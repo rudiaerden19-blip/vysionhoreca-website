@@ -74,8 +74,8 @@ function HeroSection() {
   return (
     <section className="hero-gradient min-h-screen flex items-center pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center max-w-4xl mx-auto">
-          {/* Content */}
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left content */}
           <div className="opacity-0 animate-fadeInUp">
             <p className="text-accent font-semibold tracking-widest uppercase mb-4">
               ALLES-IN-ÉÉN KASSAPLATFORM
@@ -83,32 +83,65 @@ function HeroSection() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
               Zet de toon in jouw horecazaak
             </h1>
-            <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-              Het complete kassasysteem voor frituren, restaurants en cafés. 
+            <p className="text-xl text-gray-300 mb-8 max-w-lg">
+              Vysion Horeca is het complete kassasysteem voor frituren, restaurants en cafés. 
               Kassa, online bestellingen, facturatie en personeelsbeheer - allemaal in één platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+            <div className="flex flex-col sm:flex-row gap-4">
               <a href="#demo" className="btn-primary text-center">
                 Start gratis proefperiode
               </a>
               <a href="#functies" className="btn-outline text-center">
-                Bekijk functies
+                Bekijk demo
               </a>
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 mt-4 text-sm">
               30 dagen gratis • Geen creditcard nodig • Direct aan de slag
             </p>
           </div>
 
-          {/* App Screenshot - centered below */}
-          <div className="opacity-0 animate-fadeInUp delay-300 mt-16">
-            <div className="relative inline-block">
-              <div className="absolute -inset-4 bg-gradient-to-r from-accent/20 to-primary/20 rounded-3xl blur-xl"></div>
-              <img 
-                src="https://i.imgur.com/IvW3RiX.png" 
-                alt="Vysion Horeca Kassa" 
-                className="relative rounded-2xl shadow-2xl w-full max-w-4xl border border-gray-700"
-              />
+          {/* Right content - Device mockup */}
+          <div className="opacity-0 animate-fadeInUp delay-200 relative">
+            <div className="relative">
+              {/* Main device */}
+              <div className="bg-gray-800 rounded-3xl p-4 shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500">
+                <div className="bg-gray-900 rounded-2xl overflow-hidden aspect-[4/3]">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <span className="text-white font-medium text-lg">Kassa</span>
+                      <span className="text-green-400 text-sm">● Online</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      {['Friet', 'Burger', 'Cola', 'Stoofvlees', 'Frikandel', 'Bier'].map((item, i) => (
+                        <div key={i} className="bg-primary hover:bg-primary-light rounded-xl p-4 text-center text-white font-medium transition-colors cursor-pointer">
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-6 flex justify-between items-center">
+                      <span className="text-gray-400">Totaal:</span>
+                      <span className="text-3xl font-bold text-white">€24,50</span>
+                    </div>
+                    <button className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white py-4 rounded-xl font-semibold text-lg transition-colors">
+                      Betalen
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Floating payment terminal */}
+              <div className="absolute -right-4 -bottom-4 bg-gray-800 rounded-xl p-3 shadow-xl opacity-0 animate-fadeIn delay-400">
+                <div className="w-20 h-28 bg-gray-900 rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-green-500 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-white text-xs">Betaald</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
