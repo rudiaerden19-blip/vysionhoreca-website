@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 
 // Navigation Component
@@ -159,7 +159,7 @@ function FeaturesSection() {
         </svg>
       ),
       title: 'Online bestellen',
-      description: 'Eigen webshop voor afhaal en levering. Klanten bestellen, jij ontvangt direct in de kassa.',
+      description: 'Online bestelplatform met landing pagina voor afhaal en levering. Klanten bestellen, jij ontvangt direct in de kassa.',
     },
     {
       icon: (
@@ -168,7 +168,7 @@ function FeaturesSection() {
         </svg>
       ),
       title: 'Real-time rapporten',
-      description: 'Directe inzichten in omzet, populaire producten en drukke uren. Data-gedreven beslissingen.',
+      description: 'Realtime X en Z rapporten. Directe inzichten in omzet, populaire producten en drukke uren. Data-gedreven beslissingen.',
     },
     {
       icon: (
@@ -177,7 +177,7 @@ function FeaturesSection() {
         </svg>
       ),
       title: 'Betalingen',
-      description: 'Geïntegreerde betaalterminal. Bancontact, Visa, Mastercard - alles in één systeem.',
+      description: 'Geïntegreerde betaalterminal. Bancontact, Visa, Mastercard, Mollie, Stripe - alles in één systeem.',
     },
     {
       icon: (
@@ -185,8 +185,8 @@ function FeaturesSection() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
-      title: 'Facturatie',
-      description: 'Professionele facturen met één klik. Automatisch gekoppeld aan je boekhouding.',
+      title: 'Facturatie & Peppol',
+      description: 'Professionele Peppol facturen met één klik. Automatisch gekoppeld aan je boekhouding. B2B verzending.',
     },
     {
       icon: (
@@ -195,18 +195,45 @@ function FeaturesSection() {
         </svg>
       ),
       title: 'Personeelsbeheer',
-      description: 'Urenregistratie, rollen en permissies. Weet precies wie wat heeft gedaan.',
+      description: 'Urenregistratie, rollen en permissies. Je weet precies wie wat heeft gedaan. Klaar voor afgifte loonkantoor.',
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+      title: 'Keukenbeeldscherm',
+      description: 'Real-time bestellingen in de keuken. Efficiënt en overzichtelijk werken.',
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      ),
+      title: 'Klantenkaart & Loyaliteit',
+      description: 'Bouw klantrelaties op met spaarpunten en persoonlijke aanbiedingen.',
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      ),
+      title: 'GKS Gecertificeerd',
+      description: '100% conform de Belgische fiscale wetgeving. Geen zorgen, altijd in orde.',
     },
   ]
 
   return (
-    <section id="functies" className="py-24 bg-gray-50">
+    <section id="functies" className="py-24 bg-dark">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Alles wat je nodig hebt
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Eén platform voor al je horecabehoeften. Geen losse systemen, geen gedoe.
           </p>
         </div>
@@ -215,9 +242,9 @@ function FeaturesSection() {
           {features.map((feature, index) => (
             <div 
               key={index}
-              className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow duration-300"
+              className="bg-white rounded-2xl p-8 shadow-[0_4px_15px_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.3)] transition-shadow duration-300"
             >
-              <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6">
+              <div className="w-14 h-14 bg-accent rounded-xl flex items-center justify-center text-white mb-6">
                 {feature.icon}
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
@@ -238,7 +265,7 @@ function FeaturesSection() {
 function StatsSection() {
   const stats = [
     { value: '€2.5M+', label: 'Verwerkt per maand' },
-    { value: '50+', label: 'Actieve horecazaken' },
+    { value: '500+', label: 'Actieve horecazaken' },
     { value: '99.9%', label: 'Uptime garantie' },
     { value: '24/7', label: 'Support beschikbaar' },
   ]
@@ -277,55 +304,88 @@ function PricingSection() {
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
+          {/* Light Plan */}
           <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-            <div className="grid md:grid-cols-2">
-              {/* Left - Price */}
-              <div className="p-8 lg:p-12 bg-primary text-white">
-                <p className="text-primary-light font-medium mb-2">Alles-in-één</p>
-                <div className="flex items-baseline mb-4">
-                  <span className="text-5xl font-bold">€89</span>
-                  <span className="text-xl ml-2">/maand</span>
-                </div>
-                <p className="text-gray-300 mb-8">
-                  Per locatie, onbeperkt aantal gebruikers
-                </p>
-                <a 
-                  href="#demo" 
-                  className="block w-full bg-white text-primary text-center py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-                >
-                  Start 30 dagen gratis
-                </a>
-                <p className="text-center text-sm text-gray-300 mt-4">
-                  Geen creditcard nodig
-                </p>
+            <div className="p-8 lg:p-10">
+              <p className="text-gray-500 font-medium mb-2">Light</p>
+              <div className="flex items-baseline mb-4">
+                <span className="text-5xl font-bold text-gray-900">€49</span>
+                <span className="text-xl text-gray-500 ml-2">/maand</span>
               </div>
+              <p className="text-gray-500 mb-8">
+                Per licentie
+              </p>
+              <a 
+                href="#demo" 
+                className="block w-full bg-gray-900 text-white text-center py-4 rounded-full font-semibold hover:bg-gray-800 transition-colors mb-8"
+              >
+                Start 7 dagen gratis
+              </a>
+              <p className="font-semibold text-gray-900 mb-4">Inbegrepen:</p>
+              <ul className="space-y-3">
+                {[
+                  'Volledige kassa functionaliteit',
+                  'Real-time rapporten',
+                  'Producten & categorieën',
+                  'Betaalterminal integratie',
+                  'Voorraad',
+                  'Email & telefoon support',
+                ].map((feature, index) => (
+                  <li key={index} className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
 
-              {/* Right - Features */}
-              <div className="p-8 lg:p-12">
-                <p className="font-semibold text-gray-900 mb-6">Inbegrepen:</p>
-                <ul className="space-y-4">
-                  {[
-                    'Volledige kassa functionaliteit',
-                    'Online bestelwebsite',
-                    'Facturatie & boekhouding export',
-                    'Personeelsbeheer & urenregistratie',
-                    'Real-time rapporten & analytics',
-                    'Onbeperkte producten & categorieën',
-                    'Betaalterminal integratie',
-                    'Klantenkaart & loyaliteit',
-                    'Keukenbeeldscherm (KDS)',
-                    'Email & telefoon support',
-                  ].map((feature, index) => (
-                    <li key={index} className="flex items-center">
-                      <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+          {/* Pro Plan */}
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-accent relative">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-accent text-white px-6 py-2 rounded-b-xl font-semibold text-sm">
+              Meest gekozen
+            </div>
+            <div className="p-8 lg:p-10 pt-14">
+              <p className="text-accent font-medium mb-2">Pro</p>
+              <div className="flex items-baseline mb-4">
+                <span className="text-5xl font-bold text-gray-900">€89</span>
+                <span className="text-xl text-gray-500 ml-2">/maand</span>
               </div>
+              <p className="text-gray-500 mb-8">
+                Per licentie
+              </p>
+              <a 
+                href="#demo" 
+                className="block w-full bg-accent text-white text-center py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors mb-8"
+              >
+                Start 7 dagen gratis
+              </a>
+              <p className="font-semibold text-gray-900 mb-4">Alles van Light, plus:</p>
+              <ul className="space-y-3">
+                {[
+                  'Online bestelplatform',
+                  'Personeel & urenregistratie',
+                  'Onbeperkte producten & categorieën',
+                  'Klantenkaart & loyaliteit',
+                  'Keukenbeeldscherm software',
+                  'Maandelijkse bedrijfsanalyse',
+                  'Landingspagina',
+                  'Tijdsregistratie personeel',
+                  'Peppol facturatieprogramma',
+                  'SCARDA boekhoudsoftware',
+                  'Beschikbaar in 9 talen',
+                ].map((feature, index) => (
+                  <li key={index} className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-gray-700">{feature}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
@@ -334,10 +394,154 @@ function PricingSection() {
   )
 }
 
+// Industry Section
+function IndustrySection() {
+  const [activeTab, setActiveTab] = useState('restaurant')
+  const [showLightbox, setShowLightbox] = useState(false)
+  
+  const industries = {
+    restaurant: {
+      title: 'Snellere en betere service.',
+      description: 'Verhoog je omzet en tafelrotatie en bied gasten de beste service.',
+      image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    },
+    frituur: {
+      title: 'Snelle afhandeling, tevreden klanten.',
+      description: 'Bestellingen razendsnel verwerken tijdens piekuren. Geen wachtrijen meer. Alles perfect geïntegreerd in de kassa.',
+      image: 'https://i.imgur.com/ZJUI9VI.png',
+    },
+    analyse: {
+      title: 'Inzicht in je cijfers.',
+      description: 'Realtime bedrijfsanalyse. Weet precies hoe je zaak presteert.',
+      image: 'https://i.imgur.com/xFIDs6L.png',
+    },
+  }
+
+  const current = industries[activeTab as keyof typeof industries]
+
+  return (
+    <section className="py-24 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Tabs */}
+        <div className="flex gap-8 mb-12">
+          {[
+            { id: 'restaurant', label: 'Restaurant' },
+            { id: 'frituur', label: 'Online bestelplatform' },
+            { id: 'analyse', label: 'Bedrijfsanalyse' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`text-lg font-semibold pb-2 border-b-4 transition-colors ${
+                activeTab === tab.id
+                  ? 'text-accent border-accent'
+                  : 'text-gray-400 border-transparent hover:text-gray-600'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left content */}
+          <div>
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+              {current.title}
+            </h2>
+            <p className="text-xl text-gray-600 mb-8">
+              {current.description}
+            </p>
+            <a
+              href="#demo"
+              className="inline-block border-2 border-accent text-accent px-8 py-4 rounded-full font-semibold hover:bg-accent hover:text-white transition-all"
+            >
+              Meer info
+            </a>
+          </div>
+
+          {/* Right content - Image */}
+          <div className="relative text-center">
+            <img
+              src={current.image}
+              alt={activeTab}
+              className="w-full h-auto max-h-[700px] object-contain rounded-2xl shadow-xl scale-110 cursor-pointer"
+              onClick={() => setShowLightbox(true)}
+            />
+            <p className="text-gray-500 text-sm mt-4">Klik om te vergroten</p>
+          </div>
+        </div>
+
+        {/* Lightbox Modal */}
+        {showLightbox && (
+          <div 
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
+            onClick={() => setShowLightbox(false)}
+          >
+            <img
+              src={current.image}
+              alt={activeTab}
+              className="max-w-full max-h-full object-contain"
+            />
+            <button 
+              className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
+              onClick={() => setShowLightbox(false)}
+            >
+              ×
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
 // Testimonial Section
 function TestimonialSection() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  
+  const testimonials = [
+    {
+      quote: "Eindelijk eens een platform waar alles in elkaar zit. Ik heb mijn andere abonnementen allemaal opgezegd en heb nu alles in één voor een fractie van de prijs.",
+      author: "Marc V.",
+      role: "Frituur eigenaar",
+    },
+    {
+      quote: "De online bestelmodule heeft onze omzet met 40% verhoogd. Klanten vinden het geweldig.",
+      author: "Sarah D.",
+      role: "Restaurant manager",
+    },
+    {
+      quote: "Support reageert binnen 5 minuten. Dat heb ik bij geen enkele andere leverancier.",
+      author: "Kevin L.",
+      role: "Café uitbater",
+    },
+    {
+      quote: "De beste investering die ik ooit heb gedaan voor mijn zaak. Alles werkt perfect samen en de klantenservice is top.",
+      author: "Lisa M.",
+      role: "Bakkerij eigenaar",
+    },
+    {
+      quote: "终于有一个用我自己语言的收银系统了！我找了好多年，终于找到了！",
+      author: "王伟",
+      role: "中餐厅老板",
+    },
+    {
+      quote: "I've never had such a fast POS system. They even update overnight - I just press OK in the morning and the features I requested are already there!",
+      author: "James T.",
+      role: "Fish & Chips Owner",
+    },
+  ]
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % testimonials.length)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [testimonials.length])
+
   return (
-    <section className="py-24 bg-gray-50">
+    <section className="py-24 bg-gray-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -345,41 +549,45 @@ function TestimonialSection() {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            {
-              quote: "Eindelijk een kassasysteem dat doet wat het moet doen. Simpel, snel en betrouwbaar.",
-              author: "Marc V.",
-              role: "Frituur eigenaar",
-            },
-            {
-              quote: "De online bestelmodule heeft onze omzet met 40% verhoogd. Klanten vinden het geweldig.",
-              author: "Sarah D.",
-              role: "Restaurant manager",
-            },
-            {
-              quote: "Support reageert binnen 5 minuten. Dat heb ik bij geen enkele andere leverancier.",
-              author: "Kevin L.",
-              role: "Café uitbater",
-            },
-          ].map((testimonial, index) => (
-            <div key={index} className="bg-white rounded-2xl p-8 shadow-sm">
-              <div className="flex mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
+        <div className="relative">
+          <div 
+            className="flex transition-transform duration-700 ease-in-out"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="w-full flex-shrink-0 px-4">
+                <div className="bg-white rounded-2xl p-8 shadow-sm max-w-2xl mx-auto">
+                  <div className="flex mb-4 justify-center">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-gray-700 mb-6 italic text-center text-lg">
+                    &ldquo;{testimonial.quote}&rdquo;
+                  </p>
+                  <div className="text-center">
+                    <p className="font-semibold text-gray-900">{testimonial.author}</p>
+                    <p className="text-sm text-gray-500">{testimonial.role}</p>
+                  </div>
+                </div>
               </div>
-              <p className="text-gray-700 mb-6 italic">
-                &ldquo;{testimonial.quote}&rdquo;
-              </p>
-              <div>
-                <p className="font-semibold text-gray-900">{testimonial.author}</p>
-                <p className="text-sm text-gray-500">{testimonial.role}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          
+          {/* Dots indicator */}
+          <div className="flex justify-center mt-8 gap-2">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full transition-colors ${
+                  currentSlide === index ? 'bg-accent' : 'bg-gray-300'
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -389,8 +597,9 @@ function TestimonialSection() {
 // CTA Section
 function CTASection() {
   return (
-    <section id="demo" className="bg-dark py-24">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <section id="demo" className="py-24 relative" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+      <div className="absolute inset-0 bg-black/70"></div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
           Klaar om te groeien?
         </h2>
@@ -566,6 +775,7 @@ export default function HomePage() {
       <FeaturesSection />
       <StatsSection />
       <PricingSection />
+      <IndustrySection />
       <TestimonialSection />
       <CTASection />
       <ContactSection />
