@@ -77,13 +77,13 @@ function HeroSection() {
       <div 
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80)',
+          backgroundImage: 'url(https://i.imgur.com/IvW3RiX.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/70"></div>
+        {/* Dark overlay - lighter to show the app */}
+        <div className="absolute inset-0 bg-black/50"></div>
       </div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
