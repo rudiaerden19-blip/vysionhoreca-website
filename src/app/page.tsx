@@ -72,7 +72,7 @@ function Navigation() {
 // Hero Section
 function HeroSection() {
   return (
-    <section className="hero-gradient min-h-screen flex items-center pt-20">
+    <section className="bg-[#f5f5f5] min-h-screen flex items-center pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left content */}
@@ -80,10 +80,10 @@ function HeroSection() {
             <p className="text-accent font-semibold tracking-widest uppercase mb-4 text-sm sm:text-base">
               ALLES-IN-ÉÉN KASSAPLATFORM
             </p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
               Zet de toon in jouw horecazaak
             </h1>
-            <p className="text-lg sm:text-xl text-gray-300 mb-8 max-w-lg mx-auto lg:mx-0">
+            <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
               Vysion Horeca is het complete kassasysteem voor frituren, restaurants en cafés. 
               Kassa, online bestellingen, facturatie en personeelsbeheer - allemaal in één platform.
             </p>
@@ -91,7 +91,7 @@ function HeroSection() {
               <a href="#demo" className="btn-primary text-center">
                 Start gratis proefperiode
               </a>
-              <a href="#functies" className="btn-outline text-center">
+              <a href="#functies" className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all text-center">
                 Bekijk demo
               </a>
             </div>
@@ -100,13 +100,21 @@ function HeroSection() {
             </p>
           </div>
 
-          {/* Right content - App screenshot */}
+          {/* Right content - iPad with app screenshot */}
           <div className="opacity-0 animate-fadeInUp delay-200">
-            <div className="relative w-full max-w-sm sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto lg:mx-0">
+            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto lg:mx-0">
+              {/* iPad Stand */}
+              <img 
+                src="https://i.imgur.com/mHqvsrr.png" 
+                alt="iPad Kassa Stand" 
+                className="w-full"
+              />
+              {/* App Screenshot on screen */}
               <img 
                 src="https://i.imgur.com/IvW3RiX.png" 
                 alt="Vysion Horeca Kassa" 
-                className="w-full rounded-2xl shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500 border border-gray-700"
+                className="absolute top-[4%] left-[8%] w-[84%] rounded-sm"
+                style={{ height: '52%', objectFit: 'cover' }}
               />
             </div>
           </div>
