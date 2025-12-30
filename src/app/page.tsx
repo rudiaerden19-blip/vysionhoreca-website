@@ -77,13 +77,13 @@ function HeroSection() {
       <div 
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: 'url(https://i.imgur.com/IvW3RiX.png)',
+          backgroundImage: 'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        {/* Dark overlay - lighter to show the app */}
-        <div className="absolute inset-0 bg-black/50"></div>
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/60"></div>
       </div>
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -113,48 +113,14 @@ function HeroSection() {
             </p>
           </div>
 
-          {/* Right content - Device mockup */}
-          <div className="opacity-0 animate-fadeInUp delay-200 relative">
+          {/* Right content - Real app screenshot */}
+          <div className="opacity-0 animate-fadeInUp delay-200">
             <div className="relative">
-              {/* Main device */}
-              <div className="bg-gray-800 rounded-3xl p-4 shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                <div className="bg-gray-900 rounded-2xl overflow-hidden aspect-[4/3]">
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-white font-medium">Kassa</span>
-                      <span className="text-green-400 text-sm">● Online</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['Friet', 'Burger', 'Cola', 'Stoofvlees', 'Frikandel', 'Bier'].map((item, i) => (
-                        <div key={i} className="bg-primary hover:bg-primary-light rounded-lg p-3 text-center text-white text-sm transition-colors cursor-pointer">
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-4 flex justify-between items-center">
-                      <span className="text-gray-400">Totaal:</span>
-                      <span className="text-2xl font-bold text-white">€24,50</span>
-                    </div>
-                    <button className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition-colors">
-                      Betalen
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Floating payment terminal */}
-              <div className="absolute -right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 rounded-xl p-3 shadow-xl opacity-0 animate-fadeIn delay-400">
-                <div className="w-20 h-32 bg-gray-900 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-green-500 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span className="text-white text-xs">Betaald</span>
-                  </div>
-                </div>
-              </div>
+              <img 
+                src="https://i.imgur.com/IvW3RiX.png" 
+                alt="Vysion Horeca Kassa" 
+                className="rounded-2xl shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-500 w-full max-w-2xl"
+              />
             </div>
           </div>
         </div>
