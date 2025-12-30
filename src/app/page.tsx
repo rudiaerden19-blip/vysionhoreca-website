@@ -102,19 +102,20 @@ function HeroSection() {
 
           {/* Right content - iPad with app screenshot */}
           <div className="opacity-0 animate-fadeInUp delay-200">
-            <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto lg:mx-0">
+            <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto lg:mx-0 bg-dark rounded-3xl p-4">
               {/* iPad Stand */}
               <img 
                 src="https://i.imgur.com/d4q59Vk.png" 
                 alt="iPad Kassa Stand" 
-                className="w-full"
+                className="w-full mix-blend-multiply"
+                style={{ filter: 'brightness(1.1)' }}
               />
               {/* App Screenshot on screen */}
               <img 
                 src="https://i.imgur.com/IvW3RiX.png" 
                 alt="Vysion Horeca Kassa" 
-                className="absolute top-[8%] left-[11%] w-[78%] h-auto rounded-sm"
-                style={{ maxHeight: '42%' }}
+                className="absolute top-[12%] left-[15%] w-[70%] h-auto rounded-sm"
+                style={{ maxHeight: '38%' }}
               />
             </div>
           </div>
