@@ -77,15 +77,31 @@ function HeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left content */}
           <div className="opacity-0 animate-fadeInUp text-center lg:text-left">
-            <p className="text-accent font-semibold tracking-widest uppercase mb-4 text-sm sm:text-base">
-              ALLES-IN-ÉÉN KASSAPLATFORM
-            </p>
+            <div className="flex justify-center gap-16 mb-8" style={{ marginTop: '-2.5rem' }}>
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span className="text-accent font-bold text-sm uppercase">1 Platform</span>
+              </div>
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span className="text-accent font-bold text-sm uppercase">Alles geregeld</span>
+              </div>
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span className="text-accent font-bold text-sm uppercase">Voor horecaondernemers</span>
+              </div>
+            </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
               Zet de toon in jouw horecazaak
             </h1>
             <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
-              Vysion Horeca is het complete kassasysteem voor frituren, restaurants en cafés. 
-              Kassa, online bestellingen, facturatie en personeelsbeheer - allemaal in één platform.
+              Ontstaan uit de praktijk, gemaakt door en voor horecaondernemers. Perfect voor frituren, cafés, restaurants, slagers en bakkers. Een alles-in-één platform met een GKS-gecertificeerde kassa, een eigen bestelplatform en professionele SCARDA-boekhoudsoftware met Peppol-facturatie en zoveel meer, conform de wetgeving in België én meer dan 20 andere landen.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <a href="#demo" className="btn-primary text-center">
@@ -95,8 +111,8 @@ function HeroSection() {
                 Bekijk demo
               </a>
             </div>
-            <p className="text-gray-500 mt-4 text-sm">
-              30 dagen gratis • Geen creditcard nodig • Direct aan de slag
+            <p className="text-gray-500 mt-4 text-sm" style={{ paddingLeft: '85px' }}>
+              Gratis testen 7 dagen • Direct aan de slag
             </p>
           </div>
 
