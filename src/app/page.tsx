@@ -105,7 +105,7 @@ function HeroSection() {
             <img 
               src="https://i.imgur.com/IvW3RiX.png" 
               alt="Vysion Horeca Kassa" 
-              className="rounded-2xl shadow-2xl max-w-xl xl:max-w-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500"
+              className="rounded-2xl shadow-2xl w-full max-w-3xl transform rotate-3 hover:rotate-0 transition-transform duration-500"
             />
           </div>
         </div>
