@@ -72,23 +72,10 @@ function Navigation() {
 // Hero Section
 function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/60"></div>
-      </div>
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left content */}
+    <section className="hero-gradient min-h-screen flex items-center pt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center max-w-4xl mx-auto">
+          {/* Content */}
           <div className="opacity-0 animate-fadeInUp">
             <p className="text-accent font-semibold tracking-widest uppercase mb-4">
               ALLES-IN-ÉÉN KASSAPLATFORM
@@ -96,30 +83,31 @@ function HeroSection() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
               Zet de toon in jouw horecazaak
             </h1>
-            <p className="text-xl text-gray-300 mb-8 max-w-lg">
-              Vysion Horeca is het complete kassasysteem voor frituren, restaurants en cafés. 
+            <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+              Het complete kassasysteem voor frituren, restaurants en cafés. 
               Kassa, online bestellingen, facturatie en personeelsbeheer - allemaal in één platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
               <a href="#demo" className="btn-primary text-center">
                 Start gratis proefperiode
               </a>
               <a href="#functies" className="btn-outline text-center">
-                Bekijk demo
+                Bekijk functies
               </a>
             </div>
-            <p className="text-gray-500 mt-4 text-sm">
+            <p className="text-gray-500 text-sm">
               30 dagen gratis • Geen creditcard nodig • Direct aan de slag
             </p>
           </div>
 
-          {/* Right content - Real app screenshot */}
-          <div className="opacity-0 animate-fadeInUp delay-200">
-            <div className="relative">
+          {/* App Screenshot - centered below */}
+          <div className="opacity-0 animate-fadeInUp delay-300 mt-16">
+            <div className="relative inline-block">
+              <div className="absolute -inset-4 bg-gradient-to-r from-accent/20 to-primary/20 rounded-3xl blur-xl"></div>
               <img 
                 src="https://i.imgur.com/IvW3RiX.png" 
                 alt="Vysion Horeca Kassa" 
-                className="rounded-2xl shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-500 w-full max-w-2xl"
+                className="relative rounded-2xl shadow-2xl w-full max-w-4xl border border-gray-700"
               />
             </div>
           </div>
