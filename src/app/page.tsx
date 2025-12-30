@@ -290,6 +290,96 @@ function StatsSection() {
   )
 }
 
+// Comparison Section
+function ComparisonSection() {
+  const features = [
+    { name: 'Kassasoftware', vysion: true, lightspeed: true, square: true, strobbo: true },
+    { name: 'Betaalterminal integratie', vysion: true, lightspeed: true, square: true, strobbo: true },
+    { name: 'Online bestelplatform', vysion: true, lightspeed: false, square: false, strobbo: false },
+    { name: 'GKS Gecertificeerd', vysion: true, lightspeed: true, square: false, strobbo: true },
+    { name: 'Boekhoudsoftware (SCARDA)', vysion: true, lightspeed: false, square: false, strobbo: false },
+    { name: 'Peppol facturatie', vysion: true, lightspeed: false, square: false, strobbo: false },
+    { name: 'Bedrijfsanalyse', vysion: true, lightspeed: 'Beperkt', square: false, strobbo: false },
+    { name: 'Keukenbeeldscherm', vysion: true, lightspeed: true, square: true, strobbo: true },
+    { name: 'Klantenkaart & loyaliteit', vysion: true, lightspeed: true, square: true, strobbo: false },
+    { name: 'Personeelsbeheer', vysion: true, lightspeed: true, square: false, strobbo: false },
+    { name: 'Tafelreservatie', vysion: true, lightspeed: true, square: false, strobbo: false },
+    { name: 'Beschikbaar in 9+ talen', vysion: true, lightspeed: false, square: false, strobbo: false },
+    { name: 'Multi-locatie', vysion: true, lightspeed: true, square: true, strobbo: false },
+  ]
+
+  const renderCheck = (value: boolean | string) => {
+    if (value === true) {
+      return <svg className="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+    } else if (value === false) {
+      return <svg className="w-6 h-6 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+    } else {
+      return <span className="text-yellow-500 text-sm font-medium">{value}</span>
+    }
+  }
+
+  return (
+    <section className="py-24 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            Vergelijk met de concurrentie
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Meer functies, lagere prijs. Ontdek waarom Vysion Horeca de beste keuze is.
+          </p>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+            <thead>
+              <tr className="bg-dark text-white">
+                <th className="px-6 py-5 text-left font-semibold">Functie</th>
+                <th className="px-6 py-5 text-center">
+                  <div className="text-accent font-bold text-lg">Vysion Horeca</div>
+                  <div className="text-sm text-gray-300">€69 - €99/maand</div>
+                </th>
+                <th className="px-6 py-5 text-center">
+                  <div className="font-semibold">Lightspeed</div>
+                  <div className="text-sm text-gray-300">€79 - €249/maand</div>
+                </th>
+                <th className="px-6 py-5 text-center">
+                  <div className="font-semibold">Square</div>
+                  <div className="text-sm text-gray-300">€60 - €165/maand</div>
+                </th>
+                <th className="px-6 py-5 text-center">
+                  <div className="font-semibold">Strobbo</div>
+                  <div className="text-sm text-gray-300">€75 - €150/maand</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {features.map((feature, index) => (
+                <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                  <td className="px-6 py-4 font-medium text-gray-900">{feature.name}</td>
+                  <td className="px-6 py-4 text-center bg-accent/5">{renderCheck(feature.vysion)}</td>
+                  <td className="px-6 py-4 text-center">{renderCheck(feature.lightspeed)}</td>
+                  <td className="px-6 py-4 text-center">{renderCheck(feature.square)}</td>
+                  <td className="px-6 py-4 text-center">{renderCheck(feature.strobbo)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="text-center mt-12">
+          <a
+            href="#contact"
+            className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-lg"
+          >
+            Start vandaag met Vysion Horeca
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // Pricing Section
 function PricingSection() {
   return (
@@ -310,7 +400,7 @@ function PricingSection() {
             <div className="p-8 lg:p-10">
               <p className="text-gray-500 font-medium mb-2">Light</p>
               <div className="flex items-baseline mb-4">
-                <span className="text-5xl font-bold text-gray-900">€49</span>
+                <span className="text-5xl font-bold text-gray-900">€69</span>
                 <span className="text-xl text-gray-500 ml-2">/maand</span>
               </div>
               <p className="text-gray-500 mb-8">
@@ -351,7 +441,7 @@ function PricingSection() {
             <div className="p-8 lg:p-10 pt-14">
               <p className="text-accent font-medium mb-2">Pro</p>
               <div className="flex items-baseline mb-4">
-                <span className="text-5xl font-bold text-gray-900">€89</span>
+                <span className="text-5xl font-bold text-gray-900">€99</span>
                 <span className="text-xl text-gray-500 ml-2">/maand</span>
               </div>
               <p className="text-gray-500 mb-8">
@@ -376,6 +466,8 @@ function PricingSection() {
                   'Tijdsregistratie personeel',
                   'Peppol facturatieprogramma',
                   'SCARDA boekhoudsoftware',
+                  'Tafelreservatie',
+                  'Tafel plattegrond',
                   'Beschikbaar in 9 talen',
                 ].map((feature, index) => (
                   <li key={index} className="flex items-center">
@@ -401,19 +493,24 @@ function IndustrySection() {
   
   const industries = {
     restaurant: {
-      title: 'Snellere en betere service.',
-      description: 'Verhoog je omzet en tafelrotatie en bied gasten de beste service.',
-      image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+      title: 'Snelle en professionele facturatie.',
+      description: 'Maak facturen aan voor klanten, creditnota\'s en meer. Koppel direct met Peppol en verstuur naar de boekhouder in een fractie van seconden.',
+      image: 'https://i.imgur.com/sFqK85O.png',
     },
     frituur: {
       title: 'Snelle afhandeling, tevreden klanten.',
-      description: 'Bestellingen razendsnel verwerken tijdens piekuren. Geen wachtrijen meer. Alles perfect geïntegreerd in de kassa.',
+      description: 'Bestellingen razendsnel verwerken tijdens piekuren. Geen wachtrijen meer. Alles perfect geïntegreerd in de kassa. Alles in realtime naar de keuken.',
       image: 'https://i.imgur.com/ZJUI9VI.png',
     },
     analyse: {
-      title: 'Inzicht in je cijfers.',
-      description: 'Realtime bedrijfsanalyse. Weet precies hoe je zaak presteert.',
+      title: 'Realtime bedrijfsanalyse.',
+      description: 'Weet precies hoe gezond jouw zaak is. Vul je vaste kosten in, aankopen van leveranciers, leasingen, huur en meer. Krijg direct een analyse in realtime over je bedrijf.',
       image: 'https://i.imgur.com/xFIDs6L.png',
+    },
+    boekhouding: {
+      title: 'Professionele boekhouding.',
+      description: 'SCARDA boekhoudsoftware volledig geïntegreerd. Altijd up-to-date. Bespaar 30% boekhoudkosten.',
+      image: 'https://i.imgur.com/A3yjDsL.png',
     },
   }
 
@@ -425,9 +522,10 @@ function IndustrySection() {
         {/* Tabs */}
         <div className="flex gap-8 mb-12">
           {[
-            { id: 'restaurant', label: 'Restaurant' },
+            { id: 'restaurant', label: 'Facturatie' },
             { id: 'frituur', label: 'Online bestelplatform' },
             { id: 'analyse', label: 'Bedrijfsanalyse' },
+            { id: 'boekhouding', label: 'Boekhouding' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -454,9 +552,9 @@ function IndustrySection() {
             </p>
             <a
               href="#demo"
-              className="inline-block border-2 border-accent text-accent px-8 py-4 rounded-full font-semibold hover:bg-accent hover:text-white transition-all"
+              className="inline-block bg-gray-900 text-white px-8 py-4 rounded-full font-semibold hover:bg-gray-800 transition-all"
             >
-              Meer info
+              Test 7 dagen gratis
             </a>
           </div>
 
@@ -611,7 +709,7 @@ function CTASection() {
             Start gratis proefperiode
           </a>
           <a href="#contact" className="btn-outline">
-            Vraag een demo aan
+            Vraag info aan
           </a>
         </div>
       </div>
@@ -635,8 +733,8 @@ function ContactSection() {
             
             <div className="space-y-6">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
@@ -649,15 +747,15 @@ function ContactSection() {
               </div>
 
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mr-4">
-                  <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Telefoon</p>
                   <a href="tel:+32123456789" className="text-gray-900 hover:text-accent">
-                    +32 (0) 12 34 56 78
+                    +32 (0) 49 21 29 9383
                   </a>
                 </div>
               </div>
@@ -668,34 +766,38 @@ function ContactSection() {
             <form className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Voornaam</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Voornaam <span className="text-red-500">*</span></label>
                   <input 
                     type="text" 
+                    required
                     className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                     placeholder="Jan"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Achternaam</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Achternaam <span className="text-red-500">*</span></label>
                   <input 
                     type="text" 
+                    required
                     className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                     placeholder="Janssen"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email <span className="text-red-500">*</span></label>
                 <input 
                   type="email" 
+                  required
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                   placeholder="jan@voorbeeld.be"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Bericht</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Bericht <span className="text-red-500">*</span></label>
                 <textarea 
                   rows={4}
+                  required
                   className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"
                   placeholder="Vertel ons over je horecazaak..."
                 />
@@ -714,6 +816,60 @@ function ContactSection() {
   )
 }
 
+// Cookie Banner
+function CookieBanner() {
+  const [showBanner, setShowBanner] = useState(true)
+  const [accepted, setAccepted] = useState(false)
+
+  useEffect(() => {
+    const cookieConsent = localStorage.getItem('cookieConsent')
+    if (cookieConsent) {
+      setShowBanner(false)
+      setAccepted(cookieConsent === 'accepted')
+    }
+  }, [])
+
+  const acceptCookies = () => {
+    localStorage.setItem('cookieConsent', 'accepted')
+    setShowBanner(false)
+    setAccepted(true)
+  }
+
+  const declineCookies = () => {
+    localStorage.setItem('cookieConsent', 'declined')
+    setShowBanner(false)
+  }
+
+  if (!showBanner) return null
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 bg-dark text-white p-4 md:p-6 z-50 shadow-2xl border-t border-gray-700">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex-1">
+          <p className="text-sm md:text-base">
+            🍪 Wij gebruiken cookies om je ervaring te verbeteren. Door verder te gaan ga je akkoord met ons{' '}
+            <a href="/juridisch/cookies" className="text-accent hover:underline">cookiebeleid</a>.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={declineCookies}
+            className="px-4 py-2 text-sm border border-gray-500 rounded-full hover:bg-gray-700 transition-colors"
+          >
+            Weigeren
+          </button>
+          <button
+            onClick={acceptCookies}
+            className="px-6 py-2 text-sm bg-accent text-white rounded-full hover:bg-accent/90 transition-colors font-semibold"
+          >
+            Accepteren
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Footer
 function Footer() {
   return (
@@ -729,7 +885,16 @@ function Footer() {
               </span>
             </div>
             <p className="text-gray-400 max-w-md">
-              Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie en meer - allemaal in één platform.
+              Vysion Horeca is een onderdeel van de Vysion Group International.
+              <br /><br />
+              <strong className="text-gray-300">Adres:</strong><br />
+              Vysion Group International<br />
+              Siberiëstraat 24<br />
+              3900 Pelt, België
+              <br /><br />
+              <a href="https://www.vysionapps.io" target="_blank" className="text-accent hover:underline">www.vysionapps.io</a>
+              <br />
+              <a href="https://www.vysionhoreca.com" target="_blank" className="text-accent hover:underline">www.vysionhoreca.com</a>
             </p>
           </div>
 
@@ -748,7 +913,8 @@ function Footer() {
             <ul className="space-y-2">
               <li><a href="#over-ons" className="text-gray-400 hover:text-white transition-colors">Over ons</a></li>
               <li><a href="#contact" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy</a></li>
+              <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy</a></li>
+              <li><a href="/juridisch" className="text-gray-400 hover:text-white transition-colors">Juridisch</a></li>
             </ul>
           </div>
         </div>
@@ -775,11 +941,13 @@ export default function HomePage() {
       <FeaturesSection />
       <StatsSection />
       <PricingSection />
+      <ComparisonSection />
       <IndustrySection />
       <TestimonialSection />
       <CTASection />
       <ContactSection />
       <Footer />
+      <CookieBanner />
     </main>
   )
 }
