@@ -100,13 +100,23 @@ function HeroSection() {
             </p>
           </div>
 
-          {/* Right content - Real app screenshot */}
+          {/* Right content - iPad with app screenshot */}
           <div className="opacity-0 animate-fadeInUp delay-200">
-            <img 
-              src="https://i.imgur.com/IvW3RiX.png" 
-              alt="Vysion Horeca Kassa" 
-              className="rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto lg:mx-0 transform rotate-1 sm:rotate-2 lg:rotate-3 hover:rotate-0 transition-transform duration-500"
-            />
+            <div className="relative w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto lg:mx-0">
+              {/* iPad Stand */}
+              <img 
+                src="https://i.imgur.com/d4q59Vk.png" 
+                alt="iPad Kassa Stand" 
+                className="w-full"
+              />
+              {/* App Screenshot on screen */}
+              <img 
+                src="https://i.imgur.com/IvW3RiX.png" 
+                alt="Vysion Horeca Kassa" 
+                className="absolute top-[8%] left-[11%] w-[78%] h-auto rounded-sm"
+                style={{ maxHeight: '42%' }}
+              />
+            </div>
           </div>
         </div>
       </div>
