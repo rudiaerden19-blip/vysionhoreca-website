@@ -113,8 +113,8 @@ function HeroSection() {
               <img 
                 src="https://i.imgur.com/IvW3RiX.png" 
                 alt="Vysion Horeca Kassa" 
-                className="absolute top-[4%] left-[8%] w-[84%] rounded-sm"
-                style={{ height: '52%', objectFit: 'cover' }}
+                className="absolute top-[4%] left-[9%] w-[82%] rounded-lg"
+                style={{ height: '53%', objectFit: 'fill' }}
               />
             </div>
           </div>
