@@ -113,49 +113,13 @@ function HeroSection() {
             </p>
           </div>
 
-          {/* Right content - Device mockup */}
-          <div className="opacity-0 animate-fadeInUp delay-200 relative">
-            <div className="relative">
-              {/* Main device */}
-              <div className="bg-gray-800 rounded-3xl p-4 shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                <div className="bg-gray-900 rounded-2xl overflow-hidden aspect-[4/3]">
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <span className="text-white font-medium text-lg">Kassa</span>
-                      <span className="text-green-400 text-sm">● Online</span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      {['Friet', 'Burger', 'Cola', 'Stoofvlees', 'Frikandel', 'Bier'].map((item, i) => (
-                        <div key={i} className="bg-primary hover:bg-primary-light rounded-xl p-4 text-center text-white font-medium transition-colors cursor-pointer">
-                          {item}
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-6 flex justify-between items-center">
-                      <span className="text-gray-400">Totaal:</span>
-                      <span className="text-3xl font-bold text-white">€24,50</span>
-                    </div>
-                    <button className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white py-4 rounded-xl font-semibold text-lg transition-colors">
-                      Betalen
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Floating payment terminal */}
-              <div className="absolute -right-4 -bottom-4 bg-gray-800 rounded-xl p-3 shadow-xl opacity-0 animate-fadeIn delay-400">
-                <div className="w-20 h-28 bg-gray-900 rounded-lg flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-green-500 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span className="text-white text-xs">Betaald</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Right content - Real app screenshot */}
+          <div className="opacity-0 animate-fadeInUp delay-200 hidden lg:block">
+            <img 
+              src="https://i.imgur.com/IvW3RiX.png" 
+              alt="Vysion Horeca Kassa" 
+              className="rounded-xl shadow-2xl max-w-md xl:max-w-lg"
+            />
           </div>
         </div>
       </div>
