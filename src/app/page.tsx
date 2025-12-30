@@ -74,20 +74,20 @@ function HeroSection() {
   return (
     <section className="hero-gradient min-h-screen flex items-center pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left content */}
-          <div className="opacity-0 animate-fadeInUp">
-            <p className="text-accent font-semibold tracking-widest uppercase mb-4">
+          <div className="opacity-0 animate-fadeInUp text-center lg:text-left">
+            <p className="text-accent font-semibold tracking-widest uppercase mb-4 text-sm sm:text-base">
               ALLES-IN-ÉÉN KASSAPLATFORM
             </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
               Zet de toon in jouw horecazaak
             </h1>
-            <p className="text-xl text-gray-300 mb-8 max-w-lg">
+            <p className="text-lg sm:text-xl text-gray-300 mb-8 max-w-lg mx-auto lg:mx-0">
               Vysion Horeca is het complete kassasysteem voor frituren, restaurants en cafés. 
               Kassa, online bestellingen, facturatie en personeelsbeheer - allemaal in één platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <a href="#demo" className="btn-primary text-center">
                 Start gratis proefperiode
               </a>
@@ -101,11 +101,11 @@ function HeroSection() {
           </div>
 
           {/* Right content - Real app screenshot */}
-          <div className="opacity-0 animate-fadeInUp delay-200 hidden lg:block">
+          <div className="opacity-0 animate-fadeInUp delay-200">
             <img 
               src="https://i.imgur.com/IvW3RiX.png" 
               alt="Vysion Horeca Kassa" 
-              className="rounded-2xl shadow-2xl w-full max-w-3xl transform rotate-3 hover:rotate-0 transition-transform duration-500"
+              className="rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-sm sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto lg:mx-0 transform rotate-1 sm:rotate-2 lg:rotate-3 hover:rotate-0 transition-transform duration-500"
             />
           </div>
         </div>
