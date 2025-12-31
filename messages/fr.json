@@ -454,6 +454,208 @@
     "backToHome": "Retour à l'accueil",
     "backToLegal": "← Retour au Juridique",
     "backToLogin": "Retour à la connexion",
-    "home": "Accueil"
+    "home": "Accueil",
+    "anonymous": "Anonyme",
+    "noCategory": "Sans catégorie"
+  },
+  "dashboardLayout": {
+    "loading": "Chargement du tableau de bord...",
+    "signOut": "Déconnexion"
+  },
+  "dashboard": {
+    "menu": {
+      "overview": "Aperçu",
+      "orders": "Commandes",
+      "customers": "Clients",
+      "products": "Produits",
+      "reports": "Rapports",
+      "analytics": "Analyse",
+      "settings": "Paramètres"
+    }
+  },
+  "dashboardPage": {
+    "title": "Aperçu du Tableau de Bord",
+    "welcome": "Bienvenue ! Voici un aperçu de votre entreprise.",
+    "stats": {
+      "todayRevenue": "Chiffre d'affaires aujourd'hui",
+      "todayOrders": "commandes aujourd'hui",
+      "totalRevenue": "Chiffre d'affaires total",
+      "totalOrders": "commandes totales",
+      "customers": "Clients",
+      "avgPerOrder": "Moy.",
+      "perOrder": "par commande",
+      "onlineOrders": "Commandes en ligne",
+      "pending": "en attente"
+    },
+    "recentOrders": {
+      "title": "Commandes récentes",
+      "viewAll": "Voir tout →",
+      "headers": {
+        "order": "Commande",
+        "customer": "Client",
+        "type": "Type",
+        "total": "Total",
+        "status": "Statut",
+        "date": "Date"
+      },
+      "noOrders": "Aucune commande trouvée"
+    }
+  },
+  "ordersPage": {
+    "title": "Commandes",
+    "subtitle": "Afficher et gérer toutes les commandes",
+    "refresh": "Actualiser",
+    "filters": {
+      "total": "Total",
+      "online": "En ligne",
+      "pos": "Caisse",
+      "pending": "En attente"
+    },
+    "table": {
+      "order": "Commande",
+      "customer": "Client",
+      "type": "Type",
+      "payment": "Paiement",
+      "total": "Total",
+      "status": "Statut",
+      "date": "Date",
+      "details": "Détails"
+    },
+    "noOrders": "Aucune commande trouvée",
+    "modal": {
+      "title": "Commande",
+      "customer": "Client",
+      "phone": "Téléphone",
+      "type": "Type",
+      "status": "Statut",
+      "paymentMethod": "Méthode de paiement",
+      "date": "Date",
+      "address": "Adresse",
+      "notes": "Notes",
+      "items": "Articles",
+      "noItems": "Aucun article disponible",
+      "subtotal": "Sous-total",
+      "vat": "TVA",
+      "total": "Total"
+    }
+  },
+  "customersPage": {
+    "title": "Clients",
+    "subtitle": "Afficher votre base de données clients",
+    "stats": {
+      "totalCustomers": "Total clients",
+      "totalSpent": "Total dépensé",
+      "loyaltyPoints": "Points de fidélité",
+      "avgPerCustomer": "Moy. par client"
+    },
+    "search": "Rechercher par nom, email ou téléphone...",
+    "table": {
+      "customer": "Client",
+      "contact": "Contact",
+      "city": "Ville",
+      "orders": "Commandes",
+      "spent": "Dépensé",
+      "loyalty": "Fidélité",
+      "lastOrder": "Dernière commande"
+    },
+    "noCustomers": "Aucun client trouvé"
+  },
+  "productsPage": {
+    "title": "Produits & Menu",
+    "subtitle": "Gérer votre menu",
+    "stats": {
+      "totalProducts": "Total produits",
+      "categories": "Catégories",
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "filters": {
+      "all": "Tout",
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "noProducts": "Aucun produit trouvé",
+    "card": {
+      "price": "Prix",
+      "stock": "Stock",
+      "active": "Actif",
+      "inactive": "Inactif"
+    }
+  },
+  "analysisPage": {
+    "title": "Analyse commerciale",
+    "subtitle": "Aperçu de la performance de votre entreprise",
+    "kpis": {
+      "totalRevenue": "Chiffre d'affaires total",
+      "totalCosts": "Coûts totaux",
+      "netProfit": "Bénéfice net",
+      "profitMargin": "Marge bénéficiaire"
+    },
+    "sections": {
+      "revenue": "Aperçu des revenus",
+      "costs": "Répartition des coûts",
+      "trends": "Tendances"
+    }
+  },
+  "reportsPage": {
+    "title": "Rapports",
+    "subtitle": "Rapports de vente quotidiens",
+    "summary": {
+      "totalDays": "Jours rapportés",
+      "totalRevenue": "Chiffre d'affaires total",
+      "totalOrders": "Commandes totales",
+      "avgPerDay": "Moy. par jour"
+    },
+    "table": {
+      "date": "Date",
+      "orders": "Commandes",
+      "online": "En ligne",
+      "pos": "Caisse",
+      "revenue": "Chiffre d'affaires"
+    },
+    "noReports": "Aucun rapport disponible"
+  },
+  "settingsPage": {
+    "title": "Paramètres",
+    "subtitle": "Gérer votre compte et vos préférences",
+    "saved": "Paramètres enregistrés !",
+    "sections": {
+      "account": {
+        "title": "Informations du compte",
+        "subtitle": "Mettre à jour vos informations personnelles",
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "email": "Adresse email",
+        "phone": "Numéro de téléphone"
+      },
+      "business": {
+        "title": "Informations commerciales",
+        "subtitle": "Vos données commerciales",
+        "name": "Nom de l'entreprise",
+        "address": "Adresse",
+        "city": "Ville",
+        "vat": "Numéro de TVA"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Choisissez les notifications que vous souhaitez recevoir",
+        "newOrders": "Nouvelles commandes",
+        "newOrdersDesc": "Notification pour les nouvelles commandes",
+        "dailyReports": "Rapports quotidiens",
+        "dailyReportsDesc": "Résumé quotidien par email",
+        "marketing": "Marketing",
+        "marketingDesc": "Actualités et offres"
+      },
+      "help": {
+        "title": "Aide & Support",
+        "docs": "Documentation",
+        "docsDesc": "Guides et tutoriels",
+        "troubleshoot": "Dépannage",
+        "troubleshootDesc": "Résoudre les problèmes courants",
+        "contact": "Contact",
+        "contactDesc": "Contacter notre équipe support"
+      }
+    },
+    "save": "Enregistrer les modifications"
   }
 }

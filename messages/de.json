@@ -454,6 +454,208 @@
     "backToHome": "Zurück zur Startseite",
     "backToLegal": "← Zurück zu Rechtliches",
     "backToLogin": "Zurück zur Anmeldung",
-    "home": "Startseite"
+    "home": "Startseite",
+    "anonymous": "Anonym",
+    "noCategory": "Keine Kategorie"
+  },
+  "dashboardLayout": {
+    "loading": "Dashboard wird geladen...",
+    "signOut": "Abmelden"
+  },
+  "dashboard": {
+    "menu": {
+      "overview": "Übersicht",
+      "orders": "Bestellungen",
+      "customers": "Kunden",
+      "products": "Produkte",
+      "reports": "Berichte",
+      "analytics": "Analyse",
+      "settings": "Einstellungen"
+    }
+  },
+  "dashboardPage": {
+    "title": "Dashboard Übersicht",
+    "welcome": "Willkommen zurück! Hier ist eine Übersicht Ihres Geschäfts.",
+    "stats": {
+      "todayRevenue": "Umsatz heute",
+      "todayOrders": "Bestellungen heute",
+      "totalRevenue": "Gesamtumsatz",
+      "totalOrders": "Gesamtbestellungen",
+      "customers": "Kunden",
+      "avgPerOrder": "Durchschn.",
+      "perOrder": "pro Bestellung",
+      "onlineOrders": "Online-Bestellungen",
+      "pending": "ausstehend"
+    },
+    "recentOrders": {
+      "title": "Letzte Bestellungen",
+      "viewAll": "Alle anzeigen →",
+      "headers": {
+        "order": "Bestellung",
+        "customer": "Kunde",
+        "type": "Typ",
+        "total": "Gesamt",
+        "status": "Status",
+        "date": "Datum"
+      },
+      "noOrders": "Noch keine Bestellungen gefunden"
+    }
+  },
+  "ordersPage": {
+    "title": "Bestellungen",
+    "subtitle": "Alle Bestellungen anzeigen und verwalten",
+    "refresh": "Aktualisieren",
+    "filters": {
+      "total": "Gesamt",
+      "online": "Online",
+      "pos": "Kasse",
+      "pending": "Ausstehend"
+    },
+    "table": {
+      "order": "Bestellung",
+      "customer": "Kunde",
+      "type": "Typ",
+      "payment": "Zahlung",
+      "total": "Gesamt",
+      "status": "Status",
+      "date": "Datum",
+      "details": "Details"
+    },
+    "noOrders": "Keine Bestellungen gefunden",
+    "modal": {
+      "title": "Bestellung",
+      "customer": "Kunde",
+      "phone": "Telefon",
+      "type": "Typ",
+      "status": "Status",
+      "paymentMethod": "Zahlungsmethode",
+      "date": "Datum",
+      "address": "Adresse",
+      "notes": "Notizen",
+      "items": "Artikel",
+      "noItems": "Keine Artikel verfügbar",
+      "subtotal": "Zwischensumme",
+      "vat": "MwSt",
+      "total": "Gesamt"
+    }
+  },
+  "customersPage": {
+    "title": "Kunden",
+    "subtitle": "Ihre Kundendatenbank anzeigen",
+    "stats": {
+      "totalCustomers": "Gesamtkunden",
+      "totalSpent": "Gesamtausgaben",
+      "loyaltyPoints": "Treuepunkte",
+      "avgPerCustomer": "Durchschn. pro Kunde"
+    },
+    "search": "Nach Name, E-Mail oder Telefon suchen...",
+    "table": {
+      "customer": "Kunde",
+      "contact": "Kontakt",
+      "city": "Stadt",
+      "orders": "Bestellungen",
+      "spent": "Ausgaben",
+      "loyalty": "Treue",
+      "lastOrder": "Letzte Bestellung"
+    },
+    "noCustomers": "Noch keine Kunden gefunden"
+  },
+  "productsPage": {
+    "title": "Produkte & Menü",
+    "subtitle": "Verwalten Sie Ihre Speisekarte",
+    "stats": {
+      "totalProducts": "Gesamtprodukte",
+      "categories": "Kategorien",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "filters": {
+      "all": "Alle",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "noProducts": "Noch keine Produkte gefunden",
+    "card": {
+      "price": "Preis",
+      "stock": "Lager",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    }
+  },
+  "analysisPage": {
+    "title": "Geschäftsanalyse",
+    "subtitle": "Einblicke in Ihre Geschäftsleistung",
+    "kpis": {
+      "totalRevenue": "Gesamtumsatz",
+      "totalCosts": "Gesamtkosten",
+      "netProfit": "Nettogewinn",
+      "profitMargin": "Gewinnmarge"
+    },
+    "sections": {
+      "revenue": "Umsatzübersicht",
+      "costs": "Kostenaufschlüsselung",
+      "trends": "Trends"
+    }
+  },
+  "reportsPage": {
+    "title": "Berichte",
+    "subtitle": "Tägliche Verkaufsberichte und Übersichten",
+    "summary": {
+      "totalDays": "Berichtete Tage",
+      "totalRevenue": "Gesamtumsatz",
+      "totalOrders": "Gesamtbestellungen",
+      "avgPerDay": "Durchschn. pro Tag"
+    },
+    "table": {
+      "date": "Datum",
+      "orders": "Bestellungen",
+      "online": "Online",
+      "pos": "Kasse",
+      "revenue": "Umsatz"
+    },
+    "noReports": "Noch keine Berichte verfügbar"
+  },
+  "settingsPage": {
+    "title": "Einstellungen",
+    "subtitle": "Verwalten Sie Ihr Konto und Ihre Präferenzen",
+    "saved": "Einstellungen gespeichert!",
+    "sections": {
+      "account": {
+        "title": "Kontoinformationen",
+        "subtitle": "Aktualisieren Sie Ihre persönlichen Daten",
+        "firstName": "Vorname",
+        "lastName": "Nachname",
+        "email": "E-Mail-Adresse",
+        "phone": "Telefonnummer"
+      },
+      "business": {
+        "title": "Geschäftsinformationen",
+        "subtitle": "Ihre Geschäftsdaten",
+        "name": "Geschäftsname",
+        "address": "Adresse",
+        "city": "Stadt",
+        "vat": "USt-IdNr."
+      },
+      "notifications": {
+        "title": "Benachrichtigungen",
+        "subtitle": "Wählen Sie, welche Benachrichtigungen Sie erhalten möchten",
+        "newOrders": "Neue Bestellungen",
+        "newOrdersDesc": "Benachrichtigung bei neuen Bestellungen",
+        "dailyReports": "Tägliche Berichte",
+        "dailyReportsDesc": "Tägliche Zusammenfassung per E-Mail",
+        "marketing": "Marketing",
+        "marketingDesc": "Neuigkeiten und Angebote"
+      },
+      "help": {
+        "title": "Hilfe & Support",
+        "docs": "Dokumentation",
+        "docsDesc": "Anleitungen und Tutorials",
+        "troubleshoot": "Fehlerbehebung",
+        "troubleshootDesc": "Häufige Probleme lösen",
+        "contact": "Kontakt",
+        "contactDesc": "Unser Support-Team kontaktieren"
+      }
+    },
+    "save": "Änderungen speichern"
   }
 }
