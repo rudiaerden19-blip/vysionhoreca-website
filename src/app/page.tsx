@@ -71,10 +71,12 @@ function Navigation() {
 
 // Hero Section
 function HeroSection() {
+  const [lightboxImage, setLightboxImage] = useState('');
+  
   return (
-    <section className="bg-[#f5f5f5] min-h-screen flex items-center pt-20">
+    <section className="bg-[#fdfdfd] min-h-screen flex items-center pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-center">
           {/* Left content */}
           <div className="opacity-0 animate-fadeInUp text-center lg:text-left">
             <div className="flex justify-center gap-16 mb-8" style={{ marginTop: '-2.5rem' }}>
@@ -97,11 +99,11 @@ function HeroSection() {
                 <span className="text-accent font-bold text-sm uppercase">Voor horecaondernemers</span>
               </div>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-              Zet de toon in jouw horecazaak
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-6">
+              Één scherm. Volledige controle.
             </h1>
             <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
-              Ontstaan uit de praktijk, gemaakt door en voor horecaondernemers. Perfect voor frituren, cafés, restaurants, slagers en bakkers. Een alles-in-één platform met een GKS-gecertificeerde kassa, een eigen bestelplatform en professionele SCARDA-boekhoudsoftware met Peppol-facturatie en zoveel meer, conform de wetgeving in België én meer dan 20 andere landen.
+              Ontstaan uit de praktijk, gemaakt door en voor horecaondernemers. Perfect voor frituren, cafés, restaurants, slagers en bakkers. Een alles-in-één platform met een GKS-gecertificeerde kassa, een eigen bestelplatform en professionele SCARDA-boekhoudsoftware met Peppol-facturatie, volledige bedrijfsanalyse en zoveel meer, conform de wetgeving in België én meer dan 20 andere landen.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <a href="#demo" className="btn-primary text-center">
@@ -116,24 +118,78 @@ function HeroSection() {
             </p>
           </div>
 
-          {/* Right content - iPad with app screenshot */}
+          {/* Right content - iPad and vertical image slider */}
           <div className="opacity-0 animate-fadeInUp delay-200">
-            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto lg:mx-0">
-              {/* iPad Stand */}
-              <img 
-                src="https://i.imgur.com/mHqvsrr.png" 
-                alt="iPad Kassa Stand" 
-                className="w-full"
-              />
-              {/* App Screenshot on screen */}
-              <img 
-                src="https://i.imgur.com/IvW3RiX.png" 
-                alt="Vysion Horeca Kassa" 
-                className="absolute top-[4%] left-[9%] w-[82%] rounded-lg"
-                style={{ height: '53%', objectFit: 'fill' }}
-              />
+            <div className="flex items-end gap-4 justify-center lg:justify-start lg:-ml-16">
+              {/* iPad Stand with screenshot */}
+              <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+                <img 
+                  src="https://i.imgur.com/mHqvsrr.png" 
+                  alt="iPad Kassa Stand" 
+                  className="w-full"
+                />
+                {/* App Screenshot on screen */}
+                <img 
+                  src="https://i.imgur.com/IvW3RiX.png" 
+                  alt="Vysion Horeca Kassa" 
+                  className="absolute top-[4%] left-[9%] w-[82%] rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                  style={{ height: '53%', objectFit: 'fill' }}
+                  onClick={() => setLightboxImage('https://i.imgur.com/IvW3RiX.png')}
+                />
+              </div>
+              {/* Vertical Image Slider */}
+              <div className="hidden lg:flex flex-col gap-2 h-[400px] overflow-y-auto pr-2 scrollbar-thin">
+                {[
+                  'https://i.imgur.com/6X8DuuU.png',
+                  'https://i.imgur.com/lhfJfog.png',
+                  'https://i.imgur.com/2yDjxdG.png',
+                  'https://i.imgur.com/JzNBNID.png',
+                  'https://i.imgur.com/LY3pado.png',
+                  'https://i.imgur.com/WICLOFZ.png',
+                  'https://i.imgur.com/OAV1L3S.png',
+                  'https://i.imgur.com/vA8geT0.png',
+                  'https://i.imgur.com/O9GBS6s.png',
+                  'https://i.imgur.com/DOtQn1g.png',
+                  'https://i.imgur.com/jnrBtec.png',
+                  'https://i.imgur.com/IJ2vDaw.png',
+                  'https://i.imgur.com/2IzZkB3.png',
+                  'https://i.imgur.com/Pm7YSKt.png',
+                  'https://i.imgur.com/9CAo3Yr.png',
+                  'https://i.imgur.com/cIfiPmB.png',
+                  'https://i.imgur.com/HtApXus.png',
+                  'https://i.imgur.com/meXaat6.png',
+                ].map((src, index) => (
+                  <img
+                    key={index}
+                    src={src}
+                    alt={`Screenshot ${index + 1}`}
+                    className="w-[80px] h-[50px] object-cover rounded cursor-pointer hover:scale-110 transition-transform border border-gray-200 hover:border-accent"
+                    onClick={() => setLightboxImage(src)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
+
+          {/* Lightbox */}
+          {lightboxImage && (
+            <div 
+              className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
+              onClick={() => setLightboxImage('')}
+            >
+              <img 
+                src={lightboxImage} 
+                alt="Vergrote afbeelding" 
+                className="max-w-full max-h-full object-contain"
+              />
+              <button 
+                className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
+                onClick={() => setLightboxImage('')}
+              >
+                ×
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
