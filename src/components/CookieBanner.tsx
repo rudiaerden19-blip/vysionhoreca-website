@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useLanguage } from '@/i18n'
 
 export default function CookieBanner() {
   const [showBanner, setShowBanner] = useState(false)
+  const { t } = useLanguage()
 
   useEffect(() => {
     const cookieConsent = localStorage.getItem('cookieConsent')
@@ -29,8 +31,8 @@ export default function CookieBanner() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex-1">
           <p className="text-sm md:text-base">
-            🍪 Wij gebruiken cookies om je ervaring te verbeteren. Door verder te gaan ga je akkoord met ons{' '}
-            <a href="/juridisch/cookies" className="text-accent hover:underline">cookiebeleid</a>.
+            🍪 {t('cookies.message')}{' '}
+            <a href="/juridisch/cookies" className="text-accent hover:underline">{t('cookies.policy')}</a>.
           </p>
         </div>
         <div className="flex gap-3">
@@ -38,13 +40,13 @@ export default function CookieBanner() {
             onClick={declineCookies}
             className="px-4 py-2 text-sm border border-gray-500 rounded-full hover:bg-gray-700 transition-colors"
           >
-            Weigeren
+            {t('cookies.decline')}
           </button>
           <button
             onClick={acceptCookies}
             className="px-6 py-2 text-sm bg-accent text-white rounded-full hover:bg-accent/90 transition-colors font-semibold"
           >
-            Accepteren
+            {t('cookies.accept')}
           </button>
         </div>
       </div>

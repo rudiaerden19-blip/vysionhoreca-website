@@ -1,0 +1,455 @@
+{
+  "metadata": {
+    "title": "Vysion Horeca | Alles-in-één Kassa & Betaalplatform",
+    "description": "Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 7 dagen gratis."
+  },
+  "nav": {
+    "home": "Home",
+    "features": "Functies",
+    "pricing": "Prijzen",
+    "about": "Over ons",
+    "contact": "Contact",
+    "login": "Inloggen",
+    "tryFree": "Gratis proberen",
+    "language": "Taal"
+  },
+  "hero": {
+    "badge1": "1 Platform",
+    "badge2": "Gemaakt door horecaondernemers",
+    "badge3": "Gemaakt voor horecaondernemers",
+    "title": "Één scherm. Volledige controle.",
+    "description": "Ontstaan uit de praktijk, gemaakt door en voor horecaondernemers. Perfect voor frituren, cafés, restaurants, slagers en bakkers. Een alles-in-één platform met een GKS-gecertificeerde kassa, een eigen bestelplatform en professionele SCARDA-boekhoudsoftware met Peppol-facturatie, volledige bedrijfsanalyse en zoveel meer, conform de wetgeving in België én meer dan 20 andere landen.",
+    "ctaPrimary": "Start gratis proefperiode",
+    "ctaSecondary": "Bekijk demo",
+    "trialInfo": "Gratis testen 7 dagen • Direct aan de slag",
+    "clickToOpen": "Klik om te openen"
+  },
+  "features": {
+    "title": "Alles wat je nodig hebt",
+    "subtitle": "Eén platform voor al je horecabehoeften. Geen losse systemen, geen gedoe.",
+    "pos": {
+      "title": "Krachtige kassa",
+      "description": "Intuïtieve POS interface voor snelle bediening. Werkt op tablet, computer of touchscreen."
+    },
+    "online": {
+      "title": "Online bestellen",
+      "description": "Online bestelplatform met landing pagina voor afhaal en levering. Klanten bestellen, jij ontvangt direct in de kassa."
+    },
+    "reports": {
+      "title": "Real-time rapporten",
+      "description": "Realtime X en Z rapporten. Directe inzichten in omzet, populaire producten en drukke uren. Data-gedreven beslissingen."
+    },
+    "payments": {
+      "title": "Betalingen",
+      "description": "Geïntegreerde betaalterminal. Bancontact, Visa, Mastercard, Mollie, Stripe - alles in één systeem."
+    },
+    "invoicing": {
+      "title": "Facturatie & Peppol",
+      "description": "Professionele Peppol facturen met één klik. Automatisch gekoppeld aan je boekhouding. B2B verzending."
+    },
+    "staff": {
+      "title": "Personeelsbeheer",
+      "description": "Urenregistratie, rollen en permissies. Je weet precies wie wat heeft gedaan. Klaar voor afgifte loonkantoor."
+    },
+    "kitchen": {
+      "title": "Keukenbeeldscherm",
+      "description": "Real-time bestellingen in de keuken. Efficiënt en overzichtelijk werken."
+    },
+    "loyalty": {
+      "title": "Klantenkaart & Loyaliteit",
+      "description": "Bouw klantrelaties op met spaarpunten en persoonlijke aanbiedingen."
+    },
+    "gks": {
+      "title": "GKS Gecertificeerd",
+      "description": "100% conform de Belgische fiscale wetgeving. Geen zorgen, altijd in orde."
+    }
+  },
+  "stats": {
+    "processed": "Verwerkt per maand",
+    "businesses": "Actieve horecazaken",
+    "uptime": "Uptime garantie",
+    "support": "Support beschikbaar"
+  },
+  "orderApp": {
+    "title": "Alles wat je nodig hebt",
+    "subtitle": "Een compleet ecosysteem voor jouw horecazaak. Kassa, bestelapp, betaalterminal en meer.",
+    "cta": "Ontdek het volledige platform"
+  },
+  "butWait": {
+    "label": "Wacht even...",
+    "title": "Maar... Vysion gaat",
+    "titleAccent": "nog verder",
+    "subtitle": "Waar anderen gestopt zijn, gaan wij door...",
+    "features": {
+      "1": "Volg je bedrijf in realtime",
+      "2": "Open je rapporten waar je ook zit",
+      "3": "Factureer van thuis uit",
+      "4": "Pas de tijdsregistratie van het personeel aan",
+      "5": "Stuur je boekhouding door waar je ook bent",
+      "6": "Bekijk je bedrijfsanalyse in realtime",
+      "7": "Log in op je eigen webpagina",
+      "8": "Log in je bedrijf vanaf ieder toestel",
+      "9": "Bekijk in realtime je dagelijkse verkopen",
+      "10": "Beheer je kassa op afstand",
+      "11": "Pas je bestelapp aan naar jouw voorkeuren",
+      "12": "Alles in 9 talen beschikbaar voor jou"
+    }
+  },
+  "comparison": {
+    "title": "Vergelijk met andere platformen",
+    "subtitle": "Meer functies, lagere prijs. Ontdek waarom Vysion Horeca de beste keuze is.",
+    "feature": "Functie",
+    "cta": "Start vandaag met Vysion Horeca",
+    "features": {
+      "pos": "Kassasoftware",
+      "terminal": "Betaalterminal integratie",
+      "online": "Online bestelplatform",
+      "gks": "GKS Gecertificeerd",
+      "accounting": "Boekhoudsoftware (SCARDA)",
+      "peppol": "Peppol facturatie",
+      "analytics": "Bedrijfsanalyse",
+      "kitchen": "Keukenbeeldscherm",
+      "loyalty": "Klantenkaart & loyaliteit",
+      "staff": "Personeelsbeheer",
+      "reservation": "Tafelreservatie",
+      "languages": "Beschikbaar in 9+ talen",
+      "multiLocation": "Multi-locatie"
+    },
+    "limited": "Beperkt"
+  },
+  "pricing": {
+    "title": "Simpele, transparante prijzen",
+    "subtitle": "Alles inbegrepen. Geen verrassingen.",
+    "perMonth": "/maand",
+    "perLicense": "Per licentie",
+    "startTrial": "Start 7 dagen gratis",
+    "mostChosen": "Meest gekozen",
+    "included": "Inbegrepen:",
+    "allOfLight": "Alles van Light, plus:",
+    "light": {
+      "name": "Light",
+      "features": {
+        "1": "Volledige kassa functionaliteit",
+        "2": "Real-time rapporten",
+        "3": "Producten & categorieën",
+        "4": "Betaalterminal integratie",
+        "5": "Voorraad",
+        "6": "Email & telefoon support"
+      }
+    },
+    "pro": {
+      "name": "Pro",
+      "features": {
+        "1": "Online bestelplatform",
+        "2": "Personeel & urenregistratie",
+        "3": "Onbeperkte producten & categorieën",
+        "4": "Klantenkaart & loyaliteit",
+        "5": "Keukenbeeldscherm software",
+        "6": "Maandelijkse bedrijfsanalyse",
+        "7": "Landingspagina",
+        "8": "Tijdsregistratie personeel",
+        "9": "Peppol facturatieprogramma",
+        "10": "SCARDA boekhoudsoftware",
+        "11": "Tafelreservatie",
+        "12": "Tafel plattegrond",
+        "13": "Beschikbaar in 9 talen"
+      }
+    }
+  },
+  "industry": {
+    "invoicing": {
+      "tab": "Facturatie",
+      "title": "Snelle en professionele facturatie.",
+      "description": "Maak facturen aan voor klanten, creditnota's en meer. Koppel direct met Peppol en verstuur naar de boekhouder in een fractie van seconden."
+    },
+    "ordering": {
+      "tab": "Online bestelplatform",
+      "title": "Snelle afhandeling, tevreden klanten.",
+      "description": "Bestellingen razendsnel verwerken tijdens piekuren. Geen wachtrijen meer. Alles perfect geïntegreerd in de kassa. Alles in realtime naar de keuken."
+    },
+    "analytics": {
+      "tab": "Bedrijfsanalyse",
+      "title": "Realtime bedrijfsanalyse.",
+      "description": "Weet precies hoe gezond jouw zaak is. Vul je vaste kosten in, aankopen van leveranciers, leasingen, huur en meer. Krijg direct een analyse in realtime over je bedrijf."
+    },
+    "accounting": {
+      "tab": "Boekhouding",
+      "title": "Professionele boekhouding.",
+      "description": "SCARDA boekhoudsoftware volledig geïntegreerd. Altijd up-to-date. Bespaar 30% boekhoudkosten."
+    },
+    "tryFree": "Gratis testen",
+    "clickToEnlarge": "Klik om te vergroten"
+  },
+  "testimonials": {
+    "title": "Horecaondernemers vertrouwen op Vysion",
+    "quotes": {
+      "1": {
+        "quote": "Eindelijk eens een platform waar alles in elkaar zit. Ik heb mijn andere abonnementen allemaal opgezegd en heb nu alles in één voor een fractie van de prijs.",
+        "author": "Marc V.",
+        "role": "Frituur eigenaar"
+      },
+      "2": {
+        "quote": "De online bestelmodule heeft onze omzet met 40% verhoogd. Klanten vinden het geweldig.",
+        "author": "Sarah D.",
+        "role": "Restaurant manager"
+      },
+      "3": {
+        "quote": "Support reageert binnen 5 minuten. Dat heb ik bij geen enkele andere leverancier.",
+        "author": "Kevin L.",
+        "role": "Café uitbater"
+      },
+      "4": {
+        "quote": "De beste investering die ik ooit heb gedaan voor mijn zaak. Alles werkt perfect samen en de klantenservice is top.",
+        "author": "Lisa M.",
+        "role": "Bakkerij eigenaar"
+      },
+      "5": {
+        "quote": "终于有一个用我自己语言的收银系统了！我找了好多年，终于找到了！",
+        "author": "王伟",
+        "role": "中餐厅老板"
+      },
+      "6": {
+        "quote": "I've never had such a fast POS system. They even update overnight - I just press OK in the morning and the features I requested are already there!",
+        "author": "James T.",
+        "role": "Fish & Chips Owner"
+      }
+    }
+  },
+  "cta": {
+    "title": "Klaar om te groeien?",
+    "subtitle": "Start vandaag nog met Vysion Horeca. 7 dagen gratis, geen verplichtingen.",
+    "primary": "Start gratis proefperiode",
+    "secondary": "Vraag info aan"
+  },
+  "contact": {
+    "title": "Neem contact op",
+    "subtitle": "Vragen over Vysion Horeca? Ons team staat voor je klaar.",
+    "email": "Email",
+    "phone": "Telefoon",
+    "form": {
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "Email",
+      "message": "Bericht",
+      "placeholder": {
+        "firstName": "Jan",
+        "lastName": "Janssen",
+        "email": "jan@voorbeeld.be",
+        "message": "Vertel ons over je horecazaak..."
+      },
+      "submit": "Verstuur bericht",
+      "required": "*"
+    }
+  },
+  "footer": {
+    "description": "Vysion Horeca is een onderdeel van de Vysion Group International.",
+    "address": "Adres:",
+    "product": "Product",
+    "features": "Functies",
+    "pricing": "Prijzen",
+    "updates": "Updates",
+    "company": "Bedrijf",
+    "about": "Over ons",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "legal": "Juridisch",
+    "copyright": "Alle rechten voorbehouden.",
+    "designBy": "Design by Vysion"
+  },
+  "cookies": {
+    "message": "Wij gebruiken cookies om je ervaring te verbeteren. Door verder te gaan ga je akkoord met ons",
+    "policy": "cookiebeleid",
+    "accept": "Accepteren",
+    "decline": "Weigeren"
+  },
+  "login": {
+    "backToHome": "Terug naar home",
+    "selectBusiness": "Selecteer je zaak om in te loggen",
+    "chooseBusiness": "Kies je zaak",
+    "loading": "Laden...",
+    "selectPlaceholder": "-- Selecteer een zaak --",
+    "toDashboard": "Naar Dashboard →",
+    "processing": "Bezig...",
+    "demoMode": "Demo modus:",
+    "demoInfo": "Selecteer een zaak om het dashboard te bekijken. In productie wordt dit vervangen door echte authenticatie.",
+    "troubleshooting": {
+      "title": "Problemen met je kassa?",
+      "subtitle": "Bekijk onze troubleshooting gids"
+    },
+    "copyright": "Alle rechten voorbehouden."
+  },
+  "about": {
+    "heroTitle": "Over",
+    "heroTitleAccent": "Vysion",
+    "heroTitleEnd": "Horeca",
+    "heroSubtitle": "Ontstaan uit de praktijk, gebouwd door horecaondernemers, voor horecaondernemers.",
+    "story": {
+      "title": "Ons verhaal",
+      "p1": "Vysion Horeca is ontstaan uit ervaring. Als horecaondernemers merkten we dat bestaande kassasystemen te duur waren, te complex, en nooit precies deden wat we nodig hadden.",
+      "p2": "We betaalden voor vijf verschillende abonnementen: een kassa, een bestelplatform, boekhoudsoftware, een betaalterminal en analysesoftware. Niets werkte goed samen en de kosten liepen op tot honderden euro's per maand.",
+      "p3": "Daarom besloten we het zelf te bouwen. Een alles-in-één platform dat precies doet wat een horecaondernemer nodig heeft, zonder gedoe en tegen een eerlijke prijs."
+    },
+    "facts": {
+      "founded": "Opgericht in 2013",
+      "foundedDesc": "Door horecaondernemers met meer dan 15 jaar ervaring",
+      "location": "Gevestigd in België",
+      "locationDesc": "Pelt, Limburg - het hart van de Benelux",
+      "countries": "Actief in 20+ landen",
+      "countriesDesc": "Van België tot China, van Nederland tot het VK"
+    },
+    "mission": {
+      "title": "Onze missie",
+      "subtitle": "Horecaondernemers laten focussen op wat ze het beste doen: gasten verwelkomen en geweldige ervaringen creëren. De rest regelen wij.",
+      "reliability": {
+        "title": "Betrouwbaarheid",
+        "description": "99.9% uptime. Je kassa werkt altijd, ook als het internet even wegvalt."
+      },
+      "speed": {
+        "title": "Snelheid",
+        "description": "Razendsnelle updates. Vraag een functie aan en zie het de volgende dag in je systeem."
+      },
+      "personal": {
+        "title": "Persoonlijk",
+        "description": "Geen callcenters. Directe lijnen met ons team. We kennen elke klant bij naam."
+      }
+    },
+    "values": {
+      "title": "Waar we voor staan",
+      "simplicity": {
+        "title": "🎯 Eenvoud boven alles",
+        "description": "Technologie moet je helpen, niet in de weg zitten. Daarom is Vysion zo intuïtief dat je binnen 5 minuten aan de slag kunt - zonder handleiding."
+      },
+      "pricing": {
+        "title": "💰 Eerlijke prijzen",
+        "description": "Geen verborgen kosten, geen langlopende contracten, geen verrassingen. Wat je ziet is wat je betaalt."
+      },
+      "improvement": {
+        "title": "🚀 Continu verbeteren",
+        "description": "We luisteren naar onze klanten en bouwen wat zij nodig hebben. Elke week komen er nieuwe functies bij, gebaseerd op echte feedback."
+      },
+      "global": {
+        "title": "🌍 Lokaal én internationaal",
+        "description": "GKS-gecertificeerd in België, maar ook beschikbaar in 9 talen en 20+ landen. Van frituur tot sterrenrestaurant."
+      }
+    },
+    "company": {
+      "title": "Vysion Group International",
+      "p1": "Vysion Horeca is een onderdeel van de Vysion Group International, een technologiebedrijf gespecialiseerd in software voor de horeca- en retailsector.",
+      "p2": "Naast Vysion Horeca ontwikkelen we ook custom applicaties en digitale oplossingen voor bedrijven die hun processen willen automatiseren.",
+      "happyBusinesses": "Tevreden horecazaken",
+      "processedMonthly": "Verwerkt per maand",
+      "supportAvailable": "Support beschikbaar"
+    },
+    "ctaTitle": "Klaar om te starten?",
+    "ctaSubtitle": "Probeer Vysion Horeca 7 dagen gratis. Geen creditcard nodig.",
+    "ctaPrimary": "Start gratis proefperiode",
+    "ctaSecondary": "Neem contact op"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welkom terug",
+    "menu": {
+      "overview": "Overzicht",
+      "orders": "Bestellingen",
+      "customers": "Klanten",
+      "products": "Producten",
+      "reports": "Rapporten",
+      "analytics": "Analyse",
+      "settings": "Instellingen"
+    },
+    "orders": {
+      "title": "Bestellingen",
+      "noOrders": "Geen bestellingen gevonden",
+      "status": {
+        "pending": "In behandeling",
+        "completed": "Voltooid",
+        "cancelled": "Geannuleerd"
+      }
+    },
+    "customers": {
+      "title": "Klanten",
+      "noCustomers": "Geen klanten gevonden"
+    },
+    "products": {
+      "title": "Producten",
+      "noProducts": "Geen producten gevonden"
+    },
+    "reports": {
+      "title": "Rapporten"
+    },
+    "analytics": {
+      "title": "Analyse"
+    },
+    "settings": {
+      "title": "Instellingen"
+    }
+  },
+  "legal": {
+    "title": "Juridisch",
+    "subtitle": "Alle juridische documenten en voorwaarden van Vysion Horeca",
+    "backToLegal": "Terug naar juridisch overzicht",
+    "pages": {
+      "cookies": {
+        "title": "Cookiebeleid",
+        "description": "Hoe wij cookies gebruiken op onze website"
+      },
+      "privacy": {
+        "title": "Privacybeleid",
+        "description": "Hoe wij omgaan met uw persoonsgegevens"
+      },
+      "terms": {
+        "title": "Dienstenovereenkomst",
+        "description": "Algemene voorwaarden voor het gebruik van onze diensten"
+      },
+      "dpa": {
+        "title": "Verwerkersovereenkomst",
+        "description": "Data Processing Agreement conform AVG/GDPR"
+      },
+      "sla": {
+        "title": "Service Level Agreement",
+        "description": "Onze uptime garanties en service levels"
+      },
+      "aup": {
+        "title": "Aanvaardbaar Gebruik",
+        "description": "Richtlijnen voor acceptabel gebruik van onze diensten"
+      },
+      "ip": {
+        "title": "Intellectueel Eigendom",
+        "description": "Auteursrechten en licentie-informatie"
+      },
+      "trademark": {
+        "title": "Handelsmerkbeleid",
+        "description": "Gebruik van Vysion handelsmerken en branding"
+      },
+      "subprocessors": {
+        "title": "Subverwerkers",
+        "description": "Lijst van onze dataverwerkers"
+      },
+      "payment": {
+        "title": "Betalingsplatform",
+        "description": "Voorwaarden voor betalingsverwerking"
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacybeleid",
+    "lastUpdated": "Laatst bijgewerkt"
+  },
+  "common": {
+    "learnMore": "Meer informatie",
+    "getStarted": "Aan de slag",
+    "close": "Sluiten",
+    "back": "Terug",
+    "next": "Volgende",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "search": "Zoeken",
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "success": "Succesvol",
+    "yes": "Ja",
+    "no": "Nee"
+  }
+}
