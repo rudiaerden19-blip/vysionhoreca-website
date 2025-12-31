@@ -76,29 +76,31 @@ function HeroSection() {
   return (
     <section className="bg-[#fdfdfd] min-h-screen flex items-center pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        {/* Badges centered under navbar */}
+        <div className="flex justify-center gap-8 sm:gap-16 mb-12">
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span className="text-accent font-bold text-sm uppercase">1 Platform</span>
+          </div>
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span className="text-accent font-bold text-sm uppercase">Alles geregeld</span>
+          </div>
+          <div className="flex items-center gap-2 whitespace-nowrap">
+            <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span className="text-accent font-bold text-sm uppercase">Voor horecaondernemers</span>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-center">
           {/* Left content */}
           <div className="opacity-0 animate-fadeInUp text-center lg:text-left">
-            <div className="flex justify-center gap-16 mb-8" style={{ marginTop: '-2.5rem' }}>
-              <div className="flex items-center gap-2 whitespace-nowrap">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span className="text-accent font-bold text-sm uppercase">1 Platform</span>
-              </div>
-              <div className="flex items-center gap-2 whitespace-nowrap">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span className="text-accent font-bold text-sm uppercase">Alles geregeld</span>
-              </div>
-              <div className="flex items-center gap-2 whitespace-nowrap">
-                <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span className="text-accent font-bold text-sm uppercase">Voor horecaondernemers</span>
-              </div>
-            </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-6">
               Één scherm. Volledige controle.
             </h1>
@@ -122,20 +124,23 @@ function HeroSection() {
           <div className="opacity-0 animate-fadeInUp delay-200">
             <div className="flex items-end gap-4 justify-center lg:justify-start lg:-ml-16">
               {/* iPad Stand with screenshot */}
-              <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-                <img 
-                  src="https://i.imgur.com/mHqvsrr.png" 
-                  alt="iPad Kassa Stand" 
-                  className="w-full"
-                />
-                {/* App Screenshot on screen */}
-                <img 
-                  src="https://i.imgur.com/IvW3RiX.png" 
-                  alt="Vysion Horeca Kassa" 
-                  className="absolute top-[4%] left-[9%] w-[82%] rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                  style={{ height: '53%', objectFit: 'fill' }}
-                  onClick={() => setLightboxImage('https://i.imgur.com/IvW3RiX.png')}
-                />
+              <div className="flex flex-col items-center">
+                <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+                  <img 
+                    src="https://i.imgur.com/mHqvsrr.png" 
+                    alt="iPad Kassa Stand" 
+                    className="w-full"
+                  />
+                  {/* App Screenshot on screen */}
+                  <img 
+                    src="https://i.imgur.com/IvW3RiX.png" 
+                    alt="Vysion Horeca Kassa" 
+                    className="absolute top-[4%] left-[9%] w-[82%] rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                    style={{ height: '53%', objectFit: 'fill' }}
+                    onClick={() => setLightboxImage('https://i.imgur.com/IvW3RiX.png')}
+                  />
+                </div>
+                <p className="text-gray-500 text-sm mt-2">Klik om te openen</p>
               </div>
               {/* Vertical Image Slider */}
               <div className="hidden lg:flex flex-col gap-2 h-[400px] overflow-y-auto pr-2 scrollbar-thin">
@@ -1130,7 +1135,7 @@ function Footer() {
             © {new Date().getFullYear()} Vysion Group. Alle rechten voorbehouden.
           </p>
           <p className="text-gray-500 text-sm mt-4 sm:mt-0">
-            Made with ❤️ in België
+            Design by Vysion
           </p>
         </div>
       </div>
