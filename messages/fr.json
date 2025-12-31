@@ -450,6 +450,10 @@
     "error": "Une erreur s'est produite",
     "success": "Succès",
     "yes": "Oui",
-    "no": "Non"
+    "no": "Non",
+    "backToHome": "Retour à l'accueil",
+    "backToLegal": "← Retour au Juridique",
+    "backToLogin": "Retour à la connexion",
+    "home": "Accueil"
   }
 }

@@ -452,6 +452,8 @@
     "yes": "Yes",
     "no": "No",
     "backToHome": "Back to home",
+    "backToLegal": "← Back to Legal",
+    "backToLogin": "Back to login",
     "home": "Home",
     "lastUpdated": "Last updated",
     "contact": "Contact",

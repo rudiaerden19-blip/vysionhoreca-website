@@ -450,6 +450,10 @@
     "error": "Ein Fehler ist aufgetreten",
     "success": "Erfolgreich",
     "yes": "Ja",
-    "no": "Nein"
+    "no": "Nein",
+    "backToHome": "Zurück zur Startseite",
+    "backToLegal": "← Zurück zu Rechtliches",
+    "backToLogin": "Zurück zur Anmeldung",
+    "home": "Startseite"
   }
 }

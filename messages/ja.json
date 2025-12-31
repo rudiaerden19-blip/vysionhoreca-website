@@ -452,6 +452,8 @@
     "yes": "はい",
     "no": "いいえ",
     "backToHome": "ホームに戻る",
+    "backToLegal": "← 法的情報に戻る",
+    "backToLogin": "ログインに戻る",
     "home": "ホーム",
     "lastUpdated": "最終更新日",
     "contact": "お問い合わせ",
