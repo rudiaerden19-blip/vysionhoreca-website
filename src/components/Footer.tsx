@@ -38,7 +38,7 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Bedrijf</h4>
             <ul className="space-y-2">
-              <li><a href="#over-ons" className="text-gray-400 hover:text-white transition-colors">Over ons</a></li>
+              <li><a href="/over-ons" className="text-gray-400 hover:text-white transition-colors">Over ons</a></li>
               <li><a href="#contact" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
               <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy</a></li>
               <li><a href="/juridisch" className="text-gray-400 hover:text-white transition-colors">Juridisch</a></li>

@@ -21,7 +21,7 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-8">
             <a href="#functies" className="text-gray-300 hover:text-white transition-colors">Functies</a>
             <a href="#prijzen" className="text-gray-300 hover:text-white transition-colors">Prijzen</a>
-            <a href="#over-ons" className="text-gray-300 hover:text-white transition-colors">Over ons</a>
+            <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">Over ons</a>
             <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
           </div>
 
@@ -55,7 +55,7 @@ export default function Navigation() {
             <div className="flex flex-col space-y-4">
               <a href="#functies" className="text-gray-300 hover:text-white transition-colors">Functies</a>
               <a href="#prijzen" className="text-gray-300 hover:text-white transition-colors">Prijzen</a>
-              <a href="#over-ons" className="text-gray-300 hover:text-white transition-colors">Over ons</a>
+              <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">Over ons</a>
               <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
               <a href="#demo" className="bg-accent text-white px-6 py-3 rounded-full font-medium text-center">
                 Gratis proberen
