@@ -290,6 +290,91 @@ function StatsSection() {
   )
 }
 
+// Order App Section - Product Showcase
+function OrderAppSection() {
+  return (
+    <section className="py-24 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            Alles wat je nodig hebt
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Een compleet ecosysteem voor jouw horecazaak. Kassa, bestelapp, betaalterminal en meer.
+          </p>
+        </div>
+
+        {/* Product Showcase Grid */}
+        <div className="relative h-[600px] md:h-[700px]">
+          {/* Center - Main POS */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+            <img
+              src="https://i.imgur.com/HrgjfGN.png"
+              alt="Vysion Horeca Kassa"
+              className="w-[300px] md:w-[450px] drop-shadow-2xl"
+            />
+          </div>
+
+          {/* Left Top - Phone 1 */}
+          <div className="absolute left-0 md:left-[5%] top-[5%] md:top-[10%]">
+            <img
+              src="https://i.imgur.com/inUZtVe.png"
+              alt="Vysion Bestelapp"
+              className="w-[120px] md:w-[180px] drop-shadow-xl"
+            />
+          </div>
+
+          {/* Left Bottom - Phone 2 */}
+          <div className="absolute left-[5%] md:left-[8%] bottom-[5%] md:bottom-[10%]">
+            <img
+              src="https://i.imgur.com/1SlM8G4.png"
+              alt="Vysion Bestelapp Menu"
+              className="w-[120px] md:w-[180px] drop-shadow-xl"
+            />
+          </div>
+
+          {/* Right Top */}
+          <div className="absolute right-0 md:right-[5%] top-[5%] md:top-[10%]">
+            <img
+              src="https://i.imgur.com/56z9j0j.png"
+              alt="Vysion Betaalterminal"
+              className="w-[120px] md:w-[180px] drop-shadow-xl"
+            />
+          </div>
+
+          {/* Right Bottom */}
+          <div className="absolute right-[5%] md:right-[8%] bottom-[5%] md:bottom-[10%]">
+            <img
+              src="https://i.imgur.com/b450kVT.png"
+              alt="Vysion Keukenbeeldscherm"
+              className="w-[120px] md:w-[180px] drop-shadow-xl"
+            />
+          </div>
+
+          {/* Connecting Lines (decorative) */}
+          <div className="absolute inset-0 pointer-events-none">
+            <svg className="w-full h-full opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <circle cx="50" cy="50" r="35" fill="none" stroke="#E85A3C" strokeWidth="0.2" strokeDasharray="2,2" />
+              <circle cx="50" cy="50" r="25" fill="none" stroke="#3C4D6B" strokeWidth="0.15" strokeDasharray="1,1" />
+            </svg>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="text-center mt-12">
+          <a
+            href="#contact"
+            className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-lg"
+          >
+            Ontdek het volledige platform
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // Comparison Section
 function ComparisonSection() {
   const features = [
@@ -940,6 +1025,7 @@ export default function HomePage() {
       <HeroSection />
       <FeaturesSection />
       <StatsSection />
+      <OrderAppSection />
       <PricingSection />
       <ComparisonSection />
       <IndustrySection />
