@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "Vysion Horeca | オールインワンPOS・決済プラットフォーム",
-    "description": "飲食店向け完全POSシステム。レジ、オンライン注文、請求書発行、スタッフ管理など全てを一つのプラットフォームで。7日間無料お試し。"
+    "title": "Vysion Horeca | オールインワンPOS＆決済プラットフォーム",
+    "description": "飲食業向け完全POSシステム。レジ、オンライン注文、請求書、スタッフ管理など - すべて1つのプラットフォームで。7日間無料でお試し。"
   },
   "nav": {
     "home": "ホーム",
@@ -15,143 +15,143 @@
   },
   "hero": {
     "badge1": "1つのプラットフォーム",
-    "badge2": "飲食店経営者が開発",
-    "badge3": "飲食店経営者のために",
+    "badge2": "飲食業者が開発",
+    "badge3": "飲食業者のために",
     "title": "1つの画面。完全なコントロール。",
-    "description": "現場から生まれ、飲食店経営者によって、飲食店経営者のために作られました。ファストフード、カフェ、レストラン、精肉店、ベーカリーに最適。GKS認証POSシステム、独自の注文プラットフォーム、Peppol請求書対応のプロフェッショナルSCARDA会計ソフトウェア、完全なビジネス分析など、ベルギーおよび20カ国以上の法律に準拠したオールインワンプラットフォーム。",
+    "description": "実践から生まれ、飲食業者によって飲食業者のために作られました。フライ店、カフェ、レストラン、精肉店、パン屋に最適。GKS認定レジ、独自の注文プラットフォーム、Peppol請求書付きプロフェッショナルSCARDA会計ソフトウェア、完全なビジネス分析などを備えたオールインワンプラットフォーム。ベルギーと20カ国以上の法律に準拠。",
     "ctaPrimary": "無料トライアルを開始",
     "ctaSecondary": "デモを見る",
-    "trialInfo": "7日間無料 • すぐに始められます",
+    "trialInfo": "7日間無料 • すぐに開始",
     "clickToOpen": "クリックして開く"
   },
   "features": {
-    "title": "必要なものすべて",
-    "subtitle": "飲食店のすべてのニーズに対応する1つのプラットフォーム。別々のシステムは不要、手間なし。",
+    "title": "必要なすべてが揃っています",
+    "subtitle": "飲食業のすべてのニーズに対応する1つのプラットフォーム。別々のシステムは不要、面倒もありません。",
     "pos": {
-      "title": "パワフルなPOS",
-      "description": "素早いサービスのための直感的なPOSインターフェース。タブレット、パソコン、タッチスクリーンで動作。"
+      "title": "パワフルなレジ",
+      "description": "高速サービスのための直感的なPOSインターフェース。タブレット、コンピューター、タッチスクリーンで動作。"
     },
     "online": {
       "title": "オンライン注文",
-      "description": "テイクアウト・デリバリー用ランディングページ付きオンライン注文プラットフォーム。お客様が注文、POSに直接受信。"
+      "description": "テイクアウトとデリバリー用のランディングページ付きオンライン注文プラットフォーム。お客様が注文し、レジで直接受け取れます。"
     },
     "reports": {
       "title": "リアルタイムレポート",
-      "description": "リアルタイムX・Zレポート。売上、人気商品、繁忙時間帯の即時インサイト。データドリブンな意思決定。"
+      "description": "リアルタイムのX・Zレポート。売上、人気商品、ピーク時間の即時インサイト。データに基づいた意思決定。"
     },
     "payments": {
       "title": "決済",
       "description": "統合決済端末。Bancontact、Visa、Mastercard、Mollie、Stripe - すべて1つのシステムで。"
     },
     "invoicing": {
-      "title": "請求書・Peppol",
-      "description": "ワンクリックでプロフェッショナルなPeppol請求書。会計と自動連携。B2B送信。"
+      "title": "請求書 & Peppol",
+      "description": "ワンクリックでプロフェッショナルなPeppol請求書。会計に自動接続。B2B送信。"
     },
     "staff": {
       "title": "スタッフ管理",
-      "description": "勤怠管理、役割、権限。誰が何をしたか正確に把握。給与計算対応済み。"
+      "description": "勤怠記録、役割、権限。誰が何をしたか正確に把握。給与担当者への提出準備完了。"
     },
     "kitchen": {
       "title": "キッチンディスプレイ",
-      "description": "キッチンでリアルタイム注文表示。効率的で整理された作業。"
+      "description": "キッチンでリアルタイム注文。効率的で整理された作業。"
     },
     "loyalty": {
-      "title": "顧客カード・ロイヤルティ",
-      "description": "ポイントとパーソナルオファーで顧客関係を構築。"
+      "title": "顧客カード＆ロイヤルティ",
+      "description": "ポイントとパーソナライズされたオファーで顧客関係を構築。"
     },
     "gks": {
-      "title": "GKS認証",
-      "description": "ベルギー税法に100%準拠。心配なし、常に適正。"
+      "title": "GKS認定",
+      "description": "ベルギーの税法に100%準拠。心配なし、常に規則に準拠。"
     }
   },
   "stats": {
     "processed": "月間処理額",
-    "businesses": "アクティブな飲食店",
-    "uptime": "稼働率保証",
+    "businesses": "アクティブな事業所",
+    "uptime": "稼働保証",
     "support": "サポート対応"
   },
   "orderApp": {
-    "title": "必要なものすべて",
-    "subtitle": "飲食店のための完全なエコシステム。POS、注文アプリ、決済端末など。",
+    "title": "必要なすべてが揃っています",
+    "subtitle": "飲食業向けの完全なエコシステム。レジ、注文アプリ、決済端末など。",
     "cta": "完全なプラットフォームを発見"
   },
   "butWait": {
     "label": "ちょっと待って...",
     "title": "でも... Vysionは",
-    "titleAccent": "さらに進みます",
+    "titleAccent": "さらに先へ",
     "subtitle": "他が止まったところで、私たちは続けます...",
     "features": {
       "1": "リアルタイムでビジネスを追跡",
-      "2": "どこからでもレポートを開く",
-      "3": "自宅から請求書発行",
-      "4": "スタッフの勤怠を調整",
-      "5": "どこからでも会計を送信",
-      "6": "リアルタイムでビジネス分析を表示",
-      "7": "自分のWebページにログイン",
+      "2": "どこにいてもレポートを開く",
+      "3": "自宅から請求書を発行",
+      "4": "スタッフの勤怠記録を調整",
+      "5": "どこからでも会計データを送信",
+      "6": "リアルタイムでビジネス分析を確認",
+      "7": "自分のウェブページにログイン",
       "8": "どのデバイスからでもビジネスにログイン",
-      "9": "リアルタイムで日次売上を表示",
-      "10": "リモートでPOSを管理",
+      "9": "リアルタイムで日次売上を確認",
+      "10": "リモートでレジを管理",
       "11": "好みに合わせて注文アプリをカスタマイズ",
-      "12": "9言語で利用可能"
+      "12": "9言語であなたのために利用可能"
     }
   },
   "comparison": {
     "title": "他のプラットフォームと比較",
     "subtitle": "より多くの機能、より低い価格。Vysion Horecaが最良の選択である理由を発見してください。",
     "feature": "機能",
-    "cta": "今日からVysion Horecaを始めよう",
+    "cta": "今日からVysion Horecaを始める",
     "features": {
-      "pos": "POSソフトウェア",
-      "terminal": "決済端末連携",
+      "pos": "レジソフトウェア",
+      "terminal": "決済端末統合",
       "online": "オンライン注文プラットフォーム",
-      "gks": "GKS認証",
+      "gks": "GKS認定",
       "accounting": "会計ソフトウェア（SCARDA）",
       "peppol": "Peppol請求書",
       "analytics": "ビジネス分析",
       "kitchen": "キッチンディスプレイ",
-      "loyalty": "顧客カード・ロイヤルティ",
+      "loyalty": "顧客カード＆ロイヤルティ",
       "staff": "スタッフ管理",
       "reservation": "テーブル予約",
-      "languages": "9言語以上で利用可能",
+      "languages": "9+言語で利用可能",
       "multiLocation": "マルチロケーション"
     },
-    "limited": "限定"
+    "limited": "制限あり"
   },
   "pricing": {
     "title": "シンプルで透明な料金",
     "subtitle": "すべて込み。サプライズなし。",
     "perMonth": "/月",
-    "perLicense": "ライセンスごと",
-    "startTrial": "7日間無料で始める",
-    "mostChosen": "最も人気",
+    "perLicense": "ライセンスあたり",
+    "startTrial": "7日間無料で開始",
+    "mostChosen": "最も選ばれている",
     "included": "含まれるもの:",
     "allOfLight": "Lightのすべて、さらに:",
     "light": {
       "name": "Light",
       "features": {
-        "1": "完全なPOS機能",
+        "1": "完全なレジ機能",
         "2": "リアルタイムレポート",
-        "3": "商品・カテゴリ",
-        "4": "決済端末連携",
+        "3": "商品とカテゴリ",
+        "4": "決済端末統合",
         "5": "在庫管理",
-        "6": "メール・電話サポート"
+        "6": "メール＆電話サポート"
       }
     },
     "pro": {
       "name": "Pro",
       "features": {
         "1": "オンライン注文プラットフォーム",
-        "2": "スタッフ・勤怠管理",
-        "3": "無制限の商品・カテゴリ",
-        "4": "顧客カード・ロイヤルティ",
+        "2": "スタッフ＆勤怠記録",
+        "3": "無制限の商品とカテゴリ",
+        "4": "顧客カードとロイヤルティ",
         "5": "キッチンディスプレイソフトウェア",
         "6": "月次ビジネス分析",
         "7": "ランディングページ",
-        "8": "スタッフ勤怠管理",
+        "8": "スタッフ勤怠記録",
         "9": "Peppol請求書プログラム",
         "10": "SCARDA会計ソフトウェア",
         "11": "テーブル予約",
-        "12": "テーブルフロアプラン",
+        "12": "テーブルレイアウト",
         "13": "9言語で利用可能"
       }
     }
@@ -160,33 +160,33 @@
     "invoicing": {
       "tab": "請求書",
       "title": "迅速でプロフェッショナルな請求書発行。",
-      "description": "顧客への請求書、クレジットノートなどを作成。Peppolに直接接続し、一瞬で会計士に送信。"
+      "description": "顧客向け請求書、クレジットノートなどを作成。Peppolに直接接続し、会計士に数秒で送信。"
     },
     "ordering": {
       "tab": "オンライン注文プラットフォーム",
-      "title": "迅速な処理、満足な顧客。",
-      "description": "ピーク時に高速で注文を処理。もう行列なし。すべてがPOSに完全統合。すべてがリアルタイムでキッチンへ。"
+      "title": "迅速な処理、満足した顧客。",
+      "description": "ピーク時に注文を素早く処理。行列はもうありません。すべてがレジに完璧に統合。すべてリアルタイムでキッチンへ。"
     },
     "analytics": {
       "tab": "ビジネス分析",
       "title": "リアルタイムビジネス分析。",
-      "description": "ビジネスの健全性を正確に把握。固定費、仕入れ、リース、家賃などを入力。ビジネスの即時リアルタイム分析を取得。"
+      "description": "ビジネスの状況を正確に把握。固定費、サプライヤーからの購入、リース、家賃などを入力。リアルタイムで即時分析を取得。"
     },
     "accounting": {
       "tab": "会計",
       "title": "プロフェッショナルな会計。",
-      "description": "SCARDA会計ソフトウェア完全統合。常に最新。会計コストを30%削減。"
+      "description": "SCARDA会計ソフトウェアが完全統合。常に最新。会計コストを30%節約。"
     },
     "tryFree": "無料で試す",
     "clickToEnlarge": "クリックして拡大"
   },
   "testimonials": {
-    "title": "飲食店経営者がVysionを信頼",
+    "title": "飲食業者はVysionを信頼しています",
     "quotes": {
       "1": {
-        "quote": "ついにすべてが統合されたプラットフォームが見つかりました。他のサブスクリプションをすべて解約し、価格の一部ですべてを1つにまとめました。",
+        "quote": "ついにすべてが統合されたプラットフォームが登場。他のサブスクリプションをすべてキャンセルし、価格の一部ですべてを1つで手に入れました。",
         "author": "Marc V.",
-        "role": "ファストフードオーナー"
+        "role": "フライ店オーナー"
       },
       "2": {
         "quote": "オンライン注文モジュールで売上が40%増加しました。お客様に大好評です。",
@@ -194,24 +194,24 @@
         "role": "レストランマネージャー"
       },
       "3": {
-        "quote": "サポートは5分以内に対応してくれます。他のどのサプライヤーでもこれは経験したことがありません。",
+        "quote": "サポートは5分以内に対応してくれます。他のベンダーではこんなことありませんでした。",
         "author": "Kevin L.",
         "role": "カフェオーナー"
       },
       "4": {
-        "quote": "私のビジネスにとって最高の投資でした。すべてが完璧に連携し、カスタマーサービスも素晴らしいです。",
+        "quote": "ビジネスへの最高の投資でした。すべてが完璧に連携し、カスタマーサービスも最高です。",
         "author": "Lisa M.",
-        "role": "ベーカリーオーナー"
+        "role": "パン屋オーナー"
       },
       "5": {
-        "quote": "ついに自分の言語のPOSシステムが見つかりました！何年も探して、やっと見つけました！",
-        "author": "王偉",
-        "role": "中華料理店オーナー"
+        "quote": "终于有一个用我自己语言的收银系统了！我找了好多年，终于找到了！",
+        "author": "王伟",
+        "role": "中餐厅老板"
       },
       "6": {
-        "quote": "こんなに速いPOSシステムは初めてです。夜中にも更新してくれて、朝OKを押すだけで、リクエストした機能がもうそこにあります！",
+        "quote": "I've never had such a fast POS system. They even update overnight - I just press OK in the morning and the features I requested are already there!",
         "author": "James T.",
-        "role": "Fish & Chipsオーナー"
+        "role": "Fish & Chips Owner"
       }
     }
   },
@@ -219,11 +219,11 @@
     "title": "成長する準備はできましたか？",
     "subtitle": "今日からVysion Horecaを始めましょう。7日間無料、義務なし。",
     "primary": "無料トライアルを開始",
-    "secondary": "情報をリクエスト"
+    "secondary": "情報を請求"
   },
   "contact": {
     "title": "お問い合わせ",
-    "subtitle": "Vysion Horecaについてのご質問は？私たちのチームがお手伝いします。",
+    "subtitle": "Vysion Horecaについてご質問がありますか？私たちのチームがお待ちしています。",
     "email": "メール",
     "phone": "電話",
     "form": {
@@ -235,7 +235,7 @@
         "firstName": "太郎",
         "lastName": "山田",
         "email": "taro@example.jp",
-        "message": "あなたの飲食店についてお聞かせください..."
+        "message": "あなたの飲食ビジネスについて教えてください..."
       },
       "submit": "メッセージを送信",
       "required": "*"
@@ -247,101 +247,101 @@
     "product": "製品",
     "features": "機能",
     "pricing": "料金",
-    "updates": "更新情報",
+    "updates": "アップデート",
     "company": "会社",
     "about": "会社概要",
     "contact": "お問い合わせ",
     "privacy": "プライバシー",
     "legal": "法的情報",
-    "copyright": "All rights reserved.",
-    "designBy": "Design by Vysion"
+    "copyright": "全著作権所有。",
+    "designBy": "デザイン by Vysion"
   },
   "cookies": {
-    "message": "より良い体験のためにCookieを使用しています。続行することで、当社の",
+    "message": "体験を向上させるためにCookieを使用しています。続行することで、",
     "policy": "Cookieポリシー",
     "accept": "同意する",
     "decline": "拒否する"
   },
   "login": {
     "backToHome": "ホームに戻る",
-    "selectBusiness": "ログインする店舗を選択",
-    "chooseBusiness": "店舗を選択",
+    "selectBusiness": "ログインするビジネスを選択",
+    "chooseBusiness": "ビジネスを選択",
     "loading": "読み込み中...",
-    "selectPlaceholder": "-- 店舗を選択 --",
+    "selectPlaceholder": "-- ビジネスを選択 --",
     "toDashboard": "ダッシュボードへ →",
     "processing": "処理中...",
     "demoMode": "デモモード:",
-    "demoInfo": "ダッシュボードを表示するには店舗を選択してください。本番環境では実際の認証に置き換えられます。",
+    "demoInfo": "ダッシュボードを見るにはビジネスを選択してください。本番環境では実際の認証に置き換えられます。",
     "troubleshooting": {
-      "title": "POSに問題がありますか？",
+      "title": "レジに問題がありますか？",
       "subtitle": "トラブルシューティングガイドをご覧ください"
     },
-    "copyright": "All rights reserved."
+    "copyright": "全著作権所有。"
   },
   "about": {
     "heroTitle": "",
     "heroTitleAccent": "Vysion",
     "heroTitleEnd": "Horecaについて",
-    "heroSubtitle": "現場から生まれ、飲食店経営者によって、飲食店経営者のために作られました。",
+    "heroSubtitle": "実践から生まれ、飲食業者によって飲食業者のために構築されました。",
     "story": {
       "title": "私たちのストーリー",
-      "p1": "Vysion Horecaは経験から生まれました。飲食店経営者として、既存のPOSシステムは高すぎ、複雑すぎ、必要なことを正確にしてくれないことに気づきました。",
-      "p2": "POS、注文プラットフォーム、会計ソフトウェア、決済端末、分析ソフトウェアと5つの異なるサブスクリプションに支払っていました。何も上手く連携せず、コストは月に数百ユーロにも上りました。",
-      "p3": "だから自分たちで作ることにしました。飲食店経営者が必要とするすべてを、手間なく、公正な価格で提供するオールインワンプラットフォームを。"
+      "p1": "Vysion Horecaは経験から生まれました。飲食業者として、既存のレジシステムは高すぎ、複雑すぎ、必要なことを正確に行ってくれないことに気づきました。",
+      "p2": "5つの異なるサブスクリプションに支払っていました：レジ、注文プラットフォーム、会計ソフト、決済端末、分析ソフト。何もうまく連携せず、コストは月に数百ユーロに上りました。",
+      "p3": "だから自分たちで構築することにしました。飲食業者が必要とすることを正確に行うオールインワンプラットフォーム、面倒なく、公正な価格で。"
     },
     "facts": {
       "founded": "2013年設立",
-      "foundedDesc": "15年以上の経験を持つ飲食店経営者によって",
+      "foundedDesc": "15年以上の経験を持つ飲食業者により",
       "location": "ベルギー拠点",
-      "locationDesc": "Pelt、Limburg - ベネルクスの中心",
-      "countries": "20カ国以上で展開",
+      "locationDesc": "ペルト、リンブルフ - ベネルクスの中心",
+      "countries": "20カ国以上で活動",
       "countriesDesc": "ベルギーから中国、オランダからイギリスまで"
     },
     "mission": {
       "title": "私たちのミッション",
-      "subtitle": "飲食店経営者が最も得意とすること、つまりゲストを迎え、素晴らしい体験を作ることに集中できるようにします。残りは私たちが引き受けます。",
+      "subtitle": "飲食業者が最も得意とすることに集中できるようにする：お客様を歓迎し、素晴らしい体験を創造すること。残りは私たちが対応します。",
       "reliability": {
         "title": "信頼性",
-        "description": "99.9%の稼働率。インターネットが落ちてもPOSは常に動作します。"
+        "description": "99.9%の稼働時間。インターネットが一時的に切れても、レジは常に動作します。"
       },
       "speed": {
         "title": "スピード",
-        "description": "超高速アップデート。機能をリクエストすれば翌日にはシステムに反映。"
+        "description": "超高速アップデート。機能をリクエストすると、翌日にはシステムに表示されます。"
       },
       "personal": {
         "title": "パーソナル",
-        "description": "コールセンターなし。私たちのチームと直接つながります。すべてのお客様の名前を知っています。"
+        "description": "コールセンターなし。チームへの直通回線。すべてのお客様を名前で知っています。"
       }
     },
     "values": {
-      "title": "私たちが大切にしていること",
+      "title": "私たちの価値観",
       "simplicity": {
-        "title": "🎯 シンプルさ第一",
-        "description": "テクノロジーは助けになるべきで、邪魔になってはいけません。だからVysionは非常に直感的で、5分で始められます - マニュアル不要。"
+        "title": "🎯 シンプルさが最優先",
+        "description": "テクノロジーはあなたを助けるべきで、邪魔すべきではありません。だからVysionはとても直感的で、5分で始められます - マニュアルなしで。"
       },
       "pricing": {
         "title": "💰 公正な価格",
-        "description": "隠れたコストなし、長期契約なし、サプライズなし。見たままが支払う金額です。"
+        "description": "隠れたコストなし、長期契約なし、サプライズなし。表示されているものがお支払いいただくものです。"
       },
       "improvement": {
-        "title": "🚀 継続的改善",
-        "description": "お客様の声を聞き、必要なものを作ります。実際のフィードバックに基づいて、毎週新機能を追加。"
+        "title": "🚀 継続的な改善",
+        "description": "お客様の声を聞き、必要なものを構築します。実際のフィードバックに基づいて、毎週新機能が追加されます。"
       },
       "global": {
         "title": "🌍 ローカル＆インターナショナル",
-        "description": "ベルギーでGKS認証済み、9言語、20カ国以上で利用可能。ファストフードからミシュランレストランまで。"
+        "description": "ベルギーでGKS認定、9言語と20カ国以上で利用可能。フライ店からミシュラン星付きレストランまで。"
       }
     },
     "company": {
       "title": "Vysion Group International",
-      "p1": "Vysion HorecaはVysion Group Internationalの一部であり、飲食・小売業界向けソフトウェアを専門とするテクノロジー企業です。",
+      "p1": "Vysion HorecaはVysion Group Internationalの一部で、飲食・小売業界向けソフトウェアを専門とするテクノロジー企業です。",
       "p2": "Vysion Horecaに加えて、プロセスを自動化したい企業向けのカスタムアプリケーションやデジタルソリューションも開発しています。",
-      "happyBusinesses": "満足している飲食店",
+      "happyBusinesses": "満足した事業所",
       "processedMonthly": "月間処理額",
       "supportAvailable": "サポート対応"
     },
     "ctaTitle": "始める準備はできましたか？",
-    "ctaSubtitle": "Vysion Horecaを7日間無料でお試しください。クレジットカード不要。",
+    "ctaSubtitle": "Vysion Horecaを7日間無料でお試しください。クレジットカードは不要です。",
     "ctaPrimary": "無料トライアルを開始",
     "ctaSecondary": "お問い合わせ"
   },
@@ -386,20 +386,20 @@
   },
   "legal": {
     "title": "法的情報",
-    "subtitle": "Vysion Horecaのすべての法的文書と規約",
+    "subtitle": "Vysion Horecaの法的文書と条件",
     "backToLegal": "法的概要に戻る",
     "pages": {
       "cookies": {
         "title": "Cookieポリシー",
-        "description": "当社ウェブサイトでのCookieの使用方法"
+        "description": "ウェブサイトでのCookieの使用方法"
       },
       "privacy": {
         "title": "プライバシーポリシー",
-        "description": "個人データの取り扱いについて"
+        "description": "個人データの取り扱い方法"
       },
       "terms": {
-        "title": "利用規約",
-        "description": "サービス利用に関する一般規約"
+        "title": "サービス契約",
+        "description": "サービス利用の一般条件"
       },
       "dpa": {
         "title": "データ処理契約",
@@ -407,11 +407,11 @@
       },
       "sla": {
         "title": "サービスレベル契約",
-        "description": "稼働率保証とサービスレベル"
+        "description": "稼働保証とサービスレベル"
       },
       "aup": {
-        "title": "利用規定",
-        "description": "サービスの許容される使用に関するガイドライン"
+        "title": "利用規約",
+        "description": "サービスの許容される利用に関するガイドライン"
       },
       "ip": {
         "title": "知的財産",
@@ -422,18 +422,18 @@
         "description": "Vysion商標とブランディングの使用"
       },
       "subprocessors": {
-        "title": "再委託先",
-        "description": "データ処理業者のリスト"
+        "title": "副処理者",
+        "description": "データ処理者リスト"
       },
       "payment": {
         "title": "決済プラットフォーム",
-        "description": "決済処理に関する規約"
+        "description": "決済処理の条件"
       }
     }
   },
   "privacy": {
     "title": "プライバシーポリシー",
-    "lastUpdated": "最終更新"
+    "lastUpdated": "最終更新日"
   },
   "common": {
     "learnMore": "詳細を見る",
@@ -450,6 +450,814 @@
     "error": "エラーが発生しました",
     "success": "成功",
     "yes": "はい",
-    "no": "いいえ"
+    "no": "いいえ",
+    "backToHome": "ホームに戻る",
+    "home": "ホーム",
+    "lastUpdated": "最終更新日",
+    "contact": "お問い合わせ",
+    "email": "メール",
+    "phone": "電話",
+    "anonymous": "匿名",
+    "total": "合計",
+    "subtotal": "小計",
+    "vat": "消費税",
+    "date": "日付",
+    "status": "ステータス",
+    "type": "タイプ",
+    "details": "詳細",
+    "refresh": "更新",
+    "noData": "データがありません",
+    "all": "すべて",
+    "online": "オンライン",
+    "pos": "レジ",
+    "pending": "保留中",
+    "items": "アイテム",
+    "address": "住所",
+    "notes": "備考",
+    "available": "在庫あり",
+    "soldOut": "売り切れ",
+    "active": "アクティブ",
+    "notAvailable": "利用不可",
+    "noCategory": "カテゴリなし"
+  },
+  "legalMain": {
+    "title": "法的情報",
+    "policies": "ポリシー",
+    "contracts": "契約",
+    "privacy": "プライバシー",
+    "links": {
+      "paymentPlatform": "Vysion決済プラットフォーム契約",
+      "aup": "利用規約",
+      "ip": "知的財産侵害ポリシー",
+      "trademark": "Vysion商標・著作権ガイドライン",
+      "serviceAgreement": "Vysionサービス契約",
+      "sla": "サービスレベル契約（SLA）",
+      "dpa": "データ処理契約",
+      "privacyPolicy": "プライバシーポリシー",
+      "cookies": "Cookieポリシー",
+      "subprocessors": "副処理者"
+    },
+    "backToHome": "← ホームに戻る"
+  },
+  "cookiesPage": {
+    "title": "Cookieポリシー",
+    "lastUpdated": "最終更新日: 2025年12月",
+    "whatAreCookies": {
+      "title": "Cookieとは？",
+      "content": "Cookieは、ウェブサイトを訪問した際にコンピューターやモバイルデバイスに保存される小さなテキストファイルです。ウェブサイトの適切な機能とユーザー体験の向上に役立ちます。"
+    },
+    "whichCookies": {
+      "title": "どのようなCookieを使用していますか？",
+      "necessary": {
+        "title": "必須Cookie",
+        "content": "これらのCookieはウェブサイトの機能に不可欠です。これらのCookieなしでは、特定の機能が動作しません。"
+      },
+      "functional": {
+        "title": "機能Cookie",
+        "content": "これらのCookieは、お客様の設定やプリファレンスを記憶し、体験をパーソナライズします。"
+      },
+      "analytical": {
+        "title": "分析Cookie",
+        "content": "お客様の同意を得て、訪問者がウェブサイトをどのように使用しているかを理解するために分析Cookieを使用します。これはサービス改善に役立ちます。"
+      }
+    },
+    "manageCookies": {
+      "title": "Cookieの管理",
+      "content": "ブラウザの設定からいつでもCookieの設定を変更できます。注意：特定のCookieを無効にすると、ウェブサイトの機能が制限される場合があります。"
+    },
+    "contact": {
+      "title": "お問い合わせ",
+      "content": "Cookieポリシーに関するご質問は、以下までお問い合わせください"
+    },
+    "backToLegal": "← 法的情報に戻る"
+  },
+  "privacyPage": {
+    "title": "プライバシーとセキュリティ",
+    "subtitle": "お客様のデータの取り扱い方法",
+    "sections": {
+      "intro": {
+        "title": "1. はじめに",
+        "content": "Vysion Group Internationalの一部であるVysion Horecaは、お客様の個人データの保護を非常に重視しています。このプライバシー声明では、どのようなデータを収集し、なぜ収集し、どのように取り扱うかを説明します。"
+      },
+      "whatData": {
+        "title": "2. 収集するデータ",
+        "intro": "以下の個人データを収集する場合があります：",
+        "items": {
+          "1": "名前と連絡先情報（メール、電話）",
+          "2": "事業情報（会社名、税番号、住所）",
+          "3": "支払い情報",
+          "4": "ソフトウェアの使用データ",
+          "5": "お客様とのコミュニケーション"
+        }
+      },
+      "whyData": {
+        "title": "3. データの使用目的",
+        "intro": "お客様のデータは以下の目的で使用します：",
+        "items": {
+          "1": "サービスとソフトウェアの提供",
+          "2": "支払い処理",
+          "3": "カスタマーサービスとサポート",
+          "4": "製品の改善",
+          "5": "アップデートと新機能に関するコミュニケーション",
+          "6": "法的義務の遵守（GKS、税法を含む）"
+        }
+      },
+      "security": {
+        "title": "4. データセキュリティ",
+        "intro": "データのセキュリティを非常に重視しています。システムは以下で保護されています：",
+        "items": {
+          "1": "すべてのデータ転送のSSL/TLS暗号化",
+          "2": "機密データの暗号化保存",
+          "3": "定期的なセキュリティ監査",
+          "4": "アクセス制御と認証",
+          "5": "安全なサーバーへの毎日のバックアップ"
+        }
+      },
+      "gks": {
+        "title": "5. GKSと税務コンプライアンス",
+        "content": "Vysion Horecaは完全にGKS認定を受けており、ベルギーのすべての税務要件に準拠しています。取引データは法定保存期間に従って安全に保存されます。"
+      },
+      "sharing": {
+        "title": "6. データの共有",
+        "content": "サービスに必要な場合（決済処理業者など）または法的に義務付けられている場合にのみ、第三者とデータを共有します。お客様のデータを第三者に販売することは決してありません。"
+      },
+      "rights": {
+        "title": "7. お客様の権利",
+        "intro": "お客様には以下の権利があります：",
+        "items": {
+          "1": "個人データへのアクセスを請求する",
+          "2": "データの訂正または削除を請求する",
+          "3": "処理に異議を唱える",
+          "4": "データを別のサービスに移行する"
+        }
+      },
+      "cookies": {
+        "title": "8. Cookie",
+        "content": "当社のウェブサイトでは、機能を改善するための機能Cookieを使用しています。分析Cookieはお客様の同意を得た場合にのみ設置されます。"
+      },
+      "contact": {
+        "title": "9. お問い合わせ",
+        "intro": "このプライバシー声明またはお客様のデータに関するご質問は、以下までお問い合わせください："
+      },
+      "changes": {
+        "title": "10. 変更",
+        "content": "このプライバシー声明は随時変更される場合があります。最新版はこのページでいつでもご確認いただけます。最終更新日：2025年12月。"
+      }
+    },
+    "backToHome": "← ホームに戻る"
+  },
+  "dpaPage": {
+    "title": "データ処理契約",
+    "lastUpdated": "最終更新日: 2025年12月",
+    "sections": {
+      "definitions": {
+        "title": "1. 定義",
+        "content": "このデータ処理契約において、以下の用語は次の意味を持ちます：",
+        "controller": "管理者:",
+        "controllerDef": "Vysion Horecaサービスを使用するお客様",
+        "processor": "処理者:",
+        "processorDef": "Vysion Horeca / Vysion Group International",
+        "personalData": "個人データ:",
+        "personalDataDef": "識別された、または識別可能な自然人に関するすべてのデータ"
+      },
+      "subject": {
+        "title": "2. 対象と期間",
+        "content": "この契約は、お客様に代わってVysion Horecaが行う個人データの処理を規定します。契約は、お客様が当社のサービスを使用している間有効です。"
+      },
+      "purpose": {
+        "title": "3. 処理の性質と目的",
+        "intro": "以下の目的で個人データを処理します：",
+        "items": {
+          "1": "レジソフトウェアと関連サービスの提供",
+          "2": "取引と注文の処理",
+          "3": "顧客データと注文履歴の管理",
+          "4": "レポートと分析の生成"
+        }
+      },
+      "categories": {
+        "title": "4. 個人データのカテゴリ",
+        "items": {
+          "1": "連絡先情報（名前、住所、メール、電話）",
+          "2": "取引データ",
+          "3": "注文データ",
+          "4": "従業員データ（該当する場合）"
+        }
+      },
+      "obligations": {
+        "title": "5. 処理者の義務",
+        "intro": "Vysion Horecaは以下を行います：",
+        "items": {
+          "1": "お客様の指示に従ってのみ個人データを処理する",
+          "2": "適切な技術的・組織的措置を講じる",
+          "3": "機密性を保証する",
+          "4": "GDPRに基づくお客様の義務の遵守を支援する",
+          "5": "終了時にデータを削除または返却する"
+        }
+      },
+      "subprocessors": {
+        "title": "6. 副処理者",
+        "content": "特定のサービスに副処理者を使用しています。最新のリストは副処理者ページでご確認いただけます。変更がある場合はお知らせします。"
+      },
+      "security": {
+        "title": "7. セキュリティ",
+        "content": "暗号化、アクセス制御、定期的なセキュリティ監査を含む適切なセキュリティ措置を実施しています。"
+      },
+      "breach": {
+        "title": "8. データ侵害",
+        "content": "データ侵害が発生した場合、お客様が通知義務を果たせるよう、不当な遅延なくお知らせします。"
+      },
+      "contact": {
+        "title": "9. お問い合わせ",
+        "content": "この契約に関するご質問は、以下までお問い合わせください"
+      }
+    }
+  },
+  "slaPage": {
+    "title": "サービスレベル契約（SLA）",
+    "lastUpdated": "最終更新日: 2025年12月",
+    "sections": {
+      "availability": {
+        "title": "1. 可用性",
+        "content": "Vysion Horecaは、すべてのコアサービスに対して99.9%の稼働時間を保証します。事前に告知される計画メンテナンスは除きます。"
+      },
+      "maintenance": {
+        "title": "2. 計画メンテナンス",
+        "content": "計画メンテナンスは、ピーク時間外、できればCET 02:00〜06:00の間に実施されます。お客様には少なくとも48時間前に通知されます。"
+      },
+      "response": {
+        "title": "3. サポート応答時間",
+        "headers": {
+          "priority": "優先度",
+          "description": "説明",
+          "responseTime": "応答時間"
+        },
+        "critical": {
+          "name": "クリティカル",
+          "description": "システム完全停止",
+          "time": "< 1時間"
+        },
+        "high": {
+          "name": "高",
+          "description": "重要な機能が動作しない",
+          "time": "< 4時間"
+        },
+        "medium": {
+          "name": "中",
+          "description": "機能が部分的に動作",
+          "time": "< 8時間"
+        },
+        "low": {
+          "name": "低",
+          "description": "質問または改善提案",
+          "time": "< 24時間"
+        }
+      },
+      "channels": {
+        "title": "4. サポートチャネル",
+        "email": "メール:",
+        "phone": "電話:",
+        "inApp": "アプリ内サポート:",
+        "inAppDesc": "Vysion Horecaアプリケーション内で利用可能"
+      },
+      "hours": {
+        "title": "5. サポート時間",
+        "light": "Lightプラン:",
+        "lightHours": "月〜金、09:00 - 17:00 CET",
+        "pro": "Proプラン:",
+        "proHours": "月〜日、08:00 - 22:00 CET"
+      },
+      "backups": {
+        "title": "6. バックアップ",
+        "content": "すべてのデータは毎日バックアップされます。バックアップは30日間保持されます。データ損失の場合、最新のバックアップから復元できます。"
+      },
+      "updates": {
+        "title": "7. アップデート",
+        "content": "ソフトウェアアップデートは通常夜間に自動的に展開されます。重要なアップデートは事前に通知されます。"
+      }
+    }
+  },
+  "aupPage": {
+    "title": "利用規約",
+    "lastUpdated": "最終更新日: 2025年12月",
+    "sections": {
+      "intro": {
+        "title": "はじめに",
+        "content": "この利用規約は、Vysion Horecaサービスの使用ルールを説明します。当社のサービスを使用することにより、このポリシーに同意したことになります。"
+      },
+      "allowed": {
+        "title": "許可される使用",
+        "intro": "当社のサービスは以下の目的で使用できます：",
+        "items": {
+          "1": "飲食ビジネスの管理",
+          "2": "取引と注文の処理",
+          "3": "会計と管理の維持",
+          "4": "顧客とのコミュニケーション"
+        }
+      },
+      "prohibited": {
+        "title": "禁止される使用",
+        "intro": "以下の目的での当社サービスの使用は禁止されています：",
+        "items": {
+          "1": "違法行為または詐欺",
+          "2": "マルウェアまたは有害なソフトウェアの配布",
+          "3": "知的財産権の侵害",
+          "4": "サービスまたはサーバーの妨害",
+          "5": "同意なく他のユーザーのデータを収集",
+          "6": "セキュリティ対策の回避"
+        }
+      },
+      "enforcement": {
+        "title": "施行",
+        "content": "このポリシーに違反した場合、アカウントを停止または終了する場合があります。重大なケースでは、法的措置を講じる場合があります。"
+      },
+      "contact": {
+        "title": "お問い合わせ",
+        "content": "ご質問は以下までお問い合わせください"
+      }
+    }
+  },
+  "trademarkPage": {
+    "title": "Vysion商標・著作権ガイドライン",
+    "lastUpdated": "最終更新日: 2025年12月",
+    "sections": {
+      "brands": {
+        "title": "当社のブランド",
+        "intro": "以下のブランド名とロゴはVysion Group Internationalの所有物です：",
+        "items": {
+          "1": "Vysion™",
+          "2": "Vysion Horeca™",
+          "3": "Vysion Apps™",
+          "4": "SCARDA™",
+          "5": "Vysionロゴとそのすべてのバリエーション"
+        }
+      },
+      "allowed": {
+        "title": "許可される使用",
+        "intro": "以下の場合に当社のブランドを使用できます：",
+        "items": {
+          "1": "テキストで当社の製品やサービスに言及する",
+          "2": "ビジネスでVysion Horecaを使用していることを示す",
+          "3": "当社のサービスに関するレビューや記事を書く"
+        }
+      },
+      "notAllowed": {
+        "title": "許可されない使用",
+        "intro": "以下は許可されていません：",
+        "items": {
+          "1": "書面による許可なく当社のロゴを使用する",
+          "2": "会社名または製品名に当社のブランドを使用する",
+          "3": "当社がスポンサーまたはサポートしている印象を与える",
+          "4": "当社のブランドをドメイン名またはソーシャルメディアハンドルとして登録する",
+          "5": "当社のブランドを変更または他の要素と組み合わせる"
+        }
+      },
+      "logoGuidelines": {
+        "title": "ロゴガイドライン",
+        "intro": "ロゴの使用許可がある場合は、以下のガイドラインに従ってください：",
+        "items": {
+          "1": "当社が提供する公式ロゴファイルのみを使用する",
+          "2": "色や比率を変更しない",
+          "3": "ロゴの周りに十分な余白を確保する",
+          "4": "ロゴを忙しい背景に配置しない"
+        }
+      },
+      "permission": {
+        "title": "許可の申請",
+        "content": "当社のブランドまたはロゴの使用許可については、以下までお問い合わせください"
+      }
+    }
+  },
+  "ipPage": {
+    "title": "知的財産ポリシー",
+    "lastUpdated": "最終更新日: 2025年12月",
+    "sections": {
+      "ownership": {
+        "title": "1. Vysionの所有権",
+        "content": "Vysion Horecaソフトウェアに関連するすべての知的財産権（ソースコード、デザイン、ロゴ、商標、ドキュメントを含むがこれに限定されない）は、Vysion Group Internationalの所有物であり、今後もそうあり続けます。"
+      },
+      "license": {
+        "title": "2. ライセンス",
+        "content": "サブスクリプションを購入することにより、ビジネス運営のためにソフトウェアを使用する限定的、非独占的、譲渡不可のライセンスを受け取ります。このライセンスはサブスクリプションの終了時に終了します。"
+      },
+      "prohibited": {
+        "title": "3. 禁止行為",
+        "intro": "以下は許可されていません：",
+        "items": {
+          "1": "ソフトウェアのコピー、変更、リバースエンジニアリング",
+          "2": "ソフトウェアのサブライセンスまたは再販",
+          "3": "セキュリティ対策の回避",
+          "4": "許可なく当社の商標またはロゴを使用する"
+        }
+      },
+      "yourContent": {
+        "title": "4. お客様のコンテンツ",
+        "content": "お客様は自身のビジネスデータ、製品情報、顧客データに対するすべての権利を保持します。当社のサービスを提供するためにこれらのデータを処理するライセンスを当社に付与します。"
+      },
+      "infringement": {
+        "title": "5. 侵害の報告",
+        "content": "知的財産権が侵害されていると思われる場合は、お問い合わせください。当社はそのような報告を真剣に受け止め、適切な措置を講じます。"
+      },
+      "contact": {
+        "title": "6. お問い合わせ",
+        "content": "知的財産に関するご質問は、以下までお問い合わせください"
+      }
+    }
+  },
+  "paymentPage": {
+    "title": "Vysion決済プラットフォーム契約",
+    "lastUpdated": "最終更新日: 2025年12月",
+    "sections": {
+      "intro": {
+        "title": "1. はじめに",
+        "content": "この契約は、Vysion Horecaプラットフォームを通じた決済サービスの使用条件を説明します。決済処理はパートナーのMollieとStripeを通じて行われます。"
+      },
+      "processing": {
+        "title": "2. 決済処理",
+        "content": "Vysion Horecaは、安全な取引を保証するために認定された決済処理業者と統合しています。すべての取引は暗号化され、PCI-DSS標準に準拠しています。"
+      },
+      "methods": {
+        "title": "3. サポートされる決済方法",
+        "items": {
+          "1": "Bancontact",
+          "2": "Visa / Mastercard",
+          "3": "iDEAL",
+          "4": "Apple Pay / Google Pay",
+          "5": "Payconiq"
+        }
+      },
+      "fees": {
+        "title": "4. 取引手数料",
+        "content": "取引手数料は決済処理業者によって決定され、決済方法と取引量によって異なります。現在の料金についてはお問い合わせください。"
+      },
+      "payouts": {
+        "title": "5. 支払い",
+        "content": "受け取った支払いは自動的にビジネス銀行口座に振り込まれます。支払い頻度は設定可能です（毎日、毎週、毎月）。"
+      },
+      "chargebacks": {
+        "title": "6. チャージバックと紛争",
+        "content": "チャージバックの場合、通知を受け取り、証拠を提供する機会があります。支払い紛争の処理をサポートします。"
+      },
+      "security": {
+        "title": "7. セキュリティ",
+        "content": "すべての支払いデータはPCI-DSSレベル1に準拠して処理されます。カードデータは当社のサーバーに保存されることはありません。"
+      },
+      "contact": {
+        "title": "8. お問い合わせ",
+        "content": "支払いに関するご質問は、以下までお問い合わせください"
+      }
+    }
+  },
+  "subprocessorsPage": {
+    "title": "副処理者",
+    "lastUpdated": "最終更新日: 2025年12月",
+    "intro": "Vysion Horecaはサービスを提供するために以下の副処理者を使用しています。すべての副処理者は慎重に選定され、GDPR要件に準拠しています。",
+    "table": {
+      "subprocessor": "副処理者",
+      "purpose": "目的",
+      "location": "所在地",
+      "aws": {
+        "name": "Amazon Web Services (AWS)",
+        "purpose": "クラウドホスティングとストレージ",
+        "location": "EU（フランクフルト）"
+      },
+      "mollie": {
+        "name": "Mollie",
+        "purpose": "決済処理",
+        "location": "オランダ"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "purpose": "決済処理",
+        "location": "EU"
+      },
+      "vercel": {
+        "name": "Vercel",
+        "purpose": "ウェブホスティング",
+        "location": "EU"
+      },
+      "sendgrid": {
+        "name": "SendGrid",
+        "purpose": "メールサービス",
+        "location": "EU"
+      }
+    },
+    "changes": {
+      "title": "変更",
+      "content": "副処理者リストの変更についてはお客様にお知らせします。新しい副処理者に異議がある場合は、お問い合わせください。"
+    },
+    "contact": {
+      "title": "お問い合わせ",
+      "content": "副処理者に関するご質問は、以下までお問い合わせください"
+    }
+  },
+  "serviceAgreementPage": {
+    "title": "Vysionサービス契約",
+    "lastUpdated": "最終更新日: 2025年12月",
+    "sections": {
+      "general": {
+        "title": "1. 一般",
+        "content": "このサービス契約（「契約」）は、Vysion Group Internationalの一部であるVysion Horecaのサービスの使用に適用されます。当社のサービスを使用することにより、これらの条件に同意したことになります。"
+      },
+      "services": {
+        "title": "2. サービス",
+        "content": "Vysion Horecaは、飲食業界向けにレジソフトウェア、オンライン注文プラットフォーム、会計ソフトウェア、および関連サービスを提供します。当社はサービスを変更、拡張、または制限する権利を留保します。"
+      },
+      "subscription": {
+        "title": "3. サブスクリプションと支払い",
+        "intro": "当社のサービスへのアクセスは、月額または年額のサブスクリプションを通じて利用できます。支払いは前払いで請求され、特に記載がない限り返金不可です。",
+        "items": {
+          "1": "請求書は月次または年次で送付されます",
+          "2": "支払い期限は請求書日付から14日です",
+          "3": "未払いの場合、アクセスが停止される場合があります"
+        }
+      },
+      "usage": {
+        "title": "4. サービスの使用",
+        "content": "お客様は当社のサービスの合法的な使用に責任を負います。違法な目的でサービスを使用すること、知的財産権を侵害すること、またはサービスを妨害することは禁止されています。"
+      },
+      "privacy": {
+        "title": "5. データとプライバシー",
+        "content": "当社は、プライバシー声明および適用法（GDPRを含む）に従ってお客様のデータを処理します。お客様はビジネスデータの所有権を保持します。"
+      },
+      "liability": {
+        "title": "6. 責任",
+        "content": "Vysion Horecaは、間接的損害、結果的損害、または逸失利益について責任を負いません。当社の総責任は、過去12ヶ月間にお客様が当社に支払った金額に限定されます。"
+      },
+      "termination": {
+        "title": "7. 終了",
+        "content": "いつでもサブスクリプションをキャンセルできます。キャンセルは現在の請求期間の終了時に有効になります。当社は、これらの条件に違反した場合、契約を終了することができます。"
+      },
+      "law": {
+        "title": "8. 準拠法",
+        "content": "この契約にはベルギー法が適用されます。紛争はベルギーの管轄裁判所に提出されます。"
+      },
+      "contact": {
+        "title": "9. お問い合わせ",
+        "content": "この契約に関するご質問は、以下までお問い合わせください"
+      }
+    }
+  },
+  "dashboardLayout": {
+    "loading": "読み込み中...",
+    "signOut": "ログアウト"
+  },
+  "dashboardPage": {
+    "title": "ダッシュボード概要",
+    "welcome": "おかえりなさい！ビジネスの概要です。",
+    "stats": {
+      "todayRevenue": "今日の売上",
+      "todayOrders": "今日の注文",
+      "totalRevenue": "総売上",
+      "totalOrders": "総注文数",
+      "customers": "顧客",
+      "avgPerOrder": "平均",
+      "perOrder": "注文あたり",
+      "onlineOrders": "オンライン注文",
+      "pending": "保留中"
+    },
+    "recentOrders": {
+      "title": "最近の注文",
+      "viewAll": "すべて見る →",
+      "headers": {
+        "order": "注文",
+        "customer": "顧客",
+        "type": "タイプ",
+        "total": "合計",
+        "status": "ステータス",
+        "date": "日付"
+      },
+      "noOrders": "まだ注文がありません"
+    }
+  },
+  "ordersPage": {
+    "title": "注文",
+    "subtitle": "すべての注文を表示・管理",
+    "refresh": "更新",
+    "filters": {
+      "total": "合計",
+      "online": "オンライン",
+      "pos": "レジ",
+      "pending": "保留中"
+    },
+    "table": {
+      "order": "注文",
+      "customer": "顧客",
+      "type": "タイプ",
+      "payment": "支払い",
+      "total": "合計",
+      "status": "ステータス",
+      "date": "日付",
+      "details": "詳細"
+    },
+    "noOrders": "注文が見つかりません",
+    "modal": {
+      "title": "注文",
+      "customer": "顧客",
+      "phone": "電話",
+      "type": "タイプ",
+      "status": "ステータス",
+      "paymentMethod": "支払い方法",
+      "date": "日付",
+      "address": "住所",
+      "notes": "備考",
+      "items": "アイテム",
+      "noItems": "アイテムがありません",
+      "subtotal": "小計",
+      "vat": "消費税",
+      "total": "合計"
+    }
+  },
+  "customersPage": {
+    "title": "顧客",
+    "subtitle": "顧客データベースを表示",
+    "stats": {
+      "totalCustomers": "総顧客数",
+      "totalSpent": "総支出額",
+      "loyaltyPoints": "ロイヤルティポイント",
+      "avgPerCustomer": "顧客あたり平均"
+    },
+    "search": "名前、メール、電話で検索...",
+    "table": {
+      "customer": "顧客",
+      "contact": "連絡先",
+      "city": "市区町村",
+      "orders": "注文",
+      "spent": "支出",
+      "points": "ポイント",
+      "memberSince": "会員開始日"
+    },
+    "noCustomers": "顧客が見つかりません"
+  },
+  "productsPage": {
+    "title": "商品とメニュー",
+    "subtitle": "商品とメニューアイテムを表示",
+    "stats": {
+      "totalProducts": "総商品数",
+      "categories": "カテゴリ",
+      "active": "アクティブ",
+      "notAvailable": "利用不可"
+    },
+    "filter": {
+      "all": "すべて"
+    },
+    "noProducts": "商品が見つかりません",
+    "available": "在庫あり",
+    "soldOut": "売り切れ"
+  },
+  "analysisPage": {
+    "title": "ビジネス分析",
+    "subtitle": "ビジネスパフォーマンスのインサイト",
+    "stats": {
+      "totalRevenue": "総売上",
+      "orders": "注文",
+      "fixedCosts": "固定費",
+      "costItems": "費用項目",
+      "netProfit": "純利益",
+      "afterCosts": "コスト後",
+      "profitMargin": "利益率",
+      "ofRevenue": "売上の"
+    },
+    "charts": {
+      "revenueByChannel": "チャネル別売上",
+      "pos": "レジ",
+      "online": "オンライン",
+      "paymentMethods": "支払い方法",
+      "busiestHours": "最も忙しい時間帯",
+      "orders": "注文",
+      "noData": "データがありません",
+      "fixedCostsBreakdown": "固定費内訳",
+      "noCosts": "コストが登録されていません",
+      "cost": "コスト"
+    }
+  },
+  "reportsPage": {
+    "title": "レポート",
+    "subtitle": "日次売上と注文レポート",
+    "stats": {
+      "totalRevenue": "総売上",
+      "totalOrders": "総注文数",
+      "avgPerDay": "1日平均",
+      "daysWithData": "データのある日数"
+    },
+    "table": {
+      "title": "日次レポート（Zレポート）",
+      "date": "日付",
+      "orders": "注文",
+      "pos": "レジ",
+      "online": "オンライン",
+      "revenue": "売上",
+      "avgPerOrder": "注文あたり平均"
+    },
+    "noReports": "レポートがありません"
+  },
+  "settingsPage": {
+    "title": "設定",
+    "subtitle": "アカウント設定を管理",
+    "saved": "設定が保存されました",
+    "sections": {
+      "account": {
+        "title": "アカウント",
+        "subtitle": "アカウント情報",
+        "firstName": "名",
+        "lastName": "姓",
+        "email": "メール",
+        "phone": "電話"
+      },
+      "notifications": {
+        "title": "通知",
+        "subtitle": "通知設定を管理",
+        "email": {
+          "title": "メール通知",
+          "description": "メールで更新を受信"
+        },
+        "daily": {
+          "title": "日次レポート",
+          "description": "毎日のサマリーを受信"
+        },
+        "orders": {
+          "title": "新規注文",
+          "description": "新しいオンライン注文の通知"
+        }
+      },
+      "security": {
+        "title": "セキュリティ",
+        "subtitle": "パスワードとセキュリティ",
+        "currentPassword": "現在のパスワード",
+        "newPassword": "新しいパスワード",
+        "confirmPassword": "新しいパスワードを確認"
+      },
+      "help": {
+        "title": "ヘルプとサポート",
+        "subtitle": "問題のヘルプを得る",
+        "troubleshooting": "トラブルシューティング",
+        "troubleshootingDesc": "よくある問題",
+        "emailSupport": "メールサポート",
+        "callSupport": "電話サポート",
+        "whatsapp": "WhatsApp",
+        "whatsappDesc": "直接チャット"
+      }
+    },
+    "saveChanges": "変更を保存"
+  },
+  "troubleshootingPage": {
+    "backToLogin": "ログインに戻る",
+    "title": "トラブルシューティングとヘルプ",
+    "subtitle": "Vysion Horecaレジのよくある問題と解決策",
+    "quickActions": {
+      "callSupport": "サポートに電話",
+      "emailSupport": "メールサポート",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "直接チャット"
+    },
+    "faqTitle": "よくある問題",
+    "faqs": {
+      "1": {
+        "question": "レジが起動しない",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>デバイスが電源に接続されていることを確認</li><li>電源ボタンを10秒間押し続けて再起動</li><li>すべてのケーブルが正しく接続されていることを確認</li><li>2分待ってから再試行</li><li>問題が続く場合はサポートに連絡</li></ol>"
+      },
+      "2": {
+        "question": "レジにログインできない",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>正しいPINを使用していることを確認</li><li>管理者にPINのリセットを依頼</li><li>アカウントがロックされていないか確認（5回の失敗後）</li><li>管理者アカウントにアクセスできない場合はサポートに連絡</li></ol>"
+      },
+      "3": {
+        "question": "決済端末が動作しない",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>端末がオンになっていることを確認（緑のライトが点灯）</li><li>USBまたはBluetooth接続を確認</li><li>端末をオフにしてから再度オンにして再起動</li><li>設定 → 決済端末 → 再接続に移動</li><li>インターネット接続が機能していることを確認</li></ol>"
+      },
+      "4": {
+        "question": "レシートプリンターが印刷しない",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>プリンターに用紙があることを確認</li><li>プリンターカバーを開閉（プリンターがリセットされます）</li><li>USB/ネットワーク接続を確認</li><li>設定 → プリンター → テスト印刷に移動</li><li>テストページが印刷されない場合はプリンターを再起動</li></ol>"
+      },
+      "5": {
+        "question": "レジの動作が遅い",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>使用していないアプリを閉じる</li><li>インターネット接続を確認（4G/WiFi）</li><li>レジアプリケーションを再起動</li><li>利用可能な更新があるか確認</li><li>問題が続く場合はサポートに連絡</li></ol>"
+      },
+      "6": {
+        "question": "オンライン注文が届かない",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>インターネット接続が機能していることを確認</li><li>オンライン注文モジュールが有効になっていることを確認</li><li>設定 → オンライン注文 → 同期に移動</li><li>店舗がシステムで「営業中」になっていることを確認</li><li>設定で営業時間を確認</li></ol>"
+      },
+      "7": {
+        "question": "商品を追加または変更したい",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>左上のメニュー → 商品に移動</li><li>「新規商品」をクリックまたは既存の商品を選択</li><li>名前、価格、カテゴリを入力</li><li>「保存」をクリック</li><li>商品がレジで利用可能になります</li></ol>"
+      },
+      "8": {
+        "question": "Zレポート/日次締めはどうやって作りますか？",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>左上のメニュー → レポートに移動</li><li>「Zレポート」または「日次締め」を選択</li><li>データを確認</li><li>「締めて印刷」をクリック</li><li>レポートが印刷され、1日が締められます</li></ol>"
+      },
+      "9": {
+        "question": "パスワードを忘れました",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>ログインページに移動</li><li>「パスワードを忘れた」をクリック</li><li>メールアドレスを入力</li><li>パスワードをリセットするリンクが届きます</li><li>またはサポートに連絡: +32 492 12 93 83</li></ol>"
+      },
+      "10": {
+        "question": "アプリがクラッシュし続ける",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>アプリを完全に閉じる</li><li>デバイスを再起動</li><li>最新バージョンのアプリがあることを確認</li><li>アプリをアンインストールして再インストール（データは保持されます）</li><li>問題が続く場合はサポートに連絡</li></ol>"
+      }
+    },
+    "stillNeedHelp": {
+      "title": "問題が見つかりませんか？",
+      "subtitle": "サポートチームは24時間年中無休で対応しています。お気軽にお問い合わせください！",
+      "callNow": "今すぐ電話:",
+      "emailSupport": "メールサポート"
+    },
+    "copyright": "全著作権所有。"
   }
 }

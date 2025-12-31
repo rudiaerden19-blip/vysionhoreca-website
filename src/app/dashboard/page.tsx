@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getBusinessId } from '@/lib/get-business-id'
+import { useLanguage } from '@/i18n'
 
 interface DashboardStats {
   totalOrders: number
@@ -39,6 +40,8 @@ export default function DashboardPage() {
   })
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [loading, setLoading] = useState(true)
+  const t = useTranslations('dashboardPage')
+  const tCommon = useTranslations('common')
 
   useEffect(() => {
     fetchDashboardData()
@@ -143,8 +146,8 @@ export default function DashboardPage() {
     <div className="space-y-8">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard Overzicht</h1>
-        <p className="text-gray-500 mt-1">Welkom terug! Hier is een overzicht van je zaak.</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-500 mt-1">{t('welcome')}</p>
       </div>
 
       {/* KPI Cards */}
@@ -153,7 +156,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Omzet vandaag</p>
+              <p className="text-sm text-gray-500">{t('stats.todayRevenue')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">{formatCurrency(stats.todayRevenue)}</p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
@@ -163,7 +166,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            <span className="text-green-600 font-medium">{stats.todayOrders}</span> bestellingen vandaag
+            <span className="text-green-600 font-medium">{stats.todayOrders}</span> {t('stats.todayOrders')}
           </p>
         </div>
 
@@ -171,7 +174,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Totale omzet</p>
+              <p className="text-sm text-gray-500">{t('stats.totalRevenue')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">{formatCurrency(stats.totalRevenue)}</p>
             </div>
             <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
@@ -181,7 +184,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            <span className="font-medium">{stats.totalOrders}</span> totale bestellingen
+            <span className="font-medium">{stats.totalOrders}</span> {t('stats.totalOrders')}
           </p>
         </div>
 
@@ -189,7 +192,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Klanten</p>
+              <p className="text-sm text-gray-500">{t('stats.customers')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">{stats.totalCustomers}</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -199,7 +202,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            Gem. <span className="font-medium">{formatCurrency(stats.averageOrderValue)}</span> per bestelling
+            {t('stats.avgPerOrder')} <span className="font-medium">{formatCurrency(stats.averageOrderValue)}</span> {t('stats.perOrder')}
           </p>
         </div>
 
@@ -207,7 +210,7 @@ export default function DashboardPage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Online bestellingen</p>
+              <p className="text-sm text-gray-500">{t('stats.onlineOrders')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">{stats.onlineOrders}</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
@@ -217,7 +220,7 @@ export default function DashboardPage() {
             </div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            <span className="text-yellow-600 font-medium">{stats.pendingOrders}</span> wachtend
+            <span className="text-yellow-600 font-medium">{stats.pendingOrders}</span> {t('stats.pending')}
           </p>
         </div>
       </div>
@@ -226,9 +229,9 @@ export default function DashboardPage() {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Recente bestellingen</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('recentOrders.title')}</h2>
             <a href="/dashboard/bestellingen" className="text-accent hover:underline text-sm font-medium">
-              Bekijk alles →
+              {t('recentOrders.viewAll')}
             </a>
           </div>
         </div>
@@ -236,19 +239,19 @@ export default function DashboardPage() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bestelling</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klant</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Totaal</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('recentOrders.headers.order')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('recentOrders.headers.customer')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('recentOrders.headers.type')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('recentOrders.headers.total')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('recentOrders.headers.status')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('recentOrders.headers.date')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {recentOrders.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                    Nog geen bestellingen gevonden
+                    {t('recentOrders.noOrders')}
                   </td>
                 </tr>
               ) : (
@@ -258,11 +261,11 @@ export default function DashboardPage() {
                       <span className="font-medium text-gray-900">#{order.order_number}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-600">
-                      {order.customer_name || 'Anoniem'}
+                      {order.customer_name || tCommon('anonymous')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${order.is_online ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}`}>
-                        {order.is_online ? '🌐 Online' : '🏪 Kassa'}
+                        {order.is_online ? '🌐 Online' : '🏪 POS'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">

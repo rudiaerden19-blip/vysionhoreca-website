@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/i18n'
 
 interface DailyReport {
   date: string
@@ -15,6 +16,7 @@ export default function RapportenPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [reports, setReports] = useState<DailyReport[]>([])
+  const t = useTranslations('reportsPage')
 
   useEffect(() => {
     fetchOrders()
@@ -96,26 +98,26 @@ export default function RapportenPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Rapporten</h1>
-        <p className="text-gray-500 mt-1">Dagelijkse omzet en bestellingsrapporten</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-500 mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">Totale omzet</p>
+          <p className="text-sm text-gray-500">{t('stats.totalRevenue')}</p>
           <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalRevenue)}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">Totale bestellingen</p>
+          <p className="text-sm text-gray-500">{t('stats.totalOrders')}</p>
           <p className="text-2xl font-bold text-gray-900">{totalOrders}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">Gem. per dag</p>
+          <p className="text-sm text-gray-500">{t('stats.avgPerDay')}</p>
           <p className="text-2xl font-bold text-gray-900">{formatCurrency(avgPerDay)}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">Dagen met data</p>
+          <p className="text-sm text-gray-500">{t('stats.daysWithData')}</p>
           <p className="text-2xl font-bold text-gray-900">{reports.length}</p>
         </div>
       </div>
@@ -123,25 +125,25 @@ export default function RapportenPage() {
       {/* Daily Reports */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">Dagelijkse rapporten (Z-Rapport)</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('table.title')}</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bestellingen</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kassa</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Online</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Omzet</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gem. per bestelling</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.date')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.orders')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.pos')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.online')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.revenue')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.avgPerOrder')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {reports.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                    Geen rapporten beschikbaar
+                    {t('noReports')}
                   </td>
                 </tr>
               ) : (

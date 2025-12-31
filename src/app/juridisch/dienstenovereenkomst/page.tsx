@@ -1,80 +1,73 @@
 'use client'
 
+import { useLanguage } from '@/i18n'
+
 export default function DienstenovereenkomstPage() {
+  const { t } = useLanguage()
+  const trans = (key: string) => t(`serviceAgreementPage.${key}`)
+  
   return (
     <main className="min-h-screen bg-white">
       <div className="bg-dark py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Vysion Dienstenovereenkomst
+            {trans('title')}
           </h1>
-          <p className="text-xl text-gray-300">Laatst bijgewerkt: december 2025</p>
+          <p className="text-xl text-gray-300">{trans('lastUpdated')}</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="prose prose-lg max-w-none">
           
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Algemeen</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.general.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Deze Dienstenovereenkomst ("Overeenkomst") is van toepassing op het gebruik van de diensten 
-            van Vysion Horeca, onderdeel van Vysion Group International. Door gebruik te maken van onze 
-            diensten gaat u akkoord met deze voorwaarden.
+            {trans('sections.general.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Diensten</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.services.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Vysion Horeca biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante 
-            diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, 
-            uit te breiden of te beperken.
+            {trans('sections.services.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Abonnement en Betaling</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.subscription.title')}</h2>
           <p className="text-gray-600 mb-4">
-            De toegang tot onze diensten is beschikbaar via een maandelijks of jaarlijks abonnement. 
-            Betalingen worden vooraf gefactureerd en zijn niet-restitueerbaar, tenzij anders vermeld.
+            {trans('sections.subscription.intro')}
           </p>
           <ul className="list-disc pl-6 text-gray-600 mb-8 space-y-2">
-            <li>Facturen worden maandelijks of jaarlijks verstuurd</li>
-            <li>Betalingstermijn is 14 dagen na factuurdatum</li>
-            <li>Bij niet-betaling kan toegang worden opgeschort</li>
+            <li>{trans('sections.subscription.items.1')}</li>
+            <li>{trans('sections.subscription.items.2')}</li>
+            <li>{trans('sections.subscription.items.3')}</li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Gebruik van de Diensten</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.usage.title')}</h2>
           <p className="text-gray-600 mb-8">
-            U bent verantwoordelijk voor het rechtmatige gebruik van onze diensten. Het is verboden om 
-            de diensten te gebruiken voor illegale doeleinden, inbreuk te maken op intellectuele 
-            eigendomsrechten, of de diensten te verstoren.
+            {trans('sections.usage.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Gegevens en Privacy</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.privacy.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Wij verwerken uw gegevens conform onze Privacyverklaring en de toepasselijke wetgeving, 
-            waaronder de AVG/GDPR. U behoudt eigendom over uw bedrijfsgegevens.
+            {trans('sections.privacy.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Aansprakelijkheid</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.liability.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Vysion Horeca is niet aansprakelijk voor indirecte schade, gevolgschade of gederfde winst. 
-            Onze totale aansprakelijkheid is beperkt tot het bedrag dat u in de afgelopen 12 maanden 
-            aan ons heeft betaald.
+            {trans('sections.liability.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Beëindiging</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.termination.title')}</h2>
           <p className="text-gray-600 mb-8">
-            U kunt uw abonnement op elk moment opzeggen. De opzegging gaat in aan het einde van de 
-            lopende facturatieperiode. Wij kunnen de overeenkomst beëindigen bij schending van deze voorwaarden.
+            {trans('sections.termination.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Toepasselijk Recht</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.law.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Op deze overeenkomst is Belgisch recht van toepassing. Geschillen worden voorgelegd aan 
-            de bevoegde rechtbank te België.
+            {trans('sections.law.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Contact</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.contact.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Voor vragen over deze overeenkomst kunt u contact opnemen via{' '}
+            {trans('sections.contact.content')}{' '}
             <a href="mailto:info@vysionhoreca.com" className="text-accent hover:underline">info@vysionhoreca.com</a>
           </p>
 
@@ -91,4 +84,3 @@ export default function DienstenovereenkomstPage() {
     </main>
   )
 }
-
