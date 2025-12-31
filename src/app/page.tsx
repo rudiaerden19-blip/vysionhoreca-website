@@ -939,7 +939,7 @@ function ContactSection() {
                 <div>
                   <p className="text-sm text-gray-500">Telefoon</p>
                   <a href="tel:+32123456789" className="text-gray-900 hover:text-accent">
-                    +32 492 12 99 83
+                    +32 492 12 93 83
                   </a>
                 </div>
               </div>
