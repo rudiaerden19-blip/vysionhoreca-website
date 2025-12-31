@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/lib/auth-context'
 
 interface DailyReport {
   date: string
@@ -13,25 +12,33 @@ interface DailyReport {
 }
 
 export default function RapportenPage() {
-  const { businessId } = useAuth()
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [reports, setReports] = useState<DailyReport[]>([])
 
   useEffect(() => {
-    if (businessId) {
-      fetchOrders()
-    }
-  }, [businessId])
+    fetchOrders()
+  }, [])
 
   async function fetchOrders() {
-    if (!businessId) return
+    if (!supabase) return
     
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user?.email) return
+      
+      const { data: tenant } = await supabase
+        .from('tenants')
+        .select('business_id')
+        .eq('email', session.user.email)
+        .maybeSingle()
+      
+      if (!tenant?.business_id) return
+      
       const { data, error } = await supabase
         .from('orders')
         .select('*')
-        .eq('business_id', businessId)
+        .eq('business_id', tenant.business_id)
         .order('created_at', { ascending: false })
 
       if (error) throw error
