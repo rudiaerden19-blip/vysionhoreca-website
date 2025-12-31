@@ -29,8 +29,9 @@ export default function BestellingenPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const t = useTranslations('ordersPage')
-  const tCommon = useTranslations('common')
+  const { t } = useLanguage()
+  const trans = (key: string) => t(`ordersPage.${key}`)
+  const common = (key: string) => t(`common.${key}`)
 
   useEffect(() => {
     fetchOrders()
@@ -121,8 +122,8 @@ export default function BestellingenPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-gray-500 mt-1">{t('subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{trans('title')}</h1>
+          <p className="text-gray-500 mt-1">{trans('subtitle')}</p>
         </div>
         <button 
           onClick={fetchOrders}
@@ -131,7 +132,7 @@ export default function BestellingenPage() {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          {t('refresh')}
+          {trans('refresh')}
         </button>
       </div>
 
@@ -142,28 +143,28 @@ export default function BestellingenPage() {
           className={`p-4 rounded-xl border transition-colors ${filter === 'all' ? 'bg-accent text-white border-accent' : 'bg-white border-gray-200 hover:border-accent'}`}
         >
           <p className={`text-2xl font-bold ${filter === 'all' ? 'text-white' : 'text-gray-900'}`}>{stats.total}</p>
-          <p className={`text-sm ${filter === 'all' ? 'text-white/80' : 'text-gray-500'}`}>{t('filters.total')}</p>
+          <p className={`text-sm ${filter === 'all' ? 'text-white/80' : 'text-gray-500'}`}>{trans('filters.total')}</p>
         </button>
         <button 
           onClick={() => setFilter('online')}
           className={`p-4 rounded-xl border transition-colors ${filter === 'online' ? 'bg-purple-600 text-white border-purple-600' : 'bg-white border-gray-200 hover:border-purple-600'}`}
         >
           <p className={`text-2xl font-bold ${filter === 'online' ? 'text-white' : 'text-gray-900'}`}>{stats.online}</p>
-          <p className={`text-sm ${filter === 'online' ? 'text-white/80' : 'text-gray-500'}`}>{t('filters.online')}</p>
+          <p className={`text-sm ${filter === 'online' ? 'text-white/80' : 'text-gray-500'}`}>{trans('filters.online')}</p>
         </button>
         <button 
           onClick={() => setFilter('kassa')}
           className={`p-4 rounded-xl border transition-colors ${filter === 'kassa' ? 'bg-gray-800 text-white border-gray-800' : 'bg-white border-gray-200 hover:border-gray-800'}`}
         >
           <p className={`text-2xl font-bold ${filter === 'kassa' ? 'text-white' : 'text-gray-900'}`}>{stats.kassa}</p>
-          <p className={`text-sm ${filter === 'kassa' ? 'text-white/80' : 'text-gray-500'}`}>{t('filters.pos')}</p>
+          <p className={`text-sm ${filter === 'kassa' ? 'text-white/80' : 'text-gray-500'}`}>{trans('filters.pos')}</p>
         </button>
         <button 
           onClick={() => setFilter('pending')}
           className={`p-4 rounded-xl border transition-colors ${filter === 'pending' ? 'bg-yellow-500 text-white border-yellow-500' : 'bg-white border-gray-200 hover:border-yellow-500'}`}
         >
           <p className={`text-2xl font-bold ${filter === 'pending' ? 'text-white' : 'text-gray-900'}`}>{stats.pending}</p>
-          <p className={`text-sm ${filter === 'pending' ? 'text-white/80' : 'text-gray-500'}`}>{t('filters.pending')}</p>
+          <p className={`text-sm ${filter === 'pending' ? 'text-white/80' : 'text-gray-500'}`}>{trans('filters.pending')}</p>
         </button>
       </div>
 
@@ -173,13 +174,13 @@ export default function BestellingenPage() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.order')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.customer')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.type')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.payment')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.total')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.status')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.date')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.order')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.customer')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.type')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.payment')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.total')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.status')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.date')}</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
               </tr>
             </thead>
@@ -187,7 +188,7 @@ export default function BestellingenPage() {
               {filteredOrders.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
-                    {t('noOrders')}
+                    {trans('noOrders')}
                   </td>
                 </tr>
               ) : (
@@ -198,7 +199,7 @@ export default function BestellingenPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <p className="text-gray-900">{order.customer_name || tCommon('anonymous')}</p>
+                        <p className="text-gray-900">{order.customer_name || common('anonymous')}</p>
                         {order.customer_phone && (
                           <p className="text-gray-500 text-sm">{order.customer_phone}</p>
                         )}
@@ -228,7 +229,7 @@ export default function BestellingenPage() {
                         onClick={() => setSelectedOrder(order)}
                         className="text-accent hover:underline text-sm"
                       >
-                        {t('table.details')}
+                        {trans('table.details')}
                       </button>
                     </td>
                   </tr>
@@ -245,7 +246,7 @@ export default function BestellingenPage() {
           <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-100">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">{t('modal.title')} #{selectedOrder.order_number}</h2>
+                <h2 className="text-xl font-bold text-gray-900">{trans('modal.title')} #{selectedOrder.order_number}</h2>
                 <button 
                   onClick={() => setSelectedOrder(null)}
                   className="text-gray-400 hover:text-gray-600"
@@ -259,49 +260,49 @@ export default function BestellingenPage() {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">{t('modal.customer')}</p>
-                  <p className="font-medium">{selectedOrder.customer_name || tCommon('anonymous')}</p>
+                  <p className="text-sm text-gray-500">{trans('modal.customer')}</p>
+                  <p className="font-medium">{selectedOrder.customer_name || common('anonymous')}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">{t('modal.phone')}</p>
+                  <p className="text-sm text-gray-500">{trans('modal.phone')}</p>
                   <p className="font-medium">{selectedOrder.customer_phone || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">{t('modal.type')}</p>
+                  <p className="text-sm text-gray-500">{trans('modal.type')}</p>
                   <p className="font-medium">{selectedOrder.is_online ? 'Online' : 'POS'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">{t('modal.status')}</p>
+                  <p className="text-sm text-gray-500">{trans('modal.status')}</p>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(selectedOrder.status)}`}>
                     {selectedOrder.status}
                   </span>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">{t('modal.paymentMethod')}</p>
+                  <p className="text-sm text-gray-500">{trans('modal.paymentMethod')}</p>
                   <p className="font-medium">{selectedOrder.payment_method || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">{t('modal.date')}</p>
+                  <p className="text-sm text-gray-500">{trans('modal.date')}</p>
                   <p className="font-medium">{formatDate(selectedOrder.created_at)}</p>
                 </div>
               </div>
 
               {selectedOrder.customer_address && (
                 <div>
-                  <p className="text-sm text-gray-500">{t('modal.address')}</p>
+                  <p className="text-sm text-gray-500">{trans('modal.address')}</p>
                   <p className="font-medium">{selectedOrder.customer_address}</p>
                 </div>
               )}
 
               {selectedOrder.customer_notes && (
                 <div>
-                  <p className="text-sm text-gray-500">{t('modal.notes')}</p>
+                  <p className="text-sm text-gray-500">{trans('modal.notes')}</p>
                   <p className="font-medium">{selectedOrder.customer_notes}</p>
                 </div>
               )}
 
               <div className="border-t pt-4">
-                <p className="text-sm text-gray-500 mb-2">{t('modal.items')}</p>
+                <p className="text-sm text-gray-500 mb-2">{trans('modal.items')}</p>
                 {selectedOrder.items && Array.isArray(selectedOrder.items) ? (
                   <div className="space-y-2">
                     {selectedOrder.items.map((item: any, index: number) => (
@@ -312,21 +313,21 @@ export default function BestellingenPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">{t('modal.noItems')}</p>
+                  <p className="text-gray-500">{trans('modal.noItems')}</p>
                 )}
               </div>
 
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between text-gray-600">
-                  <span>{t('modal.subtotal')}</span>
+                  <span>{trans('modal.subtotal')}</span>
                   <span>{formatCurrency(parseFloat(String(selectedOrder.subtotal)) || 0)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>{t('modal.vat')}</span>
+                  <span>{trans('modal.vat')}</span>
                   <span>{formatCurrency(parseFloat(String(selectedOrder.tax)) || 0)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold">
-                  <span>{t('modal.total')}</span>
+                  <span>{trans('modal.total')}</span>
                   <span>{formatCurrency(Number(selectedOrder.total) || 0)}</span>
                 </div>
               </div>

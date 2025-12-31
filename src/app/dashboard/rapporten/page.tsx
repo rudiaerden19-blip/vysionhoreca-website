@@ -16,7 +16,8 @@ export default function RapportenPage() {
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [reports, setReports] = useState<DailyReport[]>([])
-  const t = useTranslations('reportsPage')
+  const { t } = useLanguage()
+  const trans = (key: string) => t(`reportsPage.${key}`)
 
   useEffect(() => {
     fetchOrders()
@@ -98,26 +99,26 @@ export default function RapportenPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-        <p className="text-gray-500 mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{trans('title')}</h1>
+        <p className="text-gray-500 mt-1">{trans('subtitle')}</p>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.totalRevenue')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.totalRevenue')}</p>
           <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalRevenue)}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.totalOrders')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.totalOrders')}</p>
           <p className="text-2xl font-bold text-gray-900">{totalOrders}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.avgPerDay')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.avgPerDay')}</p>
           <p className="text-2xl font-bold text-gray-900">{formatCurrency(avgPerDay)}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.daysWithData')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.daysWithData')}</p>
           <p className="text-2xl font-bold text-gray-900">{reports.length}</p>
         </div>
       </div>
@@ -125,25 +126,25 @@ export default function RapportenPage() {
       {/* Daily Reports */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">{t('table.title')}</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{trans('table.title')}</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.date')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.orders')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.pos')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.online')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.revenue')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.avgPerOrder')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.date')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.orders')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.pos')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.online')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.revenue')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.avgPerOrder')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {reports.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                    {t('noReports')}
+                    {trans('noReports')}
                   </td>
                 </tr>
               ) : (

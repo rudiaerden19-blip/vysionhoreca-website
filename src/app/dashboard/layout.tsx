@@ -18,17 +18,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [loading, setLoading] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
-  const t = useTranslations('dashboard.menu')
-  const tLayout = useTranslations('dashboardLayout')
+  const { t } = useLanguage()
+  const menuTrans = (key: string) => t(`dashboard.menu.${key}`)
+  const layoutTrans = (key: string) => t(`dashboardLayout.${key}`)
 
   const navigation = [
-    { name: t('overview'), href: '/dashboard', icon: 'home' },
-    { name: t('orders'), href: '/dashboard/bestellingen', icon: 'orders' },
-    { name: t('customers'), href: '/dashboard/klanten', icon: 'customers' },
-    { name: t('products'), href: '/dashboard/producten', icon: 'products' },
-    { name: t('reports'), href: '/dashboard/rapporten', icon: 'reports' },
-    { name: t('analytics'), href: '/dashboard/analyse', icon: 'analytics' },
-    { name: t('settings'), href: '/dashboard/instellingen', icon: 'settings' },
+    { name: menuTrans('overview'), href: '/dashboard', icon: 'home' },
+    { name: menuTrans('orders'), href: '/dashboard/bestellingen', icon: 'orders' },
+    { name: menuTrans('customers'), href: '/dashboard/klanten', icon: 'customers' },
+    { name: menuTrans('products'), href: '/dashboard/producten', icon: 'products' },
+    { name: menuTrans('reports'), href: '/dashboard/rapporten', icon: 'reports' },
+    { name: menuTrans('analytics'), href: '/dashboard/analyse', icon: 'analytics' },
+    { name: menuTrans('settings'), href: '/dashboard/instellingen', icon: 'settings' },
   ]
 
   const icons: Record<string, JSX.Element> = {
@@ -68,7 +69,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto"></div>
-          <p className="text-gray-500 mt-4">{tLayout('loading')}</p>
+          <p className="text-gray-500 mt-4">{layoutTrans('loading')}</p>
         </div>
       </div>
     )
@@ -154,7 +155,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
-              {tLayout('signOut')}
+              {layoutTrans('signOut')}
             </button>
           </div>
         </div>

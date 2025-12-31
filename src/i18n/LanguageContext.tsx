@@ -14,7 +14,11 @@ import ja from '../../messages/ja.json'
 import zh from '../../messages/zh.json'
 import ar from '../../messages/ar.json'
 
-const messages: Record<Locale, typeof nl> = {
+// Use a looser type to allow for missing translations in non-Dutch languages
+// The t() function will fall back to Dutch for missing keys
+type Messages = Record<string, any>
+
+const messages: Record<Locale, Messages> = {
   nl,
   en,
   fr,
