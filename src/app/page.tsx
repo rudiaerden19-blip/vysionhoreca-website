@@ -338,6 +338,16 @@ function StatsSection() {
 
 // Order App Section - Product Showcase
 function OrderAppSection() {
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null)
+
+  const images = [
+    { src: 'https://i.imgur.com/inUZtVe.png', alt: 'Vysion Bestelapp', position: 'left-top' },
+    { src: 'https://i.imgur.com/1SlM8G4.png', alt: 'Vysion Bestelapp Menu', position: 'left-bottom' },
+    { src: 'https://i.imgur.com/HrgjfGN.png', alt: 'Vysion Horeca Kassa', position: 'center' },
+    { src: 'https://i.imgur.com/LVge0n4.png', alt: 'Vysion Betaalterminal', position: 'right-top' },
+    { src: 'https://i.imgur.com/b450kVT.png', alt: 'Vysion Keukenbeeldscherm', position: 'right-bottom' },
+  ]
+
   return (
     <section className="py-24 bg-dark overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -352,45 +362,69 @@ function OrderAppSection() {
         </div>
 
         {/* Product Showcase Grid */}
-        <div className="flex items-center justify-center gap-8 md:gap-16">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
           {/* Left Column - Phones stacked */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-row lg:flex-col gap-4 sm:gap-6 order-2 lg:order-1">
             <img
               src="https://i.imgur.com/inUZtVe.png"
               alt="Vysion Bestelapp"
-              className="w-[150px] md:w-[220px] drop-shadow-xl rounded-3xl"
+              className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => setLightboxImage('https://i.imgur.com/inUZtVe.png')}
             />
             <img
-              src="https://i.imgur.com/1SlM8G4.png"
+              src="https://i.imgur.com/LVge0n4.png"
               alt="Vysion Bestelapp Menu"
-              className="w-[150px] md:w-[220px] drop-shadow-xl rounded-3xl"
+              className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => setLightboxImage('https://i.imgur.com/LVge0n4.png')}
             />
           </div>
 
           {/* Center - Main POS */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 order-1 lg:order-2">
             <img
               src="https://i.imgur.com/HrgjfGN.png"
               alt="Vysion Horeca Kassa"
-              className="w-[280px] md:w-[500px] drop-shadow-2xl rounded-2xl"
+              className="w-[260px] sm:w-[320px] md:w-[400px] lg:w-[450px] xl:w-[500px] drop-shadow-2xl rounded-xl sm:rounded-2xl cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => setLightboxImage('https://i.imgur.com/HrgjfGN.png')}
             />
           </div>
 
           {/* Right Column - Devices stacked */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-row lg:flex-col gap-4 sm:gap-6 order-3">
             <img
-              src="https://i.imgur.com/56z9j0j.png"
+              src="https://i.imgur.com/1SlM8G4.png"
               alt="Vysion Betaalterminal"
-              className="w-[150px] md:w-[220px] drop-shadow-xl rounded-3xl"
+              className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => setLightboxImage('https://i.imgur.com/1SlM8G4.png')}
             />
             <img
               src="https://i.imgur.com/b450kVT.png"
               alt="Vysion Keukenbeeldscherm"
-              className="w-[150px] md:w-[220px] drop-shadow-xl rounded-3xl"
+              className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => setLightboxImage('https://i.imgur.com/b450kVT.png')}
             />
           </div>
+        </div>
 
+        {/* Lightbox */}
+        {lightboxImage && (
+          <div 
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
+            onClick={() => setLightboxImage(null)}
+          >
+            <img
+              src={lightboxImage}
+              alt="Vergroot"
+              className="max-w-full max-h-full object-contain rounded-2xl"
+            />
+            <button 
+              className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
+              onClick={() => setLightboxImage(null)}
+            >
+              ×
+            </button>
           </div>
+        )}
 
         {/* CTA */}
         <div className="text-center mt-12">
@@ -668,9 +702,9 @@ function IndustrySection() {
             </p>
             <a
               href="#demo"
-              className="inline-block bg-gray-900 text-white px-8 py-4 rounded-full font-semibold hover:bg-gray-800 transition-all"
+              className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all"
             >
-              Test 7 dagen gratis
+              Gratis testen
             </a>
           </div>
 
