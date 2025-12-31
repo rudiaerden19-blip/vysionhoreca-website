@@ -304,7 +304,13 @@ export default function RapportenPage() {
         .from('z_reports')
         .insert(zReport)
 
-      if (error) throw error
+      if (error) {
+        console.error('Supabase error:', error)
+        if (error.code === '42P01') {
+          throw new Error('De z_reports tabel bestaat nog niet. Voer eerst het SQL script uit in Supabase.')
+        }
+        throw new Error(error.message || 'Onbekende fout bij opslaan')
+      }
 
       // Simulate sending to SCARDA
       if (sendToScarda) {
@@ -327,9 +333,10 @@ export default function RapportenPage() {
         setSelectedReport(null)
       }, 2000)
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error closing day:', error)
-      alert('Er is een fout opgetreden bij het afsluiten van de dag.')
+      const errorMessage = error?.message || 'Onbekende fout'
+      alert(`Fout bij afsluiten: ${errorMessage}\n\nZorg dat de z_reports tabel bestaat in Supabase. Zie supabase/z_reports_table.sql`)
     } finally {
       setClosing(false)
     }
