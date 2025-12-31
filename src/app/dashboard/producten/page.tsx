@@ -28,8 +28,9 @@ export default function ProductenPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const t = useTranslations('productsPage')
-  const tCommon = useTranslations('common')
+  const { t } = useLanguage()
+  const trans = (key: string) => t(`productsPage.${key}`)
+  const common = (key: string) => t(`common.${key}`)
 
   useEffect(() => {
     fetchData()
@@ -66,7 +67,7 @@ export default function ProductenPage() {
   }
 
   const getCategoryName = (categoryId: string) => {
-    return categories.find(c => c.id === categoryId)?.name || tCommon('noCategory')
+    return categories.find(c => c.id === categoryId)?.name || common('noCategory')
   }
 
   const filteredItems = items.filter(item => {
@@ -89,26 +90,26 @@ export default function ProductenPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-        <p className="text-gray-500 mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{trans('title')}</h1>
+        <p className="text-gray-500 mt-1">{trans('subtitle')}</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.totalProducts')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.totalProducts')}</p>
           <p className="text-2xl font-bold text-gray-900">{items.length}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.categories')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.categories')}</p>
           <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.active')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.active')}</p>
           <p className="text-2xl font-bold text-green-600">{activeItems}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.notAvailable')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.notAvailable')}</p>
           <p className="text-2xl font-bold text-red-600">{outOfStock}</p>
         </div>
       </div>
@@ -123,7 +124,7 @@ export default function ProductenPage() {
               : 'bg-white border border-gray-200 text-gray-700 hover:border-accent'
           }`}
         >
-          {t('filter.all')} ({items.length})
+          {trans('filter.all')} ({items.length})
         </button>
         {categories.map(category => {
           const count = items.filter(i => i.category_id === category.id).length
@@ -147,7 +148,7 @@ export default function ProductenPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredItems.length === 0 ? (
           <div className="col-span-full bg-white rounded-xl p-12 text-center text-gray-500">
-            {t('noProducts')}
+            {trans('noProducts')}
           </div>
         ) : (
           filteredItems.map(item => (
@@ -179,11 +180,11 @@ export default function ProductenPage() {
                   </span>
                   {item.is_available ? (
                     <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
-                      {t('available')}
+                      {trans('available')}
                     </span>
                   ) : (
                     <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">
-                      {t('soldOut')}
+                      {trans('soldOut')}
                     </span>
                   )}
                 </div>

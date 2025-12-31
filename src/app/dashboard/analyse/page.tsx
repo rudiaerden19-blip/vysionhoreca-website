@@ -8,7 +8,8 @@ export default function AnalysePage() {
   const [orders, setOrders] = useState<any[]>([])
   const [fixedCosts, setFixedCosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const t = useTranslations('analysisPage')
+  const { t } = useLanguage()
+  const trans = (key: string) => t(`analysisPage.${key}`)
 
   useEffect(() => {
     fetchData()
@@ -83,46 +84,46 @@ export default function AnalysePage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-        <p className="text-gray-500 mt-1">{t('subtitle')}</p>
+        <h1 className="text-2xl font-bold text-gray-900">{trans('title')}</h1>
+        <p className="text-gray-500 mt-1">{trans('subtitle')}</p>
       </div>
 
       {/* Main KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.totalRevenue')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.totalRevenue')}</p>
           <p className="text-3xl font-bold text-gray-900 mt-1">{formatCurrency(totalRevenue)}</p>
-          <p className="text-sm text-gray-500 mt-2">{orders.length} {t('stats.orders')}</p>
+          <p className="text-sm text-gray-500 mt-2">{orders.length} {trans('stats.orders')}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.fixedCosts')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.fixedCosts')}</p>
           <p className="text-3xl font-bold text-red-600 mt-1">{formatCurrency(totalCosts)}</p>
-          <p className="text-sm text-gray-500 mt-2">{fixedCosts.length} {t('stats.costItems')}</p>
+          <p className="text-sm text-gray-500 mt-2">{fixedCosts.length} {trans('stats.costItems')}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.netProfit')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.netProfit')}</p>
           <p className={`text-3xl font-bold mt-1 ${netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {formatCurrency(netProfit)}
           </p>
-          <p className="text-sm text-gray-500 mt-2">{t('stats.afterCosts')}</p>
+          <p className="text-sm text-gray-500 mt-2">{trans('stats.afterCosts')}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.profitMargin')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.profitMargin')}</p>
           <p className={`text-3xl font-bold mt-1 ${profitMargin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {profitMargin.toFixed(1)}%
           </p>
-          <p className="text-sm text-gray-500 mt-2">{t('stats.ofRevenue')}</p>
+          <p className="text-sm text-gray-500 mt-2">{trans('stats.ofRevenue')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue by Channel */}
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('charts.revenueByChannel')}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{trans('charts.revenueByChannel')}</h2>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-gray-600">🏪 {t('charts.pos')}</span>
+                <span className="text-gray-600">🏪 {trans('charts.pos')}</span>
                 <span className="font-semibold">{formatCurrency(kassaRevenue)}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
@@ -134,7 +135,7 @@ export default function AnalysePage() {
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-gray-600">🌐 {t('charts.online')}</span>
+                <span className="text-gray-600">🌐 {trans('charts.online')}</span>
                 <span className="font-semibold">{formatCurrency(onlineRevenue)}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-3">
@@ -149,7 +150,7 @@ export default function AnalysePage() {
 
         {/* Payment Methods */}
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('charts.paymentMethods')}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{trans('charts.paymentMethods')}</h2>
           <div className="space-y-3">
             {Object.entries(paymentMethods)
               .sort((a, b) => b[1] - a[1])
@@ -172,10 +173,10 @@ export default function AnalysePage() {
 
         {/* Busiest Hours */}
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('charts.busiestHours')}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{trans('charts.busiestHours')}</h2>
           <div className="space-y-3">
             {topHours.length === 0 ? (
-              <p className="text-gray-500">{t('charts.noData')}</p>
+              <p className="text-gray-500">{trans('charts.noData')}</p>
             ) : (
               topHours.map(([hour, count], index) => (
                 <div key={hour} className="flex items-center justify-between">
@@ -185,7 +186,7 @@ export default function AnalysePage() {
                     {index === 2 && '🥉 '}
                     {hour}:00 - {parseInt(hour) + 1}:00
                   </span>
-                  <span className="font-semibold">{count} {t('charts.orders')}</span>
+                  <span className="font-semibold">{count} {trans('charts.orders')}</span>
                 </div>
               ))
             )}
@@ -194,10 +195,10 @@ export default function AnalysePage() {
 
         {/* Fixed Costs Breakdown */}
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('charts.fixedCostsBreakdown')}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">{trans('charts.fixedCostsBreakdown')}</h2>
           <div className="space-y-3">
             {fixedCosts.length === 0 ? (
-              <p className="text-gray-500">{t('charts.noCosts')}</p>
+              <p className="text-gray-500">{trans('charts.noCosts')}</p>
             ) : (
               fixedCosts.map((cost: any) => (
                 <div key={cost.id} className="flex items-center justify-between">

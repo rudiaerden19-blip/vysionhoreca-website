@@ -21,7 +21,8 @@ export default function KlantenPage() {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const t = useTranslations('customersPage')
+  const { t } = useLanguage()
+  const trans = (key: string) => t(`customersPage.${key}`)
 
   useEffect(() => {
     fetchCustomers()
@@ -89,27 +90,27 @@ export default function KlantenPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-gray-500 mt-1">{t('subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{trans('title')}</h1>
+          <p className="text-gray-500 mt-1">{trans('subtitle')}</p>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.totalCustomers')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.totalCustomers')}</p>
           <p className="text-2xl font-bold text-gray-900">{customers.length}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.totalSpent')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.totalSpent')}</p>
           <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalSpent)}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.loyaltyPoints')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.loyaltyPoints')}</p>
           <p className="text-2xl font-bold text-gray-900">{totalPoints.toLocaleString()}</p>
         </div>
         <div className="bg-white p-6 rounded-xl border border-gray-100">
-          <p className="text-sm text-gray-500">{t('stats.avgPerCustomer')}</p>
+          <p className="text-sm text-gray-500">{trans('stats.avgPerCustomer')}</p>
           <p className="text-2xl font-bold text-gray-900">{formatCurrency(customers.length ? totalSpent / customers.length : 0)}</p>
         </div>
       </div>
@@ -122,7 +123,7 @@ export default function KlantenPage() {
           </svg>
           <input
             type="text"
-            placeholder={t('search')}
+            placeholder={trans('search')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none"
@@ -136,20 +137,20 @@ export default function KlantenPage() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.customer')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.contact')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.city')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.orders')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.spent')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.points')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('table.memberSince')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.customer')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.contact')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.city')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.orders')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.spent')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.points')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.memberSince')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filteredCustomers.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                    {t('noCustomers')}
+                    {trans('noCustomers')}
                   </td>
                 </tr>
               ) : (
