@@ -487,6 +487,7 @@ function ButWaitSection() {
     'Bekijk in realtime je dagelijkse verkopen',
     'Beheer je kassa op afstand',
     'Pas je bestelapp aan naar jouw voorkeuren',
+    'Alles in 9 talen beschikbaar voor jou',
   ]
 
   return (
