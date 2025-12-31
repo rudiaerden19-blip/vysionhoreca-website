@@ -473,6 +473,25 @@ function OrderAppSection() {
   )
 }
 
+// But Wait Section
+function ButWaitSection() {
+  return (
+    <section className="py-20 bg-dark overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <p className="text-accent text-lg font-semibold tracking-wider uppercase mb-4">
+            Wacht even...
+          </p>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
+            Maar... Vysion gaat<br />
+            <span className="text-accent">nog verder</span>
+          </h2>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // Comparison Section
 function ComparisonSection() {
   const features = [
@@ -1010,6 +1029,7 @@ export default function HomePage() {
       <StatsSection />
       <OrderAppSection />
       <PricingSection />
+      <ButWaitSection />
       <ComparisonSection />
       <IndustrySection />
       <TestimonialSection />
