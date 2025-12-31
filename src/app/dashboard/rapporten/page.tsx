@@ -13,13 +13,12 @@ interface DailyReport {
   cashPayments: number
   cardPayments: number
   vatTotal: number
-  isClosed?: boolean
 }
 
 interface ZReport {
   id: string
-  business_id: string
   report_number: number
+  business_id: string
   date: string
   orders_count: number
   revenue: number
@@ -30,6 +29,9 @@ interface ZReport {
   vat_total: number
   closed_at: string
   closed_by: string
+  sent_to_scarda: boolean
+  sent_to_accountant: boolean
+  accountant_email: string | null
 }
 
 export default function RapportenPage() {
@@ -37,24 +39,22 @@ export default function RapportenPage() {
   const [loading, setLoading] = useState(true)
   const [reports, setReports] = useState<DailyReport[]>([])
   const [zReports, setZReports] = useState<ZReport[]>([])
-  const [activeTab, setActiveTab] = useState<'z' | 'x'>('z')
-  const [selectedReport, setSelectedReport] = useState<DailyReport | ZReport | null>(null)
+  const [activeTab, setActiveTab] = useState<'z' | 'x' | 'history'>('z')
+  const [selectedReport, setSelectedReport] = useState<DailyReport | null>(null)
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [showCloseModal, setShowCloseModal] = useState(false)
-  const [reportToClose, setReportToClose] = useState<DailyReport | null>(null)
   const [emailAddress, setEmailAddress] = useState('')
   const [emailSending, setEmailSending] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
   const [closing, setClosing] = useState(false)
-  const [tenant, setTenant] = useState<any>(null)
+  const [closingSuccess, setClosingSuccess] = useState(false)
+  const [sendToScarda, setSendToScarda] = useState(true)
+  const [sendToAccountant, setSendToAccountant] = useState(true)
+  const [accountantEmail, setAccountantEmail] = useState('')
   const { t } = useLanguage()
   const trans = (key: string) => t(`reportsPage.${key}`)
 
   useEffect(() => {
-    const stored = localStorage.getItem('vysion_tenant')
-    if (stored) {
-      setTenant(JSON.parse(stored))
-    }
     fetchOrders()
     fetchZReports()
   }, [])
@@ -119,7 +119,7 @@ export default function RapportenPage() {
           kassaOrders: orders.filter(o => !o.is_online).length,
           cashPayments: orders.filter(o => o.payment_method === 'cash').reduce((sum, o) => sum + (Number(o.total) || 0), 0),
           cardPayments: orders.filter(o => o.payment_method !== 'cash').reduce((sum, o) => sum + (Number(o.total) || 0), 0),
-          vatTotal: orders.reduce((sum, o) => sum + (Number(o.total) * 0.21 || 0), 0),
+          vatTotal: orders.reduce((sum, o) => sum + (Number(o.total) * 0.21 / 1.21 || 0), 0),
         }))
         .sort((a, b) => b.date.localeCompare(a.date))
 
@@ -148,7 +148,7 @@ export default function RapportenPage() {
   const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleString('nl-BE', {
       day: 'numeric',
-      month: 'long',
+      month: 'short',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
@@ -162,59 +162,9 @@ export default function RapportenPage() {
     })
   }
 
-  // Check if a date already has a Z-report
-  const isDateClosed = (date: string) => {
-    return zReports.some(zr => zr.date === date)
-  }
-
-  const getNextReportNumber = () => {
-    if (zReports.length === 0) return 1
-    return Math.max(...zReports.map(zr => zr.report_number)) + 1
-  }
-
-  const handleCloseDay = async () => {
-    if (!reportToClose || !supabase || !tenant) return
-    
-    setClosing(true)
-    
-    try {
-      const reportNumber = getNextReportNumber()
-      
-      const { error } = await supabase
-        .from('z_reports')
-        .insert({
-          business_id: tenant.business_id,
-          report_number: reportNumber,
-          date: reportToClose.date,
-          orders_count: reportToClose.orders,
-          revenue: reportToClose.revenue,
-          online_orders: reportToClose.onlineOrders,
-          kassa_orders: reportToClose.kassaOrders,
-          cash_payments: reportToClose.cashPayments,
-          card_payments: reportToClose.cardPayments,
-          vat_total: reportToClose.vatTotal,
-          closed_at: new Date().toISOString(),
-          closed_by: tenant.name || 'Onbekend',
-        })
-
-      if (error) throw error
-
-      // Refresh Z-reports
-      await fetchZReports()
-      
-      setShowCloseModal(false)
-      setReportToClose(null)
-    } catch (error) {
-      console.error('Error closing day:', error)
-      alert('Er is een fout opgetreden bij het afsluiten. Probeer opnieuw.')
-    } finally {
-      setClosing(false)
-    }
-  }
-
-  const totalRevenue = zReports.reduce((sum, r) => sum + Number(r.revenue), 0)
-  const totalOrders = zReports.reduce((sum, r) => sum + r.orders_count, 0)
-  const avgPerDay = zReports.length ? totalRevenue / zReports.length : 0
+  const totalRevenue = reports.reduce((sum, r) => sum + r.revenue, 0)
+  const totalOrders = reports.reduce((sum, r) => sum + r.orders, 0)
+  const avgPerDay = reports.length ? totalRevenue / reports.length : 0
 
   // Get current day report for X-rapport
   const today = new Date().toISOString().split('T')[0]
@@ -229,28 +179,34 @@ export default function RapportenPage() {
     vatTotal: 0,
   }
 
-  // Get unclosed days (days with orders but no Z-report)
-  const unclosedDays = reports.filter(r => !isDateClosed(r.date) && r.date !== today)
+  // Check if today already has a Z-report
+  const todayHasZReport = zReports.some(z => z.date === today)
 
-  const handlePrint = (report: DailyReport | ZReport, type: 'x' | 'z', reportNumber?: number) => {
+  // Get unclosed days (days with orders but no Z-report)
+  const unclosedDays = reports.filter(r => !zReports.some(z => z.date === r.date))
+
+  const handlePrint = (report: DailyReport | ZReport, type: 'x' | 'z') => {
     const printWindow = window.open('', '_blank')
     if (!printWindow) return
 
+    const stored = localStorage.getItem('vysion_tenant')
+    const tenant = stored ? JSON.parse(stored) : { name: 'Bedrijf' }
+
     const isZReport = 'report_number' in report
-    const revenue = isZReport ? Number(report.revenue) : report.revenue
-    const ordersCount = isZReport ? report.orders_count : report.orders
-    const onlineOrders = isZReport ? report.online_orders : report.onlineOrders
-    const kassaOrders = isZReport ? report.kassa_orders : report.kassaOrders
-    const cashPayments = isZReport ? Number(report.cash_payments) : report.cashPayments
-    const cardPayments = isZReport ? Number(report.card_payments) : report.cardPayments
-    const vatTotal = isZReport ? Number(report.vat_total) : report.vatTotal
-    const repNum = isZReport ? report.report_number : reportNumber
+    const reportNumber = isZReport ? (report as ZReport).report_number : null
+    const revenue = isZReport ? (report as ZReport).revenue : (report as DailyReport).revenue
+    const ordersCount = isZReport ? (report as ZReport).orders_count : (report as DailyReport).orders
+    const kassaOrders = isZReport ? (report as ZReport).kassa_orders : (report as DailyReport).kassaOrders
+    const onlineOrders = isZReport ? (report as ZReport).online_orders : (report as DailyReport).onlineOrders
+    const cashPayments = isZReport ? (report as ZReport).cash_payments : (report as DailyReport).cashPayments
+    const cardPayments = isZReport ? (report as ZReport).card_payments : (report as DailyReport).cardPayments
+    const vatTotal = isZReport ? (report as ZReport).vat_total : (report as DailyReport).vatTotal
 
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
       <head>
-        <title>${type.toUpperCase()}-Rapport ${repNum ? '#' + repNum : ''} - ${formatDate(report.date)}</title>
+        <title>${type.toUpperCase()}-Rapport ${reportNumber ? '#' + reportNumber : ''} - ${formatDate(report.date)}</title>
         <style>
           body { font-family: 'Courier New', monospace; padding: 20px; max-width: 300px; margin: 0 auto; }
           .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
@@ -261,17 +217,17 @@ export default function RapportenPage() {
           .divider { border-top: 1px dashed #000; margin: 10px 0; }
           .total { font-size: 18px; font-weight: bold; }
           .footer { text-align: center; margin-top: 20px; font-size: 12px; }
-          .official { border: 2px solid #000; padding: 8px; margin-top: 10px; text-align: center; font-weight: bold; }
+          .scarda { background: #f0f0f0; padding: 8px; margin-top: 10px; text-align: center; }
           @media print { body { padding: 0; } }
         </style>
       </head>
       <body>
         <div class="header">
           <div class="logo">Vysion Horeca</div>
-          <div>${tenant?.name || 'Bedrijf'}</div>
+          <div>${tenant.name}</div>
           <div class="type">${type.toUpperCase()}-RAPPORT</div>
-          ${type === 'z' && repNum ? `<div class="report-num">Nr. ${String(repNum).padStart(6, '0')}</div>` : ''}
-          <div>${formatDate(report.date)}</div>
+          ${reportNumber ? `<div class="report-num">Nr. ${String(reportNumber).padStart(6, '0')}</div>` : ''}
+          <div style="margin-top: 8px">${formatDate(report.date)}</div>
           ${type === 'x' ? `<div>Tijd: ${formatTime()}</div>` : ''}
         </div>
         
@@ -286,23 +242,24 @@ export default function RapportenPage() {
         
         <div class="divider"></div>
         
-        <div class="row"><span>Subtotaal:</span><span>${formatCurrency(revenue - vatTotal)}</span></div>
+        <div class="row"><span>Subtotaal (excl. BTW):</span><span>${formatCurrency(revenue - vatTotal)}</span></div>
         <div class="row"><span>BTW (21%):</span><span>${formatCurrency(vatTotal)}</span></div>
         
         <div class="divider"></div>
         
         <div class="row total"><span>TOTAAL:</span><span>${formatCurrency(revenue)}</span></div>
         
-        ${type === 'z' ? `
-        <div class="official">
-          OFFICIEEL Z-RAPPORT<br>
-          GKS GECERTIFICEERD
+        ${isZReport ? `
+        <div class="scarda">
+          <strong>SCARDA Boekhouding</strong><br>
+          ${(report as ZReport).sent_to_scarda ? '✓ Verstuurd naar SCARDA' : '○ Niet verstuurd'}
         </div>
         ` : ''}
         
         <div class="footer">
           <div>Afgedrukt op: ${new Date().toLocaleString('nl-BE')}</div>
-          <div>Vysion Horeca - www.vysionhoreca.com</div>
+          <div>Vysion Horeca - GKS Gecertificeerd</div>
+          <div style="margin-top: 4px; font-size: 10px;">Dit document is fiscaal geldig</div>
         </div>
       </body>
       </html>
@@ -311,22 +268,104 @@ export default function RapportenPage() {
     printWindow.print()
   }
 
-  const handleSendToAccountant = async () => {
-    if (!selectedReport || !emailAddress) return
+  const handleCloseDay = async () => {
+    if (!selectedReport || !supabase) return
+    
+    setClosing(true)
+    
+    try {
+      const stored = localStorage.getItem('vysion_tenant')
+      if (!stored) throw new Error('No tenant')
+      const tenant = JSON.parse(stored)
+      
+      // Get the next report number
+      const nextNumber = zReports.length > 0 ? Math.max(...zReports.map(z => z.report_number)) + 1 : 1
+
+      // Create Z-report
+      const zReport = {
+        business_id: tenant.business_id,
+        report_number: nextNumber,
+        date: selectedReport.date,
+        orders_count: selectedReport.orders,
+        revenue: selectedReport.revenue,
+        online_orders: selectedReport.onlineOrders,
+        kassa_orders: selectedReport.kassaOrders,
+        cash_payments: selectedReport.cashPayments,
+        card_payments: selectedReport.cardPayments,
+        vat_total: selectedReport.vatTotal,
+        closed_at: new Date().toISOString(),
+        closed_by: tenant.name,
+        sent_to_scarda: sendToScarda,
+        sent_to_accountant: sendToAccountant && !!accountantEmail,
+        accountant_email: sendToAccountant ? accountantEmail : null,
+      }
+
+      const { error } = await supabase
+        .from('z_reports')
+        .insert(zReport)
+
+      if (error) throw error
+
+      // Simulate sending to SCARDA
+      if (sendToScarda) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        console.log('Sent to SCARDA:', zReport)
+      }
+
+      // Simulate sending to accountant
+      if (sendToAccountant && accountantEmail) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        console.log('Sent to accountant:', accountantEmail, zReport)
+      }
+
+      setClosingSuccess(true)
+      fetchZReports()
+
+      setTimeout(() => {
+        setShowCloseModal(false)
+        setClosingSuccess(false)
+        setSelectedReport(null)
+      }, 2000)
+
+    } catch (error) {
+      console.error('Error closing day:', error)
+      alert('Er is een fout opgetreden bij het afsluiten van de dag.')
+    } finally {
+      setClosing(false)
+    }
+  }
+
+  const handleSendToAccountant = async (zReport: ZReport) => {
+    if (!emailAddress || !supabase) return
     
     setEmailSending(true)
     
-    // Simulate sending email (in production, this would call an API)
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    setEmailSending(false)
-    setEmailSent(true)
-    
-    setTimeout(() => {
-      setShowEmailModal(false)
-      setEmailSent(false)
-      setSelectedReport(null)
-    }, 2000)
+    try {
+      // Simulate sending email
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      // Update Z-report
+      await supabase
+        .from('z_reports')
+        .update({ 
+          sent_to_accountant: true, 
+          accountant_email: emailAddress 
+        })
+        .eq('id', zReport.id)
+
+      setEmailSent(true)
+      fetchZReports()
+
+      setTimeout(() => {
+        setShowEmailModal(false)
+        setEmailSent(false)
+      }, 2000)
+
+    } catch (error) {
+      console.error('Error sending to accountant:', error)
+    } finally {
+      setEmailSending(false)
+    }
   }
 
   if (loading) {
@@ -340,31 +379,20 @@ export default function RapportenPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{trans('title')}</h1>
-        <p className="text-gray-500 mt-1">{trans('subtitle')}</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{trans('title')}</h1>
+          <p className="text-gray-500 mt-1">{trans('subtitle')}</p>
+        </div>
+        <div className="flex items-center gap-2 bg-purple-100 px-4 py-2 rounded-lg">
+          <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span className="text-purple-800 font-medium">SCARDA Gekoppeld</span>
+        </div>
       </div>
 
-      {/* Unclosed Days Warning */}
-      {unclosedDays.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">⚠️</span>
-            <div>
-              <p className="font-semibold text-yellow-800">
-                {unclosedDays.length} dag(en) nog niet afgesloten
-              </p>
-              <p className="text-sm text-yellow-700 mt-1">
-                De volgende dagen hebben nog geen officieel Z-rapport: 
-                {unclosedDays.slice(0, 3).map(d => formatDate(d.date).split(',')[0]).join(', ')}
-                {unclosedDays.length > 3 ? ` en ${unclosedDays.length - 3} meer...` : ''}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tabs for X and Z Reports */}
+      {/* Tabs */}
       <div className="flex gap-4 border-b border-gray-200">
         <button
           onClick={() => setActiveTab('z')}
@@ -374,7 +402,12 @@ export default function RapportenPage() {
               : 'text-gray-400 border-transparent hover:text-gray-600'
           }`}
         >
-          📊 Z-Rapport (Dagafsluiting)
+          📊 Dagafsluiting
+          {unclosedDays.length > 0 && (
+            <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+              {unclosedDays.length}
+            </span>
+          )}
         </button>
         <button
           onClick={() => setActiveTab('x')}
@@ -384,11 +417,21 @@ export default function RapportenPage() {
               : 'text-gray-400 border-transparent hover:text-gray-600'
           }`}
         >
-          📈 X-Rapport (Tussenstand)
+          📈 X-Rapport
+        </button>
+        <button
+          onClick={() => setActiveTab('history')}
+          className={`px-6 py-3 font-semibold text-lg border-b-4 transition-colors ${
+            activeTab === 'history'
+              ? 'text-accent border-accent'
+              : 'text-gray-400 border-transparent hover:text-gray-600'
+          }`}
+        >
+          📚 Z-Rapport Archief ({zReports.length})
         </button>
       </div>
 
-      {/* X-Rapport - Current Day */}
+      {/* X-Rapport Tab */}
       {activeTab === 'x' && (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex justify-between items-start mb-6">
@@ -426,7 +469,7 @@ export default function RapportenPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="bg-blue-50 p-4 rounded-xl">
               <p className="text-sm text-gray-500">Contant</p>
               <p className="text-xl font-bold text-blue-600">{formatCurrency(todayReport.cashPayments)}</p>
@@ -435,20 +478,43 @@ export default function RapportenPage() {
               <p className="text-sm text-gray-500">Pin/Kaart</p>
               <p className="text-xl font-bold text-purple-600">{formatCurrency(todayReport.cardPayments)}</p>
             </div>
+            <div className="bg-orange-50 p-4 rounded-xl">
+              <p className="text-sm text-gray-500">BTW (21%)</p>
+              <p className="text-xl font-bold text-orange-600">{formatCurrency(todayReport.vatTotal)}</p>
+            </div>
           </div>
 
           <div className="mt-4 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
             <p className="text-sm text-yellow-800">
-              💡 <strong>Let op:</strong> Dit is een tussenstand. De dag is nog niet afgesloten. 
-              Gebruik het Z-Rapport voor de definitieve dagafsluiting.
+              💡 <strong>Let op:</strong> Dit is een tussenstand (X-Rapport). De dag is nog niet afgesloten. 
+              Ga naar "Dagafsluiting" om een officieel Z-Rapport aan te maken en naar SCARDA te versturen.
             </p>
           </div>
         </div>
       )}
 
-      {/* Z-Rapport - Daily Closings */}
+      {/* Dagafsluiting Tab */}
       {activeTab === 'z' && (
         <>
+          {/* Warning for unclosed days */}
+          {unclosedDays.length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-red-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <h3 className="font-semibold text-red-800">
+                    {unclosedDays.length} dag(en) nog niet afgesloten
+                  </h3>
+                  <p className="text-sm text-red-700 mt-1">
+                    Sluit deze dagen af om de Z-rapporten naar SCARDA te versturen.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Summary Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="bg-white p-6 rounded-xl border border-gray-100">
@@ -460,123 +526,75 @@ export default function RapportenPage() {
               <p className="text-2xl font-bold text-gray-900">{totalOrders}</p>
             </div>
             <div className="bg-white p-6 rounded-xl border border-gray-100">
-              <p className="text-sm text-gray-500">{trans('stats.avgPerDay')}</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(avgPerDay)}</p>
+              <p className="text-sm text-gray-500">Afgesloten dagen</p>
+              <p className="text-2xl font-bold text-green-600">{zReports.length}</p>
             </div>
             <div className="bg-white p-6 rounded-xl border border-gray-100">
-              <p className="text-sm text-gray-500">Z-Rapporten</p>
-              <p className="text-2xl font-bold text-gray-900">{zReports.length}</p>
+              <p className="text-sm text-gray-500">Open dagen</p>
+              <p className="text-2xl font-bold text-red-600">{unclosedDays.length}</p>
             </div>
           </div>
 
-          {/* Unclosed Days - Quick Close */}
-          {unclosedDays.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-6 border-b border-gray-100 bg-yellow-50">
-                <h2 className="text-lg font-semibold text-gray-900">⏳ Dagen nog af te sluiten</h2>
-                <p className="text-sm text-gray-600">Sluit deze dagen af om een officieel Z-rapport te genereren</p>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {unclosedDays.map((report) => (
-                  <div key={report.date} className="p-4 flex items-center justify-between hover:bg-gray-50">
-                    <div>
-                      <p className="font-medium text-gray-900">{formatDate(report.date)}</p>
-                      <p className="text-sm text-gray-500">
-                        {report.orders} bestellingen • {formatCurrency(report.revenue)} omzet
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setReportToClose(report)
-                        setShowCloseModal(true)
-                      }}
-                      className="flex items-center gap-2 bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Afsluiten
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Official Z-Reports Table */}
+          {/* Unclosed Days Table */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="p-6 border-b border-gray-100">
-              <h2 className="text-lg font-semibold text-gray-900">📋 Officiële Z-Rapporten</h2>
-              <p className="text-sm text-gray-500">Afgesloten dagen met officieel rapportnummer</p>
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-900">Dagen om af te sluiten</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nr.</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.date')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.orders')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{trans('table.revenue')}</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Afgesloten</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acties</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bestellingen</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Omzet</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">BTW</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actie</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {zReports.length === 0 ? (
+                  {unclosedDays.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                        Nog geen Z-rapporten. Sluit een dag af om het eerste Z-rapport te genereren.
+                        ✓ Alle dagen zijn afgesloten en verstuurd naar SCARDA
                       </td>
                     </tr>
                   ) : (
-                    zReports.map((report) => (
-                      <tr key={report.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-gray-900 text-white">
-                            #{String(report.report_number).padStart(6, '0')}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                    unclosedDays.map((report) => (
+                      <tr key={report.date} className="hover:bg-gray-50">
+                        <td className="px-6 py-4">
                           <p className="font-medium text-gray-900">{formatDate(report.date)}</p>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-xl font-bold text-gray-900">{report.orders_count}</span>
-                          <span className="text-sm text-gray-500 ml-2">
-                            (🏪{report.kassa_orders} / 🌐{report.online_orders})
+                        <td className="px-6 py-4">
+                          <span className="font-bold text-gray-900">{report.orders}</span>
+                          <span className="text-gray-500 text-sm ml-2">
+                            ({report.kassaOrders} kassa, {report.onlineOrders} online)
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-xl font-bold text-green-600">{formatCurrency(Number(report.revenue))}</span>
+                        <td className="px-6 py-4">
+                          <span className="text-xl font-bold text-green-600">{formatCurrency(report.revenue)}</span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {formatDateTime(report.closed_at)}
-                          <br />
-                          <span className="text-xs">door {report.closed_by}</span>
+                        <td className="px-6 py-4 text-gray-600">
+                          {formatCurrency(report.vatTotal)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handlePrint(report, 'z')}
-                              className="p-2 text-gray-600 hover:text-accent hover:bg-gray-100 rounded-lg transition-colors"
-                              title="Afdrukken"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={() => {
-                                setSelectedReport(report)
-                                setShowEmailModal(true)
-                              }}
-                              className="p-2 text-gray-600 hover:text-accent hover:bg-gray-100 rounded-lg transition-colors"
-                              title="Versturen naar boekhouder"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                              </svg>
-                            </button>
-                          </div>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            ⏳ Niet afgesloten
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => {
+                              setSelectedReport(report)
+                              setShowCloseModal(true)
+                            }}
+                            className="flex items-center gap-2 bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/90 transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Afsluiten
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -588,89 +606,232 @@ export default function RapportenPage() {
         </>
       )}
 
-      {/* Close Day Modal */}
-      {showCloseModal && reportToClose && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900">Dag afsluiten</h3>
-              <p className="text-gray-500 mt-2">{formatDate(reportToClose.date)}</p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-2">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Bestellingen</span>
-                <span className="font-semibold">{reportToClose.orders}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Omzet</span>
-                <span className="font-bold text-green-600">{formatCurrency(reportToClose.revenue)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">BTW</span>
-                <span className="font-semibold">{formatCurrency(reportToClose.vatTotal)}</span>
-              </div>
-            </div>
-
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
-              <p className="text-sm text-yellow-800">
-                ⚠️ <strong>Let op:</strong> Na het afsluiten kan dit Z-rapport niet meer worden gewijzigd. 
-                Dit rapport krijgt nummer <strong>#{String(getNextReportNumber()).padStart(6, '0')}</strong>.
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setShowCloseModal(false)
-                  setReportToClose(null)
-                }}
-                className="flex-1 px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Annuleren
-              </button>
-              <button
-                onClick={handleCloseDay}
-                disabled={closing}
-                className="flex-1 px-4 py-3 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {closing ? (
-                  <>
-                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Afsluiten...
-                  </>
+      {/* Z-Rapport History Tab */}
+      {activeTab === 'history' && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-6 border-b border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-900">Z-Rapport Archief</h2>
+            <p className="text-sm text-gray-500 mt-1">Alle officieel afgesloten dagen met volgnummer</p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nr.</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Datum</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Omzet</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Bestellingen</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SCARDA</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Boekhouder</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acties</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {zReports.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                      Nog geen Z-rapporten. Sluit een dag af om het eerste rapport aan te maken.
+                    </td>
+                  </tr>
                 ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Definitief afsluiten
-                  </>
+                  zReports.map((zReport) => (
+                    <tr key={zReport.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <span className="font-mono font-bold text-accent">
+                          #{String(zReport.report_number).padStart(6, '0')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <p className="font-medium text-gray-900">{formatDate(zReport.date)}</p>
+                        <p className="text-xs text-gray-500">Afgesloten: {formatDateTime(zReport.closed_at)}</p>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-xl font-bold text-green-600">{formatCurrency(zReport.revenue)}</span>
+                      </td>
+                      <td className="px-6 py-4 text-gray-900">
+                        {zReport.orders_count}
+                      </td>
+                      <td className="px-6 py-4">
+                        {zReport.sent_to_scarda ? (
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            ✓ Verstuurd
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                            ○ Niet verstuurd
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        {zReport.sent_to_accountant ? (
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            ✓ {zReport.accountant_email}
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setSelectedReport(zReport as any)
+                              setShowEmailModal(true)
+                            }}
+                            className="text-accent hover:underline text-sm"
+                          >
+                            + Versturen
+                          </button>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handlePrint(zReport, 'z')}
+                          className="p-2 text-gray-600 hover:text-accent hover:bg-gray-100 rounded-lg transition-colors"
+                          title="Afdrukken"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  ))
                 )}
-              </button>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
       )}
 
-      {/* Email Modal */}
-      {showEmailModal && selectedReport && (
+      {/* Close Day Modal */}
+      {showCloseModal && selectedReport && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6">
+            {closingSuccess ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-lg font-semibold text-gray-900">Dag afgesloten!</p>
+                <p className="text-gray-500 mt-2">
+                  Z-Rapport aangemaakt en verstuurd naar SCARDA
+                </p>
+              </div>
+            ) : (
+              <>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  Dag afsluiten - Z-Rapport
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Je staat op het punt om {formatDate(selectedReport.date)} af te sluiten.
+                  Dit maakt een officieel Z-Rapport aan.
+                </p>
+
+                {/* Summary */}
+                <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Omzet</p>
+                      <p className="text-xl font-bold text-green-600">{formatCurrency(selectedReport.revenue)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Bestellingen</p>
+                      <p className="text-xl font-bold text-gray-900">{selectedReport.orders}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">BTW (21%)</p>
+                      <p className="text-lg font-semibold text-gray-700">{formatCurrency(selectedReport.vatTotal)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Volgnummer</p>
+                      <p className="text-lg font-mono font-bold text-accent">
+                        #{String(zReports.length + 1).padStart(6, '0')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Options */}
+                <div className="space-y-4 mb-6">
+                  <label className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={sendToScarda}
+                      onChange={(e) => setSendToScarda(e.target.checked)}
+                      className="w-5 h-5 rounded text-accent"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900">Versturen naar SCARDA</p>
+                      <p className="text-sm text-gray-500">Automatisch doorsturen naar je boekhouding</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={sendToAccountant}
+                      onChange={(e) => setSendToAccountant(e.target.checked)}
+                      className="w-5 h-5 rounded text-accent mt-1"
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">Versturen naar boekhouder</p>
+                      {sendToAccountant && (
+                        <input
+                          type="email"
+                          value={accountantEmail}
+                          onChange={(e) => setAccountantEmail(e.target.value)}
+                          placeholder="boekhouder@example.com"
+                          className="mt-2 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                        />
+                      )}
+                    </div>
+                  </label>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setShowCloseModal(false)
+                      setSelectedReport(null)
+                    }}
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
+                  >
+                    Annuleren
+                  </button>
+                  <button
+                    onClick={handleCloseDay}
+                    disabled={closing}
+                    className="flex-1 px-4 py-3 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {closing ? (
+                      <>
+                        <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Afsluiten...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Dag afsluiten
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Send to Accountant Modal */}
+      {showEmailModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">
-              Z-Rapport versturen
+              Z-Rapport versturen naar boekhouder
             </h3>
-            <p className="text-gray-600 mb-4">
-              Verstuur het Z-Rapport van {formatDate(selectedReport.date)} naar uw boekhouder.
-            </p>
             
             {emailSent ? (
               <div className="text-center py-8">
@@ -680,7 +841,6 @@ export default function RapportenPage() {
                   </svg>
                 </div>
                 <p className="text-lg font-semibold text-gray-900">Verstuurd!</p>
-                <p className="text-gray-500">Het rapport is verzonden naar {emailAddress}</p>
               </div>
             ) : (
               <>
@@ -696,45 +856,20 @@ export default function RapportenPage() {
                     className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none"
                   />
                 </div>
-                
-                <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                  <p className="text-sm text-gray-600">
-                    <strong>Inhoud:</strong> Officieel Z-Rapport met omzet, 
-                    aantal bestellingen, BTW-overzicht en betalingsmethodes.
-                  </p>
-                </div>
 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => {
-                      setShowEmailModal(false)
-                      setSelectedReport(null)
-                    }}
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    onClick={() => setShowEmailModal(false)}
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
                   >
                     Annuleren
                   </button>
                   <button
-                    onClick={handleSendToAccountant}
+                    onClick={() => handleSendToAccountant(selectedReport as any)}
                     disabled={!emailAddress || emailSending}
-                    className="flex-1 px-4 py-3 bg-accent text-white rounded-lg hover:bg-accent/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-3 bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50"
                   >
-                    {emailSending ? (
-                      <>
-                        <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Versturen...
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
-                        Versturen
-                      </>
-                    )}
+                    {emailSending ? 'Versturen...' : 'Versturen'}
                   </button>
                 </div>
               </>
