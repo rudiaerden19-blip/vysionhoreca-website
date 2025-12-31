@@ -510,7 +510,7 @@ function ButWaitSection() {
           {/* Left - Image */}
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+              src="https://i.imgur.com/RTl6VfK.jpeg"
               alt="Ondernemer werkt met Vysion"
               className="w-full h-auto rounded-3xl shadow-2xl"
               loading="lazy"
