@@ -202,7 +202,7 @@ export default function BestellingenPage() {
                       {order.payment_method || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">
-                      {formatCurrency(parseFloat(String(order.total)))}
+                      {formatCurrency(Number(order.total) || 0)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
@@ -316,7 +316,7 @@ export default function BestellingenPage() {
                 </div>
                 <div className="flex justify-between text-lg font-bold">
                   <span>Totaal</span>
-                  <span>{formatCurrency(parseFloat(String(selectedOrder.total)) || 0)}</span>
+                  <span>{formatCurrency(Number(selectedOrder.total) || 0)}</span>
                 </div>
               </div>
             </div>

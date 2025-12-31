@@ -66,8 +66,8 @@ export default function DashboardPage() {
       const onlineOrders = orders?.filter(o => o.is_online) || []
       const pendingOrders = orders?.filter(o => o.status === 'pending' || o.status === 'preparing') || []
 
-      const totalRevenue = orders?.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0) || 0
-      const todayRevenue = todayOrders.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0)
+      const totalRevenue = orders?.reduce((sum, o) => sum + (Number(o.total) || 0), 0) || 0
+      const todayRevenue = todayOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
 
       setStats({
         totalOrders: orders?.length || 0,
@@ -257,7 +257,7 @@ export default function DashboardPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">
-                      {formatCurrency(parseFloat(order.total) || 0)}
+                      {formatCurrency(Number(order.total) || 0)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
