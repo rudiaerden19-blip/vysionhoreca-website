@@ -27,6 +27,7 @@
   "features": {
     "title": "Alles was Sie brauchen",
     "subtitle": "Eine Plattform für alle Ihre Gastronomiebedürfnisse. Keine separaten Systeme, kein Aufwand. Monatlich kündbar.",
+    "tagline": "Von der Bestellung bis zur Buchhaltung: alles korrekt, automatisch und gesetzeskonform.",
     "pos": {
       "title": "Leistungsstarke Kasse",
       "description": "Intuitive POS-Oberfläche für schnellen Service. Funktioniert auf Tablet, Computer oder Touchscreen."

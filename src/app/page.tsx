@@ -236,8 +236,11 @@ function FeaturesSection() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             {t('features.title')}
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-4">
             {t('features.subtitle')}
+          </p>
+          <p className="text-3xl sm:text-4xl font-bold text-accent max-w-4xl mx-auto">
+            {t('features.tagline')}
           </p>
         </div>
 

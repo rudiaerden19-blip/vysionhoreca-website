@@ -27,6 +27,7 @@
   "features": {
     "title": "Todo lo que necesitas",
     "subtitle": "Una plataforma para todas tus necesidades de hostelería. Sin sistemas separados, sin complicaciones. Cancelación mensual.",
+    "tagline": "Del pedido a la contabilidad: todo correcto, automático y conforme a la ley.",
     "pos": {
       "title": "Caja potente",
       "description": "Interfaz POS intuitiva para servicio rápido. Funciona en tablet, ordenador o pantalla táctil."
