@@ -61,7 +61,7 @@ function HeroSection() {
             <div className="flex items-end gap-4 justify-center lg:justify-start lg:-ml-16">
               {/* iPad Stand with screenshot */}
               <div className="flex flex-col items-center">
-                <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+                <div className="relative w-full max-w-[260px] sm:max-w-xs md:max-w-sm lg:max-w-md">
                   <img 
                     src="https://i.imgur.com/mHqvsrr.png" 
                     alt="iPad Kassa Stand" 
