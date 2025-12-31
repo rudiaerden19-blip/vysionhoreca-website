@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
 
 interface DashboardStats {
   totalOrders: number
@@ -26,6 +27,7 @@ interface RecentOrder {
 }
 
 export default function DashboardPage() {
+  const { businessId } = useAuth()
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
     totalRevenue: 0,
@@ -40,23 +42,29 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchDashboardData()
-  }, [])
+    if (businessId) {
+      fetchDashboardData()
+    }
+  }, [businessId])
 
   async function fetchDashboardData() {
+    if (!businessId) return
+    
     try {
-      // Fetch orders
+      // Fetch orders filtered by business_id
       const { data: orders, error: ordersError } = await supabase
         .from('orders')
         .select('*')
+        .eq('business_id', businessId)
         .order('created_at', { ascending: false })
 
       if (ordersError) throw ordersError
 
-      // Fetch customers
+      // Fetch customers filtered by business_id
       const { data: customers, error: customersError } = await supabase
         .from('customers')
         .select('id')
+        .eq('business_id', businessId)
 
       if (customersError) throw customersError
 

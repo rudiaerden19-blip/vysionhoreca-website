@@ -2,21 +2,27 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
 
 export default function AnalysePage() {
+  const { businessId } = useAuth()
   const [orders, setOrders] = useState<any[]>([])
   const [fixedCosts, setFixedCosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    if (businessId) {
+      fetchData()
+    }
+  }, [businessId])
 
   async function fetchData() {
+    if (!businessId) return
+    
     try {
       const [ordersRes, costsRes] = await Promise.all([
-        supabase.from('orders').select('*'),
-        supabase.from('fixed_costs').select('*'),
+        supabase.from('orders').select('*').eq('business_id', businessId),
+        supabase.from('fixed_costs').select('*').eq('business_id', businessId),
       ])
 
       if (ordersRes.error) throw ordersRes.error
