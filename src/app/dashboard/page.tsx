@@ -75,12 +75,12 @@ export default function DashboardPage() {
 
       // Calculate stats
       const today = new Date().toISOString().split('T')[0]
-      const todayOrders = orders?.filter(o => o.created_at?.startsWith(today)) || []
-      const onlineOrders = orders?.filter(o => o.is_online) || []
-      const pendingOrders = orders?.filter(o => o.status === 'pending' || o.status === 'preparing') || []
+      const todayOrders = orders?.filter((o: any) => o.created_at?.startsWith(today)) || []
+      const onlineOrders = orders?.filter((o: any) => o.is_online) || []
+      const pendingOrders = orders?.filter((o: any) => o.status === 'pending' || o.status === 'preparing') || []
 
-      const totalRevenue = orders?.reduce((sum, o) => sum + (Number(o.total) || 0), 0) || 0
-      const todayRevenue = todayOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
+      const totalRevenue = orders?.reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0) || 0
+      const todayRevenue = todayOrders.reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0)
 
       setStats({
         totalOrders: orders?.length || 0,

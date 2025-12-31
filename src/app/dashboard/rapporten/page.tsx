@@ -42,7 +42,7 @@ export default function RapportenPage() {
 
       // Group orders by date
       const groupedByDate: Record<string, any[]> = {}
-      data?.forEach(order => {
+      data?.forEach((order: any) => {
         const date = order.created_at?.split('T')[0]
         if (date) {
           if (!groupedByDate[date]) groupedByDate[date] = []
