@@ -33,53 +33,92 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!supabase) {
+      console.error('Supabase client not initialized')
+      setLoading(false)
+      return
+    }
+
+    let isMounted = true
+
+    // Safety timeout - never load forever
+    const timeout = setTimeout(() => {
+      if (isMounted && loading) {
+        console.log('Auth timeout - stopping loading')
+        setLoading(false)
+      }
+    }, 5000)
+
     // Get initial session
-    supabase?.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!isMounted) return
+      console.log('Initial session:', session ? 'found' : 'none')
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchTenant(session.user.id)
+        fetchTenant(session.user.email)
       } else {
         setLoading(false)
       }
+    }).catch(err => {
+      if (!isMounted) return
+      console.error('Error getting session:', err)
+      setLoading(false)
     })
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase?.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!isMounted) return
+        console.log('Auth state changed:', _event)
         setSession(session)
         setUser(session?.user ?? null)
         if (session?.user) {
-          await fetchTenant(session.user.id)
+          await fetchTenant(session.user.email)
         } else {
           setTenant(null)
           setBusinessId(null)
           setLoading(false)
         }
       }
-    ) ?? { data: { subscription: null } }
+    )
 
-    return () => subscription?.unsubscribe()
+    return () => {
+      isMounted = false
+      clearTimeout(timeout)
+      subscription?.unsubscribe()
+    }
   }, [])
 
-  async function fetchTenant(userId: string) {
+  async function fetchTenant(email: string | undefined) {
+    console.log('Fetching tenant for email:', email)
+    
+    if (!email || !supabase) {
+      console.log('No email or supabase client')
+      setLoading(false)
+      return
+    }
+
     try {
-      // First try to get tenant by user email
-      const { data: userData } = await supabase?.auth.getUser() ?? { data: null }
-      const email = userData?.user?.email
+      // Try to find tenant by email
+      const { data: tenantData, error } = await supabase
+        .from('tenants')
+        .select('id, business_id, name, slug, plan, logo_url')
+        .eq('email', email)
+        .maybeSingle()
 
-      if (email) {
-        // Try to find tenant by email
-        const { data: tenantData, error } = await supabase
-          ?.from('tenants')
-          .select('id, business_id, name, slug, plan, logo_url')
-          .eq('email', email)
-          .single() ?? { data: null, error: null }
+      console.log('Tenant lookup result:', { tenantData, error })
 
-        if (tenantData && !error) {
-          setTenant(tenantData)
-          setBusinessId(tenantData.business_id)
-        }
+      if (tenantData) {
+        setTenant(tenantData)
+        setBusinessId(tenantData.business_id)
+        console.log('Tenant found, business_id:', tenantData.business_id)
+      } else {
+        console.log('No tenant found for this email')
+        // Even if no tenant found, we still let them access the dashboard
+        // They'll just see empty data
+        setTenant(null)
+        setBusinessId(null)
       }
     } catch (error) {
       console.error('Error fetching tenant:', error)
@@ -89,15 +128,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signIn(email: string, password: string) {
-    const { error } = await supabase?.auth.signInWithPassword({
+    if (!supabase) {
+      return { error: new Error('Supabase not initialized') }
+    }
+    
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
-    }) ?? { error: new Error('Supabase not initialized') }
+    })
     return { error }
   }
 
   async function signOut() {
-    await supabase?.auth.signOut()
+    if (supabase) {
+      await supabase.auth.signOut()
+    }
     setUser(null)
     setSession(null)
     setTenant(null)
