@@ -51,8 +51,286 @@ export default function RapportenPage() {
   const [sendToScarda, setSendToScarda] = useState(true)
   const [sendToAccountant, setSendToAccountant] = useState(true)
   const [accountantEmail, setAccountantEmail] = useState('')
+  const [showExportModal, setShowExportModal] = useState(false)
   const { t } = useLanguage()
   const trans = (key: string) => t(`reportsPage.${key}`)
+
+  // Get tenant info
+  const getTenant = () => {
+    const stored = localStorage.getItem('vysion_tenant')
+    return stored ? JSON.parse(stored) : { name: 'Bedrijf' }
+  }
+
+  // Export to CSV/Excel
+  const exportToCSV = () => {
+    if (zReports.length === 0) {
+      alert('Geen Z-rapporten om te exporteren')
+      return
+    }
+
+    const tenant = getTenant()
+    const headers = [
+      'Rapport Nr.',
+      'Datum',
+      'Bestellingen',
+      'Kassa',
+      'Online',
+      'Omzet',
+      'Contant',
+      'Pin/Kaart',
+      'BTW',
+      'Afgesloten op',
+      'Afgesloten door',
+      'SCARDA',
+      'Boekhouder'
+    ]
+
+    const rows = zReports.map(z => [
+      z.report_number,
+      z.date,
+      z.orders_count,
+      z.kassa_orders,
+      z.online_orders,
+      z.revenue,
+      z.cash_payments,
+      z.card_payments,
+      z.vat_total,
+      z.closed_at,
+      z.closed_by,
+      z.sent_to_scarda ? 'Ja' : 'Nee',
+      z.sent_to_accountant ? z.accountant_email : 'Nee'
+    ])
+
+    const csvContent = [
+      `Z-Rapporten Export - ${tenant.name}`,
+      `Geëxporteerd op: ${new Date().toLocaleString('nl-BE')}`,
+      '',
+      headers.join(';'),
+      ...rows.map(row => row.join(';'))
+    ].join('\n')
+
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `z-rapporten-${tenant.name}-${new Date().toISOString().split('T')[0]}.csv`
+    link.click()
+  }
+
+  // Export single Z-report to PDF
+  const exportToPDF = (zReport: ZReport) => {
+    const tenant = getTenant()
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Z-Rapport #${String(zReport.report_number).padStart(6, '0')}</title>
+        <style>
+          @page { size: A4; margin: 20mm; }
+          body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+          .header { text-align: center; border-bottom: 3px solid #000; padding-bottom: 20px; margin-bottom: 30px; }
+          .logo { font-size: 32px; font-weight: bold; color: #E85D04; }
+          .company { font-size: 24px; margin: 10px 0; }
+          .report-title { font-size: 28px; font-weight: bold; margin: 20px 0; }
+          .report-number { font-size: 18px; background: #000; color: #fff; padding: 8px 16px; display: inline-block; }
+          .date { font-size: 16px; margin-top: 10px; }
+          .section { margin: 30px 0; }
+          .section-title { font-size: 18px; font-weight: bold; border-bottom: 2px solid #E85D04; padding-bottom: 5px; margin-bottom: 15px; }
+          .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+          .row:last-child { border-bottom: none; }
+          .label { color: #666; }
+          .value { font-weight: bold; font-size: 18px; }
+          .total-row { background: #f5f5f5; padding: 15px; margin-top: 10px; }
+          .total-row .value { font-size: 24px; color: #28a745; }
+          .footer { margin-top: 50px; padding-top: 20px; border-top: 2px solid #000; text-align: center; font-size: 12px; color: #666; }
+          .stamp { border: 3px solid #000; padding: 15px; display: inline-block; margin: 20px 0; }
+          .legal { font-size: 10px; color: #999; margin-top: 20px; }
+          @media print { 
+            body { padding: 0; } 
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="logo">Vysion Horeca</div>
+          <div class="company">${tenant.name}</div>
+          <div class="report-title">OFFICIEEL Z-RAPPORT</div>
+          <div class="report-number">Nr. ${String(zReport.report_number).padStart(6, '0')}</div>
+          <div class="date">${new Date(zReport.date).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">📊 Bestellingen</div>
+          <div class="row"><span class="label">Totaal aantal bestellingen</span><span class="value">${zReport.orders_count}</span></div>
+          <div class="row"><span class="label">Kassa bestellingen</span><span class="value">${zReport.kassa_orders}</span></div>
+          <div class="row"><span class="label">Online bestellingen</span><span class="value">${zReport.online_orders}</span></div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">💳 Betalingen</div>
+          <div class="row"><span class="label">Contant</span><span class="value">€ ${Number(zReport.cash_payments).toFixed(2)}</span></div>
+          <div class="row"><span class="label">Pin / Kaart</span><span class="value">€ ${Number(zReport.card_payments).toFixed(2)}</span></div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">💰 Financieel Overzicht</div>
+          <div class="row"><span class="label">Subtotaal (excl. BTW)</span><span class="value">€ ${(Number(zReport.revenue) - Number(zReport.vat_total)).toFixed(2)}</span></div>
+          <div class="row"><span class="label">BTW (21%)</span><span class="value">€ ${Number(zReport.vat_total).toFixed(2)}</span></div>
+          <div class="row total-row"><span class="label">TOTAAL OMZET</span><span class="value">€ ${Number(zReport.revenue).toFixed(2)}</span></div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">📋 Afsluiting Details</div>
+          <div class="row"><span class="label">Afgesloten op</span><span class="value">${new Date(zReport.closed_at).toLocaleString('nl-BE')}</span></div>
+          <div class="row"><span class="label">Afgesloten door</span><span class="value">${zReport.closed_by}</span></div>
+          <div class="row"><span class="label">Verstuurd naar SCARDA</span><span class="value">${zReport.sent_to_scarda ? '✓ Ja' : '✗ Nee'}</span></div>
+          <div class="row"><span class="label">Verstuurd naar boekhouder</span><span class="value">${zReport.sent_to_accountant ? '✓ ' + zReport.accountant_email : '✗ Nee'}</span></div>
+        </div>
+
+        <div style="text-align: center;">
+          <div class="stamp">
+            <strong>OFFICIEEL Z-RAPPORT</strong><br>
+            GKS GECERTIFICEERD<br>
+            Bewaartermijn: 7 jaar
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>Dit document is gegenereerd door Vysion Horeca POS</p>
+          <p>Geëxporteerd op: ${new Date().toLocaleString('nl-BE')}</p>
+          <p class="legal">
+            Conform de Belgische fiscale wetgeving dient dit document 7 jaar te worden bewaard.<br>
+            Vysion Horeca - GKS Gecertificeerd Kassasysteem - www.vysionhoreca.com
+          </p>
+        </div>
+
+        <div class="no-print" style="text-align: center; margin-top: 30px;">
+          <button onclick="window.print()" style="padding: 15px 30px; font-size: 16px; background: #E85D04; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            🖨️ Afdrukken / Opslaan als PDF
+          </button>
+        </div>
+      </body>
+      </html>
+    `)
+    printWindow.document.close()
+  }
+
+  // Export all Z-reports to PDF
+  const exportAllToPDF = () => {
+    if (zReports.length === 0) {
+      alert('Geen Z-rapporten om te exporteren')
+      return
+    }
+
+    const tenant = getTenant()
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+
+    const totalRevenue = zReports.reduce((sum, z) => sum + Number(z.revenue), 0)
+    const totalOrders = zReports.reduce((sum, z) => sum + z.orders_count, 0)
+    const totalVat = zReports.reduce((sum, z) => sum + Number(z.vat_total), 0)
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Z-Rapporten Overzicht - ${tenant.name}</title>
+        <style>
+          @page { size: A4 landscape; margin: 15mm; }
+          body { font-family: Arial, sans-serif; padding: 20px; font-size: 12px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .logo { font-size: 24px; font-weight: bold; color: #E85D04; }
+          .title { font-size: 20px; margin: 10px 0; }
+          .period { color: #666; }
+          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          th { background: #333; color: white; padding: 12px 8px; text-align: left; font-size: 11px; }
+          td { padding: 10px 8px; border-bottom: 1px solid #ddd; }
+          tr:nth-child(even) { background: #f9f9f9; }
+          .number { font-family: monospace; font-weight: bold; }
+          .currency { text-align: right; }
+          .summary { background: #f5f5f5; padding: 20px; margin-top: 20px; }
+          .summary-row { display: flex; justify-content: space-between; padding: 8px 0; }
+          .summary-total { font-size: 18px; font-weight: bold; color: #28a745; }
+          .footer { margin-top: 30px; text-align: center; font-size: 10px; color: #666; }
+          .status { padding: 3px 8px; border-radius: 4px; font-size: 10px; }
+          .status-yes { background: #d4edda; color: #155724; }
+          .status-no { background: #f8d7da; color: #721c24; }
+          @media print { .no-print { display: none; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="logo">Vysion Horeca</div>
+          <div class="title">Z-RAPPORTEN OVERZICHT</div>
+          <div style="font-size: 16px; margin: 5px 0;">${tenant.name}</div>
+          <div class="period">
+            Periode: ${zReports.length > 0 ? new Date(zReports[zReports.length-1].date).toLocaleDateString('nl-BE') : '-'} 
+            t/m ${zReports.length > 0 ? new Date(zReports[0].date).toLocaleDateString('nl-BE') : '-'}
+          </div>
+          <div class="period">Geëxporteerd op: ${new Date().toLocaleString('nl-BE')}</div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Nr.</th>
+              <th>Datum</th>
+              <th>Best.</th>
+              <th>Kassa</th>
+              <th>Online</th>
+              <th style="text-align:right">Contant</th>
+              <th style="text-align:right">Pin/Kaart</th>
+              <th style="text-align:right">BTW</th>
+              <th style="text-align:right">Omzet</th>
+              <th>SCARDA</th>
+              <th>Afgesloten</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${zReports.map(z => `
+              <tr>
+                <td class="number">#${String(z.report_number).padStart(6, '0')}</td>
+                <td>${new Date(z.date).toLocaleDateString('nl-BE')}</td>
+                <td>${z.orders_count}</td>
+                <td>${z.kassa_orders}</td>
+                <td>${z.online_orders}</td>
+                <td class="currency">€ ${Number(z.cash_payments).toFixed(2)}</td>
+                <td class="currency">€ ${Number(z.card_payments).toFixed(2)}</td>
+                <td class="currency">€ ${Number(z.vat_total).toFixed(2)}</td>
+                <td class="currency" style="font-weight:bold; color:#28a745">€ ${Number(z.revenue).toFixed(2)}</td>
+                <td><span class="status ${z.sent_to_scarda ? 'status-yes' : 'status-no'}">${z.sent_to_scarda ? '✓' : '✗'}</span></td>
+                <td style="font-size:10px">${new Date(z.closed_at).toLocaleString('nl-BE')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <div class="summary">
+          <h3 style="margin-top:0">📊 Totalen</h3>
+          <div class="summary-row"><span>Aantal Z-rapporten:</span><span><strong>${zReports.length}</strong></span></div>
+          <div class="summary-row"><span>Totaal bestellingen:</span><span><strong>${totalOrders}</strong></span></div>
+          <div class="summary-row"><span>Totaal BTW:</span><span><strong>€ ${totalVat.toFixed(2)}</strong></span></div>
+          <div class="summary-row"><span>Totaal omzet:</span><span class="summary-total">€ ${totalRevenue.toFixed(2)}</span></div>
+        </div>
+
+        <div class="footer">
+          <p>Dit document is gegenereerd door Vysion Horeca POS - GKS Gecertificeerd</p>
+          <p>Bewaartermijn: 7 jaar conform Belgische fiscale wetgeving</p>
+        </div>
+
+        <div class="no-print" style="text-align: center; margin-top: 30px;">
+          <button onclick="window.print()" style="padding: 15px 30px; font-size: 16px; background: #E85D04; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            🖨️ Afdrukken / Opslaan als PDF
+          </button>
+        </div>
+      </body>
+      </html>
+    `)
+    printWindow.document.close()
+  }
 
   useEffect(() => {
     fetchOrders()
@@ -615,6 +893,37 @@ export default function RapportenPage() {
 
       {/* Z-Rapport History Tab */}
       {activeTab === 'history' && (
+        {/* Export Buttons */}
+        <div className="flex flex-wrap gap-3 mb-6">
+          <button
+            onClick={exportToCSV}
+            disabled={zReports.length === 0}
+            className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Exporteer naar Excel/CSV
+          </button>
+          <button
+            onClick={exportAllToPDF}
+            disabled={zReports.length === 0}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+            Exporteer alle naar PDF
+          </button>
+          <div className="flex-1"></div>
+          <div className="text-sm text-gray-500 flex items-center gap-2">
+            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Bewaartermijn: 7 jaar
+          </div>
+        </div>
+
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">Z-Rapport Archief</h2>
@@ -687,15 +996,26 @@ export default function RapportenPage() {
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <button
-                          onClick={() => handlePrint(zReport, 'z')}
-                          className="p-2 text-gray-600 hover:text-accent hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Afdrukken"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                          </svg>
-                        </button>
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => handlePrint(zReport, 'z')}
+                            className="p-2 text-gray-600 hover:text-accent hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Afdrukken"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => exportToPDF(zReport)}
+                            className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Opslaan als PDF"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
