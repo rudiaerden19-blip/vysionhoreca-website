@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useLanguage } from '@/i18n'
 
 export default function TroubleshootingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const { t } = useLanguage()
 
   const faqs = [
     {
@@ -137,7 +139,7 @@ export default function TroubleshootingPage() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            Terug naar login
+            {t('common.backToLogin')}
           </Link>
           <Link href="/">
             <span className="text-xl font-bold">

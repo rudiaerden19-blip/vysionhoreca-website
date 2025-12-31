@@ -57,10 +57,10 @@ export default function IntellectueelEigendomPage() {
 
           <div className="mt-12 pt-8 border-t border-gray-200 flex gap-4">
             <a href="/juridisch" className="text-accent hover:underline font-semibold">
-              ← Terug naar Juridisch
+              {t('common.backToLegal')}
             </a>
             <a href="/" className="text-gray-500 hover:underline">
-              Home
+              {t('common.home')}
             </a>
           </div>
         </div>
