@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 
 // Navigation Component
@@ -262,24 +262,70 @@ function FeaturesSection() {
 }
 
 // Stats Section
+function CountUp({ end, suffix = '', prefix = '' }: { end: number, suffix?: string, prefix?: string }) {
+  const [count, setCount] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+
+    return () => observer.disconnect()
+  }, [isVisible])
+
+  useEffect(() => {
+    if (!isVisible) return
+
+    const duration = 2000
+    const steps = 60
+    const increment = end / steps
+    let current = 0
+
+    const timer = setInterval(() => {
+      current += increment
+      if (current >= end) {
+        setCount(end)
+        clearInterval(timer)
+      } else {
+        setCount(Math.floor(current))
+      }
+    }, duration / steps)
+
+    return () => clearInterval(timer)
+  }, [isVisible, end])
+
+  return <div ref={ref}>{prefix}{count.toLocaleString()}{suffix}</div>
+}
+
 function StatsSection() {
   const stats = [
-    { value: '€2.5M+', label: 'Verwerkt per maand' },
-    { value: '500+', label: 'Actieve horecazaken' },
-    { value: '99.9%', label: 'Uptime garantie' },
-    { value: '24/7', label: 'Support beschikbaar' },
+    { value: 2.5, prefix: '€', suffix: 'M+', label: 'Verwerkt per maand' },
+    { value: 500, prefix: '', suffix: '+', label: 'Actieve horecazaken' },
+    { value: 99.9, prefix: '', suffix: '%', label: 'Uptime garantie' },
+    { value: 24, prefix: '', suffix: '/7', label: 'Support beschikbaar' },
   ]
 
   return (
-    <section className="bg-dark py-20">
+    <section className="py-20" style={{ backgroundColor: '#E3E3E3' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
-              <div className="text-4xl sm:text-5xl font-bold text-white mb-2">
-                {stat.value}
+              <div className="text-4xl sm:text-5xl font-bold text-gray-900 mb-2">
+                <CountUp end={stat.value} prefix={stat.prefix} suffix={stat.suffix} />
               </div>
-              <div className="text-gray-400">
+              <div className="text-gray-600">
                 {stat.label}
               </div>
             </div>
@@ -293,73 +339,58 @@ function StatsSection() {
 // Order App Section - Product Showcase
 function OrderAppSection() {
   return (
-    <section className="py-24 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
+    <section className="py-24 bg-dark overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Alles wat je nodig hebt
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Een compleet ecosysteem voor jouw horecazaak. Kassa, bestelapp, betaalterminal en meer.
           </p>
         </div>
 
         {/* Product Showcase Grid */}
-        <div className="relative h-[600px] md:h-[700px]">
-          {/* Center - Main POS */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-            <img
-              src="https://i.imgur.com/HrgjfGN.png"
-              alt="Vysion Horeca Kassa"
-              className="w-[300px] md:w-[450px] drop-shadow-2xl"
-            />
-          </div>
-
-          {/* Left Top - Phone 1 */}
-          <div className="absolute left-0 md:left-[5%] top-[5%] md:top-[10%]">
+        <div className="flex items-center justify-center gap-8 md:gap-16">
+          {/* Left Column - Phones stacked */}
+          <div className="flex flex-col gap-6">
             <img
               src="https://i.imgur.com/inUZtVe.png"
               alt="Vysion Bestelapp"
-              className="w-[120px] md:w-[180px] drop-shadow-xl"
+              className="w-[150px] md:w-[220px] drop-shadow-xl rounded-3xl"
             />
-          </div>
-
-          {/* Left Bottom - Phone 2 */}
-          <div className="absolute left-[5%] md:left-[8%] bottom-[5%] md:bottom-[10%]">
             <img
               src="https://i.imgur.com/1SlM8G4.png"
               alt="Vysion Bestelapp Menu"
-              className="w-[120px] md:w-[180px] drop-shadow-xl"
+              className="w-[150px] md:w-[220px] drop-shadow-xl rounded-3xl"
             />
           </div>
 
-          {/* Right Top */}
-          <div className="absolute right-0 md:right-[5%] top-[5%] md:top-[10%]">
+          {/* Center - Main POS */}
+          <div className="flex-shrink-0">
+            <img
+              src="https://i.imgur.com/HrgjfGN.png"
+              alt="Vysion Horeca Kassa"
+              className="w-[280px] md:w-[500px] drop-shadow-2xl rounded-2xl"
+            />
+          </div>
+
+          {/* Right Column - Devices stacked */}
+          <div className="flex flex-col gap-6">
             <img
               src="https://i.imgur.com/56z9j0j.png"
               alt="Vysion Betaalterminal"
-              className="w-[120px] md:w-[180px] drop-shadow-xl"
+              className="w-[150px] md:w-[220px] drop-shadow-xl rounded-3xl"
             />
-          </div>
-
-          {/* Right Bottom */}
-          <div className="absolute right-[5%] md:right-[8%] bottom-[5%] md:bottom-[10%]">
             <img
               src="https://i.imgur.com/b450kVT.png"
               alt="Vysion Keukenbeeldscherm"
-              className="w-[120px] md:w-[180px] drop-shadow-xl"
+              className="w-[150px] md:w-[220px] drop-shadow-xl rounded-3xl"
             />
           </div>
 
-          {/* Connecting Lines (decorative) */}
-          <div className="absolute inset-0 pointer-events-none">
-            <svg className="w-full h-full opacity-20" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <circle cx="50" cy="50" r="35" fill="none" stroke="#E85A3C" strokeWidth="0.2" strokeDasharray="2,2" />
-              <circle cx="50" cy="50" r="25" fill="none" stroke="#3C4D6B" strokeWidth="0.15" strokeDasharray="1,1" />
-            </svg>
           </div>
-        </div>
 
         {/* CTA */}
         <div className="text-center mt-12">
@@ -404,11 +435,11 @@ function ComparisonSection() {
   }
 
   return (
-    <section className="py-24 bg-gray-50">
+    <section className="py-24 bg-[#E3E3E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            Vergelijk met de concurrentie
+            Vergelijk met andere platformen
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Meer functies, lagere prijs. Ontdek waarom Vysion Horeca de beste keuze is.
@@ -440,7 +471,7 @@ function ComparisonSection() {
             </thead>
             <tbody>
               {features.map((feature, index) => (
-                <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                <tr key={index} className={index % 2 === 0 ? 'bg-[#E3E3E3]' : 'bg-white'}>
                   <td className="px-6 py-4 font-medium text-gray-900">{feature.name}</td>
                   <td className="px-6 py-4 text-center bg-accent/5">{renderCheck(feature.vysion)}</td>
                   <td className="px-6 py-4 text-center">{renderCheck(feature.lightspeed)}</td>
@@ -468,7 +499,7 @@ function ComparisonSection() {
 // Pricing Section
 function PricingSection() {
   return (
-    <section id="prijzen" className="py-24">
+    <section id="prijzen" className="py-24" style={{ backgroundColor: '#E3E3E3' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -724,7 +755,7 @@ function TestimonialSection() {
   }, [testimonials.length])
 
   return (
-    <section className="py-24 bg-gray-50 overflow-hidden">
+    <section className="py-24 bg-[#E3E3E3] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -805,7 +836,7 @@ function CTASection() {
 // Contact Section
 function ContactSection() {
   return (
-    <section id="contact" className="py-24">
+    <section id="contact" className="py-24 bg-[#E3E3E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16">
           <div>
@@ -847,7 +878,7 @@ function ContactSection() {
             </div>
           </div>
 
-          <div className="bg-gray-50 rounded-2xl p-8">
+          <div className="bg-[#E3E3E3] rounded-2xl p-8">
             <form className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div>
