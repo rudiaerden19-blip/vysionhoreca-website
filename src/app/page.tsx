@@ -78,23 +78,23 @@ function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Badges centered under navbar */}
         <div className="flex justify-center gap-8 sm:gap-16 mb-12">
-          <div className="flex items-center gap-2 whitespace-nowrap">
+          <div className="flex items-center gap-2 whitespace-nowrap" style={{ position: 'relative', top: '-2cm' }}>
             <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span className="text-accent font-bold text-sm uppercase">1 Platform</span>
           </div>
-          <div className="flex items-center gap-2 whitespace-nowrap">
+          <div className="flex items-center gap-2 whitespace-nowrap" style={{ position: 'relative', top: '-2cm' }}>
             <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span className="text-accent font-bold text-sm uppercase">Alles geregeld</span>
+            <span className="text-accent font-bold text-sm uppercase">Gemaakt door horecaondernemers</span>
           </div>
-          <div className="flex items-center gap-2 whitespace-nowrap">
+          <div className="flex items-center gap-2 whitespace-nowrap" style={{ position: 'relative', top: '-2cm' }}>
             <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span className="text-accent font-bold text-sm uppercase">Voor horecaondernemers</span>
+            <span className="text-accent font-bold text-sm uppercase">Gemaakt voor horecaondernemers</span>
           </div>
         </div>
 
@@ -121,7 +121,7 @@ function HeroSection() {
           </div>
 
           {/* Right content - iPad and vertical image slider */}
-          <div className="opacity-0 animate-fadeInUp delay-200">
+          <div className="opacity-0 animate-fadeInUp delay-200" style={{ position: 'relative', left: '1.5cm' }}>
             <div className="flex items-end gap-4 justify-center lg:justify-start lg:-ml-16">
               {/* iPad Stand with screenshot */}
               <div className="flex flex-col items-center">
@@ -142,36 +142,66 @@ function HeroSection() {
                 </div>
                 <p className="text-gray-500 text-sm mt-2">Klik om te openen</p>
               </div>
-              {/* Vertical Image Slider */}
-              <div className="hidden lg:flex flex-col gap-2 h-[400px] overflow-y-auto pr-2 scrollbar-thin">
-                {[
-                  'https://i.imgur.com/6X8DuuU.png',
-                  'https://i.imgur.com/lhfJfog.png',
-                  'https://i.imgur.com/2yDjxdG.png',
-                  'https://i.imgur.com/JzNBNID.png',
-                  'https://i.imgur.com/LY3pado.png',
-                  'https://i.imgur.com/WICLOFZ.png',
-                  'https://i.imgur.com/OAV1L3S.png',
-                  'https://i.imgur.com/vA8geT0.png',
-                  'https://i.imgur.com/O9GBS6s.png',
-                  'https://i.imgur.com/DOtQn1g.png',
-                  'https://i.imgur.com/jnrBtec.png',
-                  'https://i.imgur.com/IJ2vDaw.png',
-                  'https://i.imgur.com/2IzZkB3.png',
-                  'https://i.imgur.com/Pm7YSKt.png',
-                  'https://i.imgur.com/9CAo3Yr.png',
-                  'https://i.imgur.com/cIfiPmB.png',
-                  'https://i.imgur.com/HtApXus.png',
-                  'https://i.imgur.com/meXaat6.png',
-                ].map((src, index) => (
-                  <img
-                    key={index}
-                    src={src}
-                    alt={`Screenshot ${index + 1}`}
-                    className="w-[80px] h-[50px] object-cover rounded cursor-pointer hover:scale-110 transition-transform border border-gray-200 hover:border-accent"
-                    onClick={() => setLightboxImage(src)}
-                  />
-                ))}
+              {/* Vertical Image Slider with arrows */}
+              <div className="hidden lg:flex flex-col items-center">
+                {/* Arrow Up */}
+                <button 
+                  className="text-accent hover:text-accent/70 transition-colors mb-2"
+                  onClick={() => {
+                    const slider = document.getElementById('image-slider');
+                    if (slider) slider.scrollBy({ top: -100, behavior: 'smooth' });
+                  }}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                  </svg>
+                </button>
+                
+                {/* Slider */}
+                <div id="image-slider" className="flex flex-col gap-2 h-[400px] overflow-y-auto pr-2 scrollbar-thin">
+                  {[
+                    'https://i.imgur.com/6X8DuuU.png',
+                    'https://i.imgur.com/lhfJfog.png',
+                    'https://i.imgur.com/2yDjxdG.png',
+                    'https://i.imgur.com/JzNBNID.png',
+                    'https://i.imgur.com/LY3pado.png',
+                    'https://i.imgur.com/WICLOFZ.png',
+                    'https://i.imgur.com/OAV1L3S.png',
+                    'https://i.imgur.com/vA8geT0.png',
+                    'https://i.imgur.com/O9GBS6s.png',
+                    'https://i.imgur.com/DOtQn1g.png',
+                    'https://i.imgur.com/jnrBtec.png',
+                    'https://i.imgur.com/IJ2vDaw.png',
+                    'https://i.imgur.com/2IzZkB3.png',
+                    'https://i.imgur.com/Pm7YSKt.png',
+                    'https://i.imgur.com/9CAo3Yr.png',
+                    'https://i.imgur.com/cIfiPmB.png',
+                    'https://i.imgur.com/HtApXus.png',
+                    'https://i.imgur.com/meXaat6.png',
+                  ].map((src, index) => (
+                    <img
+                      key={index}
+                      src={src}
+                      alt={`Screenshot ${index + 1}`}
+                      className="w-[80px] h-[50px] object-cover rounded cursor-pointer hover:scale-110 transition-transform border border-gray-200 hover:border-accent"
+                      onClick={() => setLightboxImage(src)}
+                    />
+                  ))}
+                </div>
+                
+                {/* Arrow Down */}
+                <button 
+                  className="text-accent hover:text-accent/70 transition-colors mt-2"
+                  onClick={() => {
+                    const slider = document.getElementById('image-slider');
+                    if (slider) slider.scrollBy({ top: 100, behavior: 'smooth' });
+                  }}
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <p className="text-gray-500 text-sm mt-2">Klik om te openen</p>
               </div>
             </div>
           </div>
