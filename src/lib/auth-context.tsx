@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, 5000)
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       if (!isMounted) return
       console.log('Initial session:', session ? 'found' : 'none')
       setSession(session)
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setLoading(false)
       }
-    }).catch(err => {
+    }).catch((err: any) => {
       if (!isMounted) return
       console.error('Error getting session:', err)
       setLoading(false)
@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (_event: any, session: any) => {
         if (!isMounted) return
         console.log('Auth state changed:', _event)
         setSession(session)
