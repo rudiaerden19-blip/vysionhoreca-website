@@ -332,6 +332,104 @@ export default function RapportenPage() {
     printWindow.document.close()
   }
 
+  // Complete Backup Package - CSV + PDF + Individual PDFs
+  const downloadBackupPackage = async () => {
+    if (zReports.length === 0) {
+      alert('Geen Z-rapporten om te exporteren')
+      return
+    }
+
+    const tenant = getTenant()
+    const dateStr = new Date().toISOString().split('T')[0]
+
+    // Step 1: Download CSV
+    exportToCSV()
+
+    // Step 2: Open PDF overview (user can save as PDF)
+    await new Promise(resolve => setTimeout(resolve, 500))
+    exportAllToPDF()
+
+    // Step 3: Create a summary text file with backup info
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    const summaryContent = `
+================================================================================
+                    VYSION HORECA - BACKUP OVERZICHT
+================================================================================
+
+Bedrijf: ${tenant.name}
+Backup datum: ${new Date().toLocaleString('nl-BE')}
+Periode: ${zReports.length > 0 ? zReports[zReports.length-1].date : '-'} t/m ${zReports.length > 0 ? zReports[0].date : '-'}
+
+================================================================================
+                              SAMENVATTING
+================================================================================
+
+Aantal Z-rapporten: ${zReports.length}
+Totaal bestellingen: ${zReports.reduce((sum, z) => sum + z.orders_count, 0)}
+Totaal omzet: € ${zReports.reduce((sum, z) => sum + Number(z.revenue), 0).toFixed(2)}
+Totaal BTW: € ${zReports.reduce((sum, z) => sum + Number(z.vat_total), 0).toFixed(2)}
+
+================================================================================
+                            RAPPORT NUMMERS
+================================================================================
+
+${zReports.map(z => `#${String(z.report_number).padStart(6, '0')} - ${z.date} - € ${Number(z.revenue).toFixed(2)}`).join('\n')}
+
+================================================================================
+                         BEWAARTERMIJN: 7 JAAR
+================================================================================
+
+Conform de Belgische fiscale wetgeving dienen deze documenten 
+minimaal 7 jaar te worden bewaard.
+
+Eerste rapport: ${zReports.length > 0 ? zReports[zReports.length-1].date : '-'}
+Bewaren tot: ${zReports.length > 0 ? new Date(new Date(zReports[zReports.length-1].date).setFullYear(new Date(zReports[zReports.length-1].date).getFullYear() + 7)).toLocaleDateString('nl-BE') : '-'}
+
+================================================================================
+                      BACKUP BESTANDEN IN DIT PAKKET
+================================================================================
+
+1. z-rapporten-${tenant.name}-${dateStr}.csv
+   → Open met Excel of Google Sheets
+   → Bevat alle financiële data
+
+2. Z-Rapporten Overzicht (PDF)
+   → Sla op via browser Print → Save as PDF
+   → Officieel overzicht voor boekhouder
+
+3. Dit bestand (backup-info.txt)
+   → Samenvatting van de backup
+
+================================================================================
+                              AANBEVELINGEN
+================================================================================
+
+✓ Bewaar backups op meerdere locaties:
+  - Lokale harde schijf
+  - Cloud opslag (Google Drive, OneDrive, Dropbox)
+  - Externe harde schijf
+  
+✓ Maak maandelijks een backup
+✓ Bewaar jaarlijkse overzichten apart
+✓ Deel met je boekhouder/accountant
+
+================================================================================
+              Vysion Horeca - GKS Gecertificeerd Kassasysteem
+                        www.vysionhoreca.com
+================================================================================
+`
+
+    const blob = new Blob([summaryContent], { type: 'text/plain;charset=utf-8;' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = `backup-info-${tenant.name}-${dateStr}.txt`
+    link.click()
+
+    // Show success message
+    alert(`✅ Backup Pakket gedownload!\n\n1. CSV bestand (Excel)\n2. PDF overzicht (sla op via Print)\n3. Backup info tekstbestand\n\nBewaar deze bestanden minimaal 7 jaar!`)
+  }
+
   useEffect(() => {
     fetchOrders()
     fetchZReports()
@@ -914,6 +1012,16 @@ export default function RapportenPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
             </svg>
             Exporteer alle naar PDF
+          </button>
+          <button
+            onClick={downloadBackupPackage}
+            disabled={zReports.length === 0}
+            className="flex items-center gap-2 bg-gradient-to-r from-accent to-orange-600 text-white px-5 py-2 rounded-lg hover:from-orange-600 hover:to-accent transition-all disabled:opacity-50 shadow-lg"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+            </svg>
+            📦 Compleet Backup Pakket
           </button>
           <div className="flex-1"></div>
           <div className="text-sm text-gray-500 flex items-center gap-2">
