@@ -523,7 +523,7 @@ function ButWaitSection() {
 
           {/* Right - Features List */}
           <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-xl flex flex-col justify-center">
-            <h3 className="text-accent text-2xl sm:text-3xl font-bold mb-6">{t('butWait.boxTitle')}</h3>
+            <h3 className="text-accent text-2xl sm:text-3xl font-bold mb-10">{t('butWait.boxTitle')}</h3>
             <ul className="space-y-4">
               {featureKeys.map((key) => (
                 <li key={key} className="flex items-center">
