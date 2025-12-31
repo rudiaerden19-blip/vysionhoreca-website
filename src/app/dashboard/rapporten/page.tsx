@@ -991,6 +991,7 @@ Bewaren tot: ${zReports.length > 0 ? new Date(new Date(zReports[zReports.length-
 
       {/* Z-Rapport History Tab */}
       {activeTab === 'history' && (
+        <>
         {/* Export Buttons */}
         <div className="flex flex-wrap gap-3 mb-6">
           <button
@@ -1132,6 +1133,7 @@ Bewaren tot: ${zReports.length > 0 ? new Date(new Date(zReports[zReports.length-
             </table>
           </div>
         </div>
+        </>
       )}
 
       {/* Close Day Modal */}
