@@ -555,8 +555,8 @@
       "city": "Ville",
       "orders": "Commandes",
       "spent": "Dépensé",
-      "loyalty": "Fidélité",
-      "lastOrder": "Dernière commande"
+      "points": "Points",
+      "memberSince": "Membre depuis"
     },
     "noCustomers": "Aucun client trouvé"
   },
@@ -600,62 +600,131 @@
   "reportsPage": {
     "title": "Rapports",
     "subtitle": "Rapports de vente quotidiens",
-    "summary": {
-      "totalDays": "Jours rapportés",
+    "stats": {
       "totalRevenue": "Chiffre d'affaires total",
       "totalOrders": "Commandes totales",
-      "avgPerDay": "Moy. par jour"
+      "avgPerDay": "Moy. par jour",
+      "daysWithData": "Jours avec données"
     },
     "table": {
+      "title": "Rapports quotidiens (Rapport Z)",
       "date": "Date",
       "orders": "Commandes",
-      "online": "En ligne",
       "pos": "Caisse",
-      "revenue": "Chiffre d'affaires"
+      "online": "En ligne",
+      "revenue": "Chiffre d'affaires",
+      "avgPerOrder": "Moy. par commande"
     },
     "noReports": "Aucun rapport disponible"
   },
   "settingsPage": {
     "title": "Paramètres",
-    "subtitle": "Gérer votre compte et vos préférences",
-    "saved": "Paramètres enregistrés !",
+    "subtitle": "Gérer les paramètres de votre compte",
+    "saved": "Paramètres enregistrés",
     "sections": {
       "account": {
-        "title": "Informations du compte",
-        "subtitle": "Mettre à jour vos informations personnelles",
+        "title": "Compte",
+        "subtitle": "Vos informations de compte",
         "firstName": "Prénom",
         "lastName": "Nom",
         "email": "Adresse email",
         "phone": "Numéro de téléphone"
       },
-      "business": {
-        "title": "Informations commerciales",
-        "subtitle": "Vos données commerciales",
-        "name": "Nom de l'entreprise",
-        "address": "Adresse",
-        "city": "Ville",
-        "vat": "Numéro de TVA"
-      },
       "notifications": {
         "title": "Notifications",
-        "subtitle": "Choisissez les notifications que vous souhaitez recevoir",
-        "newOrders": "Nouvelles commandes",
-        "newOrdersDesc": "Notification pour les nouvelles commandes",
-        "dailyReports": "Rapports quotidiens",
-        "dailyReportsDesc": "Résumé quotidien par email",
-        "marketing": "Marketing",
-        "marketingDesc": "Actualités et offres"
+        "subtitle": "Gérer vos préférences de notification",
+        "email": {
+          "title": "Notifications par email",
+          "description": "Recevoir les mises à jour par email"
+        },
+        "daily": {
+          "title": "Rapports quotidiens",
+          "description": "Recevoir un résumé quotidien"
+        },
+        "orders": {
+          "title": "Nouvelles commandes",
+          "description": "Notification pour les nouvelles commandes en ligne"
+        }
+      },
+      "security": {
+        "title": "Sécurité",
+        "subtitle": "Mot de passe et sécurité",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le nouveau mot de passe"
       },
       "help": {
         "title": "Aide & Support",
-        "docs": "Documentation",
-        "docsDesc": "Guides et tutoriels",
-        "troubleshoot": "Dépannage",
-        "troubleshootDesc": "Résoudre les problèmes courants",
-        "contact": "Contact",
-        "contactDesc": "Contacter notre équipe support"
+        "subtitle": "Obtenir de l'aide pour les problèmes",
+        "troubleshooting": "Dépannage",
+        "troubleshootingDesc": "Problèmes courants",
+        "emailSupport": "Support par email",
+        "callSupport": "Appeler le support",
+        "whatsapp": "WhatsApp",
+        "whatsappDesc": "Chat direct"
       }
     },
-    "save": "Enregistrer les modifications"
+    "saveChanges": "Enregistrer les modifications"
+  },
+  "troubleshootingPage": {
+    "backToLogin": "Retour à la connexion",
+    "title": "Dépannage & Aide",
+    "subtitle": "Problèmes courants et solutions pour votre caisse Vysion Horeca",
+    "quickActions": {
+      "callSupport": "Appeler le support",
+      "emailSupport": "Support par email",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "Chat direct"
+    },
+    "faqTitle": "Problèmes courants",
+    "faqs": {
+      "1": {
+        "question": "Ma caisse ne démarre pas",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Vérifiez que l'appareil est branché à l'alimentation</li><li>Maintenez le bouton d'alimentation enfoncé pendant 10 secondes pour redémarrer</li><li>Vérifiez que tous les câbles sont correctement connectés</li><li>Attendez 2 minutes et réessayez</li><li>Si le problème persiste, contactez le support</li></ol>"
+      },
+      "2": {
+        "question": "Je ne peux pas me connecter à ma caisse",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Vérifiez que vous utilisez le bon code PIN</li><li>Demandez à votre administrateur de réinitialiser votre PIN</li><li>Vérifiez si votre compte n'est pas bloqué (après 5 tentatives échouées)</li><li>Contactez le support si vous n'avez pas accès à un compte administrateur</li></ol>"
+      },
+      "3": {
+        "question": "Le terminal de paiement ne fonctionne pas",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Vérifiez que le terminal est allumé (voyant vert allumé)</li><li>Vérifiez la connexion USB ou Bluetooth</li><li>Redémarrez le terminal en l'éteignant et en le rallumant</li><li>Allez dans Paramètres → Terminal de paiement → Reconnecter</li><li>Vérifiez que votre connexion Internet fonctionne</li></ol>"
+      },
+      "4": {
+        "question": "L'imprimante de tickets n'imprime pas",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Vérifiez qu'il y a du papier dans l'imprimante</li><li>Ouvrez et fermez le couvercle de l'imprimante (cela réinitialise l'imprimante)</li><li>Vérifiez la connexion USB/réseau</li><li>Allez dans Paramètres → Imprimantes → Test d'impression</li><li>Si la page de test ne s'imprime pas, redémarrez l'imprimante</li></ol>"
+      },
+      "5": {
+        "question": "Ma caisse est lente",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Fermez les applications que vous n'utilisez pas</li><li>Vérifiez votre connexion Internet (4G/WiFi)</li><li>Redémarrez l'application de caisse</li><li>Vérifiez si des mises à jour sont disponibles</li><li>Contactez le support si le problème persiste</li></ol>"
+      },
+      "6": {
+        "question": "Les commandes en ligne n'arrivent pas",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Vérifiez que votre connexion Internet fonctionne</li><li>Vérifiez que le module de commandes en ligne est activé</li><li>Allez dans Paramètres → Commandes en ligne → Synchroniser</li><li>Vérifiez que votre établissement est \"ouvert\" dans le système</li><li>Vérifiez vos heures d'ouverture dans les paramètres</li></ol>"
+      },
+      "7": {
+        "question": "Je veux ajouter ou modifier un produit",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Allez dans le menu en haut à gauche → Produits</li><li>Cliquez sur \"Nouveau produit\" ou sélectionnez un produit existant</li><li>Remplissez le nom, le prix et la catégorie</li><li>Cliquez sur \"Enregistrer\"</li><li>Le produit est maintenant disponible sur votre caisse</li></ol>"
+      },
+      "8": {
+        "question": "Comment faire un rapport Z / clôture de journée ?",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Allez dans le menu en haut à gauche → Rapports</li><li>Sélectionnez \"Rapport Z\" ou \"Clôture de journée\"</li><li>Vérifiez les données</li><li>Cliquez sur \"Clôturer et imprimer\"</li><li>Le rapport est imprimé et la journée est clôturée</li></ol>"
+      },
+      "9": {
+        "question": "J'ai oublié mon mot de passe",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Allez sur la page de connexion</li><li>Cliquez sur \"Mot de passe oublié\"</li><li>Entrez votre adresse email</li><li>Vous recevrez un lien pour réinitialiser votre mot de passe</li><li>Ou contactez le support : +32 492 12 93 83</li></ol>"
+      },
+      "10": {
+        "question": "L'application plante constamment",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Fermez complètement l'application</li><li>Redémarrez votre appareil</li><li>Vérifiez que vous avez la dernière version de l'application</li><li>Désinstallez l'application et réinstallez-la (vos données sont conservées)</li><li>Contactez le support si le problème persiste</li></ol>"
+      }
+    },
+    "stillNeedHelp": {
+      "title": "Problème non trouvé ?",
+      "subtitle": "Notre équipe de support est disponible 24h/24 et 7j/7. N'hésitez pas à nous contacter !",
+      "callNow": "Appelez maintenant :",
+      "emailSupport": "Support par email"
+    },
+    "copyright": "Tous droits réservés."
   }
 }
