@@ -13,24 +13,24 @@ function HeroSection() {
     <section className="bg-[#fdfdfd] min-h-screen flex items-center pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Badges centered under navbar */}
-        <div className="flex justify-center gap-8 sm:gap-16 mb-12">
-          <div className="flex items-center gap-2 whitespace-nowrap -mt-8">
-            <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-8 lg:gap-16 mb-12 -mt-8">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span className="text-accent font-bold text-sm uppercase">{t('hero.badge1')}</span>
+            <span className="text-accent font-bold text-xs sm:text-sm uppercase">{t('hero.badge1')}</span>
           </div>
-          <div className="flex items-center gap-2 whitespace-nowrap -mt-8">
-            <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span className="text-accent font-bold text-sm uppercase">{t('hero.badge2')}</span>
+            <span className="text-accent font-bold text-xs sm:text-sm uppercase">{t('hero.badge2')}</span>
           </div>
-          <div className="flex items-center gap-2 whitespace-nowrap -mt-8">
-            <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
-            <span className="text-accent font-bold text-sm uppercase">{t('hero.badge3')}</span>
+            <span className="text-accent font-bold text-xs sm:text-sm uppercase">{t('hero.badge3')}</span>
           </div>
         </div>
 
@@ -645,12 +645,12 @@ function IndustrySection() {
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Tabs */}
-        <div className="flex gap-8 mb-12">
+        <div className="flex flex-wrap gap-3 sm:gap-6 lg:gap-8 mb-12 justify-center lg:justify-start">
           {['invoicing', 'ordering', 'analytics', 'accounting'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`text-lg font-semibold pb-2 border-b-4 transition-colors ${
+              className={`text-sm sm:text-base lg:text-lg font-semibold pb-2 border-b-4 transition-colors ${
                 activeTab === tab
                   ? 'text-accent border-accent'
                   : 'text-gray-400 border-transparent hover:text-gray-600'
