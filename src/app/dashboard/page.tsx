@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { getBusinessId } from '@/lib/get-business-id'
 
 interface DashboardStats {
   totalOrders: number
@@ -26,7 +27,6 @@ interface RecentOrder {
 }
 
 export default function DashboardPage() {
-  const [businessId, setBusinessId] = useState<string | null>(null)
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
     totalRevenue: 0,
@@ -41,49 +41,22 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getBusinessIdAndFetch()
+    fetchDashboardData()
   }, [])
 
-  async function getBusinessIdAndFetch() {
-    if (!supabase) {
+  async function fetchDashboardData() {
+    const businessId = getBusinessId()
+    if (!businessId || !supabase) {
       setLoading(false)
       return
     }
-    
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.user?.email) {
-        setLoading(false)
-        return
-      }
-      
-      const { data: tenant } = await supabase
-        .from('tenants')
-        .select('business_id')
-        .eq('email', session.user.email)
-        .maybeSingle()
-      
-      if (tenant?.business_id) {
-        setBusinessId(tenant.business_id)
-        await fetchDashboardData(tenant.business_id)
-      } else {
-        setLoading(false)
-      }
-    } catch (error) {
-      console.error('Error:', error)
-      setLoading(false)
-    }
-  }
 
-  async function fetchDashboardData(bizId: string) {
-    if (!bizId || !supabase) return
-    
     try {
       // Fetch orders filtered by business_id
       const { data: orders, error: ordersError } = await supabase
         .from('orders')
         .select('*')
-        .eq('business_id', bizId)
+        .eq('business_id', businessId)
         .order('created_at', { ascending: false })
 
       if (ordersError) throw ordersError
@@ -92,7 +65,7 @@ export default function DashboardPage() {
       const { data: customers, error: customersError } = await supabase
         .from('customers')
         .select('id')
-        .eq('business_id', bizId)
+        .eq('business_id', businessId)
 
       if (customersError) throw customersError
 
