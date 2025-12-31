@@ -6,8 +6,46 @@ import { useLanguage } from '@/i18n'
 
 // Hero Section
 function HeroSection() {
-  const [lightboxImage, setLightboxImage] = useState('');
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const { t } = useLanguage()
+  
+  const allImages = [
+    'https://i.imgur.com/IvW3RiX.png',
+    'https://i.imgur.com/6X8DuuU.png',
+    'https://i.imgur.com/lhfJfog.png',
+    'https://i.imgur.com/2yDjxdG.png',
+    'https://i.imgur.com/JzNBNID.png',
+    'https://i.imgur.com/LY3pado.png',
+    'https://i.imgur.com/WICLOFZ.png',
+    'https://i.imgur.com/OAV1L3S.png',
+    'https://i.imgur.com/vA8geT0.png',
+    'https://i.imgur.com/O9GBS6s.png',
+    'https://i.imgur.com/DOtQn1g.png',
+    'https://i.imgur.com/jnrBtec.png',
+    'https://i.imgur.com/IJ2vDaw.png',
+    'https://i.imgur.com/2IzZkB3.png',
+    'https://i.imgur.com/Pm7YSKt.png',
+    'https://i.imgur.com/9CAo3Yr.png',
+    'https://i.imgur.com/cIfiPmB.png',
+    'https://i.imgur.com/HtApXus.png',
+    'https://i.imgur.com/meXaat6.png',
+  ]
+
+  const sliderImages = allImages.slice(1) // All except the first one (iPad screen)
+
+  const goToPrev = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (lightboxIndex !== null) {
+      setLightboxIndex(lightboxIndex === 0 ? allImages.length - 1 : lightboxIndex - 1)
+    }
+  }
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (lightboxIndex !== null) {
+      setLightboxIndex(lightboxIndex === allImages.length - 1 ? 0 : lightboxIndex + 1)
+    }
+  }
   
   return (
     <section className="bg-[#fdfdfd] min-h-screen flex items-center pt-20">
@@ -71,7 +109,7 @@ function HeroSection() {
                     alt="Vysion Horeca Kassa" 
                     className="absolute top-[4%] left-[9%] w-[82%] h-[53%] object-fill rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                     loading="eager"
-                    onClick={() => setLightboxImage('https://i.imgur.com/IvW3RiX.png')}
+                    onClick={() => setLightboxIndex(0)}
                   />
                 </div>
                 <p className="text-gray-500 text-sm mt-2">{t('hero.clickToOpen')}</p>
@@ -93,33 +131,14 @@ function HeroSection() {
                 
                 {/* Slider */}
                 <div id="image-slider" className="flex flex-col gap-2 h-[400px] overflow-y-auto pr-2 scrollbar-thin">
-                  {[
-                    'https://i.imgur.com/6X8DuuU.png',
-                    'https://i.imgur.com/lhfJfog.png',
-                    'https://i.imgur.com/2yDjxdG.png',
-                    'https://i.imgur.com/JzNBNID.png',
-                    'https://i.imgur.com/LY3pado.png',
-                    'https://i.imgur.com/WICLOFZ.png',
-                    'https://i.imgur.com/OAV1L3S.png',
-                    'https://i.imgur.com/vA8geT0.png',
-                    'https://i.imgur.com/O9GBS6s.png',
-                    'https://i.imgur.com/DOtQn1g.png',
-                    'https://i.imgur.com/jnrBtec.png',
-                    'https://i.imgur.com/IJ2vDaw.png',
-                    'https://i.imgur.com/2IzZkB3.png',
-                    'https://i.imgur.com/Pm7YSKt.png',
-                    'https://i.imgur.com/9CAo3Yr.png',
-                    'https://i.imgur.com/cIfiPmB.png',
-                    'https://i.imgur.com/HtApXus.png',
-                    'https://i.imgur.com/meXaat6.png',
-                  ].map((src, index) => (
+                  {sliderImages.map((src, index) => (
                     <img
                       key={index}
                       src={src}
                       alt={`Screenshot ${index + 1}`}
                       className="w-[80px] h-[50px] object-cover rounded cursor-pointer hover:scale-110 transition-transform border border-gray-200 hover:border-accent"
                       loading="lazy"
-                      onClick={() => setLightboxImage(src)}
+                      onClick={() => setLightboxIndex(index + 1)}
                     />
                   ))}
                 </div>
@@ -141,23 +160,51 @@ function HeroSection() {
             </div>
           </div>
 
-          {/* Lightbox */}
-          {lightboxImage && (
+          {/* Lightbox with navigation */}
+          {lightboxIndex !== null && (
             <div 
               className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
-              onClick={() => setLightboxImage('')}
+              onClick={() => setLightboxIndex(null)}
             >
+              {/* Left Arrow */}
+              <button 
+                className="absolute left-4 sm:left-8 text-white text-5xl hover:text-accent transition-colors p-4"
+                onClick={goToPrev}
+              >
+                <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
               <img 
-                src={lightboxImage} 
+                src={allImages[lightboxIndex]} 
                 alt="Vergrote afbeelding" 
                 className="max-w-full max-h-full object-contain"
+                onClick={(e) => e.stopPropagation()}
               />
+
+              {/* Right Arrow */}
+              <button 
+                className="absolute right-4 sm:right-8 text-white text-5xl hover:text-accent transition-colors p-4"
+                onClick={goToNext}
+              >
+                <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Close button */}
               <button 
                 className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
-                onClick={() => setLightboxImage('')}
+                onClick={() => setLightboxIndex(null)}
               >
                 ×
               </button>
+
+              {/* Image counter */}
+              <div className="absolute bottom-4 text-white text-sm">
+                {lightboxIndex + 1} / {allImages.length}
+              </div>
             </div>
           )}
         </div>
