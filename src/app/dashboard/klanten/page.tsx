@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
 
 interface Customer {
   id: string
@@ -17,19 +18,25 @@ interface Customer {
 }
 
 export default function KlantenPage() {
+  const { businessId } = useAuth()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
-    fetchCustomers()
-  }, [])
+    if (businessId) {
+      fetchCustomers()
+    }
+  }, [businessId])
 
   async function fetchCustomers() {
+    if (!businessId) return
+    
     try {
       const { data, error } = await supabase
         .from('customers')
         .select('*')
+        .eq('business_id', businessId)
         .order('created_at', { ascending: false })
 
       if (error) throw error

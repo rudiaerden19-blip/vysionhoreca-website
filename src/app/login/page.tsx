@@ -1,23 +1,45 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Here you would handle the login logic
-    // For now, we'll just simulate a loading state
-    setTimeout(() => {
+    setError(null)
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Ongeldige e-mail of wachtwoord. Probeer opnieuw.')
+        } else {
+          setError(error.message)
+        }
+        return
+      }
+
+      // Success - redirect to dashboard
+      router.push('/dashboard')
+    } catch (err) {
+      setError('Er is een fout opgetreden. Probeer later opnieuw.')
+    } finally {
       setIsLoading(false)
-      alert('Login functionaliteit wordt binnenkort toegevoegd. Neem contact op met support.')
-    }, 1000)
+    }
   }
 
   return (
@@ -45,6 +67,18 @@ export default function LoginPage() {
             </Link>
             <p className="text-gray-400 mt-3">Log in op je kassa dashboard</p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+              <p className="text-red-400 text-sm flex items-center gap-2">
+                <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error}
+              </p>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
