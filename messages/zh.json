@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "Vysion Horeca | 一体化收银和支付平台",
-    "description": "餐饮业完整的收银系统。收银、在线订单、开票、员工管理等 - 全部集成在一个平台。免费试用7天。"
+    "title": "Vysion Horeca | 一体化收银与支付平台",
+    "description": "餐饮业完整收银系统。收银、在线订单、发票、员工管理等 - 全部在一个平台上。免费试用7天。"
   },
   "nav": {
     "home": "首页",
@@ -15,117 +15,117 @@
   },
   "hero": {
     "badge1": "1个平台",
-    "badge2": "由餐饮人创建",
-    "badge3": "为餐饮人打造",
-    "title": "一个屏幕。全面掌控。",
-    "description": "源于实践，由餐饮人为餐饮人打造。完美适用于快餐店、咖啡厅、餐厅、肉店和面包店。一体化平台，配备GKS认证收银系统、自有订单平台和专业SCARDA会计软件，支持Peppol开票、完整业务分析等，符合比利时及20多个国家的法规。",
+    "badge2": "由餐饮业者开发",
+    "badge3": "为餐饮业者打造",
+    "title": "一个屏幕。完全掌控。",
+    "description": "源于实践，由餐饮业者为餐饮业者打造。适合炸鸡店、咖啡馆、餐厅、肉店和面包店。一体化平台，配备GKS认证收银机、自有订单平台和专业SCARDA会计软件，支持Peppol发票、完整业务分析等，符合比利时及20多个国家的法规。",
     "ctaPrimary": "开始免费试用",
-    "ctaSecondary": "查看演示",
-    "trialInfo": "7天免费 • 立即开始",
+    "ctaSecondary": "观看演示",
+    "trialInfo": "免费试用7天 • 立即开始",
     "clickToOpen": "点击打开"
   },
   "features": {
     "title": "您需要的一切",
-    "subtitle": "一个平台满足所有餐饮需求。无需多个系统，无需烦恼。",
+    "subtitle": "一个平台满足您所有餐饮需求。无需多个系统，无需烦恼。",
     "pos": {
-      "title": "强大的收银系统",
-      "description": "直观的POS界面，快速服务。可在平板电脑、电脑或触摸屏上使用。"
+      "title": "强大的收银机",
+      "description": "直观的POS界面，快速服务。可在平板、电脑或触摸屏上使用。"
     },
     "online": {
-      "title": "在线订餐",
-      "description": "在线订餐平台，配有外卖和配送着陆页。顾客下单，您直接在收银系统收到。"
+      "title": "在线订单",
+      "description": "带落地页的在线订单平台，支持外卖和配送。客户下单，您直接在收银机接收。"
     },
     "reports": {
       "title": "实时报告",
-      "description": "实时X和Z报告。即时了解营收、热门产品和高峰时段。数据驱动决策。"
+      "description": "实时X和Z报告。即时了解销售、热门产品和高峰时段。数据驱动决策。"
     },
     "payments": {
       "title": "支付",
-      "description": "集成支付终端。Bancontact、Visa、Mastercard、Mollie、Stripe - 全部集成在一个系统。"
+      "description": "集成支付终端。Bancontact、Visa、Mastercard、Mollie、Stripe - 全部在一个系统中。"
     },
     "invoicing": {
-      "title": "开票与Peppol",
-      "description": "一键生成专业Peppol发票。自动与会计对接。B2B发送。"
+      "title": "发票 & Peppol",
+      "description": "一键生成专业Peppol发票。自动连接会计。B2B发送。"
     },
     "staff": {
       "title": "员工管理",
-      "description": "工时记录、角色和权限。准确知道谁做了什么。随时可用于工资核算。"
+      "description": "工时记录、角色和权限。准确知道谁做了什么。准备好交给工资部门。"
     },
     "kitchen": {
       "title": "厨房显示屏",
-      "description": "厨房实时显示订单。高效有序工作。"
+      "description": "厨房实时订单。高效有序地工作。"
     },
     "loyalty": {
-      "title": "会员卡与忠诚度",
+      "title": "会员卡 & 忠诚度",
       "description": "通过积分和个性化优惠建立客户关系。"
     },
     "gks": {
       "title": "GKS认证",
-      "description": "100%符合比利时税务法规。无需担忧，始终合规。"
+      "description": "100%符合比利时税法。无忧，始终合规。"
     }
   },
   "stats": {
     "processed": "每月处理金额",
-    "businesses": "活跃餐饮商家",
-    "uptime": "正常运行时间保证",
-    "support": "客服支持"
+    "businesses": "活跃商户",
+    "uptime": "正常运行保证",
+    "support": "可用支持"
   },
   "orderApp": {
     "title": "您需要的一切",
-    "subtitle": "餐饮业务的完整生态系统。收银、订餐应用、支付终端等。",
+    "subtitle": "为您的餐饮业务提供完整生态系统。收银机、订单应用、支付终端等。",
     "cta": "探索完整平台"
   },
   "butWait": {
     "label": "等一下...",
     "title": "但是... Vysion",
-    "titleAccent": "走得更远",
-    "subtitle": "别人停下的地方，我们继续前行...",
+    "titleAccent": "更进一步",
+    "subtitle": "别人停止的地方，我们继续前行...",
     "features": {
-      "1": "实时追踪您的业务",
-      "2": "随时随地查看报告",
-      "3": "在家开票",
+      "1": "实时跟踪您的业务",
+      "2": "随时随地打开您的报告",
+      "3": "在家开发票",
       "4": "调整员工工时记录",
-      "5": "从任何地方发送会计数据",
+      "5": "随时随地发送会计数据",
       "6": "实时查看业务分析",
       "7": "登录您自己的网页",
       "8": "从任何设备登录您的业务",
       "9": "实时查看每日销售",
-      "10": "远程管理您的收银系统",
-      "11": "根据您的偏好自定义订餐应用",
-      "12": "提供9种语言版本"
+      "10": "远程管理您的收银机",
+      "11": "根据您的喜好自定义订单应用",
+      "12": "为您提供9种语言版本"
     }
   },
   "comparison": {
     "title": "与其他平台比较",
-    "subtitle": "更多功能，更低价格。了解为什么Vysion Horeca是最佳选择。",
+    "subtitle": "更多功能，更低价格。发现为什么Vysion Horeca是最佳选择。",
     "feature": "功能",
     "cta": "今天就开始使用Vysion Horeca",
     "features": {
       "pos": "收银软件",
       "terminal": "支付终端集成",
-      "online": "在线订餐平台",
+      "online": "在线订单平台",
       "gks": "GKS认证",
       "accounting": "会计软件（SCARDA）",
-      "peppol": "Peppol开票",
+      "peppol": "Peppol发票",
       "analytics": "业务分析",
       "kitchen": "厨房显示屏",
-      "loyalty": "会员卡与忠诚度",
+      "loyalty": "会员卡 & 忠诚度",
       "staff": "员工管理",
       "reservation": "餐桌预订",
-      "languages": "支持9种以上语言",
+      "languages": "支持9+种语言",
       "multiLocation": "多门店"
     },
     "limited": "有限"
   },
   "pricing": {
     "title": "简单透明的价格",
-    "subtitle": "全部包含。无隐藏费用。",
+    "subtitle": "全部包含。无惊喜。",
     "perMonth": "/月",
-    "perLicense": "每许可证",
+    "perLicense": "每个许可证",
     "startTrial": "开始7天免费试用",
     "mostChosen": "最受欢迎",
-    "included": "包含:",
-    "allOfLight": "Light的所有功能，加上:",
+    "included": "包含：",
+    "allOfLight": "Light的所有功能，加上：",
     "light": {
       "name": "Light",
       "features": {
@@ -140,37 +140,37 @@
     "pro": {
       "name": "Pro",
       "features": {
-        "1": "在线订餐平台",
-        "2": "员工与工时管理",
+        "1": "在线订单平台",
+        "2": "员工和工时记录",
         "3": "无限产品和类别",
-        "4": "会员卡与忠诚度",
+        "4": "会员卡和忠诚度",
         "5": "厨房显示屏软件",
         "6": "月度业务分析",
-        "7": "着陆页",
-        "8": "员工工时管理",
-        "9": "Peppol开票程序",
+        "7": "落地页",
+        "8": "员工工时记录",
+        "9": "Peppol发票程序",
         "10": "SCARDA会计软件",
         "11": "餐桌预订",
-        "12": "餐桌布局图",
+        "12": "餐桌布局",
         "13": "支持9种语言"
       }
     }
   },
   "industry": {
     "invoicing": {
-      "tab": "开票",
-      "title": "快速专业的开票。",
-      "description": "为客户创建发票、贷项通知单等。直接连接Peppol，瞬间发送给会计师。"
+      "tab": "发票",
+      "title": "快速专业的发票开具。",
+      "description": "为客户创建发票、贷项通知单等。直接连接Peppol，几秒钟内发送给会计。"
     },
     "ordering": {
-      "tab": "在线订餐平台",
-      "title": "快速处理，满意顾客。",
-      "description": "高峰时段闪电般处理订单。不再排队。全部完美集成到收银系统。全部实时发送到厨房。"
+      "tab": "在线订单平台",
+      "title": "快速处理，满意客户。",
+      "description": "高峰期快速处理订单。不再排队。完美集成到收银机。实时发送到厨房。"
     },
     "analytics": {
       "tab": "业务分析",
       "title": "实时业务分析。",
-      "description": "准确了解您的业务健康状况。输入固定成本、供应商采购、租赁、租金等。获得业务的即时实时分析。"
+      "description": "准确了解您的业务状况。输入固定成本、供应商采购、租赁、租金等。获得实时即时分析。"
     },
     "accounting": {
       "tab": "会计",
@@ -181,25 +181,25 @@
     "clickToEnlarge": "点击放大"
   },
   "testimonials": {
-    "title": "餐饮人信赖Vysion",
+    "title": "餐饮业者信任Vysion",
     "quotes": {
       "1": {
-        "quote": "终于找到一个全部集成的平台。我取消了所有其他订阅，现在只用一个平台，价格只是以前的一小部分。",
+        "quote": "终于有一个一切都集成的平台了。我取消了所有其他订阅，现在以很小的价格拥有了一切。",
         "author": "Marc V.",
-        "role": "快餐店老板"
+        "role": "炸鸡店老板"
       },
       "2": {
-        "quote": "在线订餐模块使我们的营收增加了40%。顾客们都很喜欢。",
+        "quote": "在线订单模块使我们的销售额增加了40%。客户们都很喜欢。",
         "author": "Sarah D.",
         "role": "餐厅经理"
       },
       "3": {
-        "quote": "客服在5分钟内回复。这是我从任何其他供应商那里都没有得到过的。",
+        "quote": "支持在5分钟内响应。我在其他供应商那里从未有过这样的体验。",
         "author": "Kevin L.",
-        "role": "咖啡厅老板"
+        "role": "咖啡馆老板"
       },
       "4": {
-        "quote": "这是我为生意做过的最好的投资。一切都完美配合，客户服务也很出色。",
+        "quote": "这是我为我的生意做的最好的投资。一切都完美配合，客户服务也是一流的。",
         "author": "Lisa M.",
         "role": "面包店老板"
       },
@@ -209,17 +209,17 @@
         "role": "中餐厅老板"
       },
       "6": {
-        "quote": "我从未用过这么快的收银系统。他们甚至在夜间更新 - 我早上只需按OK，我请求的功能就已经在那里了！",
+        "quote": "I've never had such a fast POS system. They even update overnight - I just press OK in the morning and the features I requested are already there!",
         "author": "James T.",
-        "role": "Fish & Chips老板"
+        "role": "Fish & Chips Owner"
       }
     }
   },
   "cta": {
     "title": "准备好成长了吗？",
-    "subtitle": "今天就开始使用Vysion Horeca。7天免费，无任何义务。",
+    "subtitle": "今天就开始使用Vysion Horeca。7天免费，无义务。",
     "primary": "开始免费试用",
-    "secondary": "索取信息"
+    "secondary": "获取信息"
   },
   "contact": {
     "title": "联系我们",
@@ -235,7 +235,7 @@
         "firstName": "小明",
         "lastName": "王",
         "email": "xiaoming@example.cn",
-        "message": "告诉我们您的餐饮业务..."
+        "message": "告诉我们关于您的餐饮业务..."
       },
       "submit": "发送消息",
       "required": "*"
@@ -243,7 +243,7 @@
   },
   "footer": {
     "description": "Vysion Horeca是Vysion Group International的一部分。",
-    "address": "地址:",
+    "address": "地址：",
     "product": "产品",
     "features": "功能",
     "pricing": "价格",
@@ -253,100 +253,100 @@
     "contact": "联系我们",
     "privacy": "隐私",
     "legal": "法律",
-    "copyright": "保留所有权利。",
-    "designBy": "由Vysion设计"
+    "copyright": "版权所有。",
+    "designBy": "设计 by Vysion"
   },
   "cookies": {
-    "message": "我们使用Cookie来改善您的体验。继续使用即表示您同意我们的",
+    "message": "我们使用cookies来改善您的体验。继续即表示您同意我们的",
     "policy": "Cookie政策",
     "accept": "接受",
     "decline": "拒绝"
   },
   "login": {
     "backToHome": "返回首页",
-    "selectBusiness": "选择您的商家登录",
-    "chooseBusiness": "选择您的商家",
+    "selectBusiness": "选择您的商户登录",
+    "chooseBusiness": "选择您的商户",
     "loading": "加载中...",
-    "selectPlaceholder": "-- 选择商家 --",
-    "toDashboard": "进入仪表盘 →",
+    "selectPlaceholder": "-- 选择商户 --",
+    "toDashboard": "进入控制台 →",
     "processing": "处理中...",
-    "demoMode": "演示模式:",
-    "demoInfo": "选择一个商家查看仪表盘。在生产环境中，这将被真正的身份验证替代。",
+    "demoMode": "演示模式：",
+    "demoInfo": "选择一个商户来查看控制台。在生产环境中将替换为真实认证。",
     "troubleshooting": {
-      "title": "收银系统有问题？",
+      "title": "收银机有问题？",
       "subtitle": "查看我们的故障排除指南"
     },
-    "copyright": "保留所有权利。"
+    "copyright": "版权所有。"
   },
   "about": {
     "heroTitle": "关于",
     "heroTitleAccent": "Vysion",
     "heroTitleEnd": "Horeca",
-    "heroSubtitle": "源于实践，由餐饮人为餐饮人打造。",
+    "heroSubtitle": "源于实践，由餐饮业者为餐饮业者打造。",
     "story": {
       "title": "我们的故事",
-      "p1": "Vysion Horeca源于经验。作为餐饮人，我们发现现有的收银系统太贵、太复杂，而且从来不能完全满足我们的需求。",
-      "p2": "我们为五个不同的订阅付费：收银系统、订餐平台、会计软件、支付终端和分析软件。它们之间配合不好，每月成本高达数百欧元。",
-      "p3": "所以我们决定自己来做。一个一体化平台，准确满足餐饮人的需求，简单无忧，价格公道。"
+      "p1": "Vysion Horeca源于经验。作为餐饮业者，我们发现现有的收银系统太贵、太复杂，而且从来没有完全满足我们的需求。",
+      "p2": "我们为五个不同的订阅付费：收银机、订单平台、会计软件、支付终端和分析软件。没有什么能很好地协同工作，成本每月高达数百欧元。",
+      "p3": "这就是为什么我们决定自己构建。一个一体化平台，完全满足餐饮业者的需求，没有麻烦，价格公道。"
     },
     "facts": {
       "founded": "成立于2013年",
-      "foundedDesc": "由拥有超过15年经验的餐饮人创建",
-      "location": "总部位于比利时",
-      "locationDesc": "Pelt, Limburg - 比荷卢的心脏",
-      "countries": "在20多个国家运营",
+      "foundedDesc": "由拥有超过15年经验的餐饮业者创立",
+      "location": "位于比利时",
+      "locationDesc": "佩尔特，林堡 - 比荷卢的心脏",
+      "countries": "活跃于20+国家",
       "countriesDesc": "从比利时到中国，从荷兰到英国"
     },
     "mission": {
       "title": "我们的使命",
-      "subtitle": "让餐饮人专注于他们最擅长的事情：欢迎客人和创造美好体验。其余的我们来处理。",
+      "subtitle": "让餐饮业者专注于他们最擅长的事情：欢迎客人并创造美好体验。其余的我们来处理。",
       "reliability": {
         "title": "可靠性",
-        "description": "99.9%正常运行时间。即使网络断开，您的收银系统也始终正常工作。"
+        "description": "99.9%正常运行时间。即使网络暂时中断，您的收银机也能正常工作。"
       },
       "speed": {
         "title": "速度",
-        "description": "超快更新。请求一个功能，第二天就能在您的系统中看到。"
+        "description": "超快更新。请求一个功能，第二天就能在系统中看到。"
       },
       "personal": {
-        "title": "个性化服务",
-        "description": "没有呼叫中心。与我们的团队直接联系。我们记得每位客户的名字。"
+        "title": "个性化",
+        "description": "没有呼叫中心。直接联系我们的团队。我们认识每个客户的名字。"
       }
     },
     "values": {
       "title": "我们的价值观",
       "simplicity": {
         "title": "🎯 简单至上",
-        "description": "技术应该帮助您，而不是妨碍您。这就是为什么Vysion如此直观，您可以在5分钟内上手 - 无需手册。"
+        "description": "技术应该帮助您，而不是妨碍您。这就是为什么Vysion如此直观，您可以在5分钟内开始 - 无需手册。"
       },
       "pricing": {
         "title": "💰 公平定价",
-        "description": "无隐藏成本，无长期合同，无惊喜。所见即所付。"
+        "description": "没有隐藏费用，没有长期合同，没有惊喜。您看到的就是您付的。"
       },
       "improvement": {
         "title": "🚀 持续改进",
-        "description": "我们倾听客户的意见并构建他们需要的功能。每周根据真实反馈添加新功能。"
+        "description": "我们倾听客户的意见，构建他们需要的东西。每周都有基于真实反馈的新功能。"
       },
       "global": {
-        "title": "🌍 本地化与国际化",
-        "description": "在比利时获得GKS认证，同时提供9种语言，覆盖20多个国家。从快餐店到米其林餐厅。"
+        "title": "🌍 本地与国际",
+        "description": "在比利时通过GKS认证，但也支持9种语言和20多个国家。从炸鸡店到米其林星级餐厅。"
       }
     },
     "company": {
       "title": "Vysion Group International",
-      "p1": "Vysion Horeca是Vysion Group International的一部分，这是一家专注于餐饮和零售行业软件的科技公司。",
+      "p1": "Vysion Horeca是Vysion Group International的一部分，这是一家专门为餐饮和零售行业提供软件的技术公司。",
       "p2": "除了Vysion Horeca，我们还为希望自动化流程的企业开发定制应用程序和数字解决方案。",
-      "happyBusinesses": "满意的餐饮商家",
+      "happyBusinesses": "满意的商户",
       "processedMonthly": "每月处理金额",
-      "supportAvailable": "客服支持"
+      "supportAvailable": "可用支持"
     },
-    "ctaTitle": "准备开始了吗？",
+    "ctaTitle": "准备好开始了吗？",
     "ctaSubtitle": "免费试用Vysion Horeca 7天。无需信用卡。",
     "ctaPrimary": "开始免费试用",
     "ctaSecondary": "联系我们"
   },
   "dashboard": {
-    "title": "仪表盘",
+    "title": "控制台",
     "welcome": "欢迎回来",
     "menu": {
       "overview": "概览",
@@ -391,15 +391,15 @@
     "pages": {
       "cookies": {
         "title": "Cookie政策",
-        "description": "我们如何在网站上使用Cookie"
+        "description": "我们如何在网站上使用cookies"
       },
       "privacy": {
         "title": "隐私政策",
         "description": "我们如何处理您的个人数据"
       },
       "terms": {
-        "title": "服务条款",
-        "description": "使用我们服务的一般条款"
+        "title": "服务协议",
+        "description": "使用我们服务的一般条款和条件"
       },
       "dpa": {
         "title": "数据处理协议",
@@ -411,7 +411,7 @@
       },
       "aup": {
         "title": "可接受使用政策",
-        "description": "可接受使用我们服务的指南"
+        "description": "服务可接受使用指南"
       },
       "ip": {
         "title": "知识产权",
@@ -419,11 +419,11 @@
       },
       "trademark": {
         "title": "商标政策",
-        "description": "Vysion商标和品牌的使用"
+        "description": "使用Vysion商标和品牌"
       },
       "subprocessors": {
-        "title": "分处理商",
-        "description": "我们的数据处理商列表"
+        "title": "次级处理者",
+        "description": "我们的数据处理者列表"
       },
       "payment": {
         "title": "支付平台",
@@ -437,7 +437,7 @@
   },
   "common": {
     "learnMore": "了解更多",
-    "getStarted": "开始使用",
+    "getStarted": "开始",
     "close": "关闭",
     "back": "返回",
     "next": "下一步",
@@ -450,6 +450,814 @@
     "error": "发生错误",
     "success": "成功",
     "yes": "是",
-    "no": "否"
+    "no": "否",
+    "backToHome": "返回首页",
+    "home": "首页",
+    "lastUpdated": "最后更新",
+    "contact": "联系",
+    "email": "邮箱",
+    "phone": "电话",
+    "anonymous": "匿名",
+    "total": "总计",
+    "subtotal": "小计",
+    "vat": "增值税",
+    "date": "日期",
+    "status": "状态",
+    "type": "类型",
+    "details": "详情",
+    "refresh": "刷新",
+    "noData": "无可用数据",
+    "all": "全部",
+    "online": "在线",
+    "pos": "收银",
+    "pending": "待处理",
+    "items": "项目",
+    "address": "地址",
+    "notes": "备注",
+    "available": "有货",
+    "soldOut": "售罄",
+    "active": "活跃",
+    "notAvailable": "不可用",
+    "noCategory": "无类别"
+  },
+  "legalMain": {
+    "title": "法律",
+    "policies": "政策",
+    "contracts": "合同",
+    "privacy": "隐私",
+    "links": {
+      "paymentPlatform": "Vysion支付平台协议",
+      "aup": "可接受使用政策",
+      "ip": "知识产权侵权政策",
+      "trademark": "Vysion商标和版权指南",
+      "serviceAgreement": "Vysion服务协议",
+      "sla": "服务级别协议（SLA）",
+      "dpa": "数据处理协议",
+      "privacyPolicy": "隐私政策",
+      "cookies": "Cookie政策",
+      "subprocessors": "次级处理者"
+    },
+    "backToHome": "← 返回首页"
+  },
+  "cookiesPage": {
+    "title": "Cookie政策",
+    "lastUpdated": "最后更新：2025年12月",
+    "whatAreCookies": {
+      "title": "什么是Cookies？",
+      "content": "Cookies是当您访问我们网站时存储在您的计算机或移动设备上的小型文本文件。它们帮助网站正常运行并改善您的用户体验。"
+    },
+    "whichCookies": {
+      "title": "我们使用哪些Cookies？",
+      "necessary": {
+        "title": "必要Cookies",
+        "content": "这些cookies对于网站功能至关重要。没有这些cookies，某些功能无法工作。"
+      },
+      "functional": {
+        "title": "功能Cookies",
+        "content": "这些cookies记住您的偏好和设置，以个性化您的体验。"
+      },
+      "analytical": {
+        "title": "分析Cookies",
+        "content": "经您同意，我们使用分析cookies来了解访问者如何使用我们的网站。这有助于我们改进服务。"
+      }
+    },
+    "manageCookies": {
+      "title": "管理Cookies",
+      "content": "您可以随时通过浏览器设置调整cookie偏好。注意：禁用某些cookies可能会限制网站功能。"
+    },
+    "contact": {
+      "title": "联系我们",
+      "content": "关于我们cookie政策的问题，您可以联系"
+    },
+    "backToLegal": "← 返回法律"
+  },
+  "privacyPage": {
+    "title": "隐私与安全",
+    "subtitle": "我们如何处理您的数据",
+    "sections": {
+      "intro": {
+        "title": "1. 简介",
+        "content": "Vysion Horeca是Vysion Group International的一部分，非常重视保护您的个人数据。在本隐私声明中，我们解释我们收集哪些数据、为什么收集以及如何处理它们。"
+      },
+      "whatData": {
+        "title": "2. 我们收集哪些数据？",
+        "intro": "我们可能收集以下个人数据：",
+        "items": {
+          "1": "姓名和联系信息（邮箱、电话）",
+          "2": "企业信息（公司名称、税号、地址）",
+          "3": "支付信息",
+          "4": "我们软件的使用数据",
+          "5": "您与我们的通信"
+        }
+      },
+      "whyData": {
+        "title": "3. 我们为什么使用您的数据？",
+        "intro": "我们使用您的数据用于：",
+        "items": {
+          "1": "提供我们的服务和软件",
+          "2": "处理支付",
+          "3": "客户服务和支持",
+          "4": "改进我们的产品",
+          "5": "关于更新和新功能的沟通",
+          "6": "遵守法律义务（包括GKS、税法）"
+        }
+      },
+      "security": {
+        "title": "4. 数据安全",
+        "intro": "我们非常重视数据安全。我们的系统受到以下保护：",
+        "items": {
+          "1": "所有数据传输的SSL/TLS加密",
+          "2": "敏感数据的加密存储",
+          "3": "定期安全审计",
+          "4": "访问控制和认证",
+          "5": "每日备份到安全服务器"
+        }
+      },
+      "gks": {
+        "title": "5. GKS和税务合规",
+        "content": "Vysion Horeca已完全通过GKS认证，符合所有比利时税务要求。交易数据按照法定保留期限安全存储。"
+      },
+      "sharing": {
+        "title": "6. 数据共享",
+        "content": "我们仅在为我们的服务所必需时（如支付处理商）或法律要求时与第三方共享您的数据。我们绝不会将您的数据出售给第三方。"
+      },
+      "rights": {
+        "title": "7. 您的权利",
+        "intro": "您有权：",
+        "items": {
+          "1": "请求访问您的个人数据",
+          "2": "请求更正或删除您的数据",
+          "3": "反对处理",
+          "4": "将您的数据转移到其他服务"
+        }
+      },
+      "cookies": {
+        "title": "8. Cookies",
+        "content": "我们的网站使用功能cookies来改善操作。分析cookies仅在您同意后才会放置。"
+      },
+      "contact": {
+        "title": "9. 联系我们",
+        "intro": "关于本隐私声明或您的数据的问题，您可以联系："
+      },
+      "changes": {
+        "title": "10. 变更",
+        "content": "我们可能会不时更改本隐私声明。最新版本始终可在本页面获得。最后更新：2025年12月。"
+      }
+    },
+    "backToHome": "← 返回首页"
+  },
+  "dpaPage": {
+    "title": "数据处理协议",
+    "lastUpdated": "最后更新：2025年12月",
+    "sections": {
+      "definitions": {
+        "title": "1. 定义",
+        "content": "在本数据处理协议中，以下术语的含义：",
+        "controller": "数据控制者：",
+        "controllerDef": "使用Vysion Horeca服务的客户",
+        "processor": "数据处理者：",
+        "processorDef": "Vysion Horeca / Vysion Group International",
+        "personalData": "个人数据：",
+        "personalDataDef": "与已识别或可识别的自然人相关的所有数据"
+      },
+      "subject": {
+        "title": "2. 主题和期限",
+        "content": "本协议规范Vysion Horeca代表您进行的个人数据处理。本协议在您使用我们的服务期间有效。"
+      },
+      "purpose": {
+        "title": "3. 处理的性质和目的",
+        "intro": "我们处理个人数据用于：",
+        "items": {
+          "1": "提供收银软件和相关服务",
+          "2": "处理交易和订单",
+          "3": "维护客户数据和订单历史",
+          "4": "生成报告和分析"
+        }
+      },
+      "categories": {
+        "title": "4. 个人数据类别",
+        "items": {
+          "1": "联系信息（姓名、地址、邮箱、电话）",
+          "2": "交易数据",
+          "3": "订单数据",
+          "4": "员工数据（如适用）"
+        }
+      },
+      "obligations": {
+        "title": "5. 处理者义务",
+        "intro": "Vysion Horeca将：",
+        "items": {
+          "1": "仅按您的指示处理个人数据",
+          "2": "采取适当的技术和组织措施",
+          "3": "保证保密性",
+          "4": "协助您履行GDPR下的义务",
+          "5": "终止时删除或返还数据"
+        }
+      },
+      "subprocessors": {
+        "title": "6. 次级处理者",
+        "content": "我们为某些服务使用次级处理者。最新列表可在次级处理者页面获得。我们会在变更时通知您。"
+      },
+      "security": {
+        "title": "7. 安全",
+        "content": "我们实施适当的安全措施，包括加密、访问控制和定期安全审计。"
+      },
+      "breach": {
+        "title": "8. 数据泄露",
+        "content": "如发生数据泄露，我们将及时通知您，以便您履行通知义务。"
+      },
+      "contact": {
+        "title": "9. 联系我们",
+        "content": "关于本协议的问题，您可以联系"
+      }
+    }
+  },
+  "slaPage": {
+    "title": "服务级别协议（SLA）",
+    "lastUpdated": "最后更新：2025年12月",
+    "sections": {
+      "availability": {
+        "title": "1. 可用性",
+        "content": "Vysion Horeca保证所有核心服务99.9%的正常运行时间。这不包括事先公布的计划维护。"
+      },
+      "maintenance": {
+        "title": "2. 计划维护",
+        "content": "计划维护在非高峰时段进行，最好在CET时间02:00至06:00之间。客户将至少提前48小时收到通知。"
+      },
+      "response": {
+        "title": "3. 支持响应时间",
+        "headers": {
+          "priority": "优先级",
+          "description": "描述",
+          "responseTime": "响应时间"
+        },
+        "critical": {
+          "name": "紧急",
+          "description": "系统完全不可用",
+          "time": "< 1小时"
+        },
+        "high": {
+          "name": "高",
+          "description": "重要功能无法工作",
+          "time": "< 4小时"
+        },
+        "medium": {
+          "name": "中",
+          "description": "功能部分工作",
+          "time": "< 8小时"
+        },
+        "low": {
+          "name": "低",
+          "description": "问题或改进建议",
+          "time": "< 24小时"
+        }
+      },
+      "channels": {
+        "title": "4. 支持渠道",
+        "email": "邮箱：",
+        "phone": "电话：",
+        "inApp": "应用内支持：",
+        "inAppDesc": "在Vysion Horeca应用程序中可用"
+      },
+      "hours": {
+        "title": "5. 支持时间",
+        "light": "Light计划：",
+        "lightHours": "周一至周五，09:00 - 17:00 CET",
+        "pro": "Pro计划：",
+        "proHours": "周一至周日，08:00 - 22:00 CET"
+      },
+      "backups": {
+        "title": "6. 备份",
+        "content": "所有数据每日备份。备份保留30天。如发生数据丢失，我们可以从最新备份恢复。"
+      },
+      "updates": {
+        "title": "7. 更新",
+        "content": "软件更新自动发布，通常在夜间。重要更新会提前通知。"
+      }
+    }
+  },
+  "aupPage": {
+    "title": "可接受使用政策",
+    "lastUpdated": "最后更新：2025年12月",
+    "sections": {
+      "intro": {
+        "title": "简介",
+        "content": "本可接受使用政策描述了使用Vysion Horeca服务的规则。使用我们的服务即表示您同意本政策。"
+      },
+      "allowed": {
+        "title": "允许的使用",
+        "intro": "您可以使用我们的服务：",
+        "items": {
+          "1": "管理您的餐饮业务",
+          "2": "处理交易和订单",
+          "3": "维护您的会计和管理",
+          "4": "与客户沟通"
+        }
+      },
+      "prohibited": {
+        "title": "禁止的使用",
+        "intro": "禁止使用我们的服务：",
+        "items": {
+          "1": "非法活动或欺诈",
+          "2": "分发恶意软件或有害软件",
+          "3": "侵犯知识产权",
+          "4": "中断我们的服务或服务器",
+          "5": "未经同意收集其他用户的数据",
+          "6": "规避安全措施"
+        }
+      },
+      "enforcement": {
+        "title": "执行",
+        "content": "如违反本政策，我们可能会暂停或终止您的帐户。在严重情况下，我们可能会采取法律行动。"
+      },
+      "contact": {
+        "title": "联系我们",
+        "content": "如有问题，您可以联系"
+      }
+    }
+  },
+  "trademarkPage": {
+    "title": "Vysion商标和版权指南",
+    "lastUpdated": "最后更新：2025年12月",
+    "sections": {
+      "brands": {
+        "title": "我们的品牌",
+        "intro": "以下品牌名称和标志是Vysion Group International的财产：",
+        "items": {
+          "1": "Vysion™",
+          "2": "Vysion Horeca™",
+          "3": "Vysion Apps™",
+          "4": "SCARDA™",
+          "5": "Vysion标志及所有变体"
+        }
+      },
+      "allowed": {
+        "title": "允许的使用",
+        "intro": "您可以使用我们的品牌：",
+        "items": {
+          "1": "在文本中引用我们的产品或服务",
+          "2": "表明您在业务中使用Vysion Horeca",
+          "3": "撰写关于我们服务的评论或文章"
+        }
+      },
+      "notAllowed": {
+        "title": "不允许",
+        "intro": "不允许：",
+        "items": {
+          "1": "未经书面许可使用我们的标志",
+          "2": "在您的公司或产品名称中使用我们的品牌",
+          "3": "造成您由我们赞助或支持的印象",
+          "4": "将我们的品牌注册为域名或社交媒体账号",
+          "5": "修改或将我们的品牌与其他元素组合"
+        }
+      },
+      "logoGuidelines": {
+        "title": "标志指南",
+        "intro": "如果您获得使用我们标志的许可，请遵循以下指南：",
+        "items": {
+          "1": "仅使用我们提供的官方标志文件",
+          "2": "不要修改颜色或比例",
+          "3": "确保标志周围有足够的空白",
+          "4": "不要将标志放在繁忙的背景上"
+        }
+      },
+      "permission": {
+        "title": "请求许可",
+        "content": "如需使用我们的品牌或标志的许可，请联系"
+      }
+    }
+  },
+  "ipPage": {
+    "title": "知识产权政策",
+    "lastUpdated": "最后更新：2025年12月",
+    "sections": {
+      "ownership": {
+        "title": "1. Vysion的所有权",
+        "content": "与Vysion Horeca软件相关的所有知识产权，包括但不限于源代码、设计、标志、商标和文档，均为Vysion Group International的财产。"
+      },
+      "license": {
+        "title": "2. 许可",
+        "content": "通过订阅，您将获得有限的、非排他性的、不可转让的许可，以将软件用于您的业务运营。此许可在订阅终止时结束。"
+      },
+      "prohibited": {
+        "title": "3. 禁止行为",
+        "intro": "不允许：",
+        "items": {
+          "1": "复制、修改或逆向工程软件",
+          "2": "转授权或转售软件",
+          "3": "规避安全措施",
+          "4": "未经许可使用我们的商标或标志"
+        }
+      },
+      "yourContent": {
+        "title": "4. 您的内容",
+        "content": "您保留对您自己的业务数据、产品信息和客户数据的所有权利。您授予我们处理这些数据以提供服务的许可。"
+      },
+      "infringement": {
+        "title": "5. 侵权报告",
+        "content": "如果您怀疑存在知识产权侵权，请联系我们。我们认真对待此类报告，并将采取适当措施。"
+      },
+      "contact": {
+        "title": "6. 联系我们",
+        "content": "关于知识产权的问题，您可以联系"
+      }
+    }
+  },
+  "paymentPage": {
+    "title": "Vysion支付平台协议",
+    "lastUpdated": "最后更新：2025年12月",
+    "sections": {
+      "intro": {
+        "title": "1. 简介",
+        "content": "本协议描述了通过Vysion Horeca平台使用支付服务的条款。支付处理通过我们的合作伙伴Mollie和Stripe进行。"
+      },
+      "processing": {
+        "title": "2. 支付处理",
+        "content": "Vysion Horeca与认可的支付处理商集成，以确保安全交易。所有交易均经过加密并符合PCI-DSS标准。"
+      },
+      "methods": {
+        "title": "3. 支持的支付方式",
+        "items": {
+          "1": "Bancontact",
+          "2": "Visa / Mastercard",
+          "3": "iDEAL",
+          "4": "Apple Pay / Google Pay",
+          "5": "Payconiq"
+        }
+      },
+      "fees": {
+        "title": "4. 交易费用",
+        "content": "交易费用由支付处理商确定，取决于支付方式和交易量。请联系我们获取当前费率。"
+      },
+      "payouts": {
+        "title": "5. 付款",
+        "content": "收到的付款自动支付到您的企业银行账户。支付频率可配置（每日、每周或每月）。"
+      },
+      "chargebacks": {
+        "title": "6. 退款和争议",
+        "content": "如发生退款，您将收到通知并有机会提供证据。我们帮助您处理支付争议。"
+      },
+      "security": {
+        "title": "7. 安全",
+        "content": "所有支付数据按PCI-DSS 1级处理。卡数据永远不会存储在我们的服务器上。"
+      },
+      "contact": {
+        "title": "8. 联系我们",
+        "content": "关于支付的问题，您可以联系"
+      }
+    }
+  },
+  "subprocessorsPage": {
+    "title": "次级处理者",
+    "lastUpdated": "最后更新：2025年12月",
+    "intro": "Vysion Horeca使用以下次级处理者来提供我们的服务。所有次级处理者都经过精心挑选，符合GDPR要求。",
+    "table": {
+      "subprocessor": "次级处理者",
+      "purpose": "目的",
+      "location": "位置",
+      "aws": {
+        "name": "Amazon Web Services (AWS)",
+        "purpose": "云托管和存储",
+        "location": "欧盟（法兰克福）"
+      },
+      "mollie": {
+        "name": "Mollie",
+        "purpose": "支付处理",
+        "location": "荷兰"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "purpose": "支付处理",
+        "location": "欧盟"
+      },
+      "vercel": {
+        "name": "Vercel",
+        "purpose": "网站托管",
+        "location": "欧盟"
+      },
+      "sendgrid": {
+        "name": "SendGrid",
+        "purpose": "邮件服务",
+        "location": "欧盟"
+      }
+    },
+    "changes": {
+      "title": "变更",
+      "content": "我们会在次级处理者列表变更时通知客户。如果您对新的次级处理者有异议，可以联系我们。"
+    },
+    "contact": {
+      "title": "联系我们",
+      "content": "关于我们次级处理者的问题，您可以联系"
+    }
+  },
+  "serviceAgreementPage": {
+    "title": "Vysion服务协议",
+    "lastUpdated": "最后更新：2025年12月",
+    "sections": {
+      "general": {
+        "title": "1. 一般条款",
+        "content": "本服务协议（\"协议\"）适用于Vysion Horeca服务的使用，Vysion Horeca是Vysion Group International的一部分。使用我们的服务即表示您同意这些条款。"
+      },
+      "services": {
+        "title": "2. 服务",
+        "content": "Vysion Horeca为餐饮行业提供收银软件、在线订单平台、会计软件和相关服务。我们保留修改、扩展或限制我们服务的权利。"
+      },
+      "subscription": {
+        "title": "3. 订阅和付款",
+        "intro": "我们的服务通过月度或年度订阅提供。付款预先计费，除非另有说明，否则不可退款。",
+        "items": {
+          "1": "发票按月或按年发送",
+          "2": "付款期限为发票日期后14天",
+          "3": "未付款可能导致访问被暂停"
+        }
+      },
+      "usage": {
+        "title": "4. 服务使用",
+        "content": "您对我们服务的合法使用负责。禁止将服务用于非法目的、侵犯知识产权或中断服务。"
+      },
+      "privacy": {
+        "title": "5. 数据和隐私",
+        "content": "我们按照我们的隐私声明和适用法律（包括GDPR）处理您的数据。您保留对您的业务数据的所有权。"
+      },
+      "liability": {
+        "title": "6. 责任",
+        "content": "Vysion Horeca不对间接损害、后果性损害或利润损失负责。我们的总责任限于您过去12个月支付给我们的金额。"
+      },
+      "termination": {
+        "title": "7. 终止",
+        "content": "您可以随时取消订阅。取消在当前计费周期结束时生效。如违反这些条款，我们可以终止协议。"
+      },
+      "law": {
+        "title": "8. 适用法律",
+        "content": "本协议受比利时法律管辖。争议将提交比利时管辖法院。"
+      },
+      "contact": {
+        "title": "9. 联系我们",
+        "content": "关于本协议的问题，您可以联系"
+      }
+    }
+  },
+  "dashboardLayout": {
+    "loading": "加载中...",
+    "signOut": "退出登录"
+  },
+  "dashboardPage": {
+    "title": "控制台概览",
+    "welcome": "欢迎回来！这是您业务的概览。",
+    "stats": {
+      "todayRevenue": "今日营收",
+      "todayOrders": "今日订单",
+      "totalRevenue": "总营收",
+      "totalOrders": "总订单",
+      "customers": "客户",
+      "avgPerOrder": "平均",
+      "perOrder": "每单",
+      "onlineOrders": "在线订单",
+      "pending": "待处理"
+    },
+    "recentOrders": {
+      "title": "最近订单",
+      "viewAll": "查看全部 →",
+      "headers": {
+        "order": "订单",
+        "customer": "客户",
+        "type": "类型",
+        "total": "总计",
+        "status": "状态",
+        "date": "日期"
+      },
+      "noOrders": "暂无订单"
+    }
+  },
+  "ordersPage": {
+    "title": "订单",
+    "subtitle": "查看和管理所有订单",
+    "refresh": "刷新",
+    "filters": {
+      "total": "总计",
+      "online": "在线",
+      "pos": "收银",
+      "pending": "待处理"
+    },
+    "table": {
+      "order": "订单",
+      "customer": "客户",
+      "type": "类型",
+      "payment": "支付",
+      "total": "总计",
+      "status": "状态",
+      "date": "日期",
+      "details": "详情"
+    },
+    "noOrders": "未找到订单",
+    "modal": {
+      "title": "订单",
+      "customer": "客户",
+      "phone": "电话",
+      "type": "类型",
+      "status": "状态",
+      "paymentMethod": "支付方式",
+      "date": "日期",
+      "address": "地址",
+      "notes": "备注",
+      "items": "项目",
+      "noItems": "无项目",
+      "subtotal": "小计",
+      "vat": "增值税",
+      "total": "总计"
+    }
+  },
+  "customersPage": {
+    "title": "客户",
+    "subtitle": "查看您的客户数据库",
+    "stats": {
+      "totalCustomers": "总客户数",
+      "totalSpent": "总消费",
+      "loyaltyPoints": "忠诚度积分",
+      "avgPerCustomer": "客均消费"
+    },
+    "search": "按姓名、邮箱或电话搜索...",
+    "table": {
+      "customer": "客户",
+      "contact": "联系方式",
+      "city": "城市",
+      "orders": "订单",
+      "spent": "消费",
+      "points": "积分",
+      "memberSince": "会员自"
+    },
+    "noCustomers": "未找到客户"
+  },
+  "productsPage": {
+    "title": "产品和菜单",
+    "subtitle": "查看您的产品和菜单项目",
+    "stats": {
+      "totalProducts": "总产品数",
+      "categories": "类别",
+      "active": "活跃",
+      "notAvailable": "不可用"
+    },
+    "filter": {
+      "all": "全部"
+    },
+    "noProducts": "未找到产品",
+    "available": "有货",
+    "soldOut": "售罄"
+  },
+  "analysisPage": {
+    "title": "业务分析",
+    "subtitle": "业务绩效洞察",
+    "stats": {
+      "totalRevenue": "总营收",
+      "orders": "订单",
+      "fixedCosts": "固定成本",
+      "costItems": "成本项",
+      "netProfit": "净利润",
+      "afterCosts": "成本后",
+      "profitMargin": "利润率",
+      "ofRevenue": "占营收"
+    },
+    "charts": {
+      "revenueByChannel": "渠道营收",
+      "pos": "收银",
+      "online": "在线",
+      "paymentMethods": "支付方式",
+      "busiestHours": "最繁忙时段",
+      "orders": "订单",
+      "noData": "无可用数据",
+      "fixedCostsBreakdown": "固定成本明细",
+      "noCosts": "无已记录成本",
+      "cost": "成本"
+    }
+  },
+  "reportsPage": {
+    "title": "报告",
+    "subtitle": "每日营收和订单报告",
+    "stats": {
+      "totalRevenue": "总营收",
+      "totalOrders": "总订单",
+      "avgPerDay": "日均",
+      "daysWithData": "有数据天数"
+    },
+    "table": {
+      "title": "每日报告（Z报告）",
+      "date": "日期",
+      "orders": "订单",
+      "pos": "收银",
+      "online": "在线",
+      "revenue": "营收",
+      "avgPerOrder": "单均"
+    },
+    "noReports": "无可用报告"
+  },
+  "settingsPage": {
+    "title": "设置",
+    "subtitle": "管理您的账户设置",
+    "saved": "设置已保存",
+    "sections": {
+      "account": {
+        "title": "账户",
+        "subtitle": "您的账户信息",
+        "firstName": "名",
+        "lastName": "姓",
+        "email": "邮箱",
+        "phone": "电话"
+      },
+      "notifications": {
+        "title": "通知",
+        "subtitle": "管理您的通知偏好",
+        "email": {
+          "title": "邮件通知",
+          "description": "通过邮件接收更新"
+        },
+        "daily": {
+          "title": "每日报告",
+          "description": "每天接收摘要"
+        },
+        "orders": {
+          "title": "新订单",
+          "description": "新在线订单通知"
+        }
+      },
+      "security": {
+        "title": "安全",
+        "subtitle": "密码和安全",
+        "currentPassword": "当前密码",
+        "newPassword": "新密码",
+        "confirmPassword": "确认新密码"
+      },
+      "help": {
+        "title": "帮助与支持",
+        "subtitle": "获取问题帮助",
+        "troubleshooting": "故障排除",
+        "troubleshootingDesc": "常见问题",
+        "emailSupport": "邮件支持",
+        "callSupport": "电话支持",
+        "whatsapp": "WhatsApp",
+        "whatsappDesc": "直接聊天"
+      }
+    },
+    "saveChanges": "保存更改"
+  },
+  "troubleshootingPage": {
+    "backToLogin": "返回登录",
+    "title": "故障排除与帮助",
+    "subtitle": "Vysion Horeca收银机常见问题和解决方案",
+    "quickActions": {
+      "callSupport": "致电支持",
+      "emailSupport": "邮件支持",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "直接聊天"
+    },
+    "faqTitle": "常见问题",
+    "faqs": {
+      "1": {
+        "question": "收银机无法启动",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>检查设备是否已连接电源</li><li>按住电源按钮10秒重启</li><li>检查所有电缆是否正确连接</li><li>等待2分钟后重试</li><li>如问题持续，联系支持</li></ol>"
+      },
+      "2": {
+        "question": "无法登录收银机",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>检查您使用的PIN是否正确</li><li>请管理员重置您的PIN</li><li>检查您的账户是否被锁定（5次错误尝试后）</li><li>如无法访问管理员账户，联系支持</li></ol>"
+      },
+      "3": {
+        "question": "支付终端不工作",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>检查终端是否已开启（绿灯亮起）</li><li>检查USB或蓝牙连接</li><li>关闭再打开终端重启</li><li>前往设置 → 支付终端 → 重新连接</li><li>检查网络连接是否正常</li></ol>"
+      },
+      "4": {
+        "question": "小票打印机不打印",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>检查打印机是否有纸</li><li>打开并关闭打印机盖（这会重置打印机）</li><li>检查USB/网络连接</li><li>前往设置 → 打印机 → 测试打印</li><li>如测试页无法打印，重启打印机</li></ol>"
+      },
+      "5": {
+        "question": "收银机运行缓慢",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>关闭不使用的应用</li><li>检查网络连接（4G/WiFi）</li><li>重启收银应用程序</li><li>检查是否有可用更新</li><li>如问题持续，联系支持</li></ol>"
+      },
+      "6": {
+        "question": "在线订单未收到",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>检查网络连接是否正常</li><li>检查在线订单模块是否已启用</li><li>前往设置 → 在线订单 → 同步</li><li>检查您的店铺在系统中是否为\"营业中\"</li><li>在设置中检查营业时间</li></ol>"
+      },
+      "7": {
+        "question": "想要添加或修改产品",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>前往左上角菜单 → 产品</li><li>点击\"新产品\"或选择现有产品</li><li>填写名称、价格和类别</li><li>点击\"保存\"</li><li>产品现在可在收银机上使用</li></ol>"
+      },
+      "8": {
+        "question": "如何生成Z报告/日结？",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>前往左上角菜单 → 报告</li><li>选择\"Z报告\"或\"日结\"</li><li>检查数据</li><li>点击\"结算并打印\"</li><li>报告将被打印，当天结算完成</li></ol>"
+      },
+      "9": {
+        "question": "忘记密码",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>前往登录页面</li><li>点击\"忘记密码\"</li><li>输入您的邮箱</li><li>您将收到重置密码的链接</li><li>或联系支持：+32 492 12 93 83</li></ol>"
+      },
+      "10": {
+        "question": "应用程序持续崩溃",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>完全关闭应用</li><li>重启设备</li><li>检查是否有最新版本的应用</li><li>卸载应用并重新安装（数据将保留）</li><li>如问题持续，联系支持</li></ol>"
+      }
+    },
+    "stillNeedHelp": {
+      "title": "没有找到您的问题？",
+      "subtitle": "我们的支持团队24/7全天候服务。请随时联系我们！",
+      "callNow": "立即致电：",
+      "emailSupport": "邮件支持"
+    },
+    "copyright": "版权所有。"
   }
 }

@@ -450,6 +450,814 @@
     "error": "An error occurred",
     "success": "Success",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "backToHome": "Back to home",
+    "home": "Home",
+    "lastUpdated": "Last updated",
+    "contact": "Contact",
+    "email": "Email",
+    "phone": "Phone",
+    "anonymous": "Anonymous",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "vat": "VAT",
+    "date": "Date",
+    "status": "Status",
+    "type": "Type",
+    "details": "Details",
+    "refresh": "Refresh",
+    "noData": "No data available",
+    "all": "All",
+    "online": "Online",
+    "pos": "POS",
+    "pending": "Pending",
+    "items": "Items",
+    "address": "Address",
+    "notes": "Notes",
+    "available": "Available",
+    "soldOut": "Sold out",
+    "active": "Active",
+    "notAvailable": "Not available",
+    "noCategory": "No category"
+  },
+  "legalMain": {
+    "title": "Legal",
+    "policies": "Policies",
+    "contracts": "Contracts",
+    "privacy": "Privacy",
+    "links": {
+      "paymentPlatform": "Vysion Payments Platform Agreement",
+      "aup": "Acceptable Use Policy",
+      "ip": "Intellectual Property Policy",
+      "trademark": "Vysion trademark and copyright guidelines",
+      "serviceAgreement": "Vysion Service Agreement",
+      "sla": "Service Level Agreement (SLA)",
+      "dpa": "Data Processing Agreement",
+      "privacyPolicy": "Privacy Policy",
+      "cookies": "Cookie Policy",
+      "subprocessors": "Subprocessors"
+    },
+    "backToHome": "← Back to home"
+  },
+  "cookiesPage": {
+    "title": "Cookie Policy",
+    "lastUpdated": "Last updated: December 2025",
+    "whatAreCookies": {
+      "title": "What are cookies?",
+      "content": "Cookies are small text files that are stored on your computer or mobile device when you visit our website. They help us make the website work properly and improve your user experience."
+    },
+    "whichCookies": {
+      "title": "Which cookies do we use?",
+      "necessary": {
+        "title": "Necessary cookies",
+        "content": "These cookies are essential for the website to function. Without these cookies, certain functions cannot work."
+      },
+      "functional": {
+        "title": "Functional cookies",
+        "content": "These cookies remember your preferences and settings to personalize your experience."
+      },
+      "analytical": {
+        "title": "Analytical cookies",
+        "content": "With your consent, we use analytical cookies to understand how visitors use our website. This helps us improve our services."
+      }
+    },
+    "manageCookies": {
+      "title": "Managing cookies",
+      "content": "You can adjust your cookie preferences at any time via your browser settings. Note: disabling certain cookies may limit the functionality of the website."
+    },
+    "contact": {
+      "title": "Contact",
+      "content": "For questions about our cookie policy, please contact us at"
+    },
+    "backToLegal": "← Back to Legal"
+  },
+  "privacyPage": {
+    "title": "Privacy & Security",
+    "subtitle": "How we handle your data",
+    "sections": {
+      "intro": {
+        "title": "1. Introduction",
+        "content": "Vysion Horeca, part of Vysion Group International, values the protection of your personal data. In this privacy statement, we explain what data we collect, why we do this and how we handle it."
+      },
+      "whatData": {
+        "title": "2. What data do we collect?",
+        "intro": "We may collect the following personal data:",
+        "items": {
+          "1": "Name and contact details (email address, phone number)",
+          "2": "Business details (company name, VAT number, address)",
+          "3": "Payment details",
+          "4": "Usage data of our software",
+          "5": "Communication you have with us"
+        }
+      },
+      "whyData": {
+        "title": "3. What do we use your data for?",
+        "intro": "We use your data for:",
+        "items": {
+          "1": "Delivering our services and software",
+          "2": "Processing payments",
+          "3": "Customer service and support",
+          "4": "Improving our products",
+          "5": "Communication about updates and new features",
+          "6": "Compliance with legal obligations (including GKS, fiscal legislation)"
+        }
+      },
+      "security": {
+        "title": "4. Data security",
+        "intro": "We take the security of your data very seriously. Our systems are secured with:",
+        "items": {
+          "1": "SSL/TLS encryption for all data transfer",
+          "2": "Encrypted storage of sensitive data",
+          "3": "Regular security audits",
+          "4": "Access control and authentication",
+          "5": "Daily backups on secure servers"
+        }
+      },
+      "gks": {
+        "title": "5. GKS & Fiscal Compliance",
+        "content": "Vysion Horeca is fully GKS-certified and complies with all Belgian fiscal requirements. Transaction data is securely stored in accordance with legal retention periods."
+      },
+      "sharing": {
+        "title": "6. Sharing data",
+        "content": "We only share your data with third parties when necessary for our services (such as payment processors) or when legally required. We never sell your data to third parties."
+      },
+      "rights": {
+        "title": "7. Your rights",
+        "intro": "You have the right to:",
+        "items": {
+          "1": "Request access to your personal data",
+          "2": "Have your data corrected or deleted",
+          "3": "Object to processing",
+          "4": "Transfer your data to another service"
+        }
+      },
+      "cookies": {
+        "title": "8. Cookies",
+        "content": "Our website uses functional cookies to improve performance. Analytical cookies are only placed with your consent."
+      },
+      "contact": {
+        "title": "9. Contact",
+        "intro": "For questions about this privacy statement or your data, you can contact us at:"
+      },
+      "changes": {
+        "title": "10. Changes",
+        "content": "We may adjust this privacy statement from time to time. The most recent version is always available on this page. Last updated: December 2025."
+      }
+    },
+    "backToHome": "← Back to home"
+  },
+  "dpaPage": {
+    "title": "Data Processing Agreement",
+    "lastUpdated": "Last updated: December 2025",
+    "sections": {
+      "definitions": {
+        "title": "1. Definitions",
+        "content": "In this data processing agreement, the following terms apply:",
+        "controller": "Data Controller:",
+        "controllerDef": "the customer using Vysion Horeca services",
+        "processor": "Processor:",
+        "processorDef": "Vysion Horeca / Vysion Group International",
+        "personalData": "Personal Data:",
+        "personalDataDef": "all data relating to an identified or identifiable natural person"
+      },
+      "subject": {
+        "title": "2. Subject and Duration",
+        "content": "This agreement governs the processing of personal data by Vysion Horeca on your behalf. The agreement is in effect as long as you use our services."
+      },
+      "purpose": {
+        "title": "3. Nature and Purpose of Processing",
+        "intro": "We process personal data for:",
+        "items": {
+          "1": "Providing POS software and related services",
+          "2": "Processing transactions and orders",
+          "3": "Maintaining customer data and order history",
+          "4": "Generating reports and analyses"
+        }
+      },
+      "categories": {
+        "title": "4. Categories of Personal Data",
+        "items": {
+          "1": "Contact details (name, address, email, phone)",
+          "2": "Transaction data",
+          "3": "Order data",
+          "4": "Staff data (where applicable)"
+        }
+      },
+      "obligations": {
+        "title": "5. Processor Obligations",
+        "intro": "Vysion Horeca will:",
+        "items": {
+          "1": "Process personal data only according to your instructions",
+          "2": "Take appropriate technical and organizational measures",
+          "3": "Guarantee confidentiality",
+          "4": "Assist you in meeting your GDPR obligations",
+          "5": "Delete or return data upon termination"
+        }
+      },
+      "subprocessors": {
+        "title": "6. Subprocessors",
+        "content": "We use subprocessors for certain services. A current list is available on our subprocessors page. We inform you of changes."
+      },
+      "security": {
+        "title": "7. Security",
+        "content": "We implement appropriate security measures including encryption, access control, and regular security audits."
+      },
+      "breach": {
+        "title": "8. Data Breaches",
+        "content": "In case of a data breach, we inform you without undue delay so you can meet your notification obligations."
+      },
+      "contact": {
+        "title": "9. Contact",
+        "content": "For questions about this agreement, please contact us at"
+      }
+    }
+  },
+  "slaPage": {
+    "title": "Service Level Agreement (SLA)",
+    "lastUpdated": "Last updated: December 2025",
+    "sections": {
+      "availability": {
+        "title": "1. Availability",
+        "content": "Vysion Horeca guarantees 99.9% uptime for all core services. This excludes scheduled maintenance, which is announced in advance."
+      },
+      "maintenance": {
+        "title": "2. Scheduled Maintenance",
+        "content": "Scheduled maintenance takes place outside peak hours, preferably between 02:00 and 06:00 CET. Customers are informed at least 48 hours in advance."
+      },
+      "response": {
+        "title": "3. Support Response Times",
+        "headers": {
+          "priority": "Priority",
+          "description": "Description",
+          "responseTime": "Response Time"
+        },
+        "critical": {
+          "name": "Critical",
+          "description": "System completely unavailable",
+          "time": "< 1 hour"
+        },
+        "high": {
+          "name": "High",
+          "description": "Important function not working",
+          "time": "< 4 hours"
+        },
+        "medium": {
+          "name": "Medium",
+          "description": "Function partially working",
+          "time": "< 8 hours"
+        },
+        "low": {
+          "name": "Low",
+          "description": "Question or improvement suggestion",
+          "time": "< 24 hours"
+        }
+      },
+      "channels": {
+        "title": "4. Support Channels",
+        "email": "Email:",
+        "phone": "Phone:",
+        "inApp": "In-app support:",
+        "inAppDesc": "Available in the Vysion Horeca application"
+      },
+      "hours": {
+        "title": "5. Support Hours",
+        "light": "Light plan:",
+        "lightHours": "Monday to Friday, 09:00 - 17:00 CET",
+        "pro": "Pro plan:",
+        "proHours": "Monday to Sunday, 08:00 - 22:00 CET"
+      },
+      "backups": {
+        "title": "6. Backups",
+        "content": "All data is backed up daily. Backups are kept for 30 days. In case of data loss, we can restore from the most recent backup."
+      },
+      "updates": {
+        "title": "7. Updates",
+        "content": "Software updates are rolled out automatically, usually at night. Important updates are communicated in advance."
+      }
+    }
+  },
+  "aupPage": {
+    "title": "Acceptable Use Policy",
+    "lastUpdated": "Last updated: December 2025",
+    "sections": {
+      "intro": {
+        "title": "Introduction",
+        "content": "This Acceptable Use Policy describes the rules for using Vysion Horeca services. By using our services, you agree to this policy."
+      },
+      "allowed": {
+        "title": "Permitted Use",
+        "intro": "You may use our services to:",
+        "items": {
+          "1": "Manage your hospitality business",
+          "2": "Process transactions and orders",
+          "3": "Maintain your accounting and administration",
+          "4": "Communicate with customers"
+        }
+      },
+      "prohibited": {
+        "title": "Prohibited Use",
+        "intro": "It is prohibited to use our services for:",
+        "items": {
+          "1": "Illegal activities or fraud",
+          "2": "Distributing malware or harmful software",
+          "3": "Violating intellectual property rights",
+          "4": "Disrupting our services or servers",
+          "5": "Collecting data from other users without consent",
+          "6": "Circumventing security measures"
+        }
+      },
+      "enforcement": {
+        "title": "Enforcement",
+        "content": "Violation of this policy may result in suspension or termination of your account. In serious cases, we may take legal action."
+      },
+      "contact": {
+        "title": "Contact",
+        "content": "For questions, please contact us at"
+      }
+    }
+  },
+  "trademarkPage": {
+    "title": "Vysion Trademark and Copyright Guidelines",
+    "lastUpdated": "Last updated: December 2025",
+    "sections": {
+      "brands": {
+        "title": "Our Brands",
+        "intro": "The following brand names and logos are property of Vysion Group International:",
+        "items": {
+          "1": "Vysion™",
+          "2": "Vysion Horeca™",
+          "3": "Vysion Apps™",
+          "4": "SCARDA™",
+          "5": "The Vysion logo and all variants"
+        }
+      },
+      "allowed": {
+        "title": "Permitted Use",
+        "intro": "You may use our brand names to:",
+        "items": {
+          "1": "Refer to our products or services in text",
+          "2": "Indicate that you use Vysion Horeca in your business",
+          "3": "Write reviews or articles about our services"
+        }
+      },
+      "notAllowed": {
+        "title": "Not Permitted",
+        "intro": "It is not permitted to:",
+        "items": {
+          "1": "Use our logos without written permission",
+          "2": "Use our brand names in your company or product name",
+          "3": "Create the impression that you are sponsored or endorsed by us",
+          "4": "Register our brand names as domain names or social media handles",
+          "5": "Modify our brands or combine them with other elements"
+        }
+      },
+      "logoGuidelines": {
+        "title": "Logo Guidelines",
+        "intro": "If you have permission to use our logo, please follow these guidelines:",
+        "items": {
+          "1": "Only use official logo files that we provide",
+          "2": "Do not change colors or proportions",
+          "3": "Ensure sufficient white space around the logo",
+          "4": "Do not place the logo on busy backgrounds"
+        }
+      },
+      "permission": {
+        "title": "Request Permission",
+        "content": "For permission to use our brand names or logos, please contact us at"
+      }
+    }
+  },
+  "ipPage": {
+    "title": "Intellectual Property Policy",
+    "lastUpdated": "Last updated: December 2025",
+    "sections": {
+      "ownership": {
+        "title": "1. Vysion Ownership",
+        "content": "All intellectual property rights regarding Vysion Horeca software, including but not limited to source code, designs, logos, brand names and documentation, are and remain the property of Vysion Group International."
+      },
+      "license": {
+        "title": "2. License",
+        "content": "By subscribing, you receive a limited, non-exclusive, non-transferable license to use the software for your business operations. This license ends when the subscription is terminated."
+      },
+      "prohibited": {
+        "title": "3. Prohibited Actions",
+        "intro": "It is not permitted to:",
+        "items": {
+          "1": "Copy, modify or reverse-engineer the software",
+          "2": "Sublicense or resell the software",
+          "3": "Circumvent security measures",
+          "4": "Use our brand names or logos without permission"
+        }
+      },
+      "yourContent": {
+        "title": "4. Your Content",
+        "content": "You retain all rights to your own business data, product information and customer data. You grant us a license to process this data for providing our services."
+      },
+      "infringement": {
+        "title": "5. Infringement Reports",
+        "content": "If you suspect intellectual property rights are being infringed, please contact us. We take such reports seriously and will take appropriate action."
+      },
+      "contact": {
+        "title": "6. Contact",
+        "content": "For questions about intellectual property, please contact us at"
+      }
+    }
+  },
+  "paymentPage": {
+    "title": "Vysion Payments Platform Agreement",
+    "lastUpdated": "Last updated: December 2025",
+    "sections": {
+      "intro": {
+        "title": "1. Introduction",
+        "content": "This agreement describes the terms for using payment services via the Vysion Horeca platform. Payment processing is done through our partners Mollie and Stripe."
+      },
+      "processing": {
+        "title": "2. Payment Processing",
+        "content": "Vysion Horeca integrates with certified payment processors to ensure secure transactions. All transactions are encrypted and comply with PCI-DSS standards."
+      },
+      "methods": {
+        "title": "3. Supported Payment Methods",
+        "items": {
+          "1": "Bancontact",
+          "2": "Visa / Mastercard",
+          "3": "iDEAL",
+          "4": "Apple Pay / Google Pay",
+          "5": "Payconiq"
+        }
+      },
+      "fees": {
+        "title": "4. Transaction Fees",
+        "content": "Transaction fees are determined by the payment processor and depend on the payment method and transaction volume. Contact us for current rates."
+      },
+      "payouts": {
+        "title": "5. Payouts",
+        "content": "Received payments are automatically paid out to your business bank account. Payout frequency is configurable (daily, weekly or monthly)."
+      },
+      "chargebacks": {
+        "title": "6. Chargebacks and Disputes",
+        "content": "In case of a chargeback, you receive a notification and have the opportunity to provide evidence. We support you in handling payment disputes."
+      },
+      "security": {
+        "title": "7. Security",
+        "content": "All payment data is processed in accordance with PCI-DSS Level 1. Card data is never stored on our servers."
+      },
+      "contact": {
+        "title": "8. Contact",
+        "content": "For questions about payments, please contact us at"
+      }
+    }
+  },
+  "subprocessorsPage": {
+    "title": "Subprocessors",
+    "lastUpdated": "Last updated: December 2025",
+    "intro": "Vysion Horeca uses the following subprocessors to provide our services. All subprocessors are carefully selected and comply with GDPR requirements.",
+    "table": {
+      "subprocessor": "Subprocessor",
+      "purpose": "Purpose",
+      "location": "Location",
+      "aws": {
+        "name": "Amazon Web Services (AWS)",
+        "purpose": "Cloud hosting and storage",
+        "location": "EU (Frankfurt)"
+      },
+      "mollie": {
+        "name": "Mollie",
+        "purpose": "Payment processing",
+        "location": "Netherlands"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "purpose": "Payment processing",
+        "location": "EU"
+      },
+      "vercel": {
+        "name": "Vercel",
+        "purpose": "Website hosting",
+        "location": "EU"
+      },
+      "sendgrid": {
+        "name": "SendGrid",
+        "purpose": "Email services",
+        "location": "EU"
+      }
+    },
+    "changes": {
+      "title": "Changes",
+      "content": "We inform our customers of changes to the list of subprocessors. If you object to a new subprocessor, you can contact us."
+    },
+    "contact": {
+      "title": "Contact",
+      "content": "For questions about our subprocessors, please contact us at"
+    }
+  },
+  "serviceAgreementPage": {
+    "title": "Vysion Service Agreement",
+    "lastUpdated": "Last updated: December 2025",
+    "sections": {
+      "general": {
+        "title": "1. General",
+        "content": "This Service Agreement (\"Agreement\") applies to the use of Vysion Horeca services, part of Vysion Group International. By using our services, you agree to these terms."
+      },
+      "services": {
+        "title": "2. Services",
+        "content": "Vysion Horeca provides POS software, online ordering platform, accounting software and related services for the hospitality sector. We reserve the right to modify, expand or limit our services."
+      },
+      "subscription": {
+        "title": "3. Subscription and Payment",
+        "intro": "Access to our services is available through monthly or annual subscription. Payments are invoiced in advance and are non-refundable unless otherwise stated.",
+        "items": {
+          "1": "Invoices are sent monthly or annually",
+          "2": "Payment term is 14 days from invoice date",
+          "3": "Access may be suspended for non-payment"
+        }
+      },
+      "usage": {
+        "title": "4. Use of Services",
+        "content": "You are responsible for lawful use of our services. It is prohibited to use the services for illegal purposes, infringe intellectual property rights, or disrupt the services."
+      },
+      "privacy": {
+        "title": "5. Data and Privacy",
+        "content": "We process your data in accordance with our Privacy Policy and applicable legislation, including GDPR. You retain ownership of your business data."
+      },
+      "liability": {
+        "title": "6. Liability",
+        "content": "Vysion Horeca is not liable for indirect damage, consequential damage or lost profits. Our total liability is limited to the amount you have paid us in the past 12 months."
+      },
+      "termination": {
+        "title": "7. Termination",
+        "content": "You can cancel your subscription at any time. Cancellation takes effect at the end of the current billing period. We may terminate the agreement for breach of these terms."
+      },
+      "law": {
+        "title": "8. Applicable Law",
+        "content": "Belgian law applies to this agreement. Disputes are submitted to the competent court in Belgium."
+      },
+      "contact": {
+        "title": "9. Contact",
+        "content": "For questions about this agreement, please contact us at"
+      }
+    }
+  },
+  "dashboardLayout": {
+    "loading": "Loading...",
+    "signOut": "Sign out"
+  },
+  "dashboardPage": {
+    "title": "Dashboard Overview",
+    "welcome": "Welcome back! Here's an overview of your business.",
+    "stats": {
+      "todayRevenue": "Today's revenue",
+      "todayOrders": "orders today",
+      "totalRevenue": "Total revenue",
+      "totalOrders": "total orders",
+      "customers": "Customers",
+      "avgPerOrder": "Avg.",
+      "perOrder": "per order",
+      "onlineOrders": "Online orders",
+      "pending": "pending"
+    },
+    "recentOrders": {
+      "title": "Recent orders",
+      "viewAll": "View all →",
+      "headers": {
+        "order": "Order",
+        "customer": "Customer",
+        "type": "Type",
+        "total": "Total",
+        "status": "Status",
+        "date": "Date"
+      },
+      "noOrders": "No orders found yet"
+    }
+  },
+  "ordersPage": {
+    "title": "Orders",
+    "subtitle": "View and manage all orders",
+    "refresh": "Refresh",
+    "filters": {
+      "total": "Total",
+      "online": "Online",
+      "pos": "POS",
+      "pending": "Pending"
+    },
+    "table": {
+      "order": "Order",
+      "customer": "Customer",
+      "type": "Type",
+      "payment": "Payment",
+      "total": "Total",
+      "status": "Status",
+      "date": "Date",
+      "details": "Details"
+    },
+    "noOrders": "No orders found",
+    "modal": {
+      "title": "Order",
+      "customer": "Customer",
+      "phone": "Phone",
+      "type": "Type",
+      "status": "Status",
+      "paymentMethod": "Payment method",
+      "date": "Date",
+      "address": "Address",
+      "notes": "Notes",
+      "items": "Items",
+      "noItems": "No items available",
+      "subtotal": "Subtotal",
+      "vat": "VAT",
+      "total": "Total"
+    }
+  },
+  "customersPage": {
+    "title": "Customers",
+    "subtitle": "View your customer database",
+    "stats": {
+      "totalCustomers": "Total customers",
+      "totalSpent": "Total spent",
+      "loyaltyPoints": "Loyalty points",
+      "avgPerCustomer": "Avg. per customer"
+    },
+    "search": "Search by name, email or phone...",
+    "table": {
+      "customer": "Customer",
+      "contact": "Contact",
+      "city": "City",
+      "orders": "Orders",
+      "spent": "Spent",
+      "points": "Points",
+      "memberSince": "Member since"
+    },
+    "noCustomers": "No customers found"
+  },
+  "productsPage": {
+    "title": "Products & Menu",
+    "subtitle": "View your products and menu items",
+    "stats": {
+      "totalProducts": "Total products",
+      "categories": "Categories",
+      "active": "Active",
+      "notAvailable": "Not available"
+    },
+    "filter": {
+      "all": "All"
+    },
+    "noProducts": "No products found",
+    "available": "Available",
+    "soldOut": "Sold out"
+  },
+  "analysisPage": {
+    "title": "Business Analysis",
+    "subtitle": "Insights into your business performance",
+    "stats": {
+      "totalRevenue": "Total revenue",
+      "orders": "orders",
+      "fixedCosts": "Fixed costs",
+      "costItems": "cost items",
+      "netProfit": "Net profit",
+      "afterCosts": "After costs",
+      "profitMargin": "Profit margin",
+      "ofRevenue": "Of revenue"
+    },
+    "charts": {
+      "revenueByChannel": "Revenue by channel",
+      "pos": "POS",
+      "online": "Online",
+      "paymentMethods": "Payment methods",
+      "busiestHours": "Busiest hours",
+      "orders": "orders",
+      "noData": "No data available",
+      "fixedCostsBreakdown": "Fixed costs breakdown",
+      "noCosts": "No costs registered",
+      "cost": "Cost"
+    }
+  },
+  "reportsPage": {
+    "title": "Reports",
+    "subtitle": "Daily revenue and order reports",
+    "stats": {
+      "totalRevenue": "Total revenue",
+      "totalOrders": "Total orders",
+      "avgPerDay": "Avg. per day",
+      "daysWithData": "Days with data"
+    },
+    "table": {
+      "title": "Daily reports (Z-Report)",
+      "date": "Date",
+      "orders": "Orders",
+      "pos": "POS",
+      "online": "Online",
+      "revenue": "Revenue",
+      "avgPerOrder": "Avg. per order"
+    },
+    "noReports": "No reports available"
+  },
+  "settingsPage": {
+    "title": "Settings",
+    "subtitle": "Manage your account settings",
+    "saved": "Settings saved",
+    "sections": {
+      "account": {
+        "title": "Account",
+        "subtitle": "Your account details",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Email address",
+        "phone": "Phone number"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Manage your notification preferences",
+        "email": {
+          "title": "Email notifications",
+          "description": "Receive updates via email"
+        },
+        "daily": {
+          "title": "Daily reports",
+          "description": "Receive a daily summary"
+        },
+        "orders": {
+          "title": "New orders",
+          "description": "Notification for new online orders"
+        }
+      },
+      "security": {
+        "title": "Security",
+        "subtitle": "Password and security",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password"
+      },
+      "help": {
+        "title": "Help & Support",
+        "subtitle": "Get help with problems",
+        "troubleshooting": "Troubleshooting",
+        "troubleshootingDesc": "Common problems",
+        "emailSupport": "Email support",
+        "callSupport": "Call support",
+        "whatsapp": "WhatsApp",
+        "whatsappDesc": "Direct chat"
+      }
+    },
+    "saveChanges": "Save changes"
+  },
+  "troubleshootingPage": {
+    "backToLogin": "Back to login",
+    "title": "Troubleshooting & Help",
+    "subtitle": "Common problems and solutions for your Vysion Horeca POS",
+    "quickActions": {
+      "callSupport": "Call support",
+      "emailSupport": "Email support",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "Direct chat"
+    },
+    "faqTitle": "Common problems",
+    "faqs": {
+      "1": {
+        "question": "My POS won't start",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Check if the device is connected to power</li><li>Hold the power button for 10 seconds to restart</li><li>Check if all cables are properly connected</li><li>Wait 2 minutes and try again</li><li>If the problem persists, contact support</li></ol>"
+      },
+      "2": {
+        "question": "I can't log into my POS",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Check if you're using the correct PIN</li><li>Ask your administrator to reset your PIN</li><li>Check if your account is not blocked (after 5 failed attempts)</li><li>Contact support if you don't have access to an admin account</li></ol>"
+      },
+      "3": {
+        "question": "The payment terminal doesn't work",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Check if the terminal is turned on (green light is on)</li><li>Check the USB or Bluetooth connection</li><li>Restart the terminal by turning it off and on</li><li>Go to Settings → Payment Terminal → Reconnect</li><li>Check if your internet connection is working</li></ol>"
+      },
+      "4": {
+        "question": "Receipt printer doesn't print",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Check if there is paper in the printer</li><li>Open and close the printer cover (this resets the printer)</li><li>Check the USB/network connection</li><li>Go to Settings → Printers → Test print</li><li>If the test page doesn't print, restart the printer</li></ol>"
+      },
+      "5": {
+        "question": "My POS is slow",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Close apps you're not using</li><li>Check your internet connection (4G/WiFi)</li><li>Restart the POS application</li><li>Check if updates are available</li><li>Contact support if the problem persists</li></ol>"
+      },
+      "6": {
+        "question": "Online orders aren't coming in",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Check if your internet connection is working</li><li>Check if the online ordering module is enabled</li><li>Go to Settings → Online Ordering → Sync</li><li>Check if your location is \"open\" in the system</li><li>Check your opening hours in settings</li></ol>"
+      },
+      "7": {
+        "question": "I want to add or edit a product",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Go to the menu top left → Products</li><li>Click \"New product\" or select an existing product</li><li>Fill in the name, price and category</li><li>Click \"Save\"</li><li>The product is now available on your POS</li></ol>"
+      },
+      "8": {
+        "question": "How do I make a Z-report / day closing?",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Go to the menu top left → Reports</li><li>Select \"Z-Report\" or \"Day Closing\"</li><li>Check the details</li><li>Click \"Close and print\"</li><li>The report is printed and the day is closed</li></ol>"
+      },
+      "9": {
+        "question": "I forgot my password",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Go to the login page</li><li>Click \"Forgot password\"</li><li>Enter your email address</li><li>You will receive a link to reset your password</li><li>Or contact support: +32 492 12 93 83</li></ol>"
+      },
+      "10": {
+        "question": "The app keeps crashing",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Close the app completely</li><li>Restart your device</li><li>Check if you have the latest version of the app</li><li>Remove and reinstall the app (your data is preserved)</li><li>Contact support if the problem persists</li></ol>"
+      }
+    },
+    "stillNeedHelp": {
+      "title": "Problem not found?",
+      "subtitle": "Our support team is available 24/7. Don't hesitate to contact us!",
+      "callNow": "Call now:",
+      "emailSupport": "Email support"
+    },
+    "copyright": "All rights reserved."
   }
 }

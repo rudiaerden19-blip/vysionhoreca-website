@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "title": "Vysion Horeca | Caja y Plataforma de Pago Todo en Uno",
+    "title": "Vysion Horeca | Sistema de Caja y Plataforma de Pago Todo en Uno",
     "description": "El sistema de caja completo para hostelería. Caja, pedidos online, facturación, gestión de personal y más - todo en una plataforma. Prueba 7 días gratis."
   },
   "nav": {
@@ -10,19 +10,19 @@
     "about": "Sobre nosotros",
     "contact": "Contacto",
     "login": "Iniciar sesión",
-    "tryFree": "Probar gratis",
+    "tryFree": "Prueba gratis",
     "language": "Idioma"
   },
   "hero": {
     "badge1": "1 Plataforma",
-    "badge2": "Hecho por hosteleros",
-    "badge3": "Hecho para hosteleros",
+    "badge2": "Creado por hosteleros",
+    "badge3": "Creado para hosteleros",
     "title": "Una pantalla. Control total.",
-    "description": "Nacido de la práctica, construido por y para hosteleros. Perfecto para bares de tapas, cafeterías, restaurantes, carnicerías y panaderías. Una plataforma todo en uno con caja certificada GKS, plataforma de pedidos propia y software de contabilidad profesional SCARDA con facturación Peppol, análisis empresarial completo y mucho más, conforme a la legislación de Bélgica y más de 20 países.",
-    "ctaPrimary": "Iniciar prueba gratuita",
+    "description": "Nacido de la práctica, creado por y para hosteleros. Perfecto para freidurías, cafeterías, restaurantes, carnicerías y panaderías. Una plataforma todo en uno con caja certificada GKS, plataforma de pedidos propia y software de contabilidad SCARDA profesional con facturación Peppol, análisis empresarial completo y mucho más, conforme a la legislación de Bélgica y más de 20 países.",
+    "ctaPrimary": "Comenzar prueba gratuita",
     "ctaSecondary": "Ver demo",
-    "trialInfo": "7 días gratis • Empieza de inmediato",
-    "clickToOpen": "Haz clic para abrir"
+    "trialInfo": "Prueba gratis 7 días • Empieza de inmediato",
+    "clickToOpen": "Clic para abrir"
   },
   "features": {
     "title": "Todo lo que necesitas",
@@ -33,11 +33,11 @@
     },
     "online": {
       "title": "Pedidos online",
-      "description": "Plataforma de pedidos online con página de aterrizaje para recogida y entrega. Los clientes piden, tú recibes directamente en la caja."
+      "description": "Plataforma de pedidos online con página de destino para recogida y entrega. Los clientes piden, tú recibes directamente en la caja."
     },
     "reports": {
       "title": "Informes en tiempo real",
-      "description": "Informes X y Z en tiempo real. Información instantánea sobre ingresos, productos populares y horas punta. Decisiones basadas en datos."
+      "description": "Informes X y Z en tiempo real. Insights directos sobre ventas, productos populares y horas punta. Decisiones basadas en datos."
     },
     "payments": {
       "title": "Pagos",
@@ -45,19 +45,19 @@
     },
     "invoicing": {
       "title": "Facturación & Peppol",
-      "description": "Facturas Peppol profesionales con un clic. Conectadas automáticamente a tu contabilidad. Envío B2B."
+      "description": "Facturas Peppol profesionales con un clic. Conectado automáticamente a tu contabilidad. Envío B2B."
     },
     "staff": {
       "title": "Gestión de personal",
-      "description": "Registro de horas, roles y permisos. Sabes exactamente quién hizo qué. Listo para nóminas."
+      "description": "Registro de horas, roles y permisos. Sabes exactamente quién hizo qué. Listo para la gestoría."
     },
     "kitchen": {
       "title": "Pantalla de cocina",
       "description": "Pedidos en tiempo real en la cocina. Trabajo eficiente y organizado."
     },
     "loyalty": {
-      "title": "Tarjeta cliente y Fidelidad",
-      "description": "Construye relaciones con clientes con puntos de fidelidad y ofertas personales."
+      "title": "Tarjeta de cliente & Fidelidad",
+      "description": "Construye relaciones con clientes mediante puntos de fidelidad y ofertas personalizadas."
     },
     "gks": {
       "title": "Certificado GKS",
@@ -67,7 +67,7 @@
   "stats": {
     "processed": "Procesado por mes",
     "businesses": "Negocios activos",
-    "uptime": "Garantía de disponibilidad",
+    "uptime": "Garantía de uptime",
     "support": "Soporte disponible"
   },
   "orderApp": {
@@ -78,17 +78,17 @@
   "butWait": {
     "label": "Espera...",
     "title": "Pero... Vysion va",
-    "titleAccent": "aún más lejos",
-    "subtitle": "Donde otros se detuvieron, nosotros continuamos...",
+    "titleAccent": "más allá",
+    "subtitle": "Donde otros se detuvieron, nosotros seguimos...",
     "features": {
       "1": "Sigue tu negocio en tiempo real",
       "2": "Abre tus informes donde estés",
       "3": "Factura desde casa",
       "4": "Ajusta el registro de horas del personal",
       "5": "Envía tu contabilidad desde cualquier lugar",
-      "6": "Ve tus análisis empresariales en tiempo real",
-      "7": "Inicia sesión en tu propia página web",
-      "8": "Inicia sesión en tu negocio desde cualquier dispositivo",
+      "6": "Ve tu análisis empresarial en tiempo real",
+      "7": "Accede a tu propia página web",
+      "8": "Accede a tu negocio desde cualquier dispositivo",
       "9": "Ve tus ventas diarias en tiempo real",
       "10": "Gestiona tu caja de forma remota",
       "11": "Personaliza tu app de pedidos a tu gusto",
@@ -102,16 +102,16 @@
     "cta": "Empieza hoy con Vysion Horeca",
     "features": {
       "pos": "Software de caja",
-      "terminal": "Integración de terminal de pago",
+      "terminal": "Integración terminal de pago",
       "online": "Plataforma de pedidos online",
       "gks": "Certificado GKS",
-      "accounting": "Software de contabilidad (SCARDA)",
+      "accounting": "Software contabilidad (SCARDA)",
       "peppol": "Facturación Peppol",
       "analytics": "Análisis empresarial",
       "kitchen": "Pantalla de cocina",
-      "loyalty": "Tarjeta cliente y fidelidad",
+      "loyalty": "Tarjeta cliente & fidelidad",
       "staff": "Gestión de personal",
-      "reservation": "Reserva de mesa",
+      "reservation": "Reserva de mesas",
       "languages": "Disponible en 9+ idiomas",
       "multiLocation": "Multi-ubicación"
     },
@@ -122,8 +122,8 @@
     "subtitle": "Todo incluido. Sin sorpresas.",
     "perMonth": "/mes",
     "perLicense": "Por licencia",
-    "startTrial": "Empezar 7 días gratis",
-    "mostChosen": "El más elegido",
+    "startTrial": "Empieza 7 días gratis",
+    "mostChosen": "Más elegido",
     "included": "Incluido:",
     "allOfLight": "Todo de Light, más:",
     "light": {
@@ -132,7 +132,7 @@
         "1": "Funcionalidad completa de caja",
         "2": "Informes en tiempo real",
         "3": "Productos y categorías",
-        "4": "Integración de terminal de pago",
+        "4": "Integración terminal de pago",
         "5": "Inventario",
         "6": "Soporte por email y teléfono"
       }
@@ -144,13 +144,13 @@
         "2": "Personal y registro de horas",
         "3": "Productos y categorías ilimitados",
         "4": "Tarjeta cliente y fidelidad",
-        "5": "Software de pantalla de cocina",
+        "5": "Software pantalla de cocina",
         "6": "Análisis empresarial mensual",
-        "7": "Página de aterrizaje",
-        "8": "Registro de horas del personal",
+        "7": "Página de destino",
+        "8": "Registro de tiempo del personal",
         "9": "Programa de facturación Peppol",
-        "10": "Software de contabilidad SCARDA",
-        "11": "Reserva de mesa",
+        "10": "Software contabilidad SCARDA",
+        "11": "Reserva de mesas",
         "12": "Plano de mesas",
         "13": "Disponible en 9 idiomas"
       }
@@ -160,25 +160,25 @@
     "invoicing": {
       "tab": "Facturación",
       "title": "Facturación rápida y profesional.",
-      "description": "Crea facturas para clientes, notas de crédito y más. Conecta directamente con Peppol y envía al contable en una fracción de segundo."
+      "description": "Crea facturas para clientes, notas de crédito y más. Conecta directamente con Peppol y envía al contable en segundos."
     },
     "ordering": {
       "tab": "Plataforma de pedidos online",
-      "title": "Gestión rápida, clientes satisfechos.",
-      "description": "Procesa pedidos a la velocidad del rayo en horas punta. Sin más colas. Todo perfectamente integrado en la caja. Todo en tiempo real a la cocina."
+      "title": "Procesamiento rápido, clientes satisfechos.",
+      "description": "Procesa pedidos rápidamente durante horas punta. Sin más colas. Todo perfectamente integrado en la caja. Todo en tiempo real a la cocina."
     },
     "analytics": {
       "tab": "Análisis empresarial",
       "title": "Análisis empresarial en tiempo real.",
-      "description": "Sabe exactamente cómo de sano está tu negocio. Introduce tus costes fijos, compras a proveedores, leasings, alquiler y más. Obtén análisis instantáneo en tiempo real de tu negocio."
+      "description": "Sabe exactamente cómo está tu negocio. Ingresa costos fijos, compras de proveedores, arrendamientos, alquiler y más. Obtén análisis instantáneo en tiempo real."
     },
     "accounting": {
       "tab": "Contabilidad",
       "title": "Contabilidad profesional.",
-      "description": "Software de contabilidad SCARDA totalmente integrado. Siempre actualizado. Ahorra 30% en costes de contabilidad."
+      "description": "Software de contabilidad SCARDA completamente integrado. Siempre actualizado. Ahorra 30% en costos de contabilidad."
     },
-    "tryFree": "Probar gratis",
-    "clickToEnlarge": "Haz clic para ampliar"
+    "tryFree": "Prueba gratis",
+    "clickToEnlarge": "Clic para ampliar"
   },
   "testimonials": {
     "title": "Los hosteleros confían en Vysion",
@@ -186,44 +186,44 @@
       "1": {
         "quote": "Por fin una plataforma donde todo está integrado. Cancelé todas mis otras suscripciones y ahora tengo todo en uno por una fracción del precio.",
         "author": "Marc V.",
-        "role": "Dueño de bar de tapas"
+        "role": "Propietario de freiduría"
       },
       "2": {
-        "quote": "El módulo de pedidos online aumentó nuestros ingresos un 40%. A los clientes les encanta.",
+        "quote": "El módulo de pedidos online ha aumentado nuestras ventas un 40%. A los clientes les encanta.",
         "author": "Sarah D.",
         "role": "Gerente de restaurante"
       },
       "3": {
-        "quote": "El soporte responde en 5 minutos. Nunca había tenido eso con ningún otro proveedor.",
+        "quote": "El soporte responde en 5 minutos. No he tenido eso con ningún otro proveedor.",
         "author": "Kevin L.",
-        "role": "Dueño de cafetería"
+        "role": "Propietario de cafetería"
       },
       "4": {
         "quote": "La mejor inversión que he hecho para mi negocio. Todo funciona perfectamente junto y el servicio al cliente es excelente.",
         "author": "Lisa M.",
-        "role": "Dueña de panadería"
+        "role": "Propietaria de panadería"
       },
       "5": {
-        "quote": "¡Por fin un sistema de caja en mi propio idioma! Busqué durante años y por fin lo encontré.",
-        "author": "Wei Wang",
-        "role": "Dueño de restaurante chino"
+        "quote": "终于有一个用我自己语言的收银系统了！我找了好多年，终于找到了！",
+        "author": "王伟",
+        "role": "中餐厅老板"
       },
       "6": {
-        "quote": "Nunca había tenido un sistema de caja tan rápido. Incluso actualizan de noche - solo presiono OK por la mañana y las funciones que pedí ya están ahí.",
+        "quote": "I've never had such a fast POS system. They even update overnight - I just press OK in the morning and the features I requested are already there!",
         "author": "James T.",
-        "role": "Dueño de Fish & Chips"
+        "role": "Fish & Chips Owner"
       }
     }
   },
   "cta": {
     "title": "¿Listo para crecer?",
-    "subtitle": "Empieza hoy con Vysion Horeca. 7 días gratis, sin compromisos.",
-    "primary": "Iniciar prueba gratuita",
+    "subtitle": "Empieza hoy con Vysion Horeca. 7 días gratis, sin compromiso.",
+    "primary": "Comenzar prueba gratuita",
     "secondary": "Solicitar información"
   },
   "contact": {
-    "title": "Contáctanos",
-    "subtitle": "¿Preguntas sobre Vysion Horeca? Nuestro equipo está listo para ayudar.",
+    "title": "Contacto",
+    "subtitle": "¿Preguntas sobre Vysion Horeca? Nuestro equipo está a tu disposición.",
     "email": "Email",
     "phone": "Teléfono",
     "form": {
@@ -254,10 +254,10 @@
     "privacy": "Privacidad",
     "legal": "Legal",
     "copyright": "Todos los derechos reservados.",
-    "designBy": "Diseño de Vysion"
+    "designBy": "Diseño por Vysion"
   },
   "cookies": {
-    "message": "Usamos cookies para mejorar tu experiencia. Al continuar aceptas nuestra",
+    "message": "Usamos cookies para mejorar tu experiencia. Al continuar, aceptas nuestra",
     "policy": "política de cookies",
     "accept": "Aceptar",
     "decline": "Rechazar"
@@ -268,10 +268,10 @@
     "chooseBusiness": "Elige tu negocio",
     "loading": "Cargando...",
     "selectPlaceholder": "-- Selecciona un negocio --",
-    "toDashboard": "Al Panel →",
+    "toDashboard": "Al Dashboard →",
     "processing": "Procesando...",
     "demoMode": "Modo demo:",
-    "demoInfo": "Selecciona un negocio para ver el panel. En producción esto será reemplazado por autenticación real.",
+    "demoInfo": "Selecciona un negocio para ver el dashboard. En producción será reemplazado por autenticación real.",
     "troubleshooting": {
       "title": "¿Problemas con tu caja?",
       "subtitle": "Consulta nuestra guía de solución de problemas"
@@ -285,28 +285,28 @@
     "heroSubtitle": "Nacido de la práctica, construido por hosteleros, para hosteleros.",
     "story": {
       "title": "Nuestra historia",
-      "p1": "Vysion Horeca nació de la experiencia. Como hosteleros, notamos que los sistemas de caja existentes eran demasiado caros, demasiado complejos y nunca hacían exactamente lo que necesitábamos.",
-      "p2": "Pagábamos por cinco suscripciones diferentes: una caja, una plataforma de pedidos, software de contabilidad, un terminal de pago y software de análisis. Nada funcionaba bien junto y los costes subían a cientos de euros al mes.",
+      "p1": "Vysion Horeca nació de la experiencia. Como hosteleros, notamos que los sistemas de caja existentes eran demasiado caros, demasiado complejos, y nunca hacían exactamente lo que necesitábamos.",
+      "p2": "Pagábamos por cinco suscripciones diferentes: una caja, una plataforma de pedidos, software de contabilidad, un terminal de pago y software de análisis. Nada funcionaba bien juntos y los costos llegaban a cientos de euros al mes.",
       "p3": "Por eso decidimos construirlo nosotros mismos. Una plataforma todo en uno que hace exactamente lo que un hostelero necesita, sin complicaciones y a un precio justo."
     },
     "facts": {
       "founded": "Fundado en 2013",
       "foundedDesc": "Por hosteleros con más de 15 años de experiencia",
-      "location": "Con sede en Bélgica",
+      "location": "Ubicado en Bélgica",
       "locationDesc": "Pelt, Limburgo - el corazón del Benelux",
       "countries": "Activo en 20+ países",
-      "countriesDesc": "De Bélgica a China, de Países Bajos al Reino Unido"
+      "countriesDesc": "Desde Bélgica hasta China, de Países Bajos al Reino Unido"
     },
     "mission": {
       "title": "Nuestra misión",
-      "subtitle": "Dejar que los hosteleros se centren en lo que mejor hacen: dar la bienvenida a los clientes y crear grandes experiencias. Del resto nos encargamos nosotros.",
+      "subtitle": "Dejar que los hosteleros se enfoquen en lo que mejor hacen: dar la bienvenida a los clientes y crear experiencias increíbles. Del resto nos encargamos nosotros.",
       "reliability": {
         "title": "Fiabilidad",
-        "description": "99.9% de disponibilidad. Tu caja siempre funciona, incluso cuando internet falla."
+        "description": "99.9% uptime. Tu caja siempre funciona, incluso si internet falla momentáneamente."
       },
       "speed": {
         "title": "Velocidad",
-        "description": "Actualizaciones ultrarrápidas. Solicita una función y vela en tu sistema al día siguiente."
+        "description": "Actualizaciones rapidísimas. Solicita una función y la ves al día siguiente en tu sistema."
       },
       "personal": {
         "title": "Personal",
@@ -321,15 +321,15 @@
       },
       "pricing": {
         "title": "💰 Precios justos",
-        "description": "Sin costes ocultos, sin contratos a largo plazo, sin sorpresas. Lo que ves es lo que pagas."
+        "description": "Sin costos ocultos, sin contratos largos, sin sorpresas. Lo que ves es lo que pagas."
       },
       "improvement": {
         "title": "🚀 Mejora continua",
-        "description": "Escuchamos a nuestros clientes y construimos lo que necesitan. Se añaden nuevas funciones cada semana, basadas en feedback real."
+        "description": "Escuchamos a nuestros clientes y construimos lo que necesitan. Cada semana hay nuevas funciones, basadas en comentarios reales."
       },
       "global": {
         "title": "🌍 Local e internacional",
-        "description": "Certificado GKS en Bélgica, pero también disponible en 9 idiomas y 20+ países. Del bar de tapas al restaurante con estrella Michelin."
+        "description": "Certificado GKS en Bélgica, pero también disponible en 9 idiomas y 20+ países. De freidurías a restaurantes con estrella."
       }
     },
     "company": {
@@ -342,11 +342,11 @@
     },
     "ctaTitle": "¿Listo para empezar?",
     "ctaSubtitle": "Prueba Vysion Horeca 7 días gratis. Sin tarjeta de crédito.",
-    "ctaPrimary": "Iniciar prueba gratuita",
-    "ctaSecondary": "Contáctanos"
+    "ctaPrimary": "Comenzar prueba gratuita",
+    "ctaSecondary": "Contactar"
   },
   "dashboard": {
-    "title": "Panel",
+    "title": "Dashboard",
     "welcome": "Bienvenido de nuevo",
     "menu": {
       "overview": "Resumen",
@@ -355,7 +355,7 @@
       "products": "Productos",
       "reports": "Informes",
       "analytics": "Análisis",
-      "settings": "Ajustes"
+      "settings": "Configuración"
     },
     "orders": {
       "title": "Pedidos",
@@ -381,58 +381,58 @@
       "title": "Análisis"
     },
     "settings": {
-      "title": "Ajustes"
+      "title": "Configuración"
     }
   },
   "legal": {
     "title": "Legal",
-    "subtitle": "Todos los documentos legales y términos de Vysion Horeca",
+    "subtitle": "Todos los documentos legales y condiciones de Vysion Horeca",
     "backToLegal": "Volver al resumen legal",
     "pages": {
       "cookies": {
-        "title": "Política de Cookies",
-        "description": "Cómo usamos cookies en nuestro sitio web"
+        "title": "Política de cookies",
+        "description": "Cómo usamos las cookies en nuestro sitio web"
       },
       "privacy": {
-        "title": "Política de Privacidad",
-        "description": "Cómo manejamos tus datos personales"
+        "title": "Política de privacidad",
+        "description": "Cómo tratamos sus datos personales"
       },
       "terms": {
-        "title": "Términos de Servicio",
-        "description": "Términos generales para el uso de nuestros servicios"
+        "title": "Acuerdo de servicios",
+        "description": "Términos y condiciones generales para el uso de nuestros servicios"
       },
       "dpa": {
-        "title": "Acuerdo de Procesamiento de Datos",
-        "description": "Acuerdo de procesamiento de datos conforme al RGPD"
+        "title": "Acuerdo de procesamiento de datos",
+        "description": "Data Processing Agreement conforme GDPR"
       },
       "sla": {
-        "title": "Acuerdo de Nivel de Servicio",
-        "description": "Nuestras garantías de disponibilidad y niveles de servicio"
+        "title": "Acuerdo de nivel de servicio",
+        "description": "Nuestras garantías de uptime y niveles de servicio"
       },
       "aup": {
-        "title": "Política de Uso Aceptable",
+        "title": "Uso aceptable",
         "description": "Directrices para el uso aceptable de nuestros servicios"
       },
       "ip": {
-        "title": "Propiedad Intelectual",
-        "description": "Información de derechos de autor y licencia"
+        "title": "Propiedad intelectual",
+        "description": "Derechos de autor e información de licencia"
       },
       "trademark": {
-        "title": "Política de Marcas",
-        "description": "Uso de las marcas y branding de Vysion"
+        "title": "Política de marcas",
+        "description": "Uso de marcas y branding de Vysion"
       },
       "subprocessors": {
         "title": "Subprocesadores",
         "description": "Lista de nuestros procesadores de datos"
       },
       "payment": {
-        "title": "Plataforma de Pago",
-        "description": "Términos para el procesamiento de pagos"
+        "title": "Plataforma de pago",
+        "description": "Condiciones para el procesamiento de pagos"
       }
     }
   },
   "privacy": {
-    "title": "Política de Privacidad",
+    "title": "Política de privacidad",
     "lastUpdated": "Última actualización"
   },
   "common": {
@@ -450,6 +450,814 @@
     "error": "Ha ocurrido un error",
     "success": "Éxito",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "backToHome": "Volver al inicio",
+    "home": "Inicio",
+    "lastUpdated": "Última actualización",
+    "contact": "Contacto",
+    "email": "Email",
+    "phone": "Teléfono",
+    "anonymous": "Anónimo",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "vat": "IVA",
+    "date": "Fecha",
+    "status": "Estado",
+    "type": "Tipo",
+    "details": "Detalles",
+    "refresh": "Actualizar",
+    "noData": "No hay datos disponibles",
+    "all": "Todo",
+    "online": "Online",
+    "pos": "Caja",
+    "pending": "Pendiente",
+    "items": "Artículos",
+    "address": "Dirección",
+    "notes": "Notas",
+    "available": "Disponible",
+    "soldOut": "Agotado",
+    "active": "Activo",
+    "notAvailable": "No disponible",
+    "noCategory": "Sin categoría"
+  },
+  "legalMain": {
+    "title": "Legal",
+    "policies": "Políticas",
+    "contracts": "Contratos",
+    "privacy": "Privacidad",
+    "links": {
+      "paymentPlatform": "Acuerdo de plataforma de pagos Vysion",
+      "aup": "Política de uso aceptable",
+      "ip": "Política de infracción de propiedad intelectual",
+      "trademark": "Directrices de marca y derechos de autor de Vysion",
+      "serviceAgreement": "Acuerdo de servicios Vysion",
+      "sla": "Acuerdo de nivel de servicio (SLA)",
+      "dpa": "Acuerdo de procesamiento de datos",
+      "privacyPolicy": "Política de privacidad",
+      "cookies": "Política de cookies",
+      "subprocessors": "Subprocesadores"
+    },
+    "backToHome": "← Volver al inicio"
+  },
+  "cookiesPage": {
+    "title": "Política de cookies",
+    "lastUpdated": "Última actualización: diciembre 2025",
+    "whatAreCookies": {
+      "title": "¿Qué son las cookies?",
+      "content": "Las cookies son pequeños archivos de texto que se almacenan en su ordenador o dispositivo móvil cuando visita nuestro sitio web. Nos ayudan a que el sitio web funcione correctamente y a mejorar su experiencia de usuario."
+    },
+    "whichCookies": {
+      "title": "¿Qué cookies usamos?",
+      "necessary": {
+        "title": "Cookies necesarias",
+        "content": "Estas cookies son esenciales para el funcionamiento del sitio web. Sin estas cookies, ciertas funciones no pueden funcionar."
+      },
+      "functional": {
+        "title": "Cookies funcionales",
+        "content": "Estas cookies recuerdan sus preferencias y configuraciones para personalizar su experiencia."
+      },
+      "analytical": {
+        "title": "Cookies analíticas",
+        "content": "Con su consentimiento, usamos cookies analíticas para entender cómo los visitantes usan nuestro sitio web. Esto nos ayuda a mejorar nuestros servicios."
+      }
+    },
+    "manageCookies": {
+      "title": "Gestionar cookies",
+      "content": "Puede ajustar sus preferencias de cookies en cualquier momento a través de la configuración de su navegador. Nota: desactivar ciertas cookies puede limitar la funcionalidad del sitio web."
+    },
+    "contact": {
+      "title": "Contacto",
+      "content": "Para preguntas sobre nuestra política de cookies, puede contactar a"
+    },
+    "backToLegal": "← Volver a Legal"
+  },
+  "privacyPage": {
+    "title": "Privacidad y Seguridad",
+    "subtitle": "Cómo tratamos sus datos",
+    "sections": {
+      "intro": {
+        "title": "1. Introducción",
+        "content": "Vysion Horeca, parte de Vysion Group International, valora mucho la protección de sus datos personales. En esta declaración de privacidad explicamos qué datos recopilamos, por qué lo hacemos y cómo los tratamos."
+      },
+      "whatData": {
+        "title": "2. ¿Qué datos recopilamos?",
+        "intro": "Podemos recopilar los siguientes datos personales:",
+        "items": {
+          "1": "Nombre y datos de contacto (email, teléfono)",
+          "2": "Datos de la empresa (nombre, NIF, dirección)",
+          "3": "Datos de pago",
+          "4": "Datos de uso de nuestro software",
+          "5": "Comunicación que tenga con nosotros"
+        }
+      },
+      "whyData": {
+        "title": "3. ¿Para qué usamos sus datos?",
+        "intro": "Usamos sus datos para:",
+        "items": {
+          "1": "Prestar nuestros servicios y software",
+          "2": "Procesar pagos",
+          "3": "Servicio al cliente y soporte",
+          "4": "Mejorar nuestros productos",
+          "5": "Comunicación sobre actualizaciones y nuevas funciones",
+          "6": "Cumplimiento de obligaciones legales (incl. GKS, legislación fiscal)"
+        }
+      },
+      "security": {
+        "title": "4. Seguridad de datos",
+        "intro": "Nos tomamos muy en serio la seguridad de sus datos. Nuestros sistemas están protegidos con:",
+        "items": {
+          "1": "Cifrado SSL/TLS para toda la transferencia de datos",
+          "2": "Almacenamiento cifrado de datos sensibles",
+          "3": "Auditorías de seguridad regulares",
+          "4": "Control de acceso y autenticación",
+          "5": "Copias de seguridad diarias en servidores seguros"
+        }
+      },
+      "gks": {
+        "title": "5. GKS y Cumplimiento Fiscal",
+        "content": "Vysion Horeca está totalmente certificado GKS y cumple con todos los requisitos fiscales belgas. Los datos de transacciones se almacenan de forma segura según los períodos de retención legales."
+      },
+      "sharing": {
+        "title": "6. Compartir datos",
+        "content": "Solo compartimos sus datos con terceros cuando es necesario para nuestros servicios (como procesadores de pago) o cuando estamos legalmente obligados. Nunca vendemos sus datos a terceros."
+      },
+      "rights": {
+        "title": "7. Sus derechos",
+        "intro": "Tiene derecho a:",
+        "items": {
+          "1": "Acceder a sus datos personales",
+          "2": "Corregir o eliminar sus datos",
+          "3": "Oponerse al procesamiento",
+          "4": "Transferir sus datos a otro servicio"
+        }
+      },
+      "cookies": {
+        "title": "8. Cookies",
+        "content": "Nuestro sitio web usa cookies funcionales para mejorar la operación. Las cookies analíticas solo se colocan con su consentimiento."
+      },
+      "contact": {
+        "title": "9. Contacto",
+        "intro": "Para preguntas sobre esta declaración de privacidad o sus datos, puede contactar:"
+      },
+      "changes": {
+        "title": "10. Cambios",
+        "content": "Podemos modificar esta declaración de privacidad de vez en cuando. La versión más reciente siempre está disponible en esta página. Última actualización: diciembre 2025."
+      }
+    },
+    "backToHome": "← Volver al inicio"
+  },
+  "dpaPage": {
+    "title": "Acuerdo de Procesamiento de Datos",
+    "lastUpdated": "Última actualización: diciembre 2025",
+    "sections": {
+      "definitions": {
+        "title": "1. Definiciones",
+        "content": "En este acuerdo de procesamiento de datos se entiende por:",
+        "controller": "Responsable del tratamiento:",
+        "controllerDef": "el cliente que usa los servicios de Vysion Horeca",
+        "processor": "Encargado del tratamiento:",
+        "processorDef": "Vysion Horeca / Vysion Group International",
+        "personalData": "Datos personales:",
+        "personalDataDef": "todos los datos relacionados con una persona física identificada o identificable"
+      },
+      "subject": {
+        "title": "2. Objeto y Duración",
+        "content": "Este acuerdo regula el procesamiento de datos personales por Vysion Horeca en su nombre. El acuerdo es válido mientras use nuestros servicios."
+      },
+      "purpose": {
+        "title": "3. Naturaleza y Propósito del Procesamiento",
+        "intro": "Procesamos datos personales para:",
+        "items": {
+          "1": "Proporcionar software de caja y servicios relacionados",
+          "2": "Procesar transacciones y pedidos",
+          "3": "Mantener datos de clientes e historial de pedidos",
+          "4": "Generar informes y análisis"
+        }
+      },
+      "categories": {
+        "title": "4. Categorías de Datos Personales",
+        "items": {
+          "1": "Datos de contacto (nombre, dirección, email, teléfono)",
+          "2": "Datos de transacciones",
+          "3": "Datos de pedidos",
+          "4": "Datos de personal (si aplica)"
+        }
+      },
+      "obligations": {
+        "title": "5. Obligaciones del Encargado",
+        "intro": "Vysion Horeca:",
+        "items": {
+          "1": "Procesará datos personales solo según sus instrucciones",
+          "2": "Tomará medidas técnicas y organizativas apropiadas",
+          "3": "Garantizará la confidencialidad",
+          "4": "Le asistirá en cumplir sus obligaciones bajo el GDPR",
+          "5": "Eliminará o devolverá datos al finalizar"
+        }
+      },
+      "subprocessors": {
+        "title": "6. Subprocesadores",
+        "content": "Usamos subprocesadores para ciertos servicios. Una lista actualizada está disponible en nuestra página de subprocesadores. Le informamos de cambios."
+      },
+      "security": {
+        "title": "7. Seguridad",
+        "content": "Implementamos medidas de seguridad apropiadas incluyendo cifrado, control de acceso y auditorías de seguridad regulares."
+      },
+      "breach": {
+        "title": "8. Brechas de Datos",
+        "content": "En caso de brecha de datos, le informaremos sin demora indebida para que pueda cumplir con su obligación de notificación."
+      },
+      "contact": {
+        "title": "9. Contacto",
+        "content": "Para preguntas sobre este acuerdo puede contactar a"
+      }
+    }
+  },
+  "slaPage": {
+    "title": "Acuerdo de Nivel de Servicio (SLA)",
+    "lastUpdated": "Última actualización: diciembre 2025",
+    "sections": {
+      "availability": {
+        "title": "1. Disponibilidad",
+        "content": "Vysion Horeca garantiza un uptime del 99,9% para todos los servicios principales. Esto excluye el mantenimiento programado, que se anuncia con antelación."
+      },
+      "maintenance": {
+        "title": "2. Mantenimiento Programado",
+        "content": "El mantenimiento programado se realiza fuera de horas punta, preferiblemente entre 02:00 y 06:00 CET. Los clientes son informados con al menos 48 horas de antelación."
+      },
+      "response": {
+        "title": "3. Tiempos de Respuesta de Soporte",
+        "headers": {
+          "priority": "Prioridad",
+          "description": "Descripción",
+          "responseTime": "Tiempo de respuesta"
+        },
+        "critical": {
+          "name": "Crítico",
+          "description": "Sistema completamente no disponible",
+          "time": "< 1 hora"
+        },
+        "high": {
+          "name": "Alto",
+          "description": "Función importante no funciona",
+          "time": "< 4 horas"
+        },
+        "medium": {
+          "name": "Medio",
+          "description": "Función parcialmente funcional",
+          "time": "< 8 horas"
+        },
+        "low": {
+          "name": "Bajo",
+          "description": "Pregunta o sugerencia de mejora",
+          "time": "< 24 horas"
+        }
+      },
+      "channels": {
+        "title": "4. Canales de Soporte",
+        "email": "Email:",
+        "phone": "Teléfono:",
+        "inApp": "Soporte en la app:",
+        "inAppDesc": "Disponible en la aplicación Vysion Horeca"
+      },
+      "hours": {
+        "title": "5. Horario de Soporte",
+        "light": "Plan Light:",
+        "lightHours": "Lunes a viernes, 09:00 - 17:00 CET",
+        "pro": "Plan Pro:",
+        "proHours": "Lunes a domingo, 08:00 - 22:00 CET"
+      },
+      "backups": {
+        "title": "6. Copias de Seguridad",
+        "content": "Todos los datos se respaldan diariamente. Las copias de seguridad se conservan 30 días. En caso de pérdida de datos, podemos restaurar desde la copia más reciente."
+      },
+      "updates": {
+        "title": "7. Actualizaciones",
+        "content": "Las actualizaciones de software se implementan automáticamente, generalmente por la noche. Las actualizaciones importantes se comunican con antelación."
+      }
+    }
+  },
+  "aupPage": {
+    "title": "Política de Uso Aceptable",
+    "lastUpdated": "Última actualización: diciembre 2025",
+    "sections": {
+      "intro": {
+        "title": "Introducción",
+        "content": "Esta Política de Uso Aceptable describe las reglas para usar los servicios de Vysion Horeca. Al usar nuestros servicios, acepta esta política."
+      },
+      "allowed": {
+        "title": "Uso Permitido",
+        "intro": "Puede usar nuestros servicios para:",
+        "items": {
+          "1": "Gestionar su negocio de hostelería",
+          "2": "Procesar transacciones y pedidos",
+          "3": "Mantener su contabilidad y administración",
+          "4": "Comunicarse con clientes"
+        }
+      },
+      "prohibited": {
+        "title": "Uso Prohibido",
+        "intro": "Está prohibido usar nuestros servicios para:",
+        "items": {
+          "1": "Actividades ilegales o fraude",
+          "2": "Distribuir malware o software dañino",
+          "3": "Infringir derechos de propiedad intelectual",
+          "4": "Interrumpir nuestros servicios o servidores",
+          "5": "Recopilar datos de otros usuarios sin consentimiento",
+          "6": "Eludir medidas de seguridad"
+        }
+      },
+      "enforcement": {
+        "title": "Aplicación",
+        "content": "En caso de violación de esta política, podemos suspender o terminar su cuenta. En casos graves, podemos emprender acciones legales."
+      },
+      "contact": {
+        "title": "Contacto",
+        "content": "Para preguntas puede contactar a"
+      }
+    }
+  },
+  "trademarkPage": {
+    "title": "Directrices de Marca y Derechos de Autor de Vysion",
+    "lastUpdated": "Última actualización: diciembre 2025",
+    "sections": {
+      "brands": {
+        "title": "Nuestras Marcas",
+        "intro": "Los siguientes nombres y logotipos de marca son propiedad de Vysion Group International:",
+        "items": {
+          "1": "Vysion™",
+          "2": "Vysion Horeca™",
+          "3": "Vysion Apps™",
+          "4": "SCARDA™",
+          "5": "El logotipo de Vysion y todas las variantes"
+        }
+      },
+      "allowed": {
+        "title": "Uso Permitido",
+        "intro": "Puede usar nuestras marcas para:",
+        "items": {
+          "1": "Referirse a nuestros productos o servicios en texto",
+          "2": "Indicar que usa Vysion Horeca en su negocio",
+          "3": "Escribir reseñas o artículos sobre nuestros servicios"
+        }
+      },
+      "notAllowed": {
+        "title": "No Permitido",
+        "intro": "No está permitido:",
+        "items": {
+          "1": "Usar nuestros logotipos sin permiso escrito",
+          "2": "Usar nuestras marcas en su nombre de empresa o producto",
+          "3": "Crear la impresión de que está patrocinado o respaldado por nosotros",
+          "4": "Registrar nuestras marcas como nombre de dominio o handle de redes sociales",
+          "5": "Modificar o combinar nuestras marcas con otros elementos"
+        }
+      },
+      "logoGuidelines": {
+        "title": "Directrices del Logotipo",
+        "intro": "Si tiene permiso para usar nuestro logotipo, siga estas directrices:",
+        "items": {
+          "1": "Use solo archivos oficiales del logotipo que proporcionamos",
+          "2": "No modifique colores o proporciones",
+          "3": "Asegure suficiente espacio en blanco alrededor del logotipo",
+          "4": "No coloque el logotipo sobre fondos ocupados"
+        }
+      },
+      "permission": {
+        "title": "Solicitar Permiso",
+        "content": "Para permiso de usar nuestras marcas o logotipos, contacte a"
+      }
+    }
+  },
+  "ipPage": {
+    "title": "Política de Propiedad Intelectual",
+    "lastUpdated": "Última actualización: diciembre 2025",
+    "sections": {
+      "ownership": {
+        "title": "1. Propiedad de Vysion",
+        "content": "Todos los derechos de propiedad intelectual relacionados con el software Vysion Horeca, incluyendo pero no limitado al código fuente, diseños, logotipos, marcas y documentación, son y siguen siendo propiedad de Vysion Group International."
+      },
+      "license": {
+        "title": "2. Licencia",
+        "content": "Al suscribirse, recibe una licencia limitada, no exclusiva e intransferible para usar el software para sus operaciones comerciales. Esta licencia termina al finalizar la suscripción."
+      },
+      "prohibited": {
+        "title": "3. Acciones Prohibidas",
+        "intro": "No está permitido:",
+        "items": {
+          "1": "Copiar, modificar o hacer ingeniería inversa del software",
+          "2": "Sublicenciar o revender el software",
+          "3": "Eludir medidas de seguridad",
+          "4": "Usar nuestras marcas o logotipos sin permiso"
+        }
+      },
+      "yourContent": {
+        "title": "4. Su Contenido",
+        "content": "Usted conserva todos los derechos sobre sus propios datos comerciales, información de productos y datos de clientes. Nos otorga una licencia para procesar estos datos para proporcionar nuestros servicios."
+      },
+      "infringement": {
+        "title": "5. Informes de Infracción",
+        "content": "Si sospecha que se están infringiendo derechos de propiedad intelectual, contáctenos. Tomamos estos informes en serio y tomaremos las medidas apropiadas."
+      },
+      "contact": {
+        "title": "6. Contacto",
+        "content": "Para preguntas sobre propiedad intelectual puede contactar a"
+      }
+    }
+  },
+  "paymentPage": {
+    "title": "Acuerdo de Plataforma de Pagos Vysion",
+    "lastUpdated": "Última actualización: diciembre 2025",
+    "sections": {
+      "intro": {
+        "title": "1. Introducción",
+        "content": "Este acuerdo describe los términos para usar servicios de pago a través de la plataforma Vysion Horeca. El procesamiento de pagos se realiza a través de nuestros socios Mollie y Stripe."
+      },
+      "processing": {
+        "title": "2. Procesamiento de Pagos",
+        "content": "Vysion Horeca se integra con procesadores de pagos reconocidos para garantizar transacciones seguras. Todas las transacciones están cifradas y cumplen con los estándares PCI-DSS."
+      },
+      "methods": {
+        "title": "3. Métodos de Pago Soportados",
+        "items": {
+          "1": "Bancontact",
+          "2": "Visa / Mastercard",
+          "3": "iDEAL",
+          "4": "Apple Pay / Google Pay",
+          "5": "Payconiq"
+        }
+      },
+      "fees": {
+        "title": "4. Tarifas de Transacción",
+        "content": "Las tarifas de transacción son determinadas por el procesador de pagos y dependen del método de pago y volumen de transacciones. Contáctenos para tarifas actuales."
+      },
+      "payouts": {
+        "title": "5. Desembolsos",
+        "content": "Los pagos recibidos se desembolsan automáticamente a su cuenta bancaria comercial. La frecuencia de desembolso es configurable (diaria, semanal o mensual)."
+      },
+      "chargebacks": {
+        "title": "6. Contracargos y Disputas",
+        "content": "En caso de contracargo, recibirá una notificación y tendrá la oportunidad de proporcionar evidencia. Le ayudamos a manejar disputas de pago."
+      },
+      "security": {
+        "title": "7. Seguridad",
+        "content": "Todos los datos de pago se procesan conforme a PCI-DSS Nivel 1. Los datos de tarjetas nunca se almacenan en nuestros servidores."
+      },
+      "contact": {
+        "title": "8. Contacto",
+        "content": "Para preguntas sobre pagos puede contactar a"
+      }
+    }
+  },
+  "subprocessorsPage": {
+    "title": "Subprocesadores",
+    "lastUpdated": "Última actualización: diciembre 2025",
+    "intro": "Vysion Horeca usa los siguientes subprocesadores para proporcionar nuestros servicios. Todos los subprocesadores han sido cuidadosamente seleccionados y cumplen con los requisitos GDPR.",
+    "table": {
+      "subprocessor": "Subprocesador",
+      "purpose": "Propósito",
+      "location": "Ubicación",
+      "aws": {
+        "name": "Amazon Web Services (AWS)",
+        "purpose": "Hosting en la nube y almacenamiento",
+        "location": "UE (Frankfurt)"
+      },
+      "mollie": {
+        "name": "Mollie",
+        "purpose": "Procesamiento de pagos",
+        "location": "Países Bajos"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "purpose": "Procesamiento de pagos",
+        "location": "UE"
+      },
+      "vercel": {
+        "name": "Vercel",
+        "purpose": "Hosting web",
+        "location": "UE"
+      },
+      "sendgrid": {
+        "name": "SendGrid",
+        "purpose": "Servicios de email",
+        "location": "UE"
+      }
+    },
+    "changes": {
+      "title": "Cambios",
+      "content": "Informamos a nuestros clientes de cambios en la lista de subprocesadores. Si tiene objeciones a un nuevo subprocesador, puede contactarnos."
+    },
+    "contact": {
+      "title": "Contacto",
+      "content": "Para preguntas sobre nuestros subprocesadores puede contactar a"
+    }
+  },
+  "serviceAgreementPage": {
+    "title": "Acuerdo de Servicios Vysion",
+    "lastUpdated": "Última actualización: diciembre 2025",
+    "sections": {
+      "general": {
+        "title": "1. General",
+        "content": "Este Acuerdo de Servicios (\"Acuerdo\") se aplica al uso de los servicios de Vysion Horeca, parte de Vysion Group International. Al usar nuestros servicios, acepta estos términos."
+      },
+      "services": {
+        "title": "2. Servicios",
+        "content": "Vysion Horeca ofrece software de caja, plataforma de pedidos online, software de contabilidad y servicios relacionados para el sector de hostelería. Nos reservamos el derecho de modificar, expandir o limitar nuestros servicios."
+      },
+      "subscription": {
+        "title": "3. Suscripción y Pago",
+        "intro": "El acceso a nuestros servicios está disponible mediante suscripción mensual o anual. Los pagos se facturan por adelantado y no son reembolsables, salvo que se indique lo contrario.",
+        "items": {
+          "1": "Las facturas se envían mensual o anualmente",
+          "2": "El plazo de pago es de 14 días desde la fecha de factura",
+          "3": "El acceso puede suspenderse por impago"
+        }
+      },
+      "usage": {
+        "title": "4. Uso de los Servicios",
+        "content": "Usted es responsable del uso legal de nuestros servicios. Está prohibido usar los servicios para fines ilegales, infringir derechos de propiedad intelectual o interrumpir los servicios."
+      },
+      "privacy": {
+        "title": "5. Datos y Privacidad",
+        "content": "Procesamos sus datos conforme a nuestra Declaración de Privacidad y la legislación aplicable, incluyendo el GDPR. Usted conserva la propiedad de sus datos comerciales."
+      },
+      "liability": {
+        "title": "6. Responsabilidad",
+        "content": "Vysion Horeca no es responsable de daños indirectos, daños consecuentes o lucro cesante. Nuestra responsabilidad total está limitada al monto que nos ha pagado en los últimos 12 meses."
+      },
+      "termination": {
+        "title": "7. Terminación",
+        "content": "Puede cancelar su suscripción en cualquier momento. La cancelación entra en vigor al final del período de facturación actual. Podemos terminar el acuerdo en caso de violación de estos términos."
+      },
+      "law": {
+        "title": "8. Ley Aplicable",
+        "content": "Este acuerdo se rige por la ley belga. Las disputas se someten al tribunal competente de Bélgica."
+      },
+      "contact": {
+        "title": "9. Contacto",
+        "content": "Para preguntas sobre este acuerdo puede contactar a"
+      }
+    }
+  },
+  "dashboardLayout": {
+    "loading": "Cargando...",
+    "signOut": "Cerrar sesión"
+  },
+  "dashboardPage": {
+    "title": "Resumen del Dashboard",
+    "welcome": "¡Bienvenido de nuevo! Aquí tienes un resumen de tu negocio.",
+    "stats": {
+      "todayRevenue": "Ingresos de hoy",
+      "todayOrders": "pedidos hoy",
+      "totalRevenue": "Ingresos totales",
+      "totalOrders": "pedidos totales",
+      "customers": "Clientes",
+      "avgPerOrder": "Prom.",
+      "perOrder": "por pedido",
+      "onlineOrders": "Pedidos online",
+      "pending": "pendiente"
+    },
+    "recentOrders": {
+      "title": "Pedidos recientes",
+      "viewAll": "Ver todo →",
+      "headers": {
+        "order": "Pedido",
+        "customer": "Cliente",
+        "type": "Tipo",
+        "total": "Total",
+        "status": "Estado",
+        "date": "Fecha"
+      },
+      "noOrders": "Aún no hay pedidos"
+    }
+  },
+  "ordersPage": {
+    "title": "Pedidos",
+    "subtitle": "Ver y gestionar todos los pedidos",
+    "refresh": "Actualizar",
+    "filters": {
+      "total": "Total",
+      "online": "Online",
+      "pos": "Caja",
+      "pending": "Pendiente"
+    },
+    "table": {
+      "order": "Pedido",
+      "customer": "Cliente",
+      "type": "Tipo",
+      "payment": "Pago",
+      "total": "Total",
+      "status": "Estado",
+      "date": "Fecha",
+      "details": "Detalles"
+    },
+    "noOrders": "No se encontraron pedidos",
+    "modal": {
+      "title": "Pedido",
+      "customer": "Cliente",
+      "phone": "Teléfono",
+      "type": "Tipo",
+      "status": "Estado",
+      "paymentMethod": "Método de pago",
+      "date": "Fecha",
+      "address": "Dirección",
+      "notes": "Notas",
+      "items": "Artículos",
+      "noItems": "No hay artículos disponibles",
+      "subtotal": "Subtotal",
+      "vat": "IVA",
+      "total": "Total"
+    }
+  },
+  "customersPage": {
+    "title": "Clientes",
+    "subtitle": "Ver tu base de datos de clientes",
+    "stats": {
+      "totalCustomers": "Total clientes",
+      "totalSpent": "Total gastado",
+      "loyaltyPoints": "Puntos de fidelidad",
+      "avgPerCustomer": "Prom. por cliente"
+    },
+    "search": "Buscar por nombre, email o teléfono...",
+    "table": {
+      "customer": "Cliente",
+      "contact": "Contacto",
+      "city": "Ciudad",
+      "orders": "Pedidos",
+      "spent": "Gastado",
+      "points": "Puntos",
+      "memberSince": "Miembro desde"
+    },
+    "noCustomers": "No se encontraron clientes"
+  },
+  "productsPage": {
+    "title": "Productos y Menú",
+    "subtitle": "Ver tus productos y artículos del menú",
+    "stats": {
+      "totalProducts": "Total productos",
+      "categories": "Categorías",
+      "active": "Activo",
+      "notAvailable": "No disponible"
+    },
+    "filter": {
+      "all": "Todo"
+    },
+    "noProducts": "No se encontraron productos",
+    "available": "Disponible",
+    "soldOut": "Agotado"
+  },
+  "analysisPage": {
+    "title": "Análisis Empresarial",
+    "subtitle": "Información sobre el rendimiento de tu negocio",
+    "stats": {
+      "totalRevenue": "Ingresos totales",
+      "orders": "pedidos",
+      "fixedCosts": "Costos fijos",
+      "costItems": "partidas de costos",
+      "netProfit": "Beneficio neto",
+      "afterCosts": "Después de costos",
+      "profitMargin": "Margen de beneficio",
+      "ofRevenue": "De ingresos"
+    },
+    "charts": {
+      "revenueByChannel": "Ingresos por canal",
+      "pos": "Caja",
+      "online": "Online",
+      "paymentMethods": "Métodos de pago",
+      "busiestHours": "Horas más ocupadas",
+      "orders": "pedidos",
+      "noData": "No hay datos disponibles",
+      "fixedCostsBreakdown": "Desglose de costos fijos",
+      "noCosts": "No hay costos registrados",
+      "cost": "Costo"
+    }
+  },
+  "reportsPage": {
+    "title": "Informes",
+    "subtitle": "Informes diarios de ingresos y pedidos",
+    "stats": {
+      "totalRevenue": "Ingresos totales",
+      "totalOrders": "Pedidos totales",
+      "avgPerDay": "Prom. por día",
+      "daysWithData": "Días con datos"
+    },
+    "table": {
+      "title": "Informes diarios (Informe Z)",
+      "date": "Fecha",
+      "orders": "Pedidos",
+      "pos": "Caja",
+      "online": "Online",
+      "revenue": "Ingresos",
+      "avgPerOrder": "Prom. por pedido"
+    },
+    "noReports": "No hay informes disponibles"
+  },
+  "settingsPage": {
+    "title": "Configuración",
+    "subtitle": "Gestiona la configuración de tu cuenta",
+    "saved": "Configuración guardada",
+    "sections": {
+      "account": {
+        "title": "Cuenta",
+        "subtitle": "Tu información de cuenta",
+        "firstName": "Nombre",
+        "lastName": "Apellido",
+        "email": "Email",
+        "phone": "Teléfono"
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "subtitle": "Gestiona tus preferencias de notificación",
+        "email": {
+          "title": "Notificaciones por email",
+          "description": "Recibe actualizaciones por email"
+        },
+        "daily": {
+          "title": "Informes diarios",
+          "description": "Recibe un resumen diario"
+        },
+        "orders": {
+          "title": "Nuevos pedidos",
+          "description": "Notificación de nuevos pedidos online"
+        }
+      },
+      "security": {
+        "title": "Seguridad",
+        "subtitle": "Contraseña y seguridad",
+        "currentPassword": "Contraseña actual",
+        "newPassword": "Nueva contraseña",
+        "confirmPassword": "Confirmar nueva contraseña"
+      },
+      "help": {
+        "title": "Ayuda y Soporte",
+        "subtitle": "Obtener ayuda con problemas",
+        "troubleshooting": "Solución de problemas",
+        "troubleshootingDesc": "Problemas comunes",
+        "emailSupport": "Soporte por email",
+        "callSupport": "Llamar a soporte",
+        "whatsapp": "WhatsApp",
+        "whatsappDesc": "Chat directo"
+      }
+    },
+    "saveChanges": "Guardar cambios"
+  },
+  "troubleshootingPage": {
+    "backToLogin": "Volver al login",
+    "title": "Solución de Problemas y Ayuda",
+    "subtitle": "Problemas comunes y soluciones para tu caja Vysion Horeca",
+    "quickActions": {
+      "callSupport": "Llamar a soporte",
+      "emailSupport": "Email a soporte",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "Chat directo"
+    },
+    "faqTitle": "Problemas comunes",
+    "faqs": {
+      "1": {
+        "question": "Mi caja no arranca",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Comprueba que el dispositivo está conectado a la corriente</li><li>Mantén pulsado el botón de encendido 10 segundos para reiniciar</li><li>Comprueba que todos los cables están bien conectados</li><li>Espera 2 minutos e inténtalo de nuevo</li><li>Si el problema persiste, contacta con soporte</li></ol>"
+      },
+      "2": {
+        "question": "No puedo iniciar sesión en mi caja",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Comprueba que usas el PIN correcto</li><li>Pide a tu administrador que restablezca tu PIN</li><li>Comprueba si tu cuenta está bloqueada (después de 5 intentos fallidos)</li><li>Contacta con soporte si no tienes acceso a una cuenta de administrador</li></ol>"
+      },
+      "3": {
+        "question": "El terminal de pago no funciona",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Comprueba que el terminal está encendido (luz verde encendida)</li><li>Comprueba la conexión USB o Bluetooth</li><li>Reinicia el terminal apagándolo y encendiéndolo</li><li>Ve a Configuración → Terminal de pago → Reconectar</li><li>Comprueba que tu conexión a internet funciona</li></ol>"
+      },
+      "4": {
+        "question": "La impresora de tickets no imprime",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Comprueba que hay papel en la impresora</li><li>Abre y cierra la tapa de la impresora (esto reinicia la impresora)</li><li>Comprueba la conexión USB/red</li><li>Ve a Configuración → Impresoras → Imprimir prueba</li><li>Si la página de prueba no imprime, reinicia la impresora</li></ol>"
+      },
+      "5": {
+        "question": "Mi caja va lenta",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Cierra las apps que no uses</li><li>Comprueba tu conexión a internet (4G/WiFi)</li><li>Reinicia la aplicación de caja</li><li>Comprueba si hay actualizaciones disponibles</li><li>Contacta con soporte si el problema persiste</li></ol>"
+      },
+      "6": {
+        "question": "Los pedidos online no llegan",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Comprueba que tu conexión a internet funciona</li><li>Comprueba que el módulo de pedidos online está activado</li><li>Ve a Configuración → Pedidos online → Sincronizar</li><li>Comprueba que tu local está \"abierto\" en el sistema</li><li>Revisa tu horario de apertura en la configuración</li></ol>"
+      },
+      "7": {
+        "question": "Quiero añadir o modificar un producto",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Ve al menú arriba a la izquierda → Productos</li><li>Haz clic en \"Nuevo producto\" o selecciona un producto existente</li><li>Rellena el nombre, precio y categoría</li><li>Haz clic en \"Guardar\"</li><li>El producto ya está disponible en tu caja</li></ol>"
+      },
+      "8": {
+        "question": "¿Cómo hago un informe Z / cierre diario?",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Ve al menú arriba a la izquierda → Informes</li><li>Selecciona \"Informe Z\" o \"Cierre diario\"</li><li>Revisa los datos</li><li>Haz clic en \"Cerrar e imprimir\"</li><li>El informe se imprime y el día se cierra</li></ol>"
+      },
+      "9": {
+        "question": "He olvidado mi contraseña",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Ve a la página de login</li><li>Haz clic en \"Olvidé mi contraseña\"</li><li>Introduce tu email</li><li>Recibirás un enlace para restablecer tu contraseña</li><li>O contacta con soporte: +32 492 12 93 83</li></ol>"
+      },
+      "10": {
+        "question": "La app se cierra constantemente",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Cierra la app completamente</li><li>Reinicia tu dispositivo</li><li>Comprueba que tienes la última versión de la app</li><li>Desinstala la app y vuelve a instalarla (tus datos se conservan)</li><li>Contacta con soporte si el problema persiste</li></ol>"
+      }
+    },
+    "stillNeedHelp": {
+      "title": "¿No encuentras tu problema?",
+      "subtitle": "Nuestro equipo de soporte está disponible 24/7. ¡No dudes en contactarnos!",
+      "callNow": "Llama ahora:",
+      "emailSupport": "Email a soporte"
+    },
+    "copyright": "Todos los derechos reservados."
   }
 }

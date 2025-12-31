@@ -450,6 +450,814 @@
     "error": "Er is een fout opgetreden",
     "success": "Succesvol",
     "yes": "Ja",
-    "no": "Nee"
+    "no": "Nee",
+    "backToHome": "Terug naar home",
+    "home": "Home",
+    "lastUpdated": "Laatst bijgewerkt",
+    "contact": "Contact",
+    "email": "Email",
+    "phone": "Telefoon",
+    "anonymous": "Anoniem",
+    "total": "Totaal",
+    "subtotal": "Subtotaal",
+    "vat": "BTW",
+    "date": "Datum",
+    "status": "Status",
+    "type": "Type",
+    "details": "Details",
+    "refresh": "Vernieuwen",
+    "noData": "Geen data beschikbaar",
+    "all": "Alles",
+    "online": "Online",
+    "pos": "Kassa",
+    "pending": "Wachtend",
+    "items": "Items",
+    "address": "Adres",
+    "notes": "Opmerkingen",
+    "available": "Beschikbaar",
+    "soldOut": "Uitverkocht",
+    "active": "Actief",
+    "notAvailable": "Niet beschikbaar",
+    "noCategory": "Geen categorie"
+  },
+  "legalMain": {
+    "title": "Juridisch",
+    "policies": "Beleiden",
+    "contracts": "Contracten",
+    "privacy": "Privacy",
+    "links": {
+      "paymentPlatform": "Vysion Payments Platform Overeenkomst",
+      "aup": "Beleid voor Aanvaardbaar Gebruik",
+      "ip": "Beleid inzake inbreuk op intellectueel eigendom",
+      "trademark": "Vysion handelsmerk en auteursrechtrichtlijnen",
+      "serviceAgreement": "Vysion Dienstenovereenkomst",
+      "sla": "Service Level Agreement (SLA)",
+      "dpa": "Verwerkersovereenkomst",
+      "privacyPolicy": "Privacybeleid",
+      "cookies": "Cookiebeleid",
+      "subprocessors": "Subverwerkers"
+    },
+    "backToHome": "← Terug naar home"
+  },
+  "cookiesPage": {
+    "title": "Cookiebeleid",
+    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "whatAreCookies": {
+      "title": "Wat zijn cookies?",
+      "content": "Cookies zijn kleine tekstbestanden die op uw computer of mobiel apparaat worden opgeslagen wanneer u onze website bezoekt. Ze helpen ons om de website goed te laten functioneren en uw gebruikerservaring te verbeteren."
+    },
+    "whichCookies": {
+      "title": "Welke cookies gebruiken wij?",
+      "necessary": {
+        "title": "Noodzakelijke cookies",
+        "content": "Deze cookies zijn essentieel voor het functioneren van de website. Zonder deze cookies kunnen bepaalde functies niet werken."
+      },
+      "functional": {
+        "title": "Functionele cookies",
+        "content": "Deze cookies onthouden uw voorkeuren en instellingen om uw ervaring te personaliseren."
+      },
+      "analytical": {
+        "title": "Analytische cookies",
+        "content": "Met uw toestemming gebruiken wij analytische cookies om te begrijpen hoe bezoekers onze website gebruiken. Dit helpt ons om onze diensten te verbeteren."
+      }
+    },
+    "manageCookies": {
+      "title": "Cookies beheren",
+      "content": "U kunt uw cookievoorkeuren op elk moment aanpassen via uw browserinstellingen. Let op: het uitschakelen van bepaalde cookies kan de functionaliteit van de website beperken."
+    },
+    "contact": {
+      "title": "Contact",
+      "content": "Voor vragen over ons cookiebeleid kunt u contact opnemen via"
+    },
+    "backToLegal": "← Terug naar Juridisch"
+  },
+  "privacyPage": {
+    "title": "Privacy & Veiligheid",
+    "subtitle": "Hoe wij omgaan met jouw gegevens",
+    "sections": {
+      "intro": {
+        "title": "1. Inleiding",
+        "content": "Vysion Horeca, onderdeel van Vysion Group International, hecht veel waarde aan de bescherming van jouw persoonsgegevens. In deze privacyverklaring leggen wij uit welke gegevens wij verzamelen, waarom wij dit doen en hoe wij hiermee omgaan."
+      },
+      "whatData": {
+        "title": "2. Welke gegevens verzamelen wij?",
+        "intro": "Wij kunnen de volgende persoonsgegevens verzamelen:",
+        "items": {
+          "1": "Naam en contactgegevens (e-mailadres, telefoonnummer)",
+          "2": "Bedrijfsgegevens (bedrijfsnaam, BTW-nummer, adres)",
+          "3": "Betalingsgegevens",
+          "4": "Gebruiksgegevens van onze software",
+          "5": "Communicatie die je met ons voert"
+        }
+      },
+      "whyData": {
+        "title": "3. Waarvoor gebruiken wij jouw gegevens?",
+        "intro": "Wij gebruiken jouw gegevens voor:",
+        "items": {
+          "1": "Het leveren van onze diensten en software",
+          "2": "Het verwerken van betalingen",
+          "3": "Klantenservice en ondersteuning",
+          "4": "Het verbeteren van onze producten",
+          "5": "Communicatie over updates en nieuwe functies",
+          "6": "Naleving van wettelijke verplichtingen (o.a. GKS, fiscale wetgeving)"
+        }
+      },
+      "security": {
+        "title": "4. Gegevensbeveiliging",
+        "intro": "Wij nemen de beveiliging van jouw gegevens zeer serieus. Onze systemen zijn beveiligd met:",
+        "items": {
+          "1": "SSL/TLS encryptie voor alle dataoverdracht",
+          "2": "Versleutelde opslag van gevoelige gegevens",
+          "3": "Regelmatige beveiligingsaudits",
+          "4": "Toegangscontrole en authenticatie",
+          "5": "Dagelijkse back-ups op beveiligde servers"
+        }
+      },
+      "gks": {
+        "title": "5. GKS & Fiscale Compliance",
+        "content": "Vysion Horeca is volledig GKS-gecertificeerd en voldoet aan alle Belgische fiscale vereisten. Transactiegegevens worden veilig opgeslagen conform de wettelijke bewaartermijnen."
+      },
+      "sharing": {
+        "title": "6. Delen van gegevens",
+        "content": "Wij delen jouw gegevens alleen met derden wanneer dit noodzakelijk is voor onze dienstverlening (zoals betalingsverwerkers) of wanneer wij hiertoe wettelijk verplicht zijn. Wij verkopen nooit jouw gegevens aan derden."
+      },
+      "rights": {
+        "title": "7. Jouw rechten",
+        "intro": "Je hebt het recht om:",
+        "items": {
+          "1": "Inzage te vragen in jouw persoonsgegevens",
+          "2": "Jouw gegevens te laten corrigeren of verwijderen",
+          "3": "Bezwaar te maken tegen de verwerking",
+          "4": "Jouw gegevens over te dragen naar een andere dienst"
+        }
+      },
+      "cookies": {
+        "title": "8. Cookies",
+        "content": "Onze website maakt gebruik van functionele cookies om de werking te verbeteren. Analytische cookies worden alleen geplaatst met jouw toestemming."
+      },
+      "contact": {
+        "title": "9. Contact",
+        "intro": "Voor vragen over deze privacyverklaring of jouw gegevens kun je contact opnemen via:"
+      },
+      "changes": {
+        "title": "10. Wijzigingen",
+        "content": "Wij kunnen deze privacyverklaring van tijd tot tijd aanpassen. De meest recente versie is altijd beschikbaar op deze pagina. Laatst bijgewerkt: december 2025."
+      }
+    },
+    "backToHome": "← Terug naar home"
+  },
+  "dpaPage": {
+    "title": "Verwerkersovereenkomst",
+    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "sections": {
+      "definitions": {
+        "title": "1. Definities",
+        "content": "In deze verwerkersovereenkomst wordt verstaan onder:",
+        "controller": "Verwerkingsverantwoordelijke:",
+        "controllerDef": "de klant die gebruik maakt van Vysion Horeca diensten",
+        "processor": "Verwerker:",
+        "processorDef": "Vysion Horeca / Vysion Group International",
+        "personalData": "Persoonsgegevens:",
+        "personalDataDef": "alle gegevens die betrekking hebben op een geïdentificeerde of identificeerbare natuurlijke persoon"
+      },
+      "subject": {
+        "title": "2. Onderwerp en Duur",
+        "content": "Deze overeenkomst regelt de verwerking van persoonsgegevens door Vysion Horeca namens u. De overeenkomst is van kracht zolang u gebruik maakt van onze diensten."
+      },
+      "purpose": {
+        "title": "3. Aard en Doel van de Verwerking",
+        "intro": "Wij verwerken persoonsgegevens voor:",
+        "items": {
+          "1": "Het leveren van kassasoftware en gerelateerde diensten",
+          "2": "Het verwerken van transacties en bestellingen",
+          "3": "Het bijhouden van klantgegevens en bestelhistorie",
+          "4": "Het genereren van rapporten en analyses"
+        }
+      },
+      "categories": {
+        "title": "4. Categorieën Persoonsgegevens",
+        "items": {
+          "1": "Contactgegevens (naam, adres, e-mail, telefoon)",
+          "2": "Transactiegegevens",
+          "3": "Bestelgegevens",
+          "4": "Personeelsgegevens (indien van toepassing)"
+        }
+      },
+      "obligations": {
+        "title": "5. Verplichtingen Verwerker",
+        "intro": "Vysion Horeca zal:",
+        "items": {
+          "1": "Persoonsgegevens alleen verwerken volgens uw instructies",
+          "2": "Passende technische en organisatorische maatregelen nemen",
+          "3": "Vertrouwelijkheid garanderen",
+          "4": "U bijstaan bij het nakomen van uw verplichtingen onder de AVG",
+          "5": "Na beëindiging gegevens verwijderen of retourneren"
+        }
+      },
+      "subprocessors": {
+        "title": "6. Subverwerkers",
+        "content": "Wij maken gebruik van subverwerkers voor bepaalde diensten. Een actuele lijst is beschikbaar op onze subverwerkers pagina. Wij informeren u bij wijzigingen."
+      },
+      "security": {
+        "title": "7. Beveiliging",
+        "content": "Wij implementeren passende beveiligingsmaatregelen waaronder encryptie, toegangscontrole, en regelmatige beveiligingsaudits."
+      },
+      "breach": {
+        "title": "8. Datalekken",
+        "content": "Bij een datalek informeren wij u zonder onredelijke vertraging, zodat u aan uw meldingsplicht kunt voldoen."
+      },
+      "contact": {
+        "title": "9. Contact",
+        "content": "Voor vragen over deze overeenkomst kunt u contact opnemen via"
+      }
+    }
+  },
+  "slaPage": {
+    "title": "Service Level Agreement (SLA)",
+    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "sections": {
+      "availability": {
+        "title": "1. Beschikbaarheid",
+        "content": "Vysion Horeca garandeert een uptime van 99,9% voor alle kernservices. Dit is exclusief gepland onderhoud, dat vooraf wordt aangekondigd."
+      },
+      "maintenance": {
+        "title": "2. Gepland Onderhoud",
+        "content": "Gepland onderhoud vindt plaats buiten piekuren, bij voorkeur tussen 02:00 en 06:00 CET. Klanten worden minimaal 48 uur van tevoren geïnformeerd."
+      },
+      "response": {
+        "title": "3. Support Responstijden",
+        "headers": {
+          "priority": "Prioriteit",
+          "description": "Beschrijving",
+          "responseTime": "Responstijd"
+        },
+        "critical": {
+          "name": "Kritiek",
+          "description": "Systeem volledig onbeschikbaar",
+          "time": "< 1 uur"
+        },
+        "high": {
+          "name": "Hoog",
+          "description": "Belangrijke functie niet werkend",
+          "time": "< 4 uur"
+        },
+        "medium": {
+          "name": "Medium",
+          "description": "Functie beperkt werkend",
+          "time": "< 8 uur"
+        },
+        "low": {
+          "name": "Laag",
+          "description": "Vraag of verbetersuggestie",
+          "time": "< 24 uur"
+        }
+      },
+      "channels": {
+        "title": "4. Support Kanalen",
+        "email": "Email:",
+        "phone": "Telefoon:",
+        "inApp": "In-app support:",
+        "inAppDesc": "Beschikbaar in de Vysion Horeca applicatie"
+      },
+      "hours": {
+        "title": "5. Support Uren",
+        "light": "Light plan:",
+        "lightHours": "Maandag t/m vrijdag, 09:00 - 17:00 CET",
+        "pro": "Pro plan:",
+        "proHours": "Maandag t/m zondag, 08:00 - 22:00 CET"
+      },
+      "backups": {
+        "title": "6. Back-ups",
+        "content": "Alle gegevens worden dagelijks geback-upt. Back-ups worden 30 dagen bewaard. In geval van dataverlies kunnen wij gegevens herstellen vanaf de meest recente back-up."
+      },
+      "updates": {
+        "title": "7. Updates",
+        "content": "Software updates worden automatisch uitgerold, meestal 's nachts. Belangrijke updates worden vooraf gecommuniceerd."
+      }
+    }
+  },
+  "aupPage": {
+    "title": "Beleid voor Aanvaardbaar Gebruik",
+    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "sections": {
+      "intro": {
+        "title": "Inleiding",
+        "content": "Dit Beleid voor Aanvaardbaar Gebruik beschrijft de regels voor het gebruik van de diensten van Vysion Horeca. Door onze diensten te gebruiken, gaat u akkoord met dit beleid."
+      },
+      "allowed": {
+        "title": "Toegestaan Gebruik",
+        "intro": "U mag onze diensten gebruiken voor:",
+        "items": {
+          "1": "Het beheren van uw horecazaak",
+          "2": "Het verwerken van transacties en bestellingen",
+          "3": "Het bijhouden van uw boekhouding en administratie",
+          "4": "Het communiceren met klanten"
+        }
+      },
+      "prohibited": {
+        "title": "Verboden Gebruik",
+        "intro": "Het is verboden om onze diensten te gebruiken voor:",
+        "items": {
+          "1": "Illegale activiteiten of fraude",
+          "2": "Het verspreiden van malware of schadelijke software",
+          "3": "Het schenden van intellectuele eigendomsrechten",
+          "4": "Het verstoren van onze diensten of servers",
+          "5": "Het verzamelen van gegevens van andere gebruikers zonder toestemming",
+          "6": "Het omzeilen van beveiligingsmaatregelen"
+        }
+      },
+      "enforcement": {
+        "title": "Handhaving",
+        "content": "Bij schending van dit beleid kunnen wij uw account opschorten of beëindigen. In ernstige gevallen kunnen wij juridische stappen ondernemen."
+      },
+      "contact": {
+        "title": "Contact",
+        "content": "Voor vragen kunt u contact opnemen via"
+      }
+    }
+  },
+  "trademarkPage": {
+    "title": "Vysion Handelsmerk en Auteursrechtrichtlijnen",
+    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "sections": {
+      "brands": {
+        "title": "Onze Merken",
+        "intro": "De volgende merknamen en logo's zijn eigendom van Vysion Group International:",
+        "items": {
+          "1": "Vysion™",
+          "2": "Vysion Horeca™",
+          "3": "Vysion Apps™",
+          "4": "SCARDA™",
+          "5": "Het Vysion logo en alle varianten"
+        }
+      },
+      "allowed": {
+        "title": "Toegestaan Gebruik",
+        "intro": "U mag onze merknamen gebruiken om:",
+        "items": {
+          "1": "Naar onze producten of diensten te verwijzen in tekst",
+          "2": "Aan te geven dat u Vysion Horeca gebruikt in uw zaak",
+          "3": "Reviews of artikelen over onze diensten te schrijven"
+        }
+      },
+      "notAllowed": {
+        "title": "Niet Toegestaan",
+        "intro": "Het is niet toegestaan om:",
+        "items": {
+          "1": "Onze logo's te gebruiken zonder schriftelijke toestemming",
+          "2": "Onze merknamen te gebruiken in uw bedrijfsnaam of productnaam",
+          "3": "De indruk te wekken dat u door ons wordt gesponsord of ondersteund",
+          "4": "Onze merknamen te registreren als domeinnaam of social media handle",
+          "5": "Onze merken te wijzigen of te combineren met andere elementen"
+        }
+      },
+      "logoGuidelines": {
+        "title": "Logo Richtlijnen",
+        "intro": "Als u toestemming heeft om ons logo te gebruiken, houdt u zich aan de volgende richtlijnen:",
+        "items": {
+          "1": "Gebruik alleen officiële logo-bestanden die wij aanleveren",
+          "2": "Wijzig de kleuren of verhoudingen niet",
+          "3": "Zorg voor voldoende witruimte rondom het logo",
+          "4": "Plaats het logo niet op drukke achtergronden"
+        }
+      },
+      "permission": {
+        "title": "Toestemming Aanvragen",
+        "content": "Voor toestemming om onze merknamen of logo's te gebruiken, neem contact op via"
+      }
+    }
+  },
+  "ipPage": {
+    "title": "Beleid inzake Intellectueel Eigendom",
+    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "sections": {
+      "ownership": {
+        "title": "1. Eigendom van Vysion",
+        "content": "Alle intellectuele eigendomsrechten met betrekking tot de Vysion Horeca software, inclusief maar niet beperkt tot de broncode, ontwerpen, logo's, merknamen en documentatie, zijn en blijven eigendom van Vysion Group International."
+      },
+      "license": {
+        "title": "2. Licentie",
+        "content": "Door een abonnement af te sluiten, ontvangt u een beperkte, niet-exclusieve, niet-overdraagbare licentie om de software te gebruiken voor uw bedrijfsvoering. Deze licentie eindigt bij beëindiging van het abonnement."
+      },
+      "prohibited": {
+        "title": "3. Verboden Handelingen",
+        "intro": "Het is niet toegestaan om:",
+        "items": {
+          "1": "De software te kopiëren, wijzigen of reverse-engineeren",
+          "2": "De software te sublicentiëren of door te verkopen",
+          "3": "Beveiligingsmaatregelen te omzeilen",
+          "4": "Onze merknamen of logo's te gebruiken zonder toestemming"
+        }
+      },
+      "yourContent": {
+        "title": "4. Uw Content",
+        "content": "U behoudt alle rechten op uw eigen bedrijfsgegevens, productinformatie en klantdata. U verleent ons een licentie om deze gegevens te verwerken voor het leveren van onze diensten."
+      },
+      "infringement": {
+        "title": "5. Meldingen van Inbreuk",
+        "content": "Als u vermoedt dat er inbreuk wordt gemaakt op intellectuele eigendomsrechten, neem dan contact met ons op. Wij nemen dergelijke meldingen serieus en zullen passende maatregelen treffen."
+      },
+      "contact": {
+        "title": "6. Contact",
+        "content": "Voor vragen over intellectueel eigendom kunt u contact opnemen via"
+      }
+    }
+  },
+  "paymentPage": {
+    "title": "Vysion Payments Platform Overeenkomst",
+    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "sections": {
+      "intro": {
+        "title": "1. Inleiding",
+        "content": "Deze overeenkomst beschrijft de voorwaarden voor het gebruik van betalingsdiensten via het Vysion Horeca platform. Betalingsverwerking gebeurt via onze partners Mollie en Stripe."
+      },
+      "processing": {
+        "title": "2. Betalingsverwerking",
+        "content": "Vysion Horeca integreert met erkende betalingsverwerkers om veilige transacties te garanderen. Alle transacties worden versleuteld en voldoen aan PCI-DSS standaarden."
+      },
+      "methods": {
+        "title": "3. Ondersteunde Betaalmethodes",
+        "items": {
+          "1": "Bancontact",
+          "2": "Visa / Mastercard",
+          "3": "iDEAL",
+          "4": "Apple Pay / Google Pay",
+          "5": "Payconiq"
+        }
+      },
+      "fees": {
+        "title": "4. Transactiekosten",
+        "content": "Transactiekosten worden bepaald door de betalingsverwerker en zijn afhankelijk van de betaalmethode en het transactievolume. Neem contact op voor actuele tarieven."
+      },
+      "payouts": {
+        "title": "5. Uitbetalingen",
+        "content": "Ontvangen betalingen worden automatisch uitbetaald naar uw zakelijke bankrekening. De uitbetalingsfrequentie is instelbaar (dagelijks, wekelijks of maandelijks)."
+      },
+      "chargebacks": {
+        "title": "6. Terugboekingen en Geschillen",
+        "content": "Bij een terugboeking (chargeback) ontvangt u een melding en heeft u de mogelijkheid om bewijs te leveren. Wij ondersteunen u bij het afhandelen van betalingsgeschillen."
+      },
+      "security": {
+        "title": "7. Beveiliging",
+        "content": "Alle betalingsgegevens worden verwerkt conform PCI-DSS Level 1. Kaartgegevens worden nooit opgeslagen op onze servers."
+      },
+      "contact": {
+        "title": "8. Contact",
+        "content": "Voor vragen over betalingen kunt u contact opnemen via"
+      }
+    }
+  },
+  "subprocessorsPage": {
+    "title": "Subverwerkers",
+    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "intro": "Vysion Horeca maakt gebruik van de volgende subverwerkers voor het leveren van onze diensten. Alle subverwerkers zijn zorgvuldig geselecteerd en voldoen aan de AVG/GDPR vereisten.",
+    "table": {
+      "subprocessor": "Subverwerker",
+      "purpose": "Doel",
+      "location": "Locatie",
+      "aws": {
+        "name": "Amazon Web Services (AWS)",
+        "purpose": "Cloud hosting en opslag",
+        "location": "EU (Frankfurt)"
+      },
+      "mollie": {
+        "name": "Mollie",
+        "purpose": "Betalingsverwerking",
+        "location": "Nederland"
+      },
+      "stripe": {
+        "name": "Stripe",
+        "purpose": "Betalingsverwerking",
+        "location": "EU"
+      },
+      "vercel": {
+        "name": "Vercel",
+        "purpose": "Website hosting",
+        "location": "EU"
+      },
+      "sendgrid": {
+        "name": "SendGrid",
+        "purpose": "E-mail diensten",
+        "location": "EU"
+      }
+    },
+    "changes": {
+      "title": "Wijzigingen",
+      "content": "Wij informeren onze klanten bij wijzigingen in de lijst van subverwerkers. Als u bezwaar heeft tegen een nieuwe subverwerker, kunt u contact met ons opnemen."
+    },
+    "contact": {
+      "title": "Contact",
+      "content": "Voor vragen over onze subverwerkers kunt u contact opnemen via"
+    }
+  },
+  "serviceAgreementPage": {
+    "title": "Vysion Dienstenovereenkomst",
+    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "sections": {
+      "general": {
+        "title": "1. Algemeen",
+        "content": "Deze Dienstenovereenkomst (\"Overeenkomst\") is van toepassing op het gebruik van de diensten van Vysion Horeca, onderdeel van Vysion Group International. Door gebruik te maken van onze diensten gaat u akkoord met deze voorwaarden."
+      },
+      "services": {
+        "title": "2. Diensten",
+        "content": "Vysion Horeca biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
+      },
+      "subscription": {
+        "title": "3. Abonnement en Betaling",
+        "intro": "De toegang tot onze diensten is beschikbaar via een maandelijks of jaarlijks abonnement. Betalingen worden vooraf gefactureerd en zijn niet-restitueerbaar, tenzij anders vermeld.",
+        "items": {
+          "1": "Facturen worden maandelijks of jaarlijks verstuurd",
+          "2": "Betalingstermijn is 14 dagen na factuurdatum",
+          "3": "Bij niet-betaling kan toegang worden opgeschort"
+        }
+      },
+      "usage": {
+        "title": "4. Gebruik van de Diensten",
+        "content": "U bent verantwoordelijk voor het rechtmatige gebruik van onze diensten. Het is verboden om de diensten te gebruiken voor illegale doeleinden, inbreuk te maken op intellectuele eigendomsrechten, of de diensten te verstoren."
+      },
+      "privacy": {
+        "title": "5. Gegevens en Privacy",
+        "content": "Wij verwerken uw gegevens conform onze Privacyverklaring en de toepasselijke wetgeving, waaronder de AVG/GDPR. U behoudt eigendom over uw bedrijfsgegevens."
+      },
+      "liability": {
+        "title": "6. Aansprakelijkheid",
+        "content": "Vysion Horeca is niet aansprakelijk voor indirecte schade, gevolgschade of gederfde winst. Onze totale aansprakelijkheid is beperkt tot het bedrag dat u in de afgelopen 12 maanden aan ons heeft betaald."
+      },
+      "termination": {
+        "title": "7. Beëindiging",
+        "content": "U kunt uw abonnement op elk moment opzeggen. De opzegging gaat in aan het einde van de lopende facturatieperiode. Wij kunnen de overeenkomst beëindigen bij schending van deze voorwaarden."
+      },
+      "law": {
+        "title": "8. Toepasselijk Recht",
+        "content": "Op deze overeenkomst is Belgisch recht van toepassing. Geschillen worden voorgelegd aan de bevoegde rechtbank te België."
+      },
+      "contact": {
+        "title": "9. Contact",
+        "content": "Voor vragen over deze overeenkomst kunt u contact opnemen via"
+      }
+    }
+  },
+  "dashboardLayout": {
+    "loading": "Laden...",
+    "signOut": "Uitloggen"
+  },
+  "dashboardPage": {
+    "title": "Dashboard Overzicht",
+    "welcome": "Welkom terug! Hier is een overzicht van je zaak.",
+    "stats": {
+      "todayRevenue": "Omzet vandaag",
+      "todayOrders": "bestellingen vandaag",
+      "totalRevenue": "Totale omzet",
+      "totalOrders": "totale bestellingen",
+      "customers": "Klanten",
+      "avgPerOrder": "Gem.",
+      "perOrder": "per bestelling",
+      "onlineOrders": "Online bestellingen",
+      "pending": "wachtend"
+    },
+    "recentOrders": {
+      "title": "Recente bestellingen",
+      "viewAll": "Bekijk alles →",
+      "headers": {
+        "order": "Bestelling",
+        "customer": "Klant",
+        "type": "Type",
+        "total": "Totaal",
+        "status": "Status",
+        "date": "Datum"
+      },
+      "noOrders": "Nog geen bestellingen gevonden"
+    }
+  },
+  "ordersPage": {
+    "title": "Bestellingen",
+    "subtitle": "Bekijk en beheer alle bestellingen",
+    "refresh": "Vernieuwen",
+    "filters": {
+      "total": "Totaal",
+      "online": "Online",
+      "pos": "Kassa",
+      "pending": "Wachtend"
+    },
+    "table": {
+      "order": "Bestelling",
+      "customer": "Klant",
+      "type": "Type",
+      "payment": "Betaling",
+      "total": "Totaal",
+      "status": "Status",
+      "date": "Datum",
+      "details": "Details"
+    },
+    "noOrders": "Geen bestellingen gevonden",
+    "modal": {
+      "title": "Bestelling",
+      "customer": "Klant",
+      "phone": "Telefoon",
+      "type": "Type",
+      "status": "Status",
+      "paymentMethod": "Betaalmethode",
+      "date": "Datum",
+      "address": "Adres",
+      "notes": "Opmerkingen",
+      "items": "Items",
+      "noItems": "Geen items beschikbaar",
+      "subtotal": "Subtotaal",
+      "vat": "BTW",
+      "total": "Totaal"
+    }
+  },
+  "customersPage": {
+    "title": "Klanten",
+    "subtitle": "Bekijk je klantendatabase",
+    "stats": {
+      "totalCustomers": "Totaal klanten",
+      "totalSpent": "Totaal besteed",
+      "loyaltyPoints": "Loyaliteitspunten",
+      "avgPerCustomer": "Gem. per klant"
+    },
+    "search": "Zoek op naam, email of telefoon...",
+    "table": {
+      "customer": "Klant",
+      "contact": "Contact",
+      "city": "Stad",
+      "orders": "Bestellingen",
+      "spent": "Besteed",
+      "points": "Punten",
+      "memberSince": "Lid sinds"
+    },
+    "noCustomers": "Geen klanten gevonden"
+  },
+  "productsPage": {
+    "title": "Producten & Menu",
+    "subtitle": "Bekijk je producten en menu-items",
+    "stats": {
+      "totalProducts": "Totaal producten",
+      "categories": "Categorieën",
+      "active": "Actief",
+      "notAvailable": "Niet beschikbaar"
+    },
+    "filter": {
+      "all": "Alles"
+    },
+    "noProducts": "Geen producten gevonden",
+    "available": "Beschikbaar",
+    "soldOut": "Uitverkocht"
+  },
+  "analysisPage": {
+    "title": "Bedrijfsanalyse",
+    "subtitle": "Inzichten in je bedrijfsprestaties",
+    "stats": {
+      "totalRevenue": "Totale omzet",
+      "orders": "bestellingen",
+      "fixedCosts": "Vaste kosten",
+      "costItems": "kostenposten",
+      "netProfit": "Nettowinst",
+      "afterCosts": "Na kosten",
+      "profitMargin": "Winstmarge",
+      "ofRevenue": "Van omzet"
+    },
+    "charts": {
+      "revenueByChannel": "Omzet per kanaal",
+      "pos": "Kassa",
+      "online": "Online",
+      "paymentMethods": "Betaalmethodes",
+      "busiestHours": "Drukste uren",
+      "orders": "bestellingen",
+      "noData": "Geen data beschikbaar",
+      "fixedCostsBreakdown": "Vaste kosten overzicht",
+      "noCosts": "Geen kosten geregistreerd",
+      "cost": "Kost"
+    }
+  },
+  "reportsPage": {
+    "title": "Rapporten",
+    "subtitle": "Dagelijkse omzet en bestellingsrapporten",
+    "stats": {
+      "totalRevenue": "Totale omzet",
+      "totalOrders": "Totale bestellingen",
+      "avgPerDay": "Gem. per dag",
+      "daysWithData": "Dagen met data"
+    },
+    "table": {
+      "title": "Dagelijkse rapporten (Z-Rapport)",
+      "date": "Datum",
+      "orders": "Bestellingen",
+      "pos": "Kassa",
+      "online": "Online",
+      "revenue": "Omzet",
+      "avgPerOrder": "Gem. per bestelling"
+    },
+    "noReports": "Geen rapporten beschikbaar"
+  },
+  "settingsPage": {
+    "title": "Instellingen",
+    "subtitle": "Beheer je accountinstellingen",
+    "saved": "Instellingen opgeslagen",
+    "sections": {
+      "account": {
+        "title": "Account",
+        "subtitle": "Je accountgegevens",
+        "firstName": "Voornaam",
+        "lastName": "Achternaam",
+        "email": "E-mailadres",
+        "phone": "Telefoonnummer"
+      },
+      "notifications": {
+        "title": "Notificaties",
+        "subtitle": "Beheer je meldingsvoorkeuren",
+        "email": {
+          "title": "E-mail notificaties",
+          "description": "Ontvang updates via e-mail"
+        },
+        "daily": {
+          "title": "Dagelijkse rapporten",
+          "description": "Ontvang elke dag een samenvatting"
+        },
+        "orders": {
+          "title": "Nieuwe bestellingen",
+          "description": "Melding bij nieuwe online bestellingen"
+        }
+      },
+      "security": {
+        "title": "Beveiliging",
+        "subtitle": "Wachtwoord en beveiliging",
+        "currentPassword": "Huidig wachtwoord",
+        "newPassword": "Nieuw wachtwoord",
+        "confirmPassword": "Bevestig nieuw wachtwoord"
+      },
+      "help": {
+        "title": "Hulp & Support",
+        "subtitle": "Krijg hulp bij problemen",
+        "troubleshooting": "Troubleshooting",
+        "troubleshootingDesc": "Veelvoorkomende problemen",
+        "emailSupport": "E-mail support",
+        "callSupport": "Bel support",
+        "whatsapp": "WhatsApp",
+        "whatsappDesc": "Direct chatten"
+      }
+    },
+    "saveChanges": "Wijzigingen opslaan"
+  },
+  "troubleshootingPage": {
+    "backToLogin": "Terug naar login",
+    "title": "Troubleshooting & Hulp",
+    "subtitle": "Veelvoorkomende problemen en oplossingen voor je Vysion Horeca kassa",
+    "quickActions": {
+      "callSupport": "Bel support",
+      "emailSupport": "E-mail support",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "Direct chatten"
+    },
+    "faqTitle": "Veelvoorkomende problemen",
+    "faqs": {
+      "1": {
+        "question": "Mijn kassa start niet op",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Controleer of het apparaat is aangesloten op stroom</li><li>Houd de aan/uit-knop 10 seconden ingedrukt om opnieuw op te starten</li><li>Controleer of alle kabels goed zijn aangesloten</li><li>Wacht 2 minuten en probeer opnieuw</li><li>Als het probleem aanhoudt, neem contact op met support</li></ol>"
+      },
+      "2": {
+        "question": "Ik kan niet inloggen op mijn kassa",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Controleer of je de juiste pincode gebruikt</li><li>Vraag je beheerder om je pincode te resetten</li><li>Controleer of je account niet geblokkeerd is (na 5 foute pogingen)</li><li>Neem contact op met support als je geen toegang hebt tot een beheerdersaccount</li></ol>"
+      },
+      "3": {
+        "question": "De betaalterminal werkt niet",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Controleer of de terminal is ingeschakeld (groen lampje brandt)</li><li>Controleer de USB of Bluetooth-verbinding</li><li>Start de terminal opnieuw op door hem uit en aan te zetten</li><li>Ga naar Instellingen → Betaalterminal → Opnieuw koppelen</li><li>Controleer of je internetverbinding werkt</li></ol>"
+      },
+      "4": {
+        "question": "Bon printer print niet",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Controleer of er papier in de printer zit</li><li>Open en sluit het printerdeksel (dit reset de printer)</li><li>Controleer de USB/netwerk-verbinding</li><li>Ga naar Instellingen → Printers → Test afdrukken</li><li>Als de testpagina niet print, herstart de printer</li></ol>"
+      },
+      "5": {
+        "question": "Mijn kassa is traag",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Sluit apps af die je niet gebruikt</li><li>Controleer je internetverbinding (4G/WiFi)</li><li>Herstart de kassa-applicatie</li><li>Controleer of er updates beschikbaar zijn</li><li>Neem contact op met support als het probleem aanhoudt</li></ol>"
+      },
+      "6": {
+        "question": "Online bestellingen komen niet binnen",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Controleer of je internetverbinding werkt</li><li>Controleer of de online bestellen module is ingeschakeld</li><li>Ga naar Instellingen → Online bestellen → Synchroniseren</li><li>Controleer of je vestiging \"open\" staat in het systeem</li><li>Check je openingstijden in de instellingen</li></ol>"
+      },
+      "7": {
+        "question": "Ik wil een product toevoegen of wijzigen",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Ga naar het menu linksboven → Producten</li><li>Klik op \"Nieuw product\" of selecteer een bestaand product</li><li>Vul de naam, prijs en categorie in</li><li>Klik op \"Opslaan\"</li><li>Het product is nu beschikbaar op je kassa</li></ol>"
+      },
+      "8": {
+        "question": "Hoe maak ik een Z-rapport / dagafsluiting?",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Ga naar het menu linksboven → Rapporten</li><li>Selecteer \"Z-Rapport\" of \"Dagafsluiting\"</li><li>Controleer de gegevens</li><li>Klik op \"Afsluiten en printen\"</li><li>Het rapport wordt afgedrukt en de dag wordt afgesloten</li></ol>"
+      },
+      "9": {
+        "question": "Ik ben mijn wachtwoord vergeten",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Ga naar de inlogpagina</li><li>Klik op \"Wachtwoord vergeten\"</li><li>Vul je e-mailadres in</li><li>Je ontvangt een link om je wachtwoord te resetten</li><li>Of neem contact op met support: +32 492 12 93 83</li></ol>"
+      },
+      "10": {
+        "question": "De app crasht steeds",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Sluit de app volledig af</li><li>Herstart je apparaat</li><li>Controleer of je de laatste versie van de app hebt</li><li>Verwijder de app en installeer opnieuw (je data blijft behouden)</li><li>Neem contact op met support als het probleem aanhoudt</li></ol>"
+      }
+    },
+    "stillNeedHelp": {
+      "title": "Probleem niet gevonden?",
+      "subtitle": "Ons support team staat 24/7 voor je klaar. Neem gerust contact met ons op!",
+      "callNow": "Bel nu:",
+      "emailSupport": "E-mail support"
+    },
+    "copyright": "Alle rechten voorbehouden."
   }
 }

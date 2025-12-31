@@ -1,68 +1,67 @@
 'use client'
 
+import { useLanguage } from '@/i18n'
+
 export default function BetalingsplatformPage() {
+  const { t } = useLanguage()
+  const trans = (key: string) => t(`paymentPage.${key}`)
+  
   return (
     <main className="min-h-screen bg-white">
       <div className="bg-dark py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Vysion Payments Platform Overeenkomst
+            {trans('title')}
           </h1>
-          <p className="text-xl text-gray-300">Laatst bijgewerkt: december 2025</p>
+          <p className="text-xl text-gray-300">{trans('lastUpdated')}</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="prose prose-lg max-w-none">
           
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Inleiding</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.intro.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Deze overeenkomst beschrijft de voorwaarden voor het gebruik van betalingsdiensten 
-            via het Vysion Horeca platform. Betalingsverwerking gebeurt via onze partners Mollie en Stripe.
+            {trans('sections.intro.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Betalingsverwerking</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.processing.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Vysion Horeca integreert met erkende betalingsverwerkers om veilige transacties te garanderen. 
-            Alle transacties worden versleuteld en voldoen aan PCI-DSS standaarden.
+            {trans('sections.processing.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Ondersteunde Betaalmethodes</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.methods.title')}</h2>
           <ul className="list-disc pl-6 text-gray-600 mb-8 space-y-2">
-            <li>Bancontact</li>
-            <li>Visa / Mastercard</li>
-            <li>iDEAL</li>
-            <li>Apple Pay / Google Pay</li>
-            <li>Payconiq</li>
+            <li>{trans('sections.methods.items.1')}</li>
+            <li>{trans('sections.methods.items.2')}</li>
+            <li>{trans('sections.methods.items.3')}</li>
+            <li>{trans('sections.methods.items.4')}</li>
+            <li>{trans('sections.methods.items.5')}</li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Transactiekosten</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.fees.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Transactiekosten worden bepaald door de betalingsverwerker en zijn afhankelijk van 
-            de betaalmethode en het transactievolume. Neem contact op voor actuele tarieven.
+            {trans('sections.fees.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Uitbetalingen</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.payouts.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Ontvangen betalingen worden automatisch uitbetaald naar uw zakelijke bankrekening. 
-            De uitbetalingsfrequentie is instelbaar (dagelijks, wekelijks of maandelijks).
+            {trans('sections.payouts.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Terugboekingen en Geschillen</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.chargebacks.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Bij een terugboeking (chargeback) ontvangt u een melding en heeft u de mogelijkheid 
-            om bewijs te leveren. Wij ondersteunen u bij het afhandelen van betalingsgeschillen.
+            {trans('sections.chargebacks.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Beveiliging</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.security.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Alle betalingsgegevens worden verwerkt conform PCI-DSS Level 1. 
-            Kaartgegevens worden nooit opgeslagen op onze servers.
+            {trans('sections.security.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Contact</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.contact.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Voor vragen over betalingen kunt u contact opnemen via{' '}
+            {trans('sections.contact.content')}{' '}
             <a href="mailto:info@vysionhoreca.com" className="text-accent hover:underline">info@vysionhoreca.com</a>
           </p>
 
@@ -79,4 +78,3 @@ export default function BetalingsplatformPage() {
     </main>
   )
 }
-

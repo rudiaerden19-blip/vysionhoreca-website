@@ -1,82 +1,83 @@
 'use client'
 
+import { useLanguage } from '@/i18n'
+
 export default function VerwerkersovereenkomstPage() {
+  const { t } = useLanguage()
+  const trans = (key: string) => t(`dpaPage.${key}`)
+  
   return (
     <main className="min-h-screen bg-white">
       <div className="bg-dark py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Verwerkersovereenkomst
+            {trans('title')}
           </h1>
-          <p className="text-xl text-gray-300">Laatst bijgewerkt: december 2025</p>
+          <p className="text-xl text-gray-300">{trans('lastUpdated')}</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="prose prose-lg max-w-none">
           
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Definities</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.definitions.title')}</h2>
           <p className="text-gray-600 mb-8">
-            In deze verwerkersovereenkomst wordt verstaan onder:<br />
-            <strong>Verwerkingsverantwoordelijke:</strong> de klant die gebruik maakt van Vysion Horeca diensten<br />
-            <strong>Verwerker:</strong> Vysion Horeca / Vysion Group International<br />
-            <strong>Persoonsgegevens:</strong> alle gegevens die betrekking hebben op een geïdentificeerde of identificeerbare natuurlijke persoon
+            {trans('sections.definitions.content')}<br />
+            <strong>{trans('sections.definitions.controller')}</strong> {trans('sections.definitions.controllerDef')}<br />
+            <strong>{trans('sections.definitions.processor')}</strong> {trans('sections.definitions.processorDef')}<br />
+            <strong>{trans('sections.definitions.personalData')}</strong> {trans('sections.definitions.personalDataDef')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Onderwerp en Duur</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.subject.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Deze overeenkomst regelt de verwerking van persoonsgegevens door Vysion Horeca namens u. 
-            De overeenkomst is van kracht zolang u gebruik maakt van onze diensten.
+            {trans('sections.subject.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">3. Aard en Doel van de Verwerking</h2>
-          <p className="text-gray-600 mb-4">Wij verwerken persoonsgegevens voor:</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.purpose.title')}</h2>
+          <p className="text-gray-600 mb-4">{trans('sections.purpose.intro')}</p>
           <ul className="list-disc pl-6 text-gray-600 mb-8 space-y-2">
-            <li>Het leveren van kassasoftware en gerelateerde diensten</li>
-            <li>Het verwerken van transacties en bestellingen</li>
-            <li>Het bijhouden van klantgegevens en bestelhistorie</li>
-            <li>Het genereren van rapporten en analyses</li>
+            <li>{trans('sections.purpose.items.1')}</li>
+            <li>{trans('sections.purpose.items.2')}</li>
+            <li>{trans('sections.purpose.items.3')}</li>
+            <li>{trans('sections.purpose.items.4')}</li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Categorieën Persoonsgegevens</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.categories.title')}</h2>
           <ul className="list-disc pl-6 text-gray-600 mb-8 space-y-2">
-            <li>Contactgegevens (naam, adres, e-mail, telefoon)</li>
-            <li>Transactiegegevens</li>
-            <li>Bestelgegevens</li>
-            <li>Personeelsgegevens (indien van toepassing)</li>
+            <li>{trans('sections.categories.items.1')}</li>
+            <li>{trans('sections.categories.items.2')}</li>
+            <li>{trans('sections.categories.items.3')}</li>
+            <li>{trans('sections.categories.items.4')}</li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Verplichtingen Verwerker</h2>
-          <p className="text-gray-600 mb-4">Vysion Horeca zal:</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.obligations.title')}</h2>
+          <p className="text-gray-600 mb-4">{trans('sections.obligations.intro')}</p>
           <ul className="list-disc pl-6 text-gray-600 mb-8 space-y-2">
-            <li>Persoonsgegevens alleen verwerken volgens uw instructies</li>
-            <li>Passende technische en organisatorische maatregelen nemen</li>
-            <li>Vertrouwelijkheid garanderen</li>
-            <li>U bijstaan bij het nakomen van uw verplichtingen onder de AVG</li>
-            <li>Na beëindiging gegevens verwijderen of retourneren</li>
+            <li>{trans('sections.obligations.items.1')}</li>
+            <li>{trans('sections.obligations.items.2')}</li>
+            <li>{trans('sections.obligations.items.3')}</li>
+            <li>{trans('sections.obligations.items.4')}</li>
+            <li>{trans('sections.obligations.items.5')}</li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Subverwerkers</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.subprocessors.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Wij maken gebruik van subverwerkers voor bepaalde diensten. Een actuele lijst is 
-            beschikbaar op onze subverwerkers pagina. Wij informeren u bij wijzigingen.
+            {trans('sections.subprocessors.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Beveiliging</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.security.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Wij implementeren passende beveiligingsmaatregelen waaronder encryptie, 
-            toegangscontrole, en regelmatige beveiligingsaudits.
+            {trans('sections.security.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Datalekken</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.breach.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Bij een datalek informeren wij u zonder onredelijke vertraging, zodat u aan uw 
-            meldingsplicht kunt voldoen.
+            {trans('sections.breach.content')}
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Contact</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{trans('sections.contact.title')}</h2>
           <p className="text-gray-600 mb-8">
-            Voor vragen over deze overeenkomst kunt u contact opnemen via{' '}
+            {trans('sections.contact.content')}{' '}
             <a href="mailto:info@vysionhoreca.com" className="text-accent hover:underline">info@vysionhoreca.com</a>
           </p>
 
@@ -93,4 +94,3 @@ export default function VerwerkersovereenkomstPage() {
     </main>
   )
 }
-

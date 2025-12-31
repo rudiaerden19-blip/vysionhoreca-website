@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useLanguage } from '@/i18n'
 
 export default function InstellingenPage() {
   const [saved, setSaved] = useState(false)
+  const t = useTranslations('settingsPage')
 
   const handleSave = () => {
     setSaved(true)
@@ -15,8 +17,8 @@ export default function InstellingenPage() {
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Instellingen</h1>
-        <p className="text-gray-500 mt-1">Beheer je accountinstellingen</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-500 mt-1">{t('subtitle')}</p>
       </div>
 
       {saved && (
@@ -24,20 +26,20 @@ export default function InstellingenPage() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
-          Instellingen opgeslagen
+          {t('saved')}
         </div>
       )}
 
       {/* Account Section */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">Account</h2>
-          <p className="text-sm text-gray-500">Je accountgegevens</p>
+          <h2 className="text-lg font-semibold text-gray-900">{t('sections.account.title')}</h2>
+          <p className="text-sm text-gray-500">{t('sections.account.subtitle')}</p>
         </div>
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Voornaam</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('sections.account.firstName')}</label>
               <input 
                 type="text" 
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none"
@@ -45,7 +47,7 @@ export default function InstellingenPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Achternaam</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('sections.account.lastName')}</label>
               <input 
                 type="text" 
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none"
@@ -54,7 +56,7 @@ export default function InstellingenPage() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">E-mailadres</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sections.account.email')}</label>
             <input 
               type="email" 
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none"
@@ -62,7 +64,7 @@ export default function InstellingenPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Telefoonnummer</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sections.account.phone')}</label>
             <input 
               type="tel" 
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none"
@@ -75,28 +77,28 @@ export default function InstellingenPage() {
       {/* Notifications Section */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">Notificaties</h2>
-          <p className="text-sm text-gray-500">Beheer je meldingsvoorkeuren</p>
+          <h2 className="text-lg font-semibold text-gray-900">{t('sections.notifications.title')}</h2>
+          <p className="text-sm text-gray-500">{t('sections.notifications.subtitle')}</p>
         </div>
         <div className="p-6 space-y-4">
           <label className="flex items-center justify-between cursor-pointer">
             <div>
-              <p className="font-medium text-gray-900">E-mail notificaties</p>
-              <p className="text-sm text-gray-500">Ontvang updates via e-mail</p>
+              <p className="font-medium text-gray-900">{t('sections.notifications.email.title')}</p>
+              <p className="text-sm text-gray-500">{t('sections.notifications.email.description')}</p>
             </div>
             <input type="checkbox" className="w-5 h-5 text-accent rounded" defaultChecked />
           </label>
           <label className="flex items-center justify-between cursor-pointer">
             <div>
-              <p className="font-medium text-gray-900">Dagelijkse rapporten</p>
-              <p className="text-sm text-gray-500">Ontvang elke dag een samenvatting</p>
+              <p className="font-medium text-gray-900">{t('sections.notifications.daily.title')}</p>
+              <p className="text-sm text-gray-500">{t('sections.notifications.daily.description')}</p>
             </div>
             <input type="checkbox" className="w-5 h-5 text-accent rounded" />
           </label>
           <label className="flex items-center justify-between cursor-pointer">
             <div>
-              <p className="font-medium text-gray-900">Nieuwe bestellingen</p>
-              <p className="text-sm text-gray-500">Melding bij nieuwe online bestellingen</p>
+              <p className="font-medium text-gray-900">{t('sections.notifications.orders.title')}</p>
+              <p className="text-sm text-gray-500">{t('sections.notifications.orders.description')}</p>
             </div>
             <input type="checkbox" className="w-5 h-5 text-accent rounded" defaultChecked />
           </label>
@@ -106,12 +108,12 @@ export default function InstellingenPage() {
       {/* Security Section */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">Beveiliging</h2>
-          <p className="text-sm text-gray-500">Wachtwoord en beveiliging</p>
+          <h2 className="text-lg font-semibold text-gray-900">{t('sections.security.title')}</h2>
+          <p className="text-sm text-gray-500">{t('sections.security.subtitle')}</p>
         </div>
         <div className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Huidig wachtwoord</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sections.security.currentPassword')}</label>
             <input 
               type="password" 
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none"
@@ -119,7 +121,7 @@ export default function InstellingenPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nieuw wachtwoord</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sections.security.newPassword')}</label>
             <input 
               type="password" 
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none"
@@ -127,7 +129,7 @@ export default function InstellingenPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bevestig nieuw wachtwoord</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('sections.security.confirmPassword')}</label>
             <input 
               type="password" 
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none"
@@ -140,8 +142,8 @@ export default function InstellingenPage() {
       {/* Help Section */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">Hulp & Support</h2>
-          <p className="text-sm text-gray-500">Krijg hulp bij problemen</p>
+          <h2 className="text-lg font-semibold text-gray-900">{t('sections.help.title')}</h2>
+          <p className="text-sm text-gray-500">{t('sections.help.subtitle')}</p>
         </div>
         <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Link 
@@ -154,8 +156,8 @@ export default function InstellingenPage() {
               </svg>
             </div>
             <div>
-              <p className="font-medium text-gray-900">Troubleshooting</p>
-              <p className="text-sm text-gray-500">Veelvoorkomende problemen</p>
+              <p className="font-medium text-gray-900">{t('sections.help.troubleshooting')}</p>
+              <p className="text-sm text-gray-500">{t('sections.help.troubleshootingDesc')}</p>
             </div>
           </Link>
           <a 
@@ -168,7 +170,7 @@ export default function InstellingenPage() {
               </svg>
             </div>
             <div>
-              <p className="font-medium text-gray-900">E-mail support</p>
+              <p className="font-medium text-gray-900">{t('sections.help.emailSupport')}</p>
               <p className="text-sm text-gray-500">support@vysionhoreca.com</p>
             </div>
           </a>
@@ -182,7 +184,7 @@ export default function InstellingenPage() {
               </svg>
             </div>
             <div>
-              <p className="font-medium text-gray-900">Bel support</p>
+              <p className="font-medium text-gray-900">{t('sections.help.callSupport')}</p>
               <p className="text-sm text-gray-500">+32 492 12 93 83</p>
             </div>
           </a>
@@ -198,8 +200,8 @@ export default function InstellingenPage() {
               </svg>
             </div>
             <div>
-              <p className="font-medium text-gray-900">WhatsApp</p>
-              <p className="text-sm text-gray-500">Direct chatten</p>
+              <p className="font-medium text-gray-900">{t('sections.help.whatsapp')}</p>
+              <p className="text-sm text-gray-500">{t('sections.help.whatsappDesc')}</p>
             </div>
           </a>
         </div>
@@ -211,7 +213,7 @@ export default function InstellingenPage() {
           onClick={handleSave}
           className="px-6 py-3 bg-accent text-white rounded-lg font-semibold hover:bg-accent/90 transition-colors"
         >
-          Wijzigingen opslaan
+          {t('saveChanges')}
         </button>
       </div>
     </div>
