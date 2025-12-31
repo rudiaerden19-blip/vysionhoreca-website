@@ -409,7 +409,7 @@ function OrderAppSection() {
           </div>
 
           {/* Center - Main POS */}
-          <div className="flex-shrink-0 order-1 lg:order-2">
+          <div className="flex-shrink-0 order-1 lg:order-2 text-center">
             <img
               src="https://i.imgur.com/HrgjfGN.png"
               alt="Vysion Horeca Kassa"
@@ -417,6 +417,7 @@ function OrderAppSection() {
               loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/HrgjfGN.png')}
             />
+            <p className="text-gray-400 text-sm mt-4">Klik om te openen</p>
           </div>
 
           {/* Right Column - Devices stacked */}
