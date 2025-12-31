@@ -50,7 +50,7 @@ export default function OverOnsPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 text-lg">Opgericht in 2023</h3>
+                    <h3 className="font-semibold text-gray-900 text-lg">Opgericht in 2013</h3>
                     <p className="text-gray-600">Door horecaondernemers met meer dan 15 jaar ervaring</p>
                   </div>
                 </div>
