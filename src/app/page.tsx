@@ -680,11 +680,11 @@ function IndustrySection() {
           </div>
 
           {/* Right content - Image */}
-          <div className="relative text-center">
+          <div className="relative text-center flex justify-center">
             <img
               src={current.image}
               alt={activeTab}
-              className="w-full h-auto max-h-[500px] object-contain rounded-2xl shadow-xl cursor-pointer"
+              className="w-auto h-auto max-w-[400px] lg:max-w-[450px] object-contain rounded-2xl shadow-xl cursor-pointer"
               loading="lazy"
               onClick={() => setShowLightbox(true)}
             />
