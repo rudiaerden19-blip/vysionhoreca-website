@@ -475,10 +475,27 @@ function OrderAppSection() {
 
 // But Wait Section
 function ButWaitSection() {
+  const features = [
+    'Online bestelplatform',
+    'Personeel & urenregistratie',
+    'Onbeperkte producten & categorieën',
+    'Klantenkaart & loyaliteit',
+    'Keukenbeeldscherm software',
+    'Maandelijkse bedrijfsanalyse',
+    'Landingspagina',
+    'Tijdsregistratie personeel',
+    'Peppol facturatieprogramma',
+    'SCARDA boekhoudsoftware',
+    'Tafelreservatie',
+    'Tafel plattegrond',
+    'Beschikbaar in 9 talen',
+  ]
+
   return (
     <section className="py-20 bg-dark overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
+        {/* Header */}
+        <div className="text-center mb-16">
           <p className="text-accent text-lg font-semibold tracking-wider uppercase mb-4">
             Wacht even...
           </p>
@@ -486,6 +503,33 @@ function ButWaitSection() {
             Maar... Vysion gaat<br />
             <span className="text-accent">nog verder</span>
           </h2>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left - Image */}
+          <div className="relative">
+            <img
+              src="https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+              alt="Ondernemer werkt met Vysion"
+              className="w-full h-auto rounded-3xl shadow-2xl"
+              loading="lazy"
+            />
+          </div>
+
+          {/* Right - Features List */}
+          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-xl">
+            <ul className="space-y-4">
+              {features.map((feature, index) => (
+                <li key={index} className="flex items-center">
+                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-gray-700 text-lg">{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </section>
