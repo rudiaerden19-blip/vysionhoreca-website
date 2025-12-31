@@ -173,7 +173,7 @@ export default function InstellingenPage() {
             </div>
           </a>
           <a 
-            href="tel:+32492129983"
+            href="tel:+32492129383"
             className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-accent transition-colors"
           >
             <div className="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
@@ -183,11 +183,11 @@ export default function InstellingenPage() {
             </div>
             <div>
               <p className="font-medium text-gray-900">Bel support</p>
-              <p className="text-sm text-gray-500">+32 492 12 99 83</p>
+              <p className="text-sm text-gray-500">+32 492 12 93 83</p>
             </div>
           </a>
           <a 
-            href="https://wa.me/32492129983"
+            href="https://wa.me/32492129383"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:border-accent transition-colors"
