@@ -485,6 +485,8 @@ function ButWaitSection() {
     'Log in op je eigen webpagina',
     'Log in je bedrijf vanaf ieder toestel',
     'Bekijk in realtime je dagelijkse verkopen',
+    'Beheer je kassa op afstand',
+    'Pas je bestelapp aan naar jouw voorkeuren',
   ]
 
   return (
