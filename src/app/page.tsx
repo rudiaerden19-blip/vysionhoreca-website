@@ -43,15 +43,12 @@ function HeroSection() {
             <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
               {t('hero.description')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div className="flex justify-center lg:justify-start">
               <a href="#demo" className="btn-primary text-center">
                 {t('hero.ctaPrimary')}
               </a>
-              <a href="#functies" className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all text-center">
-                {t('hero.ctaSecondary')}
-              </a>
             </div>
-            <p className="text-gray-500 mt-4 text-sm pl-20 lg:pl-0">
+            <p className="text-gray-500 mt-4 text-sm text-center lg:text-left">
               {t('hero.trialInfo')}
             </p>
           </div>
