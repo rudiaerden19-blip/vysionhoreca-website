@@ -555,8 +555,8 @@
       "city": "Stadt",
       "orders": "Bestellungen",
       "spent": "Ausgaben",
-      "loyalty": "Treue",
-      "lastOrder": "Letzte Bestellung"
+      "points": "Punkte",
+      "memberSince": "Mitglied seit"
     },
     "noCustomers": "Noch keine Kunden gefunden"
   },
@@ -600,62 +600,131 @@
   "reportsPage": {
     "title": "Berichte",
     "subtitle": "Tägliche Verkaufsberichte und Übersichten",
-    "summary": {
-      "totalDays": "Berichtete Tage",
+    "stats": {
       "totalRevenue": "Gesamtumsatz",
       "totalOrders": "Gesamtbestellungen",
-      "avgPerDay": "Durchschn. pro Tag"
+      "avgPerDay": "Durchschn. pro Tag",
+      "daysWithData": "Tage mit Daten"
     },
     "table": {
+      "title": "Tägliche Berichte (Z-Bericht)",
       "date": "Datum",
       "orders": "Bestellungen",
-      "online": "Online",
       "pos": "Kasse",
-      "revenue": "Umsatz"
+      "online": "Online",
+      "revenue": "Umsatz",
+      "avgPerOrder": "Durchschn. pro Bestellung"
     },
     "noReports": "Noch keine Berichte verfügbar"
   },
   "settingsPage": {
     "title": "Einstellungen",
-    "subtitle": "Verwalten Sie Ihr Konto und Ihre Präferenzen",
-    "saved": "Einstellungen gespeichert!",
+    "subtitle": "Verwalten Sie Ihre Kontoeinstellungen",
+    "saved": "Einstellungen gespeichert",
     "sections": {
       "account": {
-        "title": "Kontoinformationen",
-        "subtitle": "Aktualisieren Sie Ihre persönlichen Daten",
+        "title": "Konto",
+        "subtitle": "Ihre Kontoinformationen",
         "firstName": "Vorname",
         "lastName": "Nachname",
         "email": "E-Mail-Adresse",
         "phone": "Telefonnummer"
       },
-      "business": {
-        "title": "Geschäftsinformationen",
-        "subtitle": "Ihre Geschäftsdaten",
-        "name": "Geschäftsname",
-        "address": "Adresse",
-        "city": "Stadt",
-        "vat": "USt-IdNr."
-      },
       "notifications": {
         "title": "Benachrichtigungen",
-        "subtitle": "Wählen Sie, welche Benachrichtigungen Sie erhalten möchten",
-        "newOrders": "Neue Bestellungen",
-        "newOrdersDesc": "Benachrichtigung bei neuen Bestellungen",
-        "dailyReports": "Tägliche Berichte",
-        "dailyReportsDesc": "Tägliche Zusammenfassung per E-Mail",
-        "marketing": "Marketing",
-        "marketingDesc": "Neuigkeiten und Angebote"
+        "subtitle": "Verwalten Sie Ihre Benachrichtigungseinstellungen",
+        "email": {
+          "title": "E-Mail-Benachrichtigungen",
+          "description": "Updates per E-Mail erhalten"
+        },
+        "daily": {
+          "title": "Tägliche Berichte",
+          "description": "Tägliche Zusammenfassung erhalten"
+        },
+        "orders": {
+          "title": "Neue Bestellungen",
+          "description": "Benachrichtigung bei neuen Online-Bestellungen"
+        }
+      },
+      "security": {
+        "title": "Sicherheit",
+        "subtitle": "Passwort und Sicherheit",
+        "currentPassword": "Aktuelles Passwort",
+        "newPassword": "Neues Passwort",
+        "confirmPassword": "Neues Passwort bestätigen"
       },
       "help": {
         "title": "Hilfe & Support",
-        "docs": "Dokumentation",
-        "docsDesc": "Anleitungen und Tutorials",
-        "troubleshoot": "Fehlerbehebung",
-        "troubleshootDesc": "Häufige Probleme lösen",
-        "contact": "Kontakt",
-        "contactDesc": "Unser Support-Team kontaktieren"
+        "subtitle": "Hilfe bei Problemen erhalten",
+        "troubleshooting": "Fehlerbehebung",
+        "troubleshootingDesc": "Häufige Probleme",
+        "emailSupport": "E-Mail-Support",
+        "callSupport": "Support anrufen",
+        "whatsapp": "WhatsApp",
+        "whatsappDesc": "Direkt chatten"
       }
     },
-    "save": "Änderungen speichern"
+    "saveChanges": "Änderungen speichern"
+  },
+  "troubleshootingPage": {
+    "backToLogin": "Zurück zur Anmeldung",
+    "title": "Fehlerbehebung & Hilfe",
+    "subtitle": "Häufige Probleme und Lösungen für Ihre Vysion Horeca Kasse",
+    "quickActions": {
+      "callSupport": "Support anrufen",
+      "emailSupport": "E-Mail-Support",
+      "whatsapp": "WhatsApp",
+      "whatsappDesc": "Direkt chatten"
+    },
+    "faqTitle": "Häufige Probleme",
+    "faqs": {
+      "1": {
+        "question": "Meine Kasse startet nicht",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Prüfen Sie, ob das Gerät an die Stromversorgung angeschlossen ist</li><li>Halten Sie den Ein-/Ausschalter 10 Sekunden gedrückt, um neu zu starten</li><li>Prüfen Sie, ob alle Kabel richtig angeschlossen sind</li><li>Warten Sie 2 Minuten und versuchen Sie es erneut</li><li>Wenn das Problem weiterhin besteht, kontaktieren Sie den Support</li></ol>"
+      },
+      "2": {
+        "question": "Ich kann mich nicht bei meiner Kasse anmelden",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Prüfen Sie, ob Sie die richtige PIN verwenden</li><li>Bitten Sie Ihren Administrator, Ihre PIN zurückzusetzen</li><li>Prüfen Sie, ob Ihr Konto nicht gesperrt ist (nach 5 Fehlversuchen)</li><li>Kontaktieren Sie den Support, wenn Sie keinen Zugang zu einem Administratorkonto haben</li></ol>"
+      },
+      "3": {
+        "question": "Das Zahlungsterminal funktioniert nicht",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Prüfen Sie, ob das Terminal eingeschaltet ist (grünes Licht leuchtet)</li><li>Prüfen Sie die USB- oder Bluetooth-Verbindung</li><li>Starten Sie das Terminal neu, indem Sie es aus- und wieder einschalten</li><li>Gehen Sie zu Einstellungen → Zahlungsterminal → Neu verbinden</li><li>Prüfen Sie, ob Ihre Internetverbindung funktioniert</li></ol>"
+      },
+      "4": {
+        "question": "Der Bondrucker druckt nicht",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Prüfen Sie, ob Papier im Drucker ist</li><li>Öffnen und schließen Sie die Druckerabdeckung (dies setzt den Drucker zurück)</li><li>Prüfen Sie die USB-/Netzwerkverbindung</li><li>Gehen Sie zu Einstellungen → Drucker → Testdruck</li><li>Wenn die Testseite nicht druckt, starten Sie den Drucker neu</li></ol>"
+      },
+      "5": {
+        "question": "Meine Kasse ist langsam",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Schließen Sie Apps, die Sie nicht verwenden</li><li>Prüfen Sie Ihre Internetverbindung (4G/WiFi)</li><li>Starten Sie die Kassenanwendung neu</li><li>Prüfen Sie, ob Updates verfügbar sind</li><li>Kontaktieren Sie den Support, wenn das Problem weiterhin besteht</li></ol>"
+      },
+      "6": {
+        "question": "Online-Bestellungen kommen nicht an",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Prüfen Sie, ob Ihre Internetverbindung funktioniert</li><li>Prüfen Sie, ob das Online-Bestellmodul aktiviert ist</li><li>Gehen Sie zu Einstellungen → Online-Bestellungen → Synchronisieren</li><li>Prüfen Sie, ob Ihr Standort im System als \"geöffnet\" angezeigt wird</li><li>Überprüfen Sie Ihre Öffnungszeiten in den Einstellungen</li></ol>"
+      },
+      "7": {
+        "question": "Ich möchte ein Produkt hinzufügen oder bearbeiten",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Gehen Sie zum Menü oben links → Produkte</li><li>Klicken Sie auf \"Neues Produkt\" oder wählen Sie ein bestehendes Produkt</li><li>Geben Sie Name, Preis und Kategorie ein</li><li>Klicken Sie auf \"Speichern\"</li><li>Das Produkt ist jetzt auf Ihrer Kasse verfügbar</li></ol>"
+      },
+      "8": {
+        "question": "Wie erstelle ich einen Z-Bericht / Tagesabschluss?",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Gehen Sie zum Menü oben links → Berichte</li><li>Wählen Sie \"Z-Bericht\" oder \"Tagesabschluss\"</li><li>Überprüfen Sie die Daten</li><li>Klicken Sie auf \"Abschließen und drucken\"</li><li>Der Bericht wird gedruckt und der Tag abgeschlossen</li></ol>"
+      },
+      "9": {
+        "question": "Ich habe mein Passwort vergessen",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Gehen Sie zur Anmeldeseite</li><li>Klicken Sie auf \"Passwort vergessen\"</li><li>Geben Sie Ihre E-Mail-Adresse ein</li><li>Sie erhalten einen Link zum Zurücksetzen Ihres Passworts</li><li>Oder kontaktieren Sie den Support: +32 492 12 93 83</li></ol>"
+      },
+      "10": {
+        "question": "Die App stürzt ständig ab",
+        "answer": "<ol class=\"list-decimal list-inside space-y-2\"><li>Schließen Sie die App vollständig</li><li>Starten Sie Ihr Gerät neu</li><li>Prüfen Sie, ob Sie die neueste Version der App haben</li><li>Deinstallieren Sie die App und installieren Sie sie neu (Ihre Daten bleiben erhalten)</li><li>Kontaktieren Sie den Support, wenn das Problem weiterhin besteht</li></ol>"
+      }
+    },
+    "stillNeedHelp": {
+      "title": "Problem nicht gefunden?",
+      "subtitle": "Unser Support-Team ist 24/7 erreichbar. Zögern Sie nicht, uns zu kontaktieren!",
+      "callNow": "Jetzt anrufen:",
+      "emailSupport": "E-Mail-Support"
+    },
+    "copyright": "Alle Rechte vorbehalten."
   }
 }
