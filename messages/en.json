@@ -1,0 +1,455 @@
+{
+  "metadata": {
+    "title": "Vysion Horeca | All-in-One POS & Payment Platform",
+    "description": "The complete POS system for hospitality. Cash register, online orders, invoicing, staff management and more - all in one platform. Try 7 days free."
+  },
+  "nav": {
+    "home": "Home",
+    "features": "Features",
+    "pricing": "Pricing",
+    "about": "About Us",
+    "contact": "Contact",
+    "login": "Login",
+    "tryFree": "Try Free",
+    "language": "Language"
+  },
+  "hero": {
+    "badge1": "1 Platform",
+    "badge2": "Made by hospitality entrepreneurs",
+    "badge3": "Made for hospitality entrepreneurs",
+    "title": "One screen. Full control.",
+    "description": "Born from practice, built by and for hospitality entrepreneurs. Perfect for snack bars, cafés, restaurants, butchers and bakeries. An all-in-one platform with a GKS-certified POS, your own ordering platform and professional SCARDA accounting software with Peppol invoicing, complete business analytics and so much more, compliant with legislation in Belgium and more than 20 other countries.",
+    "ctaPrimary": "Start free trial",
+    "ctaSecondary": "View demo",
+    "trialInfo": "Free trial 7 days • Get started immediately",
+    "clickToOpen": "Click to open"
+  },
+  "features": {
+    "title": "Everything you need",
+    "subtitle": "One platform for all your hospitality needs. No separate systems, no hassle.",
+    "pos": {
+      "title": "Powerful POS",
+      "description": "Intuitive POS interface for fast service. Works on tablet, computer or touchscreen."
+    },
+    "online": {
+      "title": "Online ordering",
+      "description": "Online ordering platform with landing page for pickup and delivery. Customers order, you receive directly in the POS."
+    },
+    "reports": {
+      "title": "Real-time reports",
+      "description": "Real-time X and Z reports. Instant insights into revenue, popular products and busy hours. Data-driven decisions."
+    },
+    "payments": {
+      "title": "Payments",
+      "description": "Integrated payment terminal. Bancontact, Visa, Mastercard, Mollie, Stripe - all in one system."
+    },
+    "invoicing": {
+      "title": "Invoicing & Peppol",
+      "description": "Professional Peppol invoices with one click. Automatically linked to your accounting. B2B shipping."
+    },
+    "staff": {
+      "title": "Staff management",
+      "description": "Time registration, roles and permissions. You know exactly who did what. Ready for payroll submission."
+    },
+    "kitchen": {
+      "title": "Kitchen display",
+      "description": "Real-time orders in the kitchen. Efficient and organized work."
+    },
+    "loyalty": {
+      "title": "Customer card & Loyalty",
+      "description": "Build customer relationships with loyalty points and personal offers."
+    },
+    "gks": {
+      "title": "GKS Certified",
+      "description": "100% compliant with Belgian fiscal legislation. No worries, always in order."
+    }
+  },
+  "stats": {
+    "processed": "Processed per month",
+    "businesses": "Active hospitality businesses",
+    "uptime": "Uptime guarantee",
+    "support": "Support available"
+  },
+  "orderApp": {
+    "title": "Everything you need",
+    "subtitle": "A complete ecosystem for your hospitality business. POS, ordering app, payment terminal and more.",
+    "cta": "Discover the complete platform"
+  },
+  "butWait": {
+    "label": "Wait...",
+    "title": "But... Vysion goes",
+    "titleAccent": "even further",
+    "subtitle": "Where others stopped, we continue...",
+    "features": {
+      "1": "Track your business in real-time",
+      "2": "Open your reports wherever you are",
+      "3": "Invoice from home",
+      "4": "Adjust staff time registration",
+      "5": "Send your accounting from anywhere",
+      "6": "View your business analytics in real-time",
+      "7": "Log in to your own webpage",
+      "8": "Log in to your business from any device",
+      "9": "View your daily sales in real-time",
+      "10": "Manage your POS remotely",
+      "11": "Customize your ordering app to your preferences",
+      "12": "Everything available in 9 languages for you"
+    }
+  },
+  "comparison": {
+    "title": "Compare with other platforms",
+    "subtitle": "More features, lower price. Discover why Vysion Horeca is the best choice.",
+    "feature": "Feature",
+    "cta": "Start with Vysion Horeca today",
+    "features": {
+      "pos": "POS software",
+      "terminal": "Payment terminal integration",
+      "online": "Online ordering platform",
+      "gks": "GKS Certified",
+      "accounting": "Accounting software (SCARDA)",
+      "peppol": "Peppol invoicing",
+      "analytics": "Business analytics",
+      "kitchen": "Kitchen display",
+      "loyalty": "Customer card & loyalty",
+      "staff": "Staff management",
+      "reservation": "Table reservation",
+      "languages": "Available in 9+ languages",
+      "multiLocation": "Multi-location"
+    },
+    "limited": "Limited"
+  },
+  "pricing": {
+    "title": "Simple, transparent pricing",
+    "subtitle": "Everything included. No surprises.",
+    "perMonth": "/month",
+    "perLicense": "Per license",
+    "startTrial": "Start 7 days free",
+    "mostChosen": "Most chosen",
+    "included": "Included:",
+    "allOfLight": "Everything from Light, plus:",
+    "light": {
+      "name": "Light",
+      "features": {
+        "1": "Full POS functionality",
+        "2": "Real-time reports",
+        "3": "Products & categories",
+        "4": "Payment terminal integration",
+        "5": "Inventory",
+        "6": "Email & phone support"
+      }
+    },
+    "pro": {
+      "name": "Pro",
+      "features": {
+        "1": "Online ordering platform",
+        "2": "Staff & time registration",
+        "3": "Unlimited products & categories",
+        "4": "Customer card & loyalty",
+        "5": "Kitchen display software",
+        "6": "Monthly business analysis",
+        "7": "Landing page",
+        "8": "Staff time registration",
+        "9": "Peppol invoicing program",
+        "10": "SCARDA accounting software",
+        "11": "Table reservation",
+        "12": "Table floor plan",
+        "13": "Available in 9 languages"
+      }
+    }
+  },
+  "industry": {
+    "invoicing": {
+      "tab": "Invoicing",
+      "title": "Fast and professional invoicing.",
+      "description": "Create invoices for customers, credit notes and more. Connect directly with Peppol and send to the accountant in a fraction of seconds."
+    },
+    "ordering": {
+      "tab": "Online ordering platform",
+      "title": "Fast handling, happy customers.",
+      "description": "Process orders lightning fast during peak hours. No more queues. Everything perfectly integrated in the POS. Everything in real-time to the kitchen."
+    },
+    "analytics": {
+      "tab": "Business analytics",
+      "title": "Real-time business analytics.",
+      "description": "Know exactly how healthy your business is. Enter your fixed costs, supplier purchases, leases, rent and more. Get instant real-time analysis of your business."
+    },
+    "accounting": {
+      "tab": "Accounting",
+      "title": "Professional accounting.",
+      "description": "SCARDA accounting software fully integrated. Always up-to-date. Save 30% on accounting costs."
+    },
+    "tryFree": "Try free",
+    "clickToEnlarge": "Click to enlarge"
+  },
+  "testimonials": {
+    "title": "Hospitality entrepreneurs trust Vysion",
+    "quotes": {
+      "1": {
+        "quote": "Finally a platform where everything is integrated. I cancelled all my other subscriptions and now have everything in one for a fraction of the price.",
+        "author": "Marc V.",
+        "role": "Snack bar owner"
+      },
+      "2": {
+        "quote": "The online ordering module increased our revenue by 40%. Customers love it.",
+        "author": "Sarah D.",
+        "role": "Restaurant manager"
+      },
+      "3": {
+        "quote": "Support responds within 5 minutes. I've never had that with any other supplier.",
+        "author": "Kevin L.",
+        "role": "Café owner"
+      },
+      "4": {
+        "quote": "The best investment I've ever made for my business. Everything works perfectly together and customer service is excellent.",
+        "author": "Lisa M.",
+        "role": "Bakery owner"
+      },
+      "5": {
+        "quote": "Finally a POS system in my own language! I searched for years and finally found it!",
+        "author": "Wei Wang",
+        "role": "Chinese restaurant owner"
+      },
+      "6": {
+        "quote": "I've never had such a fast POS system. They even update overnight - I just press OK in the morning and the features I requested are already there!",
+        "author": "James T.",
+        "role": "Fish & Chips Owner"
+      }
+    }
+  },
+  "cta": {
+    "title": "Ready to grow?",
+    "subtitle": "Start with Vysion Horeca today. 7 days free, no obligations.",
+    "primary": "Start free trial",
+    "secondary": "Request info"
+  },
+  "contact": {
+    "title": "Get in touch",
+    "subtitle": "Questions about Vysion Horeca? Our team is ready to help.",
+    "email": "Email",
+    "phone": "Phone",
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "message": "Message",
+      "placeholder": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john@example.com",
+        "message": "Tell us about your hospitality business..."
+      },
+      "submit": "Send message",
+      "required": "*"
+    }
+  },
+  "footer": {
+    "description": "Vysion Horeca is part of Vysion Group International.",
+    "address": "Address:",
+    "product": "Product",
+    "features": "Features",
+    "pricing": "Pricing",
+    "updates": "Updates",
+    "company": "Company",
+    "about": "About Us",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "legal": "Legal",
+    "copyright": "All rights reserved.",
+    "designBy": "Design by Vysion"
+  },
+  "cookies": {
+    "message": "We use cookies to improve your experience. By continuing you agree to our",
+    "policy": "cookie policy",
+    "accept": "Accept",
+    "decline": "Decline"
+  },
+  "login": {
+    "backToHome": "Back to home",
+    "selectBusiness": "Select your business to log in",
+    "chooseBusiness": "Choose your business",
+    "loading": "Loading...",
+    "selectPlaceholder": "-- Select a business --",
+    "toDashboard": "To Dashboard →",
+    "processing": "Processing...",
+    "demoMode": "Demo mode:",
+    "demoInfo": "Select a business to view the dashboard. In production this will be replaced by real authentication.",
+    "troubleshooting": {
+      "title": "Problems with your POS?",
+      "subtitle": "Check our troubleshooting guide"
+    },
+    "copyright": "All rights reserved."
+  },
+  "about": {
+    "heroTitle": "About",
+    "heroTitleAccent": "Vysion",
+    "heroTitleEnd": "Horeca",
+    "heroSubtitle": "Born from practice, built by hospitality entrepreneurs, for hospitality entrepreneurs.",
+    "story": {
+      "title": "Our story",
+      "p1": "Vysion Horeca was born from experience. As hospitality entrepreneurs, we noticed that existing POS systems were too expensive, too complex, and never did exactly what we needed.",
+      "p2": "We paid for five different subscriptions: a POS, an ordering platform, accounting software, a payment terminal and analytics software. Nothing worked well together and costs ran up to hundreds of euros per month.",
+      "p3": "That's why we decided to build it ourselves. An all-in-one platform that does exactly what a hospitality entrepreneur needs, without hassle and at a fair price."
+    },
+    "facts": {
+      "founded": "Founded in 2013",
+      "foundedDesc": "By hospitality entrepreneurs with more than 15 years of experience",
+      "location": "Based in Belgium",
+      "locationDesc": "Pelt, Limburg - the heart of the Benelux",
+      "countries": "Active in 20+ countries",
+      "countriesDesc": "From Belgium to China, from Netherlands to the UK"
+    },
+    "mission": {
+      "title": "Our mission",
+      "subtitle": "Let hospitality entrepreneurs focus on what they do best: welcoming guests and creating great experiences. We take care of the rest.",
+      "reliability": {
+        "title": "Reliability",
+        "description": "99.9% uptime. Your POS always works, even when the internet drops."
+      },
+      "speed": {
+        "title": "Speed",
+        "description": "Lightning-fast updates. Request a feature and see it in your system the next day."
+      },
+      "personal": {
+        "title": "Personal",
+        "description": "No call centers. Direct lines with our team. We know every customer by name."
+      }
+    },
+    "values": {
+      "title": "What we stand for",
+      "simplicity": {
+        "title": "🎯 Simplicity above all",
+        "description": "Technology should help you, not get in the way. That's why Vysion is so intuitive you can get started within 5 minutes - no manual needed."
+      },
+      "pricing": {
+        "title": "💰 Fair pricing",
+        "description": "No hidden costs, no long-term contracts, no surprises. What you see is what you pay."
+      },
+      "improvement": {
+        "title": "🚀 Continuous improvement",
+        "description": "We listen to our customers and build what they need. New features are added every week, based on real feedback."
+      },
+      "global": {
+        "title": "🌍 Local and international",
+        "description": "GKS-certified in Belgium, but also available in 9 languages and 20+ countries. From snack bar to Michelin restaurant."
+      }
+    },
+    "company": {
+      "title": "Vysion Group International",
+      "p1": "Vysion Horeca is part of Vysion Group International, a technology company specialized in software for the hospitality and retail sector.",
+      "p2": "Besides Vysion Horeca, we also develop custom applications and digital solutions for companies that want to automate their processes.",
+      "happyBusinesses": "Happy hospitality businesses",
+      "processedMonthly": "Processed per month",
+      "supportAvailable": "Support available"
+    },
+    "ctaTitle": "Ready to start?",
+    "ctaSubtitle": "Try Vysion Horeca 7 days free. No credit card required.",
+    "ctaPrimary": "Start free trial",
+    "ctaSecondary": "Get in touch"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "menu": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "customers": "Customers",
+      "products": "Products",
+      "reports": "Reports",
+      "analytics": "Analytics",
+      "settings": "Settings"
+    },
+    "orders": {
+      "title": "Orders",
+      "noOrders": "No orders found",
+      "status": {
+        "pending": "Pending",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "customers": {
+      "title": "Customers",
+      "noCustomers": "No customers found"
+    },
+    "products": {
+      "title": "Products",
+      "noProducts": "No products found"
+    },
+    "reports": {
+      "title": "Reports"
+    },
+    "analytics": {
+      "title": "Analytics"
+    },
+    "settings": {
+      "title": "Settings"
+    }
+  },
+  "legal": {
+    "title": "Legal",
+    "subtitle": "All legal documents and terms of Vysion Horeca",
+    "backToLegal": "Back to legal overview",
+    "pages": {
+      "cookies": {
+        "title": "Cookie Policy",
+        "description": "How we use cookies on our website"
+      },
+      "privacy": {
+        "title": "Privacy Policy",
+        "description": "How we handle your personal data"
+      },
+      "terms": {
+        "title": "Terms of Service",
+        "description": "General terms for using our services"
+      },
+      "dpa": {
+        "title": "Data Processing Agreement",
+        "description": "Data Processing Agreement in accordance with GDPR"
+      },
+      "sla": {
+        "title": "Service Level Agreement",
+        "description": "Our uptime guarantees and service levels"
+      },
+      "aup": {
+        "title": "Acceptable Use Policy",
+        "description": "Guidelines for acceptable use of our services"
+      },
+      "ip": {
+        "title": "Intellectual Property",
+        "description": "Copyright and license information"
+      },
+      "trademark": {
+        "title": "Trademark Policy",
+        "description": "Use of Vysion trademarks and branding"
+      },
+      "subprocessors": {
+        "title": "Subprocessors",
+        "description": "List of our data processors"
+      },
+      "payment": {
+        "title": "Payment Platform",
+        "description": "Terms for payment processing"
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated"
+  },
+  "common": {
+    "learnMore": "Learn more",
+    "getStarted": "Get started",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "yes": "Yes",
+    "no": "No"
+  }
+}

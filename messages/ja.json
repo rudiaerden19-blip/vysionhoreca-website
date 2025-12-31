@@ -1,0 +1,455 @@
+{
+  "metadata": {
+    "title": "Vysion Horeca | オールインワンPOS・決済プラットフォーム",
+    "description": "飲食店向け完全POSシステム。レジ、オンライン注文、請求書発行、スタッフ管理など全てを一つのプラットフォームで。7日間無料お試し。"
+  },
+  "nav": {
+    "home": "ホーム",
+    "features": "機能",
+    "pricing": "料金",
+    "about": "会社概要",
+    "contact": "お問い合わせ",
+    "login": "ログイン",
+    "tryFree": "無料で試す",
+    "language": "言語"
+  },
+  "hero": {
+    "badge1": "1つのプラットフォーム",
+    "badge2": "飲食店経営者が開発",
+    "badge3": "飲食店経営者のために",
+    "title": "1つの画面。完全なコントロール。",
+    "description": "現場から生まれ、飲食店経営者によって、飲食店経営者のために作られました。ファストフード、カフェ、レストラン、精肉店、ベーカリーに最適。GKS認証POSシステム、独自の注文プラットフォーム、Peppol請求書対応のプロフェッショナルSCARDA会計ソフトウェア、完全なビジネス分析など、ベルギーおよび20カ国以上の法律に準拠したオールインワンプラットフォーム。",
+    "ctaPrimary": "無料トライアルを開始",
+    "ctaSecondary": "デモを見る",
+    "trialInfo": "7日間無料 • すぐに始められます",
+    "clickToOpen": "クリックして開く"
+  },
+  "features": {
+    "title": "必要なものすべて",
+    "subtitle": "飲食店のすべてのニーズに対応する1つのプラットフォーム。別々のシステムは不要、手間なし。",
+    "pos": {
+      "title": "パワフルなPOS",
+      "description": "素早いサービスのための直感的なPOSインターフェース。タブレット、パソコン、タッチスクリーンで動作。"
+    },
+    "online": {
+      "title": "オンライン注文",
+      "description": "テイクアウト・デリバリー用ランディングページ付きオンライン注文プラットフォーム。お客様が注文、POSに直接受信。"
+    },
+    "reports": {
+      "title": "リアルタイムレポート",
+      "description": "リアルタイムX・Zレポート。売上、人気商品、繁忙時間帯の即時インサイト。データドリブンな意思決定。"
+    },
+    "payments": {
+      "title": "決済",
+      "description": "統合決済端末。Bancontact、Visa、Mastercard、Mollie、Stripe - すべて1つのシステムで。"
+    },
+    "invoicing": {
+      "title": "請求書・Peppol",
+      "description": "ワンクリックでプロフェッショナルなPeppol請求書。会計と自動連携。B2B送信。"
+    },
+    "staff": {
+      "title": "スタッフ管理",
+      "description": "勤怠管理、役割、権限。誰が何をしたか正確に把握。給与計算対応済み。"
+    },
+    "kitchen": {
+      "title": "キッチンディスプレイ",
+      "description": "キッチンでリアルタイム注文表示。効率的で整理された作業。"
+    },
+    "loyalty": {
+      "title": "顧客カード・ロイヤルティ",
+      "description": "ポイントとパーソナルオファーで顧客関係を構築。"
+    },
+    "gks": {
+      "title": "GKS認証",
+      "description": "ベルギー税法に100%準拠。心配なし、常に適正。"
+    }
+  },
+  "stats": {
+    "processed": "月間処理額",
+    "businesses": "アクティブな飲食店",
+    "uptime": "稼働率保証",
+    "support": "サポート対応"
+  },
+  "orderApp": {
+    "title": "必要なものすべて",
+    "subtitle": "飲食店のための完全なエコシステム。POS、注文アプリ、決済端末など。",
+    "cta": "完全なプラットフォームを発見"
+  },
+  "butWait": {
+    "label": "ちょっと待って...",
+    "title": "でも... Vysionは",
+    "titleAccent": "さらに進みます",
+    "subtitle": "他が止まったところで、私たちは続けます...",
+    "features": {
+      "1": "リアルタイムでビジネスを追跡",
+      "2": "どこからでもレポートを開く",
+      "3": "自宅から請求書発行",
+      "4": "スタッフの勤怠を調整",
+      "5": "どこからでも会計を送信",
+      "6": "リアルタイムでビジネス分析を表示",
+      "7": "自分のWebページにログイン",
+      "8": "どのデバイスからでもビジネスにログイン",
+      "9": "リアルタイムで日次売上を表示",
+      "10": "リモートでPOSを管理",
+      "11": "好みに合わせて注文アプリをカスタマイズ",
+      "12": "9言語で利用可能"
+    }
+  },
+  "comparison": {
+    "title": "他のプラットフォームと比較",
+    "subtitle": "より多くの機能、より低い価格。Vysion Horecaが最良の選択である理由を発見してください。",
+    "feature": "機能",
+    "cta": "今日からVysion Horecaを始めよう",
+    "features": {
+      "pos": "POSソフトウェア",
+      "terminal": "決済端末連携",
+      "online": "オンライン注文プラットフォーム",
+      "gks": "GKS認証",
+      "accounting": "会計ソフトウェア（SCARDA）",
+      "peppol": "Peppol請求書",
+      "analytics": "ビジネス分析",
+      "kitchen": "キッチンディスプレイ",
+      "loyalty": "顧客カード・ロイヤルティ",
+      "staff": "スタッフ管理",
+      "reservation": "テーブル予約",
+      "languages": "9言語以上で利用可能",
+      "multiLocation": "マルチロケーション"
+    },
+    "limited": "限定"
+  },
+  "pricing": {
+    "title": "シンプルで透明な料金",
+    "subtitle": "すべて込み。サプライズなし。",
+    "perMonth": "/月",
+    "perLicense": "ライセンスごと",
+    "startTrial": "7日間無料で始める",
+    "mostChosen": "最も人気",
+    "included": "含まれるもの:",
+    "allOfLight": "Lightのすべて、さらに:",
+    "light": {
+      "name": "Light",
+      "features": {
+        "1": "完全なPOS機能",
+        "2": "リアルタイムレポート",
+        "3": "商品・カテゴリ",
+        "4": "決済端末連携",
+        "5": "在庫管理",
+        "6": "メール・電話サポート"
+      }
+    },
+    "pro": {
+      "name": "Pro",
+      "features": {
+        "1": "オンライン注文プラットフォーム",
+        "2": "スタッフ・勤怠管理",
+        "3": "無制限の商品・カテゴリ",
+        "4": "顧客カード・ロイヤルティ",
+        "5": "キッチンディスプレイソフトウェア",
+        "6": "月次ビジネス分析",
+        "7": "ランディングページ",
+        "8": "スタッフ勤怠管理",
+        "9": "Peppol請求書プログラム",
+        "10": "SCARDA会計ソフトウェア",
+        "11": "テーブル予約",
+        "12": "テーブルフロアプラン",
+        "13": "9言語で利用可能"
+      }
+    }
+  },
+  "industry": {
+    "invoicing": {
+      "tab": "請求書",
+      "title": "迅速でプロフェッショナルな請求書発行。",
+      "description": "顧客への請求書、クレジットノートなどを作成。Peppolに直接接続し、一瞬で会計士に送信。"
+    },
+    "ordering": {
+      "tab": "オンライン注文プラットフォーム",
+      "title": "迅速な処理、満足な顧客。",
+      "description": "ピーク時に高速で注文を処理。もう行列なし。すべてがPOSに完全統合。すべてがリアルタイムでキッチンへ。"
+    },
+    "analytics": {
+      "tab": "ビジネス分析",
+      "title": "リアルタイムビジネス分析。",
+      "description": "ビジネスの健全性を正確に把握。固定費、仕入れ、リース、家賃などを入力。ビジネスの即時リアルタイム分析を取得。"
+    },
+    "accounting": {
+      "tab": "会計",
+      "title": "プロフェッショナルな会計。",
+      "description": "SCARDA会計ソフトウェア完全統合。常に最新。会計コストを30%削減。"
+    },
+    "tryFree": "無料で試す",
+    "clickToEnlarge": "クリックして拡大"
+  },
+  "testimonials": {
+    "title": "飲食店経営者がVysionを信頼",
+    "quotes": {
+      "1": {
+        "quote": "ついにすべてが統合されたプラットフォームが見つかりました。他のサブスクリプションをすべて解約し、価格の一部ですべてを1つにまとめました。",
+        "author": "Marc V.",
+        "role": "ファストフードオーナー"
+      },
+      "2": {
+        "quote": "オンライン注文モジュールで売上が40%増加しました。お客様に大好評です。",
+        "author": "Sarah D.",
+        "role": "レストランマネージャー"
+      },
+      "3": {
+        "quote": "サポートは5分以内に対応してくれます。他のどのサプライヤーでもこれは経験したことがありません。",
+        "author": "Kevin L.",
+        "role": "カフェオーナー"
+      },
+      "4": {
+        "quote": "私のビジネスにとって最高の投資でした。すべてが完璧に連携し、カスタマーサービスも素晴らしいです。",
+        "author": "Lisa M.",
+        "role": "ベーカリーオーナー"
+      },
+      "5": {
+        "quote": "ついに自分の言語のPOSシステムが見つかりました！何年も探して、やっと見つけました！",
+        "author": "王偉",
+        "role": "中華料理店オーナー"
+      },
+      "6": {
+        "quote": "こんなに速いPOSシステムは初めてです。夜中にも更新してくれて、朝OKを押すだけで、リクエストした機能がもうそこにあります！",
+        "author": "James T.",
+        "role": "Fish & Chipsオーナー"
+      }
+    }
+  },
+  "cta": {
+    "title": "成長する準備はできましたか？",
+    "subtitle": "今日からVysion Horecaを始めましょう。7日間無料、義務なし。",
+    "primary": "無料トライアルを開始",
+    "secondary": "情報をリクエスト"
+  },
+  "contact": {
+    "title": "お問い合わせ",
+    "subtitle": "Vysion Horecaについてのご質問は？私たちのチームがお手伝いします。",
+    "email": "メール",
+    "phone": "電話",
+    "form": {
+      "firstName": "名",
+      "lastName": "姓",
+      "email": "メール",
+      "message": "メッセージ",
+      "placeholder": {
+        "firstName": "太郎",
+        "lastName": "山田",
+        "email": "taro@example.jp",
+        "message": "あなたの飲食店についてお聞かせください..."
+      },
+      "submit": "メッセージを送信",
+      "required": "*"
+    }
+  },
+  "footer": {
+    "description": "Vysion HorecaはVysion Group Internationalの一部です。",
+    "address": "住所:",
+    "product": "製品",
+    "features": "機能",
+    "pricing": "料金",
+    "updates": "更新情報",
+    "company": "会社",
+    "about": "会社概要",
+    "contact": "お問い合わせ",
+    "privacy": "プライバシー",
+    "legal": "法的情報",
+    "copyright": "All rights reserved.",
+    "designBy": "Design by Vysion"
+  },
+  "cookies": {
+    "message": "より良い体験のためにCookieを使用しています。続行することで、当社の",
+    "policy": "Cookieポリシー",
+    "accept": "同意する",
+    "decline": "拒否する"
+  },
+  "login": {
+    "backToHome": "ホームに戻る",
+    "selectBusiness": "ログインする店舗を選択",
+    "chooseBusiness": "店舗を選択",
+    "loading": "読み込み中...",
+    "selectPlaceholder": "-- 店舗を選択 --",
+    "toDashboard": "ダッシュボードへ →",
+    "processing": "処理中...",
+    "demoMode": "デモモード:",
+    "demoInfo": "ダッシュボードを表示するには店舗を選択してください。本番環境では実際の認証に置き換えられます。",
+    "troubleshooting": {
+      "title": "POSに問題がありますか？",
+      "subtitle": "トラブルシューティングガイドをご覧ください"
+    },
+    "copyright": "All rights reserved."
+  },
+  "about": {
+    "heroTitle": "",
+    "heroTitleAccent": "Vysion",
+    "heroTitleEnd": "Horecaについて",
+    "heroSubtitle": "現場から生まれ、飲食店経営者によって、飲食店経営者のために作られました。",
+    "story": {
+      "title": "私たちのストーリー",
+      "p1": "Vysion Horecaは経験から生まれました。飲食店経営者として、既存のPOSシステムは高すぎ、複雑すぎ、必要なことを正確にしてくれないことに気づきました。",
+      "p2": "POS、注文プラットフォーム、会計ソフトウェア、決済端末、分析ソフトウェアと5つの異なるサブスクリプションに支払っていました。何も上手く連携せず、コストは月に数百ユーロにも上りました。",
+      "p3": "だから自分たちで作ることにしました。飲食店経営者が必要とするすべてを、手間なく、公正な価格で提供するオールインワンプラットフォームを。"
+    },
+    "facts": {
+      "founded": "2013年設立",
+      "foundedDesc": "15年以上の経験を持つ飲食店経営者によって",
+      "location": "ベルギー拠点",
+      "locationDesc": "Pelt、Limburg - ベネルクスの中心",
+      "countries": "20カ国以上で展開",
+      "countriesDesc": "ベルギーから中国、オランダからイギリスまで"
+    },
+    "mission": {
+      "title": "私たちのミッション",
+      "subtitle": "飲食店経営者が最も得意とすること、つまりゲストを迎え、素晴らしい体験を作ることに集中できるようにします。残りは私たちが引き受けます。",
+      "reliability": {
+        "title": "信頼性",
+        "description": "99.9%の稼働率。インターネットが落ちてもPOSは常に動作します。"
+      },
+      "speed": {
+        "title": "スピード",
+        "description": "超高速アップデート。機能をリクエストすれば翌日にはシステムに反映。"
+      },
+      "personal": {
+        "title": "パーソナル",
+        "description": "コールセンターなし。私たちのチームと直接つながります。すべてのお客様の名前を知っています。"
+      }
+    },
+    "values": {
+      "title": "私たちが大切にしていること",
+      "simplicity": {
+        "title": "🎯 シンプルさ第一",
+        "description": "テクノロジーは助けになるべきで、邪魔になってはいけません。だからVysionは非常に直感的で、5分で始められます - マニュアル不要。"
+      },
+      "pricing": {
+        "title": "💰 公正な価格",
+        "description": "隠れたコストなし、長期契約なし、サプライズなし。見たままが支払う金額です。"
+      },
+      "improvement": {
+        "title": "🚀 継続的改善",
+        "description": "お客様の声を聞き、必要なものを作ります。実際のフィードバックに基づいて、毎週新機能を追加。"
+      },
+      "global": {
+        "title": "🌍 ローカル＆インターナショナル",
+        "description": "ベルギーでGKS認証済み、9言語、20カ国以上で利用可能。ファストフードからミシュランレストランまで。"
+      }
+    },
+    "company": {
+      "title": "Vysion Group International",
+      "p1": "Vysion HorecaはVysion Group Internationalの一部であり、飲食・小売業界向けソフトウェアを専門とするテクノロジー企業です。",
+      "p2": "Vysion Horecaに加えて、プロセスを自動化したい企業向けのカスタムアプリケーションやデジタルソリューションも開発しています。",
+      "happyBusinesses": "満足している飲食店",
+      "processedMonthly": "月間処理額",
+      "supportAvailable": "サポート対応"
+    },
+    "ctaTitle": "始める準備はできましたか？",
+    "ctaSubtitle": "Vysion Horecaを7日間無料でお試しください。クレジットカード不要。",
+    "ctaPrimary": "無料トライアルを開始",
+    "ctaSecondary": "お問い合わせ"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "welcome": "おかえりなさい",
+    "menu": {
+      "overview": "概要",
+      "orders": "注文",
+      "customers": "顧客",
+      "products": "商品",
+      "reports": "レポート",
+      "analytics": "分析",
+      "settings": "設定"
+    },
+    "orders": {
+      "title": "注文",
+      "noOrders": "注文が見つかりません",
+      "status": {
+        "pending": "保留中",
+        "completed": "完了",
+        "cancelled": "キャンセル"
+      }
+    },
+    "customers": {
+      "title": "顧客",
+      "noCustomers": "顧客が見つかりません"
+    },
+    "products": {
+      "title": "商品",
+      "noProducts": "商品が見つかりません"
+    },
+    "reports": {
+      "title": "レポート"
+    },
+    "analytics": {
+      "title": "分析"
+    },
+    "settings": {
+      "title": "設定"
+    }
+  },
+  "legal": {
+    "title": "法的情報",
+    "subtitle": "Vysion Horecaのすべての法的文書と規約",
+    "backToLegal": "法的概要に戻る",
+    "pages": {
+      "cookies": {
+        "title": "Cookieポリシー",
+        "description": "当社ウェブサイトでのCookieの使用方法"
+      },
+      "privacy": {
+        "title": "プライバシーポリシー",
+        "description": "個人データの取り扱いについて"
+      },
+      "terms": {
+        "title": "利用規約",
+        "description": "サービス利用に関する一般規約"
+      },
+      "dpa": {
+        "title": "データ処理契約",
+        "description": "GDPR準拠のデータ処理契約"
+      },
+      "sla": {
+        "title": "サービスレベル契約",
+        "description": "稼働率保証とサービスレベル"
+      },
+      "aup": {
+        "title": "利用規定",
+        "description": "サービスの許容される使用に関するガイドライン"
+      },
+      "ip": {
+        "title": "知的財産",
+        "description": "著作権とライセンス情報"
+      },
+      "trademark": {
+        "title": "商標ポリシー",
+        "description": "Vysion商標とブランディングの使用"
+      },
+      "subprocessors": {
+        "title": "再委託先",
+        "description": "データ処理業者のリスト"
+      },
+      "payment": {
+        "title": "決済プラットフォーム",
+        "description": "決済処理に関する規約"
+      }
+    }
+  },
+  "privacy": {
+    "title": "プライバシーポリシー",
+    "lastUpdated": "最終更新"
+  },
+  "common": {
+    "learnMore": "詳細を見る",
+    "getStarted": "始める",
+    "close": "閉じる",
+    "back": "戻る",
+    "next": "次へ",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "search": "検索",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "success": "成功",
+    "yes": "はい",
+    "no": "いいえ"
+  }
+}

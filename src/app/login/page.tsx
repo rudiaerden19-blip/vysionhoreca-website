@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/i18n'
 
 interface Tenant {
   id: string
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const [selectedTenant, setSelectedTenant] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
   const [loadingTenants, setLoadingTenants] = useState(true)
+  const { t } = useLanguage()
 
   useEffect(() => {
     fetchTenants()
@@ -59,7 +61,7 @@ export default function LoginPage() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Terug naar home
+          {t('login.backToHome')}
         </Link>
       </header>
 
@@ -74,18 +76,18 @@ export default function LoginPage() {
                 <span className="text-gray-400 font-normal ml-1">horeca</span>
               </span>
             </Link>
-            <p className="text-gray-400 mt-3">Selecteer je zaak om in te loggen</p>
+            <p className="text-gray-400 mt-3">{t('login.selectBusiness')}</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="tenant" className="block text-sm font-medium text-gray-300 mb-2">
-                Kies je zaak
+                {t('login.chooseBusiness')}
               </label>
               {loadingTenants ? (
                 <div className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-gray-400">
-                  Laden...
+                  {t('login.loading')}
                 </div>
               ) : (
                 <select
@@ -95,7 +97,7 @@ export default function LoginPage() {
                   required
                   className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                 >
-                  <option value="" className="bg-dark">-- Selecteer een zaak --</option>
+                  <option value="" className="bg-dark">{t('login.selectPlaceholder')}</option>
                   {tenants.map(tenant => (
                     <option key={tenant.id} value={tenant.id} className="bg-dark">
                       {tenant.name}
@@ -116,10 +118,10 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Bezig...
+                  {t('login.processing')}
                 </>
               ) : (
-                'Naar Dashboard →'
+                t('login.toDashboard')
               )}
             </button>
           </form>
@@ -127,8 +129,7 @@ export default function LoginPage() {
           {/* Info */}
           <div className="mt-8 p-4 bg-accent/10 border border-accent/30 rounded-lg">
             <p className="text-accent text-sm">
-              💡 <strong>Demo modus:</strong> Selecteer een zaak om het dashboard te bekijken. 
-              In productie wordt dit vervangen door echte authenticatie.
+              💡 <strong>{t('login.demoMode')}</strong> {t('login.demoInfo')}
             </p>
           </div>
 
@@ -145,8 +146,8 @@ export default function LoginPage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-white font-medium">Problemen met je kassa?</p>
-                  <p className="text-sm text-gray-400">Bekijk onze troubleshooting gids</p>
+                  <p className="text-white font-medium">{t('login.troubleshooting.title')}</p>
+                  <p className="text-sm text-gray-400">{t('login.troubleshooting.subtitle')}</p>
                 </div>
               </div>
               <svg className="w-5 h-5 text-gray-500 group-hover:text-accent transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -159,7 +160,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer className="p-6 text-center text-gray-500 text-sm">
-        © {new Date().getFullYear()} Vysion Group. Alle rechten voorbehouden.
+        © {new Date().getFullYear()} Vysion Group. {t('login.copyright')}
       </footer>
     </main>
   )

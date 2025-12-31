@@ -1,0 +1,455 @@
+{
+  "metadata": {
+    "title": "Vysion Horeca | Caisse & Plateforme de Paiement Tout-en-Un",
+    "description": "Le système de caisse complet pour l'hôtellerie. Caisse, commandes en ligne, facturation, gestion du personnel et plus - tout en une plateforme. Essayez 7 jours gratuits."
+  },
+  "nav": {
+    "home": "Accueil",
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "about": "À propos",
+    "contact": "Contact",
+    "login": "Connexion",
+    "tryFree": "Essai gratuit",
+    "language": "Langue"
+  },
+  "hero": {
+    "badge1": "1 Plateforme",
+    "badge2": "Créé par des restaurateurs",
+    "badge3": "Créé pour des restaurateurs",
+    "title": "Un écran. Contrôle total.",
+    "description": "Né de la pratique, construit par et pour les restaurateurs. Parfait pour les friteries, cafés, restaurants, boucheries et boulangeries. Une plateforme tout-en-un avec une caisse certifiée GKS, votre propre plateforme de commande et le logiciel de comptabilité professionnel SCARDA avec facturation Peppol, analyse commerciale complète et bien plus, conforme à la législation en Belgique et dans plus de 20 autres pays.",
+    "ctaPrimary": "Démarrer l'essai gratuit",
+    "ctaSecondary": "Voir la démo",
+    "trialInfo": "Essai gratuit 7 jours • Commencez immédiatement",
+    "clickToOpen": "Cliquez pour ouvrir"
+  },
+  "features": {
+    "title": "Tout ce dont vous avez besoin",
+    "subtitle": "Une plateforme pour tous vos besoins en restauration. Pas de systèmes séparés, pas de tracas.",
+    "pos": {
+      "title": "Caisse puissante",
+      "description": "Interface POS intuitive pour un service rapide. Fonctionne sur tablette, ordinateur ou écran tactile."
+    },
+    "online": {
+      "title": "Commande en ligne",
+      "description": "Plateforme de commande en ligne avec page d'atterrissage pour emporter et livraison. Les clients commandent, vous recevez directement dans la caisse."
+    },
+    "reports": {
+      "title": "Rapports en temps réel",
+      "description": "Rapports X et Z en temps réel. Aperçus instantanés des revenus, produits populaires et heures de pointe. Décisions basées sur les données."
+    },
+    "payments": {
+      "title": "Paiements",
+      "description": "Terminal de paiement intégré. Bancontact, Visa, Mastercard, Mollie, Stripe - tout en un système."
+    },
+    "invoicing": {
+      "title": "Facturation & Peppol",
+      "description": "Factures Peppol professionnelles en un clic. Automatiquement liées à votre comptabilité. Envoi B2B."
+    },
+    "staff": {
+      "title": "Gestion du personnel",
+      "description": "Enregistrement du temps, rôles et permissions. Vous savez exactement qui a fait quoi. Prêt pour la paie."
+    },
+    "kitchen": {
+      "title": "Écran cuisine",
+      "description": "Commandes en temps réel dans la cuisine. Travail efficace et organisé."
+    },
+    "loyalty": {
+      "title": "Carte client & Fidélité",
+      "description": "Construisez des relations clients avec des points de fidélité et des offres personnelles."
+    },
+    "gks": {
+      "title": "Certifié GKS",
+      "description": "100% conforme à la législation fiscale belge. Pas de soucis, toujours en règle."
+    }
+  },
+  "stats": {
+    "processed": "Traité par mois",
+    "businesses": "Établissements actifs",
+    "uptime": "Garantie de disponibilité",
+    "support": "Support disponible"
+  },
+  "orderApp": {
+    "title": "Tout ce dont vous avez besoin",
+    "subtitle": "Un écosystème complet pour votre établissement. Caisse, app de commande, terminal de paiement et plus.",
+    "cta": "Découvrez la plateforme complète"
+  },
+  "butWait": {
+    "label": "Attendez...",
+    "title": "Mais... Vysion va",
+    "titleAccent": "encore plus loin",
+    "subtitle": "Là où les autres se sont arrêtés, nous continuons...",
+    "features": {
+      "1": "Suivez votre entreprise en temps réel",
+      "2": "Ouvrez vos rapports où que vous soyez",
+      "3": "Facturez depuis chez vous",
+      "4": "Ajustez l'enregistrement du temps du personnel",
+      "5": "Envoyez votre comptabilité de n'importe où",
+      "6": "Consultez vos analyses commerciales en temps réel",
+      "7": "Connectez-vous à votre propre page web",
+      "8": "Connectez-vous à votre entreprise depuis n'importe quel appareil",
+      "9": "Consultez vos ventes quotidiennes en temps réel",
+      "10": "Gérez votre caisse à distance",
+      "11": "Personnalisez votre app de commande selon vos préférences",
+      "12": "Tout disponible en 9 langues pour vous"
+    }
+  },
+  "comparison": {
+    "title": "Comparez avec d'autres plateformes",
+    "subtitle": "Plus de fonctionnalités, prix plus bas. Découvrez pourquoi Vysion Horeca est le meilleur choix.",
+    "feature": "Fonctionnalité",
+    "cta": "Commencez avec Vysion Horeca aujourd'hui",
+    "features": {
+      "pos": "Logiciel de caisse",
+      "terminal": "Intégration terminal de paiement",
+      "online": "Plateforme de commande en ligne",
+      "gks": "Certifié GKS",
+      "accounting": "Logiciel de comptabilité (SCARDA)",
+      "peppol": "Facturation Peppol",
+      "analytics": "Analyse commerciale",
+      "kitchen": "Écran cuisine",
+      "loyalty": "Carte client & fidélité",
+      "staff": "Gestion du personnel",
+      "reservation": "Réservation de table",
+      "languages": "Disponible en 9+ langues",
+      "multiLocation": "Multi-établissements"
+    },
+    "limited": "Limité"
+  },
+  "pricing": {
+    "title": "Tarifs simples et transparents",
+    "subtitle": "Tout inclus. Pas de surprises.",
+    "perMonth": "/mois",
+    "perLicense": "Par licence",
+    "startTrial": "Démarrer 7 jours gratuits",
+    "mostChosen": "Le plus choisi",
+    "included": "Inclus:",
+    "allOfLight": "Tout de Light, plus:",
+    "light": {
+      "name": "Light",
+      "features": {
+        "1": "Fonctionnalité caisse complète",
+        "2": "Rapports en temps réel",
+        "3": "Produits & catégories",
+        "4": "Intégration terminal de paiement",
+        "5": "Inventaire",
+        "6": "Support email & téléphone"
+      }
+    },
+    "pro": {
+      "name": "Pro",
+      "features": {
+        "1": "Plateforme de commande en ligne",
+        "2": "Personnel & enregistrement du temps",
+        "3": "Produits & catégories illimités",
+        "4": "Carte client & fidélité",
+        "5": "Logiciel écran cuisine",
+        "6": "Analyse commerciale mensuelle",
+        "7": "Page d'atterrissage",
+        "8": "Enregistrement du temps du personnel",
+        "9": "Programme de facturation Peppol",
+        "10": "Logiciel de comptabilité SCARDA",
+        "11": "Réservation de table",
+        "12": "Plan de salle",
+        "13": "Disponible en 9 langues"
+      }
+    }
+  },
+  "industry": {
+    "invoicing": {
+      "tab": "Facturation",
+      "title": "Facturation rapide et professionnelle.",
+      "description": "Créez des factures pour les clients, notes de crédit et plus. Connectez directement avec Peppol et envoyez au comptable en une fraction de seconde."
+    },
+    "ordering": {
+      "tab": "Plateforme de commande en ligne",
+      "title": "Traitement rapide, clients satisfaits.",
+      "description": "Traitez les commandes ultra-rapidement pendant les heures de pointe. Plus de files d'attente. Tout parfaitement intégré dans la caisse. Tout en temps réel vers la cuisine."
+    },
+    "analytics": {
+      "tab": "Analyse commerciale",
+      "title": "Analyse commerciale en temps réel.",
+      "description": "Sachez exactement à quel point votre entreprise est saine. Entrez vos coûts fixes, achats fournisseurs, leasings, loyer et plus. Obtenez une analyse instantanée en temps réel de votre entreprise."
+    },
+    "accounting": {
+      "tab": "Comptabilité",
+      "title": "Comptabilité professionnelle.",
+      "description": "Logiciel de comptabilité SCARDA entièrement intégré. Toujours à jour. Économisez 30% sur les coûts de comptabilité."
+    },
+    "tryFree": "Essayer gratuitement",
+    "clickToEnlarge": "Cliquez pour agrandir"
+  },
+  "testimonials": {
+    "title": "Les restaurateurs font confiance à Vysion",
+    "quotes": {
+      "1": {
+        "quote": "Enfin une plateforme où tout est intégré. J'ai annulé tous mes autres abonnements et j'ai maintenant tout en un pour une fraction du prix.",
+        "author": "Marc V.",
+        "role": "Propriétaire de friterie"
+      },
+      "2": {
+        "quote": "Le module de commande en ligne a augmenté notre chiffre d'affaires de 40%. Les clients adorent.",
+        "author": "Sarah D.",
+        "role": "Gérante de restaurant"
+      },
+      "3": {
+        "quote": "Le support répond en 5 minutes. Je n'ai jamais eu ça avec aucun autre fournisseur.",
+        "author": "Kevin L.",
+        "role": "Propriétaire de café"
+      },
+      "4": {
+        "quote": "Le meilleur investissement que j'ai jamais fait pour mon entreprise. Tout fonctionne parfaitement ensemble et le service client est excellent.",
+        "author": "Lisa M.",
+        "role": "Propriétaire de boulangerie"
+      },
+      "5": {
+        "quote": "Enfin un système de caisse dans ma propre langue! J'ai cherché pendant des années et je l'ai enfin trouvé!",
+        "author": "Wei Wang",
+        "role": "Propriétaire de restaurant chinois"
+      },
+      "6": {
+        "quote": "Je n'ai jamais eu un système de caisse aussi rapide. Ils mettent même à jour pendant la nuit - j'appuie juste sur OK le matin et les fonctionnalités que j'ai demandées sont déjà là!",
+        "author": "James T.",
+        "role": "Propriétaire de Fish & Chips"
+      }
+    }
+  },
+  "cta": {
+    "title": "Prêt à grandir?",
+    "subtitle": "Commencez avec Vysion Horeca aujourd'hui. 7 jours gratuits, sans engagement.",
+    "primary": "Démarrer l'essai gratuit",
+    "secondary": "Demander des infos"
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "subtitle": "Questions sur Vysion Horeca? Notre équipe est prête à vous aider.",
+    "email": "Email",
+    "phone": "Téléphone",
+    "form": {
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "email": "Email",
+      "message": "Message",
+      "placeholder": {
+        "firstName": "Jean",
+        "lastName": "Dupont",
+        "email": "jean@exemple.be",
+        "message": "Parlez-nous de votre établissement..."
+      },
+      "submit": "Envoyer le message",
+      "required": "*"
+    }
+  },
+  "footer": {
+    "description": "Vysion Horeca fait partie de Vysion Group International.",
+    "address": "Adresse:",
+    "product": "Produit",
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "updates": "Mises à jour",
+    "company": "Entreprise",
+    "about": "À propos",
+    "contact": "Contact",
+    "privacy": "Confidentialité",
+    "legal": "Juridique",
+    "copyright": "Tous droits réservés.",
+    "designBy": "Design par Vysion"
+  },
+  "cookies": {
+    "message": "Nous utilisons des cookies pour améliorer votre expérience. En continuant, vous acceptez notre",
+    "policy": "politique de cookies",
+    "accept": "Accepter",
+    "decline": "Refuser"
+  },
+  "login": {
+    "backToHome": "Retour à l'accueil",
+    "selectBusiness": "Sélectionnez votre établissement pour vous connecter",
+    "chooseBusiness": "Choisissez votre établissement",
+    "loading": "Chargement...",
+    "selectPlaceholder": "-- Sélectionnez un établissement --",
+    "toDashboard": "Vers le tableau de bord →",
+    "processing": "En cours...",
+    "demoMode": "Mode démo:",
+    "demoInfo": "Sélectionnez un établissement pour voir le tableau de bord. En production, cela sera remplacé par une vraie authentification.",
+    "troubleshooting": {
+      "title": "Problèmes avec votre caisse?",
+      "subtitle": "Consultez notre guide de dépannage"
+    },
+    "copyright": "Tous droits réservés."
+  },
+  "about": {
+    "heroTitle": "À propos de",
+    "heroTitleAccent": "Vysion",
+    "heroTitleEnd": "Horeca",
+    "heroSubtitle": "Né de la pratique, construit par des restaurateurs, pour des restaurateurs.",
+    "story": {
+      "title": "Notre histoire",
+      "p1": "Vysion Horeca est né de l'expérience. En tant que restaurateurs, nous avons remarqué que les systèmes de caisse existants étaient trop chers, trop complexes et ne faisaient jamais exactement ce dont nous avions besoin.",
+      "p2": "Nous payions pour cinq abonnements différents: une caisse, une plateforme de commande, un logiciel de comptabilité, un terminal de paiement et un logiciel d'analyse. Rien ne fonctionnait bien ensemble et les coûts montaient à des centaines d'euros par mois.",
+      "p3": "C'est pourquoi nous avons décidé de le construire nous-mêmes. Une plateforme tout-en-un qui fait exactement ce dont un restaurateur a besoin, sans tracas et à un prix équitable."
+    },
+    "facts": {
+      "founded": "Fondé en 2013",
+      "foundedDesc": "Par des restaurateurs avec plus de 15 ans d'expérience",
+      "location": "Basé en Belgique",
+      "locationDesc": "Pelt, Limbourg - le cœur du Benelux",
+      "countries": "Actif dans 20+ pays",
+      "countriesDesc": "De la Belgique à la Chine, des Pays-Bas au Royaume-Uni"
+    },
+    "mission": {
+      "title": "Notre mission",
+      "subtitle": "Permettre aux restaurateurs de se concentrer sur ce qu'ils font le mieux: accueillir les clients et créer des expériences exceptionnelles. Nous nous occupons du reste.",
+      "reliability": {
+        "title": "Fiabilité",
+        "description": "99.9% de disponibilité. Votre caisse fonctionne toujours, même quand internet tombe."
+      },
+      "speed": {
+        "title": "Rapidité",
+        "description": "Mises à jour ultra-rapides. Demandez une fonctionnalité et voyez-la dans votre système le lendemain."
+      },
+      "personal": {
+        "title": "Personnel",
+        "description": "Pas de centres d'appel. Lignes directes avec notre équipe. Nous connaissons chaque client par son nom."
+      }
+    },
+    "values": {
+      "title": "Ce que nous défendons",
+      "simplicity": {
+        "title": "🎯 La simplicité avant tout",
+        "description": "La technologie doit vous aider, pas vous gêner. C'est pourquoi Vysion est si intuitif que vous pouvez commencer en 5 minutes - sans manuel."
+      },
+      "pricing": {
+        "title": "💰 Prix équitables",
+        "description": "Pas de coûts cachés, pas de contrats à long terme, pas de surprises. Ce que vous voyez est ce que vous payez."
+      },
+      "improvement": {
+        "title": "🚀 Amélioration continue",
+        "description": "Nous écoutons nos clients et construisons ce dont ils ont besoin. De nouvelles fonctionnalités sont ajoutées chaque semaine, basées sur de vrais retours."
+      },
+      "global": {
+        "title": "🌍 Local et international",
+        "description": "Certifié GKS en Belgique, mais aussi disponible en 9 langues et 20+ pays. De la friterie au restaurant étoilé."
+      }
+    },
+    "company": {
+      "title": "Vysion Group International",
+      "p1": "Vysion Horeca fait partie de Vysion Group International, une entreprise technologique spécialisée dans les logiciels pour le secteur de la restauration et du commerce de détail.",
+      "p2": "En plus de Vysion Horeca, nous développons également des applications personnalisées et des solutions numériques pour les entreprises qui souhaitent automatiser leurs processus.",
+      "happyBusinesses": "Établissements satisfaits",
+      "processedMonthly": "Traité par mois",
+      "supportAvailable": "Support disponible"
+    },
+    "ctaTitle": "Prêt à commencer?",
+    "ctaSubtitle": "Essayez Vysion Horeca 7 jours gratuits. Aucune carte de crédit requise.",
+    "ctaPrimary": "Démarrer l'essai gratuit",
+    "ctaSecondary": "Contactez-nous"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcome": "Bienvenue",
+    "menu": {
+      "overview": "Aperçu",
+      "orders": "Commandes",
+      "customers": "Clients",
+      "products": "Produits",
+      "reports": "Rapports",
+      "analytics": "Analyse",
+      "settings": "Paramètres"
+    },
+    "orders": {
+      "title": "Commandes",
+      "noOrders": "Aucune commande trouvée",
+      "status": {
+        "pending": "En attente",
+        "completed": "Terminé",
+        "cancelled": "Annulé"
+      }
+    },
+    "customers": {
+      "title": "Clients",
+      "noCustomers": "Aucun client trouvé"
+    },
+    "products": {
+      "title": "Produits",
+      "noProducts": "Aucun produit trouvé"
+    },
+    "reports": {
+      "title": "Rapports"
+    },
+    "analytics": {
+      "title": "Analyse"
+    },
+    "settings": {
+      "title": "Paramètres"
+    }
+  },
+  "legal": {
+    "title": "Juridique",
+    "subtitle": "Tous les documents juridiques et conditions de Vysion Horeca",
+    "backToLegal": "Retour à l'aperçu juridique",
+    "pages": {
+      "cookies": {
+        "title": "Politique de cookies",
+        "description": "Comment nous utilisons les cookies sur notre site"
+      },
+      "privacy": {
+        "title": "Politique de confidentialité",
+        "description": "Comment nous traitons vos données personnelles"
+      },
+      "terms": {
+        "title": "Conditions de service",
+        "description": "Conditions générales d'utilisation de nos services"
+      },
+      "dpa": {
+        "title": "Accord de traitement des données",
+        "description": "Accord de traitement des données conforme au RGPD"
+      },
+      "sla": {
+        "title": "Accord de niveau de service",
+        "description": "Nos garanties de disponibilité et niveaux de service"
+      },
+      "aup": {
+        "title": "Politique d'utilisation acceptable",
+        "description": "Directives pour l'utilisation acceptable de nos services"
+      },
+      "ip": {
+        "title": "Propriété intellectuelle",
+        "description": "Droits d'auteur et informations de licence"
+      },
+      "trademark": {
+        "title": "Politique de marque",
+        "description": "Utilisation des marques et de l'image de marque Vysion"
+      },
+      "subprocessors": {
+        "title": "Sous-traitants",
+        "description": "Liste de nos sous-traitants de données"
+      },
+      "payment": {
+        "title": "Plateforme de paiement",
+        "description": "Conditions pour le traitement des paiements"
+      }
+    }
+  },
+  "privacy": {
+    "title": "Politique de confidentialité",
+    "lastUpdated": "Dernière mise à jour"
+  },
+  "common": {
+    "learnMore": "En savoir plus",
+    "getStarted": "Commencer",
+    "close": "Fermer",
+    "back": "Retour",
+    "next": "Suivant",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "success": "Succès",
+    "yes": "Oui",
+    "no": "Non"
+  }
+}
