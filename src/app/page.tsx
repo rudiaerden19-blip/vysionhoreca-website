@@ -476,19 +476,15 @@ function OrderAppSection() {
 // But Wait Section
 function ButWaitSection() {
   const features = [
-    'Online bestelplatform',
-    'Personeel & urenregistratie',
-    'Onbeperkte producten & categorieën',
-    'Klantenkaart & loyaliteit',
-    'Keukenbeeldscherm software',
-    'Maandelijkse bedrijfsanalyse',
-    'Landingspagina',
-    'Tijdsregistratie personeel',
-    'Peppol facturatieprogramma',
-    'SCARDA boekhoudsoftware',
-    'Tafelreservatie',
-    'Tafel plattegrond',
-    'Beschikbaar in 9 talen',
+    'Volg je bedrijf in realtime',
+    'Open je rapporten waar je ook zit',
+    'Factureer van thuis uit',
+    'Pas de tijdsregistratie van het personeel aan',
+    'Stuur je boekhouding door waar je ook bent',
+    'Bekijk je bedrijfsanalyse in realtime',
+    'Log in op je eigen webpagina',
+    'Log in je bedrijf vanaf ieder toestel',
+    'Bekijk in realtime je dagelijkse verkopen',
   ]
 
   return (
