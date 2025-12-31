@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 
 const navigation = [
   { name: 'Overzicht', href: '/dashboard', icon: 'home' },
@@ -25,55 +24,39 @@ const icons: Record<string, JSX.Element> = {
   settings: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
 }
 
+interface Tenant {
+  id: string
+  name: string
+  email: string
+  business_id: string
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [user, setUser] = useState<any>(null)
-  const [tenant, setTenant] = useState<any>(null)
+  const [tenant, setTenant] = useState<Tenant | null>(null)
   const [loading, setLoading] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
 
   useEffect(() => {
-    checkAuth()
-  }, [])
-
-  async function checkAuth() {
-    try {
-      if (!supabase) {
-        console.log('No supabase client')
-        setLoading(false)
-        return
-      }
-
-      const { data: { session } } = await supabase.auth.getSession()
-      console.log('Session check:', session ? 'found' : 'none')
-      
-      if (!session) {
-        console.log('No session, redirecting to login')
+    // Check localStorage for tenant
+    const stored = localStorage.getItem('vysion_tenant')
+    if (stored) {
+      try {
+        setTenant(JSON.parse(stored))
+      } catch {
         router.push('/login')
         return
       }
-
-      setUser(session.user)
-      
-      // Try to get tenant
-      const { data: tenantData } = await supabase
-        .from('tenants')
-        .select('*')
-        .eq('email', session.user.email)
-        .maybeSingle()
-      
-      console.log('Tenant:', tenantData)
-      setTenant(tenantData)
-      setLoading(false)
-    } catch (error) {
-      console.error('Auth error:', error)
-      setLoading(false)
+    } else {
+      router.push('/login')
+      return
     }
-  }
+    setLoading(false)
+  }, [router])
 
-  const handleSignOut = async () => {
-    await supabase?.auth.signOut()
+  const handleSignOut = () => {
+    localStorage.removeItem('vysion_tenant')
     router.push('/login')
   }
 
@@ -88,16 +71,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
 
-  if (!user) {
+  if (!tenant) {
     return null
   }
 
   const getInitials = () => {
     if (tenant?.name) {
       return tenant.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
-    }
-    if (user?.email) {
-      return user.email.slice(0, 2).toUpperCase()
     }
     return 'VH'
   }
@@ -127,12 +107,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           {/* Tenant info */}
-          {tenant && (
-            <div className="px-6 py-3 bg-accent/10 border-b border-gray-700">
-              <p className="text-accent font-medium truncate">{tenant.name}</p>
-              <p className="text-gray-500 text-xs">Plan: {tenant.plan || 'Starter'}</p>
-            </div>
-          )}
+          <div className="px-6 py-3 bg-accent/10 border-b border-gray-700">
+            <p className="text-accent font-medium truncate">{tenant.name}</p>
+            <p className="text-gray-500 text-xs truncate">{tenant.email}</p>
+          </div>
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -162,8 +140,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <span className="text-accent font-semibold">{getInitials()}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-medium truncate">{tenant?.name || 'Mijn Zaak'}</p>
-                <p className="text-gray-500 text-sm truncate">{user?.email}</p>
+                <p className="text-white font-medium truncate">{tenant.name}</p>
+                <p className="text-gray-500 text-sm truncate">{tenant.email}</p>
               </div>
             </div>
             <button

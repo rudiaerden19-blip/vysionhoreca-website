@@ -37,15 +37,9 @@ export default function BestellingenPage() {
     if (!supabase) return
     
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session?.user?.email) return
-      
-      const { data: tenant } = await supabase
-        .from('tenants')
-        .select('business_id')
-        .eq('email', session.user.email)
-        .maybeSingle()
-      
+      const stored = localStorage.getItem('vysion_tenant')
+      if (!stored) return
+      const tenant = JSON.parse(stored)
       if (!tenant?.business_id) return
       
       const { data, error } = await supabase
