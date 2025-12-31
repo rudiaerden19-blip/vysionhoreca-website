@@ -680,7 +680,7 @@ function IndustrySection() {
           </div>
 
           {/* Right content - Image */}
-          <div className="relative text-center flex justify-center">
+          <div className="relative text-center flex flex-col items-center">
             <img
               src={current.image}
               alt={activeTab}
