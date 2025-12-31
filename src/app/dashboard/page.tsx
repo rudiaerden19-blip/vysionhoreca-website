@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/lib/auth-context'
 
 interface DashboardStats {
   totalOrders: number
@@ -27,7 +26,7 @@ interface RecentOrder {
 }
 
 export default function DashboardPage() {
-  const { businessId } = useAuth()
+  const [businessId, setBusinessId] = useState<string | null>(null)
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
     totalRevenue: 0,
@@ -42,20 +41,49 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (businessId) {
-      fetchDashboardData()
-    }
-  }, [businessId])
+    getBusinessIdAndFetch()
+  }, [])
 
-  async function fetchDashboardData() {
-    if (!businessId) return
+  async function getBusinessIdAndFetch() {
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user?.email) {
+        setLoading(false)
+        return
+      }
+      
+      const { data: tenant } = await supabase
+        .from('tenants')
+        .select('business_id')
+        .eq('email', session.user.email)
+        .maybeSingle()
+      
+      if (tenant?.business_id) {
+        setBusinessId(tenant.business_id)
+        await fetchDashboardData(tenant.business_id)
+      } else {
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      setLoading(false)
+    }
+  }
+
+  async function fetchDashboardData(bizId: string) {
+    if (!bizId || !supabase) return
     
     try {
       // Fetch orders filtered by business_id
       const { data: orders, error: ordersError } = await supabase
         .from('orders')
         .select('*')
-        .eq('business_id', businessId)
+        .eq('business_id', bizId)
         .order('created_at', { ascending: false })
 
       if (ordersError) throw ordersError
@@ -64,7 +92,7 @@ export default function DashboardPage() {
       const { data: customers, error: customersError } = await supabase
         .from('customers')
         .select('id')
-        .eq('business_id', businessId)
+        .eq('business_id', bizId)
 
       if (customersError) throw customersError
 

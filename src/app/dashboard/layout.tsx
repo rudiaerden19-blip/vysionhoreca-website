@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { AuthProvider, useAuth } from '@/lib/auth-context'
+import { supabase } from '@/lib/supabase'
 
 const navigation = [
   { name: 'Overzicht', href: '/dashboard', icon: 'home' },
@@ -25,25 +25,58 @@ const icons: Record<string, JSX.Element> = {
   settings: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>,
 }
 
-function DashboardContent({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [tenant, setTenant] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
-  const { user, tenant, loading, signOut } = useAuth()
 
   useEffect(() => {
-    // Redirect to login if not authenticated
-    if (!loading && !user) {
-      router.push('/login')
+    checkAuth()
+  }, [])
+
+  async function checkAuth() {
+    try {
+      if (!supabase) {
+        console.log('No supabase client')
+        setLoading(false)
+        return
+      }
+
+      const { data: { session } } = await supabase.auth.getSession()
+      console.log('Session check:', session ? 'found' : 'none')
+      
+      if (!session) {
+        console.log('No session, redirecting to login')
+        router.push('/login')
+        return
+      }
+
+      setUser(session.user)
+      
+      // Try to get tenant
+      const { data: tenantData } = await supabase
+        .from('tenants')
+        .select('*')
+        .eq('email', session.user.email)
+        .maybeSingle()
+      
+      console.log('Tenant:', tenantData)
+      setTenant(tenantData)
+      setLoading(false)
+    } catch (error) {
+      console.error('Auth error:', error)
+      setLoading(false)
     }
-  }, [user, loading, router])
+  }
 
   const handleSignOut = async () => {
-    await signOut()
+    await supabase?.auth.signOut()
     router.push('/login')
   }
 
-  // Show loading while checking auth
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -55,15 +88,13 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
     )
   }
 
-  // Don't render dashboard if not authenticated
   if (!user) {
     return null
   }
 
-  // Get initials for avatar
   const getInitials = () => {
     if (tenant?.name) {
-      return tenant.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+      return tenant.name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     }
     if (user?.email) {
       return user.email.slice(0, 2).toUpperCase()
@@ -167,7 +198,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex items-center gap-4">
-              {/* Refresh button */}
               <button 
                 onClick={() => window.location.reload()}
                 className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
@@ -175,14 +205,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-              </button>
-              
-              {/* Notifications */}
-              <button className="p-2 text-gray-500 hover:text-gray-700 transition-colors relative">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full"></span>
               </button>
             </div>
           </div>
@@ -194,13 +216,5 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </div>
-  )
-}
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <AuthProvider>
-      <DashboardContent>{children}</DashboardContent>
-    </AuthProvider>
   )
 }

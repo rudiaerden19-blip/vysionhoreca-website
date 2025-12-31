@@ -2,27 +2,34 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/lib/auth-context'
 
 export default function AnalysePage() {
-  const { businessId } = useAuth()
   const [orders, setOrders] = useState<any[]>([])
   const [fixedCosts, setFixedCosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (businessId) {
-      fetchData()
-    }
-  }, [businessId])
+    fetchData()
+  }, [])
 
   async function fetchData() {
-    if (!businessId) return
+    if (!supabase) return
     
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user?.email) return
+      
+      const { data: tenant } = await supabase
+        .from('tenants')
+        .select('business_id')
+        .eq('email', session.user.email)
+        .maybeSingle()
+      
+      if (!tenant?.business_id) return
+      
       const [ordersRes, costsRes] = await Promise.all([
-        supabase.from('orders').select('*').eq('business_id', businessId),
-        supabase.from('fixed_costs').select('*').eq('business_id', businessId),
+        supabase.from('orders').select('*').eq('business_id', tenant.business_id),
+        supabase.from('fixed_costs').select('*').eq('business_id', tenant.business_id),
       ])
 
       if (ordersRes.error) throw ordersRes.error

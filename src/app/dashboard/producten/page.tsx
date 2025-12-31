@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useAuth } from '@/lib/auth-context'
 
 interface MenuItem {
   id: string
@@ -24,25 +23,33 @@ interface Category {
 }
 
 export default function ProductenPage() {
-  const { businessId } = useAuth()
   const [items, setItems] = useState<MenuItem[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('all')
 
   useEffect(() => {
-    if (businessId) {
-      fetchData()
-    }
-  }, [businessId])
+    fetchData()
+  }, [])
 
   async function fetchData() {
-    if (!businessId) return
+    if (!supabase) return
     
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user?.email) return
+      
+      const { data: tenant } = await supabase
+        .from('tenants')
+        .select('business_id')
+        .eq('email', session.user.email)
+        .maybeSingle()
+      
+      if (!tenant?.business_id) return
+      
       const [itemsRes, categoriesRes] = await Promise.all([
-        supabase.from('menu_items').select('*').eq('business_id', businessId).order('name'),
-        supabase.from('categories').select('*').eq('business_id', businessId).order('sort_order'),
+        supabase.from('menu_items').select('*').eq('business_id', tenant.business_id).order('name'),
+        supabase.from('categories').select('*').eq('business_id', tenant.business_id).order('sort_order'),
       ])
 
       if (itemsRes.error) throw itemsRes.error
