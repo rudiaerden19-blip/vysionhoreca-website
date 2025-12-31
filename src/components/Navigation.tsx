@@ -26,12 +26,12 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-dark/95 backdrop-blur-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-dark/95 backdrop-blur-sm" role="navigation" aria-label="Hoofdnavigatie">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center">
-            <a href="/" className="text-2xl font-bold">
+            <a href="/" className="text-2xl font-bold" aria-label="Vysion Horeca - Terug naar home">
               <span className="text-accent">Vysion</span>
               <span className="text-gray-400 font-normal ml-1">horeca</span>
             </a>
@@ -53,13 +53,17 @@ export default function Navigation() {
               <button
                 onClick={() => setIsLangOpen(!isLangOpen)}
                 className="flex items-center gap-2 text-white hover:text-accent transition-colors px-3 py-2 rounded-lg hover:bg-white/10"
+                aria-expanded={isLangOpen}
+                aria-haspopup="listbox"
+                aria-label={`Taal selecteren: ${localeNames[locale]}`}
               >
-                <span className="text-xl">{localeFlags[locale]}</span>
+                <span className="text-xl" aria-hidden="true">{localeFlags[locale]}</span>
                 <svg 
                   className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -67,7 +71,11 @@ export default function Navigation() {
 
               {/* Dropdown */}
               {isLangOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-dark rounded-xl shadow-2xl border border-gray-700 py-2 z-50">
+                <div 
+                  className="absolute right-0 mt-2 w-48 bg-dark rounded-xl shadow-2xl border border-gray-700 py-2 z-50"
+                  role="listbox"
+                  aria-label="Beschikbare talen"
+                >
                   {locales.map((langCode) => (
                     <button
                       key={langCode}
@@ -75,11 +83,13 @@ export default function Navigation() {
                       className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors ${
                         locale === langCode ? 'text-accent' : 'text-white'
                       }`}
+                      role="option"
+                      aria-selected={locale === langCode}
                     >
-                      <span className="text-xl">{localeFlags[langCode]}</span>
+                      <span className="text-xl" aria-hidden="true">{localeFlags[langCode]}</span>
                       <span>{localeNames[langCode]}</span>
                       {locale === langCode && (
-                        <svg className="w-5 h-5 ml-auto text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ml-auto text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
@@ -99,9 +109,11 @@ export default function Navigation() {
           <button 
             className="md:hidden text-white p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={isMenuOpen ? "Menu sluiten" : "Menu openen"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               {isMenuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
@@ -113,7 +125,7 @@ export default function Navigation() {
 
         {/* Mobile menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-700">
+          <div id="mobile-menu" className="md:hidden py-4 border-t border-gray-700" role="menu">
             <div className="flex flex-col space-y-4">
               <a href="/" className="text-gray-300 hover:text-white transition-colors">{t('nav.home')}</a>
               <a href="/#functies" className="text-gray-300 hover:text-white transition-colors">{t('nav.features')}</a>

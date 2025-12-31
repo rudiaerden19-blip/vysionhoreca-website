@@ -266,17 +266,32 @@
   },
   "login": {
     "backToHome": "Terug naar home",
-    "selectBusiness": "Selecteer je zaak om in te loggen",
-    "chooseBusiness": "Kies je zaak",
-    "loading": "Laden...",
-    "selectPlaceholder": "-- Selecteer een zaak --",
-    "toDashboard": "Naar Dashboard →",
-    "processing": "Bezig...",
-    "demoMode": "Demo modus:",
-    "demoInfo": "Selecteer een zaak om het dashboard te bekijken. In productie wordt dit vervangen door echte authenticatie.",
+    "title": "Log in op je account",
+    "email": "E-mailadres",
+    "emailPlaceholder": "jouw@email.be",
+    "password": "Wachtwoord",
+    "passwordPlaceholder": "••••••••",
+    "showPassword": "Wachtwoord tonen",
+    "hidePassword": "Wachtwoord verbergen",
+    "rememberMe": "Onthoud mij",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "submit": "Inloggen",
+    "processing": "Bezig met inloggen...",
+    "passwordResetSent": "Wachtwoord reset link is verstuurd naar je e-mail!",
+    "noAccount": "Nog geen account?",
+    "contactUs": "Neem contact op",
     "troubleshooting": {
       "title": "Problemen met je kassa?",
       "subtitle": "Bekijk onze troubleshooting gids"
+    },
+    "errors": {
+      "fillAllFields": "Vul alle velden in",
+      "invalidCredentials": "Onjuiste e-mail of wachtwoord",
+      "emailNotConfirmed": "Bevestig eerst je e-mailadres",
+      "serviceUnavailable": "Service tijdelijk niet beschikbaar",
+      "unexpected": "Er is iets misgegaan. Probeer het opnieuw.",
+      "enterEmailFirst": "Vul eerst je e-mailadres in",
+      "configurationMissing": "Database configuratie ontbreekt. Neem contact op met support."
     },
     "copyright": "Alle rechten voorbehouden."
   },
@@ -1003,7 +1018,8 @@
   },
   "dashboardLayout": {
     "loading": "Laden...",
-    "signOut": "Uitloggen"
+    "signOut": "Uitloggen",
+    "refresh": "Vernieuwen"
   },
   "dashboardPage": {
     "title": "Dashboard Overzicht",

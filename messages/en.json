@@ -266,17 +266,32 @@
   },
   "login": {
     "backToHome": "Back to home",
-    "selectBusiness": "Select your business to log in",
-    "chooseBusiness": "Choose your business",
-    "loading": "Loading...",
-    "selectPlaceholder": "-- Select a business --",
-    "toDashboard": "To Dashboard →",
-    "processing": "Processing...",
-    "demoMode": "Demo mode:",
-    "demoInfo": "Select a business to view the dashboard. In production this will be replaced by real authentication.",
+    "title": "Log in to your account",
+    "email": "Email address",
+    "emailPlaceholder": "your@email.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "submit": "Log in",
+    "processing": "Logging in...",
+    "passwordResetSent": "Password reset link has been sent to your email!",
+    "noAccount": "Don't have an account?",
+    "contactUs": "Contact us",
     "troubleshooting": {
       "title": "Problems with your POS?",
       "subtitle": "Check our troubleshooting guide"
+    },
+    "errors": {
+      "fillAllFields": "Please fill in all fields",
+      "invalidCredentials": "Incorrect email or password",
+      "emailNotConfirmed": "Please confirm your email first",
+      "serviceUnavailable": "Service temporarily unavailable",
+      "unexpected": "Something went wrong. Please try again.",
+      "enterEmailFirst": "Please enter your email first",
+      "configurationMissing": "Database configuration missing. Please contact support."
     },
     "copyright": "All rights reserved."
   },
@@ -1003,7 +1018,8 @@
   },
   "dashboardLayout": {
     "loading": "Loading...",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "refresh": "Refresh"
   },
   "dashboardPage": {
     "title": "Dashboard Overview",

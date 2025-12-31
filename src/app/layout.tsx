@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/i18n'
+import { ErrorBoundary } from '@/components'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -44,9 +45,11 @@ export default function RootLayout({
   return (
     <html lang="nl" className={inter.variable}>
       <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
-        <LanguageProvider>
-          {children}
-        </LanguageProvider>
+        <ErrorBoundary>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )

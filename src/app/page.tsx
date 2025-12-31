@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import { useLanguage } from '@/i18n'
 
@@ -97,18 +98,22 @@ function HeroSection() {
               {/* iPad Stand with screenshot */}
               <div className="flex flex-col items-center">
                 <div className="relative w-full max-w-[260px] sm:max-w-xs md:max-w-sm lg:max-w-md">
-                  <img 
+                  <Image 
                     src="https://i.imgur.com/mHqvsrr.png" 
                     alt="iPad Kassa Stand" 
+                    width={500}
+                    height={400}
                     className="w-full"
-                    loading="eager"
+                    priority
                   />
                   {/* App Screenshot on screen */}
-                  <img 
+                  <Image 
                     src="https://i.imgur.com/IvW3RiX.png" 
                     alt="Vysion Horeca Kassa" 
+                    width={410}
+                    height={212}
                     className="absolute top-[4%] left-[9%] w-[82%] h-[53%] object-fill rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                    loading="eager"
+                    priority
                     onClick={() => setLightboxIndex(0)}
                   />
                 </div>
@@ -132,12 +137,13 @@ function HeroSection() {
                 {/* Slider */}
                 <div id="image-slider" className="flex flex-col gap-2 h-[400px] overflow-y-auto pr-2 scrollbar-thin">
                   {sliderImages.map((src, index) => (
-                    <img
+                    <Image
                       key={index}
                       src={src}
                       alt={`Screenshot ${index + 1}`}
+                      width={80}
+                      height={50}
                       className="w-[80px] h-[50px] object-cover rounded cursor-pointer hover:scale-110 transition-transform border border-gray-200 hover:border-accent"
-                      loading="lazy"
                       onClick={() => setLightboxIndex(index + 1)}
                     />
                   ))}
@@ -176,9 +182,11 @@ function HeroSection() {
                 </svg>
               </button>
 
-              <img 
+              <Image 
                 src={allImages[lightboxIndex]} 
                 alt="Vergrote afbeelding" 
+                width={1200}
+                height={800}
                 className="max-w-full max-h-full object-contain"
                 onClick={(e) => e.stopPropagation()}
               />
@@ -368,29 +376,32 @@ function OrderAppSection() {
         <div className="flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
           {/* Left Column - Phones stacked */}
           <div className="flex flex-row lg:flex-col gap-4 sm:gap-6 order-2 lg:order-1">
-            <img
+            <Image
               src="https://i.imgur.com/inUZtVe.png"
               alt="Vysion Bestelapp"
+              width={220}
+              height={440}
               className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/inUZtVe.png')}
             />
-            <img
+            <Image
               src="https://i.imgur.com/LVge0n4.png"
               alt="Vysion Bestelapp Menu"
+              width={220}
+              height={440}
               className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/LVge0n4.png')}
             />
           </div>
 
           {/* Center - Main POS */}
           <div className="flex-shrink-0 order-1 lg:order-2 text-center">
-            <img
+            <Image
               src="https://i.imgur.com/HrgjfGN.png"
               alt="Vysion Horeca Kassa"
+              width={500}
+              height={350}
               className="w-[260px] sm:w-[320px] md:w-[400px] lg:w-[450px] xl:w-[500px] drop-shadow-2xl rounded-xl sm:rounded-2xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/HrgjfGN.png')}
             />
             <p className="text-gray-400 text-sm mt-4">{t('hero.clickToOpen')}</p>
@@ -398,18 +409,20 @@ function OrderAppSection() {
 
           {/* Right Column - Devices stacked */}
           <div className="flex flex-row lg:flex-col gap-4 sm:gap-6 order-3">
-            <img
+            <Image
               src="https://i.imgur.com/1SlM8G4.png"
               alt="Vysion Betaalterminal"
+              width={220}
+              height={300}
               className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/1SlM8G4.png')}
             />
-            <img
+            <Image
               src="https://i.imgur.com/b450kVT.png"
               alt="Vysion Keukenbeeldscherm"
+              width={220}
+              height={150}
               className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/b450kVT.png')}
             />
           </div>
@@ -421,14 +434,17 @@ function OrderAppSection() {
             className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
             onClick={() => setLightboxImage(null)}
           >
-            <img
+            <Image
               src={lightboxImage}
               alt="Vergroot"
+              width={1200}
+              height={800}
               className="max-w-full max-h-full object-contain rounded-2xl"
             />
             <button 
               className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
               onClick={() => setLightboxImage(null)}
+              aria-label="Sluiten"
             >
               ×
             </button>
@@ -563,11 +579,12 @@ function ButWaitSection() {
         <div className="grid lg:grid-cols-2 gap-12 items-stretch">
           {/* Left - Image */}
           <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-            <img
+            <Image
               src="https://i.imgur.com/RTl6VfK.jpeg"
               alt="Ondernemer werkt met Vysion"
+              width={600}
+              height={800}
               className="w-full h-full object-cover"
-              loading="lazy"
             />
           </div>
 
@@ -731,11 +748,12 @@ function IndustrySection() {
 
           {/* Right content - Image */}
           <div className="relative text-center flex flex-col items-center">
-            <img
+            <Image
               src={current.image}
               alt={activeTab}
+              width={450}
+              height={300}
               className="w-auto h-auto max-w-[400px] lg:max-w-[450px] object-contain rounded-2xl shadow-xl cursor-pointer"
-              loading="lazy"
               onClick={() => setShowLightbox(true)}
             />
             <p className="text-gray-500 text-sm mt-4">{t('industry.clickToEnlarge')}</p>
@@ -748,14 +766,17 @@ function IndustrySection() {
             className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
             onClick={() => setShowLightbox(false)}
           >
-            <img
+            <Image
               src={current.image}
               alt={activeTab}
+              width={1200}
+              height={800}
               className="max-w-full max-h-full object-contain"
             />
             <button 
               className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
               onClick={() => setShowLightbox(false)}
+              aria-label="Sluiten"
             >
               ×
             </button>
@@ -839,7 +860,16 @@ function CTASection() {
   const { t } = useLanguage()
   
   return (
-    <section id="demo" className="py-24 relative" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+    <section id="demo" className="py-24 relative overflow-hidden">
+      {/* Optimized background image */}
+      <Image
+        src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+        alt="Restaurant achtergrond"
+        fill
+        className="object-cover"
+        quality={75}
+        priority={false}
+      />
       <div className="absolute inset-0 bg-black/70"></div>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
