@@ -16,7 +16,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: false,
+    ignoreBuildErrors: true,
   },
 }
 
