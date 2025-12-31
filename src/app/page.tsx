@@ -684,7 +684,7 @@ function IndustrySection() {
             <img
               src={current.image}
               alt={activeTab}
-              className="w-full h-auto max-h-[700px] object-contain rounded-2xl shadow-xl scale-110 cursor-pointer"
+              className="w-full h-auto max-h-[500px] object-contain rounded-2xl shadow-xl cursor-pointer"
               loading="lazy"
               onClick={() => setShowLightbox(true)}
             />
