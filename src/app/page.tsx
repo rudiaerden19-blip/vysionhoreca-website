@@ -502,6 +502,9 @@ function ButWaitSection() {
             Maar... Vysion gaat<br />
             <span className="text-accent">nog verder</span>
           </h2>
+          <p className="text-xl sm:text-2xl text-gray-300 mt-6">
+            Waar anderen gestopt zijn, gaan wij door...
+          </p>
         </div>
 
         {/* Content Grid */}
