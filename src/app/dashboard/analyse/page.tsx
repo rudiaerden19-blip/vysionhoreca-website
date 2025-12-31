@@ -34,7 +34,7 @@ export default function AnalysePage() {
   }
 
   // Calculate metrics
-  const totalRevenue = orders.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0)
+  const totalRevenue = orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0)
   const totalCosts = fixedCosts.reduce((sum, c) => sum + (parseFloat(c.amount) || 0), 0)
   const netProfit = totalRevenue - totalCosts
   const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0
@@ -43,12 +43,12 @@ export default function AnalysePage() {
   const paymentMethods: Record<string, number> = {}
   orders.forEach(order => {
     const method = order.payment_method || 'Onbekend'
-    paymentMethods[method] = (paymentMethods[method] || 0) + (parseFloat(order.total) || 0)
+    paymentMethods[method] = (paymentMethods[method] || 0) + (Number(order.total) || 0)
   })
 
   // Group by order type
-  const onlineRevenue = orders.filter(o => o.is_online).reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0)
-  const kassaRevenue = orders.filter(o => !o.is_online).reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0)
+  const onlineRevenue = orders.filter(o => o.is_online).reduce((sum, o) => sum + (Number(o.total) || 0), 0)
+  const kassaRevenue = orders.filter(o => !o.is_online).reduce((sum, o) => sum + (Number(o.total) || 0), 0)
 
   // Top hours
   const ordersByHour: Record<number, number> = {}

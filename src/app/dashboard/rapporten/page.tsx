@@ -44,7 +44,7 @@ export default function RapportenPage() {
         .map(([date, orders]) => ({
           date,
           orders: orders.length,
-          revenue: orders.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0),
+          revenue: orders.reduce((sum, o) => sum + (Number(o.total) || 0), 0),
           onlineOrders: orders.filter(o => o.is_online).length,
           kassaOrders: orders.filter(o => !o.is_online).length,
         }))
