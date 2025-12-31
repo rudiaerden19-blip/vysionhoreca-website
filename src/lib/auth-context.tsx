@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Safety timeout - never load forever
     const timeout = setTimeout(() => {
       if (isMounted && loading) {
-        console.log('Auth timeout - stopping loading')
+        // Auth timeout - stopping loading
         setLoading(false)
       }
     }, 5000)
@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: any } }) => {
       if (!isMounted) return
-      console.log('Initial session:', session ? 'found' : 'none')
+      // Initial session check completed
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event: any, session: any) => {
         if (!isMounted) return
-        console.log('Auth state changed:', _event)
+        // Auth state changed
         setSession(session)
         setUser(session?.user ?? null)
         if (session?.user) {
@@ -91,10 +91,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   async function fetchTenant(email: string | undefined) {
-    console.log('Fetching tenant for email:', email)
+    // Fetching tenant
     
     if (!email || !supabase) {
-      console.log('No email or supabase client')
+      // No email or supabase client
       setLoading(false)
       return
     }
@@ -107,14 +107,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('email', email)
         .maybeSingle()
 
-      console.log('Tenant lookup result:', { tenantData, error })
+      // Tenant lookup completed
 
       if (tenantData) {
         setTenant(tenantData)
         setBusinessId(tenantData.business_id)
-        console.log('Tenant found, business_id:', tenantData.business_id)
+        // Tenant found
       } else {
-        console.log('No tenant found for this email')
+        // No tenant found
         // Even if no tenant found, we still let them access the dashboard
         // They'll just see empty data
         setTenant(null)

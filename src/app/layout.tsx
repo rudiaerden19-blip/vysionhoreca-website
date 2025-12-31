@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: 'Vysion Horeca | Alles-in-één Kassa & Betaalplatform',
   description: 'Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 7 dagen gratis.',
   keywords: 'kassa, horeca, restaurant, frituur, POS, betaalterminal, online bestellen, België',
+  manifest: '/manifest.json',
   icons: {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
@@ -22,6 +23,16 @@ export const metadata: Metadata = {
     description: 'Het complete kassasysteem voor horeca. Probeer 7 dagen gratis.',
     type: 'website',
     locale: 'nl_BE',
+    siteName: 'Vysion Horeca',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Vysion Horeca | Alles-in-één Kassa & Betaalplatform',
+    description: 'Het complete kassasysteem voor horeca. Probeer 7 dagen gratis.',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 }
 

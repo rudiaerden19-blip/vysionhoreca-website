@@ -1,0 +1,36 @@
+{
+  "name": "Vysion Horeca",
+  "short_name": "Vysion",
+  "description": "Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie en meer.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#1a1a1a",
+  "theme_color": "#E85D04",
+  "categories": ["business", "finance", "food"],
+  "lang": "nl",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/favicon.svg", "sizes": "48x48" }]
+    },
+    {
+      "name": "Login",
+      "short_name": "Login", 
+      "url": "/login",
+      "icons": [{ "src": "/favicon.svg", "sizes": "48x48" }]
+    }
+  ],
+  "prefer_related_applications": false
+}

@@ -691,13 +691,13 @@ Bewaren tot: ${zReports.length > 0 ? new Date(new Date(zReports[zReports.length-
       // Simulate sending to SCARDA
       if (sendToScarda) {
         await new Promise(resolve => setTimeout(resolve, 500))
-        console.log('Sent to SCARDA:', zReport)
+        // SCARDA sync completed
       }
 
       // Simulate sending to accountant
       if (sendToAccountant && accountantEmail) {
         await new Promise(resolve => setTimeout(resolve, 500))
-        console.log('Sent to accountant:', accountantEmail, zReport)
+        // Accountant email sent
       }
 
       setClosingSuccess(true)
