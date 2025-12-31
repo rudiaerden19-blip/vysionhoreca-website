@@ -31,7 +31,7 @@ export default function OverOnsPage() {
               </h2>
               <div className="space-y-4 text-lg text-gray-600">
                 <p>
-                  Vysion Horeca is ontstaan uit frustratie. Als horecaondernemers merkten we dat bestaande kassasystemen te duur waren, te complex, en nooit precies deden wat we nodig hadden.
+                  Vysion Horeca is ontstaan uit ervaring. Als horecaondernemers merkten we dat bestaande kassasystemen te duur waren, te complex, en nooit precies deden wat we nodig hadden.
                 </p>
                 <p>
                   We betaalden voor vijf verschillende abonnementen: een kassa, een bestelplatform, boekhoudsoftware, een betaalterminal en analysesoftware. Niets werkte goed samen en de kosten liepen op tot honderden euro's per maand.
