@@ -505,19 +505,19 @@ function ButWaitSection() {
         </div>
 
         {/* Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-stretch">
           {/* Left - Image */}
-          <div className="relative">
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl">
             <img
               src="https://i.imgur.com/RTl6VfK.jpeg"
               alt="Ondernemer werkt met Vysion"
-              className="w-full h-auto rounded-3xl shadow-2xl"
+              className="w-full h-full object-cover"
               loading="lazy"
             />
           </div>
 
           {/* Right - Features List */}
-          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-xl">
+          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-xl flex flex-col justify-center">
             <ul className="space-y-4">
               {features.map((feature, index) => (
                 <li key={index} className="flex items-center">
