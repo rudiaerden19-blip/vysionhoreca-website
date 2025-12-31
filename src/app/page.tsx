@@ -1,73 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
-
-// Navigation Component
-function Navigation() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-  return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-dark/95 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <div className="flex items-center">
-            <span className="text-2xl font-bold">
-              <span className="text-accent">Vysion</span>
-              <span className="text-gray-400 font-normal ml-1">horeca</span>
-            </span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#functies" className="text-gray-300 hover:text-white transition-colors">Functies</a>
-            <a href="#prijzen" className="text-gray-300 hover:text-white transition-colors">Prijzen</a>
-            <a href="#over-ons" className="text-gray-300 hover:text-white transition-colors">Over ons</a>
-            <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <a href="/login" className="text-white hover:text-accent transition-colors">Inloggen</a>
-            <a href="#demo" className="bg-accent hover:bg-accent/90 text-white px-6 py-2.5 rounded-full font-medium transition-all">
-              Gratis proberen
-            </a>
-          </div>
-
-          {/* Mobile menu button */}
-          <button 
-            className="md:hidden text-white p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-        </div>
-
-        {/* Mobile menu */}
-        {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-700">
-            <div className="flex flex-col space-y-4">
-              <a href="#functies" className="text-gray-300 hover:text-white transition-colors">Functies</a>
-              <a href="#prijzen" className="text-gray-300 hover:text-white transition-colors">Prijzen</a>
-              <a href="#over-ons" className="text-gray-300 hover:text-white transition-colors">Over ons</a>
-              <a href="#contact" className="text-gray-300 hover:text-white transition-colors">Contact</a>
-              <a href="#demo" className="bg-accent text-white px-6 py-3 rounded-full font-medium text-center">
-                Gratis proberen
-              </a>
-            </div>
-          </div>
-        )}
-      </div>
-    </nav>
-  )
-}
+import { Navigation, Footer, CookieBanner } from '@/components'
 
 // Hero Section
 function HeroSection() {
@@ -78,19 +12,19 @@ function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Badges centered under navbar */}
         <div className="flex justify-center gap-8 sm:gap-16 mb-12">
-          <div className="flex items-center gap-2 whitespace-nowrap" style={{ position: 'relative', top: '-2cm' }}>
+          <div className="flex items-center gap-2 whitespace-nowrap -mt-8">
             <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span className="text-accent font-bold text-sm uppercase">1 Platform</span>
           </div>
-          <div className="flex items-center gap-2 whitespace-nowrap" style={{ position: 'relative', top: '-2cm' }}>
+          <div className="flex items-center gap-2 whitespace-nowrap -mt-8">
             <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
             <span className="text-accent font-bold text-sm uppercase">Gemaakt door horecaondernemers</span>
           </div>
-          <div className="flex items-center gap-2 whitespace-nowrap" style={{ position: 'relative', top: '-2cm' }}>
+          <div className="flex items-center gap-2 whitespace-nowrap -mt-8">
             <svg className="w-5 h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
               <polyline points="20 6 9 17 4 12"></polyline>
             </svg>
@@ -115,13 +49,13 @@ function HeroSection() {
                 Bekijk demo
               </a>
             </div>
-            <p className="text-gray-500 mt-4 text-sm" style={{ paddingLeft: '85px' }}>
+            <p className="text-gray-500 mt-4 text-sm pl-20 lg:pl-0">
               Gratis testen 7 dagen • Direct aan de slag
             </p>
           </div>
 
           {/* Right content - iPad and vertical image slider */}
-          <div className="opacity-0 animate-fadeInUp delay-200" style={{ position: 'relative', left: '1.5cm' }}>
+          <div className="opacity-0 animate-fadeInUp delay-200 lg:translate-x-6">
             <div className="flex items-end gap-4 justify-center lg:justify-start lg:-ml-16">
               {/* iPad Stand with screenshot */}
               <div className="flex flex-col items-center">
@@ -130,13 +64,14 @@ function HeroSection() {
                     src="https://i.imgur.com/mHqvsrr.png" 
                     alt="iPad Kassa Stand" 
                     className="w-full"
+                    loading="eager"
                   />
                   {/* App Screenshot on screen */}
                   <img 
                     src="https://i.imgur.com/IvW3RiX.png" 
                     alt="Vysion Horeca Kassa" 
-                    className="absolute top-[4%] left-[9%] w-[82%] rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-                    style={{ height: '53%', objectFit: 'fill' }}
+                    className="absolute top-[4%] left-[9%] w-[82%] h-[53%] object-fill rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                    loading="eager"
                     onClick={() => setLightboxImage('https://i.imgur.com/IvW3RiX.png')}
                   />
                 </div>
@@ -184,6 +119,7 @@ function HeroSection() {
                       src={src}
                       alt={`Screenshot ${index + 1}`}
                       className="w-[80px] h-[50px] object-cover rounded cursor-pointer hover:scale-110 transition-transform border border-gray-200 hover:border-accent"
+                      loading="lazy"
                       onClick={() => setLightboxImage(src)}
                     />
                   ))}
@@ -408,7 +344,7 @@ function StatsSection() {
   ]
 
   return (
-    <section className="py-20" style={{ backgroundColor: '#E3E3E3' }}>
+    <section className="py-20 bg-[#E3E3E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
@@ -460,12 +396,14 @@ function OrderAppSection() {
               src="https://i.imgur.com/inUZtVe.png"
               alt="Vysion Bestelapp"
               className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
+              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/inUZtVe.png')}
             />
             <img
               src="https://i.imgur.com/LVge0n4.png"
               alt="Vysion Bestelapp Menu"
               className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
+              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/LVge0n4.png')}
             />
           </div>
@@ -476,6 +414,7 @@ function OrderAppSection() {
               src="https://i.imgur.com/HrgjfGN.png"
               alt="Vysion Horeca Kassa"
               className="w-[260px] sm:w-[320px] md:w-[400px] lg:w-[450px] xl:w-[500px] drop-shadow-2xl rounded-xl sm:rounded-2xl cursor-pointer hover:scale-105 transition-transform"
+              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/HrgjfGN.png')}
             />
           </div>
@@ -486,12 +425,14 @@ function OrderAppSection() {
               src="https://i.imgur.com/1SlM8G4.png"
               alt="Vysion Betaalterminal"
               className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
+              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/1SlM8G4.png')}
             />
             <img
               src="https://i.imgur.com/b450kVT.png"
               alt="Vysion Keukenbeeldscherm"
               className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
+              loading="lazy"
               onClick={() => setLightboxImage('https://i.imgur.com/b450kVT.png')}
             />
           </div>
@@ -624,7 +565,7 @@ function ComparisonSection() {
 // Pricing Section
 function PricingSection() {
   return (
-    <section id="prijzen" className="py-24" style={{ backgroundColor: '#E3E3E3' }}>
+    <section id="prijzen" className="py-24 bg-[#E3E3E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -805,6 +746,7 @@ function IndustrySection() {
               src={current.image}
               alt={activeTab}
               className="w-full h-auto max-h-[700px] object-contain rounded-2xl shadow-xl scale-110 cursor-pointer"
+              loading="lazy"
               onClick={() => setShowLightbox(true)}
             />
             <p className="text-gray-500 text-sm mt-4">Klik om te vergroten</p>
@@ -943,7 +885,7 @@ function CTASection() {
           Klaar om te groeien?
         </h2>
         <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          Start vandaag nog met Vysion Horeca. 30 dagen gratis, geen verplichtingen.
+          Start vandaag nog met Vysion Horeca. 7 dagen gratis, geen verplichtingen.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a href="/registreer" className="btn-primary">
@@ -996,7 +938,7 @@ function ContactSection() {
                 <div>
                   <p className="text-sm text-gray-500">Telefoon</p>
                   <a href="tel:+32123456789" className="text-gray-900 hover:text-accent">
-                    +32 (0) 49 21 29 9383
+                    +32 492 12 99 83
                   </a>
                 </div>
               </div>
@@ -1054,122 +996,6 @@ function ContactSection() {
         </div>
       </div>
     </section>
-  )
-}
-
-// Cookie Banner
-function CookieBanner() {
-  const [showBanner, setShowBanner] = useState(true)
-  const [accepted, setAccepted] = useState(false)
-
-  useEffect(() => {
-    const cookieConsent = localStorage.getItem('cookieConsent')
-    if (cookieConsent) {
-      setShowBanner(false)
-      setAccepted(cookieConsent === 'accepted')
-    }
-  }, [])
-
-  const acceptCookies = () => {
-    localStorage.setItem('cookieConsent', 'accepted')
-    setShowBanner(false)
-    setAccepted(true)
-  }
-
-  const declineCookies = () => {
-    localStorage.setItem('cookieConsent', 'declined')
-    setShowBanner(false)
-  }
-
-  if (!showBanner) return null
-
-  return (
-    <div className="fixed bottom-0 left-0 right-0 bg-dark text-white p-4 md:p-6 z-50 shadow-2xl border-t border-gray-700">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex-1">
-          <p className="text-sm md:text-base">
-            🍪 Wij gebruiken cookies om je ervaring te verbeteren. Door verder te gaan ga je akkoord met ons{' '}
-            <a href="/juridisch/cookies" className="text-accent hover:underline">cookiebeleid</a>.
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <button
-            onClick={declineCookies}
-            className="px-4 py-2 text-sm border border-gray-500 rounded-full hover:bg-gray-700 transition-colors"
-          >
-            Weigeren
-          </button>
-          <button
-            onClick={acceptCookies}
-            className="px-6 py-2 text-sm bg-accent text-white rounded-full hover:bg-accent/90 transition-colors font-semibold"
-          >
-            Accepteren
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Footer
-function Footer() {
-  return (
-    <footer className="bg-dark text-white py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-4 gap-12 mb-12">
-          {/* Logo & Description */}
-          <div className="md:col-span-2">
-            <div className="mb-4">
-              <span className="text-2xl font-bold">
-                <span className="text-accent">Vysion</span>
-                <span className="text-gray-400 font-normal ml-1">horeca</span>
-              </span>
-            </div>
-            <p className="text-gray-400 max-w-md">
-              Vysion Horeca is een onderdeel van de Vysion Group International.
-              <br /><br />
-              <strong className="text-gray-300">Adres:</strong><br />
-              Vysion Group International<br />
-              Siberiëstraat 24<br />
-              3900 Pelt, België
-              <br /><br />
-              <a href="https://www.vysionapps.io" target="_blank" className="text-accent hover:underline">www.vysionapps.io</a>
-              <br />
-              <a href="https://www.vysionhoreca.com" target="_blank" className="text-accent hover:underline">www.vysionhoreca.com</a>
-            </p>
-          </div>
-
-          {/* Links */}
-          <div>
-            <h4 className="font-semibold mb-4">Product</h4>
-            <ul className="space-y-2">
-              <li><a href="#functies" className="text-gray-400 hover:text-white transition-colors">Functies</a></li>
-              <li><a href="#prijzen" className="text-gray-400 hover:text-white transition-colors">Prijzen</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Updates</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold mb-4">Bedrijf</h4>
-            <ul className="space-y-2">
-              <li><a href="#over-ons" className="text-gray-400 hover:text-white transition-colors">Over ons</a></li>
-              <li><a href="#contact" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
-              <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy</a></li>
-              <li><a href="/juridisch" className="text-gray-400 hover:text-white transition-colors">Juridisch</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-800 pt-8 flex flex-col sm:flex-row justify-between items-center">
-          <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Vysion Group. Alle rechten voorbehouden.
-          </p>
-          <p className="text-gray-500 text-sm mt-4 sm:mt-0">
-            Design by Vysion
-          </p>
-        </div>
-      </div>
-    </footer>
   )
 }
 
