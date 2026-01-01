@@ -1,0 +1,18 @@
+# Negeer grote mappen die de AI niet nodig heeft
+node_modules/
+.next/
+.git/
+.vercel/
+
+# Grote gegenereerde bestanden
+package-lock.json
+*.log
+
+# Build output
+dist/
+build/
+out/
+
+# Cache bestanden
+.cache/
+.turbo/

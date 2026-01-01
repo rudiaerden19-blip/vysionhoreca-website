@@ -1,0 +1,324 @@
+# Vysion Horeca Website - Project Context voor AI Assistenten
+
+## ⚠️ KRITISCHE REGELS
+
+1. **500+ TENANTS IN PRODUCTIE** - Elke wijziging ALTIJD eerst testen voordat je commit/deploy
+2. **GEEN BREAKING CHANGES** - Dit is een live SaaS platform met echte klanten
+3. **ALTIJD OM BEVESTIGING VRAGEN** - Vraag ja/nee voordat je git commands uitvoert
+4. **COMMIT ALLEEN NA EXPLICIETE GOEDKEURING** - Nooit automatisch commits maken
+5. **VERCEL DEPLOY** - Push naar main = LIVE in productie, dus wees voorzichtig!
+
+### Workflow Volgorde:
+```
+1. Wijziging maken → 2. Tonen aan gebruiker → 3. Vragen "Mag ik committen?" → 4. Wachten op "ja" → 5. Commit + Push
+```
+
+---
+
+## 📋 Project Overzicht
+
+**Naam:** Vysion Horeca Website  
+**Type:** B2B SaaS Kassasysteem voor Horeca (België-focus)  
+**Framework:** Next.js 14 (App Router)  
+**Styling:** Tailwind CSS  
+**Database:** Supabase (PostgreSQL)  
+**Auth:** Supabase Auth  
+**i18n:** Custom LanguageContext met 9 talen  
+**Deployment:** Vercel (waarschijnlijk)
+
+### Doelgroep
+- Restaurants, frituren, cafés in België
+- Multi-tenant SaaS model
+- Nederlands als primaire taal (nl-BE)
+
+---
+
+## 🏗️ Architectuur
+
+### Tech Stack
+```
+- Next.js 14 (App Router, 'use client' directives)
+- React 18
+- TypeScript
+- Tailwind CSS 3
+- Supabase JS SDK v2.89
+- next-intl v4.6.1 (voor routing, niet voor vertalingen)
+```
+
+### Mappenstructuur
+```
+src/
+├── app/                    # Next.js App Router pagina's
+│   ├── dashboard/          # Beschermd dashboard gebied
+│   │   ├── analyse/        # Analytics pagina
+│   │   ├── bestellingen/   # Orders beheer
+│   │   ├── instellingen/   # Instellingen
+│   │   ├── klanten/        # Klanten CRM
+│   │   ├── producten/      # Product catalogus
+│   │   └── rapporten/      # Z-rapporten en rapportages
+│   ├── juridisch/          # Juridische pagina's (privacy, terms, etc.)
+│   ├── login/              # Auth pagina's
+│   ├── over-ons/           # Over ons pagina
+│   └── privacy/            # Privacy policy
+├── components/             # Herbruikbare UI componenten
+│   ├── CookieBanner.tsx
+│   ├── ErrorBoundary.tsx
+│   ├── Footer.tsx
+│   ├── Navigation.tsx
+│   └── index.ts            # Barrel export
+├── i18n/                   # Internationalisatie
+│   ├── config.ts           # Locale configuratie
+│   ├── LanguageContext.tsx # Context provider met t() functie
+│   └── index.ts            # Barrel export
+├── lib/                    # Utilities en hooks
+│   ├── auth-context.tsx    # Auth state management
+│   ├── get-business-id.ts  # Business ID helper
+│   ├── supabase.ts         # Supabase client singleton
+│   └── use-business.ts     # Business hook
+messages/                   # Vertalingsbestanden
+├── nl.json                 # Nederlands (primair/volledig)
+├── en.json, fr.json, etc.  # Andere talen
+```
+
+---
+
+## 🌐 Internationalisatie (i18n)
+
+### Ondersteunde Talen
+| Code | Taal | Vlag | Status |
+|------|------|------|--------|
+| nl | Nederlands | 🇳🇱 | Primair/Volledig |
+| en | English | 🇬🇧 | Vertaald |
+| fr | Français | 🇫🇷 | Vertaald |
+| de | Deutsch | 🇩🇪 | Vertaald |
+| es | Español | 🇪🇸 | Vertaald |
+| it | Italiano | 🇮🇹 | Vertaald |
+| ja | 日本語 | 🇯🇵 | Vertaald |
+| zh | 中文 | 🇨🇳 | Vertaald |
+| ar | العربية | 🇸🇦 | Vertaald (RTL) |
+
+### Hoe vertalingen werken
+```tsx
+// In componenten:
+import { useLanguage } from '@/i18n'
+
+function Component() {
+  const { t, locale, setLocale } = useLanguage()
+  
+  return <h1>{t('hero.title')}</h1>  // Nested keys ondersteund
+}
+```
+
+### Vertaalbestanden
+- Locatie: `/messages/{locale}.json`
+- Nederlands (`nl.json`) is de bron - andere talen vallen terug naar NL bij ontbrekende keys
+- RTL ondersteuning voor Arabisch via `document.dir`
+
+---
+
+## 🔐 Authenticatie & Multi-tenancy
+
+### Auth Flow
+1. Gebruiker logt in via `/login` met email/password
+2. Supabase Auth valideert credentials
+3. Na login wordt tenant opgehaald uit `tenants` tabel
+4. `business_id` wordt opgeslagen in localStorage en context
+5. Alle data queries worden gefilterd op `business_id`
+
+### Tenant Model
+```typescript
+interface Tenant {
+  id: string
+  business_id: string    // Unieke ID voor data isolatie
+  name: string           // Bedrijfsnaam
+  slug: string           // URL-vriendelijke naam
+  email: string          // Contact email
+  plan: 'light' | 'pro'  // Abonnement type
+  logo_url?: string
+}
+```
+
+### Data Isolatie
+**BELANGRIJK:** Elke query naar Supabase MOET gefilterd worden op `business_id`:
+```typescript
+const businessId = getBusinessId()
+const { data } = await supabase
+  .from('orders')
+  .select('*')
+  .eq('business_id', businessId)  // ALTIJD toevoegen!
+```
+
+---
+
+## 💾 Database (Supabase)
+
+### Bekende Tabellen
+| Tabel | Beschrijving |
+|-------|-------------|
+| `tenants` | Multi-tenant configuratie |
+| `orders` | Bestellingen |
+| `customers` | Klanten CRM |
+| `products` | Product catalogus |
+| `z_reports` | Z-rapporten (dagafsluitingen) |
+
+### Environment Variables
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIs...
+```
+
+---
+
+## 🎨 Styling & Design
+
+### Kleuren
+```javascript
+// tailwind.config.js
+colors: {
+  primary: '#3C4D6B',    // Donkerblauw
+  accent: '#E85A3C',     // Oranje-rood (CTA's, highlights)
+  dark: '#1a1a1a',       // Bijna zwart (achtergronden)
+}
+```
+
+### CSS Classes
+```css
+.btn-primary    /* Oranje CTA button */
+.btn-outline    /* Witte outline button */
+.animate-fadeInUp, .animate-fadeIn  /* Entry animaties */
+.delay-100 t/m .delay-500  /* Animation delays */
+```
+
+### Design Principes
+- Moderne, minimalistische UI
+- Dark theme voor navigatie en dashboard sidebar
+- Light theme voor content areas
+- Rounded corners (rounded-2xl, rounded-3xl)
+- Subtiele shadows en borders
+- Responsive (mobile-first)
+
+---
+
+## 📱 Pagina's
+
+### Publieke Pagina's
+| Route | Beschrijving |
+|-------|-------------|
+| `/` | Homepage met hero, features, pricing, contact |
+| `/over-ons` | Over ons pagina |
+| `/login` | Login formulier |
+| `/privacy` | Privacy beleid |
+| `/juridisch/*` | Juridische documenten |
+
+### Dashboard (Protected)
+| Route | Beschrijving |
+|-------|-------------|
+| `/dashboard` | Overzicht met KPI's en recente orders |
+| `/dashboard/bestellingen` | Orders beheer |
+| `/dashboard/klanten` | Klanten CRM |
+| `/dashboard/producten` | Product catalogus |
+| `/dashboard/rapporten` | Z-rapporten |
+| `/dashboard/analyse` | Analytics |
+| `/dashboard/instellingen` | Instellingen |
+
+---
+
+## 🚀 Deployment Workflow
+
+### ⚠️ BELANGRIJK: We werken NIET lokaal!
+
+De workflow is:
+1. **Code wijzigen** in Cursor
+2. **Testen** - Vraag ALTIJD eerst of de wijziging goed is
+3. **Bevestiging vragen** - Wacht op expliciete "ja" voordat je commit
+4. **Commit naar Git** - Alleen na goedkeuring
+5. **Automatische deploy** - Vercel pikt de commit op en deployed
+
+### Git & Vercel Commands
+```bash
+# NOOIT automatisch uitvoeren - ALTIJD eerst vragen!
+git add .
+git commit -m "beschrijving"
+git push origin main          # Triggert Vercel deploy
+```
+
+### Vercel Deployment
+- **Platform:** Vercel
+- **Branch:** `main` (production)
+- **Auto-deploy:** Ja, bij elke push naar main
+- **Build:** Next.js automatic
+
+### Checklist voor Commit
+- [ ] Code wijzigingen getest/geverifieerd
+- [ ] Gebruiker heeft "ja" gezegd
+- [ ] Commit message is duidelijk
+- [ ] Geen breaking changes
+
+---
+
+## 🔧 Development
+
+### Commands
+```bash
+npm run build    # Test production build lokaal
+npm run lint     # ESLint check voor commit
+```
+
+### Belangrijke Conventies
+1. **'use client'** - Alle componenten met hooks/interactie zijn client components
+2. **Barrel exports** - Gebruik `@/components` en `@/i18n` imports
+3. **Path aliases** - `@/` verwijst naar `src/`
+4. **TypeScript** - Strikt typed, interfaces voor alle data modellen
+
+---
+
+## 📝 Huidige Features
+
+### Geïmplementeerd ✅
+- [x] Multi-language marketing website
+- [x] Responsive design
+- [x] Cookie consent banner
+- [x] Supabase authentication
+- [x] Multi-tenant data isolatie
+- [x] Dashboard met KPI's
+- [x] Orders overzicht
+- [x] Klanten CRM basis
+- [x] Z-rapporten systeem
+- [x] 9 talen ondersteuning
+
+### Pricing Model
+- **Light:** €69/maand - Basis kassasysteem
+- **Pro:** €99/maand - Volledig pakket met online bestellen
+
+---
+
+## 🚨 Bekende Aandachtspunten
+
+1. **Supabase Client Null Check** - `supabase` kan null zijn als env vars ontbreken
+2. **Loading States** - Altijd loading states tonen tijdens data fetching
+3. **Error Boundaries** - ErrorBoundary component wraps hele app
+4. **LocalStorage** - Tenant info wordt gecached in localStorage
+5. **RTL Support** - Arabisch schakelt document direction om
+
+---
+
+## 💡 Tips voor AI Assistenten
+
+1. **Lees altijd gerelateerde bestanden** voordat je wijzigingen voorstelt
+2. **Check de vertaalbestanden** bij UI tekst wijzigingen
+3. **Voeg business_id filter toe** bij alle Supabase queries
+4. **Test op mobile** - veel horeca klanten gebruiken tablets
+5. **Gebruik bestaande componenten** waar mogelijk
+6. **Volg de huidige code stijl** (geen nieuwe abstracties zonder reden)
+
+---
+
+## 📞 Contact & Support
+
+- **Website:** vysionhoreca.com
+- **Email:** info@vysionhoreca.com
+- **Telefoon:** +32 492 12 93 83
+
+---
+
+*Laatst bijgewerkt: Januari 2026*
