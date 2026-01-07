@@ -28,6 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: menuTrans('customers'), href: '/dashboard/klanten', icon: 'customers' },
     { name: menuTrans('products'), href: '/dashboard/producten', icon: 'products' },
     { name: menuTrans('reports'), href: '/dashboard/rapporten', icon: 'reports' },
+    { name: 'Rapporten (Kassa)', href: 'https://frituurnolim.vercel.app/rapporten', icon: 'reports', external: true },
     { name: menuTrans('analytics'), href: '/dashboard/analyse', icon: 'analytics' },
     { name: menuTrans('settings'), href: '/dashboard/instellingen', icon: 'settings' },
   ]
@@ -120,6 +121,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+              const isExternal = (item as any).external
+              
+              if (isExternal) {
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-white/5 hover:text-white"
+                  >
+                    {icons[item.icon]}
+                    {item.name}
+                    <svg className="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                )
+              }
+              
               return (
                 <Link
                   key={item.name}
