@@ -43,8 +43,14 @@ export default function LoginPage() {
         return
       }
 
-      // Check password - alleen als er een wachtwoord is ingesteld
-      if (tenant.password && tenant.password !== password) {
+      // Check password - verplicht voor iedereen
+      if (!tenant.password) {
+        setError('Geen wachtwoord ingesteld. Neem contact op met de beheerder.')
+        setIsLoading(false)
+        return
+      }
+      
+      if (tenant.password !== password) {
         setError('Onjuist wachtwoord')
         setIsLoading(false)
         return
