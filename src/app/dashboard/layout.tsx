@@ -124,10 +124,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               const isExternal = (item as any).external
               
               if (isExternal) {
+                // Voeg business_id toe aan externe links voor multi-tenant support
+                const externalUrl = tenant?.business_id 
+                  ? `${item.href}?business=${tenant.business_id}`
+                  : item.href
                 return (
                   <a
                     key={item.name}
-                    href={item.href}
+                    href={externalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-white/5 hover:text-white"
