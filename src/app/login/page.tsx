@@ -29,18 +29,26 @@ export default function LoginPage() {
       }
 
       // Get tenant info from database (case-insensitive)
-      const { data: tenant, error: tenantError } = await supabase
+      const { data: tenants, error: tenantError } = await supabase
         .from('tenants')
         .select('id, name, email, business_id')
         .ilike('email', email.trim())
-        .single()
 
-      if (tenantError || !tenant) {
+      if (tenantError) {
         console.error('Tenant error:', tenantError)
-        setError(`Geen handelaar gevonden: ${tenantError?.message || 'geen data'}`)
+        setError(`Database fout: ${tenantError.message}`)
         setIsLoading(false)
         return
       }
+
+      if (!tenants || tenants.length === 0) {
+        setError('Geen handelaar gevonden met dit email adres')
+        setIsLoading(false)
+        return
+      }
+
+      // Neem de eerste match
+      const tenant = tenants[0]
 
       // Check password - standaard 8 cijfers
       if (password !== '12345678') {
