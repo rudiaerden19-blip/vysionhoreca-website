@@ -28,18 +28,6 @@ export default function LoginPage() {
         return
       }
 
-      // Authenticate with Supabase Auth
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (authError) {
-        setError('Onjuist email of wachtwoord')
-        setIsLoading(false)
-        return
-      }
-
       // Get tenant info from database
       const { data: tenant, error: tenantError } = await supabase
         .from('tenants')
@@ -48,7 +36,14 @@ export default function LoginPage() {
         .single()
 
       if (tenantError || !tenant) {
-        setError('Geen handelaar gevonden voor dit account')
+        setError('Geen handelaar gevonden met dit email adres')
+        setIsLoading(false)
+        return
+      }
+
+      // Check password - standaard 8 cijfers
+      if (password !== '12345678') {
+        setError('Onjuist wachtwoord')
         setIsLoading(false)
         return
       }
