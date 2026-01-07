@@ -32,6 +32,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Facturen (Kassa)', href: 'https://frituurnolim.vercel.app/facturen', icon: 'reports', external: true },
     { name: 'SCARDa & Peppol (Kassa)', href: 'https://frituurnolim.vercel.app/scrada', icon: 'reports', external: true },
     { name: 'Bedrijfsanalyse (Kassa)', href: 'https://frituurnolim.vercel.app/analyse', icon: 'analytics', external: true },
+    { name: 'Account (Kassa)', href: 'https://frituurnolim.vercel.app/account', icon: 'settings', external: true },
     { name: menuTrans('analytics'), href: '/dashboard/analyse', icon: 'analytics' },
     { name: menuTrans('settings'), href: '/dashboard/instellingen', icon: 'settings' },
   ]
