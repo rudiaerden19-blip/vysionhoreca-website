@@ -138,7 +138,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     href={externalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-orange-500 hover:bg-white/5 hover:text-orange-400"
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-400 hover:bg-white/5 hover:text-white"
                   >
                     {icons[item.icon]}
                     {item.name}
