@@ -36,7 +36,8 @@ export default function LoginPage() {
         .single()
 
       if (tenantError || !tenant) {
-        setError('Geen handelaar gevonden met dit email adres')
+        console.error('Tenant error:', tenantError)
+        setError(`Geen handelaar gevonden: ${tenantError?.message || 'geen data'}`)
         setIsLoading(false)
         return
       }
