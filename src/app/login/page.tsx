@@ -30,31 +30,22 @@ export default function LoginPage() {
         return
       }
 
-      // Authenticate with Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (authError) {
-        if (authError.message.includes('Invalid login credentials')) {
-          setError('Onjuist email of wachtwoord')
-        } else {
-          setError(authError.message)
-        }
-        setIsLoading(false)
-        return
-      }
-
-      // Get tenant info from database
+      // Get tenant info from database and verify password
       const { data: tenant, error: tenantError } = await supabase
         .from('tenants')
-        .select('id, name, email, business_id')
+        .select('id, name, email, business_id, password')
         .eq('email', email)
         .single()
 
       if (tenantError || !tenant) {
-        setError('Geen handelaar gevonden voor dit account')
+        setError('Geen handelaar gevonden met dit email adres')
+        setIsLoading(false)
+        return
+      }
+
+      // Check password
+      if (tenant.password !== password) {
+        setError('Onjuist wachtwoord')
         setIsLoading(false)
         return
       }
