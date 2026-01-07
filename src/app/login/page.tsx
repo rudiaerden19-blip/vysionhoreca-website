@@ -28,27 +28,30 @@ export default function LoginPage() {
         return
       }
 
-      // Get tenant info from database (case-insensitive)
-      const { data: tenants, error: tenantError } = await supabase
-        .from('tenants')
-        .select('id, name, email, business_id')
+      // Check businesses tabel (daar staan alle handelaars)
+      const { data: businesses, error: bizError } = await supabase
+        .from('businesses')
+        .select('id, name, email')
         .ilike('email', email.trim())
 
-      if (tenantError) {
-        console.error('Tenant error:', tenantError)
-        setError(`Database fout: ${tenantError.message}`)
+      if (bizError) {
+        setError(`Database fout: ${bizError.message}`)
         setIsLoading(false)
         return
       }
 
-      if (!tenants || tenants.length === 0) {
+      if (!businesses || businesses.length === 0) {
         setError('Geen handelaar gevonden met dit email adres')
         setIsLoading(false)
         return
       }
 
-      // Neem de eerste match
-      const tenant = tenants[0]
+      const tenant = {
+        id: businesses[0].id,
+        name: businesses[0].name,
+        email: businesses[0].email,
+        business_id: businesses[0].id
+      }
 
       // Check password - standaard 8 cijfers
       if (password !== '12345678') {
