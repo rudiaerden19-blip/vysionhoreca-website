@@ -30,7 +30,7 @@ export default function LoginPage() {
         return
       }
 
-      // Get tenant info from database and verify password
+      // Get tenant info from database
       const { data: tenant, error: tenantError } = await supabase
         .from('tenants')
         .select('id, name, email, business_id, password')
@@ -43,8 +43,8 @@ export default function LoginPage() {
         return
       }
 
-      // Check password
-      if (tenant.password !== password) {
+      // Check password - alleen als er een wachtwoord is ingesteld
+      if (tenant.password && tenant.password !== password) {
         setError('Onjuist wachtwoord')
         setIsLoading(false)
         return
