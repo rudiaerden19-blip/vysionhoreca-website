@@ -27,7 +27,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: menuTrans('orders'), href: '/dashboard/bestellingen', icon: 'orders' },
     { name: menuTrans('customers'), href: '/dashboard/klanten', icon: 'customers' },
     { name: menuTrans('products'), href: '/dashboard/producten', icon: 'products' },
-    { name: menuTrans('reports'), href: '/dashboard/rapporten', icon: 'reports' },
     { name: 'Rapporten (Kassa)', href: 'https://frituurnolim.vercel.app/rapporten', icon: 'reports', external: true },
     { name: menuTrans('analytics'), href: '/dashboard/analyse', icon: 'analytics' },
     { name: menuTrans('settings'), href: '/dashboard/instellingen', icon: 'settings' },
