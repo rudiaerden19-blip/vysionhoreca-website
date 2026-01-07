@@ -28,11 +28,11 @@ export default function LoginPage() {
         return
       }
 
-      // Get tenant info from database
+      // Get tenant info from database (case-insensitive)
       const { data: tenant, error: tenantError } = await supabase
         .from('tenants')
         .select('id, name, email, business_id')
-        .eq('email', email)
+        .ilike('email', email.trim())
         .single()
 
       if (tenantError || !tenant) {
