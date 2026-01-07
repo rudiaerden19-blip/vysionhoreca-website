@@ -23,18 +23,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const layoutTrans = (key: string) => t(`dashboardLayout.${key}`)
 
   const navigation = [
-    { name: menuTrans('overview'), href: '/dashboard', icon: 'home' },
-    { name: menuTrans('orders'), href: '/dashboard/bestellingen', icon: 'orders' },
-    { name: menuTrans('customers'), href: '/dashboard/klanten', icon: 'customers' },
-    { name: menuTrans('products'), href: '/dashboard/producten', icon: 'products' },
+    { name: menuTrans('overview'), href: '/dashboard', icon: 'home', hidden: true },
+    { name: menuTrans('orders'), href: '/dashboard/bestellingen', icon: 'orders', hidden: true },
+    { name: menuTrans('customers'), href: '/dashboard/klanten', icon: 'customers', hidden: true },
+    { name: menuTrans('products'), href: '/dashboard/producten', icon: 'products', hidden: true },
     { name: 'Rapporten', href: 'https://frituurnolim.vercel.app/rapporten', icon: 'reports', external: true },
     { name: 'Boekhouding', href: 'https://frituurnolim.vercel.app/boekhouding', icon: 'reports', external: true },
     { name: 'Facturen', href: 'https://frituurnolim.vercel.app/facturen', icon: 'reports', external: true },
     { name: 'SCARDa & Peppol', href: 'https://frituurnolim.vercel.app/scrada', icon: 'reports', external: true },
     { name: 'Bedrijfsanalyse', href: 'https://frituurnolim.vercel.app/analyse', icon: 'analytics', external: true },
     { name: 'Account', href: 'https://frituurnolim.vercel.app/mijn-account', icon: 'settings', external: true },
-    { name: menuTrans('analytics'), href: '/dashboard/analyse', icon: 'analytics' },
-    { name: menuTrans('settings'), href: '/dashboard/instellingen', icon: 'settings' },
+    { name: menuTrans('analytics'), href: '/dashboard/analyse', icon: 'analytics', hidden: true },
+    { name: menuTrans('settings'), href: '/dashboard/instellingen', icon: 'settings', hidden: true },
   ]
 
   const icons: Record<string, JSX.Element> = {
@@ -123,7 +123,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {navigation.map((item) => {
+            {navigation.filter(item => !(item as any).hidden).map((item) => {
               const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
               const isExternal = (item as any).external
               
