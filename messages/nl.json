@@ -1039,6 +1039,14 @@
     "orderType": {
       "online": "Online",
       "pos": "Kassa"
+    },
+    "status": {
+      "completed": "Voltooid",
+      "pending": "Wachtend",
+      "preparing": "In behandeling",
+      "cancelled": "Geannuleerd",
+      "delivered": "Bezorgd",
+      "ready": "Klaar"
     }
   },
   "ordersPage": {

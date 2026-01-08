@@ -1039,6 +1039,14 @@
     "orderType": {
       "online": "在线",
       "pos": "收银"
+    },
+    "status": {
+      "completed": "已完成",
+      "pending": "待处理",
+      "preparing": "准备中",
+      "cancelled": "已取消",
+      "delivered": "已送达",
+      "ready": "已就绪"
     }
   },
   "ordersPage": {

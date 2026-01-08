@@ -1039,6 +1039,14 @@
     "orderType": {
       "online": "أونلاين",
       "pos": "كاشير"
+    },
+    "status": {
+      "completed": "مكتمل",
+      "pending": "قيد الانتظار",
+      "preparing": "جاري التحضير",
+      "cancelled": "ملغى",
+      "delivered": "تم التوصيل",
+      "ready": "جاهز"
     }
   },
   "ordersPage": {

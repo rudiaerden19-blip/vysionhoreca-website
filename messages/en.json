@@ -1039,6 +1039,14 @@
     "orderType": {
       "online": "Online",
       "pos": "POS"
+    },
+    "status": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "preparing": "Preparing",
+      "cancelled": "Cancelled",
+      "delivered": "Delivered",
+      "ready": "Ready"
     }
   },
   "ordersPage": {
