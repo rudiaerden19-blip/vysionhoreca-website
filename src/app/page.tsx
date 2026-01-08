@@ -82,7 +82,7 @@ function HeroSection() {
               {t('hero.description')}
             </p>
             <div className="flex justify-center lg:justify-start">
-              <a href="#demo" className="btn-primary text-center">
+              <a href="https://frituurnolim.vercel.app/registreer" className="btn-primary text-center">
                 {t('hero.ctaPrimary')}
               </a>
             </div>
@@ -719,7 +719,7 @@ function IndustrySection() {
               {t(`industry.${activeTab}.description`)}
             </p>
             <a
-              href="#demo"
+              href="https://frituurnolim.vercel.app/registreer"
               className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all"
             >
               {t('industry.tryFree')}
