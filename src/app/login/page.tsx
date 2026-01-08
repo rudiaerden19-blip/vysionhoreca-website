@@ -28,29 +28,29 @@ export default function LoginPage() {
         return
       }
 
-      // Check businesses tabel (daar staan alle handelaars)
-      const { data: businesses, error: bizError } = await supabase
-        .from('businesses')
+      // Check business_profiles tabel (daar staan alle handelaars met email)
+      const { data: profiles, error: profileError } = await supabase
+        .from('business_profiles')
         .select('id, name, email')
         .ilike('email', email.trim())
 
-      if (bizError) {
-        setError(`Database fout: ${bizError.message}`)
+      if (profileError) {
+        setError(`Database fout: ${profileError.message}`)
         setIsLoading(false)
         return
       }
 
-      if (!businesses || businesses.length === 0) {
+      if (!profiles || profiles.length === 0) {
         setError('Geen handelaar gevonden met dit email adres')
         setIsLoading(false)
         return
       }
 
       const tenant = {
-        id: businesses[0].id,
-        name: businesses[0].name,
-        email: businesses[0].email,
-        business_id: businesses[0].id
+        id: profiles[0].id,
+        name: profiles[0].name || profiles[0].email,
+        email: profiles[0].email,
+        business_id: profiles[0].id
       }
 
       // Check password - standaard 8 cijfers
