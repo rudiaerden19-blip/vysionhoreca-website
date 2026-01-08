@@ -28,11 +28,11 @@ export default function LoginPage() {
         return
       }
 
-      // SIMPELE ROBUUSTE LOGIN: alleen business_profiles, alleen bestaande kolommen
+      // SIMPELE LOGIN: zoek op email in business_profiles
       const { data: profiles, error: profileError } = await supabase
         .from('business_profiles')
         .select('id, name, email')
-        .eq('email', email.trim().toLowerCase())
+        .ilike('email', email.trim())
 
       if (profileError) {
         setError(`Database fout: ${profileError.message}`)
@@ -41,33 +41,7 @@ export default function LoginPage() {
       }
 
       if (!profiles || profiles.length === 0) {
-        // Probeer case-insensitive
-        const { data: profilesIlike } = await supabase
-          .from('business_profiles')
-          .select('id, name, email')
-          .ilike('email', email.trim())
-
-        if (!profilesIlike || profilesIlike.length === 0) {
-          setError('Geen handelaar gevonden met dit email adres')
-          setIsLoading(false)
-          return
-        }
-
-        const tenant = {
-          id: profilesIlike[0].id,
-          name: profilesIlike[0].name || profilesIlike[0].email,
-          email: profilesIlike[0].email,
-          business_id: profilesIlike[0].id
-        }
-
-        if (password !== '12345678') {
-          setError('Onjuist wachtwoord')
-          setIsLoading(false)
-          return
-        }
-
-        localStorage.setItem('vysion_tenant', JSON.stringify(tenant))
-        router.push('/dashboard')
+        setError('Geen handelaar gevonden met dit email adres')
         setIsLoading(false)
         return
       }
