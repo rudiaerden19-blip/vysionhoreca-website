@@ -126,7 +126,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <span className="text-gray-400 font-normal ml-1">horeca</span>
               </span>
             </Link>
-            <p className="text-gray-500 text-sm mt-1">Dashboard</p>
+            <p className="text-gray-500 text-sm mt-1">{t('dashboard.title')}</p>
           </div>
 
           {/* Tenant info */}
@@ -210,7 +210,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </button>
 
             <div className="flex-1 lg:flex-none">
-              <h1 className="text-xl font-semibold text-white lg:hidden">Dashboard</h1>
+              <h1 className="text-xl font-semibold text-white lg:hidden">{t('dashboard.title')}</h1>
             </div>
 
             <div className="flex items-center gap-4">
