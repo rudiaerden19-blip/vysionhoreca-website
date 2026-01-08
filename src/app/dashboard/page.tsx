@@ -274,7 +274,7 @@ export default function DashboardPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                        {order.status}
+                        {trans(`status.${order.status?.toLowerCase()}`) || order.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-500 text-sm">

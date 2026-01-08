@@ -1039,6 +1039,14 @@
     "orderType": {
       "online": "オンライン",
       "pos": "レジ"
+    },
+    "status": {
+      "completed": "完了",
+      "pending": "保留中",
+      "preparing": "準備中",
+      "cancelled": "キャンセル",
+      "delivered": "配達済み",
+      "ready": "準備完了"
     }
   },
   "ordersPage": {

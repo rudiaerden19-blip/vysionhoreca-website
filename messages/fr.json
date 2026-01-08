@@ -509,6 +509,14 @@
     "orderType": {
       "online": "En ligne",
       "pos": "Caisse"
+    },
+    "status": {
+      "completed": "Terminée",
+      "pending": "En attente",
+      "preparing": "En préparation",
+      "cancelled": "Annulée",
+      "delivered": "Livrée",
+      "ready": "Prête"
     }
   },
   "ordersPage": {
