@@ -356,7 +356,12 @@
       "products": "Prodotti",
       "reports": "Report",
       "analytics": "Analisi",
-      "settings": "Impostazioni"
+      "settings": "Impostazioni",
+      "accounting": "Contabilità",
+      "invoices": "Fatture",
+      "scarda": "SCARDa & Peppol",
+      "businessAnalysis": "Analisi aziendale",
+      "account": "Account"
     },
     "orders": {
       "title": "Ordini",
@@ -1030,6 +1035,10 @@
         "date": "Data"
       },
       "noOrders": "Nessun ordine ancora"
+    },
+    "orderType": {
+      "online": "Online",
+      "pos": "Cassa"
     }
   },
   "ordersPage": {

@@ -356,7 +356,12 @@
       "products": "المنتجات",
       "reports": "التقارير",
       "analytics": "التحليلات",
-      "settings": "الإعدادات"
+      "settings": "الإعدادات",
+      "accounting": "المحاسبة",
+      "invoices": "الفواتير",
+      "scarda": "SCARDa & Peppol",
+      "businessAnalysis": "تحليل الأعمال",
+      "account": "الحساب"
     },
     "orders": {
       "title": "الطلبات",
@@ -1030,6 +1035,10 @@
         "date": "التاريخ"
       },
       "noOrders": "لا توجد طلبات بعد"
+    },
+    "orderType": {
+      "online": "أونلاين",
+      "pos": "كاشير"
     }
   },
   "ordersPage": {

@@ -356,7 +356,12 @@
       "products": "Producten",
       "reports": "Rapporten",
       "analytics": "Analyse",
-      "settings": "Instellingen"
+      "settings": "Instellingen",
+      "accounting": "Boekhouding",
+      "invoices": "Facturen",
+      "scarda": "SCARDa & Peppol",
+      "businessAnalysis": "Bedrijfsanalyse",
+      "account": "Account"
     },
     "orders": {
       "title": "Bestellingen",
@@ -1030,6 +1035,10 @@
         "date": "Datum"
       },
       "noOrders": "Nog geen bestellingen gevonden"
+    },
+    "orderType": {
+      "online": "Online",
+      "pos": "Kassa"
     }
   },
   "ordersPage": {
