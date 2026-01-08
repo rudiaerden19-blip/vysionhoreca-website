@@ -120,6 +120,7 @@ function HeroSection() {
                 {/* Arrow Left */}
                 <button 
                   className="text-accent hover:text-accent/70 transition-colors flex-shrink-0"
+                  aria-label="Vorige screenshots"
                   onClick={() => {
                     const slider = document.getElementById('image-slider');
                     if (slider) slider.scrollBy({ left: -100, behavior: 'smooth' });
@@ -138,7 +139,7 @@ function HeroSection() {
                       src={src}
                       alt={`Screenshot ${index + 1}`}
                       className="w-[60px] h-[40px] sm:w-[70px] sm:h-[45px] object-cover rounded cursor-pointer hover:scale-105 transition-transform border border-gray-200 hover:border-accent flex-shrink-0"
-                      loading="lazy"
+                      loading={index < 6 ? "eager" : "lazy"}
                       onClick={() => setLightboxIndex(index + 1)}
                     />
                   ))}
@@ -147,6 +148,7 @@ function HeroSection() {
                 {/* Arrow Right */}
                 <button 
                   className="text-accent hover:text-accent/70 transition-colors flex-shrink-0"
+                  aria-label="Volgende screenshots"
                   onClick={() => {
                     const slider = document.getElementById('image-slider');
                     if (slider) slider.scrollBy({ left: 100, behavior: 'smooth' });
@@ -170,6 +172,7 @@ function HeroSection() {
               <button 
                 className="absolute left-4 sm:left-8 text-white text-5xl hover:text-accent transition-colors p-4"
                 onClick={goToPrev}
+                aria-label="Vorige afbeelding"
               >
                 <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -187,6 +190,7 @@ function HeroSection() {
               <button 
                 className="absolute right-4 sm:right-8 text-white text-5xl hover:text-accent transition-colors p-4"
                 onClick={goToNext}
+                aria-label="Volgende afbeelding"
               >
                 <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -197,6 +201,7 @@ function HeroSection() {
               <button 
                 className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
                 onClick={() => setLightboxIndex(null)}
+                aria-label="Sluiten"
               >
                 ×
               </button>
@@ -426,6 +431,7 @@ function OrderAppSection() {
             <button 
               className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
               onClick={() => setLightboxImage(null)}
+              aria-label="Sluiten"
             >
               ×
             </button>
@@ -753,6 +759,7 @@ function IndustrySection() {
             <button 
               className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
               onClick={() => setShowLightbox(false)}
+              aria-label="Sluiten"
             >
               ×
             </button>
@@ -775,7 +782,7 @@ function TestimonialSection() {
       setCurrentSlide((prev) => (prev + 1) % testimonialKeys.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [testimonialKeys.length])
 
   return (
     <section className="py-24 bg-[#E3E3E3] overflow-hidden">
@@ -819,6 +826,7 @@ function TestimonialSection() {
               <button
                 key={index}
                 onClick={() => setCurrentSlide(index)}
+                aria-label={`Ga naar review ${index + 1}`}
                 className={`w-3 h-3 rounded-full transition-colors ${
                   currentSlide === index ? 'bg-accent' : 'bg-gray-300'
                 }`}
