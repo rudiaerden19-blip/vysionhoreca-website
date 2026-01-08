@@ -93,7 +93,24 @@ export default function LoginPage() {
       }
 
       if (!foundTenant) {
-        setError('Geen handelaar gevonden met dit email adres')
+        // Debug: probeer directe query om te zien wat er is
+        let debugInfo = ''
+        try {
+          const { data: allProfiles, error: debugErr } = await supabase
+            .from('business_profiles')
+            .select('id, email')
+            .limit(5)
+          
+          if (debugErr) {
+            debugInfo = `DB Error: ${debugErr.message}`
+          } else if (allProfiles) {
+            debugInfo = `Gevonden emails: ${allProfiles.map(p => p.email).join(', ')}`
+          }
+        } catch (e) {
+          debugInfo = 'Query failed'
+        }
+        
+        setError(`Geen handelaar gevonden met dit email adres. Debug: ${debugInfo}`)
         setIsLoading(false)
         return
       }
