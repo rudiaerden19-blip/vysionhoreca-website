@@ -7,7 +7,7 @@ import { useLanguage } from '@/i18n'
 // Hero Section
 function HeroSection() {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   
   const allImages = [
     'https://i.imgur.com/IvW3RiX.png',
@@ -82,7 +82,7 @@ function HeroSection() {
               {t('hero.description')}
             </p>
             <div className="flex justify-center lg:justify-start">
-              <a href="https://frituurnolim.vercel.app/registreer" className="btn-primary text-center">
+              <a href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`} className="btn-primary text-center">
                 {t('hero.ctaPrimary')}
               </a>
             </div>
@@ -678,7 +678,7 @@ function ComparisonSection() {
 function IndustrySection() {
   const [activeTab, setActiveTab] = useState('invoicing')
   const [showLightbox, setShowLightbox] = useState(false)
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   
   const industries = {
     invoicing: { image: 'https://i.imgur.com/sFqK85O.png' },
@@ -719,7 +719,7 @@ function IndustrySection() {
               {t(`industry.${activeTab}.description`)}
             </p>
             <a
-              href="https://frituurnolim.vercel.app/registreer"
+              href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
               className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all"
             >
               {t('industry.tryFree')}

@@ -4,7 +4,7 @@ import { Navigation, Footer } from '@/components'
 import { useLanguage } from '@/i18n'
 
 export default function OverOnsPage() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   
   return (
     <main>
@@ -221,7 +221,7 @@ export default function OverOnsPage() {
             {t('about.ctaSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="https://frituurnolim.vercel.app/registreer" className="bg-white text-accent px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all">
+            <a href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`} className="bg-white text-accent px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all">
               {t('about.ctaPrimary')}
             </a>
             <a href="/#contact" className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-accent transition-all">
