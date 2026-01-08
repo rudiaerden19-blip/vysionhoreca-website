@@ -93,9 +93,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return typeof value === 'string' ? value : key
   }
 
-  // Prevent hydration mismatch by rendering a loading state
+  // Hide content until language is loaded from localStorage to prevent flash
   if (!isHydrated) {
-    return <>{children}</>
+    return (
+      <div style={{ visibility: 'hidden', minHeight: '100vh' }}>
+        {children}
+      </div>
+    )
   }
 
   return (
