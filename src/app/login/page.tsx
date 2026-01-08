@@ -28,30 +28,77 @@ export default function LoginPage() {
         return
       }
 
-      // Check business_profiles tabel (daar staan alle handelaars met email)
-      const { data: profiles, error: profileError } = await supabase
-        .from('business_profiles')
-        .select('id, name, email')
-        .ilike('email', email.trim())
+      // ROBUUSTE LOGIN: zoek in beide tabellen voor maximale compatibiliteit
+      let foundTenant = null
 
-      if (profileError) {
-        setError(`Database fout: ${profileError.message}`)
-        setIsLoading(false)
-        return
+      // Stap 1: Probeer business_profiles tabel
+      try {
+        const { data: profiles } = await supabase
+          .from('business_profiles')
+          .select('id, name, email')
+          .ilike('email', email.trim())
+
+        if (profiles && profiles.length > 0) {
+          foundTenant = {
+            id: profiles[0].id,
+            name: profiles[0].name || profiles[0].email,
+            email: profiles[0].email,
+            business_id: profiles[0].id
+          }
+        }
+      } catch (e) {
+        // Ignore error, try next table
       }
 
-      if (!profiles || profiles.length === 0) {
+      // Stap 2: Als niet gevonden, probeer businesses tabel
+      if (!foundTenant) {
+        try {
+          const { data: businesses } = await supabase
+            .from('businesses')
+            .select('id, name, email')
+            .ilike('email', email.trim())
+
+          if (businesses && businesses.length > 0) {
+            foundTenant = {
+              id: businesses[0].id,
+              name: businesses[0].name || businesses[0].email || email,
+              email: businesses[0].email || email,
+              business_id: businesses[0].id
+            }
+          }
+        } catch (e) {
+          // Ignore error
+        }
+      }
+
+      // Stap 3: Als nog steeds niet gevonden, zoek op naam in business_profiles
+      if (!foundTenant) {
+        try {
+          const { data: byName } = await supabase
+            .from('business_profiles')
+            .select('id, name, email')
+            .ilike('name', `%${email.trim().split('@')[0]}%`)
+
+          if (byName && byName.length > 0) {
+            foundTenant = {
+              id: byName[0].id,
+              name: byName[0].name || byName[0].email,
+              email: byName[0].email || email,
+              business_id: byName[0].id
+            }
+          }
+        } catch (e) {
+          // Ignore error
+        }
+      }
+
+      if (!foundTenant) {
         setError('Geen handelaar gevonden met dit email adres')
         setIsLoading(false)
         return
       }
 
-      const tenant = {
-        id: profiles[0].id,
-        name: profiles[0].name || profiles[0].email,
-        email: profiles[0].email,
-        business_id: profiles[0].id
-      }
+      const tenant = foundTenant
 
       // Check password - standaard 8 cijfers
       if (password !== '12345678') {
