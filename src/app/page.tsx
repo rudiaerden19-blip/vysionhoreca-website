@@ -448,7 +448,7 @@ function OrderAppSection() {
 
 // Pricing Section
 function PricingSection() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   
   return (
     <section id="prijzen" className="py-24 bg-[#E3E3E3]">
@@ -468,14 +468,14 @@ function PricingSection() {
             <div className="p-8 lg:p-10">
               <p className="text-gray-500 font-medium mb-2">{t('pricing.light.name')}</p>
               <div className="flex items-baseline mb-4">
-                <span className="text-5xl font-bold text-gray-900">€69</span>
+                <span className="text-5xl font-bold text-gray-900">€89</span>
                 <span className="text-xl text-gray-500 ml-2">{t('pricing.perMonth')}</span>
               </div>
               <p className="text-gray-500 mb-8">
                 {t('pricing.perLicense')}
               </p>
               <a 
-                href="#demo" 
+                href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
                 className="block w-full bg-gray-900 text-white text-center py-4 rounded-full font-semibold hover:bg-gray-800 transition-colors mb-8"
               >
                 {t('pricing.startTrial')}
@@ -502,14 +502,14 @@ function PricingSection() {
             <div className="p-8 lg:p-10 pt-14">
               <p className="text-accent font-medium mb-2">{t('pricing.pro.name')}</p>
               <div className="flex items-baseline mb-4">
-                <span className="text-5xl font-bold text-gray-900">€99</span>
+                <span className="text-5xl font-bold text-gray-900">€129</span>
                 <span className="text-xl text-gray-500 ml-2">{t('pricing.perMonth')}</span>
               </div>
               <p className="text-gray-500 mb-8">
                 {t('pricing.perLicense')}
               </p>
               <a 
-                href="#demo" 
+                href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
                 className="block w-full bg-accent text-white text-center py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors mb-8"
               >
                 {t('pricing.startTrial')}
@@ -590,7 +590,7 @@ function ButWaitSection() {
 
 // Comparison Section
 function ComparisonSection() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   
   const featureKeys = ['pos', 'terminal', 'online', 'gks', 'accounting', 'peppol', 'analytics', 'kitchen', 'loyalty', 'staff', 'reservation', 'languages', 'multiLocation']
   
@@ -631,7 +631,7 @@ function ComparisonSection() {
                 <th className="px-6 py-5 text-left font-semibold">{t('comparison.feature')}</th>
                 <th className="px-6 py-5 text-center">
                   <div className="text-accent font-bold text-lg">Vysion Horeca</div>
-                  <div className="text-sm text-gray-300">€69 - €99/maand</div>
+                  <div className="text-sm text-gray-300">€89 - €129/maand</div>
                 </th>
                 <th className="px-6 py-5 text-center">
                   <div className="font-semibold">Lightspeed</div>
@@ -663,7 +663,7 @@ function ComparisonSection() {
 
         <div className="text-center mt-12">
           <a
-            href="#contact"
+            href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
             className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-lg"
           >
             {t('comparison.cta')}
@@ -833,7 +833,7 @@ function TestimonialSection() {
 
 // CTA Section
 function CTASection() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   
   return (
     <section id="demo" className="py-24 relative" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
@@ -846,7 +846,7 @@ function CTASection() {
           {t('cta.subtitle')}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href="/registreer" className="btn-primary">
+          <a href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`} className="btn-primary">
             {t('cta.primary')}
           </a>
           <a href="#contact" className="btn-outline">
