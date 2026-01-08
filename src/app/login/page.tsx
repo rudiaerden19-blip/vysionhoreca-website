@@ -21,54 +21,22 @@ export default function LoginPage() {
     setError('')
     
     try {
-      const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-      const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      // Server-side API call voor robuuste login
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
 
-      if (!SUPABASE_URL || !SUPABASE_KEY) {
-        setError('Database configuratie ontbreekt')
-        setIsLoading(false)
-        return
-      }
-
-      // Zoek op email in business_profiles via REST API
-      const searchEmail = email.trim()
-      const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/business_profiles?select=id,name,email&email=ilike.${encodeURIComponent(searchEmail)}`,
-        {
-          headers: {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`
-          }
-        }
-      )
+      const data = await response.json()
 
       if (!response.ok) {
-        setError('Database fout')
+        setError(data.error || 'Login mislukt')
         setIsLoading(false)
         return
       }
 
-      const profiles = await response.json()
-
-      if (!profiles || profiles.length === 0) {
-        setError('Geen handelaar gevonden met dit email adres')
-        setIsLoading(false)
-        return
-      }
-
-      const tenant = {
-        id: profiles[0].id,
-        name: profiles[0].name || profiles[0].email,
-        email: profiles[0].email,
-        business_id: profiles[0].id
-      }
-
-      // Check password - standaard 8 cijfers
-      if (password !== '12345678') {
-        setError('Onjuist wachtwoord')
-        setIsLoading(false)
-        return
-      }
+      const tenant = data.tenant
 
       // Store tenant in localStorage
       localStorage.setItem('vysion_tenant', JSON.stringify(tenant))
