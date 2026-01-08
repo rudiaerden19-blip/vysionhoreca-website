@@ -356,7 +356,12 @@
       "products": "产品",
       "reports": "报告",
       "analytics": "分析",
-      "settings": "设置"
+      "settings": "设置",
+      "accounting": "会计",
+      "invoices": "发票",
+      "scarda": "SCARDa & Peppol",
+      "businessAnalysis": "企业分析",
+      "account": "账户"
     },
     "orders": {
       "title": "订单",
@@ -1030,6 +1035,10 @@
         "date": "日期"
       },
       "noOrders": "暂无订单"
+    },
+    "orderType": {
+      "online": "在线",
+      "pos": "收银"
     }
   },
   "ordersPage": {

@@ -471,7 +471,12 @@
       "products": "Produits",
       "reports": "Rapports",
       "analytics": "Analyse",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "accounting": "Comptabilité",
+      "invoices": "Factures",
+      "scarda": "SCARDa & Peppol",
+      "businessAnalysis": "Analyse commerciale",
+      "account": "Compte"
     }
   },
   "dashboardPage": {
@@ -500,6 +505,10 @@
         "date": "Date"
       },
       "noOrders": "Aucune commande trouvée"
+    },
+    "orderType": {
+      "online": "En ligne",
+      "pos": "Caisse"
     }
   },
   "ordersPage": {
