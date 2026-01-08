@@ -239,7 +239,10 @@
         "message": "Vertel ons over je horecazaak..."
       },
       "submit": "Verstuur bericht",
-      "required": "*"
+      "sending": "Versturen...",
+      "required": "*",
+      "successTitle": "Bericht verzonden!",
+      "successMessage": "Bedankt voor je bericht. We nemen zo snel mogelijk contact met je op."
     }
   },
   "footer": {
