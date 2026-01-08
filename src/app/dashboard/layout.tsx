@@ -71,10 +71,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto"></div>
-          <p className="text-gray-500 mt-4">{layoutTrans('loading')}</p>
+          <p className="text-gray-400 mt-4">{layoutTrans('loading')}</p>
         </div>
       </div>
     )
@@ -92,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-[#0f0f0f]">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div 
@@ -184,11 +184,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-4 lg:px-8">
+        <header className="sticky top-0 z-30 bg-[#1a1a1a] border-b border-gray-800 px-4 py-4 lg:px-8">
           <div className="flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 -ml-2 text-gray-600 hover:text-gray-900"
+              className="lg:hidden p-2 -ml-2 text-gray-400 hover:text-white"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -196,13 +196,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </button>
 
             <div className="flex-1 lg:flex-none">
-              <h1 className="text-xl font-semibold text-gray-900 lg:hidden">Dashboard</h1>
+              <h1 className="text-xl font-semibold text-white lg:hidden">Dashboard</h1>
             </div>
 
             <div className="flex items-center gap-4">
               <button 
                 onClick={() => window.location.reload()}
-                className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                className="p-2 text-gray-400 hover:text-white transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
