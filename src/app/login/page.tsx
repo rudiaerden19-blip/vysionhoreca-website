@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export default function LoginPage() {
   const router = useRouter()
@@ -22,23 +24,27 @@ export default function LoginPage() {
     setError('')
     
     try {
-      if (!supabase) {
-        setError('Database niet beschikbaar')
+      // Directe REST API call naar Supabase - geen client library
+      const searchEmail = email.trim().toLowerCase()
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/business_profiles?select=id,name,email&email=ilike.${encodeURIComponent(searchEmail)}`,
+        {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+
+      if (!response.ok) {
+        const errText = await response.text()
+        setError(`Database fout: ${errText}`)
         setIsLoading(false)
         return
       }
 
-      // SIMPELE LOGIN: zoek op email in business_profiles
-      const { data: profiles, error: profileError } = await supabase
-        .from('business_profiles')
-        .select('id, name, email')
-        .ilike('email', email.trim())
-
-      if (profileError) {
-        setError(`Database fout: ${profileError.message}`)
-        setIsLoading(false)
-        return
-      }
+      const profiles = await response.json()
 
       if (!profiles || profiles.length === 0) {
         setError('Geen handelaar gevonden met dit email adres')
