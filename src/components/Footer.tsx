@@ -23,7 +23,8 @@ export default function Footer() {
               <strong className="text-gray-300">{t('footer.address')}</strong><br />
               Vysion Group International<br />
               Siberiëstraat 24<br />
-              3900 Pelt, België
+              3900 Pelt, België<br />
+              BTW BE 1003.226.953
               <br /><br />
               <a href="https://www.vysionapps.io" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">www.vysionapps.io</a>
               <br />
