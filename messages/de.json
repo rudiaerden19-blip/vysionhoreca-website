@@ -239,7 +239,10 @@
         "message": "Erzählen Sie uns von Ihrem Gastronomiebetrieb..."
       },
       "submit": "Nachricht senden",
-      "required": "*"
+      "sending": "Wird gesendet...",
+      "required": "*",
+      "successTitle": "Nachricht gesendet!",
+      "successMessage": "Vielen Dank für Ihre Nachricht. Wir werden uns so schnell wie möglich bei Ihnen melden."
     }
   },
   "footer": {

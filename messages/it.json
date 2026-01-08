@@ -239,7 +239,10 @@
         "message": "Raccontaci della tua attività di ristorazione..."
       },
       "submit": "Invia messaggio",
-      "required": "*"
+      "sending": "Invio in corso...",
+      "required": "*",
+      "successTitle": "Messaggio inviato!",
+      "successMessage": "Grazie per il tuo messaggio. Ti risponderemo il prima possibile."
     }
   },
   "footer": {

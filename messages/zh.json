@@ -239,7 +239,10 @@
         "message": "告诉我们关于您的餐饮业务..."
       },
       "submit": "发送消息",
-      "required": "*"
+      "sending": "发送中...",
+      "required": "*",
+      "successTitle": "消息已发送！",
+      "successMessage": "感谢您的留言。我们会尽快与您联系。"
     }
   },
   "footer": {

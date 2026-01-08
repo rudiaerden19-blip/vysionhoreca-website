@@ -239,7 +239,10 @@
         "message": "Parlez-nous de votre établissement..."
       },
       "submit": "Envoyer le message",
-      "required": "*"
+      "sending": "Envoi en cours...",
+      "required": "*",
+      "successTitle": "Message envoyé!",
+      "successMessage": "Merci pour votre message. Nous vous répondrons dans les plus brefs délais."
     }
   },
   "footer": {

@@ -239,7 +239,10 @@
         "message": "あなたの飲食ビジネスについて教えてください..."
       },
       "submit": "メッセージを送信",
-      "required": "*"
+      "sending": "送信中...",
+      "required": "*",
+      "successTitle": "送信完了！",
+      "successMessage": "メッセージをお送りいただきありがとうございます。できるだけ早くご連絡いたします。"
     }
   },
   "footer": {

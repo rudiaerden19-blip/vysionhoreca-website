@@ -239,7 +239,10 @@
         "message": "Cuéntanos sobre tu negocio de hostelería..."
       },
       "submit": "Enviar mensaje",
-      "required": "*"
+      "sending": "Enviando...",
+      "required": "*",
+      "successTitle": "¡Mensaje enviado!",
+      "successMessage": "Gracias por tu mensaje. Te responderemos lo antes posible."
     }
   },
   "footer": {
