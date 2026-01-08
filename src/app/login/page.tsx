@@ -28,94 +28,56 @@ export default function LoginPage() {
         return
       }
 
-      // ROBUUSTE LOGIN: zoek in beide tabellen voor maximale compatibiliteit
-      let foundTenant = null
+      // SIMPELE ROBUUSTE LOGIN: alleen business_profiles, alleen bestaande kolommen
+      const { data: profiles, error: profileError } = await supabase
+        .from('business_profiles')
+        .select('id, name, email')
+        .eq('email', email.trim().toLowerCase())
 
-      // Stap 1: Probeer business_profiles tabel
-      try {
-        const { data: profiles } = await supabase
-          .from('business_profiles')
-          .select('id, name, email')
-          .ilike('email', email.trim())
-
-        if (profiles && profiles.length > 0) {
-          foundTenant = {
-            id: profiles[0].id,
-            name: profiles[0].name || profiles[0].email,
-            email: profiles[0].email,
-            business_id: profiles[0].id
-          }
-        }
-      } catch (e) {
-        // Ignore error, try next table
-      }
-
-      // Stap 2: Als niet gevonden, probeer businesses tabel
-      if (!foundTenant) {
-        try {
-          const { data: businesses } = await supabase
-            .from('businesses')
-            .select('id, name, email')
-            .ilike('email', email.trim())
-
-          if (businesses && businesses.length > 0) {
-            foundTenant = {
-              id: businesses[0].id,
-              name: businesses[0].name || businesses[0].email || email,
-              email: businesses[0].email || email,
-              business_id: businesses[0].id
-            }
-          }
-        } catch (e) {
-          // Ignore error
-        }
-      }
-
-      // Stap 3: Als nog steeds niet gevonden, zoek op naam in business_profiles
-      if (!foundTenant) {
-        try {
-          const { data: byName } = await supabase
-            .from('business_profiles')
-            .select('id, name, email')
-            .ilike('name', `%${email.trim().split('@')[0]}%`)
-
-          if (byName && byName.length > 0) {
-            foundTenant = {
-              id: byName[0].id,
-              name: byName[0].name || byName[0].email,
-              email: byName[0].email || email,
-              business_id: byName[0].id
-            }
-          }
-        } catch (e) {
-          // Ignore error
-        }
-      }
-
-      if (!foundTenant) {
-        // Debug: probeer directe query om te zien wat er is
-        let debugInfo = ''
-        try {
-          const { data: allProfiles, error: debugErr } = await supabase
-            .from('business_profiles')
-            .select('id, email')
-            .limit(5)
-          
-          if (debugErr) {
-            debugInfo = `DB Error: ${debugErr.message}`
-          } else if (allProfiles) {
-            debugInfo = `Gevonden emails: ${allProfiles.map(p => p.email).join(', ')}`
-          }
-        } catch (e) {
-          debugInfo = 'Query failed'
-        }
-        
-        setError(`Geen handelaar gevonden met dit email adres. Debug: ${debugInfo}`)
+      if (profileError) {
+        setError(`Database fout: ${profileError.message}`)
         setIsLoading(false)
         return
       }
 
-      const tenant = foundTenant
+      if (!profiles || profiles.length === 0) {
+        // Probeer case-insensitive
+        const { data: profilesIlike } = await supabase
+          .from('business_profiles')
+          .select('id, name, email')
+          .ilike('email', email.trim())
+
+        if (!profilesIlike || profilesIlike.length === 0) {
+          setError('Geen handelaar gevonden met dit email adres')
+          setIsLoading(false)
+          return
+        }
+
+        const tenant = {
+          id: profilesIlike[0].id,
+          name: profilesIlike[0].name || profilesIlike[0].email,
+          email: profilesIlike[0].email,
+          business_id: profilesIlike[0].id
+        }
+
+        if (password !== '12345678') {
+          setError('Onjuist wachtwoord')
+          setIsLoading(false)
+          return
+        }
+
+        localStorage.setItem('vysion_tenant', JSON.stringify(tenant))
+        router.push('/dashboard')
+        setIsLoading(false)
+        return
+      }
+
+      const tenant = {
+        id: profiles[0].id,
+        name: profiles[0].name || profiles[0].email,
+        email: profiles[0].email,
+        business_id: profiles[0].id
+      }
 
       // Check password - standaard 8 cijfers
       if (password !== '12345678') {
