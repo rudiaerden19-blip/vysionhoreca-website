@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
+import { Locale } from '@/i18n/config'
 
 interface Tenant {
   id: string
@@ -16,11 +17,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [tenant, setTenant] = useState<Tenant | null>(null)
   const [loading, setLoading] = useState(true)
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false)
+  const langDropdownRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
   const menuTrans = (key: string) => t(`dashboard.menu.${key}`)
   const layoutTrans = (key: string) => t(`dashboardLayout.${key}`)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
+        setLangDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const navigation = [
     { name: menuTrans('overview'), href: '/dashboard', icon: 'home', hidden: true },
@@ -200,6 +214,46 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             <div className="flex items-center gap-4">
+              {/* Language Dropdown */}
+              <div className="relative" ref={langDropdownRef}>
+                <button
+                  onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                  className="flex items-center gap-2 px-3 py-2 bg-[#0f0f0f] rounded-lg text-gray-300 hover:text-white transition-colors"
+                >
+                  <span className="text-xl">{localeFlags[locale]}</span>
+                  <svg className={`w-4 h-4 transition-transform ${langDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {langDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-[#1a1a1a] border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
+                    {locales.map((lang) => (
+                      <button
+                        key={lang}
+                        onClick={() => {
+                          setLocale(lang as Locale)
+                          setLangDropdownOpen(false)
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
+                          locale === lang 
+                            ? 'bg-accent/20 text-accent' 
+                            : 'text-gray-300 hover:bg-[#0f0f0f] hover:text-white'
+                        }`}
+                      >
+                        <span className="text-xl">{localeFlags[lang as Locale]}</span>
+                        <span>{localeNames[lang as Locale]}</span>
+                        {locale === lang && (
+                          <svg className="w-4 h-4 ml-auto text-accent" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <button 
                 onClick={() => window.location.reload()}
                 className="p-2 text-gray-400 hover:text-white transition-colors"
