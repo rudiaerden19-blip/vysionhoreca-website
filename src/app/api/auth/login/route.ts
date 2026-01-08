@@ -1,11 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
-// Server-side Supabase client - altijd betrouwbaar
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+// Server-side Supabase client - alleen aanmaken als env vars beschikbaar zijn
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+const getSupabase = () => {
+  if (!supabaseUrl || !supabaseKey) {
+    return null
+  }
+  return createClient(supabaseUrl, supabaseKey)
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +20,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Email en wachtwoord zijn verplicht' },
         { status: 400 }
+      )
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database configuratie niet beschikbaar' },
+        { status: 503 }
       )
     }
 
