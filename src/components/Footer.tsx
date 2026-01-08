@@ -26,7 +26,7 @@ export default function Footer() {
               3900 Pelt, België<br />
               BTW BE 1003.226.953
               <br /><br />
-              <a href="https://vysionapps-website.vercel.app/home" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">www.vysionapps.io</a>
+              <a href="https://www.vysionapps.io" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">www.vysionapps.io</a>
               <br />
               <a href="https://www.vysionhoreca.com" target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">www.vysionhoreca.com</a>
             </p>
