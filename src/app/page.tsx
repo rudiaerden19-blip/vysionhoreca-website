@@ -91,9 +91,9 @@ function HeroSection() {
             </p>
           </div>
 
-          {/* Right content - iPad and vertical image slider */}
-          <div className="opacity-0 animate-fadeInUp delay-200 lg:translate-x-6">
-            <div className="flex items-end gap-4 justify-center lg:justify-start lg:-ml-16">
+          {/* Right content - iPad and horizontal image slider below */}
+          <div className="opacity-0 animate-fadeInUp delay-200">
+            <div className="flex flex-col items-center">
               {/* iPad Stand with screenshot */}
               <div className="flex flex-col items-center">
                 <div className="relative w-full max-w-[260px] sm:max-w-xs md:max-w-sm lg:max-w-md">
@@ -114,48 +114,48 @@ function HeroSection() {
                 </div>
                 <p className="text-gray-500 text-sm mt-2">{t('hero.clickToOpen')}</p>
               </div>
-              {/* Vertical Image Slider with arrows */}
-              <div className="hidden lg:flex flex-col items-center">
-                {/* Arrow Up */}
+              
+              {/* Horizontal Image Slider below iPad */}
+              <div className="flex items-center gap-2 mt-6">
+                {/* Arrow Left */}
                 <button 
-                  className="text-accent hover:text-accent/70 transition-colors mb-2"
+                  className="text-accent hover:text-accent/70 transition-colors flex-shrink-0"
                   onClick={() => {
                     const slider = document.getElementById('image-slider');
-                    if (slider) slider.scrollBy({ top: -100, behavior: 'smooth' });
+                    if (slider) slider.scrollBy({ left: -100, behavior: 'smooth' });
                   }}
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
                 
                 {/* Slider */}
-                <div id="image-slider" className="flex flex-col gap-2 h-[400px] overflow-y-auto pr-2 scrollbar-thin">
+                <div id="image-slider" className="flex gap-2 overflow-x-auto max-w-[250px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[450px] scrollbar-thin">
                   {sliderImages.map((src, index) => (
                     <img
                       key={index}
                       src={src}
                       alt={`Screenshot ${index + 1}`}
-                      className="w-[80px] h-[50px] object-cover rounded cursor-pointer hover:scale-110 transition-transform border border-gray-200 hover:border-accent"
+                      className="w-[60px] h-[40px] sm:w-[70px] sm:h-[45px] object-cover rounded cursor-pointer hover:scale-105 transition-transform border border-gray-200 hover:border-accent flex-shrink-0"
                       loading="lazy"
                       onClick={() => setLightboxIndex(index + 1)}
                     />
                   ))}
                 </div>
                 
-                {/* Arrow Down */}
+                {/* Arrow Right */}
                 <button 
-                  className="text-accent hover:text-accent/70 transition-colors mt-2"
+                  className="text-accent hover:text-accent/70 transition-colors flex-shrink-0"
                   onClick={() => {
                     const slider = document.getElementById('image-slider');
-                    if (slider) slider.scrollBy({ top: 100, behavior: 'smooth' });
+                    if (slider) slider.scrollBy({ left: 100, behavior: 'smooth' });
                   }}
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
-                <p className="text-gray-500 text-sm mt-2">{t('hero.clickToOpen')}</p>
               </div>
             </div>
           </div>
