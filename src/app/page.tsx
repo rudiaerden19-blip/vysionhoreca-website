@@ -474,7 +474,7 @@ function PricingSection() {
             <div className="p-8 lg:p-10">
               <p className="text-gray-500 font-medium mb-2">{t('pricing.light.name')}</p>
               <div className="flex items-baseline mb-4">
-                <span className="text-5xl font-bold text-gray-900">€89</span>
+                <span className="text-5xl font-bold text-gray-900">€69</span>
                 <span className="text-xl text-gray-500 ml-2">{t('pricing.perMonth')}</span>
               </div>
               <p className="text-gray-500 mb-8">
