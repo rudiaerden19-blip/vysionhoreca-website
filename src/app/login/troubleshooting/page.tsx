@@ -10,123 +10,44 @@ export default function TroubleshootingPage() {
 
   const faqs = [
     {
-      question: 'Mijn kassa start niet op',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Controleer of het apparaat is aangesloten op stroom</li>
-          <li>Houd de aan/uit-knop 10 seconden ingedrukt om opnieuw op te starten</li>
-          <li>Controleer of alle kabels goed zijn aangesloten</li>
-          <li>Wacht 2 minuten en probeer opnieuw</li>
-          <li>Als het probleem aanhoudt, neem contact op met support</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.1.question'),
+      answer: t('troubleshootingPage.faqs.1.answer')
     },
     {
-      question: 'Ik kan niet inloggen op mijn kassa',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Controleer of je de juiste pincode gebruikt</li>
-          <li>Vraag je beheerder om je pincode te resetten</li>
-          <li>Controleer of je account niet geblokkeerd is (na 5 foute pogingen)</li>
-          <li>Neem contact op met support als je geen toegang hebt tot een beheerdersaccount</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.2.question'),
+      answer: t('troubleshootingPage.faqs.2.answer')
     },
     {
-      question: 'De betaalterminal werkt niet',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Controleer of de terminal is ingeschakeld (groen lampje brandt)</li>
-          <li>Controleer de USB of Bluetooth-verbinding</li>
-          <li>Start de terminal opnieuw op door hem uit en aan te zetten</li>
-          <li>Ga naar Instellingen → Betaalterminal → Opnieuw koppelen</li>
-          <li>Controleer of je internetverbinding werkt</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.3.question'),
+      answer: t('troubleshootingPage.faqs.3.answer')
     },
     {
-      question: 'Bon printer print niet',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Controleer of er papier in de printer zit</li>
-          <li>Open en sluit het printerdeksel (dit reset de printer)</li>
-          <li>Controleer de USB/netwerk-verbinding</li>
-          <li>Ga naar Instellingen → Printers → Test afdrukken</li>
-          <li>Als de testpagina niet print, herstart de printer</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.4.question'),
+      answer: t('troubleshootingPage.faqs.4.answer')
     },
     {
-      question: 'Mijn kassa is traag',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Sluit apps af die je niet gebruikt</li>
-          <li>Controleer je internetverbinding (4G/WiFi)</li>
-          <li>Herstart de kassa-applicatie</li>
-          <li>Controleer of er updates beschikbaar zijn</li>
-          <li>Neem contact op met support als het probleem aanhoudt</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.5.question'),
+      answer: t('troubleshootingPage.faqs.5.answer')
     },
     {
-      question: 'Online bestellingen komen niet binnen',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Controleer of je internetverbinding werkt</li>
-          <li>Controleer of de online bestellen module is ingeschakeld</li>
-          <li>Ga naar Instellingen → Online bestellen → Synchroniseren</li>
-          <li>Controleer of je vestiging "open" staat in het systeem</li>
-          <li>Check je openingstijden in de instellingen</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.6.question'),
+      answer: t('troubleshootingPage.faqs.6.answer')
     },
     {
-      question: 'Ik wil een product toevoegen of wijzigen',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Ga naar het menu linksboven → Producten</li>
-          <li>Klik op "Nieuw product" of selecteer een bestaand product</li>
-          <li>Vul de naam, prijs en categorie in</li>
-          <li>Klik op "Opslaan"</li>
-          <li>Het product is nu beschikbaar op je kassa</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.7.question'),
+      answer: t('troubleshootingPage.faqs.7.answer')
     },
     {
-      question: 'Hoe maak ik een Z-rapport / dagafsluiting?',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Ga naar het menu linksboven → Rapporten</li>
-          <li>Selecteer "Z-Rapport" of "Dagafsluiting"</li>
-          <li>Controleer de gegevens</li>
-          <li>Klik op "Afsluiten en printen"</li>
-          <li>Het rapport wordt afgedrukt en de dag wordt afgesloten</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.8.question'),
+      answer: t('troubleshootingPage.faqs.8.answer')
     },
     {
-      question: 'Ik ben mijn wachtwoord vergeten',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Ga naar de inlogpagina</li>
-          <li>Klik op "Wachtwoord vergeten"</li>
-          <li>Vul je e-mailadres in</li>
-          <li>Je ontvangt een link om je wachtwoord te resetten</li>
-          <li>Of neem contact op met support: +32 492 12 93 83</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.9.question'),
+      answer: t('troubleshootingPage.faqs.9.answer')
     },
     {
-      question: 'De app crasht steeds',
-      answer: `
-        <ol class="list-decimal list-inside space-y-2">
-          <li>Sluit de app volledig af</li>
-          <li>Herstart je apparaat</li>
-          <li>Controleer of je de laatste versie van de app hebt</li>
-          <li>Verwijder de app en installeer opnieuw (je data blijft behouden)</li>
-          <li>Neem contact op met support als het probleem aanhoudt</li>
-        </ol>
-      `
+      question: t('troubleshootingPage.faqs.10.question'),
+      answer: t('troubleshootingPage.faqs.10.answer')
     },
   ]
 
@@ -139,7 +60,7 @@ export default function TroubleshootingPage() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            {t('common.backToLogin')}
+            {t('troubleshootingPage.backToLogin')}
           </Link>
           <Link href="/">
             <span className="text-xl font-bold">
@@ -159,10 +80,10 @@ export default function TroubleshootingPage() {
             </svg>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Troubleshooting & Hulp
+            {t('troubleshootingPage.title')}
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Veelvoorkomende problemen en oplossingen voor je Vysion Horeca kassa
+            {t('troubleshootingPage.subtitle')}
           </p>
         </div>
       </section>
@@ -181,7 +102,7 @@ export default function TroubleshootingPage() {
                 </svg>
               </div>
               <div>
-                <p className="text-white font-semibold">Bel support</p>
+                <p className="text-white font-semibold">{t('troubleshootingPage.quickActions.callSupport')}</p>
                 <p className="text-sm text-gray-400">+32 492 12 93 83</p>
               </div>
             </a>
@@ -196,7 +117,7 @@ export default function TroubleshootingPage() {
                 </svg>
               </div>
               <div>
-                <p className="text-white font-semibold">E-mail support</p>
+                <p className="text-white font-semibold">{t('troubleshootingPage.quickActions.emailSupport')}</p>
                 <p className="text-sm text-gray-400">support@vysionhoreca.com</p>
               </div>
             </a>
@@ -213,8 +134,8 @@ export default function TroubleshootingPage() {
                 </svg>
               </div>
               <div>
-                <p className="text-white font-semibold">WhatsApp</p>
-                <p className="text-sm text-gray-400">Direct chatten</p>
+                <p className="text-white font-semibold">{t('troubleshootingPage.quickActions.whatsapp')}</p>
+                <p className="text-sm text-gray-400">{t('troubleshootingPage.quickActions.whatsappDesc')}</p>
               </div>
             </a>
           </div>
@@ -224,7 +145,7 @@ export default function TroubleshootingPage() {
       {/* FAQ */}
       <section className="py-12">
         <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-2xl font-bold text-white mb-8">Veelvoorkomende problemen</h2>
+          <h2 className="text-2xl font-bold text-white mb-8">{t('troubleshootingPage.faqTitle')}</h2>
           
           <div className="space-y-4">
             {faqs.map((faq, index) => (
@@ -263,9 +184,9 @@ export default function TroubleshootingPage() {
       {/* Still need help */}
       <section className="py-12 border-t border-gray-800">
         <div className="max-w-5xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Probleem niet gevonden?</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">{t('troubleshootingPage.stillNeedHelp.title')}</h2>
           <p className="text-gray-400 mb-8">
-            Ons support team staat 24/7 voor je klaar. Neem gerust contact met ons op!
+            {t('troubleshootingPage.stillNeedHelp.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
@@ -275,7 +196,7 @@ export default function TroubleshootingPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              Bel nu: +32 492 12 93 83
+              {t('troubleshootingPage.stillNeedHelp.callNow')} +32 492 12 93 83
             </a>
             <a
               href="mailto:support@vysionhoreca.com"
@@ -284,7 +205,7 @@ export default function TroubleshootingPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              E-mail support
+              {t('troubleshootingPage.stillNeedHelp.emailSupport')}
             </a>
           </div>
         </div>
@@ -293,7 +214,7 @@ export default function TroubleshootingPage() {
       {/* Footer */}
       <footer className="py-8 border-t border-gray-800">
         <div className="max-w-5xl mx-auto px-4 text-center text-gray-500 text-sm">
-          © {new Date().getFullYear()} Vysion Group. Alle rechten voorbehouden.
+          © {new Date().getFullYear()} Vysion Group. {t('troubleshootingPage.copyright')}
         </div>
       </footer>
     </main>
