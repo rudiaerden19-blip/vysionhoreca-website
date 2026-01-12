@@ -75,6 +75,51 @@ export default function InstellingenPage() {
         </div>
       </div>
 
+      {/* Subscription Section */}
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <h2 className="text-lg font-semibold text-gray-900">{trans('sections.subscription.title')}</h2>
+          <p className="text-sm text-gray-500">{trans('sections.subscription.subtitle')}</p>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Standard Package */}
+            <div className="border-2 border-gray-200 rounded-xl p-6 hover:border-accent transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">{trans('sections.subscription.standardPackage')}</h3>
+                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                  {trans('sections.subscription.active')}
+                </span>
+              </div>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-gray-900">{trans('sections.subscription.standardPrice')}</span>
+                <span className="text-gray-500 ml-2">{trans('sections.subscription.perMonth')}</span>
+              </div>
+              <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+                {trans('sections.subscription.manageSubscription')}
+              </button>
+            </div>
+
+            {/* Premium Package */}
+            <div className="border-2 border-gray-200 rounded-xl p-6 hover:border-accent transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">{trans('sections.subscription.premiumPackage')}</h3>
+                <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+                  {trans('sections.subscription.upgrade')}
+                </span>
+              </div>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-gray-900">{trans('sections.subscription.premiumPrice')}</span>
+                <span className="text-gray-500 ml-2">{trans('sections.subscription.perMonth')}</span>
+              </div>
+              <button className="w-full px-4 py-2 bg-accent text-white rounded-lg font-medium hover:bg-accent/90 transition-colors">
+                {trans('sections.subscription.upgrade')}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Notifications Section */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100">

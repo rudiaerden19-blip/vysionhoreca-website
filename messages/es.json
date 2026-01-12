@@ -1219,6 +1219,21 @@
           "description": "Notificación de nuevos pedidos online"
         }
       },
+      "subscription": {
+        "title": "Suscripción",
+        "subtitle": "Tu suscripción y plan actual",
+        "currentPlan": "Plan actual",
+        "standardPackage": "Paquete Estándar",
+        "premiumPackage": "Paquete Premium",
+        "standardPrice": "€99",
+        "premiumPrice": "€129",
+        "perMonth": "/mes",
+        "active": "Activo",
+        "expiresOn": "Expira el",
+        "manageSubscription": "Gestionar suscripción",
+        "upgrade": "Actualizar",
+        "downgrade": "Degradar"
+      },
       "security": {
         "title": "Seguridad",
         "subtitle": "Contraseña y seguridad",

@@ -1219,6 +1219,21 @@
           "description": "Notifica per nuovi ordini online"
         }
       },
+      "subscription": {
+        "title": "Abbonamento",
+        "subtitle": "Il tuo abbonamento e piano attuale",
+        "currentPlan": "Piano attuale",
+        "standardPackage": "Pacchetto Standard",
+        "premiumPackage": "Pacchetto Premium",
+        "standardPrice": "€99",
+        "premiumPrice": "€129",
+        "perMonth": "/mese",
+        "active": "Attivo",
+        "expiresOn": "Scade il",
+        "manageSubscription": "Gestisci abbonamento",
+        "upgrade": "Aggiorna",
+        "downgrade": "Declassa"
+      },
       "security": {
         "title": "Sicurezza",
         "subtitle": "Password e sicurezza",

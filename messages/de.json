@@ -684,6 +684,21 @@
           "description": "Benachrichtigung bei neuen Online-Bestellungen"
         }
       },
+      "subscription": {
+        "title": "Abonnement",
+        "subtitle": "Ihr aktuelles Abonnement und Paket",
+        "currentPlan": "Aktuelles Paket",
+        "standardPackage": "Standard Paket",
+        "premiumPackage": "Premium Paket",
+        "standardPrice": "€99",
+        "premiumPrice": "€129",
+        "perMonth": "/Monat",
+        "active": "Aktiv",
+        "expiresOn": "Läuft ab am",
+        "manageSubscription": "Abonnement verwalten",
+        "upgrade": "Upgraden",
+        "downgrade": "Downgraden"
+      },
       "security": {
         "title": "Sicherheit",
         "subtitle": "Passwort und Sicherheit",

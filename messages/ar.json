@@ -1219,6 +1219,21 @@
           "description": "إشعار بالطلبات الأونلاين الجديدة"
         }
       },
+      "subscription": {
+        "title": "الاشتراك",
+        "subtitle": "اشتراكك وخطتك الحالية",
+        "currentPlan": "الخطة الحالية",
+        "standardPackage": "الباقة القياسية",
+        "premiumPackage": "الباقة المميزة",
+        "standardPrice": "€99",
+        "premiumPrice": "€129",
+        "perMonth": "/شهر",
+        "active": "نشط",
+        "expiresOn": "تنتهي في",
+        "manageSubscription": "إدارة الاشتراك",
+        "upgrade": "ترقية",
+        "downgrade": "تخفيض"
+      },
       "security": {
         "title": "الأمان",
         "subtitle": "كلمة المرور والأمان",

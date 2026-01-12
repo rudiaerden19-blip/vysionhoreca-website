@@ -1219,6 +1219,21 @@
           "description": "新在线订单通知"
         }
       },
+      "subscription": {
+        "title": "订阅",
+        "subtitle": "您当前的订阅和套餐",
+        "currentPlan": "当前套餐",
+        "standardPackage": "标准套餐",
+        "premiumPackage": "高级套餐",
+        "standardPrice": "€99",
+        "premiumPrice": "€129",
+        "perMonth": "/月",
+        "active": "有效",
+        "expiresOn": "到期日期",
+        "manageSubscription": "管理订阅",
+        "upgrade": "升级",
+        "downgrade": "降级"
+      },
       "security": {
         "title": "安全",
         "subtitle": "密码和安全",

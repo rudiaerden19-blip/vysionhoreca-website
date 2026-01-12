@@ -1219,6 +1219,21 @@
           "description": "Melding bij nieuwe online bestellingen"
         }
       },
+      "subscription": {
+        "title": "Abonnement",
+        "subtitle": "Je huidige abonnement en pakket",
+        "currentPlan": "Huidig pakket",
+        "standardPackage": "Standaard Pakket",
+        "premiumPackage": "Premium Pakket",
+        "standardPrice": "€99",
+        "premiumPrice": "€129",
+        "perMonth": "/maand",
+        "active": "Actief",
+        "expiresOn": "Verloopt op",
+        "manageSubscription": "Abonnement beheren",
+        "upgrade": "Upgraden",
+        "downgrade": "Downgraden"
+      },
       "security": {
         "title": "Beveiliging",
         "subtitle": "Wachtwoord en beveiliging",

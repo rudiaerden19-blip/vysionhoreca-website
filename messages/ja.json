@@ -1219,6 +1219,21 @@
           "description": "新しいオンライン注文の通知"
         }
       },
+      "subscription": {
+        "title": "サブスクリプション",
+        "subtitle": "現在のサブスクリプションとプラン",
+        "currentPlan": "現在のプラン",
+        "standardPackage": "スタンダードプラン",
+        "premiumPackage": "プレミアムプラン",
+        "standardPrice": "€99",
+        "premiumPrice": "€129",
+        "perMonth": "/月",
+        "active": "アクティブ",
+        "expiresOn": "有効期限",
+        "manageSubscription": "サブスクリプションを管理",
+        "upgrade": "アップグレード",
+        "downgrade": "ダウングレード"
+      },
       "security": {
         "title": "セキュリティ",
         "subtitle": "パスワードとセキュリティ",

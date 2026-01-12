@@ -1219,6 +1219,21 @@
           "description": "Notification for new online orders"
         }
       },
+      "subscription": {
+        "title": "Subscription",
+        "subtitle": "Your current subscription and plan",
+        "currentPlan": "Current plan",
+        "standardPackage": "Standard Package",
+        "premiumPackage": "Premium Package",
+        "standardPrice": "€99",
+        "premiumPrice": "€129",
+        "perMonth": "/month",
+        "active": "Active",
+        "expiresOn": "Expires on",
+        "manageSubscription": "Manage subscription",
+        "upgrade": "Upgrade",
+        "downgrade": "Downgrade"
+      },
       "security": {
         "title": "Security",
         "subtitle": "Password and security",

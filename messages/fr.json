@@ -684,6 +684,21 @@
           "description": "Notification pour les nouvelles commandes en ligne"
         }
       },
+      "subscription": {
+        "title": "Abonnement",
+        "subtitle": "Votre abonnement et forfait actuels",
+        "currentPlan": "Forfait actuel",
+        "standardPackage": "Forfait Standard",
+        "premiumPackage": "Forfait Premium",
+        "standardPrice": "€99",
+        "premiumPrice": "€129",
+        "perMonth": "/mois",
+        "active": "Actif",
+        "expiresOn": "Expire le",
+        "manageSubscription": "Gérer l'abonnement",
+        "upgrade": "Mettre à niveau",
+        "downgrade": "Rétrograder"
+      },
       "security": {
         "title": "Sécurité",
         "subtitle": "Mot de passe et sécurité",
