@@ -135,7 +135,9 @@
         "3": "Productos y categorías",
         "4": "Integración terminal de pago",
         "5": "Inventario",
-        "6": "Soporte por email y teléfono"
+        "6": "Soporte por email y teléfono",
+        "7": "Disponible en 9 idiomas",
+        "8": "Formación gratuita completa"
       },
       "notIncluded": {
         "1": "Plataforma de pedidos online",
@@ -178,7 +180,8 @@
         "10": "Reserva de mesas",
         "11": "Plano de mesas",
         "12": "Disponible en 9 idiomas",
-        "13": "Soporte prioritario"
+        "13": "Formación gratuita completa",
+        "14": "Soporte prioritario"
       }
     },
     "faq": {

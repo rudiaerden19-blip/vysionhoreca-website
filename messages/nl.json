@@ -135,7 +135,9 @@
         "3": "Producten & categorieën",
         "4": "Betaalterminal integratie",
         "5": "Voorraad",
-        "6": "Email & telefoon support"
+        "6": "Email & telefoon support",
+        "7": "Beschikbaar in 9 talen",
+        "8": "Volledige gratis opleiding"
       },
       "notIncluded": {
         "1": "Online bestelplatform",
@@ -178,7 +180,8 @@
         "10": "Tafelreservatie",
         "11": "Tafel plattegrond",
         "12": "Beschikbaar in 9 talen",
-        "13": "Prioriteit support"
+        "13": "Volledige gratis opleiding",
+        "14": "Prioriteit support"
       }
     },
     "faq": {

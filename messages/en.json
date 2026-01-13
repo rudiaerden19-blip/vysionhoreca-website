@@ -135,7 +135,9 @@
         "3": "Products & categories",
         "4": "Payment terminal integration",
         "5": "Inventory",
-        "6": "Email & phone support"
+        "6": "Email & phone support",
+        "7": "Available in 9 languages",
+        "8": "Full free training"
       },
       "notIncluded": {
         "1": "Online ordering platform",
@@ -178,7 +180,8 @@
         "10": "Table reservation",
         "11": "Table floor plan",
         "12": "Available in 9 languages",
-        "13": "Priority support"
+        "13": "Full free training",
+        "14": "Priority support"
       }
     },
     "faq": {

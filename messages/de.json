@@ -135,7 +135,9 @@
         "3": "Produkte & Kategorien",
         "4": "Zahlungsterminal-Integration",
         "5": "Inventar",
-        "6": "E-Mail & Telefon-Support"
+        "6": "E-Mail & Telefon-Support",
+        "7": "In 9 Sprachen verfügbar",
+        "8": "Vollständige kostenlose Schulung"
       },
       "notIncluded": {
         "1": "Online-Bestellplattform",
@@ -178,7 +180,8 @@
         "10": "Tischreservierung",
         "11": "Tischplan",
         "12": "In 9 Sprachen verfügbar",
-        "13": "Prioritäts-Support"
+        "13": "Vollständige kostenlose Schulung",
+        "14": "Prioritäts-Support"
       }
     },
     "faq": {
