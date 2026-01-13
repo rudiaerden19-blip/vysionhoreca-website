@@ -122,13 +122,13 @@
     "title": "Simpele, transparante prijzen",
     "subtitle": "Alles inbegrepen. Geen verrassingen.",
     "perMonth": "/maand",
-    "perLicense": "Per licentie",
-    "startTrial": "Start 7 dagen gratis",
-    "mostChosen": "Meest gekozen",
-    "included": "Inbegrepen:",
-    "allOfLight": "Alles van Light, plus:",
-    "light": {
-      "name": "Light",
+    "trialInfo": "7 dagen gratis proberen • Geen creditcard nodig • Maandelijks opzegbaar",
+    "popular": "Popular",
+    "chooseStarter": "Kies Starter",
+    "chooseStandard": "Kies Standaard",
+    "choosePro": "Kies Pro",
+    "starter": {
+      "name": "Vysion Starter",
       "features": {
         "1": "Volledige kassa functionaliteit",
         "2": "Real-time rapporten",
@@ -136,10 +136,35 @@
         "4": "Betaalterminal integratie",
         "5": "Voorraad",
         "6": "Email & telefoon support"
+      },
+      "notIncluded": {
+        "1": "Online bestelplatform",
+        "2": "Keukenbeeldscherm software",
+        "3": "Klantenkaart & loyaliteit",
+        "4": "Personeel & urenregistratie"
+      }
+    },
+    "standard": {
+      "name": "Vysion Horeca",
+      "subtitle": "Standaard",
+      "features": {
+        "1": "Volledige kassa functionaliteit",
+        "2": "Real-time rapporten",
+        "3": "Betaalterminal integratie",
+        "4": "Email & telefoon support",
+        "5": "Beschikbaar in 9 talen",
+        "6": "Klantenkaart & loyaliteit",
+        "7": "Online bestelplatform",
+        "8": "Producten & categorieën",
+        "9": "Voorraad",
+        "10": "Landingspagina",
+        "11": "Keukenbeeldscherm software",
+        "12": "Volledige gratis opleiding"
       }
     },
     "pro": {
-      "name": "Pro",
+      "name": "Vysion Pro",
+      "allOfStarter": "Pro - Alles van Starter, plus:",
       "features": {
         "1": "Online bestelplatform",
         "2": "Personeel & urenregistratie",
@@ -148,13 +173,32 @@
         "5": "Keukenbeeldscherm software",
         "6": "Maandelijkse bedrijfsanalyse",
         "7": "Landingspagina",
-        "8": "Tijdsregistratie personeel",
-        "9": "Peppol facturatieprogramma",
-        "10": "SCARDA boekhoudsoftware",
-        "11": "Tafelreservatie",
-        "12": "Tafel plattegrond",
-        "13": "Beschikbaar in 9 talen"
+        "8": "Peppol facturatieprogramma",
+        "9": "SCARDA boekhoudsoftware",
+        "10": "Tafelreservatie",
+        "11": "Tafel plattegrond",
+        "12": "Beschikbaar in 9 talen",
+        "13": "Prioriteit support"
       }
+    },
+    "faq": {
+      "title": "Veelgestelde vragen",
+      "q1": "Kan ik eerst gratis proberen?",
+      "a1": "Ja! Je krijgt 7 dagen gratis toegang tot alle functies. Geen creditcard nodig om te starten.",
+      "q2": "Kan ik upgraden of downgraden?",
+      "a2": "Ja, je kunt op elk moment upgraden naar Pro of downgraden. De wijziging gaat direct in.",
+      "q3": "Zijn er langlopende contracten?",
+      "a3": "Nee, je betaalt maandelijks en kunt op elk moment opzeggen. Geen verplichtingen.",
+      "q4": "Welke betaalmethodes worden geaccepteerd?",
+      "a4": "We accepteren alle gangbare betaalmethodes: Visa, Mastercard, Bancontact, iDEAL, en meer via Stripe.",
+      "q5": "Is mijn data veilig?",
+      "a5": "Absoluut. We gebruiken enterprise-grade beveiliging, SSL encryptie, en alle data wordt opgeslagen in beveiligde EU datacenters conform GDPR."
+    },
+    "cta": {
+      "title": "Klaar om te starten?",
+      "subtitle": "Start vandaag nog met je 7 dagen gratis proefperiode. Geen creditcard nodig.",
+      "primary": "Start gratis proefperiode →",
+      "secondary": "Contact opnemen"
     }
   },
   "industry": {

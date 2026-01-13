@@ -122,13 +122,13 @@
     "title": "Einfache, transparente Preise",
     "subtitle": "Alles inklusive. Keine Überraschungen.",
     "perMonth": "/Monat",
-    "perLicense": "Pro Lizenz",
-    "startTrial": "7 Tage kostenlos starten",
-    "mostChosen": "Am meisten gewählt",
-    "included": "Enthalten:",
-    "allOfLight": "Alles von Light, plus:",
-    "light": {
-      "name": "Light",
+    "trialInfo": "7 Tage kostenlos • Keine Kreditkarte erforderlich • Monatlich kündbar",
+    "popular": "Popular",
+    "chooseStarter": "Starter wählen",
+    "chooseStandard": "Standard wählen",
+    "choosePro": "Pro wählen",
+    "starter": {
+      "name": "Vysion Starter",
       "features": {
         "1": "Vollständige Kassenfunktionalität",
         "2": "Echtzeit-Berichte",
@@ -136,10 +136,35 @@
         "4": "Zahlungsterminal-Integration",
         "5": "Inventar",
         "6": "E-Mail & Telefon-Support"
+      },
+      "notIncluded": {
+        "1": "Online-Bestellplattform",
+        "2": "Küchenbildschirm-Software",
+        "3": "Kundenkarte & Treue",
+        "4": "Personal & Zeiterfassung"
+      }
+    },
+    "standard": {
+      "name": "Vysion Horeca",
+      "subtitle": "Standard",
+      "features": {
+        "1": "Vollständige Kassenfunktionalität",
+        "2": "Echtzeit-Berichte",
+        "3": "Zahlungsterminal-Integration",
+        "4": "E-Mail & Telefon-Support",
+        "5": "In 9 Sprachen verfügbar",
+        "6": "Kundenkarte & Treue",
+        "7": "Online-Bestellplattform",
+        "8": "Produkte & Kategorien",
+        "9": "Inventar",
+        "10": "Landingpage",
+        "11": "Küchenbildschirm-Software",
+        "12": "Vollständige kostenlose Schulung"
       }
     },
     "pro": {
-      "name": "Pro",
+      "name": "Vysion Pro",
+      "allOfStarter": "Pro - Alles von Starter, plus:",
       "features": {
         "1": "Online-Bestellplattform",
         "2": "Personal & Zeiterfassung",
@@ -148,13 +173,32 @@
         "5": "Küchenbildschirm-Software",
         "6": "Monatliche Geschäftsanalyse",
         "7": "Landingpage",
-        "8": "Zeiterfassung Personal",
-        "9": "Peppol-Rechnungsprogramm",
-        "10": "SCARDA Buchhaltungssoftware",
-        "11": "Tischreservierung",
-        "12": "Tischplan",
-        "13": "In 9 Sprachen verfügbar"
+        "8": "Peppol-Rechnungsprogramm",
+        "9": "SCARDA Buchhaltungssoftware",
+        "10": "Tischreservierung",
+        "11": "Tischplan",
+        "12": "In 9 Sprachen verfügbar",
+        "13": "Prioritäts-Support"
       }
+    },
+    "faq": {
+      "title": "Häufig gestellte Fragen",
+      "q1": "Kann ich es zuerst kostenlos testen?",
+      "a1": "Ja! Sie erhalten 7 Tage kostenlosen Zugang zu allen Funktionen. Keine Kreditkarte erforderlich.",
+      "q2": "Kann ich upgraden oder downgraden?",
+      "a2": "Ja, Sie können jederzeit auf Pro upgraden oder downgraden. Die Änderung wird sofort wirksam.",
+      "q3": "Gibt es langfristige Verträge?",
+      "a3": "Nein, Sie zahlen monatlich und können jederzeit kündigen. Keine Verpflichtungen.",
+      "q4": "Welche Zahlungsmethoden werden akzeptiert?",
+      "a4": "Wir akzeptieren alle gängigen Zahlungsmethoden: Visa, Mastercard, Bancontact, iDEAL und mehr über Stripe.",
+      "q5": "Sind meine Daten sicher?",
+      "a5": "Absolut. Wir verwenden Enterprise-Grade-Sicherheit, SSL-Verschlüsselung und alle Daten werden in sicheren EU-Rechenzentren gemäß DSGVO gespeichert."
+    },
+    "cta": {
+      "title": "Bereit anzufangen?",
+      "subtitle": "Starten Sie heute noch Ihre 7-tägige kostenlose Testphase. Keine Kreditkarte erforderlich.",
+      "primary": "Kostenlos starten →",
+      "secondary": "Kontakt aufnehmen"
     }
   },
   "industry": {

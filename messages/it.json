@@ -122,13 +122,13 @@
     "title": "Prezzi semplici e trasparenti",
     "subtitle": "Tutto incluso. Nessuna sorpresa.",
     "perMonth": "/mese",
-    "perLicense": "Per licenza",
-    "startTrial": "Inizia 7 giorni gratis",
-    "mostChosen": "Più scelto",
-    "included": "Incluso:",
-    "allOfLight": "Tutto di Light, più:",
-    "light": {
-      "name": "Light",
+    "trialInfo": "7 giorni gratis • Senza carta di credito • Annulla quando vuoi",
+    "popular": "Popular",
+    "chooseStarter": "Scegli Starter",
+    "chooseStandard": "Scegli Standard",
+    "choosePro": "Scegli Pro",
+    "starter": {
+      "name": "Vysion Starter",
       "features": {
         "1": "Funzionalità cassa completa",
         "2": "Report in tempo reale",
@@ -136,10 +136,35 @@
         "4": "Integrazione terminale pagamento",
         "5": "Inventario",
         "6": "Supporto email e telefono"
+      },
+      "notIncluded": {
+        "1": "Piattaforma ordini online",
+        "2": "Software display cucina",
+        "3": "Carta cliente e fedeltà",
+        "4": "Personale e registrazione ore"
+      }
+    },
+    "standard": {
+      "name": "Vysion Horeca",
+      "subtitle": "Standard",
+      "features": {
+        "1": "Funzionalità cassa completa",
+        "2": "Report in tempo reale",
+        "3": "Integrazione terminale pagamento",
+        "4": "Supporto email e telefono",
+        "5": "Disponibile in 9 lingue",
+        "6": "Carta cliente e fedeltà",
+        "7": "Piattaforma ordini online",
+        "8": "Prodotti e categorie",
+        "9": "Inventario",
+        "10": "Landing page",
+        "11": "Software display cucina",
+        "12": "Formazione gratuita completa"
       }
     },
     "pro": {
-      "name": "Pro",
+      "name": "Vysion Pro",
+      "allOfStarter": "Pro - Tutto di Starter, più:",
       "features": {
         "1": "Piattaforma ordini online",
         "2": "Personale e registrazione ore",
@@ -148,13 +173,32 @@
         "5": "Software display cucina",
         "6": "Analisi aziendale mensile",
         "7": "Landing page",
-        "8": "Registrazione tempo personale",
-        "9": "Programma fatturazione Peppol",
-        "10": "Software contabilità SCARDA",
-        "11": "Prenotazione tavoli",
-        "12": "Pianta tavoli",
-        "13": "Disponibile in 9 lingue"
+        "8": "Programma fatturazione Peppol",
+        "9": "Software contabilità SCARDA",
+        "10": "Prenotazione tavoli",
+        "11": "Pianta tavoli",
+        "12": "Disponibile in 9 lingue",
+        "13": "Supporto prioritario"
       }
+    },
+    "faq": {
+      "title": "Domande frequenti",
+      "q1": "Posso provare gratis prima?",
+      "a1": "Sì! Ottieni 7 giorni di accesso gratuito a tutte le funzionalità. Nessuna carta di credito richiesta.",
+      "q2": "Posso passare a un piano superiore o inferiore?",
+      "a2": "Sì, puoi passare a Pro o a un piano inferiore in qualsiasi momento. La modifica ha effetto immediato.",
+      "q3": "Ci sono contratti a lungo termine?",
+      "a3": "No, paghi mensilmente e puoi annullare in qualsiasi momento. Nessun obbligo.",
+      "q4": "Quali metodi di pagamento sono accettati?",
+      "a4": "Accettiamo tutti i metodi di pagamento comuni: Visa, Mastercard, Bancontact, iDEAL e altri tramite Stripe.",
+      "q5": "I miei dati sono al sicuro?",
+      "a5": "Assolutamente. Utilizziamo sicurezza di livello enterprise, crittografia SSL, e tutti i dati sono archiviati in data center UE sicuri conformi al GDPR."
+    },
+    "cta": {
+      "title": "Pronto per iniziare?",
+      "subtitle": "Inizia oggi la tua prova gratuita di 7 giorni. Nessuna carta di credito richiesta.",
+      "primary": "Inizia prova gratuita →",
+      "secondary": "Contattaci"
     }
   },
   "industry": {

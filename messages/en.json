@@ -122,13 +122,13 @@
     "title": "Simple, transparent pricing",
     "subtitle": "Everything included. No surprises.",
     "perMonth": "/month",
-    "perLicense": "Per license",
-    "startTrial": "Start 7 days free",
-    "mostChosen": "Most chosen",
-    "included": "Included:",
-    "allOfLight": "Everything from Light, plus:",
-    "light": {
-      "name": "Light",
+    "trialInfo": "7 days free trial • No credit card required • Cancel anytime",
+    "popular": "Popular",
+    "chooseStarter": "Choose Starter",
+    "chooseStandard": "Choose Standard",
+    "choosePro": "Choose Pro",
+    "starter": {
+      "name": "Vysion Starter",
       "features": {
         "1": "Full POS functionality",
         "2": "Real-time reports",
@@ -136,10 +136,35 @@
         "4": "Payment terminal integration",
         "5": "Inventory",
         "6": "Email & phone support"
+      },
+      "notIncluded": {
+        "1": "Online ordering platform",
+        "2": "Kitchen display software",
+        "3": "Customer card & loyalty",
+        "4": "Staff & time registration"
+      }
+    },
+    "standard": {
+      "name": "Vysion Horeca",
+      "subtitle": "Standard",
+      "features": {
+        "1": "Full POS functionality",
+        "2": "Real-time reports",
+        "3": "Payment terminal integration",
+        "4": "Email & phone support",
+        "5": "Available in 9 languages",
+        "6": "Customer card & loyalty",
+        "7": "Online ordering platform",
+        "8": "Products & categories",
+        "9": "Inventory",
+        "10": "Landing page",
+        "11": "Kitchen display software",
+        "12": "Full free training"
       }
     },
     "pro": {
-      "name": "Pro",
+      "name": "Vysion Pro",
+      "allOfStarter": "Pro - Everything from Starter, plus:",
       "features": {
         "1": "Online ordering platform",
         "2": "Staff & time registration",
@@ -148,13 +173,32 @@
         "5": "Kitchen display software",
         "6": "Monthly business analysis",
         "7": "Landing page",
-        "8": "Staff time registration",
-        "9": "Peppol invoicing program",
-        "10": "SCARDA accounting software",
-        "11": "Table reservation",
-        "12": "Table floor plan",
-        "13": "Available in 9 languages"
+        "8": "Peppol invoicing program",
+        "9": "SCARDA accounting software",
+        "10": "Table reservation",
+        "11": "Table floor plan",
+        "12": "Available in 9 languages",
+        "13": "Priority support"
       }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "q1": "Can I try it for free first?",
+      "a1": "Yes! You get 7 days free access to all features. No credit card needed to start.",
+      "q2": "Can I upgrade or downgrade?",
+      "a2": "Yes, you can upgrade to Pro or downgrade at any time. The change takes effect immediately.",
+      "q3": "Are there long-term contracts?",
+      "a3": "No, you pay monthly and can cancel at any time. No obligations.",
+      "q4": "What payment methods are accepted?",
+      "a4": "We accept all common payment methods: Visa, Mastercard, Bancontact, iDEAL, and more via Stripe.",
+      "q5": "Is my data safe?",
+      "a5": "Absolutely. We use enterprise-grade security, SSL encryption, and all data is stored in secure EU data centers in compliance with GDPR."
+    },
+    "cta": {
+      "title": "Ready to get started?",
+      "subtitle": "Start your 7 day free trial today. No credit card required.",
+      "primary": "Start free trial →",
+      "secondary": "Contact us"
     }
   },
   "industry": {

@@ -8,146 +8,212 @@ export default function PrijzenPage() {
   const { t, locale } = useLanguage()
 
   return (
-    <div className="min-h-screen bg-[#fdfdfd]">
+    <div className="min-h-screen bg-[#1a1a2e]">
       <Navigation />
       
       {/* Hero */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-[#fdfdfd] to-[#f5f5f5]">
+      <section className="pt-32 pb-16 bg-gradient-to-b from-[#1a1a2e] to-[#16213e]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6">
             {t('pricing.title')}
           </h1>
-          <p className="text-xl text-gray-600 mb-4">
+          <p className="text-xl text-gray-300 mb-4">
             {t('pricing.subtitle')}
           </p>
-          <p className="text-gray-500">
-            7 dagen gratis proberen • Geen creditcard nodig • Maandelijks opzegbaar
+          <p className="text-gray-400">
+            {t('pricing.trialInfo')}
           </p>
         </div>
       </section>
 
       {/* Pricing Cards */}
-      <section className="py-16 bg-[#E3E3E3]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Light/Starter Plan */}
-            <div className="bg-white rounded-3xl shadow-xl overflow-hidden transform hover:scale-[1.02] transition-transform">
-              <div className="p-8 lg:p-10">
-                <p className="text-gray-500 font-medium mb-2">{t('pricing.light.name')}</p>
-                <div className="flex items-baseline mb-4">
-                  <span className="text-5xl font-bold text-gray-900">€69</span>
-                  <span className="text-xl text-gray-500 ml-2">{t('pricing.perMonth')}</span>
+      <section className="py-16 bg-gradient-to-b from-[#16213e] to-[#1a1a2e]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+            
+            {/* Vysion Starter - €69 */}
+            <div className="bg-gradient-to-b from-[#2d4a3e] to-[#1e3a2f] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl">
+              <div className="p-6 lg:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-white">{t('pricing.starter.name')}</h3>
                 </div>
-                <p className="text-gray-500 mb-8">
-                  {t('pricing.perLicense')}
-                </p>
-                <a 
-                  href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
-                  className="block w-full bg-gray-900 text-white text-center py-4 rounded-full font-semibold hover:bg-gray-800 transition-colors mb-8"
-                >
-                  {t('pricing.startTrial')}
-                </a>
-                <p className="font-semibold text-gray-900 mb-4">{t('pricing.included')}</p>
-                <ul className="space-y-3">
+                <div className="flex items-baseline mb-6">
+                  <span className="text-5xl font-bold text-yellow-400">€69</span>
+                  <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
+                </div>
+                
+                <ul className="space-y-3 mb-8">
                   {[1, 2, 3, 4, 5, 6].map((i) => (
                     <li key={i} className="flex items-center">
-                      <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-700">{t(`pricing.light.features.${i}`)}</span>
+                      <span className="text-gray-200">{t(`pricing.starter.features.${i}`)}</span>
+                    </li>
+                  ))}
+                  {/* Not included features - grayed out */}
+                  {[1, 2, 3, 4].map((i) => (
+                    <li key={`not-${i}`} className="flex items-center opacity-50">
+                      <svg className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      <span className="text-gray-400 line-through">{t(`pricing.starter.notIncluded.${i}`)}</span>
                     </li>
                   ))}
                 </ul>
+                
+                <a 
+                  href={`https://frituurnolim.vercel.app/registreer?lang=${locale}&plan=starter`}
+                  className="block w-full bg-[#1a1a2e] text-white text-center py-4 rounded-full font-semibold hover:bg-[#0f0f1a] transition-colors"
+                >
+                  {t('pricing.chooseStarter')}
+                </a>
               </div>
             </div>
 
-            {/* Pro Plan */}
-            <div className="bg-white rounded-3xl shadow-xl overflow-hidden border-4 border-accent relative transform hover:scale-[1.02] transition-transform">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-accent text-white px-6 py-2 rounded-b-xl font-semibold text-sm">
-                {t('pricing.mostChosen')}
-              </div>
-              <div className="p-8 lg:p-10 pt-14">
-                <p className="text-accent font-medium mb-2">{t('pricing.pro.name')}</p>
-                <div className="flex items-baseline mb-4">
-                  <span className="text-5xl font-bold text-gray-900">€129</span>
-                  <span className="text-xl text-gray-500 ml-2">{t('pricing.perMonth')}</span>
+            {/* Vysion Horeca Standaard - €99 */}
+            <div className="bg-gradient-to-b from-[#1e3a5f] to-[#0f2744] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl">
+              <div className="p-6 lg:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white">{t('pricing.standard.name')}</h3>
+                    <p className="text-sm text-gray-400">{t('pricing.standard.subtitle')}</p>
+                  </div>
                 </div>
-                <p className="text-gray-500 mb-8">
-                  {t('pricing.perLicense')}
-                </p>
-                <a 
-                  href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
-                  className="block w-full bg-accent text-white text-center py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors mb-8"
-                >
-                  {t('pricing.startTrial')}
-                </a>
-                <p className="font-semibold text-gray-900 mb-4">{t('pricing.allOfLight')}</p>
-                <ul className="space-y-3">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((i) => (
+                <div className="flex items-baseline mb-6">
+                  <span className="text-5xl font-bold text-green-400">€99</span>
+                  <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
+                </div>
+                
+                <ul className="space-y-3 mb-8">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
                     <li key={i} className="flex items-center">
-                      <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
-                      <span className="text-gray-700">{t(`pricing.pro.features.${i}`)}</span>
+                      <span className="text-gray-200">{t(`pricing.standard.features.${i}`)}</span>
                     </li>
                   ))}
                 </ul>
+                
+                <a 
+                  href={`https://frituurnolim.vercel.app/registreer?lang=${locale}&plan=standard`}
+                  className="block w-full bg-[#1a1a2e] text-white text-center py-4 rounded-full font-semibold hover:bg-[#0f0f1a] transition-colors"
+                >
+                  {t('pricing.chooseStandard')}
+                </a>
               </div>
             </div>
+
+            {/* Vysion Pro - €129 - POPULAR */}
+            <div className="bg-gradient-to-b from-[#4a3f6e] to-[#2d2654] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl relative">
+              {/* Popular badge */}
+              <div className="absolute top-4 right-4 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                {t('pricing.popular')}
+              </div>
+              <div className="p-6 lg:p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-purple-400/20 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-white">{t('pricing.pro.name')}</h3>
+                </div>
+                <div className="flex items-baseline mb-6">
+                  <span className="text-5xl font-bold text-purple-300">€129</span>
+                  <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
+                </div>
+                
+                <p className="text-purple-200 mb-4 flex items-center">
+                  <span className="mr-2">✨</span>
+                  {t('pricing.pro.allOfStarter')}
+                </p>
+                
+                <ul className="space-y-3 mb-8">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((i) => (
+                    <li key={i} className="flex items-center">
+                      <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-200">{t(`pricing.pro.features.${i}`)}</span>
+                    </li>
+                  ))}
+                </ul>
+                
+                <a 
+                  href={`https://frituurnolim.vercel.app/registreer?lang=${locale}&plan=pro`}
+                  className="block w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center py-4 rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-colors"
+                >
+                  {t('pricing.choosePro')}
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-[#1a1a2e]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">
-            Veelgestelde vragen
+          <h2 className="text-3xl font-bold text-white text-center mb-12">
+            {t('pricing.faq.title')}
           </h2>
           
           <div className="space-y-6">
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Kan ik eerst gratis proberen?
+            <div className="bg-[#16213e] rounded-2xl p-6">
+              <h3 className="font-semibold text-white mb-2">
+                {t('pricing.faq.q1')}
               </h3>
-              <p className="text-gray-600">
-                Ja! Je krijgt 7 dagen gratis toegang tot alle functies. Geen creditcard nodig om te starten.
+              <p className="text-gray-300">
+                {t('pricing.faq.a1')}
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Kan ik upgraden of downgraden?
+            <div className="bg-[#16213e] rounded-2xl p-6">
+              <h3 className="font-semibold text-white mb-2">
+                {t('pricing.faq.q2')}
               </h3>
-              <p className="text-gray-600">
-                Ja, je kunt op elk moment upgraden naar Pro of downgraden naar Light. De wijziging gaat direct in.
+              <p className="text-gray-300">
+                {t('pricing.faq.a2')}
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Zijn er langlopende contracten?
+            <div className="bg-[#16213e] rounded-2xl p-6">
+              <h3 className="font-semibold text-white mb-2">
+                {t('pricing.faq.q3')}
               </h3>
-              <p className="text-gray-600">
-                Nee, je betaalt maandelijks en kunt op elk moment opzeggen. Geen verplichtingen.
+              <p className="text-gray-300">
+                {t('pricing.faq.a3')}
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Welke betaalmethodes worden geaccepteerd?
+            <div className="bg-[#16213e] rounded-2xl p-6">
+              <h3 className="font-semibold text-white mb-2">
+                {t('pricing.faq.q4')}
               </h3>
-              <p className="text-gray-600">
-                We accepteren alle gangbare betaalmethodes: Visa, Mastercard, Bancontact, iDEAL, en meer via Stripe.
+              <p className="text-gray-300">
+                {t('pricing.faq.a4')}
               </p>
             </div>
             
-            <div className="bg-gray-50 rounded-2xl p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                Is mijn data veilig?
+            <div className="bg-[#16213e] rounded-2xl p-6">
+              <h3 className="font-semibold text-white mb-2">
+                {t('pricing.faq.q5')}
               </h3>
-              <p className="text-gray-600">
-                Absoluut. We gebruiken enterprise-grade beveiliging, SSL encryptie, en alle data wordt opgeslagen in beveiligde EU datacenters conform GDPR.
+              <p className="text-gray-300">
+                {t('pricing.faq.a5')}
               </p>
             </div>
           </div>
@@ -155,26 +221,26 @@ export default function PrijzenPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-gray-900 to-gray-800">
+      <section className="py-20 bg-gradient-to-r from-purple-900 to-pink-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Klaar om te starten?
+            {t('pricing.cta.title')}
           </h2>
           <p className="text-xl text-gray-300 mb-8">
-            Start vandaag nog met je 7 dagen gratis proefperiode. Geen creditcard nodig.
+            {t('pricing.cta.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
               href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
-              className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors"
+              className="inline-block bg-white text-purple-900 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >
-              Start gratis proefperiode →
+              {t('pricing.cta.primary')}
             </a>
             <a 
               href="mailto:info@vysionhoreca.com"
               className="inline-block bg-white/10 text-white px-8 py-4 rounded-full font-semibold hover:bg-white/20 transition-colors border border-white/20"
             >
-              Contact opnemen
+              {t('pricing.cta.secondary')}
             </a>
           </div>
         </div>
