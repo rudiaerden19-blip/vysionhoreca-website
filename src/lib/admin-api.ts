@@ -908,27 +908,33 @@ export interface OrderItem {
 export interface Order {
   id?: string
   tenant_slug: string
+  business_id?: string
   order_number?: number
   customer_name: string
   customer_phone?: string
   customer_email?: string
-  order_type: 'pickup' | 'delivery'
-  status: 'new' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled'
+  customer_address?: string
+  customer_notes?: string
+  order_type?: 'pickup' | 'delivery' | string
+  status: 'new' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled' | string
   delivery_address?: string
   delivery_notes?: string
   subtotal: number
-  delivery_fee: number
-  discount_amount: number
+  delivery_fee?: number
+  discount_amount?: number
   discount_code?: string
+  tax?: number
   total: number
   payment_method?: string
-  payment_status: string
+  payment_status?: string
+  requested_date?: string
   requested_time?: string
   estimated_ready_time?: string
   completed_at?: string
   created_at?: string
   updated_at?: string
-  items?: OrderItem[]
+  // Items stored as JSONB in database
+  items?: OrderItem[] | { name: string; quantity: number; price: number }[]
 }
 
 export async function getOrders(tenantSlug: string, status?: string): Promise<Order[]> {

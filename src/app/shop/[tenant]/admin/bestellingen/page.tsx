@@ -2,17 +2,56 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getOrders, getOrderWithItems, updateOrderStatus, Order } from '@/lib/admin-api'
+import { getOrders, updateOrderStatus, Order } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 
-const statusConfig: Record<string, { bg: string; text: string; label: string; next?: Order['status']; prev?: Order['status'] }> = {
+// Parse items from JSONB
+interface OrderItemJson {
+  name?: string
+  product_name?: string
+  quantity: number
+  price?: number
+  unit_price?: number
+  total_price?: number
+}
+
+const statusConfig: Record<string, { bg: string; text: string; label: string; next?: string; prev?: string }> = {
   new: { bg: 'bg-blue-100', text: 'text-blue-700', label: '🆕 Nieuw', next: 'confirmed' },
+  NEW: { bg: 'bg-blue-100', text: 'text-blue-700', label: '🆕 Nieuw', next: 'confirmed' },
   confirmed: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: '✓ Bevestigd', next: 'preparing', prev: 'new' },
+  CONFIRMED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: '✓ Bevestigd', next: 'preparing', prev: 'new' },
   preparing: { bg: 'bg-orange-100', text: 'text-orange-700', label: '👨‍🍳 In bereiding', next: 'ready', prev: 'confirmed' },
+  PREPARING: { bg: 'bg-orange-100', text: 'text-orange-700', label: '👨‍🍳 In bereiding', next: 'ready', prev: 'confirmed' },
   ready: { bg: 'bg-green-100', text: 'text-green-700', label: '✅ Klaar', next: 'completed', prev: 'preparing' },
+  READY: { bg: 'bg-green-100', text: 'text-green-700', label: '✅ Klaar', next: 'completed', prev: 'preparing' },
   delivered: { bg: 'bg-purple-100', text: 'text-purple-700', label: '🚗 Onderweg', next: 'completed' },
+  DELIVERED: { bg: 'bg-purple-100', text: 'text-purple-700', label: '🚗 Onderweg', next: 'completed' },
   completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: '✔️ Afgerond' },
+  COMPLETED: { bg: 'bg-gray-100', text: 'text-gray-700', label: '✔️ Afgerond' },
   cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: '❌ Geannuleerd' },
+  CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: '❌ Geannuleerd' },
+}
+
+const paymentStatusConfig: Record<string, { bg: string; text: string; label: string }> = {
+  pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: '⏳ Wacht op betaling' },
+  PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: '⏳ Wacht op betaling' },
+  paid: { bg: 'bg-green-100', text: 'text-green-700', label: '✅ BETAALD' },
+  PAID: { bg: 'bg-green-100', text: 'text-green-700', label: '✅ BETAALD' },
+  failed: { bg: 'bg-red-100', text: 'text-red-700', label: '❌ Betaling mislukt' },
+  FAILED: { bg: 'bg-red-100', text: 'text-red-700', label: '❌ Betaling mislukt' },
+}
+
+const paymentMethodLabels: Record<string, string> = {
+  cash: '💵 Cash',
+  CASH: '💵 Cash',
+  card: '💳 Kaart',
+  CARD: '💳 Kaart',
+  online: '🌐 Online',
+  ONLINE: '🌐 Online',
+  ideal: '🏦 iDEAL',
+  IDEAL: '🏦 iDEAL',
+  bancontact: '💳 Bancontact',
+  BANCONTACT: '💳 Bancontact',
 }
 
 export default function BestellingenPage({ params }: { params: { tenant: string } }) {
@@ -22,7 +61,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [kitchenMode, setKitchenMode] = useState(false)
-  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [soundEnabled, setSoundEnabled] = useState(false)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   
   // Audio refs
@@ -30,7 +69,21 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
   
   // Track which orders are "new" and need attention
-  const hasNewOrders = orders.some(o => o.status === 'new')
+  const hasNewOrders = orders.some(o => o.status === 'new' || o.status === 'NEW')
+
+  // Helper: parse items from JSONB or array
+  const parseItems = (order: Order): OrderItemJson[] => {
+    if (!order.items) return []
+    // Could be already parsed or could be a JSON string
+    if (typeof order.items === 'string') {
+      try {
+        return JSON.parse(order.items)
+      } catch {
+        return []
+      }
+    }
+    return order.items as OrderItemJson[]
+  }
 
   // Initialize Web Audio API (iPad-compatible)
   const initAudio = useCallback(() => {
@@ -210,7 +263,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setSoundEnabled(true)
   }
 
-  const handleUpdateStatus = async (orderId: string, newStatus: Order['status']) => {
+  const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     setUpdatingId(orderId)
     const success = await updateOrderStatus(orderId, newStatus)
     if (success) {
@@ -221,13 +274,97 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setUpdatingId(null)
   }
 
-  const handleViewDetails = async (order: Order) => {
-    if (order.items && order.items.length > 0) {
-      setSelectedOrder(order)
-    } else {
-      const fullOrder = await getOrderWithItems(order.id!)
-      setSelectedOrder(fullOrder)
-    }
+  // Print receipt function
+  const printReceipt = (order: Order) => {
+    const items = parseItems(order)
+    const printWindow = window.open('', '_blank', 'width=400,height=600')
+    if (!printWindow) return
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Bon #${order.order_number || order.id?.slice(0, 8)}</title>
+        <style>
+          body { font-family: 'Courier New', monospace; padding: 20px; max-width: 300px; margin: 0 auto; }
+          h1 { text-align: center; font-size: 18px; margin-bottom: 5px; }
+          .order-num { text-align: center; font-size: 24px; font-weight: bold; margin: 10px 0; }
+          .divider { border-top: 1px dashed #000; margin: 10px 0; }
+          .item { display: flex; justify-content: space-between; margin: 5px 0; }
+          .total { font-size: 18px; font-weight: bold; }
+          .center { text-align: center; }
+          .small { font-size: 12px; color: #666; }
+          .badge { display: inline-block; padding: 2px 8px; background: #f0f0f0; border-radius: 4px; margin: 2px; }
+        </style>
+      </head>
+      <body>
+        <h1>🍟 Bestelling</h1>
+        <div class="order-num">#${order.order_number || order.id?.slice(0, 8)}</div>
+        <div class="center small">${new Date(order.created_at || '').toLocaleString('nl-BE')}</div>
+        
+        <div class="divider"></div>
+        
+        <div style="margin: 10px 0;">
+          <strong>${order.customer_name}</strong><br>
+          ${order.customer_phone ? `📞 ${order.customer_phone}<br>` : ''}
+          ${order.customer_address || order.delivery_address ? `📍 ${order.customer_address || order.delivery_address}<br>` : ''}
+        </div>
+        
+        <div class="center">
+          <span class="badge">${order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ AFHALEN' : '🚗 LEVERING'}</span>
+          ${order.payment_status ? `<span class="badge">${paymentStatusConfig[order.payment_status]?.label || order.payment_status}</span>` : ''}
+          ${order.payment_method ? `<span class="badge">${paymentMethodLabels[order.payment_method] || order.payment_method}</span>` : ''}
+        </div>
+        
+        <div class="divider"></div>
+        
+        ${items.map(item => `
+          <div class="item">
+            <span>${item.quantity}x ${item.name || item.product_name}</span>
+            <span>€${((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+          </div>
+        `).join('')}
+        
+        <div class="divider"></div>
+        
+        <div class="item">
+          <span>Subtotaal</span>
+          <span>€${order.subtotal?.toFixed(2) || '0.00'}</span>
+        </div>
+        ${(order.delivery_fee || 0) > 0 ? `
+          <div class="item">
+            <span>Bezorgkosten</span>
+            <span>€${order.delivery_fee?.toFixed(2)}</span>
+          </div>
+        ` : ''}
+        ${(order.discount_amount || 0) > 0 ? `
+          <div class="item" style="color: green;">
+            <span>Korting</span>
+            <span>-€${order.discount_amount?.toFixed(2)}</span>
+          </div>
+        ` : ''}
+        
+        <div class="divider"></div>
+        
+        <div class="item total">
+          <span>TOTAAL</span>
+          <span>€${order.total?.toFixed(2) || '0.00'}</span>
+        </div>
+        
+        ${order.customer_notes ? `
+          <div class="divider"></div>
+          <div class="small"><strong>Opmerking:</strong> ${order.customer_notes}</div>
+        ` : ''}
+        
+        <div class="divider"></div>
+        <div class="center small">Bedankt voor uw bestelling!</div>
+        
+        <script>window.onload = function() { window.print(); }</script>
+      </body>
+      </html>
+    `
+    printWindow.document.write(html)
+    printWindow.document.close()
   }
 
   const formatTime = (dateString?: string) => {
@@ -245,13 +382,14 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   }
 
   const filteredOrders = orders.filter(o => {
-    if (filter === 'active') return !['completed', 'cancelled'].includes(o.status)
-    if (filter === 'completed') return o.status === 'completed'
+    const status = o.status?.toLowerCase()
+    if (filter === 'active') return !['completed', 'cancelled'].includes(status)
+    if (filter === 'completed') return status === 'completed'
     return true
   })
 
-  const activeCount = orders.filter(o => !['completed', 'cancelled'].includes(o.status)).length
-  const newCount = orders.filter(o => o.status === 'new').length
+  const activeCount = orders.filter(o => !['completed', 'cancelled'].includes(o.status?.toLowerCase())).length
+  const newCount = orders.filter(o => o.status === 'new' || o.status === 'NEW').length
 
   if (loading) {
     return (
@@ -304,102 +442,137 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
         {/* Orders Grid */}
         <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredOrders.map((order) => (
-            <motion.div
-              key={order.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className={`rounded-2xl p-6 ${
-                order.status === 'new' 
-                  ? 'bg-blue-500 text-white ring-4 ring-yellow-400' 
-                  : order.status === 'confirmed'
-                  ? 'bg-yellow-500 text-gray-900'
-                  : order.status === 'preparing'
-                  ? 'bg-orange-500 text-white'
-                  : order.status === 'ready'
-                  ? 'bg-green-500 text-white'
-                  : 'bg-gray-700 text-white'
-              }`}
-            >
-              {/* Order Header */}
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <p className="text-3xl font-black">#{order.order_number || order.id?.slice(0, 4)}</p>
-                  <p className="text-lg opacity-80">{formatTime(order.created_at)}</p>
+          {filteredOrders.map((order) => {
+            const items = parseItems(order)
+            const status = order.status?.toLowerCase() || 'new'
+            const config = statusConfig[status] || statusConfig.new
+            
+            return (
+              <motion.div
+                key={order.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className={`rounded-2xl p-6 ${
+                  status === 'new' 
+                    ? 'bg-blue-500 text-white ring-4 ring-yellow-400' 
+                    : status === 'confirmed'
+                    ? 'bg-yellow-500 text-gray-900'
+                    : status === 'preparing'
+                    ? 'bg-orange-500 text-white'
+                    : status === 'ready'
+                    ? 'bg-green-500 text-white'
+                    : 'bg-gray-700 text-white'
+                }`}
+              >
+                {/* Order Header */}
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <p className="text-3xl font-black">#{order.order_number || order.id?.slice(0, 4)}</p>
+                    <p className="text-lg opacity-80">{formatTime(order.created_at)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold">€{order.total?.toFixed(2)}</p>
+                    <p className="text-lg">
+                      {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ Afhalen' : '🚗 Levering'}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold">€{order.total?.toFixed(2)}</p>
-                  <p className="text-lg">
-                    {order.order_type === 'pickup' ? '🛍️ Afhalen' : '🚗 Levering'}
-                  </p>
-                </div>
-              </div>
 
-              {/* Customer */}
-              <div className="mb-4 p-3 bg-black/20 rounded-xl">
-                <p className="text-xl font-bold">{order.customer_name}</p>
-                {order.customer_phone && <p className="opacity-80">{order.customer_phone}</p>}
-                {order.delivery_address && (
-                  <p className="opacity-80 text-sm mt-1">📍 {order.delivery_address}</p>
+                {/* Payment Status */}
+                {order.payment_status && (
+                  <div className={`inline-block px-3 py-1 rounded-full text-sm font-bold mb-3 ${
+                    order.payment_status.toLowerCase() === 'paid' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white'
+                  }`}>
+                    {paymentStatusConfig[order.payment_status]?.label || order.payment_status}
+                  </div>
                 )}
-              </div>
 
-              {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-3">
-                {order.status === 'new' && (
-                  <>
+                {/* Customer */}
+                <div className="mb-4 p-3 bg-black/20 rounded-xl">
+                  <p className="text-xl font-bold">{order.customer_name}</p>
+                  {order.customer_phone && <p className="opacity-80">{order.customer_phone}</p>}
+                  {(order.delivery_address || order.customer_address) && (
+                    <p className="opacity-80 text-sm mt-1">📍 {order.delivery_address || order.customer_address}</p>
+                  )}
+                </div>
+
+                {/* Items */}
+                {items.length > 0 && (
+                  <div className="mb-4 p-3 bg-black/20 rounded-xl">
+                    <p className="font-bold mb-2">Producten:</p>
+                    {items.map((item, i) => (
+                      <div key={i} className="flex justify-between text-sm">
+                        <span>{item.quantity}x {item.name || item.product_name}</span>
+                        <span>€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-2 gap-3">
+                  {status === 'new' && (
+                    <>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleUpdateStatus(order.id!, 'confirmed')}
+                        disabled={updatingId === order.id}
+                        className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xl font-bold"
+                      >
+                        ✓ BEVESTIG
+                      </motion.button>
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleUpdateStatus(order.id!, 'cancelled')}
+                        disabled={updatingId === order.id}
+                        className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xl font-bold"
+                      >
+                        ✕ ANNULEER
+                      </motion.button>
+                    </>
+                  )}
+                  {status === 'confirmed' && (
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => handleUpdateStatus(order.id!, 'confirmed')}
+                      onClick={() => handleUpdateStatus(order.id!, 'preparing')}
                       disabled={updatingId === order.id}
-                      className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xl font-bold"
+                      className="col-span-2 p-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-xl font-bold"
                     >
-                      ✓ BEVESTIG
+                      👨‍🍳 START BEREIDING
                     </motion.button>
+                  )}
+                  {status === 'preparing' && (
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => handleUpdateStatus(order.id!, 'cancelled')}
+                      onClick={() => handleUpdateStatus(order.id!, 'ready')}
                       disabled={updatingId === order.id}
-                      className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xl font-bold"
+                      className="col-span-2 p-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xl font-bold"
                     >
-                      ✕ ANNULEER
+                      ✅ KLAAR
                     </motion.button>
-                  </>
-                )}
-                {order.status === 'confirmed' && (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleUpdateStatus(order.id!, 'preparing')}
-                    disabled={updatingId === order.id}
-                    className="col-span-2 p-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-xl font-bold"
+                  )}
+                  {status === 'ready' && (
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleUpdateStatus(order.id!, 'completed')}
+                      disabled={updatingId === order.id}
+                      className="col-span-2 p-4 bg-gray-600 hover:bg-gray-700 text-white rounded-xl text-xl font-bold"
+                    >
+                      ✔️ AFGEROND
+                    </motion.button>
+                  )}
+                  {/* Print button */}
+                  <button
+                    onClick={() => printReceipt(order)}
+                    className="col-span-2 p-3 bg-white/20 hover:bg-white/30 rounded-xl font-bold flex items-center justify-center gap-2"
                   >
-                    👨‍🍳 START BEREIDING
-                  </motion.button>
-                )}
-                {order.status === 'preparing' && (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleUpdateStatus(order.id!, 'ready')}
-                    disabled={updatingId === order.id}
-                    className="col-span-2 p-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xl font-bold"
-                  >
-                    ✅ KLAAR
-                  </motion.button>
-                )}
-                {order.status === 'ready' && (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleUpdateStatus(order.id!, 'completed')}
-                    disabled={updatingId === order.id}
-                    className="col-span-2 p-4 bg-gray-600 hover:bg-gray-700 text-white rounded-xl text-xl font-bold"
-                  >
-                    ✔️ AFGEROND
-                  </motion.button>
-                )}
-              </div>
-            </motion.div>
-          ))}
+                    🖨️ BON PRINTEN
+                  </button>
+                </div>
+              </motion.div>
+            )
+          })}
         </div>
 
         {filteredOrders.length === 0 && (
@@ -524,125 +697,162 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       {/* Orders */}
       <div className="space-y-4">
         <AnimatePresence>
-          {filteredOrders.map((order, index) => (
-            <motion.div
-              key={order.id}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ delay: index * 0.05 }}
-              className={`bg-white rounded-2xl p-6 shadow-sm ${
-                order.status === 'new' ? 'ring-2 ring-red-500 animate-pulse' : ''
-              }`}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <span className="text-xl font-bold text-gray-900">#{order.order_number || order.id?.slice(0, 8)}</span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusConfig[order.status]?.bg || 'bg-gray-100'} ${statusConfig[order.status]?.text || 'text-gray-700'}`}>
-                      {statusConfig[order.status]?.label || order.status}
-                    </span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${order.order_type === 'pickup' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                      {order.order_type === 'pickup' ? '🛍️ Afhalen' : '🚗 Levering'}
-                    </span>
+          {filteredOrders.map((order, index) => {
+            const items = parseItems(order)
+            const status = order.status?.toLowerCase() || 'new'
+            const config = statusConfig[status] || statusConfig.new
+            
+            return (
+              <motion.div
+                key={order.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ delay: index * 0.05 }}
+                className={`bg-white rounded-2xl p-6 shadow-sm ${
+                  status === 'new' ? 'ring-2 ring-red-500 animate-pulse' : ''
+                }`}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="text-xl font-bold text-gray-900">#{order.order_number || order.id?.slice(0, 8)}</span>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${config.bg} ${config.text}`}>
+                        {config.label}
+                      </span>
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${order.order_type === 'pickup' || order.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                        {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ Afhalen' : '🚗 Levering'}
+                      </span>
+                      {/* Payment Status Badge */}
+                      {order.payment_status && (
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${
+                          paymentStatusConfig[order.payment_status]?.bg || 'bg-gray-100'
+                        } ${paymentStatusConfig[order.payment_status]?.text || 'text-gray-700'}`}>
+                          {paymentStatusConfig[order.payment_status]?.label || order.payment_status}
+                        </span>
+                      )}
+                      {/* Payment Method */}
+                      {order.payment_method && (
+                        <span className="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">
+                          {paymentMethodLabels[order.payment_method] || order.payment_method}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-gray-500 mt-1">{formatTime(order.created_at)}</p>
                   </div>
-                  <p className="text-gray-500 mt-1">{formatTime(order.created_at)}</p>
+                  <p className="text-2xl font-bold text-orange-500">€{order.total?.toFixed(2) || '0.00'}</p>
                 </div>
-                <p className="text-2xl font-bold text-orange-500">€{order.total?.toFixed(2) || '0.00'}</p>
-              </div>
 
-              <div className="grid md:grid-cols-2 gap-4 mb-4">
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-sm text-gray-500 mb-1">Klant</p>
-                  <p className="font-semibold text-gray-900">{order.customer_name}</p>
-                  {order.customer_phone && <p className="text-gray-600">{order.customer_phone}</p>}
-                  {order.delivery_address && (
-                    <p className="text-gray-600 text-sm mt-1">📍 {order.delivery_address}</p>
+                <div className="grid md:grid-cols-2 gap-4 mb-4">
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <p className="text-sm text-gray-500 mb-1">Klant</p>
+                    <p className="font-semibold text-gray-900">{order.customer_name}</p>
+                    {order.customer_phone && <p className="text-gray-600">{order.customer_phone}</p>}
+                    {(order.delivery_address || order.customer_address) && (
+                      <p className="text-gray-600 text-sm mt-1">📍 {order.delivery_address || order.customer_address}</p>
+                    )}
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <p className="text-sm text-gray-500 mb-1">Bestelling ({items.length} items)</p>
+                    {items.length > 0 ? (
+                      <div className="space-y-1 max-h-32 overflow-y-auto">
+                        {items.map((item, i) => (
+                          <div key={i} className="flex justify-between text-sm text-gray-700">
+                            <span>{item.quantity}x {item.name || item.product_name}</span>
+                            <span>€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-400 italic">Geen items beschikbaar</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Totals summary */}
+                <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4 p-3 bg-gray-50 rounded-xl">
+                  <span>Subtotaal: €{order.subtotal?.toFixed(2) || '0.00'}</span>
+                  {(order.delivery_fee || 0) > 0 && <span>Bezorg: €{order.delivery_fee?.toFixed(2)}</span>}
+                  {(order.discount_amount || 0) > 0 && <span className="text-green-600">Korting: -€{order.discount_amount?.toFixed(2)}</span>}
+                  {(order.tax || 0) > 0 && <span>BTW: €{order.tax?.toFixed(2)}</span>}
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 flex-wrap">
+                  {status === 'new' && (
+                    <>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleUpdateStatus(order.id!, 'confirmed')}
+                        disabled={updatingId === order.id}
+                        className="flex-1 min-w-[140px] bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white font-medium py-3 rounded-xl transition-colors"
+                      >
+                        ✓ Bevestigen
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleUpdateStatus(order.id!, 'cancelled')}
+                        disabled={updatingId === order.id}
+                        className="px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-medium rounded-xl transition-colors"
+                      >
+                        ✕ Annuleren
+                      </motion.button>
+                    </>
+                  )}
+                  {status !== 'new' && !['completed', 'cancelled'].includes(status) && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleUpdateStatus(order.id!, config.next!)}
+                      disabled={updatingId === order.id}
+                      className="flex-1 min-w-[200px] bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+                    >
+                      {updatingId === order.id ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                        />
+                      ) : (
+                        <>
+                          {status === 'confirmed' && '👨‍🍳 Start bereiding'}
+                          {status === 'preparing' && '✅ Klaar'}
+                          {status === 'ready' && '✔️ Afronden'}
+                        </>
+                      )}
+                    </motion.button>
+                  )}
+                  <button 
+                    onClick={() => setSelectedOrder(order)}
+                    className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                    title="Details bekijken"
+                  >
+                    📋
+                  </button>
+                  <button 
+                    onClick={() => printReceipt(order)}
+                    className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                    title="Bon printen"
+                  >
+                    🖨️
+                  </button>
+                  {order.customer_phone && (
+                    <a 
+                      href={`tel:${order.customer_phone}`}
+                      className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                      title="Bellen"
+                    >
+                      📞
+                    </a>
                   )}
                 </div>
-
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-sm text-gray-500 mb-1">Bestelling</p>
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-gray-700">
-                      <span>Subtotaal</span>
-                      <span>€{order.subtotal?.toFixed(2) || '0.00'}</span>
-                    </div>
-                    {order.delivery_fee > 0 && (
-                      <div className="flex justify-between text-gray-700">
-                        <span>Bezorgkosten</span>
-                        <span>€{order.delivery_fee.toFixed(2)}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-2 flex-wrap">
-                {order.status === 'new' && (
-                  <>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleUpdateStatus(order.id!, 'confirmed')}
-                      disabled={updatingId === order.id}
-                      className="flex-1 min-w-[140px] bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white font-medium py-3 rounded-xl transition-colors"
-                    >
-                      ✓ Bevestigen
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleUpdateStatus(order.id!, 'cancelled')}
-                      disabled={updatingId === order.id}
-                      className="px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-medium rounded-xl transition-colors"
-                    >
-                      ✕ Annuleren
-                    </motion.button>
-                  </>
-                )}
-                {order.status !== 'new' && !['completed', 'cancelled'].includes(order.status) && (
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleUpdateStatus(order.id!, statusConfig[order.status]?.next!)}
-                    disabled={updatingId === order.id}
-                    className="flex-1 min-w-[200px] bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
-                  >
-                    {updatingId === order.id ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                      />
-                    ) : (
-                      <>
-                        {order.status === 'confirmed' && '👨‍🍳 Start bereiding'}
-                        {order.status === 'preparing' && '✅ Klaar'}
-                        {order.status === 'ready' && '✔️ Afronden'}
-                      </>
-                    )}
-                  </motion.button>
-                )}
-                <button 
-                  onClick={() => handleViewDetails(order)}
-                  className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
-                >
-                  📋
-                </button>
-                {order.customer_phone && (
-                  <a 
-                    href={`tel:${order.customer_phone}`}
-                    className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
-                  >
-                    📞
-                  </a>
-                )}
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            )
+          })}
         </AnimatePresence>
       </div>
 
@@ -658,7 +868,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         </motion.div>
       )}
 
-      {/* Order Detail Modal */}
+      {/* Order Detail Modal - GROOT FORMAAT */}
       <AnimatePresence>
         {selectedOrder && (
           <motion.div
@@ -673,86 +883,138 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="p-6 border-b flex items-center justify-between">
+              {/* Header */}
+              <div className="p-6 border-b bg-gray-50 flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">
+                  <h2 className="text-2xl font-bold text-gray-900">
                     Bestelling #{selectedOrder.order_number || selectedOrder.id?.slice(0, 8)}
                   </h2>
-                  <p className="text-gray-500">{formatTime(selectedOrder.created_at)}</p>
+                  <p className="text-gray-500">{new Date(selectedOrder.created_at || '').toLocaleString('nl-BE')}</p>
                 </div>
                 <button 
                   onClick={() => setSelectedOrder(null)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                  className="text-gray-400 hover:text-gray-600 text-3xl w-10 h-10 flex items-center justify-center hover:bg-gray-200 rounded-full"
                 >
                   ×
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
-                <div className="flex items-center gap-2">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusConfig[selectedOrder.status]?.bg} ${statusConfig[selectedOrder.status]?.text}`}>
-                    {statusConfig[selectedOrder.status]?.label}
+              <div className="p-6 space-y-6">
+                {/* Status & Payment Badges */}
+                <div className="flex flex-wrap gap-2">
+                  <span className={`px-4 py-2 rounded-full text-sm font-bold ${statusConfig[selectedOrder.status]?.bg || 'bg-gray-100'} ${statusConfig[selectedOrder.status]?.text || 'text-gray-700'}`}>
+                    {statusConfig[selectedOrder.status]?.label || selectedOrder.status}
                   </span>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${selectedOrder.order_type === 'pickup' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                    {selectedOrder.order_type === 'pickup' ? '🛍️ Afhalen' : '🚗 Levering'}
+                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                    {selectedOrder.order_type === 'pickup' || selectedOrder.order_type === 'PICKUP' ? '🛍️ Afhalen' : '🚗 Levering'}
                   </span>
+                  {selectedOrder.payment_status && (
+                    <span className={`px-4 py-2 rounded-full text-sm font-bold ${paymentStatusConfig[selectedOrder.payment_status]?.bg || 'bg-gray-100'} ${paymentStatusConfig[selectedOrder.payment_status]?.text || 'text-gray-700'}`}>
+                      {paymentStatusConfig[selectedOrder.payment_status]?.label || selectedOrder.payment_status}
+                    </span>
+                  )}
+                  {selectedOrder.payment_method && (
+                    <span className="px-4 py-2 rounded-full text-sm bg-gray-100 text-gray-600">
+                      {paymentMethodLabels[selectedOrder.payment_method] || selectedOrder.payment_method}
+                    </span>
+                  )}
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-sm text-gray-500 mb-2">Klantgegevens</p>
-                  <p className="font-semibold text-gray-900">{selectedOrder.customer_name}</p>
-                  {selectedOrder.customer_phone && <p className="text-gray-600">{selectedOrder.customer_phone}</p>}
-                  {selectedOrder.customer_email && <p className="text-gray-600">{selectedOrder.customer_email}</p>}
-                  {selectedOrder.delivery_address && <p className="text-gray-600 mt-2">📍 {selectedOrder.delivery_address}</p>}
-                  {selectedOrder.delivery_notes && <p className="text-gray-500 text-sm mt-2 italic">"{selectedOrder.delivery_notes}"</p>}
+                {/* Customer Info */}
+                <div className="bg-blue-50 rounded-xl p-5">
+                  <p className="text-sm text-blue-600 font-medium mb-2">👤 Klantgegevens</p>
+                  <p className="text-xl font-bold text-gray-900">{selectedOrder.customer_name}</p>
+                  {selectedOrder.customer_phone && (
+                    <a href={`tel:${selectedOrder.customer_phone}`} className="text-blue-600 hover:underline text-lg">
+                      📞 {selectedOrder.customer_phone}
+                    </a>
+                  )}
+                  {selectedOrder.customer_email && <p className="text-gray-600">✉️ {selectedOrder.customer_email}</p>}
+                  {(selectedOrder.delivery_address || selectedOrder.customer_address) && (
+                    <p className="text-gray-600 mt-2">📍 {selectedOrder.delivery_address || selectedOrder.customer_address}</p>
+                  )}
+                  {(selectedOrder.delivery_notes || selectedOrder.customer_notes) && (
+                    <p className="text-gray-500 text-sm mt-2 italic bg-white p-3 rounded-lg">
+                      💬 "{selectedOrder.delivery_notes || selectedOrder.customer_notes}"
+                    </p>
+                  )}
                 </div>
 
-                {selectedOrder.items && selectedOrder.items.length > 0 && (
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-sm text-gray-500 mb-2">Producten</p>
-                    <div className="space-y-2">
-                      {selectedOrder.items.map((item, i) => (
-                        <div key={i} className="flex justify-between">
-                          <span className="text-gray-900">{item.quantity}x {item.product_name}</span>
-                          <span className="font-medium">€{item.total_price?.toFixed(2)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {/* Items */}
+                <div className="bg-orange-50 rounded-xl p-5">
+                  <p className="text-sm text-orange-600 font-medium mb-3">🍟 Bestelde producten</p>
+                  {(() => {
+                    const items = parseItems(selectedOrder)
+                    return items.length > 0 ? (
+                      <div className="space-y-3">
+                        {items.map((item, i) => (
+                          <div key={i} className="flex justify-between items-center bg-white p-3 rounded-lg">
+                            <div>
+                              <span className="font-bold text-orange-600 mr-2">{item.quantity}x</span>
+                              <span className="text-gray-900 font-medium">{item.name || item.product_name}</span>
+                            </div>
+                            <span className="font-bold text-gray-900">€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-400 italic">Geen items beschikbaar</p>
+                    )
+                  })()}
+                </div>
 
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-gray-600">
+                {/* Totals */}
+                <div className="border-t pt-4 space-y-3">
+                  <div className="flex justify-between text-gray-600 text-lg">
                     <span>Subtotaal</span>
-                    <span>€{selectedOrder.subtotal?.toFixed(2)}</span>
+                    <span>€{selectedOrder.subtotal?.toFixed(2) || '0.00'}</span>
                   </div>
-                  {selectedOrder.delivery_fee > 0 && (
+                  {(selectedOrder.delivery_fee || 0) > 0 && (
                     <div className="flex justify-between text-gray-600">
                       <span>Bezorgkosten</span>
-                      <span>€{selectedOrder.delivery_fee.toFixed(2)}</span>
+                      <span>€{selectedOrder.delivery_fee?.toFixed(2)}</span>
                     </div>
                   )}
-                  {selectedOrder.discount_amount > 0 && (
+                  {(selectedOrder.tax || 0) > 0 && (
+                    <div className="flex justify-between text-gray-600">
+                      <span>BTW</span>
+                      <span>€{selectedOrder.tax?.toFixed(2)}</span>
+                    </div>
+                  )}
+                  {(selectedOrder.discount_amount || 0) > 0 && (
                     <div className="flex justify-between text-green-600">
-                      <span>Korting</span>
-                      <span>-€{selectedOrder.discount_amount.toFixed(2)}</span>
+                      <span>Korting {selectedOrder.discount_code && `(${selectedOrder.discount_code})`}</span>
+                      <span>-€{selectedOrder.discount_amount?.toFixed(2)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t">
+                  <div className="flex justify-between text-2xl font-bold text-gray-900 pt-3 border-t">
                     <span>Totaal</span>
-                    <span className="text-orange-500">€{selectedOrder.total?.toFixed(2)}</span>
+                    <span className="text-orange-500">€{selectedOrder.total?.toFixed(2) || '0.00'}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 border-t bg-gray-50 flex gap-3">
-                <button onClick={() => setSelectedOrder(null)} className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium">
+              {/* Actions */}
+              <div className="p-6 border-t bg-gray-50 flex gap-3 flex-wrap">
+                <button 
+                  onClick={() => setSelectedOrder(null)} 
+                  className="flex-1 min-w-[120px] px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
+                >
                   Sluiten
                 </button>
+                <button 
+                  onClick={() => printReceipt(selectedOrder)}
+                  className="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-medium flex items-center gap-2"
+                >
+                  🖨️ Bon printen
+                </button>
                 {selectedOrder.customer_phone && (
-                  <a href={`tel:${selectedOrder.customer_phone}`} className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2">
+                  <a 
+                    href={`tel:${selectedOrder.customer_phone}`} 
+                    className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+                  >
                     📞 Bellen
                   </a>
                 )}
