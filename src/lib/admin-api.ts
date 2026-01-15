@@ -536,3 +536,91 @@ export async function getOptionsForProduct(productId: string): Promise<ProductOp
   
   return optionsWithChoices
 }
+
+// =====================================================
+// QR CODES
+// =====================================================
+export interface QrCode {
+  id?: string
+  tenant_slug: string
+  name: string
+  type: 'menu' | 'table' | 'promo' | 'review'
+  target_url: string
+  table_number?: number
+  scans: number
+  is_active: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getQrCodes(tenantSlug: string): Promise<QrCode[]> {
+  const { data, error } = await supabase
+    .from('qr_codes')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('created_at', { ascending: false })
+  
+  if (error) {
+    console.error('Error fetching QR codes:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function saveQrCode(qrCode: QrCode): Promise<QrCode | null> {
+  if (qrCode.id) {
+    // Update existing
+    const { data, error } = await supabase
+      .from('qr_codes')
+      .update({
+        name: qrCode.name,
+        type: qrCode.type,
+        target_url: qrCode.target_url,
+        table_number: qrCode.table_number,
+        is_active: qrCode.is_active,
+      })
+      .eq('id', qrCode.id)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating QR code:', error)
+      return null
+    }
+    return data
+  } else {
+    // Create new
+    const { data, error } = await supabase
+      .from('qr_codes')
+      .insert({
+        tenant_slug: qrCode.tenant_slug,
+        name: qrCode.name,
+        type: qrCode.type,
+        target_url: qrCode.target_url,
+        table_number: qrCode.table_number,
+        scans: 0,
+        is_active: true,
+      })
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error creating QR code:', error)
+      return null
+    }
+    return data
+  }
+}
+
+export async function deleteQrCode(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('qr_codes')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting QR code:', error)
+    return false
+  }
+  return true
+}
