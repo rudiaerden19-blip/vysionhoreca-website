@@ -26,6 +26,11 @@ export interface TenantSettings {
   cover_image_1?: string
   cover_image_2?: string
   cover_image_3?: string
+  // SEO fields
+  seo_title?: string
+  seo_description?: string
+  seo_keywords?: string
+  seo_og_image?: string
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {
