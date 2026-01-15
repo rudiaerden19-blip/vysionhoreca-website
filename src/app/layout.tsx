@@ -17,6 +17,11 @@ export const metadata: Metadata = {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
   },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
   openGraph: {
     title: 'Vysion Horeca | Alles-in-één Kassa & Betaalplatform',
     description: 'Het complete kassasysteem voor horeca. Probeer 7 dagen gratis.',
