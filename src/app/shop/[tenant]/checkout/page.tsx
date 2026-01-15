@@ -352,22 +352,22 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
-          <Link href={`/shop/${params.tenant}/menu`} className="flex items-center gap-1 sm:gap-2 text-gray-600 hover:opacity-70 transition-colors">
+      <header className="sticky top-0 z-50 bg-white shadow-sm w-full">
+        <div className="px-4 py-3 flex items-center justify-between max-w-4xl mx-auto">
+          <Link href={`/shop/${params.tenant}/menu`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span className="text-sm sm:text-base">Terug</span>
+            <span>Terug</span>
           </Link>
-          <h1 className="font-bold text-lg sm:text-xl text-gray-900">Afrekenen</h1>
-          <div className="w-12 sm:w-16"></div>
+          <h1 className="font-bold text-lg text-gray-900">Afrekenen</h1>
+          <div className="w-16"></div>
         </div>
       </header>
 
-      <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 overflow-x-hidden box-border">
+      <main className="px-4 py-6 max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left Column - Forms */}
           <div className="space-y-6">
@@ -699,7 +699,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             </motion.div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
