@@ -1,5 +1,5 @@
 -- =====================================================
--- VYSION HORECA - Top Sellers Migration
+-- VYSION HORECA - Extra Fields Migration
 -- Voer dit uit in je Supabase SQL Editor
 -- =====================================================
 
@@ -9,4 +9,9 @@ ADD COLUMN IF NOT EXISTS top_seller_1 TEXT DEFAULT '',
 ADD COLUMN IF NOT EXISTS top_seller_2 TEXT DEFAULT '',
 ADD COLUMN IF NOT EXISTS top_seller_3 TEXT DEFAULT '';
 
--- Klaar! Nu kan de klant 3 foto's uploaden voor topverkopers.
+-- Voeg tagline toe (korte tekst voor header/footer)
+-- Description blijft voor "Over Ons" sectie
+ALTER TABLE tenant_settings 
+ADD COLUMN IF NOT EXISTS tagline TEXT DEFAULT '';
+
+-- Klaar!

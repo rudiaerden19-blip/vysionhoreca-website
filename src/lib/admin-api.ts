@@ -7,7 +7,8 @@ export interface TenantSettings {
   id?: string
   tenant_slug: string
   business_name: string
-  description: string
+  tagline?: string  // Korte tekst voor header/footer
+  description: string  // Lange tekst voor "Over Ons"
   logo_url: string
   primary_color: string
   secondary_color: string
