@@ -64,6 +64,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [soundEnabled, setSoundEnabled] = useState(false)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
+  const [audioReady, setAudioReady] = useState(false)
   
   // Audio refs
   const audioContextRef = useRef<AudioContext | null>(null)
@@ -71,6 +72,14 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   
   // Track which orders are "new" and need attention
   const hasNewOrders = orders.some(o => o.status === 'new' || o.status === 'NEW')
+  
+  // Load sound preference from localStorage on mount
+  useEffect(() => {
+    const savedSoundEnabled = localStorage.getItem(`sound_enabled_${params.tenant}`)
+    if (savedSoundEnabled === 'true') {
+      setSoundEnabled(true)
+    }
+  }, [params.tenant])
 
   // Helper: parse items from JSONB or array
   const parseItems = (order: Order): OrderItemJson[] => {
@@ -266,7 +275,27 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     initAudio()
     playBeep()
     setSoundEnabled(true)
+    setAudioReady(true)
+    localStorage.setItem(`sound_enabled_${params.tenant}`, 'true')
   }
+  
+  // Disable sound
+  const disableSound = () => {
+    setSoundEnabled(false)
+    localStorage.setItem(`sound_enabled_${params.tenant}`, 'false')
+    if (audioIntervalRef.current) {
+      clearInterval(audioIntervalRef.current)
+      audioIntervalRef.current = null
+    }
+  }
+  
+  // Auto-init audio if previously enabled (needs user gesture first time only)
+  useEffect(() => {
+    if (soundEnabled && !audioReady) {
+      // User needs to click once to activate audio after page refresh
+      // This is a browser security requirement
+    }
+  }, [soundEnabled, audioReady])
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     setUpdatingId(orderId)
@@ -484,10 +513,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           </div>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className={`p-4 rounded-xl text-2xl ${soundEnabled ? 'bg-green-500' : 'bg-gray-600'}`}
+              onClick={() => soundEnabled ? disableSound() : enableSound()}
+              className={`p-4 rounded-xl text-2xl ${soundEnabled && audioReady ? 'bg-green-500' : 'bg-gray-600'}`}
             >
-              {soundEnabled ? '🔔' : '🔕'}
+              {soundEnabled && audioReady ? '🔔' : '🔕'}
             </button>
             <button
               onClick={() => setKitchenMode(false)}
@@ -648,18 +677,23 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   return (
     <div className="max-w-5xl mx-auto">
       {/* Sound activation prompt for iOS */}
-      {!soundEnabled && (
+      {/* Show banner if sound not enabled OR if enabled but audio not ready (after refresh) */}
+      {(!soundEnabled || (soundEnabled && !audioReady)) && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-center justify-between"
         >
-          <p className="text-yellow-800">🔔 Klik om geluidsmeldingen te activeren</p>
+          <p className="text-yellow-800">
+            {soundEnabled && !audioReady 
+              ? '🔔 Geluid staat aan - klik om te activeren (browser vereiste)' 
+              : '🔔 Klik om geluidsmeldingen te activeren'}
+          </p>
           <button
             onClick={enableSound}
             className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium"
           >
-            Activeren
+            {soundEnabled && !audioReady ? 'Heractiveren' : 'Activeren'}
           </button>
         </motion.div>
       )}
@@ -684,11 +718,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           
           {/* Sound toggle */}
           <button
-            onClick={() => { enableSound(); setSoundEnabled(!soundEnabled); }}
-            className={`p-2 rounded-xl transition-colors ${soundEnabled ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}
+            onClick={() => soundEnabled ? disableSound() : enableSound()}
+            className={`p-2 rounded-xl transition-colors ${soundEnabled && audioReady ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}
             title="Geluid"
           >
-            {soundEnabled ? '🔊' : '🔇'}
+            {soundEnabled && audioReady ? '🔊' : '🔇'}
           </button>
 
           {/* Kitchen mode */}
