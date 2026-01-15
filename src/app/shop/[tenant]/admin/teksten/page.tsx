@@ -1,55 +1,129 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { supabase } from '@/lib/supabase'
+
+interface TenantTexts {
+  hero_title?: string
+  hero_subtitle?: string
+  about_title?: string
+  about_text?: string
+  order_button_text?: string
+  pickup_label?: string
+  delivery_label?: string
+  closed_message?: string
+  min_order_message?: string
+  cart_empty_message?: string
+  checkout_button_text?: string
+}
 
 export default function TekstenPage({ params }: { params: { tenant: string } }) {
   const [saving, setSaving] = useState(false)
-  const [texts, setTexts] = useState({
-    heroTitle: 'Welkom bij onze zaak',
-    heroSubtitle: 'De lekkerste frieten van de streek',
-    aboutTitle: 'Ons verhaal',
-    aboutText: 'Al meer dan 35 jaar serveren wij de lekkerste frieten...',
-    orderButtonText: 'Bestel Nu',
-    pickupLabel: 'Afhalen',
-    deliveryLabel: 'Levering',
-    closedMessage: 'Momenteel gesloten',
-    minOrderMessage: 'Minimum bestelbedrag: €{amount}',
-    cartEmptyMessage: 'Je winkelwagen is leeg',
-    checkoutButtonText: 'Afrekenen',
+  const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [texts, setTexts] = useState<TenantTexts>({
+    hero_title: '',
+    hero_subtitle: '',
+    about_title: 'Ons verhaal',
+    about_text: '',
+    order_button_text: 'Bestel Nu',
+    pickup_label: 'Afhalen',
+    delivery_label: 'Levering',
+    closed_message: 'Momenteel gesloten',
+    min_order_message: 'Minimum bestelbedrag: €{amount}',
+    cart_empty_message: 'Je winkelwagen is leeg',
+    checkout_button_text: 'Afrekenen',
   })
+
+  // Load data on mount
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('tenant_texts')
+        .select('*')
+        .eq('tenant_slug', params.tenant)
+        .single()
+      
+      if (data && !error) {
+        setTexts({
+          hero_title: data.hero_title || '',
+          hero_subtitle: data.hero_subtitle || '',
+          about_title: data.about_title || 'Ons verhaal',
+          about_text: data.about_text || '',
+          order_button_text: data.order_button_text || 'Bestel Nu',
+          pickup_label: data.pickup_label || 'Afhalen',
+          delivery_label: data.delivery_label || 'Levering',
+          closed_message: data.closed_message || 'Momenteel gesloten',
+          min_order_message: data.min_order_message || 'Minimum bestelbedrag: €{amount}',
+          cart_empty_message: data.cart_empty_message || 'Je winkelwagen is leeg',
+          checkout_button_text: data.checkout_button_text || 'Afrekenen',
+        })
+      }
+      setLoading(false)
+    }
+    loadData()
+  }, [params.tenant])
 
   const handleChange = (key: string, value: string) => {
     setTexts(prev => ({ ...prev, [key]: value }))
+    setSaved(false)
   }
 
   const handleSave = async () => {
     setSaving(true)
-    await new Promise(r => setTimeout(r, 1000))
+    
+    const { error } = await supabase
+      .from('tenant_texts')
+      .upsert({
+        tenant_slug: params.tenant,
+        ...texts,
+      }, { onConflict: 'tenant_slug' })
+    
+    if (!error) {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } else {
+      alert('Opslaan mislukt: ' + error.message)
+    }
+    
     setSaving(false)
   }
 
   const textFields = [
-    { section: 'Hero sectie', fields: [
-      { key: 'heroTitle', label: 'Titel', placeholder: 'Welkom bij...' },
-      { key: 'heroSubtitle', label: 'Ondertitel', placeholder: 'De lekkerste...' },
+    { section: 'Hero sectie', icon: '🏠', fields: [
+      { key: 'hero_title', label: 'Titel', placeholder: 'Welkom bij...' },
+      { key: 'hero_subtitle', label: 'Ondertitel', placeholder: 'De lekkerste frieten van de streek' },
     ]},
-    { section: 'Over ons', fields: [
-      { key: 'aboutTitle', label: 'Titel', placeholder: 'Ons verhaal' },
-      { key: 'aboutText', label: 'Tekst', placeholder: 'Vertel je verhaal...', multiline: true },
+    { section: 'Over ons', icon: '📖', fields: [
+      { key: 'about_title', label: 'Titel', placeholder: 'Ons verhaal' },
+      { key: 'about_text', label: 'Tekst', placeholder: 'Vertel je verhaal...', multiline: true },
     ]},
-    { section: 'Knoppen', fields: [
-      { key: 'orderButtonText', label: 'Bestel knop', placeholder: 'Bestel Nu' },
-      { key: 'pickupLabel', label: 'Afhalen label', placeholder: 'Afhalen' },
-      { key: 'deliveryLabel', label: 'Levering label', placeholder: 'Levering' },
-      { key: 'checkoutButtonText', label: 'Afrekenen knop', placeholder: 'Afrekenen' },
+    { section: 'Knoppen', icon: '🔘', fields: [
+      { key: 'order_button_text', label: 'Bestel knop', placeholder: 'Bestel Nu' },
+      { key: 'pickup_label', label: 'Afhalen label', placeholder: 'Afhalen' },
+      { key: 'delivery_label', label: 'Levering label', placeholder: 'Levering' },
+      { key: 'checkout_button_text', label: 'Afrekenen knop', placeholder: 'Afrekenen' },
     ]},
-    { section: 'Berichten', fields: [
-      { key: 'closedMessage', label: 'Gesloten melding', placeholder: 'Momenteel gesloten' },
-      { key: 'minOrderMessage', label: 'Minimum bestelling', placeholder: 'Gebruik {amount} voor bedrag' },
-      { key: 'cartEmptyMessage', label: 'Lege winkelwagen', placeholder: 'Je winkelwagen is leeg' },
+    { section: 'Berichten', icon: '💬', fields: [
+      { key: 'closed_message', label: 'Gesloten melding', placeholder: 'Momenteel gesloten' },
+      { key: 'min_order_message', label: 'Minimum bestelling', placeholder: 'Gebruik {amount} voor bedrag' },
+      { key: 'cart_empty_message', label: 'Lege winkelwagen', placeholder: 'Je winkelwagen is leeg' },
     ]},
   ]
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -63,9 +137,13 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
           whileTap={{ scale: 0.98 }}
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+          className={`px-6 py-3 rounded-xl font-medium flex items-center gap-2 ${
+            saved 
+              ? 'bg-green-500 text-white' 
+              : 'bg-orange-500 hover:bg-orange-600 text-white'
+          }`}
         >
-          {saving ? '⏳' : '💾'} Opslaan
+          {saving ? '⏳ Opslaan...' : saved ? '✓ Opgeslagen!' : '💾 Opslaan'}
         </motion.button>
       </div>
 
@@ -78,7 +156,9 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
             transition={{ delay: sectionIndex * 0.1 }}
             className="bg-white rounded-2xl p-6 shadow-sm"
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">{section.section}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <span>{section.icon}</span> {section.section}
+            </h2>
             <div className="space-y-4">
               {section.fields.map((field) => (
                 <div key={field.key}>
@@ -87,7 +167,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
                   </label>
                   {field.multiline ? (
                     <textarea
-                      value={texts[field.key as keyof typeof texts]}
+                      value={texts[field.key as keyof TenantTexts] || ''}
                       onChange={(e) => handleChange(field.key, e.target.value)}
                       placeholder={field.placeholder}
                       rows={4}
@@ -96,7 +176,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
                   ) : (
                     <input
                       type="text"
-                      value={texts[field.key as keyof typeof texts]}
+                      value={texts[field.key as keyof TenantTexts] || ''}
                       onChange={(e) => handleChange(field.key, e.target.value)}
                       placeholder={field.placeholder}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -109,17 +189,16 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
         ))}
       </div>
 
-      {/* Language Note */}
+      {/* Info */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">🌍 Meerdere talen?</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">💡 Tip</h3>
         <p className="text-blue-700 text-sm">
-          Wil je je website in meerdere talen aanbieden? 
-          Neem contact op voor het activeren van meertaligheid.
+          Gebruik <code className="bg-blue-100 px-1 rounded">{'{amount}'}</code> in teksten om automatisch bedragen in te vullen.
         </p>
       </motion.div>
     </div>
