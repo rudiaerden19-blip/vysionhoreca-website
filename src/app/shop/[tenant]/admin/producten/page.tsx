@@ -7,14 +7,20 @@ import {
   getMenuCategories, 
   saveMenuProduct, 
   deleteMenuProduct, 
+  getProductOptions,
+  getProductOptionLinks,
+  saveProductOptionLinks,
   MenuProduct, 
-  MenuCategory 
+  MenuCategory,
+  ProductOption
 } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
 
 export default function ProductenPage({ params }: { params: { tenant: string } }) {
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [categories, setCategories] = useState<MenuCategory[]>([])
+  const [availableOptions, setAvailableOptions] = useState<ProductOption[]>([])
+  const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState('Alle')
   const [searchQuery, setSearchQuery] = useState('')
   const [editingProduct, setEditingProduct] = useState<MenuProduct | null>(null)
@@ -39,12 +45,14 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   useEffect(() => {
     async function loadData() {
       setLoading(true)
-      const [productsData, categoriesData] = await Promise.all([
+      const [productsData, categoriesData, optionsData] = await Promise.all([
         getMenuProducts(params.tenant),
         getMenuCategories(params.tenant),
+        getProductOptions(params.tenant),
       ])
       setProducts(productsData)
       setCategories(categoriesData)
+      setAvailableOptions(optionsData)
       setLoading(false)
     }
     loadData()
@@ -90,11 +98,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     }
   }
 
-  const openEditModal = (product: MenuProduct) => {
+  const openEditModal = async (product: MenuProduct) => {
     setFormData({
       ...product,
     })
     setEditingProduct(product)
+    // Load linked options
+    if (product.id) {
+      const linkedOptions = await getProductOptionLinks(product.id)
+      setSelectedOptionIds(linkedOptions)
+    }
   }
 
   const openAddModal = () => {
@@ -108,6 +121,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       is_popular: false,
       allergens: [],
     })
+    setSelectedOptionIds([])
     setShowAddModal(true)
   }
 
@@ -115,6 +129,15 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     setShowAddModal(false)
     setEditingProduct(null)
     setFormData({})
+    setSelectedOptionIds([])
+  }
+
+  const toggleOptionSelection = (optionId: string) => {
+    setSelectedOptionIds(prev => 
+      prev.includes(optionId) 
+        ? prev.filter(id => id !== optionId)
+        : [...prev, optionId]
+    )
   }
 
   const handleSave = async () => {
@@ -138,6 +161,11 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     const result = await saveMenuProduct(productData)
     
     if (result) {
+      // Save option links
+      if (result.id) {
+        await saveProductOptionLinks(result.id, selectedOptionIds, params.tenant)
+      }
+      
       if (editingProduct) {
         setProducts(prev => prev.map(p => p.id === result.id ? result : p))
       } else {
@@ -459,10 +487,59 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   />
                 </div>
 
-                {/* Options */}
+                {/* Koppel Opties */}
+                {availableOptions.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Opties & Extra&apos;s koppelen
+                    </label>
+                    <p className="text-sm text-gray-500 mb-3">
+                      Selecteer welke opties klanten kunnen kiezen bij dit product
+                    </p>
+                    <div className="space-y-2">
+                      {availableOptions.map(option => (
+                        <label 
+                          key={option.id} 
+                          className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors ${
+                            selectedOptionIds.includes(option.id!)
+                              ? 'border-orange-500 bg-orange-50'
+                              : 'border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedOptionIds.includes(option.id!)}
+                            onChange={() => toggleOptionSelection(option.id!)}
+                            className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                          />
+                          <div className="flex-1">
+                            <span className="font-medium text-gray-900">{option.name}</span>
+                            <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
+                              option.type === 'single' 
+                                ? 'bg-blue-100 text-blue-700' 
+                                : 'bg-purple-100 text-purple-700'
+                            }`}>
+                              {option.type === 'single' ? 'Enkele keuze' : 'Meerdere keuzes'}
+                            </span>
+                            {option.required && (
+                              <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">
+                                Verplicht
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            {option.choices?.length || 0} keuzes
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Status Opties */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Opties
+                    Status
                   </label>
                   <div className="flex flex-wrap gap-2">
                     <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl cursor-pointer hover:bg-gray-200">

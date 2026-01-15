@@ -443,3 +443,91 @@ export async function deleteProductOption(id: string): Promise<boolean> {
   }
   return true
 }
+
+// =====================================================
+// PRODUCT OPTION LINKS (Koppeling producten aan opties)
+// =====================================================
+export async function getProductOptionLinks(productId: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('product_option_links')
+    .select('option_id')
+    .eq('product_id', productId)
+  
+  if (error) {
+    console.error('Error fetching product option links:', error)
+    return []
+  }
+  return data?.map(d => d.option_id) || []
+}
+
+export async function saveProductOptionLinks(productId: string, optionIds: string[], tenantSlug: string): Promise<boolean> {
+  // First delete existing links
+  await supabase
+    .from('product_option_links')
+    .delete()
+    .eq('product_id', productId)
+  
+  // If no options selected, we're done
+  if (optionIds.length === 0) return true
+  
+  // Insert new links
+  const links = optionIds.map(optionId => ({
+    product_id: productId,
+    option_id: optionId,
+    tenant_slug: tenantSlug
+  }))
+  
+  const { error } = await supabase
+    .from('product_option_links')
+    .insert(links)
+  
+  if (error) {
+    console.error('Error saving product option links:', error)
+    return false
+  }
+  return true
+}
+
+export async function getOptionsForProduct(productId: string): Promise<ProductOption[]> {
+  // Get linked option IDs
+  const { data: links, error: linksError } = await supabase
+    .from('product_option_links')
+    .select('option_id')
+    .eq('product_id', productId)
+  
+  if (linksError || !links || links.length === 0) {
+    return []
+  }
+  
+  const optionIds = links.map(l => l.option_id)
+  
+  // Get the options
+  const { data: options, error: optionsError } = await supabase
+    .from('product_options')
+    .select('*')
+    .in('id', optionIds)
+    .eq('is_active', true)
+    .order('sort_order')
+  
+  if (optionsError || !options) {
+    return []
+  }
+  
+  // Get choices for each option
+  const optionsWithChoices: ProductOption[] = []
+  for (const option of options) {
+    const { data: choices } = await supabase
+      .from('product_option_choices')
+      .select('*')
+      .eq('option_id', option.id)
+      .eq('is_active', true)
+      .order('sort_order')
+    
+    optionsWithChoices.push({
+      ...option,
+      choices: choices || []
+    })
+  }
+  
+  return optionsWithChoices
+}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { getMenuCategories, getMenuProducts, MenuCategory, MenuProduct } from '@/lib/admin-api'
+import { getMenuCategories, getMenuProducts, getOptionsForProduct, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
 
 interface MenuItem {
   id: string
@@ -18,14 +18,24 @@ interface MenuItem {
   allergens: string[]
 }
 
+interface CartItem {
+  item: MenuItem
+  quantity: number
+  selectedOptions: { option: ProductOption; choice: ProductOptionChoice }[]
+  totalPrice: number
+}
+
 export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [cart, setCart] = useState<any[]>([])
+  const [cart, setCart] = useState<CartItem[]>([])
   const [cartOpen, setCartOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
+  const [productOptions, setProductOptions] = useState<ProductOption[]>([])
+  const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
+  const [loadingOptions, setLoadingOptions] = useState(false)
 
   useEffect(() => {
     async function loadData() {
@@ -62,26 +72,117 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
     loadData()
   }, [params.tenant])
 
-  const addToCart = (item: MenuItem, quantity: number = 1) => {
+  const selectProduct = async (item: MenuItem) => {
+    setSelectedItem(item)
+    setSelectedChoices({})
+    setLoadingOptions(true)
+    
+    // Load options for this product
+    const options = await getOptionsForProduct(item.id)
+    setProductOptions(options)
+    
+    // Pre-select first choice for required single-choice options
+    const initialChoices: Record<string, string> = {}
+    options.forEach(opt => {
+      if (opt.required && opt.type === 'single' && opt.choices && opt.choices.length > 0) {
+        initialChoices[opt.id!] = opt.choices[0].id!
+      }
+    })
+    setSelectedChoices(initialChoices)
+    setLoadingOptions(false)
+  }
+
+  const handleChoiceSelect = (optionId: string, choiceId: string, optionType: 'single' | 'multiple') => {
+    setSelectedChoices(prev => {
+      if (optionType === 'single') {
+        return { ...prev, [optionId]: choiceId }
+      } else {
+        // Multiple choice - toggle
+        const currentChoices = prev[optionId]?.split(',').filter(Boolean) || []
+        const isSelected = currentChoices.includes(choiceId)
+        const newChoices = isSelected
+          ? currentChoices.filter(id => id !== choiceId)
+          : [...currentChoices, choiceId]
+        return { ...prev, [optionId]: newChoices.join(',') }
+      }
+    })
+  }
+
+  const calculateTotalPrice = () => {
+    if (!selectedItem) return 0
+    let total = selectedItem.price
+    
+    productOptions.forEach(option => {
+      const selectedChoiceIds = selectedChoices[option.id!]?.split(',').filter(Boolean) || []
+      selectedChoiceIds.forEach(choiceId => {
+        const choice = option.choices?.find(c => c.id === choiceId)
+        if (choice) {
+          total += choice.price
+        }
+      })
+    })
+    
+    return total
+  }
+
+  const canAddToCart = () => {
+    // Check if all required options have a selection
+    return productOptions
+      .filter(opt => opt.required)
+      .every(opt => selectedChoices[opt.id!] && selectedChoices[opt.id!].length > 0)
+  }
+
+  const addToCart = () => {
+    if (!selectedItem) return
+    
+    // Build selected options array
+    const selectedOpts: { option: ProductOption; choice: ProductOptionChoice }[] = []
+    productOptions.forEach(option => {
+      const selectedChoiceIds = selectedChoices[option.id!]?.split(',').filter(Boolean) || []
+      selectedChoiceIds.forEach(choiceId => {
+        const choice = option.choices?.find(c => c.id === choiceId)
+        if (choice) {
+          selectedOpts.push({ option, choice })
+        }
+      })
+    })
+    
+    const totalPrice = calculateTotalPrice()
+    
+    // Create unique key for this combination
+    const optionsKey = selectedOpts.map(o => o.choice.id).sort().join('-')
+    const cartKey = `${selectedItem.id}-${optionsKey}`
+    
     setCart(prev => {
-      const existing = prev.find(c => c.item.id === item.id)
+      const existing = prev.find(c => 
+        c.item.id === selectedItem.id && 
+        c.selectedOptions.map(o => o.choice.id).sort().join('-') === optionsKey
+      )
       if (existing) {
         return prev.map(c => 
-          c.item.id === item.id 
-            ? { ...c, quantity: c.quantity + quantity }
+          c === existing
+            ? { ...c, quantity: c.quantity + 1 }
             : c
         )
       }
-      return [...prev, { item, quantity }]
+      return [...prev, { 
+        item: selectedItem, 
+        quantity: 1, 
+        selectedOptions: selectedOpts,
+        totalPrice 
+      }]
     })
+    
     setSelectedItem(null)
+    setProductOptions([])
+    setSelectedChoices({})
   }
 
-  const removeFromCart = (itemId: string) => {
-    setCart(prev => prev.filter(c => c.item.id !== itemId))
+  const removeFromCart = (index: number) => {
+    setCart(prev => prev.filter((_, i) => i !== index))
   }
 
-  const cartTotal = cart.reduce((sum, c) => sum + (c.item.price * c.quantity), 0)
+  const cartTotal = cart.reduce((sum, c) => sum + (c.totalPrice * c.quantity), 0)
   const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0)
 
   const filteredItems = activeCategory === 'all' 
@@ -206,7 +307,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ delay: index * 0.05 }}
                   whileHover={{ y: -4 }}
-                  onClick={() => setSelectedItem(item)}
+                  onClick={() => selectProduct(item)}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
                 >
                   <div className="relative h-48 overflow-hidden bg-gray-100">
@@ -333,16 +434,75 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   </div>
                 )}
 
+                {/* Product Options */}
+                {loadingOptions ? (
+                  <div className="flex items-center justify-center py-4">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full"
+                    />
+                  </div>
+                ) : productOptions.length > 0 && (
+                  <div className="space-y-4 mb-6">
+                    {productOptions.map(option => (
+                      <div key={option.id} className="border border-gray-200 rounded-xl p-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <h3 className="font-semibold text-gray-900">{option.name}</h3>
+                          {option.required && (
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">Verplicht</span>
+                          )}
+                          <span className="text-xs text-gray-500">
+                            {option.type === 'single' ? '(Kies 1)' : '(Kies meerdere)'}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          {option.choices?.map(choice => {
+                            const isSelected = option.type === 'single'
+                              ? selectedChoices[option.id!] === choice.id
+                              : selectedChoices[option.id!]?.split(',').includes(choice.id!)
+                            
+                            return (
+                              <label
+                                key={choice.id}
+                                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                                  isSelected
+                                    ? 'bg-orange-50 border-2 border-orange-500'
+                                    : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <input
+                                    type={option.type === 'single' ? 'radio' : 'checkbox'}
+                                    name={option.id}
+                                    checked={isSelected}
+                                    onChange={() => handleChoiceSelect(option.id!, choice.id!, option.type)}
+                                    className="w-5 h-5 text-orange-500 focus:ring-orange-500"
+                                  />
+                                  <span className="font-medium text-gray-900">{choice.name}</span>
+                                </div>
+                                <span className={`font-medium ${choice.price > 0 ? 'text-orange-500' : 'text-gray-400'}`}>
+                                  {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : 'Gratis'}
+                                </span>
+                              </label>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => addToCart(selectedItem)}
-                  disabled={!selectedItem.is_available}
+                  onClick={addToCart}
+                  disabled={!selectedItem.is_available || !canAddToCart()}
                   className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-4 rounded-2xl transition-colors flex items-center justify-center gap-2"
                 >
                   <span>🛒</span>
                   <span>Toevoegen aan bestelling</span>
-                  <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">€{selectedItem.price.toFixed(2)}</span>
+                  <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">€{calculateTotalPrice().toFixed(2)}</span>
                 </motion.button>
               </div>
             </motion.div>
@@ -402,19 +562,24 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {cart.map(({ item, quantity }) => (
-                      <motion.div key={item.id} layout className="flex gap-4 bg-gray-50 rounded-xl p-4">
-                        {item.image_url ? (
-                          <img src={item.image_url} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+                    {cart.map((cartItem, index) => (
+                      <motion.div key={index} layout className="flex gap-4 bg-gray-50 rounded-xl p-4">
+                        {cartItem.item.image_url ? (
+                          <img src={cartItem.item.image_url} alt={cartItem.item.name} className="w-20 h-20 object-cover rounded-lg" />
                         ) : (
                           <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-3xl">🍟</div>
                         )}
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                          <p className="text-orange-500 font-bold">€{(item.price * quantity).toFixed(2)}</p>
+                          <h3 className="font-semibold text-gray-900">{cartItem.item.name}</h3>
+                          {cartItem.selectedOptions.length > 0 && (
+                            <div className="text-sm text-gray-500 mt-1">
+                              {cartItem.selectedOptions.map(opt => opt.choice.name).join(', ')}
+                            </div>
+                          )}
+                          <p className="text-orange-500 font-bold">€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
                           <div className="flex items-center gap-2 mt-2">
-                            <span className="text-gray-500">Aantal: {quantity}</span>
-                            <button onClick={() => removeFromCart(item.id)} className="text-red-500 text-sm hover:underline">Verwijder</button>
+                            <span className="text-gray-500">Aantal: {cartItem.quantity}</span>
+                            <button onClick={() => removeFromCart(index)} className="text-red-500 text-sm hover:underline">Verwijder</button>
                           </div>
                         </div>
                       </motion.div>
