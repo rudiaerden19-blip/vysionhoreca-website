@@ -51,6 +51,13 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   async function loadDashboardData() {
     setLoading(true)
     
+    // Check if supabase is available
+    if (!supabase) {
+      console.warn('Supabase not configured - showing empty dashboard')
+      setLoading(false)
+      return
+    }
+    
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const todayISO = today.toISOString()
