@@ -1,62 +1,172 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  category: string
-  image: string
-  available: boolean
-  popular: boolean
-  new: boolean
-  vegetarian: boolean
-  allergens: string[]
-}
-
-const demoProducts: Product[] = [
-  { id: '1', name: 'Grote Friet', description: 'Krokante verse frieten, ruim portie', price: 4.50, category: 'Frieten', image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400', available: true, popular: true, new: false, vegetarian: true, allergens: [] },
-  { id: '2', name: 'Bicky Burger', description: 'De echte Bicky met pickles, ui en Bickysaus', price: 5.50, category: 'Burgers', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', available: true, popular: true, new: false, vegetarian: false, allergens: ['gluten', 'ei', 'melk'] },
-  { id: '3', name: 'Frikandel Speciaal', description: 'Frikandel met curry, mayo en uitjes', price: 4.00, category: 'Snacks', image: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=400', available: true, popular: true, new: false, vegetarian: false, allergens: ['gluten'] },
-  { id: '4', name: 'Kipnuggets (6 st)', description: 'Krokante kipnuggets met saus naar keuze', price: 6.00, category: 'Snacks', image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400', available: true, popular: false, new: true, vegetarian: false, allergens: ['gluten', 'ei'] },
-  { id: '5', name: 'Cheese Burger Deluxe', description: 'Dubbele burger met cheddar, bacon en BBQ saus', price: 9.50, category: 'Burgers', image: 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=400', available: true, popular: true, new: false, vegetarian: false, allergens: ['gluten', 'melk', 'ei'] },
-  { id: '6', name: 'Veggie Burger', description: 'Huisgemaakte groenteburger met verse groenten', price: 7.50, category: 'Burgers', image: 'https://images.unsplash.com/photo-1520072959219-c595dc870360?w=400', available: false, popular: false, new: true, vegetarian: true, allergens: ['gluten', 'ei'] },
-]
-
-const categories = ['Alle', 'Frieten', 'Snacks', 'Burgers', 'Sauzen', 'Dranken']
+import { 
+  getMenuProducts, 
+  getMenuCategories, 
+  saveMenuProduct, 
+  deleteMenuProduct, 
+  MenuProduct, 
+  MenuCategory 
+} from '@/lib/admin-api'
 
 export default function ProductenPage({ params }: { params: { tenant: string } }) {
-  const [products, setProducts] = useState(demoProducts)
+  const [products, setProducts] = useState<MenuProduct[]>([])
+  const [categories, setCategories] = useState<MenuCategory[]>([])
   const [selectedCategory, setSelectedCategory] = useState('Alle')
   const [searchQuery, setSearchQuery] = useState('')
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [editingProduct, setEditingProduct] = useState<MenuProduct | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  // Form state for add/edit modal
+  const [formData, setFormData] = useState<Partial<MenuProduct>>({
+    name: '',
+    description: '',
+    price: 0,
+    category_id: null,
+    image_url: '',
+    is_active: true,
+    is_popular: false,
+    allergens: [],
+  })
+
+  // Load data on mount
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true)
+      const [productsData, categoriesData] = await Promise.all([
+        getMenuProducts(params.tenant),
+        getMenuCategories(params.tenant),
+      ])
+      setProducts(productsData)
+      setCategories(categoriesData)
+      setLoading(false)
+    }
+    loadData()
+  }, [params.tenant])
 
   const filteredProducts = products.filter(p => {
-    const matchesCategory = selectedCategory === 'Alle' || p.category === selectedCategory
+    const category = categories.find(c => c.id === p.category_id)
+    const matchesCategory = selectedCategory === 'Alle' || category?.name === selectedCategory
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
 
-  const toggleAvailable = (id: string) => {
-    setProducts(prev => prev.map(p => 
-      p.id === id ? { ...p, available: !p.available } : p
-    ))
-  }
-
-  const togglePopular = (id: string) => {
-    setProducts(prev => prev.map(p => 
-      p.id === id ? { ...p, popular: !p.popular } : p
-    ))
-  }
-
-  const deleteProduct = (id: string) => {
-    if (confirm('Weet je zeker dat je dit product wilt verwijderen?')) {
-      setProducts(prev => prev.filter(p => p.id !== id))
+  const toggleAvailable = async (id: string) => {
+    const product = products.find(p => p.id === id)
+    if (product) {
+      const updated = { ...product, is_active: !product.is_active }
+      const result = await saveMenuProduct(updated)
+      if (result) {
+        setProducts(prev => prev.map(p => p.id === id ? result : p))
+      }
     }
+  }
+
+  const togglePopular = async (id: string) => {
+    const product = products.find(p => p.id === id)
+    if (product) {
+      const updated = { ...product, is_popular: !product.is_popular }
+      const result = await saveMenuProduct(updated)
+      if (result) {
+        setProducts(prev => prev.map(p => p.id === id ? result : p))
+      }
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Weet je zeker dat je dit product wilt verwijderen?')) {
+      const success = await deleteMenuProduct(id)
+      if (success) {
+        setProducts(prev => prev.filter(p => p.id !== id))
+      } else {
+        setError('Verwijderen mislukt')
+      }
+    }
+  }
+
+  const openEditModal = (product: MenuProduct) => {
+    setFormData({
+      ...product,
+    })
+    setEditingProduct(product)
+  }
+
+  const openAddModal = () => {
+    setFormData({
+      name: '',
+      description: '',
+      price: 0,
+      category_id: categories[0]?.id || null,
+      image_url: '',
+      is_active: true,
+      is_popular: false,
+      allergens: [],
+    })
+    setShowAddModal(true)
+  }
+
+  const closeModal = () => {
+    setShowAddModal(false)
+    setEditingProduct(null)
+    setFormData({})
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    setError('')
+
+    const productData: MenuProduct = {
+      id: editingProduct?.id,
+      tenant_slug: params.tenant,
+      category_id: formData.category_id || null,
+      name: formData.name || '',
+      description: formData.description || '',
+      price: formData.price || 0,
+      image_url: formData.image_url || '',
+      is_active: formData.is_active ?? true,
+      is_popular: formData.is_popular ?? false,
+      sort_order: editingProduct?.sort_order || products.length,
+      allergens: formData.allergens || [],
+    }
+
+    const result = await saveMenuProduct(productData)
+    
+    if (result) {
+      if (editingProduct) {
+        setProducts(prev => prev.map(p => p.id === result.id ? result : p))
+      } else {
+        setProducts(prev => [...prev, result])
+      }
+      closeModal()
+    } else {
+      setError('Opslaan mislukt. Probeer opnieuw.')
+    }
+    setSaving(false)
+  }
+
+  const getCategoryName = (categoryId: string | null) => {
+    const category = categories.find(c => c.id === categoryId)
+    return category?.name || 'Geen categorie'
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-gray-500">Laden...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -70,13 +180,20 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => setShowAddModal(true)}
+          onClick={openAddModal}
           className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl flex items-center gap-2"
         >
           <span>➕</span>
           <span>Nieuw product</span>
         </motion.button>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600">
+          {error}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -94,17 +211,27 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
         {/* Category Filter */}
         <div className="flex gap-2 overflow-x-auto pb-2">
+          <button
+            onClick={() => setSelectedCategory('Alle')}
+            className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
+              selectedCategory === 'Alle'
+                ? 'bg-orange-500 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Alle
+          </button>
           {categories.map(cat => (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.name)}
               className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
-                selectedCategory === cat
+                selectedCategory === cat.name
                   ? 'bg-orange-500 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              {cat}
+              {cat.name}
             </button>
           ))}
         </div>
@@ -121,28 +248,28 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ delay: index * 0.05 }}
-              className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${!product.available ? 'opacity-60' : ''}`}
+              className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${!product.is_active ? 'opacity-60' : ''}`}
             >
               {/* Image */}
-              <div className="relative h-40">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative h-40 bg-gray-100">
+                {product.image_url ? (
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-4xl">
+                    🍟
+                  </div>
+                )}
                 {/* Badges */}
                 <div className="absolute top-2 left-2 flex gap-1">
-                  {product.new && (
-                    <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">NIEUW</span>
-                  )}
-                  {product.popular && (
+                  {product.is_popular && (
                     <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">🔥</span>
                   )}
-                  {product.vegetarian && (
-                    <span className="bg-green-600 text-white text-xs font-bold px-2 py-1 rounded-full">🌱</span>
-                  )}
                 </div>
-                {!product.available && (
+                {!product.is_active && (
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                     <span className="bg-red-500 text-white font-bold px-3 py-1 rounded-full text-sm">Uitgeschakeld</span>
                   </div>
@@ -154,7 +281,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="font-bold text-gray-900">{product.name}</h3>
-                    <p className="text-sm text-gray-500">{product.category}</p>
+                    <p className="text-sm text-gray-500">{getCategoryName(product.category_id)}</p>
                   </div>
                   <span className="text-lg font-bold text-orange-500">€{product.price.toFixed(2)}</span>
                 </div>
@@ -164,38 +291,38 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div className="flex gap-2">
                     <button
-                      onClick={() => toggleAvailable(product.id)}
+                      onClick={() => toggleAvailable(product.id!)}
                       className={`p-2 rounded-lg transition-colors ${
-                        product.available 
+                        product.is_active 
                           ? 'bg-green-100 text-green-600' 
                           : 'bg-gray-100 text-gray-400'
                       }`}
-                      title={product.available ? 'Beschikbaar' : 'Niet beschikbaar'}
+                      title={product.is_active ? 'Beschikbaar' : 'Niet beschikbaar'}
                     >
-                      {product.available ? '✓' : '✕'}
+                      {product.is_active ? '✓' : '✕'}
                     </button>
                     <button
-                      onClick={() => togglePopular(product.id)}
+                      onClick={() => togglePopular(product.id!)}
                       className={`p-2 rounded-lg transition-colors ${
-                        product.popular 
+                        product.is_popular 
                           ? 'bg-orange-100 text-orange-600' 
                           : 'bg-gray-100 text-gray-400'
                       }`}
-                      title={product.popular ? 'Populair' : 'Niet populair'}
+                      title={product.is_popular ? 'Populair' : 'Niet populair'}
                     >
                       🔥
                     </button>
                   </div>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setEditingProduct(product)}
+                      onClick={() => openEditModal(product)}
                       className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                       title="Bewerken"
                     >
                       ✏️
                     </button>
                     <button
-                      onClick={() => deleteProduct(product.id)}
+                      onClick={() => handleDelete(product.id!)}
                       className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
                       title="Verwijderen"
                     >
@@ -216,7 +343,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           <h3 className="text-xl font-bold text-gray-900 mb-2">Geen producten gevonden</h3>
           <p className="text-gray-500 mb-6">Pas je filters aan of voeg een nieuw product toe</p>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={openAddModal}
             className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl"
           >
             + Nieuw product
@@ -231,7 +358,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => { setShowAddModal(false); setEditingProduct(null); }}
+            onClick={closeModal}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           >
             <motion.div
@@ -247,7 +374,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     {editingProduct ? 'Product bewerken' : 'Nieuw product'}
                   </h2>
                   <button
-                    onClick={() => { setShowAddModal(false); setEditingProduct(null); }}
+                    onClick={closeModal}
                     className="p-2 hover:bg-gray-100 rounded-lg"
                   >
                     ✕
@@ -263,7 +390,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   </label>
                   <input
                     type="text"
-                    defaultValue={editingProduct?.name || ''}
+                    value={formData.name || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     placeholder="Bijv. Grote Friet"
                   />
@@ -275,7 +403,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     Beschrijving
                   </label>
                   <textarea
-                    defaultValue={editingProduct?.description || ''}
+                    value={formData.description || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
                     placeholder="Beschrijf het product..."
@@ -293,7 +422,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       <input
                         type="number"
                         step="0.01"
-                        defaultValue={editingProduct?.price || ''}
+                        value={formData.price || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
                         className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                         placeholder="0.00"
                       />
@@ -304,27 +434,30 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       Categorie *
                     </label>
                     <select
-                      defaultValue={editingProduct?.category || ''}
+                      value={formData.category_id || ''}
+                      onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value || null }))}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
                       <option value="">Selecteer...</option>
-                      {categories.filter(c => c !== 'Alle').map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
+                      {categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
                     </select>
                   </div>
                 </div>
 
-                {/* Image */}
+                {/* Image URL */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Afbeelding
+                    Afbeelding URL
                   </label>
-                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-orange-500 transition-colors cursor-pointer">
-                    <span className="text-4xl mb-2 block">📷</span>
-                    <p className="text-gray-500">Klik om een afbeelding te uploaden</p>
-                    <p className="text-sm text-gray-400">JPG, PNG tot 5MB</p>
-                  </div>
+                  <input
+                    type="url"
+                    value={formData.image_url || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="https://..."
+                  />
                 </div>
 
                 {/* Options */}
@@ -334,36 +467,23 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   </label>
                   <div className="flex flex-wrap gap-2">
                     <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl cursor-pointer hover:bg-gray-200">
-                      <input type="checkbox" defaultChecked={editingProduct?.popular} className="rounded" />
+                      <input 
+                        type="checkbox" 
+                        checked={formData.is_active ?? true}
+                        onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
+                        className="rounded" 
+                      />
+                      <span>✓ Beschikbaar</span>
+                    </label>
+                    <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl cursor-pointer hover:bg-gray-200">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.is_popular ?? false}
+                        onChange={(e) => setFormData(prev => ({ ...prev, is_popular: e.target.checked }))}
+                        className="rounded" 
+                      />
                       <span>🔥 Populair</span>
                     </label>
-                    <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl cursor-pointer hover:bg-gray-200">
-                      <input type="checkbox" defaultChecked={editingProduct?.new} className="rounded" />
-                      <span>✨ Nieuw</span>
-                    </label>
-                    <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl cursor-pointer hover:bg-gray-200">
-                      <input type="checkbox" defaultChecked={editingProduct?.vegetarian} className="rounded" />
-                      <span>🌱 Vegetarisch</span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Allergens */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Allergenen
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {['Gluten', 'Ei', 'Melk', 'Noten', 'Soja', 'Vis', 'Schaaldieren', 'Selderij', 'Mosterd', 'Sesam'].map(allergen => (
-                      <label key={allergen} className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 text-sm">
-                        <input 
-                          type="checkbox" 
-                          defaultChecked={editingProduct?.allergens.includes(allergen.toLowerCase())} 
-                          className="rounded"
-                        />
-                        <span>{allergen}</span>
-                      </label>
-                    ))}
                   </div>
                 </div>
               </div>
@@ -371,13 +491,28 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               {/* Footer */}
               <div className="p-6 border-t bg-gray-50 flex justify-end gap-4">
                 <button
-                  onClick={() => { setShowAddModal(false); setEditingProduct(null); }}
+                  onClick={closeModal}
                   className="px-6 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-200 transition-colors"
                 >
                   Annuleren
                 </button>
-                <button className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium transition-colors">
-                  {editingProduct ? 'Opslaan' : 'Toevoegen'}
+                <button 
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+                >
+                  {saving ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                      />
+                      <span>Opslaan...</span>
+                    </>
+                  ) : (
+                    <span>{editingProduct ? 'Opslaan' : 'Toevoegen'}</span>
+                  )}
                 </button>
               </div>
             </motion.div>

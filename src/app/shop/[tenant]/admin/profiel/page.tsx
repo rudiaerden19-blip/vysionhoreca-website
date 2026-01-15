@@ -1,28 +1,43 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 
 export default function ProfielPage({ params }: { params: { tenant: string } }) {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   
-  const [formData, setFormData] = useState({
-    name: 'Frituur De Gouden Friet',
-    tagline: 'Ambachtelijke frieten sinds 1985',
-    description: 'De lekkerste frieten van de regio! Ambachtelijk bereid met verse Belgische aardappelen, gebakken in rundvet.',
-    story: 'Al meer dan 35 jaar serveren wij de lekkerste frieten van Pelt. Onze frituur is een familiebedrijf, opgericht door onze grootouders in 1985. Wij gebruiken alleen de beste Bintje aardappelen, vers geschild en dubbel gebakken in rundvet. Dat proef je!',
-    address: 'Marktplein 15',
-    city: '3900 Pelt',
-    country: 'België',
-    phone: '+32 11 12 34 56',
-    email: 'info@degoudenfriet.be',
-    website: '',
-    vatNumber: 'BE0123456789',
-    facebook: 'https://facebook.com/degoudenfriet',
-    instagram: 'https://instagram.com/degoudenfriet',
-    tiktok: '',
+  const [formData, setFormData] = useState<TenantSettings>({
+    tenant_slug: params.tenant,
+    business_name: '',
+    description: '',
+    logo_url: '',
+    primary_color: '#ef4444',
+    secondary_color: '#dc2626',
+    email: '',
+    phone: '',
+    address: '',
+    facebook_url: '',
+    instagram_url: '',
+    tiktok_url: '',
+    website_url: '',
   })
+
+  // Load data on mount
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true)
+      const data = await getTenantSettings(params.tenant)
+      if (data) {
+        setFormData(data)
+      }
+      setLoading(false)
+    }
+    loadData()
+  }, [params.tenant])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
@@ -30,15 +45,37 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
       [e.target.name]: e.target.value
     }))
     setSaved(false)
+    setError('')
   }
 
   const handleSave = async () => {
     setSaving(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    setError('')
+    
+    const success = await saveTenantSettings(formData)
+    
+    if (success) {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } else {
+      setError('Opslaan mislukt. Probeer opnieuw.')
+    }
     setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-gray-500">Laden...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -83,6 +120,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
         </motion.button>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600">
+          {error}
+        </div>
+      )}
+
       {/* Form Sections */}
       <div className="space-y-6">
         {/* Basic Info */}
@@ -102,8 +146,8 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               </label>
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="business_name"
+                value={formData.business_name}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 placeholder="Bijv. Frituur De Gouden Friet"
@@ -112,22 +156,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tagline / Slogan
-              </label>
-              <input
-                type="text"
-                name="tagline"
-                value={formData.tagline}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Bijv. Ambachtelijke frieten sinds 1985"
-              />
-              <p className="text-sm text-gray-500 mt-1">Dit verschijnt onder je zaaknaam op de website</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Korte beschrijving
+                Beschrijving
               </label>
               <textarea
                 name="description"
@@ -140,19 +169,52 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               <p className="text-sm text-gray-500 mt-1">{formData.description.length}/200 karakters</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Ons verhaal
-              </label>
-              <textarea
-                name="story"
-                value={formData.story}
-                onChange={handleChange}
-                rows={5}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
-                placeholder="Vertel het verhaal van je zaak..."
-              />
-              <p className="text-sm text-gray-500 mt-1">Dit verschijnt in de &quot;Over ons&quot; sectie</p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Primaire kleur
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    name="primary_color"
+                    value={formData.primary_color}
+                    onChange={handleChange}
+                    className="w-12 h-12 rounded-lg border border-gray-200 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    name="primary_color"
+                    value={formData.primary_color}
+                    onChange={handleChange}
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="#ef4444"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Secundaire kleur
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    name="secondary_color"
+                    value={formData.secondary_color}
+                    onChange={handleChange}
+                    className="w-12 h-12 rounded-lg border border-gray-200 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    name="secondary_color"
+                    value={formData.secondary_color}
+                    onChange={handleChange}
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="#dc2626"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -171,7 +233,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Adres *
+                Adres
               </label>
               <input
                 type="text"
@@ -179,40 +241,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.address}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Straat en huisnummer"
+                placeholder="Straat 123, 1000 Brussel"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Postcode & Plaats *
-              </label>
-              <input
-                type="text"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Bijv. 3900 Pelt"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Land
-              </label>
-              <input
-                type="text"
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Telefoonnummer *
+                Telefoonnummer
               </label>
               <input
                 type="tel"
@@ -226,7 +261,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                E-mailadres *
+                E-mailadres
               </label>
               <input
                 type="email"
@@ -235,34 +270,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 placeholder="info@jouwzaak.be"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                BTW-nummer
-              </label>
-              <input
-                type="text"
-                name="vatNumber"
-                value={formData.vatNumber}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="BE0123456789"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Website (optioneel)
-              </label>
-              <input
-                type="url"
-                name="website"
-                value={formData.website}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="https://jouwzaak.be"
               />
             </div>
           </div>
@@ -286,8 +293,8 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               </label>
               <input
                 type="url"
-                name="facebook"
-                value={formData.facebook}
+                name="facebook_url"
+                value={formData.facebook_url}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 placeholder="https://facebook.com/jouwzaak"
@@ -300,8 +307,8 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               </label>
               <input
                 type="url"
-                name="instagram"
-                value={formData.instagram}
+                name="instagram_url"
+                value={formData.instagram_url}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 placeholder="https://instagram.com/jouwzaak"
@@ -314,11 +321,25 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               </label>
               <input
                 type="url"
-                name="tiktok"
-                value={formData.tiktok}
+                name="tiktok_url"
+                value={formData.tiktok_url}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 placeholder="https://tiktok.com/@jouwzaak"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <span>🌐</span> Website
+              </label>
+              <input
+                type="url"
+                name="website_url"
+                value={formData.website_url}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                placeholder="https://jouwzaak.be"
               />
             </div>
           </div>

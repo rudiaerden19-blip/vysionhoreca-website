@@ -1,36 +1,76 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { getDeliverySettings, saveDeliverySettings, DeliverySettings } from '@/lib/admin-api'
 
 export default function LeveringPage({ params }: { params: { tenant: string } }) {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   
-  const [settings, setSettings] = useState({
-    pickupEnabled: true,
-    pickupTime: '15',
-    deliveryEnabled: true,
-    deliveryTime: '30',
-    deliveryFee: '2.50',
-    deliveryRadius: '5',
-    minimumOrder: '15',
-    freeDeliveryFrom: '25',
-    dineInEnabled: false,
-    tableReservation: false,
+  const [settings, setSettings] = useState<DeliverySettings>({
+    tenant_slug: params.tenant,
+    pickup_enabled: true,
+    pickup_time_minutes: 15,
+    delivery_enabled: true,
+    delivery_fee: 2.50,
+    min_order_amount: 15,
+    delivery_radius_km: 5,
+    delivery_time_minutes: 30,
+    payment_cash: true,
+    payment_card: true,
+    payment_online: false,
   })
 
-  const handleChange = (field: string, value: string | boolean) => {
+  // Load data on mount
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true)
+      const data = await getDeliverySettings(params.tenant)
+      if (data) {
+        setSettings(data)
+      }
+      setLoading(false)
+    }
+    loadData()
+  }, [params.tenant])
+
+  const handleChange = (field: keyof DeliverySettings, value: string | number | boolean) => {
     setSettings(prev => ({ ...prev, [field]: value }))
     setSaved(false)
+    setError('')
   }
 
   const handleSave = async () => {
     setSaving(true)
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    setError('')
+    
+    const success = await saveDeliverySettings(settings)
+    
+    if (success) {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } else {
+      setError('Opslaan mislukt. Probeer opnieuw.')
+    }
     setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-gray-500">Laden...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -75,6 +115,13 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
         </motion.button>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600">
+          {error}
+        </div>
+      )}
+
       <div className="space-y-6">
         {/* Pickup */}
         <motion.div
@@ -93,30 +140,30 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={settings.pickupEnabled}
-                onChange={(e) => handleChange('pickupEnabled', e.target.checked)}
+                checked={settings.pickup_enabled}
+                onChange={(e) => handleChange('pickup_enabled', e.target.checked)}
                 className="sr-only peer"
               />
               <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
             </label>
           </div>
 
-          {settings.pickupEnabled && (
+          {settings.pickup_enabled && (
             <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Bereidingstijd (minuten)
                 </label>
                 <select
-                  value={settings.pickupTime}
-                  onChange={(e) => handleChange('pickupTime', e.target.value)}
+                  value={settings.pickup_time_minutes}
+                  onChange={(e) => handleChange('pickup_time_minutes', parseInt(e.target.value))}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
-                  <option value="10">10 minuten</option>
-                  <option value="15">15 minuten</option>
-                  <option value="20">20 minuten</option>
-                  <option value="30">30 minuten</option>
-                  <option value="45">45 minuten</option>
+                  <option value={10}>10 minuten</option>
+                  <option value={15}>15 minuten</option>
+                  <option value={20}>20 minuten</option>
+                  <option value={30}>30 minuten</option>
+                  <option value={45}>45 minuten</option>
                 </select>
               </div>
             </div>
@@ -141,29 +188,29 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={settings.deliveryEnabled}
-                onChange={(e) => handleChange('deliveryEnabled', e.target.checked)}
+                checked={settings.delivery_enabled}
+                onChange={(e) => handleChange('delivery_enabled', e.target.checked)}
                 className="sr-only peer"
               />
               <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
             </label>
           </div>
 
-          {settings.deliveryEnabled && (
+          {settings.delivery_enabled && (
             <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Levertijd (minuten)
                 </label>
                 <select
-                  value={settings.deliveryTime}
-                  onChange={(e) => handleChange('deliveryTime', e.target.value)}
+                  value={settings.delivery_time_minutes}
+                  onChange={(e) => handleChange('delivery_time_minutes', parseInt(e.target.value))}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
-                  <option value="20">20 minuten</option>
-                  <option value="30">30 minuten</option>
-                  <option value="45">45 minuten</option>
-                  <option value="60">60 minuten</option>
+                  <option value={20}>20 minuten</option>
+                  <option value={30}>30 minuten</option>
+                  <option value={45}>45 minuten</option>
+                  <option value={60}>60 minuten</option>
                 </select>
               </div>
 
@@ -176,8 +223,8 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                   <input
                     type="number"
                     step="0.50"
-                    value={settings.deliveryFee}
-                    onChange={(e) => handleChange('deliveryFee', e.target.value)}
+                    value={settings.delivery_fee}
+                    onChange={(e) => handleChange('delivery_fee', parseFloat(e.target.value) || 0)}
                     className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
                 </div>
@@ -188,15 +235,15 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                   Bezorgradius (km)
                 </label>
                 <select
-                  value={settings.deliveryRadius}
-                  onChange={(e) => handleChange('deliveryRadius', e.target.value)}
+                  value={settings.delivery_radius_km}
+                  onChange={(e) => handleChange('delivery_radius_km', parseInt(e.target.value))}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
-                  <option value="3">3 km</option>
-                  <option value="5">5 km</option>
-                  <option value="10">10 km</option>
-                  <option value="15">15 km</option>
-                  <option value="20">20 km</option>
+                  <option value={3}>3 km</option>
+                  <option value={5}>5 km</option>
+                  <option value={10}>10 km</option>
+                  <option value={15}>15 km</option>
+                  <option value={20}>20 km</option>
                 </select>
               </div>
 
@@ -209,76 +256,70 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                   <input
                     type="number"
                     step="1"
-                    value={settings.minimumOrder}
-                    onChange={(e) => handleChange('minimumOrder', e.target.value)}
+                    value={settings.min_order_amount}
+                    onChange={(e) => handleChange('min_order_amount', parseFloat(e.target.value) || 0)}
                     className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
                 </div>
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Gratis levering vanaf
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
-                  <input
-                    type="number"
-                    step="1"
-                    value={settings.freeDeliveryFrom}
-                    onChange={(e) => handleChange('freeDeliveryFrom', e.target.value)}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Laat leeg voor nooit gratis"
-                  />
-                </div>
-                <p className="text-sm text-gray-500 mt-1">Laat op 0 voor geen gratis levering</p>
               </div>
             </div>
           )}
         </motion.div>
 
-        {/* Dine In */}
+        {/* Payment Methods */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <span className="text-3xl">🍽️</span>
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Ter plaatse eten</h2>
-                <p className="text-gray-500 text-sm">Klanten eten in je zaak</p>
-              </div>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
+          <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <span>💳</span> Betaalmethodes
+          </h2>
+          
+          <div className="space-y-4">
+            <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
               <input
                 type="checkbox"
-                checked={settings.dineInEnabled}
-                onChange={(e) => handleChange('dineInEnabled', e.target.checked)}
-                className="sr-only peer"
+                checked={settings.payment_cash}
+                onChange={(e) => handleChange('payment_cash', e.target.checked)}
+                className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
               />
-              <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+              <span className="text-2xl">💵</span>
+              <div>
+                <p className="font-medium text-gray-900">Cash</p>
+                <p className="text-sm text-gray-500">Klanten betalen bij levering of afhaling</p>
+              </div>
+            </label>
+
+            <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+              <input
+                type="checkbox"
+                checked={settings.payment_card}
+                onChange={(e) => handleChange('payment_card', e.target.checked)}
+                className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              <span className="text-2xl">💳</span>
+              <div>
+                <p className="font-medium text-gray-900">Bancontact / Kaart</p>
+                <p className="text-sm text-gray-500">Betalen met bankkaart bij levering of afhaling</p>
+              </div>
+            </label>
+
+            <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
+              <input
+                type="checkbox"
+                checked={settings.payment_online}
+                onChange={(e) => handleChange('payment_online', e.target.checked)}
+                className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              <span className="text-2xl">🌐</span>
+              <div>
+                <p className="font-medium text-gray-900">Online betalen</p>
+                <p className="text-sm text-gray-500">Klanten betalen vooraf via de website</p>
+              </div>
             </label>
           </div>
-
-          {settings.dineInEnabled && (
-            <div className="pt-4 border-t">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={settings.tableReservation}
-                  onChange={(e) => handleChange('tableReservation', e.target.checked)}
-                  className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
-                />
-                <div>
-                  <p className="font-medium text-gray-900">Tafelreserveringen toestaan</p>
-                  <p className="text-sm text-gray-500">Klanten kunnen online een tafel reserveren</p>
-                </div>
-              </label>
-            </div>
-          )}
         </motion.div>
 
         {/* Summary */}
@@ -296,8 +337,8 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 <span className="font-medium">Afhalen</span>
               </div>
               <p className="text-white/80 text-sm">
-                {settings.pickupEnabled 
-                  ? `Klaar in ${settings.pickupTime} min` 
+                {settings.pickup_enabled 
+                  ? `Klaar in ${settings.pickup_time_minutes} min` 
                   : 'Uitgeschakeld'}
               </p>
             </div>
@@ -307,20 +348,22 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 <span className="font-medium">Levering</span>
               </div>
               <p className="text-white/80 text-sm">
-                {settings.deliveryEnabled 
-                  ? `€${settings.deliveryFee} · ${settings.deliveryRadius}km · min €${settings.minimumOrder}` 
+                {settings.delivery_enabled 
+                  ? `€${settings.delivery_fee} · ${settings.delivery_radius_km}km · min €${settings.min_order_amount}` 
                   : 'Uitgeschakeld'}
               </p>
             </div>
             <div className="bg-white/10 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <span>🍽️</span>
-                <span className="font-medium">Ter plaatse</span>
+                <span>💳</span>
+                <span className="font-medium">Betaling</span>
               </div>
               <p className="text-white/80 text-sm">
-                {settings.dineInEnabled 
-                  ? (settings.tableReservation ? 'Met reservatie' : 'Zonder reservatie')
-                  : 'Uitgeschakeld'}
+                {[
+                  settings.payment_cash && 'Cash',
+                  settings.payment_card && 'Kaart',
+                  settings.payment_online && 'Online',
+                ].filter(Boolean).join(', ') || 'Geen'}
               </p>
             </div>
           </div>
