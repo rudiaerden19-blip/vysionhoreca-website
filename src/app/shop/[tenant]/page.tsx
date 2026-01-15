@@ -279,7 +279,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
         {/* Content */}
         <motion.div 
-          style={{ opacity: Math.max(0, 1 - scrollY / 400) }}
           className="absolute inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16"
         >
           <div className="max-w-5xl mx-auto w-full">
