@@ -324,28 +324,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {business.tagline}
             </motion.p>
 
-            {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6 }}
-              className="flex flex-wrap gap-4"
-            >
-              <Link href={`/shop/${params.tenant}/menu`}>
-                <motion.button
-                  whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(255, 107, 53, 0.4)" }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg px-8 py-4 rounded-full transition-colors flex items-center gap-3"
-                >
-                  <span>🍟</span>
-                  <span>Bestel Nu</span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </motion.button>
-              </Link>
-            </motion.div>
-
             {/* Quick Info Pills */}
             <motion.div
               initial={{ opacity: 0, y: 40 }}
