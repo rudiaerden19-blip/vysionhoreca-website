@@ -989,10 +989,17 @@ export async function getOrderWithItems(orderId: string): Promise<Order | null> 
 }
 
 export async function updateOrderStatus(id: string, status: Order['status']): Promise<boolean> {
+  if (!supabase) {
+    console.error('Supabase not configured')
+    return false
+  }
+  
   const updateData: Record<string, unknown> = { status }
   if (status === 'completed') {
     updateData.completed_at = new Date().toISOString()
   }
+  
+  console.log('Updating order status:', id, status)
   
   const { error } = await supabase
     .from('orders')
@@ -1003,6 +1010,7 @@ export async function updateOrderStatus(id: string, status: Order['status']): Pr
     console.error('Error updating order status:', error)
     return false
   }
+  console.log('Order status updated successfully')
   return true
 }
 

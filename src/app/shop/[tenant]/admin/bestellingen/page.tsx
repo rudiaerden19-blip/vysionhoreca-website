@@ -905,7 +905,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       </motion.button>
                     </>
                   )}
-                  {status !== 'new' && !['completed', 'cancelled'].includes(status) && (
+                  {status.toLowerCase() !== 'new' && !['completed', 'cancelled'].includes(status.toLowerCase()) && config.next && (
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -921,9 +921,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         />
                       ) : (
                         <>
-                          {status === 'confirmed' && '👨‍🍳 Start bereiding'}
-                          {status === 'preparing' && '✅ Klaar'}
-                          {status === 'ready' && '✔️ Afronden'}
+                          {status.toLowerCase() === 'confirmed' && '👨‍🍳 Start bereiding'}
+                          {status.toLowerCase() === 'preparing' && '✅ Klaar'}
+                          {status.toLowerCase() === 'ready' && '✔️ Afronden'}
                         </>
                       )}
                     </motion.button>
