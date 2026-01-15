@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { getMenuCategories, getMenuProducts, getOptionsForProduct, getTenantSettings, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
 
 interface MenuItem {
@@ -26,6 +27,7 @@ interface CartItem {
 }
 
 export default function MenuPage({ params }: { params: { tenant: string } }) {
+  const router = useRouter()
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -37,6 +39,22 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
   const [loadingOptions, setLoadingOptions] = useState(false)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    if (cart.length > 0) {
+      const cartForStorage = cart.map(c => ({
+        id: c.item.id,
+        name: c.item.name,
+        price: c.item.price,
+        quantity: c.quantity,
+        options: c.selectedOptions.map(o => ({ name: o.choice.name, price: o.choice.price })),
+        totalPrice: c.totalPrice,
+        image_url: c.item.image_url,
+      }))
+      localStorage.setItem(`cart_${params.tenant}`, JSON.stringify(cartForStorage))
+    }
+  }, [cart, params.tenant])
 
   useEffect(() => {
     async function loadData() {
@@ -613,6 +631,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setCartOpen(false)
+                      router.push(`/shop/${params.tenant}/checkout`)
+                    }}
                     style={{ backgroundColor: primaryColor }}
                     className="w-full text-white font-bold py-4 rounded-2xl transition-colors hover:opacity-90"
                   >
