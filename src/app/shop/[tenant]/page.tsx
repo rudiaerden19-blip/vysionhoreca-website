@@ -267,7 +267,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <img
               src={business.cover_images[currentImageIndex]}
               alt={business.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-top"
             />
           </motion.div>
         </AnimatePresence>
