@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS reviews (
   text TEXT,
   reply TEXT, -- reactie van eigenaar
   replied_at TIMESTAMP WITH TIME ZONE,
-  is_visible BOOLEAN DEFAULT true,
+  is_visible BOOLEAN DEFAULT false, -- Standaard niet zichtbaar, eigenaar moet goedkeuren
   is_verified BOOLEAN DEFAULT false, -- geverifieerd via bestelling
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()

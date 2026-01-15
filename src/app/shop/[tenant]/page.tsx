@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts } from '@/lib/admin-api'
+import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview } from '@/lib/admin-api'
 
 interface Business {
   id: string
@@ -54,6 +54,20 @@ interface PopularItem {
 
 const dayNames = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag']
 const dayNamesNL = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag']
+
+const formatReviewDate = (dateString?: string) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  
+  if (days === 0) return 'Vandaag'
+  if (days === 1) return 'Gisteren'
+  if (days < 7) return `${days} dagen geleden`
+  if (days < 30) return `${Math.floor(days / 7)} weken geleden`
+  return `${Math.floor(days / 30)} maanden geleden`
+}
 
 export default function TenantLandingPage({ params }: { params: { tenant: string } }) {
   const [business, setBusiness] = useState<Business | null>(null)
@@ -113,12 +127,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   useEffect(() => {
     async function loadData() {
       // Laad data uit Supabase
-      const [tenantData, hoursData, deliveryData, productsData, textsData] = await Promise.all([
+      const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData] = await Promise.all([
         getTenantSettings(params.tenant),
         getOpeningHours(params.tenant),
         getDeliverySettings(params.tenant),
         getMenuProducts(params.tenant),
         getTenantTexts(params.tenant),
+        getVisibleReviews(params.tenant),
       ])
 
       // Converteer openingstijden naar het juiste formaat
@@ -170,8 +185,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         delivery_fee: deliveryData?.delivery_fee ?? 2.50,
         delivery_time: `${deliveryData?.delivery_time_minutes ?? 30}-${(deliveryData?.delivery_time_minutes ?? 30) + 15} min`,
         pickup_time: `${deliveryData?.pickup_time_minutes ?? 15}-${(deliveryData?.pickup_time_minutes ?? 15) + 5} min`,
-        average_rating: 4.8,
-        review_count: 127,
+        average_rating: reviewsData.length > 0 
+          ? reviewsData.reduce((sum, r) => sum + r.rating, 0) / reviewsData.length 
+          : 0,
+        review_count: reviewsData.length,
         top_seller_1: tenantData?.top_seller_1 || '',
         top_seller_2: tenantData?.top_seller_2 || '',
         top_seller_3: tenantData?.top_seller_3 || '',
@@ -202,13 +219,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         setPopularItems(popular)
       }
 
-      // Demo reviews (later uit database)
-      setReviews([
-        { id: '1', author: 'Marc V.', rating: 5, text: 'Beste frieten van de streek! Altijd vers en krokant. De stoofvleessaus is hemels.', date: '2 dagen geleden' },
-        { id: '2', author: 'Sarah D.', rating: 5, text: 'Snelle levering en altijd warm. De Bicky is hier echt de beste!', date: '1 week geleden' },
-        { id: '3', author: 'Kevin L.', rating: 4, text: 'Goede porties voor een eerlijke prijs. Aanrader!', date: '2 weken geleden' },
-        { id: '4', author: 'Lisa M.', rating: 5, text: 'Wij bestellen hier elke vrijdag. Nooit teleurgesteld!', date: '3 weken geleden' },
-      ])
+      // Reviews uit database (alleen goedgekeurde)
+      const formattedReviews = reviewsData.map(r => ({
+        id: r.id || '',
+        author: r.customer_name,
+        rating: r.rating,
+        text: r.text || '',
+        date: formatReviewDate(r.created_at),
+      }))
+      setReviews(formattedReviews)
 
       setLoading(false)
     }

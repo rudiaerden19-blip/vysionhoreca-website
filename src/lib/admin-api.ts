@@ -780,6 +780,23 @@ export async function getReviews(tenantSlug: string): Promise<Review[]> {
   return data || []
 }
 
+// Alleen goedgekeurde reviews voor de shop
+export async function getVisibleReviews(tenantSlug: string): Promise<Review[]> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('is_visible', true)
+    .order('created_at', { ascending: false })
+    .limit(10) // Max 10 reviews tonen in shop
+  
+  if (error) {
+    console.error('Error fetching visible reviews:', error)
+    return []
+  }
+  return data || []
+}
+
 export async function saveReview(review: Review): Promise<Review | null> {
   if (review.id) {
     // Update existing
@@ -805,7 +822,7 @@ export async function saveReview(review: Review): Promise<Review | null> {
     }
     return data
   } else {
-    // Create new
+    // Create new - standaard NIET zichtbaar, eigenaar moet goedkeuren
     const { data, error } = await supabase
       .from('reviews')
       .insert({
@@ -815,7 +832,7 @@ export async function saveReview(review: Review): Promise<Review | null> {
         customer_email: review.customer_email,
         rating: review.rating,
         text: review.text,
-        is_visible: true,
+        is_visible: false, // Moet goedgekeurd worden door eigenaar
         is_verified: false,
       })
       .select()
