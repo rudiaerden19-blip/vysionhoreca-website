@@ -1,26 +1,95 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
+import { supabase } from '@/lib/supabase'
 
 interface MediaItem {
   id: string
   url: string
-  type: 'image' | 'video'
   name: string
-  size: string
-  uploadedAt: string
+  size: number
+  created_at: string
 }
 
 export default function MediaPage({ params }: { params: { tenant: string } }) {
-  const [media, setMedia] = useState<MediaItem[]>([
-    { id: '1', url: 'https://images.unsplash.com/photo-1619881590738-a111d176d906?w=400', type: 'image', name: 'cover-1.jpg', size: '2.4 MB', uploadedAt: '2 dagen geleden' },
-    { id: '2', url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400', type: 'image', name: 'friet.jpg', size: '1.8 MB', uploadedAt: '1 week geleden' },
-    { id: '3', url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400', type: 'image', name: 'burger.jpg', size: '2.1 MB', uploadedAt: '1 week geleden' },
-    { id: '4', url: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=400', type: 'image', name: 'snack.jpg', size: '1.5 MB', uploadedAt: '2 weken geleden' },
-  ])
+  const [media, setMedia] = useState<MediaItem[]>([])
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Load media on mount
+  useEffect(() => {
+    loadMedia()
+  }, [params.tenant])
+
+  const loadMedia = async () => {
+    setLoading(true)
+    const { data, error } = await supabase
+      .from('tenant_media')
+      .select('*')
+      .eq('tenant_slug', params.tenant)
+      .order('created_at', { ascending: false })
+    
+    if (!error && data) {
+      setMedia(data)
+    }
+    setLoading(false)
+  }
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setUploading(true)
+
+    for (const file of Array.from(files)) {
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${params.tenant}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`
+
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('media')
+        .upload(fileName, file)
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        continue
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('media')
+        .getPublicUrl(fileName)
+
+      // Save to database
+      const { error: dbError } = await supabase
+        .from('tenant_media')
+        .insert({
+          tenant_slug: params.tenant,
+          url: urlData.publicUrl,
+          name: file.name,
+          size: file.size,
+          type: 'image'
+        })
+
+      if (dbError) {
+        console.error('DB error:', dbError)
+      }
+    }
+
+    // Reload media
+    await loadMedia()
+    setUploading(false)
+    
+    // Clear input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
 
   const toggleSelect = (id: string) => {
     setSelectedItems(prev => 
@@ -28,11 +97,44 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     )
   }
 
-  const deleteSelected = () => {
-    if (confirm(`${selectedItems.length} item(s) verwijderen?`)) {
-      setMedia(prev => prev.filter(m => !selectedItems.includes(m.id)))
-      setSelectedItems([])
+  const deleteSelected = async () => {
+    if (!confirm(`${selectedItems.length} foto('s) verwijderen?`)) return
+
+    for (const id of selectedItems) {
+      const item = media.find(m => m.id === id)
+      if (!item) continue
+
+      // Delete from storage (extract path from URL)
+      const urlParts = item.url.split('/media/')
+      if (urlParts[1]) {
+        await supabase.storage.from('media').remove([urlParts[1]])
+      }
+
+      // Delete from database
+      await supabase.from('tenant_media').delete().eq('id', id)
     }
+
+    setSelectedItems([])
+    await loadMedia()
+  }
+
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  }
+
+  const formatDate = (date: string) => {
+    const d = new Date(date)
+    const now = new Date()
+    const diff = now.getTime() - d.getTime()
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    
+    if (days === 0) return 'Vandaag'
+    if (days === 1) return 'Gisteren'
+    if (days < 7) return `${days} dagen geleden`
+    if (days < 30) return `${Math.floor(days / 7)} weken geleden`
+    return d.toLocaleDateString('nl-BE')
   }
 
   return (
@@ -52,10 +154,20 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             </button>
           )}
           <button
-            className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white rounded-xl font-medium flex items-center gap-2"
           >
-            📤 Uploaden
+            {uploading ? '⏳ Uploaden...' : '📤 Uploaden'}
           </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleUpload}
+            className="hidden"
+          />
         </div>
       </div>
 
@@ -63,6 +175,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        onClick={() => fileInputRef.current?.click()}
         className="border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center mb-8 hover:border-orange-500 transition-colors cursor-pointer bg-gray-50"
       >
         <span className="text-5xl mb-4 block">📷</span>
@@ -90,8 +203,20 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         </div>
       </div>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-12">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-gray-500">Laden...</p>
+        </div>
+      )}
+
       {/* Media Grid */}
-      {viewMode === 'grid' ? (
+      {!loading && viewMode === 'grid' && media.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {media.map((item, index) => (
             <motion.div
@@ -112,7 +237,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
                 selectedItems.includes(item.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}>
-                <span className="text-3xl">
+                <span className="text-3xl text-white">
                   {selectedItems.includes(item.id) ? '✓' : '○'}
                 </span>
               </div>
@@ -122,7 +247,10 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             </motion.div>
           ))}
         </div>
-      ) : (
+      )}
+
+      {/* Media List */}
+      {!loading && viewMode === 'list' && media.length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {media.map((item) => (
             <div 
@@ -145,17 +273,16 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               />
               <div className="flex-1">
                 <p className="font-medium text-gray-900">{item.name}</p>
-                <p className="text-sm text-gray-500">{item.size}</p>
+                <p className="text-sm text-gray-500">{formatSize(item.size)}</p>
               </div>
-              <p className="text-sm text-gray-400">{item.uploadedAt}</p>
-              <button className="p-2 hover:bg-gray-200 rounded-lg">⋯</button>
+              <p className="text-sm text-gray-400">{formatDate(item.created_at)}</p>
             </div>
           ))}
         </div>
       )}
 
       {/* Empty State */}
-      {media.length === 0 && (
+      {!loading && media.length === 0 && (
         <div className="text-center py-12">
           <span className="text-6xl mb-4 block">📷</span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">Nog geen media</h3>
