@@ -887,3 +887,244 @@ export async function deleteReview(id: string): Promise<boolean> {
   }
   return true
 }
+
+// =====================================================
+// ORDERS / BESTELLINGEN
+// =====================================================
+export interface OrderItem {
+  id?: string
+  order_id?: string
+  tenant_slug: string
+  product_id?: string
+  product_name: string
+  quantity: number
+  unit_price: number
+  options_json?: Record<string, unknown>
+  options_price: number
+  total_price: number
+  notes?: string
+}
+
+export interface Order {
+  id?: string
+  tenant_slug: string
+  order_number?: number
+  customer_name: string
+  customer_phone?: string
+  customer_email?: string
+  order_type: 'pickup' | 'delivery'
+  status: 'new' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled'
+  delivery_address?: string
+  delivery_notes?: string
+  subtotal: number
+  delivery_fee: number
+  discount_amount: number
+  discount_code?: string
+  total: number
+  payment_method?: string
+  payment_status: string
+  requested_time?: string
+  estimated_ready_time?: string
+  completed_at?: string
+  created_at?: string
+  updated_at?: string
+  items?: OrderItem[]
+}
+
+export async function getOrders(tenantSlug: string, status?: string): Promise<Order[]> {
+  let query = supabase
+    .from('orders')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('created_at', { ascending: false })
+  
+  if (status && status !== 'all') {
+    if (status === 'active') {
+      query = query.not('status', 'in', '("completed","cancelled")')
+    } else {
+      query = query.eq('status', status)
+    }
+  }
+  
+  const { data, error } = await query.limit(100)
+  
+  if (error) {
+    console.error('Error fetching orders:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function getOrderWithItems(orderId: string): Promise<Order | null> {
+  const { data: order, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .single()
+  
+  if (error || !order) {
+    console.error('Error fetching order:', error)
+    return null
+  }
+  
+  const { data: items } = await supabase
+    .from('order_items')
+    .select('*')
+    .eq('order_id', orderId)
+  
+  return { ...order, items: items || [] }
+}
+
+export async function updateOrderStatus(id: string, status: Order['status']): Promise<boolean> {
+  const updateData: Record<string, unknown> = { status }
+  if (status === 'completed') {
+    updateData.completed_at = new Date().toISOString()
+  }
+  
+  const { error } = await supabase
+    .from('orders')
+    .update(updateData)
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error updating order status:', error)
+    return false
+  }
+  return true
+}
+
+// =====================================================
+// SALES STATISTICS
+// =====================================================
+export interface SalesStats {
+  total_orders: number
+  total_revenue: number
+  average_order: number
+  orders_by_status: Record<string, number>
+}
+
+export async function getSalesStats(tenantSlug: string, period: 'today' | 'week' | 'month' | 'year'): Promise<SalesStats> {
+  const now = new Date()
+  let startDate: Date
+  
+  switch (period) {
+    case 'today':
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      break
+    case 'week':
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      break
+    case 'month':
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+      break
+    case 'year':
+      startDate = new Date(now.getFullYear(), 0, 1)
+      break
+  }
+  
+  const { data, error } = await supabase
+    .from('orders')
+    .select('total, status')
+    .eq('tenant_slug', tenantSlug)
+    .gte('created_at', startDate.toISOString())
+    .not('status', 'eq', 'cancelled')
+  
+  if (error || !data) {
+    console.error('Error fetching sales stats:', error)
+    return { total_orders: 0, total_revenue: 0, average_order: 0, orders_by_status: {} }
+  }
+  
+  const total_orders = data.length
+  const total_revenue = data.reduce((sum, o) => sum + (o.total || 0), 0)
+  const average_order = total_orders > 0 ? total_revenue / total_orders : 0
+  
+  const orders_by_status: Record<string, number> = {}
+  data.forEach(o => {
+    orders_by_status[o.status] = (orders_by_status[o.status] || 0) + 1
+  })
+  
+  return { total_orders, total_revenue, average_order, orders_by_status }
+}
+
+export async function getDailyRevenue(tenantSlug: string, days: number = 7): Promise<{ date: string; revenue: number; orders: number }[]> {
+  const startDate = new Date()
+  startDate.setDate(startDate.getDate() - days)
+  
+  const { data, error } = await supabase
+    .from('orders')
+    .select('total, created_at')
+    .eq('tenant_slug', tenantSlug)
+    .gte('created_at', startDate.toISOString())
+    .not('status', 'eq', 'cancelled')
+  
+  if (error || !data) {
+    console.error('Error fetching daily revenue:', error)
+    return []
+  }
+  
+  // Group by date
+  const dailyData: Record<string, { revenue: number; orders: number }> = {}
+  
+  for (let i = 0; i < days; i++) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    const dateKey = date.toISOString().split('T')[0]
+    dailyData[dateKey] = { revenue: 0, orders: 0 }
+  }
+  
+  data.forEach(order => {
+    const dateKey = order.created_at.split('T')[0]
+    if (dailyData[dateKey]) {
+      dailyData[dateKey].revenue += order.total || 0
+      dailyData[dateKey].orders += 1
+    }
+  })
+  
+  return Object.entries(dailyData)
+    .map(([date, stats]) => ({ date, ...stats }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+}
+
+export async function getTopProducts(tenantSlug: string, period: 'week' | 'month' | 'year' = 'month'): Promise<{ name: string; sales: number; revenue: number }[]> {
+  const now = new Date()
+  let startDate: Date
+  
+  switch (period) {
+    case 'week':
+      startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      break
+    case 'month':
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+      break
+    case 'year':
+      startDate = new Date(now.getFullYear(), 0, 1)
+      break
+  }
+  
+  const { data, error } = await supabase
+    .from('order_items')
+    .select('product_name, quantity, total_price')
+    .eq('tenant_slug', tenantSlug)
+    .gte('created_at', startDate.toISOString())
+  
+  if (error || !data) {
+    console.error('Error fetching top products:', error)
+    return []
+  }
+  
+  // Aggregate by product name
+  const productStats: Record<string, { sales: number; revenue: number }> = {}
+  
+  data.forEach(item => {
+    if (!productStats[item.product_name]) {
+      productStats[item.product_name] = { sales: 0, revenue: 0 }
+    }
+    productStats[item.product_name].sales += item.quantity
+    productStats[item.product_name].revenue += item.total_price
+  })
+  
+  return Object.entries(productStats)
+    .map(([name, stats]) => ({ name, ...stats }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 10)
+}
