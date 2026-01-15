@@ -302,26 +302,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               )}
             </motion.div>
 
-            {/* Rating */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex items-center gap-3 mb-4"
-            >
-              <div className="flex">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span 
-                    key={star} 
-                    className={`text-2xl ${star <= Math.round(business.average_rating) ? 'text-yellow-400' : 'text-gray-400'}`}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-              <span className="text-white font-bold text-lg">{business.average_rating}</span>
-              <span className="text-white/70">({business.review_count} reviews)</span>
-            </motion.div>
 
             {/* Title */}
             <motion.h1
@@ -363,17 +343,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </svg>
                 </motion.button>
               </Link>
-              {business.phone && (
-                <motion.a
-                  href={`tel:${business.phone}`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-bold text-lg px-8 py-4 rounded-full transition-colors flex items-center gap-3 border border-white/30"
-                >
-                  <span>📞</span>
-                  <span>Bel Ons</span>
-                </motion.a>
-              )}
             </motion.div>
 
             {/* Quick Info Pills */}
