@@ -92,14 +92,6 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
   }
 
   const textFields = [
-    { section: 'Hero sectie', icon: '🏠', fields: [
-      { key: 'hero_title', label: 'Titel', placeholder: 'Welkom bij...' },
-      { key: 'hero_subtitle', label: 'Ondertitel', placeholder: 'De lekkerste frieten van de streek' },
-    ]},
-    { section: 'Over ons', icon: '📖', fields: [
-      { key: 'about_title', label: 'Titel', placeholder: 'Ons verhaal' },
-      { key: 'about_text', label: 'Tekst', placeholder: 'Vertel je verhaal...', multiline: true },
-    ]},
     { section: 'Knoppen', icon: '🔘', fields: [
       { key: 'order_button_text', label: 'Bestel knop', placeholder: 'Bestel Nu' },
       { key: 'pickup_label', label: 'Afhalen label', placeholder: 'Afhalen' },
