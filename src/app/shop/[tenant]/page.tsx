@@ -34,6 +34,7 @@ interface Business {
   top_seller_1?: string
   top_seller_2?: string
   top_seller_3?: string
+  about_image?: string
 }
 
 interface Review {
@@ -173,6 +174,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         top_seller_1: tenantData?.top_seller_1 || '',
         top_seller_2: tenantData?.top_seller_2 || '',
         top_seller_3: tenantData?.top_seller_3 || '',
+        about_image: tenantData?.about_image || '',
       })
 
       // Populaire items uit producten
@@ -495,7 +497,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               >
                 <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
                   <img
-                    src="https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800"
+                    src={business.about_image || "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800"}
                     alt="Onze frituur"
                     className="w-full h-full object-cover"
                   />

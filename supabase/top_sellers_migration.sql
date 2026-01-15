@@ -14,4 +14,8 @@ ADD COLUMN IF NOT EXISTS top_seller_3 TEXT DEFAULT '';
 ALTER TABLE tenant_settings 
 ADD COLUMN IF NOT EXISTS tagline TEXT DEFAULT '';
 
+-- Voeg about_image toe (foto naast "Over Ons")
+ALTER TABLE tenant_settings 
+ADD COLUMN IF NOT EXISTS about_image TEXT DEFAULT '';
+
 -- Klaar!

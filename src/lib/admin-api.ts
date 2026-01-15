@@ -22,6 +22,7 @@ export interface TenantSettings {
   top_seller_1?: string
   top_seller_2?: string
   top_seller_3?: string
+  about_image?: string
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {
