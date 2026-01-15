@@ -746,3 +746,127 @@ export async function deletePromotion(id: string): Promise<boolean> {
   }
   return true
 }
+
+// =====================================================
+// REVIEWS
+// =====================================================
+export interface Review {
+  id?: string
+  tenant_slug: string
+  order_id?: string
+  customer_name: string
+  customer_email?: string
+  rating: number
+  text?: string
+  reply?: string
+  replied_at?: string
+  is_visible: boolean
+  is_verified: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getReviews(tenantSlug: string): Promise<Review[]> {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('created_at', { ascending: false })
+  
+  if (error) {
+    console.error('Error fetching reviews:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function saveReview(review: Review): Promise<Review | null> {
+  if (review.id) {
+    // Update existing
+    const { data, error } = await supabase
+      .from('reviews')
+      .update({
+        customer_name: review.customer_name,
+        customer_email: review.customer_email,
+        rating: review.rating,
+        text: review.text,
+        reply: review.reply,
+        replied_at: review.reply ? new Date().toISOString() : null,
+        is_visible: review.is_visible,
+        is_verified: review.is_verified,
+      })
+      .eq('id', review.id)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating review:', error)
+      return null
+    }
+    return data
+  } else {
+    // Create new
+    const { data, error } = await supabase
+      .from('reviews')
+      .insert({
+        tenant_slug: review.tenant_slug,
+        order_id: review.order_id,
+        customer_name: review.customer_name,
+        customer_email: review.customer_email,
+        rating: review.rating,
+        text: review.text,
+        is_visible: true,
+        is_verified: false,
+      })
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error creating review:', error)
+      return null
+    }
+    return data
+  }
+}
+
+export async function replyToReview(id: string, reply: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('reviews')
+    .update({ 
+      reply, 
+      replied_at: new Date().toISOString() 
+    })
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error replying to review:', error)
+    return false
+  }
+  return true
+}
+
+export async function toggleReviewVisible(id: string, isVisible: boolean): Promise<boolean> {
+  const { error } = await supabase
+    .from('reviews')
+    .update({ is_visible: isVisible })
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error toggling review visibility:', error)
+    return false
+  }
+  return true
+}
+
+export async function deleteReview(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('reviews')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting review:', error)
+    return false
+  }
+  return true
+}
