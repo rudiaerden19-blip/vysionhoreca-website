@@ -154,7 +154,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           tenantData?.cover_image_3 || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=1600',
         ].filter(img => img && img.trim() !== ''),
         description: tenantData?.description || '',
-        story: textsData?.about_text || tenantData?.description || '',
+        story: (textsData?.about_text && textsData.about_text.trim()) || tenantData?.description || '',
         address: tenantData?.address || '',
         phone: tenantData?.phone || '',
         email: tenantData?.email || '',
