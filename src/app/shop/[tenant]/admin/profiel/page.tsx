@@ -22,6 +22,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     email: '',
     phone: '',
     address: '',
+    postal_code: '',
+    city: '',
+    country: '',
+    btw_number: '',
+    kvk_number: '',
+    website: '',
     facebook_url: '',
     instagram_url: '',
     tiktok_url: '',
@@ -257,7 +263,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Adres
+                Straat + huisnummer
               </label>
               <input
                 type="text"
@@ -265,7 +271,35 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.address}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Straat 123, 1000 Brussel"
+                placeholder="Kerkstraat 123"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Postcode
+              </label>
+              <input
+                type="text"
+                name="postal_code"
+                value={formData.postal_code || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                placeholder="1000"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Stad / Gemeente
+              </label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                placeholder="Brussel"
               />
             </div>
 
@@ -295,6 +329,51 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 placeholder="info@jouwzaak.be"
               />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Bedrijfsgegevens */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <span>🏢</span> Bedrijfsgegevens
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">Deze gegevens verschijnen op de kassabon (verplicht)</p>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                BTW-nummer *
+              </label>
+              <input
+                type="text"
+                name="btw_number"
+                value={formData.btw_number || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                placeholder="BE 0123.456.789"
+              />
+              <p className="text-xs text-gray-500 mt-1">Bijv. BE 0123.456.789 of NL123456789B01</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                KvK-nummer (alleen NL)
+              </label>
+              <input
+                type="text"
+                name="kvk_number"
+                value={formData.kvk_number || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                placeholder="12345678"
+              />
+              <p className="text-xs text-gray-500 mt-1">Alleen voor Nederlandse bedrijven</p>
             </div>
           </div>
         </motion.div>
