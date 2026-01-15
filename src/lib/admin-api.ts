@@ -321,7 +321,7 @@ export async function getTenantTexts(tenantSlug: string): Promise<TenantTexts | 
     .from('tenant_texts')
     .select('*')
     .eq('tenant_slug', tenantSlug)
-    .single()
+    .maybeSingle()
   
   if (error) {
     console.error('Error fetching tenant texts:', error)
