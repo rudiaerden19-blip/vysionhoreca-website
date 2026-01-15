@@ -10,6 +10,7 @@ import {
   MenuProduct, 
   MenuCategory 
 } from '@/lib/admin-api'
+import MediaPicker from '@/components/MediaPicker'
 
 export default function ProductenPage({ params }: { params: { tenant: string } }) {
   const [products, setProducts] = useState<MenuProduct[]>([])
@@ -446,17 +447,15 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   </div>
                 </div>
 
-                {/* Image URL */}
+                {/* Product Afbeelding */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Afbeelding URL
+                    Afbeelding
                   </label>
-                  <input
-                    type="url"
+                  <MediaPicker
+                    tenantSlug={params.tenant}
                     value={formData.image_url || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="https://..."
+                    onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
                   />
                 </div>
 
