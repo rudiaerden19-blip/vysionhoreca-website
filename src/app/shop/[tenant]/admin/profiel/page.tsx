@@ -13,6 +13,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
   const [formData, setFormData] = useState<TenantSettings>({
     tenant_slug: params.tenant,
     business_name: '',
+    tagline: '',
     description: '',
     logo_url: '',
     primary_color: '#ef4444',
@@ -24,6 +25,10 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     instagram_url: '',
     tiktok_url: '',
     website_url: '',
+    about_image: '',
+    top_seller_1: '',
+    top_seller_2: '',
+    top_seller_3: '',
   })
 
   // Load data on mount
@@ -156,17 +161,32 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Beschrijving
+                Tagline (korte tekst voor header)
+              </label>
+              <input
+                type="text"
+                name="tagline"
+                value={formData.tagline || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                placeholder="Bijv. De lekkerste frieten van de streek!"
+              />
+              <p className="text-sm text-gray-500 mt-1">Dit verschijnt in de header en footer</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Over Ons tekst
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                rows={3}
+                rows={4}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
-                placeholder="Beschrijf je zaak in een paar zinnen..."
+                placeholder="Vertel je verhaal... Wie zijn jullie? Wat maakt jullie uniek?"
               />
-              <p className="text-sm text-gray-500 mt-1">{formData.description.length}/200 karakters</p>
+              <p className="text-sm text-gray-500 mt-1">Dit verschijnt bij de &quot;Over Ons&quot; sectie</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
@@ -341,6 +361,89 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 placeholder="https://jouwzaak.be"
               />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Foto's */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <span>📸</span> Foto&apos;s
+          </h2>
+          
+          <div className="space-y-6">
+            {/* Over Ons foto */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Over Ons foto
+              </label>
+              <input
+                type="url"
+                name="about_image"
+                value={formData.about_image || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                placeholder="https://..."
+              />
+              <p className="text-sm text-gray-500 mt-1">Foto naast de &quot;Over Ons&quot; tekst</p>
+              {formData.about_image && (
+                <img src={formData.about_image} alt="Preview" className="mt-2 w-32 h-32 object-cover rounded-xl" />
+              )}
+            </div>
+
+            {/* Topverkopers */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-4">
+                Topverkopers (3 foto&apos;s)
+              </label>
+              <p className="text-sm text-gray-500 mb-4">Deze foto&apos;s verschijnen in de &quot;Onze Meest Verkochte Producten&quot; sectie</p>
+              
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <input
+                    type="url"
+                    name="top_seller_1"
+                    value={formData.top_seller_1 || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    placeholder="Foto 1 URL"
+                  />
+                  {formData.top_seller_1 && (
+                    <img src={formData.top_seller_1} alt="Topverkoper 1" className="mt-2 w-full h-24 object-cover rounded-xl" />
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="url"
+                    name="top_seller_2"
+                    value={formData.top_seller_2 || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    placeholder="Foto 2 URL"
+                  />
+                  {formData.top_seller_2 && (
+                    <img src={formData.top_seller_2} alt="Topverkoper 2" className="mt-2 w-full h-24 object-cover rounded-xl" />
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="url"
+                    name="top_seller_3"
+                    value={formData.top_seller_3 || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    placeholder="Foto 3 URL"
+                  />
+                  {formData.top_seller_3 && (
+                    <img src={formData.top_seller_3} alt="Topverkoper 3" className="mt-2 w-full h-24 object-cover rounded-xl" />
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </motion.div>
