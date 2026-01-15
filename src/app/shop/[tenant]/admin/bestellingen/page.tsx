@@ -807,9 +807,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     <p className="text-sm text-gray-500 mb-1">Klant</p>
                     <p className="font-semibold text-gray-900">{order.customer_name}</p>
                     {order.customer_phone && (
-                      <p className="text-gray-600">
-                        <a href={`tel:${order.customer_phone}`} className="hover:text-orange-500">📞 {order.customer_phone}</a>
-                      </p>
+                      <p className="text-gray-600">📞 {order.customer_phone}</p>
                     )}
                     {order.customer_email && (
                       <p className="text-gray-600">
@@ -910,15 +908,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   >
                     🖨️
                   </button>
-                  {order.customer_phone && (
-                    <a 
-                      href={`tel:${order.customer_phone}`}
-                      className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
-                      title="Bellen"
-                    >
-                      📞
-                    </a>
-                  )}
                 </div>
               </motion.div>
             )
@@ -997,9 +986,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   <p className="text-sm text-blue-600 font-medium mb-2">👤 Klantgegevens</p>
                   <p className="text-xl font-bold text-gray-900">{selectedOrder.customer_name}</p>
                   {selectedOrder.customer_phone && (
-                    <a href={`tel:${selectedOrder.customer_phone}`} className="text-blue-600 hover:underline text-lg">
-                      📞 {selectedOrder.customer_phone}
-                    </a>
+                    <p className="text-gray-600 text-lg">📞 {selectedOrder.customer_phone}</p>
                   )}
                   {selectedOrder.customer_email && <p className="text-gray-600">✉️ {selectedOrder.customer_email}</p>}
                   {(selectedOrder.delivery_address || selectedOrder.customer_address) && (
@@ -1080,14 +1067,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 >
                   🖨️ Bon printen
                 </button>
-                {selectedOrder.customer_phone && (
-                  <a 
-                    href={`tel:${selectedOrder.customer_phone}`} 
-                    className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
-                  >
-                    📞 Bellen
-                  </a>
-                )}
               </div>
             </motion.div>
           </motion.div>
