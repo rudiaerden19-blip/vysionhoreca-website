@@ -1236,7 +1236,10 @@ export async function registerCustomer(
   email: string, 
   password: string, 
   name: string, 
-  phone?: string
+  phone: string,
+  address: string,
+  postal_code: string,
+  city: string
 ): Promise<{ success: boolean; customer?: Customer; error?: string }> {
   // Check if email already exists
   const { data: existing } = await supabase
@@ -1260,6 +1263,9 @@ export async function registerCustomer(
       password_hash,
       name,
       phone,
+      address,
+      postal_code,
+      city,
     })
     .select()
     .single()

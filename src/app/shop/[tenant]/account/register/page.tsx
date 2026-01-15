@@ -15,10 +15,14 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
     name: '',
     email: '',
     phone: '',
+    address: '',
+    postal_code: '',
+    city: '',
     password: '',
     confirmPassword: '',
   })
-  const [error, setError] = useState('')
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [generalError, setGeneralError] = useState('')
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
 
@@ -27,7 +31,6 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
   }, [params.tenant])
 
   async function loadData() {
-    // Check if already logged in
     const customerId = localStorage.getItem(`customer_${params.tenant}`)
     if (customerId) {
       router.push(`/shop/${params.tenant}/account`)
@@ -40,22 +43,65 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
-    setError('')
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
+    }
+    setGeneralError('')
+  }
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Naam is verplicht'
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'E-mailadres is verplicht'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Ongeldig e-mailadres'
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Telefoonnummer is verplicht'
+    }
+
+    if (!formData.address.trim()) {
+      newErrors.address = 'Adres is verplicht'
+    }
+
+    if (!formData.postal_code.trim()) {
+      newErrors.postal_code = 'Postcode is verplicht'
+    }
+
+    if (!formData.city.trim()) {
+      newErrors.city = 'Stad is verplicht'
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Wachtwoord is verplicht'
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Wachtwoord moet minimaal 6 tekens zijn'
+    }
+
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Bevestig je wachtwoord'
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Wachtwoorden komen niet overeen'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
+    setGeneralError('')
 
-    // Validation
-    if (formData.password.length < 6) {
-      setError('Wachtwoord moet minimaal 6 tekens zijn')
-      return
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Wachtwoorden komen niet overeen')
+    if (!validateForm()) {
       return
     }
 
@@ -66,14 +112,17 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
       formData.email,
       formData.password,
       formData.name,
-      formData.phone || undefined
+      formData.phone,
+      formData.address,
+      formData.postal_code,
+      formData.city
     )
     
     if (result.success && result.customer) {
       localStorage.setItem(`customer_${params.tenant}`, result.customer.id!)
       router.push(`/shop/${params.tenant}/account`)
     } else {
-      setError(result.error || 'Registratie mislukt')
+      setGeneralError(result.error || 'Registratie mislukt')
     }
 
     setSubmitting(false)
@@ -108,76 +157,159 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
+          {generalError && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-              {error}
+              {generalError}
             </div>
           )}
 
+          {/* Naam */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Naam *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Naam <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
+                errors.name ? 'border-red-500 bg-red-50' : 'border-gray-200'
+              }`}
               placeholder="Je volledige naam"
             />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
 
+          {/* E-mail */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">E-mailadres *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              E-mailadres <span className="text-red-500">*</span>
+            </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
+                errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200'
+              }`}
               placeholder="je@email.com"
             />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
 
+          {/* Telefoon */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Telefoonnummer</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Telefoonnummer <span className="text-red-500">*</span>
+            </label>
             <input
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
+                errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-200'
+              }`}
               placeholder="+32 ..."
             />
+            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
           </div>
 
+          {/* Adres */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Wachtwoord *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Adres <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
+                errors.address ? 'border-red-500 bg-red-50' : 'border-gray-200'
+              }`}
+              placeholder="Straat en huisnummer"
+            />
+            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
+          </div>
+
+          {/* Postcode & Stad */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Postcode <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="postal_code"
+                value={formData.postal_code}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
+                  errors.postal_code ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                }`}
+                placeholder="1234"
+              />
+              {errors.postal_code && <p className="text-red-500 text-xs mt-1">{errors.postal_code}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Stad <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
+                  errors.city ? 'border-red-500 bg-red-50' : 'border-gray-200'
+                }`}
+                placeholder="Stad"
+              />
+              {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+            </div>
+          </div>
+
+          {/* Wachtwoord */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Wachtwoord <span className="text-red-500">*</span>
+            </label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              required
-              minLength={6}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
+                errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200'
+              }`}
               placeholder="Minimaal 6 tekens"
             />
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
           </div>
 
+          {/* Bevestig wachtwoord */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Bevestig wachtwoord *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Bevestig wachtwoord <span className="text-red-500">*</span>
+            </label>
             <input
               type="password"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
+              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
+                errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-200'
+              }`}
               placeholder="Herhaal wachtwoord"
             />
+            {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
           </div>
+
+          <p className="text-xs text-gray-400">
+            <span className="text-red-500">*</span> = verplicht veld
+          </p>
 
           <motion.button
             type="submit"
