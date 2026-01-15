@@ -44,6 +44,8 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     if (!files || files.length === 0) return
 
     setUploading(true)
+    let successCount = 0
+    let errorMessage = ''
 
     for (const file of Array.from(files)) {
       // Generate unique filename
@@ -51,12 +53,13 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       const fileName = `${params.tenant}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`
 
       // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('media')
         .upload(fileName, file)
 
       if (uploadError) {
         console.error('Upload error:', uploadError)
+        errorMessage = uploadError.message
         continue
       }
 
@@ -78,6 +81,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
 
       if (dbError) {
         console.error('DB error:', dbError)
+        errorMessage = dbError.message
+      } else {
+        successCount++
       }
     }
 
@@ -88,6 +94,13 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     // Clear input
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
+    }
+
+    // Show result
+    if (successCount > 0) {
+      alert(`✅ ${successCount} foto('s) geüpload!`)
+    } else if (errorMessage) {
+      alert(`❌ Upload mislukt: ${errorMessage}`)
     }
   }
 
