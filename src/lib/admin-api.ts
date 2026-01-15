@@ -15,6 +15,12 @@ export interface TenantSettings {
   email: string
   phone: string
   address: string
+  postal_code?: string
+  city?: string
+  country?: string
+  btw_number?: string  // BTW nummer voor kassabon
+  kvk_number?: string  // KvK nummer
+  website?: string
   facebook_url: string
   instagram_url: string
   tiktok_url: string

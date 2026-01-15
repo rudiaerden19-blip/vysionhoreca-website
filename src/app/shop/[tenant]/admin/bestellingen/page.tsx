@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getOrders, updateOrderStatus, Order } from '@/lib/admin-api'
+import { getOrders, updateOrderStatus, Order, getTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 
 // Parse items from JSONB
@@ -63,6 +63,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [kitchenMode, setKitchenMode] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(false)
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
+  const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
   
   // Audio refs
   const audioContextRef = useRef<AudioContext | null>(null)
@@ -210,10 +211,14 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     }
   }, [notificationsEnabled])
 
-  // Load orders
+  // Load orders and tenant settings
   const loadOrders = useCallback(async () => {
-    const data = await getOrders(params.tenant)
-    setOrders(data)
+    const [ordersData, settingsData] = await Promise.all([
+      getOrders(params.tenant),
+      getTenantSettings(params.tenant)
+    ])
+    setOrders(ordersData)
+    setTenantSettings(settingsData)
     setLoading(false)
   }, [params.tenant])
 
@@ -274,50 +279,78 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setUpdatingId(null)
   }
 
-  // Print receipt function
+  // Print receipt function - Officiële kassabon met alle verplichte gegevens
   const printReceipt = (order: Order) => {
     const items = parseItems(order)
-    const printWindow = window.open('', '_blank', 'width=400,height=600')
+    const printWindow = window.open('', '_blank', 'width=400,height=800')
     if (!printWindow) return
+
+    // BTW berekening (standaard 21% in België)
+    const btwPercentage = 21
+    const totalExclBtw = order.total ? order.total / (1 + btwPercentage / 100) : 0
+    const btwBedrag = order.total ? order.total - totalExclBtw : 0
 
     const html = `
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Bon #${order.order_number || order.id?.slice(0, 8)}</title>
+        <title>Kassabon #${order.order_number || order.id?.slice(0, 8)}</title>
         <style>
-          body { font-family: 'Courier New', monospace; padding: 20px; max-width: 300px; margin: 0 auto; }
-          h1 { text-align: center; font-size: 18px; margin-bottom: 5px; }
-          .order-num { text-align: center; font-size: 24px; font-weight: bold; margin: 10px 0; }
-          .divider { border-top: 1px dashed #000; margin: 10px 0; }
-          .item { display: flex; justify-content: space-between; margin: 5px 0; }
-          .total { font-size: 18px; font-weight: bold; }
+          body { font-family: 'Courier New', monospace; padding: 15px; max-width: 300px; margin: 0 auto; font-size: 12px; }
+          h1 { text-align: center; font-size: 16px; margin-bottom: 5px; }
+          .business-name { text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 3px; }
+          .business-info { text-align: center; font-size: 11px; color: #333; line-height: 1.4; }
+          .order-num { text-align: center; font-size: 20px; font-weight: bold; margin: 8px 0; }
+          .divider { border-top: 1px dashed #000; margin: 8px 0; }
+          .divider-double { border-top: 2px solid #000; margin: 8px 0; }
+          .item { display: flex; justify-content: space-between; margin: 4px 0; }
+          .total { font-size: 14px; font-weight: bold; }
           .center { text-align: center; }
-          .small { font-size: 12px; color: #666; }
-          .badge { display: inline-block; padding: 2px 8px; background: #f0f0f0; border-radius: 4px; margin: 2px; }
+          .small { font-size: 10px; color: #666; }
+          .badge { display: inline-block; padding: 2px 6px; background: #f0f0f0; border-radius: 3px; margin: 2px; font-size: 10px; }
+          .btw-section { background: #f5f5f5; padding: 8px; margin: 8px 0; }
+          .right { text-align: right; }
         </style>
       </head>
       <body>
-        <h1>🍟 Bestelling</h1>
-        <div class="order-num">#${order.order_number || order.id?.slice(0, 8)}</div>
-        <div class="center small">${new Date(order.created_at || '').toLocaleString('nl-BE')}</div>
-        
-        <div class="divider"></div>
-        
-        <div style="margin: 10px 0;">
-          <strong>${order.customer_name}</strong><br>
-          ${order.customer_phone ? `📞 ${order.customer_phone}<br>` : ''}
-          ${order.customer_address || order.delivery_address ? `📍 ${order.customer_address || order.delivery_address}<br>` : ''}
+        <!-- ZAAKGEGEVENS - VERPLICHT -->
+        <div class="business-name">${tenantSettings?.business_name || 'Horecazaak'}</div>
+        <div class="business-info">
+          ${tenantSettings?.address || ''}<br>
+          ${tenantSettings?.postal_code || ''} ${tenantSettings?.city || ''}<br>
+          ${tenantSettings?.phone ? `Tel: ${tenantSettings.phone}` : ''}<br>
+          ${tenantSettings?.email ? `${tenantSettings.email}` : ''}<br>
+          ${tenantSettings?.btw_number ? `<strong>BTW: ${tenantSettings.btw_number}</strong>` : ''}
         </div>
         
+        <div class="divider-double"></div>
+        
+        <!-- KASSABON INFO -->
         <div class="center">
-          <span class="badge">${order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ AFHALEN' : '🚗 LEVERING'}</span>
-          ${order.payment_status ? `<span class="badge">${paymentStatusConfig[order.payment_status]?.label || order.payment_status}</span>` : ''}
-          ${order.payment_method ? `<span class="badge">${paymentMethodLabels[order.payment_method] || order.payment_method}</span>` : ''}
+          <strong>KASSABON</strong><br>
+          <span class="order-num">#${order.order_number || order.id?.slice(0, 8)}</span>
+        </div>
+        <div class="center small">
+          ${new Date(order.created_at || '').toLocaleString('nl-BE')}<br>
+          ${order.order_type === 'pickup' || order.order_type === 'PICKUP' ? 'AFHALEN' : 'LEVERING'}
         </div>
         
         <div class="divider"></div>
         
+        <!-- KLANTGEGEVENS -->
+        <div style="margin: 6px 0;">
+          <strong>Klant:</strong> ${order.customer_name}<br>
+          ${order.customer_phone ? `Tel: ${order.customer_phone}<br>` : ''}
+          ${order.customer_email ? `${order.customer_email}<br>` : ''}
+          ${order.customer_address || order.delivery_address ? `Adres: ${order.customer_address || order.delivery_address}<br>` : ''}
+        </div>
+        
+        <div class="divider"></div>
+        
+        <!-- PRODUCTEN -->
+        <div style="margin: 6px 0;">
+          <strong>ARTIKELEN:</strong>
+        </div>
         ${items.map(item => `
           <div class="item">
             <span>${item.quantity}x ${item.name || item.product_name}</span>
@@ -327,10 +360,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         
         <div class="divider"></div>
         
-        <div class="item">
-          <span>Subtotaal</span>
-          <span>€${order.subtotal?.toFixed(2) || '0.00'}</span>
-        </div>
+        <!-- TOTALEN -->
         ${(order.delivery_fee || 0) > 0 ? `
           <div class="item">
             <span>Bezorgkosten</span>
@@ -339,16 +369,36 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         ` : ''}
         ${(order.discount_amount || 0) > 0 ? `
           <div class="item" style="color: green;">
-            <span>Korting</span>
+            <span>Korting ${order.discount_code ? `(${order.discount_code})` : ''}</span>
             <span>-€${order.discount_amount?.toFixed(2)}</span>
           </div>
         ` : ''}
         
+        <div class="divider-double"></div>
+        
+        <!-- BTW SECTIE - VERPLICHT -->
+        <div class="btw-section">
+          <div class="item">
+            <span>Totaal excl. BTW</span>
+            <span>€${totalExclBtw.toFixed(2)}</span>
+          </div>
+          <div class="item">
+            <span>BTW ${btwPercentage}%</span>
+            <span>€${btwBedrag.toFixed(2)}</span>
+          </div>
+        </div>
+        
+        <div class="item total" style="font-size: 16px; margin: 10px 0;">
+          <span>TOTAAL INCL. BTW</span>
+          <span>€${order.total?.toFixed(2) || '0.00'}</span>
+        </div>
+        
         <div class="divider"></div>
         
-        <div class="item total">
-          <span>TOTAAL</span>
-          <span>€${order.total?.toFixed(2) || '0.00'}</span>
+        <!-- BETALING -->
+        <div class="center">
+          ${order.payment_method ? `Betaalmethode: ${paymentMethodLabels[order.payment_method] || order.payment_method}<br>` : ''}
+          ${order.payment_status?.toLowerCase() === 'paid' ? '<strong>✓ BETAALD</strong>' : 'Betaling: In afwachting'}
         </div>
         
         ${order.customer_notes ? `
@@ -356,8 +406,16 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           <div class="small"><strong>Opmerking:</strong> ${order.customer_notes}</div>
         ` : ''}
         
-        <div class="divider"></div>
-        <div class="center small">Bedankt voor uw bestelling!</div>
+        <div class="divider-double"></div>
+        
+        <!-- FOOTER -->
+        <div class="center small">
+          Bedankt voor uw bestelling!<br>
+          ${tenantSettings?.website ? tenantSettings.website : ''}<br>
+          <br>
+          Dit is uw kassabon.<br>
+          Bewaar deze bon als bewijs van aankoop.
+        </div>
         
         <script>window.onload = function() { window.print(); }</script>
       </body>
