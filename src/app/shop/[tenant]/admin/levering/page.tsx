@@ -154,17 +154,14 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Bereidingstijd (minuten)
                 </label>
-                <select
-                  value={settings.pickup_time_minutes}
-                  onChange={(e) => handleChange('pickup_time_minutes', parseInt(e.target.value))}
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Bijv. 15"
+                  value={settings.pickup_time_minutes || ''}
+                  onChange={(e) => handleChange('pickup_time_minutes', Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                >
-                  <option value={10}>10 minuten</option>
-                  <option value={15}>15 minuten</option>
-                  <option value={20}>20 minuten</option>
-                  <option value={30}>30 minuten</option>
-                  <option value={45}>45 minuten</option>
-                </select>
+                />
               </div>
             </div>
           )}
@@ -202,16 +199,14 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Levertijd (minuten)
                 </label>
-                <select
-                  value={settings.delivery_time_minutes}
-                  onChange={(e) => handleChange('delivery_time_minutes', parseInt(e.target.value))}
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Bijv. 30"
+                  value={settings.delivery_time_minutes || ''}
+                  onChange={(e) => handleChange('delivery_time_minutes', Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                >
-                  <option value={20}>20 minuten</option>
-                  <option value={30}>30 minuten</option>
-                  <option value={45}>45 minuten</option>
-                  <option value={60}>60 minuten</option>
-                </select>
+                />
               </div>
 
               <div>
@@ -222,9 +217,11 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
                   <input
                     type="number"
-                    step="0.50"
-                    value={settings.delivery_fee}
-                    onChange={(e) => handleChange('delivery_fee', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    placeholder="Bijv. 2.50"
+                    value={settings.delivery_fee || ''}
+                    onChange={(e) => handleChange('delivery_fee', Math.max(0, parseFloat(e.target.value) || 0))}
                     className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
                 </div>
@@ -234,17 +231,14 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Bezorgradius (km)
                 </label>
-                <select
-                  value={settings.delivery_radius_km}
-                  onChange={(e) => handleChange('delivery_radius_km', parseInt(e.target.value))}
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Bijv. 10"
+                  value={settings.delivery_radius_km || ''}
+                  onChange={(e) => handleChange('delivery_radius_km', Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                >
-                  <option value={3}>3 km</option>
-                  <option value={5}>5 km</option>
-                  <option value={10}>10 km</option>
-                  <option value={15}>15 km</option>
-                  <option value={20}>20 km</option>
-                </select>
+                />
               </div>
 
               <div>
@@ -255,9 +249,11 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
                   <input
                     type="number"
-                    step="1"
-                    value={settings.min_order_amount}
-                    onChange={(e) => handleChange('min_order_amount', parseFloat(e.target.value) || 0)}
+                    min="0"
+                    step="0.01"
+                    placeholder="Bijv. 15"
+                    value={settings.min_order_amount || ''}
+                    onChange={(e) => handleChange('min_order_amount', Math.max(0, parseFloat(e.target.value) || 0))}
                     className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
                 </div>
