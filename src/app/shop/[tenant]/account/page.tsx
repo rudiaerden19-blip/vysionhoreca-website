@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { getTenantSettings, getCustomer, getCustomerOrders, updateCustomer, getLoyaltyRewards, redeemReward, Customer, Order, TenantSettings, LoyaltyReward } from '@/lib/admin-api'
+import { getTenantSettings, getCustomer, getCustomerOrders, updateCustomer, getLoyaltyRewards, redeemReward, deleteCustomerAccount, Customer, Order, TenantSettings, LoyaltyReward } from '@/lib/admin-api'
 
 export default function AccountPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
@@ -17,6 +17,9 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editForm, setEditForm] = useState({ name: '', phone: '', address: '', postal_code: '', city: '' })
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteConfirmText, setDeleteConfirmText] = useState('')
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
 
@@ -67,6 +70,23 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   const handleLogout = () => {
     localStorage.removeItem(`customer_${params.tenant}`)
     router.push(`/shop/${params.tenant}`)
+  }
+
+  // GDPR: Account verwijderen
+  const handleDeleteAccount = async () => {
+    if (!customer || deleteConfirmText !== 'VERWIJDEREN') return
+    
+    setDeleting(true)
+    const success = await deleteCustomerAccount(customer.id!, params.tenant)
+    
+    if (success) {
+      localStorage.removeItem(`customer_${params.tenant}`)
+      alert('Je account en alle gegevens zijn verwijderd.')
+      router.push(`/shop/${params.tenant}`)
+    } else {
+      alert('Er is iets misgegaan. Probeer opnieuw.')
+    }
+    setDeleting(false)
   }
 
   const handleSave = async () => {
@@ -361,7 +381,85 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
             </div>
           )}
         </motion.div>
+
+        {/* GDPR: Account verwijderen */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white rounded-2xl p-6 shadow-sm border border-red-100"
+        >
+          <h2 className="text-lg font-bold text-red-700 mb-2">⚠️ Account verwijderen</h2>
+          <p className="text-gray-600 text-sm mb-4">
+            Wanneer je je account verwijdert, worden al je persoonlijke gegevens permanent gewist. 
+            Dit kan niet ongedaan worden gemaakt. (GDPR-recht op verwijdering)
+          </p>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl font-medium transition-colors"
+          >
+            Account verwijderen
+          </button>
+        </motion.div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
+          >
+            <div className="p-6 bg-red-50 border-b">
+              <h2 className="text-xl font-bold text-red-700">⚠️ Account permanent verwijderen?</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-gray-700">
+                Dit verwijdert:
+              </p>
+              <ul className="text-gray-600 text-sm space-y-1 ml-4">
+                <li>• Je profiel en persoonlijke gegevens</li>
+                <li>• Je spaarpunten ({customer?.loyalty_points || 0} punten)</li>
+                <li>• Je bestelgeschiedenis (wordt geanonimiseerd)</li>
+              </ul>
+              <p className="text-red-600 font-medium text-sm">
+                Dit kan NIET ongedaan worden gemaakt!
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Typ <span className="font-bold text-red-600">VERWIJDEREN</span> om te bevestigen:
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  placeholder="VERWIJDEREN"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+            <div className="p-6 border-t bg-gray-50 flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteConfirm(false)
+                  setDeleteConfirmText('')
+                }}
+                className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
+              >
+                Annuleren
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'VERWIJDEREN' || deleting}
+                className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-xl font-medium"
+              >
+                {deleting ? 'Bezig...' : '🗑️ Verwijderen'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   )
 }

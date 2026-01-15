@@ -1404,6 +1404,45 @@ export async function deleteLoyaltyReward(rewardId: string): Promise<boolean> {
   return !error
 }
 
+// GDPR: Verwijder klant account en alle data
+export async function deleteCustomerAccount(customerId: string, tenantSlug: string): Promise<boolean> {
+  if (!supabase) return false
+  
+  // 1. Verwijder loyalty redemptions
+  await supabase
+    .from('loyalty_redemptions')
+    .delete()
+    .eq('customer_id', customerId)
+  
+  // 2. Anonimiseer orders (verwijderen kan niet - financiële administratie)
+  await supabase
+    .from('orders')
+    .update({
+      customer_name: 'Verwijderd',
+      customer_phone: null,
+      customer_email: null,
+      customer_address: null,
+      delivery_address: null,
+      delivery_notes: null,
+      customer_notes: null,
+    })
+    .eq('tenant_slug', tenantSlug)
+    .eq('customer_email', (await supabase.from('shop_customers').select('email').eq('id', customerId).single()).data?.email)
+  
+  // 3. Verwijder klant account
+  const { error } = await supabase
+    .from('shop_customers')
+    .delete()
+    .eq('id', customerId)
+  
+  if (error) {
+    console.error('Error deleting customer:', error)
+    return false
+  }
+  
+  return true
+}
+
 export async function redeemReward(customerId: string, rewardId: string, pointsUsed: number, tenantSlug: string): Promise<boolean> {
   // Deduct points from customer
   const { data: customer } = await supabase
