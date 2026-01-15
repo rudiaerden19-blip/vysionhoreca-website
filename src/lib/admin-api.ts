@@ -624,3 +624,125 @@ export async function deleteQrCode(id: string): Promise<boolean> {
   }
   return true
 }
+
+// =====================================================
+// PROMOTIONS / DISCOUNT CODES
+// =====================================================
+export interface Promotion {
+  id?: string
+  tenant_slug: string
+  name: string
+  code: string
+  type: 'percentage' | 'fixed' | 'freeItem'
+  value: number
+  free_item_id?: string
+  min_order_amount: number
+  max_discount?: number
+  usage_count: number
+  max_usage?: number
+  max_usage_per_customer: number
+  is_active: boolean
+  starts_at?: string
+  expires_at?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getPromotions(tenantSlug: string): Promise<Promotion[]> {
+  const { data, error } = await supabase
+    .from('promotions')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('created_at', { ascending: false })
+  
+  if (error) {
+    console.error('Error fetching promotions:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function savePromotion(promotion: Promotion): Promise<Promotion | null> {
+  if (promotion.id) {
+    // Update existing
+    const { data, error } = await supabase
+      .from('promotions')
+      .update({
+        name: promotion.name,
+        code: promotion.code.toUpperCase(),
+        type: promotion.type,
+        value: promotion.value,
+        free_item_id: promotion.free_item_id,
+        min_order_amount: promotion.min_order_amount,
+        max_discount: promotion.max_discount,
+        max_usage: promotion.max_usage,
+        max_usage_per_customer: promotion.max_usage_per_customer,
+        is_active: promotion.is_active,
+        starts_at: promotion.starts_at,
+        expires_at: promotion.expires_at,
+      })
+      .eq('id', promotion.id)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating promotion:', error)
+      return null
+    }
+    return data
+  } else {
+    // Create new
+    const { data, error } = await supabase
+      .from('promotions')
+      .insert({
+        tenant_slug: promotion.tenant_slug,
+        name: promotion.name,
+        code: promotion.code.toUpperCase(),
+        type: promotion.type,
+        value: promotion.value,
+        free_item_id: promotion.free_item_id,
+        min_order_amount: promotion.min_order_amount,
+        max_discount: promotion.max_discount,
+        usage_count: 0,
+        max_usage: promotion.max_usage,
+        max_usage_per_customer: promotion.max_usage_per_customer,
+        is_active: true,
+        starts_at: promotion.starts_at,
+        expires_at: promotion.expires_at,
+      })
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error creating promotion:', error)
+      return null
+    }
+    return data
+  }
+}
+
+export async function togglePromotionActive(id: string, isActive: boolean): Promise<boolean> {
+  const { error } = await supabase
+    .from('promotions')
+    .update({ is_active: isActive })
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error toggling promotion:', error)
+    return false
+  }
+  return true
+}
+
+export async function deletePromotion(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('promotions')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting promotion:', error)
+    return false
+  }
+  return true
+}
