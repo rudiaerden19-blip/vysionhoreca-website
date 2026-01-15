@@ -748,9 +748,21 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   <div className="bg-gray-50 rounded-xl p-4">
                     <p className="text-sm text-gray-500 mb-1">Klant</p>
                     <p className="font-semibold text-gray-900">{order.customer_name}</p>
-                    {order.customer_phone && <p className="text-gray-600">{order.customer_phone}</p>}
+                    {order.customer_phone && (
+                      <p className="text-gray-600">
+                        <a href={`tel:${order.customer_phone}`} className="hover:text-orange-500">📞 {order.customer_phone}</a>
+                      </p>
+                    )}
+                    {order.customer_email && (
+                      <p className="text-gray-600">
+                        <a href={`mailto:${order.customer_email}`} className="hover:text-orange-500">✉️ {order.customer_email}</a>
+                      </p>
+                    )}
                     {(order.delivery_address || order.customer_address) && (
                       <p className="text-gray-600 text-sm mt-1">📍 {order.delivery_address || order.customer_address}</p>
+                    )}
+                    {order.customer_notes && (
+                      <p className="text-gray-500 text-sm mt-2 italic">💬 {order.customer_notes}</p>
                     )}
                   </div>
 
