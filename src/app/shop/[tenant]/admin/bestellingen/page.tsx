@@ -285,8 +285,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     const printWindow = window.open('', '_blank', 'width=400,height=800')
     if (!printWindow) return
 
-    // BTW berekening (standaard 21% in België)
-    const btwPercentage = 21
+    // BTW berekening - gebruik percentage uit instellingen of standaard 21%
+    const btwPercentage = tenantSettings?.btw_percentage || 21
     const totalExclBtw = order.total ? order.total / (1 + btwPercentage / 100) : 0
     const btwBedrag = order.total ? order.total - totalExclBtw : 0
 

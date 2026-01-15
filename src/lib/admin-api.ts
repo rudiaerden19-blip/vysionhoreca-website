@@ -20,6 +20,7 @@ export interface TenantSettings {
   country?: string
   btw_number?: string  // BTW nummer voor kassabon
   kvk_number?: string  // KvK nummer
+  btw_percentage?: number  // BTW percentage (6, 9, 12, 21)
   website?: string
   facebook_url: string
   instagram_url: string

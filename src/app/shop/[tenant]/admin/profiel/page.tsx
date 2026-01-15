@@ -27,6 +27,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     country: '',
     btw_number: '',
     kvk_number: '',
+    btw_percentage: 21,
     website: '',
     facebook_url: '',
     instagram_url: '',
@@ -359,6 +360,32 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 placeholder="BE 0123.456.789"
               />
               <p className="text-xs text-gray-500 mt-1">Bijv. BE 0123.456.789 of NL123456789B01</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                BTW-percentage *
+              </label>
+              <div className="flex gap-2">
+                {[6, 9, 12, 21].map((pct) => (
+                  <button
+                    key={pct}
+                    type="button"
+                    onClick={() => {
+                      setFormData(prev => ({ ...prev, btw_percentage: pct }))
+                      setSaved(false)
+                    }}
+                    className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${
+                      formData.btw_percentage === pct
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {pct}%
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 mt-1">Dit wordt gebruikt op de kassabon</p>
             </div>
 
             <div>
