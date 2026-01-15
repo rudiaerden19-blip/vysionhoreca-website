@@ -998,10 +998,8 @@ export async function updateOrderStatus(id: string, status: Order['status']): Pr
     return false
   }
   
+  // Only update status - completed_at column may not exist
   const updateData: Record<string, unknown> = { status }
-  if (status === 'completed') {
-    updateData.completed_at = new Date().toISOString()
-  }
   
   console.log('Updating order status:', id, status)
   
@@ -1011,7 +1009,10 @@ export async function updateOrderStatus(id: string, status: Order['status']): Pr
     .eq('id', id)
   
   if (error) {
-    console.error('Error updating order status:', error)
+    console.error('Error updating order status:', JSON.stringify(error, null, 2))
+    console.error('Error code:', error.code)
+    console.error('Error message:', error.message)
+    console.error('Error details:', error.details)
     return false
   }
   console.log('Order status updated successfully')
