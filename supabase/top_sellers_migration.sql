@@ -18,4 +18,10 @@ ADD COLUMN IF NOT EXISTS tagline TEXT DEFAULT '';
 ALTER TABLE tenant_settings 
 ADD COLUMN IF NOT EXISTS about_image TEXT DEFAULT '';
 
+-- Voeg cover images toe (3 header foto's)
+ALTER TABLE tenant_settings 
+ADD COLUMN IF NOT EXISTS cover_image_1 TEXT DEFAULT '',
+ADD COLUMN IF NOT EXISTS cover_image_2 TEXT DEFAULT '',
+ADD COLUMN IF NOT EXISTS cover_image_3 TEXT DEFAULT '';
+
 -- Klaar!

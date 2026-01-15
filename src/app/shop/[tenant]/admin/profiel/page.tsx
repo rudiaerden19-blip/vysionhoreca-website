@@ -30,6 +30,9 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     top_seller_1: '',
     top_seller_2: '',
     top_seller_3: '',
+    cover_image_1: '',
+    cover_image_2: '',
+    cover_image_3: '',
   })
 
   // Load data on mount
@@ -378,6 +381,41 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           </h2>
           
           <div className="space-y-6">
+            {/* Header foto's */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Header foto&apos;s (3 foto&apos;s die rouleren)
+              </label>
+              <p className="text-sm text-gray-500 mb-4">Deze foto&apos;s verschijnen bovenaan je website</p>
+              
+              <div className="grid md:grid-cols-3 gap-4">
+                <MediaPicker
+                  tenantSlug={params.tenant}
+                  value={formData.cover_image_1 || ''}
+                  onChange={(url) => {
+                    setFormData(prev => ({ ...prev, cover_image_1: url }))
+                    setSaved(false)
+                  }}
+                />
+                <MediaPicker
+                  tenantSlug={params.tenant}
+                  value={formData.cover_image_2 || ''}
+                  onChange={(url) => {
+                    setFormData(prev => ({ ...prev, cover_image_2: url }))
+                    setSaved(false)
+                  }}
+                />
+                <MediaPicker
+                  tenantSlug={params.tenant}
+                  value={formData.cover_image_3 || ''}
+                  onChange={(url) => {
+                    setFormData(prev => ({ ...prev, cover_image_3: url }))
+                    setSaved(false)
+                  }}
+                />
+              </div>
+            </div>
+
             {/* Over Ons foto */}
             <div>
               <MediaPicker
