@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 
 const colorPresets = [
   { name: 'Oranje', primary: '#FF6B35', secondary: '#FFA500' },
@@ -15,26 +16,72 @@ const colorPresets = [
 ]
 
 export default function DesignPage({ params }: { params: { tenant: string } }) {
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+  const [settings, setSettings] = useState<TenantSettings | null>(null)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
   const [secondaryColor, setSecondaryColor] = useState('#FFA500')
-  const [darkMode, setDarkMode] = useState(false)
-  const [roundedCorners, setRoundedCorners] = useState(true)
-  const [showAnimations, setShowAnimations] = useState(true)
+
+  // Load current settings
+  useEffect(() => {
+    async function loadSettings() {
+      setLoading(true)
+      const data = await getTenantSettings(params.tenant)
+      if (data) {
+        setSettings(data)
+        setPrimaryColor(data.primary_color || '#FF6B35')
+        setSecondaryColor(data.secondary_color || '#FFA500')
+      }
+      setLoading(false)
+    }
+    loadSettings()
+  }, [params.tenant])
 
   const handleSave = async () => {
+    if (!settings) return
+    
     setSaving(true)
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    setError('')
+    
+    const updatedSettings: TenantSettings = {
+      ...settings,
+      primary_color: primaryColor,
+      secondary_color: secondaryColor,
+    }
+    
+    const success = await saveTenantSettings(updatedSettings)
+    
+    if (success) {
+      setSettings(updatedSettings)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    } else {
+      setError('Opslaan mislukt. Probeer opnieuw.')
+    }
     setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 3000)
   }
 
   const applyPreset = (preset: typeof colorPresets[0]) => {
     setPrimaryColor(preset.primary)
     setSecondaryColor(preset.secondary)
     setSaved(false)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+          />
+          <p className="text-gray-500">Laden...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -78,6 +125,13 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
           )}
         </motion.button>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600">
+          {error}
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Settings */}
@@ -154,69 +208,18 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             </div>
           </motion.div>
 
-          {/* Style Options */}
+          {/* Info */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-2xl p-6 shadow-sm"
+            className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span>✨</span> Stijl opties
-            </h2>
-            
-            <div className="space-y-4">
-              {/* Dark Mode */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <div>
-                  <p className="font-medium text-gray-900">Donkere modus</p>
-                  <p className="text-sm text-gray-500">Website in donkere kleuren</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={darkMode}
-                    onChange={(e) => { setDarkMode(e.target.checked); setSaved(false); }}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-                </label>
-              </div>
-
-              {/* Rounded Corners */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <div>
-                  <p className="font-medium text-gray-900">Afgeronde hoeken</p>
-                  <p className="text-sm text-gray-500">Moderne, zachte vormgeving</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={roundedCorners}
-                    onChange={(e) => { setRoundedCorners(e.target.checked); setSaved(false); }}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-                </label>
-              </div>
-
-              {/* Animations */}
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                <div>
-                  <p className="font-medium text-gray-900">Animaties</p>
-                  <p className="text-sm text-gray-500">Vloeiende overgangen en effecten</p>
-                </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={showAnimations}
-                    onChange={(e) => { setShowAnimations(e.target.checked); setSaved(false); }}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
-                </label>
-              </div>
-            </div>
+            <h3 className="font-semibold text-blue-900 mb-2">💡 Tip</h3>
+            <p className="text-blue-700 text-sm">
+              De kleuren worden toegepast op knoppen, accenten en andere elementen op je website. 
+              Kies kleuren die passen bij je huisstijl en goed leesbaar zijn.
+            </p>
           </motion.div>
         </div>
 
@@ -234,7 +237,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             
             {/* Mini Preview */}
             <div 
-              className={`rounded-xl overflow-hidden border ${darkMode ? 'bg-gray-900' : 'bg-white'}`}
+              className="rounded-xl overflow-hidden border bg-white"
               style={{ minHeight: '400px' }}
             >
               {/* Mini Header */}
@@ -243,10 +246,10 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                 style={{ background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})` }}
               >
                 <div className="absolute bottom-4 left-4">
-                  <div className={`text-xs font-bold mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>
-                    Je Zaak Naam
+                  <div className="text-white text-xs font-bold mb-1">
+                    {settings?.business_name || 'Je Zaak Naam'}
                   </div>
-                  <div className="text-white/70 text-[10px]">Tagline hier</div>
+                  <div className="text-white/70 text-[10px]">{settings?.tagline || 'Tagline hier'}</div>
                 </div>
               </div>
 
@@ -255,15 +258,15 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                 {/* Mini Category Pills */}
                 <div className="flex gap-2 mb-4 overflow-hidden">
                   <div 
-                    className={`px-3 py-1 text-xs font-medium text-white ${roundedCorners ? 'rounded-full' : 'rounded'}`}
+                    className="px-3 py-1 text-xs font-medium text-white rounded-full"
                     style={{ backgroundColor: primaryColor }}
                   >
                     Alles
                   </div>
-                  <div className={`px-3 py-1 text-xs font-medium ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'} ${roundedCorners ? 'rounded-full' : 'rounded'}`}>
+                  <div className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
                     Frieten
                   </div>
-                  <div className={`px-3 py-1 text-xs font-medium ${darkMode ? 'bg-gray-800 text-gray-300' : 'bg-gray-100 text-gray-600'} ${roundedCorners ? 'rounded-full' : 'rounded'}`}>
+                  <div className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
                     Snacks
                   </div>
                 </div>
@@ -273,11 +276,11 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                   {[1, 2].map((i) => (
                     <div 
                       key={i} 
-                      className={`${darkMode ? 'bg-gray-800' : 'bg-gray-50'} ${roundedCorners ? 'rounded-xl' : 'rounded'} overflow-hidden`}
+                      className="bg-gray-50 rounded-xl overflow-hidden"
                     >
                       <div className="h-16 bg-gray-300" />
                       <div className="p-2">
-                        <div className={`h-2 w-16 ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded mb-1`} />
+                        <div className="h-2 w-16 bg-gray-200 rounded mb-1" />
                         <div 
                           className="h-2 w-10 rounded"
                           style={{ backgroundColor: primaryColor }}
@@ -289,7 +292,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
 
                 {/* Mini CTA Button */}
                 <button 
-                  className={`w-full mt-4 py-2 text-white text-xs font-medium ${roundedCorners ? 'rounded-xl' : 'rounded'}`}
+                  className="w-full mt-4 py-2 text-white text-xs font-medium rounded-xl"
                   style={{ backgroundColor: primaryColor }}
                 >
                   Bestel Nu
