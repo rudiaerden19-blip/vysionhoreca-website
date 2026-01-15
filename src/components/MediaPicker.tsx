@@ -8,6 +8,7 @@ interface MediaItem {
   id: string
   url: string
   name: string
+  category: string
 }
 
 interface MediaPickerProps {
@@ -20,9 +21,10 @@ interface MediaPickerProps {
 export default function MediaPicker({ tenantSlug, value, onChange, label }: MediaPickerProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [media, setMedia] = useState<MediaItem[]>([])
+  const [categories, setCategories] = useState<string[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('alle')
   const [loading, setLoading] = useState(false)
 
-  // Laad media wanneer modal opent
   useEffect(() => {
     if (isOpen) {
       loadMedia()
@@ -32,7 +34,6 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   const loadMedia = async () => {
     setLoading(true)
     
-    // Haal media uit tenant_media tabel
     const { data, error } = await supabase
       .from('tenant_media')
       .select('*')
@@ -43,8 +44,12 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       setMedia(data.map(item => ({
         id: item.id,
         url: item.url,
-        name: item.name || 'Foto'
+        name: item.name || 'Foto',
+        category: item.category || ''
       })))
+      // Extract categories
+      const cats = [...new Set(data.map(m => m.category).filter(c => c && c.trim() !== ''))]
+      setCategories(cats)
     }
     
     setLoading(false)
@@ -58,6 +63,11 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   const clearImage = () => {
     onChange('')
   }
+
+  // Filter media
+  const filteredMedia = selectedCategory === 'alle' 
+    ? media 
+    : media.filter(m => m.category === selectedCategory)
 
   return (
     <div>
@@ -108,10 +118,10 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden"
+              className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b">
+              <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
                 <h3 className="text-lg font-semibold">Kies een foto</h3>
                 <button
                   onClick={() => setIsOpen(false)}
@@ -121,8 +131,39 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                 </button>
               </div>
 
+              {/* Category Filter */}
+              {categories.length > 0 && (
+                <div className="p-4 border-b flex-shrink-0">
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setSelectedCategory('alle')}
+                      className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                        selectedCategory === 'alle' 
+                          ? 'bg-orange-500 text-white' 
+                          : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      Alle
+                    </button>
+                    {categories.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                          selectedCategory === cat 
+                            ? 'bg-orange-500 text-white' 
+                            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        }`}
+                      >
+                        📁 {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Content */}
-              <div className="p-4 overflow-y-auto max-h-[60vh]">
+              <div className="p-4 overflow-y-auto flex-1">
                 {loading ? (
                   <div className="text-center py-12">
                     <motion.div
@@ -132,7 +173,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                     />
                     <p className="text-gray-500">Laden...</p>
                   </div>
-                ) : media.length === 0 ? (
+                ) : filteredMedia.length === 0 ? (
                   <div className="text-center py-12">
                     <span className="text-6xl block mb-4">📷</span>
                     <h4 className="font-semibold text-gray-900 mb-2">Nog geen foto&apos;s</h4>
@@ -142,20 +183,21 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                   </div>
                 ) : (
                   <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                    {media.map((item) => (
+                    {filteredMedia.map((item) => (
                       <motion.div
                         key={item.id}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
                         onClick={() => selectImage(item.url)}
-                        className={`aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all ${
-                          value === item.url ? 'ring-orange-500' : 'ring-transparent hover:ring-gray-300'
+                        className={`aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all bg-gray-100 ${
+                          value === item.url ? 'ring-orange-500 ring-4' : 'ring-transparent hover:ring-gray-300'
                         }`}
                       >
                         <img
                           src={item.url}
                           alt={item.name}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       </motion.div>
                     ))}
@@ -164,7 +206,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
               </div>
 
               {/* Footer */}
-              <div className="p-4 border-t bg-gray-50">
+              <div className="p-4 border-t bg-gray-50 flex-shrink-0">
                 <p className="text-sm text-gray-500 text-center">
                   Geen foto? Ga naar <span className="text-orange-500 font-medium">Foto&apos;s & Media</span> om te uploaden
                 </p>

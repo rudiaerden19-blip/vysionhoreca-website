@@ -11,11 +11,13 @@ CREATE TABLE IF NOT EXISTS tenant_media (
   name VARCHAR(255) DEFAULT '',
   size INTEGER DEFAULT 0,
   type VARCHAR(50) DEFAULT 'image',
+  category VARCHAR(255) DEFAULT '',  -- Voor mappen/categorieën
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Index voor snelle queries
 CREATE INDEX IF NOT EXISTS idx_tenant_media_tenant ON tenant_media(tenant_slug);
+CREATE INDEX IF NOT EXISTS idx_tenant_media_category ON tenant_media(category);
 
 -- Enable RLS
 ALTER TABLE tenant_media ENABLE ROW LEVEL SECURITY;
@@ -25,3 +27,6 @@ CREATE POLICY "Public read tenant_media" ON tenant_media FOR SELECT USING (true)
 
 -- Authenticated kan media beheren
 CREATE POLICY "Auth manage tenant_media" ON tenant_media FOR ALL USING (true);
+
+-- Als tabel al bestaat, voeg category kolom toe:
+-- ALTER TABLE tenant_media ADD COLUMN IF NOT EXISTS category VARCHAR(255) DEFAULT '';

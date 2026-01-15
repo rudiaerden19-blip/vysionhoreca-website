@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 
 interface MediaItem {
@@ -9,15 +9,21 @@ interface MediaItem {
   url: string
   name: string
   size: number
+  category: string
   created_at: string
 }
 
 export default function MediaPage({ params }: { params: { tenant: string } }) {
   const [media, setMedia] = useState<MediaItem[]>([])
+  const [categories, setCategories] = useState<string[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('alle')
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [showNewCategory, setShowNewCategory] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [uploadCategory, setUploadCategory] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load media on mount
@@ -35,6 +41,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     
     if (!error && data) {
       setMedia(data)
+      // Extract unique categories
+      const cats = [...new Set(data.map(m => m.category).filter(c => c && c.trim() !== ''))]
+      setCategories(cats)
     }
     setLoading(false)
   }
@@ -48,11 +57,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     let errorMessage = ''
 
     for (const file of Array.from(files)) {
-      // Generate unique filename
       const fileExt = file.name.split('.').pop()
       const fileName = `${params.tenant}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`
 
-      // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('media')
         .upload(fileName, file)
@@ -63,12 +70,10 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         continue
       }
 
-      // Get public URL
       const { data: urlData } = supabase.storage
         .from('media')
         .getPublicUrl(fileName)
 
-      // Save to database
       const { error: dbError } = await supabase
         .from('tenant_media')
         .insert({
@@ -76,7 +81,8 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
           url: urlData.publicUrl,
           name: file.name,
           size: file.size,
-          type: 'image'
+          type: 'image',
+          category: uploadCategory
         })
 
       if (dbError) {
@@ -87,20 +93,26 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       }
     }
 
-    // Reload media
     await loadMedia()
     setUploading(false)
     
-    // Clear input
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
 
-    // Show result
     if (successCount > 0) {
       alert(`✅ ${successCount} foto('s) geüpload!`)
     } else if (errorMessage) {
       alert(`❌ Upload mislukt: ${errorMessage}`)
+    }
+  }
+
+  const createCategory = () => {
+    if (newCategoryName.trim()) {
+      setCategories(prev => [...prev, newCategoryName.trim()])
+      setUploadCategory(newCategoryName.trim())
+      setNewCategoryName('')
+      setShowNewCategory(false)
     }
   }
 
@@ -117,13 +129,10 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       const item = media.find(m => m.id === id)
       if (!item) continue
 
-      // Delete from storage (extract path from URL)
       const urlParts = item.url.split('/media/')
       if (urlParts[1]) {
         await supabase.storage.from('media').remove([urlParts[1]])
       }
-
-      // Delete from database
       await supabase.from('tenant_media').delete().eq('id', id)
     }
 
@@ -146,12 +155,17 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     if (days === 0) return 'Vandaag'
     if (days === 1) return 'Gisteren'
     if (days < 7) return `${days} dagen geleden`
-    if (days < 30) return `${Math.floor(days / 7)} weken geleden`
     return d.toLocaleDateString('nl-BE')
   }
 
+  // Filter media by category
+  const filteredMedia = selectedCategory === 'alle' 
+    ? media 
+    : media.filter(m => m.category === selectedCategory)
+
   return (
     <div className="max-w-6xl mx-auto">
+      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Foto&apos;s & Media</h1>
@@ -184,6 +198,82 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         </div>
       </div>
 
+      {/* Category Selector for Upload */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl p-6 shadow-sm mb-6"
+      >
+        <h3 className="font-semibold text-gray-900 mb-4">📁 Upload naar map</h3>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setUploadCategory('')}
+            className={`px-4 py-2 rounded-xl font-medium transition-all ${
+              uploadCategory === '' 
+                ? 'bg-orange-500 text-white' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+            }`}
+          >
+            Geen map
+          </button>
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setUploadCategory(cat)}
+              className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                uploadCategory === cat 
+                  ? 'bg-orange-500 text-white' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              }`}
+            >
+              📁 {cat}
+            </button>
+          ))}
+          <button
+            onClick={() => setShowNewCategory(true)}
+            className="px-4 py-2 rounded-xl font-medium bg-gray-100 hover:bg-gray-200 text-gray-700"
+          >
+            + Nieuwe map
+          </button>
+        </div>
+
+        {/* New Category Input */}
+        <AnimatePresence>
+          {showNewCategory && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 flex gap-2"
+            >
+              <input
+                type="text"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="Naam van de map..."
+                className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                autoFocus
+              />
+              <button
+                onClick={createCategory}
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium"
+              >
+                ✓
+              </button>
+              <button
+                onClick={() => {
+                  setShowNewCategory(false)
+                  setNewCategoryName('')
+                }}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-medium"
+              >
+                ✕
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
       {/* Upload Area */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -195,11 +285,56 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         <p className="text-gray-700 font-medium mb-2">Sleep bestanden hierheen</p>
         <p className="text-gray-500 text-sm mb-4">of klik om te uploaden</p>
         <p className="text-gray-400 text-xs">JPG, PNG, GIF tot 10MB</p>
+        {uploadCategory && (
+          <p className="text-orange-500 text-sm mt-2">→ Wordt geüpload naar: <strong>{uploadCategory}</strong></p>
+        )}
       </motion.div>
+
+      {/* Category Filter */}
+      {categories.length > 0 && (
+        <div className="flex items-center gap-4 mb-6">
+          <span className="text-gray-500 text-sm">Filter:</span>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedCategory('alle')}
+              className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                selectedCategory === 'alle' 
+                  ? 'bg-gray-900 text-white' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              }`}
+            >
+              Alle ({media.length})
+            </button>
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                  selectedCategory === cat 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+              >
+                {cat} ({media.filter(m => m.category === cat).length})
+              </button>
+            ))}
+            <button
+              onClick={() => setSelectedCategory('')}
+              className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
+                selectedCategory === '' 
+                  ? 'bg-gray-900 text-white' 
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              }`}
+            >
+              Zonder map ({media.filter(m => !m.category || m.category === '').length})
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* View Toggle */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-gray-500">{media.length} bestanden</p>
+        <p className="text-gray-500">{filteredMedia.length} bestanden</p>
         <div className="flex bg-gray-100 rounded-lg p-1">
           <button
             onClick={() => setViewMode('grid')}
@@ -229,23 +364,24 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       )}
 
       {/* Media Grid */}
-      {!loading && viewMode === 'grid' && media.length > 0 && (
+      {!loading && viewMode === 'grid' && filteredMedia.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {media.map((item, index) => (
+          {filteredMedia.map((item, index) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.05 }}
+              transition={{ delay: index * 0.03 }}
               onClick={() => toggleSelect(item.id)}
-              className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer group ${
+              className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer group bg-gray-100 ${
                 selectedItems.includes(item.id) ? 'ring-4 ring-orange-500' : ''
               }`}
             >
               <img
                 src={item.url}
                 alt={item.name}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                loading="lazy"
               />
               <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
                 selectedItems.includes(item.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
@@ -254,6 +390,11 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                   {selectedItems.includes(item.id) ? '✓' : '○'}
                 </span>
               </div>
+              {item.category && (
+                <div className="absolute top-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg">
+                  📁 {item.category}
+                </div>
+              )}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <p className="text-white text-xs truncate">{item.name}</p>
               </div>
@@ -263,9 +404,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       )}
 
       {/* Media List */}
-      {!loading && viewMode === 'list' && media.length > 0 && (
+      {!loading && viewMode === 'list' && filteredMedia.length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          {media.map((item) => (
+          {filteredMedia.map((item) => (
             <div 
               key={item.id}
               onClick={() => toggleSelect(item.id)}
@@ -279,15 +420,22 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 onChange={() => toggleSelect(item.id)}
                 className="w-5 h-5 rounded border-gray-300 text-orange-500"
               />
-              <img
-                src={item.url}
-                alt={item.name}
-                className="w-16 h-16 object-cover rounded-lg"
-              />
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">{item.name}</p>
+              <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                <img
+                  src={item.url}
+                  alt={item.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-gray-900 truncate">{item.name}</p>
                 <p className="text-sm text-gray-500">{formatSize(item.size)}</p>
               </div>
+              {item.category && (
+                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg">
+                  📁 {item.category}
+                </span>
+              )}
               <p className="text-sm text-gray-400">{formatDate(item.created_at)}</p>
             </div>
           ))}
@@ -295,10 +443,12 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       )}
 
       {/* Empty State */}
-      {!loading && media.length === 0 && (
+      {!loading && filteredMedia.length === 0 && (
         <div className="text-center py-12">
           <span className="text-6xl mb-4 block">📷</span>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Nog geen media</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
+            {selectedCategory === 'alle' ? 'Nog geen media' : `Geen foto's in "${selectedCategory}"`}
+          </h3>
           <p className="text-gray-500">Upload je eerste foto&apos;s</p>
         </div>
       )}
