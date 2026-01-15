@@ -146,7 +146,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         id: '1',
         name: tenantData?.business_name || 'Demo Frituur',
         slug: params.tenant,
-        tagline: textsData?.hero_subtitle || tenantData?.tagline || 'Welkom bij onze zaak',
+        tagline: textsData?.hero_subtitle || tenantData?.tagline || 'Welkom bij onze zaak - DEBUG: geen tekst gevonden',
         logo_url: tenantData?.logo_url || '',
         cover_images: [
           tenantData?.cover_image_1 || 'https://images.unsplash.com/photo-1619881590738-a111d176d906?w=1600',
