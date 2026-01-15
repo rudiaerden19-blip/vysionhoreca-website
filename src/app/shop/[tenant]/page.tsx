@@ -242,7 +242,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               ) : (
                 <span className="inline-flex items-center gap-2 bg-green-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                  Nu open · Sluit om {todayHours?.close}
+                  Nu open · Sluit om {todayHours?.close?.slice(0, 5)}
                 </span>
               )}
             </motion.div>
@@ -537,7 +537,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     <span>
                       {hours.closed 
                         ? <span className="text-red-400">Gesloten</span>
-                        : `${hours.open} - ${hours.close}`
+                        : `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)}`
                       }
                     </span>
                   </div>
