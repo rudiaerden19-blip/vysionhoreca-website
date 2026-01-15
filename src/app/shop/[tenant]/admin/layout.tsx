@@ -53,6 +53,12 @@ const menuItems = [
     ]
   },
   {
+    category: 'KLANTEN',
+    items: [
+      { name: 'Klanten', href: '/klanten', icon: '👥' },
+    ]
+  },
+  {
     category: 'STATISTIEKEN',
     items: [
       { name: 'Verkoop', href: '/verkoop', icon: '💰' },

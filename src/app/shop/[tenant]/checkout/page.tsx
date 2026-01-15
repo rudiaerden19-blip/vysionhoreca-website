@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { getTenantSettings, getDeliverySettings, TenantSettings, DeliverySettings } from '@/lib/admin-api'
+import { getTenantSettings, getDeliverySettings, TenantSettings, DeliverySettings, addLoyaltyPoints, getCustomer } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 
 interface CartItem {
@@ -50,6 +50,8 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [promoError, setPromoError] = useState('')
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [orderNumber, setOrderNumber] = useState<number | null>(null)
+  const [earnedPoints, setEarnedPoints] = useState(0)
+  const [loggedInCustomerId, setLoggedInCustomerId] = useState<string | null>(null)
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
 
@@ -69,6 +71,25 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     // Default to pickup if delivery is not enabled
     if (!delivery?.delivery_enabled) {
       setOrderType('pickup')
+    }
+    
+    // Check if customer is logged in
+    const customerId = localStorage.getItem(`customer_${params.tenant}`)
+    if (customerId) {
+      const customer = await getCustomer(customerId)
+      if (customer) {
+        setLoggedInCustomerId(customerId)
+        // Pre-fill customer info
+        setCustomerInfo({
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone || '',
+          address: customer.address || '',
+          postal_code: customer.postal_code || '',
+          city: customer.city || '',
+          notes: '',
+        })
+      }
     }
     
     setLoading(false)
@@ -221,6 +242,13 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           .eq('code', promoCode.toUpperCase())
       }
       
+      // Add loyalty points if customer is logged in (1 point per euro)
+      if (loggedInCustomerId) {
+        const points = Math.floor(total)
+        await addLoyaltyPoints(loggedInCustomerId, points, total)
+        setEarnedPoints(points)
+      }
+      
       // Clear cart
       localStorage.removeItem(`cart_${params.tenant}`)
       
@@ -276,6 +304,12 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             <p className="text-gray-500 text-sm mb-1">Bestelnummer</p>
             <p className="text-3xl font-bold" style={{ color: primaryColor }}>#{orderNumber}</p>
           </div>
+          
+          {earnedPoints > 0 && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-6">
+              <p className="text-yellow-800 font-medium">🎁 Je hebt {earnedPoints} spaarpunten verdiend!</p>
+            </div>
+          )}
           
           <div className="space-y-3">
             <Link
@@ -390,7 +424,18 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               transition={{ delay: 0.1 }}
               className="bg-white rounded-2xl p-6 shadow-sm"
             >
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Jouw gegevens</h2>
+              <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-900">Jouw gegevens</h2>
+              {!loggedInCustomerId && (
+                <Link
+                  href={`/shop/${params.tenant}/account/login`}
+                  style={{ color: primaryColor }}
+                  className="text-sm font-medium hover:underline"
+                >
+                  Heb je een account? Login →
+                </Link>
+              )}
+            </div>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Naam *</label>
