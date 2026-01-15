@@ -355,20 +355,20 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href={`/shop/${params.tenant}/menu`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
+        <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
+          <Link href={`/shop/${params.tenant}/menu`} className="flex items-center gap-1 sm:gap-2 text-gray-600 hover:opacity-70 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Terug</span>
+            <span className="text-sm sm:text-base">Terug</span>
           </Link>
-          <h1 className="font-bold text-xl text-gray-900">Afrekenen</h1>
-          <div className="w-16"></div>
+          <h1 className="font-bold text-lg sm:text-xl text-gray-900">Afrekenen</h1>
+          <div className="w-12 sm:w-16"></div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
+      <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 overflow-x-hidden box-border">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left Column - Forms */}
           <div className="space-y-6">
             {/* Order Type */}
@@ -378,7 +378,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               className="bg-white rounded-2xl p-6 shadow-sm"
             >
               <h2 className="text-lg font-bold text-gray-900 mb-4">Hoe wil je je bestelling ontvangen?</h2>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 <button
                   onClick={() => setOrderType('pickup')}
                   style={orderType === 'pickup' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
@@ -430,17 +430,17 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               {!loggedInCustomerId && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
                   <p className="text-blue-800 font-medium mb-3">💡 Log in om spaarpunten te verdienen!</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Link
                       href={`/shop/${params.tenant}/account/login?redirect=checkout`}
                       style={{ backgroundColor: primaryColor }}
-                      className="flex-1 min-w-[120px] text-center text-white font-medium py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
+                      className="flex-1 text-center text-white font-medium py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
                     >
                       Inloggen
                     </Link>
                     <Link
                       href={`/shop/${params.tenant}/account/register?redirect=checkout`}
-                      className="flex-1 min-w-[120px] text-center bg-white border border-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex-1 text-center bg-white border border-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       Account aanmaken
                     </Link>
@@ -469,7 +469,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                   />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Telefoon *</label>
                     <input
@@ -507,7 +507,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Postcode *</label>
                         <input
@@ -556,7 +556,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               className="bg-white rounded-2xl p-6 shadow-sm"
             >
               <h2 className="text-lg font-bold text-gray-900 mb-4">Betaalmethode</h2>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 <button
                   onClick={() => setPaymentMethod('cash')}
                   style={paymentMethod === 'cash' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
@@ -600,13 +600,13 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             >
               <h2 className="text-lg font-bold text-gray-900 mb-4">Je bestelling</h2>
               
-              <div className="space-y-4 max-h-80 overflow-y-auto mb-6">
+              <div className="space-y-3 sm:space-y-4 max-h-80 overflow-y-auto mb-6">
                 {cart.map((item, index) => (
-                  <div key={index} className="flex gap-4">
+                  <div key={index} className="flex gap-3 sm:gap-4">
                     {item.image_url ? (
-                      <img src={item.image_url} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
+                      <img src={item.image_url} alt={item.name} className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg" />
                     ) : (
-                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">🍟</div>
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-100 rounded-lg flex items-center justify-center text-xl sm:text-2xl">🍟</div>
                     )}
                     <div className="flex-1">
                       <div className="flex justify-between">
