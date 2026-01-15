@@ -354,20 +354,22 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   return (
     <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm w-full">
-        <div className="px-4 py-3 flex items-center justify-between max-w-4xl mx-auto">
-          <Link href={`/shop/${params.tenant}/menu`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
+      <header className="sticky top-0 z-50 bg-white shadow-sm">
+        <div className="px-4 py-3 flex items-center justify-center relative">
+          <Link 
+            href={`/shop/${params.tenant}/menu`} 
+            className="absolute left-4 flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors"
+          >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             <span>Terug</span>
           </Link>
           <h1 className="font-bold text-lg text-gray-900">Afrekenen</h1>
-          <div className="w-16"></div>
         </div>
       </header>
 
-      <main className="px-4 py-6 max-w-4xl mx-auto">
+      <main className="px-4 py-6 w-full max-w-4xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Left Column - Forms */}
           <div className="space-y-6">
