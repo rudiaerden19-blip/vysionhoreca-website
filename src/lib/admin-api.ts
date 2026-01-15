@@ -329,3 +329,117 @@ export async function getTenantTexts(tenantSlug: string): Promise<TenantTexts | 
   }
   return data
 }
+
+// =====================================================
+// PRODUCT OPTIONS
+// =====================================================
+export interface ProductOptionChoice {
+  id?: string
+  option_id?: string
+  tenant_slug: string
+  name: string
+  price: number
+  sort_order: number
+  is_active: boolean
+}
+
+export interface ProductOption {
+  id?: string
+  tenant_slug: string
+  name: string
+  type: 'single' | 'multiple'
+  required: boolean
+  sort_order: number
+  is_active: boolean
+  choices?: ProductOptionChoice[]
+}
+
+export async function getProductOptions(tenantSlug: string): Promise<ProductOption[]> {
+  const { data: options, error } = await supabase
+    .from('product_options')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('is_active', true)
+    .order('sort_order')
+  
+  if (error) {
+    console.error('Error fetching product options:', error)
+    return []
+  }
+
+  // Fetch choices for each option
+  const optionsWithChoices: ProductOption[] = []
+  for (const option of options || []) {
+    const { data: choices } = await supabase
+      .from('product_option_choices')
+      .select('*')
+      .eq('option_id', option.id)
+      .eq('is_active', true)
+      .order('sort_order')
+    
+    optionsWithChoices.push({
+      ...option,
+      choices: choices || []
+    })
+  }
+
+  return optionsWithChoices
+}
+
+export async function saveProductOption(option: ProductOption): Promise<ProductOption | null> {
+  const { choices, ...optionData } = option
+  
+  // Save or update the option
+  const { data: savedOption, error } = await supabase
+    .from('product_options')
+    .upsert(optionData)
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Error saving product option:', error)
+    return null
+  }
+
+  // If we have choices, save them
+  if (choices && choices.length > 0) {
+    // First, delete existing choices for this option
+    await supabase
+      .from('product_option_choices')
+      .delete()
+      .eq('option_id', savedOption.id)
+
+    // Then insert new choices
+    const choicesWithOptionId = choices.map((choice, index) => ({
+      ...choice,
+      option_id: savedOption.id,
+      tenant_slug: option.tenant_slug,
+      sort_order: index,
+      is_active: true,
+    }))
+
+    const { error: choicesError } = await supabase
+      .from('product_option_choices')
+      .insert(choicesWithOptionId)
+
+    if (choicesError) {
+      console.error('Error saving option choices:', choicesError)
+    }
+  }
+
+  return { ...savedOption, choices }
+}
+
+export async function deleteProductOption(id: string): Promise<boolean> {
+  // Choices will be deleted automatically due to CASCADE
+  const { error } = await supabase
+    .from('product_options')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting product option:', error)
+    return false
+  }
+  return true
+}
