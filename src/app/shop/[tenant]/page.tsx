@@ -18,7 +18,7 @@ interface Business {
   phone: string
   email: string
   primary_color: string
-  opening_hours: Record<string, { open?: string; close?: string; closed?: boolean }>
+  opening_hours: Record<string, { open?: string; close?: string; closed?: boolean; hasBreak?: boolean; breakStart?: string; breakEnd?: string }>
   social_facebook: string
   social_instagram: string
   social_tiktok: string
@@ -76,13 +76,19 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       ])
 
       // Converteer openingstijden naar het juiste formaat
-      const openingHoursMap: Record<string, { open?: string; close?: string; closed?: boolean }> = {}
+      const openingHoursMap: Record<string, { open?: string; close?: string; closed?: boolean; hasBreak?: boolean; breakStart?: string; breakEnd?: string }> = {}
       dayNamesNL.forEach((dayName, index) => {
         const hourData = hoursData.find(h => h.day_of_week === index)
         const dayKey = dayName.toLowerCase()
         if (hourData) {
           openingHoursMap[dayKey] = hourData.is_open 
-            ? { open: hourData.open_time, close: hourData.close_time }
+            ? { 
+                open: hourData.open_time, 
+                close: hourData.close_time,
+                hasBreak: hourData.has_break,
+                breakStart: hourData.break_start || undefined,
+                breakEnd: hourData.break_end || undefined,
+              }
             : { closed: true }
         } else {
           openingHoursMap[dayKey] = { closed: true }
@@ -537,7 +543,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     <span>
                       {hours.closed 
                         ? <span className="text-red-400">Gesloten</span>
-                        : `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)}`
+                        : hours.hasBreak && hours.breakStart && hours.breakEnd
+                          ? `${hours.open?.slice(0, 5)} - ${hours.breakStart?.slice(0, 5)} & ${hours.breakEnd?.slice(0, 5)} - ${hours.close?.slice(0, 5)}`
+                          : `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)}`
                       }
                     </span>
                   </div>
