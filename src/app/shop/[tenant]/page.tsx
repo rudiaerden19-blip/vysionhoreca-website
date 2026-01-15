@@ -31,6 +31,9 @@ interface Business {
   pickup_time: string
   average_rating: number
   review_count: number
+  top_seller_1?: string
+  top_seller_2?: string
+  top_seller_3?: string
 }
 
 interface Review {
@@ -167,6 +170,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         pickup_time: `${deliveryData?.pickup_time_minutes ?? 15}-${(deliveryData?.pickup_time_minutes ?? 15) + 5} min`,
         average_rating: 4.8,
         review_count: 127,
+        top_seller_1: tenantData?.top_seller_1 || '',
+        top_seller_2: tenantData?.top_seller_2 || '',
+        top_seller_3: tenantData?.top_seller_3 || '',
       })
 
       // Populaire items uit producten
@@ -721,6 +727,50 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </div>
       </section>
+
+      {/* Top Sellers Section */}
+      {business && (business.top_seller_1 || business.top_seller_2 || business.top_seller_3) && (
+        <section className="py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 italic">
+                Onze Meest Verkochte Producten
+              </h2>
+              <div className="w-16 h-1 bg-blue-500 mx-auto mt-4 mb-6"></div>
+              <p className="text-gray-600">
+                Dit zijn de meest verkochte producten bij {business.name.toLowerCase()}.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-3 gap-8 justify-items-center">
+              {[business.top_seller_1, business.top_seller_2, business.top_seller_3]
+                .filter(url => url && url.trim() !== '')
+                .map((imageUrl, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
+                  >
+                    <img
+                      src={imageUrl}
+                      alt={`Topverkoper ${index + 1}`}
+                      className="w-full h-72 object-cover"
+                    />
+                  </motion.div>
+                ))
+              }
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Opening Hours & Contact Section */}
       <section className="py-20 bg-gray-900 text-white">

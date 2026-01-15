@@ -18,6 +18,9 @@ export interface TenantSettings {
   instagram_url: string
   tiktok_url: string
   website_url: string
+  top_seller_1?: string
+  top_seller_2?: string
+  top_seller_3?: string
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {
