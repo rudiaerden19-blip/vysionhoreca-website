@@ -241,3 +241,52 @@ export async function saveDeliverySettings(settings: DeliverySettings): Promise<
   }
   return true
 }
+
+// =====================================================
+// RESERVATIONS
+// =====================================================
+export interface Reservation {
+  id?: string
+  tenant_slug: string
+  customer_name: string
+  customer_phone: string
+  customer_email?: string
+  reservation_date: string
+  reservation_time: string
+  party_size: number
+  notes?: string
+  status?: string
+}
+
+export async function createReservation(reservation: Reservation): Promise<boolean> {
+  const { error } = await supabase
+    .from('reservations')
+    .insert(reservation)
+  
+  if (error) {
+    console.error('Error creating reservation:', error)
+    return false
+  }
+  return true
+}
+
+export async function getReservations(tenantSlug: string, date?: string): Promise<Reservation[]> {
+  let query = supabase
+    .from('reservations')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('reservation_date', { ascending: true })
+    .order('reservation_time', { ascending: true })
+  
+  if (date) {
+    query = query.eq('reservation_date', date)
+  }
+  
+  const { data, error } = await query
+  
+  if (error) {
+    console.error('Error fetching reservations:', error)
+    return []
+  }
+  return data || []
+}

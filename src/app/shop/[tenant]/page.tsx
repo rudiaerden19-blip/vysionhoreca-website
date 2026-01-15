@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, TenantSettings, OpeningHour, DeliverySettings, MenuProduct } from '@/lib/admin-api'
+import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, TenantSettings, OpeningHour, DeliverySettings, MenuProduct } from '@/lib/admin-api'
 
 interface Business {
   id: string
@@ -58,6 +58,47 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [scrollY, setScrollY] = useState(0)
+  
+  // Reservation form state
+  const [reservationForm, setReservationForm] = useState({
+    name: '',
+    phone: '',
+    date: '',
+    time: '',
+    partySize: '',
+    notes: '',
+  })
+  const [reservationSubmitting, setReservationSubmitting] = useState(false)
+  const [reservationSuccess, setReservationSuccess] = useState(false)
+  const [reservationError, setReservationError] = useState('')
+
+  const handleReservationSubmit = async () => {
+    if (!reservationForm.name || !reservationForm.phone || !reservationForm.date || !reservationForm.time || !reservationForm.partySize) {
+      setReservationError('Vul alle verplichte velden in')
+      return
+    }
+    
+    setReservationSubmitting(true)
+    setReservationError('')
+    
+    const success = await createReservation({
+      tenant_slug: params.tenant,
+      customer_name: reservationForm.name,
+      customer_phone: reservationForm.phone,
+      reservation_date: reservationForm.date,
+      reservation_time: reservationForm.time,
+      party_size: parseInt(reservationForm.partySize),
+      notes: reservationForm.notes,
+    })
+    
+    if (success) {
+      setReservationSuccess(true)
+      setReservationForm({ name: '', phone: '', date: '', time: '', partySize: '', notes: '' })
+    } else {
+      setReservationError('Er ging iets mis. Probeer opnieuw of bel ons.')
+    }
+    setReservationSubmitting(false)
+  }
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -458,6 +499,170 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </section>
       )}
+
+      {/* Table Reservation Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span className="text-orange-500 font-semibold text-sm uppercase tracking-wider">Kom langs</span>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Reserveer een tafel</h2>
+            <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+              Wil je zeker zijn van een plekje? Reserveer vooraf en geniet ter plaatse van onze lekkernijen.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-3xl p-8 md:p-12 shadow-sm"
+          >
+            {reservationSuccess ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">✅</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Reservering ontvangen!</h3>
+                <p className="text-gray-600 mb-6">
+                  We hebben je reservering ontvangen. Je krijgt zo snel mogelijk een bevestiging.
+                </p>
+                <button
+                  onClick={() => setReservationSuccess(false)}
+                  className="text-orange-500 hover:text-orange-600 font-medium"
+                >
+                  Nieuwe reservering maken
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Naam *
+                    </label>
+                    <input
+                      type="text"
+                      value={reservationForm.name}
+                      onChange={(e) => setReservationForm({ ...reservationForm, name: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="Je naam"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Telefoonnummer *
+                    </label>
+                    <input
+                      type="tel"
+                      value={reservationForm.phone}
+                      onChange={(e) => setReservationForm({ ...reservationForm, phone: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="+32 ..."
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Datum *
+                    </label>
+                    <input
+                      type="date"
+                      value={reservationForm.date}
+                      onChange={(e) => setReservationForm({ ...reservationForm, date: e.target.value })}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tijd *
+                    </label>
+                    <select 
+                      value={reservationForm.time}
+                      onChange={(e) => setReservationForm({ ...reservationForm, time: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    >
+                      <option value="">Selecteer tijd</option>
+                      <option value="11:00">11:00</option>
+                      <option value="11:30">11:30</option>
+                      <option value="12:00">12:00</option>
+                      <option value="12:30">12:30</option>
+                      <option value="13:00">13:00</option>
+                      <option value="17:00">17:00</option>
+                      <option value="17:30">17:30</option>
+                      <option value="18:00">18:00</option>
+                      <option value="18:30">18:30</option>
+                      <option value="19:00">19:00</option>
+                      <option value="19:30">19:30</option>
+                      <option value="20:00">20:00</option>
+                      <option value="20:30">20:30</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Aantal personen *
+                    </label>
+                    <select 
+                      value={reservationForm.partySize}
+                      onChange={(e) => setReservationForm({ ...reservationForm, partySize: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    >
+                      <option value="">Selecteer</option>
+                      <option value="1">1 persoon</option>
+                      <option value="2">2 personen</option>
+                      <option value="3">3 personen</option>
+                      <option value="4">4 personen</option>
+                      <option value="5">5 personen</option>
+                      <option value="6">6 personen</option>
+                      <option value="7">7+ personen</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Opmerkingen
+                    </label>
+                    <input
+                      type="text"
+                      value={reservationForm.notes}
+                      onChange={(e) => setReservationForm({ ...reservationForm, notes: e.target.value })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="Bijv. kinderstoel, allergie..."
+                    />
+                  </div>
+                </div>
+
+                {reservationError && (
+                  <p className="text-red-500 text-center mt-4">{reservationError}</p>
+                )}
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleReservationSubmit}
+                  disabled={reservationSubmitting}
+                  className="w-full mt-8 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-bold text-lg py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+                >
+                  {reservationSubmitting ? (
+                    <span>Even geduld...</span>
+                  ) : (
+                    <>
+                      <span>🍽️</span>
+                      <span>Reserveer nu</span>
+                    </>
+                  )}
+                </motion.button>
+
+                <p className="text-center text-gray-500 text-sm mt-4">
+                  Je ontvangt een bevestiging via telefoon of e-mail
+                </p>
+              </>
+            )}
+          </motion.div>
+        </div>
+      </section>
 
       {/* Reviews Section */}
       <section className="py-20 bg-gray-50">
