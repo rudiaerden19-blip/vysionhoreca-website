@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { getMenuCategories, getMenuProducts, getOptionsForProduct, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
+import { getMenuCategories, getMenuProducts, getOptionsForProduct, getTenantSettings, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
 
 interface MenuItem {
   id: string
@@ -36,13 +36,20 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [productOptions, setProductOptions] = useState<ProductOption[]>([])
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
   const [loadingOptions, setLoadingOptions] = useState(false)
+  const [primaryColor, setPrimaryColor] = useState('#FF6B35')
 
   useEffect(() => {
     async function loadData() {
-      const [categoriesData, productsData] = await Promise.all([
+      const [categoriesData, productsData, tenantData] = await Promise.all([
         getMenuCategories(params.tenant),
         getMenuProducts(params.tenant),
+        getTenantSettings(params.tenant),
       ])
+      
+      // Set primary color from tenant settings
+      if (tenantData?.primary_color) {
+        setPrimaryColor(tenantData.primary_color)
+      }
 
       setCategories(categoriesData.filter(c => c.is_active))
 
@@ -210,7 +217,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+          style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
+          className="w-12 h-12 border-4 rounded-full"
         />
       </div>
     )
@@ -221,7 +229,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href={`/shop/${params.tenant}`} className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors">
+          <Link href={`/shop/${params.tenant}`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
@@ -240,9 +248,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveCategory('all')}
+              style={activeCategory === 'all' ? { backgroundColor: primaryColor, boxShadow: `0 10px 15px -3px ${primaryColor}50` } : {}}
               className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-all ${
                 activeCategory === 'all'
-                  ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                  ? 'text-white shadow-lg'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -253,9 +262,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveCategory('popular')}
+                style={activeCategory === 'popular' ? { backgroundColor: primaryColor, boxShadow: `0 10px 15px -3px ${primaryColor}50` } : {}}
                 className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-all ${
                   activeCategory === 'popular'
-                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                    ? 'text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -271,9 +281,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveCategory(cat.id!)}
+                style={activeCategory === cat.id ? { backgroundColor: primaryColor, boxShadow: `0 10px 15px -3px ${primaryColor}50` } : {}}
                 className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-all ${
                   activeCategory === cat.id
-                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                    ? 'text-white shadow-lg'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -324,7 +335,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     )}
                     <div className="absolute top-3 left-3 flex gap-2">
                       {item.is_popular && (
-                        <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                        <span style={{ backgroundColor: primaryColor }} className="text-white text-xs font-bold px-2 py-1 rounded-full">
                           🔥 POPULAIR
                         </span>
                       )}
@@ -339,10 +350,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   </div>
                   <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-lg text-gray-900 group-hover:text-orange-500 transition-colors">
+                      <h3 className="font-bold text-lg text-gray-900 transition-colors">
                         {item.name}
                       </h3>
-                      <span className="text-xl font-bold text-orange-500">
+                      <span style={{ color: primaryColor }} className="text-xl font-bold">
                         €{item.price.toFixed(2)}
                       </span>
                     </div>
@@ -406,7 +417,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 </button>
                 <div className="absolute bottom-4 left-4 flex gap-2">
                   {selectedItem.is_popular && (
-                    <span className="bg-orange-500 text-white text-sm font-bold px-3 py-1 rounded-full">🔥 POPULAIR</span>
+                    <span style={{ backgroundColor: primaryColor }} className="text-white text-sm font-bold px-3 py-1 rounded-full">🔥 POPULAIR</span>
                   )}
                 </div>
               </div>
@@ -414,7 +425,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h2 className="text-2xl font-bold text-gray-900">{selectedItem.name}</h2>
-                  <span className="text-2xl font-bold text-orange-500">€{selectedItem.price.toFixed(2)}</span>
+                  <span style={{ color: primaryColor }} className="text-2xl font-bold">€{selectedItem.price.toFixed(2)}</span>
                 </div>
                 <p className="text-gray-600 mb-6">{selectedItem.description}</p>
 
@@ -440,7 +451,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full"
+                      style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
+                      className="w-6 h-6 border-2 rounded-full"
                     />
                   </div>
                 ) : productOptions.length > 0 && (
@@ -465,9 +477,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                             return (
                               <label
                                 key={choice.id}
+                                style={isSelected ? { backgroundColor: `${primaryColor}10`, borderColor: primaryColor } : {}}
                                 className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
                                   isSelected
-                                    ? 'bg-orange-50 border-2 border-orange-500'
+                                    ? 'border-2'
                                     : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
                                 }`}
                               >
@@ -477,11 +490,12 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                                     name={option.id}
                                     checked={isSelected}
                                     onChange={() => handleChoiceSelect(option.id!, choice.id!, option.type)}
-                                    className="w-5 h-5 text-orange-500 focus:ring-orange-500"
+                                    style={{ accentColor: primaryColor }}
+                                    className="w-5 h-5"
                                   />
                                   <span className="font-medium text-gray-900">{choice.name}</span>
                                 </div>
-                                <span className={`font-medium ${choice.price > 0 ? 'text-orange-500' : 'text-gray-400'}`}>
+                                <span style={choice.price > 0 ? { color: primaryColor } : {}} className={`font-medium ${choice.price <= 0 ? 'text-gray-400' : ''}`}>
                                   {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : 'Gratis'}
                                 </span>
                               </label>
@@ -498,7 +512,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   whileTap={{ scale: 0.98 }}
                   onClick={addToCart}
                   disabled={!selectedItem.is_available || !canAddToCart()}
-                  className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-bold py-4 rounded-2xl transition-colors flex items-center justify-center gap-2"
+                  style={{ backgroundColor: selectedItem.is_available && canAddToCart() ? primaryColor : undefined }}
+                  className="w-full disabled:bg-gray-300 text-white font-bold py-4 rounded-2xl transition-colors flex items-center justify-center gap-2 hover:opacity-90"
                 >
                   <span>🛒</span>
                   <span>Toevoegen aan bestelling</span>
@@ -518,9 +533,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
             onClick={() => setCartOpen(true)}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl shadow-orange-500/40 flex items-center gap-4 z-40"
+            style={{ backgroundColor: primaryColor, boxShadow: `0 25px 50px -12px ${primaryColor}66` }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl flex items-center gap-4 z-40 hover:opacity-90"
           >
-            <span className="bg-white text-orange-500 w-8 h-8 rounded-full flex items-center justify-center font-bold">{cartCount}</span>
+            <span style={{ color: primaryColor }} className="bg-white w-8 h-8 rounded-full flex items-center justify-center font-bold">{cartCount}</span>
             <span>Bekijk bestelling</span>
             <span className="border-l border-white/30 pl-4">€{cartTotal.toFixed(2)}</span>
           </motion.button>
@@ -576,7 +592,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                               {cartItem.selectedOptions.map(opt => opt.choice.name).join(', ')}
                             </div>
                           )}
-                          <p className="text-orange-500 font-bold">€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
+                          <p style={{ color: primaryColor }} className="font-bold">€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
                           <div className="flex items-center gap-2 mt-2">
                             <span className="text-gray-500">Aantal: {cartItem.quantity}</span>
                             <button onClick={() => removeFromCart(index)} className="text-red-500 text-sm hover:underline">Verwijder</button>
@@ -597,7 +613,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-2xl transition-colors"
+                    style={{ backgroundColor: primaryColor }}
+                    className="w-full text-white font-bold py-4 rounded-2xl transition-colors hover:opacity-90"
                   >
                     Afrekenen →
                   </motion.button>

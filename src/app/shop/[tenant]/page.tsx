@@ -362,7 +362,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <span className="text-orange-500 font-semibold text-sm uppercase tracking-wider">Ons verhaal</span>
+                <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Ons verhaal</span>
                 <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2 mb-6">Over Ons</h2>
                 <p className="text-gray-600 text-lg leading-relaxed mb-6">
                   {business.story}
@@ -397,7 +397,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <span className="text-orange-500 font-semibold text-sm uppercase tracking-wider">Kom langs</span>
+            <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Kom langs</span>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Reserveer een tafel</h2>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
               Wil je zeker zijn van een plekje? Reserveer vooraf en geniet ter plaatse van onze lekkernijen.
@@ -531,7 +531,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   whileTap={{ scale: 0.98 }}
                   onClick={handleReservationSubmit}
                   disabled={reservationSubmitting}
-                  className="w-full mt-8 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-bold text-lg py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+                  style={{ backgroundColor: business.primary_color }}
+                  className="w-full mt-8 text-white font-bold text-lg py-4 rounded-xl transition-colors flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50"
                 >
                   {reservationSubmitting ? (
                     <span>Even geduld...</span>
@@ -561,7 +562,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <span className="text-orange-500 font-semibold text-sm uppercase tracking-wider">Wat klanten zeggen</span>
+            <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Wat klanten zeggen</span>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Reviews</h2>
             <div className="flex items-center justify-center gap-2 mt-4">
               <div className="flex">
@@ -585,8 +586,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <span className="text-orange-500 font-bold text-lg">{review.author[0]}</span>
+                  <div style={{ backgroundColor: `${business.primary_color}20` }} className="w-12 h-12 rounded-full flex items-center justify-center">
+                    <span style={{ color: business.primary_color }} className="font-bold text-lg">{review.author[0]}</span>
                   </div>
                   <div>
                     <p className="font-bold text-gray-900">{review.author}</p>
@@ -779,7 +780,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-orange-500 to-amber-500">
+      <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -796,7 +797,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-white text-orange-500 font-bold text-xl px-12 py-5 rounded-full shadow-2xl inline-flex items-center gap-3"
+                style={{ color: business.primary_color }}
+                className="bg-white font-bold text-xl px-12 py-5 rounded-full shadow-2xl inline-flex items-center gap-3"
               >
                 <span>🍟</span>
                 <span>Start je bestelling</span>
@@ -819,7 +821,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             </div>
             <div className="text-center md:text-right">
               <p className="text-white/40 text-sm">
-                Powered by <span className="text-orange-500 font-semibold">Vysion</span>
+                Powered by <span style={{ color: business.primary_color }} className="font-semibold">Vysion</span>
               </p>
               <p className="text-white/40 text-sm mt-1">
                 © {new Date().getFullYear()} Alle rechten voorbehouden
@@ -836,7 +838,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             initial={{ y: 100 }}
             animate={{ y: 0 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-2xl shadow-2xl shadow-orange-500/40 flex items-center justify-center gap-3"
+            style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66` }}
+            className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90"
           >
             <span>🍟</span>
             <span>Bestel Nu</span>
