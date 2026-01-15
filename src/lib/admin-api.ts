@@ -1141,3 +1141,158 @@ export async function getTopProducts(tenantSlug: string, period: 'week' | 'month
     .sort((a, b) => b.revenue - a.revenue)
     .slice(0, 10)
 }
+
+// =====================================================
+// CUSTOMERS
+// =====================================================
+export interface Customer {
+  id?: string
+  tenant_slug: string
+  email: string
+  password_hash?: string
+  name: string
+  phone?: string
+  address?: string
+  postal_code?: string
+  city?: string
+  loyalty_points: number
+  total_spent: number
+  total_orders: number
+  is_active: boolean
+  email_verified: boolean
+  created_at?: string
+  updated_at?: string
+  last_login?: string
+}
+
+// Simple hash for demo - in production use bcrypt
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password + 'vysion_salt_2024')
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+export async function registerCustomer(
+  tenantSlug: string, 
+  email: string, 
+  password: string, 
+  name: string, 
+  phone?: string
+): Promise<{ success: boolean; customer?: Customer; error?: string }> {
+  // Check if email already exists
+  const { data: existing } = await supabase
+    .from('customers')
+    .select('id')
+    .eq('tenant_slug', tenantSlug)
+    .eq('email', email.toLowerCase())
+    .single()
+  
+  if (existing) {
+    return { success: false, error: 'Email is al in gebruik' }
+  }
+  
+  const password_hash = await hashPassword(password)
+  
+  const { data, error } = await supabase
+    .from('customers')
+    .insert({
+      tenant_slug: tenantSlug,
+      email: email.toLowerCase(),
+      password_hash,
+      name,
+      phone,
+    })
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Error registering customer:', error)
+    return { success: false, error: 'Registratie mislukt' }
+  }
+  
+  return { success: true, customer: data }
+}
+
+export async function loginCustomer(
+  tenantSlug: string, 
+  email: string, 
+  password: string
+): Promise<{ success: boolean; customer?: Customer; error?: string }> {
+  const password_hash = await hashPassword(password)
+  
+  const { data, error } = await supabase
+    .from('customers')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('email', email.toLowerCase())
+    .eq('password_hash', password_hash)
+    .single()
+  
+  if (error || !data) {
+    return { success: false, error: 'Onjuiste email of wachtwoord' }
+  }
+  
+  // Update last login
+  await supabase
+    .from('customers')
+    .update({ last_login: new Date().toISOString() })
+    .eq('id', data.id)
+  
+  return { success: true, customer: data }
+}
+
+export async function getCustomer(customerId: string): Promise<Customer | null> {
+  const { data, error } = await supabase
+    .from('customers')
+    .select('*')
+    .eq('id', customerId)
+    .single()
+  
+  if (error) return null
+  return data
+}
+
+export async function updateCustomer(customerId: string, updates: Partial<Customer>): Promise<boolean> {
+  const { error } = await supabase
+    .from('customers')
+    .update(updates)
+    .eq('id', customerId)
+  
+  return !error
+}
+
+export async function getCustomerOrders(tenantSlug: string, customerEmail: string): Promise<Order[]> {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('customer_email', customerEmail)
+    .order('created_at', { ascending: false })
+    .limit(50)
+  
+  if (error) return []
+  return data || []
+}
+
+export async function addLoyaltyPoints(customerId: string, points: number, orderTotal: number): Promise<boolean> {
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('loyalty_points, total_spent, total_orders')
+    .eq('id', customerId)
+    .single()
+  
+  if (!customer) return false
+  
+  const { error } = await supabase
+    .from('customers')
+    .update({
+      loyalty_points: customer.loyalty_points + points,
+      total_spent: customer.total_spent + orderTotal,
+      total_orders: customer.total_orders + 1,
+    })
+    .eq('id', customerId)
+  
+  return !error
+}
