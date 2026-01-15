@@ -16,6 +16,23 @@ import {
 } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
 
+const ALLERGENS = [
+  { id: 'gluten', name: 'Gluten', icon: '🌾' },
+  { id: 'ei', name: 'Eieren', icon: '🥚' },
+  { id: 'melk', name: 'Melk', icon: '🥛' },
+  { id: 'noten', name: 'Noten', icon: '🥜' },
+  { id: 'pinda', name: 'Pinda', icon: '🥜' },
+  { id: 'soja', name: 'Soja', icon: '🫘' },
+  { id: 'vis', name: 'Vis', icon: '🐟' },
+  { id: 'schaaldieren', name: 'Schaaldieren', icon: '🦐' },
+  { id: 'selderij', name: 'Selderij', icon: '🥬' },
+  { id: 'mosterd', name: 'Mosterd', icon: '🟡' },
+  { id: 'sesam', name: 'Sesamzaad', icon: '⚪' },
+  { id: 'sulfiet', name: 'Sulfiet', icon: '🍷' },
+  { id: 'lupine', name: 'Lupine', icon: '🌸' },
+  { id: 'weekdieren', name: 'Weekdieren', icon: '🐚' },
+]
+
 export default function ProductenPage({ params }: { params: { tenant: string } }) {
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [categories, setCategories] = useState<MenuCategory[]>([])
@@ -138,6 +155,19 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         ? prev.filter(id => id !== optionId)
         : [...prev, optionId]
     )
+  }
+
+  const toggleAllergen = (allergenId: string) => {
+    setFormData(prev => {
+      const currentAllergens = prev.allergens || []
+      const isSelected = currentAllergens.includes(allergenId)
+      return {
+        ...prev,
+        allergens: isSelected
+          ? currentAllergens.filter(id => id !== allergenId)
+          : [...currentAllergens, allergenId]
+      }
+    })
   }
 
   const handleSave = async () => {
@@ -535,6 +565,42 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     </div>
                   </div>
                 )}
+
+                {/* Allergenen */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Allergenen
+                  </label>
+                  <p className="text-sm text-gray-500 mb-3">
+                    Selecteer welke allergenen in dit product zitten
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {ALLERGENS.map(allergen => {
+                      const isSelected = formData.allergens?.includes(allergen.id) || false
+                      return (
+                        <label
+                          key={allergen.id}
+                          className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
+                            isSelected
+                              ? 'bg-orange-50 border-2 border-orange-500'
+                              : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleAllergen(allergen.id)}
+                            className="sr-only"
+                          />
+                          <span className="text-lg">{allergen.icon}</span>
+                          <span className={`text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-gray-600'}`}>
+                            {allergen.name}
+                          </span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                </div>
 
                 {/* Status Opties */}
                 <div>
