@@ -153,7 +153,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
                   style={{ minHeight: day.revenue > 0 ? '20px' : '4px' }}
                 />
                 <p className="mt-2 text-sm text-gray-500">{formatDayLabel(day.date)}</p>
-                <p className="text-xs text-gray-400">€{day.revenue.toFixed(0)}</p>
+                <p className="text-xs text-gray-400">€{day.revenue.toFixed(2)}</p>
               </div>
             ))}
           </div>
