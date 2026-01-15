@@ -94,7 +94,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       social_tiktok: 'https://tiktok.com/@degoudenfriet',
       delivery_enabled: true,
       pickup_enabled: true,
-      dine_in_enabled: false,
+      dine_in_enabled: true,
       minimum_order: 15,
       delivery_fee: 2.50,
       delivery_time: '30-45 min',
@@ -509,6 +509,125 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </div>
       </section>
+
+      {/* Table Reservation Section */}
+      {business.dine_in_enabled && (
+        <section className="py-20 bg-white">
+          <div className="max-w-4xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <span className="text-orange-500 font-semibold text-sm uppercase tracking-wider">Kom langs</span>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Reserveer een tafel</h2>
+              <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
+                Wil je zeker zijn van een plekje? Reserveer vooraf en geniet ter plaatse van onze lekkernijen.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bg-gray-50 rounded-3xl p-8 md:p-12"
+            >
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Naam *
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="Je naam"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Telefoonnummer *
+                  </label>
+                  <input
+                    type="tel"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="+32 ..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Datum *
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tijd *
+                  </label>
+                  <select className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <option value="">Selecteer tijd</option>
+                    <option value="11:00">11:00</option>
+                    <option value="11:30">11:30</option>
+                    <option value="12:00">12:00</option>
+                    <option value="12:30">12:30</option>
+                    <option value="13:00">13:00</option>
+                    <option value="17:00">17:00</option>
+                    <option value="17:30">17:30</option>
+                    <option value="18:00">18:00</option>
+                    <option value="18:30">18:30</option>
+                    <option value="19:00">19:00</option>
+                    <option value="19:30">19:30</option>
+                    <option value="20:00">20:00</option>
+                    <option value="20:30">20:30</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Aantal personen *
+                  </label>
+                  <select className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <option value="">Selecteer</option>
+                    <option value="1">1 persoon</option>
+                    <option value="2">2 personen</option>
+                    <option value="3">3 personen</option>
+                    <option value="4">4 personen</option>
+                    <option value="5">5 personen</option>
+                    <option value="6">6 personen</option>
+                    <option value="7">7+ personen</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Opmerkingen
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    placeholder="Bijv. kinderstoel, allergie..."
+                  />
+                </div>
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full mt-8 bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+              >
+                <span>🍽️</span>
+                <span>Reserveer nu</span>
+              </motion.button>
+
+              <p className="text-center text-gray-500 text-sm mt-4">
+                Je ontvangt een bevestiging via telefoon of e-mail
+              </p>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* Opening Hours & Contact Section */}
       <section className="py-20 bg-gray-900 text-white">
