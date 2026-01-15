@@ -923,7 +923,7 @@ export interface Order {
   customer_address?: string
   customer_notes?: string
   order_type?: 'pickup' | 'delivery' | string
-  status: 'new' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled' | string
+  status: 'new' | 'confirmed' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled' | 'rejected' | string
   delivery_address?: string
   delivery_notes?: string
   subtotal: number
@@ -938,6 +938,10 @@ export interface Order {
   requested_time?: string
   estimated_ready_time?: string
   completed_at?: string
+  confirmed_at?: string
+  rejected_at?: string
+  rejection_reason?: string
+  rejection_notes?: string
   created_at?: string
   updated_at?: string
   // Items stored as JSONB in database
@@ -1011,6 +1015,50 @@ export async function updateOrderStatus(id: string, status: Order['status']): Pr
     return false
   }
   console.log('Order status updated successfully')
+  return true
+}
+
+// Confirm order (goedkeuren)
+export async function confirmOrder(id: string): Promise<boolean> {
+  if (!supabase) return false
+  
+  const { error } = await supabase
+    .from('orders')
+    .update({ 
+      status: 'confirmed',
+      confirmed_at: new Date().toISOString()
+    })
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error confirming order:', error)
+    return false
+  }
+  return true
+}
+
+// Reject order (weigeren)
+export async function rejectOrder(
+  id: string, 
+  reason: string, 
+  notes?: string
+): Promise<boolean> {
+  if (!supabase) return false
+  
+  const { error } = await supabase
+    .from('orders')
+    .update({ 
+      status: 'rejected',
+      rejection_reason: reason,
+      rejection_notes: notes || null,
+      rejected_at: new Date().toISOString()
+    })
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error rejecting order:', error)
+    return false
+  }
   return true
 }
 

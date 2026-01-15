@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getOrders, updateOrderStatus, Order, getTenantSettings, TenantSettings } from '@/lib/admin-api'
+import { getOrders, updateOrderStatus, confirmOrder, rejectOrder, Order, getTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 
 // Parse items from JSONB
@@ -30,6 +30,8 @@ const statusConfig: Record<string, { bg: string; text: string; label: string; ne
   COMPLETED: { bg: 'bg-gray-100', text: 'text-gray-700', label: '✔️ Afgerond' },
   cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: '❌ Geannuleerd' },
   CANCELLED: { bg: 'bg-red-100', text: 'text-red-700', label: '❌ Geannuleerd' },
+  rejected: { bg: 'bg-red-100', text: 'text-red-700', label: '🚫 Geweigerd' },
+  REJECTED: { bg: 'bg-red-100', text: 'text-red-700', label: '🚫 Geweigerd' },
 }
 
 const paymentStatusConfig: Record<string, { bg: string; text: string; label: string }> = {
@@ -65,6 +67,18 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [notificationsEnabled, setNotificationsEnabled] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
   const [audioReady, setAudioReady] = useState(false)
+  const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
+  const [rejectionReason, setRejectionReason] = useState('')
+  const [rejectionNotes, setRejectionNotes] = useState('')
+  
+  const rejectionReasons = [
+    { value: 'too_busy', label: '🔥 Te druk op dit moment' },
+    { value: 'closed', label: '🚪 We zijn gesloten' },
+    { value: 'sold_out', label: '❌ Product(en) uitverkocht' },
+    { value: 'delivery_unavailable', label: '🚗 Levering niet beschikbaar' },
+    { value: 'technical', label: '⚙️ Technisch probleem' },
+    { value: 'other', label: '📝 Andere reden' },
+  ]
   
   // Audio refs
   const audioContextRef = useRef<AudioContext | null>(null)
@@ -304,6 +318,43 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       setOrders(prev => prev.map(o => 
         o.id === orderId ? { ...o, status: newStatus } : o
       ))
+    }
+    setUpdatingId(null)
+  }
+  
+  // Handle confirm order (goedkeuren)
+  const handleConfirmOrder = async (order: Order) => {
+    if (!order.id) return
+    setUpdatingId(order.id)
+    const success = await confirmOrder(order.id)
+    if (success) {
+      setOrders(prev => prev.map(o => 
+        o.id === order.id ? { ...o, status: 'confirmed', confirmed_at: new Date().toISOString() } : o
+      ))
+      // TODO: Send confirmation email to customer
+    }
+    setUpdatingId(null)
+  }
+  
+  // Handle reject order (weigeren)
+  const handleRejectOrder = async () => {
+    if (!rejectingOrder?.id || !rejectionReason) return
+    setUpdatingId(rejectingOrder.id)
+    const success = await rejectOrder(rejectingOrder.id, rejectionReason, rejectionNotes)
+    if (success) {
+      setOrders(prev => prev.map(o => 
+        o.id === rejectingOrder.id ? { 
+          ...o, 
+          status: 'rejected', 
+          rejection_reason: rejectionReason,
+          rejection_notes: rejectionNotes,
+          rejected_at: new Date().toISOString() 
+        } : o
+      ))
+      // TODO: Send rejection email to customer
+      setRejectingOrder(null)
+      setRejectionReason('')
+      setRejectionNotes('')
     }
     setUpdatingId(null)
   }
@@ -603,19 +654,19 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     <>
                       <motion.button
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => handleUpdateStatus(order.id!, 'confirmed')}
+                        onClick={() => handleConfirmOrder(order)}
                         disabled={updatingId === order.id}
                         className="p-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xl font-bold"
                       >
-                        ✓ BEVESTIG
+                        ✓ GOEDKEUREN
                       </motion.button>
                       <motion.button
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => handleUpdateStatus(order.id!, 'cancelled')}
+                        onClick={() => setRejectingOrder(order)}
                         disabled={updatingId === order.id}
                         className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xl font-bold"
                       >
-                        ✕ ANNULEER
+                        ✕ WEIGEREN
                       </motion.button>
                     </>
                   )}
@@ -888,20 +939,20 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => handleUpdateStatus(order.id!, 'confirmed')}
+                        onClick={() => handleConfirmOrder(order)}
                         disabled={updatingId === order.id}
                         className="flex-1 min-w-[140px] bg-green-500 hover:bg-green-600 disabled:bg-green-300 text-white font-medium py-3 rounded-xl transition-colors"
                       >
-                        ✓ Bevestigen
+                        ✓ Goedkeuren
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => handleUpdateStatus(order.id!, 'cancelled')}
+                        onClick={() => setRejectingOrder(order)}
                         disabled={updatingId === order.id}
                         className="px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-medium rounded-xl transition-colors"
                       >
-                        ✕ Annuleren
+                        ✕ Weigeren
                       </motion.button>
                     </>
                   )}
@@ -1100,6 +1151,107 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   className="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-medium flex items-center gap-2"
                 >
                   🖨️ Bon printen
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Rejection Modal */}
+      <AnimatePresence>
+        {rejectingOrder && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setRejectingOrder(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden"
+            >
+              {/* Header */}
+              <div className="p-6 border-b bg-red-50">
+                <h2 className="text-2xl font-bold text-red-700">🚫 Bestelling Weigeren</h2>
+                <p className="text-red-600 mt-1">#{rejectingOrder.order_number} - {rejectingOrder.customer_name}</p>
+              </div>
+              
+              {/* Content */}
+              <div className="p-6 space-y-6">
+                <div>
+                  <label className="block text-lg font-semibold text-gray-900 mb-3">
+                    Reden voor weigering *
+                  </label>
+                  <div className="grid grid-cols-1 gap-2">
+                    {rejectionReasons.map(reason => (
+                      <button
+                        key={reason.value}
+                        onClick={() => setRejectionReason(reason.value)}
+                        className={`p-4 text-left rounded-xl border-2 transition-all ${
+                          rejectionReason === reason.value
+                            ? 'border-red-500 bg-red-50 text-red-700'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        {reason.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {rejectionReason === 'other' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Toelichting (optioneel)
+                    </label>
+                    <textarea
+                      value={rejectionNotes}
+                      onChange={(e) => setRejectionNotes(e.target.value)}
+                      placeholder="Geef een korte toelichting..."
+                      rows={3}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    />
+                  </div>
+                )}
+                
+                <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                  <p className="text-yellow-800 text-sm">
+                    ⚠️ De klant ontvangt automatisch een e-mail met de reden van weigering.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Actions */}
+              <div className="p-6 border-t bg-gray-50 flex gap-3">
+                <button
+                  onClick={() => {
+                    setRejectingOrder(null)
+                    setRejectionReason('')
+                    setRejectionNotes('')
+                  }}
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={handleRejectOrder}
+                  disabled={!rejectionReason || updatingId === rejectingOrder.id}
+                  className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-xl font-medium flex items-center justify-center gap-2"
+                >
+                  {updatingId === rejectingOrder.id ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                    />
+                  ) : (
+                    '🚫 Bestelling Weigeren'
+                  )}
                 </button>
               </div>
             </motion.div>
