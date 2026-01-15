@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, TenantSettings, OpeningHour, DeliverySettings, MenuProduct } from '@/lib/admin-api'
+import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts } from '@/lib/admin-api'
 
 interface Business {
   id: string
@@ -113,11 +113,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   useEffect(() => {
     async function loadData() {
       // Laad data uit Supabase
-      const [tenantData, hoursData, deliveryData, productsData] = await Promise.all([
+      const [tenantData, hoursData, deliveryData, productsData, textsData] = await Promise.all([
         getTenantSettings(params.tenant),
         getOpeningHours(params.tenant),
         getDeliverySettings(params.tenant),
         getMenuProducts(params.tenant),
+        getTenantTexts(params.tenant),
       ])
 
       // Converteer openingstijden naar het juiste formaat
@@ -145,7 +146,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         id: '1',
         name: tenantData?.business_name || 'Demo Frituur',
         slug: params.tenant,
-        tagline: tenantData?.tagline || 'Welkom bij onze zaak',
+        tagline: textsData?.hero_subtitle || tenantData?.tagline || 'Welkom bij onze zaak',
         logo_url: tenantData?.logo_url || '',
         cover_images: [
           tenantData?.cover_image_1 || 'https://images.unsplash.com/photo-1619881590738-a111d176d906?w=1600',
@@ -153,7 +154,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           tenantData?.cover_image_3 || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=1600',
         ].filter(img => img && img.trim() !== ''),
         description: tenantData?.description || '',
-        story: tenantData?.description || 'Welkom bij onze zaak! Wij serveren de lekkerste gerechten.',
+        story: textsData?.about_text || tenantData?.description || '',
         address: tenantData?.address || '',
         phone: tenantData?.phone || '',
         email: tenantData?.email || '',

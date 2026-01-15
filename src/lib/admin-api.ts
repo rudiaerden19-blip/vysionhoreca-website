@@ -298,3 +298,34 @@ export async function getReservations(tenantSlug: string, date?: string): Promis
   }
   return data || []
 }
+
+// =====================================================
+// TENANT TEXTS
+// =====================================================
+export interface TenantTexts {
+  hero_title?: string
+  hero_subtitle?: string
+  about_title?: string
+  about_text?: string
+  order_button_text?: string
+  pickup_label?: string
+  delivery_label?: string
+  closed_message?: string
+  min_order_message?: string
+  cart_empty_message?: string
+  checkout_button_text?: string
+}
+
+export async function getTenantTexts(tenantSlug: string): Promise<TenantTexts | null> {
+  const { data, error } = await supabase
+    .from('tenant_texts')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .single()
+  
+  if (error) {
+    console.error('Error fetching tenant texts:', error)
+    return null
+  }
+  return data
+}
