@@ -56,6 +56,7 @@ const menuItems = [
     category: 'KLANTEN',
     items: [
       { name: 'Klanten', href: '/klanten', icon: '👥' },
+      { name: 'Beloningen', href: '/klanten/beloningen', icon: '🎁' },
     ]
   },
   {

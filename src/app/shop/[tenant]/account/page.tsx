@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { getTenantSettings, getCustomer, getCustomerOrders, updateCustomer, Customer, Order, TenantSettings } from '@/lib/admin-api'
+import { getTenantSettings, getCustomer, getCustomerOrders, updateCustomer, getLoyaltyRewards, redeemReward, Customer, Order, TenantSettings, LoyaltyReward } from '@/lib/admin-api'
 
 export default function AccountPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
@@ -12,6 +12,8 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [orders, setOrders] = useState<Order[]>([])
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
+  const [rewards, setRewards] = useState<LoyaltyReward[]>([])
+  const [redeeming, setRedeeming] = useState<string | null>(null)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editForm, setEditForm] = useState({ name: '', phone: '', address: '', postal_code: '', city: '' })
@@ -30,9 +32,10 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
       return
     }
 
-    const [customerData, settings] = await Promise.all([
+    const [customerData, settings, rewardsData] = await Promise.all([
       getCustomer(customerId),
       getTenantSettings(params.tenant),
+      getLoyaltyRewards(params.tenant),
     ])
 
     if (!customerData) {
@@ -43,6 +46,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
 
     setCustomer(customerData)
     setTenantSettings(settings)
+    setRewards(rewardsData.filter(r => r.is_active))
     setEditForm({
       name: customerData.name,
       phone: customerData.phone || '',
@@ -76,6 +80,26 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
     }
     
     setSaving(false)
+  }
+
+  const handleRedeem = async (reward: LoyaltyReward) => {
+    if (!customer || (customer.loyalty_points || 0) < reward.points_required) return
+    
+    if (!confirm(`Weet je zeker dat je ${reward.points_required} punten wilt inwisselen voor "${reward.name}"?`)) return
+    
+    setRedeeming(reward.id!)
+    const success = await redeemReward(customer.id!, reward.id!, reward.points_required, params.tenant)
+    
+    if (success) {
+      setCustomer({
+        ...customer,
+        loyalty_points: (customer.loyalty_points || 0) - reward.points_required,
+      })
+      alert(`🎉 Gefeliciteerd! Je hebt "${reward.name}" ingewisseld. Toon dit bij je volgende bestelling.`)
+    } else {
+      alert('Er ging iets mis. Probeer opnieuw.')
+    }
+    setRedeeming(null)
   }
 
   const formatDate = (dateString?: string) => {
@@ -249,6 +273,53 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
             <div className="text-6xl">🎁</div>
           </div>
         </motion.div>
+
+        {/* Rewards */}
+        {rewards.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="bg-white rounded-2xl p-6 shadow-sm mb-6"
+          >
+            <h2 className="text-lg font-bold text-gray-900 mb-4">🎁 Beloningen inwisselen</h2>
+            <div className="space-y-3">
+              {rewards.map((reward) => {
+                const canRedeem = (customer?.loyalty_points || 0) >= reward.points_required
+                return (
+                  <div 
+                    key={reward.id} 
+                    className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${
+                      canRedeem ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'
+                    }`}
+                  >
+                    <div>
+                      <p className="font-semibold text-gray-900">{reward.name}</p>
+                      {reward.description && (
+                        <p className="text-sm text-gray-500">{reward.description}</p>
+                      )}
+                      <p className="text-sm font-medium mt-1" style={{ color: canRedeem ? '#16a34a' : '#9ca3af' }}>
+                        ⭐ {reward.points_required} punten
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleRedeem(reward)}
+                      disabled={!canRedeem || redeeming === reward.id}
+                      style={canRedeem ? { backgroundColor: primaryColor } : undefined}
+                      className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                        canRedeem 
+                          ? 'text-white hover:opacity-90' 
+                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      }`}
+                    >
+                      {redeeming === reward.id ? 'Laden...' : canRedeem ? 'Inwisselen' : `Nog ${reward.points_required - (customer?.loyalty_points || 0)} punten`}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
 
         {/* Orders */}
         <motion.div

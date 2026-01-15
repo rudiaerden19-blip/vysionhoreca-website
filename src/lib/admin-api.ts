@@ -1296,3 +1296,84 @@ export async function addLoyaltyPoints(customerId: string, points: number, order
   
   return !error
 }
+
+// =====================================================
+// LOYALTY REWARDS
+// =====================================================
+export interface LoyaltyReward {
+  id?: string
+  tenant_slug: string
+  name: string
+  description?: string
+  points_required: number
+  reward_type: 'free_item' | 'discount_fixed' | 'discount_percentage'
+  reward_value?: number
+  is_active: boolean
+  sort_order?: number
+  created_at?: string
+}
+
+export async function getLoyaltyRewards(tenantSlug: string): Promise<LoyaltyReward[]> {
+  const { data, error } = await supabase
+    .from('loyalty_rewards')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('points_required', { ascending: true })
+  
+  if (error) return []
+  return data || []
+}
+
+export async function saveLoyaltyReward(reward: LoyaltyReward): Promise<boolean> {
+  if (reward.id) {
+    const { error } = await supabase
+      .from('loyalty_rewards')
+      .update(reward)
+      .eq('id', reward.id)
+    return !error
+  } else {
+    const { error } = await supabase
+      .from('loyalty_rewards')
+      .insert(reward)
+    return !error
+  }
+}
+
+export async function deleteLoyaltyReward(rewardId: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('loyalty_rewards')
+    .delete()
+    .eq('id', rewardId)
+  return !error
+}
+
+export async function redeemReward(customerId: string, rewardId: string, pointsUsed: number, tenantSlug: string): Promise<boolean> {
+  // Deduct points from customer
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('loyalty_points')
+    .eq('id', customerId)
+    .single()
+  
+  if (!customer || customer.loyalty_points < pointsUsed) return false
+  
+  // Update customer points
+  const { error: updateError } = await supabase
+    .from('customers')
+    .update({ loyalty_points: customer.loyalty_points - pointsUsed })
+    .eq('id', customerId)
+  
+  if (updateError) return false
+  
+  // Record redemption
+  const { error: redemptionError } = await supabase
+    .from('loyalty_redemptions')
+    .insert({
+      tenant_slug: tenantSlug,
+      customer_id: customerId,
+      reward_id: rewardId,
+      points_used: pointsUsed,
+    })
+  
+  return !redemptionError
+}
