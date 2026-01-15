@@ -19,7 +19,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
 
   async function loadCustomers() {
     const { data, error } = await supabase
-      .from('customers')
+      .from('shop_customers')
       .select('*')
       .eq('tenant_slug', params.tenant)
       .order('created_at', { ascending: false })
@@ -34,7 +34,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
     if (!selectedCustomer) return
     
     const { error } = await supabase
-      .from('customers')
+      .from('shop_customers')
       .update({ loyalty_points: newPoints })
       .eq('id', selectedCustomer.id)
     

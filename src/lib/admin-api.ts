@@ -1183,7 +1183,7 @@ export async function registerCustomer(
 ): Promise<{ success: boolean; customer?: Customer; error?: string }> {
   // Check if email already exists
   const { data: existing } = await supabase
-    .from('customers')
+    .from('shop_customers')
     .select('id')
     .eq('tenant_slug', tenantSlug)
     .eq('email', email.toLowerCase())
@@ -1196,7 +1196,7 @@ export async function registerCustomer(
   const password_hash = await hashPassword(password)
   
   const { data, error } = await supabase
-    .from('customers')
+    .from('shop_customers')
     .insert({
       tenant_slug: tenantSlug,
       email: email.toLowerCase(),
@@ -1223,7 +1223,7 @@ export async function loginCustomer(
   const password_hash = await hashPassword(password)
   
   const { data, error } = await supabase
-    .from('customers')
+    .from('shop_customers')
     .select('*')
     .eq('tenant_slug', tenantSlug)
     .eq('email', email.toLowerCase())
@@ -1236,7 +1236,7 @@ export async function loginCustomer(
   
   // Update last login
   await supabase
-    .from('customers')
+    .from('shop_customers')
     .update({ last_login: new Date().toISOString() })
     .eq('id', data.id)
   
@@ -1245,7 +1245,7 @@ export async function loginCustomer(
 
 export async function getCustomer(customerId: string): Promise<Customer | null> {
   const { data, error } = await supabase
-    .from('customers')
+    .from('shop_customers')
     .select('*')
     .eq('id', customerId)
     .single()
@@ -1256,7 +1256,7 @@ export async function getCustomer(customerId: string): Promise<Customer | null> 
 
 export async function updateCustomer(customerId: string, updates: Partial<Customer>): Promise<boolean> {
   const { error } = await supabase
-    .from('customers')
+    .from('shop_customers')
     .update(updates)
     .eq('id', customerId)
   
@@ -1278,7 +1278,7 @@ export async function getCustomerOrders(tenantSlug: string, customerEmail: strin
 
 export async function addLoyaltyPoints(customerId: string, points: number, orderTotal: number): Promise<boolean> {
   const { data: customer } = await supabase
-    .from('customers')
+    .from('shop_customers')
     .select('loyalty_points, total_spent, total_orders')
     .eq('id', customerId)
     .single()
@@ -1286,7 +1286,7 @@ export async function addLoyaltyPoints(customerId: string, points: number, order
   if (!customer) return false
   
   const { error } = await supabase
-    .from('customers')
+    .from('shop_customers')
     .update({
       loyalty_points: customer.loyalty_points + points,
       total_spent: customer.total_spent + orderTotal,
@@ -1350,7 +1350,7 @@ export async function deleteLoyaltyReward(rewardId: string): Promise<boolean> {
 export async function redeemReward(customerId: string, rewardId: string, pointsUsed: number, tenantSlug: string): Promise<boolean> {
   // Deduct points from customer
   const { data: customer } = await supabase
-    .from('customers')
+    .from('shop_customers')
     .select('loyalty_points')
     .eq('id', customerId)
     .single()
@@ -1359,7 +1359,7 @@ export async function redeemReward(customerId: string, rewardId: string, pointsU
   
   // Update customer points
   const { error: updateError } = await supabase
-    .from('customers')
+    .from('shop_customers')
     .update({ loyalty_points: customer.loyalty_points - pointsUsed })
     .eq('id', customerId)
   
