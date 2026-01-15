@@ -271,6 +271,35 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link href={`/shop/${params.tenant}`} className="flex items-center gap-3">
+            {business.logo_url && (
+              <img src={business.logo_url} alt={business.name} className="w-10 h-10 rounded-full object-cover" />
+            )}
+            <span className="text-white font-bold text-lg hidden sm:block">{business.name}</span>
+          </Link>
+          
+          <div className="flex items-center gap-3">
+            <Link 
+              href={`/shop/${params.tenant}/menu`}
+              style={{ backgroundColor: business.primary_color }}
+              className="text-white font-medium px-4 py-2 rounded-full text-sm hover:opacity-90 transition-opacity"
+            >
+              🍟 Menu
+            </Link>
+            <Link 
+              href={`/shop/${params.tenant}/account`}
+              className="bg-white/20 backdrop-blur-md text-white font-medium px-4 py-2 rounded-full text-sm hover:bg-white/30 transition-colors flex items-center gap-2"
+            >
+              <span>👤</span>
+              <span className="hidden sm:inline">Account</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+
       {/* Hero Section with Parallax */}
       <section className="relative h-screen min-h-[700px] overflow-hidden">
         {/* Background Image Slider */}

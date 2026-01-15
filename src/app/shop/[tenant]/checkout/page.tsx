@@ -424,16 +424,35 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               transition={{ delay: 0.1 }}
               className="bg-white rounded-2xl p-6 shadow-sm"
             >
-              <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Jouw gegevens</h2>
+              <div className="mb-4">
+              <h2 className="text-lg font-bold text-gray-900 mb-2">Jouw gegevens</h2>
+              
               {!loggedInCustomerId && (
-                <Link
-                  href={`/shop/${params.tenant}/account/login`}
-                  style={{ color: primaryColor }}
-                  className="text-sm font-medium hover:underline"
-                >
-                  Heb je een account? Login →
-                </Link>
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                  <p className="text-blue-800 font-medium mb-3">💡 Log in om spaarpunten te verdienen!</p>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      href={`/shop/${params.tenant}/account/login?redirect=checkout`}
+                      style={{ backgroundColor: primaryColor }}
+                      className="flex-1 min-w-[120px] text-center text-white font-medium py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      Inloggen
+                    </Link>
+                    <Link
+                      href={`/shop/${params.tenant}/account/register?redirect=checkout`}
+                      className="flex-1 min-w-[120px] text-center bg-white border border-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      Account aanmaken
+                    </Link>
+                  </div>
+                  <p className="text-blue-600 text-sm mt-3 text-center">Of bestel als gast hieronder ↓</p>
+                </div>
+              )}
+              
+              {loggedInCustomerId && (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4">
+                  <p className="text-green-700 font-medium">✓ Je bent ingelogd - je verdient spaarpunten bij deze bestelling!</p>
+                </div>
               )}
             </div>
               <div className="space-y-4">

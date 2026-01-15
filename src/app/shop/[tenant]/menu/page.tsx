@@ -254,7 +254,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             <span>Terug</span>
           </Link>
           <h1 className="font-bold text-xl text-gray-900">Menu</h1>
-          <div className="w-16"></div>
+          <Link 
+            href={`/shop/${params.tenant}/account`}
+            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <span>👤</span>
+            <span className="text-sm font-medium hidden sm:inline">Account</span>
+          </Link>
         </div>
       </header>
 
