@@ -426,6 +426,7 @@ export default function SuperAdminDashboard() {
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Slug</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Plan</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Status</th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Betaald</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Aangemaakt</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Acties</th>
                 </tr>
@@ -464,6 +465,17 @@ export default function SuperAdminDashboard() {
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(sub?.status || 'none')}`}>
                           {sub?.status || 'Geen abonnement'}
                         </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {sub?.status === 'active' ? (
+                          <span className="px-3 py-1 bg-green-500 text-white rounded-lg text-xs font-medium">
+                            ✓ Betaald
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 bg-red-500 text-white rounded-lg text-xs font-medium">
+                            ✗ Niet betaald
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-4 text-slate-400 text-sm">
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
