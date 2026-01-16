@@ -3,6 +3,23 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  DragEndEvent 
+} from '@dnd-kit/core'
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates, 
+  useSortable,
+  rectSortingStrategy 
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { 
   getMenuProducts, 
   getMenuCategories, 
   saveMenuProduct, 
@@ -32,6 +49,137 @@ const ALLERGENS = [
   { id: 'lupine', name: 'Lupine', icon: '🌸' },
   { id: 'weekdieren', name: 'Weekdieren', icon: '🐚' },
 ]
+
+// Sortable Product Card Component
+function SortableProductCard({ 
+  product, 
+  categories,
+  onToggleAvailable,
+  onTogglePopular,
+  onEdit,
+  onDelete 
+}: {
+  product: MenuProduct
+  categories: MenuCategory[]
+  onToggleAvailable: () => void
+  onTogglePopular: () => void
+  onEdit: () => void
+  onDelete: () => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: product.id! })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 1000 : 1,
+  }
+
+  const category = categories.find(c => c.id === product.category_id)
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`bg-white rounded-2xl shadow-sm overflow-hidden ${isDragging ? 'shadow-xl ring-2 ring-orange-500' : ''}`}
+    >
+      {/* Drag Handle */}
+      <div 
+        {...attributes} 
+        {...listeners}
+        className="bg-gray-50 px-4 py-2 cursor-grab active:cursor-grabbing flex items-center justify-center gap-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors border-b"
+      >
+        <span className="text-lg">⠿</span>
+        <span className="text-xs font-medium">Sleep om te verplaatsen</span>
+      </div>
+
+      {/* Image */}
+      <div className="relative h-40 bg-gray-100">
+        {product.image_url ? (
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-5xl">
+            🍟
+          </div>
+        )}
+        {!product.is_active && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+              Niet beschikbaar
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="p-4">
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <h3 className="font-bold text-gray-900">{product.name}</h3>
+            <span className="text-sm text-gray-500">{category?.name || 'Geen categorie'}</span>
+          </div>
+          <span className="text-orange-500 font-bold text-lg">€{product.price.toFixed(2)}</span>
+        </div>
+        <p className="text-sm text-gray-500 line-clamp-2 mb-4">{product.description}</p>
+
+        {/* Actions */}
+        <div className="flex items-center justify-between pt-4 border-t">
+          <div className="flex gap-2">
+            <button
+              onClick={onToggleAvailable}
+              className={`p-2 rounded-lg transition-colors ${
+                product.is_active 
+                  ? 'bg-green-100 text-green-600' 
+                  : 'bg-gray-100 text-gray-400'
+              }`}
+              title={product.is_active ? 'Beschikbaar' : 'Niet beschikbaar'}
+            >
+              {product.is_active ? '✓' : '✕'}
+            </button>
+            <button
+              onClick={onTogglePopular}
+              className={`p-2 rounded-lg transition-colors ${
+                product.is_popular 
+                  ? 'bg-orange-100 text-orange-600' 
+                  : 'bg-gray-100 text-gray-400'
+              }`}
+              title={product.is_popular ? 'Populair' : 'Niet populair'}
+            >
+              🔥
+            </button>
+          </div>
+          <div className="flex gap-1">
+            <button
+              onClick={onEdit}
+              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              title="Bewerken"
+            >
+              ✏️
+            </button>
+            <button
+              onClick={onDelete}
+              className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
+              title="Verwijderen"
+            >
+              🗑️
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function ProductenPage({ params }: { params: { tenant: string } }) {
   const [products, setProducts] = useState<MenuProduct[]>([])
@@ -115,38 +263,46 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     }
   }
 
-  // Move product up or down in sort order
-  const moveProduct = async (productId: string, direction: 'up' | 'down') => {
-    const currentIndex = filteredProducts.findIndex(p => p.id === productId)
-    if (currentIndex === -1) return
+  // Drag & drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // Handle drag end
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
     
-    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
-    if (newIndex < 0 || newIndex >= filteredProducts.length) return
+    if (!over || active.id === over.id) return
     
-    const productA = filteredProducts[currentIndex]
-    const productB = filteredProducts[newIndex]
+    const oldIndex = filteredProducts.findIndex(p => p.id === active.id)
+    const newIndex = filteredProducts.findIndex(p => p.id === over.id)
     
-    // Swap sort_order values
-    const updatedA = { ...productA, sort_order: productB.sort_order }
-    const updatedB = { ...productB, sort_order: productA.sort_order }
+    if (oldIndex === -1 || newIndex === -1) return
     
-    // Save both products
-    const [resultA, resultB] = await Promise.all([
-      saveMenuProduct(updatedA),
-      saveMenuProduct(updatedB)
-    ])
+    // Reorder locally first for instant feedback
+    const newOrder = arrayMove(filteredProducts, oldIndex, newIndex)
     
-    if (resultA && resultB) {
-      setProducts(prev => {
-        const updated = prev.map(p => {
-          if (p.id === productA.id) return resultA
-          if (p.id === productB.id) return resultB
-          return p
-        })
-        // Re-sort by sort_order
-        return updated.sort((a, b) => a.sort_order - b.sort_order)
-      })
-    }
+    // Update sort_order for all affected products
+    const updates = newOrder.map((product, index) => ({
+      ...product,
+      sort_order: index
+    }))
+    
+    // Update state immediately
+    setProducts(prev => {
+      const otherProducts = prev.filter(p => !newOrder.find(np => np.id === p.id))
+      return [...updates, ...otherProducts].sort((a, b) => a.sort_order - b.sort_order)
+    })
+    
+    // Save to database in background
+    Promise.all(updates.map(p => saveMenuProduct(p)))
   }
 
   const openEditModal = async (product: MenuProduct) => {
@@ -330,121 +486,31 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         </div>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <AnimatePresence>
-          {filteredProducts.map((product, index) => (
-            <motion.div
-              key={product.id}
-              layout
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ delay: index * 0.05 }}
-              className={`bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${!product.is_active ? 'opacity-60' : ''}`}
-            >
-              {/* Image */}
-              <div className="relative h-40 bg-gray-100">
-                {product.image_url ? (
-                  <img
-                    src={product.image_url}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-4xl">
-                    🍟
-                  </div>
-                )}
-                {/* Badges */}
-                <div className="absolute top-2 left-2 flex gap-1">
-                  {product.is_popular && (
-                    <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">🔥</span>
-                  )}
-                </div>
-                {!product.is_active && (
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <span className="bg-red-500 text-white font-bold px-3 py-1 rounded-full text-sm">Uitgeschakeld</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-bold text-gray-900">{product.name}</h3>
-                    <p className="text-sm text-gray-500">{getCategoryName(product.category_id)}</p>
-                  </div>
-                  <span className="text-lg font-bold text-orange-500">€{product.price.toFixed(2)}</span>
-                </div>
-                <p className="text-sm text-gray-500 line-clamp-2 mb-4">{product.description}</p>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => toggleAvailable(product.id!)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        product.is_active 
-                          ? 'bg-green-100 text-green-600' 
-                          : 'bg-gray-100 text-gray-400'
-                      }`}
-                      title={product.is_active ? 'Beschikbaar' : 'Niet beschikbaar'}
-                    >
-                      {product.is_active ? '✓' : '✕'}
-                    </button>
-                    <button
-                      onClick={() => togglePopular(product.id!)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        product.is_popular 
-                          ? 'bg-orange-100 text-orange-600' 
-                          : 'bg-gray-100 text-gray-400'
-                      }`}
-                      title={product.is_popular ? 'Populair' : 'Niet populair'}
-                    >
-                      🔥
-                    </button>
-                  </div>
-                  <div className="flex gap-1">
-                    {/* Reorder buttons */}
-                    <button
-                      onClick={() => moveProduct(product.id!, 'up')}
-                      disabled={filteredProducts.findIndex(p => p.id === product.id) === 0}
-                      className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                      title="Naar boven"
-                    >
-                      ↑
-                    </button>
-                    <button
-                      onClick={() => moveProduct(product.id!, 'down')}
-                      disabled={filteredProducts.findIndex(p => p.id === product.id) === filteredProducts.length - 1}
-                      className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                      title="Naar onder"
-                    >
-                      ↓
-                    </button>
-                    <button
-                      onClick={() => openEditModal(product)}
-                      className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                      title="Bewerken"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id!)}
-                      className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
-                      title="Verwijderen"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+      {/* Products Grid with Drag & Drop */}
+      <DndContext 
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext 
+          items={filteredProducts.map(p => p.id!)}
+          strategy={rectSortingStrategy}
+        >
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredProducts.map((product) => (
+              <SortableProductCard
+                key={product.id}
+                product={product}
+                categories={categories}
+                onToggleAvailable={() => toggleAvailable(product.id!)}
+                onTogglePopular={() => togglePopular(product.id!)}
+                onEdit={() => openEditModal(product)}
+                onDelete={() => handleDelete(product.id!)}
+              />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
 
       {/* Empty State */}
       {filteredProducts.length === 0 && (
