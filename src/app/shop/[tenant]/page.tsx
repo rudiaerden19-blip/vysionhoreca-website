@@ -974,7 +974,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">📱 Scan & Bestel</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">📱 Scan & Ontdek</h2>
             <p className="text-gray-600">Scan de QR-codes met je smartphone</p>
           </motion.div>
           
@@ -989,13 +989,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             >
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/menukaart`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart`)}`}
                   alt="Menu QR Code"
                   className="w-full h-full"
                 />
               </div>
               <div className="text-5xl mb-3">🍟</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Menu</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Menu Bekijken</h3>
               <p className="text-gray-600">Scan om ons menu te zien</p>
             </motion.div>
 
@@ -1009,14 +1009,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             >
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/menukaart?promo=1`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart?promo=1`)}`}
                   alt="Promoties QR Code"
                   className="w-full h-full"
                 />
               </div>
               <div className="text-5xl mb-3">🎁</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Promoties</h3>
-              <p className="text-gray-600">Scan om de promoties te zien</p>
+              <p className="text-gray-600">Scan om onze aanbiedingen te zien</p>
             </motion.div>
 
             {/* Review QR */}
@@ -1029,14 +1029,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             >
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/review`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/review`)}`}
                   alt="Review QR Code"
                   className="w-full h-full"
                 />
               </div>
               <div className="text-5xl mb-3">⭐</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Review</h3>
-              <p className="text-gray-600">Scan om een review te geven</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Review Geven</h3>
+              <p className="text-gray-600">Scan om een beoordeling te geven</p>
             </motion.div>
           </div>
         </div>
