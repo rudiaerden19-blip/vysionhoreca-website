@@ -249,8 +249,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-white shadow-sm h-14">
+        <div className="max-w-4xl mx-auto px-4 h-full flex items-center justify-between">
           <Link href={`/shop/${params.tenant}`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -268,8 +268,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         </div>
       </header>
 
-      {/* Categories Bar */}
-      <div className="sticky top-[60px] z-40 bg-white shadow-md">
+      {/* Categories Bar - Sticky onder header */}
+      <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-sm shadow-md border-b border-gray-100">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex gap-2 py-4 overflow-x-auto scrollbar-hide">
             <motion.button
