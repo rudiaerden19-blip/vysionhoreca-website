@@ -618,17 +618,17 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               {/* Promo Code */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Kortingscode</label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full">
                   <input
                     type="text"
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                     placeholder="CODE"
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all uppercase"
+                    className="flex-1 min-w-0 px-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all uppercase text-sm"
                   />
                   <button
                     onClick={applyPromoCode}
-                    className="px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors"
+                    className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors text-sm whitespace-nowrap shrink-0"
                   >
                     Toepassen
                   </button>
