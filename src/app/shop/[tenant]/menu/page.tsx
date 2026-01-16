@@ -248,30 +248,31 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white shadow-sm h-14">
-        <div className="max-w-4xl mx-auto px-4 h-full flex items-center justify-between">
-          <Link href={`/shop/${params.tenant}`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>Terug</span>
-          </Link>
-          <h1 className="font-bold text-xl text-gray-900">Menu</h1>
-          <Link 
-            href={`/shop/${params.tenant}/account`}
-            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <span>👤</span>
-            <span className="text-sm font-medium hidden sm:inline">Account</span>
-          </Link>
+      {/* Sticky Header + Categories Bar - samen in 1 container voor iOS */}
+      <div className="sticky top-0 z-50 bg-white shadow-md">
+        {/* Header */}
+        <div className="border-b border-gray-100">
+          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <Link href={`/shop/${params.tenant}`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Terug</span>
+            </Link>
+            <h1 className="font-bold text-xl text-gray-900">Menu</h1>
+            <Link 
+              href={`/shop/${params.tenant}/account`}
+              className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <span>👤</span>
+              <span className="text-sm font-medium hidden sm:inline">Account</span>
+            </Link>
+          </div>
         </div>
-      </header>
 
-      {/* Categories Bar - Sticky onder header */}
-      <div className="sticky top-14 z-40 bg-white/95 backdrop-blur-sm shadow-md border-b border-gray-100">
+        {/* Categories Bar */}
         <div className="max-w-4xl mx-auto px-4">
-          <div className="flex gap-2 py-4 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
