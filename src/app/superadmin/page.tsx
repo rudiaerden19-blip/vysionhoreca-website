@@ -220,6 +220,35 @@ export default function SuperAdminDashboard() {
     await loadData()
   }
 
+  const handleSendPaymentReminder = async (tenant: Tenant) => {
+    if (!tenant.email) {
+      alert('Deze tenant heeft geen email adres!')
+      return
+    }
+
+    if (!confirm(`Betalingsherinnering sturen naar ${tenant.email}?`)) return
+
+    try {
+      const response = await fetch('/api/send-payment-reminder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tenantEmail: tenant.email,
+          tenantName: tenant.business_name || tenant.tenant_slug,
+          tenantSlug: tenant.tenant_slug,
+        }),
+      })
+
+      if (response.ok) {
+        alert('✅ Betalingsherinnering verzonden naar ' + tenant.email)
+      } else {
+        alert('❌ Fout bij verzenden email')
+      }
+    } catch (error) {
+      alert('❌ Fout bij verzenden email')
+    }
+  }
+
   const handleTogglePaymentStatus = async (tenant: Tenant, sub: Subscription | undefined) => {
     const newStatus = sub?.status === 'active' ? 'expired' : 'active'
     const now = new Date()
@@ -559,16 +588,27 @@ export default function SuperAdminDashboard() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <button
-                          onClick={() => handleTogglePaymentStatus(tenant, sub)}
-                          className={`px-3 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105 ${
-                            sub?.status === 'active'
-                              ? 'bg-green-500 hover:bg-green-600 text-white'
-                              : 'bg-red-500 hover:bg-red-600 text-white'
-                          }`}
-                        >
-                          {sub?.status === 'active' ? '✓ Betaald' : '✗ Niet betaald'}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleTogglePaymentStatus(tenant, sub)}
+                            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105 ${
+                              sub?.status === 'active'
+                                ? 'bg-green-500 hover:bg-green-600 text-white'
+                                : 'bg-red-500 hover:bg-red-600 text-white'
+                            }`}
+                          >
+                            {sub?.status === 'active' ? '✓ Betaald' : '✗ Niet betaald'}
+                          </button>
+                          {sub?.status !== 'active' && tenant.email && (
+                            <button
+                              onClick={() => handleSendPaymentReminder(tenant)}
+                              className="px-2 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-xs font-medium transition-all hover:scale-105"
+                              title="Stuur betalingsherinnering"
+                            >
+                              📧
+                            </button>
+                          )}
+                        </div>
                       </td>
                       <td className="px-6 py-4 text-slate-400 text-sm">
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
