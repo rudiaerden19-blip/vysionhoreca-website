@@ -421,9 +421,10 @@ export async function saveProductOption(option: ProductOption): Promise<ProductO
       .delete()
       .eq('option_id', savedOption.id)
 
-    // Then insert new choices
+    // Then insert new choices (without id to avoid conflicts)
     const choicesWithOptionId = choices.map((choice, index) => ({
-      ...choice,
+      name: choice.name,
+      price: choice.price || 0,
       option_id: savedOption.id,
       tenant_slug: option.tenant_slug,
       sort_order: index,
