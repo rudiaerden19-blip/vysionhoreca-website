@@ -989,7 +989,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             >
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/menu`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/menukaart`)}`}
                   alt="Menu QR Code"
                   className="w-full h-full"
                 />
@@ -1009,7 +1009,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             >
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/menu?category=promo`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/menukaart?promo=1`)}`}
                   alt="Promoties QR Code"
                   className="w-full h-full"
                 />
