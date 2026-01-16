@@ -40,6 +40,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     cover_image_1: '',
     cover_image_2: '',
     cover_image_3: '',
+    specialty_1_image: '',
+    specialty_1_title: '',
+    specialty_2_image: '',
+    specialty_2_title: '',
+    specialty_3_image: '',
+    specialty_3_title: '',
   })
 
   // Load data on mount
@@ -568,6 +574,82 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                     setSaved(false)
                   }}
                 />
+              </div>
+            </div>
+
+            {/* Specialiteiten */}
+            <div className="pt-6 border-t border-gray-100">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Onze Specialiteiten (3 items)
+              </label>
+              <p className="text-sm text-gray-500 mb-4">Deze verschijnen op de homepage als &quot;Onze Specialiteiten&quot; sectie</p>
+              
+              <div className="space-y-6">
+                {/* Specialty 1 */}
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Specialiteit 1</p>
+                  <MediaPicker
+                    tenantSlug={params.tenant}
+                    label="Foto"
+                    value={formData.specialty_1_image || ''}
+                    onChange={(url) => {
+                      setFormData(prev => ({ ...prev, specialty_1_image: url }))
+                      setSaved(false)
+                    }}
+                  />
+                  <input
+                    type="text"
+                    name="specialty_1_title"
+                    value={formData.specialty_1_title || ''}
+                    onChange={handleChange}
+                    placeholder="Titel (bijv. Verse Frietjes)"
+                    className="mt-3 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  />
+                </div>
+
+                {/* Specialty 2 */}
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Specialiteit 2</p>
+                  <MediaPicker
+                    tenantSlug={params.tenant}
+                    label="Foto"
+                    value={formData.specialty_2_image || ''}
+                    onChange={(url) => {
+                      setFormData(prev => ({ ...prev, specialty_2_image: url }))
+                      setSaved(false)
+                    }}
+                  />
+                  <input
+                    type="text"
+                    name="specialty_2_title"
+                    value={formData.specialty_2_title || ''}
+                    onChange={handleChange}
+                    placeholder="Titel (bijv. Krokante Bitterballen)"
+                    className="mt-3 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  />
+                </div>
+
+                {/* Specialty 3 */}
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Specialiteit 3</p>
+                  <MediaPicker
+                    tenantSlug={params.tenant}
+                    label="Foto"
+                    value={formData.specialty_3_image || ''}
+                    onChange={(url) => {
+                      setFormData(prev => ({ ...prev, specialty_3_image: url }))
+                      setSaved(false)
+                    }}
+                  />
+                  <input
+                    type="text"
+                    name="specialty_3_title"
+                    value={formData.specialty_3_title || ''}
+                    onChange={handleChange}
+                    placeholder="Titel (bijv. Huisgemaakte Sauzen)"
+                    className="mt-3 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  />
+                </div>
               </div>
             </div>
           </div>

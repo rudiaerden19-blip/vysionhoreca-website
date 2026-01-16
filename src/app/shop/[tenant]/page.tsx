@@ -36,6 +36,12 @@ interface Business {
   top_seller_2?: string
   top_seller_3?: string
   about_image?: string
+  specialty_1_image?: string
+  specialty_1_title?: string
+  specialty_2_image?: string
+  specialty_2_title?: string
+  specialty_3_image?: string
+  specialty_3_title?: string
 }
 
 interface Review {
@@ -210,6 +216,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         top_seller_2: tenantData?.top_seller_2 || '',
         top_seller_3: tenantData?.top_seller_3 || '',
         about_image: tenantData?.about_image || '',
+        specialty_1_image: tenantData?.specialty_1_image || '',
+        specialty_1_title: tenantData?.specialty_1_title || '',
+        specialty_2_image: tenantData?.specialty_2_image || '',
+        specialty_2_title: tenantData?.specialty_2_title || '',
+        specialty_3_image: tenantData?.specialty_3_image || '',
+        specialty_3_title: tenantData?.specialty_3_title || '',
       })
 
       // Populaire items uit producten
@@ -469,6 +481,94 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   />
                 </div>
               </motion.div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Specialiteiten Section */}
+      {(business.specialty_1_image || business.specialty_2_image || business.specialty_3_image) && (
+        <section className="py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Onze keuken</span>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Onze Specialiteiten</h2>
+            </motion.div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Specialty 1 */}
+              {business.specialty_1_image && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="group cursor-pointer"
+                >
+                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
+                    <img 
+                      src={business.specialty_1_image}
+                      alt={business.specialty_1_title || 'Specialiteit 1'}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-2xl font-bold text-white">{business.specialty_1_title || 'Specialiteit'}</h3>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Specialty 2 */}
+              {business.specialty_2_image && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="group cursor-pointer"
+                >
+                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
+                    <img 
+                      src={business.specialty_2_image}
+                      alt={business.specialty_2_title || 'Specialiteit 2'}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-2xl font-bold text-white">{business.specialty_2_title || 'Specialiteit'}</h3>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Specialty 3 */}
+              {business.specialty_3_image && (
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="group cursor-pointer"
+                >
+                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
+                    <img 
+                      src={business.specialty_3_image}
+                      alt={business.specialty_3_title || 'Specialiteit 3'}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-2xl font-bold text-white">{business.specialty_3_title || 'Specialiteit'}</h3>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
         </section>

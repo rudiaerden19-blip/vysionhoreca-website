@@ -38,6 +38,13 @@ export interface TenantSettings {
   seo_description?: string
   seo_keywords?: string
   seo_og_image?: string
+  // Specialiteiten (3 items op homepage)
+  specialty_1_image?: string
+  specialty_1_title?: string
+  specialty_2_image?: string
+  specialty_2_title?: string
+  specialty_3_image?: string
+  specialty_3_title?: string
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {
