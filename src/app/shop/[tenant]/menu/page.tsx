@@ -343,7 +343,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                         alt={item.name}
                         loading="lazy"
                         decoding="async"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain bg-gray-50"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-6xl">
@@ -446,12 +446,12 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-t-3xl md:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
-              <div className="relative h-64 bg-gray-100">
+              <div className="relative h-64 bg-gray-50 flex items-center justify-center">
                 {selectedItem.image_url ? (
                   <img
                     src={selectedItem.image_url}
                     alt={selectedItem.name}
-                    className="w-full h-full object-cover"
+                    className="max-w-full max-h-full object-contain"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-8xl">
@@ -630,7 +630,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     {cart.map((cartItem, index) => (
                       <motion.div key={index} layout className="flex gap-4 bg-gray-50 rounded-xl p-4">
                         {cartItem.item.image_url ? (
-                          <img src={cartItem.item.image_url} alt={cartItem.item.name} className="w-20 h-20 object-cover rounded-lg" />
+                          <img src={cartItem.item.image_url} alt={cartItem.item.name} className="w-20 h-20 object-contain rounded-lg bg-gray-100" />
                         ) : (
                           <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-3xl">🍟</div>
                         )}
