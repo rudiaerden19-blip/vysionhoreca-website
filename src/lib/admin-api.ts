@@ -64,13 +64,32 @@ export async function getTenantSettings(tenantSlug: string): Promise<TenantSetti
 }
 
 export async function saveTenantSettings(settings: TenantSettings): Promise<boolean> {
+  // Only include fields that exist in the database
+  // Remove potentially missing columns to avoid errors
+  const { 
+    specialty_1_image, specialty_1_title,
+    specialty_2_image, specialty_2_title,
+    specialty_3_image, specialty_3_title,
+    show_qr_codes,
+    ...baseSettings 
+  } = settings
+
+  // First try with all fields
   const { error } = await supabase
     .from('tenant_settings')
     .upsert(settings, { onConflict: 'tenant_slug' })
   
   if (error) {
-    console.error('Error saving tenant settings:', error)
-    return false
+    // If error, try without new optional fields
+    console.warn('Trying save without new columns:', error.message)
+    const { error: fallbackError } = await supabase
+      .from('tenant_settings')
+      .upsert(baseSettings, { onConflict: 'tenant_slug' })
+    
+    if (fallbackError) {
+      console.error('Error saving tenant settings:', fallbackError)
+      return false
+    }
   }
   return true
 }
