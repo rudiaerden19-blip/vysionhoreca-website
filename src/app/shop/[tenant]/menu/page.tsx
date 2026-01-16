@@ -289,17 +289,6 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             >
               🎁 Promoties
             </button>
-            <button
-              onClick={() => setActiveCategory('all')}
-              style={activeCategory === 'all' ? { backgroundColor: primaryColor } : {}}
-              className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
-                activeCategory === 'all'
-                  ? 'text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 active:bg-gray-200'
-              }`}
-            >
-              Alle
-            </button>
             {menuItems.some(i => i.is_popular) && (
               <button
                 onClick={() => setActiveCategory('popular')}

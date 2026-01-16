@@ -502,16 +502,6 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           >
             🎁 Promoties
           </button>
-          <button
-            onClick={() => setSelectedCategory('Alle')}
-            className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
-              selectedCategory === 'Alle'
-                ? 'bg-orange-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            Alle
-          </button>
           {categories.map(cat => (
             <button
               key={cat.id}
