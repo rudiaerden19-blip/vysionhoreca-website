@@ -46,6 +46,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     specialty_2_title: '',
     specialty_3_image: '',
     specialty_3_title: '',
+    show_qr_codes: true,
   })
 
   // Load data on mount
@@ -650,6 +651,34 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                     className="mt-3 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* QR-codes toggle */}
+            <div className="pt-6 border-t border-gray-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    QR-codes sectie tonen
+                  </label>
+                  <p className="text-sm text-gray-500">Toon de 3 QR-codes (Menu, Promoties, Review) op de homepage</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData(prev => ({ ...prev, show_qr_codes: !prev.show_qr_codes }))
+                    setSaved(false)
+                  }}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    formData.show_qr_codes ? 'bg-orange-500' : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      formData.show_qr_codes ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
               </div>
             </div>
           </div>

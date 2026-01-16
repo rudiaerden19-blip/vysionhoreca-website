@@ -42,6 +42,7 @@ interface Business {
   specialty_2_title?: string
   specialty_3_image?: string
   specialty_3_title?: string
+  show_qr_codes?: boolean
 }
 
 interface Review {
@@ -222,6 +223,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         specialty_2_title: tenantData?.specialty_2_title || '',
         specialty_3_image: tenantData?.specialty_3_image || '',
         specialty_3_title: tenantData?.specialty_3_title || '',
+        show_qr_codes: tenantData?.show_qr_codes ?? true,
       })
 
       // Populaire items uit producten
@@ -966,6 +968,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </section>
 
       {/* QR Codes Section */}
+      {business.show_qr_codes && (
       <section className="py-16 bg-gray-100">
         <div className="max-w-5xl mx-auto px-4">
           <motion.div
@@ -1041,6 +1044,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </div>
       </section>
+      )}
 
       {/* CTA Section */}
       <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-20">

@@ -45,6 +45,8 @@ export interface TenantSettings {
   specialty_2_title?: string
   specialty_3_image?: string
   specialty_3_title?: string
+  // QR-codes sectie aan/uit
+  show_qr_codes?: boolean
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {

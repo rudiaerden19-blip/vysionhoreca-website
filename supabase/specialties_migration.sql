@@ -7,3 +7,6 @@ ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS specialty_2_image VARCHAR(5
 ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS specialty_2_title VARCHAR(255);
 ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS specialty_3_image VARCHAR(500);
 ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS specialty_3_title VARCHAR(255);
+
+-- QR-codes sectie aan/uit (standaard aan)
+ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS show_qr_codes BOOLEAN DEFAULT true;
