@@ -64,15 +64,36 @@ export async function getTenantSettings(tenantSlug: string): Promise<TenantSetti
 }
 
 export async function saveTenantSettings(settings: TenantSettings): Promise<boolean> {
-  // Only include fields that exist in the database
-  // Remove potentially missing columns to avoid errors
-  const { 
-    specialty_1_image, specialty_1_title,
-    specialty_2_image, specialty_2_title,
-    specialty_3_image, specialty_3_title,
-    show_qr_codes,
-    ...baseSettings 
-  } = settings
+  // Only include fields that definitely exist in the original database schema
+  const safeSettings = {
+    id: settings.id,
+    tenant_slug: settings.tenant_slug,
+    business_name: settings.business_name,
+    tagline: settings.tagline,
+    description: settings.description,
+    logo_url: settings.logo_url,
+    primary_color: settings.primary_color,
+    secondary_color: settings.secondary_color,
+    email: settings.email,
+    phone: settings.phone,
+    address: settings.address,
+    website: settings.website,
+    facebook_url: settings.facebook_url,
+    instagram_url: settings.instagram_url,
+    tiktok_url: settings.tiktok_url,
+    website_url: settings.website_url,
+    about_image: settings.about_image,
+    top_seller_1: settings.top_seller_1,
+    top_seller_2: settings.top_seller_2,
+    top_seller_3: settings.top_seller_3,
+    cover_image_1: settings.cover_image_1,
+    cover_image_2: settings.cover_image_2,
+    cover_image_3: settings.cover_image_3,
+    seo_title: settings.seo_title,
+    seo_description: settings.seo_description,
+    seo_keywords: settings.seo_keywords,
+    seo_og_image: settings.seo_og_image,
+  }
 
   // First try with all fields
   const { error } = await supabase
@@ -80,11 +101,11 @@ export async function saveTenantSettings(settings: TenantSettings): Promise<bool
     .upsert(settings, { onConflict: 'tenant_slug' })
   
   if (error) {
-    // If error, try without new optional fields
-    console.warn('Trying save without new columns:', error.message)
+    // If error, try with only safe/original fields
+    console.warn('Trying save with safe columns only:', error.message)
     const { error: fallbackError } = await supabase
       .from('tenant_settings')
-      .upsert(baseSettings, { onConflict: 'tenant_slug' })
+      .upsert(safeSettings, { onConflict: 'tenant_slug' })
     
     if (fallbackError) {
       console.error('Error saving tenant settings:', fallbackError)
