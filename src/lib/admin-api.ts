@@ -173,7 +173,7 @@ export interface MenuProduct {
   image_url: string
   is_active: boolean
   is_popular: boolean
-  is_promo: boolean
+  is_promo?: boolean
   promo_price?: number
   sort_order: number
   allergens: string[]
@@ -194,13 +194,36 @@ export async function getMenuProducts(tenantSlug: string): Promise<MenuProduct[]
 }
 
 export async function saveMenuProduct(product: MenuProduct): Promise<MenuProduct | null> {
+  // Only include promo fields if they have values (to support databases without these columns yet)
+  const { is_promo, promo_price, ...baseProduct } = product
+  const productToSave = {
+    ...baseProduct,
+    ...(is_promo !== undefined && { is_promo }),
+    ...(promo_price !== undefined && { promo_price }),
+  }
+  
   const { data, error } = await supabase
     .from('menu_products')
-    .upsert(product)
+    .upsert(productToSave)
     .select()
     .single()
   
   if (error) {
+    // If promo columns don't exist, retry without them
+    if (error.code === 'PGRST204' || error.message?.includes('is_promo')) {
+      console.warn('Promo columns not found, saving without them')
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('menu_products')
+        .upsert(baseProduct)
+        .select()
+        .single()
+      
+      if (fallbackError) {
+        console.error('Error saving menu product:', fallbackError)
+        return null
+      }
+      return fallbackData
+    }
     console.error('Error saving menu product:', error)
     return null
   }
