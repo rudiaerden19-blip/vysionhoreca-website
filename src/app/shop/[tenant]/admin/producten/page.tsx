@@ -101,12 +101,12 @@ function SortableProductCard({
       </div>
 
       {/* Image */}
-      <div className="relative h-40 bg-gray-100">
+      <div className="relative h-40 bg-gray-50 flex items-center justify-center">
         {product.image_url ? (
           <img
             src={product.image_url}
             alt={product.name}
-            className="w-full h-full object-cover"
+            className="max-w-full max-h-full object-contain"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-5xl">
