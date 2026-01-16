@@ -567,7 +567,11 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   <input
                     type="text"
                     value={formData.name || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      const capitalized = val.charAt(0).toUpperCase() + val.slice(1)
+                      setFormData(prev => ({ ...prev, name: capitalized }))
+                    }}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     placeholder="Bijv. Grote Friet"
                   />
