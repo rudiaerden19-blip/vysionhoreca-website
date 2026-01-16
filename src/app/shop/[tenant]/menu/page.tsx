@@ -273,52 +273,43 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         {/* Categories Bar */}
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => setActiveCategory('all')}
-              style={activeCategory === 'all' ? { backgroundColor: primaryColor, boxShadow: `0 10px 15px -3px ${primaryColor}50` } : {}}
-              className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-all ${
+              style={activeCategory === 'all' ? { backgroundColor: primaryColor } : {}}
+              className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
                 activeCategory === 'all'
-                  ? 'text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 active:bg-gray-200'
               }`}
             >
               Alles
-            </motion.button>
+            </button>
             {menuItems.some(i => i.is_popular) && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 onClick={() => setActiveCategory('popular')}
-                style={activeCategory === 'popular' ? { backgroundColor: primaryColor, boxShadow: `0 10px 15px -3px ${primaryColor}50` } : {}}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-all ${
+                style={activeCategory === 'popular' ? { backgroundColor: primaryColor } : {}}
+                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
                   activeCategory === 'popular'
-                    ? 'text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 active:bg-gray-200'
                 }`}
               >
                 🔥 Populair
-              </motion.button>
+              </button>
             )}
-            {categories.map((cat, index) => (
-              <motion.button
+            {categories.map((cat) => (
+              <button
                 key={cat.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
                 onClick={() => setActiveCategory(cat.id!)}
-                style={activeCategory === cat.id ? { backgroundColor: primaryColor, boxShadow: `0 10px 15px -3px ${primaryColor}50` } : {}}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-all ${
+                style={activeCategory === cat.id ? { backgroundColor: primaryColor } : {}}
+                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
                   activeCategory === cat.id
-                    ? 'text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 active:bg-gray-200'
                 }`}
               >
                 {cat.name}
-              </motion.button>
+              </button>
             ))}
           </div>
         </div>
@@ -333,29 +324,21 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             <p className="text-gray-500">De eigenaar moet eerst producten toevoegen in de admin.</p>
           </div>
         ) : (
-          <motion.div 
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredItems.map((item, index) => (
-                <motion.div
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredItems.map((item) => (
+                <div
                   key={item.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ delay: index * 0.05 }}
-                  whileHover={{ y: -4 }}
                   onClick={() => selectProduct(item)}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group"
                 >
                   <div className="relative h-48 overflow-hidden bg-gray-100">
                     {item.image_url ? (
                       <img
                         src={item.image_url}
                         alt={item.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-6xl">
@@ -421,10 +404,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                       )}
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </AnimatePresence>
-          </motion.div>
+          </div>
         )}
       </div>
 
