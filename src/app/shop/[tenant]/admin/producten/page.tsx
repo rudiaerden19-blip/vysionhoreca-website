@@ -115,6 +115,40 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     }
   }
 
+  // Move product up or down in sort order
+  const moveProduct = async (productId: string, direction: 'up' | 'down') => {
+    const currentIndex = filteredProducts.findIndex(p => p.id === productId)
+    if (currentIndex === -1) return
+    
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+    if (newIndex < 0 || newIndex >= filteredProducts.length) return
+    
+    const productA = filteredProducts[currentIndex]
+    const productB = filteredProducts[newIndex]
+    
+    // Swap sort_order values
+    const updatedA = { ...productA, sort_order: productB.sort_order }
+    const updatedB = { ...productB, sort_order: productA.sort_order }
+    
+    // Save both products
+    const [resultA, resultB] = await Promise.all([
+      saveMenuProduct(updatedA),
+      saveMenuProduct(updatedB)
+    ])
+    
+    if (resultA && resultB) {
+      setProducts(prev => {
+        const updated = prev.map(p => {
+          if (p.id === productA.id) return resultA
+          if (p.id === productB.id) return resultB
+          return p
+        })
+        // Re-sort by sort_order
+        return updated.sort((a, b) => a.sort_order - b.sort_order)
+      })
+    }
+  }
+
   const openEditModal = async (product: MenuProduct) => {
     setFormData({
       ...product,
@@ -372,7 +406,24 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       🔥
                     </button>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
+                    {/* Reorder buttons */}
+                    <button
+                      onClick={() => moveProduct(product.id!, 'up')}
+                      disabled={filteredProducts.findIndex(p => p.id === product.id) === 0}
+                      className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Naar boven"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      onClick={() => moveProduct(product.id!, 'down')}
+                      disabled={filteredProducts.findIndex(p => p.id === product.id) === filteredProducts.length - 1}
+                      className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      title="Naar onder"
+                    >
+                      ↓
+                    </button>
                     <button
                       onClick={() => openEditModal(product)}
                       className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
