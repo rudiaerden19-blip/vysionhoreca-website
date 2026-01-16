@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview } from '@/lib/admin-api'
+import { supabase } from '@/lib/supabase'
 
 interface Business {
   id: string
@@ -76,6 +77,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [scrollY, setScrollY] = useState(0)
+  const [isBlocked, setIsBlocked] = useState(false)
   
   // Reservation form state
   const [reservationForm, setReservationForm] = useState({
@@ -126,6 +128,21 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   useEffect(() => {
     async function loadData() {
+      // Check of tenant geblokkeerd is
+      if (supabase) {
+        const { data: blockCheck } = await supabase
+          .from('tenant_settings')
+          .select('is_blocked')
+          .eq('tenant_slug', params.tenant)
+          .single()
+        
+        if (blockCheck?.is_blocked) {
+          setIsBlocked(true)
+          setLoading(false)
+          return
+        }
+      }
+
       // Laad data uit Supabase
       const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData] = await Promise.all([
         getTenantSettings(params.tenant),
@@ -260,6 +277,27 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-600 font-medium">Laden...</p>
+        </motion.div>
+      </div>
+    )
+  }
+
+  if (isBlocked) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center"
+        >
+          <span className="text-6xl mb-6 block">🚫</span>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Shop Tijdelijk Niet Beschikbaar</h1>
+          <p className="text-gray-600 mb-6">
+            Deze webshop is momenteel niet actief. Neem contact op met de eigenaar voor meer informatie.
+          </p>
+          <Link href="/" className="text-orange-500 hover:text-orange-600 font-medium">
+            ← Terug naar Vysion
+          </Link>
         </motion.div>
       </div>
     )

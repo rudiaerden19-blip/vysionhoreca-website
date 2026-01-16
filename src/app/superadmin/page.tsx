@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -13,6 +13,7 @@ interface Tenant {
   email: string
   phone: string
   created_at: string
+  is_blocked?: boolean
 }
 
 interface Subscription {
@@ -49,6 +50,15 @@ export default function SuperAdminDashboard() {
     monthlyRecurring: 0,
   })
   const [searchQuery, setSearchQuery] = useState('')
+  const [showNewTenantModal, setShowNewTenantModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState<Tenant | null>(null)
+  const [newTenant, setNewTenant] = useState({
+    tenant_slug: '',
+    business_name: '',
+    email: '',
+    phone: '',
+  })
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     checkAuth()
@@ -119,6 +129,121 @@ export default function SuperAdminDashboard() {
     router.push('/superadmin/login')
   }
 
+  const handleCreateTenant = async () => {
+    if (!newTenant.tenant_slug || !newTenant.business_name) {
+      alert('Vul minimaal slug en bedrijfsnaam in')
+      return
+    }
+
+    setSaving(true)
+
+    // Create tenant_settings
+    const { error: tenantError } = await supabase
+      .from('tenant_settings')
+      .insert({
+        tenant_slug: newTenant.tenant_slug.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+        business_name: newTenant.business_name,
+        email: newTenant.email,
+        phone: newTenant.phone,
+        primary_color: '#FF6B35',
+        secondary_color: '#1a1a2e',
+      })
+
+    if (tenantError) {
+      alert('Fout bij aanmaken: ' + tenantError.message)
+      setSaving(false)
+      return
+    }
+
+    // Create subscription (trial)
+    await supabase
+      .from('subscriptions')
+      .insert({
+        tenant_slug: newTenant.tenant_slug.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+        plan: 'starter',
+        status: 'trial',
+        price_monthly: 69,
+        trial_started_at: new Date().toISOString(),
+        trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      })
+
+    setNewTenant({ tenant_slug: '', business_name: '', email: '', phone: '' })
+    setShowNewTenantModal(false)
+    setSaving(false)
+    await loadData()
+  }
+
+  const handleBlockTenant = async (tenant: Tenant) => {
+    const isBlocked = tenant.is_blocked
+    const confirmMsg = isBlocked 
+      ? `Weet je zeker dat je ${tenant.business_name} wilt deblokkeren?`
+      : `Weet je zeker dat je ${tenant.business_name} wilt blokkeren? De shop wordt ontoegankelijk.`
+    
+    if (!confirm(confirmMsg)) return
+
+    await supabase
+      .from('tenant_settings')
+      .update({ is_blocked: !isBlocked })
+      .eq('id', tenant.id)
+
+    await loadData()
+  }
+
+  const handleDeleteTenant = async (tenant: Tenant) => {
+    setSaving(true)
+
+    // Delete all related data
+    const slug = tenant.tenant_slug
+
+    // Delete in order of dependencies
+    await supabase.from('order_items').delete().eq('tenant_slug', slug)
+    await supabase.from('orders').delete().eq('tenant_slug', slug)
+    await supabase.from('reviews').delete().eq('tenant_slug', slug)
+    await supabase.from('shop_customers').delete().eq('tenant_slug', slug)
+    await supabase.from('loyalty_rewards').delete().eq('tenant_slug', slug)
+    await supabase.from('loyalty_redemptions').delete().eq('tenant_slug', slug)
+    await supabase.from('promotions').delete().eq('tenant_slug', slug)
+    await supabase.from('qr_codes').delete().eq('tenant_slug', slug)
+    await supabase.from('menu_products').delete().eq('tenant_slug', slug)
+    await supabase.from('menu_categories').delete().eq('tenant_slug', slug)
+    await supabase.from('product_options').delete().eq('tenant_slug', slug)
+    await supabase.from('product_option_choices').delete().eq('tenant_slug', slug)
+    await supabase.from('tenant_media').delete().eq('tenant_slug', slug)
+    await supabase.from('tenant_texts').delete().eq('tenant_slug', slug)
+    await supabase.from('delivery_settings').delete().eq('tenant_slug', slug)
+    await supabase.from('subscriptions').delete().eq('tenant_slug', slug)
+    await supabase.from('tenant_settings').delete().eq('id', tenant.id)
+
+    setShowDeleteModal(null)
+    setSaving(false)
+    await loadData()
+  }
+
+  const handleCleanupExpired = async () => {
+    const expiredTrials = tenants.filter(t => {
+      const sub = getSubscription(t.tenant_slug)
+      if (sub?.status === 'trial' && sub.trial_ends_at) {
+        return new Date(sub.trial_ends_at) < new Date()
+      }
+      return false
+    })
+
+    if (expiredTrials.length === 0) {
+      alert('Geen verlopen trials gevonden')
+      return
+    }
+
+    if (!confirm(`Weet je zeker dat je ${expiredTrials.length} verlopen trial(s) wilt verwijderen? Dit kan niet ongedaan worden!`)) {
+      return
+    }
+
+    for (const tenant of expiredTrials) {
+      await handleDeleteTenant(tenant)
+    }
+
+    await loadData()
+  }
+
   const getSubscription = (tenantSlug: string) => {
     return subscriptions.find(s => s.tenant_slug === tenantSlug)
   }
@@ -174,18 +299,32 @@ export default function SuperAdminDashboard() {
               <p className="text-slate-400 text-sm">Welkom, {adminName}</p>
             </div>
           </div>
-          <Link
-            href="/superadmin/abonnementen"
-            className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors"
-          >
-            💳 Abonnementen
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-colors"
-          >
-            Uitloggen
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowNewTenantModal(true)}
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-colors"
+            >
+              ➕ Nieuwe Tenant
+            </button>
+            <Link
+              href="/superadmin/abonnementen"
+              className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors"
+            >
+              💳 Abonnementen
+            </Link>
+            <button
+              onClick={handleCleanupExpired}
+              className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors border border-red-500/30"
+            >
+              🧹 Opschonen
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-colors"
+            >
+              Uitloggen
+            </button>
+          </div>
         </div>
       </header>
 
@@ -290,11 +429,14 @@ export default function SuperAdminDashboard() {
                 {filteredTenants.map((tenant) => {
                   const sub = getSubscription(tenant.tenant_slug)
                   return (
-                    <tr key={tenant.id} className="hover:bg-slate-700/30 transition-colors">
+                    <tr key={tenant.id} className={`hover:bg-slate-700/30 transition-colors ${tenant.is_blocked ? 'opacity-50' : ''}`}>
                       <td className="px-6 py-4">
-                        <div>
-                          <p className="font-medium text-white">{tenant.business_name || 'Geen naam'}</p>
-                          <p className="text-sm text-slate-400">{tenant.email}</p>
+                        <div className="flex items-center gap-2">
+                          {tenant.is_blocked && <span className="text-red-500">🚫</span>}
+                          <div>
+                            <p className="font-medium text-white">{tenant.business_name || 'Geen naam'}</p>
+                            <p className="text-sm text-slate-400">{tenant.email}</p>
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -316,27 +458,29 @@ export default function SuperAdminDashboard() {
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 flex-wrap">
                           <Link
                             href={`/superadmin/tenant/${tenant.tenant_slug}`}
                             className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors"
                           >
                             Details
                           </Link>
-                          <Link
-                            href={`/shop/${tenant.tenant_slug}/admin`}
-                            target="_blank"
-                            className="px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm transition-colors"
+                          <button
+                            onClick={() => handleBlockTenant(tenant)}
+                            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                              tenant.is_blocked 
+                                ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
+                                : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                            }`}
                           >
-                            Admin
-                          </Link>
-                          <Link
-                            href={`/shop/${tenant.tenant_slug}`}
-                            target="_blank"
-                            className="px-3 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-colors"
+                            {tenant.is_blocked ? '✓ Deblokkeren' : '⚠️ Blokkeren'}
+                          </button>
+                          <button
+                            onClick={() => setShowDeleteModal(tenant)}
+                            className="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-sm transition-colors"
                           >
-                            Shop
-                          </Link>
+                            🗑️ Verwijderen
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -354,6 +498,140 @@ export default function SuperAdminDashboard() {
           )}
         </motion.div>
       </div>
+
+      {/* New Tenant Modal */}
+      <AnimatePresence>
+        {showNewTenantModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowNewTenantModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-slate-800 rounded-2xl p-6 max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-xl font-bold text-white mb-6">➕ Nieuwe Tenant Aanmaken</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Slug (URL) *</label>
+                  <input
+                    type="text"
+                    value={newTenant.tenant_slug}
+                    onChange={(e) => setNewTenant({ ...newTenant, tenant_slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
+                    className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
+                    placeholder="mijn-frituur"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">Wordt: vysionhoreca.com/shop/{newTenant.tenant_slug || 'mijn-frituur'}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Bedrijfsnaam *</label>
+                  <input
+                    type="text"
+                    value={newTenant.business_name}
+                    onChange={(e) => setNewTenant({ ...newTenant, business_name: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
+                    placeholder="Frituur Nolim"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={newTenant.email}
+                    onChange={(e) => setNewTenant({ ...newTenant, email: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
+                    placeholder="info@frituur.be"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Telefoon</label>
+                  <input
+                    type="tel"
+                    value={newTenant.phone}
+                    onChange={(e) => setNewTenant({ ...newTenant, phone: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
+                    placeholder="+32 123 45 67 89"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setShowNewTenantModal(false)}
+                  className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-colors"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={handleCreateTenant}
+                  disabled={saving || !newTenant.tenant_slug || !newTenant.business_name}
+                  className="flex-1 px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-colors disabled:opacity-50"
+                >
+                  {saving ? 'Aanmaken...' : 'Aanmaken'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowDeleteModal(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-slate-800 rounded-2xl p-6 max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center">
+                <span className="text-5xl mb-4 block">⚠️</span>
+                <h2 className="text-xl font-bold text-white mb-2">Tenant Verwijderen?</h2>
+                <p className="text-slate-400 mb-2">
+                  Weet je zeker dat je <span className="text-white font-semibold">{showDeleteModal.business_name}</span> wilt verwijderen?
+                </p>
+                <p className="text-red-400 text-sm mb-6">
+                  Dit verwijdert ALLE data: orders, producten, klanten, reviews, etc. Dit kan niet ongedaan worden!
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(null)}
+                  className="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-colors"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={() => handleDeleteTenant(showDeleteModal)}
+                  disabled={saving}
+                  className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-colors disabled:opacity-50"
+                >
+                  {saving ? 'Verwijderen...' : '🗑️ Definitief Verwijderen'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
