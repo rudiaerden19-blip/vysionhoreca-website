@@ -199,19 +199,31 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
         }
       }
 
+      // Get next order number for this tenant
+      const { data: lastOrder } = await supabase
+        .from('orders')
+        .select('order_number')
+        .eq('tenant_slug', params.tenant)
+        .order('order_number', { ascending: false })
+        .limit(1)
+        .single()
+      
+      const nextOrderNumber = (lastOrder?.order_number || 1000) + 1
+
       // Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
           business_id: business?.id || tenantSettings?.id,
           tenant_slug: params.tenant,
+          order_number: nextOrderNumber,
           customer_name: customerInfo.name,
           customer_email: customerInfo.email || null,
           customer_phone: customerInfo.phone,
           customer_address: orderType === 'delivery' ? `${customerInfo.address}, ${customerInfo.postal_code} ${customerInfo.city}` : null,
           customer_notes: customerInfo.notes || null,
           order_type: orderType,
-          status: 'NEW',
+          status: 'new',
           items: cart.map(item => ({
             name: item.name,
             quantity: item.quantity,
@@ -222,8 +234,8 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           subtotal: subtotal,
           tax: 0,
           total: total,
-          payment_method: paymentMethod.toUpperCase(),
-          payment_status: paymentMethod === 'cash' ? 'PENDING' : 'PENDING',
+          payment_method: paymentMethod === 'cash' ? 'cash' : 'online',
+          payment_status: 'pending',
         })
         .select()
         .single()
