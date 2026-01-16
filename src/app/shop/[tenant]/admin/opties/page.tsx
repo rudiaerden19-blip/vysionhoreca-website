@@ -3,12 +3,102 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
+  DndContext, 
+  closestCenter, 
+  KeyboardSensor, 
+  PointerSensor, 
+  useSensor, 
+  useSensors,
+  DragEndEvent 
+} from '@dnd-kit/core'
+import { 
+  arrayMove, 
+  SortableContext, 
+  sortableKeyboardCoordinates, 
+  useSortable,
+  verticalListSortingStrategy 
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { 
   getProductOptions, 
   saveProductOption, 
   deleteProductOption, 
   ProductOption, 
   ProductOptionChoice 
 } from '@/lib/admin-api'
+
+// Sortable Choice Component
+function SortableChoice({ 
+  id, 
+  choice, 
+  index, 
+  onUpdate, 
+  onRemove, 
+  canRemove 
+}: {
+  id: string
+  choice: ProductOptionChoice
+  index: number
+  onUpdate: (field: string, value: any) => void
+  onRemove: () => void
+  canRemove: boolean
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className={`flex gap-2 items-center ${isDragging ? 'z-50' : ''}`}>
+      {/* Drag Handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className="p-2 text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing"
+        title="Sleep om te verplaatsen"
+      >
+        ⠿
+      </button>
+      <input
+        type="text"
+        value={choice.name}
+        onChange={(e) => onUpdate('name', e.target.value)}
+        className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+        placeholder="Naam (bijv. Klein, Medium, Groot)"
+      />
+      <div className="relative w-28">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">€</span>
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          value={choice.price || ''}
+          onChange={(e) => onUpdate('price', parseFloat(e.target.value) || 0)}
+          className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          placeholder="0.00"
+        />
+      </div>
+      {canRemove && (
+        <button
+          onClick={onRemove}
+          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+        >
+          🗑️
+        </button>
+      )}
+    </div>
+  )
+}
 
 export default function OptiesPage({ params }: { params: { tenant: string } }) {
   const [options, setOptions] = useState<ProductOption[]>([])
@@ -29,6 +119,34 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
     is_active: true,
     choices: []
   })
+
+  // Drag & drop sensors for choices
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // Handle drag end for choices
+  const handleChoiceDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const choices = formData.choices || []
+    const oldIndex = choices.findIndex((_, i) => `choice-${i}` === active.id)
+    const newIndex = choices.findIndex((_, i) => `choice-${i}` === over.id)
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const newChoices = arrayMove(choices, oldIndex, newIndex).map((c, i) => ({
+        ...c,
+        sort_order: i
+      }))
+      setFormData(prev => ({ ...prev, choices: newChoices }))
+    }
+  }
 
   // Load options on mount
   useEffect(() => {
@@ -374,44 +492,35 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   </div>
                 </div>
 
-                {/* Choices */}
+                {/* Choices with Drag & Drop */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Keuzes *
+                    Keuzes * <span className="text-gray-400 font-normal">(sleep ⠿ om te verplaatsen)</span>
                   </label>
-                  <div className="space-y-3">
-                    {formData.choices?.map((choice, index) => (
-                      <div key={index} className="flex gap-3 items-center">
-                        <input
-                          type="text"
-                          value={choice.name}
-                          onChange={(e) => updateChoice(index, 'name', e.target.value)}
-                          className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                          placeholder="Naam (bijv. Klein, Medium, Groot)"
-                        />
-                        <div className="relative w-32">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">€</span>
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={choice.price || ''}
-                            onChange={(e) => updateChoice(index, 'price', parseFloat(e.target.value) || 0)}
-                            className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                            placeholder="0.00"
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleChoiceDragEnd}
+                  >
+                    <SortableContext
+                      items={(formData.choices || []).map((_, i) => `choice-${i}`)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-3">
+                        {formData.choices?.map((choice, index) => (
+                          <SortableChoice
+                            key={`choice-${index}`}
+                            id={`choice-${index}`}
+                            choice={choice}
+                            index={index}
+                            onUpdate={(field, value) => updateChoice(index, field, value)}
+                            onRemove={() => removeChoice(index)}
+                            canRemove={(formData.choices?.length || 0) > 1}
                           />
-                        </div>
-                        {(formData.choices?.length || 0) > 1 && (
-                          <button
-                            onClick={() => removeChoice(index)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                          >
-                            🗑️
-                          </button>
-                        )}
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </SortableContext>
+                  </DndContext>
                   <button
                     onClick={addChoice}
                     className="mt-3 w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors"
