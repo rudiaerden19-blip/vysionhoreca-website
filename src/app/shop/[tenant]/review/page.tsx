@@ -55,9 +55,9 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
           customer_name: formData.customer_name.trim(),
           customer_email: formData.customer_email.trim() || null,
           rating: rating,
-          comment: formData.comment.trim(),
+          text: formData.comment.trim(),
           is_visible: false, // Standaard niet zichtbaar, moet goedgekeurd worden
-          created_at: new Date().toISOString()
+          is_verified: false
         })
 
       if (error) throw error
