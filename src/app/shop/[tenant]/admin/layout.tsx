@@ -85,7 +85,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-x-hidden">
+    <div className="min-h-screen bg-gray-100 overflow-x-hidden max-w-[100vw]">
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b z-50 flex items-center justify-between px-4">
         <button
