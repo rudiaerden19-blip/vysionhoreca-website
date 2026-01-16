@@ -179,26 +179,6 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     setSubmitting(true)
     
     try {
-      // Get business_id
-      const { data: business } = await supabase
-        .from('business_profiles')
-        .select('id')
-        .eq('name', tenantSettings?.business_name)
-        .single()
-      
-      if (!business) {
-        // Fallback - get first business for this tenant
-        const { data: fallbackBusiness } = await supabase
-          .from('tenant_settings')
-          .select('id')
-          .eq('tenant_slug', params.tenant)
-          .single()
-        
-        if (!fallbackBusiness) {
-          throw new Error('Business not found')
-        }
-      }
-
       // Get next order number for this tenant
       const { data: lastOrder } = await supabase
         .from('orders')
@@ -210,11 +190,10 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       
       const nextOrderNumber = (lastOrder?.order_number || 1000) + 1
 
-      // Create order
+      // Create order (business_id is optional - we use tenant_slug for identification)
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
-          business_id: business?.id || tenantSettings?.id,
           tenant_slug: params.tenant,
           order_number: nextOrderNumber,
           customer_name: customerInfo.name,
