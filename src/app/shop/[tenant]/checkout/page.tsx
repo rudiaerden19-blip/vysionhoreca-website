@@ -343,26 +343,26 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', width: '100%', margin: 0, padding: 0 }}>
+    <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
       {/* Header */}
-      <header style={{ position: 'sticky', top: 0, zIndex: 50, backgroundColor: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', width: '100%' }}>
-        <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <header className="sticky top-0 z-50 bg-white shadow-sm">
+        <div className="px-4 py-3 flex items-center justify-between max-w-2xl mx-auto">
           <Link 
             href={`/shop/${params.tenant}/menu`} 
-            style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#666' }}
+            className="flex items-center gap-2 text-gray-600"
           >
-            <svg style={{ width: 20, height: 20 }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             <span>Terug</span>
           </Link>
-          <h1 style={{ fontWeight: 'bold', fontSize: '18px', color: '#111' }}>Afrekenen</h1>
-          <div style={{ width: 60 }}></div>
+          <h1 className="font-bold text-lg text-gray-900">Afrekenen</h1>
+          <div className="w-16"></div>
         </div>
       </header>
 
-      <main style={{ padding: '24px 16px', width: '100%', maxWidth: '896px', marginLeft: 'auto', marginRight: 'auto' }}>
-        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8">
+      <main className="px-4 py-6 max-w-2xl mx-auto">
+        <div className="space-y-6">
           {/* Left Column - Forms */}
           <div className="space-y-6">
             {/* Order Type */}
