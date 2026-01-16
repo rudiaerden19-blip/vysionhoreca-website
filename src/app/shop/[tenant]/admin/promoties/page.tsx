@@ -382,12 +382,12 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       {formData.type === 'percentage' ? 'Percentage (%)' : 'Bedrag (€)'}
                     </label>
                     <input
-                      type="number"
-                      min="0"
-                      step={formData.type === 'percentage' ? '1' : '0.50'}
-                      value={formData.value}
+                      type="text"
+                      inputMode="decimal"
+                      value={formData.value || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, value: parseFloat(e.target.value) || 0 }))}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder={formData.type === 'percentage' ? 'bijv. 10' : 'bijv. 5.00'}
                     />
                   </div>
                 )}
@@ -398,13 +398,12 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     Minimale bestelwaarde (€)
                   </label>
                   <input
-                    type="number"
-                    min="0"
-                    step="0.50"
-                    value={formData.min_order_amount}
+                    type="text"
+                    inputMode="decimal"
+                    value={formData.min_order_amount || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, min_order_amount: parseFloat(e.target.value) || 0 }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="0 = geen minimum"
+                    placeholder="Leeg = geen minimum"
                   />
                 </div>
 
@@ -414,9 +413,9 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     Maximum gebruik
                   </label>
                   <input
-                    type="number"
-                    min="0"
-                    value={formData.max_usage}
+                    type="text"
+                    inputMode="numeric"
+                    value={formData.max_usage || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, max_usage: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     placeholder="Leeg = onbeperkt"
