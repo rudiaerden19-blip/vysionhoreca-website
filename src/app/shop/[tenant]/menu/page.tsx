@@ -282,7 +282,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   : 'bg-gray-100 text-gray-700 active:bg-gray-200'
               }`}
             >
-              Alles
+              🎁 Promoties
             </button>
             {menuItems.some(i => i.is_popular) && (
               <button
