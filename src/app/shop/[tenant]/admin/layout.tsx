@@ -15,6 +15,7 @@ const menuItems = [
     category: 'OVERZICHT',
     items: [
       { name: 'Dashboard', href: '', icon: '📊' },
+      { name: 'Kassa Display', href: '/kassa', icon: '🖥️' },
     ]
   },
   {
