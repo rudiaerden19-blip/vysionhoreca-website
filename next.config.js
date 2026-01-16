@@ -21,5 +21,3 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
-
-// Cache bust 1768599543
