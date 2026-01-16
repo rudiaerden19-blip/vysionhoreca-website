@@ -220,6 +220,39 @@ export default function SuperAdminDashboard() {
     await loadData()
   }
 
+  const handleTogglePaymentStatus = async (tenant: Tenant, sub: Subscription | undefined) => {
+    const newStatus = sub?.status === 'active' ? 'expired' : 'active'
+    const now = new Date()
+    const nextMonth = new Date(now)
+    nextMonth.setMonth(nextMonth.getMonth() + 1)
+
+    if (sub?.id) {
+      // Update bestaand abonnement
+      await supabase
+        .from('subscriptions')
+        .update({ 
+          status: newStatus,
+          subscription_started_at: newStatus === 'active' ? now.toISOString() : null,
+          next_payment_at: newStatus === 'active' ? nextMonth.toISOString() : null,
+        })
+        .eq('id', sub.id)
+    } else {
+      // Maak nieuw abonnement aan
+      await supabase
+        .from('subscriptions')
+        .insert({
+          tenant_slug: tenant.tenant_slug,
+          plan: 'starter',
+          status: newStatus,
+          price_monthly: 69,
+          subscription_started_at: newStatus === 'active' ? now.toISOString() : null,
+          next_payment_at: newStatus === 'active' ? nextMonth.toISOString() : null,
+        })
+    }
+
+    await loadData()
+  }
+
   const handleCleanupExpired = async () => {
     const expiredTrials = tenants.filter(t => {
       const sub = getSubscription(t.tenant_slug)
@@ -526,15 +559,16 @@ export default function SuperAdminDashboard() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        {sub?.status === 'active' ? (
-                          <span className="px-3 py-1 bg-green-500 text-white rounded-lg text-xs font-medium">
-                            ✓ Betaald
-                          </span>
-                        ) : (
-                          <span className="px-3 py-1 bg-red-500 text-white rounded-lg text-xs font-medium">
-                            ✗ Niet betaald
-                          </span>
-                        )}
+                        <button
+                          onClick={() => handleTogglePaymentStatus(tenant, sub)}
+                          className={`px-3 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105 ${
+                            sub?.status === 'active'
+                              ? 'bg-green-500 hover:bg-green-600 text-white'
+                              : 'bg-red-500 hover:bg-red-600 text-white'
+                          }`}
+                        >
+                          {sub?.status === 'active' ? '✓ Betaald' : '✗ Niet betaald'}
+                        </button>
                       </td>
                       <td className="px-6 py-4 text-slate-400 text-sm">
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
