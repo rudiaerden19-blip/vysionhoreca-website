@@ -16,6 +16,8 @@ interface MenuItem {
   category_name: string
   is_available: boolean
   is_popular: boolean
+  is_promo: boolean
+  promo_price?: number
   allergens: string[]
 }
 
@@ -90,6 +92,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             category_name: category?.name || 'Overig',
             is_available: p.is_active,
             is_popular: p.is_popular,
+            is_promo: p.is_promo || false,
+            promo_price: p.promo_price,
             allergens: p.allergens || [],
           }
         })
@@ -214,11 +218,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const cartTotal = cart.reduce((sum, c) => sum + (c.totalPrice * c.quantity), 0)
   const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0)
 
-  const filteredItems = activeCategory === 'all' 
-    ? menuItems 
-    : activeCategory === 'popular'
-      ? menuItems.filter(i => i.is_popular)
-      : menuItems.filter(i => i.category_id === activeCategory)
+  const filteredItems = activeCategory === 'promo' 
+    ? menuItems.filter(i => i.is_promo)
+    : activeCategory === 'all' 
+      ? menuItems 
+      : activeCategory === 'popular'
+        ? menuItems.filter(i => i.is_popular)
+        : menuItems.filter(i => i.category_id === activeCategory)
 
   const allergenIcons: Record<string, { icon: string, color: string, label: string }> = {
     gluten: { icon: '🌾', color: 'bg-amber-100 text-amber-800', label: 'Gluten' },
@@ -274,6 +280,16 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
             <button
+              onClick={() => setActiveCategory('promo')}
+              className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
+                activeCategory === 'promo'
+                  ? 'bg-green-500 text-white shadow-md'
+                  : 'bg-green-100 text-green-700 active:bg-green-200'
+              }`}
+            >
+              🎁 Promoties
+            </button>
+            <button
               onClick={() => setActiveCategory('all')}
               style={activeCategory === 'all' ? { backgroundColor: primaryColor } : {}}
               className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
@@ -282,7 +298,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   : 'bg-gray-100 text-gray-700 active:bg-gray-200'
               }`}
             >
-              🎁 Promoties
+              Alle
             </button>
             {menuItems.some(i => i.is_popular) && (
               <button
@@ -364,10 +380,24 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-bold text-lg text-gray-900 transition-colors">
                         {item.name}
+                        {item.is_promo && (
+                          <span className="ml-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                            PROMO
+                          </span>
+                        )}
                       </h3>
-                      <span style={{ color: primaryColor }} className="text-xl font-bold">
-                        €{item.price.toFixed(2)}
-                      </span>
+                      <div className="text-right">
+                        {item.is_promo && item.promo_price ? (
+                          <>
+                            <span className="text-gray-400 line-through text-sm block">€{item.price.toFixed(2)}</span>
+                            <span className="text-green-500 text-xl font-bold">€{item.promo_price.toFixed(2)}</span>
+                          </>
+                        ) : (
+                          <span style={{ color: primaryColor }} className="text-xl font-bold">
+                            €{item.price.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <p className="text-gray-500 text-sm mb-3 line-clamp-2">
                       {item.description}

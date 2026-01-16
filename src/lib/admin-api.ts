@@ -173,6 +173,8 @@ export interface MenuProduct {
   image_url: string
   is_active: boolean
   is_popular: boolean
+  is_promo: boolean
+  promo_price?: number
   sort_order: number
   allergens: string[]
 }

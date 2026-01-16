@@ -113,6 +113,19 @@ function SortableProductCard({
             🍟
           </div>
         )}
+        {/* Badges */}
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {product.is_promo && (
+            <span className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              🎁 PROMO
+            </span>
+          )}
+          {product.is_popular && (
+            <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+              🔥 POPULAIR
+            </span>
+          )}
+        </div>
         {!product.is_active && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
@@ -129,7 +142,16 @@ function SortableProductCard({
             <h3 className="font-bold text-gray-900">{product.name}</h3>
             <span className="text-sm text-gray-500">{category?.name || 'Geen categorie'}</span>
           </div>
-          <span className="text-orange-500 font-bold text-lg">€{product.price.toFixed(2)}</span>
+          <div className="text-right">
+            {product.is_promo && product.promo_price ? (
+              <>
+                <span className="text-gray-400 line-through text-sm">€{product.price.toFixed(2)}</span>
+                <span className="text-green-500 font-bold text-lg block">€{product.promo_price.toFixed(2)}</span>
+              </>
+            ) : (
+              <span className="text-orange-500 font-bold text-lg">€{product.price.toFixed(2)}</span>
+            )}
+          </div>
         </div>
         <p className="text-sm text-gray-500 line-clamp-2 mb-4">{product.description}</p>
 
@@ -186,7 +208,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [availableOptions, setAvailableOptions] = useState<ProductOption[]>([])
   const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([])
-  const [selectedCategory, setSelectedCategory] = useState('Alle')
+  const [selectedCategory, setSelectedCategory] = useState('Promoties')
   const [searchQuery, setSearchQuery] = useState('')
   const [editingProduct, setEditingProduct] = useState<MenuProduct | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
@@ -203,6 +225,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     image_url: '',
     is_active: true,
     is_popular: false,
+    is_promo: false,
+    promo_price: undefined,
     allergens: [],
   })
 
@@ -225,7 +249,11 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
   const filteredProducts = products.filter(p => {
     const category = categories.find(c => c.id === p.category_id)
-    const matchesCategory = selectedCategory === 'Alle' || category?.name === selectedCategory
+    const matchesCategory = selectedCategory === 'Promoties' 
+      ? (p as any).is_promo === true
+      : selectedCategory === 'Alle'
+        ? true
+        : category?.name === selectedCategory
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
@@ -326,6 +354,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       image_url: '',
       is_active: true,
       is_popular: false,
+      is_promo: false,
+      promo_price: undefined,
       allergens: [],
     })
     setSelectedOptionIds([])
@@ -374,6 +404,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       image_url: formData.image_url || '',
       is_active: formData.is_active ?? true,
       is_popular: formData.is_popular ?? false,
+      is_promo: formData.is_promo ?? false,
+      promo_price: formData.is_promo ? (formData.promo_price || 0) : undefined,
       sort_order: editingProduct?.sort_order || products.length,
       allergens: formData.allergens || [],
     }
@@ -460,6 +492,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
         {/* Category Filter */}
         <div className="flex gap-2 overflow-x-auto pb-2">
+          <button
+            onClick={() => setSelectedCategory('Promoties')}
+            className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
+              selectedCategory === 'Promoties'
+                ? 'bg-green-500 text-white'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            }`}
+          >
+            🎁 Promoties
+          </button>
           <button
             onClick={() => setSelectedCategory('Alle')}
             className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
@@ -747,7 +789,40 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       />
                       <span>🔥 Populair</span>
                     </label>
+                    <label className="flex items-center gap-2 px-4 py-2 bg-green-100 rounded-xl cursor-pointer hover:bg-green-200">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.is_promo ?? false}
+                        onChange={(e) => setFormData(prev => ({ ...prev, is_promo: e.target.checked }))}
+                        className="rounded" 
+                      />
+                      <span>🎁 Promotie</span>
+                    </label>
                   </div>
+                  
+                  {/* Promo Price - alleen tonen als promotie aan staat */}
+                  {formData.is_promo && (
+                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
+                      <label className="block text-sm font-medium text-green-800 mb-2">
+                        🎁 Actieprijs
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-green-600 font-bold">€</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.promo_price || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, promo_price: parseFloat(e.target.value) || 0 }))}
+                          className="w-full pl-10 pr-4 py-3 border-2 border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg font-bold"
+                          placeholder="0.00"
+                        />
+                      </div>
+                      <p className="text-sm text-green-600 mt-2">
+                        Originele prijs: €{(formData.price || 0).toFixed(2)} → Actieprijs: €{(formData.promo_price || 0).toFixed(2)}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
