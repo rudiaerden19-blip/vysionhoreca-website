@@ -865,6 +865,83 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         </div>
       </section>
 
+      {/* QR Codes Section */}
+      <section className="py-16 bg-gray-100">
+        <div className="max-w-5xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">📱 Scan & Bestel</h2>
+            <p className="text-gray-600">Scan de QR-codes met je smartphone</p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Menu QR */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl p-8 shadow-lg text-center"
+            >
+              <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/menu`)}`}
+                  alt="Menu QR Code"
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="text-5xl mb-3">🍟</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Menu</h3>
+              <p className="text-gray-600">Scan om ons menu te zien</p>
+            </motion.div>
+
+            {/* Promoties QR */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-2xl p-8 shadow-lg text-center"
+            >
+              <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/menu?category=promo`)}`}
+                  alt="Promoties QR Code"
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="text-5xl mb-3">🎁</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Promoties</h3>
+              <p className="text-gray-600">Scan om de promoties te zien</p>
+            </motion.div>
+
+            {/* Review QR */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-2xl p-8 shadow-lg text-center"
+            >
+              <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`https://vysionhoreca.com/shop/${params.tenant}/review`)}`}
+                  alt="Review QR Code"
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="text-5xl mb-3">⭐</div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Review</h3>
+              <p className="text-gray-600">Scan om een review te geven</p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
