@@ -399,7 +399,10 @@ export async function getProductOptions(tenantSlug: string): Promise<ProductOpti
 }
 
 export async function saveProductOption(option: ProductOption): Promise<ProductOption | null> {
-  const { choices, ...optionData } = option
+  const { choices, id, ...restData } = option
+  
+  // Only include id if it exists (for updates)
+  const optionData = id ? { id, ...restData } : restData
   
   // Save or update the option
   const { data: savedOption, error } = await supabase
