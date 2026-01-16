@@ -500,6 +500,25 @@ export async function saveProductOptionLinks(productId: string, optionIds: strin
   return true
 }
 
+// Get all product IDs that have options linked
+export async function getProductsWithOptions(tenantSlug: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('product_option_links')
+    .select('product_id, product_options!inner(tenant_slug)')
+    .eq('product_options.tenant_slug', tenantSlug)
+  
+  if (error || !data) {
+    // Fallback: get all links and filter later
+    const { data: allLinks } = await supabase
+      .from('product_option_links')
+      .select('product_id')
+    
+    return allLinks ? [...new Set(allLinks.map(l => l.product_id))] : []
+  }
+  
+  return [...new Set(data.map(l => l.product_id))]
+}
+
 export async function getOptionsForProduct(productId: string): Promise<ProductOption[]> {
   // Get linked option IDs
   const { data: links, error: linksError } = await supabase

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { getMenuCategories, getMenuProducts, getOptionsForProduct, getTenantSettings, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
+import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
 
 interface MenuItem {
   id: string
@@ -39,6 +39,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
   const [loadingOptions, setLoadingOptions] = useState(false)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
+  const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
@@ -58,11 +59,14 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   useEffect(() => {
     async function loadData() {
-      const [categoriesData, productsData, tenantData] = await Promise.all([
+      const [categoriesData, productsData, tenantData, optionProducts] = await Promise.all([
         getMenuCategories(params.tenant),
         getMenuProducts(params.tenant),
         getTenantSettings(params.tenant),
+        getProductsWithOptions(params.tenant),
       ])
+      
+      setProductsWithOptions(optionProducts)
       
       // Set primary color from tenant settings
       if (tenantData?.primary_color) {
@@ -385,7 +389,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                       {item.description}
                     </p>
                     {item.allergens.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mb-2">
                         {item.allergens.map(allergen => (
                           <span 
                             key={allergen}
@@ -396,6 +400,25 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                         ))}
                       </div>
                     )}
+                    {/* Indicator voor opties */}
+                    <div 
+                      className="mt-2 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all"
+                      style={{ color: primaryColor }}
+                    >
+                      {productsWithOptions.includes(item.id) ? (
+                        <>
+                          <span>⚙️</span>
+                          <span>Kies opties</span>
+                          <span className="text-lg">→</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>🛒</span>
+                          <span>Klik om te bestellen</span>
+                          <span className="text-lg">→</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               ))}
