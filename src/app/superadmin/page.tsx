@@ -267,6 +267,11 @@ export default function SuperAdminDashboard() {
     }
   }
 
+  // BESCHERMDE TENANTS - Kunnen NOOIT geblokkeerd of verwijderd worden
+  const PROTECTED_TENANTS = ['demo-frituur', 'frituur-nolim']
+
+  const isProtectedTenant = (slug: string) => PROTECTED_TENANTS.includes(slug.toLowerCase())
+
   const filteredTenants = tenants.filter(t => 
     t.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.tenant_slug?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -433,8 +438,14 @@ export default function SuperAdminDashboard() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           {tenant.is_blocked && <span className="text-red-500">🚫</span>}
+                          {isProtectedTenant(tenant.tenant_slug) && <span className="text-yellow-500">⭐</span>}
                           <div>
-                            <p className="font-medium text-white">{tenant.business_name || 'Geen naam'}</p>
+                            <p className="font-medium text-white flex items-center gap-2">
+                              {tenant.business_name || 'Geen naam'}
+                              {isProtectedTenant(tenant.tenant_slug) && (
+                                <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">MAIN</span>
+                              )}
+                            </p>
                             <p className="text-sm text-slate-400">{tenant.email}</p>
                           </div>
                         </div>
@@ -465,22 +476,31 @@ export default function SuperAdminDashboard() {
                           >
                             Details
                           </Link>
-                          <button
-                            onClick={() => handleBlockTenant(tenant)}
-                            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                              tenant.is_blocked 
-                                ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
-                                : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                            }`}
-                          >
-                            {tenant.is_blocked ? '✓ Deblokkeren' : '⚠️ Blokkeren'}
-                          </button>
-                          <button
-                            onClick={() => setShowDeleteModal(tenant)}
-                            className="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-sm transition-colors"
-                          >
-                            🗑️ Verwijderen
-                          </button>
+                          {!isProtectedTenant(tenant.tenant_slug) && (
+                            <>
+                              <button
+                                onClick={() => handleBlockTenant(tenant)}
+                                className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                                  tenant.is_blocked 
+                                    ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
+                                    : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                                }`}
+                              >
+                                {tenant.is_blocked ? '✓ Deblokkeren' : '⚠️ Blokkeren'}
+                              </button>
+                              <button
+                                onClick={() => setShowDeleteModal(tenant)}
+                                className="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-sm transition-colors"
+                              >
+                                🗑️ Verwijderen
+                              </button>
+                            </>
+                          )}
+                          {isProtectedTenant(tenant.tenant_slug) && (
+                            <span className="px-3 py-1 bg-slate-700 text-slate-400 rounded-lg text-sm">
+                              🔒 Beschermd
+                            </span>
+                          )}
                         </div>
                       </td>
                     </tr>
