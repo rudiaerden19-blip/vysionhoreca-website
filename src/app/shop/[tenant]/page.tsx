@@ -16,6 +16,9 @@ interface Business {
   description: string
   story: string
   address: string
+  postal_code?: string
+  city?: string
+  btw_number?: string
   phone: string
   email: string
   primary_color: string
@@ -195,6 +198,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         description: tenantData?.description || '',
         story: tenantData?.description || '',
         address: tenantData?.address || '',
+        postal_code: tenantData?.postal_code || '',
+        city: tenantData?.city || '',
+        btw_number: tenantData?.btw_number || '',
         phone: tenantData?.phone || '',
         email: tenantData?.email || '',
         primary_color: tenantData?.primary_color || '#FF6B35',
@@ -893,7 +899,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="space-y-6">
                 {business.address && (
                   <a 
-                    href={`https://maps.google.com/?q=${encodeURIComponent(business.address)}`}
+                    href={`https://maps.google.com/?q=${encodeURIComponent(`${business.address} ${business.postal_code || ''} ${business.city || ''}`)}`}
                     target="_blank"
                     className="flex items-start gap-4 group"
                   >
@@ -902,9 +908,26 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-orange-400 transition-colors">{business.address}</p>
+                      {(business.postal_code || business.city) && (
+                        <p className="font-semibold group-hover:text-orange-400 transition-colors">
+                          {business.postal_code} {business.city}
+                        </p>
+                      )}
                       <p className="text-white/60 text-sm">Klik voor routebeschrijving</p>
                     </div>
                   </a>
+                )}
+                
+                {business.btw_number && (
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                      <span className="text-xl">🏢</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold">BTW: {business.btw_number}</p>
+                      <p className="text-white/60 text-sm">Ondernemingsnummer</p>
+                    </div>
+                  </div>
                 )}
 
                 {business.phone && (

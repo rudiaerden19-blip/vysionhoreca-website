@@ -22,12 +22,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     email: '',
     phone: '',
     address: '',
-    postal_code: '',
-    city: '',
-    country: '',
-    btw_number: '',
-    kvk_number: '',
-    btw_percentage: 21,
     website: '',
     facebook_url: '',
     instagram_url: '',
@@ -40,13 +34,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     cover_image_1: '',
     cover_image_2: '',
     cover_image_3: '',
-    specialty_1_image: '',
-    specialty_1_title: '',
-    specialty_2_image: '',
-    specialty_2_title: '',
-    specialty_3_image: '',
-    specialty_3_title: '',
-    show_qr_codes: true,
   })
 
   // Load data on mount
@@ -280,34 +267,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 placeholder="Kerkstraat 123"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Postcode
-              </label>
-              <input
-                type="text"
-                name="postal_code"
-                value={formData.postal_code || ''}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="1000"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Stad / Gemeente
-              </label>
-              <input
-                type="text"
-                name="city"
-                value={formData.city || ''}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Brussel"
               />
             </div>
 
