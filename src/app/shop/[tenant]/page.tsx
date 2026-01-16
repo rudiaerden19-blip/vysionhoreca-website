@@ -176,7 +176,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       // Bouw business object
       setBusiness({
         id: '1',
-        name: tenantData?.business_name || 'Demo Frituur',
+        name: tenantData?.business_name || params.tenant,
         slug: params.tenant,
         tagline: tenantData?.tagline || 'Welkom bij onze zaak',
         logo_url: tenantData?.logo_url || '',
