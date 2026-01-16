@@ -59,6 +59,7 @@ export default function SuperAdminDashboard() {
     phone: '',
   })
   const [saving, setSaving] = useState(false)
+  const [showExpiringOnly, setShowExpiringOnly] = useState(false)
 
   useEffect(() => {
     checkAuth()
@@ -272,11 +273,50 @@ export default function SuperAdminDashboard() {
 
   const isProtectedTenant = (slug: string) => PROTECTED_TENANTS.includes(slug.toLowerCase())
 
-  const filteredTenants = tenants.filter(t => 
-    t.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.tenant_slug?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Check of abonnement binnenkort vervalt (binnen 7 dagen) of niet actief is
+  const isExpiringSoon = (sub: Subscription | undefined) => {
+    if (!sub) return true // Geen abonnement = moet betalen
+    if (sub.status === 'active') return false // Actief = betaald
+    if (sub.status === 'trial' && sub.trial_ends_at) {
+      const daysLeft = Math.ceil((new Date(sub.trial_ends_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+      return daysLeft <= 7
+    }
+    if (sub.status === 'expired' || sub.status === 'cancelled') return true
+    return false
+  }
+
+  const isPaid = (sub: Subscription | undefined) => {
+    return sub?.status === 'active'
+  }
+
+  // Tel aantal dat binnenkort vervalt
+  const expiringCount = tenants.filter(t => {
+    const sub = getSubscription(t.tenant_slug)
+    return isExpiringSoon(sub)
+  }).length
+
+  const filteredTenants = tenants
+    .filter(t => 
+      t.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.tenant_slug?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter(t => {
+      if (!showExpiringOnly) return true
+      const sub = getSubscription(t.tenant_slug)
+      return isExpiringSoon(sub)
+    })
+    .sort((a, b) => {
+      // Sorteer: niet-betalende tenants eerst
+      const subA = getSubscription(a.tenant_slug)
+      const subB = getSubscription(b.tenant_slug)
+      const paidA = isPaid(subA)
+      const paidB = isPaid(subB)
+      
+      if (!paidA && paidB) return -1 // a komt eerst (niet betaald)
+      if (paidA && !paidB) return 1  // b komt eerst (niet betaald)
+      return 0 // behoud originele volgorde
+    })
 
   if (loading) {
     return (
@@ -310,6 +350,21 @@ export default function SuperAdminDashboard() {
               className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-colors"
             >
               ➕ Nieuwe Tenant
+            </button>
+            <button
+              onClick={() => setShowExpiringOnly(!showExpiringOnly)}
+              className={`px-4 py-2 rounded-xl transition-colors flex items-center gap-2 ${
+                showExpiringOnly 
+                  ? 'bg-red-500 text-white' 
+                  : 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
+              }`}
+            >
+              ⚠️ Vervalt Binnenkort
+              {expiringCount > 0 && (
+                <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm font-bold">
+                  {expiringCount}
+                </span>
+              )}
             </button>
             <Link
               href="/superadmin/abonnementen"
@@ -435,7 +490,11 @@ export default function SuperAdminDashboard() {
                 {filteredTenants.map((tenant) => {
                   const sub = getSubscription(tenant.tenant_slug)
                   return (
-                    <tr key={tenant.id} className={`hover:bg-slate-700/30 transition-colors ${tenant.is_blocked ? 'opacity-50' : ''}`}>
+                    <tr key={tenant.id} className={`transition-colors ${tenant.is_blocked ? 'opacity-50' : ''} ${
+                      isPaid(sub) 
+                        ? 'bg-green-500/10 hover:bg-green-500/20 border-l-4 border-green-500' 
+                        : 'bg-red-500/10 hover:bg-red-500/20 border-l-4 border-red-500'
+                    }`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           {tenant.is_blocked && <span className="text-red-500">🚫</span>}
