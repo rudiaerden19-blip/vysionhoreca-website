@@ -73,7 +73,7 @@ export default function PersoneelPage() {
       name: '',
       email: '',
       phone: '',
-      pin: generatePin(),
+      pin: '',
       role: 'EMPLOYEE',
       color: STAFF_COLORS[Math.floor(Math.random() * STAFF_COLORS.length)],
       is_active: true,
@@ -409,6 +409,7 @@ export default function PersoneelPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   PIN-code <span className="text-red-500">*</span>
+                  <span className="text-gray-500 font-normal ml-1">(medewerker kiest zelf)</span>
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -416,15 +417,16 @@ export default function PersoneelPage() {
                     value={formData.pin || ''}
                     onChange={(e) => setFormData({ ...formData, pin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
                     className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono text-xl tracking-widest"
-                    placeholder="0000"
+                    placeholder="Vul 4 cijfers in"
                     maxLength={4}
                   />
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, pin: generatePin() })}
                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                    title="Of genereer willekeurig"
                   >
-                    🎲 Genereer
+                    🎲
                   </button>
                 </div>
               </div>
