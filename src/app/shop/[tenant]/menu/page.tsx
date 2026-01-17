@@ -253,7 +253,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden max-w-[100vw]">
       {/* Sticky Header + Categories Bar - samen in 1 container voor iOS */}
       <div className="sticky top-0 z-50 bg-white shadow-md">
         {/* Header */}
