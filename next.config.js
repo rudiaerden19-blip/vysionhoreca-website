@@ -37,4 +37,3 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
-// Force redeploy Sat Jan 17 23:49:35 CET 2026

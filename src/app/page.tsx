@@ -468,7 +468,7 @@ function PricingSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
           
           {/* Vysion Starter - €69 */}
           <div className="bg-gradient-to-b from-[#2d4a3e] to-[#1e3a2f] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl">
@@ -487,21 +487,12 @@ function PricingSection() {
               </div>
               
               <ul className="space-y-3 mb-8">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
                   <li key={i} className="flex items-center">
                     <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                     <span className="text-gray-200">{t(`pricing.starter.features.${i}`)}</span>
-                  </li>
-                ))}
-                {/* Not included features - grayed out */}
-                {[1, 2, 3, 4].map((i) => (
-                  <li key={`not-${i}`} className="flex items-center opacity-50">
-                    <svg className="w-5 h-5 text-gray-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                    <span className="text-gray-400 line-through">{t(`pricing.starter.notIncluded.${i}`)}</span>
                   </li>
                 ))}
               </ul>
@@ -515,46 +506,7 @@ function PricingSection() {
             </div>
           </div>
 
-          {/* Vysion Horeca Standaard - €99 */}
-          <div className="bg-gradient-to-b from-[#1e3a5f] to-[#0f2744] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl">
-            <div className="p-6 lg:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">{t('pricing.standard.name')}</h3>
-                  <p className="text-sm text-gray-400">{t('pricing.standard.subtitle')}</p>
-                </div>
-              </div>
-              <div className="flex items-baseline mb-6">
-                <span className="text-5xl font-bold text-green-400">€99</span>
-                <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
-              </div>
-              
-              <ul className="space-y-3 mb-8">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((i) => (
-                  <li key={i} className="flex items-center">
-                    <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-gray-200">{t(`pricing.standard.features.${i}`)}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              <a 
-                href={`https://frituurnolim.vercel.app/registreer?lang=${locale}&plan=standard`}
-                className="block w-full bg-[#1a1a2e] text-white text-center py-4 rounded-full font-semibold hover:bg-[#0f0f1a] transition-colors"
-              >
-                {t('pricing.chooseStandard')}
-              </a>
-            </div>
-          </div>
-
-          {/* Vysion Pro - €129 - POPULAR */}
+          {/* Vysion Pro - €99 - POPULAR */}
           <div className="bg-gradient-to-b from-[#4a3f6e] to-[#2d2654] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl relative">
             {/* Popular badge */}
             <div className="absolute top-4 right-4 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
@@ -570,7 +522,7 @@ function PricingSection() {
                 <h3 className="text-xl font-bold text-white">{t('pricing.pro.name')}</h3>
               </div>
               <div className="flex items-baseline mb-6">
-                <span className="text-5xl font-bold text-purple-300">€129</span>
+                <span className="text-5xl font-bold text-purple-300">€99</span>
                 <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
               </div>
               
@@ -580,7 +532,7 @@ function PricingSection() {
               </p>
               
               <ul className="space-y-3 mb-8">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((i) => (
+                {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                   <li key={i} className="flex items-center">
                     <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
