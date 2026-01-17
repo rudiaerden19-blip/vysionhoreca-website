@@ -39,6 +39,10 @@
       "title": "Real-time rapporten",
       "description": "Realtime rapporten. Directe inzichten in omzet, populaire producten en drukke uren. Data-gedreven beslissingen."
     },
+    "analytics": {
+      "title": "Bedrijfsanalyse",
+      "description": "Maandelijkse volledige bedrijfsanalyse met vaste kosten, ingrediëntenkosten en analyse over je hele bedrijf."
+    },
     "payments": {
       "title": "Betalingen",
       "description": "Geïntegreerde betaalterminal. Bancontact, Visa, Mastercard, Mollie, Stripe - alles in één systeem."

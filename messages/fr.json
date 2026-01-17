@@ -39,6 +39,10 @@
       "title": "Rapports en temps réel",
       "description": "Rapports en temps réel. Aperçus instantanés des revenus, produits populaires et heures de pointe. Décisions basées sur les données."
     },
+    "analytics": {
+      "title": "Analyse commerciale",
+      "description": "Analyse commerciale mensuelle complète avec coûts fixes, coûts des ingrédients et analyse de toute votre entreprise."
+    },
     "payments": {
       "title": "Paiements",
       "description": "Terminal de paiement intégré. Bancontact, Visa, Mastercard, Mollie, Stripe - tout en un système."

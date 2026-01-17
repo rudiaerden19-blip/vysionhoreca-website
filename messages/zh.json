@@ -39,6 +39,10 @@
       "title": "实时报告",
       "description": "实时报告。即时了解销售、热门产品和高峰时段。数据驱动决策。"
     },
+    "analytics": {
+      "title": "业务分析",
+      "description": "完整的月度业务分析，包括固定成本、配料成本和整个业务的分析。"
+    },
     "payments": {
       "title": "支付",
       "description": "集成支付终端。Bancontact、Visa、Mastercard、Mollie、Stripe - 全部在一个系统中。"

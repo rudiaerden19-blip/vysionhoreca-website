@@ -39,6 +39,10 @@
       "title": "リアルタイムレポート",
       "description": "リアルタイムレポート。売上、人気商品、ピーク時間の即時インサイト。データに基づいた意思決定。"
     },
+    "analytics": {
+      "title": "ビジネス分析",
+      "description": "固定費、食材費、ビジネス全体の分析を含む月次の完全なビジネス分析。"
+    },
     "payments": {
       "title": "決済",
       "description": "統合決済端末。Bancontact、Visa、Mastercard、Mollie、Stripe - すべて1つのシステムで。"

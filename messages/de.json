@@ -39,6 +39,10 @@
       "title": "Echtzeit-Berichte",
       "description": "Echtzeit-Berichte. Sofortige Einblicke in Umsatz, beliebte Produkte und Stoßzeiten. Datengesteuerte Entscheidungen."
     },
+    "analytics": {
+      "title": "Geschäftsanalyse",
+      "description": "Vollständige monatliche Geschäftsanalyse mit Fixkosten, Zutatenkosten und Analyse Ihres gesamten Unternehmens."
+    },
     "payments": {
       "title": "Zahlungen",
       "description": "Integriertes Zahlungsterminal. Bancontact, Visa, Mastercard, Mollie, Stripe - alles in einem System."

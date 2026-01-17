@@ -39,6 +39,10 @@
       "title": "Report in tempo reale",
       "description": "Report in tempo reale. Insight diretti su vendite, prodotti popolari e ore di punta. Decisioni basate sui dati."
     },
+    "analytics": {
+      "title": "Analisi aziendale",
+      "description": "Analisi aziendale mensile completa con costi fissi, costi degli ingredienti e analisi di tutta la tua attività."
+    },
     "payments": {
       "title": "Pagamenti",
       "description": "Terminale di pagamento integrato. Bancontact, Visa, Mastercard, Mollie, Stripe - tutto in un sistema."
