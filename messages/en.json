@@ -339,12 +339,12 @@
     "heroTitle": "About",
     "heroTitleAccent": "Vysion",
     "heroTitleEnd": "Horeca",
-    "heroSubtitle": "Born from practice, built by hospitality entrepreneurs, for hospitality entrepreneurs.",
+    "heroSubtitle": "Built from practice. Not from an office.",
     "story": {
       "title": "Our story",
-      "p1": "Vysion Horeca was born from experience. As hospitality entrepreneurs, we noticed that existing POS systems were too expensive, too complex, and never did exactly what we needed.",
-      "p2": "We paid for five different subscriptions: a POS, an ordering platform, accounting software, a payment terminal and analytics software. Nothing worked well together and costs ran up to hundreds of euros per month.",
-      "p3": "That's why we decided to build it ourselves. An all-in-one platform that does exactly what a hospitality entrepreneur needs, without hassle and at a fair price."
+      "p1": "Vysion Horeca was born from real experience. As hospitality entrepreneurs, we ran into the same problem as you: too many systems, too many costs and too little overview.",
+      "p2": "We paid every month for separate tools: an ordering platform, accounting, payments and analytics — all separate, nothing that really worked together. The costs added up. So did the hassle.",
+      "p3": "So we decided to do it differently. We built one smart platform, with the ordering platform at its heart, and everything you need alongside it simply included. No unnecessary features. No separate subscriptions. Just an honest system that works for hospitality entrepreneurs."
     },
     "facts": {
       "founded": "Founded in 2013",

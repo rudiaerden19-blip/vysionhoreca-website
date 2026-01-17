@@ -339,12 +339,12 @@
     "heroTitle": "À propos de",
     "heroTitleAccent": "Vysion",
     "heroTitleEnd": "Horeca",
-    "heroSubtitle": "Né de la pratique, construit par des restaurateurs, pour des restaurateurs.",
+    "heroSubtitle": "Construit depuis le terrain. Pas depuis un bureau.",
     "story": {
       "title": "Notre histoire",
-      "p1": "Vysion Horeca est né de l'expérience. En tant que restaurateurs, nous avons remarqué que les systèmes de caisse existants étaient trop chers, trop complexes et ne faisaient jamais exactement ce dont nous avions besoin.",
-      "p2": "Nous payions pour cinq abonnements différents: une caisse, une plateforme de commande, un logiciel de comptabilité, un terminal de paiement et un logiciel d'analyse. Rien ne fonctionnait bien ensemble et les coûts montaient à des centaines d'euros par mois.",
-      "p3": "C'est pourquoi nous avons décidé de le construire nous-mêmes. Une plateforme tout-en-un qui fait exactement ce dont un restaurateur a besoin, sans tracas et à un prix équitable."
+      "p1": "Vysion Horeca est né d'une vraie expérience. En tant que restaurateurs, nous avons rencontré le même problème que vous: trop de systèmes, trop de coûts et trop peu de visibilité.",
+      "p2": "Nous payions chaque mois pour des outils séparés: une plateforme de commande, comptabilité, paiements et analyses — tout séparé, rien qui fonctionnait vraiment ensemble. Les coûts s'accumulaient. Les tracas aussi.",
+      "p3": "Alors nous avons décidé de faire autrement. Nous avons construit une plateforme intelligente, avec la plateforme de commande au cœur, et tout ce dont vous avez besoin simplement inclus. Pas de fonctionnalités superflues. Pas d'abonnements séparés. Juste un système honnête qui fonctionne pour les restaurateurs."
     },
     "facts": {
       "founded": "Fondé en 2013",
