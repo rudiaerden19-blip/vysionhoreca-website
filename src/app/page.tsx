@@ -586,38 +586,18 @@ function StopSection() {
   const cardKeys = [1, 2, 3, 4]
   const freeKeys = [1, 2, 3, 4, 5]
   
-  // Prevent scroll function
-  const preventScroll = (e: Event) => {
-    e.preventDefault()
-    e.stopPropagation()
-    return false
-  }
-  
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasPlayed && !isLocked) {
-          // Scroll to CENTER of section
+          // Scroll to section
           if (sectionRef.current) {
-            const rect = sectionRef.current.getBoundingClientRect()
-            const scrollTop = window.pageYOffset + rect.top - (window.innerHeight / 2) + (rect.height / 2)
-            window.scrollTo({ top: scrollTop, behavior: 'smooth' })
+            sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
           }
           
-          // Lock scroll after a tiny delay to let scrollIntoView finish
+          // Start animation after scroll settles
           setTimeout(() => {
             setIsLocked(true)
-            // Block all scroll events
-            window.addEventListener('wheel', preventScroll, { passive: false })
-            window.addEventListener('touchmove', preventScroll, { passive: false })
-            window.addEventListener('keydown', (e) => {
-              if (['ArrowUp', 'ArrowDown', 'Space', 'PageUp', 'PageDown'].includes(e.code)) {
-                e.preventDefault()
-              }
-            })
-            document.body.style.overflow = 'hidden'
-            
-            // Start animation
             setPhase(1)
             
             // Phase 2: Fade STOP
@@ -628,40 +608,44 @@ function StopSection() {
             
             // Unlock after 3.5 seconds
             setTimeout(() => {
-              window.removeEventListener('wheel', preventScroll)
-              window.removeEventListener('touchmove', preventScroll)
-              document.body.style.overflow = ''
               setIsLocked(false)
               setHasPlayed(true)
             }, 3500)
-          }, 300)
+          }, 500)
         } else if (!entry.isIntersecting && hasPlayed) {
           // Reset when fully leaving view
           setPhase(0)
           setHasPlayed(false)
         }
       },
-      { threshold: 0.4 }
+      { threshold: 0.5 }
     )
     
     if (sectionRef.current) {
       observer.observe(sectionRef.current)
     }
     
-    return () => {
-      observer.disconnect()
-      window.removeEventListener('wheel', preventScroll)
-      window.removeEventListener('touchmove', preventScroll)
-      document.body.style.overflow = ''
-    }
+    return () => observer.disconnect()
   }, [hasPlayed, isLocked])
   
   return (
-    <section 
-      ref={sectionRef}
-      className="relative bg-black min-h-screen flex items-center justify-center overflow-hidden"
-    >
-      {/* STOP Text - Big and centered */}
+    <>
+      {/* Full screen overlay to block all interactions during animation */}
+      {isLocked && (
+        <div 
+          className="fixed inset-0 z-[9999] bg-transparent"
+          style={{ touchAction: 'none' }}
+          onWheel={(e) => e.preventDefault()}
+          onTouchMove={(e) => e.preventDefault()}
+          onScroll={(e) => e.preventDefault()}
+        />
+      )}
+      
+      <section 
+        ref={sectionRef}
+        className="relative bg-black min-h-screen flex items-center justify-center overflow-hidden"
+      >
+        {/* STOP Text - Big and centered */}
       <div 
         className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none transition-all duration-700"
         style={{ 
@@ -755,6 +739,7 @@ function StopSection() {
         </div>
       </div>
     </section>
+    </>
   )
 }
 
