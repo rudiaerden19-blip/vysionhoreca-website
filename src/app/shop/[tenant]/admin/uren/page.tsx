@@ -284,10 +284,10 @@ export default function UrenPage() {
     const fileName = `Urenregistratie_${selectedStaff.name.replace(/\s/g, '_')}_${selectedYear}-${String(selectedMonth).padStart(2, '0')}.pdf`
     
     const opt = {
-      margin: 10,
+      margin: [10, 15, 10, 15],
       filename: fileName,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: { scale: 1.5, useCORS: true, letterRendering: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     }
     
@@ -962,68 +962,68 @@ Met vriendelijke groeten`,
 
       {/* Hidden PDF Content for Download */}
       <div className="absolute left-[-9999px] top-0">
-        <div ref={pdfRef} className="bg-white p-8 w-[210mm]" style={{ fontFamily: 'Arial, sans-serif' }}>
+        <div ref={pdfRef} className="bg-white p-6" style={{ fontFamily: 'Arial, sans-serif', width: '180mm', maxWidth: '180mm' }}>
           {/* PDF Header */}
-          <div className="border-b-2 border-gray-800 pb-4 mb-6">
+          <div className="border-b-2 border-gray-800 pb-3 mb-4">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">URENREGISTRATIE</h1>
-                <p className="text-lg text-gray-700 mt-1">{MONTHS[selectedMonth - 1]} {selectedYear}</p>
+                <h1 className="text-xl font-bold text-gray-900">URENREGISTRATIE</h1>
+                <p className="text-base text-gray-700">{MONTHS[selectedMonth - 1]} {selectedYear}</p>
               </div>
-              <div className="text-right text-sm text-gray-600">
-                <div className="font-bold text-gray-800 text-lg">Vysion Horeca</div>
+              <div className="text-right text-xs text-gray-600">
+                <div className="font-bold text-gray-800 text-sm">Vysion Horeca</div>
                 <div>Gegenereerd: {new Date().toLocaleDateString('nl-BE')}</div>
               </div>
             </div>
           </div>
 
           {/* Employee Info */}
-          <div className="bg-gray-100 p-4 rounded mb-6">
-            <h2 className="font-bold text-lg mb-3">👤 Medewerker gegevens</h2>
-            <table className="w-full text-sm">
+          <div className="bg-gray-100 p-3 rounded mb-4">
+            <h2 className="font-bold text-sm mb-2">👤 Medewerker gegevens</h2>
+            <table className="w-full text-xs">
               <tbody>
                 <tr>
-                  <td className="py-1 font-medium w-32">Naam:</td>
-                  <td className="py-1">{selectedStaff?.name}</td>
-                  <td className="py-1 font-medium w-32">Contract:</td>
-                  <td className="py-1">{selectedStaff?.contract_type || '-'}</td>
+                  <td className="py-0.5 font-medium" style={{width: '60px'}}>Naam:</td>
+                  <td className="py-0.5">{selectedStaff?.name}</td>
+                  <td className="py-0.5 font-medium" style={{width: '70px'}}>Contract:</td>
+                  <td className="py-0.5">{selectedStaff?.contract_type || '-'}</td>
                 </tr>
                 <tr>
-                  <td className="py-1 font-medium">Email:</td>
-                  <td className="py-1">{selectedStaff?.email || '-'}</td>
-                  <td className="py-1 font-medium">Uren/week:</td>
-                  <td className="py-1">{selectedStaff?.hours_per_week || '-'}</td>
+                  <td className="py-0.5 font-medium">Email:</td>
+                  <td className="py-0.5">{selectedStaff?.email || '-'}</td>
+                  <td className="py-0.5 font-medium">Uren/week:</td>
+                  <td className="py-0.5">{selectedStaff?.hours_per_week || '-'}</td>
                 </tr>
                 <tr>
-                  <td className="py-1 font-medium">Telefoon:</td>
-                  <td className="py-1">{selectedStaff?.phone || '-'}</td>
-                  <td className="py-1 font-medium">Uurloon:</td>
-                  <td className="py-1">{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}` : '-'}</td>
+                  <td className="py-0.5 font-medium">Telefoon:</td>
+                  <td className="py-0.5">{selectedStaff?.phone || '-'}</td>
+                  <td className="py-0.5 font-medium">Uurloon:</td>
+                  <td className="py-0.5">{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}` : '-'}</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           {/* Summary Boxes */}
-          <div className="grid grid-cols-5 gap-3 mb-6">
-            <div className="bg-green-100 p-3 rounded text-center">
-              <div className="text-xl font-bold text-green-700">{totalWorked.toFixed(1)}</div>
+          <div className="grid grid-cols-5 gap-2 mb-6">
+            <div className="bg-green-100 p-2 rounded text-center">
+              <div className="text-lg font-bold text-green-700">{totalWorked.toFixed(1)}</div>
               <div className="text-xs text-green-600">Gewerkt</div>
             </div>
-            <div className="bg-red-100 p-3 rounded text-center">
-              <div className="text-xl font-bold text-red-700">{totalSick.toFixed(1)}</div>
+            <div className="bg-red-100 p-2 rounded text-center">
+              <div className="text-lg font-bold text-red-700">{totalSick.toFixed(1)}</div>
               <div className="text-xs text-red-600">Ziekte</div>
             </div>
-            <div className="bg-blue-100 p-3 rounded text-center">
-              <div className="text-xl font-bold text-blue-700">{totalVacation.toFixed(1)}</div>
+            <div className="bg-blue-100 p-2 rounded text-center">
+              <div className="text-lg font-bold text-blue-700">{totalVacation.toFixed(1)}</div>
               <div className="text-xs text-blue-600">Vakantie</div>
             </div>
-            <div className="bg-orange-100 p-3 rounded text-center">
-              <div className="text-xl font-bold text-orange-700">{totalOther.toFixed(1)}</div>
+            <div className="bg-orange-100 p-2 rounded text-center">
+              <div className="text-lg font-bold text-orange-700">{totalOther.toFixed(1)}</div>
               <div className="text-xs text-orange-600">Overig</div>
             </div>
-            <div className="bg-gray-200 p-3 rounded text-center">
-              <div className="text-xl font-bold text-gray-800">{totalHours.toFixed(1)}</div>
+            <div className="bg-gray-200 p-2 rounded text-center">
+              <div className="text-lg font-bold text-gray-800">{totalHours.toFixed(1)}</div>
               <div className="text-xs text-gray-600">TOTAAL</div>
             </div>
           </div>
