@@ -580,68 +580,81 @@ function StopSection() {
   const { t, locale } = useLanguage()
   const sectionRef = useRef<HTMLDivElement>(null)
   const [phase, setPhase] = useState(0) // 0: nothing, 1: STOP visible, 2: STOP fading, 3: content visible
-  const [isInView, setIsInView] = useState(false)
+  const [isLocked, setIsLocked] = useState(false)
   const [hasPlayed, setHasPlayed] = useState(false)
   
   const cardKeys = [1, 2, 3, 4]
   const freeKeys = [1, 2, 3, 4, 5]
   
+  // Prevent scroll function
+  const preventScroll = (e: Event) => {
+    e.preventDefault()
+    e.stopPropagation()
+    return false
+  }
+  
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasPlayed) {
-          setIsInView(true)
-          // Scroll to CENTER of section and lock scroll
+        if (entry.isIntersecting && !hasPlayed && !isLocked) {
+          // Scroll to CENTER of section
           if (sectionRef.current) {
-            sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            const rect = sectionRef.current.getBoundingClientRect()
+            const scrollTop = window.pageYOffset + rect.top - (window.innerHeight / 2) + (rect.height / 2)
+            window.scrollTo({ top: scrollTop, behavior: 'smooth' })
           }
-          // Lock scroll immediately
-          document.body.style.overflow = 'hidden'
-          document.body.style.touchAction = 'none'
-        } else if (!entry.isIntersecting) {
-          // Reset when leaving view
-          setIsInView(false)
+          
+          // Lock scroll after a tiny delay to let scrollIntoView finish
+          setTimeout(() => {
+            setIsLocked(true)
+            // Block all scroll events
+            window.addEventListener('wheel', preventScroll, { passive: false })
+            window.addEventListener('touchmove', preventScroll, { passive: false })
+            window.addEventListener('keydown', (e) => {
+              if (['ArrowUp', 'ArrowDown', 'Space', 'PageUp', 'PageDown'].includes(e.code)) {
+                e.preventDefault()
+              }
+            })
+            document.body.style.overflow = 'hidden'
+            
+            // Start animation
+            setPhase(1)
+            
+            // Phase 2: Fade STOP
+            setTimeout(() => setPhase(2), 1500)
+            
+            // Phase 3: Show content
+            setTimeout(() => setPhase(3), 2500)
+            
+            // Unlock after 3.5 seconds
+            setTimeout(() => {
+              window.removeEventListener('wheel', preventScroll)
+              window.removeEventListener('touchmove', preventScroll)
+              document.body.style.overflow = ''
+              setIsLocked(false)
+              setHasPlayed(true)
+            }, 3500)
+          }, 300)
+        } else if (!entry.isIntersecting && hasPlayed) {
+          // Reset when fully leaving view
           setPhase(0)
           setHasPlayed(false)
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.4 }
     )
     
     if (sectionRef.current) {
       observer.observe(sectionRef.current)
     }
     
-    return () => observer.disconnect()
-  }, [hasPlayed])
-  
-  useEffect(() => {
-    if (!isInView) return
-    
-    // Phase 1: Show STOP immediately
-    setPhase(1)
-    
-    // Phase 2: Start fading STOP after 1.5s
-    const timer1 = setTimeout(() => setPhase(2), 1500)
-    
-    // Phase 3: Show content after 2.5s
-    const timer2 = setTimeout(() => setPhase(3), 2500)
-    
-    // Unlock scroll after 3 seconds total
-    const timer3 = setTimeout(() => {
-      document.body.style.overflow = ''
-      document.body.style.touchAction = ''
-      setHasPlayed(true)
-    }, 3000)
-    
     return () => {
-      clearTimeout(timer1)
-      clearTimeout(timer2)
-      clearTimeout(timer3)
+      observer.disconnect()
+      window.removeEventListener('wheel', preventScroll)
+      window.removeEventListener('touchmove', preventScroll)
       document.body.style.overflow = ''
-      document.body.style.touchAction = ''
     }
-  }, [isInView])
+  }, [hasPlayed, isLocked])
   
   return (
     <section 
