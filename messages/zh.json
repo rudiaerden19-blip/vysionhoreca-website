@@ -131,6 +131,7 @@
     "chooseStarter": "选择Starter",
     "chooseStandard": "选择Standard",
     "choosePro": "选择Pro",
+    "cancelAnytime": "随时可取消",
     "starter": {
       "name": "Vysion Starter",
       "features": {
@@ -155,11 +156,12 @@
       "features": {
         "1": "SEO可见性",
         "2": "会员卡和忠诚度",
-        "3": "员工和工时记录",
+        "3": "员工和薪资管理",
         "4": "SCRADA和Peppol会计",
         "5": "完整业务分析",
         "6": "评论",
-        "7": "优先支持"
+        "7": "优先支持",
+        "8": "完整免费培训"
       }
     },
     "faq": {

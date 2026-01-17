@@ -131,6 +131,7 @@
     "chooseStarter": "Choose Starter",
     "chooseStandard": "Choose Standard",
     "choosePro": "Choose Pro",
+    "cancelAnytime": "Cancel anytime",
     "starter": {
       "name": "Vysion Starter",
       "features": {
@@ -155,11 +156,12 @@
       "features": {
         "1": "SEO visibility",
         "2": "Customer card & loyalty",
-        "3": "Staff & time registration",
+        "3": "Staff & payroll administration",
         "4": "SCRADA & Peppol accounting",
         "5": "Full business analysis",
         "6": "Reviews",
-        "7": "Priority support"
+        "7": "Priority support",
+        "8": "Full free training"
       }
     },
     "faq": {

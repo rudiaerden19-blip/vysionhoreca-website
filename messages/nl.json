@@ -131,6 +131,7 @@
     "chooseStarter": "Kies Starter",
     "chooseStandard": "Kies Standaard",
     "choosePro": "Kies Pro",
+    "cancelAnytime": "Maandelijks opzegbaar",
     "starter": {
       "name": "Vysion Starter",
       "features": {
@@ -155,11 +156,12 @@
       "features": {
         "1": "SEO vindbaarheid",
         "2": "Klantenkaart & loyaliteit",
-        "3": "Personeel & urenregistratie",
+        "3": "Personeel & loonadministratie",
         "4": "SCRADA & Peppol boekhouding",
         "5": "Volledige bedrijfsanalyse",
         "6": "Reviews",
-        "7": "Prioriteit support"
+        "7": "Prioriteit support",
+        "8": "Volledige gratis opleiding"
       }
     },
     "faq": {

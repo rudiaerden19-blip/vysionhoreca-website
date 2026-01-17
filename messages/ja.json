@@ -131,6 +131,7 @@
     "chooseStarter": "Starterを選択",
     "chooseStandard": "Standardを選択",
     "choosePro": "Proを選択",
+    "cancelAnytime": "月単位で解約可能",
     "starter": {
       "name": "Vysion Starter",
       "features": {
@@ -155,11 +156,12 @@
       "features": {
         "1": "SEO可視性",
         "2": "顧客カードとロイヤルティ",
-        "3": "スタッフ＆勤怠記録",
+        "3": "スタッフ＆給与管理",
         "4": "SCRADA＆Peppol会計",
         "5": "完全なビジネス分析",
         "6": "レビュー",
-        "7": "優先サポート"
+        "7": "優先サポート",
+        "8": "完全無料トレーニング"
       }
     },
     "faq": {

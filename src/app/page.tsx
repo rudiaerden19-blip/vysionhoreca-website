@@ -503,6 +503,7 @@ function PricingSection() {
               >
                 {t('pricing.chooseStarter')}
               </a>
+              <p className="text-center text-gray-400 text-sm mt-3">{t('pricing.cancelAnytime')}</p>
             </div>
           </div>
 
@@ -532,7 +533,7 @@ function PricingSection() {
               </p>
               
               <ul className="space-y-3 mb-8">
-                {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                   <li key={i} className="flex items-center">
                     <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -548,6 +549,7 @@ function PricingSection() {
               >
                 {t('pricing.choosePro')}
               </a>
+              <p className="text-center text-gray-400 text-sm mt-3">{t('pricing.cancelAnytime')}</p>
             </div>
           </div>
 

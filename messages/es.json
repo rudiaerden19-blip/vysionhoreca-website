@@ -131,6 +131,7 @@
     "chooseStarter": "Elegir Starter",
     "chooseStandard": "Elegir Estándar",
     "choosePro": "Elegir Pro",
+    "cancelAnytime": "Cancelable mensualmente",
     "starter": {
       "name": "Vysion Starter",
       "features": {
@@ -155,11 +156,12 @@
       "features": {
         "1": "Visibilidad SEO",
         "2": "Tarjeta cliente y fidelidad",
-        "3": "Personal y registro de horas",
+        "3": "Personal y administración de nóminas",
         "4": "Contabilidad SCRADA y Peppol",
         "5": "Análisis empresarial completo",
         "6": "Reseñas",
-        "7": "Soporte prioritario"
+        "7": "Soporte prioritario",
+        "8": "Formación gratuita completa"
       }
     },
     "faq": {
