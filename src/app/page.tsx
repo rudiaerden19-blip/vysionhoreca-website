@@ -634,14 +634,14 @@ function ButWaitSection() {
 function ComparisonSection() {
   const { t, locale } = useLanguage()
   
-  const featureKeys = ['pos', 'terminal', 'online', 'gks', 'accounting', 'peppol', 'analytics', 'kitchen', 'loyalty', 'staff', 'reservation', 'languages', 'multiLocation']
+  const featureKeys = ['online', 'website', 'terminal', 'kitchen', 'allergies', 'qr', 'promotions', 'reservation', 'inventory', 'seo', 'loyalty', 'staff', 'accounting', 'peppol', 'analytics', 'reviews', 'languages', 'training', 'commission']
   
   const features = featureKeys.map(key => ({
     name: t(`comparison.features.${key}`),
     vysion: true,
-    lightspeed: ['pos', 'terminal', 'gks', 'kitchen', 'loyalty', 'staff', 'reservation', 'multiLocation'].includes(key) ? true : key === 'analytics' ? t('comparison.limited') : false,
-    square: ['pos', 'terminal', 'kitchen', 'loyalty', 'multiLocation'].includes(key),
-    strobbo: ['pos', 'terminal', 'gks', 'kitchen'].includes(key),
+    lightspeed: ['terminal', 'kitchen', 'loyalty', 'staff', 'reservation', 'inventory'].includes(key) ? true : key === 'analytics' ? t('comparison.limited') : false,
+    square: ['terminal', 'kitchen', 'loyalty', 'inventory'].includes(key),
+    strobbo: ['online', 'terminal', 'kitchen'].includes(key),
   }))
 
   const renderCheck = (value: boolean | string) => {
@@ -673,7 +673,7 @@ function ComparisonSection() {
                 <th className="px-6 py-5 text-left font-semibold">{t('comparison.feature')}</th>
                 <th className="px-6 py-5 text-center">
                   <div className="text-accent font-bold text-lg">Vysion Horeca</div>
-                  <div className="text-sm text-gray-300">€69 - €129/maand</div>
+                  <div className="text-sm text-gray-300">€69 - €99/maand</div>
                 </th>
                 <th className="px-6 py-5 text-center">
                   <div className="font-semibold">Lightspeed</div>
