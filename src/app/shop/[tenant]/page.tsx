@@ -289,8 +289,11 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   }, [params.tenant])
 
   const getDayName = () => {
+    // JavaScript: 0=Sunday, 1=Monday, etc.
+    // We need: maandag, dinsdag, etc. (lowercase)
+    const jsDay = new Date().getDay() // 0=Sunday
     const days = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag']
-    return days[new Date().getDay()]
+    return days[jsDay]
   }
 
   if (loading) {
