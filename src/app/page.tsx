@@ -78,15 +78,22 @@ function HeroSection() {
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-6">
               {t('hero.title')}
             </h1>
-            <p className="text-lg sm:text-xl text-gray-600 mb-6 max-w-lg mx-auto lg:mx-0">
+            <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
               {t('hero.description')}
             </p>
-            <p className="text-base text-gray-700 font-semibold mb-3">
-              {t('hero.extras')}
-            </p>
-            <p className="text-base text-gray-600 mb-4 max-w-lg mx-auto lg:mx-0 whitespace-pre-line">
-              {t('hero.extrasList')}
-            </p>
+            <div className="bg-gray-50 rounded-2xl p-6 mb-6 max-w-lg mx-auto lg:mx-0 text-left">
+              <p className="text-base text-gray-800 font-semibold mb-4">
+                {t('hero.extras')}
+              </p>
+              <ul className="space-y-2 text-gray-600">
+                {String(t('hero.extrasList')).split('\n').map((item, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <span className="text-accent font-bold">✓</span>
+                    <span>{item.replace('• ', '')}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
             <p className="text-lg font-bold text-accent mb-8 max-w-lg mx-auto lg:mx-0">
               {t('hero.tagline')}
             </p>
