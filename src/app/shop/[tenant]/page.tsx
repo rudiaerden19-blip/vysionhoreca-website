@@ -290,10 +290,36 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   const getDayName = () => {
     // JavaScript: 0=Sunday, 1=Monday, etc.
-    // We need: maandag, dinsdag, etc. (lowercase)
     const jsDay = new Date().getDay() // 0=Sunday
     const days = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag']
     return days[jsDay]
+  }
+
+  const isCurrentlyOpen = () => {
+    const now = new Date()
+    const currentTime = now.getHours() * 60 + now.getMinutes() // Minutes since midnight
+    const today = getDayName()
+    const hours = business?.opening_hours[today]
+    
+    if (!hours || hours.closed) return false
+    
+    // Parse open and close times
+    const openParts = hours.open?.split(':')
+    const closeParts = hours.close?.split(':')
+    
+    if (!openParts || !closeParts) return false
+    
+    const openTime = parseInt(openParts[0]) * 60 + parseInt(openParts[1])
+    const closeTime = parseInt(closeParts[0]) * 60 + parseInt(closeParts[1])
+    
+    // Check if current time is within opening hours
+    // Handle case where close time might be after midnight (e.g., 23:00 - 02:00)
+    if (closeTime < openTime) {
+      // Open past midnight
+      return currentTime >= openTime || currentTime < closeTime
+    }
+    
+    return currentTime >= openTime && currentTime < closeTime
   }
 
   if (loading) {
@@ -414,10 +440,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                   Vandaag gesloten
                 </span>
-              ) : (
+              ) : isCurrentlyOpen() ? (
                 <span className="inline-flex items-center gap-2 bg-green-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                   Nu open · Sluit om {todayHours?.close?.slice(0, 5)}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-2 bg-orange-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
+                  <span className="w-2 h-2 bg-white rounded-full"></span>
+                  Gesloten · Opent om {todayHours?.open?.slice(0, 5)}
                 </span>
               )}
             </motion.div>
