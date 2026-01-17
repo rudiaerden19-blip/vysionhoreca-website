@@ -134,58 +134,30 @@
     "starter": {
       "name": "Vysion Starter",
       "features": {
-        "1": "Volledige kassa functionaliteit",
-        "2": "Real-time rapporten",
+        "1": "Online bestelplatform",
+        "2": "Eigen website volledig aanpasbaar",
         "3": "Producten & categorieën",
         "4": "Betaalterminal integratie",
         "5": "Voorraad",
         "6": "Email & telefoon support",
         "7": "Beschikbaar in 9 talen",
-        "8": "Volledige gratis opleiding"
-      },
-      "notIncluded": {
-        "1": "Online bestelplatform",
-        "2": "Keukenbeeldscherm software",
-        "3": "Klantenkaart & loyaliteit",
-        "4": "Personeel & urenregistratie"
-      }
-    },
-    "standard": {
-      "name": "Vysion Horeca",
-      "subtitle": "Standaard",
-      "features": {
-        "1": "Volledige kassa functionaliteit",
-        "2": "Real-time rapporten",
-        "3": "Betaalterminal integratie",
-        "4": "Email & telefoon support",
-        "5": "Beschikbaar in 9 talen",
-        "6": "Klantenkaart & loyaliteit",
-        "7": "Online bestelplatform",
-        "8": "Producten & categorieën",
-        "9": "Voorraad",
-        "10": "Landingspagina",
-        "11": "Keukenbeeldscherm software",
-        "12": "Volledige gratis opleiding"
+        "8": "Keuken display",
+        "9": "Allergenen",
+        "10": "QR codes",
+        "11": "Promoties"
       }
     },
     "pro": {
       "name": "Vysion Pro",
-      "allOfStarter": "Pro - Alles van Starter, plus:",
+      "allOfStarter": "Alles van Starter, plus:",
       "features": {
-        "1": "Online bestelplatform",
-        "2": "Personeel & urenregistratie",
-        "3": "Onbeperkte producten & categorieën",
-        "4": "Klantenkaart & loyaliteit",
-        "5": "Keukenbeeldscherm software",
-        "6": "Maandelijkse bedrijfsanalyse",
-        "7": "Landingspagina",
-        "8": "Peppol facturatieprogramma",
-        "9": "SCARDA boekhoudsoftware",
-        "10": "Tafelreservatie",
-        "11": "Tafel plattegrond",
-        "12": "Beschikbaar in 9 talen",
-        "13": "Volledige gratis opleiding",
-        "14": "Prioriteit support"
+        "1": "SEO vindbaarheid",
+        "2": "Klantenkaart & loyaliteit",
+        "3": "Personeel & urenregistratie",
+        "4": "SCRADA & Peppol boekhouding",
+        "5": "Volledige bedrijfsanalyse",
+        "6": "Reviews",
+        "7": "Prioriteit support"
       }
     },
     "faq": {

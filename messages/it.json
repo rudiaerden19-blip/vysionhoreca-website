@@ -134,58 +134,30 @@
     "starter": {
       "name": "Vysion Starter",
       "features": {
-        "1": "Funzionalità cassa completa",
-        "2": "Report in tempo reale",
+        "1": "Piattaforma ordini online",
+        "2": "Sito web proprio completamente personalizzabile",
         "3": "Prodotti e categorie",
         "4": "Integrazione terminale pagamento",
         "5": "Inventario",
         "6": "Supporto email e telefono",
         "7": "Disponibile in 9 lingue",
-        "8": "Formazione gratuita completa"
-      },
-      "notIncluded": {
-        "1": "Piattaforma ordini online",
-        "2": "Software display cucina",
-        "3": "Carta cliente e fedeltà",
-        "4": "Personale e registrazione ore"
-      }
-    },
-    "standard": {
-      "name": "Vysion Horeca",
-      "subtitle": "Standard",
-      "features": {
-        "1": "Funzionalità cassa completa",
-        "2": "Report in tempo reale",
-        "3": "Integrazione terminale pagamento",
-        "4": "Supporto email e telefono",
-        "5": "Disponibile in 9 lingue",
-        "6": "Carta cliente e fedeltà",
-        "7": "Piattaforma ordini online",
-        "8": "Prodotti e categorie",
-        "9": "Inventario",
-        "10": "Landing page",
-        "11": "Software display cucina",
-        "12": "Formazione gratuita completa"
+        "8": "Display cucina",
+        "9": "Allergeni",
+        "10": "Codici QR",
+        "11": "Promozioni"
       }
     },
     "pro": {
       "name": "Vysion Pro",
-      "allOfStarter": "Pro - Tutto di Starter, più:",
+      "allOfStarter": "Tutto di Starter, più:",
       "features": {
-        "1": "Piattaforma ordini online",
-        "2": "Personale e registrazione ore",
-        "3": "Prodotti e categorie illimitati",
-        "4": "Carta cliente e fedeltà",
-        "5": "Software display cucina",
-        "6": "Analisi aziendale mensile",
-        "7": "Landing page",
-        "8": "Programma fatturazione Peppol",
-        "9": "Software contabilità SCARDA",
-        "10": "Prenotazione tavoli",
-        "11": "Pianta tavoli",
-        "12": "Disponibile in 9 lingue",
-        "13": "Formazione gratuita completa",
-        "14": "Supporto prioritario"
+        "1": "Visibilità SEO",
+        "2": "Carta cliente e fedeltà",
+        "3": "Personale e registrazione ore",
+        "4": "Contabilità SCRADA e Peppol",
+        "5": "Analisi aziendale completa",
+        "6": "Recensioni",
+        "7": "Supporto prioritario"
       }
     },
     "faq": {

@@ -134,58 +134,30 @@
     "starter": {
       "name": "Vysion Starter",
       "features": {
-        "1": "Fonctionnalité caisse complète",
-        "2": "Rapports en temps réel",
+        "1": "Plateforme de commande en ligne",
+        "2": "Site web propre entièrement personnalisable",
         "3": "Produits & catégories",
         "4": "Intégration terminal de paiement",
         "5": "Inventaire",
         "6": "Support email & téléphone",
         "7": "Disponible en 9 langues",
-        "8": "Formation gratuite complète"
-      },
-      "notIncluded": {
-        "1": "Plateforme de commande en ligne",
-        "2": "Logiciel écran cuisine",
-        "3": "Carte client & fidélité",
-        "4": "Personnel & enregistrement du temps"
-      }
-    },
-    "standard": {
-      "name": "Vysion Horeca",
-      "subtitle": "Standard",
-      "features": {
-        "1": "Fonctionnalité caisse complète",
-        "2": "Rapports en temps réel",
-        "3": "Intégration terminal de paiement",
-        "4": "Support email & téléphone",
-        "5": "Disponible en 9 langues",
-        "6": "Carte client & fidélité",
-        "7": "Plateforme de commande en ligne",
-        "8": "Produits & catégories",
-        "9": "Inventaire",
-        "10": "Page d'atterrissage",
-        "11": "Logiciel écran cuisine",
-        "12": "Formation gratuite complète"
+        "8": "Écran cuisine",
+        "9": "Allergènes",
+        "10": "Codes QR",
+        "11": "Promotions"
       }
     },
     "pro": {
       "name": "Vysion Pro",
-      "allOfStarter": "Pro - Tout de Starter, plus:",
+      "allOfStarter": "Tout de Starter, plus:",
       "features": {
-        "1": "Plateforme de commande en ligne",
-        "2": "Personnel & enregistrement du temps",
-        "3": "Produits & catégories illimités",
-        "4": "Carte client & fidélité",
-        "5": "Logiciel écran cuisine",
-        "6": "Analyse commerciale mensuelle",
-        "7": "Page d'atterrissage",
-        "8": "Programme de facturation Peppol",
-        "9": "Logiciel de comptabilité SCARDA",
-        "10": "Réservation de table",
-        "11": "Plan de salle",
-        "12": "Disponible en 9 langues",
-        "13": "Formation gratuite complète",
-        "14": "Support prioritaire"
+        "1": "Visibilité SEO",
+        "2": "Carte client & fidélité",
+        "3": "Personnel & enregistrement du temps",
+        "4": "Comptabilité SCRADA & Peppol",
+        "5": "Analyse commerciale complète",
+        "6": "Avis",
+        "7": "Support prioritaire"
       }
     },
     "faq": {

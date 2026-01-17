@@ -134,58 +134,30 @@
     "starter": {
       "name": "Vysion Starter",
       "features": {
-        "1": "Vollständige Kassenfunktionalität",
-        "2": "Echtzeit-Berichte",
+        "1": "Online-Bestellplattform",
+        "2": "Vollständig anpassbare eigene Website",
         "3": "Produkte & Kategorien",
         "4": "Zahlungsterminal-Integration",
         "5": "Inventar",
         "6": "E-Mail & Telefon-Support",
         "7": "In 9 Sprachen verfügbar",
-        "8": "Vollständige kostenlose Schulung"
-      },
-      "notIncluded": {
-        "1": "Online-Bestellplattform",
-        "2": "Küchenbildschirm-Software",
-        "3": "Kundenkarte & Treue",
-        "4": "Personal & Zeiterfassung"
-      }
-    },
-    "standard": {
-      "name": "Vysion Horeca",
-      "subtitle": "Standard",
-      "features": {
-        "1": "Vollständige Kassenfunktionalität",
-        "2": "Echtzeit-Berichte",
-        "3": "Zahlungsterminal-Integration",
-        "4": "E-Mail & Telefon-Support",
-        "5": "In 9 Sprachen verfügbar",
-        "6": "Kundenkarte & Treue",
-        "7": "Online-Bestellplattform",
-        "8": "Produkte & Kategorien",
-        "9": "Inventar",
-        "10": "Landingpage",
-        "11": "Küchenbildschirm-Software",
-        "12": "Vollständige kostenlose Schulung"
+        "8": "Küchenbildschirm",
+        "9": "Allergene",
+        "10": "QR-Codes",
+        "11": "Aktionen"
       }
     },
     "pro": {
       "name": "Vysion Pro",
-      "allOfStarter": "Pro - Alles von Starter, plus:",
+      "allOfStarter": "Alles von Starter, plus:",
       "features": {
-        "1": "Online-Bestellplattform",
-        "2": "Personal & Zeiterfassung",
-        "3": "Unbegrenzte Produkte & Kategorien",
-        "4": "Kundenkarte & Treue",
-        "5": "Küchenbildschirm-Software",
-        "6": "Monatliche Geschäftsanalyse",
-        "7": "Landingpage",
-        "8": "Peppol-Rechnungsprogramm",
-        "9": "SCARDA Buchhaltungssoftware",
-        "10": "Tischreservierung",
-        "11": "Tischplan",
-        "12": "In 9 Sprachen verfügbar",
-        "13": "Vollständige kostenlose Schulung",
-        "14": "Prioritäts-Support"
+        "1": "SEO-Sichtbarkeit",
+        "2": "Kundenkarte & Treue",
+        "3": "Personal & Zeiterfassung",
+        "4": "SCRADA & Peppol Buchhaltung",
+        "5": "Vollständige Geschäftsanalyse",
+        "6": "Bewertungen",
+        "7": "Prioritäts-Support"
       }
     },
     "faq": {

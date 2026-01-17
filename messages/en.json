@@ -134,58 +134,30 @@
     "starter": {
       "name": "Vysion Starter",
       "features": {
-        "1": "Full POS functionality",
-        "2": "Real-time reports",
+        "1": "Online ordering platform",
+        "2": "Fully customizable own website",
         "3": "Products & categories",
         "4": "Payment terminal integration",
         "5": "Inventory",
         "6": "Email & phone support",
         "7": "Available in 9 languages",
-        "8": "Full free training"
-      },
-      "notIncluded": {
-        "1": "Online ordering platform",
-        "2": "Kitchen display software",
-        "3": "Customer card & loyalty",
-        "4": "Staff & time registration"
-      }
-    },
-    "standard": {
-      "name": "Vysion Horeca",
-      "subtitle": "Standard",
-      "features": {
-        "1": "Full POS functionality",
-        "2": "Real-time reports",
-        "3": "Payment terminal integration",
-        "4": "Email & phone support",
-        "5": "Available in 9 languages",
-        "6": "Customer card & loyalty",
-        "7": "Online ordering platform",
-        "8": "Products & categories",
-        "9": "Inventory",
-        "10": "Landing page",
-        "11": "Kitchen display software",
-        "12": "Full free training"
+        "8": "Kitchen display",
+        "9": "Allergens",
+        "10": "QR codes",
+        "11": "Promotions"
       }
     },
     "pro": {
       "name": "Vysion Pro",
-      "allOfStarter": "Pro - Everything from Starter, plus:",
+      "allOfStarter": "Everything from Starter, plus:",
       "features": {
-        "1": "Online ordering platform",
-        "2": "Staff & time registration",
-        "3": "Unlimited products & categories",
-        "4": "Customer card & loyalty",
-        "5": "Kitchen display software",
-        "6": "Monthly business analysis",
-        "7": "Landing page",
-        "8": "Peppol invoicing program",
-        "9": "SCARDA accounting software",
-        "10": "Table reservation",
-        "11": "Table floor plan",
-        "12": "Available in 9 languages",
-        "13": "Full free training",
-        "14": "Priority support"
+        "1": "SEO visibility",
+        "2": "Customer card & loyalty",
+        "3": "Staff & time registration",
+        "4": "SCRADA & Peppol accounting",
+        "5": "Full business analysis",
+        "6": "Reviews",
+        "7": "Priority support"
       }
     },
     "faq": {
