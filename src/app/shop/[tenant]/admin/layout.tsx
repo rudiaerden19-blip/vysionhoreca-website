@@ -68,6 +68,12 @@ const menuItems = [
     ]
   },
   {
+    category: 'BOEKHOUDING',
+    items: [
+      { name: 'SCRADA', href: '/scrada', icon: '📊' },
+    ]
+  },
+  {
     category: 'STATISTIEKEN',
     items: [
       { name: 'Bedrijfsanalyse', href: '/analyse', icon: '📊' },
