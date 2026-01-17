@@ -2127,3 +2127,516 @@ export async function calculateMonthlyReport(
     recommendations,
   }
 }
+
+// =====================================================
+// STAFF / PERSONEEL
+// =====================================================
+export type StaffRole = 'ADMIN' | 'MANAGER' | 'EMPLOYEE'
+export type ContractType = 'VAST' | 'INTERIM' | 'FLEXI' | 'STUDENT' | 'SEIZOEN' | 'FREELANCE' | 'STAGE'
+
+export const CONTRACT_TYPES: { id: ContractType; label: string }[] = [
+  { id: 'VAST', label: 'Vast contract' },
+  { id: 'INTERIM', label: 'Interim' },
+  { id: 'FLEXI', label: 'Flexi-job' },
+  { id: 'STUDENT', label: 'Student' },
+  { id: 'SEIZOEN', label: 'Seizoensarbeider' },
+  { id: 'FREELANCE', label: 'Freelance' },
+  { id: 'STAGE', label: 'Stagiair' },
+]
+
+export interface Staff {
+  id?: string
+  tenant_slug: string
+  name: string
+  email?: string
+  phone?: string
+  pin: string
+  role: StaffRole
+  color: string
+  contract_type?: ContractType
+  hours_per_week?: number
+  hourly_rate?: number
+  contract_start?: string
+  contract_end?: string
+  contract_notes?: string
+  is_active: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getStaff(tenantSlug: string): Promise<Staff[]> {
+  const { data, error } = await supabase
+    .from('staff')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('name', { ascending: true })
+  
+  if (error) {
+    console.error('Error fetching staff:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function getActiveStaff(tenantSlug: string): Promise<Staff[]> {
+  const { data, error } = await supabase
+    .from('staff')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('is_active', true)
+    .order('name', { ascending: true })
+  
+  if (error) {
+    console.error('Error fetching active staff:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function saveStaff(staff: Staff): Promise<Staff | null> {
+  if (staff.id) {
+    const { data, error } = await supabase
+      .from('staff')
+      .update({
+        name: staff.name,
+        email: staff.email,
+        phone: staff.phone,
+        pin: staff.pin,
+        role: staff.role,
+        color: staff.color,
+        contract_type: staff.contract_type,
+        hours_per_week: staff.hours_per_week,
+        hourly_rate: staff.hourly_rate,
+        contract_start: staff.contract_start,
+        contract_end: staff.contract_end,
+        contract_notes: staff.contract_notes,
+        is_active: staff.is_active,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', staff.id)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating staff:', error)
+      return null
+    }
+    return data
+  } else {
+    const { data, error } = await supabase
+      .from('staff')
+      .insert({
+        tenant_slug: staff.tenant_slug,
+        name: staff.name,
+        email: staff.email,
+        phone: staff.phone,
+        pin: staff.pin,
+        role: staff.role,
+        color: staff.color,
+        contract_type: staff.contract_type,
+        hours_per_week: staff.hours_per_week,
+        hourly_rate: staff.hourly_rate,
+        contract_start: staff.contract_start,
+        contract_end: staff.contract_end,
+        contract_notes: staff.contract_notes,
+        is_active: staff.is_active ?? true,
+      })
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error creating staff:', error)
+      return null
+    }
+    return data
+  }
+}
+
+export async function deleteStaff(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('staff')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting staff:', error)
+    return false
+  }
+  return true
+}
+
+export async function verifyStaffPin(tenantSlug: string, pin: string): Promise<Staff | null> {
+  const { data, error } = await supabase
+    .from('staff')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('pin', pin)
+    .eq('is_active', true)
+    .single()
+  
+  if (error) return null
+  return data
+}
+
+// =====================================================
+// TIMESHEET ENTRIES / UREN REGISTRATIE
+// =====================================================
+export type AbsenceType = 
+  | 'WORKED'      // Gewerkt
+  | 'SICK'        // Ziekte
+  | 'VACATION'    // Vakantie
+  | 'SHORT_LEAVE' // Kort verzuim
+  | 'AUTHORIZED'  // Geoorloofd afwezig
+  | 'HOLIDAY'     // Feestdag
+  | 'MATERNITY'   // Zwangerschapsverlof
+  | 'PATERNITY'   // Vaderschapsverlof
+  | 'UNPAID'      // Onbetaald verlof
+  | 'TRAINING'    // Opleiding
+  | 'OTHER'       // Overig
+
+export const ABSENCE_TYPES: { id: AbsenceType; label: string; color: string; icon: string }[] = [
+  { id: 'WORKED', label: 'Gewerkt', color: '#22c55e', icon: '✅' },
+  { id: 'SICK', label: 'Ziekte', color: '#ef4444', icon: '🤒' },
+  { id: 'VACATION', label: 'Vakantie', color: '#3b82f6', icon: '🏖️' },
+  { id: 'SHORT_LEAVE', label: 'Kort verzuim', color: '#f97316', icon: '⏰' },
+  { id: 'AUTHORIZED', label: 'Geoorloofd afwezig', color: '#8b5cf6', icon: '📋' },
+  { id: 'HOLIDAY', label: 'Feestdag', color: '#06b6d4', icon: '🎉' },
+  { id: 'MATERNITY', label: 'Zwangerschapsverlof', color: '#ec4899', icon: '👶' },
+  { id: 'PATERNITY', label: 'Vaderschapsverlof', color: '#0ea5e9', icon: '👨‍👧' },
+  { id: 'UNPAID', label: 'Onbetaald verlof', color: '#6b7280', icon: '💤' },
+  { id: 'TRAINING', label: 'Opleiding', color: '#84cc16', icon: '📚' },
+  { id: 'OTHER', label: 'Overig', color: '#a3a3a3', icon: '📝' },
+]
+
+export interface TimesheetEntry {
+  id?: string
+  tenant_slug: string
+  staff_id: string
+  date: string
+  clock_in?: string
+  clock_out?: string
+  break_minutes: number
+  worked_hours: number
+  absence_type: AbsenceType
+  absence_hours?: number
+  notes?: string
+  is_approved: boolean
+  approved_by?: string
+  approved_at?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getTimesheetEntries(
+  tenantSlug: string, 
+  staffId: string, 
+  year: number, 
+  month: number
+): Promise<TimesheetEntry[]> {
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const endDate = `${year}-${String(month).padStart(2, '0')}-31`
+  
+  const { data, error } = await supabase
+    .from('timesheet_entries')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('staff_id', staffId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: true })
+  
+  if (error) {
+    console.error('Error fetching timesheet entries:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function getAllTimesheetEntries(
+  tenantSlug: string, 
+  year: number, 
+  month: number
+): Promise<TimesheetEntry[]> {
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const endDate = `${year}-${String(month).padStart(2, '0')}-31`
+  
+  const { data, error } = await supabase
+    .from('timesheet_entries')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: true })
+  
+  if (error) {
+    console.error('Error fetching all timesheet entries:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function saveTimesheetEntry(entry: TimesheetEntry): Promise<TimesheetEntry | null> {
+  // Calculate worked hours if clock in/out provided
+  let workedHours = entry.worked_hours || 0
+  if (entry.clock_in && entry.clock_out && entry.absence_type === 'WORKED') {
+    const [inH, inM] = entry.clock_in.split(':').map(Number)
+    const [outH, outM] = entry.clock_out.split(':').map(Number)
+    const totalMinutes = (outH * 60 + outM) - (inH * 60 + inM) - (entry.break_minutes || 0)
+    workedHours = Math.max(0, totalMinutes / 60)
+  }
+  
+  const entryData = {
+    tenant_slug: entry.tenant_slug,
+    staff_id: entry.staff_id,
+    date: entry.date,
+    clock_in: entry.clock_in || null,
+    clock_out: entry.clock_out || null,
+    break_minutes: entry.break_minutes || 0,
+    worked_hours: workedHours,
+    absence_type: entry.absence_type,
+    absence_hours: entry.absence_type !== 'WORKED' ? entry.absence_hours : null,
+    notes: entry.notes || null,
+    is_approved: entry.is_approved || false,
+    approved_by: entry.approved_by || null,
+    approved_at: entry.is_approved ? new Date().toISOString() : null,
+    updated_at: new Date().toISOString(),
+  }
+  
+  const { data, error } = await supabase
+    .from('timesheet_entries')
+    .upsert(entryData, { onConflict: 'tenant_slug,staff_id,date' })
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Error saving timesheet entry:', error)
+    return null
+  }
+  return data
+}
+
+export async function deleteTimesheetEntry(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('timesheet_entries')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting timesheet entry:', error)
+    return false
+  }
+  return true
+}
+
+export async function approveTimesheetEntries(
+  tenantSlug: string, 
+  staffId: string, 
+  year: number, 
+  month: number,
+  approvedById: string
+): Promise<boolean> {
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const endDate = `${year}-${String(month).padStart(2, '0')}-31`
+  
+  const { error } = await supabase
+    .from('timesheet_entries')
+    .update({ 
+      is_approved: true, 
+      approved_by: approvedById,
+      approved_at: new Date().toISOString()
+    })
+    .eq('tenant_slug', tenantSlug)
+    .eq('staff_id', staffId)
+    .gte('date', startDate)
+    .lte('date', endDate)
+  
+  if (error) {
+    console.error('Error approving timesheet entries:', error)
+    return false
+  }
+  return true
+}
+
+// =====================================================
+// MONTHLY TIMESHEETS / MAANDOVERZICHTEN
+// =====================================================
+export interface MonthlyTimesheet {
+  id?: string
+  tenant_slug: string
+  staff_id: string
+  year: number
+  month: number
+  total_worked_hours: number
+  total_sick_hours: number
+  total_vacation_hours: number
+  total_short_leave_hours: number
+  total_authorized_hours: number
+  total_holiday_hours: number
+  total_maternity_hours: number
+  total_paternity_hours: number
+  total_unpaid_hours: number
+  total_training_hours: number
+  total_other_hours: number
+  total_paid_hours: number
+  contracted_hours: number
+  overtime: number
+  is_closed: boolean
+  closed_at?: string
+  closed_by?: string
+  exported_at?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getMonthlyTimesheet(
+  tenantSlug: string, 
+  staffId: string, 
+  year: number, 
+  month: number
+): Promise<MonthlyTimesheet | null> {
+  const { data, error } = await supabase
+    .from('monthly_timesheets')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('staff_id', staffId)
+    .eq('year', year)
+    .eq('month', month)
+    .single()
+  
+  if (error) return null
+  return data
+}
+
+export async function generateMonthlyTimesheet(
+  tenantSlug: string, 
+  staffId: string, 
+  year: number, 
+  month: number
+): Promise<MonthlyTimesheet | null> {
+  // Get all entries for this month
+  const entries = await getTimesheetEntries(tenantSlug, staffId, year, month)
+  
+  // Get staff info for contracted hours
+  const { data: staff } = await supabase
+    .from('staff')
+    .select('hours_per_week')
+    .eq('id', staffId)
+    .single()
+  
+  // Calculate hours by absence type
+  const totals: Record<string, number> = {
+    WORKED: 0,
+    SICK: 0,
+    VACATION: 0,
+    SHORT_LEAVE: 0,
+    AUTHORIZED: 0,
+    HOLIDAY: 0,
+    MATERNITY: 0,
+    PATERNITY: 0,
+    UNPAID: 0,
+    TRAINING: 0,
+    OTHER: 0,
+  }
+  
+  entries.forEach(entry => {
+    const hours = entry.absence_type === 'WORKED' 
+      ? entry.worked_hours 
+      : (entry.absence_hours || 0)
+    totals[entry.absence_type] = (totals[entry.absence_type] || 0) + hours
+  })
+  
+  // Calculate contracted hours for the month (hours_per_week * 4.33)
+  const contractedHours = (staff?.hours_per_week || 0) * 4.33
+  
+  // Calculate total paid hours (everything except UNPAID)
+  const totalPaidHours = Object.entries(totals)
+    .filter(([type]) => type !== 'UNPAID')
+    .reduce((sum, [, hours]) => sum + hours, 0)
+  
+  // Calculate overtime
+  const overtime = Math.max(0, totals.WORKED - contractedHours)
+  
+  const timesheetData: MonthlyTimesheet = {
+    tenant_slug: tenantSlug,
+    staff_id: staffId,
+    year,
+    month,
+    total_worked_hours: totals.WORKED,
+    total_sick_hours: totals.SICK,
+    total_vacation_hours: totals.VACATION,
+    total_short_leave_hours: totals.SHORT_LEAVE,
+    total_authorized_hours: totals.AUTHORIZED,
+    total_holiday_hours: totals.HOLIDAY,
+    total_maternity_hours: totals.MATERNITY,
+    total_paternity_hours: totals.PATERNITY,
+    total_unpaid_hours: totals.UNPAID,
+    total_training_hours: totals.TRAINING,
+    total_other_hours: totals.OTHER,
+    total_paid_hours: totalPaidHours,
+    contracted_hours: contractedHours,
+    overtime,
+    is_closed: false,
+  }
+  
+  const { data, error } = await supabase
+    .from('monthly_timesheets')
+    .upsert(timesheetData, { onConflict: 'tenant_slug,staff_id,year,month' })
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Error generating monthly timesheet:', error)
+    return null
+  }
+  return data
+}
+
+export async function closeMonthlyTimesheet(
+  tenantSlug: string, 
+  staffId: string, 
+  year: number, 
+  month: number,
+  closedById: string
+): Promise<boolean> {
+  // First regenerate to ensure up-to-date
+  await generateMonthlyTimesheet(tenantSlug, staffId, year, month)
+  
+  const { error } = await supabase
+    .from('monthly_timesheets')
+    .update({ 
+      is_closed: true, 
+      closed_by: closedById,
+      closed_at: new Date().toISOString()
+    })
+    .eq('tenant_slug', tenantSlug)
+    .eq('staff_id', staffId)
+    .eq('year', year)
+    .eq('month', month)
+  
+  if (error) {
+    console.error('Error closing monthly timesheet:', error)
+    return false
+  }
+  return true
+}
+
+export async function markTimesheetExported(
+  tenantSlug: string, 
+  staffId: string, 
+  year: number, 
+  month: number
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('monthly_timesheets')
+    .update({ exported_at: new Date().toISOString() })
+    .eq('tenant_slug', tenantSlug)
+    .eq('staff_id', staffId)
+    .eq('year', year)
+    .eq('month', month)
+  
+  if (error) {
+    console.error('Error marking timesheet exported:', error)
+    return false
+  }
+  return true
+}

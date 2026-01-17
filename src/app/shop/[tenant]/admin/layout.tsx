@@ -61,6 +61,13 @@ const menuItems = [
     ]
   },
   {
+    category: 'PERSONEEL',
+    items: [
+      { name: 'Medewerkers', href: '/personeel', icon: '👥' },
+      { name: 'Uren registratie', href: '/uren', icon: '⏰' },
+    ]
+  },
+  {
     category: 'STATISTIEKEN',
     items: [
       { name: 'Bedrijfsanalyse', href: '/analyse', icon: '📊' },
