@@ -68,16 +68,26 @@ const dayNamesNL = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Z
 
 const formatReviewDate = (dateString?: string) => {
   if (!dateString) return ''
-  const date = new Date(dateString)
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
   
-  if (days === 0) return 'Vandaag'
-  if (days === 1) return 'Gisteren'
-  if (days < 7) return `${days} dagen geleden`
-  if (days < 30) return `${Math.floor(days / 7)} weken geleden`
-  return `${Math.floor(days / 30)} maanden geleden`
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return ''
+    
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    
+    if (days === 0) return 'Vandaag'
+    if (days === 1) return 'Gisteren'
+    if (days < 7) return `${days} dagen geleden`
+    if (days < 30) return `${Math.floor(days / 7)} weken geleden`
+    if (days < 365) return `${Math.floor(days / 30)} maanden geleden`
+    
+    // Voor oudere reviews, toon de datum
+    return date.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
+  } catch {
+    return ''
+  }
 }
 
 export default function TenantLandingPage({ params }: { params: { tenant: string } }) {
