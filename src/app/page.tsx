@@ -78,8 +78,17 @@ function HeroSection() {
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-6">
               {t('hero.title')}
             </h1>
-            <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
+            <p className="text-lg sm:text-xl text-gray-600 mb-6 max-w-lg mx-auto lg:mx-0">
               {t('hero.description')}
+            </p>
+            <p className="text-base text-gray-700 font-semibold mb-3">
+              {t('hero.extras')}
+            </p>
+            <p className="text-base text-gray-600 mb-4 max-w-lg mx-auto lg:mx-0 whitespace-pre-line">
+              {t('hero.extrasList')}
+            </p>
+            <p className="text-lg font-bold text-accent mb-8 max-w-lg mx-auto lg:mx-0">
+              {t('hero.tagline')}
             </p>
             <div className="flex justify-center lg:justify-start">
               <a href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`} className="btn-primary text-center">
