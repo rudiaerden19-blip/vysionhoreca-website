@@ -296,6 +296,26 @@
     "copyright": "Tous droits réservés.",
     "designBy": "Design par Vysion"
   },
+  "stop": {
+    "title": "STOP",
+    "headline": "Vysion ne demande pas de frais de démarrage",
+    "subheadline": "Nous construisons tout pour vous. Gratuitement.",
+    "cards": {
+      "1": { "you": "Vous nous donnez votre menu", "we": "Nous construisons votre boutique" },
+      "2": { "you": "Vous choisissez les couleurs", "we": "Nous construisons votre site web" },
+      "3": { "you": "Vous nous donnez vos photos", "we": "Nous les plaçons sur votre site" },
+      "4": { "you": "Vous avez déjà un site web?", "we": "Nous intégrons le bouton de commande" }
+    },
+    "freeTitle": "Nous faisons cela GRATUITEMENT",
+    "freeItems": {
+      "1": "Démarrage gratuit",
+      "2": "Formation gratuite",
+      "3": "Installation gratuite",
+      "4": "7 jours d'essai gratuit",
+      "5": "Pas de frais cachés"
+    },
+    "cta": "Commencez gratuitement"
+  },
   "cookies": {
     "message": "Nous utilisons des cookies pour améliorer votre expérience. En continuant, vous acceptez notre",
     "policy": "politique de cookies",

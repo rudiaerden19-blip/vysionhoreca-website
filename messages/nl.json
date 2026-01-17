@@ -296,6 +296,26 @@
     "copyright": "Alle rechten voorbehouden.",
     "designBy": "Design by Vysion"
   },
+  "stop": {
+    "title": "STOP",
+    "headline": "Vysion vraagt geen opstartkost",
+    "subheadline": "Wij bouwen alles voor jou. Gratis.",
+    "cards": {
+      "1": { "you": "Jij geeft ons je menu", "we": "Wij bouwen je winkel" },
+      "2": { "you": "Jij bepaalt de kleuren", "we": "Wij bouwen je website" },
+      "3": { "you": "Jij geeft ons je foto's", "we": "Wij plaatsen ze in je site" },
+      "4": { "you": "Jij hebt al een website?", "we": "Wij integreren de bestelknop" }
+    },
+    "freeTitle": "Dit doen we GRATIS",
+    "freeItems": {
+      "1": "Gratis opstart",
+      "2": "Gratis opleiding",
+      "3": "Gratis installatie",
+      "4": "Gratis 7 dagen testen",
+      "5": "Geen verborgen kosten"
+    },
+    "cta": "Start nu gratis"
+  },
   "cookies": {
     "message": "Wij gebruiken cookies om je ervaring te verbeteren. Door verder te gaan ga je akkoord met ons",
     "policy": "cookiebeleid",
