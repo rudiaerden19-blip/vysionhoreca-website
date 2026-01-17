@@ -1576,3 +1576,554 @@ export async function redeemReward(customerId: string, rewardId: string, pointsU
   
   return !redemptionError
 }
+
+// =====================================================
+// BUSINESS ANALYSIS - DAILY SALES (Handmatige kassa omzet)
+// =====================================================
+export interface DailySales {
+  id?: string
+  tenant_slug: string
+  date: string
+  cash_revenue: number
+  card_revenue: number
+  total_revenue: number
+  order_count: number
+  notes?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getDailySales(tenantSlug: string, year: number, month: number): Promise<DailySales[]> {
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const endDate = `${year}-${String(month).padStart(2, '0')}-31`
+  
+  const { data, error } = await supabase
+    .from('daily_sales')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: true })
+  
+  if (error) {
+    console.error('Error fetching daily sales:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function saveDailySales(sales: DailySales): Promise<boolean> {
+  const totalRevenue = (sales.cash_revenue || 0) + (sales.card_revenue || 0)
+  
+  const { error } = await supabase
+    .from('daily_sales')
+    .upsert({
+      ...sales,
+      total_revenue: totalRevenue,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'tenant_slug,date' })
+  
+  if (error) {
+    console.error('Error saving daily sales:', error)
+    return false
+  }
+  return true
+}
+
+export async function deleteDailySales(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('daily_sales')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting daily sales:', error)
+    return false
+  }
+  return true
+}
+
+// =====================================================
+// BUSINESS ANALYSIS - FIXED COSTS (Vaste kosten)
+// =====================================================
+export type FixedCostCategory = 
+  | 'RENT' 
+  | 'PERSONNEL' 
+  | 'ELECTRICITY' 
+  | 'GAS' 
+  | 'WATER' 
+  | 'INSURANCE' 
+  | 'LEASING' 
+  | 'LOAN' 
+  | 'SUBSCRIPTIONS' 
+  | 'OTHER'
+
+export const FIXED_COST_CATEGORIES: { id: FixedCostCategory; label: string; icon: string }[] = [
+  { id: 'RENT', label: 'Huur', icon: '🏠' },
+  { id: 'PERSONNEL', label: 'Personeel', icon: '👥' },
+  { id: 'ELECTRICITY', label: 'Elektriciteit', icon: '⚡' },
+  { id: 'GAS', label: 'Gas', icon: '🔥' },
+  { id: 'WATER', label: 'Water', icon: '💧' },
+  { id: 'INSURANCE', label: 'Verzekeringen', icon: '🛡️' },
+  { id: 'LEASING', label: 'Leasing', icon: '📋' },
+  { id: 'LOAN', label: 'Leningen', icon: '🏦' },
+  { id: 'SUBSCRIPTIONS', label: 'Abonnementen', icon: '📱' },
+  { id: 'OTHER', label: 'Overige', icon: '📦' },
+]
+
+export interface FixedCost {
+  id?: string
+  tenant_slug: string
+  category: FixedCostCategory
+  name: string
+  amount: number
+  notes?: string
+  is_active: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getFixedCosts(tenantSlug: string): Promise<FixedCost[]> {
+  const { data, error } = await supabase
+    .from('fixed_costs')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('category', { ascending: true })
+  
+  if (error) {
+    console.error('Error fetching fixed costs:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function saveFixedCost(cost: FixedCost): Promise<FixedCost | null> {
+  if (cost.id) {
+    const { data, error } = await supabase
+      .from('fixed_costs')
+      .update({
+        category: cost.category,
+        name: cost.name,
+        amount: cost.amount,
+        notes: cost.notes,
+        is_active: cost.is_active,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', cost.id)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating fixed cost:', error)
+      return null
+    }
+    return data
+  } else {
+    const { data, error } = await supabase
+      .from('fixed_costs')
+      .insert({
+        tenant_slug: cost.tenant_slug,
+        category: cost.category,
+        name: cost.name,
+        amount: cost.amount,
+        notes: cost.notes,
+        is_active: cost.is_active ?? true,
+      })
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error creating fixed cost:', error)
+      return null
+    }
+    return data
+  }
+}
+
+export async function deleteFixedCost(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('fixed_costs')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting fixed cost:', error)
+    return false
+  }
+  return true
+}
+
+// =====================================================
+// BUSINESS ANALYSIS - VARIABLE COSTS (Aankopen)
+// =====================================================
+export type VariableCostCategory = 
+  | 'INGREDIENTS' 
+  | 'PACKAGING' 
+  | 'CLEANING' 
+  | 'MAINTENANCE' 
+  | 'MARKETING' 
+  | 'OTHER'
+
+export const VARIABLE_COST_CATEGORIES: { id: VariableCostCategory; label: string; icon: string }[] = [
+  { id: 'INGREDIENTS', label: 'Ingrediënten', icon: '🥔' },
+  { id: 'PACKAGING', label: 'Verpakking', icon: '📦' },
+  { id: 'CLEANING', label: 'Schoonmaak', icon: '🧹' },
+  { id: 'MAINTENANCE', label: 'Onderhoud', icon: '🔧' },
+  { id: 'MARKETING', label: 'Marketing', icon: '📢' },
+  { id: 'OTHER', label: 'Overige', icon: '📋' },
+]
+
+export interface VariableCost {
+  id?: string
+  tenant_slug: string
+  category: VariableCostCategory
+  description: string
+  supplier?: string
+  invoice_number?: string
+  amount: number
+  date: string
+  notes?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getVariableCosts(tenantSlug: string, year: number, month: number): Promise<VariableCost[]> {
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const endDate = `${year}-${String(month).padStart(2, '0')}-31`
+  
+  const { data, error } = await supabase
+    .from('variable_costs')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .gte('date', startDate)
+    .lte('date', endDate)
+    .order('date', { ascending: false })
+  
+  if (error) {
+    console.error('Error fetching variable costs:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function getAllVariableCosts(tenantSlug: string): Promise<VariableCost[]> {
+  const { data, error } = await supabase
+    .from('variable_costs')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('date', { ascending: false })
+  
+  if (error) {
+    console.error('Error fetching all variable costs:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function saveVariableCost(cost: VariableCost): Promise<VariableCost | null> {
+  if (cost.id) {
+    const { data, error } = await supabase
+      .from('variable_costs')
+      .update({
+        category: cost.category,
+        description: cost.description,
+        supplier: cost.supplier,
+        invoice_number: cost.invoice_number,
+        amount: cost.amount,
+        date: cost.date,
+        notes: cost.notes,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', cost.id)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating variable cost:', error)
+      return null
+    }
+    return data
+  } else {
+    const { data, error } = await supabase
+      .from('variable_costs')
+      .insert({
+        tenant_slug: cost.tenant_slug,
+        category: cost.category,
+        description: cost.description,
+        supplier: cost.supplier,
+        invoice_number: cost.invoice_number,
+        amount: cost.amount,
+        date: cost.date,
+        notes: cost.notes,
+      })
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error creating variable cost:', error)
+      return null
+    }
+    return data
+  }
+}
+
+export async function deleteVariableCost(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('variable_costs')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting variable cost:', error)
+    return false
+  }
+  return true
+}
+
+// =====================================================
+// BUSINESS ANALYSIS - BUSINESS TARGETS (Doelen)
+// =====================================================
+export interface BusinessTargets {
+  id?: string
+  tenant_slug: string
+  target_profit_margin: number
+  minimum_profit_margin: number
+  max_personnel_percent: number
+  max_ingredient_percent: number
+  target_average_ticket: number
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getBusinessTargets(tenantSlug: string): Promise<BusinessTargets> {
+  const { data, error } = await supabase
+    .from('business_targets')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .single()
+  
+  if (error || !data) {
+    // Return defaults
+    return {
+      tenant_slug: tenantSlug,
+      target_profit_margin: 25,
+      minimum_profit_margin: 15,
+      max_personnel_percent: 30,
+      max_ingredient_percent: 35,
+      target_average_ticket: 15,
+    }
+  }
+  return data
+}
+
+export async function saveBusinessTargets(targets: BusinessTargets): Promise<boolean> {
+  const { error } = await supabase
+    .from('business_targets')
+    .upsert({
+      ...targets,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'tenant_slug' })
+  
+  if (error) {
+    console.error('Error saving business targets:', error)
+    return false
+  }
+  return true
+}
+
+// =====================================================
+// BUSINESS ANALYSIS - MONTHLY REPORT CALCULATION
+// =====================================================
+export interface MonthlyReport {
+  // Revenue
+  onlineRevenue: number
+  kassaRevenue: number
+  totalRevenue: number
+  
+  // Orders
+  onlineOrders: number
+  kassaOrders: number
+  totalOrders: number
+  averageTicket: number
+  
+  // Costs
+  totalFixedCosts: number
+  totalVariableCosts: number
+  totalCosts: number
+  
+  // Cost breakdown
+  fixedCostBreakdown: { category: FixedCostCategory; amount: number }[]
+  variableCostBreakdown: { category: VariableCostCategory; amount: number }[]
+  
+  // Profit
+  grossProfit: number
+  netProfit: number
+  profitMargin: number
+  
+  // Health
+  healthStatus: 'EXCELLENT' | 'GOOD' | 'WARNING' | 'CRITICAL'
+  recommendations: string[]
+}
+
+export async function calculateMonthlyReport(
+  tenantSlug: string, 
+  year: number, 
+  month: number
+): Promise<MonthlyReport> {
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  const endDate = new Date(year, month, 0).toISOString().split('T')[0] // Last day of month
+  
+  // 1. Get online shop revenue from orders
+  const { data: ordersData } = await supabase
+    .from('orders')
+    .select('total, status')
+    .eq('tenant_slug', tenantSlug)
+    .gte('created_at', `${startDate}T00:00:00`)
+    .lte('created_at', `${endDate}T23:59:59`)
+    .not('status', 'in', '("cancelled","rejected")')
+  
+  const onlineRevenue = ordersData?.reduce((sum, o) => sum + (o.total || 0), 0) || 0
+  const onlineOrders = ordersData?.length || 0
+  
+  // 2. Get manual kassa revenue
+  const dailySales = await getDailySales(tenantSlug, year, month)
+  const kassaRevenue = dailySales.reduce((sum, d) => sum + (d.total_revenue || 0), 0)
+  const kassaOrders = dailySales.reduce((sum, d) => sum + (d.order_count || 0), 0)
+  
+  // 3. Get fixed costs
+  const fixedCosts = await getFixedCosts(tenantSlug)
+  const activeFixedCosts = fixedCosts.filter(c => c.is_active)
+  const totalFixedCosts = activeFixedCosts.reduce((sum, c) => sum + c.amount, 0)
+  
+  // Fixed cost breakdown by category
+  const fixedCostBreakdown: { category: FixedCostCategory; amount: number }[] = []
+  FIXED_COST_CATEGORIES.forEach(cat => {
+    const amount = activeFixedCosts
+      .filter(c => c.category === cat.id)
+      .reduce((sum, c) => sum + c.amount, 0)
+    if (amount > 0) {
+      fixedCostBreakdown.push({ category: cat.id, amount })
+    }
+  })
+  
+  // 4. Get variable costs for this month
+  const variableCosts = await getVariableCosts(tenantSlug, year, month)
+  const totalVariableCosts = variableCosts.reduce((sum, c) => sum + c.amount, 0)
+  
+  // Variable cost breakdown by category
+  const variableCostBreakdown: { category: VariableCostCategory; amount: number }[] = []
+  VARIABLE_COST_CATEGORIES.forEach(cat => {
+    const amount = variableCosts
+      .filter(c => c.category === cat.id)
+      .reduce((sum, c) => sum + c.amount, 0)
+    if (amount > 0) {
+      variableCostBreakdown.push({ category: cat.id, amount })
+    }
+  })
+  
+  // 5. Calculate totals
+  const totalRevenue = onlineRevenue + kassaRevenue
+  const totalOrders = onlineOrders + kassaOrders
+  const totalCosts = totalFixedCosts + totalVariableCosts
+  const grossProfit = totalRevenue - totalVariableCosts
+  const netProfit = totalRevenue - totalCosts
+  const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0
+  const averageTicket = totalOrders > 0 ? totalRevenue / totalOrders : 0
+  
+  // 6. Get business targets
+  const targets = await getBusinessTargets(tenantSlug)
+  
+  // 7. Determine health status
+  let healthStatus: 'EXCELLENT' | 'GOOD' | 'WARNING' | 'CRITICAL'
+  if (profitMargin >= 35) {
+    healthStatus = 'EXCELLENT'
+  } else if (profitMargin >= 22) {
+    healthStatus = 'GOOD'
+  } else if (profitMargin >= 10) {
+    healthStatus = 'WARNING'
+  } else {
+    healthStatus = 'CRITICAL'
+  }
+  
+  // 8. Generate recommendations
+  const recommendations: string[] = []
+  
+  if (totalRevenue === 0) {
+    recommendations.push('📊 Geen omzet geregistreerd deze maand')
+  } else {
+    // Profit check
+    if (profitMargin >= targets.target_profit_margin) {
+      recommendations.push(`✅ UITSTEKEND! Financieel gezond met ${profitMargin.toFixed(1)}% marge`)
+    } else if (profitMargin < targets.minimum_profit_margin) {
+      recommendations.push(`🚨 KRITIEK: Winstmarge (${profitMargin.toFixed(1)}%) onder minimum (${targets.minimum_profit_margin}%)`)
+    }
+    
+    // Personnel check
+    const personnelCost = fixedCostBreakdown.find(c => c.category === 'PERSONNEL')?.amount || 0
+    const personnelPercent = (personnelCost / totalRevenue) * 100
+    if (personnelPercent > targets.max_personnel_percent) {
+      recommendations.push(`👥 PERSONEEL TE DUUR: ${personnelPercent.toFixed(1)}% van omzet (max ${targets.max_personnel_percent}%)`)
+      recommendations.push(`→ Bespaar €${(personnelCost - (totalRevenue * targets.max_personnel_percent / 100)).toFixed(2)} op personeel`)
+    }
+    
+    // Ingredients check
+    const ingredientsCost = variableCostBreakdown.find(c => c.category === 'INGREDIENTS')?.amount || 0
+    const ingredientsPercent = (ingredientsCost / totalRevenue) * 100
+    if (ingredientsPercent > targets.max_ingredient_percent) {
+      recommendations.push(`🥔 INGREDIËNTEN TE DUUR: ${ingredientsPercent.toFixed(1)}% van omzet (max ${targets.max_ingredient_percent}%)`)
+      recommendations.push(`→ Bespaar €${(ingredientsCost - (totalRevenue * targets.max_ingredient_percent / 100)).toFixed(2)} op ingrediënten`)
+    }
+    
+    // Rent check (max 10%)
+    const rentCost = fixedCostBreakdown.find(c => c.category === 'RENT')?.amount || 0
+    const rentPercent = (rentCost / totalRevenue) * 100
+    if (rentPercent > 10) {
+      recommendations.push(`🏠 HUUR TE DUUR: ${rentPercent.toFixed(1)}% van omzet (max 10%)`)
+    }
+    
+    // Energy check (max 8%)
+    const energyCost = (fixedCostBreakdown.find(c => c.category === 'ELECTRICITY')?.amount || 0) +
+                       (fixedCostBreakdown.find(c => c.category === 'GAS')?.amount || 0)
+    const energyPercent = (energyCost / totalRevenue) * 100
+    if (energyPercent > 8) {
+      recommendations.push(`⚡ ENERGIE TE DUUR: ${energyPercent.toFixed(1)}% van omzet (max 8%)`)
+    }
+    
+    // Average ticket check
+    if (averageTicket < targets.target_average_ticket) {
+      recommendations.push(`🧾 GEMIDDELDE BON TE LAAG: €${averageTicket.toFixed(2)} (doel: €${targets.target_average_ticket})`)
+      recommendations.push(`→ Tip: Upselling, combo-deals, of prijzen verhogen`)
+    }
+    
+    // Break-even check
+    const breakEvenRevenue = totalVariableCosts > 0 
+      ? totalFixedCosts / (1 - (totalVariableCosts / totalRevenue))
+      : totalFixedCosts
+    
+    if (totalRevenue >= breakEvenRevenue) {
+      recommendations.push(`📍 Break-even bereikt! €${(totalRevenue - breakEvenRevenue).toFixed(2)} boven break-even`)
+    } else {
+      recommendations.push(`📍 Nog €${(breakEvenRevenue - totalRevenue).toFixed(2)} nodig om break-even te bereiken`)
+    }
+  }
+  
+  return {
+    onlineRevenue,
+    kassaRevenue,
+    totalRevenue,
+    onlineOrders,
+    kassaOrders,
+    totalOrders,
+    averageTicket,
+    totalFixedCosts,
+    totalVariableCosts,
+    totalCosts,
+    fixedCostBreakdown,
+    variableCostBreakdown,
+    grossProfit,
+    netProfit,
+    profitMargin,
+    healthStatus,
+    recommendations,
+  }
+}

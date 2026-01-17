@@ -63,6 +63,7 @@ const menuItems = [
   {
     category: 'STATISTIEKEN',
     items: [
+      { name: 'Bedrijfsanalyse', href: '/analyse', icon: '📊' },
       { name: 'Verkoop', href: '/verkoop', icon: '💰' },
       { name: 'Bestellingen', href: '/bestellingen', icon: '📦' },
       { name: 'Populaire items', href: '/populair', icon: '🔥' },
