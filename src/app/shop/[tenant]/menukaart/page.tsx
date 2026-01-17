@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import { getTenantSettings, getMenuCategories, getMenuProducts, TenantSettings, MenuCategory, MenuProduct } from '@/lib/admin-api'
 
 export default function MenukaartPage({ params }: { params: { tenant: string } }) {
@@ -60,11 +61,16 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
       <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md border-b border-white/10">
         <div className="px-4 py-4 text-center">
           {settings?.logo_url ? (
-            <img 
-              src={settings.logo_url} 
-              alt={settings?.business_name || 'Logo'} 
-              className="h-12 mx-auto mb-2 object-contain"
-            />
+            <div className="relative h-12 w-32 mx-auto mb-2">
+              <Image 
+                src={settings.logo_url} 
+                alt={settings?.business_name || 'Logo'} 
+                fill
+                sizes="128px"
+                priority
+                className="object-contain"
+              />
+            </div>
           ) : (
             <h1 className="text-2xl font-bold text-white">{settings?.business_name || params.tenant}</h1>
           )}
@@ -211,12 +217,15 @@ function MenuItemCard({ product, primaryColor }: { product: MenuProduct; primary
       <div className="flex">
         {/* Image */}
         {product.image_url && (
-          <div className={`${expanded ? 'w-24 h-24' : 'w-20 h-20'} flex-shrink-0 transition-all`}>
-            <img 
+          <div className={`${expanded ? 'w-24 h-24' : 'w-20 h-20'} flex-shrink-0 transition-all relative`}>
+            <Image 
               src={product.image_url} 
               alt={product.name}
-              className="w-full h-full object-contain bg-gray-800"
+              fill
+              sizes="96px"
+              quality={70}
               loading="lazy"
+              className="object-contain bg-gray-800"
             />
           </div>
         )}

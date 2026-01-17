@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 
@@ -373,7 +374,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link href={`/shop/${params.tenant}`} className="flex items-center gap-3">
             {business.logo_url && (
-              <img src={business.logo_url} alt={business.name} className="w-10 h-10 rounded-full object-cover" />
+              <div className="relative w-10 h-10">
+                <Image 
+                  src={business.logo_url} 
+                  alt={business.name} 
+                  fill
+                  sizes="40px"
+                  className="rounded-full object-cover" 
+                />
+              </div>
             )}
             <span className="text-white font-bold text-lg hidden sm:block">{business.name}</span>
           </Link>
@@ -410,10 +419,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             style={{ transform: `translateY(${scrollY * 0.3}px)` }}
             className="absolute inset-0"
           >
-            <img
+            <Image
               src={business.cover_images[currentImageIndex]}
               alt={business.name}
-              className="w-full h-full object-cover object-center"
+              fill
+              priority={currentImageIndex === 0}
+              sizes="100vw"
+              quality={85}
+              className="object-cover object-center"
               style={{ objectPosition: 'center 30%' }}
             />
           </motion.div>
@@ -526,11 +539,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 viewport={{ once: true }}
                 className="relative"
               >
-                <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl">
-                  <img
+                <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl relative">
+                  <Image
                     src={business.about_image || "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800"}
                     alt="Onze frituur"
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    quality={80}
+                    loading="lazy"
+                    className="object-cover"
                   />
                 </div>
               </motion.div>
@@ -564,10 +581,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   className="group cursor-pointer"
                 >
                   <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
-                    <img 
+                    <Image 
                       src={business.specialty_1_image}
                       alt={business.specialty_1_title || 'Specialiteit 1'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      quality={80}
+                      loading="lazy"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -587,10 +608,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   className="group cursor-pointer"
                 >
                   <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
-                    <img 
+                    <Image 
                       src={business.specialty_2_image}
                       alt={business.specialty_2_title || 'Specialiteit 2'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      quality={80}
+                      loading="lazy"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -610,10 +635,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   className="group cursor-pointer"
                 >
                   <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
-                    <img 
+                    <Image 
                       src={business.specialty_3_image}
                       alt={business.specialty_3_title || 'Specialiteit 3'}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      quality={80}
+                      loading="lazy"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -879,12 +908,16 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
-                    className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow"
+                    className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow w-full relative h-72"
                   >
-                    <img
-                      src={imageUrl}
+                    <Image
+                      src={imageUrl!}
                       alt={`Topverkoper ${index + 1}`}
-                      className="w-full h-72 object-cover"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      quality={80}
+                      loading="lazy"
+                      className="object-cover"
                     />
                   </motion.div>
                 ))

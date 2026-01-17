@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
 
@@ -338,12 +339,14 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 >
                   <div className="relative h-48 overflow-hidden bg-gray-100">
                     {item.image_url ? (
-                      <img
+                      <Image
                         src={item.image_url}
                         alt={item.name}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        quality={75}
                         loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-contain bg-gray-50"
+                        className="object-contain bg-gray-50"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-6xl">
@@ -448,10 +451,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             >
               <div className="relative h-64 bg-gray-50 flex items-center justify-center">
                 {selectedItem.image_url ? (
-                  <img
+                  <Image
                     src={selectedItem.image_url}
                     alt={selectedItem.name}
-                    className="max-w-full max-h-full object-contain"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 500px"
+                    quality={80}
+                    className="object-contain"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-8xl">
@@ -630,7 +636,16 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     {cart.map((cartItem, index) => (
                       <motion.div key={index} layout className="flex gap-4 bg-gray-50 rounded-xl p-4">
                         {cartItem.item.image_url ? (
-                          <img src={cartItem.item.image_url} alt={cartItem.item.name} className="w-20 h-20 object-contain rounded-lg bg-gray-100" />
+                          <div className="relative w-20 h-20 flex-shrink-0">
+                            <Image 
+                              src={cartItem.item.image_url} 
+                              alt={cartItem.item.name} 
+                              fill
+                              sizes="80px"
+                              quality={60}
+                              className="object-contain rounded-lg bg-gray-100" 
+                            />
+                          </div>
                         ) : (
                           <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-3xl">🍟</div>
                         )}
