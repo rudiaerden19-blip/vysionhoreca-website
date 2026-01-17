@@ -578,143 +578,78 @@ function PricingSection() {
 // STOP Section - Epic scroll animation
 function StopSection() {
   const { t, locale } = useLanguage()
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const [scrollProgress, setScrollProgress] = useState(0)
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return
-      const rect = sectionRef.current.getBoundingClientRect()
-      const windowHeight = window.innerHeight
-      const sectionHeight = rect.height
-      
-      // Calculate progress: 0 when section enters, 1 when fully scrolled
-      const progress = Math.max(0, Math.min(1, 
-        (windowHeight - rect.top) / (windowHeight + sectionHeight * 0.5)
-      ))
-      setScrollProgress(progress)
-    }
-    
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-  
   const cardKeys = [1, 2, 3, 4]
   const freeKeys = [1, 2, 3, 4, 5]
   
-  // Animation phases based on scroll
-  const showStop = scrollProgress > 0.1
-  const stopScale = Math.min(1, (scrollProgress - 0.1) * 3)
-  const showContent = scrollProgress > 0.35
-  const contentOpacity = Math.min(1, (scrollProgress - 0.35) * 3)
-  
   return (
-    <section 
-      ref={sectionRef}
-      className="relative min-h-[200vh] bg-black"
-    >
-      {/* Sticky container */}
-      <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
-        {/* Background gradient effect */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-b from-black via-gray-900 to-black"
-          style={{ opacity: Math.min(1, scrollProgress * 2) }}
-        />
-        
-        {/* STOP Text */}
-        <div 
-          className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
-          style={{ 
-            opacity: showStop ? (showContent ? 0.1 : 1) : 0,
-            transform: `scale(${0.3 + stopScale * 0.7})`,
-            transition: 'opacity 0.5s ease-out'
+    <section className="relative bg-black py-20 sm:py-32 overflow-hidden">
+      {/* Background STOP text */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        <span 
+          className="text-[40vw] sm:text-[35vw] font-black text-red-900/20 select-none whitespace-nowrap"
+          style={{
+            textShadow: '0 0 100px rgba(234, 88, 12, 0.2)',
           }}
         >
-          <span 
-            className="text-[20vw] sm:text-[25vw] font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-accent to-red-500 select-none"
-            style={{
-              textShadow: '0 0 100px rgba(234, 88, 12, 0.5)',
-              WebkitTextStroke: '2px rgba(234, 88, 12, 0.3)'
-            }}
-          >
-            {t('stop.title')}
-          </span>
+          {t('stop.title')}
+        </span>
+      </div>
+      
+      {/* Main Content */}
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Headline */}
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4">
+            {t('stop.headline')}
+          </h2>
+          <p className="text-xl sm:text-2xl text-gray-300">
+            {t('stop.subheadline')}
+          </p>
         </div>
         
-        {/* Main Content */}
-        <div 
-          className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
-          style={{ 
-            opacity: contentOpacity,
-            transform: `translateY(${(1 - contentOpacity) * 50}px)`
-          }}
-        >
-          {/* Headline */}
-          <div className="mb-12">
-            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4">
-              {t('stop.headline')}
-            </h2>
-            <p className="text-xl sm:text-2xl text-gray-300">
-              {t('stop.subheadline')}
-            </p>
-          </div>
-          
-          {/* Cards Grid */}
-          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-12">
-            {cardKeys.map((key, index) => (
-              <div 
-                key={key}
-                className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 hover:border-accent/50 transition-all duration-300 hover:scale-105"
-                style={{
-                  opacity: contentOpacity,
-                  transform: `translateY(${(1 - contentOpacity) * (30 + index * 10)}px)`,
-                  transitionDelay: `${index * 100}ms`
-                }}
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 text-left">
-                    <p className="text-gray-400 text-sm mb-1">{t(`stop.cards.${key}.you`)}</p>
-                    <p className="text-white font-bold text-lg flex items-center gap-2">
-                      <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                      {t(`stop.cards.${key}.we`)}
-                    </p>
-                  </div>
+        {/* Cards Grid */}
+        <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-12 sm:mb-16">
+          {cardKeys.map((key) => (
+            <div 
+              key={key}
+              className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 hover:border-accent/50 transition-all duration-300 hover:scale-105"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex-1 text-left">
+                  <p className="text-gray-400 text-sm mb-1">{t(`stop.cards.${key}.you`)}</p>
+                  <p className="text-white font-bold text-lg flex items-center gap-2">
+                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                    {t(`stop.cards.${key}.we`)}
+                  </p>
                 </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* FREE Section */}
+        <div className="bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20 rounded-3xl p-6 sm:p-10 border-2 border-accent/30 text-center">
+          <h3 className="text-2xl sm:text-4xl font-black text-accent mb-6">
+            {t('stop.freeTitle')}
+          </h3>
+          <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8">
+            {freeKeys.map((key) => (
+              <div key={key} className="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full">
+                <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-white font-medium text-sm sm:text-base">{t(`stop.freeItems.${key}`)}</span>
               </div>
             ))}
           </div>
-          
-          {/* FREE Section */}
-          <div 
-            className="bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20 rounded-3xl p-8 border-2 border-accent/30"
-            style={{
-              opacity: contentOpacity,
-              transform: `scale(${0.9 + contentOpacity * 0.1})`
-            }}
+          <a
+            href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
+            className="inline-block bg-accent text-white px-8 sm:px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-[0_0_30px_rgba(234,88,12,0.5)] hover:shadow-[0_0_50px_rgba(234,88,12,0.7)] hover:scale-105"
           >
-            <h3 className="text-2xl sm:text-4xl font-black text-accent mb-6 animate-pulse">
-              {t('stop.freeTitle')}
-            </h3>
-            <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-8">
-              {freeKeys.map((key) => (
-                <div key={key} className="flex items-center gap-2 bg-black/30 px-4 py-2 rounded-full">
-                  <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-white font-medium">{t(`stop.freeItems.${key}`)}</span>
-                </div>
-              ))}
-            </div>
-            <a
-              href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
-              className="inline-block bg-accent text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-[0_0_30px_rgba(234,88,12,0.5)] hover:shadow-[0_0_50px_rgba(234,88,12,0.7)] hover:scale-105"
-            >
-              {t('stop.cta')}
-            </a>
-          </div>
+            {t('stop.cta')}
+          </a>
         </div>
       </div>
     </section>
