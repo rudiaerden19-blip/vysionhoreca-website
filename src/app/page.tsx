@@ -575,12 +575,13 @@ function PricingSection() {
   )
 }
 
-// STOP Section - Sequential fade animation
+// STOP Section - Sequential fade animation with scroll lock
 function StopSection() {
   const { t, locale } = useLanguage()
   const sectionRef = useRef<HTMLDivElement>(null)
   const [phase, setPhase] = useState(0) // 0: nothing, 1: STOP visible, 2: STOP fading, 3: content visible
   const [isInView, setIsInView] = useState(false)
+  const [hasPlayed, setHasPlayed] = useState(false)
   
   const cardKeys = [1, 2, 3, 4]
   const freeKeys = [1, 2, 3, 4, 5]
@@ -588,12 +589,20 @@ function StopSection() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry.isIntersecting && !hasPlayed) {
           setIsInView(true)
-        } else {
+          // Scroll to CENTER of section and lock scroll
+          if (sectionRef.current) {
+            sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }
+          // Lock scroll immediately
+          document.body.style.overflow = 'hidden'
+          document.body.style.touchAction = 'none'
+        } else if (!entry.isIntersecting) {
           // Reset when leaving view
           setIsInView(false)
           setPhase(0)
+          setHasPlayed(false)
         }
       },
       { threshold: 0.3 }
@@ -604,7 +613,7 @@ function StopSection() {
     }
     
     return () => observer.disconnect()
-  }, [])
+  }, [hasPlayed])
   
   useEffect(() => {
     if (!isInView) return
@@ -612,15 +621,25 @@ function StopSection() {
     // Phase 1: Show STOP immediately
     setPhase(1)
     
-    // Phase 2: Start fading STOP after 800ms
-    const timer1 = setTimeout(() => setPhase(2), 800)
+    // Phase 2: Start fading STOP after 1.5s
+    const timer1 = setTimeout(() => setPhase(2), 1500)
     
-    // Phase 3: Show content after 1500ms
-    const timer2 = setTimeout(() => setPhase(3), 1500)
+    // Phase 3: Show content after 2.5s
+    const timer2 = setTimeout(() => setPhase(3), 2500)
+    
+    // Unlock scroll after 3 seconds total
+    const timer3 = setTimeout(() => {
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
+      setHasPlayed(true)
+    }, 3000)
     
     return () => {
       clearTimeout(timer1)
       clearTimeout(timer2)
+      clearTimeout(timer3)
+      document.body.style.overflow = ''
+      document.body.style.touchAction = ''
     }
   }, [isInView])
   
