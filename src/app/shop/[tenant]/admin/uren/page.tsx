@@ -473,9 +473,68 @@ Met vriendelijke groeten`,
       </div>
 
       {/* Print Header */}
-      <div className="hidden print:block">
-        <h1 className="text-xl font-bold">Urenregistratie - {selectedStaff?.name}</h1>
-        <p className="text-gray-600">{MONTHS[selectedMonth - 1]} {selectedYear}</p>
+      <div className="hidden print:block print-report">
+        <div className="border-b-2 border-gray-800 pb-4 mb-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">URENREGISTRATIE</h1>
+              <p className="text-lg text-gray-700 mt-1">{MONTHS[selectedMonth - 1]} {selectedYear}</p>
+            </div>
+            <div className="text-right text-sm text-gray-600">
+              <div className="font-bold text-gray-800">Vysion Horeca</div>
+              <div>Gegenereerd: {new Date().toLocaleDateString('nl-BE')}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-gray-100 p-4 rounded mb-4">
+          <h2 className="font-bold text-lg mb-2">👤 Medewerker gegevens</h2>
+          <table className="w-full text-sm">
+            <tbody>
+              <tr>
+                <td className="py-1 font-medium w-40">Naam:</td>
+                <td>{selectedStaff?.name}</td>
+                <td className="font-medium w-40">Contract:</td>
+                <td>{selectedStaff?.contract_type || '-'}</td>
+              </tr>
+              <tr>
+                <td className="py-1 font-medium">Email:</td>
+                <td>{selectedStaff?.email || '-'}</td>
+                <td className="font-medium">Uren/week:</td>
+                <td>{selectedStaff?.hours_per_week || '-'}</td>
+              </tr>
+              <tr>
+                <td className="py-1 font-medium">Telefoon:</td>
+                <td>{selectedStaff?.phone || '-'}</td>
+                <td className="font-medium">Uurloon:</td>
+                <td>{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}` : '-'}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="grid grid-cols-5 gap-2 mb-4">
+          <div className="bg-green-100 p-3 rounded text-center">
+            <div className="text-xl font-bold text-green-700">{totalWorked.toFixed(1)}</div>
+            <div className="text-xs text-green-600">Gewerkt</div>
+          </div>
+          <div className="bg-red-100 p-3 rounded text-center">
+            <div className="text-xl font-bold text-red-700">{totalSick.toFixed(1)}</div>
+            <div className="text-xs text-red-600">Ziekte</div>
+          </div>
+          <div className="bg-blue-100 p-3 rounded text-center">
+            <div className="text-xl font-bold text-blue-700">{totalVacation.toFixed(1)}</div>
+            <div className="text-xs text-blue-600">Vakantie</div>
+          </div>
+          <div className="bg-orange-100 p-3 rounded text-center">
+            <div className="text-xl font-bold text-orange-700">{totalOther.toFixed(1)}</div>
+            <div className="text-xs text-orange-600">Overig</div>
+          </div>
+          <div className="bg-gray-200 p-3 rounded text-center">
+            <div className="text-xl font-bold text-gray-800">{totalHours.toFixed(1)}</div>
+            <div className="text-xs text-gray-600">TOTAAL</div>
+          </div>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -569,33 +628,120 @@ Met vriendelijke groeten`,
 
       {/* Entries List (for print) */}
       <div className="hidden print:block">
-        <h3 className="font-bold mt-4 mb-2">Detail overzicht</h3>
-        <table className="w-full text-sm border-collapse border">
+        <h3 className="font-bold text-lg mt-6 mb-3 border-b pb-2">📋 Gedetailleerd overzicht</h3>
+        <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-1 text-left">Datum</th>
-              <th className="border p-1 text-left">Type</th>
-              <th className="border p-1 text-left">In</th>
-              <th className="border p-1 text-left">Uit</th>
-              <th className="border p-1 text-left">Pauze</th>
-              <th className="border p-1 text-left">Uren</th>
-              <th className="border p-1 text-left">Notities</th>
+            <tr className="bg-gray-800 text-white">
+              <th className="border border-gray-600 p-2 text-left">Datum</th>
+              <th className="border border-gray-600 p-2 text-left">Dag</th>
+              <th className="border border-gray-600 p-2 text-left">Type</th>
+              <th className="border border-gray-600 p-2 text-center">In</th>
+              <th className="border border-gray-600 p-2 text-center">Uit</th>
+              <th className="border border-gray-600 p-2 text-center">Pauze</th>
+              <th className="border border-gray-600 p-2 text-center">Uren</th>
+              <th className="border border-gray-600 p-2 text-left">Notities</th>
+              <th className="border border-gray-600 p-2 text-center">✓</th>
             </tr>
           </thead>
           <tbody>
-            {entries.map((e, i) => (
-              <tr key={i}>
-                <td className="border p-1">{new Date(e.date).toLocaleDateString('nl-BE')}</td>
-                <td className="border p-1">{ABSENCE_TYPES.find(t => t.id === e.absence_type)?.label}</td>
-                <td className="border p-1">{e.clock_in || '-'}</td>
-                <td className="border p-1">{e.clock_out || '-'}</td>
-                <td className="border p-1">{e.break_minutes || 0}m</td>
-                <td className="border p-1">{(e.worked_hours || e.absence_hours || 0).toFixed(1)}</td>
-                <td className="border p-1">{e.notes || '-'}</td>
-              </tr>
-            ))}
+            {entries.map((e, i) => {
+              const date = new Date(e.date)
+              const dayName = date.toLocaleDateString('nl-BE', { weekday: 'short' })
+              const absenceType = ABSENCE_TYPES.find(t => t.id === e.absence_type)
+              return (
+                <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <td className="border border-gray-300 p-2">{date.toLocaleDateString('nl-BE')}</td>
+                  <td className="border border-gray-300 p-2">{dayName}</td>
+                  <td className="border border-gray-300 p-2">
+                    <span style={{ color: absenceType?.color }}>{absenceType?.icon}</span> {absenceType?.label}
+                  </td>
+                  <td className="border border-gray-300 p-2 text-center font-mono">{e.clock_in || '-'}</td>
+                  <td className="border border-gray-300 p-2 text-center font-mono">{e.clock_out || '-'}</td>
+                  <td className="border border-gray-300 p-2 text-center">{e.break_minutes || 0}m</td>
+                  <td className="border border-gray-300 p-2 text-center font-bold">{(e.worked_hours || e.absence_hours || 0).toFixed(1)}</td>
+                  <td className="border border-gray-300 p-2 text-gray-600 text-xs">{e.notes || '-'}</td>
+                  <td className="border border-gray-300 p-2 text-center">{e.is_approved ? '✓' : ''}</td>
+                </tr>
+              )
+            })}
           </tbody>
+          <tfoot>
+            <tr className="bg-gray-200 font-bold">
+              <td colSpan={6} className="border border-gray-400 p-2 text-right">TOTAAL:</td>
+              <td className="border border-gray-400 p-2 text-center">{totalHours.toFixed(1)}</td>
+              <td colSpan={2} className="border border-gray-400 p-2"></td>
+            </tr>
+          </tfoot>
         </table>
+
+        {/* Breakdown per type */}
+        <div className="mt-6 grid grid-cols-2 gap-4">
+          <div>
+            <h4 className="font-bold mb-2">📊 Uitsplitsing per type</h4>
+            <table className="w-full text-sm border-collapse">
+              <tbody>
+                {ABSENCE_TYPES.map(type => {
+                  const hours = entries
+                    .filter(e => e.absence_type === type.id)
+                    .reduce((sum, e) => sum + (e.worked_hours || e.absence_hours || 0), 0)
+                  if (hours === 0) return null
+                  return (
+                    <tr key={type.id}>
+                      <td className="border p-1">{type.icon} {type.label}</td>
+                      <td className="border p-1 text-right font-mono">{hours.toFixed(1)} uur</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+          
+          {selectedStaff?.hours_per_week && (
+            <div>
+              <h4 className="font-bold mb-2">📈 Contractvergelijking</h4>
+              <table className="w-full text-sm border-collapse">
+                <tbody>
+                  <tr>
+                    <td className="border p-1">Contract uren/maand</td>
+                    <td className="border p-1 text-right font-mono">{(selectedStaff.hours_per_week * 4.33).toFixed(1)} uur</td>
+                  </tr>
+                  <tr>
+                    <td className="border p-1">Gewerkte uren</td>
+                    <td className="border p-1 text-right font-mono">{totalWorked.toFixed(1)} uur</td>
+                  </tr>
+                  <tr className="font-bold">
+                    <td className="border p-1">Verschil</td>
+                    <td className={`border p-1 text-right font-mono ${totalWorked - (selectedStaff.hours_per_week * 4.33) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {(totalWorked - (selectedStaff.hours_per_week * 4.33)).toFixed(1)} uur
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Signature section */}
+        <div className="mt-8 pt-4 border-t">
+          <div className="grid grid-cols-2 gap-8">
+            <div>
+              <p className="text-sm text-gray-600 mb-12">Handtekening medewerker:</p>
+              <div className="border-b border-gray-400 mb-1"></div>
+              <p className="text-xs text-gray-500">{selectedStaff?.name}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 mb-12">Handtekening werkgever:</p>
+              <div className="border-b border-gray-400 mb-1"></div>
+              <p className="text-xs text-gray-500">Naam + datum</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 pt-4 border-t text-center text-xs text-gray-500">
+          <p>Dit document is gegenereerd door Vysion Horeca op {new Date().toLocaleDateString('nl-BE')} om {new Date().toLocaleTimeString('nl-BE')}</p>
+          <p>www.vysionhoreca.com</p>
+        </div>
       </div>
 
       {/* Legend */}
@@ -869,15 +1015,54 @@ Met vriendelijke groeten`,
       {/* Print Styles */}
       <style jsx global>{`
         @media print {
+          @page {
+            size: A4;
+            margin: 15mm;
+          }
+          
+          body {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+          
           body * {
             visibility: hidden;
           }
+          
+          .print-report,
+          .print-report *,
           .print\\:block,
           .print\\:block * {
             visibility: visible;
           }
+          
           .print\\:hidden {
             display: none !important;
+          }
+          
+          .print-report {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            font-size: 11px;
+          }
+          
+          table {
+            page-break-inside: auto;
+          }
+          
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+          
+          thead {
+            display: table-header-group;
+          }
+          
+          tfoot {
+            display: table-footer-group;
           }
         }
       `}</style>
