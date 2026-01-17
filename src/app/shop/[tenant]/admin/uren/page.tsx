@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { 
   getActiveStaff,
   getTimesheetEntries,
@@ -60,6 +61,7 @@ export default function UrenPage() {
   const [sendingEmail, setSendingEmail] = useState(false)
   
   const printRef = useRef<HTMLDivElement>(null)
+  const pdfRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadStaff()
@@ -267,8 +269,29 @@ export default function UrenPage() {
   }
 
   // Export to PDF (print)
-  function exportToPDF() {
+  function exportToPrint() {
     window.print()
+  }
+
+  // Export to PDF (download)
+  async function exportToPDF() {
+    if (!selectedStaff || !pdfRef.current) return
+    
+    // Dynamically import html2pdf (client-side only)
+    const html2pdf = (await import('html2pdf.js')).default
+    
+    const element = pdfRef.current
+    const fileName = `Urenregistratie_${selectedStaff.name.replace(/\s/g, '_')}_${selectedYear}-${String(selectedMonth).padStart(2, '0')}.pdf`
+    
+    const opt = {
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }
+    
+    html2pdf().set(opt).from(element).save()
   }
 
   // Open email modal
@@ -400,6 +423,12 @@ Met vriendelijke groeten`,
           </button>
           <button
             onClick={exportToPDF}
+            className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
+          >
+            📄 PDF
+          </button>
+          <button
+            onClick={exportToPrint}
             className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition"
           >
             🖨️ Print
@@ -408,7 +437,7 @@ Met vriendelijke groeten`,
             onClick={openEmailModal}
             className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition"
           >
-            📧 Naar loonkantoor
+            📧 Email
           </button>
         </div>
       </div>
@@ -930,6 +959,188 @@ Met vriendelijke groeten`,
           </div>
         </div>
       )}
+
+      {/* Hidden PDF Content for Download */}
+      <div className="absolute left-[-9999px] top-0">
+        <div ref={pdfRef} className="bg-white p-8 w-[210mm]" style={{ fontFamily: 'Arial, sans-serif' }}>
+          {/* PDF Header */}
+          <div className="border-b-2 border-gray-800 pb-4 mb-6">
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">URENREGISTRATIE</h1>
+                <p className="text-lg text-gray-700 mt-1">{MONTHS[selectedMonth - 1]} {selectedYear}</p>
+              </div>
+              <div className="text-right text-sm text-gray-600">
+                <div className="font-bold text-gray-800 text-lg">Vysion Horeca</div>
+                <div>Gegenereerd: {new Date().toLocaleDateString('nl-BE')}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Employee Info */}
+          <div className="bg-gray-100 p-4 rounded mb-6">
+            <h2 className="font-bold text-lg mb-3">👤 Medewerker gegevens</h2>
+            <table className="w-full text-sm">
+              <tbody>
+                <tr>
+                  <td className="py-1 font-medium w-32">Naam:</td>
+                  <td className="py-1">{selectedStaff?.name}</td>
+                  <td className="py-1 font-medium w-32">Contract:</td>
+                  <td className="py-1">{selectedStaff?.contract_type || '-'}</td>
+                </tr>
+                <tr>
+                  <td className="py-1 font-medium">Email:</td>
+                  <td className="py-1">{selectedStaff?.email || '-'}</td>
+                  <td className="py-1 font-medium">Uren/week:</td>
+                  <td className="py-1">{selectedStaff?.hours_per_week || '-'}</td>
+                </tr>
+                <tr>
+                  <td className="py-1 font-medium">Telefoon:</td>
+                  <td className="py-1">{selectedStaff?.phone || '-'}</td>
+                  <td className="py-1 font-medium">Uurloon:</td>
+                  <td className="py-1">{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}` : '-'}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Summary Boxes */}
+          <div className="grid grid-cols-5 gap-3 mb-6">
+            <div className="bg-green-100 p-3 rounded text-center">
+              <div className="text-xl font-bold text-green-700">{totalWorked.toFixed(1)}</div>
+              <div className="text-xs text-green-600">Gewerkt</div>
+            </div>
+            <div className="bg-red-100 p-3 rounded text-center">
+              <div className="text-xl font-bold text-red-700">{totalSick.toFixed(1)}</div>
+              <div className="text-xs text-red-600">Ziekte</div>
+            </div>
+            <div className="bg-blue-100 p-3 rounded text-center">
+              <div className="text-xl font-bold text-blue-700">{totalVacation.toFixed(1)}</div>
+              <div className="text-xs text-blue-600">Vakantie</div>
+            </div>
+            <div className="bg-orange-100 p-3 rounded text-center">
+              <div className="text-xl font-bold text-orange-700">{totalOther.toFixed(1)}</div>
+              <div className="text-xs text-orange-600">Overig</div>
+            </div>
+            <div className="bg-gray-200 p-3 rounded text-center">
+              <div className="text-xl font-bold text-gray-800">{totalHours.toFixed(1)}</div>
+              <div className="text-xs text-gray-600">TOTAAL</div>
+            </div>
+          </div>
+
+          {/* Detail Table */}
+          <h3 className="font-bold text-lg mb-3 border-b pb-2">📋 Gedetailleerd overzicht</h3>
+          <table className="w-full text-xs border-collapse mb-6">
+            <thead>
+              <tr className="bg-gray-800 text-white">
+                <th className="border border-gray-600 p-2 text-left">Datum</th>
+                <th className="border border-gray-600 p-2 text-left">Dag</th>
+                <th className="border border-gray-600 p-2 text-left">Type</th>
+                <th className="border border-gray-600 p-2 text-center">In</th>
+                <th className="border border-gray-600 p-2 text-center">Uit</th>
+                <th className="border border-gray-600 p-2 text-center">Pauze</th>
+                <th className="border border-gray-600 p-2 text-center">Uren</th>
+                <th className="border border-gray-600 p-2 text-center">✓</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((e, i) => {
+                const date = new Date(e.date)
+                const dayName = date.toLocaleDateString('nl-BE', { weekday: 'short' })
+                const absenceType = ABSENCE_TYPES.find(t => t.id === e.absence_type)
+                return (
+                  <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="border border-gray-300 p-1">{date.toLocaleDateString('nl-BE')}</td>
+                    <td className="border border-gray-300 p-1">{dayName}</td>
+                    <td className="border border-gray-300 p-1">{absenceType?.label}</td>
+                    <td className="border border-gray-300 p-1 text-center font-mono">{e.clock_in || '-'}</td>
+                    <td className="border border-gray-300 p-1 text-center font-mono">{e.clock_out || '-'}</td>
+                    <td className="border border-gray-300 p-1 text-center">{e.break_minutes || 0}m</td>
+                    <td className="border border-gray-300 p-1 text-center font-bold">{(e.worked_hours || e.absence_hours || 0).toFixed(1)}</td>
+                    <td className="border border-gray-300 p-1 text-center">{e.is_approved ? '✓' : ''}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+            <tfoot>
+              <tr className="bg-gray-200 font-bold">
+                <td colSpan={6} className="border border-gray-400 p-2 text-right">TOTAAL:</td>
+                <td className="border border-gray-400 p-2 text-center">{totalHours.toFixed(1)}</td>
+                <td className="border border-gray-400 p-2"></td>
+              </tr>
+            </tfoot>
+          </table>
+
+          {/* Breakdown */}
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <h4 className="font-bold mb-2 text-sm">📊 Uitsplitsing per type</h4>
+              <table className="w-full text-xs border-collapse">
+                <tbody>
+                  {ABSENCE_TYPES.map(type => {
+                    const hours = entries
+                      .filter(e => e.absence_type === type.id)
+                      .reduce((sum, e) => sum + (e.worked_hours || e.absence_hours || 0), 0)
+                    if (hours === 0) return null
+                    return (
+                      <tr key={type.id}>
+                        <td className="border p-1">{type.icon} {type.label}</td>
+                        <td className="border p-1 text-right font-mono">{hours.toFixed(1)} uur</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+            
+            {selectedStaff?.hours_per_week && (
+              <div>
+                <h4 className="font-bold mb-2 text-sm">📈 Contractvergelijking</h4>
+                <table className="w-full text-xs border-collapse">
+                  <tbody>
+                    <tr>
+                      <td className="border p-1">Contract uren/maand</td>
+                      <td className="border p-1 text-right font-mono">{(selectedStaff.hours_per_week * 4.33).toFixed(1)} uur</td>
+                    </tr>
+                    <tr>
+                      <td className="border p-1">Gewerkte uren</td>
+                      <td className="border p-1 text-right font-mono">{totalWorked.toFixed(1)} uur</td>
+                    </tr>
+                    <tr className="font-bold">
+                      <td className="border p-1">Verschil</td>
+                      <td className={`border p-1 text-right font-mono ${totalWorked - (selectedStaff.hours_per_week * 4.33) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {(totalWorked - (selectedStaff.hours_per_week * 4.33)).toFixed(1)} uur
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Signature Section */}
+          <div className="mt-8 pt-4 border-t">
+            <div className="grid grid-cols-2 gap-8">
+              <div>
+                <p className="text-sm text-gray-600 mb-10">Handtekening medewerker:</p>
+                <div className="border-b border-gray-400 mb-1"></div>
+                <p className="text-xs text-gray-500">{selectedStaff?.name}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-10">Handtekening werkgever:</p>
+                <div className="border-b border-gray-400 mb-1"></div>
+                <p className="text-xs text-gray-500">Naam + datum</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="mt-8 pt-4 border-t text-center text-xs text-gray-500">
+            <p>Dit document is gegenereerd door Vysion Horeca op {new Date().toLocaleDateString('nl-BE')} om {new Date().toLocaleTimeString('nl-BE')}</p>
+            <p className="text-orange-500 font-medium">www.vysionhoreca.com</p>
+          </div>
+        </div>
+      </div>
 
       {/* Email Modal */}
       {showEmailModal && (
