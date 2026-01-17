@@ -473,13 +473,13 @@ function PricingSection() {
   const { t, locale } = useLanguage()
   
   return (
-    <section id="prijzen" className="py-24 bg-[#1a1a2e]">
+    <section id="prijzen" className="py-24 bg-[#E3E3E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             {t('pricing.title')}
           </h2>
-          <p className="text-xl text-gray-300">
+          <p className="text-xl text-gray-600">
             {t('pricing.subtitle')}
           </p>
         </div>
@@ -586,11 +586,33 @@ function StopSection() {
   const cardKeys = [1, 2, 3, 4]
   const freeKeys = [1, 2, 3, 4, 5]
   
+  // Lock body scroll when isLocked
+  useEffect(() => {
+    if (isLocked) {
+      const scrollY = window.scrollY
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${scrollY}px`
+      document.body.style.left = '0'
+      document.body.style.right = '0'
+      document.body.style.overflow = 'hidden'
+    } else {
+      const scrollY = document.body.style.top
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
+      document.body.style.overflow = ''
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1)
+      }
+    }
+  }, [isLocked])
+  
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasPlayed && !isLocked) {
-          // Scroll to section
+          // Scroll to section first
           if (sectionRef.current) {
             sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
           }
@@ -611,7 +633,7 @@ function StopSection() {
               setIsLocked(false)
               setHasPlayed(true)
             }, 3500)
-          }, 500)
+          }, 600)
         } else if (!entry.isIntersecting && hasPlayed) {
           // Reset when fully leaving view
           setPhase(0)
