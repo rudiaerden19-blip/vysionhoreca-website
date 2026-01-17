@@ -11,6 +11,7 @@ import {
   approveTimesheetEntries,
   generateMonthlyTimesheet,
   closeMonthlyTimesheet,
+  reopenMonthlyTimesheet,
   getMonthlyTimesheet,
   markTimesheetExported,
   Staff,
@@ -43,6 +44,8 @@ export default function UrenPage() {
   
   const [showEntryModal, setShowEntryModal] = useState(false)
   const [showEmailModal, setShowEmailModal] = useState(false)
+  const [showReopenModal, setShowReopenModal] = useState(false)
+  const [reopenReason, setReopenReason] = useState('')
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [entryForm, setEntryForm] = useState<Partial<TimesheetEntry>>({
     absence_type: 'WORKED',
@@ -215,6 +218,32 @@ export default function UrenPage() {
     const success = await closeMonthlyTimesheet(tenant, selectedStaff.id, selectedYear, selectedMonth, selectedStaff.id)
     if (success) {
       loadData()
+    }
+  }
+
+  async function handleReopenMonth() {
+    if (!selectedStaff?.id || !reopenReason.trim()) {
+      alert('Vul een reden in voor het heropenen')
+      return
+    }
+    
+    setSaving(true)
+    const success = await reopenMonthlyTimesheet(
+      tenant, 
+      selectedStaff.id, 
+      selectedYear, 
+      selectedMonth, 
+      selectedStaff.id,
+      reopenReason.trim()
+    )
+    setSaving(false)
+    
+    if (success) {
+      setShowReopenModal(false)
+      setReopenReason('')
+      loadData()
+    } else {
+      alert('Heropenen mislukt')
     }
   }
 
@@ -492,13 +521,21 @@ Met vriendelijke groeten`,
         >
           ✓ Alles goedkeuren
         </button>
-        <button
-          onClick={handleCloseMonth}
-          disabled={monthlyTimesheet?.is_closed}
-          className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition disabled:opacity-50"
-        >
-          🔒 Maand afsluiten
-        </button>
+        {monthlyTimesheet?.is_closed ? (
+          <button
+            onClick={() => setShowReopenModal(true)}
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+          >
+            🔓 Maand heropenen
+          </button>
+        ) : (
+          <button
+            onClick={handleCloseMonth}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+          >
+            🔒 Maand afsluiten
+          </button>
+        )}
       </div>
 
       {/* Print Header */}
@@ -597,8 +634,16 @@ Met vriendelijke groeten`,
 
       {/* Status badges */}
       {monthlyTimesheet?.is_closed && (
-        <div className="bg-purple-100 border border-purple-300 rounded-lg p-3 flex items-center gap-2">
-          <span className="text-purple-700">🔒 Maand is afgesloten op {new Date(monthlyTimesheet.closed_at!).toLocaleDateString('nl-BE')}</span>
+        <div className="bg-purple-100 border border-purple-300 rounded-lg p-3 flex items-center justify-between">
+          <span className="text-purple-700">
+            🔒 Maand is afgesloten op {new Date(monthlyTimesheet.closed_at!).toLocaleDateString('nl-BE')}
+          </span>
+          <button
+            onClick={() => setShowReopenModal(true)}
+            className="px-3 py-1 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 transition"
+          >
+            🔓 Heropenen
+          </button>
         </div>
       )}
 
@@ -1141,6 +1186,79 @@ Met vriendelijke groeten`,
           </div>
         </div>
       </div>
+
+      {/* Reopen Month Modal */}
+      {showReopenModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
+            <div className="p-6 border-b">
+              <h2 className="text-xl font-bold text-gray-800">
+                🔓 Maand heropenen
+              </h2>
+              <p className="text-gray-600 text-sm mt-1">
+                {selectedStaff?.name} - {MONTHS[selectedMonth - 1]} {selectedYear}
+              </p>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <p className="text-orange-800 text-sm">
+                  ⚠️ <strong>Let op:</strong> Na heropenen kunnen uren weer worden gewijzigd. 
+                  Dit wordt gelogd voor de administratie.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Reden voor heropenen <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={reopenReason}
+                  onChange={(e) => setReopenReason(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 mb-2"
+                >
+                  <option value="">Selecteer een reden...</option>
+                  <option value="Correctie foute invoer">Correctie foute invoer</option>
+                  <option value="Vergeten uren toevoegen">Vergeten uren toevoegen</option>
+                  <option value="Ziekte achteraf gemeld">Ziekte achteraf gemeld</option>
+                  <option value="Vakantie wijziging">Vakantie wijziging</option>
+                  <option value="Verzoek medewerker">Verzoek medewerker</option>
+                  <option value="Verzoek loonkantoor">Verzoek loonkantoor</option>
+                  <option value="Anders">Anders</option>
+                </select>
+                {reopenReason === 'Anders' && (
+                  <textarea
+                    value={reopenReason === 'Anders' ? '' : reopenReason}
+                    onChange={(e) => setReopenReason(e.target.value)}
+                    rows={2}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    placeholder="Beschrijf de reden..."
+                  />
+                )}
+              </div>
+            </div>
+            
+            <div className="p-6 border-t flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowReopenModal(false)
+                  setReopenReason('')
+                }}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+              >
+                Annuleren
+              </button>
+              <button
+                onClick={handleReopenMonth}
+                disabled={saving || !reopenReason.trim()}
+                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
+              >
+                {saving ? 'Bezig...' : '🔓 Heropenen'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Email Modal */}
       {showEmailModal && (

@@ -68,6 +68,9 @@ CREATE TABLE IF NOT EXISTS monthly_timesheets (
   closed_at TIMESTAMP WITH TIME ZONE,
   closed_by UUID REFERENCES staff(id),
   exported_at TIMESTAMP WITH TIME ZONE,
+  reopened_at TIMESTAMP WITH TIME ZONE,
+  reopened_by UUID REFERENCES staff(id),
+  reopen_reason TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   UNIQUE(tenant_slug, staff_id, year, month)

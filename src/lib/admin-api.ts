@@ -2640,3 +2640,31 @@ export async function markTimesheetExported(
   }
   return true
 }
+
+export async function reopenMonthlyTimesheet(
+  tenantSlug: string, 
+  staffId: string, 
+  year: number, 
+  month: number,
+  reopenedById: string,
+  reason: string
+): Promise<boolean> {
+  const { error } = await supabase
+    .from('monthly_timesheets')
+    .update({ 
+      is_closed: false,
+      reopened_at: new Date().toISOString(),
+      reopened_by: reopenedById,
+      reopen_reason: reason,
+    })
+    .eq('tenant_slug', tenantSlug)
+    .eq('staff_id', staffId)
+    .eq('year', year)
+    .eq('month', month)
+  
+  if (error) {
+    console.error('Error reopening monthly timesheet:', error)
+    return false
+  }
+  return true
+}
