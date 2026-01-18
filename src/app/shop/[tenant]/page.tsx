@@ -558,24 +558,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         <section className="py-20 bg-white">
           <div className="max-w-6xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12 items-center">
-              <motion.div
-                initial={{ opacity: 0, x: -40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
+              <div>
                 <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Ons verhaal</span>
                 <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2 mb-6">Over Ons</h2>
                 <p className="text-gray-600 text-lg leading-relaxed mb-6">
                   {business.story}
                 </p>
-              </motion.div>
+              </div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="relative"
-              >
+              <div className="relative">
                 <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl relative">
                   <Image
                     src={business.about_image || "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800"}
@@ -587,7 +578,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     className="object-cover"
                   />
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
         </section>
@@ -612,26 +603,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           />
           
           <div className="max-w-6xl mx-auto px-4 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
+            <div className="text-center mb-12">
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Onze keuken</span>
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Onze Specialiteiten</h2>
-            </motion.div>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Specialty 1 */}
               {business.specialty_1_image && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 }}
-                  className="group cursor-pointer"
-                >
+                <div className="group cursor-pointer">
                   <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
                     <Image 
                       src={business.specialty_1_image}
@@ -647,18 +627,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       <h3 className="text-2xl font-bold text-white">{business.specialty_1_title || 'Specialiteit'}</h3>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
 
               {/* Specialty 2 */}
               {business.specialty_2_image && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="group cursor-pointer"
-                >
+                <div className="group cursor-pointer">
                   <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
                     <Image 
                       src={business.specialty_2_image}
@@ -674,18 +648,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       <h3 className="text-2xl font-bold text-white">{business.specialty_2_title || 'Specialiteit'}</h3>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
 
               {/* Specialty 3 */}
               {business.specialty_3_image && (
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3 }}
-                  className="group cursor-pointer"
-                >
+                <div className="group cursor-pointer">
                   <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
                     <Image 
                       src={business.specialty_3_image}
@@ -701,7 +669,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       <h3 className="text-2xl font-bold text-white">{business.specialty_3_title || 'Specialiteit'}</h3>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
             </div>
           </div>
@@ -711,26 +679,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {/* Table Reservation Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
+          <div className="text-center mb-12">
             <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Kom langs</span>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Reserveer een tafel</h2>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
               Wil je zeker zijn van een plekje? Reserveer vooraf en geniet ter plaatse van onze lekkernijen.
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-3xl p-8 md:p-12 shadow-sm"
-          >
+          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm">
             {reservationSuccess ? (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">✅</div>
@@ -846,13 +803,11 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <p className="text-red-500 text-center mt-4">{reservationError}</p>
                 )}
 
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <button
                   onClick={handleReservationSubmit}
                   disabled={reservationSubmitting}
                   style={{ backgroundColor: business.primary_color }}
-                  className="w-full mt-8 text-white font-bold text-lg py-4 rounded-xl transition-colors flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50"
+                  className="w-full mt-8 text-white font-bold text-lg py-4 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                 >
                   {reservationSubmitting ? (
                     <span>Even geduld...</span>
@@ -862,14 +817,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       <span>Reserveer nu</span>
                     </>
                   )}
-                </motion.button>
+                </button>
 
                 <p className="text-center text-gray-500 text-sm mt-4">
                   Je ontvangt een bevestiging via telefoon of e-mail
                 </p>
               </>
             )}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -892,25 +847,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           />
           
           <div className="max-w-4xl mx-auto px-4 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center"
-            >
+            <div className="text-center">
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Kom bij ons team</span>
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">
                 {business.hiring_title || 'Wij zoeken personeel'}
               </h2>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="mt-12 bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-white/50"
-            >
+            <div className="mt-12 bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-white/50">
               {business.hiring_description && (
                 <div className="prose prose-lg max-w-none text-gray-700 mb-8">
                   <p className="whitespace-pre-line">{business.hiring_description}</p>
@@ -935,7 +879,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </a>
                 </div>
               )}
-            </motion.div>
+            </div>
           </div>
         </section>
       )}
@@ -943,12 +887,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {/* Reviews Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
+          <div className="text-center mb-12">
             <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Wat klanten zeggen</span>
             <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Reviews</h2>
             <div className="flex items-center justify-center gap-2 mt-4">
@@ -960,16 +899,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <span className="font-bold text-2xl text-gray-900">{business.average_rating}</span>
               <span className="text-gray-500">({business.review_count} reviews)</span>
             </div>
-          </motion.div>
+          </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {reviews.map((review, index) => (
-              <motion.div
+            {reviews.map((review) => (
+              <div
                 key={review.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
                 className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-center gap-4 mb-4">
@@ -992,7 +927,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                 </div>
                 <p className="text-gray-600 leading-relaxed">{review.text}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -1002,12 +937,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {business && (business.top_seller_1 || business.top_seller_2 || business.top_seller_3) && (
         <section className="py-20 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
+            <div className="text-center mb-12">
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 italic">
                 Onze Meest Verkochte Producten
               </h2>
@@ -1015,18 +945,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <p className="text-gray-600">
                 Dit zijn de meest verkochte producten bij {business.name.toLowerCase()}.
               </p>
-            </motion.div>
+            </div>
 
             <div className="grid md:grid-cols-3 gap-8 justify-items-center">
               {[business.top_seller_1, business.top_seller_2, business.top_seller_3]
                 .filter(url => url && url.trim() !== '')
                 .map((imageUrl, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, y: 40 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
                     className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow w-full relative h-72"
                   >
                     <Image
@@ -1038,7 +964,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       loading="lazy"
                       className="object-cover"
                     />
-                  </motion.div>
+                  </div>
                 ))
               }
             </div>
@@ -1050,24 +976,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {teamMembers.length > 0 && (
         <section className="py-20 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
+            <div className="text-center mb-12">
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Maak kennis met</span>
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Ons Team</h2>
-            </motion.div>
+            </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {teamMembers.map((member, index) => (
-                <motion.div
+              {teamMembers.map((member) => (
+                <div
                   key={member.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
                   className="text-center"
                 >
                   <div className="aspect-square rounded-2xl bg-gray-200 overflow-hidden mb-4 shadow-lg">
@@ -1089,7 +1006,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   {member.role && (
                     <p className="text-gray-500">{member.role}</p>
                   )}
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -1114,25 +1031,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           />
           
           <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
+            <div>
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Het perfecte cadeau</span>
               <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Geef iemand een verrassing</h2>
               <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg">
                 Bestel een cadeaubon en verras iemand met een heerlijke maaltijd. Direct in de mailbox!
               </p>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="mt-10"
-            >
+            <div className="mt-10">
               <button
                 onClick={() => setShowGiftCardModal(true)}
                 style={{ backgroundColor: business.primary_color }}
@@ -1141,16 +1048,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <span className="text-2xl">🎁</span>
                 <span>Cadeaubon bestellen</span>
               </button>
-            </motion.div>
+            </div>
 
             {/* Gift card visual */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="mt-12 max-w-md mx-auto"
-            >
+            <div className="mt-12 max-w-md mx-auto">
               <div 
                 className="relative rounded-2xl p-8 text-white shadow-2xl overflow-hidden"
                 style={{ backgroundColor: business.primary_color }}
@@ -1172,7 +1073,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
       )}
@@ -1182,11 +1083,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12">
             {/* Opening Hours */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
+            <div>
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
                 <span className="text-4xl">🕐</span>
                 Openingsuren
@@ -1211,15 +1108,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
 
             {/* Contact */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
+            <div>
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
                 <span className="text-4xl">📍</span>
                 Contact
@@ -1313,7 +1205,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   )}
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -1322,25 +1214,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {business.show_qr_codes && (
       <section className="py-16 bg-gray-100">
         <div className="max-w-5xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">📱 Scan & Ontdek</h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Scan & Ontdek</h2>
             <p className="text-gray-600">Scan de QR-codes met je smartphone</p>
-          </motion.div>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Menu QR */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl p-8 shadow-lg text-center"
-            >
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart`)}`}
@@ -1351,16 +1232,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-5xl mb-3">🍟</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Menu Bekijken</h3>
               <p className="text-gray-600">Scan om ons menu te zien</p>
-            </motion.div>
+            </div>
 
             {/* Promoties QR */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl p-8 shadow-lg text-center"
-            >
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart?promo=1`)}`}
@@ -1371,16 +1246,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-5xl mb-3">🎁</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Promoties</h3>
               <p className="text-gray-600">Scan om onze aanbiedingen te zien</p>
-            </motion.div>
+            </div>
 
             {/* Review QR */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="bg-white rounded-2xl p-8 shadow-lg text-center"
-            >
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/review`)}`}
@@ -1391,7 +1260,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-5xl mb-3">⭐</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Review Geven</h3>
               <p className="text-gray-600">Scan om een beoordeling te geven</p>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -1400,11 +1269,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {/* CTA Section */}
       <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
+          <div>
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
               Honger gekregen?
             </h2>
@@ -1412,20 +1277,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               Bestel nu online en geniet van de lekkerste gerechten!
             </p>
             <Link href={`/shop/${params.tenant}/menu`}>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+              <button
                 style={{ color: business.primary_color }}
-                className="bg-white font-bold text-xl px-12 py-5 rounded-full shadow-2xl inline-flex items-center gap-3"
+                className="bg-white font-bold text-xl px-12 py-5 rounded-full shadow-2xl inline-flex items-center gap-3 hover:scale-105 active:scale-95 transition-transform"
               >
                 <span>🍟</span>
                 <span>Start je bestelling</span>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-              </motion.button>
+              </button>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -1676,11 +1539,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   >
                     {giftCardLoading ? (
                       <>
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                        />
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         <span>Even geduld...</span>
                       </>
                     ) : (
@@ -1775,16 +1634,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {/* Floating Order Button (Mobile) */}
       <div className="fixed bottom-6 left-4 right-4 md:hidden z-50">
         <Link href={`/shop/${params.tenant}/menu`}>
-          <motion.button
-            initial={{ y: 100 }}
-            animate={{ y: 0 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66` }}
-            className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90"
+            className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-transform"
           >
             <span>🍟</span>
             <span>Bestel Nu</span>
-          </motion.button>
+          </button>
         </Link>
       </div>
     </div>
