@@ -37,7 +37,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="nl" className={`${inter.variable} overflow-x-hidden`}>
-      <body className={`${inter.className} bg-white text-gray-900 antialiased overflow-x-hidden max-w-[100vw]`}>
+      <body className={`${inter.className} bg-white text-gray-900 antialiased overflow-x-hidden w-full`}>
         <LanguageProvider>
           {children}
         </LanguageProvider>
