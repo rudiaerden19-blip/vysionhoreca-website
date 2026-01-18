@@ -23,10 +23,12 @@ export default function RegisterPage() {
 
   // Read language from URL parameter on mount
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const langParam = params.get('lang') as Locale | null
-    if (langParam && locales.includes(langParam)) {
-      setLocale(langParam)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const langParam = params.get('lang') as Locale | null
+      if (langParam && locales.includes(langParam)) {
+        setLocale(langParam)
+      }
     }
   }, [setLocale, locales])
 
