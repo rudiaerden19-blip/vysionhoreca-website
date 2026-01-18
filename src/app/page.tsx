@@ -873,7 +873,7 @@ function IndustrySection() {
   
   const industries = {
     invoicing: { image: 'https://i.imgur.com/k60MNlb.png' },
-    ordering: { image: 'https://i.imgur.com/ZJUI9VI.png' },
+    ordering: { image: 'https://i.imgur.com/0DoYrGw.png' },
     analytics: { image: 'https://i.imgur.com/xFIDs6L.png' },
     accounting: { image: 'https://i.imgur.com/A3yjDsL.png' },
   }
