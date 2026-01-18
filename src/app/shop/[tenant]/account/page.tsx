@@ -162,7 +162,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 overflow-x-hidden w-full">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -179,29 +179,29 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
         {/* Profile Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl p-6 shadow-sm mb-6"
+          className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm mb-4 sm:mb-6"
         >
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
+            <div className="flex items-center gap-3 sm:gap-4">
               <div 
-                className="w-16 h-16 rounded-full flex items-center justify-center text-2xl text-white font-bold"
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-xl sm:text-2xl text-white font-bold shrink-0"
                 style={{ backgroundColor: primaryColor }}
               >
                 {customer?.name.charAt(0).toUpperCase()}
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">{customer?.name}</h2>
-                <p className="text-gray-500">{customer?.email}</p>
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{customer?.name}</h2>
+                <p className="text-gray-500 text-sm sm:text-base truncate">{customer?.email}</p>
               </div>
             </div>
             <button
               onClick={() => setEditing(!editing)}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors"
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors text-sm sm:text-base shrink-0"
             >
               {editing ? 'Annuleren' : '✏️ Bewerken'}
             </button>
@@ -218,7 +218,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Telefoon</label>
                   <input
@@ -285,12 +285,12 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-medium opacity-90">Klantenkaart</h3>
-              <p className="text-4xl font-bold mt-2">{customer?.loyalty_points || 0} punten</p>
+              <p className="text-2xl sm:text-4xl font-bold mt-2">{customer?.loyalty_points || 0} punten</p>
               <p className="text-sm opacity-75 mt-1">
                 €{customer?.total_spent?.toFixed(2) || '0.00'} besteed • {customer?.total_orders || 0} bestellingen
               </p>
             </div>
-            <div className="text-6xl">🎁</div>
+            <div className="text-4xl sm:text-6xl">🎁</div>
           </div>
         </motion.div>
 
@@ -300,7 +300,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-white rounded-2xl p-6 shadow-sm mb-6"
+            className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm mb-4 sm:mb-6"
           >
             <h2 className="text-lg font-bold text-gray-900 mb-4">🎁 Beloningen inwisselen</h2>
             <div className="space-y-3">
@@ -346,7 +346,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl p-6 shadow-sm"
+          className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm mb-4 sm:mb-6"
         >
           <h2 className="text-lg font-bold text-gray-900 mb-4">Bestellingen</h2>
           

@@ -14,66 +14,132 @@
   box-sizing: border-box;
 }
 
-/* FORCE NO HORIZONTAL SCROLL - Mobile fix for iOS Safari */
+/* ========================================
+   MOBILE-FIRST RESPONSIVE BASE
+   ======================================== */
+
 html {
   width: 100%;
-  max-width: 100%;
-  overflow-x: hidden !important;
+  height: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
   -webkit-overflow-scrolling: touch;
 }
 
 body {
   width: 100%;
-  max-width: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: hidden !important;
-  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  line-height: 1.5;
 }
 
-/* Wrapper for all content - prevents horizontal scroll on mobile */
-#__next {
+/* Prevent horizontal overflow on all containers */
+#__next,
+main,
+article,
+section,
+header,
+footer,
+nav,
+aside {
   width: 100%;
-  max-width: 100%;
-  overflow-x: hidden !important;
-}
-
-/* Prevent any element from causing horizontal scroll */
-main, section, article, header, footer, nav {
   max-width: 100%;
   overflow-x: hidden;
 }
 
-/* Fix for absolute positioned elements that might overflow */
-.fixed, [class*="fixed"] {
-  max-width: 100vw;
+/* Fix for iOS Safari viewport issues */
+@supports (-webkit-touch-callout: none) {
+  body {
+    min-height: -webkit-fill-available;
+  }
 }
 
-/* Hide horizontal scrollbar but allow vertical */
-::-webkit-scrollbar {
-  width: 8px;
+/* ========================================
+   MOBILE SAFE AREA PADDING (iPhone notch)
+   ======================================== */
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
 }
 
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* ========================================
+   TOUCH-FRIENDLY DEFAULTS
+   ======================================== */
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Minimum touch target size (44x44px per Apple guidelines) */
+@media (max-width: 768px) {
+  button,
+  [role="button"],
+  a {
+    min-height: 44px;
+  }
+  
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+}
+
+/* ========================================
+   SCROLLBAR STYLES
+   ======================================== */
+
+/* Hide horizontal scrollbar */
 ::-webkit-scrollbar:horizontal {
   height: 0;
   display: none;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Vertical scrollbar (desktop only) */
+@media (min-width: 769px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+  }
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
-  border-radius: 4px;
-}
-
-/* Category scroll bar should be visible horizontally */
+/* Hide scrollbar utility class */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -83,13 +149,26 @@ main, section, article, header, footer, nav {
   scrollbar-width: none;
 }
 
+/* ========================================
+   RESPONSIVE TEXT UTILITIES
+   ======================================== */
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+  
+  /* Prevent text overflow */
+  .break-anywhere {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
 }
 
-/* Animations */
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -120,14 +199,23 @@ main, section, article, header, footer, nav {
 .delay-400 { animation-delay: 0.4s; }
 .delay-500 { animation-delay: 0.5s; }
 
-/* Gradient overlay for hero */
-.hero-gradient {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
-/* Button hover effects */
+/* ========================================
+   BUTTON STYLES
+   ======================================== */
+
 .btn-primary {
-  @apply bg-accent text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300;
+  @apply bg-accent text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-semibold text-base md:text-lg transition-all duration-300;
 }
 
 .btn-primary:hover {
@@ -135,10 +223,37 @@ main, section, article, header, footer, nav {
 }
 
 .btn-outline {
-  @apply border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300;
+  @apply border-2 border-white text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-semibold text-base md:text-lg transition-all duration-300;
 }
 
 .btn-outline:hover {
-  @apply bg-white text-dark;
+  @apply bg-white text-gray-900;
 }
 
+/* ========================================
+   GRADIENT HELPERS
+   ======================================== */
+
+.hero-gradient {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+}
+
+/* ========================================
+   FIXED ELEMENTS (respect safe areas)
+   ======================================== */
+
+.fixed-bottom-safe {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.fixed-top-safe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: env(safe-area-inset-top);
+}

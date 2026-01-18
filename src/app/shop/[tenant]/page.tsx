@@ -679,9 +679,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       {/* About Section */}
       {business.story && (
-        <section className="py-20 bg-white">
+        <section className="py-12 sm:py-20 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid md:grid-cols-2 gap-8 sm:gap-12 items-center">
               <div>
                 <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Ons verhaal</span>
                 <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2 mb-6">Over Ons</h2>
@@ -711,7 +711,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {/* Specialiteiten Section */}
       {(business.specialty_1_image || business.specialty_2_image || business.specialty_3_image) && (
         <section 
-          className="py-20 relative overflow-hidden"
+          className="py-12 sm:py-20 relative overflow-hidden"
           style={{ 
             background: `linear-gradient(135deg, ${business.primary_color}08 0%, ${business.primary_color}15 50%, ${business.primary_color}08 100%)` 
           }}
@@ -727,12 +727,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           />
           
           <div className="max-w-6xl mx-auto px-4 relative z-10">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 sm:mb-12">
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Onze keuken</span>
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Onze Specialiteiten</h2>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
               {/* Specialty 1 */}
               {business.specialty_1_image && (
                 <div className="group cursor-pointer">
@@ -802,9 +802,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       {/* Table Reservation Section */}
       {business.reservations_enabled && (
-      <section className="py-20 bg-gray-50">
+      <section className="py-12 sm:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12">
             <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Kom langs</span>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Reserveer een tafel</h2>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
@@ -812,7 +812,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             </p>
           </div>
 
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 md:p-12 shadow-sm">
             {reservationSuccess ? (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">✅</div>
@@ -986,7 +986,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {/* Vacatures / Personeel Sectie */}
       {business.hiring_enabled && (
         <section 
-          className="py-20 relative overflow-hidden"
+          className="py-12 sm:py-20 relative overflow-hidden"
           style={{ 
             background: `linear-gradient(135deg, ${business.primary_color}08 0%, ${business.primary_color}15 50%, ${business.primary_color}08 100%)` 
           }}
@@ -1040,9 +1040,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* Reviews Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-12 sm:py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12">
             <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Wat klanten zeggen</span>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Reviews</h2>
             <div className="flex items-center justify-center gap-2 mt-4">
@@ -1090,9 +1090,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       {/* Top Sellers Section */}
       {business && (business.top_seller_1 || business.top_seller_2 || business.top_seller_3) && (
-        <section className="py-20 bg-white">
+        <section className="py-12 sm:py-20 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 sm:mb-12">
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 italic">
                 Onze Meest Verkochte Producten
               </h2>
@@ -1129,9 +1129,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       {/* Ons Team Section */}
       {teamMembers.length > 0 && (
-        <section className="py-20 bg-gray-50">
+        <section className="py-12 sm:py-20 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 sm:mb-12">
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Maak kennis met</span>
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Ons Team</h2>
             </div>
@@ -1171,7 +1171,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {/* Cadeaubonnen Section */}
       {business.gift_cards_enabled && (
         <section 
-          className="py-20 relative overflow-hidden"
+          className="py-12 sm:py-20 relative overflow-hidden"
           style={{ 
             background: `linear-gradient(135deg, ${business.primary_color}10 0%, ${business.primary_color}20 50%, ${business.primary_color}10 100%)` 
           }}
@@ -1234,9 +1234,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* Opening Hours & Contact Section */}
-      <section className="py-20 bg-gray-900 text-white">
+      <section className="py-12 sm:py-20 bg-gray-900 text-white">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid md:grid-cols-2 gap-8 sm:gap-12">
             {/* Opening Hours */}
             <div>
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
@@ -1367,14 +1367,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       {/* QR Codes Section */}
       {business.show_qr_codes && (
-      <section className="py-16 bg-gray-100">
+      <section className="py-10 sm:py-16 bg-gray-100">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Scan & Ontdek</h2>
             <p className="text-gray-600">Scan de QR-codes met je smartphone</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
             {/* Menu QR */}
             <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
@@ -1422,7 +1422,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* CTA Section */}
-      <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-20">
+      <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-12 sm:py-20"
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-6">
@@ -1787,7 +1787,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </AnimatePresence>
 
       {/* Floating Order Button (Mobile) */}
-      <div className="fixed bottom-6 left-4 right-4 md:hidden z-50">
+      <div className="fixed bottom-4 left-3 right-3 sm:bottom-6 sm:left-4 sm:right-4 md:hidden z-50 pb-safe">
         <Link href={`/shop/${params.tenant}/menu`}>
           <button
             style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66` }}

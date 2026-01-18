@@ -322,7 +322,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       </div>
 
       {/* Menu Items Grid */}
-      <div className="max-w-4xl mx-auto px-4 py-8 pb-32">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32">
         {menuItems.length === 0 ? (
           <div className="text-center py-20">
             <span className="text-6xl mb-4 block">🍟</span>
@@ -330,7 +330,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             <p className="text-gray-500">De eigenaar moet eerst producten toevoegen in de admin.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {filteredItems.map((item) => (
                 <div
                   key={item.id}
@@ -589,11 +589,12 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             exit={{ opacity: 0, y: 100 }}
             onClick={() => setCartOpen(true)}
             style={{ backgroundColor: primaryColor, boxShadow: `0 25px 50px -12px ${primaryColor}66` }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl flex items-center gap-4 z-40 hover:opacity-90"
+            className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-4 z-40 hover:opacity-90 text-sm sm:text-base max-w-[calc(100%-2rem)]"
           >
-            <span style={{ color: primaryColor }} className="bg-white w-8 h-8 rounded-full flex items-center justify-center font-bold">{cartCount}</span>
-            <span>Bekijk bestelling</span>
-            <span className="border-l border-white/30 pl-4">€{cartTotal.toFixed(2)}</span>
+            <span style={{ color: primaryColor }} className="bg-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-sm sm:text-base shrink-0">{cartCount}</span>
+            <span className="hidden sm:inline">Bekijk bestelling</span>
+            <span className="sm:hidden">Bestelling</span>
+            <span className="border-l border-white/30 pl-2 sm:pl-4 shrink-0">€{cartTotal.toFixed(2)}</span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -616,16 +617,16 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               onClick={(e) => e.stopPropagation()}
               className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl"
             >
-              <div className="p-6 border-b">
+              <div className="p-4 sm:p-6 border-b">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900">Je bestelling</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Je bestelling</h2>
                   <button onClick={() => setCartOpen(false)} className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center">
                     <span className="text-2xl">×</span>
                   </button>
                 </div>
               </div>
 
-              <div className="p-6 flex-1 overflow-y-auto max-h-[60vh]">
+              <div className="p-4 sm:p-6 flex-1 overflow-y-auto max-h-[55vh] sm:max-h-[60vh]">
                 {cart.length === 0 ? (
                   <div className="text-center py-12">
                     <span className="text-6xl mb-4 block">🛒</span>
@@ -669,7 +670,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               </div>
 
               {cart.length > 0 && (
-                <div className="absolute bottom-0 left-0 right-0 p-6 bg-white border-t">
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-white border-t pb-safe">
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-gray-600">Subtotaal</span>
                     <span className="text-xl font-bold text-gray-900">€{cartTotal.toFixed(2)}</span>

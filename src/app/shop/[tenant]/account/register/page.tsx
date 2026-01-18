@@ -142,11 +142,11 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4 overflow-x-hidden w-full">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl p-8 shadow-lg max-w-md w-full"
+        className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-8 shadow-lg max-w-md w-full"
       >
         <div className="text-center mb-8">
           <Link href={`/shop/${params.tenant}`} className="inline-block mb-4">

@@ -393,15 +393,15 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
         </div>
       </header>
 
-      <main className="px-4 py-6 max-w-2xl mx-auto">
-        <div className="space-y-6">
+      <main className="px-3 sm:px-4 py-4 sm:py-6 max-w-2xl mx-auto pb-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Left Column - Forms */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Order Type */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl p-6 shadow-sm"
+              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
             >
               <h2 className="text-lg font-bold text-gray-900 mb-4">Hoe wil je je bestelling ontvangen?</h2>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
@@ -448,7 +448,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white rounded-2xl p-6 shadow-sm"
+              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
             >
               <div className="mb-4">
               <h2 className="text-lg font-bold text-gray-900 mb-2">Jouw gegevens</h2>
@@ -579,7 +579,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-2xl p-6 shadow-sm"
+              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
             >
               <h2 className="text-lg font-bold text-gray-900 mb-4">Betaalmethode</h2>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
