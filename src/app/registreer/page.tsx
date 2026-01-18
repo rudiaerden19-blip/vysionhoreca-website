@@ -131,16 +131,20 @@ export default function RegisterPage() {
       }
 
       // Store tenant in localStorage (same as login does)
-      if (data.tenant) {
+      if (data.tenant && data.tenant.tenant_slug) {
         localStorage.setItem('vysion_tenant', JSON.stringify(data.tenant))
+        
+        // Redirect to tenant dashboard (afb 2 style) - NOT admin dashboard
+        setSuccess(true)
+        setTimeout(() => {
+          router.push(`/shop/${data.tenant.tenant_slug}/admin`)
+        }, 2000)
+      } else {
+        setSuccess(true)
+        setTimeout(() => {
+          router.push('/dashboard')
+        }, 2000)
       }
-
-      setSuccess(true)
-      
-      // Redirect to dashboard after 2 seconds
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 2000)
       
     } catch (err) {
       setError(t('register.error'))

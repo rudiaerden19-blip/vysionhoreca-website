@@ -66,11 +66,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Haal tenant_slug op uit tenant_settings
+    const { data: tenantSettings } = await supabase
+      .from('tenant_settings')
+      .select('tenant_slug')
+      .eq('email', email.trim().toLowerCase())
+      .maybeSingle()
+
     const tenant = {
       id: profiles[0].id,
       name: profiles[0].name || profiles[0].email,
       email: profiles[0].email,
-      business_id: profiles[0].id
+      business_id: profiles[0].id,
+      tenant_slug: tenantSettings?.tenant_slug || null
     }
 
     return NextResponse.json({ tenant })
