@@ -215,6 +215,11 @@
       "title": "Professionele boekhouding.",
       "description": "SCARDA boekhoudsoftware volledig geïntegreerd. Altijd up-to-date. Bespaar 30% boekhoudkosten."
     },
+    "payroll": {
+      "tab": "Loonadministratie",
+      "title": "Loonadministratie.",
+      "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
+    },
     "tryFree": "Gratis testen",
     "clickToEnlarge": "Klik om te vergroten"
   },
