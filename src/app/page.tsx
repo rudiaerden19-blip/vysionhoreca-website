@@ -320,7 +320,7 @@ function StatsSection() {
 
 // Order App Section - Product Showcase with fade-in animation
 function OrderAppSection() {
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [visibleImages, setVisibleImages] = useState<number[]>([])
   const sectionRef = useRef<HTMLDivElement>(null)
   const hasTriggeredRef = useRef(false)
@@ -338,6 +338,20 @@ function OrderAppSection() {
     'https://i.imgur.com/DABHVsP.png',
     'https://i.imgur.com/NsSBBHs.png',
   ]
+
+  const goToPrev = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (lightboxIndex !== null) {
+      setLightboxIndex(lightboxIndex === 0 ? images.length - 1 : lightboxIndex - 1)
+    }
+  }
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (lightboxIndex !== null) {
+      setLightboxIndex(lightboxIndex === images.length - 1 ? 0 : lightboxIndex + 1)
+    }
+  }
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -375,22 +389,22 @@ function OrderAppSection() {
           </p>
         </div>
 
-        {/* Product Showcase Grid - 2 rows of 5 */}
+        {/* Product Showcase Grid - 2 rows of 5 - ALL SAME SIZE */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
           {images.map((src, index) => (
             <div
               key={index}
-              className="transition-all duration-700 ease-out cursor-pointer"
+              className="transition-all duration-700 ease-out cursor-pointer aspect-[9/16] relative overflow-hidden rounded-2xl bg-gray-800"
               style={{
                 opacity: visibleImages.includes(index) ? 1 : 0,
                 transform: visibleImages.includes(index) ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.95)',
               }}
-              onClick={() => setLightboxImage(src)}
+              onClick={() => setLightboxIndex(index)}
             >
               <img
                 src={src}
                 alt={`Vysion Platform ${index + 1}`}
-                className="w-full h-auto rounded-2xl drop-shadow-xl hover:scale-105 transition-transform"
+                className="absolute inset-0 w-full h-full object-cover rounded-2xl hover:scale-105 transition-transform"
                 loading="lazy"
               />
             </div>
@@ -399,24 +413,54 @@ function OrderAppSection() {
 
         <p className="text-gray-400 text-sm text-center mt-6">{t('hero.clickToOpen')}</p>
 
-        {/* Lightbox */}
-        {lightboxImage && (
+        {/* Lightbox with navigation */}
+        {lightboxIndex !== null && (
           <div 
             className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
-            onClick={() => setLightboxImage(null)}
+            onClick={() => setLightboxIndex(null)}
           >
+            {/* Left Arrow */}
+            <button 
+              className="absolute left-4 sm:left-8 text-white text-5xl hover:text-accent transition-colors p-4"
+              onClick={goToPrev}
+              aria-label="Vorige afbeelding"
+            >
+              <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
             <img
-              src={lightboxImage}
+              src={images[lightboxIndex]}
               alt="Vergroot"
               className="max-w-full max-h-full object-contain rounded-2xl"
+              onClick={(e) => e.stopPropagation()}
             />
+
+            {/* Right Arrow */}
+            <button 
+              className="absolute right-4 sm:right-8 text-white text-5xl hover:text-accent transition-colors p-4"
+              onClick={goToNext}
+              aria-label="Volgende afbeelding"
+            >
+              <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+
+            {/* Close button */}
             <button 
               className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
-              onClick={() => setLightboxImage(null)}
+              onClick={() => setLightboxIndex(null)}
               aria-label="Sluiten"
             >
               ×
             </button>
+
+            {/* Image counter */}
+            <div className="absolute bottom-4 text-white text-sm">
+              {lightboxIndex + 1} / {images.length}
+            </div>
           </div>
         )}
 
