@@ -43,7 +43,12 @@ export default function RootLayout({
             if ('scrollRestoration' in history) {
               history.scrollRestoration = 'manual';
             }
-            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            window.addEventListener('load', function() {
+              setTimeout(function() {
+                window.scrollTo({ top: 0, behavior: 'instant' });
+              }, 0);
+            });
           `
         }} />
       </head>
