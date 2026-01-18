@@ -208,7 +208,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [availableOptions, setAvailableOptions] = useState<ProductOption[]>([])
   const [selectedOptionIds, setSelectedOptionIds] = useState<string[]>([])
-  const [selectedCategory, setSelectedCategory] = useState('Promoties')
+  const [selectedCategory, setSelectedCategory] = useState('Alle')
   const [searchQuery, setSearchQuery] = useState('')
   const [editingProduct, setEditingProduct] = useState<MenuProduct | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
@@ -492,6 +492,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
 
         {/* Category Filter */}
         <div className="flex gap-2 overflow-x-auto pb-2">
+          <button
+            onClick={() => setSelectedCategory('Alle')}
+            className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
+              selectedCategory === 'Alle'
+                ? 'bg-orange-500 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Alle
+          </button>
           <button
             onClick={() => setSelectedCategory('Promoties')}
             className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
