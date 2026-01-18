@@ -108,7 +108,14 @@ export async function POST(request: NextRequest) {
         console.error('Error creating business profile:', profileError)
         if (profileError.code === '42P01') {
           return NextResponse.json(
-            { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: business_profiles_migration.sql' },
+            { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: business_profiles_migration.sql in Supabase SQL Editor' },
+            { status: 500 }
+          )
+        }
+        // Check for missing column error
+        if (profileError.message && profileError.message.includes('password_hash')) {
+          return NextResponse.json(
+            { error: 'Database kolom ontbreekt. Voer de migratie uit: supabase/business_profiles_migration.sql in Supabase SQL Editor' },
             { status: 500 }
           )
         }
