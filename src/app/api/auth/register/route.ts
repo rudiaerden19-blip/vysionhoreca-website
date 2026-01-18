@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { isProtectedTenant } from '@/lib/protected-tenants'
 
 // Simple hash function - in production use bcrypt
 async function hashPassword(password: string): Promise<string> {
@@ -12,7 +13,6 @@ async function hashPassword(password: string): Promise<string> {
 
 const getSupabase = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  // Use service role key for admin operations, fallback to anon key
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   
   if (!supabaseUrl || !supabaseKey) {
@@ -49,198 +49,115 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if email already exists in business_profiles
-    const { data: existingProfile, error: profileCheckError } = await supabase
-      .from('business_profiles')
+    const emailLower = email.trim().toLowerCase()
+
+    // Check if email already exists
+    const { data: existingTenant } = await supabase
+      .from('tenants')
       .select('id')
-      .ilike('email', email.trim())
+      .eq('email', emailLower)
       .maybeSingle()
 
-    if (profileCheckError) {
-      console.error('Error checking existing profile:', profileCheckError)
-      // If table doesn't exist, continue with creation
-      if (profileCheckError.code === '42P01') {
-        console.warn('business_profiles table does not exist - please run migration')
-      } else {
-        return NextResponse.json(
-          { error: 'Database fout bij controleren email' },
-          { status: 500 }
-        )
-      }
-    }
-
-    // Check if tenant_settings exists for this email (tenant might be deleted but business_profile still exists)
-    const { data: existingTenantSettings } = await supabase
-      .from('tenant_settings')
-      .select('tenant_slug')
-      .eq('email', email.trim().toLowerCase())
-      .maybeSingle()
-
-    if (existingProfile && existingTenantSettings) {
-      // Both exist - email is really in use
+    if (existingTenant) {
       return NextResponse.json(
         { error: 'Dit email adres is al in gebruik' },
         { status: 409 }
       )
     }
 
-    // If business_profile exists but no tenant_settings, delete the orphaned profile
-    if (existingProfile && !existingTenantSettings) {
-      console.log('Found orphaned business_profile, deleting it...')
-      await supabase
-        .from('business_profiles')
-        .delete()
-        .eq('id', existingProfile.id)
-    }
-
     // Generate tenant_slug from business name
-    const tenantSlug = businessName
+    let tenantSlug = businessName
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
 
-    // Check if tenant_slug already exists
-    const { data: existingTenant } = await supabase
-      .from('tenant_settings')
+    // Check if slug already exists, add number if needed
+    const { data: existingSlug } = await supabase
+      .from('tenants')
       .select('id')
-      .eq('tenant_slug', tenantSlug)
-      .single()
+      .eq('slug', tenantSlug)
+      .maybeSingle()
 
-    if (existingTenant) {
-      // Add random suffix if slug exists
-      const uniqueSlug = `${tenantSlug}-${Math.random().toString(36).substring(2, 7)}`
+    if (existingSlug) {
+      // Find a unique slug by adding a number
+      let counter = 2
+      let newSlug = `${tenantSlug}-${counter}`
       
-      // Create business_profile
-      const passwordHash = await hashPassword(password)
-      const { data: profile, error: profileError } = await supabase
-        .from('business_profiles')
-        .insert({
-          name: businessName.trim(),
-          email: email.trim().toLowerCase(),
-          password_hash: passwordHash,
-          phone: phone.trim(),
-          user_id: null, // Explicitly set to null if column exists
-        })
-        .select()
-        .single()
-
-      if (profileError) {
-        console.error('Error creating business profile:', profileError)
-        if (profileError.code === '42P01') {
-          return NextResponse.json(
-            { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: business_profiles_migration.sql in Supabase SQL Editor' },
-            { status: 500 }
-          )
-        }
-        // Check for missing column error
-        if (profileError.message && profileError.message.includes('password_hash')) {
-          return NextResponse.json(
-            { error: 'Database kolom ontbreekt. Voer de migratie uit: supabase/business_profiles_migration.sql in Supabase SQL Editor' },
-            { status: 500 }
-          )
-        }
-        return NextResponse.json(
-          { error: `Fout bij aanmaken account: ${profileError.message}` },
-          { status: 500 }
-        )
-      }
-
-      // Create tenant_settings
-      console.log('Creating tenant_settings with unique slug:', uniqueSlug)
-      const { data: tenantData, error: tenantError } = await supabase
-        .from('tenant_settings')
-        .insert({
-          tenant_slug: uniqueSlug,
-          business_name: businessName.trim(),
-          email: email.trim().toLowerCase(),
-          phone: phone.trim(),
-          primary_color: '#FF6B35',
-          secondary_color: '#1a1a2e',
-        })
-        .select()
-        .single()
-
-      if (tenantError) {
-        console.error('Error creating tenant:', tenantError)
-        // Rollback: delete the business_profile we just created
-        await supabase.from('business_profiles').delete().eq('id', profile.id)
+      while (true) {
+        const { data: checkSlug } = await supabase
+          .from('tenants')
+          .select('id')
+          .eq('slug', newSlug)
+          .maybeSingle()
         
-        if (tenantError.code === '42P01') {
+        if (!checkSlug) {
+          tenantSlug = newSlug
+          break
+        }
+        counter++
+        newSlug = `${tenantSlug}-${counter}`
+        
+        if (counter > 100) {
           return NextResponse.json(
-            { error: 'Database tabel tenant_settings bestaat niet. Voer eerst de migratie uit: admin_tables.sql' },
-            { status: 500 }
+            { error: 'Kon geen unieke slug genereren. Probeer een andere bedrijfsnaam.' },
+            { status: 400 }
           )
         }
-        if (tenantError.code === '42501') {
-          return NextResponse.json(
-            { error: 'RLS policy blokkeert insert in tenant_settings. Voer de RLS fix uit in Supabase.' },
-            { status: 500 }
-          )
-        }
-        return NextResponse.json(
-          { error: `Fout bij aanmaken tenant: ${tenantError.message} (code: ${tenantError.code})` },
-          { status: 500 }
-        )
       }
-
-      console.log('Tenant created successfully:', tenantData)
-
-      // Create subscription with 14-day trial
-      const trialEndsAt = new Date()
-      trialEndsAt.setDate(trialEndsAt.getDate() + 14)
-
-      const { error: subscriptionError } = await supabase
-        .from('subscriptions')
-        .insert({
-          tenant_slug: uniqueSlug,
-          plan: 'starter',
-          status: 'trial',
-          price_monthly: 79,
-          trial_started_at: new Date().toISOString(),
-          trial_ends_at: trialEndsAt.toISOString(),
-        })
-
-      if (subscriptionError) {
-        console.error('Error creating subscription:', subscriptionError)
-        if (subscriptionError.code === '42P01') {
-          console.warn('subscriptions table does not exist - please run superadmin_migration.sql')
-        }
-        // Don't fail registration if subscription creation fails
-      }
-
-      return NextResponse.json({ 
-        success: true,
-        tenant: {
-          id: tenantData.id,
-          name: businessName.trim(),
-          email: email.trim().toLowerCase(),
-          tenant_slug: uniqueSlug,
-        }
-      })
     }
 
-    // Create business_profile
     const passwordHash = await hashPassword(password)
+    const trialEndsAt = new Date()
+    trialEndsAt.setDate(trialEndsAt.getDate() + 14)
+
+    // ========================================
+    // 1. CREATE TENANT (main table)
+    // ========================================
+    const { data: tenant, error: tenantError } = await supabase
+      .from('tenants')
+      .insert({
+        name: businessName.trim(),
+        slug: tenantSlug,
+        email: emailLower,
+        phone: phone.trim(),
+        plan: 'starter',
+        subscription_status: 'trial',
+        trial_ends_at: trialEndsAt.toISOString(),
+      })
+      .select()
+      .single()
+
+    if (tenantError) {
+      console.error('Error creating tenant:', tenantError)
+      return NextResponse.json(
+        { error: `Fout bij aanmaken tenant: ${tenantError.message}` },
+        { status: 500 }
+      )
+    }
+
+    console.log('Tenant created:', tenant)
+
+    // ========================================
+    // 2. CREATE BUSINESS PROFILE (login account)
+    // ========================================
     const { data: profile, error: profileError } = await supabase
       .from('business_profiles')
       .insert({
         name: businessName.trim(),
-        email: email.trim().toLowerCase(),
+        email: emailLower,
         password_hash: passwordHash,
         phone: phone.trim(),
-        user_id: null, // Explicitly set to null if column exists
+        tenant_slug: tenantSlug,
       })
       .select()
       .single()
 
     if (profileError) {
       console.error('Error creating business profile:', profileError)
-      if (profileError.code === '42P01') {
-        return NextResponse.json(
-          { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: business_profiles_migration.sql' },
-          { status: 500 }
-        )
+      // Rollback tenant (maar alleen als het geen beschermde tenant is)
+      if (!isProtectedTenant(tenantSlug)) {
+        await supabase.from('tenants').delete().eq('id', tenant.id)
       }
       return NextResponse.json(
         { error: `Fout bij aanmaken account: ${profileError.message}` },
@@ -248,50 +165,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create tenant_settings
-    console.log('Creating tenant_settings with slug:', tenantSlug)
-    const { data: tenantData, error: tenantError } = await supabase
+    console.log('Business profile created:', profile)
+
+    // ========================================
+    // 3. CREATE TENANT SETTINGS (shop settings)
+    // ========================================
+    const { error: settingsError } = await supabase
       .from('tenant_settings')
       .insert({
         tenant_slug: tenantSlug,
         business_name: businessName.trim(),
-        email: email.trim().toLowerCase(),
+        email: emailLower,
         phone: phone.trim(),
         primary_color: '#FF6B35',
         secondary_color: '#1a1a2e',
       })
-      .select()
-      .single()
 
-    if (tenantError) {
-      console.error('Error creating tenant:', tenantError)
-      // Rollback: delete the business_profile we just created
-      await supabase.from('business_profiles').delete().eq('id', profile.id)
-      
-      if (tenantError.code === '42P01') {
-        return NextResponse.json(
-          { error: 'Database tabel tenant_settings bestaat niet. Voer eerst de migratie uit: admin_tables.sql' },
-          { status: 500 }
-        )
-      }
-      if (tenantError.code === '42501') {
-        return NextResponse.json(
-          { error: 'RLS policy blokkeert insert in tenant_settings. Voer de RLS fix uit in Supabase.' },
-          { status: 500 }
-        )
-      }
-      return NextResponse.json(
-        { error: `Fout bij aanmaken tenant: ${tenantError.message} (code: ${tenantError.code})` },
-        { status: 500 }
-      )
+    if (settingsError) {
+      console.error('Error creating tenant_settings:', settingsError)
+      // Don't fail - this is secondary
     }
 
-    console.log('Tenant created successfully:', tenantData)
-
-    // Create subscription with 14-day trial
-    const trialEndsAt = new Date()
-    trialEndsAt.setDate(trialEndsAt.getDate() + 14)
-
+    // ========================================
+    // 4. CREATE SUBSCRIPTION
+    // ========================================
     const { error: subscriptionError } = await supabase
       .from('subscriptions')
       .insert({
@@ -305,18 +202,18 @@ export async function POST(request: NextRequest) {
 
     if (subscriptionError) {
       console.error('Error creating subscription:', subscriptionError)
-      if (subscriptionError.code === '42P01') {
-        console.warn('subscriptions table does not exist - please run superadmin_migration.sql')
-      }
-      // Don't fail registration if subscription creation fails
+      // Don't fail - this is secondary
     }
 
+    // ========================================
+    // SUCCESS
+    // ========================================
     return NextResponse.json({ 
       success: true,
       tenant: {
-        id: tenantData.id,
+        id: tenant.id,
         name: businessName.trim(),
-        email: email.trim().toLowerCase(),
+        email: emailLower,
         tenant_slug: tenantSlug,
       }
     })

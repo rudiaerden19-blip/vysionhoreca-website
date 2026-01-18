@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { isProtectedTenant, getProtectionError } from '@/lib/protected-tenants'
 
 interface Tenant {
   id: string
@@ -191,6 +192,13 @@ export default function SuperAdminDashboard() {
   }
 
   const handleDeleteTenant = async (tenant: Tenant) => {
+    // BESCHERMING: Check of tenant beschermd is
+    if (isProtectedTenant(tenant.tenant_slug)) {
+      alert(getProtectionError(tenant.tenant_slug))
+      setShowDeleteModal(null)
+      return
+    }
+
     setSaving(true)
 
     // Delete all related data
@@ -214,6 +222,8 @@ export default function SuperAdminDashboard() {
     await supabase.from('delivery_settings').delete().eq('tenant_slug', slug)
     await supabase.from('subscriptions').delete().eq('tenant_slug', slug)
     await supabase.from('tenant_settings').delete().eq('id', tenant.id)
+    await supabase.from('tenants').delete().eq('slug', slug)
+    await supabase.from('business_profiles').delete().eq('tenant_slug', slug)
 
     setShowDeleteModal(null)
     setSaving(false)
