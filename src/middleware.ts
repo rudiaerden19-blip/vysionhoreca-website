@@ -5,17 +5,19 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
   const hostname = request.headers.get('host') || ''
   
-  // Main domains - skip subdomain routing
-  const mainDomains = [
-    'localhost',
-    '127.0.0.1',
+  // Main domains - skip subdomain routing (exact match only)
+  const exactMainDomains = [
     'www.vysionhoreca.com',
     'vysionhoreca.com',
     'www.ordervysion.com',
     'ordervysion.com',
   ]
   
-  const isMainDomain = mainDomains.some(domain => hostname.includes(domain)) ||
+  // Check for exact match or localhost/vercel
+  const isMainDomain = 
+    exactMainDomains.includes(hostname) ||
+    hostname.includes('localhost') ||
+    hostname.includes('127.0.0.1') ||
     hostname.includes('vercel.app')
   
   if (isMainDomain) {
