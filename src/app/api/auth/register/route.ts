@@ -67,11 +67,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (existingProfile) {
+    // Check if tenant_settings exists for this email (tenant might be deleted but business_profile still exists)
+    const { data: existingTenantSettings } = await supabase
+      .from('tenant_settings')
+      .select('tenant_slug')
+      .eq('email', email.trim().toLowerCase())
+      .maybeSingle()
+
+    if (existingProfile && existingTenantSettings) {
+      // Both exist - email is really in use
       return NextResponse.json(
         { error: 'Dit email adres is al in gebruik' },
         { status: 409 }
       )
+    }
+
+    // If business_profile exists but no tenant_settings, delete the orphaned profile
+    if (existingProfile && !existingTenantSettings) {
+      console.log('Found orphaned business_profile, deleting it...')
+      await supabase
+        .from('business_profiles')
+        .delete()
+        .eq('id', existingProfile.id)
     }
 
     // Generate tenant_slug from business name
