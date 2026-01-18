@@ -473,8 +473,24 @@ function PricingSection() {
   const { t, locale } = useLanguage()
   
   return (
-    <section id="prijzen" className="py-24 bg-[#2a2a3e]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="prijzen" className="py-24 bg-[#2a2a3e] relative overflow-hidden">
+      {/* Silver shimmer background effect */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%]"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(192, 192, 192, 0.08) 0%, rgba(192, 192, 192, 0.03) 30%, transparent 60%)',
+          }}
+        />
+        <div 
+          className="absolute top-0 left-0 w-full h-full animate-pulse"
+          style={{
+            background: 'linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.02) 25%, transparent 50%, rgba(255, 255, 255, 0.02) 75%, transparent 100%)',
+            animationDuration: '4s',
+          }}
+        />
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             {t('pricing.title')}
