@@ -875,7 +875,7 @@ function IndustrySection() {
     invoicing: { image: 'https://i.imgur.com/k60MNlb.png' },
     ordering: { image: 'https://i.imgur.com/0DoYrGw.png' },
     analytics: { image: 'https://i.imgur.com/t7ADBbJ.png' },
-    accounting: { image: 'https://i.imgur.com/A3yjDsL.png' },
+    accounting: { image: 'https://i.imgur.com/Q3gofpi.png' },
   }
 
   const current = industries[activeTab as keyof typeof industries]
