@@ -82,37 +82,20 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         .from('media')
         .getPublicUrl(fileName)
 
-      // Probeer eerst met file_url (nieuwe schema)
-      let dbError = null
-      const { error: error1 } = await supabase
+      // Gestandaardiseerd schema: beide kolommen aanwezig
+      // Vereist: voer FIX_TENANT_MEDIA.sql uit in Supabase
+      const { error: dbError } = await supabase
         .from('tenant_media')
         .insert({
           tenant_slug: params.tenant,
           file_url: urlData.publicUrl,
+          url: urlData.publicUrl,
           file_name: file.name,
           name: file.name,
           size: file.size,
           type: 'image',
           category: uploadCategory || ''
         })
-
-      if (error1) {
-        // Fallback: probeer met url kolom (oude schema)
-        const { error: error2 } = await supabase
-          .from('tenant_media')
-          .insert({
-            tenant_slug: params.tenant,
-            url: urlData.publicUrl,
-            name: file.name,
-            size: file.size,
-            type: 'image',
-            category: uploadCategory || ''
-          })
-        
-        if (error2) {
-          dbError = error2
-        }
-      }
 
       if (dbError) {
         console.error('DB error:', dbError)
