@@ -91,6 +91,8 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
   const updateStatus = async (id: string, newStatus: string) => {
     setUpdatingId(id)
     
+    const reservation = reservations.find(r => r.id === id)
+    
     const { error } = await supabase
       .from('reservations')
       .update({ status: newStatus })
@@ -100,6 +102,29 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
       setReservations(prev => 
         prev.map(r => r.id === id ? { ...r, status: newStatus as Reservation['status'] } : r)
       )
+      
+      // Send email notification to customer
+      if (reservation?.customer_email && (newStatus === 'confirmed' || newStatus === 'cancelled')) {
+        try {
+          await fetch('/api/send-reservation-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reservationId: id,
+              status: newStatus,
+              customerEmail: reservation.customer_email,
+              customerName: reservation.customer_name,
+              customerPhone: reservation.customer_phone,
+              reservationDate: reservation.reservation_date,
+              reservationTime: reservation.reservation_time,
+              partySize: reservation.party_size,
+              tenantSlug: params.tenant,
+            }),
+          })
+        } catch (emailError) {
+          console.error('Failed to send reservation email:', emailError)
+        }
+      }
     }
     
     setUpdatingId(null)
