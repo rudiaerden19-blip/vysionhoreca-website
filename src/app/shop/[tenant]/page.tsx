@@ -1422,7 +1422,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* CTA Section */}
-      <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-12 sm:py-20"
+      <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-12 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-6">
