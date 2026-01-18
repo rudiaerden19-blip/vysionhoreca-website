@@ -112,69 +112,22 @@ function HeroSection() {
             <div className="flex flex-col items-center">
               {/* POS Monitor with Phone */}
               <div className="flex flex-col items-center">
-                <div className="relative w-full max-w-[250px] sm:max-w-[280px] md:max-w-[340px] lg:max-w-[400px]">
+                <div className="relative w-full max-w-[200px] sm:max-w-[240px] md:max-w-[280px] lg:max-w-[320px]">
                   {/* POS Monitor */}
                   <img 
                     src="https://i.imgur.com/iEHXk3w.jpeg" 
                     alt="Vysion Horeca POS Systeem" 
-                    className="w-full cursor-pointer hover:opacity-95 transition-opacity"
+                    className="w-full rounded-lg shadow-xl"
                     loading="eager"
-                    onClick={() => setLightboxIndex(0)}
                   />
-                  {/* Phone mockup overlay - left corner */}
+                  {/* Phone mockup overlay - left corner, more to the left */}
                   <img 
                     src="https://i.imgur.com/APB1uh9.png" 
                     alt="Vysion Horeca Mobiele App" 
-                    className="absolute -left-8 sm:-left-12 bottom-4 sm:bottom-8 w-[120px] sm:w-[160px] md:w-[180px] drop-shadow-2xl"
+                    className="absolute -left-16 sm:-left-20 md:-left-24 bottom-0 w-[100px] sm:w-[130px] md:w-[150px] drop-shadow-2xl"
                     loading="eager"
                   />
                 </div>
-                <p className="text-gray-500 text-sm mt-2">{t('hero.clickToOpen')}</p>
-              </div>
-              
-              {/* Horizontal Image Slider below iPad */}
-              <div className="flex items-center gap-2 mt-6">
-                {/* Arrow Left */}
-                <button 
-                  className="text-accent hover:text-accent/70 transition-colors flex-shrink-0"
-                  aria-label="Vorige screenshots"
-                  onClick={() => {
-                    const slider = document.getElementById('image-slider');
-                    if (slider) slider.scrollBy({ left: -100, behavior: 'smooth' });
-                  }}
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                
-                {/* Slider */}
-                <div id="image-slider" className="flex gap-2 overflow-x-auto max-w-[250px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[450px] scrollbar-thin">
-                  {sliderImages.map((src, index) => (
-                    <img
-                      key={index}
-                      src={src}
-                      alt={`Screenshot ${index + 1}`}
-                      className="w-[60px] h-[40px] sm:w-[70px] sm:h-[45px] object-cover rounded cursor-pointer hover:scale-105 transition-transform border border-gray-200 hover:border-accent flex-shrink-0"
-                      loading={index < 6 ? "eager" : "lazy"}
-                      onClick={() => setLightboxIndex(index + 1)}
-                    />
-                  ))}
-                </div>
-                
-                {/* Arrow Right */}
-                <button 
-                  className="text-accent hover:text-accent/70 transition-colors flex-shrink-0"
-                  aria-label="Volgende screenshots"
-                  onClick={() => {
-                    const slider = document.getElementById('image-slider');
-                    if (slider) slider.scrollBy({ left: 100, behavior: 'smooth' });
-                  }}
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
               </div>
             </div>
           </div>
