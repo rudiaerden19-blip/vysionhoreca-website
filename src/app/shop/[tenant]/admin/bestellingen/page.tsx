@@ -70,6 +70,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [rejectionNotes, setRejectionNotes] = useState('')
+  const [showNewOrderAlert, setShowNewOrderAlert] = useState(false)
+  const [alertDismissed, setAlertDismissed] = useState(false)
   
   const rejectionReasons = [
     { value: 'too_busy', label: '🔥 Te druk op dit moment' },
@@ -86,6 +88,23 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   
   // Track which orders are "new" and need attention
   const hasNewOrders = orders.some(o => o.status === 'new' || o.status === 'NEW')
+  
+  // Show orange alert when new orders arrive
+  useEffect(() => {
+    if (hasNewOrders && !alertDismissed) {
+      setShowNewOrderAlert(true)
+    }
+    if (!hasNewOrders) {
+      setShowNewOrderAlert(false)
+      setAlertDismissed(false) // Reset for next new order
+    }
+  }, [hasNewOrders, alertDismissed])
+  
+  const dismissAlert = () => {
+    setShowNewOrderAlert(false)
+    setAlertDismissed(true)
+    // Sound keeps playing until order is confirmed/rejected
+  }
   
   // Load sound preference from localStorage on mount
   useEffect(() => {
@@ -266,6 +285,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             const newOrder = payload.new as Order
             setOrders(prev => [newOrder, ...prev])
             showNotification(newOrder)
+            // Show orange alert for new order
+            setAlertDismissed(false)
+            setShowNewOrderAlert(true)
           } else if (payload.eventType === 'UPDATE') {
             const updatedOrder = payload.new as Order
             setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o))
@@ -1253,6 +1275,55 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     '🚫 Bestelling Weigeren'
                   )}
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Fullscreen Orange Alert for New Orders */}
+      <AnimatePresence>
+        {showNewOrderAlert && hasNewOrders && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={dismissAlert}
+            className="fixed inset-0 z-[100] flex items-center justify-center cursor-pointer"
+            style={{ backgroundColor: 'rgba(249, 115, 22, 0.95)' }}
+          >
+            <motion.div
+              animate={{ 
+                scale: [1, 1.05, 1],
+                opacity: [1, 0.8, 1]
+              }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: 0.8,
+                ease: "easeInOut"
+              }}
+              className="text-center text-white p-8"
+            >
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 0.5 }}
+                className="text-9xl mb-8"
+              >
+                🔔
+              </motion.div>
+              <h1 className="text-6xl md:text-8xl font-black mb-4">
+                NIEUWE BESTELLING!
+              </h1>
+              <p className="text-2xl md:text-3xl opacity-90 mb-8">
+                {newCount} bestelling{newCount > 1 ? 'en' : ''} wacht{newCount === 1 ? '' : 'en'} op goedkeuring
+              </p>
+              <div className="bg-white/20 rounded-2xl px-8 py-4 inline-block">
+                <p className="text-xl font-medium">
+                  Tik om dit scherm te sluiten
+                </p>
+                <p className="text-lg opacity-75 mt-1">
+                  Geluid stopt na goedkeuren of weigeren
+                </p>
               </div>
             </motion.div>
           </motion.div>
