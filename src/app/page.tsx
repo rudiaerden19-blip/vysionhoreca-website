@@ -1103,7 +1103,18 @@ function CTASection() {
   const { t, locale } = useLanguage()
   
   return (
-    <section id="demo" className="py-24 relative" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+    <section id="demo" className="py-24 relative overflow-hidden">
+      {/* Video Background */}
+      <video 
+        autoPlay 
+        muted 
+        loop 
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source src="https://videos.pexels.com/video-files/853956/853956-hd_1920_1080_25fps.mp4" type="video/mp4" />
+      </video>
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/70"></div>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
