@@ -48,6 +48,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
         throw new Error('Database niet beschikbaar')
       }
 
+      // Simpele insert zonder optionele kolommen voor maximale compatibiliteit
       const { error } = await supabase
         .from('reviews')
         .insert({
@@ -55,17 +56,19 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
           customer_name: formData.customer_name.trim(),
           customer_email: formData.customer_email.trim() || null,
           rating: rating,
-          text: formData.comment.trim(),
-          is_visible: false, // Standaard niet zichtbaar, moet goedgekeurd worden
-          is_verified: false
+          text: formData.comment.trim()
         })
 
-      if (error) throw error
+      if (error) {
+        console.error('Review insert error:', error)
+        throw new Error(error.message)
+      }
 
       setSubmitted(true)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error submitting review:', error)
-      alert('Er is iets misgegaan. Probeer het opnieuw.')
+      const errorMessage = error instanceof Error ? error.message : 'Onbekende fout'
+      alert(`Er is iets misgegaan: ${errorMessage}`)
     } finally {
       setSubmitting(false)
     }
