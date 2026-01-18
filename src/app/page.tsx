@@ -493,25 +493,65 @@ function PricingSection() {
   
   return (
     <section ref={sectionRef} id="prijzen" className="py-24 bg-[#2a2a3e] relative overflow-hidden">
-      {/* Silver shimmer background effect - only shows when section is visible */}
-      <div 
-        className="absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-1000"
-        style={{ opacity: showShimmer ? 1 : 0 }}
-      >
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%]"
-          style={{
-            background: 'radial-gradient(ellipse at center, rgba(192, 192, 192, 0.08) 0%, rgba(192, 192, 192, 0.03) 30%, transparent 60%)',
-          }}
-        />
-        <div 
-          className="absolute top-0 left-0 w-full h-full animate-pulse"
-          style={{
-            background: 'linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.02) 25%, transparent 50%, rgba(255, 255, 255, 0.02) 75%, transparent 100%)',
-            animationDuration: '4s',
-          }}
-        />
-      </div>
+      {/* Silver ripple circles - water effect behind cards */}
+      {showShimmer && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {/* Ripple 1 */}
+          <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-silver/20"
+            style={{
+              width: '100px',
+              height: '100px',
+              animation: 'ripple 3s ease-out infinite',
+              borderColor: 'rgba(192, 192, 192, 0.3)',
+            }}
+          />
+          {/* Ripple 2 - delayed */}
+          <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+            style={{
+              width: '100px',
+              height: '100px',
+              animation: 'ripple 3s ease-out infinite 0.75s',
+              borderColor: 'rgba(192, 192, 192, 0.3)',
+            }}
+          />
+          {/* Ripple 3 - more delayed */}
+          <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+            style={{
+              width: '100px',
+              height: '100px',
+              animation: 'ripple 3s ease-out infinite 1.5s',
+              borderColor: 'rgba(192, 192, 192, 0.3)',
+            }}
+          />
+          {/* Ripple 4 - even more delayed */}
+          <div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+            style={{
+              width: '100px',
+              height: '100px',
+              animation: 'ripple 3s ease-out infinite 2.25s',
+              borderColor: 'rgba(192, 192, 192, 0.3)',
+            }}
+          />
+          <style jsx>{`
+            @keyframes ripple {
+              0% {
+                width: 100px;
+                height: 100px;
+                opacity: 0.6;
+              }
+              100% {
+                width: 1500px;
+                height: 1500px;
+                opacity: 0;
+              }
+            }
+          `}</style>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
