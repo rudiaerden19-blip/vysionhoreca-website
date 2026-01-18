@@ -66,18 +66,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate tenant_slug from business name
-    // Explicitly replace spaces with dashes, then clean up
+    // Remove ALL spaces and special characters - slug is lowercase letters and numbers only
     let tenantSlug = businessName
       .toLowerCase()
       .trim()
-      .replace(/\s+/g, '-')           // Spaces to dashes first
-      .replace(/[^a-z0-9-]+/g, '')    // Remove non-alphanumeric except dashes
-      .replace(/-+/g, '-')            // Multiple dashes to single dash
-      .replace(/^-+|-+$/g, '')        // Remove leading/trailing dashes
+      .replace(/[^a-z0-9]/g, '')      // Remove everything except lowercase letters and numbers
     
-    // Safety check - if somehow still has issues, fallback
+    // Safety check - if somehow empty or too short, create fallback
     if (!tenantSlug || tenantSlug.length < 2) {
-      tenantSlug = 'shop-' + Date.now().toString(36)
+      tenantSlug = 'shop' + Date.now().toString(36)
     }
 
     // Check if slug already exists, add number if needed
@@ -88,9 +85,9 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (existingSlug) {
-      // Find a unique slug by adding a number
+      // Find a unique slug by adding a number (no dash, just append number)
       let counter = 2
-      let newSlug = `${tenantSlug}-${counter}`
+      let newSlug = `${tenantSlug}${counter}`
       
       while (true) {
         const { data: checkSlug } = await supabase
@@ -104,7 +101,7 @@ export async function POST(request: NextRequest) {
           break
         }
         counter++
-        newSlug = `${tenantSlug}-${counter}`
+        newSlug = `${tenantSlug}${counter}`
         
         if (counter > 100) {
           return NextResponse.json(
