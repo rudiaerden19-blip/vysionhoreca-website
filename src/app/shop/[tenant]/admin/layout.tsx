@@ -65,6 +65,7 @@ const menuItems = [
     items: [
       { name: 'Medewerkers', href: '/personeel', icon: '👥' },
       { name: 'Uren registratie', href: '/uren', icon: '⏰' },
+      { name: 'Vacatures', href: '/vacatures', icon: '📢' },
     ]
   },
   {
