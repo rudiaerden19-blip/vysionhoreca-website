@@ -40,6 +40,26 @@ export async function POST(request: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         
+        // Handle invoice payment (one-time payment)
+        if (session.mode === 'payment' && session.metadata?.type === 'invoice_payment') {
+          const invoiceId = session.metadata?.invoice_id
+          const tenantSlug = session.metadata?.tenant_slug
+
+          if (invoiceId) {
+            await supabase
+              .from('invoices')
+              .update({
+                status: 'paid',
+                paid_at: new Date().toISOString(),
+                stripe_payment_intent_id: session.payment_intent as string,
+              })
+              .eq('id', invoiceId)
+
+            console.log(`Invoice ${invoiceId} paid for ${tenantSlug}`)
+          }
+        }
+        
+        // Handle subscription payment
         if (session.mode === 'subscription') {
           const tenantSlug = session.metadata?.tenant_slug
           const planId = session.metadata?.plan_id
@@ -78,6 +98,15 @@ export async function POST(request: NextRequest) {
                 .from('subscriptions')
                 .insert(subscriptionData)
             }
+
+            // Also update tenants table
+            await supabase
+              .from('tenants')
+              .update({
+                plan: planId || 'starter',
+                subscription_status: 'ACTIVE',
+              })
+              .eq('slug', tenantSlug)
 
             console.log(`Subscription activated for ${tenantSlug}`)
           }
