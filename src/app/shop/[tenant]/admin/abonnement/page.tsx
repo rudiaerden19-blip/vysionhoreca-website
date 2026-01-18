@@ -37,6 +37,450 @@ interface Tenant {
   trial_ends_at: string | null
 }
 
+const translations: Record<string, Record<string, string>> = {
+  nl: {
+    title: 'Abonnement',
+    subtitle: 'Beheer je abonnement en bekijk facturen',
+    currentPlan: 'Huidig plan',
+    status: 'Status',
+    paymentOverview: 'Betalingsoverzicht',
+    paidInvoices: 'Betaalde facturen',
+    totalPaid: 'Totaal betaald',
+    outstanding: 'Openstaand',
+    overdue: 'Achterstallig',
+    trialStatus: 'Proefperiode',
+    activeStatus: 'Actief',
+    expiredStatus: 'Verlopen',
+    overdueStatus: 'Achterstallig',
+    endsOn: 'Eindigt op',
+    daysLeft: 'dagen over',
+    nextPayment: 'Volgende betaling',
+    perMonth: '/maand',
+    starter: 'Vysion Starter',
+    starterDesc: 'Alles wat je nodig hebt',
+    pro: 'Vysion Pro',
+    proDesc: 'Alles + extra features',
+    popular: 'POPULAIR',
+    buyStarter: 'Starter Kopen',
+    buyPro: 'Pro Kopen',
+    payInvoice: 'Openstaande factuur betalen',
+    hasInvoices: 'Je hebt {count} openstaande factuur(en)',
+    noInvoices: 'Geen openstaande facturen',
+    payNow: 'Factuur Nu Betalen',
+    invoices: 'Facturen',
+    noInvoicesYet: 'Nog geen facturen',
+    firstInvoice: 'Je eerste factuur verschijnt hier na je eerste betaling',
+    invoiceNr: 'Factuurnr.',
+    date: 'Datum',
+    description: 'Omschrijving',
+    amount: 'Bedrag',
+    statusCol: 'Status',
+    action: 'Actie',
+    paid: 'Betaald',
+    pending: 'Openstaand',
+    pay: 'Betalen',
+    done: 'Voldaan',
+    questions: 'Vragen over facturatie?',
+    questionsDesc: 'Heb je vragen over je abonnement of facturen? Neem contact met ons op.',
+    loading: 'Laden...',
+    noOutstanding: 'Je hebt geen openstaande facturen',
+    overdueWarning: 'Achterstallige betaling',
+    overdueDesc: 'Je hebt {count} onbetaalde factuur(en) ter waarde van €{amount}. Betaal zo snel mogelijk om je account actief te houden.',
+  },
+  en: {
+    title: 'Subscription',
+    subtitle: 'Manage your subscription and view invoices',
+    currentPlan: 'Current plan',
+    status: 'Status',
+    paymentOverview: 'Payment overview',
+    paidInvoices: 'Paid invoices',
+    totalPaid: 'Total paid',
+    outstanding: 'Outstanding',
+    overdue: 'Overdue',
+    trialStatus: 'Trial',
+    activeStatus: 'Active',
+    expiredStatus: 'Expired',
+    overdueStatus: 'Overdue',
+    endsOn: 'Ends on',
+    daysLeft: 'days left',
+    nextPayment: 'Next payment',
+    perMonth: '/month',
+    starter: 'Vysion Starter',
+    starterDesc: 'Everything you need',
+    pro: 'Vysion Pro',
+    proDesc: 'Everything + extra features',
+    popular: 'POPULAR',
+    buyStarter: 'Buy Starter',
+    buyPro: 'Buy Pro',
+    payInvoice: 'Pay outstanding invoice',
+    hasInvoices: 'You have {count} outstanding invoice(s)',
+    noInvoices: 'No outstanding invoices',
+    payNow: 'Pay Invoice Now',
+    invoices: 'Invoices',
+    noInvoicesYet: 'No invoices yet',
+    firstInvoice: 'Your first invoice will appear here after your first payment',
+    invoiceNr: 'Invoice no.',
+    date: 'Date',
+    description: 'Description',
+    amount: 'Amount',
+    statusCol: 'Status',
+    action: 'Action',
+    paid: 'Paid',
+    pending: 'Pending',
+    pay: 'Pay',
+    done: 'Done',
+    questions: 'Questions about billing?',
+    questionsDesc: 'Have questions about your subscription or invoices? Contact us.',
+    loading: 'Loading...',
+    noOutstanding: 'You have no outstanding invoices',
+    overdueWarning: 'Overdue payment',
+    overdueDesc: 'You have {count} unpaid invoice(s) worth €{amount}. Please pay as soon as possible to keep your account active.',
+  },
+  fr: {
+    title: 'Abonnement',
+    subtitle: 'Gérez votre abonnement et consultez vos factures',
+    currentPlan: 'Plan actuel',
+    status: 'Statut',
+    paymentOverview: 'Aperçu des paiements',
+    paidInvoices: 'Factures payées',
+    totalPaid: 'Total payé',
+    outstanding: 'En attente',
+    overdue: 'En retard',
+    trialStatus: 'Essai',
+    activeStatus: 'Actif',
+    expiredStatus: 'Expiré',
+    overdueStatus: 'En retard',
+    endsOn: 'Se termine le',
+    daysLeft: 'jours restants',
+    nextPayment: 'Prochain paiement',
+    perMonth: '/mois',
+    starter: 'Vysion Starter',
+    starterDesc: 'Tout ce dont vous avez besoin',
+    pro: 'Vysion Pro',
+    proDesc: 'Tout + fonctionnalités supplémentaires',
+    popular: 'POPULAIRE',
+    buyStarter: 'Acheter Starter',
+    buyPro: 'Acheter Pro',
+    payInvoice: 'Payer la facture en attente',
+    hasInvoices: 'Vous avez {count} facture(s) en attente',
+    noInvoices: 'Aucune facture en attente',
+    payNow: 'Payer Maintenant',
+    invoices: 'Factures',
+    noInvoicesYet: 'Pas encore de factures',
+    firstInvoice: 'Votre première facture apparaîtra ici après votre premier paiement',
+    invoiceNr: 'N° facture',
+    date: 'Date',
+    description: 'Description',
+    amount: 'Montant',
+    statusCol: 'Statut',
+    action: 'Action',
+    paid: 'Payée',
+    pending: 'En attente',
+    pay: 'Payer',
+    done: 'Fait',
+    questions: 'Questions sur la facturation?',
+    questionsDesc: 'Des questions sur votre abonnement ou vos factures? Contactez-nous.',
+    loading: 'Chargement...',
+    noOutstanding: 'Vous n\'avez aucune facture en attente',
+    overdueWarning: 'Paiement en retard',
+    overdueDesc: 'Vous avez {count} facture(s) impayée(s) d\'une valeur de €{amount}. Veuillez payer dès que possible.',
+  },
+  de: {
+    title: 'Abonnement',
+    subtitle: 'Verwalten Sie Ihr Abonnement und sehen Sie Rechnungen ein',
+    currentPlan: 'Aktueller Plan',
+    status: 'Status',
+    paymentOverview: 'Zahlungsübersicht',
+    paidInvoices: 'Bezahlte Rechnungen',
+    totalPaid: 'Gesamt bezahlt',
+    outstanding: 'Ausstehend',
+    overdue: 'Überfällig',
+    trialStatus: 'Testphase',
+    activeStatus: 'Aktiv',
+    expiredStatus: 'Abgelaufen',
+    overdueStatus: 'Überfällig',
+    endsOn: 'Endet am',
+    daysLeft: 'Tage übrig',
+    nextPayment: 'Nächste Zahlung',
+    perMonth: '/Monat',
+    starter: 'Vysion Starter',
+    starterDesc: 'Alles was Sie brauchen',
+    pro: 'Vysion Pro',
+    proDesc: 'Alles + Zusatzfunktionen',
+    popular: 'BELIEBT',
+    buyStarter: 'Starter Kaufen',
+    buyPro: 'Pro Kaufen',
+    payInvoice: 'Offene Rechnung bezahlen',
+    hasInvoices: 'Sie haben {count} offene Rechnung(en)',
+    noInvoices: 'Keine offenen Rechnungen',
+    payNow: 'Jetzt Bezahlen',
+    invoices: 'Rechnungen',
+    noInvoicesYet: 'Noch keine Rechnungen',
+    firstInvoice: 'Ihre erste Rechnung erscheint hier nach Ihrer ersten Zahlung',
+    invoiceNr: 'Rechnungsnr.',
+    date: 'Datum',
+    description: 'Beschreibung',
+    amount: 'Betrag',
+    statusCol: 'Status',
+    action: 'Aktion',
+    paid: 'Bezahlt',
+    pending: 'Ausstehend',
+    pay: 'Bezahlen',
+    done: 'Erledigt',
+    questions: 'Fragen zur Abrechnung?',
+    questionsDesc: 'Haben Sie Fragen zu Ihrem Abonnement oder Ihren Rechnungen? Kontaktieren Sie uns.',
+    loading: 'Laden...',
+    noOutstanding: 'Sie haben keine offenen Rechnungen',
+    overdueWarning: 'Überfällige Zahlung',
+    overdueDesc: 'Sie haben {count} unbezahlte Rechnung(en) im Wert von €{amount}. Bitte zahlen Sie so schnell wie möglich.',
+  },
+  es: {
+    title: 'Suscripción',
+    subtitle: 'Gestiona tu suscripción y consulta facturas',
+    currentPlan: 'Plan actual',
+    status: 'Estado',
+    paymentOverview: 'Resumen de pagos',
+    paidInvoices: 'Facturas pagadas',
+    totalPaid: 'Total pagado',
+    outstanding: 'Pendiente',
+    overdue: 'Vencido',
+    trialStatus: 'Prueba',
+    activeStatus: 'Activo',
+    expiredStatus: 'Expirado',
+    overdueStatus: 'Vencido',
+    endsOn: 'Termina el',
+    daysLeft: 'días restantes',
+    nextPayment: 'Próximo pago',
+    perMonth: '/mes',
+    starter: 'Vysion Starter',
+    starterDesc: 'Todo lo que necesitas',
+    pro: 'Vysion Pro',
+    proDesc: 'Todo + funciones extra',
+    popular: 'POPULAR',
+    buyStarter: 'Comprar Starter',
+    buyPro: 'Comprar Pro',
+    payInvoice: 'Pagar factura pendiente',
+    hasInvoices: 'Tienes {count} factura(s) pendiente(s)',
+    noInvoices: 'Sin facturas pendientes',
+    payNow: 'Pagar Ahora',
+    invoices: 'Facturas',
+    noInvoicesYet: 'Aún no hay facturas',
+    firstInvoice: 'Tu primera factura aparecerá aquí después de tu primer pago',
+    invoiceNr: 'N° factura',
+    date: 'Fecha',
+    description: 'Descripción',
+    amount: 'Importe',
+    statusCol: 'Estado',
+    action: 'Acción',
+    paid: 'Pagada',
+    pending: 'Pendiente',
+    pay: 'Pagar',
+    done: 'Hecho',
+    questions: '¿Preguntas sobre facturación?',
+    questionsDesc: '¿Tienes preguntas sobre tu suscripción o facturas? Contáctanos.',
+    loading: 'Cargando...',
+    noOutstanding: 'No tienes facturas pendientes',
+    overdueWarning: 'Pago vencido',
+    overdueDesc: 'Tienes {count} factura(s) impagada(s) por valor de €{amount}. Por favor paga lo antes posible.',
+  },
+  it: {
+    title: 'Abbonamento',
+    subtitle: 'Gestisci il tuo abbonamento e visualizza le fatture',
+    currentPlan: 'Piano attuale',
+    status: 'Stato',
+    paymentOverview: 'Panoramica pagamenti',
+    paidInvoices: 'Fatture pagate',
+    totalPaid: 'Totale pagato',
+    outstanding: 'In sospeso',
+    overdue: 'Scaduto',
+    trialStatus: 'Prova',
+    activeStatus: 'Attivo',
+    expiredStatus: 'Scaduto',
+    overdueStatus: 'Scaduto',
+    endsOn: 'Termina il',
+    daysLeft: 'giorni rimanenti',
+    nextPayment: 'Prossimo pagamento',
+    perMonth: '/mese',
+    starter: 'Vysion Starter',
+    starterDesc: 'Tutto ciò di cui hai bisogno',
+    pro: 'Vysion Pro',
+    proDesc: 'Tutto + funzionalità extra',
+    popular: 'POPOLARE',
+    buyStarter: 'Acquista Starter',
+    buyPro: 'Acquista Pro',
+    payInvoice: 'Paga fattura in sospeso',
+    hasInvoices: 'Hai {count} fattura/e in sospeso',
+    noInvoices: 'Nessuna fattura in sospeso',
+    payNow: 'Paga Ora',
+    invoices: 'Fatture',
+    noInvoicesYet: 'Nessuna fattura ancora',
+    firstInvoice: 'La tua prima fattura apparirà qui dopo il primo pagamento',
+    invoiceNr: 'N° fattura',
+    date: 'Data',
+    description: 'Descrizione',
+    amount: 'Importo',
+    statusCol: 'Stato',
+    action: 'Azione',
+    paid: 'Pagata',
+    pending: 'In sospeso',
+    pay: 'Paga',
+    done: 'Fatto',
+    questions: 'Domande sulla fatturazione?',
+    questionsDesc: 'Hai domande sul tuo abbonamento o sulle fatture? Contattaci.',
+    loading: 'Caricamento...',
+    noOutstanding: 'Non hai fatture in sospeso',
+    overdueWarning: 'Pagamento scaduto',
+    overdueDesc: 'Hai {count} fattura/e non pagata/e per un valore di €{amount}. Paga il prima possibile.',
+  },
+  ar: {
+    title: 'الاشتراك',
+    subtitle: 'إدارة اشتراكك وعرض الفواتير',
+    currentPlan: 'الخطة الحالية',
+    status: 'الحالة',
+    paymentOverview: 'نظرة عامة على المدفوعات',
+    paidInvoices: 'الفواتير المدفوعة',
+    totalPaid: 'إجمالي المدفوع',
+    outstanding: 'معلق',
+    overdue: 'متأخر',
+    trialStatus: 'تجريبي',
+    activeStatus: 'نشط',
+    expiredStatus: 'منتهي',
+    overdueStatus: 'متأخر',
+    endsOn: 'ينتهي في',
+    daysLeft: 'أيام متبقية',
+    nextPayment: 'الدفعة التالية',
+    perMonth: '/شهر',
+    starter: 'Vysion Starter',
+    starterDesc: 'كل ما تحتاجه',
+    pro: 'Vysion Pro',
+    proDesc: 'كل شيء + ميزات إضافية',
+    popular: 'شائع',
+    buyStarter: 'شراء Starter',
+    buyPro: 'شراء Pro',
+    payInvoice: 'دفع الفاتورة المعلقة',
+    hasInvoices: 'لديك {count} فاتورة معلقة',
+    noInvoices: 'لا توجد فواتير معلقة',
+    payNow: 'ادفع الآن',
+    invoices: 'الفواتير',
+    noInvoicesYet: 'لا توجد فواتير بعد',
+    firstInvoice: 'ستظهر فاتورتك الأولى هنا بعد أول دفعة',
+    invoiceNr: 'رقم الفاتورة',
+    date: 'التاريخ',
+    description: 'الوصف',
+    amount: 'المبلغ',
+    statusCol: 'الحالة',
+    action: 'إجراء',
+    paid: 'مدفوعة',
+    pending: 'معلقة',
+    pay: 'ادفع',
+    done: 'تم',
+    questions: 'أسئلة حول الفواتير؟',
+    questionsDesc: 'هل لديك أسئلة حول اشتراكك أو فواتيرك؟ اتصل بنا.',
+    loading: 'جاري التحميل...',
+    noOutstanding: 'ليس لديك فواتير معلقة',
+    overdueWarning: 'دفعة متأخرة',
+    overdueDesc: 'لديك {count} فاتورة غير مدفوعة بقيمة €{amount}. يرجى الدفع في أقرب وقت ممكن.',
+  },
+  zh: {
+    title: '订阅',
+    subtitle: '管理您的订阅并查看发票',
+    currentPlan: '当前计划',
+    status: '状态',
+    paymentOverview: '付款概览',
+    paidInvoices: '已付发票',
+    totalPaid: '已付总额',
+    outstanding: '待付',
+    overdue: '逾期',
+    trialStatus: '试用',
+    activeStatus: '活跃',
+    expiredStatus: '已过期',
+    overdueStatus: '逾期',
+    endsOn: '结束于',
+    daysLeft: '天剩余',
+    nextPayment: '下次付款',
+    perMonth: '/月',
+    starter: 'Vysion Starter',
+    starterDesc: '您需要的一切',
+    pro: 'Vysion Pro',
+    proDesc: '一切 + 额外功能',
+    popular: '热门',
+    buyStarter: '购买 Starter',
+    buyPro: '购买 Pro',
+    payInvoice: '支付待付发票',
+    hasInvoices: '您有 {count} 张待付发票',
+    noInvoices: '没有待付发票',
+    payNow: '立即支付',
+    invoices: '发票',
+    noInvoicesYet: '还没有发票',
+    firstInvoice: '您的第一张发票将在首次付款后显示在这里',
+    invoiceNr: '发票号',
+    date: '日期',
+    description: '描述',
+    amount: '金额',
+    statusCol: '状态',
+    action: '操作',
+    paid: '已付',
+    pending: '待付',
+    pay: '支付',
+    done: '完成',
+    questions: '账单问题？',
+    questionsDesc: '对您的订阅或发票有疑问？联系我们。',
+    loading: '加载中...',
+    noOutstanding: '您没有待付发票',
+    overdueWarning: '逾期付款',
+    overdueDesc: '您有 {count} 张未付发票，价值 €{amount}。请尽快付款。',
+  },
+  ja: {
+    title: 'サブスクリプション',
+    subtitle: 'サブスクリプションの管理と請求書の確認',
+    currentPlan: '現在のプラン',
+    status: 'ステータス',
+    paymentOverview: '支払い概要',
+    paidInvoices: '支払済み請求書',
+    totalPaid: '支払い総額',
+    outstanding: '未払い',
+    overdue: '延滞',
+    trialStatus: 'お試し',
+    activeStatus: 'アクティブ',
+    expiredStatus: '期限切れ',
+    overdueStatus: '延滞',
+    endsOn: '終了日',
+    daysLeft: '日残り',
+    nextPayment: '次回支払い',
+    perMonth: '/月',
+    starter: 'Vysion Starter',
+    starterDesc: '必要なものすべて',
+    pro: 'Vysion Pro',
+    proDesc: 'すべて + 追加機能',
+    popular: '人気',
+    buyStarter: 'Starterを購入',
+    buyPro: 'Proを購入',
+    payInvoice: '未払い請求書を支払う',
+    hasInvoices: '{count}件の未払い請求書があります',
+    noInvoices: '未払い請求書はありません',
+    payNow: '今すぐ支払う',
+    invoices: '請求書',
+    noInvoicesYet: 'まだ請求書はありません',
+    firstInvoice: '最初の請求書は最初の支払い後にここに表示されます',
+    invoiceNr: '請求書番号',
+    date: '日付',
+    description: '説明',
+    amount: '金額',
+    statusCol: 'ステータス',
+    action: 'アクション',
+    paid: '支払済み',
+    pending: '未払い',
+    pay: '支払う',
+    done: '完了',
+    questions: '請求に関するご質問は？',
+    questionsDesc: 'サブスクリプションや請求書についてご質問がありますか？お問い合わせください。',
+    loading: '読み込み中...',
+    noOutstanding: '未払いの請求書はありません',
+    overdueWarning: '延滞支払い',
+    overdueDesc: '€{amount}相当の未払い請求書が{count}件あります。できるだけ早くお支払いください。',
+  },
+}
+
 const getSupabase = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -53,10 +497,26 @@ export default function AbonnementPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
+  const [lang, setLang] = useState('nl')
 
   useEffect(() => {
     loadData()
+    // Detect language from browser
+    const browserLang = navigator.language.split('-')[0]
+    if (translations[browserLang]) {
+      setLang(browserLang)
+    }
   }, [tenantSlug])
+
+  const t = (key: string, replacements?: Record<string, string | number>) => {
+    let text = translations[lang]?.[key] || translations.nl[key] || key
+    if (replacements) {
+      Object.entries(replacements).forEach(([k, v]) => {
+        text = text.replace(`{${k}}`, String(v))
+      })
+    }
+    return text
+  }
 
   async function loadData() {
     const supabase = getSupabase()
@@ -65,7 +525,6 @@ export default function AbonnementPage() {
       return
     }
 
-    // Load subscription
     const { data: subData } = await supabase
       .from('subscriptions')
       .select('*')
@@ -73,7 +532,6 @@ export default function AbonnementPage() {
       .single()
     setSubscription(subData)
 
-    // Load tenant
     const { data: tenantData } = await supabase
       .from('tenants')
       .select('*')
@@ -81,7 +539,6 @@ export default function AbonnementPage() {
       .single()
     setTenant(tenantData)
 
-    // Load invoices
     const { data: invoiceData } = await supabase
       .from('invoices')
       .select('*')
@@ -99,10 +556,7 @@ export default function AbonnementPage() {
       const response = await fetch('/api/create-subscription-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tenantSlug,
-          planId,
-        }),
+        body: JSON.stringify({ tenantSlug, planId }),
       })
 
       const data = await response.json()
@@ -167,7 +621,7 @@ export default function AbonnementPage() {
     const now = new Date()
     const trialEnd = new Date(trialEndsAt)
     daysLeft = Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
-    trialEndDate = trialEnd.toLocaleDateString('nl-BE', { 
+    trialEndDate = trialEnd.toLocaleDateString(lang === 'nl' ? 'nl-BE' : lang, { 
       day: 'numeric', 
       month: 'long', 
       year: 'numeric' 
@@ -192,8 +646,8 @@ export default function AbonnementPage() {
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Abonnement</h1>
-        <p className="text-gray-600 mt-2">Beheer je abonnement en bekijk facturen</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
+        <p className="text-gray-600 mt-2">{t('subtitle')}</p>
       </div>
 
       {/* Warning Banner for Overdue */}
@@ -206,16 +660,15 @@ export default function AbonnementPage() {
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-red-800">Achterstallige betaling</h3>
+              <h3 className="text-lg font-bold text-red-800">{t('overdueWarning')}</h3>
               <p className="text-red-700 mt-1">
-                Je hebt {overdueInvoices.length} onbetaalde {overdueInvoices.length === 1 ? 'factuur' : 'facturen'} 
-                ter waarde van €{totalOverdue.toFixed(2)}. Betaal zo snel mogelijk om je account actief te houden.
+                {t('overdueDesc', { count: overdueInvoices.length, amount: totalOverdue.toFixed(2) })}
               </p>
               <button
                 onClick={() => overdueInvoices[0] && handlePayInvoice(overdueInvoices[0])}
                 className="mt-4 bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors"
               >
-                Nu betalen
+                {t('payNow')}
               </button>
             </div>
           </div>
@@ -233,7 +686,7 @@ export default function AbonnementPage() {
               <span className="text-2xl">{currentPlan === 'pro' || currentPlan === 'PRO' ? '✨' : '⚡'}</span>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Huidig plan</p>
+              <p className="text-sm text-gray-500">{t('currentPlan')}</p>
               <p className="text-xl font-bold text-gray-900 capitalize">
                 Vysion {currentPlan}
               </p>
@@ -241,13 +694,13 @@ export default function AbonnementPage() {
           </div>
           <div className="text-3xl font-bold text-gray-900">
             €{currentPlan === 'pro' || currentPlan === 'PRO' ? '99' : '79'}
-            <span className="text-base font-normal text-gray-500">/maand</span>
+            <span className="text-base font-normal text-gray-500">{t('perMonth')}</span>
           </div>
         </div>
 
         {/* Status Card */}
         <div className="bg-white rounded-2xl border-2 border-gray-200 p-6">
-          <p className="text-sm text-gray-500 mb-2">Status</p>
+          <p className="text-sm text-gray-500 mb-2">{t('status')}</p>
           <div className="flex items-center gap-3 mb-4">
             <span className={`px-4 py-2 rounded-full text-sm font-bold ${
               hasOverdue 
@@ -258,47 +711,47 @@ export default function AbonnementPage() {
                 ? 'bg-blue-100 text-blue-700'
                 : 'bg-gray-100 text-gray-700'
             }`}>
-              {hasOverdue ? '⚠️ Achterstallig' : 
-               isActive ? '✓ Actief' : 
-               isTrial ? '🕐 Proefperiode' : 
-               isExpired ? '✗ Verlopen' : status}
+              {hasOverdue ? `⚠️ ${t('overdueStatus')}` : 
+               isActive ? `✓ ${t('activeStatus')}` : 
+               isTrial ? `🕐 ${t('trialStatus')}` : 
+               isExpired ? `✗ ${t('expiredStatus')}` : status}
             </span>
           </div>
           {isTrial && (
             <p className="text-gray-600">
-              Eindigt op <strong>{trialEndDate}</strong>
+              {t('endsOn')} <strong>{trialEndDate}</strong>
               <br />
-              <span className="text-orange-600 font-medium">{daysLeft} dagen over</span>
+              <span className="text-orange-600 font-medium">{daysLeft} {t('daysLeft')}</span>
             </p>
           )}
           {isActive && subscription?.next_payment_at && (
             <p className="text-gray-600">
-              Volgende betaling: {new Date(subscription.next_payment_at).toLocaleDateString('nl-BE')}
+              {t('nextPayment')}: {new Date(subscription.next_payment_at).toLocaleDateString(lang === 'nl' ? 'nl-BE' : lang)}
             </p>
           )}
         </div>
 
         {/* Payment Stats Card */}
         <div className="bg-white rounded-2xl border-2 border-gray-200 p-6">
-          <p className="text-sm text-gray-500 mb-4">Betalingsoverzicht</p>
+          <p className="text-sm text-gray-500 mb-4">{t('paymentOverview')}</p>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-gray-600">Betaalde facturen</span>
+              <span className="text-gray-600">{t('paidInvoices')}</span>
               <span className="font-bold text-green-600">{paidInvoices.length}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Totaal betaald</span>
+              <span className="text-gray-600">{t('totalPaid')}</span>
               <span className="font-bold text-gray-900">€{totalPaid.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Openstaand</span>
+              <span className="text-gray-600">{t('outstanding')}</span>
               <span className={`font-bold ${pendingInvoices.length > 0 ? 'text-orange-600' : 'text-gray-400'}`}>
                 {pendingInvoices.length}
               </span>
             </div>
             {overdueInvoices.length > 0 && (
               <div className="flex justify-between text-red-600">
-                <span>Achterstallig</span>
+                <span>{t('overdue')}</span>
                 <span className="font-bold">€{totalOverdue.toFixed(2)}</span>
               </div>
             )}
@@ -315,20 +768,20 @@ export default function AbonnementPage() {
               <span className="text-2xl">⚡</span>
             </div>
             <div>
-              <h3 className="text-xl font-bold">Vysion Starter</h3>
-              <p className="text-green-200 text-sm">Alles wat je nodig hebt</p>
+              <h3 className="text-xl font-bold">{t('starter')}</h3>
+              <p className="text-green-200 text-sm">{t('starterDesc')}</p>
             </div>
           </div>
           <div className="mb-6">
             <span className="text-4xl font-bold text-yellow-400">€79</span>
-            <span className="text-gray-300 ml-2">/maand</span>
+            <span className="text-gray-300 ml-2">{t('perMonth')}</span>
           </div>
           <button
             onClick={() => handleSubscribe('starter')}
             disabled={processing !== null}
             className="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-900 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
           >
-            {processing === 'starter' ? 'Laden...' : '🛒 Starter Kopen'}
+            {processing === 'starter' ? t('loading') : `🛒 ${t('buyStarter')}`}
           </button>
         </div>
 
@@ -336,7 +789,7 @@ export default function AbonnementPage() {
         <div className="bg-gradient-to-br from-[#2d1f3d] to-[#4a2d6a] rounded-2xl p-6 text-white relative">
           <div className="absolute -top-3 right-6">
             <span className="bg-pink-500 text-white text-xs font-bold px-4 py-1.5 rounded-full">
-              POPULAIR
+              {t('popular')}
             </span>
           </div>
           <div className="flex items-center gap-3 mb-4">
@@ -344,20 +797,20 @@ export default function AbonnementPage() {
               <span className="text-2xl">✨</span>
             </div>
             <div>
-              <h3 className="text-xl font-bold">Vysion Pro</h3>
-              <p className="text-purple-200 text-sm">Alles + extra features</p>
+              <h3 className="text-xl font-bold">{t('pro')}</h3>
+              <p className="text-purple-200 text-sm">{t('proDesc')}</p>
             </div>
           </div>
           <div className="mb-6">
             <span className="text-4xl font-bold text-purple-300">€99</span>
-            <span className="text-gray-300 ml-2">/maand</span>
+            <span className="text-gray-300 ml-2">{t('perMonth')}</span>
           </div>
           <button
             onClick={() => handleSubscribe('pro')}
             disabled={processing !== null}
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
           >
-            {processing === 'pro' ? 'Laden...' : '🛒 Pro Kopen'}
+            {processing === 'pro' ? t('loading') : `🛒 ${t('buyPro')}`}
           </button>
         </div>
       </div>
@@ -366,11 +819,11 @@ export default function AbonnementPage() {
       <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Openstaande factuur betalen</h3>
+            <h3 className="text-xl font-bold text-gray-900">{t('payInvoice')}</h3>
             <p className="text-gray-600 mt-1">
               {pendingInvoices.length > 0 || overdueInvoices.length > 0 
-                ? `Je hebt ${pendingInvoices.length + overdueInvoices.length} openstaande factuur(en)`
-                : 'Geen openstaande facturen'}
+                ? t('hasInvoices', { count: pendingInvoices.length + overdueInvoices.length })
+                : t('noInvoices')}
             </p>
           </div>
           <button
@@ -379,13 +832,13 @@ export default function AbonnementPage() {
               if (invoice) {
                 handlePayInvoice(invoice)
               } else {
-                alert('Je hebt geen openstaande facturen')
+                alert(t('noOutstanding'))
               }
             }}
             disabled={processing !== null}
             className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50 whitespace-nowrap"
           >
-            {processing && processing !== 'starter' && processing !== 'pro' ? 'Laden...' : '💳 Factuur Nu Betalen'}
+            {processing && processing !== 'starter' && processing !== 'pro' ? t('loading') : `💳 ${t('payNow')}`}
           </button>
         </div>
       </div>
@@ -393,7 +846,7 @@ export default function AbonnementPage() {
       {/* Invoices Table */}
       <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">Facturen</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t('invoices')}</h2>
         </div>
         
         {invoices.length === 0 ? (
@@ -401,20 +854,20 @@ export default function AbonnementPage() {
             <svg className="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-lg font-medium">Nog geen facturen</p>
-            <p className="text-sm mt-1">Je eerste factuur verschijnt hier na je eerste betaling</p>
+            <p className="text-lg font-medium">{t('noInvoicesYet')}</p>
+            <p className="text-sm mt-1">{t('firstInvoice')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Factuurnr.</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Datum</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Omschrijving</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Bedrag</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">Actie</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">{t('invoiceNr')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">{t('date')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">{t('description')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">{t('amount')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">{t('statusCol')}</th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">{t('action')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -422,7 +875,7 @@ export default function AbonnementPage() {
                   <tr key={invoice.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 font-mono text-sm">{invoice.invoice_number}</td>
                     <td className="px-6 py-4 text-gray-600">
-                      {new Date(invoice.created_at).toLocaleDateString('nl-BE')}
+                      {new Date(invoice.created_at).toLocaleDateString(lang === 'nl' ? 'nl-BE' : lang)}
                     </td>
                     <td className="px-6 py-4 text-gray-900">{invoice.description || '-'}</td>
                     <td className="px-6 py-4 font-semibold">€{Number(invoice.amount).toFixed(2)}</td>
@@ -433,9 +886,9 @@ export default function AbonnementPage() {
                         invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>
-                        {invoice.status === 'paid' ? 'Betaald' :
-                         invoice.status === 'overdue' ? 'Achterstallig' :
-                         invoice.status === 'pending' ? 'Openstaand' :
+                        {invoice.status === 'paid' ? t('paid') :
+                         invoice.status === 'overdue' ? t('overdue') :
+                         invoice.status === 'pending' ? t('pending') :
                          invoice.status}
                       </span>
                     </td>
@@ -446,10 +899,10 @@ export default function AbonnementPage() {
                           disabled={processing === invoice.id}
                           className="text-orange-600 hover:text-orange-700 font-medium text-sm"
                         >
-                          {processing === invoice.id ? 'Laden...' : 'Betalen'}
+                          {processing === invoice.id ? t('loading') : t('pay')}
                         </button>
                       ) : invoice.status === 'paid' ? (
-                        <span className="text-gray-400 text-sm">✓ Voldaan</span>
+                        <span className="text-gray-400 text-sm">✓ {t('done')}</span>
                       ) : null}
                     </td>
                   </tr>
@@ -462,10 +915,8 @@ export default function AbonnementPage() {
 
       {/* Help Section */}
       <div className="bg-gray-50 rounded-2xl p-6">
-        <h3 className="font-bold text-gray-900 mb-4">Vragen over facturatie?</h3>
-        <p className="text-gray-600 mb-4">
-          Heb je vragen over je abonnement of facturen? Neem contact met ons op.
-        </p>
+        <h3 className="font-bold text-gray-900 mb-4">{t('questions')}</h3>
+        <p className="text-gray-600 mb-4">{t('questionsDesc')}</p>
         <div className="flex flex-wrap gap-4">
           <a 
             href="mailto:info@vysionhoreca.com" 
