@@ -66,11 +66,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate tenant_slug from business name
+    // Explicitly replace spaces with dashes, then clean up
     let tenantSlug = businessName
       .toLowerCase()
       .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
+      .replace(/\s+/g, '-')           // Spaces to dashes first
+      .replace(/[^a-z0-9-]+/g, '')    // Remove non-alphanumeric except dashes
+      .replace(/-+/g, '-')            // Multiple dashes to single dash
+      .replace(/^-+|-+$/g, '')        // Remove leading/trailing dashes
+    
+    // Safety check - if somehow still has issues, fallback
+    if (!tenantSlug || tenantSlug.length < 2) {
+      tenantSlug = 'shop-' + Date.now().toString(36)
+    }
 
     // Check if slug already exists, add number if needed
     const { data: existingSlug } = await supabase
