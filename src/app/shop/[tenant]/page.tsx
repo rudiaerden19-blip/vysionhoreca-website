@@ -566,8 +566,23 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       {/* Specialiteiten Section */}
       {(business.specialty_1_image || business.specialty_2_image || business.specialty_3_image) && (
-        <section className="py-20 bg-white">
-          <div className="max-w-6xl mx-auto px-4">
+        <section 
+          className="py-20 relative overflow-hidden"
+          style={{ 
+            background: `linear-gradient(135deg, ${business.primary_color}08 0%, ${business.primary_color}15 50%, ${business.primary_color}08 100%)` 
+          }}
+        >
+          {/* Decorative elements */}
+          <div 
+            className="absolute top-10 left-10 w-48 h-48 rounded-full blur-3xl opacity-15"
+            style={{ backgroundColor: business.primary_color }}
+          />
+          <div 
+            className="absolute bottom-10 right-10 w-64 h-64 rounded-full blur-3xl opacity-10"
+            style={{ backgroundColor: business.primary_color }}
+          />
+          
+          <div className="max-w-6xl mx-auto px-4 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
