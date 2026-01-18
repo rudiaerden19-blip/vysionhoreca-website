@@ -141,8 +141,21 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     if (!customerInfo.name || !customerInfo.phone) return false
     if (orderType === 'delivery' && (!customerInfo.address || !customerInfo.postal_code || !customerInfo.city)) return false
     if (cart.length === 0) return false
-    if (shopStatus && !shopStatus.isOpen) return false
+    // Allow ordering even when closed for now - let the shop decide
+    // if (shopStatus && !shopStatus.isOpen) return false
     return true
+  }
+
+  const getSubmitError = () => {
+    if (cart.length === 0) return 'Winkelwagen is leeg'
+    if (!customerInfo.name) return 'Vul je naam in'
+    if (!customerInfo.phone) return 'Vul je telefoonnummer in'
+    if (orderType === 'delivery') {
+      if (!customerInfo.address) return 'Vul je adres in'
+      if (!customerInfo.postal_code) return 'Vul je postcode in'
+      if (!customerInfo.city) return 'Vul je stad in'
+    }
+    return null
   }
 
   const applyPromoCode = async () => {
@@ -680,6 +693,20 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                 </div>
               </div>
 
+              {/* Submit Error Message */}
+              {getSubmitError() && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm text-center">
+                  ⚠️ {getSubmitError()}
+                </div>
+              )}
+
+              {/* Shop Closed Warning */}
+              {shopStatus && !shopStatus.isOpen && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-sm text-center">
+                  ⏰ {shopStatus.message || 'Momenteel gesloten'} - Je kunt wel alvast bestellen
+                </div>
+              )}
+
               {/* Submit Button */}
               <motion.button
                 whileHover={{ scale: canSubmit() ? 1.02 : 1 }}
@@ -687,7 +714,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                 onClick={handleSubmit}
                 disabled={!canSubmit() || submitting}
                 style={{ backgroundColor: canSubmit() ? primaryColor : undefined }}
-                className="w-full mt-6 disabled:bg-gray-300 text-white font-bold py-4 rounded-2xl transition-colors flex items-center justify-center gap-2"
+                className="w-full mt-4 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-colors flex items-center justify-center gap-2"
               >
                 {submitting ? (
                   <>
