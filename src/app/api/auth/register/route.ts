@@ -100,6 +100,8 @@ export async function POST(request: NextRequest) {
           name: businessName.trim(),
           email: email.trim().toLowerCase(),
           password_hash: passwordHash,
+          phone: phone.trim(),
+          user_id: null, // Explicitly set to null if column exists
         })
         .select()
         .single()
@@ -193,6 +195,8 @@ export async function POST(request: NextRequest) {
         name: businessName.trim(),
         email: email.trim().toLowerCase(),
         password_hash: passwordHash,
+        phone: phone.trim(),
+        user_id: null, // Explicitly set to null if column exists
       })
       .select()
       .single()

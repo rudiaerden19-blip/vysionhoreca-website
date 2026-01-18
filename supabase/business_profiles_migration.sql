@@ -19,9 +19,10 @@ CREATE TABLE IF NOT EXISTS business_profiles (
   last_login TIMESTAMP WITH TIME ZONE
 );
 
--- Verwijder user_id kolom als die bestaat (niet nodig voor deze implementatie)
+-- Maak user_id kolom nullable als die bestaat (in plaats van verwijderen vanwege dependencies)
+-- Dit lost de NOT NULL constraint error op zonder alle policies te verwijderen
 ALTER TABLE business_profiles 
-  DROP COLUMN IF EXISTS user_id;
+  ALTER COLUMN user_id DROP NOT NULL;
 
 -- Voeg ontbrekende kolommen toe als de tabel al bestaat
 ALTER TABLE business_profiles 
