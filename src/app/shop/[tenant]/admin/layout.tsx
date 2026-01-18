@@ -17,6 +17,7 @@ const menuItems = [
     items: [
       { name: 'Dashboard', href: '', icon: '📊' },
       { name: 'Kassa Display', href: '/kassa', icon: '🖥️' },
+      { name: 'Abonnement', href: '/abonnement', icon: '💎' },
     ]
   },
   {
