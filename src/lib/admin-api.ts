@@ -86,6 +86,8 @@ export async function saveTenantSettings(settings: TenantSettings): Promise<bool
     email: settings.email,
     phone: settings.phone,
     address: settings.address,
+    postal_code: settings.postal_code,
+    city: settings.city,
     website: settings.website,
     facebook_url: settings.facebook_url,
     instagram_url: settings.instagram_url,

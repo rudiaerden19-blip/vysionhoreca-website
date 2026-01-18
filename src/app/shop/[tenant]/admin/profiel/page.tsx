@@ -22,6 +22,8 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     email: '',
     phone: '',
     address: '',
+    postal_code: '',
+    city: '',
     website: '',
     facebook_url: '',
     instagram_url: '',
@@ -267,6 +269,34 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                 placeholder="Kerkstraat 123"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Postcode
+              </label>
+              <input
+                type="text"
+                name="postal_code"
+                value={formData.postal_code || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                placeholder="1234 AB"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Stad
+              </label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city || ''}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                placeholder="Amsterdam"
               />
             </div>
 
