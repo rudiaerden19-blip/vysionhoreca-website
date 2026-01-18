@@ -102,6 +102,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [reviews, setReviews] = useState<Review[]>([])
   const [popularItems, setPopularItems] = useState<PopularItem[]>([])
   const [teamMembers, setTeamMembers] = useState<{id: string, name: string, role?: string, photo_url?: string}[]>([])
+  const [showGiftCardModal, setShowGiftCardModal] = useState(false)
+  const [giftCardForm, setGiftCardForm] = useState({
+    occasion: '',
+    amount: 50,
+    customAmount: '',
+    personalMessage: '',
+    senderName: '',
+    senderEmail: '',
+    recipientName: '',
+    recipientEmail: '',
+  })
+  const [giftCardLoading, setGiftCardLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [scrollY, setScrollY] = useState(0)
@@ -1122,10 +1134,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               className="mt-10"
             >
               <button
-                onClick={() => {
-                  // TODO: Open gift card modal
-                  alert('Cadeaubon popup komt hier - Stripe integratie volgt')
-                }}
+                onClick={() => setShowGiftCardModal(true)}
                 style={{ backgroundColor: business.primary_color }}
                 className="inline-flex items-center gap-3 px-8 py-4 text-white font-bold text-lg rounded-2xl hover:opacity-90 transition-opacity shadow-lg"
               >
@@ -1439,6 +1448,259 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </div>
       </footer>
+
+      {/* Gift Card Modal */}
+      <AnimatePresence>
+        {showGiftCardModal && business && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowGiftCardModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+            >
+              {/* Header */}
+              <div 
+                className="p-6 text-white text-center rounded-t-3xl"
+                style={{ backgroundColor: business.primary_color }}
+              >
+                <span className="text-4xl">🎁</span>
+                <h2 className="text-2xl font-bold mt-2">Cadeaubon bestellen</h2>
+                <p className="opacity-80">Verras iemand met een heerlijke maaltijd</p>
+              </div>
+
+              {/* Form */}
+              <div className="p-6 space-y-5">
+                {/* Occasion */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Gelegenheid
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {['Verjaardag', 'Huwelijk', 'Valentijn', 'Zomaar'].map((occ) => (
+                      <button
+                        key={occ}
+                        type="button"
+                        onClick={() => setGiftCardForm(prev => ({ ...prev, occasion: occ }))}
+                        className={`p-3 rounded-xl border-2 transition-all text-sm font-medium ${
+                          giftCardForm.occasion === occ
+                            ? 'border-current text-white'
+                            : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                        }`}
+                        style={giftCardForm.occasion === occ ? { backgroundColor: business.primary_color, borderColor: business.primary_color } : {}}
+                      >
+                        {occ === 'Verjaardag' && '🎂 '}
+                        {occ === 'Huwelijk' && '💍 '}
+                        {occ === 'Valentijn' && '❤️ '}
+                        {occ === 'Zomaar' && '🎉 '}
+                        {occ}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Amount */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Bedrag
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[25, 50, 75, 100].map((amt) => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => setGiftCardForm(prev => ({ ...prev, amount: amt, customAmount: '' }))}
+                        className={`p-3 rounded-xl border-2 transition-all font-bold ${
+                          giftCardForm.amount === amt && !giftCardForm.customAmount
+                            ? 'text-white'
+                            : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                        }`}
+                        style={giftCardForm.amount === amt && !giftCardForm.customAmount ? { backgroundColor: business.primary_color, borderColor: business.primary_color } : {}}
+                      >
+                        €{amt}
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    type="number"
+                    placeholder="Of ander bedrag..."
+                    value={giftCardForm.customAmount}
+                    onChange={(e) => setGiftCardForm(prev => ({ 
+                      ...prev, 
+                      customAmount: e.target.value,
+                      amount: e.target.value ? parseFloat(e.target.value) : 50 
+                    }))}
+                    className="w-full mt-2 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Personal Message */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Persoonlijke boodschap
+                  </label>
+                  <textarea
+                    value={giftCardForm.personalMessage}
+                    onChange={(e) => setGiftCardForm(prev => ({ ...prev, personalMessage: e.target.value }))}
+                    placeholder="Fijne verjaardag! Geniet van een lekkere maaltijd..."
+                    rows={3}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                  />
+                </div>
+
+                {/* Sender Info */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Jouw naam
+                    </label>
+                    <input
+                      type="text"
+                      value={giftCardForm.senderName}
+                      onChange={(e) => setGiftCardForm(prev => ({ ...prev, senderName: e.target.value }))}
+                      placeholder="Jan"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Jouw email
+                    </label>
+                    <input
+                      type="email"
+                      value={giftCardForm.senderEmail}
+                      onChange={(e) => setGiftCardForm(prev => ({ ...prev, senderEmail: e.target.value }))}
+                      placeholder="jan@email.be"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                {/* Recipient Info */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Naam ontvanger
+                    </label>
+                    <input
+                      type="text"
+                      value={giftCardForm.recipientName}
+                      onChange={(e) => setGiftCardForm(prev => ({ ...prev, recipientName: e.target.value }))}
+                      placeholder="Marie"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email ontvanger *
+                    </label>
+                    <input
+                      type="email"
+                      value={giftCardForm.recipientEmail}
+                      onChange={(e) => setGiftCardForm(prev => ({ ...prev, recipientEmail: e.target.value }))}
+                      placeholder="marie@email.be"
+                      required
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                {/* Total */}
+                <div className="bg-gray-50 rounded-xl p-4 flex justify-between items-center">
+                  <span className="text-gray-600">Te betalen:</span>
+                  <span className="text-2xl font-bold" style={{ color: business.primary_color }}>
+                    €{(giftCardForm.customAmount ? parseFloat(giftCardForm.customAmount) : giftCardForm.amount).toFixed(2)}
+                  </span>
+                </div>
+
+                {/* Submit */}
+                <button
+                  onClick={async () => {
+                    if (!giftCardForm.recipientEmail) {
+                      alert('Vul het email adres van de ontvanger in')
+                      return
+                    }
+                    
+                    const amount = giftCardForm.customAmount 
+                      ? parseFloat(giftCardForm.customAmount) 
+                      : giftCardForm.amount
+                    
+                    if (amount < 10) {
+                      alert('Minimum bedrag is €10')
+                      return
+                    }
+                    
+                    setGiftCardLoading(true)
+                    
+                    try {
+                      const response = await fetch('/api/create-gift-card-checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          tenantSlug: params.tenant,
+                          amount,
+                          occasion: giftCardForm.occasion,
+                          personalMessage: giftCardForm.personalMessage,
+                          senderName: giftCardForm.senderName,
+                          senderEmail: giftCardForm.senderEmail,
+                          recipientName: giftCardForm.recipientName,
+                          recipientEmail: giftCardForm.recipientEmail,
+                        }),
+                      })
+                      
+                      const data = await response.json()
+                      
+                      if (data.url) {
+                        window.location.href = data.url
+                      } else {
+                        alert(data.error || 'Er ging iets mis')
+                      }
+                    } catch (error) {
+                      alert('Er ging iets mis bij het aanmaken van de betaling')
+                    }
+                    
+                    setGiftCardLoading(false)
+                  }}
+                  disabled={giftCardLoading}
+                  style={{ backgroundColor: business.primary_color }}
+                  className="w-full py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {giftCardLoading ? (
+                    <>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                      />
+                      <span>Even geduld...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>💳</span>
+                      <span>Betalen met Bancontact/iDEAL</span>
+                    </>
+                  )}
+                </button>
+
+                {/* Cancel */}
+                <button
+                  onClick={() => setShowGiftCardModal(false)}
+                  className="w-full py-3 text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  Annuleren
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Floating Order Button (Mobile) */}
       <div className="fixed bottom-6 left-4 right-4 md:hidden z-50">
