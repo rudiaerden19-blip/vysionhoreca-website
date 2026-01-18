@@ -685,6 +685,13 @@ function StopSection() {
           ))}
         </div>
         
+        {/* Custom Build Note */}
+        <div className="text-center mb-12 sm:mb-16">
+          <p className="text-gray-400 text-base sm:text-lg">
+            {t('stop.customBuildNote')}
+          </p>
+        </div>
+        
         {/* FREE Section */}
         <div 
           className="bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20 rounded-3xl p-6 sm:p-10 border-2 border-accent/30 text-center transition-all duration-500"

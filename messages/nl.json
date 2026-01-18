@@ -78,7 +78,7 @@
     "support": "Support beschikbaar"
   },
   "orderApp": {
-    "title": "het meest uitgebreid bestelplatform op de markt",
+    "title": "Het meest uitgebreid bestelplatform op de markt",
     "subtitle": "Eindelijk een compleet ecosysteem voor de horeca",
     "cta": "Ontdek het volledige platform"
   },
@@ -312,6 +312,7 @@
       "3": { "you": "Jij geeft ons je foto's", "we": "Wij plaatsen ze in je site" },
       "4": { "you": "Jij hebt al een website?", "we": "Wij integreren de bestelknop" }
     },
+    "customBuildNote": "* Je kan natuurlijk ook kiezen voor je platform op jou tempo te bouwen",
     "freeTitle": "Dit doen we GRATIS",
     "freeItems": {
       "1": "Gratis opstart",
