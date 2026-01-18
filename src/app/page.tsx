@@ -575,124 +575,26 @@ function PricingSection() {
   )
 }
 
-// STOP Section - Sequential fade animation with scroll lock
+// STOP Section - Static version
 function StopSection() {
   const { t, locale } = useLanguage()
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const [phase, setPhase] = useState(0) // 0: nothing, 1: STOP visible, 2: STOP fading, 3: content visible
-  const [isLocked, setIsLocked] = useState(false)
-  const [hasPlayed, setHasPlayed] = useState(false)
   
   const cardKeys = [1, 2, 3, 4]
   const freeKeys = [1, 2, 3, 4, 5]
   
-  // Lock body scroll when isLocked
-  useEffect(() => {
-    if (isLocked) {
-      const scrollY = window.scrollY
-      document.body.style.position = 'fixed'
-      document.body.style.top = `-${scrollY}px`
-      document.body.style.left = '0'
-      document.body.style.right = '0'
-      document.body.style.overflow = 'hidden'
-    } else {
-      const scrollY = document.body.style.top
-      document.body.style.position = ''
-      document.body.style.top = ''
-      document.body.style.left = ''
-      document.body.style.right = ''
-      document.body.style.overflow = ''
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1)
-      }
-    }
-  }, [isLocked])
-  
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasPlayed && !isLocked) {
-          // Scroll to section first
-          if (sectionRef.current) {
-            sectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
-          }
-          
-          // Start animation after scroll settles
-          setTimeout(() => {
-            setIsLocked(true)
-            setPhase(1)
-            
-            // Phase 2: Fade STOP
-            setTimeout(() => setPhase(2), 1500)
-            
-            // Phase 3: Show content
-            setTimeout(() => setPhase(3), 2500)
-            
-            // Unlock after 3.5 seconds
-            setTimeout(() => {
-              setIsLocked(false)
-              setHasPlayed(true)
-            }, 3500)
-          }, 600)
-        } else if (!entry.isIntersecting && hasPlayed) {
-          // Reset when fully leaving view
-          setPhase(0)
-          setHasPlayed(false)
-        }
-      },
-      { threshold: 0.5 }
-    )
-    
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-    
-    return () => observer.disconnect()
-  }, [hasPlayed, isLocked])
-  
   return (
-    <>
-      {/* Full screen overlay to block all interactions during animation */}
-      {isLocked && (
-        <div 
-          className="fixed inset-0 z-[9999] bg-transparent"
-          style={{ touchAction: 'none' }}
-          onWheel={(e) => e.preventDefault()}
-          onTouchMove={(e) => e.preventDefault()}
-          onScroll={(e) => e.preventDefault()}
-        />
-      )}
-      
-      <section 
-        ref={sectionRef}
-        className="relative bg-black min-h-screen flex items-center justify-center overflow-hidden"
-      >
-        {/* STOP Text - Big and centered */}
-      <div 
-        className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none transition-all duration-700"
-        style={{ 
-          opacity: phase === 1 ? 1 : phase === 2 ? 0.1 : 0.05,
-          transform: `scale(${phase >= 1 ? 1 : 0.5})`,
-        }}
-      >
+    <section className="relative bg-black py-20 sm:py-32 overflow-hidden">
+      {/* Background STOP text */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <span 
-          className="text-[30vw] sm:text-[25vw] font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-accent to-red-600 select-none"
-          style={{
-            textShadow: '0 0 80px rgba(234, 88, 12, 0.6)',
-          }}
+          className="text-[35vw] sm:text-[30vw] font-black text-transparent bg-clip-text bg-gradient-to-r from-red-900/30 via-accent/20 to-red-900/30 select-none"
         >
           {t('stop.title')}
         </span>
       </div>
       
       {/* Main Content */}
-      <div 
-        className="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 transition-all duration-700"
-        style={{ 
-          opacity: phase >= 3 ? 1 : 0,
-          transform: `translateY(${phase >= 3 ? 0 : 30}px)`,
-        }}
-      >
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Headline */}
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4">
@@ -705,15 +607,10 @@ function StopSection() {
         
         {/* Cards Grid */}
         <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-12 sm:mb-16">
-          {cardKeys.map((key, index) => (
+          {cardKeys.map((key) => (
             <div 
               key={key}
-              className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 hover:border-accent/50 transition-all duration-500 hover:scale-105"
-              style={{
-                opacity: phase >= 3 ? 1 : 0,
-                transform: `translateY(${phase >= 3 ? 0 : 20}px)`,
-                transitionDelay: `${index * 100}ms`,
-              }}
+              className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 hover:border-accent/50 transition-all duration-300 hover:scale-105"
             >
               <div className="flex items-center gap-4">
                 <div className="flex-1 text-left">
@@ -731,14 +628,7 @@ function StopSection() {
         </div>
         
         {/* FREE Section */}
-        <div 
-          className="bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20 rounded-3xl p-6 sm:p-10 border-2 border-accent/30 text-center transition-all duration-500"
-          style={{
-            opacity: phase >= 3 ? 1 : 0,
-            transform: `translateY(${phase >= 3 ? 0 : 20}px)`,
-            transitionDelay: '400ms',
-          }}
-        >
+        <div className="bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20 rounded-3xl p-6 sm:p-10 border-2 border-accent/30 text-center">
           <h3 className="text-2xl sm:text-4xl font-black text-accent mb-6">
             {t('stop.freeTitle')}
           </h3>
@@ -761,7 +651,6 @@ function StopSection() {
         </div>
       </div>
     </section>
-    </>
   )
 }
 
