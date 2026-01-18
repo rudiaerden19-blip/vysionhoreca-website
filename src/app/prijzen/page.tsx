@@ -59,7 +59,7 @@ export default function PrijzenPage() {
                 </ul>
                 
                 <a 
-                  href={`https://frituurnolim.vercel.app/registreer?lang=${locale}&plan=starter`}
+                  href={`/registreer?lang=${locale}&plan=starter`}
                   className="block w-full bg-[#1a1a2e] text-white text-center py-4 rounded-full font-semibold hover:bg-[#0f0f1a] transition-colors"
                 >
                   {t('pricing.chooseStarter')}
@@ -105,7 +105,7 @@ export default function PrijzenPage() {
                 </ul>
                 
                 <a 
-                  href={`https://frituurnolim.vercel.app/registreer?lang=${locale}&plan=pro`}
+                  href={`/registreer?lang=${locale}&plan=pro`}
                   className="block w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center py-4 rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-colors"
                 >
                   {t('pricing.choosePro')}
@@ -185,7 +185,7 @@ export default function PrijzenPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
-              href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
+              href={`/registreer?lang=${locale}`}
               className="inline-block bg-white text-purple-900 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >
               {t('pricing.cta.primary')}

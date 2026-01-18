@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Zoek op email in business_profiles
     const { data: profiles, error: profileError } = await supabase
       .from('business_profiles')
-      .select('id, name, email')
+      .select('id, name, email, password_hash')
       .ilike('email', email.trim())
 
     if (profileError) {
@@ -51,8 +51,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Hash password and compare
+    const encoder = new TextEncoder()
+    const data = encoder.encode(password + 'vysion_salt_2024')
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+
     // Check wachtwoord
-    if (password !== '12345678') {
+    if (passwordHash !== profiles[0].password_hash) {
       return NextResponse.json(
         { error: 'Onjuist wachtwoord' },
         { status: 401 }

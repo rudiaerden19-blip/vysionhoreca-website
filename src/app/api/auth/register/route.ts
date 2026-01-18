@@ -1,0 +1,219 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getSupabase } from '@/lib/supabase'
+
+// Simple hash function - in production use bcrypt
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password + 'vysion_salt_2024')
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { businessName, email, phone, password } = await request.json()
+
+    if (!businessName || !email || !phone || !password) {
+      return NextResponse.json(
+        { error: 'Alle velden zijn verplicht' },
+        { status: 400 }
+      )
+    }
+
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: 'Wachtwoord moet minimaal 8 tekens zijn' },
+        { status: 400 }
+      )
+    }
+
+    const supabase = getSupabase()
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database configuratie niet beschikbaar' },
+        { status: 503 }
+      )
+    }
+
+    // Check if email already exists in business_profiles
+    const { data: existingProfile } = await supabase
+      .from('business_profiles')
+      .select('id')
+      .ilike('email', email.trim())
+      .single()
+
+    if (existingProfile) {
+      return NextResponse.json(
+        { error: 'Dit email adres is al in gebruik' },
+        { status: 409 }
+      )
+    }
+
+    // Generate tenant_slug from business name
+    const tenantSlug = businessName
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+
+    // Check if tenant_slug already exists
+    const { data: existingTenant } = await supabase
+      .from('tenant_settings')
+      .select('id')
+      .eq('tenant_slug', tenantSlug)
+      .single()
+
+    if (existingTenant) {
+      // Add random suffix if slug exists
+      const uniqueSlug = `${tenantSlug}-${Math.random().toString(36).substring(2, 7)}`
+      
+      // Create business_profile
+      const passwordHash = await hashPassword(password)
+      const { data: profile, error: profileError } = await supabase
+        .from('business_profiles')
+        .insert({
+          name: businessName.trim(),
+          email: email.trim().toLowerCase(),
+          password_hash: passwordHash,
+        })
+        .select()
+        .single()
+
+      if (profileError) {
+        console.error('Error creating business profile:', profileError)
+        return NextResponse.json(
+          { error: 'Fout bij aanmaken account' },
+          { status: 500 }
+        )
+      }
+
+      // Create tenant_settings
+      const { error: tenantError } = await supabase
+        .from('tenant_settings')
+        .insert({
+          tenant_slug: uniqueSlug,
+          business_name: businessName.trim(),
+          email: email.trim().toLowerCase(),
+          phone: phone.trim(),
+          primary_color: '#FF6B35',
+          secondary_color: '#1a1a2e',
+        })
+
+      if (tenantError) {
+        console.error('Error creating tenant:', tenantError)
+        return NextResponse.json(
+          { error: 'Fout bij aanmaken tenant' },
+          { status: 500 }
+        )
+      }
+
+      // Create subscription with 14-day trial
+      const trialEndsAt = new Date()
+      trialEndsAt.setDate(trialEndsAt.getDate() + 14)
+
+      const { error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .insert({
+          tenant_slug: uniqueSlug,
+          plan: 'starter',
+          status: 'trial',
+          price_monthly: 79,
+          trial_started_at: new Date().toISOString(),
+          trial_ends_at: trialEndsAt.toISOString(),
+        })
+
+      if (subscriptionError) {
+        console.error('Error creating subscription:', subscriptionError)
+        // Don't fail registration if subscription creation fails
+      }
+
+      return NextResponse.json({ 
+        success: true,
+        tenant: {
+          id: profile.id,
+          name: businessName.trim(),
+          email: email.trim().toLowerCase(),
+          tenant_slug: uniqueSlug,
+        }
+      })
+    }
+
+    // Create business_profile
+    const passwordHash = await hashPassword(password)
+    const { data: profile, error: profileError } = await supabase
+      .from('business_profiles')
+      .insert({
+        name: businessName.trim(),
+        email: email.trim().toLowerCase(),
+        password_hash: passwordHash,
+      })
+      .select()
+      .single()
+
+    if (profileError) {
+      console.error('Error creating business profile:', profileError)
+      return NextResponse.json(
+        { error: 'Fout bij aanmaken account' },
+        { status: 500 }
+      )
+    }
+
+    // Create tenant_settings
+    const { error: tenantError } = await supabase
+      .from('tenant_settings')
+      .insert({
+        tenant_slug: tenantSlug,
+        business_name: businessName.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
+        primary_color: '#FF6B35',
+        secondary_color: '#1a1a2e',
+      })
+
+    if (tenantError) {
+      console.error('Error creating tenant:', tenantError)
+      return NextResponse.json(
+        { error: 'Fout bij aanmaken tenant' },
+        { status: 500 }
+      )
+    }
+
+    // Create subscription with 14-day trial
+    const trialEndsAt = new Date()
+    trialEndsAt.setDate(trialEndsAt.getDate() + 14)
+
+    const { error: subscriptionError } = await supabase
+      .from('subscriptions')
+      .insert({
+        tenant_slug: tenantSlug,
+        plan: 'starter',
+        status: 'trial',
+        price_monthly: 79,
+        trial_started_at: new Date().toISOString(),
+        trial_ends_at: trialEndsAt.toISOString(),
+      })
+
+    if (subscriptionError) {
+      console.error('Error creating subscription:', subscriptionError)
+      // Don't fail registration if subscription creation fails
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      tenant: {
+        id: profile.id,
+        name: businessName.trim(),
+        email: email.trim().toLowerCase(),
+        tenant_slug: tenantSlug,
+      }
+    })
+
+  } catch (error) {
+    console.error('Registration error:', error)
+    return NextResponse.json(
+      { error: 'Er is een fout opgetreden' },
+      { status: 500 }
+    )
+  }
+}

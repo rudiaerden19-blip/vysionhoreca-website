@@ -98,7 +98,7 @@ function HeroSection() {
               {t('hero.tagline')}
             </p>
             <div className="flex justify-center lg:justify-start">
-              <a href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`} className="btn-primary text-center">
+              <a href={`/registreer?lang=${locale}`} className="btn-primary text-center">
                 {t('hero.ctaPrimary')}
               </a>
             </div>
@@ -519,7 +519,7 @@ function PricingSection() {
               </ul>
               
               <a 
-                href={`https://frituurnolim.vercel.app/registreer?lang=${locale}&plan=starter`}
+                href={`/registreer?lang=${locale}&plan=starter`}
                 className="block w-full bg-[#1a1a2e] text-white text-center py-4 rounded-full font-semibold hover:bg-[#0f0f1a] transition-colors"
               >
                 {t('pricing.chooseStarter')}
@@ -565,7 +565,7 @@ function PricingSection() {
               </ul>
               
               <a 
-                href={`https://frituurnolim.vercel.app/registreer?lang=${locale}&plan=pro`}
+                href={`/registreer?lang=${locale}&plan=pro`}
                 className="block w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center py-4 rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-colors"
               >
                 {t('pricing.choosePro')}
@@ -715,7 +715,7 @@ function StopSection() {
             ))}
           </div>
           <a
-            href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
+            href={`/registreer?lang=${locale}`}
             className="inline-block bg-accent text-white px-8 sm:px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-[0_0_30px_rgba(234,88,12,0.5)] hover:shadow-[0_0_50px_rgba(234,88,12,0.7)] hover:scale-105"
           >
             {t('stop.cta')}
@@ -856,7 +856,7 @@ function ComparisonSection() {
 
         <div className="text-center mt-12">
           <a
-            href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
+            href={`/registreer?lang=${locale}`}
             className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-lg"
           >
             {t('comparison.cta')}
@@ -918,7 +918,7 @@ function IndustrySection() {
               {t(`industry.${activeTab}.description`)}
             </p>
             <a
-              href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`}
+              href={`/registreer?lang=${locale}`}
               className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all"
             >
               {t('industry.tryFree')}
@@ -1073,7 +1073,7 @@ function CTASection() {
           {t('cta.subtitle')}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href={`https://frituurnolim.vercel.app/registreer?lang=${locale}`} className="btn-primary">
+          <a href={`/registreer?lang=${locale}`} className="btn-primary">
             {t('cta.primary')}
           </a>
           <a href="#contact" className="btn-outline">
