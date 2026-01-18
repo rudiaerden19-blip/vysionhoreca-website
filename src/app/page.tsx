@@ -1212,11 +1212,6 @@ function ContactSection() {
 
 // Main Page Component
 export default function HomePage() {
-  // Force scroll to top on mount/refresh
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-  
   return (
     <main>
       <Navigation />
