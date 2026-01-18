@@ -112,7 +112,7 @@ function HeroSection() {
             <div className="flex flex-col items-center">
               {/* POS Monitor with Phone */}
               <div className="flex flex-col items-center">
-                <div className="relative w-full max-w-[300px] sm:max-w-sm md:max-w-md lg:max-w-lg">
+                <div className="relative w-full max-w-[250px] sm:max-w-[280px] md:max-w-[340px] lg:max-w-[400px]">
                   {/* POS Monitor */}
                   <img 
                     src="https://i.imgur.com/iEHXk3w.jpeg" 
