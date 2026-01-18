@@ -138,10 +138,94 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [reservationSubmitting, setReservationSubmitting] = useState(false)
   const [reservationSuccess, setReservationSuccess] = useState(false)
   const [reservationError, setReservationError] = useState('')
+  const [availableTimes, setAvailableTimes] = useState<string[]>([])
+  const [selectedDayClosed, setSelectedDayClosed] = useState(false)
+
+  // Generate time slots based on opening hours for selected date
+  const generateTimeSlots = (date: string, openingHours: Record<string, { open?: string; close?: string; closed?: boolean; hasBreak?: boolean; breakStart?: string; breakEnd?: string }>) => {
+    if (!date || !openingHours) {
+      setAvailableTimes([])
+      setSelectedDayClosed(false)
+      return
+    }
+
+    // Get day of week from date (0 = Sunday in JS, but we use Monday = 0)
+    const dateObj = new Date(date)
+    const jsDay = dateObj.getDay()
+    const dayIndex = jsDay === 0 ? 6 : jsDay - 1 // Convert to our format
+    
+    const dayNames = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
+    const dayKey = dayNames[dayIndex]
+    const dayHours = openingHours[dayKey]
+
+    if (!dayHours || dayHours.closed) {
+      setAvailableTimes([])
+      setSelectedDayClosed(true)
+      return
+    }
+
+    setSelectedDayClosed(false)
+    
+    // Generate 30-minute slots between open and close time
+    const times: string[] = []
+    const openTime = dayHours.open || '11:00'
+    const closeTime = dayHours.close || '21:00'
+    const breakStart = dayHours.hasBreak ? dayHours.breakStart : null
+    const breakEnd = dayHours.hasBreak ? dayHours.breakEnd : null
+
+    const [openHour, openMin] = openTime.split(':').map(Number)
+    const [closeHour, closeMin] = closeTime.split(':').map(Number)
+    
+    let currentHour = openHour
+    let currentMin = openMin
+
+    // Stop 1 hour before closing (for reservations)
+    const lastReservationHour = closeHour - 1
+    const lastReservationMin = closeMin
+
+    while (currentHour < lastReservationHour || (currentHour === lastReservationHour && currentMin <= lastReservationMin)) {
+      const timeStr = `${currentHour.toString().padStart(2, '0')}:${currentMin.toString().padStart(2, '0')}`
+      
+      // Skip break times
+      if (breakStart && breakEnd) {
+        const [breakStartHour, breakStartMin] = breakStart.split(':').map(Number)
+        const [breakEndHour, breakEndMin] = breakEnd.split(':').map(Number)
+        const currentMinutes = currentHour * 60 + currentMin
+        const breakStartMinutes = breakStartHour * 60 + breakStartMin
+        const breakEndMinutes = breakEndHour * 60 + breakEndMin
+        
+        if (currentMinutes >= breakStartMinutes && currentMinutes < breakEndMinutes) {
+          // Skip this time, it's during break
+          currentMin += 30
+          if (currentMin >= 60) {
+            currentMin = 0
+            currentHour++
+          }
+          continue
+        }
+      }
+      
+      times.push(timeStr)
+      
+      currentMin += 30
+      if (currentMin >= 60) {
+        currentMin = 0
+        currentHour++
+      }
+    }
+
+    setAvailableTimes(times)
+  }
 
   const handleReservationSubmit = async () => {
     if (!reservationForm.firstName || !reservationForm.lastName || !reservationForm.phone || !reservationForm.email || !reservationForm.date || !reservationForm.time || !reservationForm.partySize) {
       setReservationError('Vul alle verplichte velden in')
+      return
+    }
+    
+    // Check if day is closed
+    if (selectedDayClosed) {
+      setReservationError('We zijn gesloten op deze dag. Kies een andere datum.')
       return
     }
     
@@ -777,10 +861,19 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     <input
                       type="date"
                       value={reservationForm.date}
-                      onChange={(e) => setReservationForm({ ...reservationForm, date: e.target.value })}
+                      onChange={(e) => {
+                        const newDate = e.target.value
+                        setReservationForm({ ...reservationForm, date: newDate, time: '' })
+                        if (business) {
+                          generateTimeSlots(newDate, business.opening_hours)
+                        }
+                      }}
                       min={new Date().toISOString().split('T')[0]}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     />
+                    {selectedDayClosed && reservationForm.date && (
+                      <p className="text-red-500 text-sm mt-2">⚠️ We zijn gesloten op deze dag. Kies een andere datum.</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -789,22 +882,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     <select 
                       value={reservationForm.time}
                       onChange={(e) => setReservationForm({ ...reservationForm, time: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      disabled={!reservationForm.date || selectedDayClosed || availableTimes.length === 0}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
-                      <option value="">Selecteer tijd</option>
-                      <option value="11:00">11:00</option>
-                      <option value="11:30">11:30</option>
-                      <option value="12:00">12:00</option>
-                      <option value="12:30">12:30</option>
-                      <option value="13:00">13:00</option>
-                      <option value="17:00">17:00</option>
-                      <option value="17:30">17:30</option>
-                      <option value="18:00">18:00</option>
-                      <option value="18:30">18:30</option>
-                      <option value="19:00">19:00</option>
-                      <option value="19:30">19:30</option>
-                      <option value="20:00">20:00</option>
-                      <option value="20:30">20:30</option>
+                      <option value="">{!reservationForm.date ? 'Kies eerst een datum' : selectedDayClosed ? 'Gesloten' : 'Selecteer tijd'}</option>
+                      {availableTimes.map((time) => (
+                        <option key={time} value={time}>{time}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
