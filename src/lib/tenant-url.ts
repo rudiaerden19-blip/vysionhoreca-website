@@ -47,7 +47,7 @@ export function getTenantFullUrl(tenantSlug: string, path: string = '', useSubdo
   if (typeof window === 'undefined') {
     // Server-side: default to subdomain format
     if (useSubdomain) {
-      return `https://www.${tenantSlug}.ordervysion.com${path}`
+      return `https://${tenantSlug}.ordervysion.com${path}`
     }
     return `https://www.vysionhoreca.com/shop/${tenantSlug}${path}`
   }
@@ -67,7 +67,7 @@ export function getTenantFullUrl(tenantSlug: string, path: string = '', useSubdo
     !isMainDomain2
 
   if (isSubdomain || useSubdomain) {
-    return `${protocol}//www.${tenantSlug}.ordervysion.com${path}`
+    return `${protocol}//${tenantSlug}.ordervysion.com${path}`
   }
 
   return `${protocol}//www.vysionhoreca.com/shop/${tenantSlug}${path}`

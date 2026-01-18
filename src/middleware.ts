@@ -24,6 +24,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Redirect www.tenant.ordervysion.com to tenant.ordervysion.com
+  // (wildcard SSL only covers one level of subdomains)
+  if (hostname.includes('ordervysion.com')) {
+    const parts = hostname.split('.')
+    // www.frituurrudi.ordervysion.com -> ['www', 'frituurrudi', 'ordervysion', 'com']
+    if (parts[0] === 'www' && parts.length === 4) {
+      const tenant = parts[1]
+      const redirectUrl = `https://${tenant}.ordervysion.com${url.pathname}${url.search}`
+      return NextResponse.redirect(redirectUrl, 301)
+    }
+  }
+
   // Extract subdomain from hostname
   // Examples:
   // - naamzaak.ordervysion.com -> naamzaak
