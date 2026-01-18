@@ -1035,13 +1035,14 @@ function TestimonialSection() {
   const { t } = useLanguage()
   
   const testimonialKeys = [1, 2, 3, 4, 5, 6]
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % testimonialKeys.length)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [testimonialKeys.length])
+  
+  const goToPrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + testimonialKeys.length) % testimonialKeys.length)
+  }
+  
+  const goToNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % testimonialKeys.length)
+  }
 
   return (
     <section className="py-24 bg-[#E3E3E3] overflow-hidden">
@@ -1053,8 +1054,30 @@ function TestimonialSection() {
         </div>
 
         <div className="relative">
+          {/* Left Arrow */}
+          <button 
+            onClick={goToPrev}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-lg transition-all hover:scale-110"
+            aria-label="Vorige review"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          {/* Right Arrow */}
+          <button 
+            onClick={goToNext}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-lg transition-all hover:scale-110"
+            aria-label="Volgende review"
+          >
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          
           <div 
-            className="flex transition-transform duration-700 ease-in-out"
+            className="flex transition-transform duration-500 ease-in-out mx-12"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {testimonialKeys.map((key, index) => (
@@ -1079,18 +1102,9 @@ function TestimonialSection() {
             ))}
           </div>
           
-          {/* Dots indicator */}
-          <div className="flex justify-center mt-8 gap-2">
-            {testimonialKeys.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                aria-label={`Ga naar review ${index + 1}`}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  currentSlide === index ? 'bg-accent' : 'bg-gray-300'
-                }`}
-              />
-            ))}
+          {/* Counter */}
+          <div className="text-center mt-6 text-gray-500">
+            {currentSlide + 1} / {testimonialKeys.length}
           </div>
         </div>
       </div>
