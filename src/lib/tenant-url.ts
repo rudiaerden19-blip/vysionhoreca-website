@@ -16,11 +16,17 @@ export function getTenantUrl(tenantSlug: string, path: string = ''): string {
   const hostname = window.location.hostname
   
   // Check if we're on a subdomain (not localhost, not main domain)
+  const isMainDomain = 
+    hostname === 'ordervysion.com' ||
+    hostname === 'www.ordervysion.com' ||
+    hostname === 'vysionhoreca.com' ||
+    hostname === 'www.vysionhoreca.com'
+  
   const isSubdomain = 
     !hostname.includes('localhost') &&
     !hostname.includes('127.0.0.1') &&
-    !hostname.includes('vysionhoreca.com') &&
     !hostname.includes('vercel.app') &&
+    !isMainDomain &&
     hostname.split('.').length >= 2
 
   if (isSubdomain) {
@@ -47,11 +53,18 @@ export function getTenantFullUrl(tenantSlug: string, path: string = '', useSubdo
   }
 
   const protocol = window.location.protocol
+  const hostname = window.location.hostname
+  const isMainDomain2 = 
+    hostname === 'ordervysion.com' ||
+    hostname === 'www.ordervysion.com' ||
+    hostname === 'vysionhoreca.com' ||
+    hostname === 'www.vysionhoreca.com'
+  
   const isSubdomain = 
-    !window.location.hostname.includes('localhost') &&
-    !window.location.hostname.includes('127.0.0.1') &&
-    !window.location.hostname.includes('vysionhoreca.com') &&
-    !window.location.hostname.includes('vercel.app')
+    !hostname.includes('localhost') &&
+    !hostname.includes('127.0.0.1') &&
+    !hostname.includes('vercel.app') &&
+    !isMainDomain2
 
   if (isSubdomain || useSubdomain) {
     return `${protocol}//www.${tenantSlug}.ordervysion.com${path}`
@@ -70,11 +83,17 @@ export function getCurrentTenantSlug(): string | null {
   const pathname = window.location.pathname
 
   // Check if we're on a subdomain
+  const isMainDomain3 = 
+    hostname === 'ordervysion.com' ||
+    hostname === 'www.ordervysion.com' ||
+    hostname === 'vysionhoreca.com' ||
+    hostname === 'www.vysionhoreca.com'
+  
   const isSubdomain = 
     !hostname.includes('localhost') &&
     !hostname.includes('127.0.0.1') &&
-    !hostname.includes('vysionhoreca.com') &&
-    !hostname.includes('vercel.app')
+    !hostname.includes('vercel.app') &&
+    !isMainDomain3
 
   if (isSubdomain) {
     // Extract from subdomain

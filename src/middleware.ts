@@ -11,6 +11,8 @@ export function middleware(request: NextRequest) {
     '127.0.0.1',
     'www.vysionhoreca.com',
     'vysionhoreca.com',
+    'www.ordervysion.com',
+    'ordervysion.com',
   ]
   
   const isMainDomain = mainDomains.some(domain => hostname.includes(domain)) ||
