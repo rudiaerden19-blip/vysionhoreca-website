@@ -47,6 +47,10 @@ interface Business {
   specialty_3_image?: string
   specialty_3_title?: string
   show_qr_codes?: boolean
+  hiring_enabled?: boolean
+  hiring_title?: string
+  hiring_description?: string
+  hiring_contact?: string
 }
 
 interface Review {
@@ -241,6 +245,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         specialty_3_image: tenantData?.specialty_3_image || '',
         specialty_3_title: tenantData?.specialty_3_title || '',
         show_qr_codes: tenantData?.show_qr_codes ?? true,
+        hiring_enabled: tenantData?.hiring_enabled ?? false,
+        hiring_title: tenantData?.hiring_title || '',
+        hiring_description: tenantData?.hiring_description || '',
+        hiring_contact: tenantData?.hiring_contact || '',
       })
 
       // Populaire items uit producten
@@ -820,6 +828,58 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </motion.div>
         </div>
       </section>
+
+      {/* Vacatures / Personeel Sectie */}
+      {business.hiring_enabled && (
+        <section className="py-20 bg-white">
+          <div className="max-w-4xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center"
+            >
+              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Kom bij ons team</span>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">
+                {business.hiring_title || 'Wij zoeken personeel'}
+              </h2>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="mt-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 md:p-12 shadow-sm"
+            >
+              {business.hiring_description && (
+                <div className="prose prose-lg max-w-none text-gray-700 mb-8">
+                  <p className="whitespace-pre-line">{business.hiring_description}</p>
+                </div>
+              )}
+
+              {business.hiring_contact && (
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 border-t border-gray-200">
+                  <div className="flex items-center gap-3 text-gray-600">
+                    <span className="text-2xl">📧</span>
+                    <span className="font-medium">Interesse? Neem contact op:</span>
+                  </div>
+                  <a
+                    href={business.hiring_contact.includes('@') 
+                      ? `mailto:${business.hiring_contact}` 
+                      : `tel:${business.hiring_contact.replace(/\s/g, '')}`}
+                    style={{ backgroundColor: business.primary_color }}
+                    className="inline-flex items-center gap-2 px-6 py-3 text-white font-bold rounded-xl hover:opacity-90 transition-opacity"
+                  >
+                    <span>👋</span>
+                    <span>{business.hiring_contact}</span>
+                  </a>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* Reviews Section */}
       <section className="py-20 bg-gray-50">

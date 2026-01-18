@@ -47,6 +47,11 @@ export interface TenantSettings {
   specialty_3_title?: string
   // QR-codes sectie aan/uit
   show_qr_codes?: boolean
+  // Personeel/vacature sectie
+  hiring_enabled?: boolean
+  hiring_title?: string
+  hiring_description?: string
+  hiring_contact?: string
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {

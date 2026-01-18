@@ -643,6 +643,94 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           </div>
         </motion.div>
 
+        {/* Vacatures / Personeel Sectie */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.28 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <span>👥</span> Vacatures / Personeel zoeken
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">Toon een &quot;Wij zoeken personeel&quot; sectie op je website</p>
+          
+          <div className="space-y-4">
+            {/* Toggle aan/uit */}
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Vacature sectie tonen
+                </label>
+                <p className="text-sm text-gray-500">Zichtbaar op je website tussen reservaties en reviews</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setFormData(prev => ({ ...prev, hiring_enabled: !prev.hiring_enabled }))
+                  setSaved(false)
+                }}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  formData.hiring_enabled ? 'bg-orange-500' : 'bg-gray-200'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    formData.hiring_enabled ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {formData.hiring_enabled && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Titel
+                  </label>
+                  <input
+                    type="text"
+                    name="hiring_title"
+                    value={formData.hiring_title || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    placeholder="Wij zoeken personeel"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Beschrijving
+                  </label>
+                  <textarea
+                    name="hiring_description"
+                    value={formData.hiring_description || ''}
+                    onChange={handleChange}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
+                    placeholder="Beschrijf welke functies je zoekt, werkuren, wat je biedt..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Contact voor sollicitaties
+                  </label>
+                  <input
+                    type="text"
+                    name="hiring_contact"
+                    value={formData.hiring_contact || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    placeholder="Email of telefoonnummer voor sollicitaties"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">Bijv. solliciteer@jouwzaak.be of +32 123 45 67 89</p>
+                </div>
+              </>
+            )}
+          </div>
+        </motion.div>
+
         {/* Preview Link */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
