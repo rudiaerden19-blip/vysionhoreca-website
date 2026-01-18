@@ -194,6 +194,7 @@
     }
   },
   "industry": {
+    "sectionTitle": "订阅中包含的额外功能",
     "invoicing": {
       "tab": "发票",
       "title": "快速专业的发票开具。",

@@ -194,6 +194,7 @@
     }
   },
   "industry": {
+    "sectionTitle": "Extra inclus dans votre abonnement",
     "invoicing": {
       "tab": "Facturation",
       "title": "Facturation rapide et professionnelle.",

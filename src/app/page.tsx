@@ -872,7 +872,7 @@ function IndustrySection() {
   const { t, locale } = useLanguage()
   
   const industries = {
-    invoicing: { image: 'https://i.imgur.com/sFqK85O.png' },
+    invoicing: { image: 'https://i.imgur.com/k60MNlb.png' },
     ordering: { image: 'https://i.imgur.com/ZJUI9VI.png' },
     analytics: { image: 'https://i.imgur.com/xFIDs6L.png' },
     accounting: { image: 'https://i.imgur.com/A3yjDsL.png' },
@@ -883,6 +883,11 @@ function IndustrySection() {
   return (
     <section className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Title */}
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12">
+          {t('industry.sectionTitle')}
+        </h2>
+        
         {/* Tabs */}
         <div className="flex flex-wrap gap-3 sm:gap-6 lg:gap-8 mb-12 justify-center lg:justify-start">
           {['invoicing', 'ordering', 'analytics', 'accounting'].map((tab) => (
@@ -918,11 +923,11 @@ function IndustrySection() {
           </div>
 
           {/* Right content - Image */}
-          <div className="relative text-center flex flex-col items-center">
+          <div className="relative text-center flex flex-col items-center justify-center h-full">
             <img
               src={current.image}
               alt={activeTab}
-              className="w-auto h-auto max-w-[400px] lg:max-w-[450px] object-contain rounded-2xl shadow-xl cursor-pointer"
+              className="w-full h-auto object-contain rounded-2xl shadow-xl cursor-pointer"
               loading="lazy"
               onClick={() => setShowLightbox(true)}
             />

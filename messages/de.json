@@ -194,6 +194,7 @@
     }
   },
   "industry": {
+    "sectionTitle": "Extra in Ihrem Abonnement enthalten",
     "invoicing": {
       "tab": "Rechnungsstellung",
       "title": "Schnelle und professionelle Rechnungsstellung.",

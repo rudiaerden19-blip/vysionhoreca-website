@@ -194,6 +194,7 @@
     }
   },
   "industry": {
+    "sectionTitle": "Extra included in your subscription",
     "invoicing": {
       "tab": "Invoicing",
       "title": "Fast and professional invoicing.",
