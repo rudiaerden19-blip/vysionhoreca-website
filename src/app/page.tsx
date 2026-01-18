@@ -471,93 +471,9 @@ function OrderAppSection() {
 // Pricing Section
 function PricingSection() {
   const { t, locale } = useLanguage()
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const [showShimmer, setShowShimmer] = useState(false)
-  
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShowShimmer(true)
-        }
-      },
-      { threshold: 0.6 } // 60% visible before shimmer starts
-    )
-    
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-    
-    return () => observer.disconnect()
-  }, [])
   
   return (
-    <section ref={sectionRef} id="prijzen" className="py-24 bg-[#2a2a3e] relative overflow-hidden">
-      {/* Silver ripple circles - water effect behind cards */}
-      {showShimmer && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Ripple 1 */}
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: '50px',
-              height: '50px',
-              animation: 'ripple 4s ease-out infinite',
-              border: '3px solid rgba(200, 200, 220, 0.7)',
-              boxShadow: '0 0 20px rgba(200, 200, 220, 0.4)',
-            }}
-          />
-          {/* Ripple 2 - delayed */}
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: '50px',
-              height: '50px',
-              animation: 'ripple 4s ease-out infinite 1s',
-              border: '3px solid rgba(200, 200, 220, 0.7)',
-              boxShadow: '0 0 20px rgba(200, 200, 220, 0.4)',
-            }}
-          />
-          {/* Ripple 3 - more delayed */}
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: '50px',
-              height: '50px',
-              animation: 'ripple 4s ease-out infinite 2s',
-              border: '3px solid rgba(200, 200, 220, 0.7)',
-              boxShadow: '0 0 20px rgba(200, 200, 220, 0.4)',
-            }}
-          />
-          {/* Ripple 4 - even more delayed */}
-          <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              width: '50px',
-              height: '50px',
-              animation: 'ripple 4s ease-out infinite 3s',
-              border: '3px solid rgba(200, 200, 220, 0.7)',
-              boxShadow: '0 0 20px rgba(200, 200, 220, 0.4)',
-            }}
-          />
-          <style jsx>{`
-            @keyframes ripple {
-              0% {
-                width: 50px;
-                height: 50px;
-                opacity: 1;
-                border-width: 3px;
-              }
-              100% {
-                width: 1800px;
-                height: 1800px;
-                opacity: 0;
-                border-width: 1px;
-              }
-            }
-          `}</style>
-        </div>
-      )}
+    <section id="prijzen" className="py-24 bg-[#2a2a3e] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
