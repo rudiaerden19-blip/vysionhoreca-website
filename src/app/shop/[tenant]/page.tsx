@@ -121,39 +121,56 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   
   // Reservation form state
   const [reservationForm, setReservationForm] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     phone: '',
+    email: '',
     date: '',
     time: '',
     partySize: '',
     notes: '',
   })
+  
+  // Helper function to capitalize first letter of each word
+  const capitalizeWords = (str: string) => {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase())
+  }
   const [reservationSubmitting, setReservationSubmitting] = useState(false)
   const [reservationSuccess, setReservationSuccess] = useState(false)
   const [reservationError, setReservationError] = useState('')
 
   const handleReservationSubmit = async () => {
-    if (!reservationForm.name || !reservationForm.phone || !reservationForm.date || !reservationForm.time || !reservationForm.partySize) {
+    if (!reservationForm.firstName || !reservationForm.lastName || !reservationForm.phone || !reservationForm.email || !reservationForm.date || !reservationForm.time || !reservationForm.partySize) {
       setReservationError('Vul alle verplichte velden in')
+      return
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(reservationForm.email)) {
+      setReservationError('Vul een geldig e-mailadres in')
       return
     }
     
     setReservationSubmitting(true)
     setReservationError('')
     
+    const fullName = `${capitalizeWords(reservationForm.firstName)} ${capitalizeWords(reservationForm.lastName)}`
+    
     const success = await createReservation({
       tenant_slug: params.tenant,
-      customer_name: reservationForm.name,
+      customer_name: fullName,
       customer_phone: reservationForm.phone,
+      customer_email: reservationForm.email.toLowerCase(),
       reservation_date: reservationForm.date,
       reservation_time: reservationForm.time,
       party_size: parseInt(reservationForm.partySize),
-      notes: reservationForm.notes,
+      notes: capitalizeWords(reservationForm.notes),
     })
     
     if (success) {
       setReservationSuccess(true)
-      setReservationForm({ name: '', phone: '', date: '', time: '', partySize: '', notes: '' })
+      setReservationForm({ firstName: '', lastName: '', phone: '', email: '', date: '', time: '', partySize: '', notes: '' })
     } else {
       setReservationError('Er ging iets mis. Probeer opnieuw of bel ons.')
     }
@@ -707,19 +724,43 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Naam *
+                      Voornaam <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      value={reservationForm.name}
-                      onChange={(e) => setReservationForm({ ...reservationForm, name: e.target.value })}
+                      value={reservationForm.firstName}
+                      onChange={(e) => setReservationForm({ ...reservationForm, firstName: capitalizeWords(e.target.value) })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder="Je naam"
+                      placeholder="Je voornaam"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Telefoonnummer *
+                      Achternaam <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={reservationForm.lastName}
+                      onChange={(e) => setReservationForm({ ...reservationForm, lastName: capitalizeWords(e.target.value) })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="Je achternaam"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      E-mailadres <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={reservationForm.email}
+                      onChange={(e) => setReservationForm({ ...reservationForm, email: e.target.value.toLowerCase() })}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      placeholder="je@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Telefoonnummer <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="tel"
@@ -731,7 +772,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Datum *
+                      Datum <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
@@ -743,7 +784,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Tijd *
+                      Tijd <span className="text-red-500">*</span>
                     </label>
                     <select 
                       value={reservationForm.time}
@@ -768,7 +809,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Aantal personen *
+                      Aantal personen <span className="text-red-500">*</span>
                     </label>
                     <select 
                       value={reservationForm.partySize}
@@ -792,7 +833,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     <input
                       type="text"
                       value={reservationForm.notes}
-                      onChange={(e) => setReservationForm({ ...reservationForm, notes: e.target.value })}
+                      onChange={(e) => setReservationForm({ ...reservationForm, notes: capitalizeWords(e.target.value) })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                       placeholder="Bijv. kinderstoel, allergie..."
                     />

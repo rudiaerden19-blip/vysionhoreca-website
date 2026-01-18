@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { getTenantSettings, getDeliverySettings, TenantSettings, DeliverySettings, addLoyaltyPoints, getCustomer } from '@/lib/admin-api'
+import { getTenantSettings, getDeliverySettings, TenantSettings, DeliverySettings, addLoyaltyPoints, getCustomer, getShopStatus, ShopStatus } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 
 interface CartItem {
@@ -52,6 +52,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [orderNumber, setOrderNumber] = useState<number | null>(null)
   const [earnedPoints, setEarnedPoints] = useState(0)
   const [loggedInCustomerId, setLoggedInCustomerId] = useState<string | null>(null)
+  const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
 
@@ -61,12 +62,14 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   }, [params.tenant])
 
   async function loadData() {
-    const [tenant, delivery] = await Promise.all([
+    const [tenant, delivery, status] = await Promise.all([
       getTenantSettings(params.tenant),
       getDeliverySettings(params.tenant),
+      getShopStatus(params.tenant),
     ])
     setTenantSettings(tenant)
     setDeliverySettings(delivery)
+    setShopStatus(status)
     
     // Default to pickup if delivery is not enabled
     if (!delivery?.delivery_enabled) {
@@ -107,10 +110,25 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     }
   }
 
+  // Helper function to capitalize first letter of each word
+  const capitalizeWords = (str: string) => {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase())
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    
+    // Apply capitalization to text fields (not email)
+    let processedValue = value
+    if (name !== 'email' && name !== 'phone' && name !== 'postal_code') {
+      processedValue = capitalizeWords(value)
+    } else if (name === 'email') {
+      processedValue = value.toLowerCase()
+    }
+    
     setCustomerInfo(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: processedValue
     }))
   }
 
@@ -123,6 +141,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     if (!customerInfo.name || !customerInfo.phone) return false
     if (orderType === 'delivery' && (!customerInfo.address || !customerInfo.postal_code || !customerInfo.city)) return false
     if (cart.length === 0) return false
+    if (shopStatus && !shopStatus.isOpen) return false
     return true
   }
 
@@ -451,7 +470,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Naam *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Naam <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     name="name"
@@ -465,7 +484,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Telefoon *</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Telefoon <span className="text-red-500">*</span></label>
                     <input
                       type="tel"
                       name="phone"
@@ -491,7 +510,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                 {orderType === 'delivery' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Adres *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Adres <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         name="address"
@@ -503,7 +522,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                     </div>
                     <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Postcode *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Postcode <span className="text-red-500">*</span></label>
                         <input
                           type="text"
                           name="postal_code"
@@ -514,7 +533,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Stad *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Stad <span className="text-red-500">*</span></label>
                         <input
                           type="text"
                           name="city"

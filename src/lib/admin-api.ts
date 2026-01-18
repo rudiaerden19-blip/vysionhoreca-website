@@ -167,6 +167,101 @@ export async function saveOpeningHours(hours: OpeningHour[]): Promise<boolean> {
   return true
 }
 
+// Check if shop is currently open
+export interface ShopStatus {
+  isOpen: boolean
+  message: string
+  opensAt?: string
+  closesAt?: string
+  nextOpenDay?: string
+}
+
+export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
+  const hours = await getOpeningHours(tenantSlug)
+  
+  if (!hours || hours.length === 0) {
+    // No opening hours set - assume open
+    return { isOpen: true, message: 'Open' }
+  }
+  
+  const now = new Date()
+  // Convert to correct day format (0 = Monday in our system, JS uses 0 = Sunday)
+  const jsDay = now.getDay()
+  const dayOfWeek = jsDay === 0 ? 6 : jsDay - 1 // Convert Sunday=0 to 6, Monday=1 to 0, etc.
+  
+  const currentTimeStr = now.toTimeString().slice(0, 5) // "HH:MM"
+  
+  const todayHours = hours.find(h => h.day_of_week === dayOfWeek)
+  
+  const dayNames = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
+  
+  if (!todayHours || !todayHours.is_open) {
+    // Closed today - find next open day
+    for (let i = 1; i <= 7; i++) {
+      const nextDay = (dayOfWeek + i) % 7
+      const nextDayHours = hours.find(h => h.day_of_week === nextDay)
+      if (nextDayHours && nextDayHours.is_open) {
+        return {
+          isOpen: false,
+          message: `Gesloten - Weer open ${dayNames[nextDay]} om ${nextDayHours.open_time}`,
+          nextOpenDay: dayNames[nextDay],
+          opensAt: nextDayHours.open_time
+        }
+      }
+    }
+    return { isOpen: false, message: 'Momenteel gesloten' }
+  }
+  
+  const openTime = todayHours.open_time
+  const closeTime = todayHours.close_time
+  
+  // Check if we're before opening time
+  if (currentTimeStr < openTime) {
+    return {
+      isOpen: false,
+      message: `Gesloten - We openen vandaag om ${openTime}`,
+      opensAt: openTime
+    }
+  }
+  
+  // Check if we're after closing time
+  if (currentTimeStr >= closeTime) {
+    // Find next open day
+    for (let i = 1; i <= 7; i++) {
+      const nextDay = (dayOfWeek + i) % 7
+      const nextDayHours = hours.find(h => h.day_of_week === nextDay)
+      if (nextDayHours && nextDayHours.is_open) {
+        const dayLabel = i === 1 ? 'morgen' : dayNames[nextDay]
+        return {
+          isOpen: false,
+          message: `Gesloten - Weer open ${dayLabel} om ${nextDayHours.open_time}`,
+          nextOpenDay: dayLabel,
+          opensAt: nextDayHours.open_time
+        }
+      }
+    }
+    return { isOpen: false, message: 'Momenteel gesloten' }
+  }
+  
+  // Check break time
+  if (todayHours.has_break && todayHours.break_start && todayHours.break_end) {
+    if (currentTimeStr >= todayHours.break_start && currentTimeStr < todayHours.break_end) {
+      return {
+        isOpen: false,
+        message: `Pauze - We zijn weer open om ${todayHours.break_end}`,
+        opensAt: todayHours.break_end
+      }
+    }
+  }
+  
+  // Shop is open!
+  return {
+    isOpen: true,
+    message: `Open tot ${closeTime}`,
+    closesAt: closeTime
+  }
+}
+
 // =====================================================
 // MENU CATEGORIES
 // =====================================================
