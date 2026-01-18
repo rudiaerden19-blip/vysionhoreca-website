@@ -163,7 +163,7 @@ export default function SuperAdminDashboard() {
         tenant_slug: newTenant.tenant_slug.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
         plan: 'starter',
         status: 'trial',
-        price_monthly: 69,
+        price_monthly: 79,
         trial_started_at: new Date().toISOString(),
         trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
       })
@@ -273,7 +273,7 @@ export default function SuperAdminDashboard() {
           tenant_slug: tenant.tenant_slug,
           plan: 'starter',
           status: newStatus,
-          price_monthly: 69,
+          price_monthly: 79,
           subscription_started_at: newStatus === 'active' ? now.toISOString() : null,
           next_payment_at: newStatus === 'active' ? nextMonth.toISOString() : null,
         })
