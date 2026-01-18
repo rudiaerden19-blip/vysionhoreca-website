@@ -34,6 +34,8 @@ export default function RegisterPage() {
 
   // Close dropdown when clicking outside
   useEffect(() => {
+    if (typeof window === 'undefined') return
+    
     function handleClickOutside(event: MouseEvent) {
       if (langRef.current && !langRef.current.contains(event.target as Node)) {
         setIsLangOpen(false)
