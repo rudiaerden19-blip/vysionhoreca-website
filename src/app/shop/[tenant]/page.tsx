@@ -51,6 +51,8 @@ interface Business {
   hiring_title?: string
   hiring_description?: string
   hiring_contact?: string
+  gift_cards_enabled?: boolean
+  stripe_public_key?: string
 }
 
 interface Review {
@@ -99,6 +101,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [business, setBusiness] = useState<Business | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
   const [popularItems, setPopularItems] = useState<PopularItem[]>([])
+  const [teamMembers, setTeamMembers] = useState<{id: string, name: string, role?: string, photo_url?: string}[]>([])
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [scrollY, setScrollY] = useState(0)
@@ -249,7 +252,21 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         hiring_title: tenantData?.hiring_title || '',
         hiring_description: tenantData?.hiring_description || '',
         hiring_contact: tenantData?.hiring_contact || '',
+        gift_cards_enabled: tenantData?.gift_cards_enabled ?? false,
+        stripe_public_key: tenantData?.stripe_public_key || '',
       })
+
+      // Team members ophalen
+      const { data: teamData } = await supabase
+        .from('team_members')
+        .select('*')
+        .eq('tenant_slug', params.tenant)
+        .eq('is_active', true)
+        .order('display_order', { ascending: true })
+      
+      if (teamData) {
+        setTeamMembers(teamData)
+      }
 
       // Populaire items uit producten
       const popular = productsData
@@ -1013,6 +1030,140 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 ))
               }
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Ons Team Section */}
+      {teamMembers.length > 0 && (
+        <section className="py-20 bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Maak kennis met</span>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Ons Team</h2>
+            </motion.div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {teamMembers.map((member, index) => (
+                <motion.div
+                  key={member.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="aspect-square rounded-2xl bg-gray-200 overflow-hidden mb-4 shadow-lg">
+                    {member.photo_url ? (
+                      <Image
+                        src={member.photo_url}
+                        alt={member.name}
+                        width={300}
+                        height={300}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-6xl text-gray-400">
+                        👤
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="font-bold text-gray-900 text-lg">{member.name}</h3>
+                  {member.role && (
+                    <p className="text-gray-500">{member.role}</p>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Cadeaubonnen Section */}
+      {business.gift_cards_enabled && (
+        <section 
+          className="py-20 relative overflow-hidden"
+          style={{ 
+            background: `linear-gradient(135deg, ${business.primary_color}10 0%, ${business.primary_color}20 50%, ${business.primary_color}10 100%)` 
+          }}
+        >
+          <div 
+            className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl opacity-20"
+            style={{ backgroundColor: business.primary_color }}
+          />
+          <div 
+            className="absolute bottom-0 left-0 w-56 h-56 rounded-full blur-3xl opacity-15"
+            style={{ backgroundColor: business.primary_color }}
+          />
+          
+          <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Het perfecte cadeau</span>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Geef iemand een verrassing</h2>
+              <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg">
+                Bestel een cadeaubon en verras iemand met een heerlijke maaltijd. Direct in de mailbox!
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="mt-10"
+            >
+              <button
+                onClick={() => {
+                  // TODO: Open gift card modal
+                  alert('Cadeaubon popup komt hier - Stripe integratie volgt')
+                }}
+                style={{ backgroundColor: business.primary_color }}
+                className="inline-flex items-center gap-3 px-8 py-4 text-white font-bold text-lg rounded-2xl hover:opacity-90 transition-opacity shadow-lg"
+              >
+                <span className="text-2xl">🎁</span>
+                <span>Cadeaubon bestellen</span>
+              </button>
+            </motion.div>
+
+            {/* Gift card visual */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="mt-12 max-w-md mx-auto"
+            >
+              <div 
+                className="relative rounded-2xl p-8 text-white shadow-2xl overflow-hidden"
+                style={{ backgroundColor: business.primary_color }}
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+                
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-8">
+                    <div>
+                      <p className="text-white/70 text-sm">Cadeaubon</p>
+                      <p className="text-2xl font-bold">{business.name}</p>
+                    </div>
+                    <span className="text-4xl">🎁</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-white/70 text-sm">Waarde</p>
+                    <p className="text-3xl font-black">€50</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </section>
       )}

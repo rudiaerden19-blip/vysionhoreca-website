@@ -52,6 +52,10 @@ export interface TenantSettings {
   hiring_title?: string
   hiring_description?: string
   hiring_contact?: string
+  // Stripe & Cadeaubonnen
+  stripe_secret_key?: string
+  stripe_public_key?: string
+  gift_cards_enabled?: boolean
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {
@@ -2672,4 +2676,259 @@ export async function reopenMonthlyTimesheet(
     return false
   }
   return true
+}
+
+// =====================================================
+// TEAM MEMBERS
+// =====================================================
+export interface TeamMember {
+  id?: string
+  tenant_slug: string
+  name: string
+  role?: string
+  photo_url?: string
+  display_order?: number
+  is_active?: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getTeamMembers(tenantSlug: string): Promise<TeamMember[]> {
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+  
+  if (error) {
+    console.error('Error fetching team members:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function saveTeamMember(member: TeamMember): Promise<TeamMember | null> {
+  if (member.id) {
+    // Update
+    const { data, error } = await supabase
+      .from('team_members')
+      .update({
+        name: member.name,
+        role: member.role,
+        photo_url: member.photo_url,
+        display_order: member.display_order,
+        is_active: member.is_active,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', member.id)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating team member:', error)
+      return null
+    }
+    return data
+  } else {
+    // Insert
+    const { data, error } = await supabase
+      .from('team_members')
+      .insert({
+        tenant_slug: member.tenant_slug,
+        name: member.name,
+        role: member.role,
+        photo_url: member.photo_url,
+        display_order: member.display_order || 0,
+        is_active: true,
+      })
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error creating team member:', error)
+      return null
+    }
+    return data
+  }
+}
+
+export async function deleteTeamMember(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('team_members')
+    .delete()
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error deleting team member:', error)
+    return false
+  }
+  return true
+}
+
+// =====================================================
+// GIFT CARDS / CADEAUBONNEN
+// =====================================================
+export interface GiftCard {
+  id?: string
+  tenant_slug: string
+  code: string
+  amount: number
+  remaining_amount: number
+  occasion?: string
+  personal_message?: string
+  sender_name?: string
+  sender_email?: string
+  recipient_name?: string
+  recipient_email: string
+  stripe_payment_id?: string
+  status: 'pending' | 'paid' | 'used' | 'expired'
+  is_sent?: boolean
+  expires_at?: string
+  used_at?: string
+  created_at?: string
+  updated_at?: string
+}
+
+export async function getGiftCards(tenantSlug: string): Promise<GiftCard[]> {
+  const { data, error } = await supabase
+    .from('gift_cards')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('created_at', { ascending: false })
+  
+  if (error) {
+    console.error('Error fetching gift cards:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function getGiftCardByCode(tenantSlug: string, code: string): Promise<GiftCard | null> {
+  const { data, error } = await supabase
+    .from('gift_cards')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('code', code)
+    .single()
+  
+  if (error) {
+    console.error('Error fetching gift card:', error)
+    return null
+  }
+  return data
+}
+
+export async function createGiftCard(giftCard: Omit<GiftCard, 'id' | 'code'>): Promise<GiftCard | null> {
+  // Generate unique code
+  const code = generateGiftCardCode()
+  
+  const { data, error } = await supabase
+    .from('gift_cards')
+    .insert({
+      ...giftCard,
+      code,
+      remaining_amount: giftCard.amount,
+      status: 'pending',
+    })
+    .select()
+    .single()
+  
+  if (error) {
+    console.error('Error creating gift card:', error)
+    return null
+  }
+  return data
+}
+
+export async function updateGiftCardStatus(
+  id: string, 
+  status: GiftCard['status'], 
+  stripePaymentId?: string
+): Promise<boolean> {
+  const updateData: Record<string, unknown> = { 
+    status,
+    updated_at: new Date().toISOString(),
+  }
+  
+  if (stripePaymentId) {
+    updateData.stripe_payment_id = stripePaymentId
+  }
+  
+  if (status === 'paid') {
+    updateData.is_sent = false // Will be set to true after email is sent
+  }
+  
+  if (status === 'used') {
+    updateData.used_at = new Date().toISOString()
+    updateData.remaining_amount = 0
+  }
+  
+  const { error } = await supabase
+    .from('gift_cards')
+    .update(updateData)
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error updating gift card status:', error)
+    return false
+  }
+  return true
+}
+
+export async function markGiftCardSent(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('gift_cards')
+    .update({ is_sent: true, updated_at: new Date().toISOString() })
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error marking gift card as sent:', error)
+    return false
+  }
+  return true
+}
+
+export async function useGiftCard(id: string, amountUsed: number): Promise<boolean> {
+  // First get current remaining amount
+  const { data: card, error: fetchError } = await supabase
+    .from('gift_cards')
+    .select('remaining_amount')
+    .eq('id', id)
+    .single()
+  
+  if (fetchError || !card) {
+    console.error('Error fetching gift card:', fetchError)
+    return false
+  }
+  
+  const newRemaining = Math.max(0, card.remaining_amount - amountUsed)
+  const newStatus = newRemaining === 0 ? 'used' : 'paid'
+  
+  const { error } = await supabase
+    .from('gift_cards')
+    .update({ 
+      remaining_amount: newRemaining,
+      status: newStatus,
+      used_at: newRemaining === 0 ? new Date().toISOString() : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+  
+  if (error) {
+    console.error('Error using gift card:', error)
+    return false
+  }
+  return true
+}
+
+// Helper function to generate unique gift card code
+function generateGiftCardCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // Exclude confusing chars like 0, O, 1, I
+  let code = ''
+  for (let i = 0; i < 12; i++) {
+    if (i > 0 && i % 4 === 0) code += '-'
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return code // Format: XXXX-XXXX-XXXX
 }

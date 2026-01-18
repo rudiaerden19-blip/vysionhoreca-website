@@ -42,6 +42,8 @@ const menuItems = [
       { name: 'Design & kleuren', href: '/design', icon: '🎨' },
       { name: 'Foto\'s & media', href: '/media', icon: '📷' },
       { name: 'Teksten', href: '/teksten', icon: '✏️' },
+      { name: 'Ons Team', href: '/team', icon: '👨‍🍳' },
+      { name: 'Cadeaubonnen', href: '/cadeaubonnen', icon: '🎁' },
       { name: 'SEO', href: '/seo', icon: '🔍' },
     ]
   },
