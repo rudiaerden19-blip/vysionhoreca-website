@@ -831,8 +831,23 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       {/* Vacatures / Personeel Sectie */}
       {business.hiring_enabled && (
-        <section className="py-20 bg-white">
-          <div className="max-w-4xl mx-auto px-4">
+        <section 
+          className="py-20 relative overflow-hidden"
+          style={{ 
+            background: `linear-gradient(135deg, ${business.primary_color}08 0%, ${business.primary_color}15 50%, ${business.primary_color}08 100%)` 
+          }}
+        >
+          {/* Decorative elements */}
+          <div 
+            className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20"
+            style={{ backgroundColor: business.primary_color }}
+          />
+          <div 
+            className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl opacity-15"
+            style={{ backgroundColor: business.primary_color }}
+          />
+          
+          <div className="max-w-4xl mx-auto px-4 relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -850,7 +865,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="mt-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 md:p-12 shadow-sm"
+              className="mt-12 bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-lg border border-white/50"
             >
               {business.hiring_description && (
                 <div className="prose prose-lg max-w-none text-gray-700 mb-8">
