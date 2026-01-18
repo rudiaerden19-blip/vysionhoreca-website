@@ -15,7 +15,8 @@ export async function POST(request: NextRequest) {
       reservationTime, 
       partySize,
       tenantSlug,
-      businessName 
+      businessName,
+      rejectionReason 
     } = body
 
     // Validate required fields
@@ -101,6 +102,12 @@ export async function POST(request: NextRequest) {
       headerIcon = '✕'
       mainMessage = `Helaas moeten we je reservering bij ${finalBusinessName} annuleren.`
       additionalInfo = `
+        ${rejectionReason ? `
+          <div style="background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px; padding: 16px; margin: 20px 0;">
+            <p style="color: #991B1B; font-weight: 600; margin: 0 0 8px;">Reden:</p>
+            <p style="color: #7F1D1D; margin: 0;">${rejectionReason}</p>
+          </div>
+        ` : ''}
         <p style="color: #666; text-align: center; margin: 20px 0;">
           Onze excuses voor het ongemak. Neem gerust contact met ons op voor een nieuwe reservering.
         </p>

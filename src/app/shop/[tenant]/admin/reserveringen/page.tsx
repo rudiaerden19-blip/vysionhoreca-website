@@ -31,6 +31,13 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
   const [filter, setFilter] = useState<'upcoming' | 'today' | 'all'>('upcoming')
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [rejectingReservation, setRejectingReservation] = useState<Reservation | null>(null)
+  const [rejectionReason, setRejectionReason] = useState('')
+
+  // Helper function to capitalize first letter of each word
+  const capitalizeWords = (str: string) => {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase())
+  }
 
   const loadReservations = useCallback(async () => {
     setLoading(true)
@@ -88,7 +95,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
     }
   }, [params.tenant, loadReservations])
 
-  const updateStatus = async (id: string, newStatus: string) => {
+  const updateStatus = async (id: string, newStatus: string, reason?: string) => {
     setUpdatingId(id)
     
     const reservation = reservations.find(r => r.id === id)
@@ -119,6 +126,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
               reservationTime: reservation.reservation_time,
               partySize: reservation.party_size,
               tenantSlug: params.tenant,
+              rejectionReason: reason || '',
             }),
           })
         } catch (emailError) {
@@ -128,6 +136,15 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
     }
     
     setUpdatingId(null)
+  }
+
+  const handleRejectReservation = async () => {
+    if (!rejectingReservation || !rejectionReason.trim()) return
+    
+    await updateStatus(rejectingReservation.id, 'cancelled', capitalizeWords(rejectionReason))
+    
+    setRejectingReservation(null)
+    setRejectionReason('')
   }
 
   const deleteReservation = async (id: string) => {
@@ -302,7 +319,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                             ✓ Bevestigen
                           </button>
                           <button
-                            onClick={() => updateStatus(reservation.id, 'cancelled')}
+                            onClick={() => setRejectingReservation(reservation)}
                             disabled={updatingId === reservation.id}
                             className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium text-sm disabled:opacity-50"
                           >
@@ -436,6 +453,69 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                   className="px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium"
                 >
                   🗑️ Verwijderen
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Rejection Modal */}
+      <AnimatePresence>
+        {rejectingReservation && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setRejectingReservation(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl"
+            >
+              <div className="p-6 border-b bg-red-50">
+                <h2 className="text-xl font-bold text-red-700">Reservering Weigeren</h2>
+                <p className="text-red-600 text-sm mt-1">
+                  {rejectingReservation.customer_name} - {rejectingReservation.reservation_date}
+                </p>
+              </div>
+
+              <div className="p-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Reden van afwijzing <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(capitalizeWords(e.target.value))}
+                  placeholder="Bijv. Helaas zijn we volgeboekt op deze datum..."
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                />
+                <p className="text-gray-500 text-sm mt-2">
+                  Deze reden wordt naar de klant gestuurd per e-mail.
+                </p>
+              </div>
+
+              <div className="p-6 border-t bg-gray-50 flex gap-3">
+                <button
+                  onClick={() => {
+                    setRejectingReservation(null)
+                    setRejectionReason('')
+                  }}
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={handleRejectReservation}
+                  disabled={!rejectionReason.trim() || updatingId === rejectingReservation.id}
+                  className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-xl font-medium"
+                >
+                  {updatingId === rejectingReservation.id ? 'Bezig...' : '✕ Weigeren'}
                 </button>
               </div>
             </motion.div>
