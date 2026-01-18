@@ -306,43 +306,89 @@ export default function AbonnementPage() {
         </div>
       </div>
 
-      {/* Upgrade/Change Plan */}
-      {(isTrial || isExpired || currentPlan === 'starter') && (
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 text-white">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <h3 className="text-2xl font-bold mb-2">
-                {isTrial ? 'Upgrade naar een betaald plan' : 
-                 isExpired ? 'Heractiveer je abonnement' :
-                 'Upgrade naar Pro'}
-              </h3>
-              <p className="text-purple-100">
-                {isTrial ? 'Kies een plan voor je proefperiode eindigt' :
-                 isExpired ? 'Krijg weer toegang tot alle functies' :
-                 'Krijg toegang tot SEO, personeel, reviews en meer'}
-              </p>
+      {/* Abonnement Kopen - ALTIJD ZICHTBAAR */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Starter Plan */}
+        <div className="bg-gradient-to-br from-[#1a2e1a] to-[#2d4a2d] rounded-2xl p-6 text-white">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-yellow-400 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">⚡</span>
             </div>
-            <div className="flex gap-4">
-              {currentPlan !== 'starter' && currentPlan !== 'STARTER' && (
-                <button
-                  onClick={() => handleSubscribe('starter')}
-                  disabled={processing !== null}
-                  className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-xl font-semibold transition-colors"
-                >
-                  {processing === 'starter' ? 'Laden...' : 'Starter €79/m'}
-                </button>
-              )}
-              <button
-                onClick={() => handleSubscribe('pro')}
-                disabled={processing !== null}
-                className="bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-purple-50 transition-colors"
-              >
-                {processing === 'pro' ? 'Laden...' : 'Pro €99/m'}
-              </button>
+            <div>
+              <h3 className="text-xl font-bold">Vysion Starter</h3>
+              <p className="text-green-200 text-sm">Alles wat je nodig hebt</p>
             </div>
           </div>
+          <div className="mb-6">
+            <span className="text-4xl font-bold text-yellow-400">€79</span>
+            <span className="text-gray-300 ml-2">/maand</span>
+          </div>
+          <button
+            onClick={() => handleSubscribe('starter')}
+            disabled={processing !== null}
+            className="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-900 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
+          >
+            {processing === 'starter' ? 'Laden...' : '🛒 Starter Kopen'}
+          </button>
         </div>
-      )}
+
+        {/* Pro Plan */}
+        <div className="bg-gradient-to-br from-[#2d1f3d] to-[#4a2d6a] rounded-2xl p-6 text-white relative">
+          <div className="absolute -top-3 right-6">
+            <span className="bg-pink-500 text-white text-xs font-bold px-4 py-1.5 rounded-full">
+              POPULAIR
+            </span>
+          </div>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-purple-400 rounded-xl flex items-center justify-center">
+              <span className="text-2xl">✨</span>
+            </div>
+            <div>
+              <h3 className="text-xl font-bold">Vysion Pro</h3>
+              <p className="text-purple-200 text-sm">Alles + extra features</p>
+            </div>
+          </div>
+          <div className="mb-6">
+            <span className="text-4xl font-bold text-purple-300">€99</span>
+            <span className="text-gray-300 ml-2">/maand</span>
+          </div>
+          <button
+            onClick={() => handleSubscribe('pro')}
+            disabled={processing !== null}
+            className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
+          >
+            {processing === 'pro' ? 'Laden...' : '🛒 Pro Kopen'}
+          </button>
+        </div>
+      </div>
+
+      {/* Factuur Betalen Knop - ALTIJD ZICHTBAAR */}
+      <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">Openstaande factuur betalen</h3>
+            <p className="text-gray-600 mt-1">
+              {pendingInvoices.length > 0 || overdueInvoices.length > 0 
+                ? `Je hebt ${pendingInvoices.length + overdueInvoices.length} openstaande factuur(en)`
+                : 'Geen openstaande facturen'}
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              const invoice = overdueInvoices[0] || pendingInvoices[0]
+              if (invoice) {
+                handlePayInvoice(invoice)
+              } else {
+                alert('Je hebt geen openstaande facturen')
+              }
+            }}
+            disabled={processing !== null}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50 whitespace-nowrap"
+          >
+            {processing && processing !== 'starter' && processing !== 'pro' ? 'Laden...' : '💳 Factuur Nu Betalen'}
+          </button>
+        </div>
+      </div>
 
       {/* Invoices Table */}
       <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden">
