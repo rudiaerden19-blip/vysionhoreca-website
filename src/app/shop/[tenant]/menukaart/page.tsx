@@ -217,7 +217,7 @@ function MenuItemCard({ product, primaryColor }: { product: MenuProduct; primary
       <div className="flex">
         {/* Image */}
         {product.image_url && (
-          <div className={`${expanded ? 'w-24 h-24' : 'w-20 h-20'} flex-shrink-0 transition-all relative`}>
+          <div className={`${expanded ? 'w-24 h-24' : 'w-20 h-20'} flex-shrink-0 transition-all relative overflow-hidden rounded-lg`}>
             <Image 
               src={product.image_url} 
               alt={product.name}
@@ -225,7 +225,7 @@ function MenuItemCard({ product, primaryColor }: { product: MenuProduct; primary
               sizes="96px"
               quality={70}
               loading="lazy"
-              className="object-contain bg-gray-800"
+              className="object-cover"
             />
           </div>
         )}

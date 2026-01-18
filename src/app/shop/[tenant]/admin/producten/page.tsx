@@ -100,13 +100,13 @@ function SortableProductCard({
         <span className="text-xs font-medium">Sleep om te verplaatsen</span>
       </div>
 
-      {/* Image */}
-      <div className="relative h-40 bg-gray-50 flex items-center justify-center">
+      {/* Image - vaste grootte voor uniformiteit */}
+      <div className="relative h-40 bg-gray-50 flex items-center justify-center overflow-hidden">
         {product.image_url ? (
           <img
             src={product.image_url}
             alt={product.name}
-            className="max-w-full max-h-full object-contain"
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-5xl">
