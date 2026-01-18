@@ -498,55 +498,61 @@ function PricingSection() {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* Ripple 1 */}
           <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-silver/20"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
-              width: '100px',
-              height: '100px',
-              animation: 'ripple 3s ease-out infinite',
-              borderColor: 'rgba(192, 192, 192, 0.3)',
+              width: '50px',
+              height: '50px',
+              animation: 'ripple 4s ease-out infinite',
+              border: '3px solid rgba(200, 200, 220, 0.7)',
+              boxShadow: '0 0 20px rgba(200, 200, 220, 0.4)',
             }}
           />
           {/* Ripple 2 - delayed */}
           <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
-              width: '100px',
-              height: '100px',
-              animation: 'ripple 3s ease-out infinite 0.75s',
-              borderColor: 'rgba(192, 192, 192, 0.3)',
+              width: '50px',
+              height: '50px',
+              animation: 'ripple 4s ease-out infinite 1s',
+              border: '3px solid rgba(200, 200, 220, 0.7)',
+              boxShadow: '0 0 20px rgba(200, 200, 220, 0.4)',
             }}
           />
           {/* Ripple 3 - more delayed */}
           <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
-              width: '100px',
-              height: '100px',
-              animation: 'ripple 3s ease-out infinite 1.5s',
-              borderColor: 'rgba(192, 192, 192, 0.3)',
+              width: '50px',
+              height: '50px',
+              animation: 'ripple 4s ease-out infinite 2s',
+              border: '3px solid rgba(200, 200, 220, 0.7)',
+              boxShadow: '0 0 20px rgba(200, 200, 220, 0.4)',
             }}
           />
           {/* Ripple 4 - even more delayed */}
           <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
-              width: '100px',
-              height: '100px',
-              animation: 'ripple 3s ease-out infinite 2.25s',
-              borderColor: 'rgba(192, 192, 192, 0.3)',
+              width: '50px',
+              height: '50px',
+              animation: 'ripple 4s ease-out infinite 3s',
+              border: '3px solid rgba(200, 200, 220, 0.7)',
+              boxShadow: '0 0 20px rgba(200, 200, 220, 0.4)',
             }}
           />
           <style jsx>{`
             @keyframes ripple {
               0% {
-                width: 100px;
-                height: 100px;
-                opacity: 0.6;
+                width: 50px;
+                height: 50px;
+                opacity: 1;
+                border-width: 3px;
               }
               100% {
-                width: 1500px;
-                height: 1500px;
+                width: 1800px;
+                height: 1800px;
                 opacity: 0;
+                border-width: 1px;
               }
             }
           `}</style>
