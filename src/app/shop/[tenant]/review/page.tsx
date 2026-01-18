@@ -113,7 +113,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">

@@ -65,7 +65,7 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4 overflow-x-hidden w-full">
+    <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-50 flex items-center justify-center p-3 sm:p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

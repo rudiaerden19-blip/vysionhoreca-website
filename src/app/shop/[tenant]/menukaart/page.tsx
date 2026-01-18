@@ -56,7 +56,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-900">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md border-b border-white/10">
         <div className="px-4 py-4 text-center">

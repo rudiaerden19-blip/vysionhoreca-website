@@ -111,7 +111,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-x-hidden max-w-[100vw]">
+    <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
       {/* Trial Banner */}
       <TrialBanner tenantSlug={params.tenant} />
       

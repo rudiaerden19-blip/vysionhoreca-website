@@ -499,7 +499,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
+    <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-900 text-white">
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700 px-4 py-3">
         <div className="flex items-center justify-between">
