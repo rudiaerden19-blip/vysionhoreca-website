@@ -53,6 +53,7 @@ interface Business {
   hiring_contact?: string
   gift_cards_enabled?: boolean
   stripe_public_key?: string
+  reservations_enabled?: boolean
 }
 
 interface Review {
@@ -388,6 +389,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         hiring_contact: tenantData?.hiring_contact || '',
         gift_cards_enabled: tenantData?.gift_cards_enabled ?? false,
         stripe_public_key: tenantData?.stripe_public_key || '',
+        reservations_enabled: tenantData?.reservations_enabled !== false, // Default true
       })
 
       // Team members ophalen
@@ -799,6 +801,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* Table Reservation Section */}
+      {business.reservations_enabled && (
       <section className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
@@ -973,6 +976,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </div>
       </section>
+      )}
 
       {/* Vacatures / Personeel Sectie */}
       {business.hiring_enabled && (

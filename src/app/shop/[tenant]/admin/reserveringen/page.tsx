@@ -33,10 +33,43 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [rejectingReservation, setRejectingReservation] = useState<Reservation | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
+  const [reservationsEnabled, setReservationsEnabled] = useState(true)
+  const [savingSettings, setSavingSettings] = useState(false)
 
   // Helper function to capitalize first letter of each word
   const capitalizeWords = (str: string) => {
     return str.replace(/\b\w/g, (char) => char.toUpperCase())
+  }
+
+  // Load reservations enabled setting
+  useEffect(() => {
+    async function loadSettings() {
+      const { data } = await supabase
+        .from('tenant_settings')
+        .select('reservations_enabled')
+        .eq('tenant_slug', params.tenant)
+        .single()
+      
+      if (data) {
+        setReservationsEnabled(data.reservations_enabled !== false) // Default to true
+      }
+    }
+    loadSettings()
+  }, [params.tenant])
+
+  const toggleReservationsEnabled = async () => {
+    setSavingSettings(true)
+    const newValue = !reservationsEnabled
+    
+    const { error } = await supabase
+      .from('tenant_settings')
+      .update({ reservations_enabled: newValue })
+      .eq('tenant_slug', params.tenant)
+    
+    if (!error) {
+      setReservationsEnabled(newValue)
+    }
+    setSavingSettings(false)
   }
 
   const loadReservations = useCallback(async () => {
@@ -204,6 +237,29 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
 
   return (
     <div className="max-w-5xl mx-auto">
+      {/* Enable/Disable Toggle */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">Reserveringen op website</h2>
+            <p className="text-gray-500 text-sm">
+              {reservationsEnabled ? 'Klanten kunnen online reserveren' : 'Reserveringsformulier is uitgeschakeld'}
+            </p>
+          </div>
+          <button
+            onClick={toggleReservationsEnabled}
+            disabled={savingSettings}
+            className={`relative w-12 h-7 rounded-full transition-colors ${
+              reservationsEnabled ? 'bg-green-500' : 'bg-gray-300'
+            } ${savingSettings ? 'opacity-50' : ''}`}
+          >
+            <div className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+              reservationsEnabled ? 'translate-x-5' : 'translate-x-0'
+            }`} />
+          </button>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
         <div>
@@ -334,6 +390,14 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                           className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium text-sm disabled:opacity-50"
                         >
                           ✔️ Afgerond
+                        </button>
+                      )}
+                      {(reservation.status === 'completed' || reservation.status === 'cancelled') && (
+                        <button
+                          onClick={() => deleteReservation(reservation.id)}
+                          className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium text-sm"
+                        >
+                          🗑️ Verwijderen
                         </button>
                       )}
                       <button

@@ -56,6 +56,8 @@ export interface TenantSettings {
   stripe_secret_key?: string
   stripe_public_key?: string
   gift_cards_enabled?: boolean
+  // Reserveringen aan/uit
+  reservations_enabled?: boolean
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {
