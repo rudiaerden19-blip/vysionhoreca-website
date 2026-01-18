@@ -26,21 +26,37 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get business info if not provided
-    let finalBusinessName = businessName
-    if (!finalBusinessName && tenantSlug) {
-      const { data: business } = await supabase
-        .from('business_profiles')
-        .select('business_name, phone, email')
+    // Get full business info
+    let businessInfo = {
+      name: businessName || 'Ons restaurant',
+      address: '',
+      postalCode: '',
+      city: '',
+      phone: '',
+      email: '',
+    }
+    
+    if (tenantSlug) {
+      const { data: tenant } = await supabase
+        .from('tenant_settings')
+        .select('business_name, address, postal_code, city, phone, email')
         .eq('tenant_slug', tenantSlug)
         .single()
       
-      if (business) {
-        finalBusinessName = business.business_name
+      if (tenant) {
+        businessInfo = {
+          name: tenant.business_name || businessName || 'Ons restaurant',
+          address: tenant.address || '',
+          postalCode: tenant.postal_code || '',
+          city: tenant.city || '',
+          phone: tenant.phone || '',
+          email: tenant.email || '',
+        }
       }
     }
 
-    finalBusinessName = finalBusinessName || 'Ons restaurant'
+    const finalBusinessName = businessInfo.name
+    const fullAddress = [businessInfo.address, `${businessInfo.postalCode} ${businessInfo.city}`.trim()].filter(Boolean).join(', ')
 
     // Format date nicely
     const dateObj = new Date(reservationDate)
@@ -167,6 +183,22 @@ export async function POST(request: NextRequest) {
 
               ${additionalInfo}
 
+              <!-- Business Location Box -->
+              <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 12px; padding: 20px; margin: 20px 0;">
+                <h3 style="margin: 0 0 15px; color: #1E40AF; font-size: 16px;">📍 Locatie & Contact:</h3>
+                
+                <p style="margin: 0 0 8px; color: #333; font-weight: 600; font-size: 16px;">
+                  ${finalBusinessName}
+                </p>
+                ${fullAddress ? `<p style="margin: 0 0 8px; color: #555;">${fullAddress}</p>` : ''}
+                ${businessInfo.phone ? `
+                  <p style="margin: 0; color: #555;">
+                    📞 <a href="tel:${businessInfo.phone}" style="color: #1E40AF; text-decoration: none;">${businessInfo.phone}</a>
+                    <span style="color: #888; font-size: 12px;"> (voor wijzigingen of annuleren)</span>
+                  </p>
+                ` : ''}
+              </div>
+
               <p style="color: #888; font-size: 14px; text-align: center; margin-top: 30px;">
                 Met vriendelijke groet,<br>
                 <strong style="color: #333;">${finalBusinessName}</strong>
@@ -196,6 +228,11 @@ Reserveringsgegevens:
 - Personen: ${partySize}
 - Naam: ${customerName}
 - Telefoon: ${customerPhone}
+
+Locatie & Contact:
+${finalBusinessName}
+${fullAddress ? fullAddress : ''}
+${businessInfo.phone ? `Tel: ${businessInfo.phone} (voor wijzigingen of annuleren)` : ''}
 
 Met vriendelijke groet,
 ${finalBusinessName}
