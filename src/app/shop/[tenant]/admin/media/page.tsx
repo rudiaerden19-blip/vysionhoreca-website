@@ -4,6 +4,76 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 
+// =====================================================
+// AUTOMATISCHE IMAGE RESIZE FUNCTIE
+// Verkleint afbeeldingen naar max 800x800 en optimaliseert kwaliteit
+// =====================================================
+const MAX_IMAGE_SIZE = 800
+const IMAGE_QUALITY = 0.85
+
+async function resizeImage(file: File): Promise<File> {
+  return new Promise((resolve, reject) => {
+    // Alleen afbeeldingen resizen
+    if (!file.type.startsWith('image/')) {
+      resolve(file)
+      return
+    }
+
+    const img = new Image()
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    img.onload = () => {
+      let { width, height } = img
+
+      // Bereken nieuwe dimensies (behoud aspect ratio)
+      if (width > MAX_IMAGE_SIZE || height > MAX_IMAGE_SIZE) {
+        if (width > height) {
+          height = Math.round((height * MAX_IMAGE_SIZE) / width)
+          width = MAX_IMAGE_SIZE
+        } else {
+          width = Math.round((width * MAX_IMAGE_SIZE) / height)
+          height = MAX_IMAGE_SIZE
+        }
+      }
+
+      canvas.width = width
+      canvas.height = height
+
+      // Teken afbeelding op canvas met witte achtergrond
+      if (ctx) {
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(0, 0, width, height)
+        ctx.drawImage(img, 0, 0, width, height)
+      }
+
+      // Converteer naar blob
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            // Maak nieuwe File met dezelfde naam maar .jpg extensie
+            const newFileName = file.name.replace(/\.[^/.]+$/, '') + '.jpg'
+            const resizedFile = new File([blob], newFileName, { type: 'image/jpeg' })
+            resolve(resizedFile)
+          } else {
+            resolve(file) // Fallback naar origineel
+          }
+        },
+        'image/jpeg',
+        IMAGE_QUALITY
+      )
+    }
+
+    img.onerror = () => {
+      console.error('Fout bij laden afbeelding voor resize')
+      resolve(file) // Fallback naar origineel
+    }
+
+    // Laad afbeelding van file
+    img.src = URL.createObjectURL(file)
+  })
+}
+
 interface MediaItem {
   id: string
   url: string
@@ -64,13 +134,18 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     let successCount = 0
     let errorMessage = ''
 
-    for (const file of Array.from(files)) {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${params.tenant}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.${fileExt}`
+    for (const originalFile of Array.from(files)) {
+      // Resize afbeelding naar max 800x800 pixels
+      const file = await resizeImage(originalFile)
+      
+      const fileName = `${params.tenant}/${Date.now()}-${Math.random().toString(36).substr(2, 9)}.jpg`
 
       const { error: uploadError } = await supabase.storage
         .from('media')
-        .upload(fileName, file)
+        .upload(fileName, file, {
+          contentType: 'image/jpeg',
+          cacheControl: '31536000' // 1 jaar cache
+        })
 
       if (uploadError) {
         console.error('Upload error:', uploadError)
@@ -83,16 +158,15 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         .getPublicUrl(fileName)
 
       // Gestandaardiseerd schema: beide kolommen aanwezig
-      // Vereist: voer FIX_TENANT_MEDIA.sql uit in Supabase
       const { error: dbError } = await supabase
         .from('tenant_media')
         .insert({
           tenant_slug: params.tenant,
           file_url: urlData.publicUrl,
           url: urlData.publicUrl,
-          file_name: file.name,
-          name: file.name,
-          size: file.size,
+          file_name: originalFile.name,  // Originele bestandsnaam
+          name: originalFile.name.replace(/\.[^/.]+$/, ''),  // Naam zonder extensie
+          size: file.size,  // Geoptimaliseerde grootte
           type: 'image',
           category: uploadCategory || ''
         })
@@ -113,7 +187,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     }
 
     if (successCount > 0) {
-      alert(`✅ ${successCount} foto('s) geüpload!`)
+      alert(`✅ ${successCount} foto('s) geüpload en geoptimaliseerd!`)
     } else if (errorMessage) {
       alert(`❌ Upload mislukt: ${errorMessage}`)
     }
@@ -197,7 +271,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             disabled={uploading}
             className="px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white rounded-xl font-medium flex items-center gap-2"
           >
-            {uploading ? '⏳ Uploaden...' : '📤 Uploaden'}
+            {uploading ? '⏳ Optimaliseren...' : '📤 Uploaden'}
           </button>
           <input
             ref={fileInputRef}
@@ -296,7 +370,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         <span className="text-5xl mb-4 block">📷</span>
         <p className="text-gray-700 font-medium mb-2">Sleep bestanden hierheen</p>
         <p className="text-gray-500 text-sm mb-4">of klik om te uploaden</p>
-        <p className="text-gray-400 text-xs">JPG, PNG, GIF tot 10MB</p>
+        <p className="text-gray-400 text-xs">JPG, PNG, GIF • Automatisch geoptimaliseerd naar 800x800</p>
         {uploadCategory && (
           <p className="text-orange-500 text-sm mt-2">→ Wordt geüpload naar: <strong>{uploadCategory}</strong></p>
         )}
