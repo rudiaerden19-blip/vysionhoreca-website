@@ -40,7 +40,12 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       .order('created_at', { ascending: false })
     
     if (!error && data) {
-      setMedia(data)
+      // Map file_name to name for compatibility
+      const mappedData = data.map(item => ({
+        ...item,
+        name: item.name || item.file_name || 'Foto'
+      }))
+      setMedia(mappedData)
       // Extract unique categories
       const cats = [...new Set(data.map(m => m.category).filter(c => c && c.trim() !== ''))]
       setCategories(cats)
@@ -79,6 +84,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         .insert({
           tenant_slug: params.tenant,
           url: urlData.publicUrl,
+          file_name: file.name,
           name: file.name,
           size: file.size,
           type: 'image',

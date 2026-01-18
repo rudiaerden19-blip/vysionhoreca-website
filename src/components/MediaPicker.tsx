@@ -44,7 +44,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       setMedia(data.map(item => ({
         id: item.id,
         url: item.url,
-        name: item.name || 'Foto',
+        name: item.name || item.file_name || 'Foto',
         category: item.category || ''
       })))
       // Extract categories
