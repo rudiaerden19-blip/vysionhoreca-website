@@ -12,9 +12,9 @@ export const PROTECTED_TENANTS = [
 export function isProtectedTenant(slug: string | null | undefined): boolean {
   if (!slug) return false
   const normalizedSlug = slug.toLowerCase().trim()
-  return PROTECTED_TENANTS.some(protected => 
-    normalizedSlug === protected || 
-    normalizedSlug.startsWith(protected)
+  return PROTECTED_TENANTS.some((p) => 
+    normalizedSlug === p || 
+    normalizedSlug.startsWith(p)
   )
 }
 
