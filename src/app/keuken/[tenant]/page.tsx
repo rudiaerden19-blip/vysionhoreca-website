@@ -1,0 +1,608 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { supabase } from '@/lib/supabase'
+import { getTenantSettings, updateOrderStatus } from '@/lib/admin-api'
+import Link from 'next/link'
+
+interface Order {
+  id: string
+  order_number: string
+  customer_name: string
+  customer_phone?: string
+  order_type: 'pickup' | 'delivery'
+  status: string
+  total: number
+  items: any[]
+  customer_notes?: string
+  created_at: string
+}
+
+interface BusinessSettings {
+  business_name: string
+  primary_color: string
+}
+
+export default function KeukenDisplayPage({ params }: { params: { tenant: string } }) {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [business, setBusiness] = useState<BusinessSettings | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [currentTime, setCurrentTime] = useState(new Date())
+  const [soundEnabled, setSoundEnabled] = useState(false)
+  const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
+  const audioContextRef = useRef<AudioContext | null>(null)
+  const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const printRef = useRef<HTMLDivElement>(null)
+
+  // Update time every second
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentTime(new Date()), 1000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Load initial data
+  useEffect(() => {
+    loadData()
+    const savedSound = localStorage.getItem(`keuken_sound_${params.tenant}`)
+    if (savedSound === 'true') {
+      setSoundEnabled(true)
+      initAudio()
+    }
+  }, [params.tenant])
+
+  // Continuous alert for new orders
+  useEffect(() => {
+    if (newOrderIds.size > 0 && soundEnabled) {
+      alertIntervalRef.current = setInterval(() => {
+        playAlertSound()
+      }, 5000)
+    } else {
+      if (alertIntervalRef.current) {
+        clearInterval(alertIntervalRef.current)
+        alertIntervalRef.current = null
+      }
+    }
+
+    return () => {
+      if (alertIntervalRef.current) {
+        clearInterval(alertIntervalRef.current)
+      }
+    }
+  }, [newOrderIds.size, soundEnabled])
+
+  // Real-time subscription - only confirmed orders
+  useEffect(() => {
+    if (!supabase) return
+
+    const channel = supabase
+      .channel('keuken-display-orders')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders',
+          filter: `tenant_slug=eq.${params.tenant}`,
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newOrder = payload.new as Order
+            if (typeof newOrder.items === 'string') {
+              try {
+                newOrder.items = JSON.parse(newOrder.items)
+              } catch (e) {
+                newOrder.items = []
+              }
+            }
+            // Only add if confirmed (ready to make)
+            if (newOrder.status.toLowerCase() === 'confirmed') {
+              setOrders(prev => [newOrder, ...prev])
+              setNewOrderIds(prev => new Set([...prev, newOrder.id]))
+              if (soundEnabled) playAlertSound()
+            }
+          } else if (payload.eventType === 'UPDATE') {
+            const updated = payload.new as Order
+            // If status changed to confirmed, add it
+            if (updated.status.toLowerCase() === 'confirmed') {
+              setOrders(prev => {
+                const exists = prev.find(o => o.id === updated.id)
+                if (exists) {
+                  return prev.map(o => o.id === updated.id ? { ...o, ...updated } : o)
+                } else {
+                  setNewOrderIds(p => new Set([...p, updated.id]))
+                  if (soundEnabled) playAlertSound()
+                  return [updated, ...prev]
+                }
+              })
+            } else {
+              // Remove if no longer confirmed
+              setOrders(prev => prev.filter(o => o.id !== updated.id))
+            }
+          } else if (payload.eventType === 'DELETE') {
+            setOrders(prev => prev.filter(o => o.id !== payload.old.id))
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [params.tenant, soundEnabled])
+
+  async function loadData() {
+    const settings = await getTenantSettings(params.tenant)
+    if (settings) {
+      setBusiness({
+        business_name: settings.business_name,
+        primary_color: settings.primary_color || '#FF6B35',
+      })
+    }
+
+    if (!supabase) {
+      setLoading(false)
+      return
+    }
+
+    // Only fetch confirmed orders (ready to be made)
+    const { data } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('tenant_slug', params.tenant)
+      .eq('status', 'confirmed')
+      .order('created_at', { ascending: true }) // Oldest first (FIFO)
+      .limit(50)
+
+    if (data) {
+      const parsed = data.map(order => ({
+        ...order,
+        items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
+      }))
+      setOrders(parsed)
+    }
+
+    setLoading(false)
+  }
+
+  function initAudio() {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+    }
+  }
+
+  function playAlertSound() {
+    if (!audioContextRef.current) initAudio()
+    const ctx = audioContextRef.current
+    if (!ctx) return
+
+    const playTone = (freq: number, start: number, duration: number) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.value = freq
+      osc.type = 'sine'
+      gain.gain.setValueAtTime(0.3, ctx.currentTime + start)
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + duration)
+      osc.start(ctx.currentTime + start)
+      osc.stop(ctx.currentTime + start + duration)
+    }
+
+    // Kitchen bell sound
+    playTone(1200, 0, 0.1)
+    playTone(1500, 0.1, 0.15)
+  }
+
+  function enableSound() {
+    initAudio()
+    playAlertSound()
+    setSoundEnabled(true)
+    localStorage.setItem(`keuken_sound_${params.tenant}`, 'true')
+  }
+
+  async function handleReady(order: Order) {
+    await updateOrderStatus(order.id, 'ready')
+    setNewOrderIds(prev => {
+      const next = new Set(prev)
+      next.delete(order.id)
+      return next
+    })
+    setSelectedOrder(null)
+    // Order will be removed from list via real-time subscription
+  }
+
+  function printOrder(order: Order) {
+    const printWindow = window.open('', '_blank', 'width=300,height=600')
+    if (!printWindow) return
+
+    const itemsHtml = order.items?.map((item: any) => `
+      <tr>
+        <td style="font-size: 18px; font-weight: bold; padding: 4px 0;">${item.quantity}x</td>
+        <td style="font-size: 18px; padding: 4px 0;">${item.product_name || item.name}</td>
+      </tr>
+      ${item.options?.map((opt: any) => `
+        <tr><td></td><td style="font-size: 14px; color: #666; padding-left: 10px;">+ ${opt.name}</td></tr>
+      `).join('') || ''}
+      ${item.notes ? `<tr><td></td><td style="font-size: 14px; color: #666; font-style: italic; padding-left: 10px;">📝 ${item.notes}</td></tr>` : ''}
+    `).join('') || ''
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Bon #${order.order_number}</title>
+          <style>
+            body { 
+              font-family: 'Courier New', monospace; 
+              padding: 10px; 
+              max-width: 280px;
+              margin: 0 auto;
+            }
+            .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+            .order-number { font-size: 32px; font-weight: bold; }
+            .order-type { font-size: 24px; margin: 10px 0; padding: 5px; background: #000; color: #fff; display: inline-block; }
+            table { width: 100%; border-collapse: collapse; }
+            .notes { margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+            .footer { text-align: center; margin-top: 15px; border-top: 2px dashed #000; padding-top: 10px; font-size: 12px; }
+            @media print { body { -webkit-print-color-adjust: exact; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="order-number">#${order.order_number}</div>
+            <div class="order-type">${order.order_type === 'delivery' ? '🚗 LEVERING' : '🛍️ AFHALEN'}</div>
+            <div style="font-size: 14px; margin-top: 5px;">
+              ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 10px;">
+            <strong>${order.customer_name}</strong>
+            ${order.customer_phone ? `<br>${order.customer_phone}` : ''}
+          </div>
+
+          <table>
+            ${itemsHtml}
+          </table>
+
+          ${order.customer_notes ? `
+            <div class="notes">
+              <strong>📝 Opmerkingen:</strong><br>
+              ${order.customer_notes}
+            </div>
+          ` : ''}
+
+          <div class="footer">
+            ${business?.business_name || ''}<br>
+            ${new Date().toLocaleDateString('nl-BE')}
+          </div>
+        </body>
+      </html>
+    `)
+    printWindow.document.close()
+    printWindow.focus()
+    setTimeout(() => {
+      printWindow.print()
+      printWindow.close()
+    }, 250)
+  }
+
+  const getTimeSince = (dateString: string) => {
+    const diff = Date.now() - new Date(dateString).getTime()
+    const mins = Math.floor(diff / 60000)
+    if (mins < 1) return 'Zojuist'
+    if (mins < 60) return `${mins} min`
+    return `${Math.floor(mins / 60)}u ${mins % 60}m`
+  }
+
+  const getTimeColor = (dateString: string) => {
+    const diff = Date.now() - new Date(dateString).getTime()
+    const mins = Math.floor(diff / 60000)
+    if (mins < 5) return 'text-green-400'
+    if (mins < 10) return 'text-yellow-400'
+    if (mins < 15) return 'text-orange-400'
+    return 'text-red-400'
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
+      {/* Header */}
+      <header className="bg-blue-600 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-xl">
+              👨‍🍳
+            </div>
+            <div>
+              <h1 className="text-xl font-bold">KEUKEN DISPLAY</h1>
+              <p className="text-blue-200 text-sm">{business?.business_name}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Sound Toggle */}
+            {!soundEnabled ? (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={enableSound}
+                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold flex items-center gap-2 text-sm"
+              >
+                🔔 Geluid Aan
+              </motion.button>
+            ) : (
+              <span className="px-3 py-2 bg-green-500/30 text-green-300 rounded-xl flex items-center gap-2 text-sm">
+                🔊 Aan
+              </span>
+            )}
+
+            {/* Order count */}
+            <div className="px-4 py-2 bg-white/20 rounded-xl font-bold">
+              📋 {orders.length} te maken
+            </div>
+
+            {/* New order indicator */}
+            {newOrderIds.size > 0 && (
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ repeat: Infinity, duration: 0.5 }}
+                className="px-4 py-2 bg-red-500 rounded-xl font-bold"
+              >
+                🚨 {newOrderIds.size} NIEUW
+              </motion.div>
+            )}
+
+            {/* Clock */}
+            <div className="text-2xl font-mono font-bold">
+              {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
+            </div>
+
+            {/* Back to admin */}
+            <Link
+              href={`/shop/${params.tenant}/admin`}
+              className="px-3 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm"
+            >
+              ✕
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Orders Grid */}
+      <div className="p-4 h-[calc(100vh-64px)] overflow-y-auto">
+        {orders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <span className="text-8xl mb-6">✅</span>
+            <p className="text-2xl font-bold">Alles is klaar!</p>
+            <p className="text-lg mt-2">Nieuwe bestellingen verschijnen hier automatisch</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+            {orders.map((order) => (
+              <motion.div
+                key={order.id}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className={`bg-gray-800 rounded-2xl overflow-hidden cursor-pointer transition-all ${
+                  newOrderIds.has(order.id)
+                    ? 'ring-4 ring-blue-500 shadow-[0_0_40px_rgba(59,130,246,0.6)]'
+                    : 'hover:ring-2 hover:ring-gray-600'
+                }`}
+                onClick={() => {
+                  setSelectedOrder(order)
+                  setNewOrderIds(prev => {
+                    const next = new Set(prev)
+                    next.delete(order.id)
+                    return next
+                  })
+                }}
+              >
+                {/* Order Header */}
+                <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
+                  <span className="font-bold text-2xl">#{order.order_number}</span>
+                  <span className={`font-mono font-bold ${getTimeColor(order.created_at)}`}>
+                    {getTimeSince(order.created_at)}
+                  </span>
+                </div>
+
+                {/* Order Type Badge */}
+                <div className={`px-4 py-2 text-center font-bold text-lg ${
+                  order.order_type === 'delivery' 
+                    ? 'bg-purple-600' 
+                    : 'bg-green-600'
+                }`}>
+                  {order.order_type === 'delivery' ? '🚗 LEVERING' : '🛍️ AFHALEN'}
+                </div>
+
+                {/* Items List */}
+                <div className="p-4">
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {order.items?.map((item: any, i: number) => (
+                      <div key={i} className="flex items-start gap-3 pb-2 border-b border-gray-700 last:border-0">
+                        <span className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-lg shrink-0">
+                          {item.quantity}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-lg truncate">{item.product_name || item.name}</p>
+                          {item.options?.map((opt: any, j: number) => (
+                            <p key={j} className="text-sm text-gray-400">+ {opt.name}</p>
+                          ))}
+                          {item.notes && (
+                            <p className="text-sm text-yellow-400 italic">📝 {item.notes}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Notes */}
+                  {order.customer_notes && (
+                    <div className="mt-3 p-2 bg-yellow-500/20 rounded-lg">
+                      <p className="text-sm text-yellow-400">📝 {order.customer_notes}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Actions */}
+                <div className="p-3 bg-gray-700/50 flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      printOrder(order)
+                    }}
+                    className="flex-1 py-3 bg-gray-600 hover:bg-gray-500 rounded-xl font-bold text-lg"
+                  >
+                    🖨️ Print
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleReady(order)
+                    }}
+                    className="flex-1 py-3 bg-green-500 hover:bg-green-600 rounded-xl font-bold text-lg"
+                  >
+                    ✓ Klaar
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Order Detail Modal */}
+      <AnimatePresence>
+        {selectedOrder && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setSelectedOrder(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-gray-800 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="bg-blue-600 p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-5xl font-bold">#{selectedOrder.order_number}</h2>
+                    <div className="flex items-center gap-3 mt-2">
+                      <span className={`px-3 py-1 rounded-lg font-bold ${
+                        selectedOrder.order_type === 'delivery' ? 'bg-purple-500' : 'bg-green-500'
+                      }`}>
+                        {selectedOrder.order_type === 'delivery' ? '🚗 LEVERING' : '🛍️ AFHALEN'}
+                      </span>
+                      <span className={`font-mono font-bold text-lg ${getTimeColor(selectedOrder.created_at)}`}>
+                        ⏱️ {getTimeSince(selectedOrder.created_at)}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedOrder(null)}
+                    className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-3xl hover:bg-white/30"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                {/* Customer Info */}
+                <div className="bg-gray-700/50 rounded-2xl p-4 mb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-400 text-sm">Klant</p>
+                      <p className="font-bold text-2xl">{selectedOrder.customer_name}</p>
+                    </div>
+                    {selectedOrder.customer_phone && (
+                      <div className="text-right">
+                        <p className="text-gray-400 text-sm">Telefoon</p>
+                        <p className="font-bold text-xl">{selectedOrder.customer_phone}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Items - BIG for kitchen */}
+                <div className="bg-gray-700/50 rounded-2xl p-4 mb-4">
+                  <h3 className="font-bold text-xl mb-4 text-blue-400">TE BEREIDEN</h3>
+                  <div className="space-y-4">
+                    {selectedOrder.items?.map((item: any, i: number) => (
+                      <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-600 last:border-0">
+                        <span className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center font-bold text-3xl shrink-0">
+                          {item.quantity}
+                        </span>
+                        <div className="flex-1">
+                          <p className="font-bold text-2xl">{item.product_name || item.name}</p>
+                          {item.options?.map((opt: any, j: number) => (
+                            <p key={j} className="text-lg text-gray-400 mt-1">+ {opt.name}</p>
+                          ))}
+                          {item.notes && (
+                            <p className="text-lg text-yellow-400 mt-2 p-2 bg-yellow-500/20 rounded-lg">
+                              📝 {item.notes}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Notes */}
+                {selectedOrder.customer_notes && (
+                  <div className="bg-yellow-500/20 rounded-2xl p-4 mb-4">
+                    <h3 className="font-bold text-lg mb-2 text-yellow-400">📝 OPMERKINGEN</h3>
+                    <p className="text-xl">{selectedOrder.customer_notes}</p>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="grid grid-cols-2 gap-4">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => printOrder(selectedOrder)}
+                    className="py-6 bg-gray-600 hover:bg-gray-500 rounded-2xl font-bold text-2xl"
+                  >
+                    🖨️ PRINT BON
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => handleReady(selectedOrder)}
+                    className="py-6 bg-green-500 hover:bg-green-600 rounded-2xl font-bold text-2xl"
+                  >
+                    ✓ KLAAR
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}

@@ -16,7 +16,8 @@ const menuItems = [
     category: 'OVERZICHT',
     items: [
       { name: 'Dashboard', href: '', icon: '📊' },
-      { name: 'Kassa Display', href: '/kassa', icon: '🖥️' },
+      { name: 'Shop Display', href: '/display', icon: '🖥️', fullscreen: true },
+      { name: 'Keuken Display', href: '/keuken', icon: '👨‍🍳', fullscreen: true },
       { name: 'Abonnement', href: '/abonnement', icon: '💎' },
     ]
   },
@@ -247,23 +248,39 @@ function SidebarContent({
               </h2>
             )}
             <ul className="space-y-1">
-              {section.items.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={`${baseUrl}${item.href}`}
-                    onClick={onClose}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
-                      isActive(item.href)
-                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                    title={collapsed ? item.name : undefined}
-                  >
-                    <span className="text-lg">{item.icon}</span>
-                    {!collapsed && <span className="font-medium">{item.name}</span>}
-                  </Link>
-                </li>
-              ))}
+              {section.items.map((item) => {
+                // Fullscreen displays open in new routes
+                const getHref = () => {
+                  if (item.fullscreen) {
+                    if (item.href === '/display') return `/shop/${tenant}/display`
+                    if (item.href === '/keuken') return `/keuken/${tenant}`
+                  }
+                  return `${baseUrl}${item.href}`
+                }
+                
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={getHref()}
+                      onClick={onClose}
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                        isActive(item.href)
+                          ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      } ${item.fullscreen ? 'border-2 border-dashed border-gray-300' : ''}`}
+                      title={collapsed ? item.name : undefined}
+                    >
+                      <span className="text-lg">{item.icon}</span>
+                      {!collapsed && (
+                        <span className="font-medium flex items-center gap-2">
+                          {item.name}
+                          {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
           </div>
         ))}
