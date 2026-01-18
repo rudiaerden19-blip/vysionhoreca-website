@@ -1117,15 +1117,15 @@ function CTASection() {
   const { t, locale } = useLanguage()
   
   return (
-    <section id="demo" className="py-32 sm:py-40 relative overflow-hidden min-h-[400px]">
+    <section id="demo" className="py-20 sm:py-24 relative overflow-hidden min-h-[500px] sm:min-h-[600px]">
       {/* Video Background */}
       <video 
         autoPlay 
         muted 
         loop 
         playsInline
-        className="absolute inset-0 w-full h-full object-cover object-center"
-        style={{ objectPosition: 'center 30%' }}
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ objectPosition: 'center center', transform: 'scale(1.0)' }}
       >
         <source src="https://i.imgur.com/NSvVhnz.mp4" type="video/mp4" />
       </video>
