@@ -71,14 +71,23 @@ export default function LoginPage() {
       // Store tenant in localStorage
       localStorage.setItem('vysion_tenant', JSON.stringify(tenant))
       
-      // ALTIJD naar tenant dashboard - geen fallback!
+      // ALTIJD naar tenant dashboard via subdomain - geen fallback!
       if (!tenant.tenant_slug) {
         setError('Geen tenant gevonden. Neem contact op met support.')
         setIsLoading(false)
         return
       }
       
-      router.push(`/shop/${tenant.tenant_slug}/admin`)
+      // Redirect to subdomain if not on localhost/main domain
+      const isLocalhost = typeof window !== 'undefined' && 
+        (window.location.hostname.includes('localhost') || 
+         window.location.hostname.includes('vysionhoreca.com'))
+      
+      if (!isLocalhost) {
+        window.location.href = `https://www.${tenant.tenant_slug}.ordervysion.com/admin`
+      } else {
+        router.push(`/shop/${tenant.tenant_slug}/admin`)
+      }
       
     } catch (err) {
       setError(t('login.somethingWentWrong'))

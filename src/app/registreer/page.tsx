@@ -139,10 +139,21 @@ export default function RegisterPage() {
       
       localStorage.setItem('vysion_tenant', JSON.stringify(data.tenant))
       
-      // ALTIJD naar tenant dashboard - GEEN fallback naar admin dashboard!
+      // ALTIJD naar tenant dashboard via subdomain - GEEN fallback naar admin dashboard!
       setSuccess(true)
       setTimeout(() => {
-        router.push(`/shop/${data.tenant.tenant_slug}/admin`)
+        // Redirect to subdomain if available, otherwise use path
+        const tenantUrl = typeof window !== 'undefined' && 
+          !window.location.hostname.includes('localhost') &&
+          !window.location.hostname.includes('vysionhoreca.com')
+          ? `https://www.${data.tenant.tenant_slug}.ordervysion.com/admin`
+          : `/shop/${data.tenant.tenant_slug}/admin`
+        
+        if (tenantUrl.startsWith('http')) {
+          window.location.href = tenantUrl
+        } else {
+          router.push(tenantUrl)
+        }
       }, 2000)
       
     } catch (err) {
