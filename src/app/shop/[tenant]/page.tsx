@@ -568,7 +568,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </header>
 
       {/* Hero Section with Parallax */}
-      <section className="relative h-screen min-h-[700px] overflow-hidden">
+      <section className="relative h-screen min-h-[500px] sm:min-h-[700px] overflow-hidden">
         {/* Background Image Slider */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -633,7 +633,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-4 leading-none"
+              className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white mb-4 leading-none break-words"
             >
               {business.name}
             </motion.h1>
@@ -643,7 +643,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.6 }}
-              className="text-xl md:text-2xl text-white/90 mb-8 font-light"
+              className="text-base sm:text-xl md:text-2xl text-white/90 mb-6 font-light"
             >
               {business.tagline}
             </motion.p>
@@ -653,21 +653,21 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.6 }}
-              className="flex flex-wrap gap-3 mt-8"
+              className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-8"
             >
               {business.pickup_enabled && (
-                <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm">
-                  <span>🛍️</span> Afhalen · {business.pickup_time}
+                <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
+                  <span>🛍️</span> <span className="hidden xs:inline">Afhalen ·</span> {business.pickup_time}
                 </span>
               )}
               {business.delivery_enabled && (
-                <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm">
-                  <span>🚗</span> Levering · {business.delivery_time}
+                <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
+                  <span>🚗</span> <span className="hidden xs:inline">Levering ·</span> {business.delivery_time}
                 </span>
               )}
               {business.address && (
-                <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white px-4 py-2 rounded-full text-sm">
-                  <span>📍</span> {business.address}
+                <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm max-w-full truncate">
+                  <span className="shrink-0">📍</span> <span className="truncate">{business.address}</span>
                 </span>
               )}
             </motion.div>
@@ -684,7 +684,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Ons verhaal</span>
-                <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2 mb-6">Over Ons</h2>
+                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2 mb-6">Over Ons</h2>
                 <p className="text-gray-600 text-lg leading-relaxed mb-6">
                   {business.story}
                 </p>
@@ -716,20 +716,20 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             background: `linear-gradient(135deg, ${business.primary_color}08 0%, ${business.primary_color}15 50%, ${business.primary_color}08 100%)` 
           }}
         >
-          {/* Decorative elements */}
+          {/* Decorative elements - hidden on mobile */}
           <div 
-            className="absolute top-10 left-10 w-48 h-48 rounded-full blur-3xl opacity-15"
+            className="hidden sm:block absolute top-10 left-10 w-48 h-48 rounded-full blur-3xl opacity-15"
             style={{ backgroundColor: business.primary_color }}
           />
           <div 
-            className="absolute bottom-10 right-10 w-64 h-64 rounded-full blur-3xl opacity-10"
+            className="hidden sm:block absolute bottom-10 right-10 w-64 h-64 rounded-full blur-3xl opacity-10"
             style={{ backgroundColor: business.primary_color }}
           />
           
           <div className="max-w-6xl mx-auto px-4 relative z-10">
             <div className="text-center mb-12">
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Onze keuken</span>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Onze Specialiteiten</h2>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Onze Specialiteiten</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -806,7 +806,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
             <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Kom langs</span>
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Reserveer een tafel</h2>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Reserveer een tafel</h2>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
               Wil je zeker zijn van een plekje? Reserveer vooraf en geniet ter plaatse van onze lekkernijen.
             </p>
@@ -993,18 +993,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         >
           {/* Decorative elements */}
           <div 
-            className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20"
+            className="hidden sm:block absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20"
             style={{ backgroundColor: business.primary_color }}
           />
           <div 
-            className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl opacity-15"
+            className="hidden sm:block absolute bottom-0 left-0 w-48 h-48 rounded-full blur-3xl opacity-15"
             style={{ backgroundColor: business.primary_color }}
           />
           
           <div className="max-w-4xl mx-auto px-4 relative z-10">
             <div className="text-center">
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Kom bij ons team</span>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">
                 {business.hiring_title || 'Wij zoeken personeel'}
               </h2>
             </div>
@@ -1044,7 +1044,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Wat klanten zeggen</span>
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Reviews</h2>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Reviews</h2>
             <div className="flex items-center justify-center gap-2 mt-4">
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -1093,7 +1093,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         <section className="py-20 bg-white">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 italic">
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 italic">
                 Onze Meest Verkochte Producten
               </h2>
               <div className="w-16 h-1 bg-blue-500 mx-auto mt-4 mb-6"></div>
@@ -1133,7 +1133,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-12">
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Maak kennis met</span>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Ons Team</h2>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Ons Team</h2>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -1177,18 +1177,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           }}
         >
           <div 
-            className="absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl opacity-20"
+            className="hidden sm:block absolute top-0 right-0 w-72 h-72 rounded-full blur-3xl opacity-20"
             style={{ backgroundColor: business.primary_color }}
           />
           <div 
-            className="absolute bottom-0 left-0 w-56 h-56 rounded-full blur-3xl opacity-15"
+            className="hidden sm:block absolute bottom-0 left-0 w-56 h-56 rounded-full blur-3xl opacity-15"
             style={{ backgroundColor: business.primary_color }}
           />
           
           <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
             <div>
               <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Het perfecte cadeau</span>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mt-2">Geef iemand een verrassing</h2>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Geef iemand een verrassing</h2>
               <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg">
                 Bestel een cadeaubon en verras iemand met een heerlijke maaltijd. Direct in de mailbox!
               </p>
@@ -1425,7 +1425,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       <section style={{ background: `linear-gradient(to right, ${business.primary_color}, ${business.primary_color}cc)` }} className="py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-6">
               Honger gekregen?
             </h2>
             <p className="text-white/90 text-xl mb-8">
