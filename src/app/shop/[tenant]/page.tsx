@@ -817,9 +817,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">✅</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Reservering ontvangen!</h3>
-                <p className="text-gray-600 mb-6">
-                  We hebben je reservering ontvangen. Je krijgt zo snel mogelijk een bevestiging.
+                <p className="text-gray-600 mb-4">
+                  We hebben je reservering ontvangen en behandelen deze zo snel mogelijk.
                 </p>
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 max-w-md mx-auto">
+                  <p className="text-blue-800 font-medium">
+                    📧 Je ontvangt een bevestigingsmail zodra we je reservering hebben goedgekeurd.
+                  </p>
+                </div>
                 <button
                   onClick={() => setReservationSuccess(false)}
                   className="text-orange-500 hover:text-orange-600 font-medium"
