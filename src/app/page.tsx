@@ -905,7 +905,7 @@ function IndustrySection() {
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           {/* Left content */}
           <div>
             <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">
@@ -923,15 +923,15 @@ function IndustrySection() {
           </div>
 
           {/* Right content - Image */}
-          <div className="relative text-center flex flex-col items-center justify-center h-full">
+          <div className="relative text-center flex flex-col items-center justify-center">
             <img
               src={current.image}
               alt={activeTab}
-              className="w-full h-auto object-contain rounded-2xl shadow-xl cursor-pointer"
+              className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-xl cursor-pointer"
               loading="lazy"
               onClick={() => setShowLightbox(true)}
             />
-            <p className="text-gray-500 text-sm mt-4">{t('industry.clickToEnlarge')}</p>
+            <p className="text-gray-500 text-sm mt-6">{t('industry.clickToEnlarge')}</p>
           </div>
         </div>
 
