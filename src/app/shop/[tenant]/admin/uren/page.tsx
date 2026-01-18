@@ -131,12 +131,21 @@ export default function UrenPage() {
     return entries.find(e => e.date === dateStr)
   }
 
-  function openEntryModal(date: Date) {
+  // Get ALL entries for a date (multiple types possible)
+  function getEntriesForDate(date: Date): TimesheetEntry[] {
+    const dateStr = date.toISOString().split('T')[0]
+    return entries.filter(e => e.date === dateStr)
+  }
+
+  const [editingEntry, setEditingEntry] = useState<TimesheetEntry | null>(null)
+
+  function openEntryModal(date: Date, existingEntry?: TimesheetEntry) {
     const dateStr = date.toISOString().split('T')[0]
     setSelectedDate(dateStr)
+    setEditingEntry(existingEntry || null)
     
-    const existingEntry = getEntryForDate(date)
     if (existingEntry) {
+      // Bewerk bestaande entry
       setEntryForm({
         absence_type: existingEntry.absence_type,
         clock_in: existingEntry.clock_in || '',
@@ -147,6 +156,7 @@ export default function UrenPage() {
         notes: existingEntry.notes || '',
       })
     } else {
+      // Nieuwe entry toevoegen
       setEntryForm({
         absence_type: 'WORKED',
         clock_in: '09:00',
@@ -167,6 +177,7 @@ export default function UrenPage() {
     setSaving(true)
     
     const entry: TimesheetEntry = {
+      id: editingEntry?.id,  // Behoud ID als we bewerken
       tenant_slug: tenant,
       staff_id: selectedStaff.id,
       date: selectedDate,
@@ -177,7 +188,7 @@ export default function UrenPage() {
       worked_hours: entryForm.worked_hours || 0,
       absence_hours: entryForm.absence_type !== 'WORKED' ? entryForm.absence_hours : undefined,
       notes: entryForm.notes,
-      is_approved: false,
+      is_approved: editingEntry?.is_approved || false,
     }
     
     const result = await saveTimesheetEntry(entry)
@@ -185,6 +196,7 @@ export default function UrenPage() {
     
     if (result) {
       setShowEntryModal(false)
+      setEditingEntry(null)
       loadData()
     } else {
       alert('Opslaan mislukt')
@@ -661,10 +673,9 @@ Met vriendelijke groeten`,
         {/* Calendar Days */}
         <div className="grid grid-cols-7">
           {getCalendarDays().map(({ date, inMonth }, idx) => {
-            const entry = getEntryForDate(date)
+            const dayEntries = getEntriesForDate(date)
             const isToday = date.toDateString() === new Date().toDateString()
             const isWeekend = date.getDay() === 0 || date.getDay() === 6
-            const absenceType = entry ? ABSENCE_TYPES.find(t => t.id === entry.absence_type) : null
             
             return (
               <div
@@ -682,18 +693,23 @@ Met vriendelijke groeten`,
                   {date.getDate()}
                 </div>
                 
-                {entry && inMonth && (
-                  <div
-                    className="text-xs rounded px-1.5 py-0.5 truncate print:text-[10px]"
-                    style={{ 
-                      backgroundColor: absenceType?.color + '20',
-                      color: absenceType?.color
-                    }}
-                  >
-                    {absenceType?.icon} {entry.absence_type === 'WORKED' ? `${entry.worked_hours?.toFixed(1)}u` : absenceType?.label}
-                    {entry.is_approved && <span className="ml-1">✓</span>}
-                  </div>
-                )}
+                {/* Toon ALLE entries voor deze dag */}
+                {inMonth && dayEntries.map((entry, i) => {
+                  const absenceType = ABSENCE_TYPES.find(t => t.id === entry.absence_type)
+                  return (
+                    <div
+                      key={entry.id || i}
+                      className="text-xs rounded px-1.5 py-0.5 truncate print:text-[10px] mb-0.5"
+                      style={{ 
+                        backgroundColor: absenceType?.color + '20',
+                        color: absenceType?.color
+                      }}
+                    >
+                      {absenceType?.icon} {entry.absence_type === 'WORKED' ? `${entry.worked_hours?.toFixed(1)}u` : `${entry.absence_hours || 8}u ${absenceType?.label}`}
+                      {entry.is_approved && <span className="ml-1">✓</span>}
+                    </div>
+                  )
+                })}
               </div>
             )
           })}
@@ -846,6 +862,57 @@ Met vriendelijke groeten`,
             </div>
             
             <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
+              {/* Bestaande entries voor deze dag */}
+              {!editingEntry && getEntriesForDate(new Date(selectedDate)).length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Bestaande registraties</label>
+                  <div className="space-y-2">
+                    {getEntriesForDate(new Date(selectedDate)).map((entry) => {
+                      const absenceType = ABSENCE_TYPES.find(t => t.id === entry.absence_type)
+                      return (
+                        <div
+                          key={entry.id}
+                          className="flex items-center justify-between p-3 rounded-lg border"
+                          style={{ backgroundColor: absenceType?.color + '10', borderColor: absenceType?.color + '40' }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{absenceType?.icon}</span>
+                            <span className="font-medium">{absenceType?.label}</span>
+                            <span className="text-gray-600">
+                              {entry.absence_type === 'WORKED' 
+                                ? `${entry.worked_hours?.toFixed(1)}u` 
+                                : `${entry.absence_hours || 8}u`}
+                            </span>
+                          </div>
+                          <div className="flex gap-1">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                openEntryModal(new Date(selectedDate), entry)
+                              }}
+                              className="px-2 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteEntry(entry)
+                              }}
+                              className="px-2 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="border-t my-4 pt-4">
+                    <p className="text-sm font-medium text-gray-700">➕ Nieuwe registratie toevoegen:</p>
+                  </div>
+                </div>
+              )}
               {/* Absence Type Selector */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
@@ -975,19 +1042,26 @@ Met vriendelijke groeten`,
             </div>
             
             <div className="p-6 border-t flex gap-3 justify-between">
-              <button
-                onClick={() => {
-                  const entry = getEntryForDate(new Date(selectedDate))
-                  if (entry) handleDeleteEntry(entry)
-                  setShowEntryModal(false)
-                }}
-                className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
-              >
-                🗑️ Verwijderen
-              </button>
+              {editingEntry ? (
+                <button
+                  onClick={() => {
+                    handleDeleteEntry(editingEntry)
+                    setShowEntryModal(false)
+                    setEditingEntry(null)
+                  }}
+                  className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
+                >
+                  🗑️ Verwijderen
+                </button>
+              ) : (
+                <div />
+              )}
               <div className="flex gap-3">
                 <button
-                  onClick={() => setShowEntryModal(false)}
+                  onClick={() => {
+                    setShowEntryModal(false)
+                    setEditingEntry(null)
+                  }}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
                 >
                   Annuleren
@@ -997,7 +1071,7 @@ Met vriendelijke groeten`,
                   disabled={saving}
                   className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
                 >
-                  {saving ? 'Opslaan...' : 'Opslaan'}
+                  {saving ? 'Opslaan...' : editingEntry ? 'Bijwerken' : 'Toevoegen'}
                 </button>
               </div>
             </div>

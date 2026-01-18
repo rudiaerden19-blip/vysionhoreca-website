@@ -2396,7 +2396,7 @@ export async function saveTimesheetEntry(entry: TimesheetEntry): Promise<Timeshe
     workedHours = Math.max(0, totalMinutes / 60)
   }
   
-  const entryData = {
+  const entryData: Record<string, unknown> = {
     tenant_slug: entry.tenant_slug,
     staff_id: entry.staff_id,
     date: entry.date,
@@ -2413,9 +2413,26 @@ export async function saveTimesheetEntry(entry: TimesheetEntry): Promise<Timeshe
     updated_at: new Date().toISOString(),
   }
   
+  // Als we een ID hebben, update die specifieke entry
+  if (entry.id) {
+    const { data, error } = await supabase
+      .from('timesheet_entries')
+      .update(entryData)
+      .eq('id', entry.id)
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error updating timesheet entry:', error)
+      return null
+    }
+    return data
+  }
+  
+  // Anders insert nieuwe entry
   const { data, error } = await supabase
     .from('timesheet_entries')
-    .upsert(entryData, { onConflict: 'tenant_slug,staff_id,date' })
+    .insert(entryData)
     .select()
     .single()
   
