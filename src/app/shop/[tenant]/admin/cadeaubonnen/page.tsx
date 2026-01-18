@@ -12,6 +12,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [activeTab, setActiveTab] = useState<'instellingen' | 'bonnen'>('instellingen')
+  const [showSecretKey, setShowSecretKey] = useState(false)
   
   const [formData, setFormData] = useState({
     gift_cards_enabled: false,
@@ -210,14 +211,23 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Secret Key (sk_...)
                 </label>
-                <input
-                  type="password"
-                  value={formData.stripe_secret_key}
-                  onChange={(e) => setFormData(prev => ({ ...prev, stripe_secret_key: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono text-sm"
-                  placeholder="sk_live_..."
-                />
-                <p className="text-xs text-gray-500 mt-1">🔒 Deze key wordt veilig opgeslagen en nooit getoond</p>
+                <div className="relative">
+                  <input
+                    type={showSecretKey ? 'text' : 'password'}
+                    value={formData.stripe_secret_key}
+                    onChange={(e) => setFormData(prev => ({ ...prev, stripe_secret_key: e.target.value }))}
+                    className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono text-sm"
+                    placeholder="sk_live_..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSecretKey(!showSecretKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                  >
+                    {showSecretKey ? '🙈' : '👁️'}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">🔒 Deze key wordt veilig opgeslagen</p>
               </div>
             </div>
           </motion.div>
