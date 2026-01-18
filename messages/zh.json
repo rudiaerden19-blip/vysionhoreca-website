@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Vysion Horeca | 一体化收银与支付平台",
-    "description": "餐饮业完整收银系统。收银、在线订单、发票、员工管理等 - 全部在一个平台上。免费试用7天。"
+    "description": "餐饮业完整收银系统。收银、在线订单、发票、员工管理等 - 全部在一个平台上。免费试用14天。"
   },
   "nav": {
     "home": "首页",
@@ -24,7 +24,7 @@
     "tagline": "一个平台。一个屏幕。完全控制。",
     "ctaPrimary": "开始免费试用",
     "ctaSecondary": "观看演示",
-    "trialInfo": "免费试用7天 • 立即开始",
+    "trialInfo": "免费试用14天 • 立即开始",
     "clickToOpen": "点击打开"
   },
   "features": {
@@ -78,8 +78,8 @@
     "support": "可用支持"
   },
   "orderApp": {
-    "title": "您需要的一切",
-    "subtitle": "完整的生态系统。不再为单独的模块支付过高费用。",
+    "title": "市场上最全面的订购平台",
+    "subtitle": "终于为餐饮业提供完整的生态系统",
     "cta": "探索完整平台"
   },
   "butWait": {
@@ -135,7 +135,7 @@
     "title": "简单透明的价格",
     "subtitle": "全部包含。无惊喜。",
     "perMonth": "/月",
-    "trialInfo": "7天免费试用 • 无需信用卡 • 随时取消",
+      "trialInfo": "14天免费试用 • 无需信用卡 • 随时取消",
     "popular": "Popular",
     "chooseStarter": "选择Starter",
     "chooseStandard": "选择Standard",
@@ -176,7 +176,7 @@
     "faq": {
       "title": "常见问题",
       "q1": "可以先免费试用吗？",
-      "a1": "是的！您可以免费使用7天所有功能。无需信用卡。",
+      "a1": "是的！您可以免费使用14天所有功能。无需信用卡。",
       "q2": "可以升级或降级吗？",
       "a2": "是的，您可以随时升级到Pro或降级。更改立即生效。",
       "q3": "有长期合同吗？",
@@ -188,7 +188,7 @@
     },
     "cta": {
       "title": "准备开始了吗？",
-      "subtitle": "立即开始7天免费试用。无需信用卡。",
+      "subtitle": "立即开始14天免费试用。无需信用卡。",
       "primary": "开始免费试用 →",
       "secondary": "联系我们"
     }
@@ -255,7 +255,7 @@
   },
   "cta": {
     "title": "准备好成长了吗？",
-    "subtitle": "今天就开始使用Vysion Horeca。7天免费，无义务。",
+    "subtitle": "今天就开始使用Vysion Horeca。14天免费，无义务。",
     "primary": "开始免费试用",
     "secondary": "获取信息"
   },
@@ -312,7 +312,7 @@
       "1": "免费启动",
       "2": "免费培训",
       "3": "免费安装",
-      "4": "7天免费试用",
+      "4": "14天免费试用",
       "5": "无隐藏费用"
     },
     "cta": "立即免费开始"
@@ -419,7 +419,7 @@
       "supportAvailable": "可用支持"
     },
     "ctaTitle": "准备好开始了吗？",
-    "ctaSubtitle": "免费试用Vysion Horeca 7天。无需信用卡。",
+    "ctaSubtitle": "免费试用Vysion Horeca 14天。无需信用卡。",
     "ctaPrimary": "开始免费试用",
     "ctaSecondary": "联系我们"
   },

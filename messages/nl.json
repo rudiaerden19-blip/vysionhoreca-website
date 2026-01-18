@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Vysion Horeca | Alles-in-één Kassa & Betaalplatform",
-    "description": "Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 7 dagen gratis."
+    "description": "Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 14 dagen gratis."
   },
   "nav": {
     "home": "Home",
@@ -24,7 +24,7 @@
     "tagline": "Eén platform. Eén scherm. Volledige controle.",
     "ctaPrimary": "Start gratis proefperiode",
     "ctaSecondary": "Bekijk demo",
-    "trialInfo": "Gratis testen 7 dagen • Direct aan de slag",
+    "trialInfo": "Gratis testen 14 dagen • Direct aan de slag",
     "clickToOpen": "Klik om te openen"
   },
   "features": {
@@ -135,7 +135,7 @@
     "title": "Simpele, transparante prijzen",
     "subtitle": "Alles inbegrepen. Geen verrassingen.",
     "perMonth": "/maand",
-    "trialInfo": "7 dagen gratis proberen • Geen creditcard nodig • Maandelijks opzegbaar",
+      "trialInfo": "14 dagen gratis proberen • Geen creditcard nodig • Maandelijks opzegbaar",
     "popular": "Popular",
     "chooseStarter": "Kies Starter",
     "chooseStandard": "Kies Standaard",
@@ -176,7 +176,7 @@
     "faq": {
       "title": "Veelgestelde vragen",
       "q1": "Kan ik eerst gratis proberen?",
-      "a1": "Ja! Je krijgt 7 dagen gratis toegang tot alle functies. Geen creditcard nodig om te starten.",
+      "a1": "Ja! Je krijgt 14 dagen gratis toegang tot alle functies. Geen creditcard nodig om te starten.",
       "q2": "Kan ik upgraden of downgraden?",
       "a2": "Ja, je kunt op elk moment upgraden naar Pro of downgraden. De wijziging gaat direct in.",
       "q3": "Zijn er langlopende contracten?",
@@ -188,7 +188,7 @@
     },
     "cta": {
       "title": "Klaar om te starten?",
-      "subtitle": "Start vandaag nog met je 7 dagen gratis proefperiode. Geen creditcard nodig.",
+      "subtitle": "Start vandaag nog met je 14 dagen gratis proefperiode. Geen creditcard nodig.",
       "primary": "Start gratis proefperiode →",
       "secondary": "Contact opnemen"
     }
@@ -260,7 +260,7 @@
   },
   "cta": {
     "title": "Klaar om te groeien?",
-    "subtitle": "Start vandaag nog met Vysion Horeca. 7 dagen gratis, geen verplichtingen.",
+    "subtitle": "Start vandaag nog met Vysion Horeca. 14 dagen gratis, geen verplichtingen.",
     "primary": "Start gratis proefperiode",
     "secondary": "Vraag info aan"
   },
@@ -318,7 +318,7 @@
       "1": "Gratis opstart",
       "2": "Gratis opleiding",
       "3": "Gratis installatie",
-      "4": "Gratis 7 dagen testen",
+      "4": "Gratis 14 dagen testen",
       "5": "Geen verborgen kosten"
     },
     "cta": "Start nu gratis"
@@ -425,7 +425,7 @@
       "supportAvailable": "Support beschikbaar"
     },
     "ctaTitle": "Klaar om te starten?",
-    "ctaSubtitle": "Probeer Vysion Horeca 7 dagen gratis. Geen creditcard nodig.",
+    "ctaSubtitle": "Probeer Vysion Horeca 14 dagen gratis. Geen creditcard nodig.",
     "ctaPrimary": "Start gratis proefperiode",
     "ctaSecondary": "Neem contact op"
   },

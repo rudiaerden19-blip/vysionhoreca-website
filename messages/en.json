@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Vysion Horeca | All-in-One POS & Payment Platform",
-    "description": "The complete POS system for hospitality. Cash register, online orders, invoicing, staff management and more - all in one platform. Try 7 days free."
+    "description": "The complete POS system for hospitality. Cash register, online orders, invoicing, staff management and more - all in one platform. Try 14 days free."
   },
   "nav": {
     "home": "Home",
@@ -24,7 +24,7 @@
     "tagline": "One platform. One screen. Full control.",
     "ctaPrimary": "Start free trial",
     "ctaSecondary": "View demo",
-    "trialInfo": "Free trial 7 days • Get started immediately",
+    "trialInfo": "Free trial 14 days • Get started immediately",
     "clickToOpen": "Click to open"
   },
   "features": {
@@ -78,8 +78,8 @@
     "support": "Support available"
   },
   "orderApp": {
-    "title": "Everything you need",
-    "subtitle": "A complete ecosystem. Stop paying too much for separate modules.",
+    "title": "The most comprehensive ordering platform on the market",
+    "subtitle": "Finally a complete ecosystem for hospitality",
     "cta": "Discover the complete platform"
   },
   "butWait": {
@@ -135,7 +135,7 @@
     "title": "Simple, transparent pricing",
     "subtitle": "Everything included. No surprises.",
     "perMonth": "/month",
-    "trialInfo": "7 days free trial • No credit card required • Cancel anytime",
+      "trialInfo": "14 days free trial • No credit card required • Cancel anytime",
     "popular": "Popular",
     "chooseStarter": "Choose Starter",
     "chooseStandard": "Choose Standard",
@@ -176,7 +176,7 @@
     "faq": {
       "title": "Frequently asked questions",
       "q1": "Can I try it for free first?",
-      "a1": "Yes! You get 7 days free access to all features. No credit card needed to start.",
+      "a1": "Yes! You get 14 days free access to all features. No credit card needed to start.",
       "q2": "Can I upgrade or downgrade?",
       "a2": "Yes, you can upgrade to Pro or downgrade at any time. The change takes effect immediately.",
       "q3": "Are there long-term contracts?",
@@ -188,7 +188,7 @@
     },
     "cta": {
       "title": "Ready to get started?",
-      "subtitle": "Start your 7 day free trial today. No credit card required.",
+      "subtitle": "Start your 14 day free trial today. No credit card required.",
       "primary": "Start free trial →",
       "secondary": "Contact us"
     }
@@ -255,7 +255,7 @@
   },
   "cta": {
     "title": "Ready to grow?",
-    "subtitle": "Start with Vysion Horeca today. 7 days free, no obligations.",
+    "subtitle": "Start with Vysion Horeca today. 14 days free, no obligations.",
     "primary": "Start free trial",
     "secondary": "Request info"
   },
@@ -312,7 +312,7 @@
       "1": "Free startup",
       "2": "Free training",
       "3": "Free installation",
-      "4": "Free 7-day trial",
+      "4": "Free 14-day trial",
       "5": "No hidden costs"
     },
     "cta": "Start free now"
@@ -419,7 +419,7 @@
       "supportAvailable": "Support available"
     },
     "ctaTitle": "Ready to start?",
-    "ctaSubtitle": "Try Vysion Horeca 7 days free. No credit card required.",
+    "ctaSubtitle": "Try Vysion Horeca 14 days free. No credit card required.",
     "ctaPrimary": "Start free trial",
     "ctaSecondary": "Get in touch"
   },

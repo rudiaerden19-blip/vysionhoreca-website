@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Vysion Horeca | All-in-One Kassen- & Zahlungsplattform",
-    "description": "Das komplette Kassensystem für die Gastronomie. Kasse, Online-Bestellungen, Rechnungsstellung, Personalverwaltung und mehr - alles in einer Plattform. 7 Tage kostenlos testen."
+    "description": "Das komplette Kassensystem für die Gastronomie. Kasse, Online-Bestellungen, Rechnungsstellung, Personalverwaltung und mehr - alles in einer Plattform. 14 Tage kostenlos testen."
   },
   "nav": {
     "home": "Startseite",
@@ -24,7 +24,7 @@
     "tagline": "Eine Plattform. Ein Bildschirm. Volle Kontrolle.",
     "ctaPrimary": "Kostenlose Testversion starten",
     "ctaSecondary": "Demo ansehen",
-    "trialInfo": "7 Tage kostenlos testen • Sofort loslegen",
+    "trialInfo": "14 Tage kostenlos testen • Sofort loslegen",
     "clickToOpen": "Zum Öffnen klicken"
   },
   "features": {
@@ -78,8 +78,8 @@
     "support": "Support verfügbar"
   },
   "orderApp": {
-    "title": "Alles was Sie brauchen",
-    "subtitle": "Ein komplettes Ökosystem. Schluss mit zu hohen Kosten für einzelne Module.",
+    "title": "Die umfassendste Bestellplattform auf dem Markt",
+    "subtitle": "Endlich ein komplettes Ökosystem für die Gastronomie",
     "cta": "Entdecken Sie die komplette Plattform"
   },
   "butWait": {
@@ -135,7 +135,7 @@
     "title": "Einfache, transparente Preise",
     "subtitle": "Alles inklusive. Keine Überraschungen.",
     "perMonth": "/Monat",
-    "trialInfo": "7 Tage kostenlos • Keine Kreditkarte erforderlich • Monatlich kündbar",
+      "trialInfo": "14 Tage kostenlos • Keine Kreditkarte erforderlich • Monatlich kündbar",
     "popular": "Popular",
     "chooseStarter": "Starter wählen",
     "chooseStandard": "Standard wählen",
@@ -176,7 +176,7 @@
     "faq": {
       "title": "Häufig gestellte Fragen",
       "q1": "Kann ich es zuerst kostenlos testen?",
-      "a1": "Ja! Sie erhalten 7 Tage kostenlosen Zugang zu allen Funktionen. Keine Kreditkarte erforderlich.",
+      "a1": "Ja! Sie erhalten 14 Tage kostenlosen Zugang zu allen Funktionen. Keine Kreditkarte erforderlich.",
       "q2": "Kann ich upgraden oder downgraden?",
       "a2": "Ja, Sie können jederzeit auf Pro upgraden oder downgraden. Die Änderung wird sofort wirksam.",
       "q3": "Gibt es langfristige Verträge?",
@@ -188,7 +188,7 @@
     },
     "cta": {
       "title": "Bereit anzufangen?",
-      "subtitle": "Starten Sie heute noch Ihre 7-tägige kostenlose Testphase. Keine Kreditkarte erforderlich.",
+      "subtitle": "Starten Sie heute noch Ihre 14-tägige kostenlose Testphase. Keine Kreditkarte erforderlich.",
       "primary": "Kostenlos starten →",
       "secondary": "Kontakt aufnehmen"
     }
@@ -255,7 +255,7 @@
   },
   "cta": {
     "title": "Bereit zu wachsen?",
-    "subtitle": "Starten Sie noch heute mit Vysion Horeca. 7 Tage kostenlos, keine Verpflichtungen.",
+    "subtitle": "Starten Sie noch heute mit Vysion Horeca. 14 Tage kostenlos, keine Verpflichtungen.",
     "primary": "Kostenlose Testversion starten",
     "secondary": "Info anfordern"
   },
@@ -312,7 +312,7 @@
       "1": "Kostenloser Start",
       "2": "Kostenlose Schulung",
       "3": "Kostenlose Installation",
-      "4": "7 Tage kostenlos testen",
+      "4": "14 Tage kostenlos testen",
       "5": "Keine versteckten Kosten"
     },
     "cta": "Jetzt kostenlos starten"
@@ -419,7 +419,7 @@
       "supportAvailable": "Support verfügbar"
     },
     "ctaTitle": "Bereit zum Starten?",
-    "ctaSubtitle": "Testen Sie Vysion Horeca 7 Tage kostenlos. Keine Kreditkarte erforderlich.",
+    "ctaSubtitle": "Testen Sie Vysion Horeca 14 Tage kostenlos. Keine Kreditkarte erforderlich.",
     "ctaPrimary": "Kostenlose Testversion starten",
     "ctaSecondary": "Kontaktieren Sie uns"
   },

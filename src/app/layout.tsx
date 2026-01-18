@@ -11,7 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Vysion Horeca | Alles-in-één Kassa & Betaalplatform',
-  description: 'Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 7 dagen gratis.',
+  description: 'Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 14 dagen gratis.',
   keywords: 'kassa, horeca, restaurant, frituur, POS, betaalterminal, online bestellen, België',
   icons: {
     icon: '/favicon.svg',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Vysion Horeca | Alles-in-één Kassa & Betaalplatform',
-    description: 'Het complete kassasysteem voor horeca. Probeer 7 dagen gratis.',
+    description: 'Het complete kassasysteem voor horeca. Probeer 14 dagen gratis.',
     type: 'website',
     locale: 'nl_BE',
   },

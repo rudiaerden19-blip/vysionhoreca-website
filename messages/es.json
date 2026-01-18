@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Vysion Horeca | Sistema de Caja y Plataforma de Pago Todo en Uno",
-    "description": "El sistema de caja completo para hostelería. Caja, pedidos online, facturación, gestión de personal y más - todo en una plataforma. Prueba 7 días gratis."
+    "description": "El sistema de caja completo para hostelería. Caja, pedidos online, facturación, gestión de personal y más - todo en una plataforma. Prueba 14 días gratis."
   },
   "nav": {
     "home": "Inicio",
@@ -78,8 +78,8 @@
     "support": "Soporte disponible"
   },
   "orderApp": {
-    "title": "Todo lo que necesitas",
-    "subtitle": "Un ecosistema completo. Deja de pagar demasiado por módulos separados.",
+    "title": "La plataforma de pedidos más completa del mercado",
+    "subtitle": "Finalmente un ecosistema completo para la hostelería",
     "cta": "Descubre la plataforma completa"
   },
   "butWait": {
@@ -135,7 +135,7 @@
     "title": "Precios simples y transparentes",
     "subtitle": "Todo incluido. Sin sorpresas.",
     "perMonth": "/mes",
-    "trialInfo": "7 días gratis • Sin tarjeta de crédito • Cancela cuando quieras",
+      "trialInfo": "14 días gratis • Sin tarjeta de crédito • Cancela cuando quieras",
     "popular": "Popular",
     "chooseStarter": "Elegir Starter",
     "chooseStandard": "Elegir Estándar",
@@ -176,7 +176,7 @@
     "faq": {
       "title": "Preguntas frecuentes",
       "q1": "¿Puedo probarlo gratis primero?",
-      "a1": "¡Sí! Obtienes 7 días de acceso gratuito a todas las funciones. No se necesita tarjeta de crédito.",
+      "a1": "¡Sí! Obtienes 14 días de acceso gratuito a todas las funciones. No se necesita tarjeta de crédito.",
       "q2": "¿Puedo subir o bajar de plan?",
       "a2": "Sí, puedes subir a Pro o bajar de plan en cualquier momento. El cambio es inmediato.",
       "q3": "¿Hay contratos a largo plazo?",
@@ -188,7 +188,7 @@
     },
     "cta": {
       "title": "¿Listo para empezar?",
-      "subtitle": "Comienza tu prueba gratuita de 7 días hoy. Sin tarjeta de crédito.",
+      "subtitle": "Comienza tu prueba gratuita de 14 días hoy. Sin tarjeta de crédito.",
       "primary": "Comenzar prueba gratis →",
       "secondary": "Contactar"
     }
@@ -255,7 +255,7 @@
   },
   "cta": {
     "title": "¿Listo para crecer?",
-    "subtitle": "Empieza hoy con Vysion Horeca. 7 días gratis, sin compromiso.",
+    "subtitle": "Empieza hoy con Vysion Horeca. 14 días gratis, sin compromiso.",
     "primary": "Comenzar prueba gratuita",
     "secondary": "Solicitar información"
   },
@@ -312,7 +312,7 @@
       "1": "Inicio gratis",
       "2": "Formación gratis",
       "3": "Instalación gratis",
-      "4": "7 días de prueba gratis",
+      "4": "14 días de prueba gratis",
       "5": "Sin costos ocultos"
     },
     "cta": "Empieza gratis ahora"
@@ -419,7 +419,7 @@
       "supportAvailable": "Soporte disponible"
     },
     "ctaTitle": "¿Listo para empezar?",
-    "ctaSubtitle": "Prueba Vysion Horeca 7 días gratis. Sin tarjeta de crédito.",
+    "ctaSubtitle": "Prueba Vysion Horeca 14 días gratis. Sin tarjeta de crédito.",
     "ctaPrimary": "Comenzar prueba gratuita",
     "ctaSecondary": "Contactar"
   },
