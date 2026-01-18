@@ -34,6 +34,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Allow subdomain routing
+  async rewrites() {
+    return []
+  },
 }
 
 module.exports = nextConfig
