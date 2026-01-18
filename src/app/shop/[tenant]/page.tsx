@@ -1620,74 +1620,144 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </span>
                 </div>
 
-                {/* Submit */}
-                <button
-                  onClick={async () => {
-                    if (!giftCardForm.recipientEmail) {
-                      alert('Vul het email adres van de ontvanger in')
-                      return
-                    }
-                    
-                    const amount = giftCardForm.customAmount 
-                      ? parseFloat(giftCardForm.customAmount) 
-                      : giftCardForm.amount
-                    
-                    if (amount < 10) {
-                      alert('Minimum bedrag is €10')
-                      return
-                    }
-                    
-                    setGiftCardLoading(true)
-                    
-                    try {
-                      const response = await fetch('/api/create-gift-card-checkout', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          tenantSlug: params.tenant,
-                          amount,
-                          occasion: giftCardForm.occasion,
-                          personalMessage: giftCardForm.personalMessage,
-                          senderName: giftCardForm.senderName,
-                          senderEmail: giftCardForm.senderEmail,
-                          recipientName: giftCardForm.recipientName,
-                          recipientEmail: giftCardForm.recipientEmail,
-                        }),
-                      })
-                      
-                      const data = await response.json()
-                      
-                      if (data.url) {
-                        window.location.href = data.url
-                      } else {
-                        alert(data.error || 'Er ging iets mis')
+                {/* Payment Options */}
+                <div className="space-y-3">
+                  {/* Bancontact/iDEAL */}
+                  <button
+                    onClick={async () => {
+                      if (!giftCardForm.recipientEmail) {
+                        alert('Vul het email adres van de ontvanger in')
+                        return
                       }
-                    } catch (error) {
-                      alert('Er ging iets mis bij het aanmaken van de betaling')
-                    }
-                    
-                    setGiftCardLoading(false)
-                  }}
-                  disabled={giftCardLoading}
-                  style={{ backgroundColor: business.primary_color }}
-                  className="w-full py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {giftCardLoading ? (
-                    <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                      />
-                      <span>Even geduld...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>💳</span>
-                      <span>Betalen met Bancontact/iDEAL</span>
-                    </>
-                  )}
-                </button>
+                      
+                      const amount = giftCardForm.customAmount 
+                        ? parseFloat(giftCardForm.customAmount) 
+                        : giftCardForm.amount
+                      
+                      if (amount < 10) {
+                        alert('Minimum bedrag is €10')
+                        return
+                      }
+                      
+                      setGiftCardLoading(true)
+                      
+                      try {
+                        const response = await fetch('/api/create-gift-card-checkout', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            tenantSlug: params.tenant,
+                            amount,
+                            occasion: giftCardForm.occasion,
+                            personalMessage: giftCardForm.personalMessage,
+                            senderName: giftCardForm.senderName,
+                            senderEmail: giftCardForm.senderEmail,
+                            recipientName: giftCardForm.recipientName,
+                            recipientEmail: giftCardForm.recipientEmail,
+                          }),
+                        })
+                        
+                        const data = await response.json()
+                        
+                        if (data.url) {
+                          window.location.href = data.url
+                        } else {
+                          alert(data.error || 'Er ging iets mis')
+                        }
+                      } catch (error) {
+                        alert('Er ging iets mis bij het aanmaken van de betaling')
+                      }
+                      
+                      setGiftCardLoading(false)
+                    }}
+                    disabled={giftCardLoading}
+                    style={{ backgroundColor: business.primary_color }}
+                    className="w-full py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {giftCardLoading ? (
+                      <>
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                        />
+                        <span>Even geduld...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>💳</span>
+                        <span>Betalen met Bancontact/iDEAL</span>
+                      </>
+                    )}
+                  </button>
+
+                  {/* Cash - betalen in de zaak */}
+                  <button
+                    onClick={async () => {
+                      if (!giftCardForm.recipientEmail) {
+                        alert('Vul het email adres van de ontvanger in')
+                        return
+                      }
+                      
+                      const amount = giftCardForm.customAmount 
+                        ? parseFloat(giftCardForm.customAmount) 
+                        : giftCardForm.amount
+                      
+                      if (amount < 10) {
+                        alert('Minimum bedrag is €10')
+                        return
+                      }
+                      
+                      setGiftCardLoading(true)
+                      
+                      try {
+                        const response = await fetch('/api/create-gift-card-checkout', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            tenantSlug: params.tenant,
+                            amount,
+                            occasion: giftCardForm.occasion,
+                            personalMessage: giftCardForm.personalMessage,
+                            senderName: giftCardForm.senderName,
+                            senderEmail: giftCardForm.senderEmail,
+                            recipientName: giftCardForm.recipientName,
+                            recipientEmail: giftCardForm.recipientEmail,
+                            paymentMethod: 'cash', // Mark as cash payment
+                          }),
+                        })
+                        
+                        const data = await response.json()
+                        
+                        if (data.success) {
+                          alert(`✅ Cadeaubon aangemaakt!\n\nCode: ${data.code}\n\nBetaal €${amount.toFixed(2)} in de zaak om de bon te activeren.\n\nDe ontvanger krijgt een email zodra de betaling is ontvangen.`)
+                          setShowGiftCardModal(false)
+                          setGiftCardForm({
+                            occasion: '',
+                            amount: 50,
+                            customAmount: '',
+                            personalMessage: '',
+                            senderName: '',
+                            senderEmail: '',
+                            recipientName: '',
+                            recipientEmail: '',
+                          })
+                        } else {
+                          alert(data.error || 'Er ging iets mis')
+                        }
+                      } catch (error) {
+                        alert('Er ging iets mis bij het aanmaken van de cadeaubon')
+                      }
+                      
+                      setGiftCardLoading(false)
+                    }}
+                    disabled={giftCardLoading}
+                    className="w-full py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <span>💵</span>
+                    <span>Betalen in de zaak (cash)</span>
+                  </button>
+                </div>
 
                 {/* Cancel */}
                 <button

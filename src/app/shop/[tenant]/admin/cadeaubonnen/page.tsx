@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getGiftCards, GiftCard, getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
+import { supabase } from '@/lib/supabase'
 
 export default function CadeaubonnenPage({ params }: { params: { tenant: string } }) {
   const [giftCards, setGiftCards] = useState<GiftCard[]>([])
@@ -71,6 +72,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
       case 'paid': return 'bg-green-100 text-green-800'
       case 'used': return 'bg-gray-100 text-gray-800'
       case 'expired': return 'bg-red-100 text-red-800'
+      case 'pending_cash': return 'bg-orange-100 text-orange-800'
       default: return 'bg-yellow-100 text-yellow-800'
     }
   }
@@ -80,6 +82,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
       case 'paid': return 'Actief'
       case 'used': return 'Gebruikt'
       case 'expired': return 'Verlopen'
+      case 'pending_cash': return 'Wacht op cash'
       default: return 'In afwachting'
     }
   }
@@ -316,11 +319,34 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-bold text-gray-900">€{card.remaining_amount.toFixed(2)}</p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(card.status)}`}>
-                      {getStatusLabel(card.status)}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    {card.status === 'pending_cash' && (
+                      <button
+                        onClick={async () => {
+                          if (!confirm('Cash betaling ontvangen? Dit activeert de cadeaubon.')) return
+                          
+                          const { error } = await supabase
+                            .from('gift_cards')
+                            .update({ status: 'paid' })
+                            .eq('id', card.id)
+                          
+                          if (!error) {
+                            loadData()
+                          } else {
+                            alert('Activeren mislukt')
+                          }
+                        }}
+                        className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white text-sm font-medium rounded-lg transition-colors"
+                      >
+                        ✓ Cash ontvangen
+                      </button>
+                    )}
+                    <div className="text-right">
+                      <p className="font-bold text-gray-900">€{card.remaining_amount.toFixed(2)}</p>
+                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(card.status)}`}>
+                        {getStatusLabel(card.status)}
+                      </span>
+                    </div>
                   </div>
                 </motion.div>
               ))}
