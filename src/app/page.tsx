@@ -1117,7 +1117,7 @@ function CTASection() {
   const { t, locale } = useLanguage()
   
   return (
-    <section id="demo" className="py-20 sm:py-24 relative overflow-hidden min-h-[500px] sm:min-h-[600px]">
+    <section id="demo" className="relative overflow-hidden min-h-[500px] sm:min-h-[600px] flex items-center justify-center">
       {/* Video Background */}
       <video 
         autoPlay 
