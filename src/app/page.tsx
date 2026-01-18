@@ -107,25 +107,26 @@ function HeroSection() {
             </p>
           </div>
 
-          {/* Right content - iPad and horizontal image slider below */}
+          {/* Right content - POS Monitor with Phone overlay */}
           <div className="opacity-0 animate-fadeInUp delay-200">
             <div className="flex flex-col items-center">
-              {/* iPad Stand with screenshot */}
+              {/* POS Monitor with Phone */}
               <div className="flex flex-col items-center">
-                <div className="relative w-full max-w-[260px] sm:max-w-xs md:max-w-sm lg:max-w-md">
+                <div className="relative w-full max-w-[300px] sm:max-w-sm md:max-w-md lg:max-w-lg">
+                  {/* POS Monitor */}
                   <img 
-                    src="https://i.imgur.com/mHqvsrr.png" 
-                    alt="iPad Kassa Stand" 
-                    className="w-full"
-                    loading="eager"
-                  />
-                  {/* App Screenshot on screen */}
-                  <img 
-                    src="https://i.imgur.com/IvW3RiX.png" 
-                    alt="Vysion Horeca Kassa" 
-                    className="absolute top-[4%] left-[9%] w-[82%] h-[53%] object-fill rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                    src="https://i.imgur.com/iEHXk3w.jpeg" 
+                    alt="Vysion Horeca POS Systeem" 
+                    className="w-full cursor-pointer hover:opacity-95 transition-opacity"
                     loading="eager"
                     onClick={() => setLightboxIndex(0)}
+                  />
+                  {/* Phone mockup overlay - left corner */}
+                  <img 
+                    src="https://i.imgur.com/APB1uh9.png" 
+                    alt="Vysion Horeca Mobiele App" 
+                    className="absolute -left-8 sm:-left-12 bottom-4 sm:bottom-8 w-[120px] sm:w-[160px] md:w-[180px] drop-shadow-2xl"
+                    loading="eager"
                   />
                 </div>
                 <p className="text-gray-500 text-sm mt-2">{t('hero.clickToOpen')}</p>
