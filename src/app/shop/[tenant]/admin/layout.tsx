@@ -79,11 +79,17 @@ const menuItems = [
     ]
   },
   {
+    category: 'BESTELLINGEN',
+    items: [
+      { name: 'Bestellingen', href: '/bestellingen', icon: '📦' },
+      { name: 'Reserveringen', href: '/reserveringen', icon: '📅' },
+    ]
+  },
+  {
     category: 'STATISTIEKEN',
     items: [
       { name: 'Bedrijfsanalyse', href: '/analyse', icon: '📊' },
       { name: 'Verkoop', href: '/verkoop', icon: '💰' },
-      { name: 'Bestellingen', href: '/bestellingen', icon: '📦' },
       { name: 'Populaire items', href: '/populair', icon: '🔥' },
     ]
   },
