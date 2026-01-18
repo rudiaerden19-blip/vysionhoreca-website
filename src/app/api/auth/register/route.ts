@@ -147,7 +147,8 @@ export async function POST(request: NextRequest) {
       }
 
       // Create tenant_settings
-      const { error: tenantError } = await supabase
+      console.log('Creating tenant_settings with unique slug:', uniqueSlug)
+      const { data: tenantData, error: tenantError } = await supabase
         .from('tenant_settings')
         .insert({
           tenant_slug: uniqueSlug,
@@ -157,20 +158,33 @@ export async function POST(request: NextRequest) {
           primary_color: '#FF6B35',
           secondary_color: '#1a1a2e',
         })
+        .select()
+        .single()
 
       if (tenantError) {
         console.error('Error creating tenant:', tenantError)
+        // Rollback: delete the business_profile we just created
+        await supabase.from('business_profiles').delete().eq('id', profile.id)
+        
         if (tenantError.code === '42P01') {
           return NextResponse.json(
-            { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: admin_tables.sql' },
+            { error: 'Database tabel tenant_settings bestaat niet. Voer eerst de migratie uit: admin_tables.sql' },
+            { status: 500 }
+          )
+        }
+        if (tenantError.code === '42501') {
+          return NextResponse.json(
+            { error: 'RLS policy blokkeert insert in tenant_settings. Voer de RLS fix uit in Supabase.' },
             { status: 500 }
           )
         }
         return NextResponse.json(
-          { error: `Fout bij aanmaken tenant: ${tenantError.message}` },
+          { error: `Fout bij aanmaken tenant: ${tenantError.message} (code: ${tenantError.code})` },
           { status: 500 }
         )
       }
+
+      console.log('Tenant created successfully:', tenantData)
 
       // Create subscription with 14-day trial
       const trialEndsAt = new Date()
@@ -198,7 +212,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         success: true,
         tenant: {
-          id: profile.id,
+          id: tenantData.id,
           name: businessName.trim(),
           email: email.trim().toLowerCase(),
           tenant_slug: uniqueSlug,
@@ -235,7 +249,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create tenant_settings
-    const { error: tenantError } = await supabase
+    console.log('Creating tenant_settings with slug:', tenantSlug)
+    const { data: tenantData, error: tenantError } = await supabase
       .from('tenant_settings')
       .insert({
         tenant_slug: tenantSlug,
@@ -245,20 +260,33 @@ export async function POST(request: NextRequest) {
         primary_color: '#FF6B35',
         secondary_color: '#1a1a2e',
       })
+      .select()
+      .single()
 
     if (tenantError) {
       console.error('Error creating tenant:', tenantError)
+      // Rollback: delete the business_profile we just created
+      await supabase.from('business_profiles').delete().eq('id', profile.id)
+      
       if (tenantError.code === '42P01') {
         return NextResponse.json(
-          { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: admin_tables.sql' },
+          { error: 'Database tabel tenant_settings bestaat niet. Voer eerst de migratie uit: admin_tables.sql' },
+          { status: 500 }
+        )
+      }
+      if (tenantError.code === '42501') {
+        return NextResponse.json(
+          { error: 'RLS policy blokkeert insert in tenant_settings. Voer de RLS fix uit in Supabase.' },
           { status: 500 }
         )
       }
       return NextResponse.json(
-        { error: `Fout bij aanmaken tenant: ${tenantError.message}` },
+        { error: `Fout bij aanmaken tenant: ${tenantError.message} (code: ${tenantError.code})` },
         { status: 500 }
       )
     }
+
+    console.log('Tenant created successfully:', tenantData)
 
     // Create subscription with 14-day trial
     const trialEndsAt = new Date()
@@ -286,7 +314,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       success: true,
       tenant: {
-        id: profile.id,
+        id: tenantData.id,
         name: businessName.trim(),
         email: email.trim().toLowerCase(),
         tenant_slug: tenantSlug,
