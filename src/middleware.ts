@@ -78,7 +78,8 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/login') ||
     pathname.startsWith('/registreer') ||
     pathname.startsWith('/superadmin') ||
-    pathname.startsWith('/kassa')
+    pathname.startsWith('/kassa') ||
+    pathname.startsWith('/keuken')
   ) {
     return NextResponse.next()
   }
