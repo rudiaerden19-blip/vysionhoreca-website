@@ -337,7 +337,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   onClick={() => selectProduct(item)}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group"
                 >
-                  <div className="relative h-48 overflow-hidden bg-gray-100">
+                  <div className="relative h-48 overflow-hidden bg-white">
                     {item.image_url ? (
                       <Image
                         src={item.image_url}
@@ -346,7 +346,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                         sizes="(max-width: 768px) 100vw, 50vw"
                         quality={75}
                         loading="lazy"
-                        className="object-cover"
+                        className="object-contain p-4"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-6xl">
@@ -449,7 +449,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-t-3xl md:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
-              <div className="relative h-64 bg-gray-50 overflow-hidden">
+              <div className="relative h-64 bg-white overflow-hidden">
                 {selectedItem.image_url ? (
                   <Image
                     src={selectedItem.image_url}
@@ -457,7 +457,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     fill
                     sizes="(max-width: 768px) 100vw, 500px"
                     quality={80}
-                    className="object-cover"
+                    className="object-contain p-4"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-8xl">
@@ -636,14 +636,14 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     {cart.map((cartItem, index) => (
                       <motion.div key={index} layout className="flex gap-4 bg-gray-50 rounded-xl p-4">
                         {cartItem.item.image_url ? (
-                          <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg">
+                          <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg bg-white">
                             <Image 
                               src={cartItem.item.image_url} 
                               alt={cartItem.item.name} 
                               fill
                               sizes="80px"
                               quality={60}
-                              className="object-cover" 
+                              className="object-contain p-1" 
                             />
                           </div>
                         ) : (
