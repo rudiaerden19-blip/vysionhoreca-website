@@ -9,15 +9,13 @@ const supabase = createClient(
 
 // Plan pricing in cents
 const planPrices: Record<string, number> = {
-  starter: 7900,      // €79
-  professional: 12900, // €129
-  enterprise: 19900,   // €199
+  starter: 7900,  // €79
+  pro: 9900,      // €99
 }
 
 const planNames: Record<string, string> = {
   starter: 'Vysion Starter',
-  professional: 'Vysion Professional',
-  enterprise: 'Vysion Enterprise',
+  pro: 'Vysion Pro',
 }
 
 export async function POST(request: NextRequest) {
