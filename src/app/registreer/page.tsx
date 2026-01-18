@@ -142,17 +142,14 @@ export default function RegisterPage() {
       // ALTIJD naar tenant dashboard via subdomain - GEEN fallback naar admin dashboard!
       setSuccess(true)
       setTimeout(() => {
-        // Redirect to subdomain if available, otherwise use path
-        const tenantUrl = typeof window !== 'undefined' && 
-          !window.location.hostname.includes('localhost') &&
-          !window.location.hostname.includes('vysionhoreca.com')
-          ? `https://www.${data.tenant.tenant_slug}.ordervysion.com/admin`
-          : `/shop/${data.tenant.tenant_slug}/admin`
+        // Always redirect to ordervysion.com subdomain (except localhost)
+        const isLocalhost = typeof window !== 'undefined' && 
+          (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1'))
         
-        if (tenantUrl.startsWith('http')) {
-          window.location.href = tenantUrl
+        if (isLocalhost) {
+          router.push(`/shop/${data.tenant.tenant_slug}/admin`)
         } else {
-          router.push(tenantUrl)
+          window.location.href = `https://${data.tenant.tenant_slug}.ordervysion.com/admin`
         }
       }, 2000)
       

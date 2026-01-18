@@ -12,9 +12,11 @@ async function hashPassword(password: string): Promise<string> {
 
 const getSupabase = () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  // Use service role key for admin operations, fallback to anon key
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   
   if (!supabaseUrl || !supabaseKey) {
+    console.error('Missing Supabase config:', { url: !!supabaseUrl, key: !!supabaseKey })
     return null
   }
   

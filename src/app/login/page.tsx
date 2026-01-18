@@ -78,15 +78,15 @@ export default function LoginPage() {
         return
       }
       
-      // Redirect to subdomain if not on localhost/main domain
+      // Always redirect to ordervysion.com subdomain (except localhost)
       const isLocalhost = typeof window !== 'undefined' && 
         (window.location.hostname.includes('localhost') || 
-         window.location.hostname.includes('vysionhoreca.com'))
+         window.location.hostname.includes('127.0.0.1'))
       
-      if (!isLocalhost) {
-        window.location.href = `https://www.${tenant.tenant_slug}.ordervysion.com/admin`
-      } else {
+      if (isLocalhost) {
         router.push(`/shop/${tenant.tenant_slug}/admin`)
+      } else {
+        window.location.href = `https://${tenant.tenant_slug}.ordervysion.com/admin`
       }
       
     } catch (err) {
