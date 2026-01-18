@@ -112,7 +112,7 @@ function HeroSection() {
             <div className="flex flex-col items-center">
               {/* POS Monitor with Phone */}
               <div className="flex flex-col items-center">
-                <div className="relative w-full max-w-[200px] sm:max-w-[240px] md:max-w-[280px] lg:max-w-[320px]">
+                <div className="relative w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[440px]">
                   {/* POS Monitor */}
                   <img 
                     src="https://i.imgur.com/iEHXk3w.jpeg" 
@@ -124,7 +124,7 @@ function HeroSection() {
                   <img 
                     src="https://i.imgur.com/APB1uh9.png" 
                     alt="Vysion Horeca Mobiele App" 
-                    className="absolute -left-16 sm:-left-20 md:-left-24 bottom-0 w-[100px] sm:w-[130px] md:w-[150px] drop-shadow-2xl"
+                    className="absolute -left-12 sm:-left-16 md:-left-20 bottom-0 w-[120px] sm:w-[150px] md:w-[180px] drop-shadow-2xl"
                     loading="eager"
                   />
                 </div>
