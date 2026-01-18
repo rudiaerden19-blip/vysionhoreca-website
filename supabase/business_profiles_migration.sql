@@ -19,6 +19,10 @@ CREATE TABLE IF NOT EXISTS business_profiles (
   last_login TIMESTAMP WITH TIME ZONE
 );
 
+-- Verwijder user_id kolom als die bestaat (niet nodig voor deze implementatie)
+ALTER TABLE business_profiles 
+  DROP COLUMN IF EXISTS user_id;
+
 -- Voeg ontbrekende kolommen toe als de tabel al bestaat
 ALTER TABLE business_profiles 
   ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid(),
