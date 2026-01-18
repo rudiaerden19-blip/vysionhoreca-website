@@ -19,36 +19,16 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
-
-  // Ensure component is mounted before rendering
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   // Read language from URL parameter on mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search)
-      const langParam = params.get('lang') as Locale | null
-      if (langParam && locales.includes(langParam)) {
-        setLocale(langParam)
-      } else if (!localStorage.getItem('vysion_locale')) {
-        // Set default to Dutch if no preference is saved
-        setLocale('nl')
-      }
+    const params = new URLSearchParams(window.location.search)
+    const langParam = params.get('lang') as Locale | null
+    if (langParam && locales.includes(langParam)) {
+      setLocale(langParam)
     }
   }, [setLocale, locales])
-
-  // Don't render until mounted to prevent hydration issues
-  if (!isMounted) {
-    return (
-      <main className="min-h-screen bg-dark flex items-center justify-center">
-        <div className="text-white">Laden...</div>
-      </main>
-    )
-  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -62,10 +42,10 @@ export default function RegisterPage() {
   }, [])
 
   const handleLanguageSelect = (langCode: Locale) => {
+    setLocale(langCode)
+    setIsLangOpen(false)
+    // Update URL with new language parameter
     if (typeof window !== 'undefined') {
-      setLocale(langCode)
-      setIsLangOpen(false)
-      // Update URL with new language parameter
       const url = new URL(window.location.href)
       url.searchParams.set('lang', langCode)
       window.history.replaceState({}, '', url.toString())
