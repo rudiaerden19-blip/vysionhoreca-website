@@ -90,9 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize Stripe with tenant's key
-    const stripe = new Stripe(tenant.stripe_secret_key, {
-      apiVersion: '2023-10-16',
-    })
+    const stripe = new Stripe(tenant.stripe_secret_key)
 
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -132,10 +130,10 @@ export async function POST(request: NextRequest) {
       url: session.url,
     })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Stripe checkout error:', error)
     return NextResponse.json(
-      { error: 'Er ging iets mis bij het aanmaken van de betaling' },
+      { error: error?.message || 'Er ging iets mis bij het aanmaken van de betaling' },
       { status: 500 }
     )
   }
