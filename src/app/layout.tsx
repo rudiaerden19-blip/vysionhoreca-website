@@ -37,21 +37,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="nl" className={`${inter.variable} overflow-x-hidden`}>
-      <head>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            if ('scrollRestoration' in history) {
-              history.scrollRestoration = 'manual';
-            }
-            document.documentElement.scrollTop = 0;
-            window.addEventListener('load', function() {
-              setTimeout(function() {
-                window.scrollTo({ top: 0, behavior: 'instant' });
-              }, 0);
-            });
-          `
-        }} />
-      </head>
       <body className={`${inter.className} bg-white text-gray-900 antialiased overflow-x-hidden max-w-[100vw]`}>
         <LanguageProvider>
           {children}

@@ -318,13 +318,52 @@ function StatsSection() {
   )
 }
 
-// Order App Section - Product Showcase
+// Order App Section - Product Showcase with fade-in animation
 function OrderAppSection() {
   const [lightboxImage, setLightboxImage] = useState<string | null>(null)
+  const [visibleImages, setVisibleImages] = useState<number[]>([])
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const hasTriggeredRef = useRef(false)
   const { t } = useLanguage()
 
+  const images = [
+    'https://i.imgur.com/JVFNcOz.png',
+    'https://i.imgur.com/AWyYq3x.png',
+    'https://i.imgur.com/wZwQJoG.png',
+    'https://i.imgur.com/tazhTFi.png',
+    'https://i.imgur.com/J6EJhaQ.png',
+    'https://i.imgur.com/bbUJ0uh.png',
+    'https://i.imgur.com/aw4tHlO.png',
+    'https://i.imgur.com/9vnNLsh.png',
+    'https://i.imgur.com/DABHVsP.png',
+    'https://i.imgur.com/NsSBBHs.png',
+  ]
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasTriggeredRef.current) {
+          hasTriggeredRef.current = true
+          // Fade in images one by one with 200ms delay
+          images.forEach((_, index) => {
+            setTimeout(() => {
+              setVisibleImages(prev => [...prev, index])
+            }, index * 200)
+          })
+        }
+      },
+      { threshold: 0.2 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section className="py-24 bg-dark overflow-hidden">
+    <section ref={sectionRef} className="py-24 bg-dark overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
@@ -336,56 +375,29 @@ function OrderAppSection() {
           </p>
         </div>
 
-        {/* Product Showcase Grid */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
-          {/* Left Column - Phones stacked */}
-          <div className="flex flex-row lg:flex-col gap-4 sm:gap-6 order-2 lg:order-1">
-            <img
-              src="https://i.imgur.com/inUZtVe.png"
-              alt="Vysion Bestelapp"
-              className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
-              onClick={() => setLightboxImage('https://i.imgur.com/inUZtVe.png')}
-            />
-            <img
-              src="https://i.imgur.com/LVge0n4.png"
-              alt="Vysion Bestelapp Menu"
-              className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
-              onClick={() => setLightboxImage('https://i.imgur.com/LVge0n4.png')}
-            />
-          </div>
-
-          {/* Center - Main POS */}
-          <div className="flex-shrink-0 order-1 lg:order-2 text-center">
-            <img
-              src="https://i.imgur.com/HrgjfGN.png"
-              alt="Vysion Horeca Kassa"
-              className="w-[260px] sm:w-[320px] md:w-[400px] lg:w-[450px] xl:w-[500px] drop-shadow-2xl rounded-xl sm:rounded-2xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
-              onClick={() => setLightboxImage('https://i.imgur.com/HrgjfGN.png')}
-            />
-            <p className="text-gray-400 text-sm mt-4">{t('hero.clickToOpen')}</p>
-          </div>
-
-          {/* Right Column - Devices stacked */}
-          <div className="flex flex-row lg:flex-col gap-4 sm:gap-6 order-3">
-            <img
-              src="https://i.imgur.com/1SlM8G4.png"
-              alt="Vysion Betaalterminal"
-              className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
-              onClick={() => setLightboxImage('https://i.imgur.com/1SlM8G4.png')}
-            />
-            <img
-              src="https://i.imgur.com/b450kVT.png"
-              alt="Vysion Keukenbeeldscherm"
-              className="w-[100px] sm:w-[140px] md:w-[180px] lg:w-[200px] xl:w-[220px] drop-shadow-xl rounded-2xl sm:rounded-3xl cursor-pointer hover:scale-105 transition-transform"
-              loading="lazy"
-              onClick={() => setLightboxImage('https://i.imgur.com/b450kVT.png')}
-            />
-          </div>
+        {/* Product Showcase Grid - 2 rows of 5 */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
+          {images.map((src, index) => (
+            <div
+              key={index}
+              className="transition-all duration-700 ease-out cursor-pointer"
+              style={{
+                opacity: visibleImages.includes(index) ? 1 : 0,
+                transform: visibleImages.includes(index) ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.95)',
+              }}
+              onClick={() => setLightboxImage(src)}
+            >
+              <img
+                src={src}
+                alt={`Vysion Platform ${index + 1}`}
+                className="w-full h-auto rounded-2xl drop-shadow-xl hover:scale-105 transition-transform"
+                loading="lazy"
+              />
+            </div>
+          ))}
         </div>
+
+        <p className="text-gray-400 text-sm text-center mt-6">{t('hero.clickToOpen')}</p>
 
         {/* Lightbox */}
         {lightboxImage && (
