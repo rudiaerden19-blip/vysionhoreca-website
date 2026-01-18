@@ -301,7 +301,7 @@
     "headline": "Vysion vraagt geen opstartkost",
     "subheadline": "Wij bouwen alles voor jou. Gratis.",
     "cards": {
-      "1": { "you": "Jij geeft ons je menu", "we": "Wij bouwen je winkel" },
+      "1": { "you": "Jij geeft ons je menu", "we": "Wij bouwen je bestelplatform" },
       "2": { "you": "Jij bepaalt de kleuren", "we": "Wij bouwen je website" },
       "3": { "you": "Jij geeft ons je foto's", "we": "Wij plaatsen ze in je site" },
       "4": { "you": "Jij hebt al een website?", "we": "Wij integreren de bestelknop" }

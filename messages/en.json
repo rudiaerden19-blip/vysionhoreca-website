@@ -301,7 +301,7 @@
     "headline": "Vysion charges no startup costs",
     "subheadline": "We build everything for you. Free.",
     "cards": {
-      "1": { "you": "You give us your menu", "we": "We build your store" },
+      "1": { "you": "You give us your menu", "we": "We build your ordering platform" },
       "2": { "you": "You choose the colors", "we": "We build your website" },
       "3": { "you": "You give us your photos", "we": "We place them on your site" },
       "4": { "you": "You already have a website?", "we": "We integrate the order button" }

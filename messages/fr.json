@@ -301,7 +301,7 @@
     "headline": "Vysion ne demande pas de frais de démarrage",
     "subheadline": "Nous construisons tout pour vous. Gratuitement.",
     "cards": {
-      "1": { "you": "Vous nous donnez votre menu", "we": "Nous construisons votre boutique" },
+      "1": { "you": "Vous nous donnez votre menu", "we": "Nous construisons votre plateforme de commande" },
       "2": { "you": "Vous choisissez les couleurs", "we": "Nous construisons votre site web" },
       "3": { "you": "Vous nous donnez vos photos", "we": "Nous les plaçons sur votre site" },
       "4": { "you": "Vous avez déjà un site web?", "we": "Nous intégrons le bouton de commande" }
