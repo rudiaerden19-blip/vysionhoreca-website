@@ -131,20 +131,19 @@ export default function RegisterPage() {
       }
 
       // Store tenant in localStorage (same as login does)
-      if (data.tenant && data.tenant.tenant_slug) {
-        localStorage.setItem('vysion_tenant', JSON.stringify(data.tenant))
-        
-        // Redirect to tenant dashboard (afb 2 style) - NOT admin dashboard
-        setSuccess(true)
-        setTimeout(() => {
-          router.push(`/shop/${data.tenant.tenant_slug}/admin`)
-        }, 2000)
-      } else {
-        setSuccess(true)
-        setTimeout(() => {
-          router.push('/dashboard')
-        }, 2000)
+      if (!data.tenant || !data.tenant.tenant_slug) {
+        setError('Fout: Geen tenant_slug ontvangen. Neem contact op met support.')
+        setIsLoading(false)
+        return
       }
+      
+      localStorage.setItem('vysion_tenant', JSON.stringify(data.tenant))
+      
+      // ALTIJD naar tenant dashboard - GEEN fallback naar admin dashboard!
+      setSuccess(true)
+      setTimeout(() => {
+        router.push(`/shop/${data.tenant.tenant_slug}/admin`)
+      }, 2000)
       
     } catch (err) {
       setError(t('register.error'))

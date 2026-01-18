@@ -66,19 +66,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Haal tenant_slug op uit tenant_settings
-    const { data: tenantSettings } = await supabase
+    // Haal tenant_slug op uit tenant_settings - VERPLICHT!
+    const { data: tenantSettings, error: tenantError } = await supabase
       .from('tenant_settings')
       .select('tenant_slug')
       .eq('email', email.trim().toLowerCase())
       .maybeSingle()
+
+    if (tenantError) {
+      return NextResponse.json(
+        { error: `Database fout bij ophalen tenant: ${tenantError.message}` },
+        { status: 500 }
+      )
+    }
+
+    if (!tenantSettings || !tenantSettings.tenant_slug) {
+      return NextResponse.json(
+        { error: 'Geen tenant gevonden voor dit account. Neem contact op met support.' },
+        { status: 404 }
+      )
+    }
 
     const tenant = {
       id: profiles[0].id,
       name: profiles[0].name || profiles[0].email,
       email: profiles[0].email,
       business_id: profiles[0].id,
-      tenant_slug: tenantSettings?.tenant_slug || null
+      tenant_slug: tenantSettings.tenant_slug
     }
 
     return NextResponse.json({ tenant })

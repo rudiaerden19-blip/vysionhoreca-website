@@ -71,13 +71,14 @@ export default function LoginPage() {
       // Store tenant in localStorage
       localStorage.setItem('vysion_tenant', JSON.stringify(tenant))
       
-      // Redirect to tenant dashboard (afb 2 style) if tenant_slug exists
-      if (tenant.tenant_slug) {
-        router.push(`/shop/${tenant.tenant_slug}/admin`)
-      } else {
-        // Fallback to admin dashboard if no tenant_slug
-        router.push('/dashboard')
+      // ALTIJD naar tenant dashboard - geen fallback!
+      if (!tenant.tenant_slug) {
+        setError('Geen tenant gevonden. Neem contact op met support.')
+        setIsLoading(false)
+        return
       }
+      
+      router.push(`/shop/${tenant.tenant_slug}/admin`)
       
     } catch (err) {
       setError(t('login.somethingWentWrong'))
