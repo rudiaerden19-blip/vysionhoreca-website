@@ -7,7 +7,9 @@ import { supabase } from '@/lib/supabase'
 interface MediaItem {
   id: string
   url: string
+  file_url?: string  // Database kolom naam
   name: string
+  file_name?: string // Database kolom naam
   category: string
 }
 
@@ -43,7 +45,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
     if (!error && data) {
       setMedia(data.map(item => ({
         id: item.id,
-        url: item.url,
+        url: item.url || item.file_url || '',  // Ondersteun beide kolom namen
         name: item.name || item.file_name || 'Foto',
         category: item.category || ''
       })))

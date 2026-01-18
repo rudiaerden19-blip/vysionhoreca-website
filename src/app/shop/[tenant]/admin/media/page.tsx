@@ -7,7 +7,9 @@ import { supabase } from '@/lib/supabase'
 interface MediaItem {
   id: string
   url: string
+  file_url?: string  // Database kolom naam
   name: string
+  file_name?: string // Database kolom naam
   size: number
   category: string
   created_at: string
@@ -40,9 +42,10 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       .order('created_at', { ascending: false })
     
     if (!error && data) {
-      // Map file_name to name for compatibility
+      // Map voor backwards compatibility met verschillende kolom namen
       const mappedData = data.map(item => ({
         ...item,
+        url: item.url || item.file_url || '',  // Ondersteun beide kolom namen
         name: item.name || item.file_name || 'Foto'
       }))
       setMedia(mappedData)
@@ -79,17 +82,37 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         .from('media')
         .getPublicUrl(fileName)
 
-      const { error: dbError } = await supabase
+      // Probeer eerst met file_url (nieuwe schema)
+      let dbError = null
+      const { error: error1 } = await supabase
         .from('tenant_media')
         .insert({
           tenant_slug: params.tenant,
-          url: urlData.publicUrl,
+          file_url: urlData.publicUrl,
           file_name: file.name,
           name: file.name,
           size: file.size,
           type: 'image',
-          category: uploadCategory
+          category: uploadCategory || ''
         })
+
+      if (error1) {
+        // Fallback: probeer met url kolom (oude schema)
+        const { error: error2 } = await supabase
+          .from('tenant_media')
+          .insert({
+            tenant_slug: params.tenant,
+            url: urlData.publicUrl,
+            name: file.name,
+            size: file.size,
+            type: 'image',
+            category: uploadCategory || ''
+          })
+        
+        if (error2) {
+          dbError = error2
+        }
+      }
 
       if (dbError) {
         console.error('DB error:', dbError)
