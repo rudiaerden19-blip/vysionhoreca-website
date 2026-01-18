@@ -45,10 +45,25 @@ export async function POST(request: NextRequest) {
       .eq('tenant_slug', tenantSlug)
       .single()
 
-    if (tenantError || !tenant) {
+    if (tenantError) {
+      console.error('Tenant lookup error:', tenantError, 'for slug:', tenantSlug)
       return NextResponse.json(
-        { error: 'Tenant niet gevonden' },
+        { error: `Tenant niet gevonden: ${tenantSlug}` },
         { status: 404 }
+      )
+    }
+    
+    if (!tenant) {
+      return NextResponse.json(
+        { error: `Geen tenant gevonden met slug: ${tenantSlug}` },
+        { status: 404 }
+      )
+    }
+    
+    if (!tenant.email) {
+      return NextResponse.json(
+        { error: 'Tenant heeft geen email adres ingesteld' },
+        { status: 400 }
       )
     }
 
