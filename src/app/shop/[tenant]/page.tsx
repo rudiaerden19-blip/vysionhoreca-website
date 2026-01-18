@@ -253,6 +253,27 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     })
     
     if (success) {
+      // Send confirmation email to customer
+      try {
+        await fetch('/api/send-reservation-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'pending',
+            customerEmail: reservationForm.email.toLowerCase(),
+            customerName: fullName,
+            customerPhone: reservationForm.phone,
+            reservationDate: reservationForm.date,
+            reservationTime: reservationForm.time,
+            partySize: parseInt(reservationForm.partySize),
+            tenantSlug: params.tenant,
+            businessName: business?.name,
+          }),
+        })
+      } catch (emailError) {
+        console.error('Failed to send reservation email:', emailError)
+      }
+      
       setReservationSuccess(true)
       setReservationForm({ firstName: '', lastName: '', phone: '', email: '', date: '', time: '', partySize: '', notes: '' })
     } else {

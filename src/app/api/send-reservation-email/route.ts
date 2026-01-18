@@ -93,8 +93,14 @@ export async function POST(request: NextRequest) {
       subject = `Reservering ontvangen - ${finalBusinessName}`
       headerColor = '#F97316'
       headerIcon = '📅'
-      mainMessage = `We hebben je reservering ontvangen en nemen zo snel mogelijk contact op.`
-      additionalInfo = ''
+      mainMessage = `Bedankt voor je reservering bij ${finalBusinessName}! We hebben je aanvraag ontvangen.`
+      additionalInfo = `
+        <div style="background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 12px; padding: 16px; margin: 20px 0; text-align: center;">
+          <p style="color: #C2410C; font-weight: 600; margin: 0;">
+            ⏳ We bevestigen je reservering zo snel mogelijk per e-mail.
+          </p>
+        </div>
+      `
     }
 
     const mailOptions = {
