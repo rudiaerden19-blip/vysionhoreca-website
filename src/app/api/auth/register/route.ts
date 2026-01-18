@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSupabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
 
 // Simple hash function - in production use bcrypt
 async function hashPassword(password: string): Promise<string> {
@@ -8,6 +8,17 @@ async function hashPassword(password: string): Promise<string> {
   const hashBuffer = await crypto.subtle.digest('SHA-256', data)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+const getSupabase = () => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  
+  if (!supabaseUrl || !supabaseKey) {
+    return null
+  }
+  
+  return createClient(supabaseUrl, supabaseKey)
 }
 
 export async function POST(request: NextRequest) {
@@ -37,11 +48,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if email already exists in business_profiles
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile, error: profileCheckError } = await supabase
       .from('business_profiles')
       .select('id')
       .ilike('email', email.trim())
-      .single()
+      .maybeSingle()
+
+    if (profileCheckError) {
+      console.error('Error checking existing profile:', profileCheckError)
+      // If table doesn't exist, continue with creation
+      if (profileCheckError.code === '42P01') {
+        console.warn('business_profiles table does not exist - please run migration')
+      } else {
+        return NextResponse.json(
+          { error: 'Database fout bij controleren email' },
+          { status: 500 }
+        )
+      }
+    }
 
     if (existingProfile) {
       return NextResponse.json(
@@ -82,8 +106,14 @@ export async function POST(request: NextRequest) {
 
       if (profileError) {
         console.error('Error creating business profile:', profileError)
+        if (profileError.code === '42P01') {
+          return NextResponse.json(
+            { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: business_profiles_migration.sql' },
+            { status: 500 }
+          )
+        }
         return NextResponse.json(
-          { error: 'Fout bij aanmaken account' },
+          { error: `Fout bij aanmaken account: ${profileError.message}` },
           { status: 500 }
         )
       }
@@ -102,8 +132,14 @@ export async function POST(request: NextRequest) {
 
       if (tenantError) {
         console.error('Error creating tenant:', tenantError)
+        if (tenantError.code === '42P01') {
+          return NextResponse.json(
+            { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: admin_tables.sql' },
+            { status: 500 }
+          )
+        }
         return NextResponse.json(
-          { error: 'Fout bij aanmaken tenant' },
+          { error: `Fout bij aanmaken tenant: ${tenantError.message}` },
           { status: 500 }
         )
       }
@@ -125,6 +161,9 @@ export async function POST(request: NextRequest) {
 
       if (subscriptionError) {
         console.error('Error creating subscription:', subscriptionError)
+        if (subscriptionError.code === '42P01') {
+          console.warn('subscriptions table does not exist - please run superadmin_migration.sql')
+        }
         // Don't fail registration if subscription creation fails
       }
 
@@ -153,8 +192,14 @@ export async function POST(request: NextRequest) {
 
     if (profileError) {
       console.error('Error creating business profile:', profileError)
+      if (profileError.code === '42P01') {
+        return NextResponse.json(
+          { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: business_profiles_migration.sql' },
+          { status: 500 }
+        )
+      }
       return NextResponse.json(
-        { error: 'Fout bij aanmaken account' },
+        { error: `Fout bij aanmaken account: ${profileError.message}` },
         { status: 500 }
       )
     }
@@ -173,8 +218,14 @@ export async function POST(request: NextRequest) {
 
     if (tenantError) {
       console.error('Error creating tenant:', tenantError)
+      if (tenantError.code === '42P01') {
+        return NextResponse.json(
+          { error: 'Database tabel bestaat niet. Voer eerst de migratie uit: admin_tables.sql' },
+          { status: 500 }
+        )
+      }
       return NextResponse.json(
-        { error: 'Fout bij aanmaken tenant' },
+        { error: `Fout bij aanmaken tenant: ${tenantError.message}` },
         { status: 500 }
       )
     }
@@ -196,6 +247,9 @@ export async function POST(request: NextRequest) {
 
     if (subscriptionError) {
       console.error('Error creating subscription:', subscriptionError)
+      if (subscriptionError.code === '42P01') {
+        console.warn('subscriptions table does not exist - please run superadmin_migration.sql')
+      }
       // Don't fail registration if subscription creation fails
     }
 

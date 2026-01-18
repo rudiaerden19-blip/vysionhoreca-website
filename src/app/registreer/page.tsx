@@ -23,10 +23,12 @@ export default function RegisterPage() {
 
   // Read language from URL parameter on mount
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const langParam = params.get('lang') as Locale | null
-    if (langParam && locales.includes(langParam)) {
-      setLocale(langParam)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const langParam = params.get('lang') as Locale | null
+      if (langParam && locales.includes(langParam)) {
+        setLocale(langParam)
+      }
     }
   }, [setLocale, locales])
 
@@ -42,8 +44,14 @@ export default function RegisterPage() {
   }, [])
 
   const handleLanguageSelect = (langCode: Locale) => {
-    setLocale(langCode)
-    setIsLangOpen(false)
+    if (typeof window !== 'undefined') {
+      setLocale(langCode)
+      setIsLangOpen(false)
+      // Update URL with new language parameter
+      const url = new URL(window.location.href)
+      url.searchParams.set('lang', langCode)
+      window.history.replaceState({}, '', url.toString())
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
