@@ -68,8 +68,9 @@ CREATE POLICY "Allow all on super_admins" ON super_admins FOR ALL USING (true);
 CREATE POLICY "Allow all on subscriptions" ON subscriptions FOR ALL USING (true);
 CREATE POLICY "Allow all on platform_activity" ON platform_activity FOR ALL USING (true);
 
--- Voeg jezelf toe als super admin (verander wachtwoord hash!)
--- Password: YOUR_PASSWORD_HASH (SHA256 hash - verander dit!)
-INSERT INTO super_admins (email, password_hash, name, role) 
-VALUES ('YOUR_EMAIL', 'YOUR_PASSWORD_HASH', 'Rudi Aerden', 'admin')
-ON CONFLICT (email) DO NOTHING;
+-- Voeg jezelf toe als super admin
+-- BELANGRIJK: Vervang 'YOUR_EMAIL' en 'YOUR_PASSWORD_HASH' met je eigen gegevens!
+-- Genereer een password hash met: echo -n "jouw_wachtwoord" | sha256sum
+-- INSERT INTO super_admins (email, password_hash, name, role) 
+-- VALUES ('YOUR_EMAIL', 'YOUR_PASSWORD_HASH', 'Your Name', 'admin')
+-- ON CONFLICT (email) DO NOTHING;
