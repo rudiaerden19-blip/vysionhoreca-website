@@ -471,11 +471,33 @@ function OrderAppSection() {
 // Pricing Section
 function PricingSection() {
   const { t, locale } = useLanguage()
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const [showShimmer, setShowShimmer] = useState(false)
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowShimmer(true)
+        }
+      },
+      { threshold: 0.6 } // 60% visible before shimmer starts
+    )
+    
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+    
+    return () => observer.disconnect()
+  }, [])
   
   return (
-    <section id="prijzen" className="py-24 bg-[#2a2a3e] relative overflow-hidden">
-      {/* Silver shimmer background effect */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <section ref={sectionRef} id="prijzen" className="py-24 bg-[#2a2a3e] relative overflow-hidden">
+      {/* Silver shimmer background effect - only shows when section is visible */}
+      <div 
+        className="absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-1000"
+        style={{ opacity: showShimmer ? 1 : 0 }}
+      >
         <div 
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%]"
           style={{
