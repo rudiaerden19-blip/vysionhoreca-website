@@ -327,11 +327,6 @@ function OrderAppSection() {
   const { t } = useLanguage()
 
   const images = [
-    'https://i.imgur.com/JVFNcOz.png',
-    'https://i.imgur.com/AWyYq3x.png',
-    'https://i.imgur.com/wZwQJoG.png',
-    'https://i.imgur.com/tazhTFi.png',
-    'https://i.imgur.com/J6EJhaQ.png',
     'https://i.imgur.com/bbUJ0uh.png',
     'https://i.imgur.com/aw4tHlO.png',
     'https://i.imgur.com/9vnNLsh.png',
@@ -389,7 +384,7 @@ function OrderAppSection() {
           </p>
         </div>
 
-        {/* Product Showcase Grid - 2 rows of 5 - ALL SAME SIZE */}
+        {/* Product Showcase Grid - 1 row of 5 */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 sm:gap-6">
           {images.map((src, index) => (
             <div
