@@ -85,6 +85,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // Audio refs
   const audioContextRef = useRef<AudioContext | null>(null)
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const knownOrderIdsRef = useRef<Set<string>>(new Set())
   
   // Track which orders are "new" and need attention
   const hasNewOrders = orders.some(o => o.status === 'new' || o.status === 'NEW')
@@ -206,10 +208,23 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   // Play repeating sound when there are new orders
   useEffect(() => {
-    if (hasNewOrders && soundEnabled) {
-      // Play immediately and repeat every 3 seconds
+    if (hasNewOrders && soundEnabled && audioReady) {
+      // Resume audio context if suspended (happens on iOS/mobile)
+      if (audioContextRef.current?.state === 'suspended') {
+        audioContextRef.current.resume()
+      }
+      
+      // Play immediately
       playBeep()
-      audioIntervalRef.current = setInterval(playBeep, 3000)
+      
+      // Repeat every 2 seconds (faster = more noticeable)
+      audioIntervalRef.current = setInterval(() => {
+        // Always try to resume before playing
+        if (audioContextRef.current?.state === 'suspended') {
+          audioContextRef.current.resume()
+        }
+        playBeep()
+      }, 2000)
       
     } else {
       // Stop sound
@@ -224,7 +239,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         clearInterval(audioIntervalRef.current)
       }
     }
-  }, [hasNewOrders, soundEnabled, playBeep])
+  }, [hasNewOrders, soundEnabled, audioReady, playBeep])
 
   // Request notification permission
   useEffect(() => {
@@ -268,43 +283,67 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     loadOrders()
   }, [loadOrders])
 
-  // Real-time subscription for new orders
+  // POLLING - Check for new orders every 3 seconds (MOST RELIABLE)
   useEffect(() => {
-    const channel = supabase
-      .channel('orders-realtime')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-          filter: `tenant_slug=eq.${params.tenant}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const newOrder = payload.new as Order
-            setOrders(prev => [newOrder, ...prev])
-            showNotification(newOrder)
-            // Show orange alert for new order
-            setAlertDismissed(false)
-            setShowNewOrderAlert(true)
-          } else if (payload.eventType === 'UPDATE') {
-            const updatedOrder = payload.new as Order
-            setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o))
-          } else if (payload.eventType === 'DELETE') {
-            const deletedId = payload.old?.id
-            if (deletedId) {
-              setOrders(prev => prev.filter(o => o.id !== deletedId))
+    // Initialize known order IDs from current orders
+    orders.forEach(o => o.id && knownOrderIdsRef.current.add(o.id))
+    
+    const pollForNewOrders = async () => {
+      try {
+        const freshOrders = await getOrders(params.tenant)
+        
+        // Check for NEW orders we haven't seen before
+        const newOrdersFound = freshOrders.filter(o => 
+          o.id && 
+          !knownOrderIdsRef.current.has(o.id) &&
+          (o.status === 'new' || o.status === 'NEW')
+        )
+        
+        // Update known IDs
+        freshOrders.forEach(o => o.id && knownOrderIdsRef.current.add(o.id))
+        
+        // If we found new orders, trigger alert!
+        if (newOrdersFound.length > 0) {
+          setAlertDismissed(false)
+          setShowNewOrderAlert(true)
+          newOrdersFound.forEach(o => showNotification(o))
+          
+          // Play sound immediately if enabled
+          if (soundEnabled && audioContextRef.current) {
+            // Resume audio context if suspended (iOS)
+            if (audioContextRef.current.state === 'suspended') {
+              audioContextRef.current.resume()
             }
+            playBeep()
           }
         }
-      )
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
+        
+        // Always update orders list
+        setOrders(freshOrders)
+        
+      } catch (e) {
+        console.error('Polling error:', e)
+      }
     }
-  }, [params.tenant, showNotification])
+    
+    // Poll every 3 seconds - this is the MAIN way to detect orders
+    pollingIntervalRef.current = setInterval(pollForNewOrders, 3000)
+    
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+      }
+    }
+  }, [params.tenant, soundEnabled, showNotification, playBeep])
+  
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+      }
+    }
+  }, [])
 
   // Enable sound on first user interaction (iOS requirement)
   const enableSound = () => {
