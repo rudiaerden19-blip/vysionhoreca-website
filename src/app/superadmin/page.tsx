@@ -340,11 +340,6 @@ export default function SuperAdminDashboard() {
     }
   }
 
-  // BESCHERMDE TENANTS - Kunnen NOOIT geblokkeerd of verwijderd worden
-  const PROTECTED_TENANTS = ['demo-frituur', 'frituur-nolim']
-
-  const isProtectedTenant = (slug: string) => PROTECTED_TENANTS.includes(slug.toLowerCase())
-
   // Check of abonnement binnenkort vervalt (binnen 7 dagen) of niet actief is
   const isExpiringSoon = (sub: Subscription | undefined) => {
     if (!sub) return true // Geen abonnement = moet betalen
