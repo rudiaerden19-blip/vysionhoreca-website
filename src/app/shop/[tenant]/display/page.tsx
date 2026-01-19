@@ -243,49 +243,74 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   // =========================================
-  // AUDIO VIA HTML AUDIO ELEMENT
+  // NOTIFICATION SOUND
   // =========================================
   
-  // Base64 encoded beep sound (short WAV file)
-  const BEEP_SOUND = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1sbW1tf4LGvJdfPVlpYHGQw9HHj2ZLWWxhWXaeyMzBi2ZXZW5iXHulxcGqfmVaaWVmjLHJt4xkU1pnZY230NW3g1VLW2hkksHZ2sFvQUdeaG2Uyt3Yt3IzO1NqbI7H5+XWqloiOFZseqDT8O3er0cXMlZugqrk/vvntFoVKUxzg6bq//7yvVoPH0V0iqbr//7xyWcMFjt0j6rv//7w0XEJEjR0l63z///x2XkFDjB0m7H2///y4YECDDB0nbT3///y5IYACy10n7b4///z5ogACit0obb4///z5ooACil0orf5///054wACCl0o7j5///06I4AB6d0pbn6///17JABByd0p7v7///28pIBBid0qLz8///39JQBBSd1qb39///4+JYBAyd1q8D+///5+5gBAid2rcL////6/ZoBASd2rsT////7/5wA/yd3sMf////8AZ4A/id3scn////9A6AA+yd4s8v////+BKIA+id4tM3/////BqQA9id5ttD/////CKYA9Cd5t9L/////CqsA8id6uNT/////DK0A8Cd6udj/////DrEA7id7u9v/////ELMA7Cd7vN3/////ErYA6id8vuD/////FLYA6Cd8v+L/////Frr/5id9wOT/////GL3/5Sd9weX/////Gr//4yd+w+j/////HMEA4Cd+xOr/////H8MA3id/xuz/////IcQA3Cd/x+7/////I8n/2ieAye//////Jcv/2CeAy/H/////J87/1ieBy/P/////KdH/1CeBzPT/////K9P/0ieCzvb/////Ldf/0CeCz/j/////MNr/zieD0Pr/////Mtz/zCeD0fz/////NN7/yieE0/3/////NuL/yCeE1P//////OOP/xieF1f//////OuX/xCeF1v//////POf/wieG2P//////Pun/wCeG2f//////QOv/vieH2///////Qu3/vCeH3P//////RO//uieI3f//////RvL/uCeI3v//////SPT/tieJ4P//////SvX/tCeJ4f//////TPf/sieK4v//////Tvn/sCeK4///////UPv/rieL5P//////Uvz/rCeL5f//////VP7/qieM5v//////VgD/qCeM5///////WAL/pieN6P//////WgP/pCeN6f//////XAX/oieO6v//////XQf/oCeO6///////Xwj/nieP7P//////YQr/nCeP7f//////Ywv/mieQ7v//////ZQ3/mCeQ7///////Zw7/lieR8P//////aRD/lCeR8f//////axH/kieS8v//////bRP/kCeS8///////bhT/jieT9P//////cBb/jCeT9f//////chf/iieU9v//////cxn/iCeU9///////dRr/hieV+P//////dxz/hCeV+f//////eB3/gieW+v//////eh//gCeW+///////fCD/fieX/P//////fSL/fCeX/f//////fyP/eieY/v//////gCX/eCeY////////gib/diec';
-  
   function playAlertSound() {
+    console.log('🔊 Playing sound...')
+    
+    // Method 1: Web Audio API - create beep directly
     try {
-      const audio = new Audio(BEEP_SOUND)
-      audio.volume = 1.0
-      audio.play().then(() => {
-        console.log('🔔 AUDIO PLAYED!')
-      }).catch(err => {
-        console.error('Audio play failed:', err)
-        // Fallback: try Web Audio API
-        tryWebAudio()
-      })
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext
+      if (AudioContext) {
+        const ctx = new AudioContext()
+        
+        // Create oscillator
+        const osc = ctx.createOscillator()
+        const gainNode = ctx.createGain()
+        
+        osc.connect(gainNode)
+        gainNode.connect(ctx.destination)
+        
+        // Loud beep
+        osc.frequency.value = 880
+        osc.type = 'square'
+        gainNode.gain.value = 0.8
+        
+        // Start immediately
+        osc.start(0)
+        osc.stop(ctx.currentTime + 0.3)
+        
+        // Second beep
+        setTimeout(() => {
+          try {
+            const osc2 = ctx.createOscillator()
+            const gain2 = ctx.createGain()
+            osc2.connect(gain2)
+            gain2.connect(ctx.destination)
+            osc2.frequency.value = 1100
+            osc2.type = 'square'
+            gain2.gain.value = 0.8
+            osc2.start(0)
+            osc2.stop(ctx.currentTime + 0.3)
+          } catch(e) {}
+        }, 200)
+        
+        console.log('✅ Sound played via Web Audio')
+        return
+      }
     } catch (e) {
-      console.error('Audio error:', e)
-      tryWebAudio()
+      console.error('Web Audio failed:', e)
     }
-  }
-  
-  function tryWebAudio() {
+    
+    // Method 2: HTML Audio fallback
     try {
-      const AC = window.AudioContext || (window as any).webkitAudioContext
-      const ctx = new AC()
-      const osc = ctx.createOscillator()
-      osc.connect(ctx.destination)
-      osc.frequency.value = 800
-      osc.type = 'square'
-      osc.start()
-      osc.stop(ctx.currentTime + 0.3)
-      console.log('🔔 WEB AUDIO FALLBACK')
+      const audio = new Audio('https://cdn.freesound.org/previews/352/352661_5121236-lq.mp3')
+      audio.volume = 1.0
+      audio.play()
+      console.log('✅ Sound played via HTML Audio')
     } catch (e) {
-      console.error('Web Audio also failed:', e)
+      console.error('HTML Audio failed:', e)
     }
   }
 
   function enableSound() {
+    console.log('🔊 Enabling sound...')
     setAudioReady(true)
     setSoundEnabled(true)
     localStorage.setItem(`shop_display_sound_${params.tenant}`, 'true')
+    
+    // Play test sound
     playAlertSound()
   }
 
