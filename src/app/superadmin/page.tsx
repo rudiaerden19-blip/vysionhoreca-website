@@ -698,7 +698,7 @@ export default function SuperAdminDashboard() {
                     className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
                     placeholder="mijn-frituur"
                   />
-                  <p className="text-xs text-slate-400 mt-1">Wordt: vysionhoreca.com/shop/{newTenant.tenant_slug || 'mijn-frituur'}</p>
+                  <p className="text-xs text-slate-400 mt-1">Wordt: <span className="text-orange-400 font-medium">{newTenant.tenant_slug || 'mijn-frituur'}.ordervysion.com</span></p>
                 </div>
 
                 <div>
