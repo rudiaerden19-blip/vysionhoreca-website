@@ -529,7 +529,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const todayHours = business.opening_hours[getDayName()]
 
   return (
-    <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-white">
+    <div style={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden', overflowY: 'auto', position: 'relative' }} className="min-h-screen bg-white">
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
