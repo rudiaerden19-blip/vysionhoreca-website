@@ -72,65 +72,55 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     }
   }, [newOrderIds.size, soundEnabled])
 
-  // Real-time subscription - only confirmed orders
+  // Polling fallback - check for orders every 3 seconds (realtime often fails)
+  const knownOrderIdsRef = useRef<Set<string>>(new Set())
+  
   useEffect(() => {
     if (!supabase) return
 
-    const channel = supabase
-      .channel('keuken-display-orders')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-          filter: `tenant_slug=eq.${params.tenant}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const newOrder = payload.new as Order
-            if (typeof newOrder.items === 'string') {
-              try {
-                newOrder.items = JSON.parse(newOrder.items)
-              } catch (e) {
-                newOrder.items = []
-              }
-            }
-            // Only add if confirmed (ready to make)
-            if (newOrder.status.toLowerCase() === 'confirmed') {
-              setOrders(prev => [newOrder, ...prev])
-              setNewOrderIds(prev => new Set([...prev, newOrder.id]))
-              if (soundEnabled) playAlertSound()
-            }
-          } else if (payload.eventType === 'UPDATE') {
-            const updated = payload.new as Order
-            // If status changed to confirmed, add it
-            if (updated.status.toLowerCase() === 'confirmed') {
-              setOrders(prev => {
-                const exists = prev.find(o => o.id === updated.id)
-                if (exists) {
-                  return prev.map(o => o.id === updated.id ? { ...o, ...updated } : o)
-                } else {
-                  setNewOrderIds(p => new Set([...p, updated.id]))
-                  if (soundEnabled) playAlertSound()
-                  return [updated, ...prev]
-                }
-              })
-            } else {
-              // Remove if no longer confirmed
-              setOrders(prev => prev.filter(o => o.id !== updated.id))
-            }
-          } else if (payload.eventType === 'DELETE') {
-            setOrders(prev => prev.filter(o => o.id !== payload.old.id))
-          }
+    const pollOrders = async () => {
+      const { data } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('tenant_slug', params.tenant)
+        .eq('status', 'confirmed')
+        .order('created_at', { ascending: true })
+        .limit(50)
+
+      if (data) {
+        const parsed = data.map(order => ({
+          ...order,
+          items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
+        }))
+        
+        // Check for NEW orders that we haven't seen before
+        const newOrders = parsed.filter(o => !knownOrderIdsRef.current.has(o.id))
+        
+        // Update known IDs
+        knownOrderIdsRef.current = new Set(parsed.map(o => o.id))
+        
+        // If there are new orders, alert!
+        if (newOrders.length > 0 && orders.length > 0) {
+          newOrders.forEach(order => {
+            setNewOrderIds(prev => new Set([...prev, order.id]))
+          })
+          if (soundEnabled) playAlertSound()
         }
-      )
-      .subscribe()
+        
+        setOrders(parsed)
+      }
+    }
+
+    // Initial load of known IDs
+    orders.forEach(o => knownOrderIdsRef.current.add(o.id))
+
+    // Poll every 3 seconds
+    const pollInterval = setInterval(pollOrders, 3000)
 
     return () => {
-      supabase.removeChannel(channel)
+      clearInterval(pollInterval)
     }
-  }, [params.tenant, soundEnabled])
+  }, [params.tenant, soundEnabled, orders.length])
 
   async function loadData() {
     const settings = await getTenantSettings(params.tenant)
@@ -209,8 +199,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       next.delete(order.id)
       return next
     })
+    // Remove from known IDs so it doesn't show up again
+    knownOrderIdsRef.current.delete(order.id)
+    // Remove from orders list immediately
+    setOrders(prev => prev.filter(o => o.id !== order.id))
     setSelectedOrder(null)
-    // Order will be removed from list via real-time subscription
   }
 
   function printOrder(order: Order) {
