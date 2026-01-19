@@ -166,7 +166,31 @@ export async function POST(request: NextRequest) {
               .eq('id', sub.id)
 
             console.log(`Payment failed for ${sub.tenant_slug}`)
-            // TODO: Send email notification about failed payment
+            
+            // Send email notification about failed payment
+            if (sub.tenant_slug) {
+              try {
+                const { data: settings } = await supabase
+                  .from('tenant_settings')
+                  .select('email, business_name')
+                  .eq('tenant_slug', sub.tenant_slug)
+                  .single()
+                
+                if (settings?.email) {
+                  await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://vysionhoreca.com'}/api/send-payment-reminder`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      email: settings.email,
+                      businessName: settings.business_name,
+                      type: 'payment_failed',
+                    }),
+                  })
+                }
+              } catch (emailError) {
+                console.error('Failed to send payment failed email:', emailError)
+              }
+            }
           }
         }
         break

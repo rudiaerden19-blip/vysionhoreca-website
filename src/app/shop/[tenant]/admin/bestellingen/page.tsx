@@ -196,7 +196,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             gain2.gain.value = 0.8
             osc2.start(0)
             osc2.stop(ctx.currentTime + 0.3)
-          } catch(e) {}
+          } catch {
+            // Audio oscillator cleanup - non-critical, safe to ignore
+          }
         }, 200)
       }
     } catch (e) {

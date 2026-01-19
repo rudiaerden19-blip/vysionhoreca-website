@@ -1,12 +1,47 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
 export default function ScradaPage() {
   const params = useParams()
   const tenant = params.tenant as string
-  const [isPremium] = useState(true) // TODO: Check actual subscription
+  const [isPremium, setIsPremium] = useState(false)
+  const [loading, setLoading] = useState(true)
+  
+  // Check actual subscription status
+  useEffect(() => {
+    async function checkSubscription() {
+      if (!supabase) {
+        setIsPremium(true) // Fallback: assume premium if no supabase
+        setLoading(false)
+        return
+      }
+      
+      const { data } = await supabase
+        .from('subscriptions')
+        .select('plan, status')
+        .eq('tenant_slug', tenant)
+        .eq('status', 'active')
+        .single()
+      
+      // Premium plans that include SCRADA
+      const premiumPlans = ['premium', 'enterprise', 'pro']
+      setIsPremium(data ? premiumPlans.includes(data.plan?.toLowerCase()) : false)
+      setLoading(false)
+    }
+    
+    checkSubscription()
+  }, [tenant])
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   if (!isPremium) {
     return (
