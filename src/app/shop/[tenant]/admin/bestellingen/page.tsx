@@ -208,8 +208,15 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   // Play repeating sound when there are new orders
   useEffect(() => {
-    if (hasNewOrders && soundEnabled && audioReady) {
-      // Resume audio context if suspended (happens on iOS/mobile)
+    if (hasNewOrders && soundEnabled) {
+      // Try to init/resume audio
+      if (!audioContextRef.current) {
+        try {
+          audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+        } catch (e) {
+          console.log('Could not create audio context:', e)
+        }
+      }
       if (audioContextRef.current?.state === 'suspended') {
         audioContextRef.current.resume()
       }
@@ -219,7 +226,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       
       // Repeat every 3 seconds
       audioIntervalRef.current = setInterval(() => {
-        // Always try to resume before playing
         if (audioContextRef.current?.state === 'suspended') {
           audioContextRef.current.resume()
         }
@@ -239,7 +245,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         clearInterval(audioIntervalRef.current)
       }
     }
-  }, [hasNewOrders, soundEnabled, audioReady, playBeep])
+  }, [hasNewOrders, soundEnabled, playBeep])
 
   // Request notification permission
   useEffect(() => {
@@ -285,9 +291,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   // POLLING - Check for new orders every 3 seconds (MOST RELIABLE)
   useEffect(() => {
-    // Initialize known order IDs from current orders
-    orders.forEach(o => o.id && knownOrderIdsRef.current.add(o.id))
-    
     const pollForNewOrders = async () => {
       try {
         const freshOrders = await getOrders(params.tenant)
@@ -306,25 +309,18 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         if (newOrdersFound.length > 0) {
           setAlertDismissed(false)
           setShowNewOrderAlert(true)
-          newOrdersFound.forEach(o => showNotification(o))
-          
-          // Play sound immediately if enabled
-          if (soundEnabled && audioContextRef.current) {
-            // Resume audio context if suspended (iOS)
-            if (audioContextRef.current.state === 'suspended') {
-              audioContextRef.current.resume()
-            }
-            playBeep()
-          }
         }
         
-        // Always update orders list
+        // Update orders list
         setOrders(freshOrders)
         
       } catch (e) {
         console.error('Polling error:', e)
       }
     }
+    
+    // Initialize known IDs on mount
+    orders.forEach(o => o.id && knownOrderIdsRef.current.add(o.id))
     
     // Poll every 3 seconds - this is the MAIN way to detect orders
     pollingIntervalRef.current = setInterval(pollForNewOrders, 3000)
@@ -334,16 +330,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         clearInterval(pollingIntervalRef.current)
       }
     }
-  }, [params.tenant, soundEnabled, showNotification, playBeep])
-  
-  // Cleanup polling on unmount
-  useEffect(() => {
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current)
-      }
-    }
-  }, [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.tenant]) // Only restart polling when tenant changes
 
   // Enable sound on first user interaction (iOS requirement)
   const enableSound = () => {
