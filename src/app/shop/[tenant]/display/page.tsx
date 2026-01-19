@@ -242,8 +242,18 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     localStorage.setItem(`shop_display_sound_${params.tenant}`, 'true')
   }
 
+  const sentEmailsRef = useRef<Set<string>>(new Set())
+
   async function sendOrderStatusEmail(order: Order, status: string, rejectionReason?: string, rejectionNotes?: string) {
     if (!order.customer_email) return
+    
+    // Prevent duplicate emails
+    const emailKey = `${order.id}-${status}`
+    if (sentEmailsRef.current.has(emailKey)) {
+      console.log('Email already sent for this order/status:', emailKey)
+      return
+    }
+    sentEmailsRef.current.add(emailKey)
     
     try {
       await fetch('/api/send-order-status', {
@@ -255,7 +265,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           orderNumber: order.order_number,
           status,
           businessName: business?.business_name,
-          businessEmail: business?.phone, // or email if available
+          businessEmail: business?.phone,
           rejectionReason,
           rejectionNotes,
           total: order.total,
