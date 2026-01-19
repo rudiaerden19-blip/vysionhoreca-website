@@ -71,28 +71,10 @@ img, video, iframe, embed, object {
   }
 }
 
-/* ===========================================
-   AUTO CAPITALIZE - Eerste letter hoofdletter
-   =========================================== */
-
-/* Alle tekstvelden beginnen met hoofdletter */
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input:not([type]),
-textarea {
-  text-transform: capitalize;
-}
-
-/* Email velden NIET kapitaliseren (emails zijn lowercase) */
-input[type="email"] {
-  text-transform: lowercase !important;
-}
-
-/* Placeholder blijft normaal */
+/* Placeholder styling */
 input::placeholder,
 textarea::placeholder {
-  text-transform: none;
+  color: #9ca3af;
 }
 
 /* ===========================================
