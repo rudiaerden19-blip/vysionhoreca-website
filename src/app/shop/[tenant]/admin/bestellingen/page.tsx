@@ -372,7 +372,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               deliveryFee: order.delivery_fee,
               discount: order.discount_amount,
               total: order.total,
-              btwPercentage: tenantSettings?.btw_percentage || 21,
+              btwPercentage: tenantSettings?.btw_percentage || 6,
             }),
           })
         } catch (e) {
@@ -423,7 +423,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               deliveryFee: order.delivery_fee,
               discount: order.discount_amount,
               total: order.total,
-              btwPercentage: tenantSettings?.btw_percentage || 21,
+              btwPercentage: tenantSettings?.btw_percentage || 6,
             }),
           })
         } catch (e) {
@@ -521,7 +521,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     if (!printWindow) return
 
     // BTW berekening - gebruik percentage uit instellingen of standaard 21%
-    const btwPercentage = tenantSettings?.btw_percentage || 21
+    const btwPercentage = tenantSettings?.btw_percentage || 6
     const totalExclBtw = order.total ? order.total / (1 + btwPercentage / 100) : 0
     const btwBedrag = order.total ? order.total - totalExclBtw : 0
 

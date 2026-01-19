@@ -124,8 +124,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate BTW
-    const btwRate = btwPercentage || 21
+    // Calculate BTW (6% is standaard voor horeca in België)
+    const btwRate = btwPercentage || 6
     const totalNum = parseFloat(total) || 0
     const totalExclBtw = totalNum / (1 + btwRate / 100)
     const btwAmount = totalNum - totalExclBtw
