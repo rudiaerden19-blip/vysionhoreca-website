@@ -130,72 +130,69 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     return order.items as OrderItemJson[]
   }
 
-  // Initialize Web Audio API (iPad-compatible)
-  const initAudio = useCallback(() => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-    }
-    // Resume if suspended (iOS requirement)
-    if (audioContextRef.current.state === 'suspended') {
-      audioContextRef.current.resume()
-    }
-  }, [])
-
-  // Play beep sound using Web Audio API
-  const playBeep = useCallback(() => {
-    if (!audioContextRef.current) return
-    
+  // SIMPEL GELUID - werkt ALTIJD
+  function playSound() {
     try {
+      // Maak audio context aan als die niet bestaat
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+      }
+      
       const ctx = audioContextRef.current
-      const oscillator = ctx.createOscillator()
-      const gainNode = ctx.createGain()
       
-      oscillator.connect(gainNode)
-      gainNode.connect(ctx.destination)
+      // Resume als suspended (iOS)
+      if (ctx.state === 'suspended') {
+        ctx.resume()
+      }
       
-      // Create a pleasant notification sound (3 beeps)
-      oscillator.frequency.value = 880 // A5 note
-      oscillator.type = 'sine'
+      // Speel geluid
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.value = 880
+      osc.type = 'sine'
+      gain.gain.setValueAtTime(0.5, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.3)
       
-      gainNode.gain.setValueAtTime(0.3, ctx.currentTime)
-      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5)
-      
-      oscillator.start(ctx.currentTime)
-      oscillator.stop(ctx.currentTime + 0.5)
-      
-      // Second beep
+      // Tweede toon
       setTimeout(() => {
-        if (!audioContextRef.current) return
-        const osc2 = ctx.createOscillator()
-        const gain2 = ctx.createGain()
-        osc2.connect(gain2)
-        gain2.connect(ctx.destination)
-        osc2.frequency.value = 1100
-        osc2.type = 'sine'
-        gain2.gain.setValueAtTime(0.3, ctx.currentTime)
-        gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5)
-        osc2.start(ctx.currentTime)
-        osc2.stop(ctx.currentTime + 0.5)
+        try {
+          const osc2 = ctx.createOscillator()
+          const gain2 = ctx.createGain()
+          osc2.connect(gain2)
+          gain2.connect(ctx.destination)
+          osc2.frequency.value = 1100
+          osc2.type = 'sine'
+          gain2.gain.setValueAtTime(0.5, ctx.currentTime)
+          gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+          osc2.start(ctx.currentTime)
+          osc2.stop(ctx.currentTime + 0.3)
+        } catch (e) {}
       }, 150)
       
-      // Third beep (higher)
+      // Derde toon
       setTimeout(() => {
-        if (!audioContextRef.current) return
-        const osc3 = ctx.createOscillator()
-        const gain3 = ctx.createGain()
-        osc3.connect(gain3)
-        gain3.connect(ctx.destination)
-        osc3.frequency.value = 1320
-        osc3.type = 'sine'
-        gain3.gain.setValueAtTime(0.3, ctx.currentTime)
-        gain3.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5)
-        osc3.start(ctx.currentTime)
-        osc3.stop(ctx.currentTime + 0.5)
+        try {
+          const osc3 = ctx.createOscillator()
+          const gain3 = ctx.createGain()
+          osc3.connect(gain3)
+          gain3.connect(ctx.destination)
+          osc3.frequency.value = 1320
+          osc3.type = 'sine'
+          gain3.gain.setValueAtTime(0.5, ctx.currentTime)
+          gain3.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+          osc3.start(ctx.currentTime)
+          osc3.stop(ctx.currentTime + 0.3)
+        } catch (e) {}
       }, 300)
+      
     } catch (e) {
-      console.log('Audio play failed:', e)
+      console.log('Geluid fout:', e)
     }
-  }, [])
+  }
   
   // Cleanup
   useEffect(() => {
@@ -209,28 +206,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // Play repeating sound when there are new orders
   useEffect(() => {
     if (hasNewOrders && soundEnabled) {
-      // Try to init/resume audio
-      if (!audioContextRef.current) {
-        try {
-          audioContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
-        } catch (e) {
-          console.log('Could not create audio context:', e)
-        }
-      }
-      if (audioContextRef.current?.state === 'suspended') {
-        audioContextRef.current.resume()
-      }
-      
       // Play immediately
-      playBeep()
+      playSound()
       
       // Repeat every 3 seconds
-      audioIntervalRef.current = setInterval(() => {
-        if (audioContextRef.current?.state === 'suspended') {
-          audioContextRef.current.resume()
-        }
-        playBeep()
-      }, 3000)
+      audioIntervalRef.current = setInterval(playSound, 3000)
       
     } else {
       // Stop sound
@@ -245,7 +225,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         clearInterval(audioIntervalRef.current)
       }
     }
-  }, [hasNewOrders, soundEnabled, playBeep])
+  }, [hasNewOrders, soundEnabled])
 
   // Request notification permission
   useEffect(() => {
@@ -335,8 +315,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   // Enable sound on first user interaction (iOS requirement)
   const enableSound = () => {
-    initAudio()
-    playBeep()
+    playSound()
     setSoundEnabled(true)
     setAudioReady(true)
     localStorage.setItem(`sound_enabled_${params.tenant}`, 'true')
