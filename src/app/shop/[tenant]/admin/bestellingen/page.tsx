@@ -167,43 +167,28 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   }
 
   // =========================================
-  // ULTRA SIMPLE AUDIO
+  // DEAD SIMPLE AUDIO
   // =========================================
   
-  async function playSound() {
-    try {
-      const AC = window.AudioContext || (window as any).webkitAudioContext
-      if (!AC) return
-      
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AC()
-      }
-      
-      const ctx = audioContextRef.current
-      
-      // MUST await resume
-      if (ctx.state !== 'running') {
-        await ctx.resume()
-      }
-      
-      const beep = (frequency: number, delay: number, length: number) => {
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.connect(gain)
-        gain.connect(ctx.destination)
-        osc.frequency.value = frequency
-        osc.type = 'sine'
-        gain.gain.value = 0.5
-        osc.start(ctx.currentTime + delay)
-        osc.stop(ctx.currentTime + delay + length)
-      }
-      
-      beep(880, 0, 0.15)
-      beep(1100, 0.2, 0.15)
-      beep(1320, 0.4, 0.2)
-    } catch (e) {
-      console.error('Audio error:', e)
-    }
+  function playSound() {
+    const AC = window.AudioContext || (window as any).webkitAudioContext
+    if (!AC) return
+    
+    const ctx = new AC()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    
+    osc.frequency.value = 800
+    osc.type = 'square'
+    gain.gain.value = 1
+    
+    osc.start()
+    osc.stop(ctx.currentTime + 0.5)
+    
+    console.log('🔔 BEEP!')
   }
   
   // Cleanup
@@ -326,29 +311,12 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant]) // Only restart polling when tenant changes
 
-  // Enable sound - initializes audio and plays test sound
-  const enableSound = async () => {
-    try {
-      const AC = window.AudioContext || (window as any).webkitAudioContext
-      if (!AC) {
-        alert('Audio niet ondersteund')
-        return
-      }
-      
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AC()
-      }
-      
-      await audioContextRef.current.resume()
-      console.log('🔊 Audio state:', audioContextRef.current.state)
-    } catch (e) {
-      console.error('Audio init error:', e)
-    }
-    
+  // Enable sound
+  const enableSound = () => {
     setSoundEnabled(true)
     setAudioReady(true)
     localStorage.setItem(`sound_enabled_${params.tenant}`, 'true')
-    await playSound()
+    playSound()
   }
   
   // Disable sound

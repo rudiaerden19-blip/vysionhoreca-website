@@ -54,33 +54,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     }
   }, [params.tenant])
 
-  // Auto-initialize audio on first user interaction
+  // Mark audio ready after any click
   useEffect(() => {
-    const handleFirstInteraction = async () => {
-      try {
-        const AC = window.AudioContext || (window as any).webkitAudioContext
-        if (AC && !audioContextRef.current) {
-          audioContextRef.current = new AC()
-          await audioContextRef.current.resume()
-        }
-        setAudioReady(true)
-      } catch (e) {
-        console.error('Audio init error:', e)
-      }
-      document.removeEventListener('click', handleFirstInteraction)
-      document.removeEventListener('touchstart', handleFirstInteraction)
-      document.removeEventListener('keydown', handleFirstInteraction)
+    const markReady = () => {
+      setAudioReady(true)
+      document.removeEventListener('click', markReady)
     }
-
-    document.addEventListener('click', handleFirstInteraction)
-    document.addEventListener('touchstart', handleFirstInteraction)
-    document.addEventListener('keydown', handleFirstInteraction)
-
-    return () => {
-      document.removeEventListener('click', handleFirstInteraction)
-      document.removeEventListener('touchstart', handleFirstInteraction)
-      document.removeEventListener('keydown', handleFirstInteraction)
-    }
+    document.addEventListener('click', markReady)
+    return () => document.removeEventListener('click', markReady)
   }, [])
 
   // Continuous alert for new orders - plays every 5 seconds
@@ -205,66 +186,35 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   // =========================================
-  // ULTRA SIMPLE AUDIO
+  // DEAD SIMPLE AUDIO
   // =========================================
   
-  async function playAlertSound() {
-    try {
-      const AC = window.AudioContext || (window as any).webkitAudioContext
-      if (!AC) return
-      
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AC()
-      }
-      
-      const ctx = audioContextRef.current
-      
-      // MUST await resume
-      if (ctx.state !== 'running') {
-        await ctx.resume()
-      }
-      
-      const beep = (frequency: number, delay: number, length: number) => {
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.connect(gain)
-        gain.connect(ctx.destination)
-        osc.frequency.value = frequency
-        osc.type = 'sine'
-        gain.gain.value = 0.5
-        osc.start(ctx.currentTime + delay)
-        osc.stop(ctx.currentTime + delay + length)
-      }
-      
-      // Kitchen bell: 2 tones
-      beep(1200, 0, 0.1)
-      beep(1500, 0.15, 0.15)
-    } catch (e) {
-      console.error('Audio error:', e)
-    }
+  function playAlertSound() {
+    const AC = window.AudioContext || (window as any).webkitAudioContext
+    if (!AC) return
+    
+    const ctx = new AC()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    
+    osc.frequency.value = 1000
+    osc.type = 'square'
+    gain.gain.value = 1
+    
+    osc.start()
+    osc.stop(ctx.currentTime + 0.3)
+    
+    console.log('🔔 KITCHEN BEEP!')
   }
 
-  async function enableSound() {
-    try {
-      const AC = window.AudioContext || (window as any).webkitAudioContext
-      if (!AC) {
-        alert('Audio niet ondersteund')
-        return
-      }
-      
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AC()
-      }
-      
-      await audioContextRef.current.resume()
-    } catch (e) {
-      console.error('Audio init error:', e)
-    }
-    
+  function enableSound() {
     setAudioReady(true)
     setSoundEnabled(true)
     localStorage.setItem(`keuken_sound_${params.tenant}`, 'true')
-    await playAlertSound()
+    playAlertSound()
   }
 
   async function handleReady(order: Order) {

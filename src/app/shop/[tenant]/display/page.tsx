@@ -100,33 +100,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }
   }, [params.tenant])
 
-  // Initialize audio on first user interaction (browser requirement)
+  // Mark audio ready after any user interaction
   useEffect(() => {
-    const handleFirstInteraction = async () => {
-      try {
-        const AC = window.AudioContext || (window as any).webkitAudioContext
-        if (AC && !audioContextRef.current) {
-          audioContextRef.current = new AC()
-          await audioContextRef.current.resume()
-        }
-        setAudioReady(true)
-      } catch (e) {
-        console.error('Audio init error:', e)
-      }
-      document.removeEventListener('click', handleFirstInteraction)
-      document.removeEventListener('touchstart', handleFirstInteraction)
-      document.removeEventListener('keydown', handleFirstInteraction)
+    const markReady = () => {
+      setAudioReady(true)
+      document.removeEventListener('click', markReady)
     }
-
-    document.addEventListener('click', handleFirstInteraction)
-    document.addEventListener('touchstart', handleFirstInteraction)
-    document.addEventListener('keydown', handleFirstInteraction)
-
-    return () => {
-      document.removeEventListener('click', handleFirstInteraction)
-      document.removeEventListener('touchstart', handleFirstInteraction)
-      document.removeEventListener('keydown', handleFirstInteraction)
-    }
+    document.addEventListener('click', markReady)
+    return () => document.removeEventListener('click', markReady)
   }, [])
 
   // Continuous alert sound for new orders - plays every 3 seconds
@@ -262,77 +243,43 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   // =========================================
-  // ULTRA SIMPLE AUDIO
+  // DEAD SIMPLE AUDIO - MINIMUM CODE
   // =========================================
   
-  async function playAlertSound() {
-    try {
-      // Get or create AudioContext
-      const AC = window.AudioContext || (window as any).webkitAudioContext
-      if (!AC) return
-      
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AC()
-      }
-      
-      const ctx = audioContextRef.current
-      
-      // MUST await resume before playing
-      if (ctx.state !== 'running') {
-        await ctx.resume()
-      }
-      
-      // Simple beep function
-      const beep = (frequency: number, delay: number, length: number) => {
-        const osc = ctx.createOscillator()
-        const gain = ctx.createGain()
-        osc.connect(gain)
-        gain.connect(ctx.destination)
-        osc.frequency.value = frequency
-        osc.type = 'sine'
-        gain.gain.value = 0.5
-        osc.start(ctx.currentTime + delay)
-        osc.stop(ctx.currentTime + delay + length)
-      }
-      
-      // 3 beeps
-      beep(880, 0, 0.15)
-      beep(1100, 0.2, 0.15)
-      beep(1320, 0.4, 0.2)
-      
-      console.log('🔔 SOUND PLAYED')
-    } catch (e) {
-      console.error('Audio error:', e)
-    }
-  }
-
-  async function enableSound() {
-    try {
-      const AC = window.AudioContext || (window as any).webkitAudioContext
-      if (!AC) {
-        alert('Audio niet ondersteund in deze browser')
-        return
-      }
-      
-      // Create context
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AC()
-      }
-      
-      // Resume and wait
-      await audioContextRef.current.resume()
-      console.log('🔊 Audio context state:', audioContextRef.current.state)
-      
-    } catch (e) {
-      console.error('Audio init error:', e)
+  function playAlertSound() {
+    // Create fresh context every time - most reliable
+    const AC = window.AudioContext || (window as any).webkitAudioContext
+    if (!AC) {
+      console.error('NO AUDIO SUPPORT')
+      return
     }
     
+    const ctx = new AC()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    
+    osc.frequency.value = 800
+    osc.type = 'square'  // Louder than sine
+    gain.gain.value = 1  // Maximum volume
+    
+    osc.start()
+    osc.stop(ctx.currentTime + 0.5)
+    
+    console.log('🔔 BEEP!')
+  }
+
+  function enableSound() {
     setAudioReady(true)
     setSoundEnabled(true)
     localStorage.setItem(`shop_display_sound_${params.tenant}`, 'true')
     
-    // Play test sound
-    await playAlertSound()
+    // Test beep
+    playAlertSound()
+    
+    alert('Geluid is nu AAN - hoorde je een piep?')
   }
 
   // EMAIL FUNCTION - BULLETPROOF with all required business info
