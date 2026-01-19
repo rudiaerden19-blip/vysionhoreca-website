@@ -36,9 +36,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="nl" className={inter.variable}>
-      <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
-        <div style={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden' }}>
+    <html lang="nl" className={inter.variable} style={{ overflowX: 'hidden' }}>
+      <body className={`${inter.className} bg-white text-gray-900 antialiased`} style={{ overflowX: 'hidden' }}>
+        <div style={{ 
+          width: '100%', 
+          maxWidth: '100vw', 
+          overflowX: 'hidden',
+          overflowY: 'visible'
+        }}>
           <LanguageProvider>
             {children}
           </LanguageProvider>

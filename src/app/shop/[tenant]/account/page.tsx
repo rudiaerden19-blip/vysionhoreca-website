@@ -162,7 +162,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   }
 
   return (
-    <div style={{ width: '100%', maxWidth: '100vw', overflowX: 'hidden', overflowY: 'auto', position: 'relative' }} className="min-h-screen bg-gray-50">
+    <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">

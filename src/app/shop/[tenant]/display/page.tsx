@@ -500,6 +500,56 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   return (
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-900 text-white">
+      {/* FULLSCREEN NEW ORDER ALERT */}
+      <AnimatePresence>
+        {newOrderIds.size > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] pointer-events-none"
+          >
+            {/* Pulsing orange border around entire screen */}
+            <motion.div
+              animate={{ 
+                boxShadow: [
+                  'inset 0 0 60px 30px rgba(249, 115, 22, 0.8)',
+                  'inset 0 0 100px 50px rgba(249, 115, 22, 0.4)',
+                  'inset 0 0 60px 30px rgba(249, 115, 22, 0.8)',
+                ]
+              }}
+              transition={{ duration: 1, repeat: Infinity }}
+              className="absolute inset-0"
+            />
+            
+            {/* Top banner */}
+            <motion.div
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ duration: 0.5, repeat: Infinity }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-orange-500 px-12 py-8 rounded-3xl shadow-2xl pointer-events-auto"
+              onClick={() => {
+                // Click to dismiss and view orders
+                const firstNewOrderId = Array.from(newOrderIds)[0]
+                const order = orders.find(o => o.id === firstNewOrderId)
+                if (order) {
+                  setSelectedOrder(order)
+                  setNewOrderIds(prev => {
+                    const next = new Set(prev)
+                    next.delete(firstNewOrderId)
+                    return next
+                  })
+                }
+              }}
+            >
+              <p className="text-6xl font-black text-white text-center mb-2">🔔 NIEUWE BESTELLING!</p>
+              <p className="text-3xl font-bold text-white/90 text-center">
+                {newOrderIds.size === 1 ? 'Klik om te bekijken' : `${newOrderIds.size} nieuwe bestellingen`}
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700 px-4 py-3">
         <div className="flex items-center justify-between">
