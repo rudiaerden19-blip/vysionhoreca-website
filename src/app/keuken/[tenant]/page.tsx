@@ -29,12 +29,15 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [business, setBusiness] = useState<BusinessSettings | null>(null)
   const [loading, setLoading] = useState(true)
+  const [initialLoadDone, setInitialLoadDone] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [soundEnabled, setSoundEnabled] = useState(false)
+  const [audioReady, setAudioReady] = useState(false)
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const audioContextRef = useRef<AudioContext | null>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
+  const knownOrderIdsRef = useRef<Set<string>>(new Set())
 
   // Update time every second
   useEffect(() => {
@@ -48,13 +51,37 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     const savedSound = localStorage.getItem(`keuken_sound_${params.tenant}`)
     if (savedSound === 'true') {
       setSoundEnabled(true)
-      initAudio()
     }
   }, [params.tenant])
 
-  // Continuous alert for new orders
+  // Auto-initialize audio on first user interaction
   useEffect(() => {
-    if (newOrderIds.size > 0 && soundEnabled) {
+    const handleFirstInteraction = () => {
+      initAudio()
+      setAudioReady(true)
+      document.removeEventListener('click', handleFirstInteraction)
+      document.removeEventListener('touchstart', handleFirstInteraction)
+      document.removeEventListener('keydown', handleFirstInteraction)
+    }
+
+    document.addEventListener('click', handleFirstInteraction)
+    document.addEventListener('touchstart', handleFirstInteraction)
+    document.addEventListener('keydown', handleFirstInteraction)
+
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction)
+      document.removeEventListener('touchstart', handleFirstInteraction)
+      document.removeEventListener('keydown', handleFirstInteraction)
+    }
+  }, [])
+
+  // Continuous alert for new orders - plays every 5 seconds
+  useEffect(() => {
+    if (newOrderIds.size > 0 && soundEnabled && audioReady) {
+      // Play immediately
+      playAlertSound()
+      
+      // Repeat every 5 seconds
       alertIntervalRef.current = setInterval(() => {
         playAlertSound()
       }, 5000)
@@ -70,49 +97,52 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         clearInterval(alertIntervalRef.current)
       }
     }
-  }, [newOrderIds.size, soundEnabled])
+  }, [newOrderIds.size, soundEnabled, audioReady])
 
-  // Polling fallback - check for orders every 3 seconds (realtime often fails)
-  const knownOrderIdsRef = useRef<Set<string>>(new Set())
-  
+  // Polling - check for orders every 3 seconds
+  // Only starts AFTER initial load is complete
   useEffect(() => {
-    if (!supabase) return
+    if (!supabase || !initialLoadDone) return
 
     const pollOrders = async () => {
-      const { data } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('tenant_slug', params.tenant)
-        .eq('status', 'confirmed')
-        .order('created_at', { ascending: true })
-        .limit(50)
+      try {
+        const { data } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('tenant_slug', params.tenant)
+          .eq('status', 'confirmed')
+          .order('created_at', { ascending: true })
+          .limit(50)
 
-      if (data) {
-        const parsed = data.map(order => ({
-          ...order,
-          items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
-        }))
-        
-        // Check for NEW orders that we haven't seen before
-        const newOrders = parsed.filter(o => !knownOrderIdsRef.current.has(o.id))
-        
-        // Update known IDs
-        knownOrderIdsRef.current = new Set(parsed.map(o => o.id))
-        
-        // If there are new orders, alert!
-        if (newOrders.length > 0 && orders.length > 0) {
-          newOrders.forEach(order => {
-            setNewOrderIds(prev => new Set([...prev, order.id]))
-          })
-          if (soundEnabled) playAlertSound()
+        if (data) {
+          const parsed = data.map(order => ({
+            ...order,
+            items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
+          }))
+          
+          // Find TRULY new orders (not in known set)
+          const trulyNewOrders = parsed.filter(o => !knownOrderIdsRef.current.has(o.id))
+          
+          // Add ALL current order IDs to known set
+          parsed.forEach(o => knownOrderIdsRef.current.add(o.id))
+          
+          // Alert for truly new orders
+          if (trulyNewOrders.length > 0) {
+            console.log(`👨‍🍳 ${trulyNewOrders.length} nieuwe keuken bestelling(en)!`)
+            trulyNewOrders.forEach(order => {
+              setNewOrderIds(prev => new Set([...prev, order.id]))
+            })
+            if (soundEnabled && audioReady) {
+              playAlertSound()
+            }
+          }
+          
+          setOrders(parsed)
         }
-        
-        setOrders(parsed)
+      } catch (error) {
+        console.error('Polling error:', error)
       }
     }
-
-    // Initial load of known IDs
-    orders.forEach(o => knownOrderIdsRef.current.add(o.id))
 
     // Poll every 3 seconds
     const pollInterval = setInterval(pollOrders, 3000)
@@ -120,73 +150,107 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return () => {
       clearInterval(pollInterval)
     }
-  }, [params.tenant, soundEnabled, orders.length])
+  }, [params.tenant, soundEnabled, audioReady, initialLoadDone])
 
   async function loadData() {
-    const settings = await getTenantSettings(params.tenant)
-    if (settings) {
-      setBusiness({
-        business_name: settings.business_name,
-        primary_color: settings.primary_color || '#FF6B35',
-      })
-    }
+    try {
+      const settings = await getTenantSettings(params.tenant)
+      if (settings) {
+        setBusiness({
+          business_name: settings.business_name,
+          primary_color: settings.primary_color || '#FF6B35',
+        })
+      }
 
-    if (!supabase) {
-      setLoading(false)
-      return
-    }
+      if (!supabase) {
+        setLoading(false)
+        setInitialLoadDone(true)
+        return
+      }
 
-    // Only fetch confirmed orders (ready to be made)
-    const { data } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .eq('status', 'confirmed')
-      .order('created_at', { ascending: true }) // Oldest first (FIFO)
-      .limit(50)
+      // Only fetch confirmed orders (ready to be made)
+      const { data } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('tenant_slug', params.tenant)
+        .eq('status', 'confirmed')
+        .order('created_at', { ascending: true }) // Oldest first (FIFO)
+        .limit(50)
 
-    if (data) {
-      const parsed = data.map(order => ({
-        ...order,
-        items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
-      }))
-      setOrders(parsed)
+      if (data) {
+        const parsed = data.map(order => ({
+          ...order,
+          items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
+        }))
+        setOrders(parsed)
+        
+        // CRITICAL: Initialize known IDs with ALL current orders
+        parsed.forEach(o => knownOrderIdsRef.current.add(o.id))
+        console.log(`👨‍🍳 Initial load: ${parsed.length} keuken orders`)
+      }
+    } catch (error) {
+      console.error('Error loading data:', error)
     }
 
     setLoading(false)
+    setInitialLoadDone(true)
   }
 
   function initAudio() {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+      }
+      // Resume if suspended (iOS requirement)
+      if (audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume()
+      }
+    } catch (e) {
+      console.error('Audio init error:', e)
     }
   }
 
   function playAlertSound() {
-    if (!audioContextRef.current) initAudio()
-    const ctx = audioContextRef.current
-    if (!ctx) return
+    try {
+      if (!audioContextRef.current) {
+        initAudio()
+      }
+      const ctx = audioContextRef.current
+      if (!ctx) return
 
-    const playTone = (freq: number, start: number, duration: number) => {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.frequency.value = freq
-      osc.type = 'sine'
-      gain.gain.setValueAtTime(0.3, ctx.currentTime + start)
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + duration)
-      osc.start(ctx.currentTime + start)
-      osc.stop(ctx.currentTime + start + duration)
+      // Resume if suspended
+      if (ctx.state === 'suspended') {
+        ctx.resume()
+      }
+
+      const playTone = (freq: number, start: number, duration: number) => {
+        try {
+          const osc = ctx.createOscillator()
+          const gain = ctx.createGain()
+          osc.connect(gain)
+          gain.connect(ctx.destination)
+          osc.frequency.value = freq
+          osc.type = 'sine'
+          gain.gain.setValueAtTime(0.4, ctx.currentTime + start)
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + duration)
+          osc.start(ctx.currentTime + start)
+          osc.stop(ctx.currentTime + start + duration)
+        } catch (e) {
+          // Ignore individual tone errors
+        }
+      }
+
+      // Kitchen bell sound - 2 tones
+      playTone(1200, 0, 0.1)
+      playTone(1500, 0.1, 0.15)
+    } catch (e) {
+      console.error('Sound error:', e)
     }
-
-    // Kitchen bell sound
-    playTone(1200, 0, 0.1)
-    playTone(1500, 0.1, 0.15)
   }
 
   function enableSound() {
     initAudio()
+    setAudioReady(true)
     playAlertSound()
     setSoundEnabled(true)
     localStorage.setItem(`keuken_sound_${params.tenant}`, 'true')

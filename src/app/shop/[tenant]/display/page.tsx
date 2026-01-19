@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings, updateOrderStatus } from '@/lib/admin-api'
+import { getTenantSettings, updateOrderStatus, TenantSettings } from '@/lib/admin-api'
 import Link from 'next/link'
 
 interface Order {
@@ -33,6 +33,11 @@ interface BusinessSettings {
   primary_color: string
   address?: string
   phone?: string
+  email?: string
+  postal_code?: string
+  city?: string
+  btw_number?: string
+  btw_percentage?: number
 }
 
 const REJECTION_REASONS = [
@@ -51,13 +56,34 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [rejectReason, setRejectReason] = useState('')
   const [rejectNotes, setRejectNotes] = useState('')
   const [business, setBusiness] = useState<BusinessSettings | null>(null)
+  const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
   const [loading, setLoading] = useState(true)
+  const [initialLoadDone, setInitialLoadDone] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [soundEnabled, setSoundEnabled] = useState(false)
+  const [audioReady, setAudioReady] = useState(false)
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
   const audioContextRef = useRef<AudioContext | null>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  
+  // CRITICAL: Track ALL known order IDs to prevent false alerts
+  const knownOrderIdsRef = useRef<Set<string>>(new Set())
+  // Track which emails have been sent (persisted in sessionStorage)
+  const sentEmailsRef = useRef<Set<string>>(new Set())
+
+  // Initialize sent emails from sessionStorage
+  useEffect(() => {
+    const stored = sessionStorage.getItem(`sent_emails_${params.tenant}`)
+    if (stored) {
+      try {
+        sentEmailsRef.current = new Set(JSON.parse(stored))
+      } catch (e) {
+        sentEmailsRef.current = new Set()
+      }
+    }
+  }, [params.tenant])
 
   // Update time every second
   useEffect(() => {
@@ -65,7 +91,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     return () => clearInterval(interval)
   }, [])
 
-  // Load initial data
+  // Load initial data - CRITICAL: Initialize known IDs BEFORE polling starts
   useEffect(() => {
     loadData()
     const savedSound = localStorage.getItem(`shop_display_sound_${params.tenant}`)
@@ -74,33 +100,34 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }
   }, [params.tenant])
 
-  // Auto-enable audio on first user interaction (browser security requirement)
+  // Initialize audio on first user interaction (browser requirement)
   useEffect(() => {
     const handleFirstInteraction = () => {
-      if (!audioContextRef.current) {
-        initAudio()
-        // If sound was previously enabled, it's now fully active
-        if (localStorage.getItem(`shop_display_sound_${params.tenant}`) === 'true') {
-          setSoundEnabled(true)
-        }
-      }
-      // Remove listeners after first interaction
+      initAudio()
+      setAudioReady(true)
       document.removeEventListener('click', handleFirstInteraction)
       document.removeEventListener('touchstart', handleFirstInteraction)
+      document.removeEventListener('keydown', handleFirstInteraction)
     }
 
     document.addEventListener('click', handleFirstInteraction)
     document.addEventListener('touchstart', handleFirstInteraction)
+    document.addEventListener('keydown', handleFirstInteraction)
 
     return () => {
       document.removeEventListener('click', handleFirstInteraction)
       document.removeEventListener('touchstart', handleFirstInteraction)
+      document.removeEventListener('keydown', handleFirstInteraction)
     }
-  }, [params.tenant])
+  }, [])
 
-  // Continuous alert for new orders
+  // Continuous alert sound for new orders - plays every 3 seconds
   useEffect(() => {
-    if (newOrderIds.size > 0 && soundEnabled) {
+    if (newOrderIds.size > 0 && soundEnabled && audioReady) {
+      // Play immediately
+      playAlertSound()
+      
+      // Then repeat every 3 seconds
       alertIntervalRef.current = setInterval(() => {
         playAlertSound()
       }, 3000)
@@ -116,16 +143,89 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         clearInterval(alertIntervalRef.current)
       }
     }
-  }, [newOrderIds.size, soundEnabled])
+  }, [newOrderIds.size, soundEnabled, audioReady])
 
-  // Polling fallback - check for new orders every 5 seconds
-  // (Realtime often fails, this is more reliable)
-  const knownOrderIdsRef = useRef<Set<string>>(new Set())
-  
+  // MAIN POLLING - Check for new orders every 3 seconds
+  // Only starts AFTER initial load is complete
   useEffect(() => {
-    if (!supabase) return
+    if (!supabase || !initialLoadDone) return
 
     const pollOrders = async () => {
+      try {
+        const { data } = await supabase
+          .from('orders')
+          .select('*')
+          .eq('tenant_slug', params.tenant)
+          .order('created_at', { ascending: false })
+          .limit(100)
+
+        if (data) {
+          const parsed = data.map(order => ({
+            ...order,
+            items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
+          }))
+          
+          // Find TRULY new orders (not in known set AND status is 'new')
+          const trulyNewOrders = parsed.filter(o => 
+            !knownOrderIdsRef.current.has(o.id) && 
+            o.status.toLowerCase() === 'new'
+          )
+          
+          // Add ALL current order IDs to known set
+          parsed.forEach(o => knownOrderIdsRef.current.add(o.id))
+          
+          // Alert for truly new orders
+          if (trulyNewOrders.length > 0) {
+            console.log(`🔔 ${trulyNewOrders.length} NIEUWE bestelling(en) gedetecteerd!`)
+            trulyNewOrders.forEach(order => {
+              setNewOrderIds(prev => new Set([...prev, order.id]))
+            })
+            if (soundEnabled && audioReady) {
+              playAlertSound()
+            }
+          }
+          
+          setOrders(parsed)
+        }
+      } catch (error) {
+        console.error('Polling error:', error)
+      }
+    }
+
+    // Poll every 3 seconds
+    pollingIntervalRef.current = setInterval(pollOrders, 3000)
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current)
+      }
+    }
+  }, [params.tenant, soundEnabled, audioReady, initialLoadDone])
+
+  async function loadData() {
+    try {
+      const settings = await getTenantSettings(params.tenant)
+      if (settings) {
+        setTenantSettings(settings)
+        setBusiness({
+          business_name: settings.business_name,
+          primary_color: settings.primary_color || '#FF6B35',
+          address: settings.address,
+          phone: settings.phone,
+          email: settings.email,
+          postal_code: settings.postal_code,
+          city: settings.city,
+          btw_number: settings.btw_number,
+          btw_percentage: settings.btw_percentage,
+        })
+      }
+
+      if (!supabase) {
+        setLoading(false)
+        setInitialLoadDone(true)
+        return
+      }
+
       const { data } = await supabase
         .from('orders')
         .select('*')
@@ -138,141 +238,157 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           ...order,
           items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
         }))
-        
-        // Check for NEW orders that we haven't seen before
-        const currentIds = new Set(parsed.map(o => o.id))
-        const newOrders = parsed.filter(o => 
-          !knownOrderIdsRef.current.has(o.id) && 
-          o.status.toLowerCase() === 'new'
-        )
-        
-        // Update known IDs
-        knownOrderIdsRef.current = currentIds
-        
-        // If there are new orders, alert!
-        if (newOrders.length > 0 && knownOrderIdsRef.current.size > 0) {
-          newOrders.forEach(order => {
-            setNewOrderIds(prev => new Set([...prev, order.id]))
-          })
-          if (soundEnabled) playAlertSound()
-        }
-        
         setOrders(parsed)
+        
+        // CRITICAL: Initialize known IDs with ALL current orders
+        // This prevents false "new order" alerts on page load
+        parsed.forEach(o => knownOrderIdsRef.current.add(o.id))
+        console.log(`📋 Initial load: ${parsed.length} orders, ${knownOrderIdsRef.current.size} known IDs`)
       }
-    }
-
-    // Initial load of known IDs
-    orders.forEach(o => knownOrderIdsRef.current.add(o.id))
-
-    // Poll every 5 seconds
-    const pollInterval = setInterval(pollOrders, 5000)
-
-    return () => {
-      clearInterval(pollInterval)
-    }
-  }, [params.tenant, soundEnabled, orders.length])
-
-  async function loadData() {
-    const settings = await getTenantSettings(params.tenant)
-    if (settings) {
-      setBusiness({
-        business_name: settings.business_name,
-        primary_color: settings.primary_color || '#FF6B35',
-        address: settings.address,
-        phone: settings.phone,
-      })
-    }
-
-    if (!supabase) {
-      setLoading(false)
-      return
-    }
-
-    const { data } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .order('created_at', { ascending: false })
-      .limit(100)
-
-    if (data) {
-      const parsed = data.map(order => ({
-        ...order,
-        items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
-      }))
-      setOrders(parsed)
+    } catch (error) {
+      console.error('Error loading data:', error)
     }
 
     setLoading(false)
+    setInitialLoadDone(true)
   }
 
+  // AUDIO FUNCTIONS - BULLETPROOF
   function initAudio() {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+      }
+      // Resume if suspended (iOS requirement)
+      if (audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume()
+      }
+    } catch (e) {
+      console.error('Audio init error:', e)
     }
   }
 
   function playAlertSound() {
-    if (!audioContextRef.current) initAudio()
-    const ctx = audioContextRef.current
-    if (!ctx) return
+    try {
+      if (!audioContextRef.current) {
+        initAudio()
+      }
+      const ctx = audioContextRef.current
+      if (!ctx) return
 
-    const playTone = (freq: number, start: number, duration: number) => {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.frequency.value = freq
-      osc.type = 'sine'
-      gain.gain.setValueAtTime(0.4, ctx.currentTime + start)
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + duration)
-      osc.start(ctx.currentTime + start)
-      osc.stop(ctx.currentTime + start + duration)
+      // Resume if suspended
+      if (ctx.state === 'suspended') {
+        ctx.resume()
+      }
+
+      const playTone = (freq: number, start: number, duration: number) => {
+        try {
+          const osc = ctx.createOscillator()
+          const gain = ctx.createGain()
+          osc.connect(gain)
+          gain.connect(ctx.destination)
+          osc.frequency.value = freq
+          osc.type = 'sine'
+          gain.gain.setValueAtTime(0.5, ctx.currentTime + start)
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + duration)
+          osc.start(ctx.currentTime + start)
+          osc.stop(ctx.currentTime + start + duration)
+        } catch (e) {
+          // Ignore individual tone errors
+        }
+      }
+
+      // Play 3-tone alert
+      playTone(880, 0, 0.15)
+      playTone(1100, 0.15, 0.15)
+      playTone(1320, 0.3, 0.3)
+    } catch (e) {
+      console.error('Sound error:', e)
     }
-
-    playTone(880, 0, 0.15)
-    playTone(1100, 0.15, 0.15)
-    playTone(1320, 0.3, 0.3)
   }
 
   function enableSound() {
     initAudio()
+    setAudioReady(true)
     playAlertSound()
     setSoundEnabled(true)
     localStorage.setItem(`shop_display_sound_${params.tenant}`, 'true')
   }
 
-  const sentEmailsRef = useRef<Set<string>>(new Set())
-
+  // EMAIL FUNCTION - BULLETPROOF with all required business info
   async function sendOrderStatusEmail(order: Order, status: string, rejectionReason?: string, rejectionNotes?: string) {
-    if (!order.customer_email) return
-    
-    // Prevent duplicate emails
-    const emailKey = `${order.id}-${status}`
-    if (sentEmailsRef.current.has(emailKey)) {
-      console.log('Email already sent for this order/status:', emailKey)
+    // Skip if no email
+    if (!order.customer_email) {
+      console.log('⚠️ No customer email - skipping notification')
       return
     }
+    
+    // Prevent duplicate emails using sessionStorage
+    const emailKey = `${order.id}-${status}`
+    if (sentEmailsRef.current.has(emailKey)) {
+      console.log('📧 Email already sent:', emailKey)
+      return
+    }
+    
+    // Mark as sent BEFORE trying (prevents duplicates on retry)
     sentEmailsRef.current.add(emailKey)
     
+    // Persist to sessionStorage
     try {
-      await fetch('/api/send-order-status', {
+      sessionStorage.setItem(
+        `sent_emails_${params.tenant}`, 
+        JSON.stringify([...sentEmailsRef.current])
+      )
+    } catch (e) {
+      // SessionStorage might be full or disabled
+    }
+    
+    console.log(`📧 Sending ${status} email to ${order.customer_email}...`)
+    
+    try {
+      const response = await fetch('/api/send-order-status', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          // Customer info
           customerEmail: order.customer_email,
           customerName: order.customer_name,
+          customerPhone: order.customer_phone,
+          customerAddress: order.delivery_address,
+          // Order info
           orderNumber: order.order_number,
+          orderType: order.order_type,
           status,
-          businessName: business?.business_name,
-          businessEmail: business?.phone,
+          // Business info (REQUIRED for Belgian law)
+          businessName: tenantSettings?.business_name || business?.business_name || 'Restaurant',
+          businessEmail: tenantSettings?.email || business?.email,
+          businessPhone: tenantSettings?.phone || business?.phone,
+          businessAddress: tenantSettings?.address || business?.address,
+          businessPostalCode: tenantSettings?.postal_code || business?.postal_code,
+          businessCity: tenantSettings?.city || business?.city,
+          businessBtwNumber: tenantSettings?.btw_number || business?.btw_number,
+          // Order details
+          items: order.items,
+          subtotal: order.subtotal,
+          deliveryFee: order.delivery_fee,
+          discount: order.discount_amount,
+          total: order.total,
+          btwPercentage: tenantSettings?.btw_percentage || 6,
+          // Rejection info
           rejectionReason,
           rejectionNotes,
-          total: order.total,
         }),
       })
+      
+      if (response.ok) {
+        console.log(`✅ Email sent successfully to ${order.customer_email}`)
+      } else {
+        const errorText = await response.text()
+        console.error(`❌ Email API error: ${response.status} - ${errorText}`)
+      }
     } catch (error) {
-      console.error('Failed to send status email:', error)
+      console.error('❌ Failed to send email:', error)
+      // Don't remove from sentEmailsRef - we don't want to spam on retry
     }
   }
 

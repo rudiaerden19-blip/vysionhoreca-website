@@ -116,6 +116,42 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     }
   }, [params.tenant])
 
+  // Auto-initialize audio on first user interaction (browser security requirement)
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      // Initialize audio context
+      if (!audioContextRef.current) {
+        try {
+          audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
+        } catch (e) {
+          console.error('Audio init error:', e)
+        }
+      }
+      // Resume if suspended
+      if (audioContextRef.current?.state === 'suspended') {
+        audioContextRef.current.resume()
+      }
+      // If sound was previously enabled, mark audio as ready
+      if (localStorage.getItem(`sound_enabled_${params.tenant}`) === 'true') {
+        setAudioReady(true)
+      }
+      // Remove listeners after first interaction
+      document.removeEventListener('click', handleFirstInteraction)
+      document.removeEventListener('touchstart', handleFirstInteraction)
+      document.removeEventListener('keydown', handleFirstInteraction)
+    }
+
+    document.addEventListener('click', handleFirstInteraction)
+    document.addEventListener('touchstart', handleFirstInteraction)
+    document.addEventListener('keydown', handleFirstInteraction)
+
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction)
+      document.removeEventListener('touchstart', handleFirstInteraction)
+      document.removeEventListener('keydown', handleFirstInteraction)
+    }
+  }, [params.tenant])
+
   // Helper: parse items from JSONB or array
   const parseItems = (order: Order): OrderItemJson[] => {
     if (!order.items) return []
@@ -205,7 +241,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   // Play repeating sound when there are new orders
   useEffect(() => {
-    if (hasNewOrders && soundEnabled) {
+    // Only play if sound is enabled AND audio is ready (user has interacted)
+    if (hasNewOrders && soundEnabled && audioReady) {
       // Play immediately
       playSound()
       
@@ -225,7 +262,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         clearInterval(audioIntervalRef.current)
       }
     }
-  }, [hasNewOrders, soundEnabled])
+  }, [hasNewOrders, soundEnabled, audioReady])
 
   // Request notification permission
   useEffect(() => {
