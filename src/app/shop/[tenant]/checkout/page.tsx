@@ -212,20 +212,37 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     
     try {
       // Get next order number for this tenant
-      const { data: lastOrder } = await supabase
+      // We need the HIGHEST valid order number, not just the most recent
+      const { data: orders } = await supabase
         .from('orders')
         .select('order_number')
         .eq('tenant_slug', params.tenant)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
+        .order('order_number', { ascending: false })
+        .limit(10)
       
-      // Make sure order number is reasonable (between 1001 and 999999)
-      let lastNum = lastOrder?.order_number || 1000
-      if (typeof lastNum !== 'number' || lastNum < 1000 || lastNum > 999999) {
-        lastNum = 1000
+      // Find the highest VALID order number (must be a reasonable integer)
+      let highestValidNum = 1000
+      if (orders && orders.length > 0) {
+        for (const order of orders) {
+          // Parse as integer, handle strings and numbers
+          const num = typeof order.order_number === 'string' 
+            ? parseInt(order.order_number, 10) 
+            : Number(order.order_number)
+          
+          // Only accept reasonable order numbers (1001-9999)
+          if (!isNaN(num) && num >= 1001 && num <= 9999 && num > highestValidNum) {
+            highestValidNum = num
+          }
+        }
       }
-      const nextOrderNumber = lastNum + 1
+      
+      // Next order number (max 9999, then wrap to 1001)
+      let nextOrderNumber = highestValidNum + 1
+      if (nextOrderNumber > 9999) {
+        nextOrderNumber = 1001
+      }
+      
+      console.log(`📦 Nieuw bestelnummer: ${nextOrderNumber} (hoogste gevonden: ${highestValidNum})`)
 
       // Create order (business_id is optional - we use tenant_slug for identification)
       const { data: order, error: orderError } = await supabase
