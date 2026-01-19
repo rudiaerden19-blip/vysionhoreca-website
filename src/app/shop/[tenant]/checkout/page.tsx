@@ -280,6 +280,9 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       setOrderNumber(order.order_number)
       setOrderSuccess(true)
       
+      // Scroll to top for mobile (important!)
+      window.scrollTo({ top: 0, behavior: 'instant' })
+      
     } catch (error) {
       console.error('Error submitting order:', error)
       alert('Er ging iets mis. Probeer opnieuw.')
@@ -304,11 +307,11 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   // Success screen - Wacht op bevestiging
   if (orderSuccess) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-gray-50 flex items-center justify-center p-4 overflow-auto z-50">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-xl"
+          className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-xl my-auto"
         >
           <motion.div
             initial={{ scale: 0 }}
