@@ -102,9 +102,17 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   // Initialize audio on first user interaction (browser requirement)
   useEffect(() => {
-    const handleFirstInteraction = () => {
-      initAudio()
-      setAudioReady(true)
+    const handleFirstInteraction = async () => {
+      try {
+        const AC = window.AudioContext || (window as any).webkitAudioContext
+        if (AC && !audioContextRef.current) {
+          audioContextRef.current = new AC()
+          await audioContextRef.current.resume()
+        }
+        setAudioReady(true)
+      } catch (e) {
+        console.error('Audio init error:', e)
+      }
       document.removeEventListener('click', handleFirstInteraction)
       document.removeEventListener('touchstart', handleFirstInteraction)
       document.removeEventListener('keydown', handleFirstInteraction)
