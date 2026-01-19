@@ -71,7 +71,30 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     const savedSound = localStorage.getItem(`shop_display_sound_${params.tenant}`)
     if (savedSound === 'true') {
       setSoundEnabled(true)
-      initAudio()
+    }
+  }, [params.tenant])
+
+  // Auto-enable audio on first user interaction (browser security requirement)
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      if (!audioContextRef.current) {
+        initAudio()
+        // If sound was previously enabled, it's now fully active
+        if (localStorage.getItem(`shop_display_sound_${params.tenant}`) === 'true') {
+          setSoundEnabled(true)
+        }
+      }
+      // Remove listeners after first interaction
+      document.removeEventListener('click', handleFirstInteraction)
+      document.removeEventListener('touchstart', handleFirstInteraction)
+    }
+
+    document.addEventListener('click', handleFirstInteraction)
+    document.addEventListener('touchstart', handleFirstInteraction)
+
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction)
+      document.removeEventListener('touchstart', handleFirstInteraction)
     }
   }, [params.tenant])
 
