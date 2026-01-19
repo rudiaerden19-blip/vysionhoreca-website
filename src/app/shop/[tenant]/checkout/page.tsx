@@ -216,11 +216,16 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
         .from('orders')
         .select('order_number')
         .eq('tenant_slug', params.tenant)
-        .order('order_number', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(1)
         .single()
       
-      const nextOrderNumber = (lastOrder?.order_number || 1000) + 1
+      // Make sure order number is reasonable (between 1001 and 999999)
+      let lastNum = lastOrder?.order_number || 1000
+      if (typeof lastNum !== 'number' || lastNum < 1000 || lastNum > 999999) {
+        lastNum = 1000
+      }
+      const nextOrderNumber = lastNum + 1
 
       // Create order (business_id is optional - we use tenant_slug for identification)
       const { data: order, error: orderError } = await supabase
