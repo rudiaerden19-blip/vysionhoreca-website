@@ -349,13 +349,30 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              // Customer info
               customerEmail: order.customer_email,
               customerName: order.customer_name,
+              customerPhone: order.customer_phone,
+              customerAddress: order.customer_address || order.delivery_address,
+              // Order info
               orderNumber: order.order_number,
+              orderType: order.order_type,
               status: 'ready',
+              // Business info (verplicht voor Belgische wetgeving)
               businessName: tenantSettings?.business_name || 'Restaurant',
               businessEmail: tenantSettings?.email,
+              businessPhone: tenantSettings?.phone,
+              businessAddress: tenantSettings?.address,
+              businessPostalCode: tenantSettings?.postal_code,
+              businessCity: tenantSettings?.city,
+              businessBtwNumber: tenantSettings?.btw_number,
+              // Order details
+              items: order.items,
+              subtotal: order.subtotal,
+              deliveryFee: order.delivery_fee,
+              discount: order.discount_amount,
               total: order.total,
+              btwPercentage: tenantSettings?.btw_percentage || 21,
             }),
           })
         } catch (e) {
@@ -376,20 +393,37 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         o.id === order.id ? { ...o, status: 'confirmed', confirmed_at: new Date().toISOString() } : o
       ))
       
-      // Send confirmation email to customer
+      // Send confirmation email to customer with full order details
       if (order.customer_email) {
         try {
           await fetch('/api/send-order-status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              // Customer info
               customerEmail: order.customer_email,
               customerName: order.customer_name,
+              customerPhone: order.customer_phone,
+              customerAddress: order.customer_address || order.delivery_address,
+              // Order info
               orderNumber: order.order_number,
+              orderType: order.order_type,
               status: 'confirmed',
+              // Business info (verplicht voor Belgische wetgeving)
               businessName: tenantSettings?.business_name || 'Restaurant',
               businessEmail: tenantSettings?.email,
+              businessPhone: tenantSettings?.phone,
+              businessAddress: tenantSettings?.address,
+              businessPostalCode: tenantSettings?.postal_code,
+              businessCity: tenantSettings?.city,
+              businessBtwNumber: tenantSettings?.btw_number,
+              // Order details
+              items: order.items,
+              subtotal: order.subtotal,
+              deliveryFee: order.delivery_fee,
+              discount: order.discount_amount,
               total: order.total,
+              btwPercentage: tenantSettings?.btw_percentage || 21,
             }),
           })
         } catch (e) {
@@ -437,19 +471,30 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         } : o
       ))
       
-      // Send rejection email to customer
+      // Send rejection email to customer with business details
       if (rejectingOrder.customer_email) {
         try {
           await fetch('/api/send-order-status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              // Customer info
               customerEmail: rejectingOrder.customer_email,
               customerName: rejectingOrder.customer_name,
+              customerPhone: rejectingOrder.customer_phone,
+              // Order info
               orderNumber: rejectingOrder.order_number,
+              orderType: rejectingOrder.order_type,
               status: 'rejected',
+              // Business info (verplicht voor Belgische wetgeving)
               businessName: tenantSettings?.business_name || 'Restaurant',
               businessEmail: tenantSettings?.email,
+              businessPhone: tenantSettings?.phone,
+              businessAddress: tenantSettings?.address,
+              businessPostalCode: tenantSettings?.postal_code,
+              businessCity: tenantSettings?.city,
+              businessBtwNumber: tenantSettings?.btw_number,
+              // Rejection details
               rejectionReason: rejectionReason,
               rejectionNotes: rejectionNotes,
               total: rejectingOrder.total,
