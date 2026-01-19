@@ -265,10 +265,11 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           .eq('code', promoCode.toUpperCase())
       }
       
-      // Add loyalty points if customer is logged in (1 point per euro)
+      // NOTE: Spaarpunten worden pas toegekend na goedkeuring door de zaak!
+      // Dit gebeurt in de admin bestellingen pagina bij handleConfirmOrder
       if (loggedInCustomerId) {
+        // Toon hoeveel punten ze KUNNEN verdienen (nog niet toegekend)
         const points = Math.floor(total)
-        await addLoyaltyPoints(loggedInCustomerId, points, total)
         setEarnedPoints(points)
       }
       
@@ -300,7 +301,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     )
   }
 
-  // Success screen
+  // Success screen - Wacht op bevestiging
   if (orderSuccess) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -313,24 +314,29 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring' }}
-            className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl"
-            style={{ backgroundColor: `${primaryColor}20` }}
+            className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl bg-blue-100"
           >
-            ✅
+            ⏳
           </motion.div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Bestelling geplaatst!</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Bestelling ontvangen!</h1>
           <p className="text-gray-600 mb-6">
-            Je bestelling #{orderNumber} is ontvangen en wordt zo snel mogelijk klaargemaakt.
+            Je bestelling #{orderNumber} is ontvangen. Je krijgt een bevestigingsmail zodra de zaak je bestelling heeft goedgekeurd.
           </p>
+          
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
+            <p className="text-blue-800 font-medium mb-2">📱 Wacht op bevestiging</p>
+            <p className="text-blue-600 text-sm">De zaak bekijkt je bestelling en stuurt je een e-mail met de bevestiging of als er een probleem is.</p>
+          </div>
           
           <div className="bg-gray-50 rounded-2xl p-4 mb-6">
             <p className="text-gray-500 text-sm mb-1">Bestelnummer</p>
             <p className="text-3xl font-bold" style={{ color: primaryColor }}>#{orderNumber}</p>
           </div>
           
-          {earnedPoints > 0 && (
+          {earnedPoints > 0 && loggedInCustomerId && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-6">
-              <p className="text-yellow-800 font-medium">🎁 Je hebt {earnedPoints} spaarpunten verdiend!</p>
+              <p className="text-yellow-800 font-medium">🎁 Je kunt {earnedPoints} spaarpunten verdienen!</p>
+              <p className="text-yellow-600 text-sm">Punten worden toegekend na goedkeuring van je bestelling.</p>
             </div>
           )}
           

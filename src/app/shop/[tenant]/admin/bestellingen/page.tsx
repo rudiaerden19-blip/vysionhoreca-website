@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getOrders, updateOrderStatus, confirmOrder, rejectOrder, Order, getTenantSettings, TenantSettings } from '@/lib/admin-api'
+import { getOrders, updateOrderStatus, confirmOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 
 // Parse items from JSONB
@@ -337,9 +337,31 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setUpdatingId(orderId)
     const success = await updateOrderStatus(orderId, newStatus)
     if (success) {
+      const order = orders.find(o => o.id === orderId)
       setOrders(prev => prev.map(o => 
         o.id === orderId ? { ...o, status: newStatus } : o
       ))
+      
+      // Send email when order is ready for pickup
+      if (newStatus === 'ready' && order?.customer_email) {
+        try {
+          await fetch('/api/send-order-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              customerEmail: order.customer_email,
+              customerName: order.customer_name,
+              orderNumber: order.order_number,
+              status: 'ready',
+              businessName: tenantSettings?.business_name || 'Restaurant',
+              businessEmail: tenantSettings?.email,
+              total: order.total,
+            }),
+          })
+        } catch (e) {
+          console.error('Failed to send ready email:', e)
+        }
+      }
     }
     setUpdatingId(null)
   }
@@ -353,7 +375,48 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       setOrders(prev => prev.map(o => 
         o.id === order.id ? { ...o, status: 'confirmed', confirmed_at: new Date().toISOString() } : o
       ))
-      // TODO: Send confirmation email to customer
+      
+      // Send confirmation email to customer
+      if (order.customer_email) {
+        try {
+          await fetch('/api/send-order-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              customerEmail: order.customer_email,
+              customerName: order.customer_name,
+              orderNumber: order.order_number,
+              status: 'confirmed',
+              businessName: tenantSettings?.business_name || 'Restaurant',
+              businessEmail: tenantSettings?.email,
+              total: order.total,
+            }),
+          })
+        } catch (e) {
+          console.error('Failed to send confirmation email:', e)
+        }
+      }
+      
+      // Add loyalty points NOW (after approval) - 1 point per euro
+      // Find customer by email
+      if (order.customer_email && order.total) {
+        try {
+          const { data: customer } = await supabase
+            .from('shop_customers')
+            .select('id')
+            .eq('tenant_slug', params.tenant)
+            .eq('email', order.customer_email.toLowerCase())
+            .single()
+          
+          if (customer) {
+            const points = Math.floor(order.total)
+            await addLoyaltyPoints(customer.id, points, order.total)
+            console.log(`Added ${points} loyalty points to customer ${customer.id}`)
+          }
+        } catch (e) {
+          console.error('Failed to add loyalty points:', e)
+        }
+      }
     }
     setUpdatingId(null)
   }
@@ -373,7 +436,32 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           rejected_at: new Date().toISOString() 
         } : o
       ))
-      // TODO: Send rejection email to customer
+      
+      // Send rejection email to customer
+      if (rejectingOrder.customer_email) {
+        try {
+          await fetch('/api/send-order-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              customerEmail: rejectingOrder.customer_email,
+              customerName: rejectingOrder.customer_name,
+              orderNumber: rejectingOrder.order_number,
+              status: 'rejected',
+              businessName: tenantSettings?.business_name || 'Restaurant',
+              businessEmail: tenantSettings?.email,
+              rejectionReason: rejectionReason,
+              rejectionNotes: rejectionNotes,
+              total: rejectingOrder.total,
+            }),
+          })
+        } catch (e) {
+          console.error('Failed to send rejection email:', e)
+        }
+      }
+      
+      // NOTE: Geen spaarpunten - die worden pas bij goedkeuring gegeven
+      
       setRejectingOrder(null)
       setRejectionReason('')
       setRejectionNotes('')

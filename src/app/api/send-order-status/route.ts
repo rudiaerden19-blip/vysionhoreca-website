@@ -56,17 +56,21 @@ export async function POST(request: NextRequest) {
         statusEmoji = '❌'
         if (rejectionReason) {
           const reasonLabels: Record<string, string> = {
+            'too_busy': 'We zijn op dit moment te druk',
             'busy': 'We zijn op dit moment te druk',
             'closed': 'We zijn gesloten',
+            'sold_out': 'Product(en) uitverkocht',
             'no_stock': 'Product(en) niet op voorraad',
+            'delivery_unavailable': 'Levering niet beschikbaar voor dit adres',
             'technical': 'Technisch probleem',
             'address': 'Adres niet bezorgbaar',
             'other': 'Andere reden',
           }
-          additionalInfo = `<p style="color: #666;">Reden: ${reasonLabels[rejectionReason] || rejectionReason}</p>`
+          additionalInfo = `<p style="color: #666; margin-top: 15px;"><strong>Reden:</strong> ${reasonLabels[rejectionReason] || rejectionReason}</p>`
           if (rejectionNotes) {
-            additionalInfo += `<p style="color: #666;">${rejectionNotes}</p>`
+            additionalInfo += `<p style="color: #666; font-style: italic;">${rejectionNotes}</p>`
           }
+          additionalInfo += `<p style="color: #666; margin-top: 15px;">Je hebt niets betaald. Probeer het later opnieuw of neem contact op met de zaak.</p>`
         }
         break
       default:
