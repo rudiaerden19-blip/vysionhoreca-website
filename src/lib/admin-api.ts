@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { cache, CACHE_TTL, cacheKey } from './cache'
 
 // =====================================================
 // TENANT SETTINGS
@@ -61,17 +62,23 @@ export interface TenantSettings {
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {
-  const { data, error } = await supabase
-    .from('tenant_settings')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .single()
-  
-  if (error) {
-    console.error('Error fetching tenant settings:', error)
-    return null
-  }
-  return data
+  return cache.getOrFetch(
+    cacheKey('tenant_settings', tenantSlug),
+    async () => {
+      const { data, error } = await supabase
+        .from('tenant_settings')
+        .select('*')
+        .eq('tenant_slug', tenantSlug)
+        .single()
+      
+      if (error) {
+        console.error('Error fetching tenant settings:', error)
+        return null
+      }
+      return data
+    },
+    CACHE_TTL.TENANT_SETTINGS
+  )
 }
 
 export async function saveTenantSettings(settings: TenantSettings): Promise<boolean> {
@@ -125,6 +132,9 @@ export async function saveTenantSettings(settings: TenantSettings): Promise<bool
       return false
     }
   }
+  
+  // Invalidate cache after successful save
+  cache.invalidate(cacheKey('tenant_settings', settings.tenant_slug))
   return true
 }
 
@@ -144,17 +154,23 @@ export interface OpeningHour {
 }
 
 export async function getOpeningHours(tenantSlug: string): Promise<OpeningHour[]> {
-  const { data, error } = await supabase
-    .from('opening_hours')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .order('day_of_week')
-  
-  if (error) {
-    console.error('Error fetching opening hours:', error)
-    return []
-  }
-  return data || []
+  return cache.getOrFetch(
+    cacheKey('opening_hours', tenantSlug),
+    async () => {
+      const { data, error } = await supabase
+        .from('opening_hours')
+        .select('*')
+        .eq('tenant_slug', tenantSlug)
+        .order('day_of_week')
+      
+      if (error) {
+        console.error('Error fetching opening hours:', error)
+        return []
+      }
+      return data || []
+    },
+    CACHE_TTL.OPENING_HOURS
+  )
 }
 
 export async function saveOpeningHours(hours: OpeningHour[]): Promise<boolean> {
@@ -277,17 +293,23 @@ export interface MenuCategory {
 }
 
 export async function getMenuCategories(tenantSlug: string): Promise<MenuCategory[]> {
-  const { data, error } = await supabase
-    .from('menu_categories')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .order('sort_order')
-  
-  if (error) {
-    console.error('Error fetching menu categories:', error)
-    return []
-  }
-  return data || []
+  return cache.getOrFetch(
+    cacheKey('menu_categories', tenantSlug),
+    async () => {
+      const { data, error } = await supabase
+        .from('menu_categories')
+        .select('*')
+        .eq('tenant_slug', tenantSlug)
+        .order('sort_order')
+      
+      if (error) {
+        console.error('Error fetching menu categories:', error)
+        return []
+      }
+      return data || []
+    },
+    CACHE_TTL.MENU_CATEGORIES
+  )
 }
 
 export async function saveMenuCategory(category: MenuCategory): Promise<MenuCategory | null> {
@@ -337,17 +359,23 @@ export interface MenuProduct {
 }
 
 export async function getMenuProducts(tenantSlug: string): Promise<MenuProduct[]> {
-  const { data, error } = await supabase
-    .from('menu_products')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .order('sort_order')
-  
-  if (error) {
-    console.error('Error fetching menu products:', error)
-    return []
-  }
-  return data || []
+  return cache.getOrFetch(
+    cacheKey('menu_products', tenantSlug),
+    async () => {
+      const { data, error } = await supabase
+        .from('menu_products')
+        .select('*')
+        .eq('tenant_slug', tenantSlug)
+        .order('sort_order')
+      
+      if (error) {
+        console.error('Error fetching menu products:', error)
+        return []
+      }
+      return data || []
+    },
+    CACHE_TTL.MENU_PRODUCTS
+  )
 }
 
 export async function saveMenuProduct(product: MenuProduct): Promise<MenuProduct | null> {
@@ -419,17 +447,23 @@ export interface DeliverySettings {
 }
 
 export async function getDeliverySettings(tenantSlug: string): Promise<DeliverySettings | null> {
-  const { data, error } = await supabase
-    .from('delivery_settings')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .single()
-  
-  if (error) {
-    console.error('Error fetching delivery settings:', error)
-    return null
-  }
-  return data
+  return cache.getOrFetch(
+    cacheKey('delivery_settings', tenantSlug),
+    async () => {
+      const { data, error } = await supabase
+        .from('delivery_settings')
+        .select('*')
+        .eq('tenant_slug', tenantSlug)
+        .single()
+      
+      if (error) {
+        console.error('Error fetching delivery settings:', error)
+        return null
+      }
+      return data
+    },
+    CACHE_TTL.DELIVERY_SETTINGS
+  )
 }
 
 export async function saveDeliverySettings(settings: DeliverySettings): Promise<boolean> {
@@ -561,23 +595,31 @@ export async function getProductOptions(tenantSlug: string): Promise<ProductOpti
     return []
   }
 
-  // Fetch choices for each option
-  const optionsWithChoices: ProductOption[] = []
-  for (const option of options || []) {
-    const { data: choices } = await supabase
-      .from('product_option_choices')
-      .select('*')
-      .eq('option_id', option.id)
-      .eq('is_active', true)
-      .order('sort_order')
-    
-    optionsWithChoices.push({
-      ...option,
-      choices: choices || []
-    })
-  }
+  if (!options || options.length === 0) return []
 
-  return optionsWithChoices
+  // OPTIMIZED: Fetch ALL choices in ONE query instead of N queries
+  const optionIds = options.map(o => o.id)
+  const { data: allChoices } = await supabase
+    .from('product_option_choices')
+    .select('*')
+    .in('option_id', optionIds)
+    .eq('is_active', true)
+    .order('sort_order')
+
+  // Group choices by option_id
+  const choicesByOptionId: Record<string, ProductOptionChoice[]> = {}
+  ;(allChoices || []).forEach(choice => {
+    if (!choicesByOptionId[choice.option_id]) {
+      choicesByOptionId[choice.option_id] = []
+    }
+    choicesByOptionId[choice.option_id].push(choice)
+  })
+
+  // Combine options with their choices
+  return options.map(option => ({
+    ...option,
+    choices: choicesByOptionId[option.id] || []
+  }))
 }
 
 export async function saveProductOption(option: ProductOption): Promise<ProductOption | null> {
@@ -726,27 +768,32 @@ export async function getOptionsForProduct(productId: string): Promise<ProductOp
     .eq('is_active', true)
     .order('sort_order')
   
-  if (optionsError || !options) {
+  if (optionsError || !options || options.length === 0) {
     return []
   }
   
-  // Get choices for each option
-  const optionsWithChoices: ProductOption[] = []
-  for (const option of options) {
-    const { data: choices } = await supabase
-      .from('product_option_choices')
-      .select('*')
-      .eq('option_id', option.id)
-      .eq('is_active', true)
-      .order('sort_order')
-    
-    optionsWithChoices.push({
-      ...option,
-      choices: choices || []
-    })
-  }
-  
-  return optionsWithChoices
+  // OPTIMIZED: Fetch ALL choices in ONE query instead of N queries
+  const { data: allChoices } = await supabase
+    .from('product_option_choices')
+    .select('*')
+    .in('option_id', optionIds)
+    .eq('is_active', true)
+    .order('sort_order')
+
+  // Group choices by option_id
+  const choicesByOptionId: Record<string, ProductOptionChoice[]> = {}
+  ;(allChoices || []).forEach(choice => {
+    if (!choicesByOptionId[choice.option_id]) {
+      choicesByOptionId[choice.option_id] = []
+    }
+    choicesByOptionId[choice.option_id].push(choice)
+  })
+
+  // Combine options with their choices
+  return options.map(option => ({
+    ...option,
+    choices: choicesByOptionId[option.id] || []
+  }))
 }
 
 // =====================================================

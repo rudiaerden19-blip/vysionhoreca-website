@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus, TenantSettings } from '@/lib/admin-api'
@@ -65,6 +65,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
   const audioContextRef = useRef<AudioContext | null>(null)
+  const audioElementRef = useRef<HTMLAudioElement | null>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   
@@ -253,36 +254,99 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     setInitialLoadDone(true)
   }
 
-  // AUDIO FUNCTIONS - BULLETPROOF
+  // =========================================
+  // BULLETPROOF AUDIO SYSTEM
+  // Uses Web Audio API + HTML5 Audio fallback
+  // =========================================
+  
+  // Generate a beep sound as base64 data URL
+  const generateBeepDataUrl = useCallback(() => {
+    // Create a simple beep using Web Audio and convert to base64
+    const sampleRate = 44100
+    const duration = 0.5
+    const frequency = 880
+    const samples = sampleRate * duration
+    const buffer = new Float32Array(samples)
+    
+    for (let i = 0; i < samples; i++) {
+      const t = i / sampleRate
+      // Three tone beep
+      let sample = 0
+      if (t < 0.15) {
+        sample = Math.sin(2 * Math.PI * 880 * t) * (1 - t / 0.15) * 0.5
+      } else if (t < 0.3) {
+        sample = Math.sin(2 * Math.PI * 1100 * (t - 0.15)) * (1 - (t - 0.15) / 0.15) * 0.5
+      } else if (t < 0.5) {
+        sample = Math.sin(2 * Math.PI * 1320 * (t - 0.3)) * (1 - (t - 0.3) / 0.2) * 0.5
+      }
+      buffer[i] = sample
+    }
+    
+    // Convert to 16-bit PCM WAV
+    const wavBuffer = new ArrayBuffer(44 + samples * 2)
+    const view = new DataView(wavBuffer)
+    
+    // WAV header
+    const writeString = (offset: number, str: string) => {
+      for (let i = 0; i < str.length; i++) {
+        view.setUint8(offset + i, str.charCodeAt(i))
+      }
+    }
+    
+    writeString(0, 'RIFF')
+    view.setUint32(4, 36 + samples * 2, true)
+    writeString(8, 'WAVE')
+    writeString(12, 'fmt ')
+    view.setUint32(16, 16, true)
+    view.setUint16(20, 1, true)
+    view.setUint16(22, 1, true)
+    view.setUint32(24, sampleRate, true)
+    view.setUint32(28, sampleRate * 2, true)
+    view.setUint16(32, 2, true)
+    view.setUint16(34, 16, true)
+    writeString(36, 'data')
+    view.setUint32(40, samples * 2, true)
+    
+    for (let i = 0; i < samples; i++) {
+      const s = Math.max(-1, Math.min(1, buffer[i]))
+      view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
+    }
+    
+    const blob = new Blob([wavBuffer], { type: 'audio/wav' })
+    return URL.createObjectURL(blob)
+  }, [])
+
   function initAudio() {
     try {
+      // Method 1: Web Audio API
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
       }
-      // Resume if suspended (iOS requirement)
       if (audioContextRef.current.state === 'suspended') {
         audioContextRef.current.resume()
       }
+      
+      // Method 2: HTML5 Audio element as fallback
+      if (!audioElementRef.current) {
+        const beepUrl = generateBeepDataUrl()
+        audioElementRef.current = new Audio(beepUrl)
+        audioElementRef.current.volume = 0.7
+      }
+      
+      console.log('🔊 Audio initialized successfully')
     } catch (e) {
       console.error('Audio init error:', e)
     }
   }
 
   function playAlertSound() {
+    let played = false
+    
+    // Try Web Audio API first
     try {
-      if (!audioContextRef.current) {
-        initAudio()
-      }
       const ctx = audioContextRef.current
-      if (!ctx) return
-
-      // Resume if suspended
-      if (ctx.state === 'suspended') {
-        ctx.resume()
-      }
-
-      const playTone = (freq: number, start: number, duration: number) => {
-        try {
+      if (ctx && ctx.state === 'running') {
+        const playTone = (freq: number, start: number, duration: number) => {
           const osc = ctx.createOscillator()
           const gain = ctx.createGain()
           osc.connect(gain)
@@ -293,26 +357,53 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + duration)
           osc.start(ctx.currentTime + start)
           osc.stop(ctx.currentTime + start + duration)
-        } catch (e) {
-          // Ignore individual tone errors
         }
+        
+        playTone(880, 0, 0.15)
+        playTone(1100, 0.15, 0.15)
+        playTone(1320, 0.3, 0.3)
+        played = true
+        console.log('🔔 Sound played via Web Audio API')
       }
-
-      // Play 3-tone alert
-      playTone(880, 0, 0.15)
-      playTone(1100, 0.15, 0.15)
-      playTone(1320, 0.3, 0.3)
     } catch (e) {
-      console.error('Sound error:', e)
+      console.warn('Web Audio failed:', e)
+    }
+    
+    // Fallback to HTML5 Audio if Web Audio failed
+    if (!played && audioElementRef.current) {
+      try {
+        audioElementRef.current.currentTime = 0
+        audioElementRef.current.play().then(() => {
+          console.log('🔔 Sound played via HTML5 Audio')
+        }).catch(e => {
+          console.warn('HTML5 Audio failed:', e)
+        })
+      } catch (e) {
+        console.warn('HTML5 Audio error:', e)
+      }
     }
   }
 
   function enableSound() {
+    // Initialize both audio systems
     initAudio()
+    
+    // Resume Web Audio context (required after user interaction)
+    if (audioContextRef.current?.state === 'suspended') {
+      audioContextRef.current.resume()
+    }
+    
+    // Pre-load HTML5 audio
+    if (audioElementRef.current) {
+      audioElementRef.current.load()
+    }
+    
     setAudioReady(true)
-    playAlertSound()
     setSoundEnabled(true)
     localStorage.setItem(`shop_display_sound_${params.tenant}`, 'true')
+    
+    // Play test sound to confirm it works
+    setTimeout(() => playAlertSound(), 100)
   }
 
   // EMAIL FUNCTION - BULLETPROOF with all required business info

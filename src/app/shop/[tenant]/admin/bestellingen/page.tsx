@@ -82,8 +82,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     { value: 'other', label: '📝 Andere reden' },
   ]
   
-  // Audio refs
+  // Audio refs - dual system for maximum compatibility
   const audioContextRef = useRef<AudioContext | null>(null)
+  const audioElementRef = useRef<HTMLAudioElement | null>(null)
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
@@ -166,67 +167,103 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     return order.items as OrderItemJson[]
   }
 
-  // SIMPEL GELUID - werkt ALTIJD
-  function playSound() {
+  // =========================================
+  // BULLETPROOF AUDIO SYSTEM
+  // Uses Web Audio API + HTML5 Audio fallback
+  // =========================================
+  
+  // Generate beep as data URL for HTML5 Audio fallback
+  const generateBeepDataUrl = useCallback(() => {
+    const sampleRate = 44100
+    const duration = 0.5
+    const samples = sampleRate * duration
+    const buffer = new Float32Array(samples)
+    
+    for (let i = 0; i < samples; i++) {
+      const t = i / sampleRate
+      let sample = 0
+      if (t < 0.15) sample = Math.sin(2 * Math.PI * 880 * t) * (1 - t / 0.15) * 0.5
+      else if (t < 0.3) sample = Math.sin(2 * Math.PI * 1100 * (t - 0.15)) * (1 - (t - 0.15) / 0.15) * 0.5
+      else if (t < 0.5) sample = Math.sin(2 * Math.PI * 1320 * (t - 0.3)) * (1 - (t - 0.3) / 0.2) * 0.5
+      buffer[i] = sample
+    }
+    
+    const wavBuffer = new ArrayBuffer(44 + samples * 2)
+    const view = new DataView(wavBuffer)
+    const writeString = (offset: number, str: string) => {
+      for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i))
+    }
+    
+    writeString(0, 'RIFF')
+    view.setUint32(4, 36 + samples * 2, true)
+    writeString(8, 'WAVE')
+    writeString(12, 'fmt ')
+    view.setUint32(16, 16, true)
+    view.setUint16(20, 1, true)
+    view.setUint16(22, 1, true)
+    view.setUint32(24, sampleRate, true)
+    view.setUint32(28, sampleRate * 2, true)
+    view.setUint16(32, 2, true)
+    view.setUint16(34, 16, true)
+    writeString(36, 'data')
+    view.setUint32(40, samples * 2, true)
+    
+    for (let i = 0; i < samples; i++) {
+      const s = Math.max(-1, Math.min(1, buffer[i]))
+      view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
+    }
+    
+    return URL.createObjectURL(new Blob([wavBuffer], { type: 'audio/wav' }))
+  }, [])
+
+  function initAudio() {
     try {
-      // Maak audio context aan als die niet bestaat
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
       }
-      
-      const ctx = audioContextRef.current
-      
-      // Resume als suspended (iOS)
-      if (ctx.state === 'suspended') {
-        ctx.resume()
+      if (audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume()
       }
-      
-      // Speel geluid
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
-      osc.connect(gain)
-      gain.connect(ctx.destination)
-      osc.frequency.value = 880
-      osc.type = 'sine'
-      gain.gain.setValueAtTime(0.5, ctx.currentTime)
-      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
-      osc.start(ctx.currentTime)
-      osc.stop(ctx.currentTime + 0.3)
-      
-      // Tweede toon
-      setTimeout(() => {
-        try {
-          const osc2 = ctx.createOscillator()
-          const gain2 = ctx.createGain()
-          osc2.connect(gain2)
-          gain2.connect(ctx.destination)
-          osc2.frequency.value = 1100
-          osc2.type = 'sine'
-          gain2.gain.setValueAtTime(0.5, ctx.currentTime)
-          gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
-          osc2.start(ctx.currentTime)
-          osc2.stop(ctx.currentTime + 0.3)
-        } catch (e) {}
-      }, 150)
-      
-      // Derde toon
-      setTimeout(() => {
-        try {
-          const osc3 = ctx.createOscillator()
-          const gain3 = ctx.createGain()
-          osc3.connect(gain3)
-          gain3.connect(ctx.destination)
-          osc3.frequency.value = 1320
-          osc3.type = 'sine'
-          gain3.gain.setValueAtTime(0.5, ctx.currentTime)
-          gain3.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
-          osc3.start(ctx.currentTime)
-          osc3.stop(ctx.currentTime + 0.3)
-        } catch (e) {}
-      }, 300)
-      
+      if (!audioElementRef.current) {
+        audioElementRef.current = new Audio(generateBeepDataUrl())
+        audioElementRef.current.volume = 0.7
+      }
+      console.log('🔊 Audio initialized')
     } catch (e) {
-      console.log('Geluid fout:', e)
+      console.error('Audio init error:', e)
+    }
+  }
+
+  function playSound() {
+    let played = false
+    
+    // Try Web Audio API first
+    try {
+      const ctx = audioContextRef.current
+      if (ctx && ctx.state === 'running') {
+        const playTone = (freq: number, start: number, dur: number) => {
+          const osc = ctx.createOscillator()
+          const gain = ctx.createGain()
+          osc.connect(gain)
+          gain.connect(ctx.destination)
+          osc.frequency.value = freq
+          osc.type = 'sine'
+          gain.gain.setValueAtTime(0.5, ctx.currentTime + start)
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + dur)
+          osc.start(ctx.currentTime + start)
+          osc.stop(ctx.currentTime + start + dur)
+        }
+        playTone(880, 0, 0.15)
+        playTone(1100, 0.15, 0.15)
+        playTone(1320, 0.3, 0.3)
+        played = true
+      }
+    } catch (e) {}
+    
+    // Fallback to HTML5 Audio
+    if (!played && audioElementRef.current) {
+      audioElementRef.current.currentTime = 0
+      audioElementRef.current.play().catch(() => {})
     }
   }
   
@@ -350,17 +387,22 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant]) // Only restart polling when tenant changes
 
-  // Enable sound on first user interaction (iOS requirement)
+  // Enable sound - initializes audio and plays test sound
   const enableSound = () => {
-    playSound()
+    initAudio()
+    if (audioContextRef.current?.state === 'suspended') {
+      audioContextRef.current.resume()
+    }
     setSoundEnabled(true)
     setAudioReady(true)
     localStorage.setItem(`sound_enabled_${params.tenant}`, 'true')
+    setTimeout(() => playSound(), 100) // Test sound
   }
   
   // Disable sound
   const disableSound = () => {
     setSoundEnabled(false)
+    setAudioReady(false)
     localStorage.setItem(`sound_enabled_${params.tenant}`, 'false')
     if (audioIntervalRef.current) {
       clearInterval(audioIntervalRef.current)
