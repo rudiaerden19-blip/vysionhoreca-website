@@ -217,14 +217,14 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       // Play immediately
       playBeep()
       
-      // Repeat every 2 seconds (faster = more noticeable)
+      // Repeat every 3 seconds
       audioIntervalRef.current = setInterval(() => {
         // Always try to resume before playing
         if (audioContextRef.current?.state === 'suspended') {
           audioContextRef.current.resume()
         }
         playBeep()
-      }, 2000)
+      }, 3000)
       
     } else {
       // Stop sound
