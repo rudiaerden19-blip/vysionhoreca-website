@@ -273,15 +273,17 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
         setEarnedPoints(points)
       }
       
-      // Clear cart
-      localStorage.removeItem(`cart_${params.tenant}`)
-      
-      // Show success
+      // IMPORTANT: Set success state FIRST before anything else
       setOrderNumber(order.order_number)
       setOrderSuccess(true)
       
-      // Scroll to top for mobile (important!)
-      window.scrollTo({ top: 0, behavior: 'instant' })
+      // Then clear cart from localStorage (state blijft zodat we geen "empty cart" zien)
+      localStorage.removeItem(`cart_${params.tenant}`)
+      
+      // Scroll to top for mobile
+      setTimeout(() => {
+        window.scrollTo(0, 0)
+      }, 50)
       
     } catch (error) {
       console.error('Error submitting order:', error)
@@ -304,14 +306,14 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     )
   }
 
-  // Success screen - Wacht op bevestiging
+  // Success screen - Wacht op bevestiging (MOET VOOR empty cart check!)
   if (orderSuccess) {
     return (
-      <div className="fixed inset-0 bg-gray-50 flex items-center justify-center p-4 overflow-auto z-50">
+      <div style={{ minHeight: '100dvh' }} className="bg-gray-50 flex items-center justify-center p-4">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-xl my-auto"
+          className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-xl"
         >
           <motion.div
             initial={{ scale: 0 }}
