@@ -95,61 +95,59 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }
   }, [newOrderIds.size, soundEnabled])
 
-  // Real-time subscription
+  // Polling fallback - check for new orders every 5 seconds
+  // (Realtime often fails, this is more reliable)
+  const knownOrderIdsRef = useRef<Set<string>>(new Set())
+  
   useEffect(() => {
     if (!supabase) return
 
-    const channel = supabase
-      .channel('shop-display-orders')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-          filter: `tenant_slug=eq.${params.tenant}`,
-        },
-        (payload) => {
-          if (payload.eventType === 'INSERT') {
-            const newOrder = payload.new as Order
-            if (typeof newOrder.items === 'string') {
-              try {
-                newOrder.items = JSON.parse(newOrder.items)
-              } catch (e) {
-                newOrder.items = []
-              }
-            }
-            setOrders(prev => [newOrder, ...prev])
-            if (newOrder.status.toLowerCase() === 'new') {
-              setNewOrderIds(prev => new Set([...prev, newOrder.id]))
-              if (soundEnabled) playAlertSound()
-            }
-          } else if (payload.eventType === 'UPDATE') {
-            setOrders(prev => prev.map(o => {
-              if (o.id === payload.new.id) {
-                const updated = { ...o, ...payload.new }
-                if (typeof updated.items === 'string') {
-                  try {
-                    updated.items = JSON.parse(updated.items)
-                  } catch (e) {
-                    updated.items = []
-                  }
-                }
-                return updated
-              }
-              return o
-            }))
-          } else if (payload.eventType === 'DELETE') {
-            setOrders(prev => prev.filter(o => o.id !== payload.old.id))
-          }
+    const pollOrders = async () => {
+      const { data } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('tenant_slug', params.tenant)
+        .order('created_at', { ascending: false })
+        .limit(100)
+
+      if (data) {
+        const parsed = data.map(order => ({
+          ...order,
+          items: typeof order.items === 'string' ? JSON.parse(order.items) : order.items || []
+        }))
+        
+        // Check for NEW orders that we haven't seen before
+        const currentIds = new Set(parsed.map(o => o.id))
+        const newOrders = parsed.filter(o => 
+          !knownOrderIdsRef.current.has(o.id) && 
+          o.status.toLowerCase() === 'new'
+        )
+        
+        // Update known IDs
+        knownOrderIdsRef.current = currentIds
+        
+        // If there are new orders, alert!
+        if (newOrders.length > 0 && knownOrderIdsRef.current.size > 0) {
+          newOrders.forEach(order => {
+            setNewOrderIds(prev => new Set([...prev, order.id]))
+          })
+          if (soundEnabled) playAlertSound()
         }
-      )
-      .subscribe()
+        
+        setOrders(parsed)
+      }
+    }
+
+    // Initial load of known IDs
+    orders.forEach(o => knownOrderIdsRef.current.add(o.id))
+
+    // Poll every 5 seconds
+    const pollInterval = setInterval(pollOrders, 5000)
 
     return () => {
-      supabase.removeChannel(channel)
+      clearInterval(pollInterval)
     }
-  }, [params.tenant, soundEnabled])
+  }, [params.tenant, soundEnabled, orders.length])
 
   async function loadData() {
     const settings = await getTenantSettings(params.tenant)
@@ -221,18 +219,46 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     localStorage.setItem(`shop_display_sound_${params.tenant}`, 'true')
   }
 
+  async function sendOrderStatusEmail(order: Order, status: string, rejectionReason?: string, rejectionNotes?: string) {
+    if (!order.customer_email) return
+    
+    try {
+      await fetch('/api/send-order-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerEmail: order.customer_email,
+          customerName: order.customer_name,
+          orderNumber: order.order_number,
+          status,
+          businessName: business?.business_name,
+          businessEmail: business?.phone, // or email if available
+          rejectionReason,
+          rejectionNotes,
+          total: order.total,
+        }),
+      })
+    } catch (error) {
+      console.error('Failed to send status email:', error)
+    }
+  }
+
   async function handleApprove(order: Order) {
     await updateOrderStatus(order.id, 'confirmed')
+    await sendOrderStatusEmail(order, 'confirmed')
     setNewOrderIds(prev => {
       const next = new Set(prev)
       next.delete(order.id)
       return next
     })
     setSelectedOrder(null)
+    // Force refresh orders
+    loadData()
   }
 
   async function handleReject(order: Order) {
     await updateOrderStatus(order.id, 'rejected', rejectReason, rejectNotes)
+    await sendOrderStatusEmail(order, 'rejected', rejectReason, rejectNotes)
     setNewOrderIds(prev => {
       const next = new Set(prev)
       next.delete(order.id)
@@ -242,6 +268,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     setSelectedOrder(null)
     setRejectReason('')
     setRejectNotes('')
+    // Force refresh orders
+    loadData()
   }
 
   async function handleComplete(order: Order) {

@@ -1197,14 +1197,26 @@ export async function getOrderWithItems(orderId: string): Promise<Order | null> 
   return { ...order, items: items || [] }
 }
 
-export async function updateOrderStatus(id: string, status: Order['status']): Promise<boolean> {
+export async function updateOrderStatus(
+  id: string, 
+  status: Order['status'], 
+  rejectionReason?: string, 
+  rejectionNotes?: string
+): Promise<boolean> {
   if (!supabase) {
     console.error('Supabase not configured')
     return false
   }
   
-  // Only update status - completed_at column may not exist
   const updateData: Record<string, unknown> = { status }
+  
+  // Add rejection fields if provided
+  if (rejectionReason) {
+    updateData.rejection_reason = rejectionReason
+  }
+  if (rejectionNotes) {
+    updateData.rejection_notes = rejectionNotes
+  }
   
   console.log('Updating order status:', id, status)
   
