@@ -667,7 +667,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               )}
               {business.address && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm max-w-full truncate">
-                  <span className="shrink-0">📍</span> <span className="truncate">{business.address}</span>
+                  <span className="shrink-0">📍</span> <span className="truncate">{business.address}{business.postal_code || business.city ? `, ${business.postal_code || ''} ${business.city || ''}`.trim() : ''}</span>
                 </span>
               )}
             </motion.div>
