@@ -254,72 +254,67 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   // =========================================
-  // SIMPLE AUDIO - Direct Web Audio API
+  // ULTRA SIMPLE AUDIO
   // =========================================
   
-  function playAlertSound() {
+  async function playAlertSound() {
     try {
-      // Create fresh audio context each time (most reliable)
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
-      if (!AudioContextClass) {
-        console.warn('Web Audio API not supported')
-        return
-      }
+      // Get or create AudioContext
+      const AC = window.AudioContext || (window as any).webkitAudioContext
+      if (!AC) return
       
-      // Use existing context or create new one
       if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContextClass()
+        audioContextRef.current = new AC()
       }
       
       const ctx = audioContextRef.current
       
-      // Resume if suspended (required on iOS/Safari)
-      if (ctx.state === 'suspended') {
-        ctx.resume()
+      // MUST await resume before playing
+      if (ctx.state !== 'running') {
+        await ctx.resume()
       }
       
-      // Play three ascending tones
-      const playTone = (freq: number, startTime: number, duration: number) => {
-        const oscillator = ctx.createOscillator()
-        const gainNode = ctx.createGain()
-        
-        oscillator.connect(gainNode)
-        gainNode.connect(ctx.destination)
-        
-        oscillator.frequency.value = freq
-        oscillator.type = 'sine'
-        
-        const now = ctx.currentTime
-        gainNode.gain.setValueAtTime(0.5, now + startTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, now + startTime + duration)
-        
-        oscillator.start(now + startTime)
-        oscillator.stop(now + startTime + duration)
+      // Simple beep function
+      const beep = (frequency: number, delay: number, length: number) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.frequency.value = frequency
+        osc.type = 'sine'
+        gain.gain.value = 0.5
+        osc.start(ctx.currentTime + delay)
+        osc.stop(ctx.currentTime + delay + length)
       }
       
-      // Three-tone alert: 880Hz, 1100Hz, 1320Hz
-      playTone(880, 0, 0.15)
-      playTone(1100, 0.15, 0.15)  
-      playTone(1320, 0.3, 0.3)
+      // 3 beeps
+      beep(880, 0, 0.15)
+      beep(1100, 0.2, 0.15)
+      beep(1320, 0.4, 0.2)
       
-      console.log('🔔 Sound played')
+      console.log('🔔 SOUND PLAYED')
     } catch (e) {
       console.error('Audio error:', e)
     }
   }
 
-  function enableSound() {
-    // Create audio context on user interaction (required by browsers)
+  async function enableSound() {
     try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
-      if (AudioContextClass && !audioContextRef.current) {
-        audioContextRef.current = new AudioContextClass()
+      const AC = window.AudioContext || (window as any).webkitAudioContext
+      if (!AC) {
+        alert('Audio niet ondersteund in deze browser')
+        return
       }
       
-      // Resume if suspended
-      if (audioContextRef.current?.state === 'suspended') {
-        audioContextRef.current.resume()
+      // Create context
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AC()
       }
+      
+      // Resume and wait
+      await audioContextRef.current.resume()
+      console.log('🔊 Audio context state:', audioContextRef.current.state)
+      
     } catch (e) {
       console.error('Audio init error:', e)
     }
@@ -328,8 +323,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     setSoundEnabled(true)
     localStorage.setItem(`shop_display_sound_${params.tenant}`, 'true')
     
-    // Play test sound immediately
-    playAlertSound()
+    // Play test sound
+    await playAlertSound()
   }
 
   // EMAIL FUNCTION - BULLETPROOF with all required business info

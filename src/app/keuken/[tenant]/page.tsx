@@ -197,60 +197,58 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   // =========================================
-  // SIMPLE AUDIO - Direct Web Audio API
+  // ULTRA SIMPLE AUDIO
   // =========================================
   
-  function playAlertSound() {
+  async function playAlertSound() {
     try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
-      if (!AudioContextClass) return
+      const AC = window.AudioContext || (window as any).webkitAudioContext
+      if (!AC) return
       
       if (!audioContextRef.current) {
-        audioContextRef.current = new AudioContextClass()
+        audioContextRef.current = new AC()
       }
       
       const ctx = audioContextRef.current
       
-      // Resume if suspended
-      if (ctx.state === 'suspended') {
-        ctx.resume()
+      // MUST await resume
+      if (ctx.state !== 'running') {
+        await ctx.resume()
       }
       
-      // Play kitchen bell sound (2 tones)
-      const playTone = (freq: number, startTime: number, duration: number) => {
-        const oscillator = ctx.createOscillator()
-        const gainNode = ctx.createGain()
-        
-        oscillator.connect(gainNode)
-        gainNode.connect(ctx.destination)
-        
-        oscillator.frequency.value = freq
-        oscillator.type = 'sine'
-        
-        const now = ctx.currentTime
-        gainNode.gain.setValueAtTime(0.5, now + startTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, now + startTime + duration)
-        
-        oscillator.start(now + startTime)
-        oscillator.stop(now + startTime + duration)
+      const beep = (frequency: number, delay: number, length: number) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.frequency.value = frequency
+        osc.type = 'sine'
+        gain.gain.value = 0.5
+        osc.start(ctx.currentTime + delay)
+        osc.stop(ctx.currentTime + delay + length)
       }
       
-      playTone(1200, 0, 0.1)
-      playTone(1500, 0.1, 0.15)
+      // Kitchen bell: 2 tones
+      beep(1200, 0, 0.1)
+      beep(1500, 0.15, 0.15)
     } catch (e) {
       console.error('Audio error:', e)
     }
   }
 
-  function enableSound() {
+  async function enableSound() {
     try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
-      if (AudioContextClass && !audioContextRef.current) {
-        audioContextRef.current = new AudioContextClass()
+      const AC = window.AudioContext || (window as any).webkitAudioContext
+      if (!AC) {
+        alert('Audio niet ondersteund')
+        return
       }
-      if (audioContextRef.current?.state === 'suspended') {
-        audioContextRef.current.resume()
+      
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AC()
       }
+      
+      await audioContextRef.current.resume()
     } catch (e) {
       console.error('Audio init error:', e)
     }
@@ -258,7 +256,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     setAudioReady(true)
     setSoundEnabled(true)
     localStorage.setItem(`keuken_sound_${params.tenant}`, 'true')
-    playAlertSound() // Test sound immediately
+    await playAlertSound()
   }
 
   async function handleReady(order: Order) {
