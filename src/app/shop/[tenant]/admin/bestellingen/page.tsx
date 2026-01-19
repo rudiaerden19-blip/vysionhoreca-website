@@ -82,9 +82,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     { value: 'other', label: '📝 Andere reden' },
   ]
   
-  // Audio refs - dual system for maximum compatibility
+  // Audio refs
   const audioContextRef = useRef<AudioContext | null>(null)
-  const audioElementRef = useRef<HTMLAudioElement | null>(null)
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
@@ -168,102 +167,49 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   }
 
   // =========================================
-  // BULLETPROOF AUDIO SYSTEM
-  // Uses Web Audio API + HTML5 Audio fallback
+  // SIMPLE AUDIO - Direct Web Audio API
   // =========================================
   
-  // Generate beep as data URL for HTML5 Audio fallback
-  const generateBeepDataUrl = useCallback(() => {
-    const sampleRate = 44100
-    const duration = 0.5
-    const samples = sampleRate * duration
-    const buffer = new Float32Array(samples)
-    
-    for (let i = 0; i < samples; i++) {
-      const t = i / sampleRate
-      let sample = 0
-      if (t < 0.15) sample = Math.sin(2 * Math.PI * 880 * t) * (1 - t / 0.15) * 0.5
-      else if (t < 0.3) sample = Math.sin(2 * Math.PI * 1100 * (t - 0.15)) * (1 - (t - 0.15) / 0.15) * 0.5
-      else if (t < 0.5) sample = Math.sin(2 * Math.PI * 1320 * (t - 0.3)) * (1 - (t - 0.3) / 0.2) * 0.5
-      buffer[i] = sample
-    }
-    
-    const wavBuffer = new ArrayBuffer(44 + samples * 2)
-    const view = new DataView(wavBuffer)
-    const writeString = (offset: number, str: string) => {
-      for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i))
-    }
-    
-    writeString(0, 'RIFF')
-    view.setUint32(4, 36 + samples * 2, true)
-    writeString(8, 'WAVE')
-    writeString(12, 'fmt ')
-    view.setUint32(16, 16, true)
-    view.setUint16(20, 1, true)
-    view.setUint16(22, 1, true)
-    view.setUint32(24, sampleRate, true)
-    view.setUint32(28, sampleRate * 2, true)
-    view.setUint16(32, 2, true)
-    view.setUint16(34, 16, true)
-    writeString(36, 'data')
-    view.setUint32(40, samples * 2, true)
-    
-    for (let i = 0; i < samples; i++) {
-      const s = Math.max(-1, Math.min(1, buffer[i]))
-      view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
-    }
-    
-    return URL.createObjectURL(new Blob([wavBuffer], { type: 'audio/wav' }))
-  }, [])
-
-  function initAudio() {
-    try {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
-      }
-      if (audioContextRef.current.state === 'suspended') {
-        audioContextRef.current.resume()
-      }
-      if (!audioElementRef.current) {
-        audioElementRef.current = new Audio(generateBeepDataUrl())
-        audioElementRef.current.volume = 0.7
-      }
-      console.log('🔊 Audio initialized')
-    } catch (e) {
-      console.error('Audio init error:', e)
-    }
-  }
-
   function playSound() {
-    let played = false
-    
-    // Try Web Audio API first
     try {
-      const ctx = audioContextRef.current
-      if (ctx && ctx.state === 'running') {
-        const playTone = (freq: number, start: number, dur: number) => {
-          const osc = ctx.createOscillator()
-          const gain = ctx.createGain()
-          osc.connect(gain)
-          gain.connect(ctx.destination)
-          osc.frequency.value = freq
-          osc.type = 'sine'
-          gain.gain.setValueAtTime(0.5, ctx.currentTime + start)
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + dur)
-          osc.start(ctx.currentTime + start)
-          osc.stop(ctx.currentTime + start + dur)
-        }
-        playTone(880, 0, 0.15)
-        playTone(1100, 0.15, 0.15)
-        playTone(1320, 0.3, 0.3)
-        played = true
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+      if (!AudioContextClass) return
+      
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContextClass()
       }
-    } catch (e) {}
-    
-    // Fallback to HTML5 Audio
-    if (!played && audioElementRef.current) {
-      audioElementRef.current.currentTime = 0
-      audioElementRef.current.play().catch(() => {})
+      
+      const ctx = audioContextRef.current
+      
+      // Resume if suspended
+      if (ctx.state === 'suspended') {
+        ctx.resume()
+      }
+      
+      // Play three ascending tones
+      const playTone = (freq: number, startTime: number, duration: number) => {
+        const oscillator = ctx.createOscillator()
+        const gainNode = ctx.createGain()
+        
+        oscillator.connect(gainNode)
+        gainNode.connect(ctx.destination)
+        
+        oscillator.frequency.value = freq
+        oscillator.type = 'sine'
+        
+        const now = ctx.currentTime
+        gainNode.gain.setValueAtTime(0.5, now + startTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + startTime + duration)
+        
+        oscillator.start(now + startTime)
+        oscillator.stop(now + startTime + duration)
+      }
+      
+      playTone(880, 0, 0.15)
+      playTone(1100, 0.15, 0.15)
+      playTone(1320, 0.3, 0.3)
+    } catch (e) {
+      console.error('Audio error:', e)
     }
   }
   
@@ -389,14 +335,22 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   // Enable sound - initializes audio and plays test sound
   const enableSound = () => {
-    initAudio()
-    if (audioContextRef.current?.state === 'suspended') {
-      audioContextRef.current.resume()
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+      if (AudioContextClass && !audioContextRef.current) {
+        audioContextRef.current = new AudioContextClass()
+      }
+      if (audioContextRef.current?.state === 'suspended') {
+        audioContextRef.current.resume()
+      }
+    } catch (e) {
+      console.error('Audio init error:', e)
     }
+    
     setSoundEnabled(true)
     setAudioReady(true)
     localStorage.setItem(`sound_enabled_${params.tenant}`, 'true')
-    setTimeout(() => playSound(), 100) // Test sound
+    playSound() // Test sound immediately
   }
   
   // Disable sound

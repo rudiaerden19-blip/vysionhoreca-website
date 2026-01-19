@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus } from '@/lib/admin-api'
@@ -35,7 +35,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [audioReady, setAudioReady] = useState(false)
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const audioContextRef = useRef<AudioContext | null>(null)
-  const audioElementRef = useRef<HTMLAudioElement | null>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
@@ -198,106 +197,68 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   // =========================================
-  // BULLETPROOF AUDIO - Web Audio + HTML5 fallback
+  // SIMPLE AUDIO - Direct Web Audio API
   // =========================================
-  const generateBeepDataUrl = useCallback(() => {
-    const sampleRate = 44100
-    const duration = 0.3
-    const samples = sampleRate * duration
-    const buffer = new Float32Array(samples)
-    
-    for (let i = 0; i < samples; i++) {
-      const t = i / sampleRate
-      let sample = 0
-      if (t < 0.1) sample = Math.sin(2 * Math.PI * 1200 * t) * (1 - t / 0.1) * 0.5
-      else if (t < 0.25) sample = Math.sin(2 * Math.PI * 1500 * (t - 0.1)) * (1 - (t - 0.1) / 0.15) * 0.5
-      buffer[i] = sample
-    }
-    
-    const wavBuffer = new ArrayBuffer(44 + samples * 2)
-    const view = new DataView(wavBuffer)
-    const writeString = (offset: number, str: string) => {
-      for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i))
-    }
-    
-    writeString(0, 'RIFF')
-    view.setUint32(4, 36 + samples * 2, true)
-    writeString(8, 'WAVE')
-    writeString(12, 'fmt ')
-    view.setUint32(16, 16, true)
-    view.setUint16(20, 1, true)
-    view.setUint16(22, 1, true)
-    view.setUint32(24, sampleRate, true)
-    view.setUint32(28, sampleRate * 2, true)
-    view.setUint16(32, 2, true)
-    view.setUint16(34, 16, true)
-    writeString(36, 'data')
-    view.setUint32(40, samples * 2, true)
-    
-    for (let i = 0; i < samples; i++) {
-      const s = Math.max(-1, Math.min(1, buffer[i]))
-      view.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
-    }
-    
-    return URL.createObjectURL(new Blob([wavBuffer], { type: 'audio/wav' }))
-  }, [])
-
-  function initAudio() {
-    try {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
-      }
-      if (audioContextRef.current.state === 'suspended') {
-        audioContextRef.current.resume()
-      }
-      if (!audioElementRef.current) {
-        audioElementRef.current = new Audio(generateBeepDataUrl())
-        audioElementRef.current.volume = 0.7
-      }
-    } catch (e) {
-      console.error('Audio init error:', e)
-    }
-  }
-
+  
   function playAlertSound() {
-    let played = false
-    
     try {
-      const ctx = audioContextRef.current
-      if (ctx && ctx.state === 'running') {
-        const playTone = (freq: number, start: number, dur: number) => {
-          const osc = ctx.createOscillator()
-          const gain = ctx.createGain()
-          osc.connect(gain)
-          gain.connect(ctx.destination)
-          osc.frequency.value = freq
-          osc.type = 'sine'
-          gain.gain.setValueAtTime(0.5, ctx.currentTime + start)
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + start + dur)
-          osc.start(ctx.currentTime + start)
-          osc.stop(ctx.currentTime + start + dur)
-        }
-        playTone(1200, 0, 0.1)
-        playTone(1500, 0.1, 0.15)
-        played = true
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+      if (!AudioContextClass) return
+      
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContextClass()
       }
-    } catch (e) {}
-    
-    if (!played && audioElementRef.current) {
-      audioElementRef.current.currentTime = 0
-      audioElementRef.current.play().catch(() => {})
+      
+      const ctx = audioContextRef.current
+      
+      // Resume if suspended
+      if (ctx.state === 'suspended') {
+        ctx.resume()
+      }
+      
+      // Play kitchen bell sound (2 tones)
+      const playTone = (freq: number, startTime: number, duration: number) => {
+        const oscillator = ctx.createOscillator()
+        const gainNode = ctx.createGain()
+        
+        oscillator.connect(gainNode)
+        gainNode.connect(ctx.destination)
+        
+        oscillator.frequency.value = freq
+        oscillator.type = 'sine'
+        
+        const now = ctx.currentTime
+        gainNode.gain.setValueAtTime(0.5, now + startTime)
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + startTime + duration)
+        
+        oscillator.start(now + startTime)
+        oscillator.stop(now + startTime + duration)
+      }
+      
+      playTone(1200, 0, 0.1)
+      playTone(1500, 0.1, 0.15)
+    } catch (e) {
+      console.error('Audio error:', e)
     }
   }
 
   function enableSound() {
-    initAudio()
-    if (audioContextRef.current?.state === 'suspended') {
-      audioContextRef.current.resume()
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+      if (AudioContextClass && !audioContextRef.current) {
+        audioContextRef.current = new AudioContextClass()
+      }
+      if (audioContextRef.current?.state === 'suspended') {
+        audioContextRef.current.resume()
+      }
+    } catch (e) {
+      console.error('Audio init error:', e)
     }
+    
     setAudioReady(true)
     setSoundEnabled(true)
     localStorage.setItem(`keuken_sound_${params.tenant}`, 'true')
-    setTimeout(() => playAlertSound(), 100)
+    playAlertSound() // Test sound immediately
   }
 
   async function handleReady(order: Order) {
