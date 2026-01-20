@@ -225,13 +225,13 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      setError('Vul een naam in voor de optie')
+      setError(t('adminPages.opties.fillName'))
       return
     }
 
     const validChoices = formData.choices?.filter(c => c.name.trim() !== '') || []
     if (validChoices.length === 0) {
-      setError('Voeg minstens één keuze toe')
+      setError(t('adminPages.opties.addAtLeastOne'))
       return
     }
 
@@ -252,19 +252,19 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      setError('Opslaan mislukt. Probeer opnieuw.')
+      setError(t('adminPages.opties.saveFailed'))
     }
 
     setSaving(false)
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Weet je zeker dat je deze optie wilt verwijderen? Alle keuzes worden ook verwijderd.')) {
+    if (confirm(t('adminPages.opties.confirmDelete'))) {
       const success = await deleteProductOption(id)
       if (success) {
         setOptions(prev => prev.filter(o => o.id !== id))
       } else {
-        setError('Verwijderen mislukt')
+        setError(t('adminPages.opties.deleteFailed'))
       }
     }
   }
@@ -289,8 +289,8 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Opties & Extra&apos;s</h1>
-          <p className="text-gray-500">Beheer keuzes die klanten kunnen maken</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.opties.title')}</h1>
+          <p className="text-gray-500">{t('adminPages.opties.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -299,7 +299,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
           className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
         >
           <span>➕</span>
-          <span>Nieuwe optie</span>
+          <span>{t('adminPages.opties.addOption')}</span>
         </motion.button>
       </div>
 
@@ -310,7 +310,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-600 flex items-center gap-2"
         >
-          <span>✓</span> Opgeslagen!
+          <span>✓</span> {t('adminPages.common.saved')}
         </motion.div>
       )}
 
@@ -340,11 +340,11 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                       ? 'bg-blue-100 text-blue-700' 
                       : 'bg-purple-100 text-purple-700'
                   }`}>
-                    {option.type === 'single' ? '☝️ Enkele keuze' : '✅ Meerdere keuzes'}
+                    {option.type === 'single' ? t('adminPages.opties.singleChoice') : t('adminPages.opties.multipleChoice')}
                   </span>
                   {option.required && (
                     <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-700">
-                      Verplicht
+                      {t('adminPages.opties.required')}
                     </span>
                   )}
                 </div>
@@ -373,7 +373,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                 >
                   <span className="text-gray-700">{choice.name}</span>
                   <span className={`font-medium ${choice.price > 0 ? 'text-orange-500' : 'text-gray-400'}`}>
-                    {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : 'Gratis'}
+                    {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('adminPages.opties.free')}
                   </span>
                 </div>
               ))}
@@ -386,13 +386,13 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
       {options.length === 0 && (
         <div className="text-center py-12 bg-white rounded-2xl">
           <span className="text-6xl mb-4 block">⚙️</span>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Nog geen opties</h3>
-          <p className="text-gray-500 mb-6">Voeg opties toe zoals formaten, sauzen of extra&apos;s</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{t('adminPages.opties.noOptions')}</h3>
+          <p className="text-gray-500 mb-6">{t('adminPages.opties.noOptionsDesc')}</p>
           <button
             onClick={openAddModal}
             className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl"
           >
-            + Eerste optie toevoegen
+            {t('adminPages.opties.addFirstOption')}
           </button>
         </div>
       )}
@@ -404,11 +404,11 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
         transition={{ delay: 0.3 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 Hoe werken opties?</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">{t('adminPages.opties.howItWorks')}</h3>
         <ul className="text-blue-700 text-sm space-y-1">
-          <li>• <strong>Enkele keuze:</strong> Klant kiest 1 optie (bijv. formaat)</li>
-          <li>• <strong>Meerdere keuzes:</strong> Klant kan meerdere selecteren (bijv. toppings)</li>
-          <li>• <strong>Verplicht:</strong> Klant moet kiezen voordat ze bestellen</li>
+          <li>• <strong>{t('adminPages.opties.singleChoice')}:</strong> {t('adminPages.opties.singleChoiceDesc')}</li>
+          <li>• <strong>{t('adminPages.opties.multipleChoice')}:</strong> {t('adminPages.opties.multipleChoiceDesc')}</li>
+          <li>• <strong>{t('adminPages.opties.required')}:</strong> {t('adminPages.opties.requiredDesc')}</li>
         </ul>
       </motion.div>
 
@@ -432,7 +432,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
               <div className="p-6 border-b sticky top-0 bg-white z-10">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-gray-900">
-                    {editingOption ? 'Optie bewerken' : 'Nieuwe optie'}
+                    {editingOption ? t('adminPages.opties.editOption') : t('adminPages.opties.addOption')}
                   </h2>
                   <button
                     onClick={closeModal}
@@ -454,7 +454,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                 {/* Option Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Naam van de optie *
+                    {t('adminPages.opties.optionName')} *
                   </label>
                   <input
                     type="text"
@@ -465,7 +465,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                       setFormData(prev => ({ ...prev, name: capitalized }))
                     }}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Bijv. Formaat, Saus, Extra toppings"
+                    placeholder={t('adminPages.opties.optionNamePlaceholder')}
                   />
                 </div>
 
@@ -473,20 +473,20 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Type keuze
+                      {t('adminPages.opties.typeChoice')}
                     </label>
                     <select
                       value={formData.type}
                       onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as 'single' | 'multiple' }))}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
-                      <option value="single">☝️ Enkele keuze</option>
-                      <option value="multiple">✅ Meerdere keuzes</option>
+                      <option value="single">{t('adminPages.opties.singleChoice')}</option>
+                      <option value="multiple">{t('adminPages.opties.multipleChoice')}</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Verplicht?
+                      {t('adminPages.opties.required')}?
                     </label>
                     <div className="flex items-center gap-4 h-12">
                       <label className="flex items-center gap-2 cursor-pointer">
@@ -496,7 +496,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                           onChange={(e) => setFormData(prev => ({ ...prev, required: e.target.checked }))}
                           className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
                         />
-                        <span>Ja, klant moet kiezen</span>
+                        <span>{t('adminPages.opties.mustChoose')}</span>
                       </label>
                     </div>
                   </div>
@@ -505,7 +505,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                 {/* Choices with Drag & Drop */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Keuzes * <span className="text-gray-400 font-normal">(sleep ⠿ om te verplaatsen)</span>
+                    {t('adminPages.opties.choices')} * <span className="text-gray-400 font-normal">({t('adminPages.opties.dragToSort')})</span>
                   </label>
                   <DndContext
                     sensors={sensors}
@@ -535,7 +535,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                     onClick={addChoice}
                     className="mt-3 w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors"
                   >
-                    + Keuze toevoegen
+                    {t('adminPages.opties.addChoice')}
                   </button>
                 </div>
               </div>
@@ -546,7 +546,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   onClick={closeModal}
                   className="px-6 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-200 transition-colors"
                 >
-                  Annuleren
+                  {t('adminPages.common.cancel')}
                 </button>
                 <button
                   onClick={handleSave}
@@ -563,7 +563,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                       <span>{t('adminPages.common.saving')}</span>
                     </>
                   ) : (
-                    <span>{editingOption ? 'Opslaan' : 'Toevoegen'}</span>
+                    <span>{editingOption ? t('adminPages.common.save') : t('adminPages.common.add')}</span>
                   )}
                 </button>
               </div>

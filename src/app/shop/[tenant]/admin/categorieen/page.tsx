@@ -34,12 +34,12 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Weet je zeker dat je deze categorie wilt verwijderen?')) {
+    if (confirm(t('adminPages.categorieen.confirmDelete'))) {
       const success = await deleteMenuCategory(id)
       if (success) {
         setCategories(prev => prev.filter(c => c.id !== id))
       } else {
-        setError('Verwijderen mislukt')
+        setError(t('adminPages.categorieen.deleteFailed'))
       }
     }
   }
@@ -59,7 +59,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
         setCategories(prev => [...prev, saved])
         setNewCategory('')
       } else {
-        setError('Toevoegen mislukt')
+        setError(t('adminPages.categorieen.addFailed'))
       }
     }
   }
@@ -87,7 +87,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      setError('Sommige categorieën konden niet worden opgeslagen')
+      setError(t('adminPages.categorieen.saveFailed'))
     }
     setSaving(false)
   }
@@ -111,8 +111,8 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Categorieën</h1>
-          <p className="text-gray-500">Beheer je menu categorieën</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.categorieen.title')}</h1>
+          <p className="text-gray-500">{t('adminPages.categorieen.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -161,7 +161,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           type="text"
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
-          placeholder="Nieuwe categorie naam..."
+          placeholder={t('adminPages.categorieen.newCategoryPlaceholder')}
           className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           onKeyDown={(e) => e.key === 'Enter' && addCategory()}
         />
@@ -169,19 +169,19 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           onClick={addCategory}
           className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium"
         >
-          + Toevoegen
+          {t('adminPages.categorieen.add')}
         </button>
       </div>
 
       {/* Categories List */}
       <motion.div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="p-4 border-b bg-gray-50">
-          <p className="text-sm text-gray-500">💡 Sleep om de volgorde te wijzigen</p>
+          <p className="text-sm text-gray-500">{t('adminPages.categorieen.dragHint')}</p>
         </div>
         {categories.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             <span className="text-4xl mb-4 block">📂</span>
-            <p>Nog geen categorieën. Voeg je eerste categorie toe!</p>
+            <p>{t('adminPages.categorieen.noItems')}</p>
           </div>
         ) : (
           <Reorder.Group values={categories} onReorder={setCategories} className="divide-y">
@@ -216,7 +216,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                         ? 'bg-green-100 text-green-600' 
                         : 'bg-gray-100 text-gray-400'
                     }`}
-                    title={category.is_active ? 'Zichtbaar' : 'Verborgen'}
+                    title={category.is_active ? t('adminPages.categorieen.visible') : t('adminPages.categorieen.hidden')}
                   >
                     {category.is_active ? '👁️' : '🙈'}
                   </button>

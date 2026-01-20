@@ -283,12 +283,12 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Weet je zeker dat je dit product wilt verwijderen?')) {
+    if (confirm(t('adminPages.producten.confirmDelete'))) {
       const success = await deleteMenuProduct(id)
       if (success) {
         setProducts(prev => prev.filter(p => p.id !== id))
       } else {
-        setError('Verwijderen mislukt')
+        setError(t('adminPages.producten.deleteFailed'))
       }
     }
   }
@@ -427,14 +427,14 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       }
       closeModal()
     } else {
-      setError('Opslaan mislukt. Probeer opnieuw.')
+      setError(t('adminPages.producten.saveFailed'))
     }
     setSaving(false)
   }
 
   const getCategoryName = (categoryId: string | null) => {
     const category = categories.find(c => c.id === categoryId)
-    return category?.name || 'Geen categorie'
+    return category?.name || t('adminPages.producten.noCategory')
   }
 
   if (loading) {
@@ -457,8 +457,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Producten</h1>
-          <p className="text-gray-500">{products.length} producten in je menu</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.producten.title')}</h1>
+          <p className="text-gray-500">{products.length} {t('adminPages.producten.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -467,7 +467,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl flex items-center gap-2"
         >
           <span>➕</span>
-          <span>Nieuw product</span>
+          <span>{t('adminPages.producten.newProduct')}</span>
         </motion.button>
       </div>
 
@@ -487,7 +487,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Zoek producten..."
+            placeholder={t('adminPages.producten.searchPlaceholder')}
             className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           />
         </div>
@@ -502,7 +502,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            Alle
+            {t('adminPages.producten.all')}
           </button>
           <button
             onClick={() => setSelectedCategory('Promoties')}
@@ -512,7 +512,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 : 'bg-green-100 text-green-700 hover:bg-green-200'
             }`}
           >
-            🎁 Promoties
+            🎁 {t('adminPages.producten.promotions')}
           </button>
           {categories.map(cat => (
             <button
@@ -560,13 +560,13 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       {filteredProducts.length === 0 && (
         <div className="text-center py-12">
           <span className="text-6xl mb-4 block">🍟</span>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Geen producten gevonden</h3>
-          <p className="text-gray-500 mb-6">Pas je filters aan of voeg een nieuw product toe</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{t('adminPages.producten.noProductsFound')}</h3>
+          <p className="text-gray-500 mb-6">{t('adminPages.producten.adjustFilters')}</p>
           <button
             onClick={openAddModal}
             className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl"
           >
-            + Nieuw product
+            + {t('adminPages.producten.newProduct')}
           </button>
         </div>
       )}
@@ -591,7 +591,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               <div className="p-6 border-b sticky top-0 bg-white z-10">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold text-gray-900">
-                    {editingProduct ? 'Product bewerken' : 'Nieuw product'}
+                    {editingProduct ? t('adminPages.producten.editProduct') : t('adminPages.producten.newProduct')}
                   </h2>
                   <button
                     onClick={closeModal}
@@ -606,7 +606,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 {/* Product Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Productnaam *
+                    {t('adminPages.producten.name')} *
                   </label>
                   <input
                     type="text"
@@ -617,21 +617,21 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       setFormData(prev => ({ ...prev, name: capitalized }))
                     }}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Bijv. Grote Friet"
+                    placeholder={t('adminPages.producten.namePlaceholder')}
                   />
                 </div>
 
                 {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Beschrijving
+                    {t('adminPages.producten.description')}
                   </label>
                   <textarea
                     value={formData.description || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
-                    placeholder="Beschrijf het product..."
+                    placeholder={t('adminPages.producten.descriptionPlaceholder')}
                   />
                 </div>
 
@@ -639,7 +639,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Prijs *
+                      {t('adminPages.producten.price')} *
                     </label>
                     <div className="relative">
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
@@ -655,14 +655,14 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Categorie *
+                      {t('adminPages.producten.category')} *
                     </label>
                     <select
                       value={formData.category_id || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value || null }))}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
-                      <option value="">Selecteer...</option>
+                      <option value="">{t('adminPages.producten.selectCategory')}</option>
                       {categories.map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
@@ -673,7 +673,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 {/* Product Afbeelding */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Afbeelding
+                    {t('adminPages.producten.image')}
                   </label>
                   <MediaPicker
                     tenantSlug={params.tenant}
@@ -686,10 +686,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 {availableOptions.length > 0 && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Opties & Extra&apos;s koppelen
+                      {t('adminPages.producten.linkOptions')}
                     </label>
                     <p className="text-sm text-gray-500 mb-3">
-                      Selecteer welke opties klanten kunnen kiezen bij dit product
+                      {t('adminPages.producten.linkOptionsDesc')}
                     </p>
                     <div className="space-y-2">
                       {availableOptions.map(option => (
@@ -714,16 +714,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                                 ? 'bg-blue-100 text-blue-700' 
                                 : 'bg-purple-100 text-purple-700'
                             }`}>
-                              {option.type === 'single' ? 'Enkele keuze' : 'Meerdere keuzes'}
+                              {option.type === 'single' ? t('adminPages.producten.singleChoice') : t('adminPages.producten.multipleChoice')}
                             </span>
                             {option.required && (
                               <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">
-                                Verplicht
+                                {t('adminPages.producten.required')}
                               </span>
                             )}
                           </div>
                           <span className="text-sm text-gray-500">
-                            {option.choices?.length || 0} keuzes
+                            {option.choices?.length || 0} {t('adminPages.producten.choices')}
                           </span>
                         </label>
                       ))}
@@ -734,10 +734,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 {/* Allergenen */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Allergenen
+                    {t('adminPages.producten.allergens')}
                   </label>
                   <p className="text-sm text-gray-500 mb-3">
-                    Selecteer welke allergenen in dit product zitten
+                    {t('adminPages.producten.allergensDesc')}
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {ALLERGENS.map(allergen => {
@@ -770,7 +770,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 {/* Status Opties */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
+                    {t('adminPages.producten.status')}
                   </label>
                   <div className="flex flex-wrap gap-2">
                     <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl cursor-pointer hover:bg-gray-200">
@@ -834,7 +834,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   onClick={closeModal}
                   className="px-6 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-200 transition-colors"
                 >
-                  Annuleren
+                  {t('adminPages.common.cancel')}
                 </button>
                 <button 
                   onClick={handleSave}
@@ -851,7 +851,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       <span>{t('adminPages.common.saving')}</span>
                     </>
                   ) : (
-                    <span>{editingProduct ? 'Opslaan' : 'Toevoegen'}</span>
+                    <span>{editingProduct ? t('adminPages.common.save') : t('adminPages.common.add')}</span>
                   )}
                 </button>
               </div>
