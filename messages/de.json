@@ -2042,6 +2042,9 @@
   "shopPage": {
     "loading": "Laden...",
     "blocked": "Dieser Shop ist derzeit nicht verfügbar",
+    "blockedTitle": "Shop Vorübergehend Nicht Verfügbar",
+    "blockedDescription": "Dieser Webshop ist derzeit nicht aktiv. Bitte kontaktieren Sie den Inhaber für weitere Informationen.",
+    "backToVysion": "Zurück zu Vysion",
     "menu": "Menü",
     "account": "Konto",
     "admin": "Admin",

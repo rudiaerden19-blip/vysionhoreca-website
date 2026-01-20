@@ -2561,6 +2561,9 @@
   "shopPage": {
     "loading": "加载中...",
     "blocked": "此商店目前不可用",
+    "blockedTitle": "商店暂时不可用",
+    "blockedDescription": "此网上商店目前未激活。请联系店主了解更多信息。",
+    "backToVysion": "返回Vysion",
     "menu": "菜单",
     "account": "账户",
     "admin": "管理",

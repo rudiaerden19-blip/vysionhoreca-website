@@ -2970,6 +2970,9 @@
   "shopPage": {
     "loading": "Loading...",
     "blocked": "This shop is currently unavailable",
+    "blockedTitle": "Shop Temporarily Unavailable",
+    "blockedDescription": "This webshop is currently not active. Please contact the owner for more information.",
+    "backToVysion": "Back to Vysion",
     "menu": "Menu",
     "account": "Account",
     "admin": "Admin",

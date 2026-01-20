@@ -72,8 +72,20 @@ interface PopularItem {
   image_url: string
 }
 
-const dayNames = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag']
+// Dutch day names (used as database keys)
+const dayNamesDB = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag']
 const dayNamesNL = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag']
+
+// Map Dutch day names to English translation keys
+const dayKeyMap: Record<string, string> = {
+  'maandag': 'monday',
+  'dinsdag': 'tuesday',
+  'woensdag': 'wednesday',
+  'donderdag': 'thursday',
+  'vrijdag': 'friday',
+  'zaterdag': 'saturday',
+  'zondag': 'sunday'
+}
 
 export default function TenantLandingPage({ params }: { params: { tenant: string } }) {
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
@@ -547,12 +559,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center"
         >
           <span className="text-6xl mb-6 block">🚫</span>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Shop Tijdelijk Niet Beschikbaar</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('shopPage.blockedTitle')}</h1>
           <p className="text-gray-600 mb-6">
-            Deze webshop is momenteel niet actief. Neem contact op met de eigenaar voor meer informatie.
+            {t('shopPage.blockedDescription')}
           </p>
           <Link href="/" className="text-orange-500 hover:text-orange-600 font-medium">
-            ← Terug naar Vysion
+            ← {t('shopPage.backToVysion')}
           </Link>
         </motion.div>
       </div>
@@ -1334,24 +1346,30 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {t('shopPage.openingHours')}
               </h2>
               <div className="space-y-3">
-                {Object.entries(business.opening_hours).map(([day, hours]) => (
-                  <div 
-                    key={day}
-                    className={`flex justify-between items-center py-3 border-b border-white/10 ${
-                      day === getDayName() ? 'text-orange-400 font-bold' : ''
-                    }`}
-                  >
-                    <span className="capitalize">{day}</span>
-                    <span>
-                      {hours.closed 
-                        ? <span className="text-red-400">{t('shopPage.closed')}</span>
-                        : hours.hasShift2 && hours.open2 && hours.close2
-                          ? `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)} & ${hours.open2?.slice(0, 5)} - ${hours.close2?.slice(0, 5)}`
-                          : `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)}`
-                      }
-                    </span>
-                  </div>
-                ))}
+                {Object.entries(business.opening_hours).map(([day, hours]) => {
+                  // Translate the day name
+                  const dayKey = dayKeyMap[day.toLowerCase()] || day
+                  const translatedDay = t(`shopPage.days.${dayKey}`)
+                  
+                  return (
+                    <div 
+                      key={day}
+                      className={`flex justify-between items-center py-3 border-b border-white/10 ${
+                        day === getDayName() ? 'text-orange-400 font-bold' : ''
+                      }`}
+                    >
+                      <span className="capitalize">{translatedDay}</span>
+                      <span>
+                        {hours.closed 
+                          ? <span className="text-red-400">{t('shopPage.closed')}</span>
+                          : hours.hasShift2 && hours.open2 && hours.close2
+                            ? `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)} & ${hours.open2?.slice(0, 5)} - ${hours.close2?.slice(0, 5)}`
+                            : `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)}`
+                        }
+                      </span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
 

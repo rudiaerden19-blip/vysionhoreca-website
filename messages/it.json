@@ -2574,6 +2574,9 @@
   "shopPage": {
     "loading": "Caricamento...",
     "blocked": "Questo negozio non è attualmente disponibile",
+    "blockedTitle": "Negozio Temporaneamente Non Disponibile",
+    "blockedDescription": "Questo negozio online non è attualmente attivo. Contattare il proprietario per ulteriori informazioni.",
+    "backToVysion": "Torna a Vysion",
     "menu": "Menu",
     "account": "Account",
     "admin": "Admin",

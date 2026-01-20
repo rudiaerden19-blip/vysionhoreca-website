@@ -32,7 +32,8 @@ interface CartItem {
 
 export default function MenuPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
