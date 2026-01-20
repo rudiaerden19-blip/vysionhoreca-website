@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus, TenantSettings } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 
 interface Order {
@@ -40,16 +41,22 @@ interface BusinessSettings {
   btw_percentage?: number
 }
 
-const REJECTION_REASONS = [
-  { id: 'busy', label: 'Te druk', icon: '🔥' },
-  { id: 'closed', label: 'Gesloten', icon: '🚫' },
-  { id: 'no_stock', label: 'Niet op voorraad', icon: '📦' },
-  { id: 'technical', label: 'Technisch probleem', icon: '⚠️' },
-  { id: 'address', label: 'Adres niet bezorgbaar', icon: '📍' },
-  { id: 'other', label: 'Andere reden', icon: '💬' },
-]
-
 export default function ShopDisplayPage({ params }: { params: { tenant: string } }) {
+  const { t, locale } = useLanguage()
+  
+  // Translation helper for shopDisplay keys
+  const tx = (key: string) => t(`shopDisplay.${key}`)
+  
+  // Rejection reasons with translated labels
+  const REJECTION_REASONS = [
+    { id: 'busy', label: tx('reasonBusy'), icon: '🔥' },
+    { id: 'closed', label: tx('reasonClosed'), icon: '🚫' },
+    { id: 'no_stock', label: tx('reasonNoStock'), icon: '📦' },
+    { id: 'technical', label: tx('reasonTechnical'), icon: '⚠️' },
+    { id: 'address', label: tx('reasonAddress'), icon: '📍' },
+    { id: 'other', label: tx('reasonOther'), icon: '💬' },
+  ]
+  
   const [orders, setOrders] = useState<Order[]>([])
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [showRejectModal, setShowRejectModal] = useState(false)
@@ -634,12 +641,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   const getStatusLabel = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'new': return 'NIEUW'
-      case 'confirmed': return 'IN KEUKEN'
-      case 'preparing': return 'IN BEREIDING'
-      case 'ready': return '✓ KLAAR'
-      case 'completed': return 'AFGEROND'
-      case 'rejected': return 'GEWEIGERD'
+      case 'new': return tx('statusNew')
+      case 'confirmed': return tx('statusKitchen')
+      case 'preparing': return tx('statusPreparing')
+      case 'ready': return `✓ ${tx('statusReady')}`
+      case 'completed': return tx('statusCompleted')
+      case 'rejected': return tx('statusRejected')
       default: return status.toUpperCase()
     }
   }
@@ -647,8 +654,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const getTimeSince = (dateString: string) => {
     const diff = Date.now() - new Date(dateString).getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'Zojuist'
-    if (mins < 60) return `${mins} min`
+    if (mins < 1) return tx('justNow')
+    if (mins < 60) return `${mins} ${tx('min')}`
     return `${Math.floor(mins / 60)}u ${mins % 60}m`
   }
 
@@ -719,9 +726,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 }
               }}
             >
-              <p className="text-6xl font-black text-white text-center mb-2">🔔 NIEUWE BESTELLING!</p>
+              <p className="text-6xl font-black text-white text-center mb-2">🔔 {tx('newOrder')}</p>
               <p className="text-3xl font-bold text-white/90 text-center">
-                {newOrderIds.size === 1 ? 'Klik om te bekijken' : `${newOrderIds.size} nieuwe bestellingen`}
+                {newOrderIds.size === 1 ? tx('clickToView') : `${newOrderIds.size} ${tx('newOrders')}`}
               </p>
             </motion.div>
           </motion.div>
@@ -739,7 +746,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               🖥️
             </div>
             <div>
-              <h1 className="text-xl font-bold">SHOP DISPLAY</h1>
+              <h1 className="text-xl font-bold">{tx('title')}</h1>
               <p className="text-gray-400 text-sm">{business?.business_name}</p>
             </div>
           </div>
@@ -753,11 +760,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 onClick={enableSound}
                 className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-xl font-bold flex items-center gap-2 text-sm"
               >
-                🔔 Geluid Aan
+                🔔 {tx('soundOn')}
               </motion.button>
             ) : (
               <span className="px-3 py-2 bg-green-500/20 text-green-400 rounded-xl flex items-center gap-2 text-sm">
-                🔊 Aan
+                🔊 {tx('soundEnabled')}
               </span>
             )}
 
@@ -768,20 +775,20 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 transition={{ repeat: Infinity, duration: 0.5 }}
                 className="px-4 py-2 bg-red-500 rounded-xl font-bold"
               >
-                🚨 {newOrderIds.size} NIEUW
+                🚨 {newOrderIds.size} {tx('new').toUpperCase()}
               </motion.div>
             )}
 
             {/* Stats */}
             <div className="flex gap-2">
               <span className="px-3 py-2 bg-orange-500/20 text-orange-400 rounded-lg text-sm font-bold">
-                {activeOrders.filter(o => o.status.toLowerCase() === 'new').length} Nieuw
+                {activeOrders.filter(o => o.status.toLowerCase() === 'new').length} {tx('new')}
               </span>
               <span className="px-3 py-2 bg-blue-500/20 text-blue-400 rounded-lg text-sm font-bold">
-                {activeOrders.filter(o => o.status.toLowerCase() === 'confirmed').length} Keuken
+                {activeOrders.filter(o => o.status.toLowerCase() === 'confirmed').length} {tx('kitchen')}
               </span>
               <span className="px-3 py-2 bg-green-500/20 text-green-400 rounded-lg text-sm font-bold">
-                {activeOrders.filter(o => o.status.toLowerCase() === 'ready').length} Klaar
+                {activeOrders.filter(o => o.status.toLowerCase() === 'ready').length} {tx('ready')}
               </span>
             </div>
 
@@ -797,7 +804,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               href={`/keuken/${params.tenant}`}
               className="px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-sm font-bold"
             >
-              👨‍🍳 Keuken
+              👨‍🍳 {tx('kitchen')}
             </Link>
             <Link
               href={`/shop/${params.tenant}/admin`}
@@ -819,7 +826,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
           }`}
         >
-          Actief ({activeOrders.length})
+          {tx('active')} ({activeOrders.length})
         </button>
         <button
           onClick={() => setActiveTab('completed')}
@@ -829,7 +836,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
           }`}
         >
-          Afgerond ({completedOrders.length})
+          {tx('completed')} ({completedOrders.length})
         </button>
       </div>
 
@@ -839,8 +846,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           sortedActiveOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <span className="text-8xl mb-6">📭</span>
-              <p className="text-2xl font-bold">Geen actieve bestellingen</p>
-              <p className="text-lg mt-2">Nieuwe bestellingen verschijnen hier automatisch</p>
+              <p className="text-2xl font-bold">{tx('noActiveOrders')}</p>
+              <p className="text-lg mt-2">{tx('ordersAppearHere')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
@@ -883,12 +890,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                       <span className={`px-2 py-0.5 rounded text-xs font-bold ${
                         order.order_type === 'delivery' ? 'bg-purple-500/20 text-purple-400' : 'bg-green-500/20 text-green-400'
                       }`}>
-                        {order.order_type === 'delivery' ? '🚗 Levering' : '🛍️ Afhalen'}
+                        {order.order_type === 'delivery' ? `🚗 ${tx('delivery')}` : `🛍️ ${tx('pickup')}`}
                       </span>
                       <span className={`px-2 py-0.5 rounded text-xs ${
                         order.payment_status === 'paid' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'
                       }`}>
-                        {order.payment_status === 'paid' ? '✓ Betaald' : '⏳'}
+                        {order.payment_status === 'paid' ? `✓ ${tx('paid')}` : '⏳'}
                       </span>
                     </div>
 
@@ -898,7 +905,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                         <p key={i} className="truncate">{item.quantity}x {item.product_name || item.name}</p>
                       ))}
                       {(order.items?.length || 0) > 2 && (
-                        <p className="text-gray-500">+{order.items.length - 2} meer...</p>
+                        <p className="text-gray-500">+{order.items.length - 2} {tx('more')}</p>
                       )}
                     </div>
 
@@ -924,7 +931,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   <span className={`text-xs px-2 py-0.5 rounded ${
                     order.status === 'completed' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                   }`}>
-                    {order.status === 'completed' ? '✓ Afgerond' : '✗ Geweigerd'}
+                    {order.status === 'completed' ? `✓ ${tx('completed')}` : `✗ ${tx('rejected')}`}
                   </span>
                 </div>
                 <p className="text-sm text-gray-400">{order.customer_name}</p>
@@ -974,19 +981,19 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 <div className="bg-gray-700/50 rounded-2xl p-4 mb-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-gray-400 text-sm">Klant</p>
+                      <p className="text-gray-400 text-sm">{tx('customer')}</p>
                       <p className="font-bold text-xl">{selectedOrder.customer_name}</p>
                     </div>
                     {selectedOrder.customer_phone && (
                       <div>
-                        <p className="text-gray-400 text-sm">Telefoon</p>
+                        <p className="text-gray-400 text-sm">{tx('phone')}</p>
                         <p className="font-bold text-xl">{selectedOrder.customer_phone}</p>
                       </div>
                     )}
                   </div>
                   {selectedOrder.delivery_address && (
                     <div className="mt-3 pt-3 border-t border-gray-600">
-                      <p className="text-gray-400 text-sm">Bezorgadres</p>
+                      <p className="text-gray-400 text-sm">{tx('deliveryAddress')}</p>
                       <p className="font-medium">{selectedOrder.delivery_address}</p>
                     </div>
                   )}
@@ -998,19 +1005,19 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     selectedOrder.order_type === 'delivery' ? 'bg-purple-500/20' : 'bg-green-500/20'
                   }`}>
                     <p className="text-3xl">{selectedOrder.order_type === 'delivery' ? '🚗' : '🛍️'}</p>
-                    <p className="font-bold">{selectedOrder.order_type === 'delivery' ? 'Levering' : 'Afhalen'}</p>
+                    <p className="font-bold">{selectedOrder.order_type === 'delivery' ? tx('delivery') : tx('pickup')}</p>
                   </div>
                   <div className={`flex-1 rounded-xl p-3 text-center ${
                     selectedOrder.payment_status === 'paid' ? 'bg-green-500/20' : 'bg-yellow-500/20'
                   }`}>
                     <p className="text-3xl">{selectedOrder.payment_status === 'paid' ? '✓' : '⏳'}</p>
-                    <p className="font-bold">{selectedOrder.payment_status === 'paid' ? 'Betaald' : 'Niet betaald'}</p>
+                    <p className="font-bold">{selectedOrder.payment_status === 'paid' ? tx('paid') : tx('notPaid')}</p>
                   </div>
                 </div>
 
                 {/* Items */}
                 <div className="bg-gray-700/50 rounded-2xl p-4 mb-4">
-                  <h3 className="font-bold text-lg mb-3">Bestelling</h3>
+                  <h3 className="font-bold text-lg mb-3">{tx('order')}</h3>
                   <div className="space-y-2">
                     {selectedOrder.items?.map((item: any, i: number) => (
                       <div key={i} className="flex items-start justify-between py-2 border-b border-gray-600 last:border-0">
@@ -1036,24 +1043,24 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   <div className="mt-4 pt-4 border-t border-gray-600 space-y-1">
                     {selectedOrder.subtotal && (
                       <div className="flex justify-between text-gray-400">
-                        <span>Subtotaal</span>
+                        <span>{tx('subtotal')}</span>
                         <span>€{selectedOrder.subtotal.toFixed(2)}</span>
                       </div>
                     )}
                     {selectedOrder.delivery_fee && (
                       <div className="flex justify-between text-gray-400">
-                        <span>Bezorgkosten</span>
+                        <span>{tx('deliveryFee')}</span>
                         <span>€{selectedOrder.delivery_fee.toFixed(2)}</span>
                       </div>
                     )}
                     {selectedOrder.discount_amount && (
                       <div className="flex justify-between text-green-400">
-                        <span>Korting</span>
+                        <span>{tx('discount')}</span>
                         <span>-€{selectedOrder.discount_amount.toFixed(2)}</span>
                       </div>
                     )}
                     <div className="flex justify-between text-3xl font-bold pt-2">
-                      <span>Totaal</span>
+                      <span>{tx('total')}</span>
                       <span style={{ color: business?.primary_color }}>€{selectedOrder.total?.toFixed(2)}</span>
                     </div>
                   </div>
@@ -1069,7 +1076,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 {/* Rejection info */}
                 {selectedOrder.status === 'rejected' && selectedOrder.rejection_reason && (
                   <div className="bg-red-500/20 rounded-2xl p-4 mb-4">
-                    <p className="font-bold text-red-400">❌ Geweigerd: {
+                    <p className="font-bold text-red-400">❌ {tx('rejected')}: {
                       REJECTION_REASONS.find(r => r.id === selectedOrder.rejection_reason)?.label || selectedOrder.rejection_reason
                     }</p>
                     {selectedOrder.rejection_notes && (
@@ -1084,13 +1091,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                     onClick={() => printOrder(selectedOrder, 'customer')}
                     className="flex-1 py-3 bg-gray-600 hover:bg-gray-500 rounded-xl font-bold flex items-center justify-center gap-2"
                   >
-                    🖨️ Klantbon
+                    🖨️ {tx('customerReceipt')}
                   </button>
                   <button
                     onClick={() => printOrder(selectedOrder, 'kitchen')}
                     className="flex-1 py-3 bg-gray-600 hover:bg-gray-500 rounded-xl font-bold flex items-center justify-center gap-2"
                   >
-                    🖨️ Keukenbon
+                    🖨️ {tx('kitchenReceipt')}
                   </button>
                 </div>
 
@@ -1104,7 +1111,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                         onClick={() => setShowRejectModal(true)}
                         className="py-6 bg-red-500 hover:bg-red-600 rounded-2xl font-bold text-2xl"
                       >
-                        ✗ AFWIJZEN
+                        ✗ {tx('reject')}
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.02 }}
@@ -1112,7 +1119,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                         onClick={() => handleApprove(selectedOrder)}
                         className="py-6 bg-green-500 hover:bg-green-600 rounded-2xl font-bold text-2xl"
                       >
-                        ✓ GOEDKEUREN
+                        ✓ {tx('approve')}
                       </motion.button>
                     </>
                   )}
@@ -1123,7 +1130,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                       onClick={() => handleReady(selectedOrder)}
                       className="col-span-2 py-6 bg-green-500 hover:bg-green-600 rounded-2xl font-bold text-2xl"
                     >
-                      ✓ KLAAR
+                      ✓ {tx('markReady')}
                     </motion.button>
                   )}
                   {selectedOrder.status.toLowerCase() === 'ready' && (
@@ -1133,7 +1140,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                       onClick={() => handleComplete(selectedOrder)}
                       className="col-span-2 py-6 bg-blue-500 hover:bg-blue-600 rounded-2xl font-bold text-2xl"
                     >
-                      ✓ AFGEROND
+                      ✓ {tx('markCompleted')}
                     </motion.button>
                   )}
                 </div>
@@ -1160,10 +1167,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               className="bg-gray-800 rounded-3xl max-w-lg w-full p-6"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-2xl font-bold mb-2 text-center">Bestelling Afwijzen</h2>
+              <h2 className="text-2xl font-bold mb-2 text-center">{tx('rejectOrder')}</h2>
               <p className="text-gray-400 text-center mb-6">#{selectedOrder.order_number} - {selectedOrder.customer_name}</p>
 
-              <p className="text-sm text-gray-400 mb-3">Selecteer een reden:</p>
+              <p className="text-sm text-gray-400 mb-3">{tx('selectReason')}</p>
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {REJECTION_REASONS.map((reason) => (
                   <button
@@ -1184,7 +1191,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               <textarea
                 value={rejectNotes}
                 onChange={(e) => setRejectNotes(e.target.value)}
-                placeholder="Extra notities voor de klant (optioneel)..."
+                placeholder={tx('extraNotes')}
                 className="w-full px-4 py-3 bg-gray-700 rounded-xl border-none resize-none h-24 mb-6 text-white placeholder-gray-400"
               />
 
@@ -1197,14 +1204,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   }}
                   className="flex-1 py-4 bg-gray-700 hover:bg-gray-600 rounded-2xl font-bold text-lg"
                 >
-                  Annuleren
+                  {tx('cancel')}
                 </button>
                 <button
                   onClick={() => handleReject(selectedOrder)}
                   disabled={!rejectReason}
                   className="flex-1 py-4 bg-red-500 hover:bg-red-600 rounded-2xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Afwijzen
+                  {tx('reject')}
                 </button>
               </div>
             </motion.div>

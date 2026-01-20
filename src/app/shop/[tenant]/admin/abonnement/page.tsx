@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useParams } from 'next/navigation'
+import { useLanguage } from '@/i18n'
 
 interface Subscription {
   id: string
@@ -37,7 +38,8 @@ interface Tenant {
   trial_ends_at: string | null
 }
 
-const translations: Record<string, Record<string, string>> = {
+// Keep legacy translations as fallback - will be removed after migration
+const legacyTranslations: Record<string, Record<string, string>> = {
   nl: {
     title: 'Abonnement',
     subtitle: 'Beheer je abonnement en bekijk facturen',
@@ -491,25 +493,29 @@ const getSupabase = () => {
 export default function AbonnementPage() {
   const params = useParams()
   const tenantSlug = params.tenant as string
+  const { t: globalT, locale } = useLanguage()
   
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [tenant, setTenant] = useState<Tenant | null>(null)
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
-  const [lang, setLang] = useState('nl')
 
   useEffect(() => {
     loadData()
-    // Detect language from browser
-    const browserLang = navigator.language.split('-')[0]
-    if (translations[browserLang]) {
-      setLang(browserLang)
-    }
   }, [tenantSlug])
 
+  // Translation function that uses global i18n system
   const t = (key: string, replacements?: Record<string, string | number>) => {
-    let text = translations[lang]?.[key] || translations.nl[key] || key
+    // Try global i18n first
+    let text = globalT(`adminPages.subscription.${key}`)
+    
+    // If key not found in global, fall back to legacy translations
+    if (text === `adminPages.subscription.${key}`) {
+      text = legacyTranslations[locale]?.[key] || legacyTranslations.nl[key] || key
+    }
+    
+    // Apply replacements
     if (replacements) {
       Object.entries(replacements).forEach(([k, v]) => {
         text = text.replace(`{${k}}`, String(v))
@@ -621,7 +627,7 @@ export default function AbonnementPage() {
     const now = new Date()
     const trialEnd = new Date(trialEndsAt)
     daysLeft = Math.max(0, Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
-    trialEndDate = trialEnd.toLocaleDateString(lang === 'nl' ? 'nl-BE' : lang, { 
+    trialEndDate = trialEnd.toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale, { 
       day: 'numeric', 
       month: 'long', 
       year: 'numeric' 
@@ -726,7 +732,7 @@ export default function AbonnementPage() {
           )}
           {isActive && subscription?.next_payment_at && (
             <p className="text-gray-600">
-              {t('nextPayment')}: {new Date(subscription.next_payment_at).toLocaleDateString(lang === 'nl' ? 'nl-BE' : lang)}
+              {t('nextPayment')}: {new Date(subscription.next_payment_at).toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale)}
             </p>
           )}
         </div>
@@ -875,7 +881,7 @@ export default function AbonnementPage() {
                   <tr key={invoice.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 font-mono text-sm">{invoice.invoice_number}</td>
                     <td className="px-6 py-4 text-gray-600">
-                      {new Date(invoice.created_at).toLocaleDateString(lang === 'nl' ? 'nl-BE' : lang)}
+                      {new Date(invoice.created_at).toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale)}
                     </td>
                     <td className="px-6 py-4 text-gray-900">{invoice.description || '-'}</td>
                     <td className="px-6 py-4 font-semibold">€{Number(invoice.amount).toFixed(2)}</td>

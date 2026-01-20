@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 
 interface Order {
@@ -25,6 +26,11 @@ interface BusinessSettings {
 }
 
 export default function KeukenDisplayPage({ params }: { params: { tenant: string } }) {
+  const { t, locale } = useLanguage()
+  
+  // Translation helper for kitchenDisplay keys
+  const tx = (key: string) => t(`kitchenDisplay.${key}`)
+  
   const [orders, setOrders] = useState<Order[]>([])
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [business, setBusiness] = useState<BusinessSettings | null>(null)
@@ -325,8 +331,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const getTimeSince = (dateString: string) => {
     const diff = Date.now() - new Date(dateString).getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'Zojuist'
-    if (mins < 60) return `${mins} min`
+    if (mins < 1) return tx('justNow')
+    if (mins < 60) return `${mins} ${tx('min')}`
     return `${Math.floor(mins / 60)}u ${mins % 60}m`
   }
 
@@ -361,7 +367,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               👨‍🍳
             </div>
             <div>
-              <h1 className="text-xl font-bold">KEUKEN DISPLAY</h1>
+              <h1 className="text-xl font-bold">{tx('title')}</h1>
               <p className="text-blue-200 text-sm">{business?.business_name}</p>
             </div>
           </div>
@@ -375,17 +381,17 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 onClick={enableSound}
                 className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold flex items-center gap-2 text-sm"
               >
-                🔔 Geluid Aan
+                🔔 {tx('soundOn')}
               </motion.button>
             ) : (
               <span className="px-3 py-2 bg-green-500/30 text-green-300 rounded-xl flex items-center gap-2 text-sm">
-                🔊 Aan
+                🔊 {tx('soundEnabled')}
               </span>
             )}
 
             {/* Order count */}
             <div className="px-4 py-2 bg-white/20 rounded-xl font-bold">
-              📋 {orders.length} te maken
+              📋 {orders.length} {tx('toMake')}
             </div>
 
             {/* New order indicator */}
@@ -395,7 +401,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 transition={{ repeat: Infinity, duration: 0.5 }}
                 className="px-4 py-2 bg-red-500 rounded-xl font-bold"
               >
-                🚨 {newOrderIds.size} NIEUW
+                🚨 {newOrderIds.size} {tx('newOrder')}
               </motion.div>
             )}
 
@@ -420,8 +426,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         {orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
             <span className="text-8xl mb-6">✅</span>
-            <p className="text-2xl font-bold">Alles is klaar!</p>
-            <p className="text-lg mt-2">Nieuwe bestellingen verschijnen hier automatisch</p>
+            <p className="text-2xl font-bold">{tx('allDone')}</p>
+            <p className="text-lg mt-2">{tx('ordersAppearHere')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
@@ -460,7 +466,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     ? 'bg-purple-600' 
                     : 'bg-green-600'
                 }`}>
-                  {order.order_type === 'delivery' ? '🚗 LEVERING' : '🛍️ AFHALEN'}
+                  {order.order_type === 'delivery' ? `🚗 ${tx('delivery')}` : `🛍️ ${tx('pickup')}`}
                 </div>
 
                 {/* Items List */}
@@ -501,7 +507,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     }}
                     className="flex-1 py-3 bg-gray-600 hover:bg-gray-500 rounded-xl font-bold text-lg"
                   >
-                    🖨️ Print
+                    🖨️ {tx('print')}
                   </button>
                   <button
                     onClick={(e) => {
@@ -510,7 +516,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     }}
                     className="flex-1 py-3 bg-green-500 hover:bg-green-600 rounded-xl font-bold text-lg"
                   >
-                    ✓ Klaar
+                    ✓ {tx('ready')}
                   </button>
                 </div>
               </motion.div>
@@ -545,7 +551,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                       <span className={`px-3 py-1 rounded-lg font-bold ${
                         selectedOrder.order_type === 'delivery' ? 'bg-purple-500' : 'bg-green-500'
                       }`}>
-                        {selectedOrder.order_type === 'delivery' ? '🚗 LEVERING' : '🛍️ AFHALEN'}
+                        {selectedOrder.order_type === 'delivery' ? `🚗 ${tx('delivery')}` : `🛍️ ${tx('pickup')}`}
                       </span>
                       <span className={`font-mono font-bold text-lg ${getTimeColor(selectedOrder.created_at)}`}>
                         ⏱️ {getTimeSince(selectedOrder.created_at)}
@@ -567,12 +573,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 <div className="bg-gray-700/50 rounded-2xl p-4 mb-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-gray-400 text-sm">Klant</p>
+                      <p className="text-gray-400 text-sm">{tx('customer')}</p>
                       <p className="font-bold text-2xl">{selectedOrder.customer_name}</p>
                     </div>
                     {selectedOrder.customer_phone && (
                       <div className="text-right">
-                        <p className="text-gray-400 text-sm">Telefoon</p>
+                        <p className="text-gray-400 text-sm">{tx('phone')}</p>
                         <p className="font-bold text-xl">{selectedOrder.customer_phone}</p>
                       </div>
                     )}
@@ -581,7 +587,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
                 {/* Items - BIG for kitchen */}
                 <div className="bg-gray-700/50 rounded-2xl p-4 mb-4">
-                  <h3 className="font-bold text-xl mb-4 text-blue-400">TE BEREIDEN</h3>
+                  <h3 className="font-bold text-xl mb-4 text-blue-400">{tx('toPrepare')}</h3>
                   <div className="space-y-4">
                     {selectedOrder.items?.map((item: any, i: number) => (
                       <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-600 last:border-0">
@@ -607,7 +613,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 {/* Notes */}
                 {selectedOrder.customer_notes && (
                   <div className="bg-yellow-500/20 rounded-2xl p-4 mb-4">
-                    <h3 className="font-bold text-lg mb-2 text-yellow-400">📝 OPMERKINGEN</h3>
+                    <h3 className="font-bold text-lg mb-2 text-yellow-400">📝 {tx('notes')}</h3>
                     <p className="text-xl">{selectedOrder.customer_notes}</p>
                   </div>
                 )}
@@ -620,7 +626,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     onClick={() => printOrder(selectedOrder)}
                     className="py-6 bg-gray-600 hover:bg-gray-500 rounded-2xl font-bold text-2xl"
                   >
-                    🖨️ PRINT BON
+                    🖨️ {tx('printReceipt')}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -628,7 +634,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     onClick={() => handleReady(selectedOrder)}
                     className="py-6 bg-green-500 hover:bg-green-600 rounded-2xl font-bold text-2xl"
                   >
-                    ✓ KLAAR
+                    ✓ {tx('markReady')}
                   </motion.button>
                 </div>
               </div>
