@@ -14,8 +14,13 @@ const getSupabase = () => {
 
 // Legacy SHA-256 hash for backward compatibility
 async function hashPasswordLegacy(password: string): Promise<string> {
+  const legacySalt = process.env.PASSWORD_LEGACY_SALT
+  if (!legacySalt) {
+    console.error('PASSWORD_LEGACY_SALT not configured - legacy password verification will fail')
+    throw new Error('Legacy password verification not configured')
+  }
   const encoder = new TextEncoder()
-  const data = encoder.encode(password + 'vysion_salt_2024')
+  const data = encoder.encode(password + legacySalt)
   const hashBuffer = await crypto.subtle.digest('SHA-256', data)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
