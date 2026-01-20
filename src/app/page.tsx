@@ -10,25 +10,25 @@ function HeroSection() {
   const { t, locale } = useLanguage()
   
   const allImages = [
-    'https://i.imgur.com/IvW3RiX.png',
-    'https://i.imgur.com/6X8DuuU.png',
-    'https://i.imgur.com/lhfJfog.png',
-    'https://i.imgur.com/2yDjxdG.png',
-    'https://i.imgur.com/JzNBNID.png',
-    'https://i.imgur.com/LY3pado.png',
-    'https://i.imgur.com/WICLOFZ.png',
-    'https://i.imgur.com/OAV1L3S.png',
-    'https://i.imgur.com/vA8geT0.png',
-    'https://i.imgur.com/O9GBS6s.png',
-    'https://i.imgur.com/DOtQn1g.png',
-    'https://i.imgur.com/jnrBtec.png',
-    'https://i.imgur.com/IJ2vDaw.png',
-    'https://i.imgur.com/2IzZkB3.png',
-    'https://i.imgur.com/Pm7YSKt.png',
-    'https://i.imgur.com/9CAo3Yr.png',
-    'https://i.imgur.com/cIfiPmB.png',
-    'https://i.imgur.com/HtApXus.png',
-    'https://i.imgur.com/meXaat6.png',
+    '/images/screen-1.png',
+    '/images/screen-2.png',
+    '/images/screen-3.png',
+    '/images/screen-4.png',
+    '/images/screen-5.png',
+    '/images/screen-6.png',
+    '/images/screen-7.png',
+    '/images/screen-8.png',
+    '/images/screen-9.png',
+    '/images/screen-10.png',
+    '/images/screen-11.png',
+    '/images/screen-12.png',
+    '/images/screen-13.png',
+    '/images/screen-14.png',
+    '/images/screen-15.png',
+    '/images/screen-16.png',
+    '/images/screen-17.png',
+    '/images/screen-18.png',
+    '/images/screen-19.png',
   ]
 
   const sliderImages = allImages.slice(1) // All except the first one (iPad screen)
@@ -115,14 +115,14 @@ function HeroSection() {
                 <div className="relative w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[440px]">
                   {/* POS Monitor */}
                   <img 
-                    src="https://i.imgur.com/iEHXk3w.jpeg" 
+                    src="/images/pos-monitor.jpg" 
                     alt="Vysion Horeca POS Systeem" 
                     className="w-full rounded-lg shadow-xl"
                     loading="eager"
                   />
                   {/* Phone mockup overlay - left corner, more to the left */}
                   <img 
-                    src="https://i.imgur.com/APB1uh9.png" 
+                    src="/images/phone-mockup.png" 
                     alt="Vysion Horeca Mobiele App" 
                     className="absolute -left-12 sm:-left-16 md:-left-20 bottom-0 w-[120px] sm:w-[150px] md:w-[180px] drop-shadow-2xl"
                     loading="eager"
@@ -327,11 +327,11 @@ function OrderAppSection() {
   const { t } = useLanguage()
 
   const images = [
-    'https://i.imgur.com/bbUJ0uh.png',
-    'https://i.imgur.com/aw4tHlO.png',
-    'https://i.imgur.com/9vnNLsh.png',
-    'https://i.imgur.com/DABHVsP.png',
-    'https://i.imgur.com/NsSBBHs.png',
+    '/images/app-1.png',
+    '/images/app-2.png',
+    '/images/app-3.png',
+    '/images/app-4.png',
+    '/images/app-5.png',
   ]
 
   const goToPrev = (e: React.MouseEvent) => {
@@ -754,7 +754,7 @@ function ButWaitSection() {
           {/* Left - Image */}
           <div className="relative rounded-3xl overflow-hidden shadow-2xl">
             <img
-              src="https://i.imgur.com/RTl6VfK.jpeg"
+              src="/images/entrepreneur.jpg"
               alt="Ondernemer werkt met Vysion"
               className="w-full h-full object-cover"
               loading="lazy"
@@ -874,11 +874,11 @@ function IndustrySection() {
   const { t, locale } = useLanguage()
   
   const industries = {
-    invoicing: { image: 'https://i.imgur.com/k60MNlb.png' },
-    ordering: { image: 'https://i.imgur.com/0DoYrGw.png' },
-    analytics: { image: 'https://i.imgur.com/t7ADBbJ.png' },
-    accounting: { image: 'https://i.imgur.com/Q3gofpi.png' },
-    payroll: { image: 'https://i.imgur.com/DBVBcUP.png' },
+    invoicing: { image: '/images/industry-invoicing.png' },
+    ordering: { image: '/images/industry-ordering.png' },
+    analytics: { image: '/images/industry-analytics.png' },
+    accounting: { image: '/images/industry-accounting.png' },
+    payroll: { image: '/images/industry-payroll.png' },
   }
 
   const current = industries[activeTab as keyof typeof industries]
@@ -1061,7 +1061,7 @@ function CTASection() {
         className="absolute inset-0 w-full h-full object-cover"
         style={{ objectPosition: 'center center', transform: 'scale(1.0)' }}
       >
-        <source src="https://i.imgur.com/NSvVhnz.mp4" type="video/mp4" />
+        <source src="/images/cta-video.mp4" type="video/mp4" />
       </video>
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/70"></div>
