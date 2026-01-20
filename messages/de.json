@@ -1711,6 +1711,83 @@
       "fri": "Fr",
       "sat": "Sa",
       "sun": "So"
+    },
+    "absenceTypes": {
+      "worked": "Gearbeitet",
+      "sick": "Krank",
+      "vacation": "Urlaub",
+      "shortLeave": "Kurzurlaub",
+      "authorized": "Genehmigte Abwesenheit",
+      "holiday": "Feiertag",
+      "maternity": "Mutterschaftsurlaub",
+      "paternity": "Vaterschaftsurlaub",
+      "unpaid": "Unbezahlter Urlaub",
+      "training": "Schulung",
+      "other": "Sonstiges"
+    }
+  },
+  "personeelPage": {
+    "title": "Personal",
+    "subtitle": "Verwalten Sie Ihre Mitarbeiter und deren Daten",
+    "addEmployee": "Mitarbeiter hinzufügen",
+    "addFirstEmployee": "Ersten Mitarbeiter hinzufügen",
+    "noEmployees": "Noch keine Mitarbeiter",
+    "noEmployeesDesc": "Fügen Sie Ihren ersten Mitarbeiter hinzu",
+    "showInactive": "Inaktive Mitarbeiter anzeigen",
+    "newEmployee": "Neuer Mitarbeiter",
+    "editEmployee": "Mitarbeiter bearbeiten",
+    "pin": "PIN",
+    "hoursPerWeek": "Std/Woche",
+    "contract": "Vertrag",
+    "stats": {
+      "activeEmployees": "Aktive Mitarbeiter"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "manager": "Manager",
+      "employee": "Mitarbeiter",
+      "employees": "Mitarbeiter"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Vorname Nachname",
+      "email": "E-Mail",
+      "emailPlaceholder": "email@beispiel.de",
+      "phone": "Telefon",
+      "phonePlaceholder": "+49 xxx xxx xxxx",
+      "pinCode": "PIN-Code",
+      "pinHint": "Mitarbeiter wählt selbst",
+      "pinPlaceholder": "4 Ziffern eingeben",
+      "role": "Rolle",
+      "color": "Farbe"
+    },
+    "contractForm": {
+      "type": "Vertragsart",
+      "select": "Auswählen...",
+      "hoursPerWeek": "Stunden pro Woche",
+      "hourlyRate": "Stundenlohn (€)",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "notes": "Notizen",
+      "notesPlaceholder": "Zusätzliche Anmerkungen zum Vertrag...",
+      "calculation": "Berechnung",
+      "perWeek": "Pro Woche",
+      "perMonth": "Pro Monat",
+      "saveContract": "Vertrag speichern"
+    },
+    "contractTypes": {
+      "permanent": "Festvertrag",
+      "interim": "Zeitarbeit",
+      "flexi": "Flexi-Job",
+      "student": "Student",
+      "seasonal": "Saisonarbeiter",
+      "freelance": "Freiberufler",
+      "intern": "Praktikant"
+    },
+    "alerts": {
+      "nameAndPinRequired": "Name und PIN eingeben",
+      "confirmDelete": "Möchten Sie wirklich löschen:",
+      "deleteFailed": "Löschen fehlgeschlagen"
     }
   },
   "websiteGiftCards": {

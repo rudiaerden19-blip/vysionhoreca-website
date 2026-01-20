@@ -20,7 +20,6 @@ import {
   TimesheetEntry,
   MonthlyTimesheet,
   AbsenceType,
-  ABSENCE_TYPES,
 } from '@/lib/admin-api'
 
 const getMonths = (t: (key: string) => string) => [
@@ -35,6 +34,20 @@ const getDays = (t: (key: string) => string) => [
   t('urenPage.days.thu'), t('urenPage.days.fri'), t('urenPage.days.sat'), t('urenPage.days.sun')
 ]
 
+const getAbsenceTypes = (t: (key: string) => string): { id: AbsenceType; label: string; color: string; icon: string }[] => [
+  { id: 'WORKED', label: t('urenPage.absenceTypes.worked'), color: '#22c55e', icon: '✅' },
+  { id: 'SICK', label: t('urenPage.absenceTypes.sick'), color: '#ef4444', icon: '🤒' },
+  { id: 'VACATION', label: t('urenPage.absenceTypes.vacation'), color: '#3b82f6', icon: '🏖️' },
+  { id: 'SHORT_LEAVE', label: t('urenPage.absenceTypes.shortLeave'), color: '#f97316', icon: '⏰' },
+  { id: 'AUTHORIZED', label: t('urenPage.absenceTypes.authorized'), color: '#8b5cf6', icon: '📋' },
+  { id: 'HOLIDAY', label: t('urenPage.absenceTypes.holiday'), color: '#06b6d4', icon: '🎉' },
+  { id: 'MATERNITY', label: t('urenPage.absenceTypes.maternity'), color: '#ec4899', icon: '👶' },
+  { id: 'PATERNITY', label: t('urenPage.absenceTypes.paternity'), color: '#0ea5e9', icon: '👨‍👧' },
+  { id: 'UNPAID', label: t('urenPage.absenceTypes.unpaid'), color: '#6b7280', icon: '💤' },
+  { id: 'TRAINING', label: t('urenPage.absenceTypes.training'), color: '#84cc16', icon: '📚' },
+  { id: 'OTHER', label: t('urenPage.absenceTypes.other'), color: '#a3a3a3', icon: '📝' },
+]
+
 export default function UrenPage() {
   const { t } = useLanguage()
   const params = useParams()
@@ -42,6 +55,7 @@ export default function UrenPage() {
   
   const MONTHS = getMonths(t)
   const DAYS = getDays(t)
+  const LOCAL_ABSENCE_TYPES = getAbsenceTypes(t)
   
   const [staff, setStaff] = useState<Staff[]>([])
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null)
@@ -301,7 +315,7 @@ export default function UrenPage() {
       e.clock_out || '',
       e.break_minutes || 0,
       e.worked_hours || e.absence_hours || 0,
-      ABSENCE_TYPES.find(t => t.id === e.absence_type)?.label || e.absence_type,
+      LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)?.label || e.absence_type,
       e.notes || ''
     ])
     
@@ -386,7 +400,7 @@ Met vriendelijke groeten`,
         e.clock_out || '',
         e.break_minutes || 0,
         e.worked_hours || e.absence_hours || 0,
-        ABSENCE_TYPES.find(t => t.id === e.absence_type)?.label || e.absence_type,
+        LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)?.label || e.absence_type,
         e.notes || ''
       ])
       const csvContent = [headers, ...rows].map(row => row.join(';')).join('\n')
@@ -706,7 +720,7 @@ Met vriendelijke groeten`,
                 
                 {/* Toon ALLE entries voor deze dag */}
                 {inMonth && dayEntries.map((entry, i) => {
-                  const absenceType = ABSENCE_TYPES.find(t => t.id === entry.absence_type)
+                  const absenceType = LOCAL_ABSENCE_TYPES.find(at => at.id === entry.absence_type)
                   return (
                     <div
                       key={entry.id || i}
@@ -748,7 +762,7 @@ Met vriendelijke groeten`,
             {entries.map((e, i) => {
               const date = new Date(e.date)
               const dayName = date.toLocaleDateString('nl-BE', { weekday: 'short' })
-              const absenceType = ABSENCE_TYPES.find(t => t.id === e.absence_type)
+              const absenceType = LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)
               return (
                 <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                   <td className="border border-gray-300 p-2">{date.toLocaleDateString('nl-BE')}</td>
@@ -781,7 +795,7 @@ Met vriendelijke groeten`,
             <h4 className="font-bold mb-2">📊 Uitsplitsing per type</h4>
             <table className="w-full text-sm border-collapse">
               <tbody>
-                {ABSENCE_TYPES.map(type => {
+                {LOCAL_ABSENCE_TYPES.map(type => {
                   const hours = entries
                     .filter(e => e.absence_type === type.id)
                     .reduce((sum, e) => sum + (e.worked_hours || e.absence_hours || 0), 0)
@@ -849,7 +863,7 @@ Met vriendelijke groeten`,
       <div className="bg-white rounded-xl p-4 shadow-sm border print:hidden">
         <h3 className="font-medium text-gray-800 mb-3">{t('urenPage.legend')}</h3>
         <div className="flex flex-wrap gap-3">
-          {ABSENCE_TYPES.map(type => (
+          {LOCAL_ABSENCE_TYPES.map(type => (
             <div key={type.id} className="flex items-center gap-1 text-sm">
               <span
                 className="w-4 h-4 rounded"
@@ -879,7 +893,7 @@ Met vriendelijke groeten`,
                   <label className="block text-sm font-medium text-gray-700 mb-2">{t('urenPage.existingEntries')}</label>
                   <div className="space-y-2">
                     {getEntriesForDate(new Date(selectedDate)).map((entry) => {
-                      const absenceType = ABSENCE_TYPES.find(t => t.id === entry.absence_type)
+                      const absenceType = LOCAL_ABSENCE_TYPES.find(at => at.id === entry.absence_type)
                       return (
                         <div
                           key={entry.id}
@@ -928,7 +942,7 @@ Met vriendelijke groeten`,
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">{t('urenPage.type')}</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {ABSENCE_TYPES.slice(0, 6).map(type => (
+                  {LOCAL_ABSENCE_TYPES.slice(0, 6).map(type => (
                     <button
                       key={type.id}
                       type="button"
@@ -954,7 +968,7 @@ Met vriendelijke groeten`,
                   onChange={(e) => setEntryForm({ ...entryForm, absence_type: e.target.value as AbsenceType })}
                   className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
-                  {ABSENCE_TYPES.map(type => (
+                  {LOCAL_ABSENCE_TYPES.map(type => (
                     <option key={type.id} value={type.id}>{type.icon} {type.label}</option>
                   ))}
                 </select>
@@ -1177,7 +1191,7 @@ Met vriendelijke groeten`,
               {entries.map((e, i) => {
                 const date = new Date(e.date)
                 const dayName = date.toLocaleDateString('nl-BE', { weekday: 'short' })
-                const absenceType = ABSENCE_TYPES.find(t => t.id === e.absence_type)
+                const absenceType = LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)
                 return (
                   <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                     <td className="border border-gray-300 p-1">{date.toLocaleDateString('nl-BE')}</td>
@@ -1207,7 +1221,7 @@ Met vriendelijke groeten`,
               <h4 className="font-bold mb-2 text-sm">📊 Uitsplitsing per type</h4>
               <table className="w-full text-xs border-collapse">
                 <tbody>
-                  {ABSENCE_TYPES.map(type => {
+                  {LOCAL_ABSENCE_TYPES.map(type => {
                     const hours = entries
                       .filter(e => e.absence_type === type.id)
                       .reduce((sum, e) => sum + (e.worked_hours || e.absence_hours || 0), 0)

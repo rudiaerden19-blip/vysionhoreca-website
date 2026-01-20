@@ -2246,6 +2246,83 @@
       "fri": "جمع",
       "sat": "سبت",
       "sun": "أحد"
+    },
+    "absenceTypes": {
+      "worked": "عمل",
+      "sick": "مرض",
+      "vacation": "إجازة",
+      "shortLeave": "إذن قصير",
+      "authorized": "غياب مرخص",
+      "holiday": "عطلة",
+      "maternity": "إجازة أمومة",
+      "paternity": "إجازة أبوة",
+      "unpaid": "إجازة بدون راتب",
+      "training": "تدريب",
+      "other": "أخرى"
+    }
+  },
+  "personeelPage": {
+    "title": "الموظفين",
+    "subtitle": "إدارة الموظفين وبياناتهم",
+    "addEmployee": "إضافة موظف",
+    "addFirstEmployee": "إضافة أول موظف",
+    "noEmployees": "لا يوجد موظفون بعد",
+    "noEmployeesDesc": "أضف أول موظف للبدء",
+    "showInactive": "إظهار الموظفين غير النشطين",
+    "newEmployee": "موظف جديد",
+    "editEmployee": "تعديل موظف",
+    "pin": "رمز PIN",
+    "hoursPerWeek": "ساعة/أسبوع",
+    "contract": "العقد",
+    "stats": {
+      "activeEmployees": "الموظفون النشطون"
+    },
+    "roles": {
+      "admin": "مدير النظام",
+      "manager": "مدير",
+      "employee": "موظف",
+      "employees": "موظفون"
+    },
+    "form": {
+      "name": "الاسم",
+      "namePlaceholder": "الاسم الأول الأخير",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "email@example.com",
+      "phone": "الهاتف",
+      "phonePlaceholder": "+966 xxx xxx xxxx",
+      "pinCode": "رمز PIN",
+      "pinHint": "الموظف يختار بنفسه",
+      "pinPlaceholder": "أدخل 4 أرقام",
+      "role": "الدور",
+      "color": "اللون"
+    },
+    "contractForm": {
+      "type": "نوع العقد",
+      "select": "اختر...",
+      "hoursPerWeek": "ساعات في الأسبوع",
+      "hourlyRate": "الأجر بالساعة (€)",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "notes": "ملاحظات",
+      "notesPlaceholder": "ملاحظات إضافية عن العقد...",
+      "calculation": "الحساب",
+      "perWeek": "في الأسبوع",
+      "perMonth": "في الشهر",
+      "saveContract": "حفظ العقد"
+    },
+    "contractTypes": {
+      "permanent": "عقد دائم",
+      "interim": "مؤقت",
+      "flexi": "عمل مرن",
+      "student": "طالب",
+      "seasonal": "موسمي",
+      "freelance": "مستقل",
+      "intern": "متدرب"
+    },
+    "alerts": {
+      "nameAndPinRequired": "أدخل الاسم ورمز PIN",
+      "confirmDelete": "هل أنت متأكد من الحذف:",
+      "deleteFailed": "فشل الحذف"
     }
   },
   "websiteGiftCards": {

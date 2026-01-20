@@ -2246,6 +2246,83 @@
       "fri": "金",
       "sat": "土",
       "sun": "日"
+    },
+    "absenceTypes": {
+      "worked": "勤務",
+      "sick": "病欠",
+      "vacation": "休暇",
+      "shortLeave": "短期休暇",
+      "authorized": "許可された欠勤",
+      "holiday": "祝日",
+      "maternity": "産休",
+      "paternity": "育休",
+      "unpaid": "無給休暇",
+      "training": "研修",
+      "other": "その他"
+    }
+  },
+  "personeelPage": {
+    "title": "スタッフ",
+    "subtitle": "従業員とその情報を管理",
+    "addEmployee": "従業員を追加",
+    "addFirstEmployee": "最初の従業員を追加",
+    "noEmployees": "まだ従業員がいません",
+    "noEmployeesDesc": "最初の従業員を追加して開始",
+    "showInactive": "非アクティブな従業員を表示",
+    "newEmployee": "新規従業員",
+    "editEmployee": "従業員を編集",
+    "pin": "PIN",
+    "hoursPerWeek": "時間/週",
+    "contract": "契約",
+    "stats": {
+      "activeEmployees": "アクティブな従業員"
+    },
+    "roles": {
+      "admin": "管理者",
+      "manager": "マネージャー",
+      "employee": "従業員",
+      "employees": "従業員"
+    },
+    "form": {
+      "name": "名前",
+      "namePlaceholder": "姓 名",
+      "email": "メール",
+      "emailPlaceholder": "email@example.com",
+      "phone": "電話",
+      "phonePlaceholder": "+81 xxx xxxx xxxx",
+      "pinCode": "PINコード",
+      "pinHint": "従業員が選択",
+      "pinPlaceholder": "4桁を入力",
+      "role": "役割",
+      "color": "色"
+    },
+    "contractForm": {
+      "type": "契約タイプ",
+      "select": "選択...",
+      "hoursPerWeek": "週あたりの時間",
+      "hourlyRate": "時給（€）",
+      "startDate": "開始日",
+      "endDate": "終了日",
+      "notes": "メモ",
+      "notesPlaceholder": "契約に関する追加メモ...",
+      "calculation": "計算",
+      "perWeek": "週あたり",
+      "perMonth": "月あたり",
+      "saveContract": "契約を保存"
+    },
+    "contractTypes": {
+      "permanent": "正社員",
+      "interim": "派遣",
+      "flexi": "フレキシブル",
+      "student": "学生",
+      "seasonal": "季節労働者",
+      "freelance": "フリーランス",
+      "intern": "インターン"
+    },
+    "alerts": {
+      "nameAndPinRequired": "名前とPINを入力",
+      "confirmDelete": "削除してもよろしいですか：",
+      "deleteFailed": "削除に失敗"
     }
   },
   "websiteGiftCards": {

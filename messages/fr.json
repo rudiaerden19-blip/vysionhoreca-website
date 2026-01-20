@@ -1711,6 +1711,83 @@
       "fri": "Ven",
       "sat": "Sam",
       "sun": "Dim"
+    },
+    "absenceTypes": {
+      "worked": "Travaillé",
+      "sick": "Maladie",
+      "vacation": "Vacances",
+      "shortLeave": "Congé court",
+      "authorized": "Absence autorisée",
+      "holiday": "Jour férié",
+      "maternity": "Congé maternité",
+      "paternity": "Congé paternité",
+      "unpaid": "Congé sans solde",
+      "training": "Formation",
+      "other": "Autre"
+    }
+  },
+  "personeelPage": {
+    "title": "Personnel",
+    "subtitle": "Gérez vos employés et leurs informations",
+    "addEmployee": "Ajouter employé",
+    "addFirstEmployee": "Ajouter premier employé",
+    "noEmployees": "Pas encore d'employés",
+    "noEmployeesDesc": "Ajoutez votre premier employé pour commencer",
+    "showInactive": "Afficher les employés inactifs",
+    "newEmployee": "Nouvel employé",
+    "editEmployee": "Modifier employé",
+    "pin": "PIN",
+    "hoursPerWeek": "h/semaine",
+    "contract": "Contrat",
+    "stats": {
+      "activeEmployees": "Employés actifs"
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "manager": "Manager",
+      "employee": "Employé",
+      "employees": "Employés"
+    },
+    "form": {
+      "name": "Nom",
+      "namePlaceholder": "Prénom Nom",
+      "email": "Email",
+      "emailPlaceholder": "email@exemple.fr",
+      "phone": "Téléphone",
+      "phonePlaceholder": "+33 x xx xx xx xx",
+      "pinCode": "Code PIN",
+      "pinHint": "l'employé choisit lui-même",
+      "pinPlaceholder": "Entrer 4 chiffres",
+      "role": "Rôle",
+      "color": "Couleur"
+    },
+    "contractForm": {
+      "type": "Type de contrat",
+      "select": "Sélectionner...",
+      "hoursPerWeek": "Heures par semaine",
+      "hourlyRate": "Taux horaire (€)",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "notes": "Notes",
+      "notesPlaceholder": "Notes supplémentaires sur le contrat...",
+      "calculation": "Calcul",
+      "perWeek": "Par semaine",
+      "perMonth": "Par mois",
+      "saveContract": "Enregistrer contrat"
+    },
+    "contractTypes": {
+      "permanent": "CDI",
+      "interim": "Intérim",
+      "flexi": "Flexi-job",
+      "student": "Étudiant",
+      "seasonal": "Saisonnier",
+      "freelance": "Freelance",
+      "intern": "Stagiaire"
+    },
+    "alerts": {
+      "nameAndPinRequired": "Entrez nom et PIN",
+      "confirmDelete": "Êtes-vous sûr de vouloir supprimer:",
+      "deleteFailed": "Échec de la suppression"
     }
   },
   "websiteGiftCards": {

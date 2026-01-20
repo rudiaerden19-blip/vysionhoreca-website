@@ -2246,6 +2246,83 @@
       "fri": "五",
       "sat": "六",
       "sun": "日"
+    },
+    "absenceTypes": {
+      "worked": "工作",
+      "sick": "病假",
+      "vacation": "休假",
+      "shortLeave": "短假",
+      "authorized": "已批准缺勤",
+      "holiday": "节假日",
+      "maternity": "产假",
+      "paternity": "陪产假",
+      "unpaid": "无薪假",
+      "training": "培训",
+      "other": "其他"
+    }
+  },
+  "personeelPage": {
+    "title": "员工",
+    "subtitle": "管理您的员工及其信息",
+    "addEmployee": "添加员工",
+    "addFirstEmployee": "添加第一位员工",
+    "noEmployees": "暂无员工",
+    "noEmployeesDesc": "添加第一位员工开始使用",
+    "showInactive": "显示非活跃员工",
+    "newEmployee": "新员工",
+    "editEmployee": "编辑员工",
+    "pin": "PIN码",
+    "hoursPerWeek": "小时/周",
+    "contract": "合同",
+    "stats": {
+      "activeEmployees": "活跃员工"
+    },
+    "roles": {
+      "admin": "管理员",
+      "manager": "经理",
+      "employee": "员工",
+      "employees": "员工"
+    },
+    "form": {
+      "name": "姓名",
+      "namePlaceholder": "姓 名",
+      "email": "邮箱",
+      "emailPlaceholder": "email@example.com",
+      "phone": "电话",
+      "phonePlaceholder": "+86 xxx xxxx xxxx",
+      "pinCode": "PIN码",
+      "pinHint": "员工自行选择",
+      "pinPlaceholder": "输入4位数字",
+      "role": "角色",
+      "color": "颜色"
+    },
+    "contractForm": {
+      "type": "合同类型",
+      "select": "选择...",
+      "hoursPerWeek": "每周工时",
+      "hourlyRate": "时薪（€）",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "notes": "备注",
+      "notesPlaceholder": "合同相关备注...",
+      "calculation": "计算",
+      "perWeek": "每周",
+      "perMonth": "每月",
+      "saveContract": "保存合同"
+    },
+    "contractTypes": {
+      "permanent": "正式合同",
+      "interim": "临时工",
+      "flexi": "灵活工作",
+      "student": "学生",
+      "seasonal": "季节工",
+      "freelance": "自由职业",
+      "intern": "实习生"
+    },
+    "alerts": {
+      "nameAndPinRequired": "请输入姓名和PIN码",
+      "confirmDelete": "确定要删除吗：",
+      "deleteFailed": "删除失败"
     }
   },
   "websiteGiftCards": {

@@ -2332,6 +2332,83 @@
       "fri": "Fri",
       "sat": "Sat",
       "sun": "Sun"
+    },
+    "absenceTypes": {
+      "worked": "Worked",
+      "sick": "Sick",
+      "vacation": "Vacation",
+      "shortLeave": "Short leave",
+      "authorized": "Authorized absence",
+      "holiday": "Holiday",
+      "maternity": "Maternity leave",
+      "paternity": "Paternity leave",
+      "unpaid": "Unpaid leave",
+      "training": "Training",
+      "other": "Other"
+    }
+  },
+  "personeelPage": {
+    "title": "Staff",
+    "subtitle": "Manage your employees and their details",
+    "addEmployee": "Add employee",
+    "addFirstEmployee": "Add first employee",
+    "noEmployees": "No employees yet",
+    "noEmployeesDesc": "Add your first employee to get started",
+    "showInactive": "Show inactive employees",
+    "newEmployee": "New employee",
+    "editEmployee": "Edit employee",
+    "pin": "PIN",
+    "hoursPerWeek": "hours/week",
+    "contract": "Contract",
+    "stats": {
+      "activeEmployees": "Active employees"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "manager": "Manager",
+      "employee": "Employee",
+      "employees": "Employees"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "First Last",
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "phone": "Phone",
+      "phonePlaceholder": "+1 xxx xxx xxxx",
+      "pinCode": "PIN code",
+      "pinHint": "employee chooses their own",
+      "pinPlaceholder": "Enter 4 digits",
+      "role": "Role",
+      "color": "Color"
+    },
+    "contractForm": {
+      "type": "Contract type",
+      "select": "Select...",
+      "hoursPerWeek": "Hours per week",
+      "hourlyRate": "Hourly rate (€)",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "notes": "Notes",
+      "notesPlaceholder": "Additional notes about the contract...",
+      "calculation": "Calculation",
+      "perWeek": "Per week",
+      "perMonth": "Per month",
+      "saveContract": "Save contract"
+    },
+    "contractTypes": {
+      "permanent": "Permanent contract",
+      "interim": "Interim",
+      "flexi": "Flexi-job",
+      "student": "Student",
+      "seasonal": "Seasonal worker",
+      "freelance": "Freelance",
+      "intern": "Intern"
+    },
+    "alerts": {
+      "nameAndPinRequired": "Enter name and PIN",
+      "confirmDelete": "Are you sure you want to delete:",
+      "deleteFailed": "Delete failed"
     }
   },
   "websiteGiftCards": {

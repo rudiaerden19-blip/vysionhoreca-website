@@ -2338,6 +2338,83 @@
       "fri": "Vr",
       "sat": "Za",
       "sun": "Zo"
+    },
+    "absenceTypes": {
+      "worked": "Gewerkt",
+      "sick": "Ziekte",
+      "vacation": "Vakantie",
+      "shortLeave": "Kort verzuim",
+      "authorized": "Geoorloofd afwezig",
+      "holiday": "Feestdag",
+      "maternity": "Zwangerschapsverlof",
+      "paternity": "Vaderschapsverlof",
+      "unpaid": "Onbetaald verlof",
+      "training": "Opleiding",
+      "other": "Overig"
+    }
+  },
+  "personeelPage": {
+    "title": "Personeel",
+    "subtitle": "Beheer je medewerkers en hun gegevens",
+    "addEmployee": "Medewerker toevoegen",
+    "addFirstEmployee": "Eerste medewerker toevoegen",
+    "noEmployees": "Nog geen medewerkers",
+    "noEmployeesDesc": "Voeg je eerste medewerker toe om te beginnen",
+    "showInactive": "Toon inactieve medewerkers",
+    "newEmployee": "Nieuwe medewerker",
+    "editEmployee": "Medewerker bewerken",
+    "pin": "PIN",
+    "hoursPerWeek": "uur/week",
+    "contract": "Contract",
+    "stats": {
+      "activeEmployees": "Actieve medewerkers"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "manager": "Manager",
+      "employee": "Medewerker",
+      "employees": "Medewerkers"
+    },
+    "form": {
+      "name": "Naam",
+      "namePlaceholder": "Voornaam Achternaam",
+      "email": "Email",
+      "emailPlaceholder": "email@voorbeeld.be",
+      "phone": "Telefoon",
+      "phonePlaceholder": "+32 xxx xx xx xx",
+      "pinCode": "PIN-code",
+      "pinHint": "medewerker kiest zelf",
+      "pinPlaceholder": "Vul 4 cijfers in",
+      "role": "Rol",
+      "color": "Kleur"
+    },
+    "contractForm": {
+      "type": "Contracttype",
+      "select": "Selecteer...",
+      "hoursPerWeek": "Uren per week",
+      "hourlyRate": "Uurloon (€)",
+      "startDate": "Startdatum",
+      "endDate": "Einddatum",
+      "notes": "Notities",
+      "notesPlaceholder": "Extra opmerkingen over het contract...",
+      "calculation": "Berekening",
+      "perWeek": "Per week",
+      "perMonth": "Per maand",
+      "saveContract": "Contract opslaan"
+    },
+    "contractTypes": {
+      "permanent": "Vast contract",
+      "interim": "Interim",
+      "flexi": "Flexi-job",
+      "student": "Student",
+      "seasonal": "Seizoensarbeider",
+      "freelance": "Freelance",
+      "intern": "Stagiair"
+    },
+    "alerts": {
+      "nameAndPinRequired": "Vul naam en PIN in",
+      "confirmDelete": "Weet je zeker dat je wilt verwijderen:",
+      "deleteFailed": "Verwijderen mislukt"
     }
   },
   "websiteGiftCards": {
