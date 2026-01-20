@@ -2829,5 +2829,29 @@
     "accountDeleted": "您的账户和所有数据已删除。",
     "deleteError": "出错了，请重试。",
     "backToMenu": "返回菜单"
+  },
+  "reviewPage": {
+    "back": "返回",
+    "writeReview": "写评价",
+    "leaveReviewFor": "为以下店铺留下评价",
+    "howWasExperience": "您的体验如何？",
+    "ratingBad": "很差",
+    "ratingPoor": "较差",
+    "ratingAverage": "一般",
+    "ratingGood": "良好",
+    "ratingExcellent": "优秀！",
+    "yourName": "您的姓名",
+    "email": "邮箱（可选）",
+    "emailNote": "我们仅用于回复您的评价。",
+    "yourReview": "您的评价",
+    "reviewPlaceholder": "分享您的体验...",
+    "submit": "提交评价",
+    "submitting": "提交中...",
+    "selectRating": "请选择评分（1-5星）",
+    "fillAllFields": "请填写所有必填项",
+    "thankYou": "感谢您的评价！",
+    "thankYouDesc": "非常感谢您的反馈。您的评价将经过审核后发布。",
+    "backToShop": "返回商店",
+    "reviewModerated": "您的评价将在审核后发布。"
   }
 }

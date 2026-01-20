@@ -3244,5 +3244,29 @@
     "accountDeleted": "Je account en alle gegevens zijn verwijderd.",
     "deleteError": "Er is iets misgegaan. Probeer opnieuw.",
     "backToMenu": "Terug naar menu"
+  },
+  "reviewPage": {
+    "back": "Terug",
+    "writeReview": "Review Schrijven",
+    "leaveReviewFor": "Laat een review achter voor",
+    "howWasExperience": "Hoe was je ervaring?",
+    "ratingBad": "Slecht",
+    "ratingPoor": "Matig",
+    "ratingAverage": "Gemiddeld",
+    "ratingGood": "Goed",
+    "ratingExcellent": "Uitstekend!",
+    "yourName": "Je naam",
+    "email": "E-mail (optioneel)",
+    "emailNote": "We gebruiken dit alleen om eventueel te reageren op je review.",
+    "yourReview": "Je review",
+    "reviewPlaceholder": "Vertel ons over je ervaring...",
+    "submit": "Review Plaatsen",
+    "submitting": "Verzenden...",
+    "selectRating": "Selecteer een beoordeling (1-5 sterren)",
+    "fillAllFields": "Vul alle verplichte velden in",
+    "thankYou": "Bedankt voor je review!",
+    "thankYouDesc": "We waarderen je feedback enorm. Je review wordt beoordeeld en binnenkort gepubliceerd.",
+    "backToShop": "Terug naar de shop",
+    "reviewModerated": "Je review wordt beoordeeld voordat deze gepubliceerd wordt."
   }
 }

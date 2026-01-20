@@ -2307,5 +2307,29 @@
     "accountDeleted": "Votre compte et toutes vos données ont été supprimés.",
     "deleteError": "Une erreur s'est produite. Veuillez réessayer.",
     "backToMenu": "Retour au menu"
+  },
+  "reviewPage": {
+    "back": "Retour",
+    "writeReview": "Écrire un avis",
+    "leaveReviewFor": "Laissez un avis pour",
+    "howWasExperience": "Comment était votre expérience ?",
+    "ratingBad": "Mauvais",
+    "ratingPoor": "Moyen",
+    "ratingAverage": "Correct",
+    "ratingGood": "Bon",
+    "ratingExcellent": "Excellent !",
+    "yourName": "Votre nom",
+    "email": "Email (optionnel)",
+    "emailNote": "Nous utilisons ceci uniquement pour éventuellement répondre à votre avis.",
+    "yourReview": "Votre avis",
+    "reviewPlaceholder": "Parlez-nous de votre expérience...",
+    "submit": "Publier l'avis",
+    "submitting": "Envoi...",
+    "selectRating": "Sélectionnez une note (1-5 étoiles)",
+    "fillAllFields": "Veuillez remplir tous les champs obligatoires",
+    "thankYou": "Merci pour votre avis !",
+    "thankYouDesc": "Nous apprécions énormément votre retour. Votre avis sera examiné et publié prochainement.",
+    "backToShop": "Retour à la boutique",
+    "reviewModerated": "Votre avis sera examiné avant d'être publié."
   }
 }

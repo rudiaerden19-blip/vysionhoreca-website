@@ -2310,5 +2310,29 @@
     "accountDeleted": "Dein Konto und alle Daten wurden gelöscht.",
     "deleteError": "Etwas ist schief gelaufen. Bitte versuche es erneut.",
     "backToMenu": "Zurück zum Menü"
+  },
+  "reviewPage": {
+    "back": "Zurück",
+    "writeReview": "Bewertung schreiben",
+    "leaveReviewFor": "Hinterlasse eine Bewertung für",
+    "howWasExperience": "Wie war deine Erfahrung?",
+    "ratingBad": "Schlecht",
+    "ratingPoor": "Mäßig",
+    "ratingAverage": "Durchschnitt",
+    "ratingGood": "Gut",
+    "ratingExcellent": "Ausgezeichnet!",
+    "yourName": "Dein Name",
+    "email": "E-Mail (optional)",
+    "emailNote": "Wir verwenden dies nur, um möglicherweise auf deine Bewertung zu antworten.",
+    "yourReview": "Deine Bewertung",
+    "reviewPlaceholder": "Erzähle uns von deiner Erfahrung...",
+    "submit": "Bewertung abgeben",
+    "submitting": "Wird gesendet...",
+    "selectRating": "Wähle eine Bewertung (1-5 Sterne)",
+    "fillAllFields": "Bitte fülle alle Pflichtfelder aus",
+    "thankYou": "Danke für deine Bewertung!",
+    "thankYouDesc": "Wir schätzen dein Feedback sehr. Deine Bewertung wird geprüft und bald veröffentlicht.",
+    "backToShop": "Zurück zum Shop",
+    "reviewModerated": "Deine Bewertung wird geprüft, bevor sie veröffentlicht wird."
   }
 }

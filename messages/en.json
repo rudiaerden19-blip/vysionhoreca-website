@@ -3238,5 +3238,29 @@
     "accountDeleted": "Your account and all data have been deleted.",
     "deleteError": "Something went wrong. Please try again.",
     "backToMenu": "Back to menu"
+  },
+  "reviewPage": {
+    "back": "Back",
+    "writeReview": "Write Review",
+    "leaveReviewFor": "Leave a review for",
+    "howWasExperience": "How was your experience?",
+    "ratingBad": "Bad",
+    "ratingPoor": "Poor",
+    "ratingAverage": "Average",
+    "ratingGood": "Good",
+    "ratingExcellent": "Excellent!",
+    "yourName": "Your name",
+    "email": "Email (optional)",
+    "emailNote": "We only use this to possibly respond to your review.",
+    "yourReview": "Your review",
+    "reviewPlaceholder": "Tell us about your experience...",
+    "submit": "Submit Review",
+    "submitting": "Submitting...",
+    "selectRating": "Select a rating (1-5 stars)",
+    "fillAllFields": "Please fill in all required fields",
+    "thankYou": "Thank you for your review!",
+    "thankYouDesc": "We greatly appreciate your feedback. Your review will be reviewed and published soon.",
+    "backToShop": "Back to shop",
+    "reviewModerated": "Your review will be reviewed before it is published."
   }
 }

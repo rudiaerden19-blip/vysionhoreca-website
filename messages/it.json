@@ -2842,5 +2842,29 @@
     "accountDeleted": "Il tuo account e tutti i dati sono stati eliminati.",
     "deleteError": "Qualcosa è andato storto. Riprova.",
     "backToMenu": "Torna al menu"
+  },
+  "reviewPage": {
+    "back": "Indietro",
+    "writeReview": "Scrivi recensione",
+    "leaveReviewFor": "Lascia una recensione per",
+    "howWasExperience": "Com'è stata la tua esperienza?",
+    "ratingBad": "Pessimo",
+    "ratingPoor": "Scarso",
+    "ratingAverage": "Nella media",
+    "ratingGood": "Buono",
+    "ratingExcellent": "Eccellente!",
+    "yourName": "Il tuo nome",
+    "email": "Email (opzionale)",
+    "emailNote": "Usiamo questo solo per eventualmente rispondere alla tua recensione.",
+    "yourReview": "La tua recensione",
+    "reviewPlaceholder": "Raccontaci la tua esperienza...",
+    "submit": "Pubblica recensione",
+    "submitting": "Invio...",
+    "selectRating": "Seleziona una valutazione (1-5 stelle)",
+    "fillAllFields": "Per favore compila tutti i campi obbligatori",
+    "thankYou": "Grazie per la tua recensione!",
+    "thankYouDesc": "Apprezziamo molto il tuo feedback. La tua recensione sarà esaminata e pubblicata presto.",
+    "backToShop": "Torna al negozio",
+    "reviewModerated": "La tua recensione sarà esaminata prima della pubblicazione."
   }
 }

@@ -2830,5 +2830,29 @@
     "accountDeleted": "تم حذف حسابك وجميع بياناتك.",
     "deleteError": "حدث خطأ. حاول مرة أخرى.",
     "backToMenu": "العودة للقائمة"
+  },
+  "reviewPage": {
+    "back": "رجوع",
+    "writeReview": "اكتب تقييماً",
+    "leaveReviewFor": "اترك تقييماً لـ",
+    "howWasExperience": "كيف كانت تجربتك؟",
+    "ratingBad": "سيء",
+    "ratingPoor": "ضعيف",
+    "ratingAverage": "متوسط",
+    "ratingGood": "جيد",
+    "ratingExcellent": "ممتاز!",
+    "yourName": "اسمك",
+    "email": "البريد الإلكتروني (اختياري)",
+    "emailNote": "نستخدم هذا فقط للرد على تقييمك إذا لزم الأمر.",
+    "yourReview": "تقييمك",
+    "reviewPlaceholder": "أخبرنا عن تجربتك...",
+    "submit": "نشر التقييم",
+    "submitting": "جاري الإرسال...",
+    "selectRating": "اختر تقييماً (1-5 نجوم)",
+    "fillAllFields": "يرجى ملء جميع الحقول المطلوبة",
+    "thankYou": "شكراً لتقييمك!",
+    "thankYouDesc": "نقدر ملاحظاتك كثيراً. سيتم مراجعة تقييمك ونشره قريباً.",
+    "backToShop": "العودة للمتجر",
+    "reviewModerated": "سيتم مراجعة تقييمك قبل نشره."
   }
 }

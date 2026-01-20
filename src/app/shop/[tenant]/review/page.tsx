@@ -5,8 +5,10 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { getTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/i18n'
 
 export default function ReviewPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [settings, setSettings] = useState<TenantSettings | null>(null)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -32,12 +34,12 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
     e.preventDefault()
     
     if (rating === 0) {
-      alert('Selecteer een beoordeling (1-5 sterren)')
+      alert(t('reviewPage.selectRating'))
       return
     }
 
     if (!formData.customer_name.trim() || !formData.comment.trim()) {
-      alert('Vul alle verplichte velden in')
+      alert(t('reviewPage.fillAllFields'))
       return
     }
 
@@ -93,9 +95,9 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
           className="bg-white rounded-3xl p-8 shadow-xl text-center max-w-md w-full"
         >
           <div className="text-6xl mb-4">🎉</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Bedankt voor je review!</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('reviewPage.thankYou')}</h1>
           <p className="text-gray-600 mb-6">
-            We waarderen je feedback enorm. Je review wordt beoordeeld en binnenkort gepubliceerd.
+            {t('reviewPage.thankYouDesc')}
           </p>
           <Link href={`/shop/${params.tenant}`}>
             <motion.button
@@ -104,7 +106,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
               style={{ backgroundColor: primaryColor }}
               className="text-white font-bold px-8 py-3 rounded-xl"
             >
-              Terug naar de shop
+              {t('reviewPage.backToShop')}
             </motion.button>
           </Link>
         </motion.div>
@@ -121,9 +123,9 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Terug</span>
+            <span>{t('reviewPage.back')}</span>
           </Link>
-          <h1 className="font-bold text-xl text-gray-900">Review Schrijven</h1>
+          <h1 className="font-bold text-xl text-gray-900">{t('reviewPage.writeReview')}</h1>
           <div className="w-16"></div>
         </div>
       </header>
@@ -138,7 +140,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
           {/* Business Name */}
           <div className="text-center mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Laat een review achter voor
+              {t('reviewPage.leaveReviewFor')}
             </h2>
             <p style={{ color: primaryColor }} className="text-xl font-semibold">
               {settings?.business_name || params.tenant}
@@ -148,7 +150,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
           {/* Rating Stars */}
           <div className="mb-8">
             <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
-              Hoe was je ervaring? *
+              {t('reviewPage.howWasExperience')} *
             </label>
             <div className="flex justify-center gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -168,11 +170,11 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
             </div>
             {rating > 0 && (
               <p className="text-center mt-3 text-gray-600">
-                {rating === 1 && 'Slecht'}
-                {rating === 2 && 'Matig'}
-                {rating === 3 && 'Gemiddeld'}
-                {rating === 4 && 'Goed'}
-                {rating === 5 && 'Uitstekend!'}
+                {rating === 1 && t('reviewPage.ratingBad')}
+                {rating === 2 && t('reviewPage.ratingPoor')}
+                {rating === 3 && t('reviewPage.ratingAverage')}
+                {rating === 4 && t('reviewPage.ratingGood')}
+                {rating === 5 && t('reviewPage.ratingExcellent')}
               </p>
             )}
           </div>
@@ -182,7 +184,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Je naam *
+                {t('reviewPage.yourName')} *
               </label>
               <input
                 type="text"
@@ -193,31 +195,31 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
                   customer_name: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1) 
                 }))}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Bijv. Jan"
+                placeholder={t('reviewPage.yourName')}
               />
             </div>
 
             {/* Email (optional) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                E-mail (optioneel)
+                {t('reviewPage.email')}
               </label>
               <input
                 type="email"
                 value={formData.customer_email}
                 onChange={(e) => setFormData(prev => ({ ...prev, customer_email: e.target.value }))}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="jan@voorbeeld.be"
+                placeholder={t('reviewPage.email')}
               />
               <p className="text-sm text-gray-500 mt-1">
-                We gebruiken dit alleen om eventueel te reageren op je review.
+                {t('reviewPage.emailNote')}
               </p>
             </div>
 
             {/* Comment */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Je review *
+                {t('reviewPage.yourReview')} *
               </label>
               <textarea
                 required
@@ -228,7 +230,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
                   comment: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1) 
                 }))}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
-                placeholder="Vertel ons over je ervaring..."
+                placeholder={t('reviewPage.reviewPlaceholder')}
               />
             </div>
 
@@ -244,12 +246,12 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
               {submitting ? (
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                  <span>Verzenden...</span>
+                  <span>{t('reviewPage.submitting')}</span>
                 </>
               ) : (
                 <>
                   <span>⭐</span>
-                  <span>Review Plaatsen</span>
+                  <span>{t('reviewPage.submit')}</span>
                 </>
               )}
             </motion.button>
@@ -257,7 +259,7 @@ export default function ReviewPage({ params }: { params: { tenant: string } }) {
 
           {/* Note */}
           <p className="text-center text-gray-500 text-sm mt-6">
-            Je review wordt beoordeeld voordat deze gepubliceerd wordt.
+            {t('reviewPage.reviewModerated')}
           </p>
         </motion.div>
       </main>

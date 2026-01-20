@@ -2829,5 +2829,29 @@
     "accountDeleted": "アカウントとすべてのデータが削除されました。",
     "deleteError": "エラーが発生しました。再試行してください。",
     "backToMenu": "メニューに戻る"
+  },
+  "reviewPage": {
+    "back": "戻る",
+    "writeReview": "レビューを書く",
+    "leaveReviewFor": "レビューを投稿",
+    "howWasExperience": "いかがでしたか？",
+    "ratingBad": "悪い",
+    "ratingPoor": "やや悪い",
+    "ratingAverage": "普通",
+    "ratingGood": "良い",
+    "ratingExcellent": "素晴らしい！",
+    "yourName": "お名前",
+    "email": "メール（任意）",
+    "emailNote": "レビューへの返信にのみ使用します。",
+    "yourReview": "レビュー内容",
+    "reviewPlaceholder": "体験についてお聞かせください...",
+    "submit": "レビューを投稿",
+    "submitting": "送信中...",
+    "selectRating": "評価を選択してください（1〜5つ星）",
+    "fillAllFields": "必須項目をすべて入力してください",
+    "thankYou": "レビューありがとうございます！",
+    "thankYouDesc": "貴重なご意見をいただきありがとうございます。確認後、公開されます。",
+    "backToShop": "ショップに戻る",
+    "reviewModerated": "レビューは公開前に確認されます。"
   }
 }
