@@ -139,11 +139,50 @@ export default function SuperAdminDashboard() {
 
     setSaving(true)
 
-    // Create tenant_settings
-    const { error: tenantError } = await supabase
+    const slug = newTenant.tenant_slug.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+
+    // 1. Create tenants record
+    const { error: tenantsError } = await supabase
+      .from('tenants')
+      .insert({
+        name: newTenant.business_name,
+        slug: slug,
+        email: newTenant.email || '',
+        phone: newTenant.phone || '',
+        plan: 'starter',
+        subscription_status: 'trial',
+        trial_ends_at: trialEndsAt,
+      })
+
+    if (tenantsError) {
+      console.error('Error creating tenants:', tenantsError)
+      // Continue anyway - table might not exist
+    }
+
+    // 2. Create business_profiles record (voor login)
+    if (newTenant.email) {
+      const { error: profileError } = await supabase
+        .from('business_profiles')
+        .insert({
+          name: newTenant.business_name,
+          email: newTenant.email,
+          password_hash: 'RESET_REQUIRED',
+          phone: newTenant.phone || '',
+          tenant_slug: slug,
+        })
+
+      if (profileError) {
+        console.error('Error creating business_profiles:', profileError)
+        // Continue anyway
+      }
+    }
+
+    // 3. Create tenant_settings
+    const { error: settingsError } = await supabase
       .from('tenant_settings')
       .insert({
-        tenant_slug: newTenant.tenant_slug.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+        tenant_slug: slug,
         business_name: newTenant.business_name,
         email: newTenant.email,
         phone: newTenant.phone,
@@ -151,22 +190,22 @@ export default function SuperAdminDashboard() {
         secondary_color: '#1a1a2e',
       })
 
-    if (tenantError) {
-      alert('Fout bij aanmaken: ' + tenantError.message)
+    if (settingsError) {
+      alert('Fout bij aanmaken: ' + settingsError.message)
       setSaving(false)
       return
     }
 
-    // Create subscription (trial)
+    // 4. Create subscription (trial)
     await supabase
       .from('subscriptions')
       .insert({
-        tenant_slug: newTenant.tenant_slug.toLowerCase().replace(/[^a-z0-9-]/g, '-'),
+        tenant_slug: slug,
         plan: 'starter',
         status: 'trial',
         price_monthly: 79,
         trial_started_at: new Date().toISOString(),
-        trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+        trial_ends_at: trialEndsAt,
       })
 
     setNewTenant({ tenant_slug: '', business_name: '', email: '', phone: '' })
