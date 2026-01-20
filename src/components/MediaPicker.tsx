@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { useLanguage } from '@/context/LanguageContext'
+import { useLanguage } from '@/i18n'
 
 interface MediaItem {
   id: string
