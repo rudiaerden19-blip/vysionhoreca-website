@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function ScradaPage() {
+  const { t } = useLanguage()
   const params = useParams()
   const tenant = params.tenant as string
   const [isPremium, setIsPremium] = useState(false)

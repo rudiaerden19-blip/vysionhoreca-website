@@ -146,7 +146,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
           />
-          <p className="text-gray-500">Laden...</p>
+          <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
       </div>
     )

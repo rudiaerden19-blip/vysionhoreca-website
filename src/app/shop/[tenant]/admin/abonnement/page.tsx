@@ -489,6 +489,7 @@ const getSupabase = () => {
 }
 
 export default function AbonnementPage() {
+  const { t } = useLanguage()
   const params = useParams()
   const tenantSlug = params.tenant as string
   

@@ -28,6 +28,7 @@ const ROLES: { id: StaffRole; label: string }[] = [
 ]
 
 export default function PersoneelPage() {
+  const { t } = useLanguage()
   const params = useParams()
   const tenant = params.tenant as string
   

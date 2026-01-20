@@ -31,6 +31,7 @@ const MONTHS = [
 const DAYS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
 
 export default function UrenPage() {
+  const { t } = useLanguage()
   const params = useParams()
   const tenant = params.tenant as string
   
