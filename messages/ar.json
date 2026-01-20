@@ -1397,5 +1397,55 @@
       "emailSupport": "دعم البريد الإلكتروني"
     },
     "copyright": "جميع الحقوق محفوظة."
+  },
+  "admin": {
+    "categories": {
+      "overview": "نظرة عامة",
+      "settings": "الإعدادات",
+      "menu": "القائمة",
+      "website": "الموقع",
+      "marketing": "التسويق",
+      "customers": "العملاء",
+      "staff": "الموظفين",
+      "accounting": "المحاسبة",
+      "orders": "الطلبات",
+      "statistics": "الإحصائيات"
+    },
+    "menu": {
+      "dashboard": "لوحة التحكم",
+      "shopDisplay": "شاشة المتجر",
+      "kitchenDisplay": "شاشة المطبخ",
+      "subscription": "الاشتراك",
+      "businessProfile": "ملف النشاط التجاري",
+      "openingHours": "ساعات العمل",
+      "deliveryPickup": "التوصيل والاستلام",
+      "paymentMethods": "طرق الدفع",
+      "categories": "الفئات",
+      "products": "المنتجات",
+      "optionsExtras": "الخيارات والإضافات",
+      "allergens": "مسببات الحساسية",
+      "designColors": "التصميم والألوان",
+      "photosMedia": "الصور والوسائط",
+      "texts": "النصوص",
+      "ourTeam": "فريقنا",
+      "giftCards": "بطاقات الهدايا",
+      "seo": "SEO",
+      "qrCodes": "رموز QR",
+      "promotions": "العروض",
+      "reviews": "التقييمات",
+      "customerList": "العملاء",
+      "rewards": "المكافآت",
+      "employees": "الموظفون",
+      "timeTracking": "تتبع الوقت",
+      "vacancies": "الوظائف الشاغرة",
+      "scrada": "SCRADA",
+      "orderList": "الطلبات",
+      "reservations": "الحجوزات",
+      "businessAnalysis": "تحليل الأعمال",
+      "sales": "المبيعات",
+      "popularItems": "العناصر الشائعة"
+    },
+    "viewWebsite": "عرض الموقع",
+    "logout": "تسجيل الخروج"
   }
 }

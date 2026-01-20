@@ -862,5 +862,55 @@
       "emailSupport": "E-Mail-Support"
     },
     "copyright": "Alle Rechte vorbehalten."
+  },
+  "admin": {
+    "categories": {
+      "overview": "ÜBERSICHT",
+      "settings": "EINSTELLUNGEN",
+      "menu": "MENÜ",
+      "website": "WEBSITE",
+      "marketing": "MARKETING",
+      "customers": "KUNDEN",
+      "staff": "PERSONAL",
+      "accounting": "BUCHHALTUNG",
+      "orders": "BESTELLUNGEN",
+      "statistics": "STATISTIKEN"
+    },
+    "menu": {
+      "dashboard": "Dashboard",
+      "shopDisplay": "Shop Display",
+      "kitchenDisplay": "Küchen Display",
+      "subscription": "Abonnement",
+      "businessProfile": "Geschäftsprofil",
+      "openingHours": "Öffnungszeiten",
+      "deliveryPickup": "Lieferung & Abholung",
+      "paymentMethods": "Zahlungsmethoden",
+      "categories": "Kategorien",
+      "products": "Produkte",
+      "optionsExtras": "Optionen & Extras",
+      "allergens": "Allergene",
+      "designColors": "Design & Farben",
+      "photosMedia": "Fotos & Medien",
+      "texts": "Texte",
+      "ourTeam": "Unser Team",
+      "giftCards": "Geschenkkarten",
+      "seo": "SEO",
+      "qrCodes": "QR-Codes",
+      "promotions": "Aktionen",
+      "reviews": "Bewertungen",
+      "customerList": "Kunden",
+      "rewards": "Belohnungen",
+      "employees": "Mitarbeiter",
+      "timeTracking": "Zeiterfassung",
+      "vacancies": "Stellenangebote",
+      "scrada": "SCRADA",
+      "orderList": "Bestellungen",
+      "reservations": "Reservierungen",
+      "businessAnalysis": "Geschäftsanalyse",
+      "sales": "Verkauf",
+      "popularItems": "Beliebte Artikel"
+    },
+    "viewWebsite": "Website ansehen",
+    "logout": "Abmelden"
   }
 }

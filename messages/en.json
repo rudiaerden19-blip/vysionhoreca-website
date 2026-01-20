@@ -1397,5 +1397,55 @@
       "emailSupport": "Email support"
     },
     "copyright": "All rights reserved."
+  },
+  "admin": {
+    "categories": {
+      "overview": "OVERVIEW",
+      "settings": "SETTINGS",
+      "menu": "MENU",
+      "website": "WEBSITE",
+      "marketing": "MARKETING",
+      "customers": "CUSTOMERS",
+      "staff": "STAFF",
+      "accounting": "ACCOUNTING",
+      "orders": "ORDERS",
+      "statistics": "STATISTICS"
+    },
+    "menu": {
+      "dashboard": "Dashboard",
+      "shopDisplay": "Shop Display",
+      "kitchenDisplay": "Kitchen Display",
+      "subscription": "Subscription",
+      "businessProfile": "Business Profile",
+      "openingHours": "Opening Hours",
+      "deliveryPickup": "Delivery & Pickup",
+      "paymentMethods": "Payment Methods",
+      "categories": "Categories",
+      "products": "Products",
+      "optionsExtras": "Options & Extras",
+      "allergens": "Allergens",
+      "designColors": "Design & Colors",
+      "photosMedia": "Photos & Media",
+      "texts": "Texts",
+      "ourTeam": "Our Team",
+      "giftCards": "Gift Cards",
+      "seo": "SEO",
+      "qrCodes": "QR Codes",
+      "promotions": "Promotions",
+      "reviews": "Reviews",
+      "customerList": "Customers",
+      "rewards": "Rewards",
+      "employees": "Employees",
+      "timeTracking": "Time Tracking",
+      "vacancies": "Vacancies",
+      "scrada": "SCRADA",
+      "orderList": "Orders",
+      "reservations": "Reservations",
+      "businessAnalysis": "Business Analysis",
+      "sales": "Sales",
+      "popularItems": "Popular Items"
+    },
+    "viewWebsite": "View Website",
+    "logout": "Logout"
   }
 }

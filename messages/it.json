@@ -1397,5 +1397,55 @@
       "emailSupport": "Email supporto"
     },
     "copyright": "Tutti i diritti riservati."
+  },
+  "admin": {
+    "categories": {
+      "overview": "PANORAMICA",
+      "settings": "IMPOSTAZIONI",
+      "menu": "MENU",
+      "website": "SITO WEB",
+      "marketing": "MARKETING",
+      "customers": "CLIENTI",
+      "staff": "PERSONALE",
+      "accounting": "CONTABILITÀ",
+      "orders": "ORDINI",
+      "statistics": "STATISTICHE"
+    },
+    "menu": {
+      "dashboard": "Dashboard",
+      "shopDisplay": "Display negozio",
+      "kitchenDisplay": "Display cucina",
+      "subscription": "Abbonamento",
+      "businessProfile": "Profilo attività",
+      "openingHours": "Orari di apertura",
+      "deliveryPickup": "Consegna e Ritiro",
+      "paymentMethods": "Metodi di pagamento",
+      "categories": "Categorie",
+      "products": "Prodotti",
+      "optionsExtras": "Opzioni ed Extra",
+      "allergens": "Allergeni",
+      "designColors": "Design e Colori",
+      "photosMedia": "Foto e Media",
+      "texts": "Testi",
+      "ourTeam": "Il nostro team",
+      "giftCards": "Carte regalo",
+      "seo": "SEO",
+      "qrCodes": "Codici QR",
+      "promotions": "Promozioni",
+      "reviews": "Recensioni",
+      "customerList": "Clienti",
+      "rewards": "Premi",
+      "employees": "Dipendenti",
+      "timeTracking": "Monitoraggio ore",
+      "vacancies": "Offerte di lavoro",
+      "scrada": "SCRADA",
+      "orderList": "Ordini",
+      "reservations": "Prenotazioni",
+      "businessAnalysis": "Analisi aziendale",
+      "sales": "Vendite",
+      "popularItems": "Articoli popolari"
+    },
+    "viewWebsite": "Visualizza sito",
+    "logout": "Esci"
   }
 }

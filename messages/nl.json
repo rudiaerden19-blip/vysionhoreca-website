@@ -1403,5 +1403,55 @@
       "emailSupport": "E-mail support"
     },
     "copyright": "Alle rechten voorbehouden."
+  },
+  "admin": {
+    "categories": {
+      "overview": "OVERZICHT",
+      "settings": "INSTELLINGEN",
+      "menu": "MENU",
+      "website": "WEBSITE",
+      "marketing": "MARKETING",
+      "customers": "KLANTEN",
+      "staff": "PERSONEEL",
+      "accounting": "BOEKHOUDING",
+      "orders": "BESTELLINGEN",
+      "statistics": "STATISTIEKEN"
+    },
+    "menu": {
+      "dashboard": "Dashboard",
+      "shopDisplay": "Shop Display",
+      "kitchenDisplay": "Keuken Display",
+      "subscription": "Abonnement",
+      "businessProfile": "Zaak profiel",
+      "openingHours": "Openingstijden",
+      "deliveryPickup": "Levering & afhaal",
+      "paymentMethods": "Betaalmethodes",
+      "categories": "Categorieën",
+      "products": "Producten",
+      "optionsExtras": "Opties & extra's",
+      "allergens": "Allergenen",
+      "designColors": "Design & kleuren",
+      "photosMedia": "Foto's & media",
+      "texts": "Teksten",
+      "ourTeam": "Ons Team",
+      "giftCards": "Cadeaubonnen",
+      "seo": "SEO",
+      "qrCodes": "QR-codes",
+      "promotions": "Promoties",
+      "reviews": "Reviews",
+      "customerList": "Klanten",
+      "rewards": "Beloningen",
+      "employees": "Medewerkers",
+      "timeTracking": "Uren registratie",
+      "vacancies": "Vacatures",
+      "scrada": "SCRADA",
+      "orderList": "Bestellingen",
+      "reservations": "Reserveringen",
+      "businessAnalysis": "Bedrijfsanalyse",
+      "sales": "Verkoop",
+      "popularItems": "Populaire items"
+    },
+    "viewWebsite": "Bekijk website",
+    "logout": "Uitloggen"
   }
 }

@@ -1397,5 +1397,55 @@
       "emailSupport": "Email a soporte"
     },
     "copyright": "Todos los derechos reservados."
+  },
+  "admin": {
+    "categories": {
+      "overview": "RESUMEN",
+      "settings": "CONFIGURACIÓN",
+      "menu": "MENÚ",
+      "website": "SITIO WEB",
+      "marketing": "MARKETING",
+      "customers": "CLIENTES",
+      "staff": "PERSONAL",
+      "accounting": "CONTABILIDAD",
+      "orders": "PEDIDOS",
+      "statistics": "ESTADÍSTICAS"
+    },
+    "menu": {
+      "dashboard": "Panel de control",
+      "shopDisplay": "Pantalla de tienda",
+      "kitchenDisplay": "Pantalla de cocina",
+      "subscription": "Suscripción",
+      "businessProfile": "Perfil del negocio",
+      "openingHours": "Horarios de apertura",
+      "deliveryPickup": "Entrega y Recogida",
+      "paymentMethods": "Métodos de pago",
+      "categories": "Categorías",
+      "products": "Productos",
+      "optionsExtras": "Opciones y Extras",
+      "allergens": "Alérgenos",
+      "designColors": "Diseño y Colores",
+      "photosMedia": "Fotos y Medios",
+      "texts": "Textos",
+      "ourTeam": "Nuestro equipo",
+      "giftCards": "Tarjetas regalo",
+      "seo": "SEO",
+      "qrCodes": "Códigos QR",
+      "promotions": "Promociones",
+      "reviews": "Reseñas",
+      "customerList": "Clientes",
+      "rewards": "Recompensas",
+      "employees": "Empleados",
+      "timeTracking": "Control de tiempo",
+      "vacancies": "Vacantes",
+      "scrada": "SCRADA",
+      "orderList": "Pedidos",
+      "reservations": "Reservas",
+      "businessAnalysis": "Análisis del negocio",
+      "sales": "Ventas",
+      "popularItems": "Artículos populares"
+    },
+    "viewWebsite": "Ver sitio web",
+    "logout": "Cerrar sesión"
   }
 }

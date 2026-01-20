@@ -1397,5 +1397,55 @@
       "emailSupport": "メールサポート"
     },
     "copyright": "全著作権所有。"
+  },
+  "admin": {
+    "categories": {
+      "overview": "概要",
+      "settings": "設定",
+      "menu": "メニュー",
+      "website": "ウェブサイト",
+      "marketing": "マーケティング",
+      "customers": "顧客",
+      "staff": "スタッフ",
+      "accounting": "会計",
+      "orders": "注文",
+      "statistics": "統計"
+    },
+    "menu": {
+      "dashboard": "ダッシュボード",
+      "shopDisplay": "ショップディスプレイ",
+      "kitchenDisplay": "キッチンディスプレイ",
+      "subscription": "サブスクリプション",
+      "businessProfile": "ビジネスプロフィール",
+      "openingHours": "営業時間",
+      "deliveryPickup": "配達と受け取り",
+      "paymentMethods": "支払い方法",
+      "categories": "カテゴリー",
+      "products": "製品",
+      "optionsExtras": "オプションとエクストラ",
+      "allergens": "アレルゲン",
+      "designColors": "デザインと色",
+      "photosMedia": "写真とメディア",
+      "texts": "テキスト",
+      "ourTeam": "私たちのチーム",
+      "giftCards": "ギフトカード",
+      "seo": "SEO",
+      "qrCodes": "QRコード",
+      "promotions": "プロモーション",
+      "reviews": "レビュー",
+      "customerList": "顧客リスト",
+      "rewards": "報酬",
+      "employees": "従業員",
+      "timeTracking": "時間追跡",
+      "vacancies": "求人",
+      "scrada": "SCRADA",
+      "orderList": "注文リスト",
+      "reservations": "予約",
+      "businessAnalysis": "ビジネス分析",
+      "sales": "売上",
+      "popularItems": "人気商品"
+    },
+    "viewWebsite": "ウェブサイトを見る",
+    "logout": "ログアウト"
   }
 }

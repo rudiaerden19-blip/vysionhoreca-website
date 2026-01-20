@@ -862,5 +862,55 @@
       "emailSupport": "Support par email"
     },
     "copyright": "Tous droits réservés."
+  },
+  "admin": {
+    "categories": {
+      "overview": "APERÇU",
+      "settings": "PARAMÈTRES",
+      "menu": "MENU",
+      "website": "SITE WEB",
+      "marketing": "MARKETING",
+      "customers": "CLIENTS",
+      "staff": "PERSONNEL",
+      "accounting": "COMPTABILITÉ",
+      "orders": "COMMANDES",
+      "statistics": "STATISTIQUES"
+    },
+    "menu": {
+      "dashboard": "Tableau de bord",
+      "shopDisplay": "Affichage boutique",
+      "kitchenDisplay": "Affichage cuisine",
+      "subscription": "Abonnement",
+      "businessProfile": "Profil de l'entreprise",
+      "openingHours": "Heures d'ouverture",
+      "deliveryPickup": "Livraison & Retrait",
+      "paymentMethods": "Méthodes de paiement",
+      "categories": "Catégories",
+      "products": "Produits",
+      "optionsExtras": "Options & Extras",
+      "allergens": "Allergènes",
+      "designColors": "Design & Couleurs",
+      "photosMedia": "Photos & Médias",
+      "texts": "Textes",
+      "ourTeam": "Notre équipe",
+      "giftCards": "Cartes cadeaux",
+      "seo": "SEO",
+      "qrCodes": "Codes QR",
+      "promotions": "Promotions",
+      "reviews": "Avis",
+      "customerList": "Clients",
+      "rewards": "Récompenses",
+      "employees": "Employés",
+      "timeTracking": "Suivi du temps",
+      "vacancies": "Offres d'emploi",
+      "scrada": "SCRADA",
+      "orderList": "Commandes",
+      "reservations": "Réservations",
+      "businessAnalysis": "Analyse commerciale",
+      "sales": "Ventes",
+      "popularItems": "Articles populaires"
+    },
+    "viewWebsite": "Voir le site",
+    "logout": "Déconnexion"
   }
 }

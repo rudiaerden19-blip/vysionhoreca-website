@@ -1397,5 +1397,55 @@
       "emailSupport": "邮件支持"
     },
     "copyright": "版权所有。"
+  },
+  "admin": {
+    "categories": {
+      "overview": "概览",
+      "settings": "设置",
+      "menu": "菜单",
+      "website": "网站",
+      "marketing": "营销",
+      "customers": "客户",
+      "staff": "员工",
+      "accounting": "会计",
+      "orders": "订单",
+      "statistics": "统计"
+    },
+    "menu": {
+      "dashboard": "仪表板",
+      "shopDisplay": "店铺显示屏",
+      "kitchenDisplay": "厨房显示屏",
+      "subscription": "订阅",
+      "businessProfile": "企业资料",
+      "openingHours": "营业时间",
+      "deliveryPickup": "配送和自取",
+      "paymentMethods": "支付方式",
+      "categories": "分类",
+      "products": "产品",
+      "optionsExtras": "选项和附加",
+      "allergens": "过敏原",
+      "designColors": "设计和颜色",
+      "photosMedia": "照片和媒体",
+      "texts": "文本",
+      "ourTeam": "我们的团队",
+      "giftCards": "礼品卡",
+      "seo": "SEO",
+      "qrCodes": "二维码",
+      "promotions": "促销",
+      "reviews": "评价",
+      "customerList": "客户列表",
+      "rewards": "奖励",
+      "employees": "员工",
+      "timeTracking": "时间跟踪",
+      "vacancies": "职位空缺",
+      "scrada": "SCRADA",
+      "orderList": "订单列表",
+      "reservations": "预订",
+      "businessAnalysis": "业务分析",
+      "sales": "销售",
+      "popularItems": "热门商品"
+    },
+    "viewWebsite": "查看网站",
+    "logout": "退出登录"
   }
 }

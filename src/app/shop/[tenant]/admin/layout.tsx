@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import TrialBanner from '@/components/TrialBanner'
+import { useLanguage } from '@/i18n'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -13,95 +14,95 @@ interface AdminLayoutProps {
 
 const menuItems = [
   {
-    category: 'OVERZICHT',
+    categoryKey: 'overview',
     icon: '📊',
     items: [
-      { name: 'Dashboard', href: '', icon: '📊' },
-      { name: 'Shop Display', href: '/display', icon: '🖥️', fullscreen: true },
-      { name: 'Keuken Display', href: '/keuken', icon: '👨‍🍳', fullscreen: true },
-      { name: 'Abonnement', href: '/abonnement', icon: '💎' },
+      { nameKey: 'dashboard', href: '', icon: '📊' },
+      { nameKey: 'shopDisplay', href: '/display', icon: '🖥️', fullscreen: true },
+      { nameKey: 'kitchenDisplay', href: '/keuken', icon: '👨‍🍳', fullscreen: true },
+      { nameKey: 'subscription', href: '/abonnement', icon: '💎' },
     ]
   },
   {
-    category: 'INSTELLINGEN',
+    categoryKey: 'settings',
     icon: '⚙️',
     items: [
-      { name: 'Zaak profiel', href: '/profiel', icon: '🏪' },
-      { name: 'Openingstijden', href: '/openingstijden', icon: '🕐' },
-      { name: 'Levering & afhaal', href: '/levering', icon: '🚗' },
-      { name: 'Betaalmethodes', href: '/betaling', icon: '💳' },
+      { nameKey: 'businessProfile', href: '/profiel', icon: '🏪' },
+      { nameKey: 'openingHours', href: '/openingstijden', icon: '🕐' },
+      { nameKey: 'deliveryPickup', href: '/levering', icon: '🚗' },
+      { nameKey: 'paymentMethods', href: '/betaling', icon: '💳' },
     ]
   },
   {
-    category: 'MENU',
+    categoryKey: 'menu',
     icon: '🍽️',
     items: [
-      { name: 'Categorieën', href: '/categorieen', icon: '📁' },
-      { name: 'Producten', href: '/producten', icon: '🍟' },
-      { name: 'Opties & extra\'s', href: '/opties', icon: '➕' },
-      { name: 'Allergenen', href: '/allergenen', icon: '⚠️' },
+      { nameKey: 'categories', href: '/categorieen', icon: '📁' },
+      { nameKey: 'products', href: '/producten', icon: '🍟' },
+      { nameKey: 'optionsExtras', href: '/opties', icon: '➕' },
+      { nameKey: 'allergens', href: '/allergenen', icon: '⚠️' },
     ]
   },
   {
-    category: 'WEBSITE',
+    categoryKey: 'website',
     icon: '🌐',
     items: [
-      { name: 'Design & kleuren', href: '/design', icon: '🎨' },
-      { name: 'Foto\'s & media', href: '/media', icon: '📷' },
-      { name: 'Teksten', href: '/teksten', icon: '✏️' },
-      { name: 'Ons Team', href: '/team', icon: '👨‍🍳' },
-      { name: 'Cadeaubonnen', href: '/cadeaubonnen', icon: '🎁' },
-      { name: 'SEO', href: '/seo', icon: '🔍' },
+      { nameKey: 'designColors', href: '/design', icon: '🎨' },
+      { nameKey: 'photosMedia', href: '/media', icon: '📷' },
+      { nameKey: 'texts', href: '/teksten', icon: '✏️' },
+      { nameKey: 'ourTeam', href: '/team', icon: '👨‍🍳' },
+      { nameKey: 'giftCards', href: '/cadeaubonnen', icon: '🎁' },
+      { nameKey: 'seo', href: '/seo', icon: '🔍' },
     ]
   },
   {
-    category: 'MARKETING',
+    categoryKey: 'marketing',
     icon: '📣',
     items: [
-      { name: 'QR-codes', href: '/qr-codes', icon: '📱' },
-      { name: 'Promoties', href: '/promoties', icon: '🎁' },
-      { name: 'Reviews', href: '/reviews', icon: '⭐' },
+      { nameKey: 'qrCodes', href: '/qr-codes', icon: '📱' },
+      { nameKey: 'promotions', href: '/promoties', icon: '🎁' },
+      { nameKey: 'reviews', href: '/reviews', icon: '⭐' },
     ]
   },
   {
-    category: 'KLANTEN',
+    categoryKey: 'customers',
     icon: '👥',
     items: [
-      { name: 'Klanten', href: '/klanten', icon: '👥' },
-      { name: 'Beloningen', href: '/klanten/beloningen', icon: '🎁' },
+      { nameKey: 'customerList', href: '/klanten', icon: '👥' },
+      { nameKey: 'rewards', href: '/klanten/beloningen', icon: '🎁' },
     ]
   },
   {
-    category: 'PERSONEEL',
+    categoryKey: 'staff',
     icon: '👔',
     items: [
-      { name: 'Medewerkers', href: '/personeel', icon: '👥' },
-      { name: 'Uren registratie', href: '/uren', icon: '⏰' },
-      { name: 'Vacatures', href: '/vacatures', icon: '📢' },
+      { nameKey: 'employees', href: '/personeel', icon: '👥' },
+      { nameKey: 'timeTracking', href: '/uren', icon: '⏰' },
+      { nameKey: 'vacancies', href: '/vacatures', icon: '📢' },
     ]
   },
   {
-    category: 'BOEKHOUDING',
+    categoryKey: 'accounting',
     icon: '📒',
     items: [
-      { name: 'SCRADA', href: '/scrada', icon: '📊' },
+      { nameKey: 'scrada', href: '/scrada', icon: '📊' },
     ]
   },
   {
-    category: 'BESTELLINGEN',
+    categoryKey: 'orders',
     icon: '📦',
     items: [
-      { name: 'Bestellingen', href: '/bestellingen', icon: '📦' },
-      { name: 'Reserveringen', href: '/reserveringen', icon: '📅' },
+      { nameKey: 'orderList', href: '/bestellingen', icon: '📦' },
+      { nameKey: 'reservations', href: '/reserveringen', icon: '📅' },
     ]
   },
   {
-    category: 'STATISTIEKEN',
+    categoryKey: 'statistics',
     icon: '📈',
     items: [
-      { name: 'Bedrijfsanalyse', href: '/analyse', icon: '📊' },
-      { name: 'Verkoop', href: '/verkoop', icon: '💰' },
-      { name: 'Populaire items', href: '/populair', icon: '🔥' },
+      { nameKey: 'businessAnalysis', href: '/analyse', icon: '📊' },
+      { nameKey: 'sales', href: '/verkoop', icon: '💰' },
+      { nameKey: 'popularItems', href: '/populair', icon: '🔥' },
     ]
   },
 ]
@@ -213,29 +214,48 @@ function SidebarContent({
 }) {
   const pathname = usePathname()
   const [expandedSections, setExpandedSections] = useState<string[]>([])
+  const [isLangOpen, setIsLangOpen] = useState(false)
+  const langRef = useRef<HTMLDivElement>(null)
+  const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
+
+  // Close language dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(event.target as Node)) {
+        setIsLangOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Auto-expand section that contains active item
   useEffect(() => {
     menuItems.forEach((section) => {
       const hasActiveItem = section.items.some((item) => isActive(item.href))
-      if (hasActiveItem && !expandedSections.includes(section.category)) {
-        setExpandedSections(prev => [...prev, section.category])
+      if (hasActiveItem && !expandedSections.includes(section.categoryKey)) {
+        setExpandedSections(prev => [...prev, section.categoryKey])
       }
     })
   }, [pathname])
 
-  const toggleSection = (category: string) => {
+  const toggleSection = (categoryKey: string) => {
     setExpandedSections(prev => 
-      prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
+      prev.includes(categoryKey) 
+        ? prev.filter(c => c !== categoryKey)
+        : [...prev, categoryKey]
     )
   }
 
-  const isSectionExpanded = (category: string) => expandedSections.includes(category)
+  const isSectionExpanded = (categoryKey: string) => expandedSections.includes(categoryKey)
   
   const hasActiveItemInSection = (section: typeof menuItems[0]) => {
     return section.items.some((item) => isActive(item.href))
+  }
+
+  const handleLanguageSelect = (langCode: string) => {
+    setLocale(langCode as any)
+    setIsLangOpen(false)
   }
 
   return (
@@ -275,28 +295,74 @@ function SidebarContent({
         )}
       </div>
 
+      {/* Language Selector */}
+      {!collapsed && (
+        <div ref={langRef} className="px-4 py-2 border-b relative">
+          <button
+            onClick={() => setIsLangOpen(!isLangOpen)}
+            className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{localeFlags[locale]}</span>
+              <span className="text-sm font-medium text-gray-700">{localeNames[locale]}</span>
+            </div>
+            <svg 
+              className={`w-4 h-4 text-gray-500 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {isLangOpen && (
+            <div className="absolute left-4 right-4 mt-1 bg-white rounded-lg shadow-lg border z-50 max-h-64 overflow-y-auto">
+              {locales.map((langCode) => (
+                <button
+                  key={langCode}
+                  onClick={() => handleLanguageSelect(langCode)}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${
+                    locale === langCode ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
+                  }`}
+                >
+                  <span className="text-lg">{localeFlags[langCode]}</span>
+                  <span className="text-sm">{localeNames[langCode]}</span>
+                  {locale === langCode && (
+                    <svg className="w-4 h-4 ml-auto text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2">
         {menuItems.map((section) => {
-          const isExpanded = isSectionExpanded(section.category)
+          const isExpanded = isSectionExpanded(section.categoryKey)
           const hasActive = hasActiveItemInSection(section)
+          const categoryName = t(`admin.categories.${section.categoryKey}`)
           
           return (
-            <div key={section.category} className="mb-1">
+            <div key={section.categoryKey} className="mb-1">
               {/* Category Header - Clickable */}
               <button
-                onClick={() => !collapsed && toggleSection(section.category)}
+                onClick={() => !collapsed && toggleSection(section.categoryKey)}
                 className={`w-full flex items-center justify-between px-4 py-3 transition-all ${
                   hasActive 
                     ? 'bg-orange-50 text-orange-600 border-l-4 border-orange-500' 
                     : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'
                 } ${collapsed ? 'justify-center' : ''}`}
-                title={collapsed ? section.category : undefined}
+                title={collapsed ? categoryName : undefined}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{section.icon}</span>
                   {!collapsed && (
-                    <span className="font-semibold text-sm">{section.category}</span>
+                    <span className="font-semibold text-sm">{categoryName}</span>
                   )}
                 </div>
                 {!collapsed && (
@@ -343,7 +409,7 @@ function SidebarContent({
                           >
                             <span className="text-base">{item.icon}</span>
                             <span className="text-sm flex items-center gap-2">
-                              {item.name}
+                              {t(`admin.menu.${item.nameKey}`)}
                               {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
                             </span>
                           </Link>
@@ -368,7 +434,7 @@ function SidebarContent({
           <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>
-          {!collapsed && <span className="font-medium text-gray-600">Bekijk website</span>}
+          {!collapsed && <span className="font-medium text-gray-600">{t('admin.viewWebsite')}</span>}
         </Link>
         <button
           onClick={() => {
@@ -380,7 +446,7 @@ function SidebarContent({
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          {!collapsed && <span className="font-medium">Uitloggen</span>}
+          {!collapsed && <span className="font-medium">{t('admin.logout')}</span>}
         </button>
       </div>
     </div>
