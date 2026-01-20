@@ -2455,6 +2455,181 @@
       "deleteFailed": "Delete failed"
     }
   },
+  "ordersPage": {
+    "title": "Orders",
+    "loading": "Loading orders...",
+    "active": "active",
+    "new": "new",
+    "noOrders": "No orders",
+    "waitingForOrders": "Waiting for new orders...",
+    "newOrders": "new order",
+    "newOrdersPlural": "new orders",
+    "clickToConfirm": "Click confirm to stop the sound",
+    "soundPrompt": "Click to activate sound notifications",
+    "soundEnabled": "Sound is on - click to activate (browser requirement)",
+    "activate": "Activate",
+    "reactivate": "Reactivate",
+    "kitchenMode": "Kitchen mode",
+    "refresh": "Refresh",
+    "browserNotifications": "Browser notifications",
+    "sound": "Sound",
+    "filter": {
+      "active": "Active",
+      "completed": "Completed",
+      "all": "All"
+    },
+    "status": {
+      "new": "New",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "delivered": "On the way",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "rejected": "Rejected"
+    },
+    "paymentStatus": {
+      "pending": "Awaiting payment",
+      "paid": "PAID",
+      "failed": "Payment failed"
+    },
+    "paymentMethod": {
+      "cash": "Cash",
+      "card": "Card",
+      "online": "Online",
+      "ideal": "iDEAL",
+      "bancontact": "Bancontact"
+    },
+    "orderType": {
+      "pickup": "Pickup",
+      "delivery": "Delivery"
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "startPreparation": "Start preparation",
+      "ready": "Ready",
+      "complete": "Complete",
+      "printReceipt": "Print receipt",
+      "details": "View details",
+      "close": "Close"
+    },
+    "kitchen": {
+      "title": "Kitchen",
+      "close": "Close",
+      "newAlert": "NEW!",
+      "products": "Products"
+    },
+    "customer": "Customer",
+    "order": "Order",
+    "items": "items",
+    "noItemsAvailable": "No items available",
+    "subtotal": "Subtotal",
+    "deliveryFee": "Delivery",
+    "discount": "Discount",
+    "vat": "VAT",
+    "total": "Total",
+    "justNow": "Just now",
+    "minutesAgo": "min",
+    "hoursAgo": "h",
+    "rejection": {
+      "title": "Reject Order",
+      "reasonLabel": "Reason for rejection",
+      "reasons": {
+        "tooBusy": "Too busy right now",
+        "closed": "We are closed",
+        "soldOut": "Product(s) sold out",
+        "deliveryUnavailable": "Delivery not available",
+        "technical": "Technical problem",
+        "other": "Other reason"
+      },
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Provide a brief explanation...",
+      "customerNotified": "The customer will automatically receive an email with the rejection reason.",
+      "cancel": "Cancel",
+      "confirmReject": "Reject Order"
+    },
+    "receipt": {
+      "title": "RECEIPT",
+      "businessInfo": "Business info",
+      "customer": "Customer",
+      "articles": "ITEMS",
+      "deliveryFee": "Delivery fee",
+      "discount": "Discount",
+      "totalExclVat": "Total excl. VAT",
+      "vat": "VAT",
+      "totalInclVat": "TOTAL INCL. VAT",
+      "paymentMethod": "Payment method",
+      "paid": "PAID",
+      "paymentPending": "Payment: Pending",
+      "note": "Note",
+      "thankYou": "Thank you for your order!",
+      "keepReceipt": "This is your receipt. Keep it as proof of purchase."
+    },
+    "newOrderAlert": {
+      "title": "NEW ORDER!",
+      "waitingApproval": "waiting for approval",
+      "waitingApprovalPlural": "waiting for approval",
+      "tapToClose": "Tap to close this screen",
+      "soundStopsAfter": "Sound stops after approving or rejecting"
+    },
+    "customerDetails": "Customer details",
+    "orderedProducts": "Ordered products"
+  },
+  "reservationsPage": {
+    "title": "Reservations",
+    "pending": "pending",
+    "today": "today",
+    "manageReservations": "Manage your reservations",
+    "websiteReservations": "Website reservations",
+    "customersCanReserve": "Customers can book online",
+    "reservationFormDisabled": "Reservation form is disabled",
+    "refresh": "Refresh",
+    "filter": {
+      "upcoming": "Upcoming",
+      "today": "Today",
+      "all": "All"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled",
+      "completed": "Completed"
+    },
+    "newReservations": "new reservation",
+    "newReservationsPlural": "new reservations",
+    "confirmOrReject": "Confirm or reject to notify the customer",
+    "persons": "persons",
+    "actions": {
+      "confirm": "Confirm",
+      "reject": "Reject",
+      "complete": "Complete",
+      "delete": "Delete",
+      "details": "Details"
+    },
+    "noReservations": "No reservations",
+    "noUpcoming": "There are no upcoming reservations.",
+    "noToday": "There are no reservations today.",
+    "noAny": "No reservations have been made yet.",
+    "detailsTitle": "Reservation details",
+    "at": "at",
+    "customer": "Customer",
+    "notes": "Notes",
+    "createdAt": "Created",
+    "close": "Close",
+    "rejection": {
+      "title": "Reject Reservation",
+      "reasonLabel": "Reason for rejection",
+      "reasonPlaceholder": "E.g. Unfortunately we are fully booked on this date...",
+      "reasonSentToCustomer": "This reason will be sent to the customer by email.",
+      "cancel": "Cancel",
+      "processing": "Processing...",
+      "confirmReject": "Reject"
+    },
+    "confirmDelete": "Are you sure you want to delete this reservation?",
+    "todayLabel": "Today",
+    "tomorrowLabel": "Tomorrow"
+  },
   "scradaPage": {
     "title": "SCRADA Integration",
     "subtitle": "Automatic daily receipts, cash book and Peppol invoicing",

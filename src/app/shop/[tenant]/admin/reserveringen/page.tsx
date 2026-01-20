@@ -1,8 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
-
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 
@@ -20,14 +19,17 @@ interface Reservation {
   created_at: string
 }
 
-const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
-  pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: '⏳ In afwachting' },
-  confirmed: { bg: 'bg-green-100', text: 'text-green-700', label: '✓ Bevestigd' },
-  cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: '❌ Geannuleerd' },
-  completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: '✔️ Afgerond' },
-}
+const getStatusConfig = (t: (key: string) => string): Record<string, { bg: string; text: string; label: string }> => ({
+  pending: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: `⏳ ${t('reservationsPage.status.pending')}` },
+  confirmed: { bg: 'bg-green-100', text: 'text-green-700', label: `✓ ${t('reservationsPage.status.confirmed')}` },
+  cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: `❌ ${t('reservationsPage.status.cancelled')}` },
+  completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: `✔️ ${t('reservationsPage.status.completed')}` },
+})
 
 export default function ReserveringenPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
+  const statusConfig = useMemo(() => getStatusConfig(t), [t])
+  
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<'upcoming' | 'today' | 'all'>('upcoming')
@@ -183,7 +185,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
   }
 
   const deleteReservation = async (id: string) => {
-    if (!confirm('Weet je zeker dat je deze reservering wilt verwijderen?')) return
+    if (!confirm(t('reservationsPage.confirmDelete'))) return
     
     const { error } = await supabase
       .from('reservations')
@@ -203,10 +205,10 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
     tomorrow.setDate(tomorrow.getDate() + 1)
     
     if (dateString === today.toISOString().split('T')[0]) {
-      return 'Vandaag'
+      return t('reservationsPage.todayLabel')
     }
     if (dateString === tomorrow.toISOString().split('T')[0]) {
-      return 'Morgen'
+      return t('reservationsPage.tomorrowLabel')
     }
     
     return date.toLocaleDateString('nl-BE', { 
@@ -243,9 +245,9 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
       <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">Reserveringen op website</h2>
+            <h2 className="text-lg font-bold text-gray-900">{t('reservationsPage.websiteReservations')}</h2>
             <p className="text-gray-500 text-sm">
-              {reservationsEnabled ? 'Klanten kunnen online reserveren' : 'Reserveringsformulier is uitgeschakeld'}
+              {reservationsEnabled ? t('reservationsPage.customersCanReserve') : t('reservationsPage.reservationFormDisabled')}
             </p>
           </div>
           <button
@@ -265,12 +267,12 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
       {/* Header */}
       <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reserveringen</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('reservationsPage.title')}</h1>
           <p className="text-gray-500">
-            {pendingCount > 0 && <span className="text-yellow-600 font-medium">{pendingCount} wachtend</span>}
+            {pendingCount > 0 && <span className="text-yellow-600 font-medium">{pendingCount} {t('reservationsPage.pending')}</span>}
             {pendingCount > 0 && todayCount > 0 && ' • '}
-            {todayCount > 0 && <span className="text-orange-600 font-medium">{todayCount} vandaag</span>}
-            {pendingCount === 0 && todayCount === 0 && 'Beheer je reserveringen'}
+            {todayCount > 0 && <span className="text-orange-600 font-medium">{todayCount} {t('reservationsPage.today')}</span>}
+            {pendingCount === 0 && todayCount === 0 && t('reservationsPage.manageReservations')}
           </p>
         </div>
         
@@ -278,7 +280,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
           <button
             onClick={loadReservations}
             className="p-2 bg-gray-100 hover:bg-gray-200 rounded-xl"
-            title="Vernieuwen"
+            title={t('reservationsPage.refresh')}
           >
             🔄
           </button>
@@ -292,7 +294,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                   filter === f ? 'bg-white shadow text-gray-900' : 'text-gray-500'
                 }`}
               >
-                {f === 'upcoming' ? 'Komend' : f === 'today' ? 'Vandaag' : 'Alles'}
+                {t(`reservationsPage.filter.${f}`)}
               </button>
             ))}
           </div>
@@ -308,8 +310,8 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
         >
           <span className="text-3xl">📅</span>
           <div>
-            <p className="font-bold text-yellow-800">{pendingCount} nieuwe reservering{pendingCount > 1 ? 'en' : ''}</p>
-            <p className="text-yellow-700 text-sm">Bevestig of weiger om de klant op de hoogte te stellen</p>
+            <p className="font-bold text-yellow-800">{pendingCount} {pendingCount > 1 ? t('reservationsPage.newReservationsPlural') : t('reservationsPage.newReservations')}</p>
+            <p className="text-yellow-700 text-sm">{t('reservationsPage.confirmOrReject')}</p>
           </div>
         </motion.div>
       )}
@@ -363,7 +365,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                   <div className="flex items-center gap-4">
                     <div className="text-center">
                       <p className="text-3xl font-bold text-orange-500">{reservation.party_size}</p>
-                      <p className="text-sm text-gray-500">personen</p>
+                      <p className="text-sm text-gray-500">{t('reservationsPage.persons')}</p>
                     </div>
                     
                     <div className="flex flex-col gap-2">
@@ -374,14 +376,14 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                             disabled={updatingId === reservation.id}
                             className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium text-sm disabled:opacity-50"
                           >
-                            ✓ Bevestigen
+                            ✓ {t('reservationsPage.actions.confirm')}
                           </button>
                           <button
                             onClick={() => setRejectingReservation(reservation)}
                             disabled={updatingId === reservation.id}
                             className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium text-sm disabled:opacity-50"
                           >
-                            ✕ Weigeren
+                            ✕ {t('reservationsPage.actions.reject')}
                           </button>
                         </>
                       )}
@@ -391,7 +393,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                           disabled={updatingId === reservation.id}
                           className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium text-sm disabled:opacity-50"
                         >
-                          ✔️ Afgerond
+                          ✔️ {t('reservationsPage.actions.complete')}
                         </button>
                       )}
                       {(reservation.status === 'completed' || reservation.status === 'cancelled') && (
@@ -399,14 +401,14 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                           onClick={() => deleteReservation(reservation.id)}
                           className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium text-sm"
                         >
-                          🗑️ Verwijderen
+                          🗑️ {t('reservationsPage.actions.delete')}
                         </button>
                       )}
                       <button
                         onClick={() => setSelectedReservation(reservation)}
                         className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium text-sm text-gray-700"
                       >
-                        📋 Details
+                        📋 {t('reservationsPage.actions.details')}
                       </button>
                     </div>
                   </div>
@@ -432,11 +434,11 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
           className="text-center py-16 bg-white rounded-2xl shadow-sm"
         >
           <span className="text-6xl mb-4 block">📅</span>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Geen reserveringen</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{t('reservationsPage.noReservations')}</h3>
           <p className="text-gray-500">
-            {filter === 'upcoming' && 'Er zijn geen komende reserveringen.'}
-            {filter === 'today' && 'Er zijn vandaag geen reserveringen.'}
-            {filter === 'all' && 'Er zijn nog geen reserveringen gemaakt.'}
+            {filter === 'upcoming' && t('reservationsPage.noUpcoming')}
+            {filter === 'today' && t('reservationsPage.noToday')}
+            {filter === 'all' && t('reservationsPage.noAny')}
           </p>
         </motion.div>
       )}
@@ -460,9 +462,9 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
             >
               <div className="p-6 border-b bg-gray-50 flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Reservering details</h2>
+                  <h2 className="text-xl font-bold text-gray-900">{t('reservationsPage.detailsTitle')}</h2>
                   <p className="text-gray-500">
-                    {formatDate(selectedReservation.reservation_date)} om {formatTime(selectedReservation.reservation_time)}
+                    {formatDate(selectedReservation.reservation_date)} {t('reservationsPage.at')} {formatTime(selectedReservation.reservation_time)}
                   </p>
                 </div>
                 <button 
@@ -477,7 +479,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-orange-50 rounded-xl p-4 text-center">
                     <p className="text-3xl font-bold text-orange-600">{selectedReservation.party_size}</p>
-                    <p className="text-orange-600 text-sm">personen</p>
+                    <p className="text-orange-600 text-sm">{t('reservationsPage.persons')}</p>
                   </div>
                   <div className={`rounded-xl p-4 text-center ${statusConfig[selectedReservation.status]?.bg}`}>
                     <p className={`text-lg font-bold ${statusConfig[selectedReservation.status]?.text}`}>
@@ -487,7 +489,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-sm text-gray-500 mb-1">Klant</p>
+                  <p className="text-sm text-gray-500 mb-1">{t('reservationsPage.customer')}</p>
                   <p className="font-bold text-gray-900 text-lg">{selectedReservation.customer_name}</p>
                   <p className="text-gray-600">📞 {selectedReservation.customer_phone}</p>
                   {selectedReservation.customer_email && (
@@ -497,13 +499,13 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
 
                 {selectedReservation.notes && (
                   <div className="bg-blue-50 rounded-xl p-4">
-                    <p className="text-sm text-blue-600 mb-1">Opmerkingen</p>
+                    <p className="text-sm text-blue-600 mb-1">{t('reservationsPage.notes')}</p>
                     <p className="text-gray-900">{selectedReservation.notes}</p>
                   </div>
                 )}
 
                 <div className="text-sm text-gray-500">
-                  Aangemaakt: {new Date(selectedReservation.created_at).toLocaleString('nl-BE')}
+                  {t('reservationsPage.createdAt')}: {new Date(selectedReservation.created_at).toLocaleString('nl-BE')}
                 </div>
               </div>
 
@@ -512,13 +514,13 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                   onClick={() => setSelectedReservation(null)}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
                 >
-                  Sluiten
+                  {t('reservationsPage.close')}
                 </button>
                 <button
                   onClick={() => deleteReservation(selectedReservation.id)}
                   className="px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium"
                 >
-                  🗑️ Verwijderen
+                  🗑️ {t('reservationsPage.actions.delete')}
                 </button>
               </div>
             </motion.div>
@@ -544,7 +546,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
               className="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl"
             >
               <div className="p-6 border-b bg-red-50">
-                <h2 className="text-xl font-bold text-red-700">Reservering Weigeren</h2>
+                <h2 className="text-xl font-bold text-red-700">{t('reservationsPage.rejection.title')}</h2>
                 <p className="text-red-600 text-sm mt-1">
                   {rejectingReservation.customer_name} - {rejectingReservation.reservation_date}
                 </p>
@@ -552,17 +554,17 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
 
               <div className="p-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reden van afwijzing <span className="text-red-500">*</span>
+                  {t('reservationsPage.rejection.reasonLabel')} <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(capitalizeWords(e.target.value))}
-                  placeholder="Bijv. Helaas zijn we volgeboekt op deze datum..."
+                  placeholder={t('reservationsPage.rejection.reasonPlaceholder')}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                 />
                 <p className="text-gray-500 text-sm mt-2">
-                  Deze reden wordt naar de klant gestuurd per e-mail.
+                  {t('reservationsPage.rejection.reasonSentToCustomer')}
                 </p>
               </div>
 
@@ -574,14 +576,14 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                   }}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
                 >
-                  Annuleren
+                  {t('reservationsPage.rejection.cancel')}
                 </button>
                 <button
                   onClick={handleRejectReservation}
                   disabled={!rejectionReason.trim() || updatingId === rejectingReservation.id}
                   className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-xl font-medium"
                 >
-                  {updatingId === rejectingReservation.id ? 'Bezig...' : '✕ Weigeren'}
+                  {updatingId === rejectingReservation.id ? t('reservationsPage.rejection.processing') : `✕ ${t('reservationsPage.rejection.confirmReject')}`}
                 </button>
               </div>
             </motion.div>

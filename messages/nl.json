@@ -2461,6 +2461,181 @@
       "deleteFailed": "Verwijderen mislukt"
     }
   },
+  "ordersPage": {
+    "title": "Bestellingen",
+    "loading": "Bestellingen laden...",
+    "active": "actief",
+    "new": "nieuw",
+    "noOrders": "Geen bestellingen",
+    "waitingForOrders": "Wachten op nieuwe bestellingen...",
+    "newOrders": "nieuwe bestelling",
+    "newOrdersPlural": "nieuwe bestellingen",
+    "clickToConfirm": "Klik op bevestigen om het geluid te stoppen",
+    "soundPrompt": "Klik om geluidsmeldingen te activeren",
+    "soundEnabled": "Geluid staat aan - klik om te activeren (browser vereiste)",
+    "activate": "Activeren",
+    "reactivate": "Heractiveren",
+    "kitchenMode": "Keuken modus",
+    "refresh": "Vernieuwen",
+    "browserNotifications": "Browser notificaties",
+    "sound": "Geluid",
+    "filter": {
+      "active": "Actief",
+      "completed": "Afgerond",
+      "all": "Alles"
+    },
+    "status": {
+      "new": "Nieuw",
+      "confirmed": "Bevestigd",
+      "preparing": "In bereiding",
+      "ready": "Klaar",
+      "delivered": "Onderweg",
+      "completed": "Afgerond",
+      "cancelled": "Geannuleerd",
+      "rejected": "Geweigerd"
+    },
+    "paymentStatus": {
+      "pending": "Wacht op betaling",
+      "paid": "BETAALD",
+      "failed": "Betaling mislukt"
+    },
+    "paymentMethod": {
+      "cash": "Cash",
+      "card": "Kaart",
+      "online": "Online",
+      "ideal": "iDEAL",
+      "bancontact": "Bancontact"
+    },
+    "orderType": {
+      "pickup": "Afhalen",
+      "delivery": "Levering"
+    },
+    "actions": {
+      "approve": "Goedkeuren",
+      "reject": "Weigeren",
+      "startPreparation": "Start bereiding",
+      "ready": "Klaar",
+      "complete": "Afronden",
+      "printReceipt": "Bon printen",
+      "details": "Details bekijken",
+      "close": "Sluiten"
+    },
+    "kitchen": {
+      "title": "Keuken",
+      "close": "Sluiten",
+      "newAlert": "NIEUW!",
+      "products": "Producten"
+    },
+    "customer": "Klant",
+    "order": "Bestelling",
+    "items": "items",
+    "noItemsAvailable": "Geen items beschikbaar",
+    "subtotal": "Subtotaal",
+    "deliveryFee": "Bezorg",
+    "discount": "Korting",
+    "vat": "BTW",
+    "total": "Totaal",
+    "justNow": "Zojuist",
+    "minutesAgo": "min",
+    "hoursAgo": "u",
+    "rejection": {
+      "title": "Bestelling Weigeren",
+      "reasonLabel": "Reden voor weigering",
+      "reasons": {
+        "tooBusy": "Te druk op dit moment",
+        "closed": "We zijn gesloten",
+        "soldOut": "Product(en) uitverkocht",
+        "deliveryUnavailable": "Levering niet beschikbaar",
+        "technical": "Technisch probleem",
+        "other": "Andere reden"
+      },
+      "notesLabel": "Toelichting (optioneel)",
+      "notesPlaceholder": "Geef een korte toelichting...",
+      "customerNotified": "De klant ontvangt automatisch een e-mail met de reden van weigering.",
+      "cancel": "Annuleren",
+      "confirmReject": "Bestelling Weigeren"
+    },
+    "receipt": {
+      "title": "KASSABON",
+      "businessInfo": "Zaakgegevens",
+      "customer": "Klant",
+      "articles": "ARTIKELEN",
+      "deliveryFee": "Bezorgkosten",
+      "discount": "Korting",
+      "totalExclVat": "Totaal excl. BTW",
+      "vat": "BTW",
+      "totalInclVat": "TOTAAL INCL. BTW",
+      "paymentMethod": "Betaalmethode",
+      "paid": "BETAALD",
+      "paymentPending": "Betaling: In afwachting",
+      "note": "Opmerking",
+      "thankYou": "Bedankt voor uw bestelling!",
+      "keepReceipt": "Dit is uw kassabon. Bewaar deze bon als bewijs van aankoop."
+    },
+    "newOrderAlert": {
+      "title": "NIEUWE BESTELLING!",
+      "waitingApproval": "wacht op goedkeuring",
+      "waitingApprovalPlural": "wachten op goedkeuring",
+      "tapToClose": "Tik om dit scherm te sluiten",
+      "soundStopsAfter": "Geluid stopt na goedkeuren of weigeren"
+    },
+    "customerDetails": "Klantgegevens",
+    "orderedProducts": "Bestelde producten"
+  },
+  "reservationsPage": {
+    "title": "Reserveringen",
+    "pending": "wachtend",
+    "today": "vandaag",
+    "manageReservations": "Beheer je reserveringen",
+    "websiteReservations": "Reserveringen op website",
+    "customersCanReserve": "Klanten kunnen online reserveren",
+    "reservationFormDisabled": "Reserveringsformulier is uitgeschakeld",
+    "refresh": "Vernieuwen",
+    "filter": {
+      "upcoming": "Komend",
+      "today": "Vandaag",
+      "all": "Alles"
+    },
+    "status": {
+      "pending": "In afwachting",
+      "confirmed": "Bevestigd",
+      "cancelled": "Geannuleerd",
+      "completed": "Afgerond"
+    },
+    "newReservations": "nieuwe reservering",
+    "newReservationsPlural": "nieuwe reserveringen",
+    "confirmOrReject": "Bevestig of weiger om de klant op de hoogte te stellen",
+    "persons": "personen",
+    "actions": {
+      "confirm": "Bevestigen",
+      "reject": "Weigeren",
+      "complete": "Afgerond",
+      "delete": "Verwijderen",
+      "details": "Details"
+    },
+    "noReservations": "Geen reserveringen",
+    "noUpcoming": "Er zijn geen komende reserveringen.",
+    "noToday": "Er zijn vandaag geen reserveringen.",
+    "noAny": "Er zijn nog geen reserveringen gemaakt.",
+    "detailsTitle": "Reservering details",
+    "at": "om",
+    "customer": "Klant",
+    "notes": "Opmerkingen",
+    "createdAt": "Aangemaakt",
+    "close": "Sluiten",
+    "rejection": {
+      "title": "Reservering Weigeren",
+      "reasonLabel": "Reden van afwijzing",
+      "reasonPlaceholder": "Bijv. Helaas zijn we volgeboekt op deze datum...",
+      "reasonSentToCustomer": "Deze reden wordt naar de klant gestuurd per e-mail.",
+      "cancel": "Annuleren",
+      "processing": "Bezig...",
+      "confirmReject": "Weigeren"
+    },
+    "confirmDelete": "Weet je zeker dat je deze reservering wilt verwijderen?",
+    "todayLabel": "Vandaag",
+    "tomorrowLabel": "Morgen"
+  },
   "scradaPage": {
     "title": "SCRADA Integratie",
     "subtitle": "Automatisch dagontvangstenboek, kasboek en Peppol facturatie",
