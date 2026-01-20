@@ -2369,6 +2369,20 @@
       "deleteFailed": "删除失败"
     }
   },
+  "analysePage": {
+    "title": "业务分析",
+    "subtitle": "分析您的收入、成本和利润",
+    "tabs": { "overview": "概览", "kassa": "收银销售", "fixed": "固定成本", "variable": "采购", "year": "年度概览", "settings": "目标" },
+    "months": ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+    "health": { "excellent": "优秀", "good": "健康", "warning": "警告", "critical": "危急" },
+    "overview": { "totalRevenue": "总收入", "totalCosts": "总成本", "netProfit": "净利润", "profitMargin": "利润率", "orders": "订单", "total": "合计", "averageTicket": "平均客单价", "fixedCosts": "固定成本", "variableCosts": "可变成本", "recommendations": "诊断与建议" },
+    "kassa": { "title": "录入收银销售", "newDay": "新建日", "date": "日期", "cash": "现金", "card": "刷卡", "orders": "订单", "noData": "暂无收银销售记录", "monthTotal": "收银销售总额", "confirmDelete": "确定要删除这一天吗？" },
+    "fixed": { "title": "每月固定成本", "newCost": "新建成本", "category": "类别", "name": "名称/描述", "noData": "暂无固定成本", "monthTotal": "每月固定成本总额", "confirmDelete": "确定要删除这项固定成本吗？" },
+    "variable": { "title": "采购与发票", "newPurchase": "新建采购", "category": "类别", "description": "描述", "supplier": "供应商", "amount": "金额 (€)", "date": "日期", "noData": "暂无采购记录", "monthTotal": "采购总额", "confirmDelete": "确定要删除这项采购吗？" },
+    "year": { "yearRevenue": "年收入（估算）", "yearCosts": "年成本", "yearProfit": "年利润", "averageMargin": "平均利润率" },
+    "settings": { "title": "设定业务目标", "targetMargin": "目标利润率 (%)", "minMargin": "最低利润率 (%)", "saveTargets": "保存目标", "targetsSaved": "目标已保存!" },
+    "common": { "cancel": "取消", "save": "保存", "saving": "保存中...", "actions": "操作", "total": "合计" }
+  },
   "ordersPage": {
     "title": "订单",
     "loading": "加载订单中...",

@@ -2369,6 +2369,20 @@
       "deleteFailed": "Eliminazione fallita"
     }
   },
+  "analysePage": {
+    "title": "Analisi aziendale",
+    "subtitle": "Analizza ricavi, costi e profitti",
+    "tabs": { "overview": "Panoramica", "kassa": "Incassi POS", "fixed": "Costi fissi", "variable": "Acquisti", "year": "Panoramica annuale", "settings": "Obiettivi" },
+    "months": ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"],
+    "health": { "excellent": "Eccellente", "good": "Sano", "warning": "Attenzione", "critical": "Critico", "excellentDesc": "La tua attività sta andando alla grande!", "goodDesc": "La tua attività è finanziariamente sana", "warningDesc": "Controlla costi e margini", "criticalDesc": "Azione necessaria per diventare redditizio" },
+    "overview": { "totalRevenue": "Ricavi totali", "totalCosts": "Costi totali", "netProfit": "Profitto netto", "profitMargin": "Margine di profitto", "online": "Online", "kassa": "POS", "orders": "Ordini", "total": "Totale", "averageTicket": "Scontrino medio", "fixedCosts": "Costi fissi", "variableCosts": "Costi variabili", "recommendations": "Diagnosi e Raccomandazioni" },
+    "kassa": { "title": "Inserisci incassi POS", "subtitle": "Inserisci le vendite giornaliere", "newDay": "Nuovo giorno", "date": "Data", "cash": "Contanti", "card": "Carta", "orders": "Ordini", "noData": "Nessun incasso POS inserito", "monthTotal": "Totale incassi POS", "confirmDelete": "Sei sicuro di voler eliminare questo giorno?" },
+    "fixed": { "title": "Costi fissi mensili", "subtitle": "Costi ricorrenti ogni mese", "newCost": "Nuovo costo", "category": "Categoria", "name": "Nome / Descrizione", "amountPerMonth": "Importo al mese (€)", "noData": "Nessun costo fisso ancora", "monthTotal": "Totale costi fissi al mese", "confirmDelete": "Sei sicuro di voler eliminare questo costo?" },
+    "variable": { "title": "Acquisti e Fatture", "newPurchase": "Nuovo acquisto", "category": "Categoria", "description": "Descrizione", "supplier": "Fornitore", "invoiceNumber": "N° fattura", "amount": "Importo (€)", "date": "Data", "noData": "Nessun acquisto inserito", "monthTotal": "Totale acquisti", "confirmDelete": "Sei sicuro di voler eliminare questo acquisto?" },
+    "year": { "yearRevenue": "Ricavi annuali (stima)", "yearCosts": "Costi annuali", "yearProfit": "Profitto annuale", "averageMargin": "Margine medio", "tip": "Inserisci ogni mese incassi e acquisti per una panoramica annuale precisa." },
+    "settings": { "title": "Imposta obiettivi aziendali", "subtitle": "Definisci i tuoi target per avvisi e analisi", "targetMargin": "Margine obiettivo (%)", "minMargin": "Margine minimo (%)", "maxPersonnel": "Personale max (%)", "maxIngredients": "Ingredienti max (%)", "targetTicket": "Scontrino medio obiettivo (€)", "saveTargets": "Salva obiettivi", "targetsSaved": "Obiettivi salvati!", "benchmarks": "Benchmark settore (Ristorazione)" },
+    "common": { "cancel": "Annulla", "save": "Salva", "saving": "Salvataggio...", "actions": "Azioni", "total": "Totale" }
+  },
   "ordersPage": {
     "title": "Ordini",
     "loading": "Caricamento ordini...",

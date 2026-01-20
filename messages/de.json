@@ -1834,6 +1834,20 @@
       "deleteFailed": "Löschen fehlgeschlagen"
     }
   },
+  "analysePage": {
+    "title": "Betriebsanalyse",
+    "subtitle": "Analysieren Sie Umsatz, Kosten und Gewinn",
+    "tabs": { "overview": "Übersicht", "kassa": "Kassenumsatz", "fixed": "Fixkosten", "variable": "Einkäufe", "year": "Jahresübersicht", "settings": "Ziele" },
+    "months": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+    "health": { "excellent": "Ausgezeichnet", "good": "Gesund", "warning": "Warnung", "critical": "Kritisch", "excellentDesc": "Ihr Unternehmen läuft ausgezeichnet!", "goodDesc": "Ihr Unternehmen ist finanziell gesund", "warningDesc": "Achten Sie auf Kosten und Margen", "criticalDesc": "Handlungsbedarf um profitabel zu werden" },
+    "overview": { "totalRevenue": "Gesamtumsatz", "totalCosts": "Gesamtkosten", "netProfit": "Nettogewinn", "profitMargin": "Gewinnmarge", "online": "Online", "kassa": "Kasse", "fixed": "Fest", "variable": "Variabel", "orders": "Bestellungen", "total": "Gesamt", "averageTicket": "Durchschnittsbon", "fixedCosts": "Fixkosten", "variableCosts": "Variable Kosten", "recommendations": "Diagnose & Empfehlungen" },
+    "kassa": { "title": "Kassenumsatz eingeben", "subtitle": "Tägliche Kassenverkäufe eintragen", "newDay": "Neuer Tag", "date": "Datum", "cash": "Bar", "card": "Karte", "orders": "Bestellungen", "noData": "Noch kein Kassenumsatz eingetragen", "monthTotal": "Gesamter Kassenumsatz", "confirmDelete": "Möchten Sie diesen Tag wirklich löschen?" },
+    "fixed": { "title": "Monatliche Fixkosten", "subtitle": "Kosten die jeden Monat anfallen", "newCost": "Neue Kosten", "category": "Kategorie", "name": "Name / Beschreibung", "amountPerMonth": "Betrag pro Monat (€)", "notes": "Notizen (optional)", "active": "Aktiv (in Analyse einbeziehen)", "noData": "Noch keine Fixkosten", "monthTotal": "Gesamte Fixkosten pro Monat", "confirmDelete": "Möchten Sie diese Fixkosten wirklich löschen?" },
+    "variable": { "title": "Einkäufe & Rechnungen", "newPurchase": "Neuer Einkauf", "category": "Kategorie", "description": "Beschreibung", "supplier": "Lieferant", "invoiceNumber": "Rechnungsnr.", "amount": "Betrag (€)", "date": "Datum", "noData": "Noch keine Einkäufe eingetragen", "monthTotal": "Gesamte Einkäufe", "confirmDelete": "Möchten Sie diesen Einkauf wirklich löschen?" },
+    "year": { "yearRevenue": "Jahresumsatz (Schätzung)", "yearCosts": "Jahreskosten", "yearProfit": "Jahresgewinn", "averageMargin": "Durchschnittliche Marge", "tip": "Tragen Sie jeden Monat Kassenumsatz und Einkäufe ein für eine genaue Jahresübersicht." },
+    "settings": { "title": "Geschäftsziele festlegen", "subtitle": "Targets für Warnungen und Analysen", "targetMargin": "Ziel-Gewinnmarge (%)", "minMargin": "Minimum-Gewinnmarge (%)", "maxPersonnel": "Max. Personalkosten (%)", "maxIngredients": "Max. Zutatenkosten (%)", "targetTicket": "Ziel Durchschnittsbon (€)", "saveTargets": "Ziele speichern", "targetsSaved": "Ziele gespeichert!", "benchmarks": "Branchenbenchmarks (Gastronomie)" },
+    "common": { "cancel": "Abbrechen", "save": "Speichern", "saving": "Speichern...", "actions": "Aktionen", "total": "Gesamt" }
+  },
   "ordersPage": {
     "title": "Bestellungen",
     "loading": "Bestellungen laden...",

@@ -2369,6 +2369,20 @@
       "deleteFailed": "فشل الحذف"
     }
   },
+  "analysePage": {
+    "title": "تحليل الأعمال",
+    "subtitle": "حلل إيراداتك وتكاليفك وأرباحك",
+    "tabs": { "overview": "نظرة عامة", "kassa": "مبيعات نقاط البيع", "fixed": "التكاليف الثابتة", "variable": "المشتريات", "year": "نظرة سنوية", "settings": "الأهداف" },
+    "months": ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
+    "health": { "excellent": "ممتاز", "good": "صحي", "warning": "تحذير", "critical": "حرج" },
+    "overview": { "totalRevenue": "إجمالي الإيرادات", "totalCosts": "إجمالي التكاليف", "netProfit": "صافي الربح", "profitMargin": "هامش الربح", "orders": "الطلبات", "total": "المجموع", "averageTicket": "متوسط الفاتورة", "fixedCosts": "التكاليف الثابتة", "variableCosts": "التكاليف المتغيرة", "recommendations": "التشخيص والتوصيات" },
+    "kassa": { "title": "إدخال مبيعات نقاط البيع", "newDay": "يوم جديد", "date": "التاريخ", "cash": "نقدي", "card": "بطاقة", "orders": "الطلبات", "noData": "لا توجد مبيعات مسجلة", "monthTotal": "إجمالي المبيعات", "confirmDelete": "هل أنت متأكد من حذف هذا اليوم؟" },
+    "fixed": { "title": "التكاليف الثابتة الشهرية", "newCost": "تكلفة جديدة", "category": "الفئة", "name": "الاسم / الوصف", "noData": "لا توجد تكاليف ثابتة", "monthTotal": "إجمالي التكاليف الثابتة", "confirmDelete": "هل أنت متأكد من حذف هذه التكلفة؟" },
+    "variable": { "title": "المشتريات والفواتير", "newPurchase": "شراء جديد", "category": "الفئة", "description": "الوصف", "supplier": "المورد", "amount": "المبلغ (€)", "date": "التاريخ", "noData": "لا توجد مشتريات مسجلة", "monthTotal": "إجمالي المشتريات", "confirmDelete": "هل أنت متأكد من حذف هذا الشراء؟" },
+    "year": { "yearRevenue": "الإيرادات السنوية (تقدير)", "yearCosts": "التكاليف السنوية", "yearProfit": "الربح السنوي", "averageMargin": "متوسط الهامش" },
+    "settings": { "title": "تعيين أهداف العمل", "targetMargin": "هامش الربح المستهدف (%)", "minMargin": "الحد الأدنى للهامش (%)", "saveTargets": "حفظ الأهداف", "targetsSaved": "تم حفظ الأهداف!" },
+    "common": { "cancel": "إلغاء", "save": "حفظ", "saving": "جاري الحفظ...", "actions": "الإجراءات", "total": "المجموع" }
+  },
   "ordersPage": {
     "title": "الطلبات",
     "loading": "جاري تحميل الطلبات...",

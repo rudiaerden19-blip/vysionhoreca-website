@@ -2369,6 +2369,20 @@
       "deleteFailed": "Error al eliminar"
     }
   },
+  "analysePage": {
+    "title": "Análisis empresarial",
+    "subtitle": "Analiza tus ingresos, costos y beneficios",
+    "tabs": { "overview": "Resumen", "kassa": "Ventas TPV", "fixed": "Costos fijos", "variable": "Compras", "year": "Resumen anual", "settings": "Objetivos" },
+    "months": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+    "health": { "excellent": "Excelente", "good": "Saludable", "warning": "Advertencia", "critical": "Crítico", "excellentDesc": "¡Tu negocio está funcionando excelentemente!", "goodDesc": "Tu negocio es financieramente saludable", "warningDesc": "Vigila tus costos y márgenes", "criticalDesc": "Acción necesaria para ser rentable" },
+    "overview": { "totalRevenue": "Ingresos totales", "totalCosts": "Costos totales", "netProfit": "Beneficio neto", "profitMargin": "Margen de beneficio", "online": "Online", "kassa": "TPV", "orders": "Pedidos", "total": "Total", "averageTicket": "Ticket promedio", "fixedCosts": "Costos fijos", "variableCosts": "Costos variables", "recommendations": "Diagnóstico y Recomendaciones" },
+    "kassa": { "title": "Ingresar ventas TPV", "subtitle": "Ingresa tus ventas diarias", "newDay": "Nuevo día", "date": "Fecha", "cash": "Efectivo", "card": "Tarjeta", "orders": "Pedidos", "noData": "Sin ventas TPV registradas", "monthTotal": "Total ventas TPV", "confirmDelete": "¿Estás seguro de eliminar este día?" },
+    "fixed": { "title": "Costos fijos mensuales", "subtitle": "Costos que se repiten cada mes", "newCost": "Nuevo costo", "category": "Categoría", "name": "Nombre / Descripción", "amountPerMonth": "Monto por mes (€)", "noData": "Sin costos fijos aún", "monthTotal": "Total costos fijos por mes", "confirmDelete": "¿Estás seguro de eliminar este costo?" },
+    "variable": { "title": "Compras y Facturas", "newPurchase": "Nueva compra", "category": "Categoría", "description": "Descripción", "supplier": "Proveedor", "invoiceNumber": "N° factura", "amount": "Monto (€)", "date": "Fecha", "noData": "Sin compras registradas", "monthTotal": "Total compras", "confirmDelete": "¿Estás seguro de eliminar esta compra?" },
+    "year": { "yearRevenue": "Ingresos anuales (estimación)", "yearCosts": "Costos anuales", "yearProfit": "Beneficio anual", "averageMargin": "Margen promedio", "tip": "Ingresa cada mes tus ventas y compras para un resumen anual preciso." },
+    "settings": { "title": "Establecer objetivos", "subtitle": "Define tus metas para alertas y análisis", "targetMargin": "Margen objetivo (%)", "minMargin": "Margen mínimo (%)", "maxPersonnel": "Personal máx (%)", "maxIngredients": "Ingredientes máx (%)", "targetTicket": "Ticket promedio objetivo (€)", "saveTargets": "Guardar objetivos", "targetsSaved": "¡Objetivos guardados!", "benchmarks": "Benchmarks del sector (Hostelería)" },
+    "common": { "cancel": "Cancelar", "save": "Guardar", "saving": "Guardando...", "actions": "Acciones", "total": "Total" }
+  },
   "ordersPage": {
     "title": "Pedidos",
     "loading": "Cargando pedidos...",
