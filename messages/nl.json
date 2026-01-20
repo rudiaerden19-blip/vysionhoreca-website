@@ -1505,5 +1505,215 @@
     },
     "viewWebsite": "Bekijk website",
     "logout": "Uitloggen"
+  },
+  "adminPages": {
+    "common": {
+      "save": "Opslaan",
+      "saving": "Opslaan...",
+      "saved": "Opgeslagen!",
+      "loading": "Laden...",
+      "error": "Er is een fout opgetreden",
+      "saveFailed": "Opslaan mislukt. Probeer opnieuw.",
+      "cancel": "Annuleren",
+      "delete": "Verwijderen",
+      "edit": "Bewerken",
+      "add": "Toevoegen",
+      "search": "Zoeken...",
+      "noResults": "Geen resultaten",
+      "confirm": "Bevestigen",
+      "back": "Terug",
+      "yes": "Ja",
+      "no": "Nee",
+      "enabled": "Ingeschakeld",
+      "disabled": "Uitgeschakeld",
+      "active": "Actief",
+      "inactive": "Inactief"
+    },
+    "profiel": {
+      "title": "Zaakprofiel",
+      "subtitle": "Beheer de basisinformatie van je zaak",
+      "businessInfo": "Bedrijfsinformatie",
+      "businessName": "Bedrijfsnaam",
+      "tagline": "Tagline",
+      "description": "Beschrijving",
+      "contactInfo": "Contactgegevens",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "address": "Adres",
+      "postalCode": "Postcode",
+      "city": "Stad",
+      "website": "Website",
+      "socialMedia": "Social Media",
+      "facebook": "Facebook URL",
+      "instagram": "Instagram URL",
+      "tiktok": "TikTok URL",
+      "branding": "Huisstijl",
+      "logo": "Logo",
+      "primaryColor": "Primaire kleur",
+      "secondaryColor": "Secundaire kleur"
+    },
+    "openingstijden": {
+      "title": "Openingstijden",
+      "subtitle": "Stel in wanneer je zaak open is",
+      "days": {
+        "monday": "Maandag",
+        "tuesday": "Dinsdag",
+        "wednesday": "Woensdag",
+        "thursday": "Donderdag",
+        "friday": "Vrijdag",
+        "saturday": "Zaterdag",
+        "sunday": "Zondag"
+      },
+      "open": "Open",
+      "closed": "Gesloten",
+      "openTime": "Openingstijd",
+      "closeTime": "Sluitingstijd",
+      "addShift": "Tweede shift toevoegen",
+      "shift1": "Shift 1",
+      "shift2": "Shift 2"
+    },
+    "levering": {
+      "title": "Levering & Afhaal",
+      "subtitle": "Configureer je lever- en afhaalopties",
+      "pickup": {
+        "title": "Afhalen",
+        "enabled": "Afhalen inschakelen",
+        "time": "Bereidingstijd (minuten)"
+      },
+      "delivery": {
+        "title": "Bezorging",
+        "enabled": "Bezorging inschakelen",
+        "fee": "Bezorgkosten",
+        "minOrder": "Minimale bestelling",
+        "radius": "Bezorgradius (km)",
+        "time": "Bezorgtijd (minuten)"
+      }
+    },
+    "betaling": {
+      "title": "Betaalmethodes & BTW",
+      "subtitle": "Configureer hoe klanten kunnen betalen",
+      "methods": "Betaalmethodes",
+      "cash": "Contant",
+      "cashDesc": "Betalen bij afhalen/levering",
+      "bancontact": "Bancontact",
+      "bancontactDesc": "Belgische betaalkaart",
+      "visa": "Visa",
+      "visaDesc": "Kredietkaart",
+      "mastercard": "Mastercard",
+      "mastercardDesc": "Kredietkaart",
+      "paypal": "PayPal",
+      "paypalDesc": "Online betalen",
+      "ideal": "iDEAL",
+      "idealDesc": "Nederlandse banken",
+      "vat": "BTW-tarief",
+      "vatRate": "BTW percentage"
+    },
+    "categorieen": {
+      "title": "Categorieën",
+      "subtitle": "Beheer je menucategorieën",
+      "addCategory": "Categorie toevoegen",
+      "editCategory": "Categorie bewerken",
+      "name": "Naam",
+      "description": "Beschrijving",
+      "image": "Afbeelding",
+      "order": "Volgorde",
+      "noCategories": "Nog geen categorieën"
+    },
+    "producten": {
+      "title": "Producten",
+      "subtitle": "Beheer je menu-items",
+      "addProduct": "Product toevoegen",
+      "editProduct": "Product bewerken",
+      "name": "Naam",
+      "description": "Beschrijving",
+      "price": "Prijs",
+      "category": "Categorie",
+      "image": "Afbeelding",
+      "available": "Beschikbaar",
+      "soldOut": "Uitverkocht",
+      "noProducts": "Nog geen producten"
+    },
+    "opties": {
+      "title": "Opties & Extra's",
+      "subtitle": "Beheer product opties en extra's",
+      "addOption": "Optie toevoegen",
+      "optionName": "Optie naam",
+      "choices": "Keuzes",
+      "required": "Verplicht",
+      "multiSelect": "Meerdere keuzes mogelijk"
+    },
+    "allergenen": {
+      "title": "Allergenen",
+      "subtitle": "Beheer allergeneninformatie",
+      "addAllergen": "Allergeen toevoegen",
+      "name": "Naam",
+      "icon": "Icoon"
+    },
+    "bestellingen": {
+      "title": "Bestellingen",
+      "subtitle": "Bekijk en beheer bestellingen",
+      "orderNumber": "Bestelnummer",
+      "customer": "Klant",
+      "total": "Totaal",
+      "status": "Status",
+      "date": "Datum",
+      "items": "Items",
+      "noOrders": "Nog geen bestellingen",
+      "statusLabels": {
+        "pending": "Nieuw",
+        "confirmed": "Bevestigd",
+        "preparing": "In bereiding",
+        "ready": "Klaar",
+        "delivered": "Bezorgd",
+        "completed": "Afgerond",
+        "cancelled": "Geannuleerd"
+      }
+    },
+    "klanten": {
+      "title": "Klanten",
+      "subtitle": "Bekijk je klantenbestand",
+      "name": "Naam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "orders": "Bestellingen",
+      "totalSpent": "Totaal besteed",
+      "noCustomers": "Nog geen klanten"
+    },
+    "analyse": {
+      "title": "Bedrijfsanalyse",
+      "subtitle": "Inzichten in je bedrijfsprestaties",
+      "revenue": "Omzet",
+      "orders": "Bestellingen",
+      "avgOrder": "Gemiddelde bestelling",
+      "topProducts": "Top producten"
+    },
+    "qrCodes": {
+      "title": "QR-codes",
+      "subtitle": "Genereer QR-codes voor je zaak",
+      "generate": "QR-code genereren",
+      "download": "Downloaden",
+      "tableNumber": "Tafelnummer",
+      "menuQr": "Menu QR-code",
+      "orderQr": "Bestel QR-code"
+    },
+    "promoties": {
+      "title": "Promoties",
+      "subtitle": "Beheer kortingen en aanbiedingen",
+      "addPromotion": "Promotie toevoegen",
+      "code": "Kortingscode",
+      "discount": "Korting",
+      "validFrom": "Geldig vanaf",
+      "validUntil": "Geldig tot",
+      "noPromotions": "Geen actieve promoties"
+    },
+    "reviews": {
+      "title": "Reviews",
+      "subtitle": "Bekijk klantbeoordelingen",
+      "rating": "Beoordeling",
+      "comment": "Opmerking",
+      "date": "Datum",
+      "reply": "Reageren",
+      "noReviews": "Nog geen reviews"
+    }
   }
 }

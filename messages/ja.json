@@ -1499,5 +1499,215 @@
     },
     "viewWebsite": "ウェブサイトを見る",
     "logout": "ログアウト"
+  },
+  "adminPages": {
+    "common": {
+      "save": "保存",
+      "saving": "保存中...",
+      "saved": "保存しました！",
+      "loading": "読み込み中...",
+      "error": "エラーが発生しました",
+      "saveFailed": "保存に失敗しました。もう一度お試しください。",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "edit": "編集",
+      "add": "追加",
+      "search": "検索...",
+      "noResults": "結果がありません",
+      "confirm": "確認",
+      "back": "戻る",
+      "yes": "はい",
+      "no": "いいえ",
+      "enabled": "有効",
+      "disabled": "無効",
+      "active": "アクティブ",
+      "inactive": "非アクティブ"
+    },
+    "profiel": {
+      "title": "ビジネスプロフィール",
+      "subtitle": "ビジネス情報を管理",
+      "businessInfo": "ビジネス情報",
+      "businessName": "ビジネス名",
+      "tagline": "タグライン",
+      "description": "説明",
+      "contactInfo": "連絡先情報",
+      "email": "メール",
+      "phone": "電話",
+      "address": "住所",
+      "postalCode": "郵便番号",
+      "city": "市区町村",
+      "website": "ウェブサイト",
+      "socialMedia": "ソーシャルメディア",
+      "facebook": "Facebook URL",
+      "instagram": "Instagram URL",
+      "tiktok": "TikTok URL",
+      "branding": "ブランディング",
+      "logo": "ロゴ",
+      "primaryColor": "メインカラー",
+      "secondaryColor": "サブカラー"
+    },
+    "openingstijden": {
+      "title": "営業時間",
+      "subtitle": "営業時間を設定",
+      "days": {
+        "monday": "月曜日",
+        "tuesday": "火曜日",
+        "wednesday": "水曜日",
+        "thursday": "木曜日",
+        "friday": "金曜日",
+        "saturday": "土曜日",
+        "sunday": "日曜日"
+      },
+      "open": "営業",
+      "closed": "休業",
+      "openTime": "開店時間",
+      "closeTime": "閉店時間",
+      "addShift": "第2シフトを追加",
+      "shift1": "シフト1",
+      "shift2": "シフト2"
+    },
+    "levering": {
+      "title": "配達とテイクアウト",
+      "subtitle": "配達とテイクアウトのオプションを設定",
+      "pickup": {
+        "title": "テイクアウト",
+        "enabled": "テイクアウトを有効にする",
+        "time": "調理時間（分）"
+      },
+      "delivery": {
+        "title": "配達",
+        "enabled": "配達を有効にする",
+        "fee": "配達料",
+        "minOrder": "最低注文額",
+        "radius": "配達エリア（km）",
+        "time": "配達時間（分）"
+      }
+    },
+    "betaling": {
+      "title": "支払い方法と税金",
+      "subtitle": "お客様の支払い方法を設定",
+      "methods": "支払い方法",
+      "cash": "現金",
+      "cashDesc": "受取時/配達時に支払い",
+      "bancontact": "Bancontact",
+      "bancontactDesc": "ベルギーの決済カード",
+      "visa": "Visa",
+      "visaDesc": "クレジットカード",
+      "mastercard": "Mastercard",
+      "mastercardDesc": "クレジットカード",
+      "paypal": "PayPal",
+      "paypalDesc": "オンライン決済",
+      "ideal": "iDEAL",
+      "idealDesc": "オランダの銀行",
+      "vat": "税率",
+      "vatRate": "消費税率"
+    },
+    "categorieen": {
+      "title": "カテゴリー",
+      "subtitle": "メニューカテゴリーを管理",
+      "addCategory": "カテゴリーを追加",
+      "editCategory": "カテゴリーを編集",
+      "name": "名前",
+      "description": "説明",
+      "image": "画像",
+      "order": "順序",
+      "noCategories": "カテゴリーはまだありません"
+    },
+    "producten": {
+      "title": "商品",
+      "subtitle": "メニューアイテムを管理",
+      "addProduct": "商品を追加",
+      "editProduct": "商品を編集",
+      "name": "名前",
+      "description": "説明",
+      "price": "価格",
+      "category": "カテゴリー",
+      "image": "画像",
+      "available": "在庫あり",
+      "soldOut": "売り切れ",
+      "noProducts": "商品はまだありません"
+    },
+    "opties": {
+      "title": "オプションとエクストラ",
+      "subtitle": "商品オプションとエクストラを管理",
+      "addOption": "オプションを追加",
+      "optionName": "オプション名",
+      "choices": "選択肢",
+      "required": "必須",
+      "multiSelect": "複数選択可"
+    },
+    "allergenen": {
+      "title": "アレルゲン",
+      "subtitle": "アレルゲン情報を管理",
+      "addAllergen": "アレルゲンを追加",
+      "name": "名前",
+      "icon": "アイコン"
+    },
+    "bestellingen": {
+      "title": "注文",
+      "subtitle": "注文を表示・管理",
+      "orderNumber": "注文番号",
+      "customer": "顧客",
+      "total": "合計",
+      "status": "ステータス",
+      "date": "日付",
+      "items": "アイテム",
+      "noOrders": "注文はまだありません",
+      "statusLabels": {
+        "pending": "新規",
+        "confirmed": "確認済み",
+        "preparing": "準備中",
+        "ready": "準備完了",
+        "delivered": "配達済み",
+        "completed": "完了",
+        "cancelled": "キャンセル"
+      }
+    },
+    "klanten": {
+      "title": "顧客",
+      "subtitle": "顧客データベースを表示",
+      "name": "名前",
+      "email": "メール",
+      "phone": "電話",
+      "orders": "注文",
+      "totalSpent": "総支出",
+      "noCustomers": "顧客はまだいません"
+    },
+    "analyse": {
+      "title": "ビジネス分析",
+      "subtitle": "ビジネスパフォーマンスの分析",
+      "revenue": "売上",
+      "orders": "注文",
+      "avgOrder": "平均注文額",
+      "topProducts": "人気商品"
+    },
+    "qrCodes": {
+      "title": "QRコード",
+      "subtitle": "ビジネス用QRコードを生成",
+      "generate": "QRコードを生成",
+      "download": "ダウンロード",
+      "tableNumber": "テーブル番号",
+      "menuQr": "メニューQRコード",
+      "orderQr": "注文QRコード"
+    },
+    "promoties": {
+      "title": "プロモーション",
+      "subtitle": "割引とオファーを管理",
+      "addPromotion": "プロモーションを追加",
+      "code": "割引コード",
+      "discount": "割引",
+      "validFrom": "有効開始日",
+      "validUntil": "有効期限",
+      "noPromotions": "アクティブなプロモーションはありません"
+    },
+    "reviews": {
+      "title": "レビュー",
+      "subtitle": "顧客レビューを表示",
+      "rating": "評価",
+      "comment": "コメント",
+      "date": "日付",
+      "reply": "返信",
+      "noReviews": "レビューはまだありません"
+    }
   }
 }

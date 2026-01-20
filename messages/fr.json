@@ -964,5 +964,215 @@
     },
     "viewWebsite": "Voir le site",
     "logout": "Déconnexion"
+  },
+  "adminPages": {
+    "common": {
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "saved": "Enregistré!",
+      "loading": "Chargement...",
+      "error": "Une erreur s'est produite",
+      "saveFailed": "Échec de l'enregistrement. Veuillez réessayer.",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "add": "Ajouter",
+      "search": "Rechercher...",
+      "noResults": "Aucun résultat",
+      "confirm": "Confirmer",
+      "back": "Retour",
+      "yes": "Oui",
+      "no": "Non",
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "profiel": {
+      "title": "Profil de l'entreprise",
+      "subtitle": "Gérez les informations de votre entreprise",
+      "businessInfo": "Informations sur l'entreprise",
+      "businessName": "Nom de l'entreprise",
+      "tagline": "Slogan",
+      "description": "Description",
+      "contactInfo": "Coordonnées",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "address": "Adresse",
+      "postalCode": "Code postal",
+      "city": "Ville",
+      "website": "Site web",
+      "socialMedia": "Réseaux sociaux",
+      "facebook": "URL Facebook",
+      "instagram": "URL Instagram",
+      "tiktok": "URL TikTok",
+      "branding": "Image de marque",
+      "logo": "Logo",
+      "primaryColor": "Couleur primaire",
+      "secondaryColor": "Couleur secondaire"
+    },
+    "openingstijden": {
+      "title": "Heures d'ouverture",
+      "subtitle": "Définissez quand votre établissement est ouvert",
+      "days": {
+        "monday": "Lundi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi",
+        "thursday": "Jeudi",
+        "friday": "Vendredi",
+        "saturday": "Samedi",
+        "sunday": "Dimanche"
+      },
+      "open": "Ouvert",
+      "closed": "Fermé",
+      "openTime": "Heure d'ouverture",
+      "closeTime": "Heure de fermeture",
+      "addShift": "Ajouter un deuxième service",
+      "shift1": "Service 1",
+      "shift2": "Service 2"
+    },
+    "levering": {
+      "title": "Livraison & Retrait",
+      "subtitle": "Configurez vos options de livraison et retrait",
+      "pickup": {
+        "title": "Retrait",
+        "enabled": "Activer le retrait",
+        "time": "Temps de préparation (minutes)"
+      },
+      "delivery": {
+        "title": "Livraison",
+        "enabled": "Activer la livraison",
+        "fee": "Frais de livraison",
+        "minOrder": "Commande minimum",
+        "radius": "Rayon de livraison (km)",
+        "time": "Temps de livraison (minutes)"
+      }
+    },
+    "betaling": {
+      "title": "Méthodes de paiement & TVA",
+      "subtitle": "Configurez comment les clients peuvent payer",
+      "methods": "Méthodes de paiement",
+      "cash": "Espèces",
+      "cashDesc": "Paiement au retrait/livraison",
+      "bancontact": "Bancontact",
+      "bancontactDesc": "Carte de paiement belge",
+      "visa": "Visa",
+      "visaDesc": "Carte de crédit",
+      "mastercard": "Mastercard",
+      "mastercardDesc": "Carte de crédit",
+      "paypal": "PayPal",
+      "paypalDesc": "Paiement en ligne",
+      "ideal": "iDEAL",
+      "idealDesc": "Banques néerlandaises",
+      "vat": "Taux de TVA",
+      "vatRate": "Pourcentage de TVA"
+    },
+    "categorieen": {
+      "title": "Catégories",
+      "subtitle": "Gérez vos catégories de menu",
+      "addCategory": "Ajouter une catégorie",
+      "editCategory": "Modifier la catégorie",
+      "name": "Nom",
+      "description": "Description",
+      "image": "Image",
+      "order": "Ordre",
+      "noCategories": "Pas encore de catégories"
+    },
+    "producten": {
+      "title": "Produits",
+      "subtitle": "Gérez vos articles de menu",
+      "addProduct": "Ajouter un produit",
+      "editProduct": "Modifier le produit",
+      "name": "Nom",
+      "description": "Description",
+      "price": "Prix",
+      "category": "Catégorie",
+      "image": "Image",
+      "available": "Disponible",
+      "soldOut": "Épuisé",
+      "noProducts": "Pas encore de produits"
+    },
+    "opties": {
+      "title": "Options & Extras",
+      "subtitle": "Gérez les options et extras des produits",
+      "addOption": "Ajouter une option",
+      "optionName": "Nom de l'option",
+      "choices": "Choix",
+      "required": "Obligatoire",
+      "multiSelect": "Sélections multiples autorisées"
+    },
+    "allergenen": {
+      "title": "Allergènes",
+      "subtitle": "Gérez les informations sur les allergènes",
+      "addAllergen": "Ajouter un allergène",
+      "name": "Nom",
+      "icon": "Icône"
+    },
+    "bestellingen": {
+      "title": "Commandes",
+      "subtitle": "Voir et gérer les commandes",
+      "orderNumber": "Numéro de commande",
+      "customer": "Client",
+      "total": "Total",
+      "status": "Statut",
+      "date": "Date",
+      "items": "Articles",
+      "noOrders": "Pas encore de commandes",
+      "statusLabels": {
+        "pending": "Nouveau",
+        "confirmed": "Confirmé",
+        "preparing": "En préparation",
+        "ready": "Prêt",
+        "delivered": "Livré",
+        "completed": "Terminé",
+        "cancelled": "Annulé"
+      }
+    },
+    "klanten": {
+      "title": "Clients",
+      "subtitle": "Voir votre base de clients",
+      "name": "Nom",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "orders": "Commandes",
+      "totalSpent": "Total dépensé",
+      "noCustomers": "Pas encore de clients"
+    },
+    "analyse": {
+      "title": "Analyse commerciale",
+      "subtitle": "Aperçu de vos performances commerciales",
+      "revenue": "Chiffre d'affaires",
+      "orders": "Commandes",
+      "avgOrder": "Commande moyenne",
+      "topProducts": "Meilleurs produits"
+    },
+    "qrCodes": {
+      "title": "Codes QR",
+      "subtitle": "Générez des codes QR pour votre établissement",
+      "generate": "Générer un code QR",
+      "download": "Télécharger",
+      "tableNumber": "Numéro de table",
+      "menuQr": "Code QR du menu",
+      "orderQr": "Code QR de commande"
+    },
+    "promoties": {
+      "title": "Promotions",
+      "subtitle": "Gérez les remises et offres",
+      "addPromotion": "Ajouter une promotion",
+      "code": "Code de réduction",
+      "discount": "Remise",
+      "validFrom": "Valide à partir de",
+      "validUntil": "Valide jusqu'au",
+      "noPromotions": "Aucune promotion active"
+    },
+    "reviews": {
+      "title": "Avis",
+      "subtitle": "Voir les avis des clients",
+      "rating": "Note",
+      "comment": "Commentaire",
+      "date": "Date",
+      "reply": "Répondre",
+      "noReviews": "Pas encore d'avis"
+    }
   }
 }

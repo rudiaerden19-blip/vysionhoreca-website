@@ -1499,5 +1499,215 @@
     },
     "viewWebsite": "View Website",
     "logout": "Logout"
+  },
+  "adminPages": {
+    "common": {
+      "save": "Save",
+      "saving": "Saving...",
+      "saved": "Saved!",
+      "loading": "Loading...",
+      "error": "An error occurred",
+      "saveFailed": "Save failed. Please try again.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "add": "Add",
+      "search": "Search...",
+      "noResults": "No results",
+      "confirm": "Confirm",
+      "back": "Back",
+      "yes": "Yes",
+      "no": "No",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "profiel": {
+      "title": "Business Profile",
+      "subtitle": "Manage your business information",
+      "businessInfo": "Business Information",
+      "businessName": "Business Name",
+      "tagline": "Tagline",
+      "description": "Description",
+      "contactInfo": "Contact Information",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "postalCode": "Postal Code",
+      "city": "City",
+      "website": "Website",
+      "socialMedia": "Social Media",
+      "facebook": "Facebook URL",
+      "instagram": "Instagram URL",
+      "tiktok": "TikTok URL",
+      "branding": "Branding",
+      "logo": "Logo",
+      "primaryColor": "Primary Color",
+      "secondaryColor": "Secondary Color"
+    },
+    "openingstijden": {
+      "title": "Opening Hours",
+      "subtitle": "Set when your business is open",
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "open": "Open",
+      "closed": "Closed",
+      "openTime": "Opening Time",
+      "closeTime": "Closing Time",
+      "addShift": "Add Second Shift",
+      "shift1": "Shift 1",
+      "shift2": "Shift 2"
+    },
+    "levering": {
+      "title": "Delivery & Pickup",
+      "subtitle": "Configure your delivery and pickup options",
+      "pickup": {
+        "title": "Pickup",
+        "enabled": "Enable Pickup",
+        "time": "Preparation Time (minutes)"
+      },
+      "delivery": {
+        "title": "Delivery",
+        "enabled": "Enable Delivery",
+        "fee": "Delivery Fee",
+        "minOrder": "Minimum Order",
+        "radius": "Delivery Radius (km)",
+        "time": "Delivery Time (minutes)"
+      }
+    },
+    "betaling": {
+      "title": "Payment Methods & VAT",
+      "subtitle": "Configure how customers can pay",
+      "methods": "Payment Methods",
+      "cash": "Cash",
+      "cashDesc": "Pay on pickup/delivery",
+      "bancontact": "Bancontact",
+      "bancontactDesc": "Belgian payment card",
+      "visa": "Visa",
+      "visaDesc": "Credit card",
+      "mastercard": "Mastercard",
+      "mastercardDesc": "Credit card",
+      "paypal": "PayPal",
+      "paypalDesc": "Online payment",
+      "ideal": "iDEAL",
+      "idealDesc": "Dutch banks",
+      "vat": "VAT Rate",
+      "vatRate": "VAT percentage"
+    },
+    "categorieen": {
+      "title": "Categories",
+      "subtitle": "Manage your menu categories",
+      "addCategory": "Add Category",
+      "editCategory": "Edit Category",
+      "name": "Name",
+      "description": "Description",
+      "image": "Image",
+      "order": "Order",
+      "noCategories": "No categories yet"
+    },
+    "producten": {
+      "title": "Products",
+      "subtitle": "Manage your menu items",
+      "addProduct": "Add Product",
+      "editProduct": "Edit Product",
+      "name": "Name",
+      "description": "Description",
+      "price": "Price",
+      "category": "Category",
+      "image": "Image",
+      "available": "Available",
+      "soldOut": "Sold Out",
+      "noProducts": "No products yet"
+    },
+    "opties": {
+      "title": "Options & Extras",
+      "subtitle": "Manage product options and extras",
+      "addOption": "Add Option",
+      "optionName": "Option Name",
+      "choices": "Choices",
+      "required": "Required",
+      "multiSelect": "Multiple selections allowed"
+    },
+    "allergenen": {
+      "title": "Allergens",
+      "subtitle": "Manage allergen information",
+      "addAllergen": "Add Allergen",
+      "name": "Name",
+      "icon": "Icon"
+    },
+    "bestellingen": {
+      "title": "Orders",
+      "subtitle": "View and manage orders",
+      "orderNumber": "Order Number",
+      "customer": "Customer",
+      "total": "Total",
+      "status": "Status",
+      "date": "Date",
+      "items": "Items",
+      "noOrders": "No orders yet",
+      "statusLabels": {
+        "pending": "New",
+        "confirmed": "Confirmed",
+        "preparing": "Preparing",
+        "ready": "Ready",
+        "delivered": "Delivered",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "klanten": {
+      "title": "Customers",
+      "subtitle": "View your customer base",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "orders": "Orders",
+      "totalSpent": "Total Spent",
+      "noCustomers": "No customers yet"
+    },
+    "analyse": {
+      "title": "Business Analysis",
+      "subtitle": "Insights into your business performance",
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "avgOrder": "Average Order",
+      "topProducts": "Top Products"
+    },
+    "qrCodes": {
+      "title": "QR Codes",
+      "subtitle": "Generate QR codes for your business",
+      "generate": "Generate QR Code",
+      "download": "Download",
+      "tableNumber": "Table Number",
+      "menuQr": "Menu QR Code",
+      "orderQr": "Order QR Code"
+    },
+    "promoties": {
+      "title": "Promotions",
+      "subtitle": "Manage discounts and offers",
+      "addPromotion": "Add Promotion",
+      "code": "Discount Code",
+      "discount": "Discount",
+      "validFrom": "Valid From",
+      "validUntil": "Valid Until",
+      "noPromotions": "No active promotions"
+    },
+    "reviews": {
+      "title": "Reviews",
+      "subtitle": "View customer reviews",
+      "rating": "Rating",
+      "comment": "Comment",
+      "date": "Date",
+      "reply": "Reply",
+      "noReviews": "No reviews yet"
+    }
   }
 }

@@ -1499,5 +1499,215 @@
     },
     "viewWebsite": "عرض الموقع",
     "logout": "تسجيل الخروج"
+  },
+  "adminPages": {
+    "common": {
+      "save": "حفظ",
+      "saving": "جاري الحفظ...",
+      "saved": "تم الحفظ!",
+      "loading": "جاري التحميل...",
+      "error": "حدث خطأ",
+      "saveFailed": "فشل الحفظ. حاول مرة أخرى.",
+      "cancel": "إلغاء",
+      "delete": "حذف",
+      "edit": "تعديل",
+      "add": "إضافة",
+      "search": "بحث...",
+      "noResults": "لا توجد نتائج",
+      "confirm": "تأكيد",
+      "back": "رجوع",
+      "yes": "نعم",
+      "no": "لا",
+      "enabled": "مفعل",
+      "disabled": "معطل",
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "profiel": {
+      "title": "ملف النشاط التجاري",
+      "subtitle": "إدارة معلومات نشاطك التجاري",
+      "businessInfo": "معلومات النشاط التجاري",
+      "businessName": "اسم النشاط التجاري",
+      "tagline": "الشعار",
+      "description": "الوصف",
+      "contactInfo": "معلومات الاتصال",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "address": "العنوان",
+      "postalCode": "الرمز البريدي",
+      "city": "المدينة",
+      "website": "الموقع الإلكتروني",
+      "socialMedia": "وسائل التواصل الاجتماعي",
+      "facebook": "رابط فيسبوك",
+      "instagram": "رابط انستغرام",
+      "tiktok": "رابط تيك توك",
+      "branding": "الهوية البصرية",
+      "logo": "الشعار",
+      "primaryColor": "اللون الأساسي",
+      "secondaryColor": "اللون الثانوي"
+    },
+    "openingstijden": {
+      "title": "ساعات العمل",
+      "subtitle": "حدد أوقات عمل نشاطك التجاري",
+      "days": {
+        "monday": "الاثنين",
+        "tuesday": "الثلاثاء",
+        "wednesday": "الأربعاء",
+        "thursday": "الخميس",
+        "friday": "الجمعة",
+        "saturday": "السبت",
+        "sunday": "الأحد"
+      },
+      "open": "مفتوح",
+      "closed": "مغلق",
+      "openTime": "وقت الفتح",
+      "closeTime": "وقت الإغلاق",
+      "addShift": "إضافة فترة ثانية",
+      "shift1": "الفترة 1",
+      "shift2": "الفترة 2"
+    },
+    "levering": {
+      "title": "التوصيل والاستلام",
+      "subtitle": "إعداد خيارات التوصيل والاستلام",
+      "pickup": {
+        "title": "الاستلام",
+        "enabled": "تفعيل الاستلام",
+        "time": "وقت التحضير (دقائق)"
+      },
+      "delivery": {
+        "title": "التوصيل",
+        "enabled": "تفعيل التوصيل",
+        "fee": "رسوم التوصيل",
+        "minOrder": "الحد الأدنى للطلب",
+        "radius": "نطاق التوصيل (كم)",
+        "time": "وقت التوصيل (دقائق)"
+      }
+    },
+    "betaling": {
+      "title": "طرق الدفع والضريبة",
+      "subtitle": "إعداد طرق الدفع للعملاء",
+      "methods": "طرق الدفع",
+      "cash": "نقداً",
+      "cashDesc": "الدفع عند الاستلام/التوصيل",
+      "bancontact": "بانكونتاكت",
+      "bancontactDesc": "بطاقة الدفع البلجيكية",
+      "visa": "فيزا",
+      "visaDesc": "بطاقة ائتمان",
+      "mastercard": "ماستركارد",
+      "mastercardDesc": "بطاقة ائتمان",
+      "paypal": "باي بال",
+      "paypalDesc": "الدفع عبر الإنترنت",
+      "ideal": "آيديال",
+      "idealDesc": "البنوك الهولندية",
+      "vat": "نسبة الضريبة",
+      "vatRate": "نسبة الضريبة المضافة"
+    },
+    "categorieen": {
+      "title": "الفئات",
+      "subtitle": "إدارة فئات القائمة",
+      "addCategory": "إضافة فئة",
+      "editCategory": "تعديل الفئة",
+      "name": "الاسم",
+      "description": "الوصف",
+      "image": "الصورة",
+      "order": "الترتيب",
+      "noCategories": "لا توجد فئات بعد"
+    },
+    "producten": {
+      "title": "المنتجات",
+      "subtitle": "إدارة عناصر القائمة",
+      "addProduct": "إضافة منتج",
+      "editProduct": "تعديل المنتج",
+      "name": "الاسم",
+      "description": "الوصف",
+      "price": "السعر",
+      "category": "الفئة",
+      "image": "الصورة",
+      "available": "متوفر",
+      "soldOut": "نفذ",
+      "noProducts": "لا توجد منتجات بعد"
+    },
+    "opties": {
+      "title": "الخيارات والإضافات",
+      "subtitle": "إدارة خيارات وإضافات المنتجات",
+      "addOption": "إضافة خيار",
+      "optionName": "اسم الخيار",
+      "choices": "الاختيارات",
+      "required": "مطلوب",
+      "multiSelect": "يمكن اختيار عدة خيارات"
+    },
+    "allergenen": {
+      "title": "مسببات الحساسية",
+      "subtitle": "إدارة معلومات الحساسية",
+      "addAllergen": "إضافة مسبب حساسية",
+      "name": "الاسم",
+      "icon": "الأيقونة"
+    },
+    "bestellingen": {
+      "title": "الطلبات",
+      "subtitle": "عرض وإدارة الطلبات",
+      "orderNumber": "رقم الطلب",
+      "customer": "العميل",
+      "total": "الإجمالي",
+      "status": "الحالة",
+      "date": "التاريخ",
+      "items": "العناصر",
+      "noOrders": "لا توجد طلبات بعد",
+      "statusLabels": {
+        "pending": "جديد",
+        "confirmed": "مؤكد",
+        "preparing": "قيد التحضير",
+        "ready": "جاهز",
+        "delivered": "تم التوصيل",
+        "completed": "مكتمل",
+        "cancelled": "ملغى"
+      }
+    },
+    "klanten": {
+      "title": "العملاء",
+      "subtitle": "عرض قاعدة عملائك",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "orders": "الطلبات",
+      "totalSpent": "إجمالي الإنفاق",
+      "noCustomers": "لا يوجد عملاء بعد"
+    },
+    "analyse": {
+      "title": "تحليل الأعمال",
+      "subtitle": "رؤى حول أداء عملك",
+      "revenue": "الإيرادات",
+      "orders": "الطلبات",
+      "avgOrder": "متوسط الطلب",
+      "topProducts": "المنتجات الأكثر مبيعاً"
+    },
+    "qrCodes": {
+      "title": "رموز QR",
+      "subtitle": "إنشاء رموز QR لنشاطك التجاري",
+      "generate": "إنشاء رمز QR",
+      "download": "تحميل",
+      "tableNumber": "رقم الطاولة",
+      "menuQr": "رمز QR للقائمة",
+      "orderQr": "رمز QR للطلب"
+    },
+    "promoties": {
+      "title": "العروض الترويجية",
+      "subtitle": "إدارة الخصومات والعروض",
+      "addPromotion": "إضافة عرض",
+      "code": "رمز الخصم",
+      "discount": "الخصم",
+      "validFrom": "صالح من",
+      "validUntil": "صالح حتى",
+      "noPromotions": "لا توجد عروض نشطة"
+    },
+    "reviews": {
+      "title": "التقييمات",
+      "subtitle": "عرض تقييمات العملاء",
+      "rating": "التقييم",
+      "comment": "التعليق",
+      "date": "التاريخ",
+      "reply": "الرد",
+      "noReviews": "لا توجد تقييمات بعد"
+    }
   }
 }
