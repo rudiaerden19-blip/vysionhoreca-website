@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     // Find business profile by email
     const { data: profile, error: profileError } = await supabase
       .from('business_profiles')
-      .select('id, name, email, password_hash, tenant_slug')
+      .select('id, name, email, password_hash, tenant_slug, email_verified')
       .eq('email', emailLower)
       .maybeSingle()
 
@@ -134,7 +134,8 @@ export async function POST(request: NextRequest) {
         name: profile.name || profile.email,
         email: profile.email,
         business_id: profile.id,
-        tenant_slug: tenantSlug
+        tenant_slug: tenantSlug,
+        email_verified: profile.email_verified || false
       }
     })
 

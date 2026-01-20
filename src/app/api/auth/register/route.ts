@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { isProtectedTenant } from '@/lib/protected-tenants'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
+import nodemailer from 'nodemailer'
 import { registerRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
@@ -209,6 +211,27 @@ export async function POST(request: NextRequest) {
     }
 
     // ========================================
+    // 5. SEND VERIFICATION EMAIL
+    // ========================================
+    try {
+      const verificationToken = crypto.randomBytes(32).toString('hex')
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+
+      await supabase
+        .from('email_verification_tokens')
+        .insert({
+          email: emailLower,
+          token: verificationToken,
+          expires_at: expiresAt.toISOString(),
+        })
+
+      await sendVerificationEmail(emailLower, businessName.trim(), verificationToken)
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError)
+      // Don't fail registration - email can be resent
+    }
+
+    // ========================================
     // SUCCESS
     // ========================================
     return NextResponse.json({ 
@@ -218,7 +241,8 @@ export async function POST(request: NextRequest) {
         name: businessName.trim(),
         email: emailLower,
         tenant_slug: tenantSlug,
-      }
+      },
+      message: 'Account aangemaakt! Check je email om je account te bevestigen.'
     })
 
   } catch (error) {
@@ -228,4 +252,85 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+async function sendVerificationEmail(email: string, name: string, token: string) {
+  const verifyUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://vysionhoreca.com'}/api/auth/verify-email?token=${token}`
+
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.zoho.eu',
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.ZOHO_EMAIL,
+      pass: process.env.ZOHO_PASSWORD,
+    },
+  })
+
+  const mailOptions = {
+    from: `"Vysion Horeca" <${process.env.ZOHO_EMAIL}>`,
+    to: email,
+    subject: 'Welkom bij Vysion Horeca - Bevestig je email',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h1 style="color: #F97316; margin: 0;">Vysion<span style="color: #666; font-weight: normal;">horeca</span></h1>
+        </div>
+        
+        <h2 style="color: #333;">Welkom ${name}!</h2>
+        
+        <p style="color: #555; line-height: 1.6;">
+          Bedankt voor je registratie bij Vysion Horeca! Je proefperiode van 14 dagen is gestart.
+        </p>
+        
+        <p style="color: #555; line-height: 1.6;">
+          Klik op de knop hieronder om je emailadres te bevestigen:
+        </p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verifyUrl}" 
+             style="background-color: #F97316; color: white; padding: 14px 28px; 
+                    text-decoration: none; border-radius: 8px; font-weight: bold;
+                    display: inline-block;">
+            Email bevestigen
+          </a>
+        </div>
+        
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #333;">Wat kun je nu doen?</h3>
+          <ul style="color: #555; line-height: 1.8;">
+            <li>Producten toevoegen aan je menu</li>
+            <li>Je online shop personaliseren</li>
+            <li>QR-codes genereren voor tafels</li>
+            <li>Bestellingen ontvangen</li>
+          </ul>
+        </div>
+        
+        <p style="color: #888; font-size: 14px;">
+          Deze verificatie link is 24 uur geldig.
+        </p>
+        
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        
+        <p style="color: #999; font-size: 12px; text-align: center;">
+          © ${new Date().getFullYear()} Vysion Group. Alle rechten voorbehouden.
+        </p>
+      </div>
+    `,
+    text: `
+Welkom ${name}!
+
+Bedankt voor je registratie bij Vysion Horeca! Je proefperiode van 14 dagen is gestart.
+
+Klik op deze link om je emailadres te bevestigen:
+${verifyUrl}
+
+Deze link is 24 uur geldig.
+
+© ${new Date().getFullYear()} Vysion Group
+    `,
+  }
+
+  await transporter.sendMail(mailOptions)
+  console.log('Verification email sent to:', email)
 }
