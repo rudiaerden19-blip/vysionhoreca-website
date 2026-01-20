@@ -2381,7 +2381,10 @@
     "variable": { "title": "采购与发票", "newPurchase": "新建采购", "category": "类别", "description": "描述", "supplier": "供应商", "amount": "金额 (€)", "date": "日期", "noData": "暂无采购记录", "monthTotal": "采购总额", "confirmDelete": "确定要删除这项采购吗？" },
     "year": { "yearRevenue": "年收入（估算）", "yearCosts": "年成本", "yearProfit": "年利润", "averageMargin": "平均利润率" },
     "settings": { "title": "设定业务目标", "targetMargin": "目标利润率 (%)", "minMargin": "最低利润率 (%)", "saveTargets": "保存目标", "targetsSaved": "目标已保存!" },
-    "common": { "cancel": "取消", "save": "保存", "saving": "保存中...", "actions": "操作", "total": "合计" }
+    "common": { "cancel": "取消", "save": "保存", "saving": "保存中...", "actions": "操作", "total": "合计" },
+    "fixedCategories": { "RENT": "租金", "PERSONNEL": "人工", "ELECTRICITY": "电费", "GAS": "燃气", "WATER": "水费", "INSURANCE": "保险", "LEASING": "租赁", "LOAN": "贷款", "SUBSCRIPTIONS": "订阅", "OTHER": "其他" },
+    "variableCategories": { "INGREDIENTS": "食材", "PACKAGING": "包装", "CLEANING": "清洁", "MAINTENANCE": "维护", "MARKETING": "营销", "OTHER": "其他" },
+    "recommendations": { "noRevenue": "本月无收入记录", "excellent": "优秀！利润率{margin}%，财务健康", "critical": "危机：利润率({margin}%)低于最低值({min}%)", "personnelTooHigh": "人工成本过高：占收入{percent}%（最高{max}%）", "saveOnPersonnel": "人工可节省€{amount}", "ingredientsTooHigh": "食材成本过高：占收入{percent}%（最高{max}%）", "saveOnIngredients": "食材可节省€{amount}", "rentTooHigh": "租金过高：占收入{percent}%（最高10%）", "energyTooHigh": "能源过高：占收入{percent}%（最高8%）", "ticketTooLow": "客单价过低：€{current}（目标：€{target}）", "ticketTip": "建议：追加销售、套餐优惠或提价", "breakEvenReached": "已达盈亏平衡！超出€{amount}", "breakEvenNeeded": "距盈亏平衡还差€{amount}" }
   },
   "ordersPage": {
     "title": "订单",

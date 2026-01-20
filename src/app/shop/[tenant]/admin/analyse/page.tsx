@@ -47,12 +47,96 @@ const getHealthStatus = (t: (key: string) => string) => ({
   CRITICAL: { label: t('analysePage.health.critical'), desc: t('analysePage.health.criticalDesc'), icon: '🚨', color: '#ef4444', bgColor: 'bg-red-50', borderColor: 'border-red-500' },
 })
 
+// Icon mapping for categories
+const FIXED_ICONS: Record<string, string> = {
+  RENT: '🏠', PERSONNEL: '👥', ELECTRICITY: '⚡', GAS: '🔥', WATER: '💧',
+  INSURANCE: '🛡️', LEASING: '📋', LOAN: '🏦', SUBSCRIPTIONS: '📱', OTHER: '📦'
+}
+const VARIABLE_ICONS: Record<string, string> = {
+  INGREDIENTS: '🥔', PACKAGING: '📦', CLEANING: '🧹', MAINTENANCE: '🔧', MARKETING: '📢', OTHER: '📋'
+}
+
 export default function AnalysePage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   
   // Memoized translations
   const MONTH_NAMES = useMemo(() => t('analysePage.months') as unknown as string[], [t])
   const HEALTH_STATUS = useMemo(() => getHealthStatus(t), [t])
+  
+  // Category translation helpers
+  const getFixedCatLabel = (id: string) => t(`analysePage.fixedCategories.${id}`) || id
+  const getVariableCatLabel = (id: string) => t(`analysePage.variableCategories.${id}`) || id
+  
+  // Translated categories for dropdowns
+  const translatedFixedCategories = useMemo(() => 
+    FIXED_COST_CATEGORIES.map(cat => ({
+      ...cat,
+      label: getFixedCatLabel(cat.id),
+      icon: FIXED_ICONS[cat.id] || '📦'
+    })), [t])
+  
+  const translatedVariableCategories = useMemo(() =>
+    VARIABLE_COST_CATEGORIES.map(cat => ({
+      ...cat,
+      label: getVariableCatLabel(cat.id),
+      icon: VARIABLE_ICONS[cat.id] || '📋'
+    })), [t])
+  
+  // Translate recommendations
+  const translateRecommendations = (recs: string[]) => {
+    return recs.map(rec => {
+      // Parse and translate each recommendation
+      if (rec.includes('Geen omzet')) return `📊 ${t('analysePage.recommendations.noRevenue')}`
+      if (rec.includes('UITSTEKEND')) {
+        const match = rec.match(/([\d.]+)%/)
+        return `✅ ${t('analysePage.recommendations.excellent').replace('{margin}', match?.[1] || '0')}`
+      }
+      if (rec.includes('KRITIEK')) {
+        const matches = rec.match(/([\d.]+)%/g)
+        return `🚨 ${t('analysePage.recommendations.critical').replace('{margin}', matches?.[0]?.replace('%','') || '0').replace('{min}', matches?.[1]?.replace('%','') || '0')}`
+      }
+      if (rec.includes('PERSONEEL TE DUUR')) {
+        const matches = rec.match(/([\d.]+)%/g)
+        return `👥 ${t('analysePage.recommendations.personnelTooHigh').replace('{percent}', matches?.[0]?.replace('%','') || '0').replace('{max}', matches?.[1]?.replace('%','') || '0')}`
+      }
+      if (rec.includes('op personeel')) {
+        const match = rec.match(/€([\d.]+)/)
+        return `→ ${t('analysePage.recommendations.saveOnPersonnel').replace('{amount}', match?.[1] || '0')}`
+      }
+      if (rec.includes('INGREDIËNTEN TE DUUR')) {
+        const matches = rec.match(/([\d.]+)%/g)
+        return `🥔 ${t('analysePage.recommendations.ingredientsTooHigh').replace('{percent}', matches?.[0]?.replace('%','') || '0').replace('{max}', matches?.[1]?.replace('%','') || '0')}`
+      }
+      if (rec.includes('op ingrediënten')) {
+        const match = rec.match(/€([\d.]+)/)
+        return `→ ${t('analysePage.recommendations.saveOnIngredients').replace('{amount}', match?.[1] || '0')}`
+      }
+      if (rec.includes('HUUR TE DUUR')) {
+        const match = rec.match(/([\d.]+)%/)
+        return `🏠 ${t('analysePage.recommendations.rentTooHigh').replace('{percent}', match?.[1] || '0')}`
+      }
+      if (rec.includes('ENERGIE TE DUUR')) {
+        const match = rec.match(/([\d.]+)%/)
+        return `⚡ ${t('analysePage.recommendations.energyTooHigh').replace('{percent}', match?.[1] || '0')}`
+      }
+      if (rec.includes('GEMIDDELDE BON TE LAAG')) {
+        const matches = rec.match(/€([\d.]+)/g)
+        return `🧾 ${t('analysePage.recommendations.ticketTooLow').replace('{current}', matches?.[0]?.replace('€','') || '0').replace('{target}', matches?.[1]?.replace('€','') || '0')}`
+      }
+      if (rec.includes('Tip:')) {
+        return `→ ${t('analysePage.recommendations.ticketTip')}`
+      }
+      if (rec.includes('Break-even bereikt')) {
+        const match = rec.match(/€([\d.]+)/)
+        return `📍 ${t('analysePage.recommendations.breakEvenReached').replace('{amount}', match?.[1] || '0')}`
+      }
+      if (rec.includes('Nog €')) {
+        const match = rec.match(/€([\d.]+)/)
+        return `📍 ${t('analysePage.recommendations.breakEvenNeeded').replace('{amount}', match?.[1] || '0')}`
+      }
+      return rec
+    })
+  }
   
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
@@ -547,7 +631,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               <div className="space-y-2">
                 {monthlyReport.fixedCostBreakdown.length > 0 ? (
                   monthlyReport.fixedCostBreakdown.map(item => {
-                    const cat = FIXED_COST_CATEGORIES.find(c => c.id === item.category)
+                    const cat = translatedFixedCategories.find(c => c.id === item.category)
                     return (
                       <div key={item.category} className="flex justify-between items-center">
                         <span className="text-gray-600">{cat?.icon} {cat?.label}</span>
@@ -576,7 +660,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               <div className="space-y-2">
                 {monthlyReport.variableCostBreakdown.length > 0 ? (
                   monthlyReport.variableCostBreakdown.map(item => {
-                    const cat = VARIABLE_COST_CATEGORIES.find(c => c.id === item.category)
+                    const cat = translatedVariableCategories.find(c => c.id === item.category)
                     return (
                       <div key={item.category} className="flex justify-between items-center">
                         <span className="text-gray-600">{cat?.icon} {cat?.label}</span>
@@ -605,7 +689,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
           >
             <h3 className="font-bold text-gray-900 mb-4">🔍 {t('analysePage.overview.recommendations')}</h3>
             <div className="space-y-2">
-              {monthlyReport.recommendations.map((rec, idx) => {
+              {translateRecommendations(monthlyReport.recommendations).map((rec, idx) => {
                 let bgClass = 'bg-gray-50'
                 if (rec.includes('✅')) bgClass = 'bg-green-50 border-l-4 border-green-500'
                 else if (rec.includes('🚨')) bgClass = 'bg-red-50 border-l-4 border-red-500'
@@ -723,7 +807,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {fixedCosts.map(cost => {
-              const cat = FIXED_COST_CATEGORIES.find(c => c.id === cost.category)
+              const cat = translatedFixedCategories.find(c => c.id === cost.category)
               return (
                 <motion.div
                   key={cost.id}
@@ -812,7 +896,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               <tbody className="divide-y divide-gray-100">
                 {variableCosts.length > 0 ? (
                   variableCosts.map(cost => {
-                    const cat = VARIABLE_COST_CATEGORIES.find(c => c.id === cost.category)
+                    const cat = translatedVariableCategories.find(c => c.id === cost.category)
                     return (
                       <tr key={cost.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 text-gray-600">
@@ -1144,7 +1228,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     onChange={e => setFixedForm(f => ({ ...f, category: e.target.value as FixedCostCategory }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                   >
-                    {FIXED_COST_CATEGORIES.map(cat => (
+                    {translatedFixedCategories.map(cat => (
                       <option key={cat.id} value={cat.id}>{cat.icon} {cat.label}</option>
                     ))}
                   </select>
@@ -1239,7 +1323,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     onChange={e => setVariableForm(f => ({ ...f, category: e.target.value as VariableCostCategory }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl"
                   >
-                    {VARIABLE_COST_CATEGORIES.map(cat => (
+                    {translatedVariableCategories.map(cat => (
                       <option key={cat.id} value={cat.id}>{cat.icon} {cat.label}</option>
                     ))}
                   </select>

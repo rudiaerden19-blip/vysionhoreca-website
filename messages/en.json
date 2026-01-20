@@ -2587,6 +2587,41 @@
       "total": "Total",
       "fillNameAndAmount": "Enter a name and amount",
       "fillDescAndAmount": "Enter a description and amount"
+    },
+    "fixedCategories": {
+      "RENT": "Rent",
+      "PERSONNEL": "Staff",
+      "ELECTRICITY": "Electricity",
+      "GAS": "Gas",
+      "WATER": "Water",
+      "INSURANCE": "Insurance",
+      "LEASING": "Leasing",
+      "LOAN": "Loans",
+      "SUBSCRIPTIONS": "Subscriptions",
+      "OTHER": "Other"
+    },
+    "variableCategories": {
+      "INGREDIENTS": "Ingredients",
+      "PACKAGING": "Packaging",
+      "CLEANING": "Cleaning",
+      "MAINTENANCE": "Maintenance",
+      "MARKETING": "Marketing",
+      "OTHER": "Other"
+    },
+    "recommendations": {
+      "noRevenue": "No revenue recorded this month",
+      "excellent": "EXCELLENT! Financially healthy with {margin}% margin",
+      "critical": "CRITICAL: Profit margin ({margin}%) below minimum ({min}%)",
+      "personnelTooHigh": "STAFF TOO EXPENSIVE: {percent}% of revenue (max {max}%)",
+      "saveOnPersonnel": "Save €{amount} on staff",
+      "ingredientsTooHigh": "INGREDIENTS TOO EXPENSIVE: {percent}% of revenue (max {max}%)",
+      "saveOnIngredients": "Save €{amount} on ingredients",
+      "rentTooHigh": "RENT TOO EXPENSIVE: {percent}% of revenue (max 10%)",
+      "energyTooHigh": "ENERGY TOO EXPENSIVE: {percent}% of revenue (max 8%)",
+      "ticketTooLow": "AVERAGE TICKET TOO LOW: €{current} (target: €{target})",
+      "ticketTip": "Tip: Upselling, combo deals, or increase prices",
+      "breakEvenReached": "Break-even reached! €{amount} above break-even",
+      "breakEvenNeeded": "Still need €{amount} to reach break-even"
     }
   },
   "ordersPage": {

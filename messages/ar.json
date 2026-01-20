@@ -2381,7 +2381,10 @@
     "variable": { "title": "المشتريات والفواتير", "newPurchase": "شراء جديد", "category": "الفئة", "description": "الوصف", "supplier": "المورد", "amount": "المبلغ (€)", "date": "التاريخ", "noData": "لا توجد مشتريات مسجلة", "monthTotal": "إجمالي المشتريات", "confirmDelete": "هل أنت متأكد من حذف هذا الشراء؟" },
     "year": { "yearRevenue": "الإيرادات السنوية (تقدير)", "yearCosts": "التكاليف السنوية", "yearProfit": "الربح السنوي", "averageMargin": "متوسط الهامش" },
     "settings": { "title": "تعيين أهداف العمل", "targetMargin": "هامش الربح المستهدف (%)", "minMargin": "الحد الأدنى للهامش (%)", "saveTargets": "حفظ الأهداف", "targetsSaved": "تم حفظ الأهداف!" },
-    "common": { "cancel": "إلغاء", "save": "حفظ", "saving": "جاري الحفظ...", "actions": "الإجراءات", "total": "المجموع" }
+    "common": { "cancel": "إلغاء", "save": "حفظ", "saving": "جاري الحفظ...", "actions": "الإجراءات", "total": "المجموع" },
+    "fixedCategories": { "RENT": "إيجار", "PERSONNEL": "موظفين", "ELECTRICITY": "كهرباء", "GAS": "غاز", "WATER": "ماء", "INSURANCE": "تأمين", "LEASING": "تأجير", "LOAN": "قروض", "SUBSCRIPTIONS": "اشتراكات", "OTHER": "أخرى" },
+    "variableCategories": { "INGREDIENTS": "مكونات", "PACKAGING": "تغليف", "CLEANING": "تنظيف", "MAINTENANCE": "صيانة", "MARKETING": "تسويق", "OTHER": "أخرى" },
+    "recommendations": { "noRevenue": "لا إيرادات مسجلة هذا الشهر", "excellent": "ممتاز! صحة مالية مع هامش {margin}%", "critical": "حرج: الهامش ({margin}%) أقل من الحد الأدنى ({min}%)", "personnelTooHigh": "تكلفة الموظفين مرتفعة: {percent}% من الإيرادات (الحد الأقصى {max}%)", "saveOnPersonnel": "وفر €{amount} على الموظفين", "ingredientsTooHigh": "تكلفة المكونات مرتفعة: {percent}% من الإيرادات (الحد الأقصى {max}%)", "saveOnIngredients": "وفر €{amount} على المكونات", "rentTooHigh": "الإيجار مرتفع: {percent}% من الإيرادات (الحد الأقصى 10%)", "energyTooHigh": "الطاقة مرتفعة: {percent}% من الإيرادات (الحد الأقصى 8%)", "ticketTooLow": "متوسط الفاتورة منخفض: €{current} (الهدف: €{target})", "ticketTip": "نصيحة: البيع الإضافي أو العروض المجمعة", "breakEvenReached": "تم تحقيق نقطة التعادل! €{amount} فوق التعادل", "breakEvenNeeded": "لا يزال مطلوب €{amount} للوصول للتعادل" }
   },
   "ordersPage": {
     "title": "الطلبات",

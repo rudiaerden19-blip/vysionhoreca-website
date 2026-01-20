@@ -2593,6 +2593,41 @@
       "total": "Totaal",
       "fillNameAndAmount": "Vul een naam en bedrag in",
       "fillDescAndAmount": "Vul een beschrijving en bedrag in"
+    },
+    "fixedCategories": {
+      "RENT": "Huur",
+      "PERSONNEL": "Personeel",
+      "ELECTRICITY": "Elektriciteit",
+      "GAS": "Gas",
+      "WATER": "Water",
+      "INSURANCE": "Verzekeringen",
+      "LEASING": "Leasing",
+      "LOAN": "Leningen",
+      "SUBSCRIPTIONS": "Abonnementen",
+      "OTHER": "Overige"
+    },
+    "variableCategories": {
+      "INGREDIENTS": "Ingrediënten",
+      "PACKAGING": "Verpakking",
+      "CLEANING": "Schoonmaak",
+      "MAINTENANCE": "Onderhoud",
+      "MARKETING": "Marketing",
+      "OTHER": "Overige"
+    },
+    "recommendations": {
+      "noRevenue": "Geen omzet geregistreerd deze maand",
+      "excellent": "UITSTEKEND! Financieel gezond met {margin}% marge",
+      "critical": "KRITIEK: Winstmarge ({margin}%) onder minimum ({min}%)",
+      "personnelTooHigh": "PERSONEEL TE DUUR: {percent}% van omzet (max {max}%)",
+      "saveOnPersonnel": "Bespaar €{amount} op personeel",
+      "ingredientsTooHigh": "INGREDIËNTEN TE DUUR: {percent}% van omzet (max {max}%)",
+      "saveOnIngredients": "Bespaar €{amount} op ingrediënten",
+      "rentTooHigh": "HUUR TE DUUR: {percent}% van omzet (max 10%)",
+      "energyTooHigh": "ENERGIE TE DUUR: {percent}% van omzet (max 8%)",
+      "ticketTooLow": "GEMIDDELDE BON TE LAAG: €{current} (doel: €{target})",
+      "ticketTip": "Tip: Upselling, combo-deals, of prijzen verhogen",
+      "breakEvenReached": "Break-even bereikt! €{amount} boven break-even",
+      "breakEvenNeeded": "Nog €{amount} nodig om break-even te bereiken"
     }
   },
   "ordersPage": {

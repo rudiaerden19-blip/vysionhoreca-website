@@ -2381,7 +2381,10 @@
     "variable": { "title": "仕入れと請求書", "newPurchase": "新規仕入れ", "category": "カテゴリ", "description": "説明", "supplier": "仕入先", "amount": "金額 (€)", "date": "日付", "noData": "仕入れがありません", "monthTotal": "仕入れ合計", "confirmDelete": "この仕入れを削除しますか？" },
     "year": { "yearRevenue": "年間売上（見積）", "yearCosts": "年間コスト", "yearProfit": "年間利益", "averageMargin": "平均利益率" },
     "settings": { "title": "事業目標を設定", "targetMargin": "目標利益率 (%)", "minMargin": "最低利益率 (%)", "saveTargets": "目標を保存", "targetsSaved": "目標を保存しました!" },
-    "common": { "cancel": "キャンセル", "save": "保存", "saving": "保存中...", "actions": "アクション", "total": "合計" }
+    "common": { "cancel": "キャンセル", "save": "保存", "saving": "保存中...", "actions": "アクション", "total": "合計" },
+    "fixedCategories": { "RENT": "家賃", "PERSONNEL": "人件費", "ELECTRICITY": "電気", "GAS": "ガス", "WATER": "水道", "INSURANCE": "保険", "LEASING": "リース", "LOAN": "ローン", "SUBSCRIPTIONS": "サブスク", "OTHER": "その他" },
+    "variableCategories": { "INGREDIENTS": "食材", "PACKAGING": "包装", "CLEANING": "清掃", "MAINTENANCE": "メンテナンス", "MARKETING": "マーケティング", "OTHER": "その他" },
+    "recommendations": { "noRevenue": "今月の売上がありません", "excellent": "優秀！{margin}%の利益率で財務健全", "critical": "危機的：利益率({margin}%)が最低値({min}%)を下回っています", "personnelTooHigh": "人件費が高すぎます：売上の{percent}%（最大{max}%）", "saveOnPersonnel": "人件費を€{amount}節約", "ingredientsTooHigh": "食材費が高すぎます：売上の{percent}%（最大{max}%）", "saveOnIngredients": "食材費を€{amount}節約", "rentTooHigh": "家賃が高すぎます：売上の{percent}%（最大10%）", "energyTooHigh": "光熱費が高すぎます：売上の{percent}%（最大8%）", "ticketTooLow": "客単価が低すぎます：€{current}（目標：€{target}）", "ticketTip": "ヒント：アップセル、コンボ、または価格アップ", "breakEvenReached": "損益分岐点達成！€{amount}の黒字", "breakEvenNeeded": "損益分岐点まであと€{amount}必要" }
   },
   "ordersPage": {
     "title": "注文",
