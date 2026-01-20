@@ -422,7 +422,7 @@ Met vriendelijke groeten`,
       })
       
       if (response.ok) {
-        alert('Urenregistratie succesvol verzonden!')
+        alert(t('urenPage.print.emailSent'))
         setShowEmailModal(false)
         
         // Mark as exported
@@ -430,11 +430,11 @@ Met vriendelijke groeten`,
           markTimesheetExported(tenant, selectedStaff.id, selectedYear, selectedMonth)
         }
       } else {
-        throw new Error('Verzenden mislukt')
+        throw new Error(t('urenPage.print.sendFailed'))
       }
     } catch (error) {
       console.error('Email error:', error)
-      alert('Er is een fout opgetreden bij het verzenden. Probeer het opnieuw of gebruik CSV export.')
+      alert(t('urenPage.print.sendError'))
     }
     
     setSendingEmail(false)
@@ -580,36 +580,36 @@ Met vriendelijke groeten`,
         <div className="border-b-2 border-gray-800 pb-4 mb-4">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">URENREGISTRATIE</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('urenPage.print.title')}</h1>
               <p className="text-lg text-gray-700 mt-1">{MONTHS[selectedMonth - 1]} {selectedYear}</p>
             </div>
             <div className="text-right text-sm text-gray-600">
               <div className="font-bold text-gray-800">Vysion Horeca</div>
-              <div>Gegenereerd: {new Date().toLocaleDateString('nl-BE')}</div>
+              <div>{t('urenPage.print.generated')}: {new Date().toLocaleDateString()}</div>
             </div>
           </div>
         </div>
         
         <div className="bg-gray-100 p-4 rounded mb-4">
-          <h2 className="font-bold text-lg mb-2">👤 Medewerker gegevens</h2>
+          <h2 className="font-bold text-lg mb-2">👤 {t('urenPage.print.employeeDetails')}</h2>
           <table className="w-full text-sm">
             <tbody>
               <tr>
-                <td className="py-1 font-medium w-40">Naam:</td>
+                <td className="py-1 font-medium w-40">{t('urenPage.print.name')}:</td>
                 <td>{selectedStaff?.name}</td>
-                <td className="font-medium w-40">Contract:</td>
+                <td className="font-medium w-40">{t('urenPage.print.contract')}:</td>
                 <td>{selectedStaff?.contract_type || '-'}</td>
               </tr>
               <tr>
-                <td className="py-1 font-medium">Email:</td>
+                <td className="py-1 font-medium">{t('urenPage.print.email')}:</td>
                 <td>{selectedStaff?.email || '-'}</td>
-                <td className="font-medium">Uren/week:</td>
+                <td className="font-medium">{t('urenPage.print.hoursWeek')}:</td>
                 <td>{selectedStaff?.hours_per_week || '-'}</td>
               </tr>
               <tr>
-                <td className="py-1 font-medium">Telefoon:</td>
+                <td className="py-1 font-medium">{t('urenPage.print.phone')}:</td>
                 <td>{selectedStaff?.phone || '-'}</td>
-                <td className="font-medium">Uurloon:</td>
+                <td className="font-medium">{t('urenPage.print.hourlyRate')}:</td>
                 <td>{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}` : '-'}</td>
               </tr>
             </tbody>
@@ -619,23 +619,23 @@ Met vriendelijke groeten`,
         <div className="grid grid-cols-5 gap-2 mb-4">
           <div className="bg-green-100 p-3 rounded text-center">
             <div className="text-xl font-bold text-green-700">{totalWorked.toFixed(1)}</div>
-            <div className="text-xs text-green-600">Gewerkt</div>
+            <div className="text-xs text-green-600">{t('urenPage.worked')}</div>
           </div>
           <div className="bg-red-100 p-3 rounded text-center">
             <div className="text-xl font-bold text-red-700">{totalSick.toFixed(1)}</div>
-            <div className="text-xs text-red-600">Ziekte</div>
+            <div className="text-xs text-red-600">{t('urenPage.sick')}</div>
           </div>
           <div className="bg-blue-100 p-3 rounded text-center">
             <div className="text-xl font-bold text-blue-700">{totalVacation.toFixed(1)}</div>
-            <div className="text-xs text-blue-600">Vakantie</div>
+            <div className="text-xs text-blue-600">{t('urenPage.vacation')}</div>
           </div>
           <div className="bg-orange-100 p-3 rounded text-center">
             <div className="text-xl font-bold text-orange-700">{totalOther.toFixed(1)}</div>
-            <div className="text-xs text-orange-600">Overig</div>
+            <div className="text-xs text-orange-600">{t('urenPage.other')}</div>
           </div>
           <div className="bg-gray-200 p-3 rounded text-center">
             <div className="text-xl font-bold text-gray-800">{totalHours.toFixed(1)}</div>
-            <div className="text-xs text-gray-600">TOTAAL</div>
+            <div className="text-xs text-gray-600">{t('urenPage.print.total')}</div>
           </div>
         </div>
       </div>
@@ -663,7 +663,7 @@ Met vriendelijke groeten`,
           <div className="text-gray-600 text-sm">{t('urenPage.total')}</div>
           {selectedStaff?.hours_per_week && (
             <div className="text-xs text-gray-500 mt-1">
-              Contract: {(selectedStaff.hours_per_week * 4.33).toFixed(1)}u/maand
+              {t('urenPage.print.contract')}: {(selectedStaff.hours_per_week * 4.33).toFixed(1)} {t('urenPage.print.hoursPerMonth')}
             </div>
           )}
         </div>
@@ -673,13 +673,13 @@ Met vriendelijke groeten`,
       {monthlyTimesheet?.is_closed && (
         <div className="bg-purple-100 border border-purple-300 rounded-lg p-3 flex items-center justify-between">
           <span className="text-purple-700">
-            🔒 Maand is afgesloten op {new Date(monthlyTimesheet.closed_at!).toLocaleDateString('nl-BE')}
+            🔒 {t('urenPage.print.monthClosed')} {new Date(monthlyTimesheet.closed_at!).toLocaleDateString()}
           </span>
           <button
             onClick={() => setShowReopenModal(true)}
             className="px-3 py-1 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 transition"
           >
-            🔓 Heropenen
+            🔓 {t('urenPage.print.reopen')}
           </button>
         </div>
       )}
@@ -743,29 +743,29 @@ Met vriendelijke groeten`,
 
       {/* Entries List (for print) */}
       <div className="hidden print:block">
-        <h3 className="font-bold text-lg mt-6 mb-3 border-b pb-2">📋 Gedetailleerd overzicht</h3>
+        <h3 className="font-bold text-lg mt-6 mb-3 border-b pb-2">📋 {t('urenPage.print.detailedOverview')}</h3>
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="bg-gray-800 text-white">
-              <th className="border border-gray-600 p-2 text-left">Datum</th>
-              <th className="border border-gray-600 p-2 text-left">Dag</th>
-              <th className="border border-gray-600 p-2 text-left">Type</th>
-              <th className="border border-gray-600 p-2 text-center">In</th>
-              <th className="border border-gray-600 p-2 text-center">Uit</th>
-              <th className="border border-gray-600 p-2 text-center">Pauze</th>
-              <th className="border border-gray-600 p-2 text-center">Uren</th>
-              <th className="border border-gray-600 p-2 text-left">Notities</th>
+              <th className="border border-gray-600 p-2 text-left">{t('urenPage.print.date')}</th>
+              <th className="border border-gray-600 p-2 text-left">{t('urenPage.print.day')}</th>
+              <th className="border border-gray-600 p-2 text-left">{t('urenPage.print.type')}</th>
+              <th className="border border-gray-600 p-2 text-center">{t('urenPage.print.in')}</th>
+              <th className="border border-gray-600 p-2 text-center">{t('urenPage.print.out')}</th>
+              <th className="border border-gray-600 p-2 text-center">{t('urenPage.print.break')}</th>
+              <th className="border border-gray-600 p-2 text-center">{t('urenPage.print.hours')}</th>
+              <th className="border border-gray-600 p-2 text-left">{t('urenPage.print.notes')}</th>
               <th className="border border-gray-600 p-2 text-center">✓</th>
             </tr>
           </thead>
           <tbody>
             {entries.map((e, i) => {
               const date = new Date(e.date)
-              const dayName = date.toLocaleDateString('nl-BE', { weekday: 'short' })
+              const dayName = date.toLocaleDateString(undefined, { weekday: 'short' })
               const absenceType = LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)
               return (
                 <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                  <td className="border border-gray-300 p-2">{date.toLocaleDateString('nl-BE')}</td>
+                  <td className="border border-gray-300 p-2">{date.toLocaleDateString()}</td>
                   <td className="border border-gray-300 p-2">{dayName}</td>
                   <td className="border border-gray-300 p-2">
                     <span style={{ color: absenceType?.color }}>{absenceType?.icon}</span> {absenceType?.label}
@@ -782,7 +782,7 @@ Met vriendelijke groeten`,
           </tbody>
           <tfoot>
             <tr className="bg-gray-200 font-bold">
-              <td colSpan={6} className="border border-gray-400 p-2 text-right">TOTAAL:</td>
+              <td colSpan={6} className="border border-gray-400 p-2 text-right">{t('urenPage.print.total')}:</td>
               <td className="border border-gray-400 p-2 text-center">{totalHours.toFixed(1)}</td>
               <td colSpan={2} className="border border-gray-400 p-2"></td>
             </tr>
@@ -792,7 +792,7 @@ Met vriendelijke groeten`,
         {/* Breakdown per type */}
         <div className="mt-6 grid grid-cols-2 gap-4">
           <div>
-            <h4 className="font-bold mb-2">📊 Uitsplitsing per type</h4>
+            <h4 className="font-bold mb-2">📊 {t('urenPage.print.breakdownByType')}</h4>
             <table className="w-full text-sm border-collapse">
               <tbody>
                 {LOCAL_ABSENCE_TYPES.map(type => {
@@ -803,7 +803,7 @@ Met vriendelijke groeten`,
                   return (
                     <tr key={type.id}>
                       <td className="border p-1">{type.icon} {type.label}</td>
-                      <td className="border p-1 text-right font-mono">{hours.toFixed(1)} uur</td>
+                      <td className="border p-1 text-right font-mono">{hours.toFixed(1)} {t('urenPage.print.hour')}</td>
                     </tr>
                   )
                 })}
@@ -813,19 +813,19 @@ Met vriendelijke groeten`,
           
           {selectedStaff?.hours_per_week && (
             <div>
-              <h4 className="font-bold mb-2">📈 Contractvergelijking</h4>
+              <h4 className="font-bold mb-2">📈 {t('urenPage.print.contractComparison')}</h4>
               <table className="w-full text-sm border-collapse">
                 <tbody>
                   <tr>
-                    <td className="border p-1">Contract uren/maand</td>
+                    <td className="border p-1">{t('urenPage.print.contractHoursMonth')}</td>
                     <td className="border p-1 text-right font-mono">{(selectedStaff.hours_per_week * 4.33).toFixed(1)} uur</td>
                   </tr>
                   <tr>
-                    <td className="border p-1">Gewerkte uren</td>
+                    <td className="border p-1">{t('urenPage.print.workedHours')}</td>
                     <td className="border p-1 text-right font-mono">{totalWorked.toFixed(1)} uur</td>
                   </tr>
                   <tr className="font-bold">
-                    <td className="border p-1">Verschil</td>
+                    <td className="border p-1">{t('urenPage.print.difference')}</td>
                     <td className={`border p-1 text-right font-mono ${totalWorked - (selectedStaff.hours_per_week * 4.33) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       {(totalWorked - (selectedStaff.hours_per_week * 4.33)).toFixed(1)} uur
                     </td>
@@ -840,21 +840,21 @@ Met vriendelijke groeten`,
         <div className="mt-8 pt-4 border-t">
           <div className="grid grid-cols-2 gap-8">
             <div>
-              <p className="text-sm text-gray-600 mb-12">Handtekening medewerker:</p>
+              <p className="text-sm text-gray-600 mb-12">{t('urenPage.print.signatureEmployee')}:</p>
               <div className="border-b border-gray-400 mb-1"></div>
               <p className="text-xs text-gray-500">{selectedStaff?.name}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-12">Handtekening werkgever:</p>
+              <p className="text-sm text-gray-600 mb-12">{t('urenPage.print.signatureEmployer')}:</p>
               <div className="border-b border-gray-400 mb-1"></div>
-              <p className="text-xs text-gray-500">Naam + datum</p>
+              <p className="text-xs text-gray-500">{t('urenPage.print.nameAndDate')}</p>
             </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-8 pt-4 border-t text-center text-xs text-gray-500">
-          <p>Dit document is gegenereerd door Vysion Horeca op {new Date().toLocaleDateString('nl-BE')} om {new Date().toLocaleTimeString('nl-BE')}</p>
+          <p>{t('urenPage.print.documentGenerated')} {new Date().toLocaleDateString()} {t('urenPage.print.at')} {new Date().toLocaleTimeString()}</p>
           <p>www.vysionhoreca.com</p>
         </div>
       </div>
@@ -1111,37 +1111,37 @@ Met vriendelijke groeten`,
           <div className="border-b-2 border-gray-800 pb-3 mb-4">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-xl font-bold text-gray-900">URENREGISTRATIE</h1>
+                <h1 className="text-xl font-bold text-gray-900">{t('urenPage.print.title')}</h1>
                 <p className="text-base text-gray-700">{MONTHS[selectedMonth - 1]} {selectedYear}</p>
               </div>
               <div className="text-right text-xs text-gray-600">
                 <div className="font-bold text-gray-800 text-sm">Vysion Horeca</div>
-                <div>Gegenereerd: {new Date().toLocaleDateString('nl-BE')}</div>
+                <div>{t('urenPage.print.generated')}: {new Date().toLocaleDateString()}</div>
               </div>
             </div>
           </div>
 
           {/* Employee Info */}
           <div className="bg-gray-100 p-3 rounded mb-4">
-            <h2 className="font-bold text-sm mb-2">👤 Medewerker gegevens</h2>
+            <h2 className="font-bold text-sm mb-2">👤 {t('urenPage.print.employeeDetails')}</h2>
             <table className="w-full text-xs">
               <tbody>
                 <tr>
-                  <td className="py-0.5 font-medium" style={{width: '60px'}}>Naam:</td>
+                  <td className="py-0.5 font-medium" style={{width: '60px'}}>{t('urenPage.print.name')}:</td>
                   <td className="py-0.5">{selectedStaff?.name}</td>
-                  <td className="py-0.5 font-medium" style={{width: '70px'}}>Contract:</td>
+                  <td className="py-0.5 font-medium" style={{width: '70px'}}>{t('urenPage.print.contract')}:</td>
                   <td className="py-0.5">{selectedStaff?.contract_type || '-'}</td>
                 </tr>
                 <tr>
-                  <td className="py-0.5 font-medium">Email:</td>
+                  <td className="py-0.5 font-medium">{t('urenPage.print.email')}:</td>
                   <td className="py-0.5">{selectedStaff?.email || '-'}</td>
-                  <td className="py-0.5 font-medium">Uren/week:</td>
+                  <td className="py-0.5 font-medium">{t('urenPage.print.hoursWeek')}:</td>
                   <td className="py-0.5">{selectedStaff?.hours_per_week || '-'}</td>
                 </tr>
                 <tr>
-                  <td className="py-0.5 font-medium">Telefoon:</td>
+                  <td className="py-0.5 font-medium">{t('urenPage.print.phone')}:</td>
                   <td className="py-0.5">{selectedStaff?.phone || '-'}</td>
-                  <td className="py-0.5 font-medium">Uurloon:</td>
+                  <td className="py-0.5 font-medium">{t('urenPage.print.hourlyRate')}:</td>
                   <td className="py-0.5">{selectedStaff?.hourly_rate ? `€${selectedStaff.hourly_rate}` : '-'}</td>
                 </tr>
               </tbody>
@@ -1152,49 +1152,49 @@ Met vriendelijke groeten`,
           <div className="grid grid-cols-5 gap-2 mb-6">
             <div className="bg-green-100 p-2 rounded text-center">
               <div className="text-lg font-bold text-green-700">{totalWorked.toFixed(1)}</div>
-              <div className="text-xs text-green-600">Gewerkt</div>
+              <div className="text-xs text-green-600">{t('urenPage.worked')}</div>
             </div>
             <div className="bg-red-100 p-2 rounded text-center">
               <div className="text-lg font-bold text-red-700">{totalSick.toFixed(1)}</div>
-              <div className="text-xs text-red-600">Ziekte</div>
+              <div className="text-xs text-red-600">{t('urenPage.sick')}</div>
             </div>
             <div className="bg-blue-100 p-2 rounded text-center">
               <div className="text-lg font-bold text-blue-700">{totalVacation.toFixed(1)}</div>
-              <div className="text-xs text-blue-600">Vakantie</div>
+              <div className="text-xs text-blue-600">{t('urenPage.vacation')}</div>
             </div>
             <div className="bg-orange-100 p-2 rounded text-center">
               <div className="text-lg font-bold text-orange-700">{totalOther.toFixed(1)}</div>
-              <div className="text-xs text-orange-600">Overig</div>
+              <div className="text-xs text-orange-600">{t('urenPage.other')}</div>
             </div>
             <div className="bg-gray-200 p-2 rounded text-center">
               <div className="text-lg font-bold text-gray-800">{totalHours.toFixed(1)}</div>
-              <div className="text-xs text-gray-600">TOTAAL</div>
+              <div className="text-xs text-gray-600">{t('urenPage.print.total')}</div>
             </div>
           </div>
 
           {/* Detail Table */}
-          <h3 className="font-bold text-lg mb-3 border-b pb-2">📋 Gedetailleerd overzicht</h3>
+          <h3 className="font-bold text-lg mb-3 border-b pb-2">📋 {t('urenPage.print.detailedOverview')}</h3>
           <table className="w-full text-xs border-collapse mb-6">
             <thead>
               <tr className="bg-gray-800 text-white">
-                <th className="border border-gray-600 p-2 text-left">Datum</th>
-                <th className="border border-gray-600 p-2 text-left">Dag</th>
-                <th className="border border-gray-600 p-2 text-left">Type</th>
-                <th className="border border-gray-600 p-2 text-center">In</th>
-                <th className="border border-gray-600 p-2 text-center">Uit</th>
-                <th className="border border-gray-600 p-2 text-center">Pauze</th>
-                <th className="border border-gray-600 p-2 text-center">Uren</th>
+                <th className="border border-gray-600 p-2 text-left">{t('urenPage.print.date')}</th>
+                <th className="border border-gray-600 p-2 text-left">{t('urenPage.print.day')}</th>
+                <th className="border border-gray-600 p-2 text-left">{t('urenPage.print.type')}</th>
+                <th className="border border-gray-600 p-2 text-center">{t('urenPage.print.in')}</th>
+                <th className="border border-gray-600 p-2 text-center">{t('urenPage.print.out')}</th>
+                <th className="border border-gray-600 p-2 text-center">{t('urenPage.print.break')}</th>
+                <th className="border border-gray-600 p-2 text-center">{t('urenPage.print.hours')}</th>
                 <th className="border border-gray-600 p-2 text-center">✓</th>
               </tr>
             </thead>
             <tbody>
               {entries.map((e, i) => {
                 const date = new Date(e.date)
-                const dayName = date.toLocaleDateString('nl-BE', { weekday: 'short' })
+                const dayName = date.toLocaleDateString(undefined, { weekday: 'short' })
                 const absenceType = LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)
                 return (
                   <tr key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="border border-gray-300 p-1">{date.toLocaleDateString('nl-BE')}</td>
+                    <td className="border border-gray-300 p-1">{date.toLocaleDateString()}</td>
                     <td className="border border-gray-300 p-1">{dayName}</td>
                     <td className="border border-gray-300 p-1">{absenceType?.label}</td>
                     <td className="border border-gray-300 p-1 text-center font-mono">{e.clock_in || '-'}</td>
@@ -1208,7 +1208,7 @@ Met vriendelijke groeten`,
             </tbody>
             <tfoot>
               <tr className="bg-gray-200 font-bold">
-                <td colSpan={6} className="border border-gray-400 p-2 text-right">TOTAAL:</td>
+                <td colSpan={6} className="border border-gray-400 p-2 text-right">{t('urenPage.print.total')}:</td>
                 <td className="border border-gray-400 p-2 text-center">{totalHours.toFixed(1)}</td>
                 <td className="border border-gray-400 p-2"></td>
               </tr>
@@ -1218,7 +1218,7 @@ Met vriendelijke groeten`,
           {/* Breakdown */}
           <div className="grid grid-cols-2 gap-6 mb-6">
             <div>
-              <h4 className="font-bold mb-2 text-sm">📊 Uitsplitsing per type</h4>
+              <h4 className="font-bold mb-2 text-sm">📊 {t('urenPage.print.breakdownByType')}</h4>
               <table className="w-full text-xs border-collapse">
                 <tbody>
                   {LOCAL_ABSENCE_TYPES.map(type => {
@@ -1229,7 +1229,7 @@ Met vriendelijke groeten`,
                     return (
                       <tr key={type.id}>
                         <td className="border p-1">{type.icon} {type.label}</td>
-                        <td className="border p-1 text-right font-mono">{hours.toFixed(1)} uur</td>
+                        <td className="border p-1 text-right font-mono">{hours.toFixed(1)} {t('urenPage.print.hour')}</td>
                       </tr>
                     )
                   })}
@@ -1239,21 +1239,21 @@ Met vriendelijke groeten`,
             
             {selectedStaff?.hours_per_week && (
               <div>
-                <h4 className="font-bold mb-2 text-sm">📈 Contractvergelijking</h4>
+                <h4 className="font-bold mb-2 text-sm">📈 {t('urenPage.print.contractComparison')}</h4>
                 <table className="w-full text-xs border-collapse">
                   <tbody>
                     <tr>
-                      <td className="border p-1">Contract uren/maand</td>
-                      <td className="border p-1 text-right font-mono">{(selectedStaff.hours_per_week * 4.33).toFixed(1)} uur</td>
+                      <td className="border p-1">{t('urenPage.print.contractHoursMonth')}</td>
+                      <td className="border p-1 text-right font-mono">{(selectedStaff.hours_per_week * 4.33).toFixed(1)} {t('urenPage.print.hour')}</td>
                     </tr>
                     <tr>
-                      <td className="border p-1">Gewerkte uren</td>
-                      <td className="border p-1 text-right font-mono">{totalWorked.toFixed(1)} uur</td>
+                      <td className="border p-1">{t('urenPage.print.workedHours')}</td>
+                      <td className="border p-1 text-right font-mono">{totalWorked.toFixed(1)} {t('urenPage.print.hour')}</td>
                     </tr>
                     <tr className="font-bold">
-                      <td className="border p-1">Verschil</td>
+                      <td className="border p-1">{t('urenPage.print.difference')}</td>
                       <td className={`border p-1 text-right font-mono ${totalWorked - (selectedStaff.hours_per_week * 4.33) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {(totalWorked - (selectedStaff.hours_per_week * 4.33)).toFixed(1)} uur
+                        {(totalWorked - (selectedStaff.hours_per_week * 4.33)).toFixed(1)} {t('urenPage.print.hour')}
                       </td>
                     </tr>
                   </tbody>
@@ -1266,21 +1266,21 @@ Met vriendelijke groeten`,
           <div className="mt-8 pt-4 border-t">
             <div className="grid grid-cols-2 gap-8">
               <div>
-                <p className="text-sm text-gray-600 mb-10">Handtekening medewerker:</p>
+                <p className="text-sm text-gray-600 mb-10">{t('urenPage.print.signatureEmployee')}:</p>
                 <div className="border-b border-gray-400 mb-1"></div>
                 <p className="text-xs text-gray-500">{selectedStaff?.name}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 mb-10">Handtekening werkgever:</p>
+                <p className="text-sm text-gray-600 mb-10">{t('urenPage.print.signatureEmployer')}:</p>
                 <div className="border-b border-gray-400 mb-1"></div>
-                <p className="text-xs text-gray-500">Naam + datum</p>
+                <p className="text-xs text-gray-500">{t('urenPage.print.nameAndDate')}</p>
               </div>
             </div>
           </div>
 
           {/* Footer */}
           <div className="mt-8 pt-4 border-t text-center text-xs text-gray-500">
-            <p>Dit document is gegenereerd door Vysion Horeca op {new Date().toLocaleDateString('nl-BE')} om {new Date().toLocaleTimeString('nl-BE')}</p>
+            <p>{t('urenPage.print.documentGenerated')} {new Date().toLocaleDateString()} {t('urenPage.print.at')} {new Date().toLocaleTimeString()}</p>
             <p className="text-orange-500 font-medium">www.vysionhoreca.com</p>
           </div>
         </div>
@@ -1302,8 +1302,7 @@ Met vriendelijke groeten`,
             <div className="p-6 space-y-4">
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
                 <p className="text-orange-800 text-sm">
-                  ⚠️ <strong>Let op:</strong> Na heropenen kunnen uren weer worden gewijzigd. 
-                  Dit wordt gelogd voor de administratie.
+                  ⚠️ <strong>{t('adminPages.common.note')}:</strong> {t('urenPage.reopenWarning')}
                 </p>
               </div>
 
@@ -1352,7 +1351,7 @@ Met vriendelijke groeten`,
                 disabled={saving || !reopenReason.trim()}
                 className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
               >
-                {saving ? 'Bezig...' : '🔓 Heropenen'}
+                {saving ? `${t('adminPages.common.saving')}...` : `🔓 ${t('urenPage.print.reopen')}`}
               </button>
             </div>
           </div>
@@ -1365,7 +1364,7 @@ Met vriendelijke groeten`,
           <div className="bg-white rounded-xl w-full max-w-lg shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
-                📧 Versturen naar loonkantoor
+                📧 {t('urenPage.sendToPayroll')}
               </h2>
               <p className="text-gray-600 text-sm mt-1">
                 {selectedStaff?.name} - {MONTHS[selectedMonth - 1]} {selectedYear}
@@ -1407,7 +1406,7 @@ Met vriendelijke groeten`,
               </div>
 
               <div className="bg-blue-50 rounded-lg p-4 text-sm text-blue-700">
-                <div className="font-medium mb-1">📎 Bijlage:</div>
+                <div className="font-medium mb-1">📎 {t('urenPage.print.attachment')}:</div>
                 <div>uren_{selectedStaff?.name.replace(/\s/g, '_')}_{selectedYear}-{String(selectedMonth).padStart(2, '0')}.csv</div>
               </div>
             </div>
@@ -1427,11 +1426,11 @@ Met vriendelijke groeten`,
                 {sendingEmail ? (
                   <>
                     <span className="animate-spin">⏳</span>
-                    Versturen...
+                    {t('urenPage.print.sending')}
                   </>
                 ) : (
                   <>
-                    📧 Versturen
+                    📧 {t('urenPage.print.send')}
                   </>
                 )}
               </button>
