@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useParams } from 'next/navigation'
+import { useLanguage } from '@/i18n'
 
 interface Subscription {
   id: string
