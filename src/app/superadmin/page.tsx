@@ -240,10 +240,10 @@ export default function SuperAdminDashboard() {
 
     setSaving(true)
 
-    // Delete all related data
+    // Delete ALL related data from ALL tables
     const slug = tenant.tenant_slug
 
-    // Delete in order of dependencies
+    // Delete in order of dependencies - ALLE TABELLEN
     await supabase.from('order_items').delete().eq('tenant_slug', slug)
     await supabase.from('orders').delete().eq('tenant_slug', slug)
     await supabase.from('reviews').delete().eq('tenant_slug', slug)
@@ -256,9 +256,22 @@ export default function SuperAdminDashboard() {
     await supabase.from('menu_categories').delete().eq('tenant_slug', slug)
     await supabase.from('product_options').delete().eq('tenant_slug', slug)
     await supabase.from('product_option_choices').delete().eq('tenant_slug', slug)
+    await supabase.from('product_option_links').delete().eq('tenant_slug', slug)
     await supabase.from('tenant_media').delete().eq('tenant_slug', slug)
     await supabase.from('tenant_texts').delete().eq('tenant_slug', slug)
     await supabase.from('delivery_settings').delete().eq('tenant_slug', slug)
+    await supabase.from('opening_hours').delete().eq('tenant_slug', slug)
+    await supabase.from('reservations').delete().eq('tenant_slug', slug)
+    await supabase.from('gift_cards').delete().eq('tenant_slug', slug)
+    await supabase.from('team_members').delete().eq('tenant_slug', slug)
+    await supabase.from('staff').delete().eq('tenant_slug', slug)
+    await supabase.from('timesheet_entries').delete().eq('tenant_slug', slug)
+    await supabase.from('monthly_timesheets').delete().eq('tenant_slug', slug)
+    await supabase.from('daily_sales').delete().eq('tenant_slug', slug)
+    await supabase.from('fixed_costs').delete().eq('tenant_slug', slug)
+    await supabase.from('variable_costs').delete().eq('tenant_slug', slug)
+    await supabase.from('business_targets').delete().eq('tenant_slug', slug)
+    await supabase.from('z_reports').delete().eq('tenant_slug', slug)
     await supabase.from('subscriptions').delete().eq('tenant_slug', slug)
     await supabase.from('tenant_settings').delete().eq('id', tenant.id)
     await supabase.from('tenants').delete().eq('slug', slug)
