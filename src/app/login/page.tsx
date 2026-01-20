@@ -306,16 +306,12 @@ export default function LoginPage() {
                 {isLoading ? t('login.loggingIn') : `${t('login.loginButton')} →`}
               </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setShowForgotPassword(true)
-                  setError('')
-                }}
-                className="w-full text-accent hover:text-accent/80 transition-colors text-sm"
+              <Link
+                href="/login/forgot-password"
+                className="w-full block text-center text-accent hover:text-accent/80 transition-colors text-sm"
               >
                 {t('login.forgotPassword')}
-              </button>
+              </Link>
             </form>
           )}
 
