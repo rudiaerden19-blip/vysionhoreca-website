@@ -1500,6 +1500,9 @@
     "viewWebsite": "Ver sitio web",
     "logout": "Cerrar sesión"
   },
+  "mediaPicker": {
+    "choosePhoto": "Elegir foto"
+  },
   "adminPages": {
     "common": {
       "save": "Guardar",

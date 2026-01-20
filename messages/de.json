@@ -965,6 +965,9 @@
     "viewWebsite": "Website ansehen",
     "logout": "Abmelden"
   },
+  "mediaPicker": {
+    "choosePhoto": "Foto wählen"
+  },
   "adminPages": {
     "common": {
       "save": "Speichern",

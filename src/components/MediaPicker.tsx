@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/context/LanguageContext'
 
 interface MediaItem {
   id: string
@@ -21,6 +22,7 @@ interface MediaPickerProps {
 }
 
 export default function MediaPicker({ tenantSlug, value, onChange, label }: MediaPickerProps) {
+  const { t } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [media, setMedia] = useState<MediaItem[]>([])
   const [categories, setCategories] = useState<string[]>([])
@@ -90,7 +92,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
           ) : (
             <div className="text-center p-2">
               <span className="text-3xl block mb-1">📷</span>
-              <span className="text-xs text-gray-500">Kies foto</span>
+              <span className="text-xs text-gray-500">{t('mediaPicker.choosePhoto')}</span>
             </div>
           )}
         </div>

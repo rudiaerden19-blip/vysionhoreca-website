@@ -1500,6 +1500,9 @@
     "viewWebsite": "عرض الموقع",
     "logout": "تسجيل الخروج"
   },
+  "mediaPicker": {
+    "choosePhoto": "اختر صورة"
+  },
   "adminPages": {
     "common": {
       "save": "حفظ",

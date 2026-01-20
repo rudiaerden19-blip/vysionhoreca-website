@@ -1506,6 +1506,9 @@
     "viewWebsite": "Bekijk website",
     "logout": "Uitloggen"
   },
+  "mediaPicker": {
+    "choosePhoto": "Kies foto"
+  },
   "adminPages": {
     "common": {
       "save": "Opslaan",

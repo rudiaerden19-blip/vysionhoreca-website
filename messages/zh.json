@@ -1500,6 +1500,9 @@
     "viewWebsite": "查看网站",
     "logout": "退出登录"
   },
+  "mediaPicker": {
+    "choosePhoto": "选择照片"
+  },
   "adminPages": {
     "common": {
       "save": "保存",

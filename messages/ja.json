@@ -1500,6 +1500,9 @@
     "viewWebsite": "ウェブサイトを見る",
     "logout": "ログアウト"
   },
+  "mediaPicker": {
+    "choosePhoto": "写真を選択"
+  },
   "adminPages": {
     "common": {
       "save": "保存",

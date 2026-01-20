@@ -965,6 +965,9 @@
     "viewWebsite": "Voir le site",
     "logout": "Déconnexion"
   },
+  "mediaPicker": {
+    "choosePhoto": "Choisir photo"
+  },
   "adminPages": {
     "common": {
       "save": "Enregistrer",
