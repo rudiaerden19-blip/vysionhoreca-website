@@ -2369,6 +2369,43 @@
       "deleteFailed": "فشل الحذف"
     }
   },
+  "scradaPage": {
+    "title": "تكامل SCRADA",
+    "subtitle": "سجل الإيرادات اليومية التلقائي ودفتر النقدية وفواتير Peppol",
+    "premiumFeature": "ميزة Premium",
+    "upgradeText": "قم بالترقية إلى باقة Premium (€99/شهر) للوصول إلى:",
+    "features": {
+      "dailyReceipts": "سجل الإيرادات اليومية",
+      "cashBook": "دفتر النقدية",
+      "peppolInbox": "صندوق بريد Peppol",
+      "sendInvoices": "إرسال فواتير المبيعات عبر Peppol",
+      "paymentProviders": "تكامل مزودي الدفع",
+      "legalCompliant": "متوافق 100% مع القانون"
+    },
+    "upgradeToPremium": "الترقية إلى Premium",
+    "headerSubtitle": "الإيرادات اليومية وفواتير Peppol",
+    "headerDescription": "إدارة سجل الإيرادات اليومية المطلوب قانونياً ودفتر النقدية وإرسال الفواتير عبر Peppol.",
+    "openDashboard": "فتح لوحة تحكم SCRADA",
+    "goToDailyReceipts": "الذهاب إلى سجل الإيرادات اليومية",
+    "peppolInvoices": "فواتير Peppol",
+    "sendReceiveInvoices": "إرسال واستلام الفواتير الإلكترونية",
+    "whatIsIncluded": "ماذا يتضمن SCRADA؟",
+    "dailyReceiptsDesc": "سجل قانوني لجميع الإيرادات",
+    "cashBookDesc": "تسجيل جميع المعاملات النقدية",
+    "peppolInboxDesc": "استلام الفواتير الرقمية من الموردين",
+    "sendInvoicesTitle": "إرسال الفواتير",
+    "sendInvoicesDesc": "حتى 120 فاتورة مبيعات سنوياً عبر Peppol",
+    "paymentMethods": "طرق الدفع",
+    "paymentMethodsDesc": "تسجيل النقد والبطاقة والمدفوعات عبر الإنترنت",
+    "exportAccounting": "تصدير إلى المحاسبة",
+    "exportAccountingDesc": "الإيرادات اليومية مباشرة إلى محاسبك",
+    "needHelp": "تحتاج مساعدة؟",
+    "helpDescription": "SCRADA لديها وثائق ودعم شامل متاح.",
+    "documentation": "الوثائق",
+    "contactSupport": "اتصل بالدعم",
+    "legalNote": "SCRADA هي خدمة خارجية من SCRADA bv. توفر Vysion Horeca الوصول إلى SCRADA كجزء من باقة Premium. للأسئلة حول وظائف SCRADA، اتصل بدعم SCRADA.",
+    "important": "مهم"
+  },
   "websiteGiftCards": {
     "title": "بطاقات الهدايا",
     "subtitle": "إدارة بطاقات الهدايا لنشاطك التجاري",

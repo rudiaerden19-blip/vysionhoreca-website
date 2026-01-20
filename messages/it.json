@@ -2369,6 +2369,43 @@
       "deleteFailed": "Eliminazione fallita"
     }
   },
+  "scradaPage": {
+    "title": "Integrazione SCRADA",
+    "subtitle": "Registro incassi giornaliero, libro cassa e fatturazione Peppol automatici",
+    "premiumFeature": "Funzione Premium",
+    "upgradeText": "Passa al pacchetto Premium (€99/mese) per accedere a:",
+    "features": {
+      "dailyReceipts": "Registro incassi giornaliero",
+      "cashBook": "Libro cassa",
+      "peppolInbox": "Posta in arrivo Peppol",
+      "sendInvoices": "Invio fatture di vendita via Peppol",
+      "paymentProviders": "Integrazione fornitori di pagamento",
+      "legalCompliant": "100% conforme alla legge"
+    },
+    "upgradeToPremium": "Passa a Premium",
+    "headerSubtitle": "Incassi Giornalieri & Fatturazione Peppol",
+    "headerDescription": "Gestisci il tuo registro incassi giornaliero legalmente richiesto, libro cassa e invia fatture via Peppol.",
+    "openDashboard": "Apri Dashboard SCRADA",
+    "goToDailyReceipts": "Vai al registro incassi giornaliero",
+    "peppolInvoices": "Fatture Peppol",
+    "sendReceiveInvoices": "Invia e ricevi e-fatture",
+    "whatIsIncluded": "Cosa include SCRADA?",
+    "dailyReceiptsDesc": "Registro legalmente richiesto di tutti i ricavi",
+    "cashBookDesc": "Registrazione di tutte le transazioni in contanti",
+    "peppolInboxDesc": "Ricevi fatture digitali dai fornitori",
+    "sendInvoicesTitle": "Invia Fatture",
+    "sendInvoicesDesc": "Fino a 120 fatture di vendita all'anno via Peppol",
+    "paymentMethods": "Metodi di Pagamento",
+    "paymentMethodsDesc": "Registrazione contanti, carta, pagamenti online",
+    "exportAccounting": "Esporta in contabilità",
+    "exportAccountingDesc": "Incassi giornalieri direttamente al tuo commercialista",
+    "needHelp": "Serve aiuto?",
+    "helpDescription": "SCRADA ha documentazione e supporto estesi disponibili.",
+    "documentation": "Documentazione",
+    "contactSupport": "Contatta Supporto",
+    "legalNote": "SCRADA è un servizio esterno di SCRADA bv. Vysion Horeca fornisce accesso a SCRADA come parte del pacchetto Premium. Per domande sulla funzionalità SCRADA, contatta il supporto SCRADA.",
+    "important": "Importante"
+  },
   "websiteGiftCards": {
     "title": "Carte Regalo",
     "subtitle": "Gestisci le carte regalo per la tua attività",

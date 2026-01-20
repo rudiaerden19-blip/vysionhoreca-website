@@ -2369,6 +2369,43 @@
       "deleteFailed": "削除に失敗"
     }
   },
+  "scradaPage": {
+    "title": "SCRADA連携",
+    "subtitle": "自動日次収入帳、現金出納帳、Peppol請求書",
+    "premiumFeature": "プレミアム機能",
+    "upgradeText": "プレミアムパッケージ（€99/月）にアップグレードしてアクセス:",
+    "features": {
+      "dailyReceipts": "日次収入帳",
+      "cashBook": "現金出納帳",
+      "peppolInbox": "Peppol受信トレイ",
+      "sendInvoices": "Peppol経由で販売請求書を送信",
+      "paymentProviders": "決済プロバイダー連携",
+      "legalCompliant": "100%法令遵守"
+    },
+    "upgradeToPremium": "プレミアムにアップグレード",
+    "headerSubtitle": "日次収入 & Peppol請求書",
+    "headerDescription": "法的に必要な日次収入帳、現金出納帳を管理し、Peppol経由で請求書を送信。",
+    "openDashboard": "SCRADAダッシュボードを開く",
+    "goToDailyReceipts": "日次収入帳へ移動",
+    "peppolInvoices": "Peppol請求書",
+    "sendReceiveInvoices": "電子請求書の送受信",
+    "whatIsIncluded": "SCRADAに含まれるもの",
+    "dailyReceiptsDesc": "すべての収入の法的に必要な記録",
+    "cashBookDesc": "すべての現金取引の記録",
+    "peppolInboxDesc": "サプライヤーからのデジタル請求書を受信",
+    "sendInvoicesTitle": "請求書を送信",
+    "sendInvoicesDesc": "Peppol経由で年間最大120件の販売請求書",
+    "paymentMethods": "支払い方法",
+    "paymentMethodsDesc": "現金、カード、オンライン支払いの記録",
+    "exportAccounting": "会計にエクスポート",
+    "exportAccountingDesc": "日次収入を直接会計士へ",
+    "needHelp": "ヘルプが必要ですか？",
+    "helpDescription": "SCRADAには充実したドキュメントとサポートがあります。",
+    "documentation": "ドキュメント",
+    "contactSupport": "サポートに連絡",
+    "legalNote": "SCRADAはSCRADA bvの外部サービスです。Vysion Horecaはプレミアムパッケージの一部としてSCRADAへのアクセスを提供しています。SCRADA機能に関するご質問は、SCRADAサポートにお問い合わせください。",
+    "important": "重要"
+  },
   "websiteGiftCards": {
     "title": "ギフトカード",
     "subtitle": "ビジネス用ギフトカードを管理",

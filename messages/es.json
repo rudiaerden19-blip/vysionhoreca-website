@@ -2369,6 +2369,43 @@
       "deleteFailed": "Error al eliminar"
     }
   },
+  "scradaPage": {
+    "title": "Integración SCRADA",
+    "subtitle": "Libro de ingresos diarios, libro de caja y facturación Peppol automáticos",
+    "premiumFeature": "Función Premium",
+    "upgradeText": "Actualiza al paquete Premium (€99/mes) para acceder a:",
+    "features": {
+      "dailyReceipts": "Libro de ingresos diarios",
+      "cashBook": "Libro de caja",
+      "peppolInbox": "Bandeja de entrada Peppol",
+      "sendInvoices": "Envío de facturas de venta vía Peppol",
+      "paymentProviders": "Integración de proveedores de pago",
+      "legalCompliant": "100% legalmente conforme"
+    },
+    "upgradeToPremium": "Actualizar a Premium",
+    "headerSubtitle": "Ingresos Diarios & Facturación Peppol",
+    "headerDescription": "Gestiona tu libro de ingresos diarios legalmente requerido, libro de caja y envía facturas vía Peppol.",
+    "openDashboard": "Abrir panel SCRADA",
+    "goToDailyReceipts": "Ir al libro de ingresos diarios",
+    "peppolInvoices": "Facturas Peppol",
+    "sendReceiveInvoices": "Envía y recibe e-facturas",
+    "whatIsIncluded": "¿Qué incluye SCRADA?",
+    "dailyReceiptsDesc": "Registro legal de todos los ingresos",
+    "cashBookDesc": "Registro de todas las transacciones en efectivo",
+    "peppolInboxDesc": "Recibe facturas digitales de proveedores",
+    "sendInvoicesTitle": "Enviar Facturas",
+    "sendInvoicesDesc": "Hasta 120 facturas de venta al año vía Peppol",
+    "paymentMethods": "Métodos de Pago",
+    "paymentMethodsDesc": "Registro de efectivo, tarjeta, pagos online",
+    "exportAccounting": "Exportar a contabilidad",
+    "exportAccountingDesc": "Ingresos diarios directamente a tu contable",
+    "needHelp": "¿Necesitas ayuda?",
+    "helpDescription": "SCRADA tiene documentación y soporte extensos disponibles.",
+    "documentation": "Documentación",
+    "contactSupport": "Contactar Soporte",
+    "legalNote": "SCRADA es un servicio externo de SCRADA bv. Vysion Horeca proporciona acceso a SCRADA como parte del paquete Premium. Para preguntas sobre funcionalidad SCRADA, contacta al soporte de SCRADA.",
+    "important": "Importante"
+  },
   "websiteGiftCards": {
     "title": "Tarjetas Regalo",
     "subtitle": "Gestiona tarjetas regalo para tu negocio",

@@ -50,28 +50,28 @@ export default function ScradaPage() {
     return (
       <div className="space-y-6">
         <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-8 text-white">
-          <h1 className="text-3xl font-bold mb-4">📊 SCRADA Integratie</h1>
+          <h1 className="text-3xl font-bold mb-4">📊 {t('scradaPage.title')}</h1>
           <p className="text-lg opacity-90 mb-6">
-            Automatisch dagontvangstenboek, kasboek en Peppol facturatie
+            {t('scradaPage.subtitle')}
           </p>
           <div className="bg-white/20 backdrop-blur rounded-xl p-6">
-            <p className="text-xl font-semibold mb-4">🔒 Premium functie</p>
+            <p className="text-xl font-semibold mb-4">🔒 {t('scradaPage.premiumFeature')}</p>
             <p className="mb-4">
-              Upgrade naar het Premium pakket (€99/maand) om toegang te krijgen tot:
+              {t('scradaPage.upgradeText')}
             </p>
             <ul className="space-y-2 mb-6">
-              <li>✅ Dagontvangstenboek</li>
-              <li>✅ Kasboek</li>
-              <li>✅ Peppol Inbox</li>
-              <li>✅ Verstuur verkoopfacturen via Peppol</li>
-              <li>✅ Koppeling betaalproviders</li>
-              <li>✅ 100% wettelijk compliant</li>
+              <li>✅ {t('scradaPage.features.dailyReceipts')}</li>
+              <li>✅ {t('scradaPage.features.cashBook')}</li>
+              <li>✅ {t('scradaPage.features.peppolInbox')}</li>
+              <li>✅ {t('scradaPage.features.sendInvoices')}</li>
+              <li>✅ {t('scradaPage.features.paymentProviders')}</li>
+              <li>✅ {t('scradaPage.features.legalCompliant')}</li>
             </ul>
             <a
               href="https://www.vysionhoreca.com/prijzen"
               className="inline-block px-6 py-3 bg-white text-orange-600 font-bold rounded-lg hover:bg-gray-100 transition"
             >
-              Upgrade naar Premium →
+              {t('scradaPage.upgradeToPremium')} →
             </a>
           </div>
         </div>
@@ -89,11 +89,11 @@ export default function ScradaPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold">SCRADA</h1>
-            <p className="opacity-90">Dagontvangstenboek & Peppol Facturatie</p>
+            <p className="opacity-90">{t('scradaPage.headerSubtitle')}</p>
           </div>
         </div>
         <p className="text-lg opacity-90">
-          Beheer je wettelijk verplichte dagontvangstenboek, kasboek en verstuur facturen via Peppol.
+          {t('scradaPage.headerDescription')}
         </p>
       </div>
 
@@ -110,8 +110,8 @@ export default function ScradaPage() {
               <span className="text-2xl">🚀</span>
             </div>
             <div>
-              <h3 className="font-bold text-gray-800 text-lg">Open SCRADA Dashboard</h3>
-              <p className="text-gray-600">Ga naar je dagontvangstenboek</p>
+              <h3 className="font-bold text-gray-800 text-lg">{t('scradaPage.openDashboard')}</h3>
+              <p className="text-gray-600">{t('scradaPage.goToDailyReceipts')}</p>
             </div>
             <div className="ml-auto text-gray-400 group-hover:text-red-500 transition">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,8 +132,8 @@ export default function ScradaPage() {
               <span className="text-2xl">📄</span>
             </div>
             <div>
-              <h3 className="font-bold text-gray-800 text-lg">Peppol Facturen</h3>
-              <p className="text-gray-600">Verstuur en ontvang e-facturen</p>
+              <h3 className="font-bold text-gray-800 text-lg">{t('scradaPage.peppolInvoices')}</h3>
+              <p className="text-gray-600">{t('scradaPage.sendReceiveInvoices')}</p>
             </div>
             <div className="ml-auto text-gray-400 group-hover:text-blue-500 transition">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,15 +146,15 @@ export default function ScradaPage() {
 
       {/* Features */}
       <div className="bg-white rounded-xl p-6 shadow-sm border">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">✅ Wat zit er in SCRADA?</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">✅ {t('scradaPage.whatIsIncluded')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
               <span>📒</span>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-800">Dagontvangstenboek</h4>
-              <p className="text-sm text-gray-600">Wettelijk verplicht logboek van alle inkomsten</p>
+              <h4 className="font-semibold text-gray-800">{t('scradaPage.features.dailyReceipts')}</h4>
+              <p className="text-sm text-gray-600">{t('scradaPage.dailyReceiptsDesc')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -162,8 +162,8 @@ export default function ScradaPage() {
               <span>💵</span>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-800">Kasboek</h4>
-              <p className="text-sm text-gray-600">Registratie van alle cash transacties</p>
+              <h4 className="font-semibold text-gray-800">{t('scradaPage.features.cashBook')}</h4>
+              <p className="text-sm text-gray-600">{t('scradaPage.cashBookDesc')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -171,8 +171,8 @@ export default function ScradaPage() {
               <span>📨</span>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-800">Peppol Inbox</h4>
-              <p className="text-sm text-gray-600">Ontvang digitale facturen van leveranciers</p>
+              <h4 className="font-semibold text-gray-800">{t('scradaPage.features.peppolInbox')}</h4>
+              <p className="text-sm text-gray-600">{t('scradaPage.peppolInboxDesc')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -180,8 +180,8 @@ export default function ScradaPage() {
               <span>📤</span>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-800">Verstuur Facturen</h4>
-              <p className="text-sm text-gray-600">Tot 120 verkoopfacturen per jaar via Peppol</p>
+              <h4 className="font-semibold text-gray-800">{t('scradaPage.sendInvoicesTitle')}</h4>
+              <p className="text-sm text-gray-600">{t('scradaPage.sendInvoicesDesc')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -189,8 +189,8 @@ export default function ScradaPage() {
               <span>💳</span>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-800">Betaalmethoden</h4>
-              <p className="text-sm text-gray-600">Registratie cash, kaart, online betalingen</p>
+              <h4 className="font-semibold text-gray-800">{t('scradaPage.paymentMethods')}</h4>
+              <p className="text-sm text-gray-600">{t('scradaPage.paymentMethodsDesc')}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -198,8 +198,8 @@ export default function ScradaPage() {
               <span>📊</span>
             </div>
             <div>
-              <h4 className="font-semibold text-gray-800">Export naar boekhouding</h4>
-              <p className="text-sm text-gray-600">Dagontvangsten direct naar je boekhouder</p>
+              <h4 className="font-semibold text-gray-800">{t('scradaPage.exportAccounting')}</h4>
+              <p className="text-sm text-gray-600">{t('scradaPage.exportAccountingDesc')}</p>
             </div>
           </div>
         </div>
@@ -207,9 +207,9 @@ export default function ScradaPage() {
 
       {/* Help */}
       <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-        <h3 className="font-bold text-blue-800 mb-2">💡 Hulp nodig?</h3>
+        <h3 className="font-bold text-blue-800 mb-2">💡 {t('scradaPage.needHelp')}</h3>
         <p className="text-blue-700 mb-4">
-          SCRADA heeft uitgebreide documentatie en support beschikbaar.
+          {t('scradaPage.helpDescription')}
         </p>
         <div className="flex gap-3">
           <a
@@ -218,13 +218,13 @@ export default function ScradaPage() {
             rel="noopener noreferrer"
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
-            📚 Documentatie
+            📚 {t('scradaPage.documentation')}
           </a>
           <a
             href="mailto:support@scrada.be"
             className="px-4 py-2 bg-white text-blue-600 border border-blue-300 rounded-lg hover:bg-blue-50 transition"
           >
-            📧 Contact Support
+            📧 {t('scradaPage.contactSupport')}
           </a>
         </div>
       </div>
@@ -232,9 +232,7 @@ export default function ScradaPage() {
       {/* Legal Note */}
       <div className="bg-gray-50 rounded-xl p-4 text-sm text-gray-600">
         <p>
-          <strong>ℹ️ Belangrijk:</strong> SCRADA is een externe dienst van SCRADA bv. 
-          Vysion Horeca biedt toegang tot SCRADA als onderdeel van het Premium pakket. 
-          Voor vragen over SCRADA functionaliteit, neem contact op met SCRADA support.
+          <strong>ℹ️ {t('scradaPage.important')}:</strong> {t('scradaPage.legalNote')}
         </p>
       </div>
     </div>

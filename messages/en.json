@@ -2455,6 +2455,43 @@
       "deleteFailed": "Delete failed"
     }
   },
+  "scradaPage": {
+    "title": "SCRADA Integration",
+    "subtitle": "Automatic daily receipts, cash book and Peppol invoicing",
+    "premiumFeature": "Premium feature",
+    "upgradeText": "Upgrade to the Premium package (€99/month) to get access to:",
+    "features": {
+      "dailyReceipts": "Daily receipts book",
+      "cashBook": "Cash book",
+      "peppolInbox": "Peppol Inbox",
+      "sendInvoices": "Send sales invoices via Peppol",
+      "paymentProviders": "Payment provider integration",
+      "legalCompliant": "100% legally compliant"
+    },
+    "upgradeToPremium": "Upgrade to Premium",
+    "headerSubtitle": "Daily Receipts & Peppol Invoicing",
+    "headerDescription": "Manage your legally required daily receipts book, cash book and send invoices via Peppol.",
+    "openDashboard": "Open SCRADA Dashboard",
+    "goToDailyReceipts": "Go to your daily receipts book",
+    "peppolInvoices": "Peppol Invoices",
+    "sendReceiveInvoices": "Send and receive e-invoices",
+    "whatIsIncluded": "What's included in SCRADA?",
+    "dailyReceiptsDesc": "Legally required log of all income",
+    "cashBookDesc": "Registration of all cash transactions",
+    "peppolInboxDesc": "Receive digital invoices from suppliers",
+    "sendInvoicesTitle": "Send Invoices",
+    "sendInvoicesDesc": "Up to 120 sales invoices per year via Peppol",
+    "paymentMethods": "Payment Methods",
+    "paymentMethodsDesc": "Registration of cash, card, online payments",
+    "exportAccounting": "Export to accounting",
+    "exportAccountingDesc": "Daily receipts directly to your accountant",
+    "needHelp": "Need help?",
+    "helpDescription": "SCRADA has extensive documentation and support available.",
+    "documentation": "Documentation",
+    "contactSupport": "Contact Support",
+    "legalNote": "SCRADA is an external service by SCRADA bv. Vysion Horeca provides access to SCRADA as part of the Premium package. For questions about SCRADA functionality, contact SCRADA support.",
+    "important": "Important"
+  },
   "websiteGiftCards": {
     "title": "Gift Cards",
     "subtitle": "Sell gift cards via your website",

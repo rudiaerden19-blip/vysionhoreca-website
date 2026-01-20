@@ -2369,6 +2369,43 @@
       "deleteFailed": "删除失败"
     }
   },
+  "scradaPage": {
+    "title": "SCRADA 集成",
+    "subtitle": "自动日收入账簿、现金账簿和Peppol开票",
+    "premiumFeature": "高级功能",
+    "upgradeText": "升级到高级套餐（€99/月）以获得访问权限：",
+    "features": {
+      "dailyReceipts": "日收入账簿",
+      "cashBook": "现金账簿",
+      "peppolInbox": "Peppol收件箱",
+      "sendInvoices": "通过Peppol发送销售发票",
+      "paymentProviders": "支付提供商集成",
+      "legalCompliant": "100%合法合规"
+    },
+    "upgradeToPremium": "升级到高级版",
+    "headerSubtitle": "日收入 & Peppol开票",
+    "headerDescription": "管理您法律要求的日收入账簿、现金账簿并通过Peppol发送发票。",
+    "openDashboard": "打开SCRADA仪表板",
+    "goToDailyReceipts": "前往日收入账簿",
+    "peppolInvoices": "Peppol发票",
+    "sendReceiveInvoices": "发送和接收电子发票",
+    "whatIsIncluded": "SCRADA包含什么？",
+    "dailyReceiptsDesc": "所有收入的法定记录",
+    "cashBookDesc": "所有现金交易的记录",
+    "peppolInboxDesc": "接收供应商的数字发票",
+    "sendInvoicesTitle": "发送发票",
+    "sendInvoicesDesc": "每年通过Peppol发送最多120张销售发票",
+    "paymentMethods": "支付方式",
+    "paymentMethodsDesc": "现金、卡片、在线支付记录",
+    "exportAccounting": "导出到会计",
+    "exportAccountingDesc": "日收入直接发送给您的会计",
+    "needHelp": "需要帮助？",
+    "helpDescription": "SCRADA提供广泛的文档和支持。",
+    "documentation": "文档",
+    "contactSupport": "联系支持",
+    "legalNote": "SCRADA是SCRADA bv的外部服务。Vysion Horeca作为高级套餐的一部分提供SCRADA访问权限。有关SCRADA功能的问题，请联系SCRADA支持。",
+    "important": "重要"
+  },
   "websiteGiftCards": {
     "title": "礼品卡",
     "subtitle": "管理您企业的礼品卡",

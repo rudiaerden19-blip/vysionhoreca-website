@@ -1834,6 +1834,43 @@
       "deleteFailed": "Échec de la suppression"
     }
   },
+  "scradaPage": {
+    "title": "Intégration SCRADA",
+    "subtitle": "Journal des recettes quotidiennes, livre de caisse et facturation Peppol automatiques",
+    "premiumFeature": "Fonctionnalité Premium",
+    "upgradeText": "Passez au forfait Premium (€99/mois) pour accéder à:",
+    "features": {
+      "dailyReceipts": "Journal des recettes quotidiennes",
+      "cashBook": "Livre de caisse",
+      "peppolInbox": "Boîte de réception Peppol",
+      "sendInvoices": "Envoi de factures de vente via Peppol",
+      "paymentProviders": "Intégration des fournisseurs de paiement",
+      "legalCompliant": "100% conforme à la loi"
+    },
+    "upgradeToPremium": "Passer à Premium",
+    "headerSubtitle": "Recettes quotidiennes & Facturation Peppol",
+    "headerDescription": "Gérez votre journal des recettes quotidiennes légalement requis, livre de caisse et envoyez des factures via Peppol.",
+    "openDashboard": "Ouvrir le tableau de bord SCRADA",
+    "goToDailyReceipts": "Aller au journal des recettes",
+    "peppolInvoices": "Factures Peppol",
+    "sendReceiveInvoices": "Envoyer et recevoir des e-factures",
+    "whatIsIncluded": "Qu'est-ce qui est inclus dans SCRADA?",
+    "dailyReceiptsDesc": "Journal légalement requis de tous les revenus",
+    "cashBookDesc": "Enregistrement de toutes les transactions en espèces",
+    "peppolInboxDesc": "Recevoir des factures numériques des fournisseurs",
+    "sendInvoicesTitle": "Envoyer des factures",
+    "sendInvoicesDesc": "Jusqu'à 120 factures de vente par an via Peppol",
+    "paymentMethods": "Méthodes de paiement",
+    "paymentMethodsDesc": "Enregistrement espèces, carte, paiements en ligne",
+    "exportAccounting": "Export vers comptabilité",
+    "exportAccountingDesc": "Recettes quotidiennes directement à votre comptable",
+    "needHelp": "Besoin d'aide?",
+    "helpDescription": "SCRADA dispose d'une documentation et d'un support étendus.",
+    "documentation": "Documentation",
+    "contactSupport": "Contacter le support",
+    "legalNote": "SCRADA est un service externe de SCRADA bv. Vysion Horeca fournit l'accès à SCRADA dans le cadre du forfait Premium. Pour les questions sur les fonctionnalités SCRADA, contactez le support SCRADA.",
+    "important": "Important"
+  },
   "websiteGiftCards": {
     "title": "Cartes Cadeaux",
     "subtitle": "Gérez les cartes cadeaux pour votre établissement",

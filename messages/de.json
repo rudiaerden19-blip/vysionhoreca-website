@@ -1834,6 +1834,43 @@
       "deleteFailed": "Löschen fehlgeschlagen"
     }
   },
+  "scradaPage": {
+    "title": "SCRADA Integration",
+    "subtitle": "Automatisches Tageseinnahmenjournal, Kassenbuch und Peppol-Rechnungen",
+    "premiumFeature": "Premium-Funktion",
+    "upgradeText": "Upgraden Sie auf das Premium-Paket (€99/Monat) um Zugang zu erhalten:",
+    "features": {
+      "dailyReceipts": "Tageseinnahmenjournal",
+      "cashBook": "Kassenbuch",
+      "peppolInbox": "Peppol Posteingang",
+      "sendInvoices": "Versand von Verkaufsrechnungen über Peppol",
+      "paymentProviders": "Zahlungsanbieter-Integration",
+      "legalCompliant": "100% gesetzeskonform"
+    },
+    "upgradeToPremium": "Auf Premium upgraden",
+    "headerSubtitle": "Tageseinnahmen & Peppol-Rechnungen",
+    "headerDescription": "Verwalten Sie Ihr gesetzlich vorgeschriebenes Tageseinnahmenjournal, Kassenbuch und versenden Sie Rechnungen über Peppol.",
+    "openDashboard": "SCRADA Dashboard öffnen",
+    "goToDailyReceipts": "Zum Tageseinnahmenjournal",
+    "peppolInvoices": "Peppol-Rechnungen",
+    "sendReceiveInvoices": "E-Rechnungen senden und empfangen",
+    "whatIsIncluded": "Was ist in SCRADA enthalten?",
+    "dailyReceiptsDesc": "Gesetzlich vorgeschriebenes Protokoll aller Einnahmen",
+    "cashBookDesc": "Registrierung aller Bargeldtransaktionen",
+    "peppolInboxDesc": "Digitale Rechnungen von Lieferanten empfangen",
+    "sendInvoicesTitle": "Rechnungen versenden",
+    "sendInvoicesDesc": "Bis zu 120 Verkaufsrechnungen pro Jahr über Peppol",
+    "paymentMethods": "Zahlungsmethoden",
+    "paymentMethodsDesc": "Registrierung von Bar-, Karten- und Online-Zahlungen",
+    "exportAccounting": "Export zur Buchhaltung",
+    "exportAccountingDesc": "Tageseinnahmen direkt an Ihren Buchhalter",
+    "needHelp": "Hilfe benötigt?",
+    "helpDescription": "SCRADA bietet umfangreiche Dokumentation und Support.",
+    "documentation": "Dokumentation",
+    "contactSupport": "Support kontaktieren",
+    "legalNote": "SCRADA ist ein externer Dienst von SCRADA bv. Vysion Horeca bietet Zugang zu SCRADA als Teil des Premium-Pakets. Bei Fragen zur SCRADA-Funktionalität wenden Sie sich an den SCRADA-Support.",
+    "important": "Wichtig"
+  },
   "websiteGiftCards": {
     "title": "Geschenkkarten",
     "subtitle": "Verwalten Sie Geschenkkarten für Ihr Geschäft",
