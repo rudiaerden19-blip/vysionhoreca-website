@@ -6,10 +6,10 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getPromotions, savePromotion, togglePromotionActive, deletePromotion, Promotion } from '@/lib/admin-api'
 
-const promoTypes = [
-  { id: 'percentage', name: 'Percentage', icon: '%', color: 'bg-green-500', description: 'Bijv. 10% korting' },
-  { id: 'fixed', name: 'Vast bedrag', icon: '€', color: 'bg-blue-500', description: 'Bijv. €5 korting' },
-  { id: 'freeItem', name: 'Gratis item', icon: '🎁', color: 'bg-purple-500', description: 'Bijv. Gratis friet' },
+const getPromoTypes = (t: (key: string) => string) => [
+  { id: 'percentage', name: t('marketingPromo.types.percentage'), icon: '%', color: 'bg-green-500', description: t('marketingPromo.types.percentageDesc') },
+  { id: 'fixed', name: t('marketingPromo.types.fixed'), icon: '€', color: 'bg-blue-500', description: t('marketingPromo.types.fixedDesc') },
+  { id: 'freeItem', name: t('marketingPromo.types.freeItem'), icon: '🎁', color: 'bg-purple-500', description: t('marketingPromo.types.freeItemDesc') },
 ]
 
 export default function PromotiesPage({ params }: { params: { tenant: string } }) {
@@ -50,7 +50,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Weet je zeker dat je deze promotie wilt verwijderen?')) return
+    if (!confirm(t('marketingPromo.confirmDelete'))) return
     
     const success = await deletePromotion(id)
     if (success) {
@@ -128,7 +128,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
     setFormData(prev => ({ ...prev, code }))
   }
 
-  const getTypeInfo = (type: string) => promoTypes.find(t => t.id === type)
+  const promoTypes = getPromoTypes(t)
+  const getTypeInfo = (type: string) => promoTypes.find(pt => pt.id === type)
 
   const activeCount = promos.filter(p => p.is_active).length
   const totalUsage = promos.reduce((sum, p) => sum + (p.usage_count || 0), 0)
@@ -312,7 +313,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
             >
               <div className="p-6 border-b flex items-center justify-between">
                 <h2 className="text-xl font-bold text-gray-900">
-                  {editingPromo ? 'Promotie bewerken' : 'Nieuwe promotie'}
+                  {editingPromo ? t('marketingPromo.editPromotion') : t('marketingPromo.newPromotion')}
                 </h2>
                 <button 
                   onClick={() => setShowModal(false)}
@@ -325,7 +326,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
               <div className="p-6 space-y-4">
                 {/* Type Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('marketingPromo.type')}</label>
                   <div className="grid grid-cols-3 gap-2">
                     {promoTypes.map((type) => (
                       <button
@@ -348,32 +349,32 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
 
                 {/* Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Naam</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('marketingPromo.name')}</label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Bijv. Welkomstkorting"
+                    placeholder={t('marketingPromo.namePlaceholder')}
                   />
                 </div>
 
                 {/* Code */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Code</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('marketingPromo.code')}</label>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       value={formData.code}
                       onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
                       className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono uppercase"
-                      placeholder="WELKOM10"
+                      placeholder={t('marketingPromo.codePlaceholder')}
                     />
                     <button
                       onClick={generateCode}
                       className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-medium"
                     >
-                      🎲 Genereer
+                      🎲 {t('marketingPromo.generate')}
                     </button>
                   </div>
                 </div>
@@ -382,7 +383,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 {formData.type !== 'freeItem' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {formData.type === 'percentage' ? 'Percentage (%)' : 'Bedrag (€)'}
+                      {formData.type === 'percentage' ? t('marketingPromo.percentageLabel') : t('marketingPromo.amountLabel')}
                     </label>
                     <input
                       type="text"
@@ -390,7 +391,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       value={formData.value || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, value: parseFloat(e.target.value) || 0 }))}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder={formData.type === 'percentage' ? 'bijv. 10' : 'bijv. 5.00'}
+                      placeholder={formData.type === 'percentage' ? t('marketingPromo.percentagePlaceholder') : t('marketingPromo.amountPlaceholder')}
                     />
                   </div>
                 )}
@@ -398,7 +399,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 {/* Min order amount */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Minimale bestelwaarde (€)
+                    {t('marketingPromo.minOrderAmount')}
                   </label>
                   <input
                     type="text"
@@ -406,14 +407,14 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     value={formData.min_order_amount || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, min_order_amount: parseFloat(e.target.value) || 0 }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Leeg = geen minimum"
+                    placeholder={t('marketingPromo.minOrderPlaceholder')}
                   />
                 </div>
 
                 {/* Max usage */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Maximum gebruik
+                    {t('marketingPromo.maxUsage')}
                   </label>
                   <input
                     type="text"
@@ -421,14 +422,14 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     value={formData.max_usage || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, max_usage: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Leeg = onbeperkt"
+                    placeholder={t('marketingPromo.maxUsagePlaceholder')}
                   />
                 </div>
 
                 {/* Expiry */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vervaldatum
+                    {t('marketingPromo.expiryDate')}
                   </label>
                   <input
                     type="date"
@@ -436,7 +437,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     onChange={(e) => setFormData(prev => ({ ...prev, expires_at: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Leeg = geen vervaldatum</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('marketingPromo.expiryPlaceholder')}</p>
                 </div>
               </div>
 
@@ -445,7 +446,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
                 >
-                  Annuleren
+                  {t('adminPages.common.cancel')}
                 </button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -466,7 +467,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                   ) : (
                     <>
                       <span>✓</span>
-                      <span>{editingPromo ? 'Opslaan' : 'Aanmaken'}</span>
+                      <span>{editingPromo ? t('adminPages.common.save') : t('marketingPromo.create')}</span>
                     </>
                   )}
                 </motion.button>
