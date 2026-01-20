@@ -119,6 +119,22 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [scrollY, setScrollY] = useState(0)
   const [isBlocked, setIsBlocked] = useState(false)
+  const [isOwner, setIsOwner] = useState(false)
+  
+  // Check if owner is logged in for this tenant
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('vysion_tenant')
+      if (stored) {
+        const tenant = JSON.parse(stored)
+        if (tenant.tenant_slug === params.tenant) {
+          setIsOwner(true)
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }, [params.tenant])
   
   // Reservation form state
   const [reservationForm, setReservationForm] = useState({
@@ -549,6 +565,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </Link>
           
           <div className="flex items-center gap-3">
+            {isOwner && (
+              <Link 
+                href={`/shop/${params.tenant}/admin`}
+                className="bg-orange-500 text-white font-medium px-4 py-2 rounded-full text-sm hover:bg-orange-600 transition-colors flex items-center gap-2"
+              >
+                <span>⚙️</span>
+                <span className="hidden sm:inline">Admin</span>
+              </Link>
+            )}
             <Link 
               href={`/shop/${params.tenant}/menu`}
               style={{ backgroundColor: business.primary_color }}
