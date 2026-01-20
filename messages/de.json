@@ -2154,5 +2154,31 @@
       "saturday": "Samstag",
       "sunday": "Sonntag"
     }
+  },
+  "menuPage": {
+    "back": "Zurück",
+    "menu": "Menü",
+    "account": "Konto",
+    "promotions": "Aktionen",
+    "popular": "Beliebt",
+    "noProducts": "Noch keine Produkte",
+    "noProductsDesc": "Der Inhaber muss zuerst Produkte im Admin hinzufügen.",
+    "soldOut": "Ausverkauft",
+    "chooseOptions": "Optionen wählen",
+    "clickToOrder": "Klicken zum Bestellen",
+    "allergens": "Allergene",
+    "required": "Pflicht",
+    "chooseSingle": "Wähle 1",
+    "chooseMultiple": "Wähle mehrere",
+    "free": "Gratis",
+    "addToOrder": "Zur Bestellung hinzufügen",
+    "viewOrder": "Bestellung ansehen",
+    "order": "Bestellung",
+    "yourOrder": "Deine Bestellung",
+    "emptyCart": "Deine Bestellung ist leer",
+    "quantity": "Anzahl",
+    "remove": "Entfernen",
+    "subtotal": "Zwischensumme",
+    "checkout": "Zur Kasse"
   }
 }

@@ -2673,5 +2673,31 @@
       "saturday": "星期六",
       "sunday": "星期日"
     }
+  },
+  "menuPage": {
+    "back": "返回",
+    "menu": "菜单",
+    "account": "账户",
+    "promotions": "促销",
+    "popular": "热门",
+    "noProducts": "暂无产品",
+    "noProductsDesc": "店主需要先在管理后台添加产品。",
+    "soldOut": "售罄",
+    "chooseOptions": "选择选项",
+    "clickToOrder": "点击下单",
+    "allergens": "过敏原",
+    "required": "必选",
+    "chooseSingle": "选择1个",
+    "chooseMultiple": "选择多个",
+    "free": "免费",
+    "addToOrder": "加入订单",
+    "viewOrder": "查看订单",
+    "order": "订单",
+    "yourOrder": "您的订单",
+    "emptyCart": "您的订单是空的",
+    "quantity": "数量",
+    "remove": "删除",
+    "subtotal": "小计",
+    "checkout": "结账"
   }
 }

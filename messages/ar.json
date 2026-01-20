@@ -2674,5 +2674,31 @@
       "saturday": "السبت",
       "sunday": "الأحد"
     }
+  },
+  "menuPage": {
+    "back": "رجوع",
+    "menu": "القائمة",
+    "account": "الحساب",
+    "promotions": "العروض",
+    "popular": "شائع",
+    "noProducts": "لا توجد منتجات بعد",
+    "noProductsDesc": "يجب على المالك إضافة المنتجات أولاً في لوحة الإدارة.",
+    "soldOut": "نفذ",
+    "chooseOptions": "اختر الخيارات",
+    "clickToOrder": "انقر للطلب",
+    "allergens": "مسببات الحساسية",
+    "required": "مطلوب",
+    "chooseSingle": "اختر 1",
+    "chooseMultiple": "اختر عدة",
+    "free": "مجاني",
+    "addToOrder": "أضف للطلب",
+    "viewOrder": "عرض الطلب",
+    "order": "الطلب",
+    "yourOrder": "طلبك",
+    "emptyCart": "طلبك فارغ",
+    "quantity": "الكمية",
+    "remove": "إزالة",
+    "subtotal": "المجموع الفرعي",
+    "checkout": "الدفع"
   }
 }

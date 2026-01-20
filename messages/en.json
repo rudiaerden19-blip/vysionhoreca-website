@@ -3082,5 +3082,31 @@
       "saturday": "saturday",
       "sunday": "sunday"
     }
+  },
+  "menuPage": {
+    "back": "Back",
+    "menu": "Menu",
+    "account": "Account",
+    "promotions": "Promotions",
+    "popular": "Popular",
+    "noProducts": "No products yet",
+    "noProductsDesc": "The owner needs to add products in the admin first.",
+    "soldOut": "Sold out",
+    "chooseOptions": "Choose options",
+    "clickToOrder": "Click to order",
+    "allergens": "Allergens",
+    "required": "Required",
+    "chooseSingle": "Choose 1",
+    "chooseMultiple": "Choose multiple",
+    "free": "Free",
+    "addToOrder": "Add to order",
+    "viewOrder": "View order",
+    "order": "Order",
+    "yourOrder": "Your order",
+    "emptyCart": "Your order is empty",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "subtotal": "Subtotal",
+    "checkout": "Checkout"
   }
 }

@@ -2673,5 +2673,31 @@
       "saturday": "土曜日",
       "sunday": "日曜日"
     }
+  },
+  "menuPage": {
+    "back": "戻る",
+    "menu": "メニュー",
+    "account": "アカウント",
+    "promotions": "プロモーション",
+    "popular": "人気",
+    "noProducts": "商品がありません",
+    "noProductsDesc": "オーナーが管理画面で商品を追加する必要があります。",
+    "soldOut": "売り切れ",
+    "chooseOptions": "オプションを選択",
+    "clickToOrder": "クリックして注文",
+    "allergens": "アレルゲン",
+    "required": "必須",
+    "chooseSingle": "1つ選択",
+    "chooseMultiple": "複数選択可",
+    "free": "無料",
+    "addToOrder": "注文に追加",
+    "viewOrder": "注文を見る",
+    "order": "注文",
+    "yourOrder": "あなたの注文",
+    "emptyCart": "注文が空です",
+    "quantity": "数量",
+    "remove": "削除",
+    "subtotal": "小計",
+    "checkout": "お会計"
   }
 }

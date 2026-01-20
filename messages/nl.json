@@ -3088,5 +3088,31 @@
       "saturday": "zaterdag",
       "sunday": "zondag"
     }
+  },
+  "menuPage": {
+    "back": "Terug",
+    "menu": "Menu",
+    "account": "Account",
+    "promotions": "Promoties",
+    "popular": "Populair",
+    "noProducts": "Nog geen producten",
+    "noProductsDesc": "De eigenaar moet eerst producten toevoegen in de admin.",
+    "soldOut": "Uitverkocht",
+    "chooseOptions": "Kies opties",
+    "clickToOrder": "Klik om te bestellen",
+    "allergens": "Allergenen",
+    "required": "Verplicht",
+    "chooseSingle": "Kies 1",
+    "chooseMultiple": "Kies meerdere",
+    "free": "Gratis",
+    "addToOrder": "Toevoegen aan bestelling",
+    "viewOrder": "Bekijk bestelling",
+    "order": "Bestelling",
+    "yourOrder": "Je bestelling",
+    "emptyCart": "Je bestelling is leeg",
+    "quantity": "Aantal",
+    "remove": "Verwijder",
+    "subtotal": "Subtotaal",
+    "checkout": "Afrekenen"
   }
 }

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 
 interface MenuItem {
   id: string
@@ -31,6 +32,7 @@ interface CartItem {
 
 export default function MenuPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
+  const { t } = useLanguage()
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -264,15 +266,15 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span>Terug</span>
+              <span>{t('menuPage.back')}</span>
             </Link>
-            <h1 className="font-bold text-xl text-gray-900">Menu</h1>
+            <h1 className="font-bold text-xl text-gray-900">{t('menuPage.menu')}</h1>
             <Link 
               href={`/shop/${params.tenant}/account`}
               className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
             >
               <span>👤</span>
-              <span className="text-sm font-medium hidden sm:inline">Account</span>
+              <span className="text-sm font-medium hidden sm:inline">{t('menuPage.account')}</span>
             </Link>
           </div>
         </div>
@@ -288,7 +290,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   : 'bg-green-100 text-green-700 active:bg-green-200'
               }`}
             >
-              🎁 Promoties
+              🎁 {t('menuPage.promotions')}
             </button>
             {menuItems.some(i => i.is_popular) && (
               <button
@@ -300,7 +302,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     : 'bg-gray-100 text-gray-700 active:bg-gray-200'
                 }`}
               >
-                🔥 Populair
+                🔥 {t('menuPage.popular')}
               </button>
             )}
             {categories.map((cat) => (
@@ -326,8 +328,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         {menuItems.length === 0 ? (
           <div className="text-center py-20">
             <span className="text-6xl mb-4 block">🍟</span>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Nog geen producten</h2>
-            <p className="text-gray-500">De eigenaar moet eerst producten toevoegen in de admin.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('menuPage.noProducts')}</h2>
+            <p className="text-gray-500">{t('menuPage.noProductsDesc')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -363,7 +365,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     {!item.is_available && (
                       <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                         <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-full">
-                          Uitverkocht
+                          {t('menuPage.soldOut')}
                         </span>
                       </div>
                     )}
@@ -414,13 +416,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                       {productsWithOptions.includes(item.id) ? (
                         <>
                           <span>⚙️</span>
-                          <span>Kies opties</span>
+                          <span>{t('menuPage.chooseOptions')}</span>
                           <span className="text-lg">→</span>
                         </>
                       ) : (
                         <>
                           <span>🛒</span>
-                          <span>Klik om te bestellen</span>
+                          <span>{t('menuPage.clickToOrder')}</span>
                           <span className="text-lg">→</span>
                         </>
                       )}
@@ -486,7 +488,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
                 {selectedItem.allergens.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-2">Allergenen</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">{t('menuPage.allergens')}</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedItem.allergens.map(allergen => (
                         <span 
@@ -517,10 +519,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                         <div className="flex items-center gap-2 mb-3">
                           <h3 className="font-semibold text-gray-900">{option.name}</h3>
                           {option.required && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">Verplicht</span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">{t('menuPage.required')}</span>
                           )}
                           <span className="text-xs text-gray-500">
-                            {option.type === 'single' ? '(Kies 1)' : '(Kies meerdere)'}
+                            {option.type === 'single' ? `(${t('menuPage.chooseSingle')})` : `(${t('menuPage.chooseMultiple')})`}
                           </span>
                         </div>
                         <div className="space-y-2">
@@ -551,7 +553,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                                   <span className="font-medium text-gray-900">{choice.name}</span>
                                 </div>
                                 <span style={choice.price > 0 ? { color: primaryColor } : {}} className={`font-medium ${choice.price <= 0 ? 'text-gray-400' : ''}`}>
-                                  {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : 'Gratis'}
+                                  {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('menuPage.free')}
                                 </span>
                               </label>
                             )
@@ -571,7 +573,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   className="w-full disabled:bg-gray-300 text-white font-bold py-4 rounded-2xl transition-colors flex items-center justify-center gap-2 hover:opacity-90"
                 >
                   <span>🛒</span>
-                  <span>Toevoegen aan bestelling</span>
+                  <span>{t('menuPage.addToOrder')}</span>
                   <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">€{calculateTotalPrice().toFixed(2)}</span>
                 </motion.button>
               </div>
@@ -592,8 +594,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-4 z-40 hover:opacity-90 text-sm sm:text-base max-w-[calc(100%-2rem)]"
           >
             <span style={{ color: primaryColor }} className="bg-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-sm sm:text-base shrink-0">{cartCount}</span>
-            <span className="hidden sm:inline">Bekijk bestelling</span>
-            <span className="sm:hidden">Bestelling</span>
+            <span className="hidden sm:inline">{t('menuPage.viewOrder')}</span>
+            <span className="sm:hidden">{t('menuPage.order')}</span>
             <span className="border-l border-white/30 pl-2 sm:pl-4 shrink-0">€{cartTotal.toFixed(2)}</span>
           </motion.button>
         )}
@@ -619,7 +621,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             >
               <div className="p-4 sm:p-6 border-b">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Je bestelling</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{t('menuPage.yourOrder')}</h2>
                   <button onClick={() => setCartOpen(false)} className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center">
                     <span className="text-2xl">×</span>
                   </button>
@@ -630,7 +632,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 {cart.length === 0 ? (
                   <div className="text-center py-12">
                     <span className="text-6xl mb-4 block">🛒</span>
-                    <p className="text-gray-500">Je bestelling is leeg</p>
+                    <p className="text-gray-500">{t('menuPage.emptyCart')}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -659,8 +661,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                           )}
                           <p style={{ color: primaryColor }} className="font-bold">€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
                           <div className="flex items-center gap-2 mt-2">
-                            <span className="text-gray-500">Aantal: {cartItem.quantity}</span>
-                            <button onClick={() => removeFromCart(index)} className="text-red-500 text-sm hover:underline">Verwijder</button>
+                            <span className="text-gray-500">{t('menuPage.quantity')}: {cartItem.quantity}</span>
+                            <button onClick={() => removeFromCart(index)} className="text-red-500 text-sm hover:underline">{t('menuPage.remove')}</button>
                           </div>
                         </div>
                       </motion.div>
@@ -672,7 +674,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               {cart.length > 0 && (
                 <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-white border-t pb-safe">
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-gray-600">Subtotaal</span>
+                    <span className="text-gray-600">{t('menuPage.subtotal')}</span>
                     <span className="text-xl font-bold text-gray-900">€{cartTotal.toFixed(2)}</span>
                   </div>
                   <motion.button
@@ -685,7 +687,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     style={{ backgroundColor: primaryColor }}
                     className="w-full text-white font-bold py-4 rounded-2xl transition-colors hover:opacity-90"
                   >
-                    Afrekenen →
+                    {t('menuPage.checkout')} →
                   </motion.button>
                 </div>
               )}
