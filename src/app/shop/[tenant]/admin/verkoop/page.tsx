@@ -6,10 +6,9 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getSalesStats, getDailyRevenue, getTopProducts, SalesStats } from '@/lib/admin-api'
 
-const dayLabels = ['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za']
-
 export default function VerkoopPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const dayLabels = t('salesPage.days') as unknown as string[]
   const [period, setPeriod] = useState<'today' | 'week' | 'month' | 'year'>('week')
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<SalesStats>({ total_orders: 0, total_revenue: 0, average_order: 0, orders_by_status: {} })
@@ -64,8 +63,8 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Verkoop</h1>
-          <p className="text-gray-500">Analyseer je omzet en bestellingen</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('salesPage.title')}</h1>
+          <p className="text-gray-500">{t('salesPage.subtitle')}</p>
         </div>
         <div className="flex bg-gray-100 rounded-xl p-1">
           {(['today', 'week', 'month', 'year'] as const).map((p) => (
@@ -76,7 +75,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
                 period === p ? 'bg-white shadow text-gray-900' : 'text-gray-500'
               }`}
             >
-              {p === 'today' ? 'Vandaag' : p === 'week' ? 'Week' : p === 'month' ? 'Maand' : 'Jaar'}
+              {t(`salesPage.periods.${p}`)}
             </button>
           ))}
         </div>
@@ -90,12 +89,12 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-500">Totale omzet</span>
+            <span className="text-gray-500">{t('salesPage.totalRevenue')}</span>
             <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">💰</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">€{stats.total_revenue.toFixed(2)}</p>
           <p className="text-gray-400 text-sm mt-1">
-            {period === 'today' ? 'Vandaag' : period === 'week' ? 'Deze week' : period === 'month' ? 'Deze maand' : 'Dit jaar'}
+            {t(`salesPage.periodLabels.${period}`)}
           </p>
         </motion.div>
 
@@ -106,12 +105,12 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-500">Bestellingen</span>
+            <span className="text-gray-500">{t('salesPage.orders')}</span>
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">📦</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.total_orders}</p>
           <p className="text-gray-400 text-sm mt-1">
-            {stats.orders_by_status.completed || 0} afgerond
+            {stats.orders_by_status.completed || 0} {t('salesPage.completed')}
           </p>
         </motion.div>
 
@@ -122,11 +121,11 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-500">Gem. bestelling</span>
+            <span className="text-gray-500">{t('salesPage.avgOrder')}</span>
             <span className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">📊</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">€{stats.average_order.toFixed(2)}</p>
-          <p className="text-gray-400 text-sm mt-1">Per bestelling</p>
+          <p className="text-gray-400 text-sm mt-1">{t('salesPage.perOrder')}</p>
         </motion.div>
       </div>
 
@@ -137,12 +136,12 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.3 }}
         className="bg-white rounded-2xl p-6 shadow-sm mb-8"
       >
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Omzet per dag</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">{t('salesPage.revenuePerDay')}</h2>
         
         {dailyData.length === 0 ? (
           <div className="text-center py-12">
             <span className="text-4xl mb-4 block">📊</span>
-            <p className="text-gray-500">Nog geen verkoopdata voor deze periode</p>
+            <p className="text-gray-500">{t('salesPage.noSalesData')}</p>
           </div>
         ) : (
           <div className="flex items-end justify-between gap-2 h-48">
@@ -170,12 +169,12 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.4 }}
         className="bg-white rounded-2xl p-6 shadow-sm"
       >
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Top producten</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('salesPage.topProducts')}</h2>
         
         {topProducts.length === 0 ? (
           <div className="text-center py-12">
             <span className="text-4xl mb-4 block">🍟</span>
-            <p className="text-gray-500">Nog geen producten verkocht in deze periode</p>
+            <p className="text-gray-500">{t('salesPage.noProductsSold')}</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -210,11 +209,9 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.5 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 Over deze statistieken</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('salesPage.aboutStats')}</h3>
         <p className="text-blue-700 text-sm">
-          Deze statistieken worden berekend op basis van alle bestellingen in je systeem. 
-          Geannuleerde bestellingen worden niet meegeteld. De data wordt real-time bijgewerkt 
-          wanneer er nieuwe bestellingen binnenkomen.
+          {t('salesPage.statsDescription')}
         </p>
       </motion.div>
     </div>

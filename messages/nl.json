@@ -2630,6 +2630,42 @@
       "breakEvenNeeded": "Nog €{amount} nodig om break-even te bereiken"
     }
   },
+  "salesPage": {
+    "title": "Verkoop",
+    "subtitle": "Analyseer je omzet en bestellingen",
+    "periods": { "today": "Vandaag", "week": "Week", "month": "Maand", "year": "Jaar" },
+    "periodLabels": { "today": "Vandaag", "week": "Deze week", "month": "Deze maand", "year": "Dit jaar" },
+    "totalRevenue": "Totale omzet",
+    "orders": "Bestellingen",
+    "completed": "afgerond",
+    "avgOrder": "Gem. bestelling",
+    "perOrder": "Per bestelling",
+    "revenuePerDay": "Omzet per dag",
+    "noSalesData": "Nog geen verkoopdata voor deze periode",
+    "topProducts": "Top producten",
+    "noProductsSold": "Nog geen producten verkocht in deze periode",
+    "aboutStats": "Over deze statistieken",
+    "statsDescription": "Deze statistieken worden berekend op basis van alle bestellingen in je systeem. Geannuleerde bestellingen worden niet meegeteld. De data wordt real-time bijgewerkt wanneer er nieuwe bestellingen binnenkomen.",
+    "days": ["Zo", "Ma", "Di", "Wo", "Do", "Vr", "Za"]
+  },
+  "popularPage": {
+    "title": "Populaire items",
+    "subtitle": "Ontdek wat het beste verkoopt",
+    "periods": { "week": "Week", "month": "Maand", "year": "Jaar" },
+    "noSalesData": "Geen verkoopdata",
+    "noOrdersPeriod": "Afgelopen {period} zijn er geen bestellingen geplaatst.",
+    "periodLabels": { "week": "week", "month": "maand", "year": "jaar" },
+    "sold": "verkocht",
+    "revenue": "omzet",
+    "table": {
+      "rank": "#",
+      "product": "Product",
+      "category": "Categorie",
+      "sold": "Verkocht",
+      "revenue": "Omzet",
+      "trend": "Trend"
+    }
+  },
   "ordersPage": {
     "title": "Bestellingen",
     "loading": "Bestellingen laden...",

@@ -25,6 +25,7 @@ interface PopularProduct {
 }
 
 export default function PopulairPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [period, setPeriod] = useState<'week' | 'month' | 'year'>('week')
   const [products, setProducts] = useState<PopularProduct[]>([])
   const [loading, setLoading] = useState(true)
@@ -163,8 +164,8 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
     <div className="max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Populaire items</h1>
-          <p className="text-gray-500">Ontdek wat het beste verkoopt</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('popularPage.title')}</h1>
+          <p className="text-gray-500">{t('popularPage.subtitle')}</p>
         </div>
         <div className="flex bg-gray-100 rounded-xl p-1">
           {(['week', 'month', 'year'] as const).map((p) => (
@@ -175,7 +176,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
                 period === p ? 'bg-white shadow text-gray-900' : 'text-gray-500'
               }`}
             >
-              {p === 'week' ? 'Week' : p === 'month' ? 'Maand' : 'Jaar'}
+              {t(`popularPage.periods.${p}`)}
             </button>
           ))}
         </div>
@@ -189,9 +190,9 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
           className="text-center py-16 bg-white rounded-2xl shadow-sm"
         >
           <span className="text-6xl mb-4 block">📊</span>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Geen verkoopdata</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{t('popularPage.noSalesData')}</h3>
           <p className="text-gray-500">
-            {period === 'week' ? 'Afgelopen week' : period === 'month' ? 'Afgelopen maand' : 'Afgelopen jaar'} zijn er geen bestellingen geplaatst.
+            {t('popularPage.noOrdersPeriod').replace('{period}', t(`popularPage.periodLabels.${period}`))}
           </p>
         </motion.div>
       )}
@@ -221,11 +222,11 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
                 <div className="flex justify-between">
                   <div>
                     <p className="text-2xl font-bold">{product.sales}</p>
-                    <p className="text-white/70 text-sm">verkocht</p>
+                    <p className="text-white/70 text-sm">{t('popularPage.sold')}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-2xl font-bold">€{product.revenue.toFixed(0)}</p>
-                    <p className="text-white/70 text-sm">omzet</p>
+                    <p className="text-white/70 text-sm">{t('popularPage.revenue')}</p>
                   </div>
                 </div>
               </motion.div>
@@ -242,12 +243,12 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
             <table className="w-full">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="text-left p-4 font-medium text-gray-500">#</th>
-                  <th className="text-left p-4 font-medium text-gray-500">Product</th>
-                  <th className="text-left p-4 font-medium text-gray-500">Categorie</th>
-                  <th className="text-right p-4 font-medium text-gray-500">Verkocht</th>
-                  <th className="text-right p-4 font-medium text-gray-500">Omzet</th>
-                  <th className="text-right p-4 font-medium text-gray-500">Trend</th>
+                  <th className="text-left p-4 font-medium text-gray-500">{t('popularPage.table.rank')}</th>
+                  <th className="text-left p-4 font-medium text-gray-500">{t('popularPage.table.product')}</th>
+                  <th className="text-left p-4 font-medium text-gray-500">{t('popularPage.table.category')}</th>
+                  <th className="text-right p-4 font-medium text-gray-500">{t('popularPage.table.sold')}</th>
+                  <th className="text-right p-4 font-medium text-gray-500">{t('popularPage.table.revenue')}</th>
+                  <th className="text-right p-4 font-medium text-gray-500">{t('popularPage.table.trend')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">

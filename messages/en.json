@@ -2624,6 +2624,42 @@
       "breakEvenNeeded": "Still need €{amount} to reach break-even"
     }
   },
+  "salesPage": {
+    "title": "Sales",
+    "subtitle": "Analyze your revenue and orders",
+    "periods": { "today": "Today", "week": "Week", "month": "Month", "year": "Year" },
+    "periodLabels": { "today": "Today", "week": "This week", "month": "This month", "year": "This year" },
+    "totalRevenue": "Total revenue",
+    "orders": "Orders",
+    "completed": "completed",
+    "avgOrder": "Avg. order",
+    "perOrder": "Per order",
+    "revenuePerDay": "Revenue per day",
+    "noSalesData": "No sales data for this period yet",
+    "topProducts": "Top products",
+    "noProductsSold": "No products sold in this period yet",
+    "aboutStats": "About these statistics",
+    "statsDescription": "These statistics are calculated based on all orders in your system. Cancelled orders are not included. The data is updated in real-time when new orders come in.",
+    "days": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  },
+  "popularPage": {
+    "title": "Popular items",
+    "subtitle": "Discover what sells best",
+    "periods": { "week": "Week", "month": "Month", "year": "Year" },
+    "noSalesData": "No sales data",
+    "noOrdersPeriod": "No orders placed in the past {period}.",
+    "periodLabels": { "week": "week", "month": "month", "year": "year" },
+    "sold": "sold",
+    "revenue": "revenue",
+    "table": {
+      "rank": "#",
+      "product": "Product",
+      "category": "Category",
+      "sold": "Sold",
+      "revenue": "Revenue",
+      "trend": "Trend"
+    }
+  },
   "ordersPage": {
     "title": "Orders",
     "loading": "Loading orders...",
