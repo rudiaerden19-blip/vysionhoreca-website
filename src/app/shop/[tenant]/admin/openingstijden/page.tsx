@@ -12,9 +12,9 @@ const defaultHours: OpeningHour[] = dayNames.map((_, index) => ({
   is_open: index !== 6, // Zondag gesloten
   open_time: '11:00',
   close_time: '21:00',
-  has_break: false,
-  break_start: null,
-  break_end: null,
+  has_shift2: false,
+  open_time_2: null,
+  close_time_2: null,
 }))
 
 export default function OpeningstijdenPage({ params }: { params: { tenant: string } }) {
@@ -32,10 +32,27 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
       setLoading(true)
       const data = await getOpeningHours(params.tenant)
       if (data && data.length > 0) {
-        // Merge loaded data with defaults
+        // Merge loaded data with defaults + migrate old break data to shift2
         const merged = defaultHours.map(defaultHour => {
           const loaded = data.find(d => d.day_of_week === defaultHour.day_of_week)
-          return loaded || { ...defaultHour, tenant_slug: params.tenant }
+          if (loaded) {
+            // Migrate old break system to shift2 system
+            if (loaded.has_break && loaded.break_start && loaded.break_end && !loaded.has_shift2) {
+              return {
+                ...loaded,
+                // Convert: open-breakStart becomes shift1, breakEnd-close becomes shift2
+                close_time: loaded.break_start,
+                has_shift2: true,
+                open_time_2: loaded.break_end,
+                close_time_2: loaded.close_time,
+                has_break: false,
+                break_start: null,
+                break_end: null,
+              }
+            }
+            return { ...defaultHour, ...loaded }
+          }
+          return { ...defaultHour, tenant_slug: params.tenant }
         })
         setSchedule(merged)
       }
@@ -75,12 +92,20 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
         is_open: source.is_open,
         open_time: source.open_time, 
         close_time: source.close_time,
-        has_break: source.has_break,
-        break_start: source.break_start,
-        break_end: source.break_end,
+        has_shift2: source.has_shift2,
+        open_time_2: source.open_time_2,
+        close_time_2: source.close_time_2,
       }
     ))
     setSaved(false)
+  }
+
+  const formatHoursPreview = (day: OpeningHour) => {
+    if (!day.is_open) return 'Gesloten'
+    if (day.has_shift2 && day.open_time_2 && day.close_time_2) {
+      return `${day.open_time} - ${day.close_time} & ${day.open_time_2} - ${day.close_time_2}`
+    }
+    return `${day.open_time} - ${day.close_time}`
   }
 
   if (loading) {
@@ -157,6 +182,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
           <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <span>🕐</span> Weekschema
           </h2>
+          <p className="text-sm text-gray-500 mt-1">Je kunt per dag 2 openingstijden instellen (bijv. middag & avond)</p>
         </div>
 
         <div className="divide-y">
@@ -168,7 +194,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
               transition={{ delay: index * 0.05 }}
               className={`p-6 ${!daySchedule.is_open ? 'bg-gray-50' : ''}`}
             >
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
                 {/* Day Name & Toggle */}
                 <div className="flex items-center gap-4 min-w-[140px]">
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -187,7 +213,8 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
 
                 {/* Time Inputs */}
                 {daySchedule.is_open ? (
-                  <div className="flex items-center gap-4 flex-1">
+                  <div className="flex items-center gap-4 flex-1 flex-wrap">
+                    {/* Shift 1 */}
                     <div className="flex items-center gap-2">
                       <input
                         type="time"
@@ -204,16 +231,23 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                       />
                     </div>
 
-                    {/* Break Toggle */}
+                    {/* Shift 2 Toggle */}
                     <button
-                      onClick={() => updateDay(index, 'has_break', !daySchedule.has_break)}
+                      onClick={() => {
+                        updateDay(index, 'has_shift2', !daySchedule.has_shift2)
+                        if (!daySchedule.has_shift2) {
+                          // Set default shift 2 times
+                          updateDay(index, 'open_time_2', '17:00')
+                          updateDay(index, 'close_time_2', '21:00')
+                        }
+                      }}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                        daySchedule.has_break 
+                        daySchedule.has_shift2 
                           ? 'bg-orange-100 text-orange-600' 
                           : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                       }`}
                     >
-                      {daySchedule.has_break ? '☕ Pauze aan' : '+ Pauze'}
+                      {daySchedule.has_shift2 ? '🕐 2e shift aan' : '+ 2e shift'}
                     </button>
 
                     {/* Copy Button */}
@@ -232,25 +266,25 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                 )}
               </div>
 
-              {/* Break Times */}
-              {daySchedule.is_open && daySchedule.has_break && (
+              {/* Shift 2 Times */}
+              {daySchedule.is_open && daySchedule.has_shift2 && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   className="mt-4 ml-[156px] flex items-center gap-2"
                 >
-                  <span className="text-sm text-gray-500">Pauze:</span>
+                  <span className="text-sm text-gray-500">2e shift:</span>
                   <input
                     type="time"
-                    value={daySchedule.break_start || '15:00'}
-                    onChange={(e) => updateDay(index, 'break_start', e.target.value)}
+                    value={daySchedule.open_time_2 || '17:00'}
+                    onChange={(e) => updateDay(index, 'open_time_2', e.target.value)}
                     className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
                   />
                   <span className="text-gray-400">tot</span>
                   <input
                     type="time"
-                    value={daySchedule.break_end || '17:00'}
-                    onChange={(e) => updateDay(index, 'break_end', e.target.value)}
+                    value={daySchedule.close_time_2 || '21:00'}
+                    onChange={(e) => updateDay(index, 'close_time_2', e.target.value)}
                     className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
                   />
                 </motion.div>
@@ -269,16 +303,11 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
       >
         <h3 className="font-semibold text-lg mb-4">Preview op website</h3>
         <div className="bg-white/10 rounded-xl p-4">
-          <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
             {schedule.map((day, index) => (
               <div key={index} className="flex justify-between">
                 <span>{dayNames[index]}</span>
-                <span>
-                  {day.is_open 
-                    ? `${day.open_time} - ${day.close_time}`
-                    : 'Gesloten'
-                  }
-                </span>
+                <span>{formatHoursPreview(day)}</span>
               </div>
             ))}
           </div>

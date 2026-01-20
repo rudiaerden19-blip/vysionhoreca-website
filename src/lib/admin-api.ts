@@ -148,9 +148,14 @@ export interface OpeningHour {
   is_open: boolean
   open_time: string
   close_time: string
-  has_break: boolean
-  break_start: string | null
-  break_end: string | null
+  // Shift 2 (optioneel - voor twee openingstijden per dag)
+  has_shift2: boolean
+  open_time_2: string | null
+  close_time_2: string | null
+  // Legacy fields (niet meer gebruikt, maar voor backward compatibility)
+  has_break?: boolean
+  break_start?: string | null
+  break_end?: string | null
 }
 
 export async function getOpeningHours(tenantSlug: string): Promise<OpeningHour[]> {
