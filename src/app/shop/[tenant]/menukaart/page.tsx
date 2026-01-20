@@ -5,8 +5,10 @@ import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { getTenantSettings, getMenuCategories, getMenuProducts, TenantSettings, MenuCategory, MenuProduct } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 
 export default function MenukaartPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const searchParams = useSearchParams()
   const showPromoOnly = searchParams.get('promo') === '1'
   
@@ -49,7 +51,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-white/60">Menu laden...</p>
+          <p className="text-white/60">{t('menuCard.loading')}</p>
         </div>
       </div>
     )
@@ -74,7 +76,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
           ) : (
             <h1 className="text-2xl font-bold text-white">{settings?.business_name || params.tenant}</h1>
           )}
-          <p className="text-white/60 text-sm">{settings?.tagline || 'Ons Menu'}</p>
+          <p className="text-white/60 text-sm">{settings?.tagline || t('menuCard.ourMenu')}</p>
         </div>
         
         {/* Category Navigation */}
@@ -89,7 +91,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
             >
-              Alles
+              {t('menuCard.all')}
             </button>
             {products.some(p => p.is_promo) && (
               <button
@@ -101,7 +103,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                     : 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
                 }`}
               >
-                🎁 Promoties
+                🎁 {t('menuCard.promotions')}
               </button>
             )}
             {categories.map((category) => (
@@ -145,7 +147,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                   </h2>
                   <div className="space-y-3">
                     {categoryProducts.map((product) => (
-                      <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} />
+                      <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} t={t} />
                     ))}
                   </div>
                 </motion.section>
@@ -159,11 +161,11 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                 animate={{ opacity: 1, y: 0 }}
               >
                 <h2 className="text-xl font-bold text-white mb-4 pb-2 border-b border-white/10">
-                  🍽️ Overige
+                  🍽️ {t('menuCard.other')}
                 </h2>
                 <div className="space-y-3">
                   {products.filter(p => !p.category_id).map((product) => (
-                    <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} />
+                    <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} t={t} />
                   ))}
                 </div>
               </motion.section>
@@ -173,10 +175,10 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
           // Toon gefilterde producten
           <div className="space-y-3">
             {filteredProducts.map((product) => (
-              <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} />
+              <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} t={t} />
             ))}
             {filteredProducts.length === 0 && (
-              <p className="text-white/40 text-center py-8">Geen producten in deze categorie</p>
+              <p className="text-white/40 text-center py-8">{t('menuCard.noProducts')}</p>
             )}
           </div>
         )}
@@ -186,7 +188,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
       <footer className="fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-md border-t border-white/10 px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-white/40 text-xs">Powered by Vysion</p>
+            <p className="text-white/40 text-xs">{t('menuCard.poweredBy')}</p>
           </div>
           <a 
             href={`/shop/${params.tenant}/menu`}
@@ -194,7 +196,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
             className="px-6 py-2 rounded-full text-white text-sm font-medium flex items-center gap-2"
           >
             <span>🛒</span>
-            <span>Online Bestellen</span>
+            <span>{t('menuCard.orderOnline')}</span>
           </a>
         </div>
       </footer>
@@ -203,7 +205,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
 }
 
 // Menu Item Card Component
-function MenuItemCard({ product, primaryColor }: { product: MenuProduct; primaryColor: string }) {
+function MenuItemCard({ product, primaryColor, t }: { product: MenuProduct; primaryColor: string; t: (key: string) => string }) {
   const [expanded, setExpanded] = useState(false)
   
   const hasPromo = product.is_promo && product.promo_price !== undefined && product.promo_price < product.price
@@ -237,7 +239,7 @@ function MenuItemCard({ product, primaryColor }: { product: MenuProduct; primary
               <h3 className="font-semibold text-white text-sm leading-tight">
                 {product.name}
                 {hasPromo && (
-                  <span className="ml-2 text-xs bg-green-500 text-white px-1.5 py-0.5 rounded">PROMO</span>
+                  <span className="ml-2 text-xs bg-green-500 text-white px-1.5 py-0.5 rounded">{t('menuCard.promo')}</span>
                 )}
               </h3>
               {product.description && !expanded && (

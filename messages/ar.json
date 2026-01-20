@@ -2854,5 +2854,32 @@
     "thankYouDesc": "نقدر ملاحظاتك كثيراً. سيتم مراجعة تقييمك ونشره قريباً.",
     "backToShop": "العودة للمتجر",
     "reviewModerated": "سيتم مراجعة تقييمك قبل نشره."
+  },
+  "menuCard": {
+    "loading": "جاري تحميل القائمة...",
+    "all": "الكل",
+    "promotions": "العروض",
+    "other": "أخرى",
+    "noProducts": "لا توجد منتجات في هذه الفئة",
+    "poweredBy": "Powered by Vysion",
+    "orderOnline": "اطلب عبر الإنترنت",
+    "promo": "عرض",
+    "ourMenu": "قائمتنا"
+  },
+  "languageSwitcher": {
+    "selectLanguage": "اختر اللغة"
+  },
+  "timeAgo": {
+    "today": "اليوم",
+    "yesterday": "أمس",
+    "daysAgo": "منذ {days} أيام",
+    "weeksAgo": "منذ {weeks} أسابيع",
+    "monthsAgo": "منذ {months} أشهر"
+  },
+  "giftCardPayment": {
+    "toPay": "للدفع",
+    "payWithBancontact": "الدفع بـ Bancontact/iDEAL",
+    "payInStore": "الدفع في المتجر (نقداً)",
+    "pleaseWait": "يرجى الانتظار..."
   }
 }

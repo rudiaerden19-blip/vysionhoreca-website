@@ -75,33 +75,39 @@ interface PopularItem {
 const dayNames = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag']
 const dayNamesNL = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag']
 
-const formatReviewDate = (dateString?: string) => {
-  if (!dateString) return ''
-  
-  try {
-    const date = new Date(dateString)
-    if (isNaN(date.getTime())) return ''
-    
-    const now = new Date()
-    const diff = now.getTime() - date.getTime()
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    
-    if (days === 0) return 'Vandaag'
-    if (days === 1) return 'Gisteren'
-    if (days < 7) return `${days} dagen geleden`
-    if (days < 30) return `${Math.floor(days / 7)} weken geleden`
-    if (days < 365) return `${Math.floor(days / 30)} maanden geleden`
-    
-    // Voor oudere reviews, toon de datum
-    return date.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
-  } catch {
-    return ''
-  }
-}
-
 export default function TenantLandingPage({ params }: { params: { tenant: string } }) {
-  const { t } = useLanguage()
+  const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [business, setBusiness] = useState<Business | null>(null)
+  
+  // Formateer review datum met vertalingen
+  const formatReviewDate = (dateString?: string) => {
+    if (!dateString) return ''
+    
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return ''
+      
+      const now = new Date()
+      const diff = now.getTime() - date.getTime()
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+      
+      if (days === 0) return t('timeAgo.today')
+      if (days === 1) return t('timeAgo.yesterday')
+      if (days < 7) return t('timeAgo.daysAgo').replace('{days}', String(days))
+      if (days < 30) return t('timeAgo.weeksAgo').replace('{weeks}', String(Math.floor(days / 7)))
+      if (days < 365) return t('timeAgo.monthsAgo').replace('{months}', String(Math.floor(days / 30)))
+      
+      // Voor oudere reviews, toon de datum in de juiste taal
+      const localeMap: Record<string, string> = {
+        nl: 'nl-BE', en: 'en-GB', fr: 'fr-FR', de: 'de-DE', 
+        es: 'es-ES', it: 'it-IT', ja: 'ja-JP', zh: 'zh-CN', ar: 'ar-SA'
+      }
+      return date.toLocaleDateString(localeMap[locale] || 'nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
+    } catch {
+      return ''
+    }
+  }
   const [reviews, setReviews] = useState<Review[]>([])
   const [popularItems, setPopularItems] = useState<PopularItem[]>([])
   const [teamMembers, setTeamMembers] = useState<{id: string, name: string, role?: string, photo_url?: string}[]>([])
@@ -577,7 +583,53 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <span className="text-white font-bold text-lg hidden sm:block">{business.name}</span>
           </Link>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Language Switcher */}
+            <div className="relative">
+              <button
+                onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                className="bg-white/20 backdrop-blur-md text-white font-medium px-3 py-2 rounded-full text-sm hover:bg-white/30 transition-colors flex items-center gap-1"
+                title={t('languageSwitcher.selectLanguage')}
+              >
+                <span>{localeFlags[locale]}</span>
+                <span className="hidden sm:inline">{locale.toUpperCase()}</span>
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {/* Language Dropdown */}
+              <AnimatePresence>
+                {showLanguageMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl overflow-hidden z-50 min-w-[160px]"
+                  >
+                    {locales.map((loc) => (
+                      <button
+                        key={loc}
+                        onClick={() => {
+                          setLocale(loc)
+                          setShowLanguageMenu(false)
+                        }}
+                        className={`w-full px-4 py-2.5 text-left hover:bg-gray-100 transition-colors flex items-center gap-3 ${
+                          locale === loc ? 'bg-gray-50 font-medium' : ''
+                        }`}
+                      >
+                        <span className="text-lg">{localeFlags[loc]}</span>
+                        <span className="text-gray-700">{localeNames[loc]}</span>
+                        {locale === loc && (
+                          <span className="ml-auto text-green-500">✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             {isOwner && (
               <Link 
                 href={`/shop/${params.tenant}/admin`}
@@ -1666,7 +1718,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
                 {/* Total */}
                 <div className="bg-gray-50 rounded-xl p-4 flex justify-between items-center">
-                  <span className="text-gray-600">Te betalen:</span>
+                  <span className="text-gray-600">{t('giftCardPayment.toPay')}:</span>
                   <span className="text-2xl font-bold" style={{ color: business.primary_color }}>
                     €{(giftCardForm.customAmount ? parseFloat(giftCardForm.customAmount) : giftCardForm.amount).toFixed(2)}
                   </span>
@@ -1729,12 +1781,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     {giftCardLoading ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Even geduld...</span>
+                        <span>{t('giftCardPayment.pleaseWait')}</span>
                       </>
                     ) : (
                       <>
                         <span>💳</span>
-                        <span>Betalen met Bancontact/iDEAL</span>
+                        <span>{t('giftCardPayment.payWithBancontact')}</span>
                       </>
                     )}
                   </button>
@@ -1803,7 +1855,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     className="w-full py-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-lg rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <span>💵</span>
-                    <span>Betalen in de zaak (cash)</span>
+                    <span>{t('giftCardPayment.payInStore')}</span>
                   </button>
                 </div>
 
@@ -1828,7 +1880,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-transform"
           >
             <span>🍟</span>
-            <span>Bestel Nu</span>
+            <span>{t('shopPage.startYourOrder')}</span>
           </button>
         </Link>
       </div>

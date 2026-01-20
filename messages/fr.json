@@ -2331,5 +2331,32 @@
     "thankYouDesc": "Nous apprécions énormément votre retour. Votre avis sera examiné et publié prochainement.",
     "backToShop": "Retour à la boutique",
     "reviewModerated": "Votre avis sera examiné avant d'être publié."
+  },
+  "menuCard": {
+    "loading": "Chargement du menu...",
+    "all": "Tout",
+    "promotions": "Promotions",
+    "other": "Autres",
+    "noProducts": "Aucun produit dans cette catégorie",
+    "poweredBy": "Propulsé par Vysion",
+    "orderOnline": "Commander en ligne",
+    "promo": "PROMO",
+    "ourMenu": "Notre Menu"
+  },
+  "languageSwitcher": {
+    "selectLanguage": "Choisir la langue"
+  },
+  "timeAgo": {
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "daysAgo": "il y a {days} jours",
+    "weeksAgo": "il y a {weeks} semaines",
+    "monthsAgo": "il y a {months} mois"
+  },
+  "giftCardPayment": {
+    "toPay": "À payer",
+    "payWithBancontact": "Payer par Bancontact/iDEAL",
+    "payInStore": "Payer en magasin (espèces)",
+    "pleaseWait": "Veuillez patienter..."
   }
 }

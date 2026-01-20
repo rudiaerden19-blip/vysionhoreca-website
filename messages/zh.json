@@ -2853,5 +2853,32 @@
     "thankYouDesc": "非常感谢您的反馈。您的评价将经过审核后发布。",
     "backToShop": "返回商店",
     "reviewModerated": "您的评价将在审核后发布。"
+  },
+  "menuCard": {
+    "loading": "正在加载菜单...",
+    "all": "全部",
+    "promotions": "促销",
+    "other": "其他",
+    "noProducts": "此分类暂无商品",
+    "poweredBy": "Powered by Vysion",
+    "orderOnline": "在线订购",
+    "promo": "促销",
+    "ourMenu": "我们的菜单"
+  },
+  "languageSwitcher": {
+    "selectLanguage": "选择语言"
+  },
+  "timeAgo": {
+    "today": "今天",
+    "yesterday": "昨天",
+    "daysAgo": "{days}天前",
+    "weeksAgo": "{weeks}周前",
+    "monthsAgo": "{months}个月前"
+  },
+  "giftCardPayment": {
+    "toPay": "待支付",
+    "payWithBancontact": "使用Bancontact/iDEAL支付",
+    "payInStore": "店内支付（现金）",
+    "pleaseWait": "请稍候..."
   }
 }

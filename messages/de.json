@@ -2334,5 +2334,32 @@
     "thankYouDesc": "Wir schätzen dein Feedback sehr. Deine Bewertung wird geprüft und bald veröffentlicht.",
     "backToShop": "Zurück zum Shop",
     "reviewModerated": "Deine Bewertung wird geprüft, bevor sie veröffentlicht wird."
+  },
+  "menuCard": {
+    "loading": "Menü wird geladen...",
+    "all": "Alles",
+    "promotions": "Aktionen",
+    "other": "Sonstiges",
+    "noProducts": "Keine Produkte in dieser Kategorie",
+    "poweredBy": "Powered by Vysion",
+    "orderOnline": "Online bestellen",
+    "promo": "AKTION",
+    "ourMenu": "Unser Menü"
+  },
+  "languageSwitcher": {
+    "selectLanguage": "Sprache wählen"
+  },
+  "timeAgo": {
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "daysAgo": "vor {days} Tagen",
+    "weeksAgo": "vor {weeks} Wochen",
+    "monthsAgo": "vor {months} Monaten"
+  },
+  "giftCardPayment": {
+    "toPay": "Zu zahlen",
+    "payWithBancontact": "Mit Bancontact/iDEAL bezahlen",
+    "payInStore": "Im Laden zahlen (bar)",
+    "pleaseWait": "Bitte warten..."
   }
 }

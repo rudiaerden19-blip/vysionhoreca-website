@@ -2853,5 +2853,32 @@
     "thankYouDesc": "貴重なご意見をいただきありがとうございます。確認後、公開されます。",
     "backToShop": "ショップに戻る",
     "reviewModerated": "レビューは公開前に確認されます。"
+  },
+  "menuCard": {
+    "loading": "メニューを読み込み中...",
+    "all": "すべて",
+    "promotions": "プロモーション",
+    "other": "その他",
+    "noProducts": "このカテゴリに商品がありません",
+    "poweredBy": "Powered by Vysion",
+    "orderOnline": "オンライン注文",
+    "promo": "プロモ",
+    "ourMenu": "メニュー"
+  },
+  "languageSwitcher": {
+    "selectLanguage": "言語を選択"
+  },
+  "timeAgo": {
+    "today": "今日",
+    "yesterday": "昨日",
+    "daysAgo": "{days}日前",
+    "weeksAgo": "{weeks}週間前",
+    "monthsAgo": "{months}ヶ月前"
+  },
+  "giftCardPayment": {
+    "toPay": "お支払い金額",
+    "payWithBancontact": "Bancontact/iDEALで支払う",
+    "payInStore": "店舗で支払う（現金）",
+    "pleaseWait": "お待ちください..."
   }
 }

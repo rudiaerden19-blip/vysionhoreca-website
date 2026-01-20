@@ -3262,5 +3262,32 @@
     "thankYouDesc": "We greatly appreciate your feedback. Your review will be reviewed and published soon.",
     "backToShop": "Back to shop",
     "reviewModerated": "Your review will be reviewed before it is published."
+  },
+  "menuCard": {
+    "loading": "Loading menu...",
+    "all": "All",
+    "promotions": "Promotions",
+    "other": "Other",
+    "noProducts": "No products in this category",
+    "poweredBy": "Powered by Vysion",
+    "orderOnline": "Order Online",
+    "promo": "PROMO",
+    "ourMenu": "Our Menu"
+  },
+  "languageSwitcher": {
+    "selectLanguage": "Select language"
+  },
+  "timeAgo": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{days} days ago",
+    "weeksAgo": "{weeks} weeks ago",
+    "monthsAgo": "{months} months ago"
+  },
+  "giftCardPayment": {
+    "toPay": "To pay",
+    "payWithBancontact": "Pay with Bancontact/iDEAL",
+    "payInStore": "Pay in store (cash)",
+    "pleaseWait": "Please wait..."
   }
 }

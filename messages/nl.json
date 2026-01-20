@@ -3268,5 +3268,32 @@
     "thankYouDesc": "We waarderen je feedback enorm. Je review wordt beoordeeld en binnenkort gepubliceerd.",
     "backToShop": "Terug naar de shop",
     "reviewModerated": "Je review wordt beoordeeld voordat deze gepubliceerd wordt."
+  },
+  "menuCard": {
+    "loading": "Menu laden...",
+    "all": "Alles",
+    "promotions": "Promoties",
+    "other": "Overige",
+    "noProducts": "Geen producten in deze categorie",
+    "poweredBy": "Powered by Vysion",
+    "orderOnline": "Online Bestellen",
+    "promo": "PROMO",
+    "ourMenu": "Ons Menu"
+  },
+  "languageSwitcher": {
+    "selectLanguage": "Selecteer taal"
+  },
+  "timeAgo": {
+    "today": "Vandaag",
+    "yesterday": "Gisteren",
+    "daysAgo": "{days} dagen geleden",
+    "weeksAgo": "{weeks} weken geleden",
+    "monthsAgo": "{months} maanden geleden"
+  },
+  "giftCardPayment": {
+    "toPay": "Te betalen",
+    "payWithBancontact": "Betalen met Bancontact/iDEAL",
+    "payInStore": "Betalen in de zaak (cash)",
+    "pleaseWait": "Even geduld..."
   }
 }
