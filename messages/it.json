@@ -1192,14 +1192,16 @@
   },
   "customersPage": {
     "title": "Clienti",
-    "subtitle": "Visualizza il tuo database clienti",
+    "subtitle": "Gestisci i tuoi clienti e le carte fedeltà",
     "stats": {
       "totalCustomers": "Totale clienti",
+      "totalPoints": "Totale punti",
+      "totalRevenue": "Fatturato totale",
       "totalSpent": "Totale speso",
       "loyaltyPoints": "Punti fedeltà",
       "avgPerCustomer": "Media per cliente"
     },
-    "search": "Cerca per nome, email o telefono...",
+    "search": "Cerca cliente per nome, email o telefono...",
     "table": {
       "customer": "Cliente",
       "contact": "Contatto",
@@ -1207,9 +1209,60 @@
       "orders": "Ordini",
       "spent": "Speso",
       "points": "Punti",
-      "memberSince": "Membro dal"
+      "memberSince": "Dal"
     },
-    "noCustomers": "Nessun cliente trovato"
+    "noCustomers": "Nessun cliente",
+    "noCustomersDesc": "I clienti appariranno qui quando creeranno un account.",
+    "modal": {
+      "phone": "Telefono",
+      "city": "Città",
+      "loyaltyPoints": "Punti fedeltà",
+      "adjust": "Modifica",
+      "totalSpent": "Totale speso",
+      "orders": "Ordini",
+      "registered": "Registrato",
+      "lastLogin": "Ultimo accesso"
+    }
+  },
+  "rewardsPage": {
+    "title": "Premi fedeltà",
+    "subtitle": "Imposta cosa i clienti possono ottenere con i loro punti",
+    "addReward": "Aggiungi premio",
+    "addFirstReward": "Aggiungi primo premio",
+    "noRewards": "Nessun premio ancora",
+    "noRewardsDesc": "Aggiungi premi che i clienti possono riscattare con i loro punti.",
+    "points": "punti",
+    "active": "Attivo",
+    "inactive": "Inattivo",
+    "newReward": "Nuovo premio",
+    "editReward": "Modifica premio",
+    "confirmDelete": "Sei sicuro di voler eliminare questo premio?",
+    "howItWorks": {
+      "title": "Come funziona?",
+      "point1": "I clienti guadagnano 1 punto per ogni €1 speso",
+      "point2": "Puoi impostare premi che i clienti possono riscattare",
+      "point3": "I clienti vedono i loro punti nella pagina account"
+    },
+    "types": {
+      "freeItem": "Articolo gratis",
+      "fixedDiscount": "Sconto fisso",
+      "percentDiscount": "% Sconto",
+      "discountEuro": "Sconto €",
+      "discountPercent": "Sconto %",
+      "freeItemDesc": "Es. bevanda",
+      "fixedAmount": "Importo fisso",
+      "percentage": "Percentuale"
+    },
+    "form": {
+      "name": "Nome del premio",
+      "namePlaceholder": "Es. Bevanda gratis",
+      "description": "Descrizione",
+      "descriptionPlaceholder": "Es. Scelta tra bibita o caffè",
+      "pointsRequired": "Punti richiesti",
+      "rewardType": "Tipo di premio",
+      "discountAmount": "Importo sconto (€)",
+      "discountPercentage": "Percentuale sconto (%)"
+    }
   },
   "productsPage": {
     "title": "Prodotti e Menu",

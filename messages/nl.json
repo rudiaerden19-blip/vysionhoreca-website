@@ -1198,14 +1198,16 @@
   },
   "customersPage": {
     "title": "Klanten",
-    "subtitle": "Bekijk je klantendatabase",
+    "subtitle": "Beheer je klanten en klantenkaart",
     "stats": {
       "totalCustomers": "Totaal klanten",
+      "totalPoints": "Totaal punten",
+      "totalRevenue": "Totaal omzet",
       "totalSpent": "Totaal besteed",
       "loyaltyPoints": "Loyaliteitspunten",
       "avgPerCustomer": "Gem. per klant"
     },
-    "search": "Zoek op naam, email of telefoon...",
+    "search": "Zoek klant op naam, email of telefoon...",
     "table": {
       "customer": "Klant",
       "contact": "Contact",
@@ -1213,9 +1215,60 @@
       "orders": "Bestellingen",
       "spent": "Besteed",
       "points": "Punten",
-      "memberSince": "Lid sinds"
+      "memberSince": "Sinds"
     },
-    "noCustomers": "Geen klanten gevonden"
+    "noCustomers": "Geen klanten",
+    "noCustomersDesc": "Klanten verschijnen hier als ze een account aanmaken.",
+    "modal": {
+      "phone": "Telefoon",
+      "city": "Stad",
+      "loyaltyPoints": "Spaarpunten",
+      "adjust": "Aanpassen",
+      "totalSpent": "Totaal besteed",
+      "orders": "Bestellingen",
+      "registered": "Geregistreerd",
+      "lastLogin": "Laatste login"
+    }
+  },
+  "rewardsPage": {
+    "title": "Spaarpunten Beloningen",
+    "subtitle": "Stel in wat klanten kunnen krijgen voor hun punten",
+    "addReward": "Beloning toevoegen",
+    "addFirstReward": "Eerste beloning toevoegen",
+    "noRewards": "Nog geen beloningen",
+    "noRewardsDesc": "Voeg beloningen toe die klanten kunnen inwisselen met hun spaarpunten.",
+    "points": "punten",
+    "active": "Actief",
+    "inactive": "Inactief",
+    "newReward": "Nieuwe beloning",
+    "editReward": "Beloning bewerken",
+    "confirmDelete": "Weet je zeker dat je deze beloning wilt verwijderen?",
+    "howItWorks": {
+      "title": "Hoe werkt het?",
+      "point1": "Klanten verdienen 1 punt per €1 die ze besteden",
+      "point2": "Je kunt beloningen instellen die klanten kunnen inwisselen",
+      "point3": "Klanten zien hun punten in hun account pagina"
+    },
+    "types": {
+      "freeItem": "Gratis item",
+      "fixedDiscount": "Vaste korting",
+      "percentDiscount": "% Korting",
+      "discountEuro": "Korting €",
+      "discountPercent": "Korting %",
+      "freeItemDesc": "Bijv. drankje",
+      "fixedAmount": "Vast bedrag",
+      "percentage": "Percentage"
+    },
+    "form": {
+      "name": "Naam van de beloning",
+      "namePlaceholder": "Bijv. Gratis drankje",
+      "description": "Beschrijving",
+      "descriptionPlaceholder": "Bijv. Keuze uit frisdrank of koffie",
+      "pointsRequired": "Aantal punten nodig",
+      "rewardType": "Type beloning",
+      "discountAmount": "Kortingsbedrag (€)",
+      "discountPercentage": "Kortingspercentage (%)"
+    }
   },
   "productsPage": {
     "title": "Producten & Menu",

@@ -1192,14 +1192,16 @@
   },
   "customersPage": {
     "title": "顧客",
-    "subtitle": "顧客データベースを表示",
+    "subtitle": "顧客とポイントカードを管理",
     "stats": {
       "totalCustomers": "総顧客数",
+      "totalPoints": "総ポイント",
+      "totalRevenue": "総売上",
       "totalSpent": "総支出額",
       "loyaltyPoints": "ロイヤルティポイント",
       "avgPerCustomer": "顧客あたり平均"
     },
-    "search": "名前、メール、電話で検索...",
+    "search": "名前、メール、電話で顧客を検索...",
     "table": {
       "customer": "顧客",
       "contact": "連絡先",
@@ -1207,9 +1209,60 @@
       "orders": "注文",
       "spent": "支出",
       "points": "ポイント",
-      "memberSince": "会員開始日"
+      "memberSince": "以来"
     },
-    "noCustomers": "顧客が見つかりません"
+    "noCustomers": "顧客がいません",
+    "noCustomersDesc": "アカウントを作成すると顧客がここに表示されます。",
+    "modal": {
+      "phone": "電話",
+      "city": "都市",
+      "loyaltyPoints": "貯蓄ポイント",
+      "adjust": "調整",
+      "totalSpent": "総支出",
+      "orders": "注文",
+      "registered": "登録日",
+      "lastLogin": "最終ログイン"
+    }
+  },
+  "rewardsPage": {
+    "title": "ポイント特典",
+    "subtitle": "顧客がポイントで得られるものを設定",
+    "addReward": "特典を追加",
+    "addFirstReward": "最初の特典を追加",
+    "noRewards": "まだ特典がありません",
+    "noRewardsDesc": "顧客がポイントで交換できる特典を追加してください。",
+    "points": "ポイント",
+    "active": "アクティブ",
+    "inactive": "非アクティブ",
+    "newReward": "新規特典",
+    "editReward": "特典を編集",
+    "confirmDelete": "この特典を削除してもよろしいですか？",
+    "howItWorks": {
+      "title": "仕組みは？",
+      "point1": "顧客は€1の支出ごとに1ポイント獲得",
+      "point2": "顧客が交換できる特典を設定できます",
+      "point3": "顧客はアカウントページでポイントを確認できます"
+    },
+    "types": {
+      "freeItem": "無料アイテム",
+      "fixedDiscount": "固定割引",
+      "percentDiscount": "%割引",
+      "discountEuro": "割引€",
+      "discountPercent": "割引%",
+      "freeItemDesc": "例：ドリンク",
+      "fixedAmount": "固定金額",
+      "percentage": "パーセント"
+    },
+    "form": {
+      "name": "特典名",
+      "namePlaceholder": "例：無料ドリンク",
+      "description": "説明",
+      "descriptionPlaceholder": "例：ソフトドリンクまたはコーヒーから選択",
+      "pointsRequired": "必要ポイント",
+      "rewardType": "特典タイプ",
+      "discountAmount": "割引金額（€）",
+      "discountPercentage": "割引率（%）"
+    }
   },
   "productsPage": {
     "title": "商品とメニュー",

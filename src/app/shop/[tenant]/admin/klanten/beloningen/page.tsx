@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { getLoyaltyRewards, saveLoyaltyReward, deleteLoyaltyReward, LoyaltyReward } from '@/lib/admin-api'
 
 export default function BeloningenPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [rewards, setRewards] = useState<LoyaltyReward[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -82,7 +83,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Weet je zeker dat je deze beloning wilt verwijderen?')) return
+    if (!confirm(t('rewardsPage.confirmDelete'))) return
     await deleteLoyaltyReward(id)
     setRewards(rewards.filter(r => r.id !== id))
   }
@@ -96,9 +97,9 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
   }
 
   const rewardTypeLabels = {
-    free_item: '🎁 Gratis item',
-    discount_fixed: '💰 Vaste korting',
-    discount_percentage: '📊 % Korting',
+    free_item: `🎁 ${t('rewardsPage.types.freeItem')}`,
+    discount_fixed: `💰 ${t('rewardsPage.types.fixedDiscount')}`,
+    discount_percentage: `📊 ${t('rewardsPage.types.percentDiscount')}`,
   }
 
   if (loading) {
@@ -119,11 +120,11 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
         <div>
           <div className="flex items-center gap-3 mb-2">
             <Link href={`/shop/${params.tenant}/admin/klanten`} className="text-gray-400 hover:text-gray-600">
-              ← Klanten
+              ← {t('customersPage.title')}
             </Link>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Spaarpunten Beloningen</h1>
-          <p className="text-gray-500">Stel in wat klanten kunnen krijgen voor hun punten</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('rewardsPage.title')}</h1>
+          <p className="text-gray-500">{t('rewardsPage.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -132,7 +133,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
           className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-xl transition-colors flex items-center gap-2"
         >
           <span>+</span>
-          <span>Beloning toevoegen</span>
+          <span>{t('rewardsPage.addReward')}</span>
         </motion.button>
       </div>
 
@@ -142,11 +143,11 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
         animate={{ opacity: 1, y: 0 }}
         className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 mb-8"
       >
-        <h3 className="font-semibold text-yellow-800 mb-2">💡 Hoe werkt het?</h3>
+        <h3 className="font-semibold text-yellow-800 mb-2">💡 {t('rewardsPage.howItWorks.title')}</h3>
         <ul className="text-yellow-700 space-y-1 text-sm">
-          <li>• Klanten verdienen <strong>1 punt per €1</strong> die ze besteden</li>
-          <li>• Je kunt beloningen instellen die klanten kunnen inwisselen</li>
-          <li>• Klanten zien hun punten in hun account pagina</li>
+          <li>• {t('rewardsPage.howItWorks.point1')}</li>
+          <li>• {t('rewardsPage.howItWorks.point2')}</li>
+          <li>• {t('rewardsPage.howItWorks.point3')}</li>
         </ul>
       </motion.div>
 
@@ -158,13 +159,13 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
           className="bg-white rounded-2xl p-12 shadow-sm text-center"
         >
           <span className="text-6xl mb-4 block">🎁</span>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Nog geen beloningen</h3>
-          <p className="text-gray-500 mb-6">Voeg beloningen toe die klanten kunnen inwisselen met hun spaarpunten.</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{t('rewardsPage.noRewards')}</h3>
+          <p className="text-gray-500 mb-6">{t('rewardsPage.noRewardsDesc')}</p>
           <button
             onClick={openAddModal}
             className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-xl transition-colors"
           >
-            Eerste beloning toevoegen
+            {t('rewardsPage.addFirstReward')}
           </button>
         </motion.div>
       ) : (
@@ -189,7 +190,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                     )}
                     <div className="flex items-center gap-3 mt-2">
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-medium">
-                        ⭐ {reward.points_required} punten
+                        ⭐ {reward.points_required} {t('rewardsPage.points')}
                       </span>
                       <span className="text-sm text-gray-500">
                         {rewardTypeLabels[reward.reward_type]}
@@ -208,13 +209,13 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                         : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                     }`}
                   >
-                    {reward.is_active ? '✓ Actief' : 'Inactief'}
+                    {reward.is_active ? `✓ ${t('rewardsPage.active')}` : t('rewardsPage.inactive')}
                   </button>
                   <button
                     onClick={() => openEditModal(reward)}
                     className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
                   >
-                    ✏️ Bewerken
+                    ✏️ {t('adminPages.common.edit')}
                   </button>
                   <button
                     onClick={() => handleDelete(reward.id!)}
@@ -248,40 +249,40 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
             >
               <div className="p-6 border-b">
                 <h2 className="text-xl font-bold text-gray-900">
-                  {editingReward ? 'Beloning bewerken' : 'Nieuwe beloning'}
+                  {editingReward ? t('rewardsPage.editReward') : t('rewardsPage.newReward')}
                 </h2>
               </div>
 
               <div className="p-6 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Naam van de beloning *
+                    {t('rewardsPage.form.name')} *
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Bijv. Gratis drankje"
+                    placeholder={t('rewardsPage.form.namePlaceholder')}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Beschrijving
+                    {t('rewardsPage.form.description')}
                   </label>
                   <input
                     type="text"
                     value={formData.description || ''}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Bijv. Keuze uit frisdrank of koffie"
+                    placeholder={t('rewardsPage.form.descriptionPlaceholder')}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Aantal punten nodig *
+                    {t('rewardsPage.form.pointsRequired')} *
                   </label>
                   <input
                     type="number"
@@ -294,13 +295,13 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Type beloning
+                    {t('rewardsPage.form.rewardType')}
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { value: 'free_item', label: '🎁 Gratis item', desc: 'Bijv. drankje' },
-                      { value: 'discount_fixed', label: '💰 Korting €', desc: 'Vast bedrag' },
-                      { value: 'discount_percentage', label: '📊 Korting %', desc: 'Percentage' },
+                      { value: 'free_item', label: `🎁 ${t('rewardsPage.types.freeItem')}`, desc: t('rewardsPage.types.freeItemDesc') },
+                      { value: 'discount_fixed', label: `💰 ${t('rewardsPage.types.discountEuro')}`, desc: t('rewardsPage.types.fixedAmount') },
+                      { value: 'discount_percentage', label: `📊 ${t('rewardsPage.types.discountPercent')}`, desc: t('rewardsPage.types.percentage') },
                     ].map((type) => (
                       <button
                         key={type.value}
@@ -322,7 +323,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                 {(formData.reward_type === 'discount_fixed' || formData.reward_type === 'discount_percentage') && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {formData.reward_type === 'discount_fixed' ? 'Kortingsbedrag (€)' : 'Kortingspercentage (%)'}
+                      {formData.reward_type === 'discount_fixed' ? t('rewardsPage.form.discountAmount') : t('rewardsPage.form.discountPercentage')}
                     </label>
                     <input
                       type="number"
@@ -342,14 +343,14 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium transition-colors"
                 >
-                  Annuleren
+                  {t('adminPages.common.cancel')}
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={saving || !formData.name || !formData.points_required}
                   className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors"
                 >
-                  {saving ? 'Opslaan...' : 'Opslaan'}
+                  {saving ? `${t('adminPages.common.save')}...` : t('adminPages.common.save')}
                 </button>
               </div>
             </motion.div>

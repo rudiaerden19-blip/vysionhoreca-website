@@ -1192,14 +1192,16 @@
   },
   "customersPage": {
     "title": "Clientes",
-    "subtitle": "Ver tu base de datos de clientes",
+    "subtitle": "Gestiona tus clientes y tarjetas de fidelidad",
     "stats": {
       "totalCustomers": "Total clientes",
+      "totalPoints": "Total puntos",
+      "totalRevenue": "Total ingresos",
       "totalSpent": "Total gastado",
       "loyaltyPoints": "Puntos de fidelidad",
       "avgPerCustomer": "Prom. por cliente"
     },
-    "search": "Buscar por nombre, email o teléfono...",
+    "search": "Buscar cliente por nombre, email o teléfono...",
     "table": {
       "customer": "Cliente",
       "contact": "Contacto",
@@ -1207,9 +1209,60 @@
       "orders": "Pedidos",
       "spent": "Gastado",
       "points": "Puntos",
-      "memberSince": "Miembro desde"
+      "memberSince": "Desde"
     },
-    "noCustomers": "No se encontraron clientes"
+    "noCustomers": "Sin clientes",
+    "noCustomersDesc": "Los clientes aparecerán aquí cuando creen una cuenta.",
+    "modal": {
+      "phone": "Teléfono",
+      "city": "Ciudad",
+      "loyaltyPoints": "Puntos de ahorro",
+      "adjust": "Ajustar",
+      "totalSpent": "Total gastado",
+      "orders": "Pedidos",
+      "registered": "Registrado",
+      "lastLogin": "Último inicio de sesión"
+    }
+  },
+  "rewardsPage": {
+    "title": "Recompensas de puntos",
+    "subtitle": "Define lo que los clientes pueden obtener con sus puntos",
+    "addReward": "Añadir recompensa",
+    "addFirstReward": "Añadir primera recompensa",
+    "noRewards": "Sin recompensas aún",
+    "noRewardsDesc": "Añade recompensas que los clientes puedan canjear con sus puntos.",
+    "points": "puntos",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "newReward": "Nueva recompensa",
+    "editReward": "Editar recompensa",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar esta recompensa?",
+    "howItWorks": {
+      "title": "¿Cómo funciona?",
+      "point1": "Los clientes ganan 1 punto por cada €1 que gastan",
+      "point2": "Puedes configurar recompensas que los clientes pueden canjear",
+      "point3": "Los clientes ven sus puntos en su página de cuenta"
+    },
+    "types": {
+      "freeItem": "Artículo gratis",
+      "fixedDiscount": "Descuento fijo",
+      "percentDiscount": "% Descuento",
+      "discountEuro": "Descuento €",
+      "discountPercent": "Descuento %",
+      "freeItemDesc": "Ej. bebida",
+      "fixedAmount": "Importe fijo",
+      "percentage": "Porcentaje"
+    },
+    "form": {
+      "name": "Nombre de la recompensa",
+      "namePlaceholder": "Ej. Bebida gratis",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Ej. Elección de refresco o café",
+      "pointsRequired": "Puntos necesarios",
+      "rewardType": "Tipo de recompensa",
+      "discountAmount": "Importe de descuento (€)",
+      "discountPercentage": "Porcentaje de descuento (%)"
+    }
   },
   "productsPage": {
     "title": "Productos y Menú",

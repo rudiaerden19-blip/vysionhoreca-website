@@ -1192,14 +1192,16 @@
   },
   "customersPage": {
     "title": "客户",
-    "subtitle": "查看您的客户数据库",
+    "subtitle": "管理您的客户和会员卡",
     "stats": {
       "totalCustomers": "总客户数",
+      "totalPoints": "总积分",
+      "totalRevenue": "总收入",
       "totalSpent": "总消费",
       "loyaltyPoints": "忠诚度积分",
       "avgPerCustomer": "客均消费"
     },
-    "search": "按姓名、邮箱或电话搜索...",
+    "search": "按姓名、邮箱或电话搜索客户...",
     "table": {
       "customer": "客户",
       "contact": "联系方式",
@@ -1207,9 +1209,60 @@
       "orders": "订单",
       "spent": "消费",
       "points": "积分",
-      "memberSince": "会员自"
+      "memberSince": "自"
     },
-    "noCustomers": "未找到客户"
+    "noCustomers": "无客户",
+    "noCustomersDesc": "客户创建账户后将显示在这里。",
+    "modal": {
+      "phone": "电话",
+      "city": "城市",
+      "loyaltyPoints": "储蓄积分",
+      "adjust": "调整",
+      "totalSpent": "总消费",
+      "orders": "订单",
+      "registered": "注册日期",
+      "lastLogin": "最后登录"
+    }
+  },
+  "rewardsPage": {
+    "title": "积分奖励",
+    "subtitle": "设置客户可以用积分兑换什么",
+    "addReward": "添加奖励",
+    "addFirstReward": "添加第一个奖励",
+    "noRewards": "暂无奖励",
+    "noRewardsDesc": "添加客户可以用积分兑换的奖励。",
+    "points": "积分",
+    "active": "启用",
+    "inactive": "停用",
+    "newReward": "新奖励",
+    "editReward": "编辑奖励",
+    "confirmDelete": "确定要删除这个奖励吗？",
+    "howItWorks": {
+      "title": "如何运作？",
+      "point1": "客户每消费€1可获得1积分",
+      "point2": "您可以设置客户可兑换的奖励",
+      "point3": "客户可在账户页面查看积分"
+    },
+    "types": {
+      "freeItem": "免费商品",
+      "fixedDiscount": "固定折扣",
+      "percentDiscount": "%折扣",
+      "discountEuro": "折扣€",
+      "discountPercent": "折扣%",
+      "freeItemDesc": "如：饮料",
+      "fixedAmount": "固定金额",
+      "percentage": "百分比"
+    },
+    "form": {
+      "name": "奖励名称",
+      "namePlaceholder": "如：免费饮料",
+      "description": "描述",
+      "descriptionPlaceholder": "如：可选软饮或咖啡",
+      "pointsRequired": "所需积分",
+      "rewardType": "奖励类型",
+      "discountAmount": "折扣金额（€）",
+      "discountPercentage": "折扣百分比（%）"
+    }
   },
   "productsPage": {
     "title": "产品和菜单",

@@ -1192,14 +1192,16 @@
   },
   "customersPage": {
     "title": "العملاء",
-    "subtitle": "عرض قاعدة بيانات العملاء",
+    "subtitle": "إدارة العملاء وبطاقات الولاء",
     "stats": {
       "totalCustomers": "إجمالي العملاء",
+      "totalPoints": "إجمالي النقاط",
+      "totalRevenue": "إجمالي الإيرادات",
       "totalSpent": "إجمالي الإنفاق",
       "loyaltyPoints": "نقاط الولاء",
       "avgPerCustomer": "متوسط لكل عميل"
     },
-    "search": "ابحث بالاسم، البريد الإلكتروني أو الهاتف...",
+    "search": "ابحث عن عميل بالاسم، البريد الإلكتروني أو الهاتف...",
     "table": {
       "customer": "العميل",
       "contact": "الاتصال",
@@ -1207,9 +1209,60 @@
       "orders": "الطلبات",
       "spent": "الإنفاق",
       "points": "النقاط",
-      "memberSince": "عضو منذ"
+      "memberSince": "منذ"
     },
-    "noCustomers": "لم يتم العثور على عملاء"
+    "noCustomers": "لا يوجد عملاء",
+    "noCustomersDesc": "سيظهر العملاء هنا عند إنشاء حساب.",
+    "modal": {
+      "phone": "الهاتف",
+      "city": "المدينة",
+      "loyaltyPoints": "نقاط التوفير",
+      "adjust": "تعديل",
+      "totalSpent": "إجمالي الإنفاق",
+      "orders": "الطلبات",
+      "registered": "مسجل",
+      "lastLogin": "آخر تسجيل دخول"
+    }
+  },
+  "rewardsPage": {
+    "title": "مكافآت نقاط الولاء",
+    "subtitle": "حدد ما يمكن للعملاء الحصول عليه مقابل نقاطهم",
+    "addReward": "إضافة مكافأة",
+    "addFirstReward": "إضافة أول مكافأة",
+    "noRewards": "لا توجد مكافآت بعد",
+    "noRewardsDesc": "أضف مكافآت يمكن للعملاء استبدالها بنقاطهم.",
+    "points": "نقاط",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "newReward": "مكافأة جديدة",
+    "editReward": "تعديل المكافأة",
+    "confirmDelete": "هل أنت متأكد من حذف هذه المكافأة؟",
+    "howItWorks": {
+      "title": "كيف يعمل؟",
+      "point1": "يكسب العملاء نقطة واحدة لكل €1 ينفقونه",
+      "point2": "يمكنك تعيين مكافآت يمكن للعملاء استبدالها",
+      "point3": "يرى العملاء نقاطهم في صفحة حسابهم"
+    },
+    "types": {
+      "freeItem": "عنصر مجاني",
+      "fixedDiscount": "خصم ثابت",
+      "percentDiscount": "% خصم",
+      "discountEuro": "خصم €",
+      "discountPercent": "خصم %",
+      "freeItemDesc": "مثل مشروب",
+      "fixedAmount": "مبلغ ثابت",
+      "percentage": "نسبة مئوية"
+    },
+    "form": {
+      "name": "اسم المكافأة",
+      "namePlaceholder": "مثل: مشروب مجاني",
+      "description": "الوصف",
+      "descriptionPlaceholder": "مثل: اختيار من مشروب غازي أو قهوة",
+      "pointsRequired": "النقاط المطلوبة",
+      "rewardType": "نوع المكافأة",
+      "discountAmount": "مبلغ الخصم (€)",
+      "discountPercentage": "نسبة الخصم (%)"
+    }
   },
   "productsPage": {
     "title": "المنتجات والقائمة",

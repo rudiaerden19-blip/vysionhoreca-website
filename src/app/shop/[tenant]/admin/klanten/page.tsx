@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { Customer } from '@/lib/admin-api'
 
 export default function KlantenPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -84,8 +85,8 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Klanten</h1>
-          <p className="text-gray-500">Beheer je klanten en klantenkaart</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('customersPage.title')}</h1>
+          <p className="text-gray-500">{t('customersPage.subtitle')}</p>
         </div>
       </div>
 
@@ -97,7 +98,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-500">Totaal klanten</span>
+            <span className="text-gray-500">{t('customersPage.stats.totalCustomers')}</span>
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">👥</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{totalCustomers}</p>
@@ -110,7 +111,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-500">Totaal punten</span>
+            <span className="text-gray-500">{t('customersPage.stats.totalPoints')}</span>
             <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">🎁</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{totalPoints}</p>
@@ -123,7 +124,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-gray-500">Totaal omzet</span>
+            <span className="text-gray-500">{t('customersPage.stats.totalRevenue')}</span>
             <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">💰</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">€{totalSpent.toFixed(2)}</p>
@@ -136,7 +137,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="🔍 Zoek klant op naam, email of telefoon..."
+          placeholder={`🔍 ${t('customersPage.search')}`}
           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
         />
       </div>
@@ -151,20 +152,20 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
         {filteredCustomers.length === 0 ? (
           <div className="text-center py-12">
             <span className="text-5xl mb-4 block">👥</span>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Geen klanten</h3>
-            <p className="text-gray-500">Klanten verschijnen hier als ze een account aanmaken.</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">{t('customersPage.noCustomers')}</h3>
+            <p className="text-gray-500">{t('customersPage.noCustomersDesc')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b">
                 <tr>
-                  <th className="text-left py-4 px-6 font-medium text-gray-600">Klant</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-600">Contact</th>
-                  <th className="text-right py-4 px-6 font-medium text-gray-600">Punten</th>
-                  <th className="text-right py-4 px-6 font-medium text-gray-600">Besteed</th>
-                  <th className="text-right py-4 px-6 font-medium text-gray-600">Bestellingen</th>
-                  <th className="text-left py-4 px-6 font-medium text-gray-600">Sinds</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600">{t('customersPage.table.customer')}</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600">{t('customersPage.table.contact')}</th>
+                  <th className="text-right py-4 px-6 font-medium text-gray-600">{t('customersPage.table.points')}</th>
+                  <th className="text-right py-4 px-6 font-medium text-gray-600">{t('customersPage.table.spent')}</th>
+                  <th className="text-right py-4 px-6 font-medium text-gray-600">{t('customersPage.table.orders')}</th>
+                  <th className="text-left py-4 px-6 font-medium text-gray-600">{t('customersPage.table.memberSince')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -246,23 +247,23 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-gray-500 text-sm">Telefoon</p>
+                  <p className="text-gray-500 text-sm">{t('customersPage.modal.phone')}</p>
                   <p className="font-medium text-gray-900">{selectedCustomer.phone || '-'}</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-gray-500 text-sm">Stad</p>
+                  <p className="text-gray-500 text-sm">{t('customersPage.modal.city')}</p>
                   <p className="font-medium text-gray-900">{selectedCustomer.city || '-'}</p>
                 </div>
               </div>
 
               <div className="bg-yellow-50 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-yellow-700 font-medium">Spaarpunten</p>
+                  <p className="text-yellow-700 font-medium">{t('customersPage.modal.loyaltyPoints')}</p>
                   <button
                     onClick={() => { setEditingPoints(true); setNewPoints(selectedCustomer.loyalty_points || 0) }}
                     className="text-sm text-yellow-600 hover:underline"
                   >
-                    Aanpassen
+                    {t('customersPage.modal.adjust')}
                   </button>
                 </div>
                 {editingPoints ? (
@@ -277,7 +278,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
                       onClick={handleUpdatePoints}
                       className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium"
                     >
-                      Opslaan
+                      {t('adminPages.common.save')}
                     </button>
                   </div>
                 ) : (
@@ -287,18 +288,18 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-green-50 rounded-xl p-4">
-                  <p className="text-green-700 text-sm">Totaal besteed</p>
+                  <p className="text-green-700 text-sm">{t('customersPage.modal.totalSpent')}</p>
                   <p className="text-2xl font-bold text-green-700">€{(selectedCustomer.total_spent || 0).toFixed(2)}</p>
                 </div>
                 <div className="bg-blue-50 rounded-xl p-4">
-                  <p className="text-blue-700 text-sm">Bestellingen</p>
+                  <p className="text-blue-700 text-sm">{t('customersPage.modal.orders')}</p>
                   <p className="text-2xl font-bold text-blue-700">{selectedCustomer.total_orders || 0}</p>
                 </div>
               </div>
 
               <div className="text-sm text-gray-500">
-                <p>Geregistreerd: {formatDate(selectedCustomer.created_at)}</p>
-                <p>Laatste login: {formatDate(selectedCustomer.last_login)}</p>
+                <p>{t('customersPage.modal.registered')}: {formatDate(selectedCustomer.created_at)}</p>
+                <p>{t('customersPage.modal.lastLogin')}: {formatDate(selectedCustomer.last_login)}</p>
               </div>
             </div>
           </motion.div>

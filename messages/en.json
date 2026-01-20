@@ -1192,14 +1192,16 @@
   },
   "customersPage": {
     "title": "Customers",
-    "subtitle": "View your customer database",
+    "subtitle": "Manage your customers and loyalty cards",
     "stats": {
       "totalCustomers": "Total customers",
+      "totalPoints": "Total points",
+      "totalRevenue": "Total revenue",
       "totalSpent": "Total spent",
       "loyaltyPoints": "Loyalty points",
       "avgPerCustomer": "Avg. per customer"
     },
-    "search": "Search by name, email or phone...",
+    "search": "Search customer by name, email or phone...",
     "table": {
       "customer": "Customer",
       "contact": "Contact",
@@ -1207,9 +1209,60 @@
       "orders": "Orders",
       "spent": "Spent",
       "points": "Points",
-      "memberSince": "Member since"
+      "memberSince": "Since"
     },
-    "noCustomers": "No customers found"
+    "noCustomers": "No customers",
+    "noCustomersDesc": "Customers will appear here when they create an account.",
+    "modal": {
+      "phone": "Phone",
+      "city": "City",
+      "loyaltyPoints": "Loyalty points",
+      "adjust": "Adjust",
+      "totalSpent": "Total spent",
+      "orders": "Orders",
+      "registered": "Registered",
+      "lastLogin": "Last login"
+    }
+  },
+  "rewardsPage": {
+    "title": "Loyalty Rewards",
+    "subtitle": "Set what customers can get for their points",
+    "addReward": "Add reward",
+    "addFirstReward": "Add first reward",
+    "noRewards": "No rewards yet",
+    "noRewardsDesc": "Add rewards that customers can redeem with their loyalty points.",
+    "points": "points",
+    "active": "Active",
+    "inactive": "Inactive",
+    "newReward": "New reward",
+    "editReward": "Edit reward",
+    "confirmDelete": "Are you sure you want to delete this reward?",
+    "howItWorks": {
+      "title": "How does it work?",
+      "point1": "Customers earn 1 point per €1 they spend",
+      "point2": "You can set rewards that customers can redeem",
+      "point3": "Customers see their points in their account page"
+    },
+    "types": {
+      "freeItem": "Free item",
+      "fixedDiscount": "Fixed discount",
+      "percentDiscount": "% Discount",
+      "discountEuro": "Discount €",
+      "discountPercent": "Discount %",
+      "freeItemDesc": "E.g. drink",
+      "fixedAmount": "Fixed amount",
+      "percentage": "Percentage"
+    },
+    "form": {
+      "name": "Reward name",
+      "namePlaceholder": "E.g. Free drink",
+      "description": "Description",
+      "descriptionPlaceholder": "E.g. Choice of soft drink or coffee",
+      "pointsRequired": "Points required",
+      "rewardType": "Reward type",
+      "discountAmount": "Discount amount (€)",
+      "discountPercentage": "Discount percentage (%)"
+    }
   },
   "productsPage": {
     "title": "Products & Menu",

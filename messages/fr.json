@@ -662,14 +662,16 @@
   },
   "customersPage": {
     "title": "Clients",
-    "subtitle": "Afficher votre base de données clients",
+    "subtitle": "Gérez vos clients et cartes de fidélité",
     "stats": {
       "totalCustomers": "Total clients",
+      "totalPoints": "Total points",
+      "totalRevenue": "Chiffre d'affaires",
       "totalSpent": "Total dépensé",
       "loyaltyPoints": "Points de fidélité",
       "avgPerCustomer": "Moy. par client"
     },
-    "search": "Rechercher par nom, email ou téléphone...",
+    "search": "Rechercher client par nom, email ou téléphone...",
     "table": {
       "customer": "Client",
       "contact": "Contact",
@@ -677,9 +679,60 @@
       "orders": "Commandes",
       "spent": "Dépensé",
       "points": "Points",
-      "memberSince": "Membre depuis"
+      "memberSince": "Depuis"
     },
-    "noCustomers": "Aucun client trouvé"
+    "noCustomers": "Aucun client",
+    "noCustomersDesc": "Les clients apparaîtront ici lorsqu'ils créeront un compte.",
+    "modal": {
+      "phone": "Téléphone",
+      "city": "Ville",
+      "loyaltyPoints": "Points de fidélité",
+      "adjust": "Ajuster",
+      "totalSpent": "Total dépensé",
+      "orders": "Commandes",
+      "registered": "Inscrit",
+      "lastLogin": "Dernière connexion"
+    }
+  },
+  "rewardsPage": {
+    "title": "Récompenses de fidélité",
+    "subtitle": "Définissez ce que les clients peuvent obtenir avec leurs points",
+    "addReward": "Ajouter récompense",
+    "addFirstReward": "Ajouter première récompense",
+    "noRewards": "Pas encore de récompenses",
+    "noRewardsDesc": "Ajoutez des récompenses que les clients peuvent échanger avec leurs points.",
+    "points": "points",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "newReward": "Nouvelle récompense",
+    "editReward": "Modifier récompense",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette récompense?",
+    "howItWorks": {
+      "title": "Comment ça marche?",
+      "point1": "Les clients gagnent 1 point par €1 dépensé",
+      "point2": "Vous pouvez définir des récompenses que les clients peuvent échanger",
+      "point3": "Les clients voient leurs points sur leur page compte"
+    },
+    "types": {
+      "freeItem": "Article gratuit",
+      "fixedDiscount": "Réduction fixe",
+      "percentDiscount": "% Réduction",
+      "discountEuro": "Réduction €",
+      "discountPercent": "Réduction %",
+      "freeItemDesc": "Ex. boisson",
+      "fixedAmount": "Montant fixe",
+      "percentage": "Pourcentage"
+    },
+    "form": {
+      "name": "Nom de la récompense",
+      "namePlaceholder": "Ex. Boisson gratuite",
+      "description": "Description",
+      "descriptionPlaceholder": "Ex. Choix de soda ou café",
+      "pointsRequired": "Points requis",
+      "rewardType": "Type de récompense",
+      "discountAmount": "Montant de réduction (€)",
+      "discountPercentage": "Pourcentage de réduction (%)"
+    }
   },
   "productsPage": {
     "title": "Produits & Menu",

@@ -662,14 +662,16 @@
   },
   "customersPage": {
     "title": "Kunden",
-    "subtitle": "Ihre Kundendatenbank anzeigen",
+    "subtitle": "Verwalten Sie Ihre Kunden und Kundenkarten",
     "stats": {
       "totalCustomers": "Gesamtkunden",
+      "totalPoints": "Gesamtpunkte",
+      "totalRevenue": "Gesamtumsatz",
       "totalSpent": "Gesamtausgaben",
       "loyaltyPoints": "Treuepunkte",
       "avgPerCustomer": "Durchschn. pro Kunde"
     },
-    "search": "Nach Name, E-Mail oder Telefon suchen...",
+    "search": "Kunde nach Name, E-Mail oder Telefon suchen...",
     "table": {
       "customer": "Kunde",
       "contact": "Kontakt",
@@ -677,9 +679,60 @@
       "orders": "Bestellungen",
       "spent": "Ausgaben",
       "points": "Punkte",
-      "memberSince": "Mitglied seit"
+      "memberSince": "Seit"
     },
-    "noCustomers": "Noch keine Kunden gefunden"
+    "noCustomers": "Keine Kunden",
+    "noCustomersDesc": "Kunden erscheinen hier, wenn sie ein Konto erstellen.",
+    "modal": {
+      "phone": "Telefon",
+      "city": "Stadt",
+      "loyaltyPoints": "Treuepunkte",
+      "adjust": "Anpassen",
+      "totalSpent": "Gesamtausgaben",
+      "orders": "Bestellungen",
+      "registered": "Registriert",
+      "lastLogin": "Letzte Anmeldung"
+    }
+  },
+  "rewardsPage": {
+    "title": "Treuepunkte-Prämien",
+    "subtitle": "Legen Sie fest, was Kunden für ihre Punkte bekommen können",
+    "addReward": "Prämie hinzufügen",
+    "addFirstReward": "Erste Prämie hinzufügen",
+    "noRewards": "Noch keine Prämien",
+    "noRewardsDesc": "Fügen Sie Prämien hinzu, die Kunden mit ihren Treuepunkten einlösen können.",
+    "points": "Punkte",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "newReward": "Neue Prämie",
+    "editReward": "Prämie bearbeiten",
+    "confirmDelete": "Sind Sie sicher, dass Sie diese Prämie löschen möchten?",
+    "howItWorks": {
+      "title": "Wie funktioniert es?",
+      "point1": "Kunden verdienen 1 Punkt pro 1€ Ausgaben",
+      "point2": "Sie können Prämien festlegen, die Kunden einlösen können",
+      "point3": "Kunden sehen ihre Punkte auf ihrer Kontoseite"
+    },
+    "types": {
+      "freeItem": "Gratis Artikel",
+      "fixedDiscount": "Fester Rabatt",
+      "percentDiscount": "% Rabatt",
+      "discountEuro": "Rabatt €",
+      "discountPercent": "Rabatt %",
+      "freeItemDesc": "Z.B. Getränk",
+      "fixedAmount": "Fester Betrag",
+      "percentage": "Prozent"
+    },
+    "form": {
+      "name": "Name der Prämie",
+      "namePlaceholder": "Z.B. Gratis Getränk",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Z.B. Wahl aus Softdrink oder Kaffee",
+      "pointsRequired": "Benötigte Punkte",
+      "rewardType": "Art der Prämie",
+      "discountAmount": "Rabattbetrag (€)",
+      "discountPercentage": "Rabattprozent (%)"
+    }
   },
   "productsPage": {
     "title": "Produkte & Menü",
