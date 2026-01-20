@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -14,6 +14,7 @@ interface AdminLayoutProps {
 const menuItems = [
   {
     category: 'OVERZICHT',
+    icon: '📊',
     items: [
       { name: 'Dashboard', href: '', icon: '📊' },
       { name: 'Shop Display', href: '/display', icon: '🖥️', fullscreen: true },
@@ -23,6 +24,7 @@ const menuItems = [
   },
   {
     category: 'INSTELLINGEN',
+    icon: '⚙️',
     items: [
       { name: 'Zaak profiel', href: '/profiel', icon: '🏪' },
       { name: 'Openingstijden', href: '/openingstijden', icon: '🕐' },
@@ -32,6 +34,7 @@ const menuItems = [
   },
   {
     category: 'MENU',
+    icon: '🍽️',
     items: [
       { name: 'Categorieën', href: '/categorieen', icon: '📁' },
       { name: 'Producten', href: '/producten', icon: '🍟' },
@@ -41,6 +44,7 @@ const menuItems = [
   },
   {
     category: 'WEBSITE',
+    icon: '🌐',
     items: [
       { name: 'Design & kleuren', href: '/design', icon: '🎨' },
       { name: 'Foto\'s & media', href: '/media', icon: '📷' },
@@ -52,6 +56,7 @@ const menuItems = [
   },
   {
     category: 'MARKETING',
+    icon: '📣',
     items: [
       { name: 'QR-codes', href: '/qr-codes', icon: '📱' },
       { name: 'Promoties', href: '/promoties', icon: '🎁' },
@@ -60,6 +65,7 @@ const menuItems = [
   },
   {
     category: 'KLANTEN',
+    icon: '👥',
     items: [
       { name: 'Klanten', href: '/klanten', icon: '👥' },
       { name: 'Beloningen', href: '/klanten/beloningen', icon: '🎁' },
@@ -67,6 +73,7 @@ const menuItems = [
   },
   {
     category: 'PERSONEEL',
+    icon: '👔',
     items: [
       { name: 'Medewerkers', href: '/personeel', icon: '👥' },
       { name: 'Uren registratie', href: '/uren', icon: '⏰' },
@@ -75,12 +82,14 @@ const menuItems = [
   },
   {
     category: 'BOEKHOUDING',
+    icon: '📒',
     items: [
       { name: 'SCRADA', href: '/scrada', icon: '📊' },
     ]
   },
   {
     category: 'BESTELLINGEN',
+    icon: '📦',
     items: [
       { name: 'Bestellingen', href: '/bestellingen', icon: '📦' },
       { name: 'Reserveringen', href: '/reserveringen', icon: '📅' },
@@ -88,6 +97,7 @@ const menuItems = [
   },
   {
     category: 'STATISTIEKEN',
+    icon: '📈',
     items: [
       { name: 'Bedrijfsanalyse', href: '/analyse', icon: '📊' },
       { name: 'Verkoop', href: '/verkoop', icon: '💰' },
@@ -201,6 +211,33 @@ function SidebarContent({
   onClose?: () => void
   onToggle?: () => void
 }) {
+  const pathname = usePathname()
+  const [expandedSections, setExpandedSections] = useState<string[]>([])
+
+  // Auto-expand section that contains active item
+  useEffect(() => {
+    menuItems.forEach((section) => {
+      const hasActiveItem = section.items.some((item) => isActive(item.href))
+      if (hasActiveItem && !expandedSections.includes(section.category)) {
+        setExpandedSections(prev => [...prev, section.category])
+      }
+    })
+  }, [pathname])
+
+  const toggleSection = (category: string) => {
+    setExpandedSections(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    )
+  }
+
+  const isSectionExpanded = (category: string) => expandedSections.includes(category)
+  
+  const hasActiveItemInSection = (section: typeof menuItems[0]) => {
+    return section.items.some((item) => isActive(item.href))
+  }
+
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
@@ -239,51 +276,86 @@ function SidebarContent({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-4">
-        {menuItems.map((section) => (
-          <div key={section.category} className="mb-6">
-            {!collapsed && (
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-3">
-                {section.category}
-              </h2>
-            )}
-            <ul className="space-y-1">
-              {section.items.map((item) => {
-                // Fullscreen displays open in new routes
-                const getHref = () => {
-                  if (item.fullscreen) {
-                    if (item.href === '/display') return `/shop/${tenant}/display`
-                    if (item.href === '/keuken') return `/keuken/${tenant}`
-                  }
-                  return `${baseUrl}${item.href}`
-                }
-                
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={getHref()}
-                      onClick={onClose}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
-                        isActive(item.href)
-                          ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                          : 'text-gray-600 hover:bg-gray-100'
-                      } ${item.fullscreen ? 'border-2 border-dashed border-gray-300' : ''}`}
-                      title={collapsed ? item.name : undefined}
-                    >
-                      <span className="text-lg">{item.icon}</span>
-                      {!collapsed && (
-                        <span className="font-medium flex items-center gap-2">
-                          {item.name}
-                          {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
-                        </span>
-                      )}
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        ))}
+      <nav className="flex-1 overflow-y-auto py-2">
+        {menuItems.map((section) => {
+          const isExpanded = isSectionExpanded(section.category)
+          const hasActive = hasActiveItemInSection(section)
+          
+          return (
+            <div key={section.category} className="mb-1">
+              {/* Category Header - Clickable */}
+              <button
+                onClick={() => !collapsed && toggleSection(section.category)}
+                className={`w-full flex items-center justify-between px-4 py-3 transition-all ${
+                  hasActive 
+                    ? 'bg-orange-50 text-orange-600 border-l-4 border-orange-500' 
+                    : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'
+                } ${collapsed ? 'justify-center' : ''}`}
+                title={collapsed ? section.category : undefined}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">{section.icon}</span>
+                  {!collapsed && (
+                    <span className="font-semibold text-sm">{section.category}</span>
+                  )}
+                </div>
+                {!collapsed && (
+                  <svg 
+                    className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                )}
+              </button>
+              
+              {/* Submenu Items */}
+              <AnimatePresence initial={false}>
+                {!collapsed && isExpanded && (
+                  <motion.ul
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden bg-gray-50"
+                  >
+                    {section.items.map((item) => {
+                      const getHref = () => {
+                        if (item.fullscreen) {
+                          if (item.href === '/display') return `/shop/${tenant}/display`
+                          if (item.href === '/keuken') return `/keuken/${tenant}`
+                        }
+                        return `${baseUrl}${item.href}`
+                      }
+                      
+                      return (
+                        <li key={item.href}>
+                          <Link
+                            href={getHref()}
+                            onClick={onClose}
+                            className={`flex items-center gap-3 pl-12 pr-4 py-2.5 transition-all ${
+                              isActive(item.href)
+                                ? 'bg-orange-500 text-white'
+                                : 'text-gray-600 hover:bg-gray-100'
+                            } ${item.fullscreen ? 'border-l-2 border-dashed border-gray-300' : ''}`}
+                          >
+                            <span className="text-base">{item.icon}</span>
+                            <span className="text-sm flex items-center gap-2">
+                              {item.name}
+                              {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
+                            </span>
+                          </Link>
+                        </li>
+                      )
+                    })}
+                  </motion.ul>
+                )}
+              </AnimatePresence>
+            </div>
+          )
+        })}
       </nav>
 
       {/* Footer */}
