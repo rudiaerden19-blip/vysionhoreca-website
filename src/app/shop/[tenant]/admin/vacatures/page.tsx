@@ -70,7 +70,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      setError('Opslaan mislukt. Probeer opnieuw.')
+      setError(t('adminPages.common.saveFailed'))
     }
     setSaving(false)
   }
@@ -95,8 +95,8 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vacatures</h1>
-          <p className="text-gray-500">Laat bezoekers weten dat je personeel zoekt</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('vacaturesPage.title')}</h1>
+          <p className="text-gray-500">{t('vacaturesPage.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -146,7 +146,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
         className="bg-white rounded-2xl p-6 shadow-sm"
       >
         <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-          <span>📢</span> Personeel zoeken
+          <span>📢</span> {t('vacaturesPage.lookingForStaff')}
         </h2>
         
         <div className="space-y-6">
@@ -154,9 +154,9 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Vacature sectie tonen op website
+                {t('vacaturesPage.showOnWebsite')}
               </label>
-              <p className="text-sm text-gray-500">Zichtbaar tussen reservaties en reviews</p>
+              <p className="text-sm text-gray-500">{t('vacaturesPage.showOnWebsiteDesc')}</p>
             </div>
             <button
               type="button"
@@ -184,7 +184,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
             >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Titel
+                  {t('vacaturesPage.titleLabel')}
                 </label>
                 <input
                   type="text"
@@ -192,13 +192,13 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
                   value={formData.hiring_title || ''}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="Wij zoeken personeel"
+                  placeholder={t('vacaturesPage.titlePlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Beschrijving
+                  {t('vacaturesPage.descriptionLabel')}
                 </label>
                 <textarea
                   name="hiring_description"
@@ -206,20 +206,14 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
                   onChange={handleChange}
                   rows={6}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
-                  placeholder="Beschrijf welke functies je zoekt, werkuren, wat je biedt...
-
-Bijvoorbeeld:
-- Flexibele werkuren
-- Weekendwerk mogelijk
-- Gezellig team
-- Competitief loon"
+                  placeholder={t('vacaturesPage.descriptionPlaceholder')}
                 />
-                <p className="text-sm text-gray-500 mt-1">Tip: Gebruik enters voor een duidelijke opsomming</p>
+                <p className="text-sm text-gray-500 mt-1">{t('vacaturesPage.descriptionTip')}</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Contact voor sollicitaties
+                  {t('vacaturesPage.contactLabel')}
                 </label>
                 <input
                   type="text"
@@ -227,9 +221,9 @@ Bijvoorbeeld:
                   value={formData.hiring_contact || ''}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  placeholder="Email of telefoonnummer"
+                  placeholder={t('vacaturesPage.contactPlaceholder')}
                 />
-                <p className="text-sm text-gray-500 mt-1">Bijv. solliciteer@jouwzaak.be of +32 123 45 67 89</p>
+                <p className="text-sm text-gray-500 mt-1">{t('vacaturesPage.contactTip')}</p>
               </div>
             </motion.div>
           )}
@@ -245,11 +239,11 @@ Bijvoorbeeld:
           className="mt-6 bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-2xl p-6"
         >
           <h3 className="font-semibold text-orange-900 mb-4 flex items-center gap-2">
-            <span>👁️</span> Preview op website
+            <span>👁️</span> {t('vacaturesPage.preview')}
           </h3>
           <div className="bg-white rounded-xl p-6 shadow-sm">
-            <p className="text-sm text-orange-600 font-medium uppercase tracking-wider">Kom bij ons team</p>
-            <h4 className="text-2xl font-bold text-gray-900 mt-1">{formData.hiring_title || 'Wij zoeken personeel'}</h4>
+            <p className="text-sm text-orange-600 font-medium uppercase tracking-wider">{t('vacaturesPage.joinOurTeam')}</p>
+            <h4 className="text-2xl font-bold text-gray-900 mt-1">{formData.hiring_title || t('vacaturesPage.titlePlaceholder')}</h4>
             {formData.hiring_description && (
               <p className="text-gray-600 mt-4 whitespace-pre-line">{formData.hiring_description}</p>
             )}
@@ -271,12 +265,12 @@ Bijvoorbeeld:
         transition={{ delay: 0.2 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 Tips voor een goede vacature</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('vacaturesPage.tips.title')}</h3>
         <ul className="text-blue-700 text-sm space-y-1">
-          <li>• Wees specifiek over welke functies je zoekt</li>
-          <li>• Vermeld de werkuren (flexibel, weekend, etc.)</li>
-          <li>• Benoem wat je biedt (sfeer, loon, voordelen)</li>
-          <li>• Gebruik een duidelijk contactadres</li>
+          <li>• {t('vacaturesPage.tips.tip1')}</li>
+          <li>• {t('vacaturesPage.tips.tip2')}</li>
+          <li>• {t('vacaturesPage.tips.tip3')}</li>
+          <li>• {t('vacaturesPage.tips.tip4')}</li>
         </ul>
       </motion.div>
     </div>

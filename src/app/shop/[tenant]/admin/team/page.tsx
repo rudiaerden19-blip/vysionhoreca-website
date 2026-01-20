@@ -49,19 +49,19 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Weet je zeker dat je dit teamlid wilt verwijderen?')) return
+    if (!confirm(t('websiteTeam.confirmDelete'))) return
     
     const success = await deleteTeamMember(id)
     if (success) {
       setMembers(prev => prev.filter(m => m.id !== id))
     } else {
-      alert('Verwijderen mislukt')
+      alert(t('websiteTeam.deleteFailed'))
     }
   }
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      alert('Vul een naam in')
+      alert(t('websiteTeam.nameRequired'))
       return
     }
 
@@ -82,7 +82,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
       setShowModal(false)
       loadMembers()
     } else {
-      alert('Opslaan mislukt')
+      alert(t('websiteTeam.saveFailed'))
     }
     
     setSaving(false)

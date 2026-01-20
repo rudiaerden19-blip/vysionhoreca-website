@@ -23,17 +23,25 @@ import {
   ABSENCE_TYPES,
 } from '@/lib/admin-api'
 
-const MONTHS = [
-  'Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni',
-  'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'
+const getMonths = (t: (key: string) => string) => [
+  t('urenPage.months.january'), t('urenPage.months.february'), t('urenPage.months.march'),
+  t('urenPage.months.april'), t('urenPage.months.may'), t('urenPage.months.june'),
+  t('urenPage.months.july'), t('urenPage.months.august'), t('urenPage.months.september'),
+  t('urenPage.months.october'), t('urenPage.months.november'), t('urenPage.months.december')
 ]
 
-const DAYS = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
+const getDays = (t: (key: string) => string) => [
+  t('urenPage.days.mon'), t('urenPage.days.tue'), t('urenPage.days.wed'),
+  t('urenPage.days.thu'), t('urenPage.days.fri'), t('urenPage.days.sat'), t('urenPage.days.sun')
+]
 
 export default function UrenPage() {
   const { t } = useLanguage()
   const params = useParams()
   const tenant = params.tenant as string
+  
+  const MONTHS = getMonths(t)
+  const DAYS = getDays(t)
   
   const [staff, setStaff] = useState<Staff[]>([])
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null)
@@ -202,13 +210,13 @@ export default function UrenPage() {
       setEditingEntry(null)
       loadData()
     } else {
-      alert('Opslaan mislukt')
+      alert(t('adminPages.common.saveFailed'))
     }
   }
 
   async function handleDeleteEntry(entry: TimesheetEntry) {
     if (!entry.id) return
-    if (!confirm('Weet je zeker dat je deze uren wilt verwijderen?')) return
+    if (!confirm(t('urenPage.confirmDeleteHours'))) return
     
     const success = await deleteTimesheetEntry(entry.id)
     if (success) {
@@ -218,7 +226,7 @@ export default function UrenPage() {
 
   async function handleApproveAll() {
     if (!selectedStaff?.id) return
-    if (!confirm('Alle uren voor deze maand goedkeuren?')) return
+    if (!confirm(t('urenPage.confirmApproveAll'))) return
     
     const success = await approveTimesheetEntries(tenant, selectedStaff.id, selectedYear, selectedMonth, selectedStaff.id)
     if (success) {
@@ -228,7 +236,7 @@ export default function UrenPage() {
 
   async function handleCloseMonth() {
     if (!selectedStaff?.id) return
-    if (!confirm('Maand afsluiten? Na afsluiting kunnen uren niet meer worden gewijzigd.')) return
+    if (!confirm(t('urenPage.confirmCloseMonth'))) return
     
     const success = await closeMonthlyTimesheet(tenant, selectedStaff.id, selectedYear, selectedMonth, selectedStaff.id)
     if (success) {
@@ -238,7 +246,7 @@ export default function UrenPage() {
 
   async function handleReopenMonth() {
     if (!selectedStaff?.id || !reopenReason.trim()) {
-      alert('Vul een reden in voor het heropenen')
+      alert(t('urenPage.reopenReasonRequired'))
       return
     }
     
@@ -258,7 +266,7 @@ export default function UrenPage() {
       setReopenReason('')
       loadData()
     } else {
-      alert('Heropenen mislukt')
+      alert(t('urenPage.reopenFailed'))
     }
   }
 
@@ -438,13 +446,13 @@ Met vriendelijke groeten`,
     return (
       <div className="bg-white rounded-xl p-12 text-center shadow-sm border">
         <div className="text-5xl mb-4">👥</div>
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Geen medewerkers</h2>
-        <p className="text-gray-600 mb-6">Voeg eerst medewerkers toe bij Personeel</p>
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">{t('urenPage.noStaff')}</h2>
+        <p className="text-gray-600 mb-6">{t('urenPage.noStaffDesc')}</p>
         <a
           href={`/shop/${tenant}/admin/personeel`}
           className="inline-block px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
         >
-          Naar Personeel
+          {t('urenPage.goToStaff')}
         </a>
       </div>
     )
@@ -455,8 +463,8 @@ Met vriendelijke groeten`,
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-4 print:hidden">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">📅 Uren Registratie</h1>
-          <p className="text-gray-600">Beheer werkuren en verzuim per medewerker</p>
+          <h1 className="text-2xl font-bold text-gray-800">📅 {t('urenPage.title')}</h1>
+          <p className="text-gray-600">{t('urenPage.subtitle')}</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -489,7 +497,7 @@ Met vriendelijke groeten`,
       {/* Filters */}
       <div className="bg-white rounded-xl p-4 shadow-sm border flex flex-wrap gap-4 items-center print:hidden">
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Medewerker</label>
+          <label className="block text-xs text-gray-500 mb-1">{t('urenPage.employee')}</label>
           <select
             value={selectedStaff?.id || ''}
             onChange={(e) => setSelectedStaff(staff.find(s => s.id === e.target.value) || null)}
@@ -502,7 +510,7 @@ Met vriendelijke groeten`,
         </div>
         
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Maand</label>
+          <label className="block text-xs text-gray-500 mb-1">{t('urenPage.month')}</label>
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
@@ -515,7 +523,7 @@ Met vriendelijke groeten`,
         </div>
         
         <div>
-          <label className="block text-xs text-gray-500 mb-1">Jaar</label>
+          <label className="block text-xs text-gray-500 mb-1">{t('urenPage.year')}</label>
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
@@ -534,21 +542,21 @@ Met vriendelijke groeten`,
           disabled={monthlyTimesheet?.is_closed}
           className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
         >
-          ✓ Alles goedkeuren
+          ✓ {t('urenPage.approveAll')}
         </button>
         {monthlyTimesheet?.is_closed ? (
           <button
             onClick={() => setShowReopenModal(true)}
             className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
           >
-            🔓 Maand heropenen
+            🔓 {t('urenPage.reopenMonth')}
           </button>
         ) : (
           <button
             onClick={handleCloseMonth}
             className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
           >
-            🔒 Maand afsluiten
+            🔒 {t('urenPage.closeMonth')}
           </button>
         )}
       </div>
@@ -622,23 +630,23 @@ Met vriendelijke groeten`,
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl p-4 shadow-sm border print:border-black">
           <div className="text-2xl font-bold text-green-600">{totalWorked.toFixed(1)}u</div>
-          <div className="text-gray-600 text-sm">Gewerkt</div>
+          <div className="text-gray-600 text-sm">{t('urenPage.worked')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border print:border-black">
           <div className="text-2xl font-bold text-red-600">{totalSick.toFixed(1)}u</div>
-          <div className="text-gray-600 text-sm">Ziekte</div>
+          <div className="text-gray-600 text-sm">{t('urenPage.sick')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border print:border-black">
           <div className="text-2xl font-bold text-blue-600">{totalVacation.toFixed(1)}u</div>
-          <div className="text-gray-600 text-sm">Vakantie</div>
+          <div className="text-gray-600 text-sm">{t('urenPage.vacation')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border print:border-black">
           <div className="text-2xl font-bold text-orange-600">{totalOther.toFixed(1)}u</div>
-          <div className="text-gray-600 text-sm">Overig</div>
+          <div className="text-gray-600 text-sm">{t('urenPage.other')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border print:border-black">
           <div className="text-2xl font-bold text-gray-800">{totalHours.toFixed(1)}u</div>
-          <div className="text-gray-600 text-sm">Totaal</div>
+          <div className="text-gray-600 text-sm">{t('urenPage.total')}</div>
           {selectedStaff?.hours_per_week && (
             <div className="text-xs text-gray-500 mt-1">
               Contract: {(selectedStaff.hours_per_week * 4.33).toFixed(1)}u/maand
@@ -839,7 +847,7 @@ Met vriendelijke groeten`,
 
       {/* Legend */}
       <div className="bg-white rounded-xl p-4 shadow-sm border print:hidden">
-        <h3 className="font-medium text-gray-800 mb-3">Legenda</h3>
+        <h3 className="font-medium text-gray-800 mb-3">{t('urenPage.legend')}</h3>
         <div className="flex flex-wrap gap-3">
           {ABSENCE_TYPES.map(type => (
             <div key={type.id} className="flex items-center gap-1 text-sm">
@@ -868,7 +876,7 @@ Met vriendelijke groeten`,
               {/* Bestaande entries voor deze dag */}
               {!editingEntry && getEntriesForDate(new Date(selectedDate)).length > 0 && (
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Bestaande registraties</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('urenPage.existingEntries')}</label>
                   <div className="space-y-2">
                     {getEntriesForDate(new Date(selectedDate)).map((entry) => {
                       const absenceType = ABSENCE_TYPES.find(t => t.id === entry.absence_type)
@@ -912,13 +920,13 @@ Met vriendelijke groeten`,
                     })}
                   </div>
                   <div className="border-t my-4 pt-4">
-                    <p className="text-sm font-medium text-gray-700">➕ Nieuwe registratie toevoegen:</p>
+                    <p className="text-sm font-medium text-gray-700">➕ {t('urenPage.addNewEntry')}:</p>
                   </div>
                 </div>
               )}
               {/* Absence Type Selector */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('urenPage.type')}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {ABSENCE_TYPES.slice(0, 6).map(type => (
                     <button
@@ -957,7 +965,7 @@ Met vriendelijke groeten`,
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Inkloktijd</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('urenPage.clockIn')}</label>
                       <input
                         type="time"
                         value={entryForm.clock_in || ''}
@@ -970,7 +978,7 @@ Met vriendelijke groeten`,
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Uitkloktijd</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('urenPage.clockOut')}</label>
                       <input
                         type="time"
                         value={entryForm.clock_out || ''}
@@ -986,7 +994,7 @@ Met vriendelijke groeten`,
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Pauze (min)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('urenPage.breakMin')}</label>
                       <input
                         type="number"
                         value={entryForm.break_minutes || 0}
@@ -1001,7 +1009,7 @@ Met vriendelijke groeten`,
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Gewerkte uren</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('urenPage.workedHours')}</label>
                       <input
                         type="number"
                         value={entryForm.worked_hours || 0}
@@ -1018,7 +1026,7 @@ Met vriendelijke groeten`,
               {/* Absence Hours */}
               {entryForm.absence_type !== 'WORKED' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Uren</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('urenPage.hours')}</label>
                   <input
                     type="number"
                     value={entryForm.absence_hours || 8}
@@ -1033,13 +1041,13 @@ Met vriendelijke groeten`,
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Notities</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('urenPage.notes')}</label>
                 <textarea
                   value={entryForm.notes || ''}
                   onChange={(e) => setEntryForm({ ...entryForm, notes: e.target.value })}
                   rows={2}
                   className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  placeholder="Optionele opmerkingen..."
+                  placeholder={t('urenPage.notesPlaceholder')}
                 />
               </div>
             </div>
@@ -1054,7 +1062,7 @@ Met vriendelijke groeten`,
                   }}
                   className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition"
                 >
-                  🗑️ Verwijderen
+                  🗑️ {t('urenPage.delete')}
                 </button>
               ) : (
                 <div />
@@ -1067,14 +1075,14 @@ Met vriendelijke groeten`,
                   }}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
                 >
-                  Annuleren
+                  {t('adminPages.common.cancel')}
                 </button>
                 <button
                   onClick={handleSaveEntry}
                   disabled={saving}
                   className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
                 >
-                  {saving ? 'Opslaan...' : editingEntry ? 'Bijwerken' : 'Toevoegen'}
+                  {saving ? `${t('adminPages.common.saving')}...` : editingEntry ? t('urenPage.update') : t('urenPage.add')}
                 </button>
               </div>
             </div>
@@ -1270,7 +1278,7 @@ Met vriendelijke groeten`,
           <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
             <div className="p-6 border-b">
               <h2 className="text-xl font-bold text-gray-800">
-                🔓 Maand heropenen
+                🔓 {t('urenPage.reopenMonth')}
               </h2>
               <p className="text-gray-600 text-sm mt-1">
                 {selectedStaff?.name} - {MONTHS[selectedMonth - 1]} {selectedYear}
@@ -1323,7 +1331,7 @@ Met vriendelijke groeten`,
                 }}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
               >
-                Annuleren
+                {t('adminPages.common.cancel')}
               </button>
               <button
                 onClick={handleReopenMonth}
@@ -1395,7 +1403,7 @@ Met vriendelijke groeten`,
                 onClick={() => setShowEmailModal(false)}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
               >
-                Annuleren
+                {t('adminPages.common.cancel')}
               </button>
               <button
                 onClick={sendToPayroll}
