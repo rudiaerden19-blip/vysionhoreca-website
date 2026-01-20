@@ -1,17 +1,7 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { loginRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-const getSupabase = () => {
-  if (!supabaseUrl || !supabaseKey) {
-    return null
-  }
-  return createClient(supabaseUrl, supabaseKey)
-}
+import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 // Legacy SHA-256 hash for backward compatibility
 async function hashPasswordLegacy(password: string): Promise<string> {
@@ -58,10 +48,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = getSupabase()
+    const supabase = getServerSupabaseClient()
     if (!supabase) {
+      console.error('Login failed: Supabase not configured')
       return NextResponse.json(
-        { error: 'Database configuratie niet beschikbaar' },
+        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
         { status: 503 }
       )
     }

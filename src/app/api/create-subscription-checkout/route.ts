@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 // Plan pricing in cents
 const planPrices: Record<string, number> = {
@@ -20,6 +15,16 @@ const planNames: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate Supabase configuration
+    const supabase = getServerSupabaseClient()
+    if (!supabase) {
+      console.error('Subscription checkout failed: Supabase not configured')
+      return NextResponse.json(
+        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
+        { status: 503 }
+      )
+    }
+
     const { tenantSlug, planId } = await request.json()
 
     if (!tenantSlug || !planId) {

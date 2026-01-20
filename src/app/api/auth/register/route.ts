@@ -1,24 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { isProtectedTenant } from '@/lib/protected-tenants'
 import bcrypt from 'bcryptjs'
 import { registerRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
+import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 // Secure password hashing with bcrypt
 async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12)
-}
-
-const getSupabase = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  
-  if (!supabaseUrl || !supabaseKey) {
-    console.error('Missing Supabase config:', { url: !!supabaseUrl, key: !!supabaseKey })
-    return null
-  }
-  
-  return createClient(supabaseUrl, supabaseKey)
 }
 
 export async function POST(request: NextRequest) {
@@ -50,10 +38,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = getSupabase()
+    const supabase = getServerSupabaseClient()
     if (!supabase) {
+      console.error('Registration failed: Supabase not configured')
       return NextResponse.json(
-        { error: 'Database configuratie niet beschikbaar' },
+        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
         { status: 503 }
       )
     }

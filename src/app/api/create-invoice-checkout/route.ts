@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createClient } from '@supabase/supabase-js'
+import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2023-10-16',
 })
-
-const getSupabase = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!supabaseUrl || !supabaseKey) return null
-  return createClient(supabaseUrl, supabaseKey)
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,11 +24,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = getSupabase()
+    const supabase = getServerSupabaseClient()
     if (!supabase) {
+      console.error('Invoice checkout failed: Supabase not configured')
       return NextResponse.json(
-        { error: 'Database niet beschikbaar' },
-        { status: 500 }
+        { error: 'Database niet geconfigureerd. Neem contact op met support.' },
+        { status: 503 }
       )
     }
 
