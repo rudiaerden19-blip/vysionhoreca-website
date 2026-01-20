@@ -32,6 +32,7 @@ import {
   ProductOption
 } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
+import { useLanguage } from '@/i18n'
 
 const ALLERGENS = [
   { id: 'gluten', name: 'Gluten', icon: '🌾' },

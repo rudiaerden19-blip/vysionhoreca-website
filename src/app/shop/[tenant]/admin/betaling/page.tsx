@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useLanguage } from '@/i18n'
 
 export default function BetalingPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [methods, setMethods] = useState({
     cash: true,
     bancontact: true,
@@ -22,20 +24,20 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
   }
 
   const paymentMethods = [
-    { id: 'cash', name: 'Contant', icon: '💵', description: 'Betalen bij afhalen/levering' },
-    { id: 'bancontact', name: 'Bancontact', icon: '💳', description: 'Belgische betaalkaart' },
-    { id: 'visa', name: 'Visa', icon: '💳', description: 'Kredietkaart' },
-    { id: 'mastercard', name: 'Mastercard', icon: '💳', description: 'Kredietkaart' },
-    { id: 'paypal', name: 'PayPal', icon: '🅿️', description: 'Online betalen' },
-    { id: 'ideal', name: 'iDEAL', icon: '🏦', description: 'Nederlandse banken' },
+    { id: 'cash', name: t('adminPages.betaling.cash'), icon: '💵', description: t('adminPages.betaling.cashDesc') },
+    { id: 'bancontact', name: t('adminPages.betaling.bancontact'), icon: '💳', description: t('adminPages.betaling.bancontactDesc') },
+    { id: 'visa', name: t('adminPages.betaling.visa'), icon: '💳', description: t('adminPages.betaling.visaDesc') },
+    { id: 'mastercard', name: t('adminPages.betaling.mastercard'), icon: '💳', description: t('adminPages.betaling.mastercardDesc') },
+    { id: 'paypal', name: t('adminPages.betaling.paypal'), icon: '🅿️', description: t('adminPages.betaling.paypalDesc') },
+    { id: 'ideal', name: t('adminPages.betaling.ideal'), icon: '🏦', description: t('adminPages.betaling.idealDesc') },
   ]
 
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Betaalmethodes & BTW</h1>
-          <p className="text-gray-500">Configureer hoe klanten kunnen betalen</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.betaling.title')}</h1>
+          <p className="text-gray-500">{t('adminPages.betaling.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -44,7 +46,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           disabled={saving}
           className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
         >
-          {saving ? '⏳' : '💾'} Opslaan
+          {saving ? '⏳' : '💾'} {t('adminPages.common.save')}
         </motion.button>
       </div>
 
@@ -55,7 +57,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         className="bg-white rounded-2xl p-6 shadow-sm mb-6"
       >
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span>💳</span> Betaalmethodes
+          <span>💳</span> {t('adminPages.betaling.methods')}
         </h2>
         <div className="space-y-3">
           {paymentMethods.map((method) => (
@@ -93,7 +95,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         className="bg-white rounded-2xl p-6 shadow-sm"
       >
         <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span>📊</span> BTW-tarief
+          <span>📊</span> {t('adminPages.betaling.vat')}
         </h2>
         <div className="grid grid-cols-3 gap-4">
           {['6', '12', '21'].map((rate) => (
@@ -111,7 +113,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           ))}
         </div>
         <p className="text-sm text-gray-500 mt-4">
-          💡 In België geldt 6% BTW voor afhaal, 12% voor ter plaatse consumptie
+          💡 {t('adminPages.betaling.vatRate')}
         </p>
       </motion.div>
 
@@ -122,12 +124,12 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         transition={{ delay: 0.2 }}
         className="mt-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-6 text-white"
       >
-        <h3 className="font-semibold text-lg mb-2">💡 Online betalingen activeren</h3>
+        <h3 className="font-semibold text-lg mb-2">💡 {t('adminPages.betaling.paypalDesc')}</h3>
         <p className="text-white/80 mb-4">
-          Wil je online betalingen accepteren? Neem contact op om Stripe of Mollie te koppelen.
+          Stripe / Mollie
         </p>
         <button className="bg-white text-blue-600 font-medium px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors">
-          Contact opnemen
+          Contact
         </button>
       </motion.div>
     </div>

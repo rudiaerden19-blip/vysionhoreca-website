@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useLanguage } from '@/i18n'
 
 const defaultAllergens = [
   { id: 'gluten', name: 'Gluten', icon: '🌾', enabled: true },

@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
+import { useLanguage } from '@/i18n'
 
 export default function ProfielPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -38,7 +40,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     cover_image_3: '',
   })
 
-  // Load data on mount
   useEffect(() => {
     async function loadData() {
       setLoading(true)
@@ -70,7 +71,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      setError('Opslaan mislukt. Probeer opnieuw.')
+      setError(t('adminPages.common.saveFailed'))
     }
     setSaving(false)
   }
@@ -84,7 +85,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
           />
-          <p className="text-gray-500">Laden...</p>
+          <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
       </div>
     )
@@ -95,8 +96,8 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Zaak profiel</h1>
-          <p className="text-gray-500">Beheer de basisinformatie van je zaak</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.profiel.title')}</h1>
+          <p className="text-gray-500">{t('adminPages.profiel.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -116,17 +117,17 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                 className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
               />
-              <span>Opslaan...</span>
+              <span>{t('adminPages.common.saving')}</span>
             </>
           ) : saved ? (
             <>
               <span>✓</span>
-              <span>Opgeslagen!</span>
+              <span>{t('adminPages.common.saved')}</span>
             </>
           ) : (
             <>
               <span>💾</span>
-              <span>Opslaan</span>
+              <span>{t('adminPages.common.save')}</span>
             </>
           )}
         </motion.button>
@@ -148,13 +149,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>🏪</span> Basisinformatie
+            <span>🏪</span> {t('adminPages.profiel.businessInfo')}
           </h2>
           
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Naam van je zaak *
+                {t('adminPages.profiel.businessName')} *
               </label>
               <input
                 type="text"
@@ -162,13 +163,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.business_name}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Bijv. Frituur De Gouden Friet"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tagline (korte tekst voor header)
+                {t('adminPages.profiel.tagline')}
               </label>
               <input
                 type="text"
@@ -176,14 +176,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.tagline || ''}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Bijv. De lekkerste frieten van de streek!"
               />
-              <p className="text-sm text-gray-500 mt-1">Dit verschijnt in de header en footer</p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Over Ons tekst
+                {t('adminPages.profiel.description')}
               </label>
               <textarea
                 name="description"
@@ -191,15 +189,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 onChange={handleChange}
                 rows={4}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
-                placeholder="Vertel je verhaal... Wie zijn jullie? Wat maakt jullie uniek?"
               />
-              <p className="text-sm text-gray-500 mt-1">Dit verschijnt bij de &quot;Over Ons&quot; sectie</p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Primaire kleur
+                  {t('adminPages.profiel.primaryColor')}
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -222,7 +218,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Secundaire kleur
+                  {t('adminPages.profiel.secondaryColor')}
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -254,13 +250,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>📍</span> Contactgegevens
+            <span>📍</span> {t('adminPages.profiel.contactInfo')}
           </h2>
           
           <div className="grid md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Straat + huisnummer
+                {t('adminPages.profiel.address')}
               </label>
               <input
                 type="text"
@@ -268,13 +264,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.address}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Kerkstraat 123"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Postcode
+                {t('adminPages.profiel.postalCode')}
               </label>
               <input
                 type="text"
@@ -282,13 +277,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.postal_code || ''}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="1234 AB"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Stad
+                {t('adminPages.profiel.city')}
               </label>
               <input
                 type="text"
@@ -296,13 +290,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.city || ''}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="Amsterdam"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Telefoonnummer
+                {t('adminPages.profiel.phone')}
               </label>
               <input
                 type="tel"
@@ -310,13 +303,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.phone}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="+32 11 12 34 56"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                E-mailadres
+                {t('adminPages.profiel.email')}
               </label>
               <input
                 type="email"
@@ -324,79 +316,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="info@jouwzaak.be"
               />
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Bedrijfsgegevens */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-          className="bg-white rounded-2xl p-6 shadow-sm"
-        >
-          <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>🏢</span> Bedrijfsgegevens
-          </h2>
-          <p className="text-sm text-gray-500 mb-4">Deze gegevens verschijnen op de kassabon (verplicht)</p>
-          
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                BTW-nummer *
-              </label>
-              <input
-                type="text"
-                name="btw_number"
-                value={formData.btw_number || ''}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="BE 0123.456.789"
-              />
-              <p className="text-xs text-gray-500 mt-1">Bijv. BE 0123.456.789 of NL123456789B01</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                BTW-percentage *
-              </label>
-              <div className="flex gap-2">
-                {[6, 9, 12, 21].map((pct) => (
-                  <button
-                    key={pct}
-                    type="button"
-                    onClick={() => {
-                      setFormData(prev => ({ ...prev, btw_percentage: pct }))
-                      setSaved(false)
-                    }}
-                    className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${
-                      formData.btw_percentage === pct
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {pct}%
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-gray-500 mt-1">Dit wordt gebruikt op de kassabon</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                KvK-nummer (alleen NL)
-              </label>
-              <input
-                type="text"
-                name="kvk_number"
-                value={formData.kvk_number || ''}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="12345678"
-              />
-              <p className="text-xs text-gray-500 mt-1">Alleen voor Nederlandse bedrijven</p>
             </div>
           </div>
         </motion.div>
@@ -409,13 +329,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>📱</span> Social Media
+            <span>📱</span> {t('adminPages.profiel.socialMedia')}
           </h2>
           
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <span>📘</span> Facebook
+                <span>📘</span> {t('adminPages.profiel.facebook')}
               </label>
               <input
                 type="url"
@@ -423,13 +343,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.facebook_url}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="https://facebook.com/jouwzaak"
+                placeholder="https://facebook.com/..."
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <span>📸</span> Instagram
+                <span>📸</span> {t('adminPages.profiel.instagram')}
               </label>
               <input
                 type="url"
@@ -437,13 +357,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.instagram_url}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="https://instagram.com/jouwzaak"
+                placeholder="https://instagram.com/..."
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <span>🎵</span> TikTok
+                <span>🎵</span> {t('adminPages.profiel.tiktok')}
               </label>
               <input
                 type="url"
@@ -451,13 +371,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.tiktok_url}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="https://tiktok.com/@jouwzaak"
+                placeholder="https://tiktok.com/@..."
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                <span>🌐</span> Website
+                <span>🌐</span> {t('adminPages.profiel.website')}
               </label>
               <input
                 type="url"
@@ -465,13 +385,13 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.website_url}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                placeholder="https://jouwzaak.be"
+                placeholder="https://..."
               />
             </div>
           </div>
         </motion.div>
 
-        {/* Foto's */}
+        {/* Logo */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -479,200 +399,18 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>📸</span> Foto&apos;s
+            <span>🖼️</span> {t('adminPages.profiel.logo')}
           </h2>
           
-          <div className="space-y-6">
-            {/* Header foto's */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Header foto&apos;s (3 foto&apos;s die rouleren)
-              </label>
-              <p className="text-sm text-gray-500 mb-4">Deze foto&apos;s verschijnen bovenaan je website</p>
-              
-              <div className="grid md:grid-cols-3 gap-4">
-                <MediaPicker
-                  tenantSlug={params.tenant}
-                  value={formData.cover_image_1 || ''}
-                  onChange={(url) => {
-                    setFormData(prev => ({ ...prev, cover_image_1: url }))
-                    setSaved(false)
-                  }}
-                />
-                <MediaPicker
-                  tenantSlug={params.tenant}
-                  value={formData.cover_image_2 || ''}
-                  onChange={(url) => {
-                    setFormData(prev => ({ ...prev, cover_image_2: url }))
-                    setSaved(false)
-                  }}
-                />
-                <MediaPicker
-                  tenantSlug={params.tenant}
-                  value={formData.cover_image_3 || ''}
-                  onChange={(url) => {
-                    setFormData(prev => ({ ...prev, cover_image_3: url }))
-                    setSaved(false)
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Over Ons foto */}
-            <div>
-              <MediaPicker
-                tenantSlug={params.tenant}
-                label="Over Ons foto"
-                value={formData.about_image || ''}
-                onChange={(url) => {
-                  setFormData(prev => ({ ...prev, about_image: url }))
-                  setSaved(false)
-                }}
-              />
-              <p className="text-sm text-gray-500 mt-2">Foto naast de &quot;Over Ons&quot; tekst</p>
-            </div>
-
-            {/* Topverkopers */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Topverkopers (3 foto&apos;s)
-              </label>
-              <p className="text-sm text-gray-500 mb-4">Deze foto&apos;s verschijnen in de &quot;Onze Meest Verkochte Producten&quot; sectie</p>
-              
-              <div className="grid md:grid-cols-3 gap-4">
-                <MediaPicker
-                  tenantSlug={params.tenant}
-                  value={formData.top_seller_1 || ''}
-                  onChange={(url) => {
-                    setFormData(prev => ({ ...prev, top_seller_1: url }))
-                    setSaved(false)
-                  }}
-                />
-                <MediaPicker
-                  tenantSlug={params.tenant}
-                  value={formData.top_seller_2 || ''}
-                  onChange={(url) => {
-                    setFormData(prev => ({ ...prev, top_seller_2: url }))
-                    setSaved(false)
-                  }}
-                />
-                <MediaPicker
-                  tenantSlug={params.tenant}
-                  value={formData.top_seller_3 || ''}
-                  onChange={(url) => {
-                    setFormData(prev => ({ ...prev, top_seller_3: url }))
-                    setSaved(false)
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Specialiteiten */}
-            <div className="pt-6 border-t border-gray-100">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Onze Specialiteiten (3 items)
-              </label>
-              <p className="text-sm text-gray-500 mb-4">Deze verschijnen op de homepage als &quot;Onze Specialiteiten&quot; sectie</p>
-              
-              <div className="space-y-6">
-                {/* Specialty 1 */}
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <p className="text-sm font-medium text-gray-700 mb-3">Specialiteit 1</p>
-                  <MediaPicker
-                    tenantSlug={params.tenant}
-                    label="Foto"
-                    value={formData.specialty_1_image || ''}
-                    onChange={(url) => {
-                      setFormData(prev => ({ ...prev, specialty_1_image: url }))
-                      setSaved(false)
-                    }}
-                  />
-                  <input
-                    type="text"
-                    name="specialty_1_title"
-                    value={formData.specialty_1_title || ''}
-                    onChange={handleChange}
-                    placeholder="Titel (bijv. Verse Frietjes)"
-                    className="mt-3 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  />
-                </div>
-
-                {/* Specialty 2 */}
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <p className="text-sm font-medium text-gray-700 mb-3">Specialiteit 2</p>
-                  <MediaPicker
-                    tenantSlug={params.tenant}
-                    label="Foto"
-                    value={formData.specialty_2_image || ''}
-                    onChange={(url) => {
-                      setFormData(prev => ({ ...prev, specialty_2_image: url }))
-                      setSaved(false)
-                    }}
-                  />
-                  <input
-                    type="text"
-                    name="specialty_2_title"
-                    value={formData.specialty_2_title || ''}
-                    onChange={handleChange}
-                    placeholder="Titel (bijv. Krokante Bitterballen)"
-                    className="mt-3 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  />
-                </div>
-
-                {/* Specialty 3 */}
-                <div className="bg-gray-50 p-4 rounded-xl">
-                  <p className="text-sm font-medium text-gray-700 mb-3">Specialiteit 3</p>
-                  <MediaPicker
-                    tenantSlug={params.tenant}
-                    label="Foto"
-                    value={formData.specialty_3_image || ''}
-                    onChange={(url) => {
-                      setFormData(prev => ({ ...prev, specialty_3_image: url }))
-                      setSaved(false)
-                    }}
-                  />
-                  <input
-                    type="text"
-                    name="specialty_3_title"
-                    value={formData.specialty_3_title || ''}
-                    onChange={handleChange}
-                    placeholder="Titel (bijv. Huisgemaakte Sauzen)"
-                    className="mt-3 w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* QR-codes toggle */}
-            <div className="pt-6 border-t border-gray-100">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    QR-codes sectie tonen
-                  </label>
-                  <p className="text-sm text-gray-500">Toon de 3 QR-codes (Menu, Promoties, Review) op de homepage</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFormData(prev => ({ ...prev, show_qr_codes: !prev.show_qr_codes }))
-                    setSaved(false)
-                  }}
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    formData.show_qr_codes ? 'bg-orange-500' : 'bg-gray-200'
-                  }`}
-                >
-                  <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      formData.show_qr_codes ? 'translate-x-5' : 'translate-x-0'
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
+          <MediaPicker
+            tenantSlug={params.tenant}
+            value={formData.logo_url || ''}
+            onChange={(url) => {
+              setFormData(prev => ({ ...prev, logo_url: url }))
+              setSaved(false)
+            }}
+          />
         </motion.div>
-
 
         {/* Preview Link */}
         <motion.div
@@ -683,15 +421,15 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
         >
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-lg">Bekijk je website</h3>
-              <p className="text-white/80 text-sm">Zie hoe je wijzigingen eruitzien op de live website</p>
+              <h3 className="font-semibold text-lg">{t('admin.viewWebsite')}</h3>
+              <p className="text-white/80 text-sm">{t('adminPages.profiel.subtitle')}</p>
             </div>
             <a
               href={`/shop/${params.tenant}`}
               target="_blank"
               className="bg-white text-orange-500 font-medium px-6 py-3 rounded-xl hover:bg-orange-50 transition-colors flex items-center gap-2"
             >
-              <span>Bekijk website</span>
+              <span>{t('admin.viewWebsite')}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>

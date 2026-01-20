@@ -26,6 +26,7 @@ import {
   ProductOption, 
   ProductOptionChoice 
 } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 
 // Sortable Choice Component
 function SortableChoice({ 

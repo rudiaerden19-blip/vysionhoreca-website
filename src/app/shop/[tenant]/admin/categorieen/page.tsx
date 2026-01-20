@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import { motion, Reorder } from 'framer-motion'
 import { getMenuCategories, saveMenuCategory, deleteMenuCategory, MenuCategory } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 
 export default function CategorieenPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
   const [newCategory, setNewCategory] = useState('')

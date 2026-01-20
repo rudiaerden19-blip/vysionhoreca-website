@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getDeliverySettings, saveDeliverySettings, DeliverySettings } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 
 export default function LeveringPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -24,7 +26,6 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
     payment_online: false,
   })
 
-  // Load data on mount
   useEffect(() => {
     async function loadData() {
       setLoading(true)
@@ -53,7 +54,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      setError('Opslaan mislukt. Probeer opnieuw.')
+      setError(t('adminPages.common.saveFailed'))
     }
     setSaving(false)
   }
@@ -67,7 +68,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
           />
-          <p className="text-gray-500">Laden...</p>
+          <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
       </div>
     )
@@ -78,8 +79,8 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Levering & afhaal</h1>
-          <p className="text-gray-500">Beheer hoe klanten kunnen bestellen</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.levering.title')}</h1>
+          <p className="text-gray-500">{t('adminPages.levering.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -99,17 +100,17 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                 className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
               />
-              <span>Opslaan...</span>
+              <span>{t('adminPages.common.saving')}</span>
             </>
           ) : saved ? (
             <>
               <span>✓</span>
-              <span>Opgeslagen!</span>
+              <span>{t('adminPages.common.saved')}</span>
             </>
           ) : (
             <>
               <span>💾</span>
-              <span>Opslaan</span>
+              <span>{t('adminPages.common.save')}</span>
             </>
           )}
         </motion.button>
@@ -133,8 +134,8 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             <div className="flex items-center gap-4">
               <span className="text-3xl">🛍️</span>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Afhalen</h2>
-                <p className="text-gray-500 text-sm">Klanten halen bestelling op bij je zaak</p>
+                <h2 className="text-lg font-semibold text-gray-900">{t('adminPages.levering.pickup.title')}</h2>
+                <p className="text-gray-500 text-sm">{t('adminPages.levering.pickup.enabled')}</p>
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -152,12 +153,11 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bereidingstijd (minuten)
+                  {t('adminPages.levering.pickup.time')}
                 </label>
                 <input
                   type="number"
                   min="0"
-                  placeholder="Bijv. 15"
                   value={settings.pickup_time_minutes || ''}
                   onChange={(e) => handleChange('pickup_time_minutes', Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -178,8 +178,8 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             <div className="flex items-center gap-4">
               <span className="text-3xl">🚗</span>
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Levering</h2>
-                <p className="text-gray-500 text-sm">Bestellingen worden thuisbezorgd</p>
+                <h2 className="text-lg font-semibold text-gray-900">{t('adminPages.levering.delivery.title')}</h2>
+                <p className="text-gray-500 text-sm">{t('adminPages.levering.delivery.enabled')}</p>
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -197,12 +197,11 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             <div className="grid md:grid-cols-2 gap-4 pt-4 border-t">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Levertijd (minuten)
+                  {t('adminPages.levering.delivery.time')}
                 </label>
                 <input
                   type="number"
                   min="0"
-                  placeholder="Bijv. 30"
                   value={settings.delivery_time_minutes || ''}
                   onChange={(e) => handleChange('delivery_time_minutes', Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -211,7 +210,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Leveringskosten
+                  {t('adminPages.levering.delivery.fee')}
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
@@ -219,7 +218,6 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                     type="number"
                     min="0"
                     step="0.01"
-                    placeholder="Bijv. 2.50"
                     value={settings.delivery_fee || ''}
                     onChange={(e) => handleChange('delivery_fee', Math.max(0, parseFloat(e.target.value) || 0))}
                     className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -229,12 +227,11 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bezorgradius (km)
+                  {t('adminPages.levering.delivery.radius')}
                 </label>
                 <input
                   type="number"
                   min="0"
-                  placeholder="Bijv. 10"
                   value={settings.delivery_radius_km || ''}
                   onChange={(e) => handleChange('delivery_radius_km', Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -243,7 +240,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Minimumbedrag
+                  {t('adminPages.levering.delivery.minOrder')}
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
@@ -251,7 +248,6 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                     type="number"
                     min="0"
                     step="0.01"
-                    placeholder="Bijv. 15"
                     value={settings.min_order_amount || ''}
                     onChange={(e) => handleChange('min_order_amount', Math.max(0, parseFloat(e.target.value) || 0))}
                     className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
@@ -270,7 +266,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span>💳</span> Betaalmethodes
+            <span>💳</span> {t('adminPages.betaling.methods')}
           </h2>
           
           <div className="space-y-4">
@@ -283,8 +279,8 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
               />
               <span className="text-2xl">💵</span>
               <div>
-                <p className="font-medium text-gray-900">Cash</p>
-                <p className="text-sm text-gray-500">Klanten betalen bij levering of afhaling</p>
+                <p className="font-medium text-gray-900">{t('adminPages.betaling.cash')}</p>
+                <p className="text-sm text-gray-500">{t('adminPages.betaling.cashDesc')}</p>
               </div>
             </label>
 
@@ -297,8 +293,8 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
               />
               <span className="text-2xl">💳</span>
               <div>
-                <p className="font-medium text-gray-900">Bancontact / Kaart</p>
-                <p className="text-sm text-gray-500">Betalen met bankkaart bij levering of afhaling</p>
+                <p className="font-medium text-gray-900">{t('adminPages.betaling.bancontact')}</p>
+                <p className="text-sm text-gray-500">{t('adminPages.betaling.bancontactDesc')}</p>
               </div>
             </label>
 
@@ -311,8 +307,8 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
               />
               <span className="text-2xl">🌐</span>
               <div>
-                <p className="font-medium text-gray-900">Online betalen</p>
-                <p className="text-sm text-gray-500">Klanten betalen vooraf via de website</p>
+                <p className="font-medium text-gray-900">{t('adminPages.betaling.paypal')}</p>
+                <p className="text-sm text-gray-500">{t('adminPages.betaling.paypalDesc')}</p>
               </div>
             </label>
           </div>
@@ -325,41 +321,41 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
           transition={{ delay: 0.3 }}
           className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 text-white"
         >
-          <h3 className="font-semibold text-lg mb-4">Samenvatting</h3>
+          <h3 className="font-semibold text-lg mb-4">Preview</h3>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-white/10 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span>🛍️</span>
-                <span className="font-medium">Afhalen</span>
+                <span className="font-medium">{t('adminPages.levering.pickup.title')}</span>
               </div>
               <p className="text-white/80 text-sm">
                 {settings.pickup_enabled 
-                  ? `Klaar in ${settings.pickup_time_minutes} min` 
-                  : 'Uitgeschakeld'}
+                  ? `${settings.pickup_time_minutes} min` 
+                  : t('adminPages.common.disabled')}
               </p>
             </div>
             <div className="bg-white/10 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span>🚗</span>
-                <span className="font-medium">Levering</span>
+                <span className="font-medium">{t('adminPages.levering.delivery.title')}</span>
               </div>
               <p className="text-white/80 text-sm">
                 {settings.delivery_enabled 
                   ? `€${settings.delivery_fee} · ${settings.delivery_radius_km}km · min €${settings.min_order_amount}` 
-                  : 'Uitgeschakeld'}
+                  : t('adminPages.common.disabled')}
               </p>
             </div>
             <div className="bg-white/10 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span>💳</span>
-                <span className="font-medium">Betaling</span>
+                <span className="font-medium">{t('adminPages.betaling.methods')}</span>
               </div>
               <p className="text-white/80 text-sm">
                 {[
-                  settings.payment_cash && 'Cash',
-                  settings.payment_card && 'Kaart',
+                  settings.payment_cash && t('adminPages.betaling.cash'),
+                  settings.payment_card && t('adminPages.betaling.bancontact'),
                   settings.payment_online && 'Online',
-                ].filter(Boolean).join(', ') || 'Geen'}
+                ].filter(Boolean).join(', ') || '-'}
               </p>
             </div>
           </div>
