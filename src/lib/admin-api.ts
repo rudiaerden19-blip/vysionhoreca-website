@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { cache, CACHE_TTL, cacheKey } from './cache'
+import bcrypt from 'bcryptjs'
 
 // =====================================================
 // TENANT SETTINGS
@@ -1491,13 +1492,35 @@ export interface Customer {
   last_login?: string
 }
 
-// Simple hash for demo - in production use bcrypt
+// Secure password hashing with bcrypt
 async function hashPassword(password: string): Promise<string> {
+  // Use bcrypt with 12 rounds (secure + fast enough)
+  return bcrypt.hash(password, 12)
+}
+
+// Legacy SHA-256 hash for backward compatibility with old passwords
+async function hashPasswordLegacy(password: string): Promise<string> {
   const encoder = new TextEncoder()
   const data = encoder.encode(password + 'vysion_salt_2024')
   const hashBuffer = await crypto.subtle.digest('SHA-256', data)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+// Verify password - supports both bcrypt and legacy SHA-256
+export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  // Bcrypt hashes start with $2a$, $2b$, or $2y$
+  if (storedHash.startsWith('$2')) {
+    return bcrypt.compare(password, storedHash)
+  }
+  // Legacy SHA-256 fallback for old passwords
+  const legacyHash = await hashPasswordLegacy(password)
+  return legacyHash === storedHash
+}
+
+// Check if a hash needs to be upgraded from legacy to bcrypt
+export function needsHashUpgrade(storedHash: string): boolean {
+  return !storedHash.startsWith('$2')
 }
 
 export async function registerCustomer(
@@ -1552,18 +1575,32 @@ export async function loginCustomer(
   email: string, 
   password: string
 ): Promise<{ success: boolean; customer?: Customer; error?: string }> {
-  const password_hash = await hashPassword(password)
-  
+  // First, find the customer by email
   const { data, error } = await supabase
     .from('shop_customers')
     .select('*')
     .eq('tenant_slug', tenantSlug)
     .eq('email', email.toLowerCase())
-    .eq('password_hash', password_hash)
     .single()
   
   if (error || !data) {
     return { success: false, error: 'Onjuiste email of wachtwoord' }
+  }
+  
+  // Verify password using the new secure method (supports both bcrypt and legacy)
+  const isValid = await verifyPassword(password, data.password_hash)
+  
+  if (!isValid) {
+    return { success: false, error: 'Onjuiste email of wachtwoord' }
+  }
+  
+  // Auto-upgrade legacy passwords to bcrypt
+  if (needsHashUpgrade(data.password_hash)) {
+    const newHash = await hashPassword(password)
+    await supabase
+      .from('shop_customers')
+      .update({ password_hash: newHash })
+      .eq('id', data.id)
   }
   
   // Update last login

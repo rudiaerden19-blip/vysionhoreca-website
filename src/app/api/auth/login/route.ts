@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import bcrypt from 'bcryptjs'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -9,6 +10,24 @@ const getSupabase = () => {
     return null
   }
   return createClient(supabaseUrl, supabaseKey)
+}
+
+// Legacy SHA-256 hash for backward compatibility
+async function hashPasswordLegacy(password: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password + 'vysion_salt_2024')
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+// Verify password - supports both bcrypt and legacy SHA-256
+async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  if (storedHash.startsWith('$2')) {
+    return bcrypt.compare(password, storedHash)
+  }
+  const legacyHash = await hashPasswordLegacy(password)
+  return legacyHash === storedHash
 }
 
 export async function POST(request: NextRequest) {
@@ -54,18 +73,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Hash password and compare
-    const encoder = new TextEncoder()
-    const data = encoder.encode(password + 'vysion_salt_2024')
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    // Verify password using secure method (supports bcrypt and legacy SHA-256)
+    const isValid = await verifyPassword(password, profile.password_hash)
 
-    if (passwordHash !== profile.password_hash) {
+    if (!isValid) {
       return NextResponse.json(
         { error: 'Onjuist wachtwoord' },
         { status: 401 }
       )
+    }
+
+    // Auto-upgrade legacy passwords to bcrypt
+    if (!profile.password_hash.startsWith('$2')) {
+      const newHash = await bcrypt.hash(password, 12)
+      await supabase
+        .from('business_profiles')
+        .update({ password_hash: newHash })
+        .eq('id', profile.id)
     }
 
     // Get tenant_slug from profile or find it
