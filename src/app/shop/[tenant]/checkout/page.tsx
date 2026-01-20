@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getTenantSettings, getDeliverySettings, TenantSettings, DeliverySettings, addLoyaltyPoints, getCustomer, getShopStatus, ShopStatus } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/i18n'
 
 interface CartItem {
   id: string
@@ -29,6 +30,7 @@ interface CustomerInfo {
 
 export default function CheckoutPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
@@ -147,13 +149,13 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   }
 
   const getSubmitError = () => {
-    if (cart.length === 0) return 'Winkelwagen is leeg'
-    if (!customerInfo.name) return 'Vul je naam in'
-    if (!customerInfo.phone) return 'Vul je telefoonnummer in'
+    if (cart.length === 0) return t('checkoutPage.cartEmpty')
+    if (!customerInfo.name) return t('checkoutPage.fillName')
+    if (!customerInfo.phone) return t('checkoutPage.fillPhone')
     if (orderType === 'delivery') {
-      if (!customerInfo.address) return 'Vul je adres in'
-      if (!customerInfo.postal_code) return 'Vul je postcode in'
-      if (!customerInfo.city) return 'Vul je stad in'
+      if (!customerInfo.address) return t('checkoutPage.fillAddress')
+      if (!customerInfo.postal_code) return t('checkoutPage.fillPostalCode')
+      if (!customerInfo.city) return t('checkoutPage.fillCity')
     }
     return null
   }
@@ -172,21 +174,21 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       .single()
     
     if (error || !data) {
-      setPromoError('Ongeldige kortingscode')
+      setPromoError(t('checkoutPage.invalidCode'))
       setPromoDiscount(0)
       return
     }
     
     // Check min order
     if (data.min_order_amount && subtotal < data.min_order_amount) {
-      setPromoError(`Minimumbedrag €${data.min_order_amount.toFixed(2)} niet bereikt`)
+      setPromoError(t('checkoutPage.minOrderNotReached').replace('{amount}', data.min_order_amount.toFixed(2)))
       setPromoDiscount(0)
       return
     }
     
     // Check expiry
     if (data.expires_at && new Date(data.expires_at) < new Date()) {
-      setPromoError('Deze code is verlopen')
+      setPromoError(t('checkoutPage.codeExpired'))
       setPromoDiscount(0)
       return
     }
@@ -309,7 +311,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       
     } catch (error) {
       console.error('Error submitting order:', error)
-      alert('Er ging iets mis. Probeer opnieuw.')
+      alert(t('checkoutPage.somethingWentWrong'))
     }
     
     setSubmitting(false)
@@ -345,25 +347,25 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           >
             ⏳
           </motion.div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Bestelling ontvangen!</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('checkoutPage.orderReceived')}</h1>
           <p className="text-gray-600 mb-6">
-            Je bestelling #{orderNumber} is ontvangen. Je krijgt een bevestigingsmail zodra de zaak je bestelling heeft goedgekeurd.
+            {t('checkoutPage.orderReceivedDesc').replace('{orderNumber}', String(orderNumber))}
           </p>
           
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6">
-            <p className="text-blue-800 font-medium mb-2">📱 Wacht op bevestiging</p>
-            <p className="text-blue-600 text-sm">De zaak bekijkt je bestelling en stuurt je een e-mail met de bevestiging of als er een probleem is.</p>
+            <p className="text-blue-800 font-medium mb-2">📱 {t('checkoutPage.waitForConfirmation')}</p>
+            <p className="text-blue-600 text-sm">{t('checkoutPage.waitForConfirmationDesc')}</p>
           </div>
           
           <div className="bg-gray-50 rounded-2xl p-4 mb-6">
-            <p className="text-gray-500 text-sm mb-1">Bestelnummer</p>
+            <p className="text-gray-500 text-sm mb-1">{t('checkoutPage.orderNumber')}</p>
             <p className="text-3xl font-bold" style={{ color: primaryColor }}>#{orderNumber}</p>
           </div>
           
           {earnedPoints > 0 && loggedInCustomerId && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-6">
-              <p className="text-yellow-800 font-medium">🎁 Je kunt {earnedPoints} spaarpunten verdienen!</p>
-              <p className="text-yellow-600 text-sm">Punten worden toegekend na goedkeuring van je bestelling.</p>
+              <p className="text-yellow-800 font-medium">🎁 {t('checkoutPage.canEarnPoints').replace('{points}', String(earnedPoints))}</p>
+              <p className="text-yellow-600 text-sm">{t('checkoutPage.pointsAfterApproval')}</p>
             </div>
           )}
           
@@ -373,13 +375,13 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               style={{ backgroundColor: primaryColor }}
               className="block w-full text-white font-bold py-4 rounded-2xl hover:opacity-90 transition-colors"
             >
-              Terug naar menu
+              {t('checkoutPage.backToMenu')}
             </Link>
             <Link
               href={`/shop/${params.tenant}`}
               className="block w-full bg-gray-100 text-gray-700 font-medium py-4 rounded-2xl hover:bg-gray-200 transition-colors"
             >
-              Naar homepagina
+              {t('checkoutPage.toHomepage')}
             </Link>
           </div>
         </motion.div>
@@ -393,14 +395,14 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <span className="text-6xl mb-4 block">🛒</span>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Je winkelwagen is leeg</h1>
-          <p className="text-gray-500 mb-6">Voeg eerst producten toe aan je bestelling.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('checkoutPage.emptyCart')}</h1>
+          <p className="text-gray-500 mb-6">{t('checkoutPage.emptyCartDesc')}</p>
           <Link
             href={`/shop/${params.tenant}/menu`}
             style={{ backgroundColor: primaryColor }}
             className="inline-block text-white font-bold py-4 px-8 rounded-2xl hover:opacity-90 transition-colors"
           >
-            Bekijk menu
+            {t('checkoutPage.viewMenu')}
           </Link>
         </div>
       </div>
@@ -419,9 +421,9 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Terug</span>
+            <span>{t('checkoutPage.back')}</span>
           </Link>
-          <h1 className="font-bold text-lg text-gray-900">Afrekenen</h1>
+          <h1 className="font-bold text-lg text-gray-900">{t('checkoutPage.checkout')}</h1>
           <div className="w-16"></div>
         </div>
       </header>
@@ -436,7 +438,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
             >
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Hoe wil je je bestelling ontvangen?</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.howReceiveOrder')}</h2>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 <button
                   onClick={() => setOrderType('pickup')}
@@ -446,9 +448,9 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                   }`}
                 >
                   <span className="text-3xl block mb-2">🛍️</span>
-                  <span className="font-bold text-gray-900">Afhalen</span>
+                  <span className="font-bold text-gray-900">{t('checkoutPage.pickup')}</span>
                   <span className="block text-sm text-gray-500">
-                    {deliverySettings?.pickup_time_minutes ? `~${deliverySettings.pickup_time_minutes} min` : 'Direct klaar'}
+                    {deliverySettings?.pickup_time_minutes ? `~${deliverySettings.pickup_time_minutes} min` : t('checkoutPage.readyDirect')}
                   </span>
                 </button>
                 
@@ -461,7 +463,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                     }`}
                   >
                     <span className="text-3xl block mb-2">🚗</span>
-                    <span className="font-bold text-gray-900">Levering</span>
+                    <span className="font-bold text-gray-900">{t('checkoutPage.delivery')}</span>
                     <span className="block text-sm text-gray-500">
                       +€{deliverySettings?.delivery_fee?.toFixed(2) || '0.00'}
                     </span>
@@ -471,7 +473,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               
               {orderType === 'delivery' && deliverySettings?.min_order_amount && subtotal < deliverySettings.min_order_amount && (
                 <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-sm">
-                  ⚠️ Minimumbedrag voor levering is €{deliverySettings.min_order_amount.toFixed(2)}
+                  ⚠️ {t('checkoutPage.minDelivery')} €{deliverySettings.min_order_amount.toFixed(2)}
                 </div>
               )}
             </motion.div>
@@ -484,45 +486,45 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
             >
               <div className="mb-4">
-              <h2 className="text-lg font-bold text-gray-900 mb-2">Jouw gegevens</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-2">{t('checkoutPage.yourDetails')}</h2>
               
               {!loggedInCustomerId && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-                  <p className="text-blue-800 font-medium mb-3">💡 Log in om spaarpunten te verdienen!</p>
+                  <p className="text-blue-800 font-medium mb-3">💡 {t('checkoutPage.loginForPoints')}</p>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Link
                       href={`/shop/${params.tenant}/account/login?redirect=checkout`}
                       style={{ backgroundColor: primaryColor }}
                       className="flex-1 text-center text-white font-medium py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
                     >
-                      Inloggen
+                      {t('checkoutPage.login')}
                     </Link>
                     <Link
                       href={`/shop/${params.tenant}/account/register?redirect=checkout`}
                       className="flex-1 text-center bg-white border border-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                      Account aanmaken
+                      {t('checkoutPage.createAccount')}
                     </Link>
                   </div>
-                  <p className="text-blue-600 text-sm mt-3 text-center">Of bestel als gast hieronder ↓</p>
+                  <p className="text-blue-600 text-sm mt-3 text-center">{t('checkoutPage.orOrderAsGuest')}</p>
                 </div>
               )}
               
               {loggedInCustomerId && (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4">
-                  <p className="text-green-700 font-medium">✓ Je bent ingelogd - je verdient spaarpunten bij deze bestelling!</p>
+                  <p className="text-green-700 font-medium">✓ {t('checkoutPage.loggedInPoints')}</p>
                 </div>
               )}
             </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Naam <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.name')} <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     name="name"
                     value={customerInfo.name}
                     onChange={handleInputChange}
-                    placeholder="Je volledige naam"
+                    placeholder={t('checkoutPage.name')}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                     style={{ '--tw-ring-color': primaryColor } as React.CSSProperties}
                   />
@@ -530,7 +532,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Telefoon <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.phone')} <span className="text-red-500">*</span></label>
                     <input
                       type="tel"
                       name="phone"
@@ -541,13 +543,13 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.email')}</label>
                     <input
                       type="email"
                       name="email"
                       value={customerInfo.email}
                       onChange={handleInputChange}
-                      placeholder="optioneel"
+                      placeholder={t('checkoutPage.optional')}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                     />
                   </div>
@@ -556,19 +558,19 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                 {orderType === 'delivery' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Adres <span className="text-red-500">*</span></label>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.address')} <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         name="address"
                         value={customerInfo.address}
                         onChange={handleInputChange}
-                        placeholder="Straat + huisnummer"
+                        placeholder={t('checkoutPage.streetNumber')}
                         className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Postcode <span className="text-red-500">*</span></label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.postalCode')} <span className="text-red-500">*</span></label>
                         <input
                           type="text"
                           name="postal_code"
@@ -579,13 +581,13 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Stad <span className="text-red-500">*</span></label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.city')} <span className="text-red-500">*</span></label>
                         <input
                           type="text"
                           name="city"
                           value={customerInfo.city}
                           onChange={handleInputChange}
-                          placeholder="Stad"
+                          placeholder={t('checkoutPage.city')}
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                         />
                       </div>
@@ -594,12 +596,12 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Opmerkingen</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.notes')}</label>
                   <textarea
                     name="notes"
                     value={customerInfo.notes}
                     onChange={handleInputChange}
-                    placeholder="Extra info voor je bestelling..."
+                    placeholder={t('checkoutPage.notesPlaceholder')}
                     rows={2}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all resize-none"
                   />
@@ -614,7 +616,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               transition={{ delay: 0.2 }}
               className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
             >
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Betaalmethode</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.paymentMethod')}</h2>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 <button
                   onClick={() => setPaymentMethod('cash')}
@@ -624,8 +626,8 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                   }`}
                 >
                   <span className="text-3xl block mb-2">💵</span>
-                  <span className="font-bold text-gray-900">Cash</span>
-                  <span className="block text-sm text-gray-500">Betalen bij {orderType === 'pickup' ? 'afhalen' : 'levering'}</span>
+                  <span className="font-bold text-gray-900">{t('checkoutPage.cash')}</span>
+                  <span className="block text-sm text-gray-500">{orderType === 'pickup' ? t('checkoutPage.payAtPickup') : t('checkoutPage.payAtDelivery')}</span>
                 </button>
                 
                 <button
@@ -636,14 +638,14 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                   }`}
                 >
                   <span className="text-3xl block mb-2">💳</span>
-                  <span className="font-bold text-gray-900">Online</span>
-                  <span className="block text-sm text-gray-500">Veilig betalen</span>
+                  <span className="font-bold text-gray-900">{t('checkoutPage.online')}</span>
+                  <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
                 </button>
               </div>
               
               {paymentMethod === 'online' && (
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-800 text-sm">
-                  ℹ️ Online betaling wordt binnenkort beschikbaar. Kies voorlopig cash.
+                  ℹ️ {t('checkoutPage.onlineComingSoon')}
                 </div>
               )}
             </motion.div>
@@ -657,7 +659,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               transition={{ delay: 0.3 }}
               className="bg-white rounded-2xl p-6 shadow-sm sticky top-24"
             >
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Je bestelling</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.yourOrder')}</h2>
               
               <div className="space-y-3 sm:space-y-4 max-h-80 overflow-y-auto mb-6">
                 {cart.map((item, index) => (
@@ -682,7 +684,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
 
               {/* Promo Code */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Kortingscode</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.promoCode')}</label>
                 <div className="flex gap-2 w-full">
                   <input
                     type="text"
@@ -695,33 +697,33 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                     onClick={applyPromoCode}
                     className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors text-sm whitespace-nowrap shrink-0"
                   >
-                    Toepassen
+                    {t('checkoutPage.apply')}
                   </button>
                 </div>
                 {promoError && <p className="text-red-500 text-sm mt-2">{promoError}</p>}
-                {promoDiscount > 0 && <p className="text-green-600 text-sm mt-2">✓ Korting toegepast!</p>}
+                {promoDiscount > 0 && <p className="text-green-600 text-sm mt-2">✓ {t('checkoutPage.discountApplied')}</p>}
               </div>
 
               {/* Totals */}
               <div className="border-t pt-4 space-y-2">
                 <div className="flex justify-between text-gray-600">
-                  <span>Subtotaal</span>
+                  <span>{t('checkoutPage.subtotal')}</span>
                   <span>€{subtotal.toFixed(2)}</span>
                 </div>
                 {deliveryFee > 0 && (
                   <div className="flex justify-between text-gray-600">
-                    <span>Bezorgkosten</span>
+                    <span>{t('checkoutPage.deliveryFee')}</span>
                     <span>€{deliveryFee.toFixed(2)}</span>
                   </div>
                 )}
                 {discount > 0 && (
                   <div className="flex justify-between text-green-600">
-                    <span>Korting</span>
+                    <span>{t('checkoutPage.discount')}</span>
                     <span>-€{discount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t">
-                  <span>Totaal</span>
+                  <span>{t('checkoutPage.total')}</span>
                   <span style={{ color: primaryColor }}>€{total.toFixed(2)}</span>
                 </div>
               </div>
@@ -736,7 +738,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               {/* Shop Closed Warning */}
               {shopStatus && !shopStatus.isOpen && (
                 <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-sm text-center">
-                  ⏰ {shopStatus.message || 'Momenteel gesloten'} - Je kunt wel alvast bestellen
+                  ⏰ {shopStatus.message || t('checkoutPage.currentlyClosed')} - {t('checkoutPage.canStillOrder')}
                 </div>
               )}
 
@@ -756,18 +758,18 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                       className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                     />
-                    <span>Bestelling plaatsen...</span>
+                    <span>{t('checkoutPage.placingOrder')}</span>
                   </>
                 ) : (
                   <>
-                    <span>Bestelling plaatsen</span>
+                    <span>{t('checkoutPage.placeOrder')}</span>
                     <span className="bg-white/20 px-3 py-1 rounded-full">€{total.toFixed(2)}</span>
                   </>
                 )}
               </motion.button>
 
               <p className="text-center text-sm text-gray-500 mt-4">
-                Door te bestellen ga je akkoord met onze voorwaarden
+                {t('checkoutPage.agreeTerms')}
               </p>
             </motion.div>
           </div>
