@@ -1,8 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import { contactRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 contact messages per hour per IP
+    const clientIP = getClientIP(request)
+    const rateLimitResult = await checkRateLimit(contactRateLimiter, clientIP)
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Te veel berichten verstuurd. Probeer het later opnieuw.' },
+        { status: 429 }
+      )
+    }
+
     const body = await request.json()
     const { firstName, lastName, email, message } = body
 

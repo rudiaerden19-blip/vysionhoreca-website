@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
+import { loginRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -37,6 +38,17 @@ async function verifyPassword(password: string, storedHash: string): Promise<boo
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 login attempts per minute per IP
+    const clientIP = getClientIP(request)
+    const rateLimitResult = await checkRateLimit(loginRateLimiter, clientIP)
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Te veel login pogingen. Probeer het over een minuut opnieuw.' },
+        { status: 429 }
+      )
+    }
+
     const { email, password } = await request.json()
 
     if (!email || !password) {

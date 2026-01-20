@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { isProtectedTenant } from '@/lib/protected-tenants'
 import bcrypt from 'bcryptjs'
+import { registerRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 
 // Secure password hashing with bcrypt
 async function hashPassword(password: string): Promise<string> {
@@ -22,6 +23,17 @@ const getSupabase = () => {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 3 registrations per hour per IP
+    const clientIP = getClientIP(request)
+    const rateLimitResult = await checkRateLimit(registerRateLimiter, clientIP)
+    
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Te veel registraties. Probeer het later opnieuw.' },
+        { status: 429 }
+      )
+    }
+
     const { businessName, email, phone, password } = await request.json()
 
     if (!businessName || !email || !phone || !password) {
