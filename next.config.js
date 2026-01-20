@@ -29,7 +29,9 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    // ESLint checks enabled - warnings are shown but don't fail build
+    // Only actual errors will block deployment
+    ignoreDuringBuilds: false,
   },
   typescript: {
     ignoreBuildErrors: true,
