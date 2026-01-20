@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/i18n'
 import '@/lib/silence-console-prod' // Silence console.log in production
+import { GlobalAutoCapitalize } from '@/components/GlobalAutoCapitalize'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -46,6 +47,7 @@ export default function RootLayout({
           overflowY: 'visible'
         }}>
           <LanguageProvider>
+            <GlobalAutoCapitalize />
             {children}
           </LanguageProvider>
         </div>
