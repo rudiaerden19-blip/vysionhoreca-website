@@ -35,7 +35,8 @@ function SortableChoice({
   index, 
   onUpdate, 
   onRemove, 
-  canRemove 
+  canRemove,
+  placeholder
 }: {
   id: string
   choice: ProductOptionChoice
@@ -43,6 +44,7 @@ function SortableChoice({
   onUpdate: (field: string, value: any) => void
   onRemove: () => void
   canRemove: boolean
+  placeholder: string
 }) {
   const {
     attributes,
@@ -79,7 +81,7 @@ function SortableChoice({
           onUpdate('name', capitalized)
         }}
         className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent capitalize"
-        placeholder="Naam (bijv. Klein, Medium, Groot)"
+        placeholder={placeholder}
       />
       <div className="relative w-28">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">€</span>
@@ -526,6 +528,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                             onUpdate={(field, value) => updateChoice(index, field, value)}
                             onRemove={() => removeChoice(index)}
                             canRemove={(formData.choices?.length || 0) > 1}
+                            placeholder={t('adminPages.opties.choiceNamePlaceholder')}
                           />
                         ))}
                       </div>

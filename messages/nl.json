@@ -1669,6 +1669,9 @@
       "allergens": "Allergenen",
       "allergensDesc": "Selecteer welke allergenen in dit product zitten",
       "status": "Status",
+      "statusAvailable": "✓ Beschikbaar",
+      "statusPopular": "🔥 Populair",
+      "statusPromo": "🎁 Promotie",
       "noProductsFound": "Geen producten gevonden",
       "adjustFilters": "Pas je filters aan of voeg een nieuw product toe"
     },
@@ -1680,7 +1683,7 @@
       "optionName": "Naam van de optie",
       "optionNamePlaceholder": "Bijv. Formaat, Saus, Extra toppings",
       "choices": "Keuzes",
-      "choicePlaceholder": "Naam (bijv. Klein, Medium, Groot)",
+      "choiceNamePlaceholder": "Naam (bijv. Klein, Medium, Groot)",
       "required": "Verplicht",
       "mustChoose": "Ja, klant moet kiezen",
       "multiSelect": "Meerdere keuzes mogelijk",

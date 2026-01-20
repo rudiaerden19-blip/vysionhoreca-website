@@ -781,7 +781,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
                         className="rounded" 
                       />
-                      <span>✓ Beschikbaar</span>
+                      <span>{t('adminPages.producten.statusAvailable')}</span>
                     </label>
                     <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl cursor-pointer hover:bg-gray-200">
                       <input 
@@ -790,7 +790,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         onChange={(e) => setFormData(prev => ({ ...prev, is_popular: e.target.checked }))}
                         className="rounded" 
                       />
-                      <span>🔥 Populair</span>
+                      <span>{t('adminPages.producten.statusPopular')}</span>
                     </label>
                     <label className="flex items-center gap-2 px-4 py-2 bg-green-100 rounded-xl cursor-pointer hover:bg-green-200">
                       <input 
@@ -799,7 +799,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         onChange={(e) => setFormData(prev => ({ ...prev, is_promo: e.target.checked }))}
                         className="rounded" 
                       />
-                      <span>🎁 Promotie</span>
+                      <span>{t('adminPages.producten.statusPromo')}</span>
                     </label>
                   </div>
                   

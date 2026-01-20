@@ -1663,6 +1663,9 @@
       "allergens": "Allergens",
       "allergensDesc": "Select which allergens are in this product",
       "status": "Status",
+      "statusAvailable": "✓ Available",
+      "statusPopular": "🔥 Popular",
+      "statusPromo": "🎁 Promotion",
       "noProductsFound": "No products found",
       "adjustFilters": "Adjust your filters or add a new product"
     },
@@ -1674,7 +1677,7 @@
       "optionName": "Option name",
       "optionNamePlaceholder": "E.g. Size, Sauce, Extra toppings",
       "choices": "Choices",
-      "choicePlaceholder": "Name (e.g. Small, Medium, Large)",
+      "choiceNamePlaceholder": "Name (e.g. Small, Medium, Large)",
       "required": "Required",
       "mustChoose": "Yes, customer must choose",
       "multiSelect": "Multiple selections allowed",
