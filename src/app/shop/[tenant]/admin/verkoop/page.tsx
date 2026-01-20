@@ -9,6 +9,7 @@ import { getSalesStats, getDailyRevenue, getTopProducts, SalesStats } from '@/li
 const dayLabels = ['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za']
 
 export default function VerkoopPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [period, setPeriod] = useState<'today' | 'week' | 'month' | 'year'>('week')
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<SalesStats>({ total_orders: 0, total_revenue: 0, average_order: 0, orders_by_status: {} })

@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getReviews, replyToReview, toggleReviewVisible, deleteReview, Review } from '@/lib/admin-api'
 
 export default function ReviewsPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [replyingTo, setReplyingTo] = useState<string | null>(null)

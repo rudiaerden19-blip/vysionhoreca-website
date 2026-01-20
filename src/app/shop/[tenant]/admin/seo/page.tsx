@@ -8,6 +8,7 @@ import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/adm
 import MediaPicker from '@/components/MediaPicker'
 
 export default function SeoPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)

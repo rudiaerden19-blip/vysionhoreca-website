@@ -18,6 +18,7 @@ const colorPresets = [
 ]
 
 export default function DesignPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)

@@ -14,6 +14,7 @@ const qrTypes = [
 ]
 
 export default function QrCodesPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [qrCodes, setQrCodes] = useState<QrCode[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)

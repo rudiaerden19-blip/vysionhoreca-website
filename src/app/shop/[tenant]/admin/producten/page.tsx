@@ -205,6 +205,7 @@ function SortableProductCard({
 }
 
 export default function ProductenPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [availableOptions, setAvailableOptions] = useState<ProductOption[]>([])

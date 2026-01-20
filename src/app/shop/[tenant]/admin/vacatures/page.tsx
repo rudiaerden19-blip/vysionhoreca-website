@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 
 export default function VacaturesPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)

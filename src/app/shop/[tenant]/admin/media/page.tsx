@@ -88,6 +88,7 @@ interface MediaItem {
 }
 
 export default function MediaPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [media, setMedia] = useState<MediaItem[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('alle')

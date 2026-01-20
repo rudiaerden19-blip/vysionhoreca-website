@@ -51,6 +51,7 @@ const HEALTH_STATUS = {
 }
 
 export default function AnalysePage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [activeTab, setActiveTab] = useState<TabType>('overview')
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1)
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear())

@@ -106,6 +106,7 @@ function SortableChoice({
 }
 
 export default function OptiesPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [options, setOptions] = useState<ProductOption[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)

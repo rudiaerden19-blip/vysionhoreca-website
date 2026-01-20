@@ -13,6 +13,7 @@ const promoTypes = [
 ]
 
 export default function PromotiesPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [promos, setPromos] = useState<Promotion[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
