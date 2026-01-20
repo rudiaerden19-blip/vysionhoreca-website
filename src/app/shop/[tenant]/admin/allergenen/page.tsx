@@ -4,26 +4,26 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
 
-const defaultAllergens = [
-  { id: 'gluten', name: 'Gluten', icon: '🌾', enabled: true },
-  { id: 'ei', name: 'Eieren', icon: '🥚', enabled: true },
-  { id: 'melk', name: 'Melk', icon: '🥛', enabled: true },
-  { id: 'noten', name: 'Noten', icon: '🥜', enabled: true },
-  { id: 'pinda', name: 'Pinda', icon: '🥜', enabled: true },
-  { id: 'soja', name: 'Soja', icon: '🫘', enabled: true },
-  { id: 'vis', name: 'Vis', icon: '🐟', enabled: true },
-  { id: 'schaaldieren', name: 'Schaaldieren', icon: '🦐', enabled: true },
-  { id: 'weekdieren', name: 'Weekdieren', icon: '🐚', enabled: false },
-  { id: 'selderij', name: 'Selderij', icon: '🥬', enabled: true },
-  { id: 'mosterd', name: 'Mosterd', icon: '🟡', enabled: true },
-  { id: 'sesam', name: 'Sesamzaad', icon: '⚪', enabled: true },
-  { id: 'sulfiet', name: 'Sulfiet', icon: '🍷', enabled: false },
-  { id: 'lupine', name: 'Lupine', icon: '🌸', enabled: false },
+const ALLERGEN_DATA = [
+  { id: 'gluten', icon: '🌾', enabled: true },
+  { id: 'ei', icon: '🥚', enabled: true },
+  { id: 'melk', icon: '🥛', enabled: true },
+  { id: 'noten', icon: '🥜', enabled: true },
+  { id: 'pinda', icon: '🥜', enabled: true },
+  { id: 'soja', icon: '🫘', enabled: true },
+  { id: 'vis', icon: '🐟', enabled: true },
+  { id: 'schaaldieren', icon: '🦐', enabled: true },
+  { id: 'weekdieren', icon: '🐚', enabled: false },
+  { id: 'selderij', icon: '🥬', enabled: true },
+  { id: 'mosterd', icon: '🟡', enabled: true },
+  { id: 'sesam', icon: '⚪', enabled: true },
+  { id: 'sulfiet', icon: '🍷', enabled: false },
+  { id: 'lupine', icon: '🌸', enabled: false },
 ]
 
 export default function AllergenenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
-  const [allergens, setAllergens] = useState(defaultAllergens)
+  const [allergens, setAllergens] = useState(ALLERGEN_DATA)
   const [saving, setSaving] = useState(false)
 
   const toggleAllergen = (id: string) => {
@@ -66,31 +66,34 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
         </p>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {allergens.map((allergen) => (
-            <motion.button
-              key={allergen.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => toggleAllergen(allergen.id)}
-              className={`p-4 rounded-xl text-left transition-all ${
-                allergen.enabled 
-                  ? 'bg-orange-50 border-2 border-orange-500' 
-                  : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">{allergen.icon}</span>
-                <div>
-                  <p className={`font-medium ${allergen.enabled ? 'text-orange-700' : 'text-gray-600'}`}>
-                    {allergen.name}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {allergen.enabled ? t('adminPages.allergenen.active') : t('adminPages.allergenen.notActive')}
-                  </p>
+          {allergens.map((allergen) => {
+            const allergenName = t(`adminPages.allergenen.allergenNames.${allergen.id}`)
+            return (
+              <motion.button
+                key={allergen.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => toggleAllergen(allergen.id)}
+                className={`p-4 rounded-xl text-left transition-all ${
+                  allergen.enabled 
+                    ? 'bg-orange-50 border-2 border-orange-500' 
+                    : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{allergen.icon}</span>
+                  <div>
+                    <p className={`font-medium ${allergen.enabled ? 'text-orange-700' : 'text-gray-600'}`}>
+                      {allergenName}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {allergen.enabled ? t('adminPages.allergenen.active') : t('adminPages.allergenen.notActive')}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </motion.button>
-          ))}
+              </motion.button>
+            )
+          })}
         </div>
       </motion.div>
 
@@ -122,7 +125,7 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
               className="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 rounded-full text-sm"
             >
               <span>{allergen.icon}</span>
-              <span>{allergen.name}</span>
+              <span>{t(`adminPages.allergenen.allergenNames.${allergen.id}`)}</span>
             </span>
           ))}
         </div>

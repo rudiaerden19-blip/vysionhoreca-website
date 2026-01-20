@@ -34,21 +34,21 @@ import {
 import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
 
-const ALLERGENS = [
-  { id: 'gluten', name: 'Gluten', icon: '🌾' },
-  { id: 'ei', name: 'Eieren', icon: '🥚' },
-  { id: 'melk', name: 'Melk', icon: '🥛' },
-  { id: 'noten', name: 'Noten', icon: '🥜' },
-  { id: 'pinda', name: 'Pinda', icon: '🥜' },
-  { id: 'soja', name: 'Soja', icon: '🫘' },
-  { id: 'vis', name: 'Vis', icon: '🐟' },
-  { id: 'schaaldieren', name: 'Schaaldieren', icon: '🦐' },
-  { id: 'selderij', name: 'Selderij', icon: '🥬' },
-  { id: 'mosterd', name: 'Mosterd', icon: '🟡' },
-  { id: 'sesam', name: 'Sesamzaad', icon: '⚪' },
-  { id: 'sulfiet', name: 'Sulfiet', icon: '🍷' },
-  { id: 'lupine', name: 'Lupine', icon: '🌸' },
-  { id: 'weekdieren', name: 'Weekdieren', icon: '🐚' },
+const ALLERGEN_IDS = [
+  { id: 'gluten', icon: '🌾' },
+  { id: 'ei', icon: '🥚' },
+  { id: 'melk', icon: '🥛' },
+  { id: 'noten', icon: '🥜' },
+  { id: 'pinda', icon: '🥜' },
+  { id: 'soja', icon: '🫘' },
+  { id: 'vis', icon: '🐟' },
+  { id: 'schaaldieren', icon: '🦐' },
+  { id: 'selderij', icon: '🥬' },
+  { id: 'mosterd', icon: '🟡' },
+  { id: 'sesam', icon: '⚪' },
+  { id: 'sulfiet', icon: '🍷' },
+  { id: 'lupine', icon: '🌸' },
+  { id: 'weekdieren', icon: '🐚' },
 ]
 
 // Sortable Product Card Component
@@ -740,8 +740,9 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     {t('adminPages.producten.allergensDesc')}
                   </p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {ALLERGENS.map(allergen => {
+                    {ALLERGEN_IDS.map(allergen => {
                       const isSelected = formData.allergens?.includes(allergen.id) || false
+                      const allergenName = t(`adminPages.allergenen.allergenNames.${allergen.id}`)
                       return (
                         <label
                           key={allergen.id}
@@ -759,7 +760,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           />
                           <span className="text-lg">{allergen.icon}</span>
                           <span className={`text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-gray-600'}`}>
-                            {allergen.name}
+                            {allergenName}
                           </span>
                         </label>
                       )
