@@ -1,5 +1,7 @@
 'use client'
 
+import { useLanguage } from '@/i18n'
+
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 

@@ -1,5 +1,7 @@
 'use client'
 
+import { useLanguage } from '@/i18n'
+
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { 

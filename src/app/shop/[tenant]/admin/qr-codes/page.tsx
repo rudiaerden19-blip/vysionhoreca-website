@@ -1,5 +1,7 @@
 'use client'
 
+import { useLanguage } from '@/i18n'
+
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getQrCodes, saveQrCode, deleteQrCode, QrCode } from '@/lib/admin-api'

@@ -1,5 +1,7 @@
 'use client'
 
+import { useLanguage } from '@/i18n'
+
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getSalesStats, getDailyRevenue, getTopProducts, SalesStats } from '@/lib/admin-api'
