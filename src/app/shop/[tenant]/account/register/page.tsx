@@ -5,9 +5,11 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getTenantSettings, registerCustomer, TenantSettings } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 
 export default function RegisterPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
@@ -56,41 +58,41 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
     const newErrors: Record<string, string> = {}
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Naam is verplicht'
+      newErrors.name = t('accountPage.nameRequired')
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'E-mailadres is verplicht'
+      newErrors.email = t('accountPage.emailRequired')
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Ongeldig e-mailadres'
+      newErrors.email = t('accountPage.invalidEmail')
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Telefoonnummer is verplicht'
+      newErrors.phone = t('accountPage.phoneRequired')
     }
 
     if (!formData.address.trim()) {
-      newErrors.address = 'Adres is verplicht'
+      newErrors.address = t('accountPage.addressRequired')
     }
 
     if (!formData.postal_code.trim()) {
-      newErrors.postal_code = 'Postcode is verplicht'
+      newErrors.postal_code = t('accountPage.postalCodeRequired')
     }
 
     if (!formData.city.trim()) {
-      newErrors.city = 'Stad is verplicht'
+      newErrors.city = t('accountPage.cityRequired')
     }
 
     if (!formData.password) {
-      newErrors.password = 'Wachtwoord is verplicht'
+      newErrors.password = t('accountPage.passwordRequired')
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Wachtwoord moet minimaal 6 tekens zijn'
+      newErrors.password = t('accountPage.passwordMin')
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Bevestig je wachtwoord'
+      newErrors.confirmPassword = t('accountPage.confirmPasswordRequired')
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Wachtwoorden komen niet overeen'
+      newErrors.confirmPassword = t('accountPage.passwordsMismatch')
     }
 
     setErrors(newErrors)
@@ -122,7 +124,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
       localStorage.setItem(`customer_${params.tenant}`, result.customer.id!)
       router.push(`/shop/${params.tenant}/account`)
     } else {
-      setGeneralError(result.error || 'Registratie mislukt')
+      setGeneralError(result.error || t('accountPage.registrationFailed'))
     }
 
     setSubmitting(false)
@@ -152,8 +154,8 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
           <Link href={`/shop/${params.tenant}`} className="inline-block mb-4">
             <span className="text-4xl">🎉</span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Account aanmaken</h1>
-          <p className="text-gray-500 mt-1">Registreer bij {tenantSettings?.business_name}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('accountPage.createAccount')}</h1>
+          <p className="text-gray-500 mt-1">{t('accountPage.joinLoyalty')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -166,7 +168,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
           {/* Naam */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Naam <span className="text-red-500">*</span>
+              {t('accountPage.name')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -176,7 +178,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
                 errors.name ? 'border-red-500 bg-red-50' : 'border-gray-200'
               }`}
-              placeholder="Je volledige naam"
+              placeholder={t('accountPage.name')}
             />
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
@@ -184,7 +186,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
           {/* E-mail */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              E-mailadres <span className="text-red-500">*</span>
+              {t('accountPage.email')} <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
@@ -194,7 +196,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
                 errors.email ? 'border-red-500 bg-red-50' : 'border-gray-200'
               }`}
-              placeholder="je@email.com"
+              placeholder={t('accountPage.email')}
             />
             {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
@@ -202,7 +204,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
           {/* Telefoon */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Telefoonnummer <span className="text-red-500">*</span>
+              {t('accountPage.phone')} <span className="text-red-500">*</span>
             </label>
             <input
               type="tel"
@@ -212,7 +214,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
                 errors.phone ? 'border-red-500 bg-red-50' : 'border-gray-200'
               }`}
-              placeholder="+32 ..."
+              placeholder={t('accountPage.phone')}
             />
             {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
           </div>
@@ -220,7 +222,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
           {/* Adres */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Adres <span className="text-red-500">*</span>
+              {t('accountPage.address')} <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -230,7 +232,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
                 errors.address ? 'border-red-500 bg-red-50' : 'border-gray-200'
               }`}
-              placeholder="Straat en huisnummer"
+              placeholder={t('accountPage.address')}
             />
             {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
           </div>
@@ -239,7 +241,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Postcode <span className="text-red-500">*</span>
+                {t('accountPage.postalCode')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -249,13 +251,13 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
                 className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
                   errors.postal_code ? 'border-red-500 bg-red-50' : 'border-gray-200'
                 }`}
-                placeholder="1234"
+                placeholder={t('accountPage.postalCode')}
               />
               {errors.postal_code && <p className="text-red-500 text-xs mt-1">{errors.postal_code}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Stad <span className="text-red-500">*</span>
+                {t('accountPage.city')} <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -265,7 +267,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
                 className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
                   errors.city ? 'border-red-500 bg-red-50' : 'border-gray-200'
                 }`}
-                placeholder="Stad"
+                placeholder={t('accountPage.city')}
               />
               {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
             </div>
@@ -274,7 +276,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
           {/* Wachtwoord */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Wachtwoord <span className="text-red-500">*</span>
+              {t('accountPage.password')} <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -284,7 +286,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
                 errors.password ? 'border-red-500 bg-red-50' : 'border-gray-200'
               }`}
-              placeholder="Minimaal 6 tekens"
+              placeholder={t('accountPage.passwordMin')}
             />
             {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
           </div>
@@ -292,7 +294,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
           {/* Bevestig wachtwoord */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Bevestig wachtwoord <span className="text-red-500">*</span>
+              {t('accountPage.confirmPassword')} <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -302,7 +304,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:border-transparent transition-all ${
                 errors.confirmPassword ? 'border-red-500 bg-red-50' : 'border-gray-200'
               }`}
-              placeholder="Herhaal wachtwoord"
+              placeholder={t('accountPage.confirmPassword')}
             />
             {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
           </div>
@@ -326,23 +328,23 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                 />
-                <span>Account aanmaken...</span>
+                <span>{t('accountPage.registering')}</span>
               </>
             ) : (
-              <span>Account aanmaken</span>
+              <span>{t('accountPage.createAccount')}</span>
             )}
           </motion.button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-gray-500">
-            Al een account?{' '}
+            {t('accountPage.alreadyAccount')}{' '}
             <Link
               href={`/shop/${params.tenant}/account/login`}
               style={{ color: primaryColor }}
               className="font-medium hover:underline"
             >
-              Inloggen
+              {t('accountPage.login')}
             </Link>
           </p>
         </div>
@@ -352,7 +354,7 @@ export default function RegisterPage({ params }: { params: { tenant: string } })
             href={`/shop/${params.tenant}`}
             className="text-gray-400 text-sm hover:text-gray-600"
           >
-            ← Terug naar winkel
+            ← {t('accountPage.backToShop')}
           </Link>
         </div>
 

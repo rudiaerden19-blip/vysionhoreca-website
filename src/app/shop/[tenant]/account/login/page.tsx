@@ -5,9 +5,11 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getTenantSettings, loginCustomer, TenantSettings } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 
 export default function LoginPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
@@ -45,7 +47,7 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
       localStorage.setItem(`customer_${params.tenant}`, result.customer.id!)
       router.push(`/shop/${params.tenant}/account`)
     } else {
-      setError(result.error || 'Login mislukt')
+      setError(result.error || t('accountPage.loginFailed'))
     }
 
     setSubmitting(false)
@@ -75,8 +77,8 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
           <Link href={`/shop/${params.tenant}`} className="inline-block mb-4">
             <span className="text-4xl">👤</span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Inloggen</h1>
-          <p className="text-gray-500 mt-1">Log in op je account bij {tenantSettings?.business_name}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('accountPage.login')}</h1>
+          <p className="text-gray-500 mt-1">{t('accountPage.loginAt')} {tenantSettings?.business_name}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -87,19 +89,19 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">E-mailadres</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('accountPage.email')}</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
-              placeholder="je@email.com"
+              placeholder={t('accountPage.email')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Wachtwoord</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">{t('accountPage.password')}</label>
             <input
               type="password"
               value={password}
@@ -125,23 +127,23 @@ export default function LoginPage({ params }: { params: { tenant: string } }) {
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                 />
-                <span>Inloggen...</span>
+                <span>{t('accountPage.loggingIn')}</span>
               </>
             ) : (
-              <span>Inloggen</span>
+              <span>{t('accountPage.login')}</span>
             )}
           </motion.button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-gray-500">
-            Nog geen account?{' '}
+            {t('accountPage.noAccount')}{' '}
             <Link
               href={`/shop/${params.tenant}/account/register`}
               style={{ color: primaryColor }}
               className="font-medium hover:underline"
             >
-              Registreren
+              {t('accountPage.register')}
             </Link>
           </p>
         </div>

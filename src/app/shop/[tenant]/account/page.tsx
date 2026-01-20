@@ -5,9 +5,11 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { getTenantSettings, getCustomer, getCustomerOrders, updateCustomer, getLoyaltyRewards, redeemReward, deleteCustomerAccount, Customer, Order, TenantSettings, LoyaltyReward } from '@/lib/admin-api'
+import { useLanguage } from '@/i18n'
 
 export default function AccountPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [orders, setOrders] = useState<Order[]>([])
@@ -74,17 +76,17 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
 
   // GDPR: Account verwijderen
   const handleDeleteAccount = async () => {
-    if (!customer || deleteConfirmText !== 'VERWIJDEREN') return
+    if (!customer || deleteConfirmText !== t('accountPage.deleteConfirmWord')) return
     
     setDeleting(true)
     const success = await deleteCustomerAccount(customer.id!, params.tenant)
     
     if (success) {
       localStorage.removeItem(`customer_${params.tenant}`)
-      alert('Je account en alle gegevens zijn verwijderd.')
+      alert(t('accountPage.accountDeleted'))
       router.push(`/shop/${params.tenant}`)
     } else {
-      alert('Er is iets misgegaan. Probeer opnieuw.')
+      alert(t('accountPage.deleteError'))
     }
     setDeleting(false)
   }
@@ -105,7 +107,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
   const handleRedeem = async (reward: LoyaltyReward) => {
     if (!customer || (customer.loyalty_points || 0) < reward.points_required) return
     
-    if (!confirm(`Weet je zeker dat je ${reward.points_required} punten wilt inwisselen voor "${reward.name}"?`)) return
+    if (!confirm(t('accountPage.confirmRedeem').replace('{points}', String(reward.points_required)).replace('{reward}', reward.name))) return
     
     setRedeeming(reward.id!)
     const success = await redeemReward(customer.id!, reward.id!, reward.points_required, params.tenant)
@@ -115,9 +117,9 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
         ...customer,
         loyalty_points: (customer.loyalty_points || 0) - reward.points_required,
       })
-      alert(`🎉 Gefeliciteerd! Je hebt "${reward.name}" ingewisseld. Toon dit bij je volgende bestelling.`)
+      alert('🎉 ' + t('accountPage.redeemSuccess').replace('{reward}', reward.name))
     } else {
-      alert('Er ging iets mis. Probeer opnieuw.')
+      alert(t('accountPage.deleteError'))
     }
     setRedeeming(null)
   }
@@ -170,11 +172,11 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>Terug</span>
+            <span>{t('accountPage.backToMenu')}</span>
           </Link>
-          <h1 className="font-bold text-xl text-gray-900">Mijn Account</h1>
+          <h1 className="font-bold text-xl text-gray-900">{t('accountPage.myAccount')}</h1>
           <button onClick={handleLogout} className="text-red-500 font-medium">
-            Uitloggen
+            {t('accountPage.logout')}
           </button>
         </div>
       </header>
@@ -203,14 +205,14 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
               onClick={() => setEditing(!editing)}
               className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors text-sm sm:text-base shrink-0"
             >
-              {editing ? 'Annuleren' : '✏️ Bewerken'}
+              {editing ? t('accountPage.cancel') : '✏️ ' + t('accountPage.edit')}
             </button>
           </div>
 
           {editing ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Naam</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('accountPage.name')}</label>
                 <input
                   type="text"
                   value={editForm.name}
@@ -220,7 +222,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Telefoon</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('accountPage.phone')}</label>
                   <input
                     type="tel"
                     value={editForm.phone}
@@ -229,7 +231,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Stad</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('accountPage.city')}</label>
                   <input
                     type="text"
                     value={editForm.city}
@@ -239,7 +241,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Adres</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('accountPage.address')}</label>
                 <input
                   type="text"
                   value={editForm.address}
@@ -253,21 +255,21 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                 style={{ backgroundColor: primaryColor }}
                 className="w-full text-white font-bold py-3 rounded-xl hover:opacity-90 transition-colors"
               >
-                {saving ? 'Opslaan...' : 'Opslaan'}
+                {saving ? t('accountPage.saving') : t('accountPage.save')}
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">Telefoon</span>
+                <span className="text-gray-500">{t('accountPage.phone')}</span>
                 <p className="font-medium text-gray-900">{customer?.phone || '-'}</p>
               </div>
               <div>
-                <span className="text-gray-500">Stad</span>
+                <span className="text-gray-500">{t('accountPage.city')}</span>
                 <p className="font-medium text-gray-900">{customer?.city || '-'}</p>
               </div>
               <div className="col-span-2">
-                <span className="text-gray-500">Adres</span>
+                <span className="text-gray-500">{t('accountPage.address')}</span>
                 <p className="font-medium text-gray-900">{customer?.address || '-'}</p>
               </div>
             </div>
@@ -284,8 +286,8 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
         >
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-medium opacity-90">Klantenkaart</h3>
-              <p className="text-2xl sm:text-4xl font-bold mt-2">{customer?.loyalty_points || 0} punten</p>
+              <h3 className="text-lg font-medium opacity-90">{t('accountPage.loyaltyPoints')}</h3>
+              <p className="text-2xl sm:text-4xl font-bold mt-2">{customer?.loyalty_points || 0} {t('accountPage.points')}</p>
               <p className="text-sm opacity-75 mt-1">
                 €{customer?.total_spent?.toFixed(2) || '0.00'} besteed • {customer?.total_orders || 0} bestellingen
               </p>
@@ -302,7 +304,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
             transition={{ delay: 0.15 }}
             className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm mb-4 sm:mb-6"
           >
-            <h2 className="text-lg font-bold text-gray-900 mb-4">🎁 Beloningen inwisselen</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">🎁 {t('accountPage.rewards')}</h2>
             <div className="space-y-3">
               {rewards.map((reward) => {
                 const canRedeem = (customer?.loyalty_points || 0) >= reward.points_required
@@ -319,7 +321,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                         <p className="text-sm text-gray-500">{reward.description}</p>
                       )}
                       <p className="text-sm font-medium mt-1" style={{ color: canRedeem ? '#16a34a' : '#9ca3af' }}>
-                        ⭐ {reward.points_required} punten
+                        ⭐ {reward.points_required} {t('accountPage.points')}
                       </p>
                     </div>
                     <button
@@ -332,7 +334,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                           : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                       }`}
                     >
-                      {redeeming === reward.id ? 'Laden...' : canRedeem ? 'Inwisselen' : `Nog ${reward.points_required - (customer?.loyalty_points || 0)} punten`}
+                      {redeeming === reward.id ? t('accountPage.redeeming') : canRedeem ? t('accountPage.redeem') : `${reward.points_required - (customer?.loyalty_points || 0)} ${t('accountPage.points')}`}
                     </button>
                   </div>
                 )
@@ -348,18 +350,18 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
           transition={{ delay: 0.2 }}
           className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm mb-4 sm:mb-6"
         >
-          <h2 className="text-lg font-bold text-gray-900 mb-4">Bestellingen</h2>
+          <h2 className="text-lg font-bold text-gray-900 mb-4">{t('accountPage.myOrders')}</h2>
           
           {orders.length === 0 ? (
             <div className="text-center py-12">
               <span className="text-5xl mb-4 block">📦</span>
-              <p className="text-gray-500">Je hebt nog geen bestellingen geplaatst.</p>
+              <p className="text-gray-500">{t('accountPage.noOrders')}</p>
               <Link
                 href={`/shop/${params.tenant}/menu`}
                 style={{ color: primaryColor }}
                 className="font-medium hover:underline mt-2 inline-block"
               >
-                Bekijk menu →
+                {t('accountPage.orderNow')} →
               </Link>
             </div>
           ) : (
@@ -389,16 +391,15 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
           transition={{ delay: 0.3 }}
           className="bg-white rounded-2xl p-6 shadow-sm border border-red-100"
         >
-          <h2 className="text-lg font-bold text-red-700 mb-2">⚠️ Account verwijderen</h2>
+          <h2 className="text-lg font-bold text-red-700 mb-2">⚠️ {t('accountPage.deleteAccount')}</h2>
           <p className="text-gray-600 text-sm mb-4">
-            Wanneer je je account verwijdert, worden al je persoonlijke gegevens permanent gewist. 
-            Dit kan niet ongedaan worden gemaakt. (GDPR-recht op verwijdering)
+            {t('accountPage.deleteAccountWarning')}
           </p>
           <button
             onClick={() => setShowDeleteConfirm(true)}
             className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl font-medium transition-colors"
           >
-            Account verwijderen
+            {t('accountPage.deleteAccount')}
           </button>
         </motion.div>
       </div>
@@ -447,14 +448,14 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
                 }}
                 className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
               >
-                Annuleren
+                {t('accountPage.cancel')}
               </button>
               <button
                 onClick={handleDeleteAccount}
-                disabled={deleteConfirmText !== 'VERWIJDEREN' || deleting}
+                disabled={deleteConfirmText !== t('accountPage.deleteConfirmWord') || deleting}
                 className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white rounded-xl font-medium"
               >
-                {deleting ? 'Bezig...' : '🗑️ Verwijderen'}
+                {deleting ? t('accountPage.deleting') : '🗑️ ' + t('accountPage.deleteAccount')}
               </button>
             </div>
           </motion.div>
