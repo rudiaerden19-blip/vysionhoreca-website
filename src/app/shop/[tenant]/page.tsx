@@ -307,33 +307,34 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   useEffect(() => {
     async function loadData() {
-      // Check of tenant geblokkeerd is
-      if (supabase) {
-        const { data: blockCheck } = await supabase
-          .from('tenant_settings')
-          .select('is_blocked')
-          .eq('tenant_slug', params.tenant)
-          .single()
-        
-        if (blockCheck?.is_blocked) {
-          setIsBlocked(true)
-          setLoading(false)
-          return
+      try {
+        // Check of tenant geblokkeerd is
+        if (supabase) {
+          const { data: blockCheck } = await supabase
+            .from('tenant_settings')
+            .select('is_blocked')
+            .eq('tenant_slug', params.tenant)
+            .single()
+          
+          if (blockCheck?.is_blocked) {
+            setIsBlocked(true)
+            setLoading(false)
+            return
+          }
         }
-      }
 
-      // Laad data uit Supabase
-      const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData] = await Promise.all([
-        getTenantSettings(params.tenant),
-        getOpeningHours(params.tenant),
-        getDeliverySettings(params.tenant),
-        getMenuProducts(params.tenant),
-        getTenantTexts(params.tenant),
-        getVisibleReviews(params.tenant),
-      ])
+        // Laad data uit Supabase
+        const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData] = await Promise.all([
+          getTenantSettings(params.tenant),
+          getOpeningHours(params.tenant),
+          getDeliverySettings(params.tenant),
+          getMenuProducts(params.tenant),
+          getTenantTexts(params.tenant),
+          getVisibleReviews(params.tenant),
+        ])
 
       // Converteer openingstijden naar het juiste formaat
-      const openingHoursMap: Record<string, { open?: string; close?: string; closed?: boolean; hasShift2?: boolean; open2?: string; close2?: string; hasBreak?: boolean; breakStart?: string; breakEnd?: string }> = {}
+        const openingHoursMap: Record<string, { open?: string; close?: string; closed?: boolean; hasShift2?: boolean; open2?: string; close2?: string; hasBreak?: boolean; breakStart?: string; breakEnd?: string }> = {}
       dayNamesNL.forEach((dayName, index) => {
         const hourData = hoursData.find(h => h.day_of_week === index)
         const dayKey = dayName.toLowerCase()
@@ -364,10 +365,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         tagline: tenantData?.tagline || 'Welkom bij onze zaak',
         logo_url: tenantData?.logo_url || '',
         cover_images: [
-          tenantData?.cover_image_1 || 'https://images.unsplash.com/photo-1619881590738-a111d176d906?w=1600',
-          tenantData?.cover_image_2 || 'https://images.unsplash.com/photo-1598679253544-2c97992403ea?w=1600',
-          tenantData?.cover_image_3 || 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=1600',
-        ].filter(img => img && img.trim() !== ''),
+          tenantData?.cover_image_1,
+          tenantData?.cover_image_2,
+          tenantData?.cover_image_3,
+        ].filter((img): img is string => !!img && img.trim() !== ''),
         description: tenantData?.description || '',
         story: tenantData?.description || '',
         address: tenantData?.address || '',
@@ -413,16 +414,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       })
 
       // Team members ophalen
-      const { data: teamData } = await supabase
-        .from('team_members')
-        .select('*')
-        .eq('tenant_slug', params.tenant)
-        .eq('is_active', true)
-        .order('display_order', { ascending: true })
-      
-      if (teamData) {
-        setTeamMembers(teamData)
-      }
+        if (supabase) {
+          const { data: teamData } = await supabase
+            .from('team_members')
+            .select('*')
+            .eq('tenant_slug', params.tenant)
+            .eq('is_active', true)
+            .order('display_order', { ascending: true })
+          
+          if (teamData) {
+            setTeamMembers(teamData)
+          }
+        }
 
       // Populaire items uit producten
       const popular = productsData
@@ -432,7 +435,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           id: p.id || '',
           name: p.name,
           price: p.price,
-          image_url: p.image_url || 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400',
+          image_url: p.image_url || '',
         }))
       
       // Als geen populaire items, toon eerste 4 actieve producten
@@ -442,7 +445,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           id: p.id || '',
           name: p.name,
           price: p.price,
-          image_url: p.image_url || 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400',
+          image_url: p.image_url || '',
         })))
       } else {
         setPopularItems(popular)
@@ -458,7 +461,11 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       }))
       setReviews(formattedReviews)
 
-      setLoading(false)
+        setLoading(false)
+      } catch (error) {
+        console.error('Error loading tenant data:', error)
+        setLoading(false)
+      }
     }
 
     loadData()
