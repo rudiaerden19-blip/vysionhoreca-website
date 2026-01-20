@@ -8,6 +8,7 @@ import { getTeamMembers, saveTeamMember, deleteTeamMember, TeamMember } from '@/
 import MediaPicker from '@/components/MediaPicker'
 
 export default function TeamPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [members, setMembers] = useState<TeamMember[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -104,8 +105,8 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Ons Team</h1>
-          <p className="text-gray-500">Toon je teamleden op de website</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('websiteTeam.title')}</h1>
+          <p className="text-gray-500">{t('websiteTeam.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -114,7 +115,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
           className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
         >
           <span>+</span>
-          <span>Teamlid toevoegen</span>
+          <span>{t('websiteTeam.addMember')}</span>
         </motion.button>
       </div>
 
@@ -126,13 +127,13 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
           className="bg-white rounded-2xl p-12 text-center shadow-sm"
         >
           <div className="text-6xl mb-4">👥</div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">Nog geen teamleden</h3>
-          <p className="text-gray-500 mb-6">Voeg teamleden toe om ze op je website te tonen</p>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('websiteTeam.noMembers')}</h3>
+          <p className="text-gray-500 mb-6">{t('websiteTeam.noMembersDesc')}</p>
           <button
             onClick={handleAdd}
             className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium"
           >
-            Eerste teamlid toevoegen
+            {t('websiteTeam.addFirstMember')}
           </button>
         </motion.div>
       ) : (
@@ -193,9 +194,9 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
         transition={{ delay: 0.2 }}
         className="mt-8 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 Tip</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('websiteTeam.tip')}</h3>
         <p className="text-blue-700 text-sm">
-          Teamleden worden automatisch getoond op je website in de &quot;Ons Team&quot; sectie tussen de topverkopers en openingsuren.
+          {t('websiteTeam.tipText')}
         </p>
       </motion.div>
 
@@ -217,14 +218,14 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
               className="bg-white rounded-2xl p-6 w-full max-w-md"
             >
               <h2 className="text-xl font-bold text-gray-900 mb-6">
-                {editingMember ? 'Teamlid bewerken' : 'Nieuw teamlid'}
+                {editingMember ? t('websiteTeam.editMember') : t('websiteTeam.newMember')}
               </h2>
 
               <div className="space-y-4">
                 {/* Photo */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Foto
+                    {t('websiteTeam.photo')}
                   </label>
                   <MediaPicker
                     tenantSlug={params.tenant}
@@ -236,28 +237,28 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
                 {/* Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Naam *
+                    {t('websiteTeam.name')} *
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Jan Jansen"
+                    placeholder={t('websiteTeam.namePlaceholder')}
                   />
                 </div>
 
                 {/* Role */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Functie
+                    {t('websiteTeam.role')}
                   </label>
                   <input
                     type="text"
                     value={formData.role}
                     onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Chef-kok, Eigenaar, Medewerker..."
+                    placeholder={t('websiteTeam.rolePlaceholder')}
                   />
                 </div>
               </div>
@@ -268,14 +269,14 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
                 >
-                  Annuleren
+                  {t('adminPages.common.cancel')}
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={saving}
                   className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium disabled:opacity-50"
                 >
-                  {saving ? 'Opslaan...' : 'Opslaan'}
+                  {saving ? t('adminPages.common.saving') : t('adminPages.common.save')}
                 </button>
               </div>
             </motion.div>

@@ -257,8 +257,8 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Foto&apos;s & Media</h1>
-          <p className="text-gray-500">{media.length} bestanden geüpload</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('websiteMedia.title')}</h1>
+          <p className="text-gray-500">{media.length} {t('websiteMedia.filesUploaded')}</p>
         </div>
         <div className="flex gap-3">
           {selectedItems.length > 0 && (
@@ -266,7 +266,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               onClick={deleteSelected}
               className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-xl font-medium"
             >
-              🗑️ {selectedItems.length} verwijderen
+              🗑️ {selectedItems.length} {t('websiteMedia.delete')}
             </button>
           )}
           <button
@@ -274,7 +274,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             disabled={uploading}
             className="px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white rounded-xl font-medium flex items-center gap-2"
           >
-            {uploading ? '⏳ Optimaliseren...' : '📤 Uploaden'}
+            {uploading ? `⏳ ${t('websiteMedia.optimizing')}` : `📤 ${t('websiteMedia.upload')}`}
           </button>
           <input
             ref={fileInputRef}
@@ -293,7 +293,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl p-6 shadow-sm mb-6"
       >
-        <h3 className="font-semibold text-gray-900 mb-4">📁 Upload naar map</h3>
+        <h3 className="font-semibold text-gray-900 mb-4">📁 {t('websiteMedia.uploadToFolder')}</h3>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setUploadCategory('')}
@@ -303,7 +303,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
             }`}
           >
-            Geen map
+            {t('websiteMedia.noFolder')}
           </button>
           {categories.map(cat => (
             <button
@@ -322,7 +322,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             onClick={() => setShowNewCategory(true)}
             className="px-4 py-2 rounded-xl font-medium bg-gray-100 hover:bg-gray-200 text-gray-700"
           >
-            + Nieuwe map
+            + {t('websiteMedia.newFolder')}
           </button>
         </div>
 
@@ -339,7 +339,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 type="text"
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
-                placeholder="Naam van de map..."
+                placeholder={t('websiteMedia.folderNamePlaceholder')}
                 className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 autoFocus
               />
@@ -371,18 +371,18 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         className="border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center mb-8 hover:border-orange-500 transition-colors cursor-pointer bg-gray-50"
       >
         <span className="text-5xl mb-4 block">📷</span>
-        <p className="text-gray-700 font-medium mb-2">Sleep bestanden hierheen</p>
-        <p className="text-gray-500 text-sm mb-4">of klik om te uploaden</p>
-        <p className="text-gray-400 text-xs">JPG, PNG, GIF • Automatisch geoptimaliseerd naar 800x800</p>
+        <p className="text-gray-700 font-medium mb-2">{t('websiteMedia.dragFilesHere')}</p>
+        <p className="text-gray-500 text-sm mb-4">{t('websiteMedia.orClickToUpload')}</p>
+        <p className="text-gray-400 text-xs">{t('websiteMedia.supportedFormats')}</p>
         {uploadCategory && (
-          <p className="text-orange-500 text-sm mt-2">→ Wordt geüpload naar: <strong>{uploadCategory}</strong></p>
+          <p className="text-orange-500 text-sm mt-2">→ {t('websiteMedia.uploadingTo')}: <strong>{uploadCategory}</strong></p>
         )}
       </motion.div>
 
       {/* Category Filter */}
       {categories.length > 0 && (
         <div className="flex items-center gap-4 mb-6">
-          <span className="text-gray-500 text-sm">Filter:</span>
+          <span className="text-gray-500 text-sm">{t('websiteMedia.filter')}:</span>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedCategory('alle')}
@@ -392,7 +392,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
               }`}
             >
-              Alle ({media.length})
+              {t('websiteMedia.all')} ({media.length})
             </button>
             {categories.map(cat => (
               <button
@@ -415,7 +415,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
               }`}
             >
-              Zonder map ({media.filter(m => !m.category || m.category === '').length})
+              {t('websiteMedia.withoutFolder')} ({media.filter(m => !m.category || m.category === '').length})
             </button>
           </div>
         </div>
@@ -423,7 +423,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
 
       {/* View Toggle */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-gray-500">{filteredMedia.length} bestanden</p>
+        <p className="text-gray-500">{filteredMedia.length} {t('websiteMedia.files')}</p>
         <div className="flex bg-gray-100 rounded-lg p-1">
           <button
             onClick={() => setViewMode('grid')}
@@ -536,9 +536,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         <div className="text-center py-12">
           <span className="text-6xl mb-4 block">📷</span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">
-            {selectedCategory === 'alle' ? 'Nog geen media' : `Geen foto's in "${selectedCategory}"`}
+            {selectedCategory === 'alle' ? t('websiteMedia.noMedia') : `${t('websiteMedia.noPhotosIn')} "${selectedCategory}"`}
           </h3>
-          <p className="text-gray-500">Upload je eerste foto&apos;s</p>
+          <p className="text-gray-500">{t('websiteMedia.uploadFirstPhotos')}</p>
         </div>
       )}
     </div>

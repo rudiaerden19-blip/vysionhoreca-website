@@ -8,6 +8,7 @@ import { getGiftCards, GiftCard, getTenantSettings, saveTenantSettings, TenantSe
 import { supabase } from '@/lib/supabase'
 
 export default function CadeaubonnenPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [giftCards, setGiftCards] = useState<GiftCard[]>([])
   const [settings, setSettings] = useState<TenantSettings | null>(null)
   const [loading, setLoading] = useState(true)
@@ -107,8 +108,8 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Cadeaubonnen</h1>
-          <p className="text-gray-500">Verkoop cadeaubonnen via je website</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('websiteGiftCards.title')}</h1>
+          <p className="text-gray-500">{t('websiteGiftCards.subtitle')}</p>
         </div>
         {activeTab === 'instellingen' && (
           <motion.button
@@ -122,7 +123,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                 : 'bg-orange-500 hover:bg-orange-600 text-white'
             }`}
           >
-            {saving ? 'Opslaan...' : saved ? '✓ Opgeslagen!' : '💾 Opslaan'}
+            {saving ? t('adminPages.common.saving') : saved ? `✓ ${t('adminPages.common.saved')}` : `💾 ${t('adminPages.common.save')}`}
           </motion.button>
         )}
       </div>
@@ -137,7 +138,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          ⚙️ Instellingen
+          ⚙️ {t('websiteGiftCards.settings')}
         </button>
         <button
           onClick={() => setActiveTab('bonnen')}
@@ -147,7 +148,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          🎫 Verkochte bonnen ({giftCards.filter(g => g.status === 'paid').length})
+          🎫 {t('websiteGiftCards.soldCards')} ({giftCards.filter(g => g.status === 'paid').length})
         </button>
       </div>
 
@@ -161,8 +162,8 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           >
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">Cadeaubonnen activeren</h2>
-                <p className="text-gray-500 text-sm">Toon de cadeaubon sectie op je website</p>
+                <h2 className="text-lg font-semibold text-gray-900">{t('websiteGiftCards.enableGiftCards')}</h2>
+                <p className="text-gray-500 text-sm">{t('websiteGiftCards.enableGiftCardsDesc')}</p>
               </div>
               <button
                 type="button"
@@ -187,18 +188,18 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
             transition={{ delay: 0.1 }}
             className="bg-white rounded-2xl p-6 shadow-sm"
           >
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">💳 Stripe Betalingen</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">💳 {t('websiteGiftCards.stripePayments')}</h2>
             <p className="text-gray-500 text-sm mb-6">
-              Koppel je Stripe account om betalingen te ontvangen. 
+              {t('websiteGiftCards.stripeDesc')} 
               <a href="https://dashboard.stripe.com/apikeys" target="_blank" className="text-orange-500 hover:underline ml-1">
-                API keys ophalen →
+                {t('websiteGiftCards.getApiKeys')} →
               </a>
             </p>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Publishable Key (pk_...)
+                  {t('websiteGiftCards.publishableKey')} (pk_...)
                 </label>
                 <input
                   type="text"
@@ -211,7 +212,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Secret Key (sk_...)
+                  {t('websiteGiftCards.secretKey')} (sk_...)
                 </label>
                 <div className="relative">
                   <input
@@ -229,7 +230,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                     {showSecretKey ? '🙈' : '👁️'}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">🔒 Deze key wordt veilig opgeslagen</p>
+                <p className="text-xs text-gray-500 mt-1">🔒 {t('websiteGiftCards.keySecurelyStored')}</p>
               </div>
             </div>
           </motion.div>
@@ -263,13 +264,13 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
             transition={{ delay: 0.3 }}
             className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
           >
-            <h3 className="font-semibold text-blue-900 mb-4">📋 Hoe werkt het?</h3>
+            <h3 className="font-semibold text-blue-900 mb-4">📋 {t('websiteGiftCards.howItWorks')}</h3>
             <ol className="text-blue-700 text-sm space-y-2">
-              <li>1. Klant klikt op &quot;Cadeaubon bestellen&quot; op je website</li>
-              <li>2. Kiest gelegenheid, bedrag en persoonlijke tekst</li>
-              <li>3. Betaalt met Bancontact/iDEAL via Stripe</li>
-              <li>4. Ontvanger krijgt bon per email met unieke code</li>
-              <li>5. Code kan ingewisseld worden bij checkout</li>
+              <li>1. {t('websiteGiftCards.step1')}</li>
+              <li>2. {t('websiteGiftCards.step2')}</li>
+              <li>3. {t('websiteGiftCards.step3')}</li>
+              <li>4. {t('websiteGiftCards.step4')}</li>
+              <li>5. {t('websiteGiftCards.step5')}</li>
             </ol>
           </motion.div>
         </div>
@@ -284,8 +285,8 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               className="bg-white rounded-2xl p-12 text-center shadow-sm"
             >
               <div className="text-6xl mb-4">🎁</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Nog geen cadeaubonnen verkocht</h3>
-              <p className="text-gray-500">Zodra klanten cadeaubonnen kopen, verschijnen ze hier</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('websiteGiftCards.noGiftCards')}</h3>
+              <p className="text-gray-500">{t('websiteGiftCards.noGiftCardsDesc')}</p>
             </motion.div>
           ) : (
             <>
@@ -295,19 +296,19 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                   <p className="text-2xl font-bold text-gray-900">
                     €{giftCards.filter(g => g.status === 'paid').reduce((sum, g) => sum + g.remaining_amount, 0).toFixed(2)}
                   </p>
-                  <p className="text-sm text-gray-500">Open saldo</p>
+                  <p className="text-sm text-gray-500">{t('websiteGiftCards.openBalance')}</p>
                 </div>
                 <div className="bg-white rounded-xl p-4 shadow-sm text-center">
                   <p className="text-2xl font-bold text-green-600">
                     {giftCards.filter(g => g.status === 'paid').length}
                   </p>
-                  <p className="text-sm text-gray-500">Actieve bonnen</p>
+                  <p className="text-sm text-gray-500">{t('websiteGiftCards.activeCards')}</p>
                 </div>
                 <div className="bg-white rounded-xl p-4 shadow-sm text-center">
                   <p className="text-2xl font-bold text-gray-600">
                     {giftCards.filter(g => g.status === 'used').length}
                   </p>
-                  <p className="text-sm text-gray-500">Ingewisseld</p>
+                  <p className="text-sm text-gray-500">{t('websiteGiftCards.redeemed')}</p>
                 </div>
               </div>
 

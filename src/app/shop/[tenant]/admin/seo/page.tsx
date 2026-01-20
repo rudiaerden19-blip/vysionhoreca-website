@@ -93,8 +93,8 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">SEO</h1>
-          <p className="text-gray-500">Optimaliseer voor zoekmachines</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('websiteSeo.title')}</h1>
+          <p className="text-gray-500">{t('websiteSeo.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -146,17 +146,17 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
         {/* Title */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Pagina titel
+            {t('websiteSeo.pageTitle')}
           </label>
           <input
             type="text"
             value={seo.title}
             onChange={(e) => handleChange('title', e.target.value)}
             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            placeholder="Bijv. Frituur De Gouden Friet | Beste frieten van Pelt"
+            placeholder={t('websiteSeo.pageTitlePlaceholder')}
           />
           <div className="flex justify-between mt-2">
-            <p className="text-sm text-gray-500">Dit verschijnt in de browsertab en zoekresultaten</p>
+            <p className="text-sm text-gray-500">{t('websiteSeo.pageTitleDesc')}</p>
             <p className={`text-sm ${titleLength > 60 ? 'text-red-500' : 'text-gray-400'}`}>
               {titleLength}/60
             </p>
@@ -166,17 +166,17 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
         {/* Description */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Meta beschrijving
+            {t('websiteSeo.metaDescription')}
           </label>
           <textarea
             value={seo.description}
             onChange={(e) => handleChange('description', e.target.value)}
             rows={3}
             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
-            placeholder="Beschrijf je zaak in 1-2 zinnen..."
+            placeholder={t('websiteSeo.metaDescriptionPlaceholder')}
           />
           <div className="flex justify-between mt-2">
-            <p className="text-sm text-gray-500">Korte beschrijving voor zoekresultaten</p>
+            <p className="text-sm text-gray-500">{t('websiteSeo.metaDescriptionDesc')}</p>
             <p className={`text-sm ${descLength > 160 ? 'text-red-500' : 'text-gray-400'}`}>
               {descLength}/160
             </p>
@@ -186,29 +186,29 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
         {/* Keywords */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Zoekwoorden
+            {t('websiteSeo.keywords')}
           </label>
           <input
             type="text"
             value={seo.keywords}
             onChange={(e) => handleChange('keywords', e.target.value)}
             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-            placeholder="frituur, friet, afhaal, levering..."
+            placeholder={t('websiteSeo.keywordsPlaceholder')}
           />
-          <p className="text-sm text-gray-500 mt-2">Gescheiden door komma&apos;s</p>
+          <p className="text-sm text-gray-500 mt-2">{t('websiteSeo.keywordsDesc')}</p>
         </div>
 
         {/* OG Image */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Social media afbeelding
+            {t('websiteSeo.ogImage')}
           </label>
           <MediaPicker
             tenantSlug={params.tenant}
             value={seo.ogImage}
             onChange={(url) => handleChange('ogImage', url)}
           />
-          <p className="text-sm text-gray-500 mt-2">Aanbevolen: 1200 x 630 pixels. Wordt getoond als je link gedeeld wordt op social media.</p>
+          <p className="text-sm text-gray-500 mt-2">{t('websiteSeo.ogImageDesc')}</p>
         </div>
       </motion.div>
 
@@ -220,17 +220,17 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
         className="mt-6 bg-white rounded-2xl p-6 shadow-sm"
       >
         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span>🔍</span> Google preview
+          <span>🔍</span> {t('websiteSeo.googlePreview')}
         </h3>
         <div className="border rounded-xl p-4 bg-gray-50">
           <p className="text-blue-600 text-lg hover:underline cursor-pointer truncate">
-            {seo.title || 'Pagina titel'}
+            {seo.title || t('websiteSeo.pageTitle')}
           </p>
           <p className="text-green-700 text-sm mb-1">
             {params.tenant}.ordervysion.com
           </p>
           <p className="text-gray-600 text-sm line-clamp-2">
-            {seo.description || 'Voeg een meta beschrijving toe...'}
+            {seo.description || t('websiteSeo.addMetaDescription')}
           </p>
         </div>
       </motion.div>
@@ -244,7 +244,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
           className="mt-6 bg-white rounded-2xl p-6 shadow-sm"
         >
           <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span>📱</span> Social media preview
+            <span>📱</span> {t('websiteSeo.facebookPreview')}
           </h3>
           <div className="border rounded-xl overflow-hidden bg-gray-50 max-w-md">
             <img 
@@ -254,8 +254,8 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
             />
             <div className="p-3">
               <p className="text-gray-500 text-xs uppercase">{params.tenant}.ordervysion.com</p>
-              <p className="font-semibold text-gray-900 truncate">{seo.title || 'Pagina titel'}</p>
-              <p className="text-gray-600 text-sm line-clamp-2">{seo.description || 'Beschrijving'}</p>
+              <p className="font-semibold text-gray-900 truncate">{seo.title || t('websiteSeo.pageTitle')}</p>
+              <p className="text-gray-600 text-sm line-clamp-2">{seo.description || t('websiteSeo.description')}</p>
             </div>
           </div>
         </motion.div>
@@ -268,13 +268,13 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
         transition={{ delay: 0.2 }}
         className="mt-6 bg-green-50 border border-green-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-green-900 mb-2">💡 SEO Tips</h3>
+        <h3 className="font-semibold text-green-900 mb-2">💡 {t('websiteSeo.tips.title')}</h3>
         <ul className="text-green-700 text-sm space-y-1">
-          <li>• Gebruik je plaatsnaam in de titel (bijv. &quot;Frituur Pelt&quot;)</li>
-          <li>• Houd de titel onder 60 karakters</li>
-          <li>• Beschrijf je unieke selling points in de beschrijving</li>
-          <li>• Voeg relevante zoekwoorden toe die klanten gebruiken</li>
-          <li>• Upload een aantrekkelijke afbeelding voor social media</li>
+          <li>• {t('websiteSeo.tips.tip1')}</li>
+          <li>• {t('websiteSeo.tips.tip2')}</li>
+          <li>• {t('websiteSeo.tips.tip3')}</li>
+          <li>• {t('websiteSeo.tips.tip4')}</li>
+          <li>• {t('websiteSeo.tips.tip5')}</li>
         </ul>
       </motion.div>
     </div>

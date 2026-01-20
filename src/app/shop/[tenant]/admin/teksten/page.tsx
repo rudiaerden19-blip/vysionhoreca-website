@@ -21,6 +21,7 @@ interface TenantTexts {
 }
 
 export default function TekstenPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -94,16 +95,16 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
   }
 
   const textFields = [
-    { section: 'Knoppen', icon: '🔘', fields: [
-      { key: 'order_button_text', label: 'Bestel knop', placeholder: 'Bestel Nu' },
-      { key: 'pickup_label', label: 'Afhalen label', placeholder: 'Afhalen' },
-      { key: 'delivery_label', label: 'Levering label', placeholder: 'Levering' },
-      { key: 'checkout_button_text', label: 'Afrekenen knop', placeholder: 'Afrekenen' },
+    { section: t('websiteTexts.buttons'), icon: '🔘', fields: [
+      { key: 'order_button_text', label: t('websiteTexts.orderButton'), placeholder: t('websiteTexts.orderButtonPlaceholder') },
+      { key: 'pickup_label', label: t('websiteTexts.pickupLabel'), placeholder: t('websiteTexts.pickupPlaceholder') },
+      { key: 'delivery_label', label: t('websiteTexts.deliveryLabel'), placeholder: t('websiteTexts.deliveryPlaceholder') },
+      { key: 'checkout_button_text', label: t('websiteTexts.checkoutButton'), placeholder: t('websiteTexts.checkoutPlaceholder') },
     ]},
-    { section: 'Berichten', icon: '💬', fields: [
-      { key: 'closed_message', label: 'Gesloten melding', placeholder: 'Momenteel gesloten' },
-      { key: 'min_order_message', label: 'Minimum bestelling', placeholder: 'Gebruik {amount} voor bedrag' },
-      { key: 'cart_empty_message', label: 'Lege winkelwagen', placeholder: 'Je winkelwagen is leeg' },
+    { section: t('websiteTexts.messages'), icon: '💬', fields: [
+      { key: 'closed_message', label: t('websiteTexts.closedMessage'), placeholder: t('websiteTexts.closedPlaceholder') },
+      { key: 'min_order_message', label: t('websiteTexts.minOrderMessage'), placeholder: t('websiteTexts.minOrderPlaceholder') },
+      { key: 'cart_empty_message', label: t('websiteTexts.cartEmptyMessage'), placeholder: t('websiteTexts.cartEmptyPlaceholder') },
     ]},
   ]
 
@@ -123,8 +124,8 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Teksten</h1>
-          <p className="text-gray-500">Pas alle teksten op je website aan</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('websiteTexts.title')}</h1>
+          <p className="text-gray-500">{t('websiteTexts.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -137,7 +138,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
               : 'bg-orange-500 hover:bg-orange-600 text-white'
           }`}
         >
-          {saving ? '⏳ Opslaan...' : saved ? '✓ Opgeslagen!' : '💾 Opslaan'}
+          {saving ? `⏳ ${t('adminPages.common.saving')}` : saved ? `✓ ${t('adminPages.common.saved')}` : `💾 ${t('adminPages.common.save')}`}
         </motion.button>
       </div>
 
@@ -190,9 +191,9 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.4 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 Tip</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('websiteTexts.tip')}</h3>
         <p className="text-blue-700 text-sm">
-          Gebruik <code className="bg-blue-100 px-1 rounded">{'{amount}'}</code> in teksten om automatisch bedragen in te vullen.
+          {t('websiteTexts.tipText')}
         </p>
       </motion.div>
     </div>

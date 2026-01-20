@@ -7,14 +7,14 @@ import { motion } from 'framer-motion'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 
 const colorPresets = [
-  { name: 'Oranje', primary: '#FF6B35', secondary: '#FFA500' },
-  { name: 'Rood', primary: '#E53935', secondary: '#FF5252' },
-  { name: 'Blauw', primary: '#1E88E5', secondary: '#42A5F5' },
-  { name: 'Groen', primary: '#43A047', secondary: '#66BB6A' },
-  { name: 'Paars', primary: '#8E24AA', secondary: '#AB47BC' },
-  { name: 'Roze', primary: '#D81B60', secondary: '#EC407A' },
-  { name: 'Teal', primary: '#00897B', secondary: '#26A69A' },
-  { name: 'Donker', primary: '#37474F', secondary: '#546E7A' },
+  { nameKey: 'orange', primary: '#FF6B35', secondary: '#FFA500' },
+  { nameKey: 'red', primary: '#E53935', secondary: '#FF5252' },
+  { nameKey: 'blue', primary: '#1E88E5', secondary: '#42A5F5' },
+  { nameKey: 'green', primary: '#43A047', secondary: '#66BB6A' },
+  { nameKey: 'purple', primary: '#8E24AA', secondary: '#AB47BC' },
+  { nameKey: 'pink', primary: '#D81B60', secondary: '#EC407A' },
+  { nameKey: 'teal', primary: '#00897B', secondary: '#26A69A' },
+  { nameKey: 'dark', primary: '#37474F', secondary: '#546E7A' },
 ]
 
 export default function DesignPage({ params }: { params: { tenant: string } }) {
@@ -61,7 +61,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      setError('Opslaan mislukt. Probeer opnieuw.')
+      setError(t('websiteDesign.saveFailed'))
     }
     setSaving(false)
   }
@@ -92,8 +92,8 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Design & kleuren</h1>
-          <p className="text-gray-500">Pas het uiterlijk van je website aan</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('websiteDesign.title')}</h1>
+          <p className="text-gray-500">{t('websiteDesign.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -146,7 +146,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             className="bg-white rounded-2xl p-6 shadow-sm"
           >
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span>🎨</span> Kleurenschema
+              <span>🎨</span> {t('websiteDesign.colorScheme')}
             </h2>
             <div className="grid grid-cols-4 gap-3 mb-6">
               {colorPresets.map((preset) => (
@@ -163,7 +163,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                     className="w-full aspect-square rounded-lg mb-2"
                     style={{ background: `linear-gradient(135deg, ${preset.primary}, ${preset.secondary})` }}
                   />
-                  <p className="text-xs text-gray-600 text-center">{preset.name}</p>
+                  <p className="text-xs text-gray-600 text-center">{t(`websiteDesign.colors.${preset.nameKey}`)}</p>
                 </button>
               ))}
             </div>
@@ -172,7 +172,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hoofdkleur
+                  {t('websiteDesign.primaryColor')}
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -191,7 +191,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Accentkleur
+                  {t('websiteDesign.secondaryColor')}
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -218,10 +218,9 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             transition={{ delay: 0.1 }}
             className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
           >
-            <h3 className="font-semibold text-blue-900 mb-2">💡 Tip</h3>
+            <h3 className="font-semibold text-blue-900 mb-2">💡 {t('websiteDesign.tip')}</h3>
             <p className="text-blue-700 text-sm">
-              De kleuren worden toegepast op knoppen, accenten en andere elementen op je website. 
-              Kies kleuren die passen bij je huisstijl en goed leesbaar zijn.
+              {t('websiteDesign.tipText')}
             </p>
           </motion.div>
         </div>
@@ -235,7 +234,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
         >
           <div className="bg-white rounded-2xl p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span>👁️</span> Live preview
+              <span>👁️</span> {t('websiteDesign.livePreview')}
             </h2>
             
             {/* Mini Preview */}
@@ -252,7 +251,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                   <div className="text-white text-xs font-bold mb-1">
                     {settings?.business_name || 'Je Zaak Naam'}
                   </div>
-                  <div className="text-white/70 text-[10px]">{settings?.tagline || 'Tagline hier'}</div>
+                  <div className="text-white/70 text-[10px]">{settings?.tagline || t('websiteDesign.taglineHere')}</div>
                 </div>
               </div>
 
@@ -264,13 +263,13 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                     className="px-3 py-1 text-xs font-medium text-white rounded-full"
                     style={{ backgroundColor: primaryColor }}
                   >
-                    Alles
+                    {t('websiteDesign.previewAll')}
                   </div>
                   <div className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
-                    Frieten
+                    {t('websiteDesign.previewFries')}
                   </div>
                   <div className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
-                    Snacks
+                    {t('websiteDesign.previewSnacks')}
                   </div>
                 </div>
 
@@ -298,7 +297,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                   className="w-full mt-4 py-2 text-white text-xs font-medium rounded-xl"
                   style={{ backgroundColor: primaryColor }}
                 >
-                  Bestel Nu
+                  {t('websiteDesign.orderNow')}
                 </button>
               </div>
             </div>
@@ -308,7 +307,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
               target="_blank"
               className="mt-4 w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 rounded-xl flex items-center justify-center gap-2 transition-colors"
             >
-              <span>Bekijk volledige website</span>
+              <span>{t('websiteDesign.viewFullWebsite')}</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
