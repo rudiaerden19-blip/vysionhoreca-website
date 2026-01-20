@@ -98,11 +98,11 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   })
 
   const [targetsForm, setTargetsForm] = useState({
-    target_profit_margin: 25,
-    minimum_profit_margin: 15,
-    max_personnel_percent: 30,
-    max_ingredient_percent: 35,
-    target_average_ticket: 15,
+    target_profit_margin: 0,
+    minimum_profit_margin: 0,
+    max_personnel_percent: 0,
+    max_ingredient_percent: 0,
+    target_average_ticket: 0,
   })
 
   // Load data
@@ -921,8 +921,9 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               <label className="block font-medium text-gray-700 mb-2">🎯 Gewenste Winstmarge (%)</label>
               <input
                 type="number"
-                value={targetsForm.target_profit_margin}
+                value={targetsForm.target_profit_margin || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, target_profit_margin: Number(e.target.value) }))}
+                placeholder="25"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
               />
               <p className="text-sm text-gray-500 mt-1">Aanbevolen voor horeca: 25-30%</p>
@@ -932,8 +933,9 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               <label className="block font-medium text-gray-700 mb-2">⚠️ Minimum Winstmarge (%)</label>
               <input
                 type="number"
-                value={targetsForm.minimum_profit_margin}
+                value={targetsForm.minimum_profit_margin || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, minimum_profit_margin: Number(e.target.value) }))}
+                placeholder="15"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
               />
               <p className="text-sm text-gray-500 mt-1">Onder deze waarde krijg je een waarschuwing</p>
@@ -943,8 +945,9 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               <label className="block font-medium text-gray-700 mb-2">👥 Max Personeelskosten (%)</label>
               <input
                 type="number"
-                value={targetsForm.max_personnel_percent}
+                value={targetsForm.max_personnel_percent || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, max_personnel_percent: Number(e.target.value) }))}
+                placeholder="30"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
               />
               <p className="text-sm text-gray-500 mt-1">Aanbevolen max: 30% van omzet</p>
@@ -954,8 +957,9 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               <label className="block font-medium text-gray-700 mb-2">🥔 Max Ingrediëntenkosten (%)</label>
               <input
                 type="number"
-                value={targetsForm.max_ingredient_percent}
+                value={targetsForm.max_ingredient_percent || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, max_ingredient_percent: Number(e.target.value) }))}
+                placeholder="35"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
               />
               <p className="text-sm text-gray-500 mt-1">Aanbevolen max: 35% van omzet</p>
@@ -965,8 +969,9 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               <label className="block font-medium text-gray-700 mb-2">🧾 Doel Gemiddelde Bon (€)</label>
               <input
                 type="number"
-                value={targetsForm.target_average_ticket}
+                value={targetsForm.target_average_ticket || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, target_average_ticket: Number(e.target.value) }))}
+                placeholder="15"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
               />
             </div>
