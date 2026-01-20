@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/i18n'
 
 interface Business {
   id: string
@@ -99,6 +100,7 @@ const formatReviewDate = (dateString?: string) => {
 }
 
 export default function TenantLandingPage({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [business, setBusiness] = useState<Business | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
   const [popularItems, setPopularItems] = useState<PopularItem[]>([])
@@ -236,20 +238,20 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   const handleReservationSubmit = async () => {
     if (!reservationForm.firstName || !reservationForm.lastName || !reservationForm.phone || !reservationForm.email || !reservationForm.date || !reservationForm.time || !reservationForm.partySize) {
-      setReservationError('Vul alle verplichte velden in')
+      setReservationError(t('shopPage.fillAllFields'))
       return
     }
     
     // Check if day is closed
     if (selectedDayClosed) {
-      setReservationError('We zijn gesloten op deze dag. Kies een andere datum.')
+      setReservationError(t('shopPage.closedOnThisDay'))
       return
     }
     
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(reservationForm.email)) {
-      setReservationError('Vul een geldig e-mailadres in')
+      setReservationError(t('shopPage.invalidEmail'))
       return
     }
     
@@ -294,7 +296,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       setReservationSuccess(true)
       setReservationForm({ firstName: '', lastName: '', phone: '', email: '', date: '', time: '', partySize: '', notes: '' })
     } else {
-      setReservationError('Er ging iets mis. Probeer opnieuw of bel ons.')
+      setReservationError(t('shopPage.reservationError'))
     }
     setReservationSubmitting(false)
   }
@@ -524,7 +526,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
             className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
           />
-          <p className="text-gray-600 font-medium">Laden...</p>
+          <p className="text-gray-600 font-medium">{t('shopPage.loading')}</p>
         </motion.div>
       </div>
     )
@@ -582,7 +584,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 className="bg-orange-500 text-white font-medium px-4 py-2 rounded-full text-sm hover:bg-orange-600 transition-colors flex items-center gap-2"
               >
                 <span>⚙️</span>
-                <span className="hidden sm:inline">Admin</span>
+                <span className="hidden sm:inline">{t('shopPage.admin')}</span>
               </Link>
             )}
             <Link 
@@ -590,14 +592,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               style={{ backgroundColor: business.primary_color }}
               className="text-white font-medium px-4 py-2 rounded-full text-sm hover:opacity-90 transition-opacity"
             >
-              🍟 Menu
+              🍟 {t('shopPage.menu')}
             </Link>
             <Link 
               href={`/shop/${params.tenant}/account`}
               className="bg-white/20 backdrop-blur-md text-white font-medium px-4 py-2 rounded-full text-sm hover:bg-white/30 transition-colors flex items-center gap-2"
             >
               <span>👤</span>
-              <span className="hidden sm:inline">Account</span>
+              <span className="hidden sm:inline">{t('shopPage.account')}</span>
             </Link>
           </div>
         </div>
@@ -648,17 +650,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {todayHours?.closed ? (
                 <span className="inline-flex items-center gap-2 bg-red-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                  Vandaag gesloten
+                  {t('shopPage.closedToday')}
                 </span>
               ) : isCurrentlyOpen() ? (
                 <span className="inline-flex items-center gap-2 bg-green-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                  Nu open · Sluit om {todayHours?.close?.slice(0, 5)}
+                  {t('shopPage.openNow')} · {t('shopPage.closesAt')} {todayHours?.close?.slice(0, 5)}
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2 bg-orange-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
                   <span className="w-2 h-2 bg-white rounded-full"></span>
-                  Gesloten · Opent om {todayHours?.open?.slice(0, 5)}
+                  {t('shopPage.closedNow')} · {t('shopPage.opensAt')} {todayHours?.open?.slice(0, 5)}
                 </span>
               )}
             </motion.div>
@@ -693,12 +695,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             >
               {business.pickup_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
-                  <span>🛍️</span> <span className="hidden xs:inline">Afhalen ·</span> {business.pickup_time}
+                  <span>🛍️</span> <span className="hidden xs:inline">{t('shopPage.pickup')} ·</span> {business.pickup_time}
                 </span>
               )}
               {business.delivery_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
-                  <span>🚗</span> <span className="hidden xs:inline">Levering ·</span> {business.delivery_time}
+                  <span>🚗</span> <span className="hidden xs:inline">{t('shopPage.delivery')} ·</span> {business.delivery_time}
                 </span>
               )}
               {business.address && (
@@ -719,8 +721,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <div className="max-w-6xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-8 sm:gap-12 items-center">
               <div>
-                <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Ons verhaal</span>
-                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2 mb-6">Over Ons</h2>
+                <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">{t('shopPage.ourStory')}</span>
+                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2 mb-6">{t('shopPage.aboutUs')}</h2>
                 <p className="text-gray-600 text-lg leading-relaxed mb-6">
                   {business.story}
                 </p>
@@ -764,8 +766,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           
           <div className="max-w-6xl mx-auto px-4 relative z-10">
             <div className="text-center mb-8 sm:mb-12">
-              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Onze keuken</span>
-              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Onze Specialiteiten</h2>
+              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">{t('shopPage.ourKitchen')}</span>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">{t('shopPage.ourSpecialties')}</h2>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
@@ -775,7 +777,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
                     <Image 
                       src={business.specialty_1_image}
-                      alt={business.specialty_1_title || 'Specialiteit 1'}
+                      alt={business.specialty_1_title || t('shopPage.specialty')}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={80}
@@ -784,7 +786,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-2xl font-bold text-white">{business.specialty_1_title || 'Specialiteit'}</h3>
+                      <h3 className="text-2xl font-bold text-white">{business.specialty_1_title || t('shopPage.specialty')}</h3>
                     </div>
                   </div>
                 </div>
@@ -796,7 +798,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
                     <Image 
                       src={business.specialty_2_image}
-                      alt={business.specialty_2_title || 'Specialiteit 2'}
+                      alt={business.specialty_2_title || t('shopPage.specialty')}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={80}
@@ -805,7 +807,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-2xl font-bold text-white">{business.specialty_2_title || 'Specialiteit'}</h3>
+                      <h3 className="text-2xl font-bold text-white">{business.specialty_2_title || t('shopPage.specialty')}</h3>
                     </div>
                   </div>
                 </div>
@@ -817,7 +819,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
                     <Image 
                       src={business.specialty_3_image}
-                      alt={business.specialty_3_title || 'Specialiteit 3'}
+                      alt={business.specialty_3_title || t('shopPage.specialty')}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={80}
@@ -826,7 +828,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-2xl font-bold text-white">{business.specialty_3_title || 'Specialiteit'}</h3>
+                      <h3 className="text-2xl font-bold text-white">{business.specialty_3_title || t('shopPage.specialty')}</h3>
                     </div>
                   </div>
                 </div>
@@ -841,10 +843,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       <section className="py-12 sm:py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-8 sm:mb-12">
-            <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Kom langs</span>
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Reserveer een tafel</h2>
+            <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">{t('shopPage.comeBy')}</span>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">{t('shopPage.reserveTable')}</h2>
             <p className="text-gray-600 mt-4 max-w-2xl mx-auto">
-              Wil je zeker zijn van een plekje? Reserveer vooraf en geniet ter plaatse van onze lekkernijen.
+              {t('shopPage.reserveDescription')}
             </p>
           </div>
 
@@ -852,20 +854,20 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             {reservationSuccess ? (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">✅</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Reservering ontvangen!</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('shopPage.reservationReceived')}</h3>
                 <p className="text-gray-600 mb-4">
-                  We hebben je reservering ontvangen en behandelen deze zo snel mogelijk.
+                  {t('shopPage.reservationReceivedDesc')}
                 </p>
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 max-w-md mx-auto">
                   <p className="text-blue-800 font-medium">
-                    📧 Je ontvangt een bevestigingsmail zodra we je reservering hebben goedgekeurd.
+                    📧 {t('shopPage.reservationEmailNotice')}
                   </p>
                 </div>
                 <button
                   onClick={() => setReservationSuccess(false)}
                   className="text-orange-500 hover:text-orange-600 font-medium"
                 >
-                  Nieuwe reservering maken
+                  {t('shopPage.newReservation')}
                 </button>
               </div>
             ) : (
@@ -873,55 +875,55 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Voornaam <span className="text-red-500">*</span>
+                      {t('shopPage.firstName')} <span className="text-red-500">{t('shopPage.required')}</span>
                     </label>
                     <input
                       type="text"
                       value={reservationForm.firstName}
                       onChange={(e) => setReservationForm({ ...reservationForm, firstName: capitalizeWords(e.target.value) })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder="Je voornaam"
+                      placeholder={t('shopPage.firstName')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Achternaam <span className="text-red-500">*</span>
+                      {t('shopPage.lastName')} <span className="text-red-500">{t('shopPage.required')}</span>
                     </label>
                     <input
                       type="text"
                       value={reservationForm.lastName}
                       onChange={(e) => setReservationForm({ ...reservationForm, lastName: capitalizeWords(e.target.value) })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder="Je achternaam"
+                      placeholder={t('shopPage.lastName')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      E-mailadres <span className="text-red-500">*</span>
+                      {t('shopPage.email')} <span className="text-red-500">{t('shopPage.required')}</span>
                     </label>
                     <input
                       type="email"
                       value={reservationForm.email}
                       onChange={(e) => setReservationForm({ ...reservationForm, email: e.target.value.toLowerCase() })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder="je@email.com"
+                      placeholder={t('shopPage.email')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Telefoonnummer <span className="text-red-500">*</span>
+                      {t('shopPage.phone')} <span className="text-red-500">{t('shopPage.required')}</span>
                     </label>
                     <input
                       type="tel"
                       value={reservationForm.phone}
                       onChange={(e) => setReservationForm({ ...reservationForm, phone: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder="+32 ..."
+                      placeholder={t('shopPage.phone')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Datum <span className="text-red-500">*</span>
+                      {t('shopPage.date')} <span className="text-red-500">{t('shopPage.required')}</span>
                     </label>
                     <input
                       type="date"
@@ -937,12 +939,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     />
                     {selectedDayClosed && reservationForm.date && (
-                      <p className="text-red-500 text-sm mt-2">⚠️ We zijn gesloten op deze dag. Kies een andere datum.</p>
+                      <p className="text-red-500 text-sm mt-2">⚠️ {t('shopPage.closedOnThisDay')}</p>
                     )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Tijd <span className="text-red-500">*</span>
+                      {t('shopPage.time')} <span className="text-red-500">{t('shopPage.required')}</span>
                     </label>
                     <select 
                       value={reservationForm.time}
@@ -950,7 +952,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       disabled={!reservationForm.date || selectedDayClosed || availableTimes.length === 0}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
-                      <option value="">{!reservationForm.date ? 'Kies eerst een datum' : selectedDayClosed ? 'Gesloten' : 'Selecteer tijd'}</option>
+                      <option value="">{!reservationForm.date ? t('shopPage.selectDateFirst') : selectedDayClosed ? t('shopPage.closed') : t('shopPage.selectTime')}</option>
                       {availableTimes.map((time) => (
                         <option key={time} value={time}>{time}</option>
                       ))}
@@ -958,33 +960,33 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Aantal personen <span className="text-red-500">*</span>
+                      {t('shopPage.numberOfPersons')} <span className="text-red-500">{t('shopPage.required')}</span>
                     </label>
                     <select 
                       value={reservationForm.partySize}
                       onChange={(e) => setReservationForm({ ...reservationForm, partySize: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
-                      <option value="">Selecteer</option>
-                      <option value="1">1 persoon</option>
-                      <option value="2">2 personen</option>
-                      <option value="3">3 personen</option>
-                      <option value="4">4 personen</option>
-                      <option value="5">5 personen</option>
-                      <option value="6">6 personen</option>
-                      <option value="7">7+ personen</option>
+                      <option value="">{t('shopPage.select')}</option>
+                      <option value="1">1 {t('shopPage.person')}</option>
+                      <option value="2">2 {t('shopPage.persons')}</option>
+                      <option value="3">3 {t('shopPage.persons')}</option>
+                      <option value="4">4 {t('shopPage.persons')}</option>
+                      <option value="5">5 {t('shopPage.persons')}</option>
+                      <option value="6">6 {t('shopPage.persons')}</option>
+                      <option value="7">7+ {t('shopPage.personsPlus')}</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Opmerkingen
+                      {t('shopPage.notes')}
                     </label>
                     <input
                       type="text"
                       value={reservationForm.notes}
                       onChange={(e) => setReservationForm({ ...reservationForm, notes: capitalizeWords(e.target.value) })}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      placeholder="Bijv. kinderstoel, allergie..."
+                      placeholder={t('shopPage.notesPlaceholder')}
                     />
                   </div>
                 </div>
@@ -1000,17 +1002,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   className="w-full mt-8 text-white font-bold text-lg py-4 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                 >
                   {reservationSubmitting ? (
-                    <span>Even geduld...</span>
+                    <span>{t('shopPage.pleaseWait')}</span>
                   ) : (
                     <>
                       <span>🍽️</span>
-                      <span>Reserveer nu</span>
+                      <span>{t('shopPage.reserveNow')}</span>
                     </>
                   )}
                 </button>
 
                 <p className="text-center text-gray-500 text-sm mt-4">
-                  Je ontvangt een bevestiging via telefoon of e-mail
+                  {t('shopPage.confirmationNotice')}
                 </p>
               </>
             )}
@@ -1039,9 +1041,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           
           <div className="max-w-4xl mx-auto px-4 relative z-10">
             <div className="text-center">
-              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Kom bij ons team</span>
+              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">{t('shopPage.joinOurTeam')}</span>
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">
-                {business.hiring_title || 'Wij zoeken personeel'}
+                {business.hiring_title || t('shopPage.lookingForStaff')}
               </h2>
             </div>
 
@@ -1056,7 +1058,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 border-t border-gray-200">
                   <div className="flex items-center gap-3 text-gray-600">
                     <span className="text-2xl">📧</span>
-                    <span className="font-medium">Interesse? Neem contact op:</span>
+                    <span className="font-medium">{t('shopPage.interested')}</span>
                   </div>
                   <a
                     href={business.hiring_contact.includes('@') 
@@ -1079,8 +1081,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       <section className="py-12 sm:py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-8 sm:mb-12">
-            <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Wat klanten zeggen</span>
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Reviews</h2>
+            <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">{t('shopPage.whatCustomersSay')}</span>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">{t('shopPage.reviews')}</h2>
             <div className="flex items-center justify-center gap-2 mt-4">
               <div className="flex">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -1088,7 +1090,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 ))}
               </div>
               <span className="font-bold text-2xl text-gray-900">{business.average_rating}</span>
-              <span className="text-gray-500">({business.review_count} reviews)</span>
+              <span className="text-gray-500">({business.review_count} {t('shopPage.reviews')})</span>
             </div>
           </div>
 
@@ -1130,11 +1132,11 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-8 sm:mb-12">
               <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 italic">
-                Onze Meest Verkochte Producten
+                {t('shopPage.mostSoldProducts')}
               </h2>
               <div className="w-16 h-1 bg-blue-500 mx-auto mt-4 mb-6"></div>
               <p className="text-gray-600">
-                Dit zijn de meest verkochte producten bij {business.name.toLowerCase()}.
+                {t('shopPage.mostSoldDescription')} {business.name.toLowerCase()}.
               </p>
             </div>
 
@@ -1148,7 +1150,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   >
                     <Image
                       src={imageUrl!}
-                      alt={`Topverkoper ${index + 1}`}
+                      alt={`${t('shopPage.topSeller')} ${index + 1}`}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={80}
@@ -1168,8 +1170,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         <section className="py-12 sm:py-20 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-8 sm:mb-12">
-              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Maak kennis met</span>
-              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Ons Team</h2>
+              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">{t('shopPage.meetOur')}</span>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">{t('shopPage.ourTeam')}</h2>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -1223,10 +1225,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           
           <div className="max-w-4xl mx-auto px-4 relative z-10 text-center">
             <div>
-              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">Het perfecte cadeau</span>
-              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">Geef iemand een verrassing</h2>
+              <span style={{ color: business.primary_color }} className="font-semibold text-sm uppercase tracking-wider">{t('shopPage.perfectGift')}</span>
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mt-2">{t('shopPage.giftCardTitle')}</h2>
               <p className="text-gray-600 mt-4 max-w-2xl mx-auto text-lg">
-                Bestel een cadeaubon en verras iemand met een heerlijke maaltijd. Direct in de mailbox!
+                {t('shopPage.giftCardDescription')}
               </p>
             </div>
 
@@ -1237,7 +1239,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 className="inline-flex items-center gap-3 px-8 py-4 text-white font-bold text-lg rounded-2xl hover:opacity-90 transition-opacity shadow-lg"
               >
                 <span className="text-2xl">🎁</span>
-                <span>Cadeaubon bestellen</span>
+                <span>{t('shopPage.orderGiftCard')}</span>
               </button>
             </div>
 
@@ -1253,13 +1255,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-8">
                     <div>
-                      <p className="text-white/70 text-sm">Cadeaubon</p>
+                      <p className="text-white/70 text-sm">{t('shopPage.giftCard')}</p>
                       <p className="text-2xl font-bold">{business.name}</p>
                     </div>
                     <span className="text-4xl">🎁</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-white/70 text-sm">Waarde</p>
+                    <p className="text-white/70 text-sm">{t('shopPage.value')}</p>
                     <p className="text-3xl font-black">€50</p>
                   </div>
                 </div>
@@ -1277,7 +1279,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <div>
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
                 <span className="text-4xl">🕐</span>
-                Openingsuren
+                {t('shopPage.openingHours')}
               </h2>
               <div className="space-y-3">
                 {Object.entries(business.opening_hours).map(([day, hours]) => (
@@ -1290,7 +1292,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     <span className="capitalize">{day}</span>
                     <span>
                       {hours.closed 
-                        ? <span className="text-red-400">Gesloten</span>
+                        ? <span className="text-red-400">{t('shopPage.closed')}</span>
                         : hours.hasShift2 && hours.open2 && hours.close2
                           ? `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)} & ${hours.open2?.slice(0, 5)} - ${hours.close2?.slice(0, 5)}`
                           : `${hours.open?.slice(0, 5)} - ${hours.close?.slice(0, 5)}`
@@ -1305,7 +1307,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <div>
               <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
                 <span className="text-4xl">📍</span>
-                Contact
+                {t('shopPage.contact')}
               </h2>
               <div className="space-y-6">
                 {business.address && (
@@ -1324,7 +1326,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                           {business.postal_code} {business.city}
                         </p>
                       )}
-                      <p className="text-white/60 text-sm">Klik voor routebeschrijving</p>
+                      <p className="text-white/60 text-sm">{t('shopPage.clickForDirections')}</p>
                     </div>
                   </a>
                 )}
@@ -1336,7 +1338,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     </div>
                     <div>
                       <p className="font-semibold">BTW: {business.btw_number}</p>
-                      <p className="text-white/60 text-sm">Ondernemingsnummer</p>
+                      <p className="text-white/60 text-sm">{t('shopPage.vatNumber')}</p>
                     </div>
                   </div>
                 )}
@@ -1348,7 +1350,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-orange-400 transition-colors">{business.phone}</p>
-                      <p className="text-white/60 text-sm">Bel voor reservaties</p>
+                      <p className="text-white/60 text-sm">{t('shopPage.callForReservations')}</p>
                     </div>
                   </a>
                 )}
@@ -1360,7 +1362,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-orange-400 transition-colors">{business.email}</p>
-                      <p className="text-white/60 text-sm">Stuur ons een bericht</p>
+                      <p className="text-white/60 text-sm">{t('shopPage.sendUsMessage')}</p>
                     </div>
                   </a>
                 )}
@@ -1406,8 +1408,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       <section className="py-10 sm:py-16 bg-gray-100">
         <div className="max-w-5xl mx-auto px-4">
           <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Scan & Ontdek</h2>
-            <p className="text-gray-600">Scan de QR-codes met je smartphone</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('shopPage.scanAndDiscover')}</h2>
+            <p className="text-gray-600">{t('shopPage.scanQrCodes')}</p>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
@@ -1421,8 +1423,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 />
               </div>
               <div className="text-5xl mb-3">🍟</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Menu Bekijken</h3>
-              <p className="text-gray-600">Scan om ons menu te zien</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.viewMenu')}</h3>
+              <p className="text-gray-600">{t('shopPage.scanToSeeMenu')}</p>
             </div>
 
             {/* Promoties QR */}
@@ -1435,8 +1437,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 />
               </div>
               <div className="text-5xl mb-3">🎁</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Promoties</h3>
-              <p className="text-gray-600">Scan om onze aanbiedingen te zien</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.promotions')}</h3>
+              <p className="text-gray-600">{t('shopPage.scanToSeeOffers')}</p>
             </div>
 
             {/* Review QR */}
@@ -1449,8 +1451,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 />
               </div>
               <div className="text-5xl mb-3">⭐</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Review Geven</h3>
-              <p className="text-gray-600">Scan om een beoordeling te geven</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.giveReview')}</h3>
+              <p className="text-gray-600">{t('shopPage.scanToReview')}</p>
             </div>
           </div>
         </div>
@@ -1462,10 +1464,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-6">
-              Honger gekregen?
+              {t('shopPage.hungryNow')}
             </h2>
             <p className="text-white/90 text-xl mb-8">
-              Bestel nu online en geniet van de lekkerste gerechten!
+              {t('shopPage.orderNowOnline')}
             </p>
             <Link href={`/shop/${params.tenant}/menu`}>
               <button
@@ -1473,7 +1475,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 className="bg-white font-bold text-xl px-12 py-5 rounded-full shadow-2xl inline-flex items-center gap-3 hover:scale-105 active:scale-95 transition-transform"
               >
                 <span>🍟</span>
-                <span>Start je bestelling</span>
+                <span>{t('shopPage.startYourOrder')}</span>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -1493,10 +1495,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             </div>
             <div className="text-center md:text-right">
               <p className="text-white/40 text-sm">
-                Powered by <span style={{ color: business.primary_color }} className="font-semibold">Vysion</span>
+                {t('shopPage.poweredBy')} <span style={{ color: business.primary_color }} className="font-semibold">Vysion</span>
               </p>
               <p className="text-white/40 text-sm mt-1">
-                © {new Date().getFullYear()} Alle rechten voorbehouden
+                © {new Date().getFullYear()} {t('shopPage.allRightsReserved')}
               </p>
             </div>
           </div>
@@ -1526,8 +1528,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 style={{ backgroundColor: business.primary_color }}
               >
                 <span className="text-4xl">🎁</span>
-                <h2 className="text-2xl font-bold mt-2">Cadeaubon bestellen</h2>
-                <p className="opacity-80">Verras iemand met een heerlijke maaltijd</p>
+                <h2 className="text-2xl font-bold mt-2">{t('shopPage.giftCardModal.title')}</h2>
+                <p className="opacity-80">{t('shopPage.giftCardModal.subtitle')}</p>
               </div>
 
               {/* Form */}
@@ -1535,26 +1537,22 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {/* Occasion */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Gelegenheid
+                    {t('shopPage.giftCardModal.occasion')}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    {['Verjaardag', 'Huwelijk', 'Valentijn', 'Zomaar'].map((occ) => (
+                    {[{key: 'birthday', label: t('shopPage.giftCardModal.birthday'), icon: '🎂'}, {key: 'wedding', label: t('shopPage.giftCardModal.wedding'), icon: '💍'}, {key: 'valentine', label: t('shopPage.giftCardModal.valentine'), icon: '❤️'}, {key: 'justBecause', label: t('shopPage.giftCardModal.justBecause'), icon: '🎉'}].map(({key, label, icon}) => (
                       <button
-                        key={occ}
+                        key={key}
                         type="button"
-                        onClick={() => setGiftCardForm(prev => ({ ...prev, occasion: occ }))}
+                        onClick={() => setGiftCardForm(prev => ({ ...prev, occasion: key }))}
                         className={`p-3 rounded-xl border-2 transition-all text-sm font-medium ${
-                          giftCardForm.occasion === occ
+                          giftCardForm.occasion === key
                             ? 'border-current text-white'
                             : 'border-gray-200 text-gray-700 hover:border-gray-300'
                         }`}
-                        style={giftCardForm.occasion === occ ? { backgroundColor: business.primary_color, borderColor: business.primary_color } : {}}
+                        style={giftCardForm.occasion === key ? { backgroundColor: business.primary_color, borderColor: business.primary_color } : {}}
                       >
-                        {occ === 'Verjaardag' && '🎂 '}
-                        {occ === 'Huwelijk' && '💍 '}
-                        {occ === 'Valentijn' && '❤️ '}
-                        {occ === 'Zomaar' && '🎉 '}
-                        {occ}
+                        {icon} {label}
                       </button>
                     ))}
                   </div>
@@ -1563,7 +1561,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {/* Amount */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Bedrag
+                    {t('shopPage.giftCardModal.amount')}
                   </label>
                   <div className="grid grid-cols-4 gap-2">
                     {[25, 50, 75, 100].map((amt) => (
@@ -1584,7 +1582,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                   <input
                     type="number"
-                    placeholder="Of ander bedrag..."
+                    placeholder={t('shopPage.giftCardModal.otherAmount')}
                     value={giftCardForm.customAmount}
                     onChange={(e) => setGiftCardForm(prev => ({ 
                       ...prev, 
@@ -1598,12 +1596,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {/* Personal Message */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Persoonlijke boodschap
+                    {t('shopPage.giftCardModal.personalMessage')}
                   </label>
                   <textarea
                     value={giftCardForm.personalMessage}
                     onChange={(e) => setGiftCardForm(prev => ({ ...prev, personalMessage: e.target.value }))}
-                    placeholder="Fijne verjaardag! Geniet van een lekkere maaltijd..."
+                    placeholder={t('shopPage.giftCardModal.personalMessagePlaceholder')}
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
                   />
@@ -1613,7 +1611,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Jouw naam
+                      {t('shopPage.giftCardModal.yourName')}
                     </label>
                     <input
                       type="text"
@@ -1625,7 +1623,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Jouw email
+                      {t('shopPage.giftCardModal.yourEmail')}
                     </label>
                     <input
                       type="email"
@@ -1641,7 +1639,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Naam ontvanger
+                      {t('shopPage.giftCardModal.recipientName')}
                     </label>
                     <input
                       type="text"
@@ -1653,7 +1651,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email ontvanger *
+                      {t('shopPage.giftCardModal.recipientEmail')} *
                     </label>
                     <input
                       type="email"
@@ -1814,7 +1812,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   onClick={() => setShowGiftCardModal(false)}
                   className="w-full py-3 text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  Annuleren
+                  {t('shopPage.giftCardModal.cancel')}
                 </button>
               </div>
             </motion.div>
