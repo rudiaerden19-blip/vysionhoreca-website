@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { useLanguage, Locale } from '@/i18n'
 
 export default function LoginPage() {
@@ -13,8 +12,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [showForgotPassword, setShowForgotPassword] = useState(false)
-  const [resetEmailSent, setResetEmailSent] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
 
@@ -96,39 +93,6 @@ export default function LoginPage() {
     setIsLoading(false)
   }
 
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email) {
-      setError(t('login.fillEmailFirst'))
-      return
-    }
-    
-    setIsLoading(true)
-    setError('')
-    
-    try {
-      if (!supabase) {
-        setError(t('login.databaseNotAvailable'))
-        setIsLoading(false)
-        return
-      }
-
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/login/reset-password`,
-      })
-
-      if (error) {
-        setError(error.message)
-      } else {
-        setResetEmailSent(true)
-      }
-    } catch (err) {
-      setError(t('login.somethingWentWrong'))
-    }
-    
-    setIsLoading(false)
-  }
-
   return (
     <main className="min-h-screen bg-dark flex flex-col">
       {/* Header */}
@@ -195,73 +159,11 @@ export default function LoginPage() {
               </span>
             </Link>
             <p className="text-gray-400 mt-3">
-              {showForgotPassword ? t('login.resetPassword') : t('login.logInToAccount')}
+              {t('login.logInToAccount')}
             </p>
           </div>
 
-          {/* Reset Email Sent Message */}
-          {resetEmailSent ? (
-            <div className="space-y-6">
-              <div className="p-6 bg-green-500/10 border border-green-500/30 rounded-lg text-center">
-                <svg className="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                <h3 className="text-xl font-bold text-white mb-2">{t('login.emailSent')}</h3>
-                <p className="text-gray-300">
-                  {t('login.resetLinkSent').replace('{email}', email)}
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  setShowForgotPassword(false)
-                  setResetEmailSent(false)
-                }}
-                className="w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-lg font-semibold transition-colors"
-              >
-                {t('login.backToLogin')}
-              </button>
-            </div>
-          ) : showForgotPassword ? (
-            <form onSubmit={handleForgotPassword} className="space-y-6">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                  {t('login.emailAddress')}
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder={t('login.emailPlaceholder')}
-                  className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
-                />
-              </div>
-
-              {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isLoading || !email}
-                className="w-full bg-accent hover:bg-accent/90 disabled:bg-accent/50 text-white py-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
-              >
-                {isLoading ? t('login.sending') : `${t('login.sendResetLink')} →`}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowForgotPassword(false)}
-                className="w-full text-gray-400 hover:text-white transition-colors text-sm"
-              >
-                ← {t('login.backToLogin')}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                   {t('login.emailAddress')}
@@ -313,11 +215,9 @@ export default function LoginPage() {
                 {t('login.forgotPassword')}
               </Link>
             </form>
-          )}
 
           {/* Help Links */}
-          {!showForgotPassword && !resetEmailSent && (
-            <div className="space-y-4 mt-8">
+          <div className="space-y-4 mt-8">
               <Link
                 href="/login/troubleshooting"
                 className="flex items-center justify-between w-full px-4 py-3 bg-white/5 hover:bg-white/10 border border-gray-700 rounded-lg transition-colors group"
@@ -338,7 +238,6 @@ export default function LoginPage() {
                 </svg>
               </Link>
             </div>
-          )}
         </div>
       </div>
 
