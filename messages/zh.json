@@ -1398,6 +1398,58 @@
     },
     "copyright": "版权所有。"
   },
+  "adminDashboard": {
+    "welcomeBack": "欢迎回来！",
+    "subtitle": "这是您今天的业务概览。",
+    "viewAll": "查看全部",
+    "stats": {
+      "ordersToday": "今日订单",
+      "revenueToday": "今日营收",
+      "pendingOrders": "待处理订单",
+      "rating": "评分",
+      "reviews": "条评价",
+      "vsYesterday": "较昨日",
+      "actionRequired": "需要处理",
+      "allProcessed": "全部已处理"
+    },
+    "quickActions": {
+      "title": "快捷操作",
+      "addProduct": "添加产品",
+      "openingHours": "营业时间",
+      "createQr": "创建二维码",
+      "startPromotion": "开始促销"
+    },
+    "recentOrders": {
+      "title": "最近订单",
+      "noOrders": "暂无订单"
+    },
+    "popularItems": {
+      "title": "热门商品",
+      "noSales": "暂无销售"
+    },
+    "thisWeek": {
+      "title": "本周",
+      "totalOrders": "总订单",
+      "totalRevenue": "总营收",
+      "avgOrder": "平均订单"
+    },
+    "status": {
+      "pending": "新订单",
+      "confirmed": "已确认",
+      "preparing": "准备中",
+      "ready": "已就绪",
+      "delivered": "已送达",
+      "completed": "已完成",
+      "cancelled": "已取消"
+    },
+    "time": {
+      "justNow": "刚刚",
+      "minAgo": "分钟前",
+      "hoursAgo": "小时前",
+      "dayAgo": "天前",
+      "daysAgo": "天前"
+    }
+  },
   "admin": {
     "categories": {
       "overview": "概览",

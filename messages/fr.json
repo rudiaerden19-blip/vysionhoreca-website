@@ -863,6 +863,58 @@
     },
     "copyright": "Tous droits réservés."
   },
+  "adminDashboard": {
+    "welcomeBack": "Bon retour!",
+    "subtitle": "Voici un aperçu de votre établissement aujourd'hui.",
+    "viewAll": "Voir tout",
+    "stats": {
+      "ordersToday": "Commandes aujourd'hui",
+      "revenueToday": "Chiffre d'affaires aujourd'hui",
+      "pendingOrders": "Commandes en attente",
+      "rating": "Note",
+      "reviews": "avis",
+      "vsYesterday": "vs hier",
+      "actionRequired": "Action requise",
+      "allProcessed": "Tout traité"
+    },
+    "quickActions": {
+      "title": "Actions rapides",
+      "addProduct": "Ajouter un produit",
+      "openingHours": "Heures d'ouverture",
+      "createQr": "Créer un code QR",
+      "startPromotion": "Lancer une promotion"
+    },
+    "recentOrders": {
+      "title": "Commandes récentes",
+      "noOrders": "Pas encore de commandes"
+    },
+    "popularItems": {
+      "title": "Articles populaires",
+      "noSales": "Pas encore de ventes"
+    },
+    "thisWeek": {
+      "title": "Cette semaine",
+      "totalOrders": "Total commandes",
+      "totalRevenue": "Chiffre d'affaires total",
+      "avgOrder": "Commande moyenne"
+    },
+    "status": {
+      "pending": "Nouveau",
+      "confirmed": "Confirmé",
+      "preparing": "En préparation",
+      "ready": "Prêt",
+      "delivered": "Livré",
+      "completed": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "time": {
+      "justNow": "À l'instant",
+      "minAgo": "min",
+      "hoursAgo": "h",
+      "dayAgo": "jour",
+      "daysAgo": "jours"
+    }
+  },
   "admin": {
     "categories": {
       "overview": "APERÇU",

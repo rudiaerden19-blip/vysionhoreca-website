@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/i18n'
 
 interface DashboardStats {
   todayOrders: number
@@ -29,6 +30,7 @@ interface RecentOrder {
 }
 
 export default function AdminDashboard({ params }: { params: { tenant: string } }) {
+  const { t } = useLanguage()
   const [stats, setStats] = useState<DashboardStats>({
     todayOrders: 0,
     todayRevenue: 0,
@@ -157,21 +159,21 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     setLoading(false)
   }
 
-  const statusColors: Record<string, { bg: string; text: string; label: string }> = {
-    pending: { bg: 'bg-blue-100', text: 'text-blue-700', label: 'Nieuw' },
-    confirmed: { bg: 'bg-purple-100', text: 'text-purple-700', label: 'Bevestigd' },
-    preparing: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'In bereiding' },
-    ready: { bg: 'bg-green-100', text: 'text-green-700', label: 'Klaar' },
-    delivered: { bg: 'bg-emerald-100', text: 'text-emerald-700', label: 'Bezorgd' },
-    completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Afgerond' },
-    cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: 'Geannuleerd' },
+  const statusColors: Record<string, { bg: string; text: string; labelKey: string }> = {
+    pending: { bg: 'bg-blue-100', text: 'text-blue-700', labelKey: 'pending' },
+    confirmed: { bg: 'bg-purple-100', text: 'text-purple-700', labelKey: 'confirmed' },
+    preparing: { bg: 'bg-yellow-100', text: 'text-yellow-700', labelKey: 'preparing' },
+    ready: { bg: 'bg-green-100', text: 'text-green-700', labelKey: 'ready' },
+    delivered: { bg: 'bg-emerald-100', text: 'text-emerald-700', labelKey: 'delivered' },
+    completed: { bg: 'bg-gray-100', text: 'text-gray-700', labelKey: 'completed' },
+    cancelled: { bg: 'bg-red-100', text: 'text-red-700', labelKey: 'cancelled' },
   }
 
   const quickActions = [
-    { name: 'Product toevoegen', href: `/shop/${params.tenant}/admin/producten`, icon: '➕', color: 'bg-green-500' },
-    { name: 'Openingstijden', href: `/shop/${params.tenant}/admin/openingstijden`, icon: '🕐', color: 'bg-blue-500' },
-    { name: 'QR-code maken', href: `/shop/${params.tenant}/admin/qr-codes`, icon: '📱', color: 'bg-purple-500' },
-    { name: 'Promotie starten', href: `/shop/${params.tenant}/admin/promoties`, icon: '🎁', color: 'bg-pink-500' },
+    { nameKey: 'addProduct', href: `/shop/${params.tenant}/admin/producten`, icon: '➕', color: 'bg-green-500' },
+    { nameKey: 'openingHours', href: `/shop/${params.tenant}/admin/openingstijden`, icon: '🕐', color: 'bg-blue-500' },
+    { nameKey: 'createQr', href: `/shop/${params.tenant}/admin/qr-codes`, icon: '📱', color: 'bg-purple-500' },
+    { nameKey: 'startPromotion', href: `/shop/${params.tenant}/admin/promoties`, icon: '🎁', color: 'bg-pink-500' },
   ]
 
   function getTimeAgo(dateString: string): string {
@@ -180,12 +182,12 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     const diffMs = now.getTime() - date.getTime()
     const diffMins = Math.floor(diffMs / 60000)
     
-    if (diffMins < 1) return 'Zojuist'
-    if (diffMins < 60) return `${diffMins} min geleden`
+    if (diffMins < 1) return t('adminDashboard.time.justNow')
+    if (diffMins < 60) return `${diffMins} ${t('adminDashboard.time.minAgo')}`
     const diffHours = Math.floor(diffMins / 60)
-    if (diffHours < 24) return `${diffHours} uur geleden`
+    if (diffHours < 24) return `${diffHours} ${t('adminDashboard.time.hoursAgo')}`
     const diffDays = Math.floor(diffHours / 24)
-    return `${diffDays} dag${diffDays > 1 ? 'en' : ''} geleden`
+    return `${diffDays} ${diffDays > 1 ? t('adminDashboard.time.daysAgo') : t('adminDashboard.time.dayAgo')}`
   }
 
   function getPercentageChange(current: number, previous: number): { value: string; positive: boolean } {
@@ -219,9 +221,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-bold text-gray-900"
         >
-          Welkom terug! 👋
+          {t('adminDashboard.welcomeBack')} 👋
         </motion.h1>
-        <p className="text-gray-500 mt-1">Hier is een overzicht van je zaak vandaag.</p>
+        <p className="text-gray-500 mt-1">{t('adminDashboard.subtitle')}</p>
       </div>
 
       {/* Stats Grid */}
@@ -233,12 +235,12 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-500 text-sm">Bestellingen vandaag</span>
+            <span className="text-gray-500 text-sm">{t('adminDashboard.stats.ordersToday')}</span>
             <span className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">📦</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.todayOrders}</p>
           <p className={`text-sm mt-1 ${ordersChange.positive ? 'text-green-500' : 'text-red-500'}`}>
-            {ordersChange.value} vs gisteren
+            {ordersChange.value} {t('adminDashboard.stats.vsYesterday')}
           </p>
         </motion.div>
 
@@ -249,12 +251,12 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-500 text-sm">Omzet vandaag</span>
+            <span className="text-gray-500 text-sm">{t('adminDashboard.stats.revenueToday')}</span>
             <span className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">💰</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">€{stats.todayRevenue.toFixed(2)}</p>
           <p className={`text-sm mt-1 ${revenueChange.positive ? 'text-green-500' : 'text-red-500'}`}>
-            {revenueChange.value} vs gisteren
+            {revenueChange.value} {t('adminDashboard.stats.vsYesterday')}
           </p>
         </motion.div>
 
@@ -265,12 +267,12 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-500 text-sm">Wachtende bestellingen</span>
+            <span className="text-gray-500 text-sm">{t('adminDashboard.stats.pendingOrders')}</span>
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">⏳</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.pendingOrders}</p>
           <p className={`text-sm mt-1 ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-green-500'}`}>
-            {stats.pendingOrders > 0 ? 'Actie vereist' : 'Alles verwerkt'}
+            {stats.pendingOrders > 0 ? t('adminDashboard.stats.actionRequired') : t('adminDashboard.stats.allProcessed')}
           </p>
         </motion.div>
 
@@ -281,11 +283,11 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-500 text-sm">Beoordeling</span>
+            <span className="text-gray-500 text-sm">{t('adminDashboard.stats.rating')}</span>
             <span className="w-10 h-10 bg-yellow-100 rounded-xl flex items-center justify-center">⭐</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.averageRating || '-'}</p>
-          <p className="text-gray-500 text-sm mt-1">{stats.totalReviews} reviews</p>
+          <p className="text-gray-500 text-sm mt-1">{stats.totalReviews} {t('adminDashboard.stats.reviews')}</p>
         </motion.div>
       </div>
 
@@ -296,10 +298,10 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         transition={{ delay: 0.5 }}
         className="mb-8"
       >
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Snelle acties</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('adminDashboard.quickActions.title')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {quickActions.map((action, index) => (
-            <Link key={action.name} href={action.href}>
+            <Link key={action.nameKey} href={action.href}>
               <motion.div
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
@@ -308,7 +310,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                 <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center text-2xl mb-3`}>
                   {action.icon}
                 </div>
-                <p className="font-medium text-gray-900">{action.name}</p>
+                <p className="font-medium text-gray-900">{t(`adminDashboard.quickActions.${action.nameKey}`)}</p>
               </motion.div>
             </Link>
           ))}
@@ -324,15 +326,15 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Recente bestellingen</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.recentOrders.title')}</h2>
             <Link href={`/shop/${params.tenant}/admin/bestellingen`} className="text-orange-500 hover:text-orange-600 text-sm font-medium">
-              Bekijk alles →
+              {t('adminDashboard.viewAll')} →
             </Link>
           </div>
           {recentOrders.length === 0 ? (
             <div className="text-center py-8 text-gray-400">
               <p className="text-4xl mb-2">📦</p>
-              <p>Nog geen bestellingen</p>
+              <p>{t('adminDashboard.recentOrders.noOrders')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -350,7 +352,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                   <div className="text-right">
                     <p className="font-bold text-gray-900">€{order.total.toFixed(2)}</p>
                     <span className={`text-xs px-2 py-1 rounded-full ${statusColors[order.status]?.bg || 'bg-gray-100'} ${statusColors[order.status]?.text || 'text-gray-700'}`}>
-                      {statusColors[order.status]?.label || order.status}
+                      {t(`adminDashboard.status.${statusColors[order.status]?.labelKey || 'pending'}`)}
                     </span>
                   </div>
                 </div>
@@ -367,15 +369,15 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           className="bg-white rounded-2xl p-6 shadow-sm"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Populaire items</h2>
+            <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.popularItems.title')}</h2>
             <Link href={`/shop/${params.tenant}/admin/verkoop`} className="text-orange-500 hover:text-orange-600 text-sm font-medium">
-              Bekijk alles →
+              {t('adminDashboard.viewAll')} →
             </Link>
           </div>
           {stats.popularItems.length === 0 ? (
             <div className="text-center py-8 text-gray-400">
               <p className="text-4xl mb-2">🍟</p>
-              <p>Nog geen verkopen</p>
+              <p>{t('adminDashboard.popularItems.noSales')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -408,18 +410,18 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         transition={{ delay: 0.8 }}
         className="mt-6 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 text-white"
       >
-        <h2 className="text-lg font-semibold mb-4">Deze week</h2>
+        <h2 className="text-lg font-semibold mb-4">{t('adminDashboard.thisWeek.title')}</h2>
         <div className="grid md:grid-cols-3 gap-6">
           <div>
-            <p className="text-white/70 text-sm">Totaal bestellingen</p>
+            <p className="text-white/70 text-sm">{t('adminDashboard.thisWeek.totalOrders')}</p>
             <p className="text-3xl font-bold">{stats.weekOrders}</p>
           </div>
           <div>
-            <p className="text-white/70 text-sm">Totaal omzet</p>
+            <p className="text-white/70 text-sm">{t('adminDashboard.thisWeek.totalRevenue')}</p>
             <p className="text-3xl font-bold">€{stats.weekRevenue.toFixed(2)}</p>
           </div>
           <div>
-            <p className="text-white/70 text-sm">Gemiddelde bestelling</p>
+            <p className="text-white/70 text-sm">{t('adminDashboard.thisWeek.avgOrder')}</p>
             <p className="text-3xl font-bold">€{stats.weekOrders > 0 ? (stats.weekRevenue / stats.weekOrders).toFixed(2) : '0.00'}</p>
           </div>
         </div>

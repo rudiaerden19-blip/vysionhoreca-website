@@ -1398,6 +1398,58 @@
     },
     "copyright": "جميع الحقوق محفوظة."
   },
+  "adminDashboard": {
+    "welcomeBack": "مرحباً بعودتك!",
+    "subtitle": "إليك نظرة عامة على عملك اليوم.",
+    "viewAll": "عرض الكل",
+    "stats": {
+      "ordersToday": "طلبات اليوم",
+      "revenueToday": "إيرادات اليوم",
+      "pendingOrders": "طلبات قيد الانتظار",
+      "rating": "التقييم",
+      "reviews": "تقييمات",
+      "vsYesterday": "مقارنة بالأمس",
+      "actionRequired": "إجراء مطلوب",
+      "allProcessed": "تمت المعالجة"
+    },
+    "quickActions": {
+      "title": "إجراءات سريعة",
+      "addProduct": "إضافة منتج",
+      "openingHours": "ساعات العمل",
+      "createQr": "إنشاء رمز QR",
+      "startPromotion": "بدء عرض ترويجي"
+    },
+    "recentOrders": {
+      "title": "الطلبات الأخيرة",
+      "noOrders": "لا توجد طلبات بعد"
+    },
+    "popularItems": {
+      "title": "العناصر الشائعة",
+      "noSales": "لا توجد مبيعات بعد"
+    },
+    "thisWeek": {
+      "title": "هذا الأسبوع",
+      "totalOrders": "إجمالي الطلبات",
+      "totalRevenue": "إجمالي الإيرادات",
+      "avgOrder": "متوسط الطلب"
+    },
+    "status": {
+      "pending": "جديد",
+      "confirmed": "مؤكد",
+      "preparing": "قيد التحضير",
+      "ready": "جاهز",
+      "delivered": "تم التوصيل",
+      "completed": "مكتمل",
+      "cancelled": "ملغى"
+    },
+    "time": {
+      "justNow": "الآن",
+      "minAgo": "دقيقة",
+      "hoursAgo": "ساعة",
+      "dayAgo": "يوم",
+      "daysAgo": "أيام"
+    }
+  },
   "admin": {
     "categories": {
       "overview": "نظرة عامة",

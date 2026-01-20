@@ -1398,6 +1398,58 @@
     },
     "copyright": "全著作権所有。"
   },
+  "adminDashboard": {
+    "welcomeBack": "おかえりなさい！",
+    "subtitle": "本日のビジネス概要です。",
+    "viewAll": "すべて表示",
+    "stats": {
+      "ordersToday": "本日の注文",
+      "revenueToday": "本日の売上",
+      "pendingOrders": "保留中の注文",
+      "rating": "評価",
+      "reviews": "件のレビュー",
+      "vsYesterday": "vs 昨日",
+      "actionRequired": "対応が必要",
+      "allProcessed": "すべて処理済み"
+    },
+    "quickActions": {
+      "title": "クイックアクション",
+      "addProduct": "商品を追加",
+      "openingHours": "営業時間",
+      "createQr": "QRコード作成",
+      "startPromotion": "プロモーション開始"
+    },
+    "recentOrders": {
+      "title": "最近の注文",
+      "noOrders": "注文はまだありません"
+    },
+    "popularItems": {
+      "title": "人気商品",
+      "noSales": "売上はまだありません"
+    },
+    "thisWeek": {
+      "title": "今週",
+      "totalOrders": "総注文数",
+      "totalRevenue": "総売上",
+      "avgOrder": "平均注文額"
+    },
+    "status": {
+      "pending": "新規",
+      "confirmed": "確認済み",
+      "preparing": "準備中",
+      "ready": "準備完了",
+      "delivered": "配達済み",
+      "completed": "完了",
+      "cancelled": "キャンセル"
+    },
+    "time": {
+      "justNow": "たった今",
+      "minAgo": "分前",
+      "hoursAgo": "時間前",
+      "dayAgo": "日前",
+      "daysAgo": "日前"
+    }
+  },
   "admin": {
     "categories": {
       "overview": "概要",

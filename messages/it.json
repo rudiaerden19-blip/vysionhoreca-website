@@ -1398,6 +1398,58 @@
     },
     "copyright": "Tutti i diritti riservati."
   },
+  "adminDashboard": {
+    "welcomeBack": "Bentornato!",
+    "subtitle": "Ecco una panoramica della tua attività oggi.",
+    "viewAll": "Vedi tutto",
+    "stats": {
+      "ordersToday": "Ordini oggi",
+      "revenueToday": "Fatturato oggi",
+      "pendingOrders": "Ordini in attesa",
+      "rating": "Valutazione",
+      "reviews": "recensioni",
+      "vsYesterday": "vs ieri",
+      "actionRequired": "Azione richiesta",
+      "allProcessed": "Tutto elaborato"
+    },
+    "quickActions": {
+      "title": "Azioni rapide",
+      "addProduct": "Aggiungi prodotto",
+      "openingHours": "Orari di apertura",
+      "createQr": "Crea codice QR",
+      "startPromotion": "Avvia promozione"
+    },
+    "recentOrders": {
+      "title": "Ordini recenti",
+      "noOrders": "Nessun ordine ancora"
+    },
+    "popularItems": {
+      "title": "Articoli popolari",
+      "noSales": "Nessuna vendita ancora"
+    },
+    "thisWeek": {
+      "title": "Questa settimana",
+      "totalOrders": "Ordini totali",
+      "totalRevenue": "Fatturato totale",
+      "avgOrder": "Ordine medio"
+    },
+    "status": {
+      "pending": "Nuovo",
+      "confirmed": "Confermato",
+      "preparing": "In preparazione",
+      "ready": "Pronto",
+      "delivered": "Consegnato",
+      "completed": "Completato",
+      "cancelled": "Annullato"
+    },
+    "time": {
+      "justNow": "Proprio ora",
+      "minAgo": "min fa",
+      "hoursAgo": "ore fa",
+      "dayAgo": "giorno fa",
+      "daysAgo": "giorni fa"
+    }
+  },
   "admin": {
     "categories": {
       "overview": "PANORAMICA",

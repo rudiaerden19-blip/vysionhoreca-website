@@ -1398,6 +1398,58 @@
     },
     "copyright": "All rights reserved."
   },
+  "adminDashboard": {
+    "welcomeBack": "Welcome back!",
+    "subtitle": "Here's an overview of your business today.",
+    "viewAll": "View all",
+    "stats": {
+      "ordersToday": "Orders today",
+      "revenueToday": "Revenue today",
+      "pendingOrders": "Pending orders",
+      "rating": "Rating",
+      "reviews": "reviews",
+      "vsYesterday": "vs yesterday",
+      "actionRequired": "Action required",
+      "allProcessed": "All processed"
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "addProduct": "Add product",
+      "openingHours": "Opening hours",
+      "createQr": "Create QR code",
+      "startPromotion": "Start promotion"
+    },
+    "recentOrders": {
+      "title": "Recent orders",
+      "noOrders": "No orders yet"
+    },
+    "popularItems": {
+      "title": "Popular items",
+      "noSales": "No sales yet"
+    },
+    "thisWeek": {
+      "title": "This week",
+      "totalOrders": "Total orders",
+      "totalRevenue": "Total revenue",
+      "avgOrder": "Average order"
+    },
+    "status": {
+      "pending": "New",
+      "confirmed": "Confirmed",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "time": {
+      "justNow": "Just now",
+      "minAgo": "min ago",
+      "hoursAgo": "hours ago",
+      "dayAgo": "day ago",
+      "daysAgo": "days ago"
+    }
+  },
   "admin": {
     "categories": {
       "overview": "OVERVIEW",

@@ -1404,6 +1404,58 @@
     },
     "copyright": "Alle rechten voorbehouden."
   },
+  "adminDashboard": {
+    "welcomeBack": "Welkom terug!",
+    "subtitle": "Hier is een overzicht van je zaak vandaag.",
+    "viewAll": "Bekijk alles",
+    "stats": {
+      "ordersToday": "Bestellingen vandaag",
+      "revenueToday": "Omzet vandaag",
+      "pendingOrders": "Wachtende bestellingen",
+      "rating": "Beoordeling",
+      "reviews": "reviews",
+      "vsYesterday": "vs gisteren",
+      "actionRequired": "Actie vereist",
+      "allProcessed": "Alles verwerkt"
+    },
+    "quickActions": {
+      "title": "Snelle acties",
+      "addProduct": "Product toevoegen",
+      "openingHours": "Openingstijden",
+      "createQr": "QR-code maken",
+      "startPromotion": "Promotie starten"
+    },
+    "recentOrders": {
+      "title": "Recente bestellingen",
+      "noOrders": "Nog geen bestellingen"
+    },
+    "popularItems": {
+      "title": "Populaire items",
+      "noSales": "Nog geen verkopen"
+    },
+    "thisWeek": {
+      "title": "Deze week",
+      "totalOrders": "Totaal bestellingen",
+      "totalRevenue": "Totaal omzet",
+      "avgOrder": "Gemiddelde bestelling"
+    },
+    "status": {
+      "pending": "Nieuw",
+      "confirmed": "Bevestigd",
+      "preparing": "In bereiding",
+      "ready": "Klaar",
+      "delivered": "Bezorgd",
+      "completed": "Afgerond",
+      "cancelled": "Geannuleerd"
+    },
+    "time": {
+      "justNow": "Zojuist",
+      "minAgo": "min geleden",
+      "hoursAgo": "uur geleden",
+      "dayAgo": "dag geleden",
+      "daysAgo": "dagen geleden"
+    }
+  },
   "admin": {
     "categories": {
       "overview": "OVERZICHT",
