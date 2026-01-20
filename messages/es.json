@@ -1503,6 +1503,69 @@
   "mediaPicker": {
     "choosePhoto": "Elegir foto"
   },
+  "marketingQr": {
+    "title": "Códigos QR",
+    "subtitle": "Crea y gestiona códigos QR para tu negocio",
+    "yourCodes": "Tus códigos QR",
+    "noQrCodes": "Aún no hay códigos QR",
+    "noQrCodesDesc": "Haz clic en un tipo arriba para crear tu primer código QR",
+    "scans": "escaneos",
+    "newQrCode": "Nuevo código QR",
+    "name": "Nombre",
+    "namePlaceholder": "Ej. Carta menú, Mesa 5...",
+    "tableNumber": "Número de mesa",
+    "preview": "Vista previa",
+    "create": "Crear",
+    "creating": "Creando...",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar este código QR?",
+    "types": {
+      "menu": "Menú",
+      "menuDesc": "Enlace al menú",
+      "table": "Mesa",
+      "tableDesc": "Pedir en mesa",
+      "promo": "Promoción",
+      "promoDesc": "Oferta especial",
+      "review": "Reseña",
+      "reviewDesc": "Pedir reseña"
+    },
+    "tips": {
+      "title": "Consejos para códigos QR",
+      "tip1": "Imprime códigos QR en las cartas para pedidos rápidos",
+      "tip2": "Coloca un QR único en cada mesa",
+      "tip3": "Usa en folletos para promociones y ofertas",
+      "tip4": "Pide a los clientes una reseña después de su pedido"
+    }
+  },
+  "marketingPromo": {
+    "title": "Promociones",
+    "subtitle": "Gestiona códigos de descuento y promociones",
+    "newPromotion": "Nueva promoción",
+    "activePromotions": "Promociones activas",
+    "totalUsed": "Total usado",
+    "totalPromotions": "Total promociones",
+    "noPromotions": "Aún no hay promociones",
+    "noPromotionsDesc": "Crea tu primer código de descuento",
+    "createFirst": "Crear primera promoción"
+  },
+  "marketingReviews": {
+    "title": "Reseñas",
+    "subtitle": "Gestiona las reseñas de clientes",
+    "all": "Todas",
+    "visible": "Visibles",
+    "hidden": "Ocultas",
+    "noReviews": "Aún no hay reseñas",
+    "noReviewsDesc": "Las reseñas de clientes aparecerán aquí",
+    "noVisibleReviews": "No hay reseñas visibles",
+    "noHiddenReviews": "No hay reseñas ocultas",
+    "changeFilter": "Ajusta el filtro para ver otras reseñas",
+    "tips": {
+      "title": "Consejos para reseñas",
+      "tip1": "Responde rápidamente a las reseñas negativas",
+      "tip2": "Agradece a los clientes por comentarios positivos",
+      "tip3": "Oculta reseñas inapropiadas en lugar de eliminarlas",
+      "tip4": "Pide a clientes satisfechos una reseña vía código QR"
+    }
+  },
   "adminPages": {
     "common": {
       "save": "Guardar",

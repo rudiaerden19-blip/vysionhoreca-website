@@ -1509,6 +1509,69 @@
   "mediaPicker": {
     "choosePhoto": "Kies foto"
   },
+  "marketingQr": {
+    "title": "QR-codes",
+    "subtitle": "Maak en beheer QR-codes voor je zaak",
+    "yourCodes": "Je QR-codes",
+    "noQrCodes": "Nog geen QR-codes",
+    "noQrCodesDesc": "Klik hierboven op een type om je eerste QR-code te maken",
+    "scans": "scans",
+    "newQrCode": "Nieuwe QR-code",
+    "name": "Naam",
+    "namePlaceholder": "Bijv. Menu kaart, Tafel 5...",
+    "tableNumber": "Tafelnummer",
+    "preview": "Preview",
+    "create": "Aanmaken",
+    "creating": "Maken...",
+    "confirmDelete": "Weet je zeker dat je deze QR-code wilt verwijderen?",
+    "types": {
+      "menu": "Menu",
+      "menuDesc": "Link naar je menu",
+      "table": "Tafel",
+      "tableDesc": "Bestellen aan tafel",
+      "promo": "Promotie",
+      "promoDesc": "Speciale actie",
+      "review": "Review",
+      "reviewDesc": "Vraag om review"
+    },
+    "tips": {
+      "title": "Tips voor QR-codes",
+      "tip1": "Print QR-codes op menukaarten voor snel bestellen",
+      "tip2": "Plaats op elke tafel een unieke QR voor tafelbestellingen",
+      "tip3": "Gebruik op flyers voor promoties en speciale acties",
+      "tip4": "Vraag klanten om een review na hun bestelling"
+    }
+  },
+  "marketingPromo": {
+    "title": "Promoties",
+    "subtitle": "Beheer kortingscodes en acties",
+    "newPromotion": "Nieuwe promotie",
+    "activePromotions": "Actieve promoties",
+    "totalUsed": "Totaal gebruikt",
+    "totalPromotions": "Totaal promoties",
+    "noPromotions": "Nog geen promoties",
+    "noPromotionsDesc": "Maak je eerste kortingscode aan",
+    "createFirst": "Eerste promotie maken"
+  },
+  "marketingReviews": {
+    "title": "Reviews",
+    "subtitle": "Beheer klantbeoordelingen",
+    "all": "Alle",
+    "visible": "Zichtbaar",
+    "hidden": "Verborgen",
+    "noReviews": "Nog geen reviews",
+    "noReviewsDesc": "Reviews van klanten verschijnen hier",
+    "noVisibleReviews": "Geen zichtbare reviews",
+    "noHiddenReviews": "Geen verborgen reviews",
+    "changeFilter": "Pas de filter aan om andere reviews te zien",
+    "tips": {
+      "title": "Tips voor reviews",
+      "tip1": "Reageer snel op negatieve reviews om problemen op te lossen",
+      "tip2": "Bedank klanten voor positieve feedback",
+      "tip3": "Verberg ongepaste reviews in plaats van ze te verwijderen",
+      "tip4": "Vraag tevreden klanten om een review via de QR-code functie"
+    }
+  },
   "adminPages": {
     "common": {
       "save": "Opslaan",

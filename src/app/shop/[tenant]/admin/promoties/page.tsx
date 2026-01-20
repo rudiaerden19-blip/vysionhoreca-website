@@ -152,8 +152,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Promoties</h1>
-          <p className="text-gray-500">Beheer kortingscodes en acties</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('marketingPromo.title')}</h1>
+          <p className="text-gray-500">{t('marketingPromo.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -161,7 +161,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           onClick={openCreateModal}
           className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
         >
-          ➕ Nieuwe promotie
+          ➕ {t('marketingPromo.newPromotion')}
         </motion.button>
       </div>
 
@@ -172,7 +172,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl p-4 shadow-sm"
         >
-          <p className="text-gray-500 text-sm">Actieve promoties</p>
+          <p className="text-gray-500 text-sm">{t('marketingPromo.activePromotions')}</p>
           <p className="text-3xl font-bold text-green-500">{activeCount}</p>
         </motion.div>
         <motion.div
@@ -181,7 +181,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           transition={{ delay: 0.1 }}
           className="bg-white rounded-2xl p-4 shadow-sm"
         >
-          <p className="text-gray-500 text-sm">Totaal gebruikt</p>
+          <p className="text-gray-500 text-sm">{t('marketingPromo.totalUsed')}</p>
           <p className="text-3xl font-bold text-orange-500">{totalUsage}</p>
         </motion.div>
         <motion.div
@@ -190,7 +190,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           transition={{ delay: 0.2 }}
           className="bg-white rounded-2xl p-4 shadow-sm"
         >
-          <p className="text-gray-500 text-sm">Totaal promoties</p>
+          <p className="text-gray-500 text-sm">{t('marketingPromo.totalPromotions')}</p>
           <p className="text-3xl font-bold text-blue-500">{promos.length}</p>
         </motion.div>
       </div>
@@ -203,15 +203,15 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           className="text-center py-12 bg-white rounded-2xl shadow-sm"
         >
           <span className="text-6xl mb-4 block">🎁</span>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Nog geen promoties</h3>
-          <p className="text-gray-500 mb-6">Maak je eerste kortingscode aan</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{t('marketingPromo.noPromotions')}</h3>
+          <p className="text-gray-500 mb-6">{t('marketingPromo.noPromotionsDesc')}</p>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={openCreateModal}
             className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl"
           >
-            + Eerste promotie maken
+            + {t('marketingPromo.createFirst')}
           </motion.button>
         </motion.div>
       ) : (

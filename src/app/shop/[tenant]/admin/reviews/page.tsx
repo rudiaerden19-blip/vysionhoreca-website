@@ -107,8 +107,8 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reviews</h1>
-          <p className="text-gray-500">Beheer klantbeoordelingen</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('marketingReviews.title')}</h1>
+          <p className="text-gray-500">{t('marketingReviews.subtitle')}</p>
         </div>
       </div>
 
@@ -146,9 +146,9 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
       {/* Filter */}
       <div className="flex gap-2 mb-6">
         {[
-          { id: 'all', label: 'Alle', count: reviews.length },
-          { id: 'visible', label: 'Zichtbaar', count: reviews.filter(r => r.is_visible).length },
-          { id: 'hidden', label: 'Verborgen', count: reviews.filter(r => !r.is_visible).length },
+          { id: 'all', label: t('marketingReviews.all'), count: reviews.length },
+          { id: 'visible', label: t('marketingReviews.visible'), count: reviews.filter(r => r.is_visible).length },
+          { id: 'hidden', label: t('marketingReviews.hidden'), count: reviews.filter(r => !r.is_visible).length },
         ].map((f) => (
           <button
             key={f.id}
@@ -173,10 +173,10 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
         >
           <span className="text-6xl mb-4 block">⭐</span>
           <h3 className="text-xl font-bold text-gray-900 mb-2">
-            {filter === 'all' ? 'Nog geen reviews' : filter === 'visible' ? 'Geen zichtbare reviews' : 'Geen verborgen reviews'}
+            {filter === 'all' ? t('marketingReviews.noReviews') : filter === 'visible' ? t('marketingReviews.noVisibleReviews') : t('marketingReviews.noHiddenReviews')}
           </h3>
           <p className="text-gray-500">
-            {filter === 'all' ? 'Reviews van klanten verschijnen hier' : 'Pas de filter aan om andere reviews te zien'}
+            {filter === 'all' ? t('marketingReviews.noReviewsDesc') : t('marketingReviews.changeFilter')}
           </p>
         </motion.div>
       ) : (
@@ -302,12 +302,12 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.3 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 Tips voor reviews</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('marketingReviews.tips.title')}</h3>
         <ul className="text-blue-700 text-sm space-y-1">
-          <li>• Reageer snel op negatieve reviews om problemen op te lossen</li>
-          <li>• Bedank klanten voor positieve feedback</li>
-          <li>• Verberg ongepaste reviews in plaats van ze te verwijderen</li>
-          <li>• Vraag tevreden klanten om een review via de QR-code functie</li>
+          <li>• {t('marketingReviews.tips.tip1')}</li>
+          <li>• {t('marketingReviews.tips.tip2')}</li>
+          <li>• {t('marketingReviews.tips.tip3')}</li>
+          <li>• {t('marketingReviews.tips.tip4')}</li>
         </ul>
       </motion.div>
     </div>

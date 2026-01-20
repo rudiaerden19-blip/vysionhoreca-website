@@ -6,11 +6,11 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getQrCodes, saveQrCode, deleteQrCode, QrCode } from '@/lib/admin-api'
 
-const qrTypes = [
-  { id: 'menu', name: 'Menu', icon: '📋', description: 'Link naar je menu' },
-  { id: 'table', name: 'Tafel', icon: '🍽️', description: 'Bestellen aan tafel' },
-  { id: 'promo', name: 'Promotie', icon: '🎁', description: 'Speciale actie' },
-  { id: 'review', name: 'Review', icon: '⭐', description: 'Vraag om review' },
+const getQrTypes = (t: (key: string) => string) => [
+  { id: 'menu', name: t('marketingQr.types.menu'), icon: '📋', description: t('marketingQr.types.menuDesc') },
+  { id: 'table', name: t('marketingQr.types.table'), icon: '🍽️', description: t('marketingQr.types.tableDesc') },
+  { id: 'promo', name: t('marketingQr.types.promo'), icon: '🎁', description: t('marketingQr.types.promoDesc') },
+  { id: 'review', name: t('marketingQr.types.review'), icon: '⭐', description: t('marketingQr.types.reviewDesc') },
 ]
 
 export default function QrCodesPage({ params }: { params: { tenant: string } }) {
@@ -84,7 +84,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Weet je zeker dat je deze QR-code wilt verwijderen?')) return
+    if (!confirm(t('marketingQr.confirmDelete'))) return
     
     const success = await deleteQrCode(id)
     if (success) {
@@ -122,7 +122,8 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
     setShowModal(true)
   }
 
-  const getTypeInfo = (type: string) => qrTypes.find(t => t.id === type)
+  const qrTypes = getQrTypes(t)
+  const getTypeInfo = (type: string) => qrTypes.find(qt => qt.id === type)
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return ''
@@ -157,8 +158,8 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">QR-codes</h1>
-          <p className="text-gray-500">Maak en beheer QR-codes voor je zaak</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('marketingQr.title')}</h1>
+          <p className="text-gray-500">{t('marketingQr.subtitle')}</p>
         </div>
       </div>
 
@@ -191,14 +192,14 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
         className="bg-white rounded-2xl shadow-sm overflow-hidden"
       >
         <div className="p-4 border-b">
-          <h2 className="font-semibold text-gray-900">Je QR-codes ({qrCodes.length})</h2>
+          <h2 className="font-semibold text-gray-900">{t('marketingQr.yourCodes')} ({qrCodes.length})</h2>
         </div>
         
         {qrCodes.length === 0 ? (
           <div className="p-12 text-center">
             <span className="text-6xl mb-4 block">📱</span>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Nog geen QR-codes</h3>
-            <p className="text-gray-500">Klik hierboven op een type om je eerste QR-code te maken</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('marketingQr.noQrCodes')}</h3>
+            <p className="text-gray-500">{t('marketingQr.noQrCodesDesc')}</p>
           </div>
         ) : (
           <div className="divide-y">
@@ -230,7 +231,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                 {/* Stats */}
                 <div className="text-right hidden sm:block">
                   <p className="text-2xl font-bold text-orange-500">{qr.scans}</p>
-                  <p className="text-sm text-gray-500">scans</p>
+                  <p className="text-sm text-gray-500">{t('marketingQr.scans')}</p>
                 </div>
 
                 {/* Actions */}
@@ -267,12 +268,12 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
         transition={{ delay: 0.2 }}
         className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-6"
       >
-        <h3 className="font-semibold text-blue-900 mb-2">💡 Tips voor QR-codes</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">💡 {t('marketingQr.tips.title')}</h3>
         <ul className="text-blue-700 text-sm space-y-1">
-          <li>• Print QR-codes op menukaarten voor snel bestellen</li>
-          <li>• Plaats op elke tafel een unieke QR voor tafelbestellingen</li>
-          <li>• Gebruik op flyers voor promoties en speciale acties</li>
-          <li>• Vraag klanten om een review na hun bestelling</li>
+          <li>• {t('marketingQr.tips.tip1')}</li>
+          <li>• {t('marketingQr.tips.tip2')}</li>
+          <li>• {t('marketingQr.tips.tip3')}</li>
+          <li>• {t('marketingQr.tips.tip4')}</li>
         </ul>
       </motion.div>
 
@@ -297,7 +298,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                 <div className="flex items-center gap-3">
                   <span className="text-3xl">{getTypeInfo(selectedType || '')?.icon}</span>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Nieuwe QR-code</h2>
+                    <h2 className="text-xl font-bold text-gray-900">{t('marketingQr.newQrCode')}</h2>
                     <p className="text-gray-500 text-sm">{getTypeInfo(selectedType || '')?.description}</p>
                   </div>
                 </div>
@@ -312,21 +313,21 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
               <div className="p-6 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Naam
+                    {t('marketingQr.name')}
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    placeholder="Bijv. Menu kaart, Tafel 5..."
+                    placeholder={t('marketingQr.namePlaceholder')}
                   />
                 </div>
 
                 {selectedType === 'table' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Tafelnummer
+                      {t('marketingQr.tableNumber')}
                     </label>
                     <input
                       type="number"
@@ -341,7 +342,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
 
                 {/* Preview */}
                 <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <p className="text-sm text-gray-500 mb-3">Preview</p>
+                  <p className="text-sm text-gray-500 mb-3">{t('marketingQr.preview')}</p>
                   <img 
                     src={getQrImageUrl(getTargetUrl(formData.type, formData.table_number), 150)}
                     alt="QR Preview"
@@ -358,7 +359,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
                 >
-                  Annuleren
+                  {t('adminPages.common.cancel')}
                 </button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -374,12 +375,12 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                       />
-                      <span>Maken...</span>
+                      <span>{t('marketingQr.creating')}</span>
                     </>
                   ) : (
                     <>
                       <span>✓</span>
-                      <span>Aanmaken</span>
+                      <span>{t('marketingQr.create')}</span>
                     </>
                   )}
                 </motion.button>

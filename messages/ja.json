@@ -1503,6 +1503,69 @@
   "mediaPicker": {
     "choosePhoto": "写真を選択"
   },
+  "marketingQr": {
+    "title": "QRコード",
+    "subtitle": "ビジネス用のQRコードを作成・管理",
+    "yourCodes": "あなたのQRコード",
+    "noQrCodes": "QRコードがまだありません",
+    "noQrCodesDesc": "上のタイプをクリックして最初のQRコードを作成",
+    "scans": "スキャン",
+    "newQrCode": "新規QRコード",
+    "name": "名前",
+    "namePlaceholder": "例：メニューカード、テーブル5...",
+    "tableNumber": "テーブル番号",
+    "preview": "プレビュー",
+    "create": "作成",
+    "creating": "作成中...",
+    "confirmDelete": "このQRコードを削除してもよろしいですか？",
+    "types": {
+      "menu": "メニュー",
+      "menuDesc": "メニューへのリンク",
+      "table": "テーブル",
+      "tableDesc": "テーブルで注文",
+      "promo": "プロモーション",
+      "promoDesc": "特別オファー",
+      "review": "レビュー",
+      "reviewDesc": "レビューを依頼"
+    },
+    "tips": {
+      "title": "QRコードのヒント",
+      "tip1": "メニューカードにQRコードを印刷して素早く注文",
+      "tip2": "各テーブルに固有のQRを設置",
+      "tip3": "チラシでプロモーションや特別オファーに使用",
+      "tip4": "注文後にお客様にレビューを依頼"
+    }
+  },
+  "marketingPromo": {
+    "title": "プロモーション",
+    "subtitle": "割引コードとプロモーションを管理",
+    "newPromotion": "新規プロモーション",
+    "activePromotions": "アクティブなプロモーション",
+    "totalUsed": "合計使用回数",
+    "totalPromotions": "プロモーション合計",
+    "noPromotions": "プロモーションがまだありません",
+    "noPromotionsDesc": "最初の割引コードを作成",
+    "createFirst": "最初のプロモーションを作成"
+  },
+  "marketingReviews": {
+    "title": "レビュー",
+    "subtitle": "顧客レビューを管理",
+    "all": "すべて",
+    "visible": "表示中",
+    "hidden": "非表示",
+    "noReviews": "レビューがまだありません",
+    "noReviewsDesc": "顧客レビューはここに表示されます",
+    "noVisibleReviews": "表示中のレビューなし",
+    "noHiddenReviews": "非表示のレビューなし",
+    "changeFilter": "フィルターを調整して他のレビューを表示",
+    "tips": {
+      "title": "レビューのヒント",
+      "tip1": "ネガティブなレビューには迅速に対応",
+      "tip2": "ポジティブなフィードバックにはお礼を",
+      "tip3": "不適切なレビューは削除せず非表示に",
+      "tip4": "満足したお客様にQRでレビューを依頼"
+    }
+  },
   "adminPages": {
     "common": {
       "save": "保存",

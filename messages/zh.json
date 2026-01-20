@@ -1503,6 +1503,69 @@
   "mediaPicker": {
     "choosePhoto": "选择照片"
   },
+  "marketingQr": {
+    "title": "二维码",
+    "subtitle": "创建和管理您的二维码",
+    "yourCodes": "您的二维码",
+    "noQrCodes": "还没有二维码",
+    "noQrCodesDesc": "点击上方类型创建您的第一个二维码",
+    "scans": "扫描次数",
+    "newQrCode": "新建二维码",
+    "name": "名称",
+    "namePlaceholder": "例如：菜单卡、5号桌...",
+    "tableNumber": "桌号",
+    "preview": "预览",
+    "create": "创建",
+    "creating": "创建中...",
+    "confirmDelete": "确定要删除这个二维码吗？",
+    "types": {
+      "menu": "菜单",
+      "menuDesc": "链接到菜单",
+      "table": "餐桌",
+      "tableDesc": "餐桌点餐",
+      "promo": "促销",
+      "promoDesc": "特别优惠",
+      "review": "评价",
+      "reviewDesc": "请求评价"
+    },
+    "tips": {
+      "title": "二维码使用技巧",
+      "tip1": "在菜单卡上打印二维码便于快速点餐",
+      "tip2": "每张桌子放置一个唯一的二维码",
+      "tip3": "在传单上使用促销和特别优惠",
+      "tip4": "订单后请客户留下评价"
+    }
+  },
+  "marketingPromo": {
+    "title": "促销活动",
+    "subtitle": "管理优惠码和促销活动",
+    "newPromotion": "新建促销",
+    "activePromotions": "活跃促销",
+    "totalUsed": "总使用次数",
+    "totalPromotions": "促销总数",
+    "noPromotions": "还没有促销活动",
+    "noPromotionsDesc": "创建您的第一个优惠码",
+    "createFirst": "创建第一个促销"
+  },
+  "marketingReviews": {
+    "title": "评价",
+    "subtitle": "管理客户评价",
+    "all": "全部",
+    "visible": "可见",
+    "hidden": "隐藏",
+    "noReviews": "还没有评价",
+    "noReviewsDesc": "客户评价将显示在这里",
+    "noVisibleReviews": "没有可见的评价",
+    "noHiddenReviews": "没有隐藏的评价",
+    "changeFilter": "调整筛选器查看其他评价",
+    "tips": {
+      "title": "评价管理技巧",
+      "tip1": "快速回复负面评价以解决问题",
+      "tip2": "感谢客户的正面反馈",
+      "tip3": "隐藏不当评价而不是删除",
+      "tip4": "通过二维码请求满意客户留下评价"
+    }
+  },
   "adminPages": {
     "common": {
       "save": "保存",

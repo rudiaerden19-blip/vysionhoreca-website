@@ -968,6 +968,69 @@
   "mediaPicker": {
     "choosePhoto": "Choisir photo"
   },
+  "marketingQr": {
+    "title": "Codes QR",
+    "subtitle": "Créez et gérez les codes QR pour votre établissement",
+    "yourCodes": "Vos codes QR",
+    "noQrCodes": "Pas encore de codes QR",
+    "noQrCodesDesc": "Cliquez sur un type ci-dessus pour créer votre premier code QR",
+    "scans": "scans",
+    "newQrCode": "Nouveau code QR",
+    "name": "Nom",
+    "namePlaceholder": "Ex. Carte menu, Table 5...",
+    "tableNumber": "Numéro de table",
+    "preview": "Aperçu",
+    "create": "Créer",
+    "creating": "Création...",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce code QR?",
+    "types": {
+      "menu": "Menu",
+      "menuDesc": "Lien vers le menu",
+      "table": "Table",
+      "tableDesc": "Commander à table",
+      "promo": "Promotion",
+      "promoDesc": "Offre spéciale",
+      "review": "Avis",
+      "reviewDesc": "Demander un avis"
+    },
+    "tips": {
+      "title": "Conseils pour les codes QR",
+      "tip1": "Imprimez les codes QR sur les cartes menu",
+      "tip2": "Placez un QR unique sur chaque table",
+      "tip3": "Utilisez sur les flyers pour les promotions",
+      "tip4": "Demandez aux clients un avis après leur commande"
+    }
+  },
+  "marketingPromo": {
+    "title": "Promotions",
+    "subtitle": "Gérez les codes de réduction et promotions",
+    "newPromotion": "Nouvelle promotion",
+    "activePromotions": "Promotions actives",
+    "totalUsed": "Total utilisé",
+    "totalPromotions": "Total promotions",
+    "noPromotions": "Pas encore de promotions",
+    "noPromotionsDesc": "Créez votre premier code de réduction",
+    "createFirst": "Créer première promotion"
+  },
+  "marketingReviews": {
+    "title": "Avis",
+    "subtitle": "Gérez les avis clients",
+    "all": "Tous",
+    "visible": "Visibles",
+    "hidden": "Masqués",
+    "noReviews": "Pas encore d'avis",
+    "noReviewsDesc": "Les avis clients apparaîtront ici",
+    "noVisibleReviews": "Pas d'avis visibles",
+    "noHiddenReviews": "Pas d'avis masqués",
+    "changeFilter": "Ajustez le filtre pour voir d'autres avis",
+    "tips": {
+      "title": "Conseils pour les avis",
+      "tip1": "Répondez rapidement aux avis négatifs",
+      "tip2": "Remerciez les clients pour les retours positifs",
+      "tip3": "Masquez les avis inappropriés au lieu de les supprimer",
+      "tip4": "Demandez aux clients satisfaits un avis via le code QR"
+    }
+  },
   "adminPages": {
     "common": {
       "save": "Enregistrer",

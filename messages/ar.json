@@ -1503,6 +1503,69 @@
   "mediaPicker": {
     "choosePhoto": "اختر صورة"
   },
+  "marketingQr": {
+    "title": "رموز QR",
+    "subtitle": "أنشئ وأدر رموز QR لنشاطك التجاري",
+    "yourCodes": "رموز QR الخاصة بك",
+    "noQrCodes": "لا توجد رموز QR بعد",
+    "noQrCodesDesc": "انقر على نوع أعلاه لإنشاء أول رمز QR",
+    "scans": "مسح",
+    "newQrCode": "رمز QR جديد",
+    "name": "الاسم",
+    "namePlaceholder": "مثل: قائمة الطعام، طاولة 5...",
+    "tableNumber": "رقم الطاولة",
+    "preview": "معاينة",
+    "create": "إنشاء",
+    "creating": "جاري الإنشاء...",
+    "confirmDelete": "هل أنت متأكد من حذف رمز QR هذا؟",
+    "types": {
+      "menu": "القائمة",
+      "menuDesc": "رابط للقائمة",
+      "table": "طاولة",
+      "tableDesc": "الطلب على الطاولة",
+      "promo": "عرض",
+      "promoDesc": "عرض خاص",
+      "review": "تقييم",
+      "reviewDesc": "طلب تقييم"
+    },
+    "tips": {
+      "title": "نصائح لرموز QR",
+      "tip1": "اطبع رموز QR على قوائم الطعام للطلب السريع",
+      "tip2": "ضع رمز QR فريد على كل طاولة",
+      "tip3": "استخدم على النشرات للعروض الخاصة",
+      "tip4": "اطلب من العملاء تقييم بعد طلبهم"
+    }
+  },
+  "marketingPromo": {
+    "title": "العروض",
+    "subtitle": "إدارة رموز الخصم والعروض",
+    "newPromotion": "عرض جديد",
+    "activePromotions": "العروض النشطة",
+    "totalUsed": "إجمالي الاستخدام",
+    "totalPromotions": "إجمالي العروض",
+    "noPromotions": "لا توجد عروض بعد",
+    "noPromotionsDesc": "أنشئ أول رمز خصم",
+    "createFirst": "إنشاء أول عرض"
+  },
+  "marketingReviews": {
+    "title": "التقييمات",
+    "subtitle": "إدارة تقييمات العملاء",
+    "all": "الكل",
+    "visible": "مرئية",
+    "hidden": "مخفية",
+    "noReviews": "لا توجد تقييمات بعد",
+    "noReviewsDesc": "ستظهر تقييمات العملاء هنا",
+    "noVisibleReviews": "لا توجد تقييمات مرئية",
+    "noHiddenReviews": "لا توجد تقييمات مخفية",
+    "changeFilter": "غيّر الفلتر لرؤية تقييمات أخرى",
+    "tips": {
+      "title": "نصائح للتقييمات",
+      "tip1": "رد بسرعة على التقييمات السلبية",
+      "tip2": "اشكر العملاء على الملاحظات الإيجابية",
+      "tip3": "أخفِ التقييمات غير اللائقة بدلاً من حذفها",
+      "tip4": "اطلب من العملاء الراضين تقييماً عبر QR"
+    }
+  },
   "adminPages": {
     "common": {
       "save": "حفظ",

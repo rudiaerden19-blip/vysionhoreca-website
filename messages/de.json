@@ -968,6 +968,69 @@
   "mediaPicker": {
     "choosePhoto": "Foto wählen"
   },
+  "marketingQr": {
+    "title": "QR-Codes",
+    "subtitle": "Erstellen und verwalten Sie QR-Codes für Ihr Geschäft",
+    "yourCodes": "Ihre QR-Codes",
+    "noQrCodes": "Noch keine QR-Codes",
+    "noQrCodesDesc": "Klicken Sie oben auf einen Typ, um Ihren ersten QR-Code zu erstellen",
+    "scans": "Scans",
+    "newQrCode": "Neuer QR-Code",
+    "name": "Name",
+    "namePlaceholder": "Z.B. Menükarte, Tisch 5...",
+    "tableNumber": "Tischnummer",
+    "preview": "Vorschau",
+    "create": "Erstellen",
+    "creating": "Erstellen...",
+    "confirmDelete": "Sind Sie sicher, dass Sie diesen QR-Code löschen möchten?",
+    "types": {
+      "menu": "Menü",
+      "menuDesc": "Link zum Menü",
+      "table": "Tisch",
+      "tableDesc": "Am Tisch bestellen",
+      "promo": "Aktion",
+      "promoDesc": "Sonderangebot",
+      "review": "Bewertung",
+      "reviewDesc": "Um Bewertung bitten"
+    },
+    "tips": {
+      "title": "Tipps für QR-Codes",
+      "tip1": "Drucken Sie QR-Codes auf Menükarten für schnelles Bestellen",
+      "tip2": "Platzieren Sie einen einzigartigen QR an jedem Tisch",
+      "tip3": "Verwenden Sie auf Flyern für Aktionen und Sonderangebote",
+      "tip4": "Bitten Sie Kunden um eine Bewertung nach ihrer Bestellung"
+    }
+  },
+  "marketingPromo": {
+    "title": "Aktionen",
+    "subtitle": "Rabattcodes und Aktionen verwalten",
+    "newPromotion": "Neue Aktion",
+    "activePromotions": "Aktive Aktionen",
+    "totalUsed": "Gesamt verwendet",
+    "totalPromotions": "Gesamt Aktionen",
+    "noPromotions": "Noch keine Aktionen",
+    "noPromotionsDesc": "Erstellen Sie Ihren ersten Rabattcode",
+    "createFirst": "Erste Aktion erstellen"
+  },
+  "marketingReviews": {
+    "title": "Bewertungen",
+    "subtitle": "Kundenbewertungen verwalten",
+    "all": "Alle",
+    "visible": "Sichtbar",
+    "hidden": "Versteckt",
+    "noReviews": "Noch keine Bewertungen",
+    "noReviewsDesc": "Kundenbewertungen erscheinen hier",
+    "noVisibleReviews": "Keine sichtbaren Bewertungen",
+    "noHiddenReviews": "Keine versteckten Bewertungen",
+    "changeFilter": "Filter anpassen um andere Bewertungen zu sehen",
+    "tips": {
+      "title": "Tipps für Bewertungen",
+      "tip1": "Reagieren Sie schnell auf negative Bewertungen",
+      "tip2": "Danken Sie Kunden für positives Feedback",
+      "tip3": "Verstecken Sie unangemessene Bewertungen statt sie zu löschen",
+      "tip4": "Bitten Sie zufriedene Kunden um eine Bewertung via QR-Code"
+    }
+  },
   "adminPages": {
     "common": {
       "save": "Speichern",

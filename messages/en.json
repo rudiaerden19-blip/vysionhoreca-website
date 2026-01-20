@@ -1503,6 +1503,69 @@
   "mediaPicker": {
     "choosePhoto": "Choose photo"
   },
+  "marketingQr": {
+    "title": "QR Codes",
+    "subtitle": "Create and manage QR codes for your business",
+    "yourCodes": "Your QR codes",
+    "noQrCodes": "No QR codes yet",
+    "noQrCodesDesc": "Click on a type above to create your first QR code",
+    "scans": "scans",
+    "newQrCode": "New QR code",
+    "name": "Name",
+    "namePlaceholder": "E.g. Menu card, Table 5...",
+    "tableNumber": "Table number",
+    "preview": "Preview",
+    "create": "Create",
+    "creating": "Creating...",
+    "confirmDelete": "Are you sure you want to delete this QR code?",
+    "types": {
+      "menu": "Menu",
+      "menuDesc": "Link to your menu",
+      "table": "Table",
+      "tableDesc": "Order at table",
+      "promo": "Promotion",
+      "promoDesc": "Special offer",
+      "review": "Review",
+      "reviewDesc": "Ask for review"
+    },
+    "tips": {
+      "title": "Tips for QR codes",
+      "tip1": "Print QR codes on menu cards for quick ordering",
+      "tip2": "Place a unique QR on each table for table orders",
+      "tip3": "Use on flyers for promotions and special offers",
+      "tip4": "Ask customers for a review after their order"
+    }
+  },
+  "marketingPromo": {
+    "title": "Promotions",
+    "subtitle": "Manage discount codes and promotions",
+    "newPromotion": "New promotion",
+    "activePromotions": "Active promotions",
+    "totalUsed": "Total used",
+    "totalPromotions": "Total promotions",
+    "noPromotions": "No promotions yet",
+    "noPromotionsDesc": "Create your first discount code",
+    "createFirst": "Create first promotion"
+  },
+  "marketingReviews": {
+    "title": "Reviews",
+    "subtitle": "Manage customer reviews",
+    "all": "All",
+    "visible": "Visible",
+    "hidden": "Hidden",
+    "noReviews": "No reviews yet",
+    "noReviewsDesc": "Customer reviews will appear here",
+    "noVisibleReviews": "No visible reviews",
+    "noHiddenReviews": "No hidden reviews",
+    "changeFilter": "Adjust the filter to see other reviews",
+    "tips": {
+      "title": "Tips for reviews",
+      "tip1": "Respond quickly to negative reviews to resolve issues",
+      "tip2": "Thank customers for positive feedback",
+      "tip3": "Hide inappropriate reviews instead of deleting them",
+      "tip4": "Ask satisfied customers for a review via the QR code feature"
+    }
+  },
   "adminPages": {
     "common": {
       "save": "Save",
