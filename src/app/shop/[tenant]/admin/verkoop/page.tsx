@@ -7,8 +7,22 @@ import { motion } from 'framer-motion'
 import { getSalesStats, getDailyRevenue, getTopProducts, SalesStats } from '@/lib/admin-api'
 
 export default function VerkoopPage({ params }: { params: { tenant: string } }) {
-  const { t } = useLanguage()
-  const dayLabels = t('salesPage.days') as unknown as string[]
+  const { t, locale } = useLanguage()
+  
+  // Day labels per language
+  const dayLabelsMap: Record<string, string[]> = {
+    nl: ['Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za'],
+    en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    de: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+    fr: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+    es: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+    it: ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'],
+    ar: ['أحد', 'إثن', 'ثلا', 'أرب', 'خمي', 'جمع', 'سبت'],
+    ja: ['日', '月', '火', '水', '木', '金', '土'],
+    zh: ['日', '一', '二', '三', '四', '五', '六'],
+  }
+  const dayLabels = dayLabelsMap[locale] || dayLabelsMap.nl
+  
   const [period, setPeriod] = useState<'today' | 'week' | 'month' | 'year'>('week')
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState<SalesStats>({ total_orders: 0, total_revenue: 0, average_order: 0, orders_by_status: {} })
