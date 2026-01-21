@@ -175,13 +175,14 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         />
       </aside>
 
+      {/* Language Selector - Fixed top right */}
+      <div className="hidden lg:block fixed top-4 right-6 z-50">
+        <LanguageSelector />
+      </div>
+
       {/* Main Content */}
       <main className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} pt-16 lg:pt-0 overflow-x-hidden`}>
         <div className="p-4 md:p-6 max-w-full">
-          {/* Language Selector - top right of content area */}
-          <div className="hidden lg:flex justify-end mb-4">
-            <LanguageSelector />
-          </div>
           {children}
         </div>
       </main>
