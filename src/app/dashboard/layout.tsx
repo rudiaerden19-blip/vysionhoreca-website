@@ -194,7 +194,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="lg:pl-64">
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-[#1a1a1a] border-b border-gray-800 px-4 py-4 lg:px-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden p-2 -ml-2 text-gray-400 hover:text-white"
@@ -208,7 +208,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <h1 className="text-xl font-semibold text-white lg:hidden">{t('dashboard.title')}</h1>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 ml-auto lg:mr-16">
               {/* Language Dropdown */}
               <div className="relative" ref={langDropdownRef}>
                 <button
