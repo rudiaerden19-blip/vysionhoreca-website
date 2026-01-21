@@ -71,6 +71,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [audioReady, setAudioReady] = useState(false)
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
+  const [printerIP, setPrinterIP] = useState<string | null>(null)
+  const [showPrinterSettings, setShowPrinterSettings] = useState(false)
+  const [printerStatus, setPrinterStatus] = useState<'unknown' | 'online' | 'offline'>('unknown')
   const audioContextRef = useRef<AudioContext | null>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -91,6 +94,46 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       }
     }
   }, [params.tenant])
+
+  // Load printer IP from localStorage and check status
+  useEffect(() => {
+    const savedIP = localStorage.getItem(`printer_ip_${params.tenant}`)
+    if (savedIP) {
+      setPrinterIP(savedIP)
+      checkPrinterStatus(savedIP)
+    }
+  }, [params.tenant])
+
+  // Check printer status
+  async function checkPrinterStatus(ip: string) {
+    try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 3000)
+      
+      const response = await fetch(`http://${ip}:3001/status`, {
+        signal: controller.signal
+      })
+      clearTimeout(timeoutId)
+      
+      if (response.ok) {
+        setPrinterStatus('online')
+        console.log('🖨️ Printer online:', ip)
+      } else {
+        setPrinterStatus('offline')
+      }
+    } catch (error) {
+      setPrinterStatus('offline')
+      console.log('🖨️ Printer offline or unreachable:', ip)
+    }
+  }
+
+  // Save printer IP
+  function savePrinterIP(ip: string) {
+    localStorage.setItem(`printer_ip_${params.tenant}`, ip)
+    setPrinterIP(ip)
+    checkPrinterStatus(ip)
+    setShowPrinterSettings(false)
+  }
 
   // Update time every second
   useEffect(() => {
@@ -440,7 +483,58 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     setSelectedOrder(null)
   }
 
-  function printOrder(order: Order, type: 'customer' | 'kitchen' = 'customer') {
+  // Print to thermal printer via iPad app
+  async function printToThermal(order: Order, type: 'customer' | 'kitchen') {
+    if (!printerIP) {
+      console.log('🖨️ No printer IP configured')
+      return false
+    }
+
+    try {
+      const response = await fetch(`http://${printerIP}:3001/print`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order: {
+            order_number: order.order_number,
+            customer_name: order.customer_name,
+            customer_phone: order.customer_phone,
+            customer_address: order.delivery_address,
+            order_type: order.order_type,
+            payment_status: order.payment_status,
+            items: order.items,
+            subtotal: order.subtotal,
+            delivery_fee: order.delivery_fee,
+            discount: order.discount_amount,
+            total: order.total,
+            notes: order.customer_notes,
+            created_at: order.created_at,
+          },
+          businessInfo: {
+            name: business?.business_name,
+            address: business?.address,
+            phone: business?.phone,
+            btw_number: business?.btw_number,
+          },
+          printType: type, // 'customer' or 'kitchen'
+        }),
+      })
+
+      if (response.ok) {
+        console.log(`✅ ${type} bon geprint via iPad`)
+        return true
+      } else {
+        console.error('❌ Print failed:', await response.text())
+        return false
+      }
+    } catch (error) {
+      console.error('❌ Could not reach printer:', error)
+      return false
+    }
+  }
+
+  // Fallback browser print
+  function browserPrint(order: Order, type: 'customer' | 'kitchen') {
     const printWindow = window.open('', '_blank', 'width=320,height=700')
     if (!printWindow) return
 
@@ -614,6 +708,18 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       printWindow.print()
       printWindow.close()
     }, 250)
+  }
+
+  // Main print function - tries thermal first, falls back to browser
+  async function printOrder(order: Order, type: 'customer' | 'kitchen' = 'customer') {
+    // If printer is configured and online, use thermal printer
+    if (printerIP && printerStatus === 'online') {
+      const success = await printToThermal(order, type)
+      if (success) return
+    }
+    
+    // Fallback to browser print
+    browserPrint(order, type)
   }
 
   const getStatusColor = (status: string) => {
@@ -799,6 +905,20 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 {currentTime.toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
+
+            {/* Printer Status */}
+            <button
+              onClick={() => setShowPrinterSettings(true)}
+              className={`px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-2 ${
+                printerStatus === 'online' 
+                  ? 'bg-green-500/20 text-green-400' 
+                  : printerStatus === 'offline'
+                  ? 'bg-red-500/20 text-red-400'
+                  : 'bg-gray-700 text-gray-400'
+              }`}
+            >
+              🖨️ {printerStatus === 'online' ? 'Online' : printerStatus === 'offline' ? 'Offline' : 'Instellen'}
+            </button>
 
             {/* Links */}
             <Link
@@ -1146,6 +1266,100 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   )}
                 </div>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Printer Settings Modal */}
+      <AnimatePresence>
+        {showPrinterSettings && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowPrinterSettings(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-gray-800 rounded-3xl max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-2xl font-bold mb-2 text-center">🖨️ Printer Instellingen</h2>
+              <p className="text-gray-400 text-center mb-6">Verbind met de Vysion Print iPad app</p>
+
+              <div className="mb-6">
+                <label className="block text-sm text-gray-400 mb-2">iPad IP Adres</label>
+                <input
+                  type="text"
+                  defaultValue={printerIP || ''}
+                  placeholder="bijv. 192.168.1.100"
+                  className="w-full px-4 py-3 bg-gray-700 rounded-xl border-none text-white placeholder-gray-500"
+                  id="printer-ip-input"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Je vindt dit IP adres in de Vysion Print app op de iPad
+                </p>
+              </div>
+
+              {/* Status indicator */}
+              <div className={`mb-6 p-4 rounded-xl ${
+                printerStatus === 'online' 
+                  ? 'bg-green-500/20 text-green-400' 
+                  : printerStatus === 'offline'
+                  ? 'bg-red-500/20 text-red-400'
+                  : 'bg-gray-700 text-gray-400'
+              }`}>
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">
+                    {printerStatus === 'online' ? '✅' : printerStatus === 'offline' ? '❌' : '❓'}
+                  </span>
+                  <div>
+                    <p className="font-bold">
+                      {printerStatus === 'online' 
+                        ? 'Printer Verbonden' 
+                        : printerStatus === 'offline'
+                        ? 'Printer Niet Bereikbaar'
+                        : 'Nog Niet Geconfigureerd'}
+                    </p>
+                    {printerIP && (
+                      <p className="text-sm opacity-80">{printerIP}:3001</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setShowPrinterSettings(false)}
+                  className="flex-1 py-4 bg-gray-700 hover:bg-gray-600 rounded-2xl font-bold text-lg"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={() => {
+                    const input = document.getElementById('printer-ip-input') as HTMLInputElement
+                    if (input?.value) {
+                      savePrinterIP(input.value.trim())
+                    }
+                  }}
+                  className="flex-1 py-4 bg-orange-500 hover:bg-orange-600 rounded-2xl font-bold text-lg"
+                >
+                  Opslaan
+                </button>
+              </div>
+
+              {printerIP && (
+                <button
+                  onClick={() => checkPrinterStatus(printerIP)}
+                  className="w-full mt-4 py-3 bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 rounded-xl font-bold"
+                >
+                  🔄 Verbinding Testen
+                </button>
+              )}
             </motion.div>
           </motion.div>
         )}
