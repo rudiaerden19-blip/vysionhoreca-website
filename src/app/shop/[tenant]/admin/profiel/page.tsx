@@ -26,6 +26,9 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     address: '',
     postal_code: '',
     city: '',
+    btw_number: '',
+    btw_percentage: 6,
+    kvk_number: '',
     website: '',
     facebook_url: '',
     instagram_url: '',
@@ -321,6 +324,75 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Fiscale Gegevens */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <span>📋</span> {t('adminPages.profiel.fiscalInfo') || 'Fiscale Gegevens'}
+          </h2>
+          <p className="text-gray-500 text-sm mb-6">
+            {t('adminPages.profiel.fiscalInfoDescription') || 'Deze gegevens worden getoond op kassabonnen en facturen (wettelijk verplicht in België)'}
+          </p>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('adminPages.profiel.btwNumber') || 'BTW Nummer'} *
+              </label>
+              <input
+                type="text"
+                name="btw_number"
+                value={formData.btw_number || ''}
+                onChange={handleChange}
+                placeholder="BE0123.456.789"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+              />
+              <p className="text-xs text-gray-400 mt-1">Verplicht op kassabonnen in België</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('adminPages.profiel.btwPercentage') || 'BTW Percentage'} *
+              </label>
+              <select
+                name="btw_percentage"
+                value={formData.btw_percentage || 6}
+                onChange={(e) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    btw_percentage: parseInt(e.target.value)
+                  }))
+                  setSaved(false)
+                }}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+              >
+                <option value={6}>6% - Voeding (horeca, afhaal)</option>
+                <option value={12}>12% - Restaurant (ter plaatse)</option>
+                <option value={21}>21% - Standaard tarief</option>
+              </select>
+              <p className="text-xs text-gray-400 mt-1">6% voor afhaalmaaltijden, 12% voor ter plaatse consumptie</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('adminPages.profiel.kvkNumber') || 'Ondernemingsnummer'}
+              </label>
+              <input
+                type="text"
+                name="kvk_number"
+                value={formData.kvk_number || ''}
+                onChange={handleChange}
+                placeholder="0123.456.789"
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
               />
             </div>
