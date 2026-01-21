@@ -31,6 +31,11 @@ const menuItems = [
       { nameKey: 'openingHours', href: '/openingstijden', icon: '🕐' },
       { nameKey: 'deliveryPickup', href: '/levering', icon: '🚗' },
       { nameKey: 'paymentMethods', href: '/betaling', icon: '💳' },
+      { nameKey: 'designColors', href: '/design', icon: '🎨' },
+      { nameKey: 'texts', href: '/teksten', icon: '✏️' },
+      { nameKey: 'ourTeam', href: '/team', icon: '👨‍🍳' },
+      { nameKey: 'giftCards', href: '/cadeaubonnen', icon: '🎁' },
+      { nameKey: 'seo', href: '/seo', icon: '🔍' },
     ]
   },
   {
@@ -42,17 +47,6 @@ const menuItems = [
       { nameKey: 'optionsExtras', href: '/opties', icon: '➕' },
       { nameKey: 'allergens', href: '/allergenen', icon: '⚠️' },
       { nameKey: 'photosMedia', href: '/media', icon: '📷' },
-    ]
-  },
-  {
-    categoryKey: 'website',
-    icon: '🌐',
-    items: [
-      { nameKey: 'designColors', href: '/design', icon: '🎨' },
-      { nameKey: 'texts', href: '/teksten', icon: '✏️' },
-      { nameKey: 'ourTeam', href: '/team', icon: '👨‍🍳' },
-      { nameKey: 'giftCards', href: '/cadeaubonnen', icon: '🎁' },
-      { nameKey: 'seo', href: '/seo', icon: '🔍' },
     ]
   },
   {
