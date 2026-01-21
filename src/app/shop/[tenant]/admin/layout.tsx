@@ -392,16 +392,7 @@ function SidebarContent({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Auto-expand section that contains active item
-  useEffect(() => {
-    menuItems.forEach((section) => {
-      const hasActiveItem = section.items.some((item) => isActive(item.href))
-      if (hasActiveItem && !expandedSections.includes(section.categoryKey)) {
-        setExpandedSections(prev => [...prev, section.categoryKey])
-      }
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname])
+  // Don't auto-expand sections - only expand when user clicks
 
   const toggleSection = (categoryKey: string) => {
     // Only one section open at a time - clicking another closes the previous
