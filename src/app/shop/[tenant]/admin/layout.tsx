@@ -176,7 +176,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       </aside>
 
       {/* Language Selector - Fixed top right */}
-      <div className="hidden lg:block fixed top-4 right-28 z-50">
+      <div className="hidden lg:block fixed top-4 right-80 z-50">
         <LanguageSelector />
       </div>
 
