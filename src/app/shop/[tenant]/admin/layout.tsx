@@ -196,7 +196,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       </div>
 
       {/* Main Content */}
-      <main className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} pt-16 lg:pt-0 overflow-x-hidden`}>
+      <main className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} pt-16 lg:pt-20 overflow-x-hidden`}>
         <div className="p-4 md:p-6 max-w-full">
           {children}
         </div>
