@@ -104,26 +104,22 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }
   }, [params.tenant])
 
-  // Check printer status
+  // Check printer status via server proxy (avoids mixed content)
   async function checkPrinterStatus(ip: string) {
     try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 3000)
+      const response = await fetch(`/api/print-proxy?printerIP=${encodeURIComponent(ip)}`)
+      const data = await response.json()
       
-      const response = await fetch(`http://${ip}:3001/status`, {
-        signal: controller.signal
-      })
-      clearTimeout(timeoutId)
-      
-      if (response.ok) {
+      if (data.status === 'online') {
         setPrinterStatus('online')
         console.log('🖨️ Printer online:', ip)
       } else {
         setPrinterStatus('offline')
+        console.log('🖨️ Printer offline:', ip)
       }
     } catch (error) {
       setPrinterStatus('offline')
-      console.log('🖨️ Printer offline or unreachable:', ip)
+      console.log('🖨️ Printer check failed:', error)
     }
   }
 
@@ -483,18 +479,21 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     setSelectedOrder(null)
   }
 
-  // Print to thermal printer via iPad app
+  // Print to thermal printer via server proxy (avoids HTTPS/HTTP mixed content)
   async function printToThermal(order: Order, type: 'customer' | 'kitchen') {
     if (!printerIP) {
       console.log('🖨️ No printer IP configured')
       return false
     }
 
+    console.log(`🖨️ Sending ${type} receipt to printer...`)
+
     try {
-      const response = await fetch(`http://${printerIP}:3001/print`, {
+      const response = await fetch('/api/print-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          printerIP,
           order: {
             order_number: order.order_number,
             customer_name: order.customer_name,
@@ -516,19 +515,23 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             phone: business?.phone,
             btw_number: business?.btw_number,
           },
-          printType: type, // 'customer' or 'kitchen'
+          printType: type,
         }),
       })
 
-      if (response.ok) {
+      const data = await response.json()
+
+      if (response.ok && data.success) {
         console.log(`✅ ${type} bon geprint via iPad`)
         return true
       } else {
-        console.error('❌ Print failed:', await response.text())
+        console.error('❌ Print failed:', data.error || 'Unknown error')
+        alert(`Print mislukt: ${data.error || 'Controleer of de iPad app draait'}`)
         return false
       }
-    } catch (error) {
-      console.error('❌ Could not reach printer:', error)
+    } catch (error: any) {
+      console.error('❌ Print error:', error)
+      alert(`Print error: ${error.message}`)
       return false
     }
   }

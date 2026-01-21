@@ -73,14 +73,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
-  // Check printer status
+  // Check printer status via server proxy
   async function checkPrinterStatus(ip: string) {
     try {
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 3000)
-      const response = await fetch(`http://${ip}:3001/status`, { signal: controller.signal })
-      clearTimeout(timeoutId)
-      setPrinterStatus(response.ok ? 'online' : 'offline')
+      const response = await fetch(`/api/print-proxy?printerIP=${encodeURIComponent(ip)}`)
+      const data = await response.json()
+      setPrinterStatus(data.status === 'online' ? 'online' : 'offline')
     } catch {
       setPrinterStatus('offline')
     }
@@ -93,14 +91,16 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     setShowPrinterSettings(false)
   }
 
-  // Print to thermal printer
+  // Print to thermal printer via server proxy
   async function printToThermal(order: Order) {
     if (!printerIP) return false
+    console.log('🖨️ Sending kitchen receipt to printer...')
     try {
-      const response = await fetch(`http://${printerIP}:3001/print`, {
+      const response = await fetch('/api/print-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          printerIP,
           order: {
             order_number: order.order_number,
             customer_name: order.customer_name,
@@ -120,8 +120,16 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           printType: 'kitchen',
         }),
       })
-      return response.ok
-    } catch {
+      const data = await response.json()
+      if (response.ok && data.success) {
+        console.log('✅ Kitchen receipt printed')
+        return true
+      } else {
+        console.error('❌ Print failed:', data.error)
+        return false
+      }
+    } catch (error) {
+      console.error('❌ Print error:', error)
       return false
     }
   }
