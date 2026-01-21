@@ -175,8 +175,15 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         />
       </aside>
 
-      {/* Language Selector - Fixed top right */}
-      <div className="hidden lg:block fixed top-4 right-[600px] z-50">
+      {/* Top Bar with Language Selector and Shop Link - Fixed top right */}
+      <div className="hidden lg:flex fixed top-4 right-8 z-50 items-center gap-3">
+        <Link
+          href={`/shop/${params.tenant}`}
+          target="_blank"
+          className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors font-medium shadow-lg"
+        >
+          🛒 Online Shop
+        </Link>
         <LanguageSelector />
       </div>
 
