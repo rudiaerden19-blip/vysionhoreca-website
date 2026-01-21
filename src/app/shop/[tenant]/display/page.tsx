@@ -481,12 +481,16 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   // Print to thermal printer via server proxy (avoids HTTPS/HTTP mixed content)
   async function printToThermal(order: Order, type: 'customer' | 'kitchen') {
-    if (!printerIP) {
+    // Check if running inside Vysion Print iPad app
+    const isInVysionApp = typeof window !== 'undefined' && (window as any)._vysionPrintApp === true
+    
+    // In Vysion app, we don't need printerIP - the WebView handles it
+    if (!printerIP && !isInVysionApp) {
       console.log('🖨️ No printer IP configured')
       return false
     }
 
-    console.log(`🖨️ Sending ${type} receipt to printer...`)
+    console.log(`🖨️ Sending ${type} receipt to printer...${isInVysionApp ? ' (via Vysion app)' : ''}`)
 
     try {
       const response = await fetch('/api/print-proxy', {
@@ -715,13 +719,26 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   // Main print function - tries thermal first, falls back to browser
   async function printOrder(order: Order, type: 'customer' | 'kitchen' = 'customer') {
+    // Check if running inside Vysion Print iPad app
+    const isInVysionApp = typeof window !== 'undefined' && (window as any)._vysionPrintApp === true
+    
+    // If in Vysion Print app, always use thermal (WebView intercepts the request)
+    if (isInVysionApp) {
+      console.log('🖨️ Running in Vysion Print app, sending to native...')
+      const success = await printToThermal(order, type)
+      if (success) return
+      // Don't fallback to browser print in the app - it won't work
+      console.log('❌ Native print failed')
+      return
+    }
+    
     // If printer is configured and online, use thermal printer
     if (printerIP && printerStatus === 'online') {
       const success = await printToThermal(order, type)
       if (success) return
     }
     
-    // Fallback to browser print
+    // Fallback to browser print (only works in regular browser)
     browserPrint(order, type)
   }
 
