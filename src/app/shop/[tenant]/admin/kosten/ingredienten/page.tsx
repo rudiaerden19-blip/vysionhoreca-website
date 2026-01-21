@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { createClient } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 
 interface Ingredient {
@@ -60,7 +60,6 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   }, [params.tenant])
 
   async function loadData() {
-    const supabase = createClient()
     
     // Use tenant_slug directly
     setBusinessId(params.tenant)
@@ -118,7 +117,6 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     if (!formData.name || !businessId) return
     
     setSaving(true)
-    const supabase = createClient()
 
     // Calculate price per unit if package info is provided
     let pricePerUnit = formData.purchase_price
@@ -169,7 +167,6 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   async function deleteIngredient(id: string) {
     if (!confirm('Weet je zeker dat je dit ingrediënt wilt verwijderen?')) return
     
-    const supabase = createClient()
     await supabase.from('ingredients').delete().eq('id', id)
     setIngredients(prev => prev.filter(i => i.id !== id))
   }

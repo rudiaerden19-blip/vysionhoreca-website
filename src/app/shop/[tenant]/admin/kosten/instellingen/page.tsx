@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { createClient } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 
 interface CostCategory {
@@ -36,7 +36,6 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   }, [params.tenant])
 
   async function loadData() {
-    const supabase = createClient()
     
     // Use tenant_slug directly
     setBusinessId(params.tenant)
@@ -72,7 +71,6 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   }
 
   async function updateMultiplier(id: string, multiplier: number) {
-    const supabase = createClient()
     await supabase
       .from('cost_categories')
       .update({ multiplier })
@@ -85,7 +83,6 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
     if (!newCategory.name || !businessId) return
     
     setSaving(true)
-    const supabase = createClient()
     
     const { data } = await supabase
       .from('cost_categories')
@@ -108,7 +105,6 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   async function deleteCategory(id: string) {
     if (!confirm('Weet je zeker dat je deze categorie wilt verwijderen?')) return
     
-    const supabase = createClient()
     await supabase.from('cost_categories').delete().eq('id', id)
     setCategories(prev => prev.filter(c => c.id !== id))
   }

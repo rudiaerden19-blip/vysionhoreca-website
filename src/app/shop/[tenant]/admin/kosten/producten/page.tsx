@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { createClient } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 
 interface Product {
@@ -64,7 +64,6 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   }, [params.tenant])
 
   async function loadData() {
-    const supabase = createClient()
     
     // Use tenant_slug directly
     setBusinessId(params.tenant)
@@ -145,7 +144,6 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   async function addIngredientToProduct() {
     if (!selectedProduct || !addingIngredient || !businessId) return
 
-    const supabase = createClient()
     
     const { data } = await supabase
       .from('product_ingredients')
@@ -166,13 +164,11 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   }
 
   async function removeIngredientFromProduct(piId: string) {
-    const supabase = createClient()
     await supabase.from('product_ingredients').delete().eq('id', piId)
     setProductIngredients(prev => prev.filter(pi => pi.id !== piId))
   }
 
   async function updateIngredientQuantity(piId: string, quantity: number) {
-    const supabase = createClient()
     await supabase.from('product_ingredients').update({ quantity }).eq('id', piId)
     setProductIngredients(prev => prev.map(pi => pi.id === piId ? { ...pi, quantity } : pi))
   }
