@@ -17,6 +17,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
 
   useEffect(() => {
     loadReviews()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function loadReviews() {

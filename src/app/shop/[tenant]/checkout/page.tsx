@@ -61,6 +61,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   useEffect(() => {
     loadData()
     loadCart()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function loadData() {

@@ -93,12 +93,14 @@ export default function UrenPage() {
 
   useEffect(() => {
     loadStaff()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenant])
 
   useEffect(() => {
     if (selectedStaff) {
       loadData()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedStaff, selectedYear, selectedMonth])
 
   async function loadStaff() {

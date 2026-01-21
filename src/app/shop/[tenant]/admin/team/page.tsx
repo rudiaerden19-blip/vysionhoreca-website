@@ -23,6 +23,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
 
   useEffect(() => {
     loadMembers()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function loadMembers() {

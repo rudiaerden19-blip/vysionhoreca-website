@@ -18,6 +18,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
 
   useEffect(() => {
     loadCustomers()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function loadCustomers() {

@@ -237,6 +237,7 @@ function SidebarContent({
         setExpandedSections(prev => [...prev, section.categoryKey])
       }
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
   const toggleSection = (categoryKey: string) => {

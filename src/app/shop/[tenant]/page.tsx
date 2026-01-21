@@ -495,6 +495,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       setCurrentImageIndex(prev => (prev + 1) % 3)
     }, 5000)
     return () => clearInterval(interval)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   const getDayName = () => {

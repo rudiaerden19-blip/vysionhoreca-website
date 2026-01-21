@@ -48,6 +48,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
 
   useEffect(() => {
     loadDashboardData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function loadDashboardData() {

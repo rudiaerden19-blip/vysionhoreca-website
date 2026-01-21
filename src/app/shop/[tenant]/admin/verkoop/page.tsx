@@ -31,6 +31,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
 
   useEffect(() => {
     loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, period])
 
   async function loadData() {

@@ -84,6 +84,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       ...cat,
       label: getFixedCatLabel(cat.id),
       icon: FIXED_ICONS[cat.id] || '📦'
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     })), [t])
   
   const translatedVariableCategories = useMemo(() =>
@@ -91,6 +92,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       ...cat,
       label: getVariableCatLabel(cat.id),
       icon: VARIABLE_ICONS[cat.id] || '📋'
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     })), [t])
   
   // Translate recommendations
@@ -208,6 +210,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   // Load data
   useEffect(() => {
     loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, selectedYear, selectedMonth])
 
   async function loadData() {

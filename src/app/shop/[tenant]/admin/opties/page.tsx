@@ -159,6 +159,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
   // Load options on mount
   useEffect(() => {
     loadOptions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   const loadOptions = async () => {

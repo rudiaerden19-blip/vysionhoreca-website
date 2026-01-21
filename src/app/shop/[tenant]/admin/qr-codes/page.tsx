@@ -28,6 +28,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
 
   useEffect(() => {
     loadQrCodes()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function loadQrCodes() {

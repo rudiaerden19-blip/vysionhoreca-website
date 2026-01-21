@@ -73,6 +73,7 @@ export default function PersoneelPage() {
 
   useEffect(() => {
     loadStaff()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenant])
 
   async function loadStaff() {

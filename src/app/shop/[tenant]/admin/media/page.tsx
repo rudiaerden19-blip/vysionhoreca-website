@@ -104,6 +104,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
   // Load media on mount
   useEffect(() => {
     loadMedia()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   const loadMedia = async () => {

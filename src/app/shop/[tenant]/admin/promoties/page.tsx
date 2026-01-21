@@ -31,6 +31,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
 
   useEffect(() => {
     loadPromotions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function loadPromotions() {

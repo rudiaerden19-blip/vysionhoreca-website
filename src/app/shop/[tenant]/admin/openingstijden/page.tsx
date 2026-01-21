@@ -58,6 +58,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
       setLoading(false)
     }
     loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   const updateDay = (dayIndex: number, field: keyof OpeningHour, value: string | boolean | null) => {

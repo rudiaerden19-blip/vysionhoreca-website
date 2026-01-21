@@ -25,6 +25,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
 
   useEffect(() => {
     loadRewards()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function loadRewards() {

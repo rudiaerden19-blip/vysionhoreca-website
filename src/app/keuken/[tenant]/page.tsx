@@ -58,6 +58,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     if (savedSound === 'true') {
       setSoundEnabled(true)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   // Mark audio ready after any click

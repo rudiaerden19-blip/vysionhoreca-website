@@ -27,6 +27,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
 
   useEffect(() => {
     checkAuth()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function checkAuth() {

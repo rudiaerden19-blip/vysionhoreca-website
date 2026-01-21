@@ -503,6 +503,7 @@ export default function AbonnementPage() {
 
   useEffect(() => {
     loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantSlug])
 
   // Translation function that uses global i18n system
