@@ -41,6 +41,7 @@ const menuItems = [
       { nameKey: 'products', href: '/producten', icon: '🍟' },
       { nameKey: 'optionsExtras', href: '/opties', icon: '➕' },
       { nameKey: 'allergens', href: '/allergenen', icon: '⚠️' },
+      { nameKey: 'photosMedia', href: '/media', icon: '📷' },
     ]
   },
   {
@@ -48,7 +49,6 @@ const menuItems = [
     icon: '🌐',
     items: [
       { nameKey: 'designColors', href: '/design', icon: '🎨' },
-      { nameKey: 'photosMedia', href: '/media', icon: '📷' },
       { nameKey: 'texts', href: '/teksten', icon: '✏️' },
       { nameKey: 'ourTeam', href: '/team', icon: '👨‍🍳' },
       { nameKey: 'giftCards', href: '/cadeaubonnen', icon: '🎁' },
