@@ -1512,6 +1512,7 @@
       "marketing": "营销",
       "customers": "客户",
       "staff": "员工",
+      "costCalculation": "成本计算",
       "accounting": "会计",
       "orders": "订单",
       "statistics": "统计"
@@ -1543,6 +1544,9 @@
       "employees": "员工",
       "timeTracking": "时间跟踪",
       "vacancies": "职位空缺",
+      "costSettings": "利润率设置",
+      "ingredients": "原料",
+      "productCosts": "产品成本",
       "scrada": "SCRADA",
       "orderList": "订单列表",
       "reservations": "预订",

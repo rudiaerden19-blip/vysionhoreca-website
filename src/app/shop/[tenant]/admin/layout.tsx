@@ -79,6 +79,15 @@ const menuItems = [
     ]
   },
   {
+    categoryKey: 'costCalculation',
+    icon: '🧮',
+    items: [
+      { nameKey: 'costSettings', href: '/kosten/instellingen', icon: '⚙️' },
+      { nameKey: 'ingredients', href: '/kosten/ingredienten', icon: '🥬' },
+      { nameKey: 'productCosts', href: '/kosten/producten', icon: '📊' },
+    ]
+  },
+  {
     categoryKey: 'accounting',
     icon: '📒',
     items: [

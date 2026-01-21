@@ -977,6 +977,7 @@
       "marketing": "MARKETING",
       "customers": "KUNDEN",
       "staff": "PERSONAL",
+      "costCalculation": "KOSTENBERECHNUNG",
       "accounting": "BUCHHALTUNG",
       "orders": "BESTELLUNGEN",
       "statistics": "STATISTIKEN"
@@ -1008,6 +1009,9 @@
       "employees": "Mitarbeiter",
       "timeTracking": "Zeiterfassung",
       "vacancies": "Stellenangebote",
+      "costSettings": "Margen-Einstellungen",
+      "ingredients": "Zutaten",
+      "productCosts": "Produktkosten",
       "scrada": "SCRADA",
       "orderList": "Bestellungen",
       "reservations": "Reservierungen",

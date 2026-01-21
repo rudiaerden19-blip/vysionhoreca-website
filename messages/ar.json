@@ -1512,6 +1512,7 @@
       "marketing": "التسويق",
       "customers": "العملاء",
       "staff": "الموظفين",
+      "costCalculation": "حساب التكاليف",
       "accounting": "المحاسبة",
       "orders": "الطلبات",
       "statistics": "الإحصائيات"
@@ -1543,6 +1544,9 @@
       "employees": "الموظفون",
       "timeTracking": "تتبع الوقت",
       "vacancies": "الوظائف الشاغرة",
+      "costSettings": "إعدادات الهامش",
+      "ingredients": "المكونات",
+      "productCosts": "تكاليف المنتج",
       "scrada": "SCRADA",
       "orderList": "الطلبات",
       "reservations": "الحجوزات",

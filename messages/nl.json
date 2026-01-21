@@ -1518,6 +1518,7 @@
       "marketing": "MARKETING",
       "customers": "KLANTEN",
       "staff": "PERSONEEL",
+      "costCalculation": "KOSTENBEREKENING",
       "accounting": "BOEKHOUDING",
       "orders": "BESTELLINGEN",
       "statistics": "STATISTIEKEN"
@@ -1549,6 +1550,9 @@
       "employees": "Medewerkers",
       "timeTracking": "Uren registratie",
       "vacancies": "Vacatures",
+      "costSettings": "Marge Instellingen",
+      "ingredients": "Ingrediënten",
+      "productCosts": "Product Kostprijs",
       "scrada": "SCRADA",
       "orderList": "Bestellingen",
       "reservations": "Reserveringen",

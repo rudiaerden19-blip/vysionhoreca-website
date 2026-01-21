@@ -1512,6 +1512,7 @@
       "marketing": "MARKETING",
       "customers": "CLIENTES",
       "staff": "PERSONAL",
+      "costCalculation": "CÁLCULO DE COSTES",
       "accounting": "CONTABILIDAD",
       "orders": "PEDIDOS",
       "statistics": "ESTADÍSTICAS"
@@ -1543,6 +1544,9 @@
       "employees": "Empleados",
       "timeTracking": "Control de tiempo",
       "vacancies": "Vacantes",
+      "costSettings": "Ajustes de margen",
+      "ingredients": "Ingredientes",
+      "productCosts": "Costes de producto",
       "scrada": "SCRADA",
       "orderList": "Pedidos",
       "reservations": "Reservas",

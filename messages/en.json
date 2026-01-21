@@ -1512,6 +1512,7 @@
       "marketing": "MARKETING",
       "customers": "CUSTOMERS",
       "staff": "STAFF",
+      "costCalculation": "COST CALCULATION",
       "accounting": "ACCOUNTING",
       "orders": "ORDERS",
       "statistics": "STATISTICS"
@@ -1543,6 +1544,9 @@
       "employees": "Employees",
       "timeTracking": "Time Tracking",
       "vacancies": "Vacancies",
+      "costSettings": "Margin Settings",
+      "ingredients": "Ingredients",
+      "productCosts": "Product Costs",
       "scrada": "SCRADA",
       "orderList": "Orders",
       "reservations": "Reservations",
