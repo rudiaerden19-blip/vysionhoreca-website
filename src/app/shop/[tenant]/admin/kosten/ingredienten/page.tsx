@@ -62,24 +62,14 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   async function loadData() {
     const supabase = createClient()
     
-    const { data: business } = await supabase
-      .from('business_profiles')
-      .select('id')
-      .eq('tenant_slug', params.tenant)
-      .single()
-
-    if (!business) {
-      setLoading(false)
-      return
-    }
-
-    setBusinessId(business.id)
+    // Use tenant_slug directly
+    setBusinessId(params.tenant)
 
     // Load categories
     const { data: cats } = await supabase
       .from('cost_categories')
       .select('*')
-      .eq('business_id', business.id)
+      .eq('tenant_slug', params.tenant)
       .order('name')
 
     if (cats) setCategories(cats)
@@ -88,7 +78,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     const { data: ings } = await supabase
       .from('ingredients')
       .select('*')
-      .eq('business_id', business.id)
+      .eq('tenant_slug', params.tenant)
       .order('name')
 
     if (ings) setIngredients(ings)
@@ -137,7 +127,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     }
 
     const ingredientData = {
-      business_id: businessId,
+      tenant_slug: businessId,
       name: formData.name,
       unit: formData.unit,
       purchase_price: pricePerUnit,

@@ -38,25 +38,14 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   async function loadData() {
     const supabase = createClient()
     
-    // Get business ID
-    const { data: business } = await supabase
-      .from('business_profiles')
-      .select('id')
-      .eq('tenant_slug', params.tenant)
-      .single()
-
-    if (!business) {
-      setLoading(false)
-      return
-    }
-
-    setBusinessId(business.id)
+    // Use tenant_slug directly
+    setBusinessId(params.tenant)
 
     // Load categories
     const { data: cats } = await supabase
       .from('cost_categories')
       .select('*')
-      .eq('business_id', business.id)
+      .eq('tenant_slug', params.tenant)
       .order('name')
 
     if (cats && cats.length > 0) {
@@ -68,7 +57,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
         const { data } = await supabase
           .from('cost_categories')
           .insert({
-            business_id: business.id,
+            tenant_slug: params.tenant,
             name: cat.name,
             multiplier: cat.multiplier
           })
@@ -101,7 +90,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
     const { data } = await supabase
       .from('cost_categories')
       .insert({
-        business_id: businessId,
+        tenant_slug: businessId,
         name: newCategory.name,
         multiplier: newCategory.multiplier
       })

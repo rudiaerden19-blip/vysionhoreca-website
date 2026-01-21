@@ -66,25 +66,15 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   async function loadData() {
     const supabase = createClient()
     
-    const { data: business } = await supabase
-      .from('business_profiles')
-      .select('id')
-      .eq('tenant_slug', params.tenant)
-      .single()
-
-    if (!business) {
-      setLoading(false)
-      return
-    }
-
-    setBusinessId(business.id)
+    // Use tenant_slug directly
+    setBusinessId(params.tenant)
 
     // Load all data in parallel
     const [productsRes, ingredientsRes, categoriesRes, productIngsRes] = await Promise.all([
-      supabase.from('products').select('id, name, price, category_id').eq('business_id', business.id).order('name'),
-      supabase.from('ingredients').select('*').eq('business_id', business.id).order('name'),
-      supabase.from('cost_categories').select('*').eq('business_id', business.id),
-      supabase.from('product_ingredients').select('*')
+      supabase.from('menu_products').select('id, name, price, category_id').eq('tenant_slug', params.tenant).order('name'),
+      supabase.from('ingredients').select('*').eq('tenant_slug', params.tenant).order('name'),
+      supabase.from('cost_categories').select('*').eq('tenant_slug', params.tenant),
+      supabase.from('product_ingredients').select('*').eq('tenant_slug', params.tenant)
     ])
 
     if (productsRes.data) setProducts(productsRes.data)
@@ -160,6 +150,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     const { data } = await supabase
       .from('product_ingredients')
       .insert({
+        tenant_slug: businessId,
         product_id: selectedProduct,
         ingredient_id: addingIngredient,
         quantity: addingQuantity
