@@ -954,6 +954,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
             {/* Links */}
             <Link
+              href={`/shop/${params.tenant}/admin`}
+              className="px-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-sm font-bold"
+            >
+              ⚙️ Admin
+            </Link>
+            <Link
               href={`/keuken/${params.tenant}`}
               className="px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-sm font-bold"
             >
