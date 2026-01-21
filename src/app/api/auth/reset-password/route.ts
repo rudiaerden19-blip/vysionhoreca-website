@@ -3,6 +3,9 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { apiRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import bcrypt from 'bcryptjs'
 
+// Force dynamic rendering - GET endpoint uses request.url
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
