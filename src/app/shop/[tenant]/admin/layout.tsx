@@ -21,6 +21,9 @@ const menuItems = [
       { nameKey: 'shopDisplay', href: '/display', icon: '🖥️', fullscreen: true },
       { nameKey: 'kitchenDisplay', href: '/keuken', icon: '👨‍🍳', fullscreen: true },
       { nameKey: 'subscription', href: '/abonnement', icon: '💎' },
+      { nameKey: 'businessAnalysis', href: '/analyse', icon: '📊' },
+      { nameKey: 'sales', href: '/verkoop', icon: '💰' },
+      { nameKey: 'popularItems', href: '/populair', icon: '🔥' },
     ]
   },
   {
@@ -88,15 +91,6 @@ const menuItems = [
     items: [
       { nameKey: 'orderList', href: '/bestellingen', icon: '📦' },
       { nameKey: 'reservations', href: '/reserveringen', icon: '📅' },
-    ]
-  },
-  {
-    categoryKey: 'statistics',
-    icon: '📈',
-    items: [
-      { nameKey: 'businessAnalysis', href: '/analyse', icon: '📊' },
-      { nameKey: 'sales', href: '/verkoop', icon: '💰' },
-      { nameKey: 'popularItems', href: '/populair', icon: '🔥' },
     ]
   },
 ]
