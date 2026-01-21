@@ -177,10 +177,76 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
       {/* Main Content */}
       <main className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} pt-16 lg:pt-0 overflow-x-hidden`}>
+        {/* Top Header Bar with Language Selector */}
+        <div className="hidden lg:flex items-center justify-end px-6 py-3 bg-white border-b">
+          <LanguageSelector />
+        </div>
         <div className="p-4 md:p-6 max-w-full">
           {children}
         </div>
       </main>
+    </div>
+  )
+}
+
+// Language Selector Component for top-right header
+function LanguageSelector() {
+  const [isOpen, setIsOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const { locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+      >
+        <span className="text-xl">{localeFlags[locale]}</span>
+        <span className="text-sm font-medium text-gray-700">{localeNames[locale]}</span>
+        <svg 
+          className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      
+      {isOpen && (
+        <div className="absolute right-0 mt-2 bg-white rounded-xl shadow-xl border z-50 min-w-[180px] max-h-80 overflow-y-auto">
+          {locales.map((langCode) => (
+            <button
+              key={langCode}
+              onClick={() => {
+                setLocale(langCode as typeof locale)
+                setIsOpen(false)
+              }}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${
+                locale === langCode ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
+              }`}
+            >
+              <span className="text-lg">{localeFlags[langCode]}</span>
+              <span className="text-sm">{localeNames[langCode]}</span>
+              {locale === langCode && (
+                <svg className="w-4 h-4 ml-auto text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -386,51 +452,6 @@ function SidebarContent({
           </button>
         )}
       </div>
-
-      {/* Language Selector */}
-      {!collapsed && (
-        <div ref={langRef} className="px-4 py-2 border-b relative">
-          <button
-            onClick={() => setIsLangOpen(!isLangOpen)}
-            className="w-full flex items-center justify-between px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-xl">{localeFlags[locale]}</span>
-              <span className="text-sm font-medium text-gray-700">{localeNames[locale]}</span>
-            </div>
-            <svg 
-              className={`w-4 h-4 text-gray-500 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {isLangOpen && (
-            <div className="absolute left-4 right-4 mt-1 bg-white rounded-lg shadow-lg border z-50 max-h-64 overflow-y-auto">
-              {locales.map((langCode) => (
-                <button
-                  key={langCode}
-                  onClick={() => handleLanguageSelect(langCode)}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${
-                    locale === langCode ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
-                  }`}
-                >
-                  <span className="text-lg">{localeFlags[langCode]}</span>
-                  <span className="text-sm">{localeNames[langCode]}</span>
-                  {locale === langCode && (
-                    <svg className="w-4 h-4 ml-auto text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2">
