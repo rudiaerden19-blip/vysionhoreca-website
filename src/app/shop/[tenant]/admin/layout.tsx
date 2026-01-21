@@ -197,6 +197,108 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   )
 }
 
+// Flyout Menu Component - renders with fixed positioning to escape overflow
+function FlyoutMenu({ 
+  section, 
+  categoryName, 
+  sectionIndex,
+  baseUrl, 
+  tenant, 
+  isActive, 
+  onClose,
+  t 
+}: { 
+  section: typeof menuItems[0]
+  categoryName: string
+  sectionIndex: number
+  baseUrl: string
+  tenant: string
+  isActive: (href: string) => boolean
+  onClose: () => void
+  t: (key: string) => string
+}) {
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [position, setPosition] = useState({ top: 0, left: 0 })
+
+  useEffect(() => {
+    // Get the button position to align the flyout
+    const button = document.getElementById(`menu-btn-${section.categoryKey}`)
+    if (button) {
+      const rect = button.getBoundingClientRect()
+      setPosition({
+        top: rect.top,
+        left: rect.right + 8 // 8px gap from sidebar
+      })
+    }
+  }, [section.categoryKey])
+
+  // Close when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        const button = document.getElementById(`menu-btn-${section.categoryKey}`)
+        if (button && !button.contains(event.target as Node)) {
+          onClose()
+        }
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [onClose, section.categoryKey])
+
+  return (
+    <motion.div
+      ref={menuRef}
+      initial={{ opacity: 0, x: -10, scale: 0.95 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: -10, scale: 0.95 }}
+      transition={{ duration: 0.15 }}
+      style={{
+        position: 'fixed',
+        top: position.top,
+        left: position.left,
+        zIndex: 9999
+      }}
+      className="bg-white rounded-xl shadow-2xl border border-gray-200 py-2 min-w-[220px] max-h-[70vh] overflow-y-auto"
+    >
+      <div className="px-4 py-2 border-b border-gray-100 mb-1">
+        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{categoryName}</span>
+      </div>
+      <ul>
+        {section.items.map((item) => {
+          const getHref = () => {
+            if (item.fullscreen) {
+              if (item.href === '/display') return `/shop/${tenant}/display`
+              if (item.href === '/keuken') return `/keuken/${tenant}`
+            }
+            return `${baseUrl}${item.href}`
+          }
+          
+          return (
+            <li key={item.href}>
+              <Link
+                href={getHref()}
+                onClick={onClose}
+                className={`flex items-center gap-3 px-4 py-2.5 transition-all ${
+                  isActive(item.href)
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
+                }`}
+              >
+                <span className="text-lg">{item.icon}</span>
+                <span className="text-sm font-medium flex items-center gap-2">
+                  {t(`admin.menu.${item.nameKey}`)}
+                  {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
+                </span>
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </motion.div>
+  )
+}
+
 function SidebarContent({ 
   baseUrl, 
   isActive, 
@@ -241,10 +343,11 @@ function SidebarContent({
   }, [pathname])
 
   const toggleSection = (categoryKey: string) => {
+    // Only one section open at a time - clicking another closes the previous
     setExpandedSections(prev => 
       prev.includes(categoryKey) 
-        ? prev.filter(c => c !== categoryKey)
-        : [...prev, categoryKey]
+        ? [] // Close if clicking same section
+        : [categoryKey] // Open only this one, close all others
     )
   }
 
@@ -343,7 +446,7 @@ function SidebarContent({
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2">
-        {menuItems.map((section) => {
+        {menuItems.map((section, sectionIndex) => {
           const isExpanded = isSectionExpanded(section.categoryKey)
           const hasActive = hasActiveItemInSection(section)
           const categoryName = t(`admin.categories.${section.categoryKey}`)
@@ -352,6 +455,7 @@ function SidebarContent({
             <div key={section.categoryKey} className="mb-1">
               {/* Category Header - Clickable */}
               <button
+                id={`menu-btn-${section.categoryKey}`}
                 onClick={() => !collapsed && toggleSection(section.categoryKey)}
                 className={`w-full flex items-center justify-between px-4 py-3 transition-all ${
                   hasActive 
@@ -363,63 +467,37 @@ function SidebarContent({
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{section.icon}</span>
                   {!collapsed && (
-                    <span className="font-semibold text-sm">{categoryName}</span>
+                    <span className="font-semibold text-sm uppercase tracking-wide">{categoryName}</span>
                   )}
                 </div>
                 {!collapsed && (
                   <svg 
-                    className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                    className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 )}
               </button>
               
-              {/* Submenu Items */}
-              <AnimatePresence initial={false}>
-                {!collapsed && isExpanded && (
-                  <motion.ul
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden bg-gray-50"
-                  >
-                    {section.items.map((item) => {
-                      const getHref = () => {
-                        if (item.fullscreen) {
-                          if (item.href === '/display') return `/shop/${tenant}/display`
-                          if (item.href === '/keuken') return `/keuken/${tenant}`
-                        }
-                        return `${baseUrl}${item.href}`
-                      }
-                      
-                      return (
-                        <li key={item.href}>
-                          <Link
-                            href={getHref()}
-                            onClick={onClose}
-                            className={`flex items-center gap-3 pl-12 pr-4 py-2.5 transition-all ${
-                              isActive(item.href)
-                                ? 'bg-orange-500 text-white'
-                                : 'text-gray-600 hover:bg-gray-100'
-                            } ${item.fullscreen ? 'border-l-2 border-dashed border-gray-300' : ''}`}
-                          >
-                            <span className="text-base">{item.icon}</span>
-                            <span className="text-sm flex items-center gap-2">
-                              {t(`admin.menu.${item.nameKey}`)}
-                              {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
-                            </span>
-                          </Link>
-                        </li>
-                      )
-                    })}
-                  </motion.ul>
-                )}
-              </AnimatePresence>
+              {/* Submenu Items - Flyout to the right using fixed positioning */}
+              {!collapsed && isExpanded && (
+                <FlyoutMenu
+                  section={section}
+                  categoryName={categoryName}
+                  sectionIndex={sectionIndex}
+                  baseUrl={baseUrl}
+                  tenant={tenant}
+                  isActive={isActive}
+                  onClose={() => {
+                    onClose?.()
+                    toggleSection(section.categoryKey)
+                  }}
+                  t={t}
+                />
+              )}
             </div>
           )
         })}
