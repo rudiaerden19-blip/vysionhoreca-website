@@ -218,11 +218,16 @@ function SidebarContent({
   const langRef = useRef<HTMLDivElement>(null)
   const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
 
-  // Close language dropdown when clicking outside
+  // Close language dropdown and flyout menus when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (langRef.current && !langRef.current.contains(event.target as Node)) {
         setIsLangOpen(false)
+      }
+      // Close flyout menu when clicking outside the sidebar
+      const sidebar = document.querySelector('nav')
+      if (sidebar && !sidebar.contains(event.target as Node)) {
+        setExpandedSections([])
       }
     }
     document.addEventListener('mousedown', handleClickOutside)
@@ -241,10 +246,11 @@ function SidebarContent({
   }, [pathname])
 
   const toggleSection = (categoryKey: string) => {
+    // Only one section open at a time - close others when opening a new one
     setExpandedSections(prev => 
       prev.includes(categoryKey) 
-        ? prev.filter(c => c !== categoryKey)
-        : [...prev, categoryKey]
+        ? [] // Close if clicking same section
+        : [categoryKey] // Open only this one, close others
     )
   }
 
@@ -349,7 +355,7 @@ function SidebarContent({
           const categoryName = t(`admin.categories.${section.categoryKey}`)
           
           return (
-            <div key={section.categoryKey} className="mb-1">
+            <div key={section.categoryKey} className="mb-1 relative">
               {/* Category Header - Clickable */}
               <button
                 onClick={() => !collapsed && toggleSection(section.categoryKey)}
@@ -363,61 +369,69 @@ function SidebarContent({
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{section.icon}</span>
                   {!collapsed && (
-                    <span className="font-semibold text-sm">{categoryName}</span>
+                    <span className="font-semibold text-sm uppercase tracking-wide">{categoryName}</span>
                   )}
                 </div>
                 {!collapsed && (
                   <svg 
-                    className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                    className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 )}
               </button>
               
-              {/* Submenu Items */}
+              {/* Submenu Items - Flyout to the right */}
               <AnimatePresence initial={false}>
                 {!collapsed && isExpanded && (
-                  <motion.ul
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden bg-gray-50"
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-full top-0 ml-1 bg-white rounded-xl shadow-xl border border-gray-200 py-2 min-w-[200px] z-50"
                   >
-                    {section.items.map((item) => {
-                      const getHref = () => {
-                        if (item.fullscreen) {
-                          if (item.href === '/display') return `/shop/${tenant}/display`
-                          if (item.href === '/keuken') return `/keuken/${tenant}`
+                    <div className="px-3 py-2 border-b border-gray-100 mb-1">
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{categoryName}</span>
+                    </div>
+                    <ul>
+                      {section.items.map((item) => {
+                        const getHref = () => {
+                          if (item.fullscreen) {
+                            if (item.href === '/display') return `/shop/${tenant}/display`
+                            if (item.href === '/keuken') return `/keuken/${tenant}`
+                          }
+                          return `${baseUrl}${item.href}`
                         }
-                        return `${baseUrl}${item.href}`
-                      }
-                      
-                      return (
-                        <li key={item.href}>
-                          <Link
-                            href={getHref()}
-                            onClick={onClose}
-                            className={`flex items-center gap-3 pl-12 pr-4 py-2.5 transition-all ${
-                              isActive(item.href)
-                                ? 'bg-orange-500 text-white'
-                                : 'text-gray-600 hover:bg-gray-100'
-                            } ${item.fullscreen ? 'border-l-2 border-dashed border-gray-300' : ''}`}
-                          >
-                            <span className="text-base">{item.icon}</span>
-                            <span className="text-sm flex items-center gap-2">
-                              {t(`admin.menu.${item.nameKey}`)}
-                              {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
-                            </span>
-                          </Link>
-                        </li>
-                      )
-                    })}
-                  </motion.ul>
+                        
+                        return (
+                          <li key={item.href}>
+                            <Link
+                              href={getHref()}
+                              onClick={() => {
+                                onClose?.()
+                                toggleSection(section.categoryKey) // Close flyout after click
+                              }}
+                              className={`flex items-center gap-3 px-4 py-2.5 transition-all ${
+                                isActive(item.href)
+                                  ? 'bg-orange-500 text-white'
+                                  : 'text-gray-600 hover:bg-gray-50'
+                              }`}
+                            >
+                              <span className="text-base">{item.icon}</span>
+                              <span className="text-sm flex items-center gap-2">
+                                {t(`admin.menu.${item.nameKey}`)}
+                                {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
+                              </span>
+                            </Link>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
