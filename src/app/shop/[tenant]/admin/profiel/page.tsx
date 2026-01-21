@@ -38,6 +38,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     cover_image_1: '',
     cover_image_2: '',
     cover_image_3: '',
+    specialty_1_image: '',
+    specialty_1_title: '',
+    specialty_2_image: '',
+    specialty_2_title: '',
+    specialty_3_image: '',
+    specialty_3_title: '',
   })
 
   useEffect(() => {
@@ -410,6 +416,228 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               setSaved(false)
             }}
           />
+        </motion.div>
+
+        {/* Cover Images / Hero Slider */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <span>🎠</span> Hero Slider Foto's
+          </h2>
+          <p className="text-gray-500 text-sm mb-6">Deze foto's worden getoond als slideshow bovenaan je website</p>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Slide 1</label>
+              <MediaPicker
+                tenantSlug={params.tenant}
+                value={formData.cover_image_1 || ''}
+                onChange={(url) => {
+                  setFormData(prev => ({ ...prev, cover_image_1: url }))
+                  setSaved(false)
+                }}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Slide 2</label>
+              <MediaPicker
+                tenantSlug={params.tenant}
+                value={formData.cover_image_2 || ''}
+                onChange={(url) => {
+                  setFormData(prev => ({ ...prev, cover_image_2: url }))
+                  setSaved(false)
+                }}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Slide 3</label>
+              <MediaPicker
+                tenantSlug={params.tenant}
+                value={formData.cover_image_3 || ''}
+                onChange={(url) => {
+                  setFormData(prev => ({ ...prev, cover_image_3: url }))
+                  setSaved(false)
+                }}
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* About Image */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <span>👥</span> Over Ons Foto
+          </h2>
+          <p className="text-gray-500 text-sm mb-6">Deze foto wordt getoond naast de "Over Ons" sectie</p>
+          
+          <MediaPicker
+            tenantSlug={params.tenant}
+            value={formData.about_image || ''}
+            onChange={(url) => {
+              setFormData(prev => ({ ...prev, about_image: url }))
+              setSaved(false)
+            }}
+          />
+        </motion.div>
+
+        {/* Top Sellers */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <span>🏆</span> Best Verkochte Producten
+          </h2>
+          <p className="text-gray-500 text-sm mb-6">Toon je 3 populairste producten op de homepage</p>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Product 1</label>
+              <MediaPicker
+                tenantSlug={params.tenant}
+                value={formData.top_seller_1 || ''}
+                onChange={(url) => {
+                  setFormData(prev => ({ ...prev, top_seller_1: url }))
+                  setSaved(false)
+                }}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Product 2</label>
+              <MediaPicker
+                tenantSlug={params.tenant}
+                value={formData.top_seller_2 || ''}
+                onChange={(url) => {
+                  setFormData(prev => ({ ...prev, top_seller_2: url }))
+                  setSaved(false)
+                }}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Product 3</label>
+              <MediaPicker
+                tenantSlug={params.tenant}
+                value={formData.top_seller_3 || ''}
+                onChange={(url) => {
+                  setFormData(prev => ({ ...prev, top_seller_3: url }))
+                  setSaved(false)
+                }}
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Specialiteiten */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <span>⭐</span> Onze Specialiteiten
+          </h2>
+          <p className="text-gray-500 text-sm mb-6">Highlight 3 specialiteiten met foto en titel</p>
+          
+          <div className="space-y-6">
+            {/* Specialty 1 */}
+            <div className="border border-gray-200 rounded-xl p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Specialiteit 1</label>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Titel</label>
+                  <input
+                    type="text"
+                    name="specialty_1_title"
+                    value={formData.specialty_1_title || ''}
+                    onChange={handleChange}
+                    placeholder="bijv. Huisgemaakte Pasta"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Foto</label>
+                  <MediaPicker
+                    tenantSlug={params.tenant}
+                    value={formData.specialty_1_image || ''}
+                    onChange={(url) => {
+                      setFormData(prev => ({ ...prev, specialty_1_image: url }))
+                      setSaved(false)
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Specialty 2 */}
+            <div className="border border-gray-200 rounded-xl p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Specialiteit 2</label>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Titel</label>
+                  <input
+                    type="text"
+                    name="specialty_2_title"
+                    value={formData.specialty_2_title || ''}
+                    onChange={handleChange}
+                    placeholder="bijv. Verse Visgerechten"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Foto</label>
+                  <MediaPicker
+                    tenantSlug={params.tenant}
+                    value={formData.specialty_2_image || ''}
+                    onChange={(url) => {
+                      setFormData(prev => ({ ...prev, specialty_2_image: url }))
+                      setSaved(false)
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Specialty 3 */}
+            <div className="border border-gray-200 rounded-xl p-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Specialiteit 3</label>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Titel</label>
+                  <input
+                    type="text"
+                    name="specialty_3_title"
+                    value={formData.specialty_3_title || ''}
+                    onChange={handleChange}
+                    placeholder="bijv. Ambachtelijk Brood"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Foto</label>
+                  <MediaPicker
+                    tenantSlug={params.tenant}
+                    value={formData.specialty_3_image || ''}
+                    onChange={(url) => {
+                      setFormData(prev => ({ ...prev, specialty_3_image: url }))
+                      setSaved(false)
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
         {/* Preview Link */}
