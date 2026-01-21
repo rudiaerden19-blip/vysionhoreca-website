@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 
@@ -29,13 +30,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   const [selectedCategory, setSelectedCategory] = useState<string>('alle')
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    if (isOpen) {
-      loadMedia()
-    }
-  }, [isOpen, tenantSlug])
-
-  const loadMedia = async () => {
+  const loadMedia = useCallback(async () => {
     setLoading(true)
     
     const { data, error } = await supabase
@@ -57,7 +52,13 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
     }
     
     setLoading(false)
-  }
+  }, [tenantSlug])
+
+  useEffect(() => {
+    if (isOpen) {
+      loadMedia()
+    }
+  }, [isOpen, loadMedia])
 
   const selectImage = (url: string) => {
     onChange(url)
@@ -85,10 +86,10 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       <div className="flex items-start gap-4">
         <div 
           onClick={() => setIsOpen(true)}
-          className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:border-orange-500 transition-colors overflow-hidden bg-gray-50"
+          className="relative w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:border-orange-500 transition-colors overflow-hidden bg-gray-50"
         >
           {value ? (
-            <img src={value} alt="Selected" className="w-full h-full object-cover" />
+            <Image src={value} alt="Selected" fill className="object-cover" unoptimized />
           ) : (
             <div className="text-center p-2">
               <span className="text-3xl block mb-1">📷</span>
@@ -193,15 +194,16 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => selectImage(item.url)}
-                        className={`aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all bg-gray-100 ${
+                        className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all bg-gray-100 ${
                           value === item.url ? 'ring-orange-500 ring-4' : 'ring-transparent hover:ring-gray-300'
                         }`}
                       >
-                        <img
+                        <Image
                           src={item.url}
                           alt={item.name}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
+                          fill
+                          className="object-cover"
+                          unoptimized
                         />
                       </motion.div>
                     ))}

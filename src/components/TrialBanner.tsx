@@ -29,25 +29,25 @@ export default function TrialBanner({ tenantSlug }: TrialBannerProps) {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
+    async function loadSubscription() {
+      const supabase = getSupabase()
+      if (!supabase) {
+        setLoading(false)
+        return
+      }
+
+      const { data } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('tenant_slug', tenantSlug)
+        .single()
+
+      setSubscription(data)
+      setLoading(false)
+    }
+    
     loadSubscription()
   }, [tenantSlug])
-
-  async function loadSubscription() {
-    const supabase = getSupabase()
-    if (!supabase) {
-      setLoading(false)
-      return
-    }
-
-    const { data } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .eq('tenant_slug', tenantSlug)
-      .single()
-
-    setSubscription(data)
-    setLoading(false)
-  }
 
   if (loading || dismissed) return null
   if (!subscription) return null
