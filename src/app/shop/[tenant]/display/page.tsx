@@ -493,6 +493,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     console.log(`🖨️ Sending ${type} receipt to printer...${isInVysionApp ? ' (via Vysion app)' : ''}`)
 
     try {
+      // Calculate tax amount based on BTW percentage
+      const btwPercentage = business?.btw_percentage || 6
+      const totalAmount = order.total || 0
+      const taxAmount = totalAmount - (totalAmount / (1 + btwPercentage / 100))
+      
       const response = await fetch('/api/print-proxy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -502,22 +507,29 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             order_number: order.order_number,
             customer_name: order.customer_name,
             customer_phone: order.customer_phone,
+            customer_email: order.customer_email,
             customer_address: order.delivery_address,
             order_type: order.order_type,
             payment_status: order.payment_status,
+            payment_method: order.payment_method,
             items: order.items,
             subtotal: order.subtotal,
             delivery_fee: order.delivery_fee,
             discount: order.discount_amount,
             total: order.total,
+            tax: taxAmount,
             notes: order.customer_notes,
             created_at: order.created_at,
           },
           businessInfo: {
             name: business?.business_name,
             address: business?.address,
+            city: business?.city,
+            postalCode: business?.postal_code,
             phone: business?.phone,
+            email: business?.email,
             btw_number: business?.btw_number,
+            btw_percentage: business?.btw_percentage || 6,
           },
           printType: type,
         }),
