@@ -177,11 +177,11 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
       {/* Main Content */}
       <main className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} pt-16 lg:pt-0 overflow-x-hidden`}>
-        {/* Top Header Bar with Language Selector */}
-        <div className="hidden lg:flex items-center justify-end px-6 py-3 bg-white border-b">
-          <LanguageSelector />
-        </div>
         <div className="p-4 md:p-6 max-w-full">
+          {/* Language Selector - top right of content area */}
+          <div className="hidden lg:flex justify-end mb-4">
+            <LanguageSelector />
+          </div>
           {children}
         </div>
       </main>
