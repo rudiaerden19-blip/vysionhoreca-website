@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
@@ -54,6 +54,12 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     cost_category_id: '',
     notes: ''
   })
+
+  // Import Van Zon state
+  const [showImport, setShowImport] = useState(false)
+  const [importText, setImportText] = useState('')
+  const [importPreview, setImportPreview] = useState<Array<{name: string, articleNr: string, price: number}>>([])
+  const [importing, setImporting] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -171,6 +177,120 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     setIngredients(prev => prev.filter(i => i.id !== id))
   }
 
+  // Parse Van Zon copied text
+  function parseVanZonText(text: string) {
+    const products: Array<{name: string, articleNr: string, price: number}> = []
+    
+    // Split by product patterns - look for price patterns
+    const lines = text.split('\n').filter(l => l.trim())
+    
+    let currentName = ''
+    let currentArticleNr = ''
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim()
+      
+      // Check for article number pattern (number followed by status)
+      const articleMatch = line.match(/^(\d+)\s+(Op voorraad|Beperkte voorraad|Volgens beschikbaarheid)/)
+      if (articleMatch) {
+        currentArticleNr = articleMatch[1]
+        // Previous non-empty line that's not a duplicate is the name
+        for (let j = i - 1; j >= 0; j--) {
+          const prevLine = lines[j].trim()
+          if (prevLine && !prevLine.endsWith('.') && !prevLine.match(/^Prijs|^€|maateenheid|Aantal|Verwijder|−|\+|^CU$|^WUK$/)) {
+            currentName = prevLine
+            break
+          }
+        }
+        continue
+      }
+      
+      // Check for price pattern
+      const priceMatch = line.match(/€\s*(\d+)[,.](\d{2})/)
+      if (priceMatch && currentName && currentArticleNr) {
+        const price = parseFloat(`${priceMatch[1]}.${priceMatch[2]}`)
+        
+        // Clean up name - remove trailing dot
+        let cleanName = currentName.replace(/\.$/, '').trim()
+        
+        // Don't add duplicates
+        if (!products.some(p => p.articleNr === currentArticleNr)) {
+          products.push({
+            name: cleanName,
+            articleNr: currentArticleNr,
+            price: price
+          })
+        }
+        
+        currentName = ''
+        currentArticleNr = ''
+      }
+    }
+    
+    return products
+  }
+
+  function handleImportTextChange(text: string) {
+    setImportText(text)
+    const parsed = parseVanZonText(text)
+    setImportPreview(parsed)
+  }
+
+  async function importProducts() {
+    if (!businessId || importPreview.length === 0) return
+    
+    setImporting(true)
+    
+    const newIngredients: Ingredient[] = []
+    const existingArticleNrs = ingredients
+      .map(i => i.notes?.match(/Van Zon #(\d+)/)?.[1])
+      .filter(Boolean)
+    
+    let skipped = 0
+    
+    for (const product of importPreview) {
+      // Skip if already exists in database (check by article number in notes)
+      if (existingArticleNrs.includes(product.articleNr)) {
+        skipped++
+        continue
+      }
+      
+      // Skip if already added in this batch
+      if (newIngredients.some(i => i.notes?.includes(`Van Zon #${product.articleNr}`))) {
+        skipped++
+        continue
+      }
+      
+      const { data } = await supabase
+        .from('ingredients')
+        .insert({
+          tenant_slug: businessId,
+          name: product.name,
+          unit: 'doos',
+          purchase_price: product.price,
+          units_per_package: 1,
+          package_price: product.price,
+          notes: `Van Zon #${product.articleNr}`
+        })
+        .select()
+        .single()
+      
+      if (data) {
+        newIngredients.push(data)
+      }
+    }
+    
+    if (skipped > 0) {
+      alert(`${newIngredients.length} producten toegevoegd, ${skipped} dubbelen overgeslagen`)
+    }
+    
+    setIngredients(prev => [...prev, ...newIngredients].sort((a, b) => a.name.localeCompare(b.name)))
+    setShowImport(false)
+    setImportText('')
+    setImportPreview([])
+    setImporting(false)
+  }
+
   const filteredIngredients = ingredients.filter(i => 
     i.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -199,13 +319,113 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             Beheer alle ingrediënten met hun inkoopprijzen
           </p>
         </div>
-        <button
-          onClick={() => { resetForm(); setShowAddForm(true) }}
-          className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-        >
-          + Ingrediënt toevoegen
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setShowImport(true)}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            📥 Van Zon Import
+          </button>
+          <button
+            onClick={() => { resetForm(); setShowAddForm(true) }}
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            + Ingrediënt toevoegen
+          </button>
+        </div>
       </div>
+
+      {/* Van Zon Import Modal */}
+      <AnimatePresence>
+        {showImport && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowImport(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-6 border-b bg-blue-50">
+                <h2 className="text-xl font-bold text-gray-900">📥 Van Zon Import</h2>
+                <p className="text-gray-600 mt-1">
+                  Kopieer je bestelgeschiedenis van shopvanzon.be en plak het hieronder
+                </p>
+              </div>
+              
+              <div className="p-6 grid grid-cols-2 gap-6 max-h-[60vh] overflow-auto">
+                {/* Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Plak hier de gekopieerde tekst:
+                  </label>
+                  <textarea
+                    value={importText}
+                    onChange={(e) => handleImportTextChange(e.target.value)}
+                    className="w-full h-80 p-3 border rounded-lg text-sm font-mono"
+                    placeholder="Kopieer de producten van Van Zon en plak hier..."
+                  />
+                </div>
+                
+                {/* Preview */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Preview ({importPreview.length} producten gevonden):
+                  </label>
+                  <div className="h-80 overflow-auto border rounded-lg bg-gray-50">
+                    {importPreview.length > 0 ? (
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-100 sticky top-0">
+                          <tr>
+                            <th className="px-2 py-1 text-left">Art.Nr</th>
+                            <th className="px-2 py-1 text-left">Naam</th>
+                            <th className="px-2 py-1 text-right">Prijs</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {importPreview.map((p, i) => (
+                            <tr key={i} className="border-t">
+                              <td className="px-2 py-1 font-mono text-gray-500">{p.articleNr}</td>
+                              <td className="px-2 py-1">{p.name}</td>
+                              <td className="px-2 py-1 text-right font-mono">€{p.price.toFixed(2)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <div className="p-4 text-gray-500 text-center">
+                        Plak tekst om preview te zien
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-6 border-t bg-gray-50 flex justify-between">
+                <button
+                  onClick={() => { setShowImport(false); setImportText(''); setImportPreview([]) }}
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={importProducts}
+                  disabled={importing || importPreview.length === 0}
+                  className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
+                >
+                  {importing ? 'Importeren...' : `${importPreview.length} producten importeren`}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Search */}
       <div className="relative">
