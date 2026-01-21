@@ -208,7 +208,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <h1 className="text-xl font-semibold text-white lg:hidden">{t('dashboard.title')}</h1>
             </div>
 
-            <div className="flex items-center gap-4 ml-auto lg:mr-16">
+            <div className="flex items-center gap-4 ml-auto lg:mr-36">
               {/* Language Dropdown */}
               <div className="relative" ref={langDropdownRef}>
                 <button
