@@ -706,11 +706,15 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                     <div className="relative">
                       <span className="absolute left-3 top-2 text-gray-500">€</span>
                       <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.purchase_price || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, purchase_price: parseFloat(e.target.value) || 0 }))}
+                        type="text"
+                        inputMode="decimal"
+                        value={formData.purchase_price === 0 ? '' : formData.purchase_price}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(',', '.')
+                          if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                            setFormData(prev => ({ ...prev, purchase_price: val === '' ? 0 : parseFloat(val) || 0 }))
+                          }
+                        }}
                         className="w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
                         placeholder="0.00"
                       />
@@ -721,11 +725,15 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                     <div className="relative">
                       <span className="absolute left-3 top-2 text-gray-500">€</span>
                       <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={formData.package_price || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, package_price: parseFloat(e.target.value) || 0 }))}
+                        type="text"
+                        inputMode="decimal"
+                        value={formData.package_price === 0 ? '' : formData.package_price}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(',', '.')
+                          if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                            setFormData(prev => ({ ...prev, package_price: val === '' ? 0 : parseFloat(val) || 0 }))
+                          }
+                        }}
                         className="w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
                         placeholder="0.00"
                       />
@@ -734,11 +742,17 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Aantal in doos</label>
                     <input
-                      type="number"
-                      min="1"
-                      value={formData.units_per_package}
-                      onChange={(e) => setFormData(prev => ({ ...prev, units_per_package: parseInt(e.target.value) || 1 }))}
+                      type="text"
+                      inputMode="numeric"
+                      value={formData.units_per_package === 0 ? '' : formData.units_per_package}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        if (val === '' || /^\d+$/.test(val)) {
+                          setFormData(prev => ({ ...prev, units_per_package: val === '' ? 1 : parseInt(val) || 1 }))
+                        }
+                      }}
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                      placeholder="1"
                     />
                   </div>
                 </div>
