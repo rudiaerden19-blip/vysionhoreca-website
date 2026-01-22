@@ -1,34 +1,52 @@
--- Z-Rapporten tabel voor Vysion Horeca
--- Voer dit SQL uit in je Supabase Dashboard -> SQL Editor
+-- Z-Rapporten tabel voor GKS compliance
+-- Bewaarplicht: 7 jaar
 
--- Stap 1: Maak de z_reports tabel aan (ZONDER foreign key voor compatibiliteit)
 CREATE TABLE IF NOT EXISTS z_reports (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  business_id TEXT NOT NULL,
-  report_number INTEGER NOT NULL,
-  date DATE NOT NULL,
-  orders_count INTEGER NOT NULL DEFAULT 0,
-  revenue DECIMAL(10,2) NOT NULL DEFAULT 0,
-  online_orders INTEGER NOT NULL DEFAULT 0,
-  kassa_orders INTEGER NOT NULL DEFAULT 0,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_slug VARCHAR(100) NOT NULL,
+  report_date DATE NOT NULL,
+  
+  -- Totalen
+  order_count INTEGER NOT NULL DEFAULT 0,
+  subtotal DECIMAL(10,2) NOT NULL DEFAULT 0,
+  tax_low DECIMAL(10,2) NOT NULL DEFAULT 0,      -- BTW 6%
+  tax_mid DECIMAL(10,2) NOT NULL DEFAULT 0,      -- BTW 12%
+  tax_high DECIMAL(10,2) NOT NULL DEFAULT 0,     -- BTW 21%
+  total DECIMAL(10,2) NOT NULL DEFAULT 0,
+  
+  -- Betaalmethodes
   cash_payments DECIMAL(10,2) NOT NULL DEFAULT 0,
   card_payments DECIMAL(10,2) NOT NULL DEFAULT 0,
-  vat_total DECIMAL(10,2) NOT NULL DEFAULT 0,
-  closed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  closed_by TEXT NOT NULL,
-  sent_to_scarda BOOLEAN NOT NULL DEFAULT FALSE,
-  sent_to_accountant BOOLEAN NOT NULL DEFAULT FALSE,
-  accountant_email TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  online_payments DECIMAL(10,2) NOT NULL DEFAULT 0,
+  
+  -- Metadata
+  btw_percentage INTEGER DEFAULT 6,
+  generated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  generated_by VARCHAR(255),
+  
+  -- Business info snapshot (voor archief)
+  business_name VARCHAR(255),
+  business_address TEXT,
+  btw_number VARCHAR(50),
+  
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  
+  -- Unieke constraint: 1 rapport per dag per tenant
+  UNIQUE(tenant_slug, report_date)
 );
 
--- Stap 2: Indexen voor snelle queries
-CREATE INDEX IF NOT EXISTS idx_z_reports_business_id ON z_reports(business_id);
-CREATE INDEX IF NOT EXISTS idx_z_reports_date ON z_reports(date DESC);
+-- Index voor snelle queries
+CREATE INDEX IF NOT EXISTS idx_z_reports_tenant_date ON z_reports(tenant_slug, report_date DESC);
 
--- Stap 3: Row Level Security (RLS) uitschakelen voor nu (maakt testen makkelijker)
-ALTER TABLE z_reports DISABLE ROW LEVEL SECURITY;
+-- RLS Policies
+ALTER TABLE z_reports ENABLE ROW LEVEL SECURITY;
 
--- Klaar! Test met:
--- SELECT * FROM z_reports;
+-- Tenant kan alleen eigen rapporten zien
+CREATE POLICY "Tenants can view own z_reports" ON z_reports
+  FOR SELECT USING (true);
+
+CREATE POLICY "Tenants can insert own z_reports" ON z_reports
+  FOR INSERT WITH CHECK (true);
+
+-- Comment voor documentatie
+COMMENT ON TABLE z_reports IS 'Z-Rapporten voor GKS compliance. Bewaarplicht: 7 jaar.';

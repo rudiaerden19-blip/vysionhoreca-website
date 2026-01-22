@@ -1761,7 +1761,8 @@
       "costCalculation": "حساب التكاليف",
       "accounting": "المحاسبة",
       "orders": "الطلبات",
-      "statistics": "الإحصائيات"
+      "statistics": "الإحصائيات",
+      "gksReports": "GKS RAPPORTEN"
     },
     "menu": {
       "dashboard": "لوحة التحكم",
@@ -1798,7 +1799,8 @@
       "reservations": "الحجوزات",
       "businessAnalysis": "تحليل الأعمال",
       "sales": "المبيعات",
-      "popularItems": "العناصر الشائعة"
+      "popularItems": "العناصر الشائعة",
+      "zReport": "Z-Rapport"
     },
     "viewWebsite": "عرض الموقع",
     "logout": "تسجيل الخروج"
@@ -3493,5 +3495,39 @@
     "payWithBancontact": "الدفع بـ Bancontact/iDEAL",
     "payInStore": "الدفع في المتجر (نقداً)",
     "pleaseWait": "يرجى الانتظار..."
+  },
+  "zReport": {
+    "title": "Z-Rapport Online Verkopen",
+    "subtitle": "Dagelijks overzicht voor witte kassa (GKS)",
+    "reportTitle": "Z-RAPPORT",
+    "onlineSales": "ONLINE VERKOPEN",
+    "history": "Archief",
+    "print": "Afdrukken",
+    "save": "Opslaan",
+    "saved": "Opgeslagen!",
+    "alreadySaved": "Al opgeslagen",
+    "savedToArchive": "Opgeslagen in archief",
+    "orderCount": "Aantal bestellingen",
+    "subtotal": "Subtotaal (excl. BTW)",
+    "vat": "BTW",
+    "total": "TOTAAL",
+    "paymentMethods": "Betaalmethodes",
+    "onlinePaid": "Online betaald",
+    "cardPaid": "Kaart/PIN",
+    "cashPaid": "Contant",
+    "generatedOn": "Gegenereerd op",
+    "noOrders": "Geen bestellingen",
+    "noOrdersDesc": "Er zijn geen online bestellingen op deze dag.",
+    "howToUse": "Hoe invoeren in witte kassa?",
+    "step1": "Klik op 'Opslaan' om dit rapport te archiveren",
+    "step2": "Open je witte kassa en maak een nieuwe verkoop aan",
+    "step3": "Voer in: 'Online verkopen' met bedrag",
+    "step4": "Selecteer de juiste BTW-categorie",
+    "retention": "Z-Rapporten worden 7 jaar bewaard conform fiscale wetgeving.",
+    "savedReports": "Opgeslagen rapporten",
+    "noSavedReports": "Nog geen rapporten opgeslagen",
+    "orders": "bestellingen",
+    "totalSaved": "Totaal opgeslagen",
+    "vatNumber": "BTW"
   }
 }

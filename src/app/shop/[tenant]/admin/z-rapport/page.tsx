@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
@@ -10,42 +10,54 @@ interface DailyStats {
   date: string
   orderCount: number
   subtotal: number
-  taxLow: number      // BTW 6%
-  taxMid: number      // BTW 12%
-  taxHigh: number     // BTW 21%
+  taxLow: number
+  taxMid: number
+  taxHigh: number
   total: number
   cashPayments: number
   onlinePayments: number
   cardPayments: number
 }
 
+interface SavedReport {
+  id: string
+  report_date: string
+  order_count: number
+  total: number
+  generated_at: string
+}
+
 export default function ZRapportPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [stats, setStats] = useState<DailyStats | null>(null)
   const [businessInfo, setBusinessInfo] = useState<any>(null)
   const [btwPercentage, setBtwPercentage] = useState(6)
+  const [savedReports, setSavedReports] = useState<SavedReport[]>([])
+  const [isAlreadySaved, setIsAlreadySaved] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
 
   useEffect(() => {
     loadData()
+    loadSavedReports()
   }, [params.tenant, selectedDate])
 
   const loadData = async () => {
     setLoading(true)
     
-    // Load business info
     const settings = await getTenantSettings(params.tenant)
     if (settings) {
       setBusinessInfo(settings)
       setBtwPercentage(settings.btw_percentage || 6)
     }
 
-    // Load orders for selected date
     const startOfDay = `${selectedDate}T00:00:00`
     const endOfDay = `${selectedDate}T23:59:59`
 
-    const { data: orders, error } = await supabase
+    const { data: orders } = await supabase
       .from('orders')
       .select('*')
       .eq('tenant_slug', params.tenant)
@@ -53,9 +65,17 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       .lte('created_at', endOfDay)
       .in('status', ['completed', 'ready', 'preparing', 'confirmed'])
 
-    if (!error && orders) {
-      // Calculate stats
-      let subtotal = 0
+    // Check if already saved
+    const { data: existingReport } = await supabase
+      .from('z_reports')
+      .select('id')
+      .eq('tenant_slug', params.tenant)
+      .eq('report_date', selectedDate)
+      .single()
+
+    setIsAlreadySaved(!!existingReport)
+
+    if (orders) {
       let total = 0
       let cashPayments = 0
       let onlinePayments = 0
@@ -65,7 +85,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         const orderTotal = order.total_amount || 0
         total += orderTotal
         
-        // Payment method
         const paymentMethod = (order.payment_method || '').toLowerCase()
         if (paymentMethod === 'cash' || paymentMethod === 'contant') {
           cashPayments += orderTotal
@@ -76,19 +95,18 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         }
       })
 
-      // Calculate BTW (simplified - using single rate)
       const taxRate = btwPercentage / 100
-      subtotal = total / (1 + taxRate)
+      const subtotal = total / (1 + taxRate)
       const tax = total - subtotal
 
       setStats({
         date: selectedDate,
         orderCount: orders.length,
-        subtotal: subtotal,
+        subtotal,
         taxLow: btwPercentage === 6 ? tax : 0,
         taxMid: btwPercentage === 12 ? tax : 0,
         taxHigh: btwPercentage === 21 ? tax : 0,
-        total: total,
+        total,
         cashPayments,
         onlinePayments,
         cardPayments,
@@ -96,6 +114,54 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     }
 
     setLoading(false)
+  }
+
+  const loadSavedReports = async () => {
+    const { data } = await supabase
+      .from('z_reports')
+      .select('id, report_date, order_count, total, generated_at')
+      .eq('tenant_slug', params.tenant)
+      .order('report_date', { ascending: false })
+      .limit(100)
+
+    if (data) {
+      setSavedReports(data)
+    }
+  }
+
+  const saveReport = async () => {
+    if (!stats || isAlreadySaved) return
+
+    setSaving(true)
+
+    const { error } = await supabase
+      .from('z_reports')
+      .insert({
+        tenant_slug: params.tenant,
+        report_date: selectedDate,
+        order_count: stats.orderCount,
+        subtotal: stats.subtotal,
+        tax_low: stats.taxLow,
+        tax_mid: stats.taxMid,
+        tax_high: stats.taxHigh,
+        total: stats.total,
+        cash_payments: stats.cashPayments,
+        card_payments: stats.cardPayments,
+        online_payments: stats.onlinePayments,
+        btw_percentage: btwPercentage,
+        business_name: businessInfo?.business_name,
+        business_address: businessInfo?.address,
+        btw_number: businessInfo?.btw_number,
+      })
+
+    if (!error) {
+      setIsAlreadySaved(true)
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 3000)
+      loadSavedReports()
+    }
+
+    setSaving(false)
   }
 
   const formatDate = (dateStr: string) => {
@@ -108,13 +174,18 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     })
   }
 
-  const formatCurrency = (amount: number) => {
-    return `€${amount.toFixed(2)}`
+  const formatShortDate = (dateStr: string) => {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('nl-BE', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
+    })
   }
 
-  const printZRapport = () => {
-    window.print()
-  }
+  const formatCurrency = (amount: number) => `€${amount.toFixed(2)}`
+
+  const printZRapport = () => window.print()
 
   const goToPreviousDay = () => {
     const date = new Date(selectedDate)
@@ -147,195 +218,238 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 print:hidden">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">📊 Z-Rapport Online Verkopen</h1>
-          <p className="text-gray-500">Dagelijks overzicht voor witte kassa</p>
+          <h1 className="text-2xl font-bold text-gray-900">🧾 {t('zReport.title')}</h1>
+          <p className="text-gray-500">{t('zReport.subtitle')}</p>
         </div>
-        <button
-          onClick={printZRapport}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
-        >
-          🖨️ Afdrukken
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${
+              showHistory ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            📚 {t('zReport.history')}
+          </button>
+          <button
+            onClick={printZRapport}
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-medium flex items-center gap-2"
+          >
+            🖨️ {t('zReport.print')}
+          </button>
+          <button
+            onClick={saveReport}
+            disabled={saving || isAlreadySaved || !stats || stats.orderCount === 0}
+            className={`px-6 py-2 rounded-xl font-medium flex items-center gap-2 ${
+              isAlreadySaved 
+                ? 'bg-green-100 text-green-600' 
+                : saveSuccess
+                ? 'bg-green-500 text-white'
+                : 'bg-orange-500 hover:bg-orange-600 text-white disabled:bg-gray-300'
+            }`}
+          >
+            {saving ? '⏳' : isAlreadySaved ? '✓' : saveSuccess ? '✓' : '💾'} 
+            {isAlreadySaved ? t('zReport.alreadySaved') : saveSuccess ? t('zReport.saved') : t('zReport.save')}
+          </button>
+        </div>
       </div>
 
-      {/* Date Selector */}
-      <div className="flex items-center justify-center gap-4 mb-8 print:hidden">
-        <button
-          onClick={goToPreviousDay}
-          className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl"
-        >
-          ←
-        </button>
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          max={new Date().toISOString().split('T')[0]}
-          className="px-4 py-3 border border-gray-200 rounded-xl text-center font-medium"
-        />
-        <button
-          onClick={goToNextDay}
-          disabled={selectedDate === new Date().toISOString().split('T')[0]}
-          className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl disabled:opacity-50"
-        >
-          →
-        </button>
-      </div>
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Main Report */}
+        <div className="lg:col-span-2">
+          {/* Date Selector */}
+          <div className="flex items-center justify-center gap-4 mb-6 print:hidden">
+            <button onClick={goToPreviousDay} className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl">←</button>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
+              className="px-4 py-3 border border-gray-200 rounded-xl text-center font-medium"
+            />
+            <button
+              onClick={goToNextDay}
+              disabled={selectedDate === new Date().toISOString().split('T')[0]}
+              className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl disabled:opacity-50"
+            >→</button>
+          </div>
 
-      {/* Z-Rapport */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-lg overflow-hidden print:shadow-none print:rounded-none"
-      >
-        {/* Header */}
-        <div className="bg-gray-900 text-white p-6 text-center">
-          <h2 className="text-xl font-bold mb-1">{businessInfo?.business_name || 'Zaak'}</h2>
-          <p className="text-gray-400 text-sm">{businessInfo?.address}</p>
-          {businessInfo?.btw_number && (
-            <p className="text-gray-400 text-sm">BTW: {businessInfo.btw_number}</p>
-          )}
+          {/* Z-Rapport */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden print:shadow-none"
+          >
+            {/* Header */}
+            <div className="bg-gray-900 text-white p-6 text-center">
+              <h2 className="text-xl font-bold mb-1">{businessInfo?.business_name || 'Zaak'}</h2>
+              <p className="text-gray-400 text-sm">{businessInfo?.address}</p>
+              {businessInfo?.btw_number && (
+                <p className="text-gray-400 text-sm">{t('zReport.vatNumber')}: {businessInfo.btw_number}</p>
+              )}
+            </div>
+
+            {/* Title */}
+            <div className="border-b-2 border-dashed border-gray-300 p-6 text-center">
+              <h3 className="text-2xl font-bold text-gray-900">{t('zReport.reportTitle')}</h3>
+              <p className="text-lg text-gray-600">{t('zReport.onlineSales')}</p>
+              <p className="text-gray-500 mt-2">{formatDate(selectedDate)}</p>
+              {isAlreadySaved && (
+                <span className="inline-block mt-2 px-3 py-1 bg-green-100 text-green-600 text-sm rounded-full">
+                  ✓ {t('zReport.savedToArchive')}
+                </span>
+              )}
+            </div>
+
+            {/* Stats */}
+            {stats && stats.orderCount > 0 ? (
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                  <span className="text-gray-600">{t('zReport.orderCount')}</span>
+                  <span className="font-bold text-lg">{stats.orderCount}</span>
+                </div>
+
+                <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
+
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-gray-600">{t('zReport.subtotal')}</span>
+                  <span className="font-medium">{formatCurrency(stats.subtotal)}</span>
+                </div>
+
+                {stats.taxLow > 0 && (
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-600">{t('zReport.vat')} 6%</span>
+                    <span className="font-medium">{formatCurrency(stats.taxLow)}</span>
+                  </div>
+                )}
+                {stats.taxMid > 0 && (
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-600">{t('zReport.vat')} 12%</span>
+                    <span className="font-medium">{formatCurrency(stats.taxMid)}</span>
+                  </div>
+                )}
+                {stats.taxHigh > 0 && (
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-600">{t('zReport.vat')} 21%</span>
+                    <span className="font-medium">{formatCurrency(stats.taxHigh)}</span>
+                  </div>
+                )}
+
+                <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
+
+                <div className="flex justify-between items-center py-4 bg-gray-100 -mx-6 px-6">
+                  <span className="text-xl font-bold text-gray-900">{t('zReport.total')}</span>
+                  <span className="text-2xl font-bold text-green-600">{formatCurrency(stats.total)}</span>
+                </div>
+
+                <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
+
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-gray-900 mb-3">{t('zReport.paymentMethods')}</h4>
+                  
+                  {stats.onlinePayments > 0 && (
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600">💳 {t('zReport.onlinePaid')}</span>
+                      <span className="font-medium">{formatCurrency(stats.onlinePayments)}</span>
+                    </div>
+                  )}
+                  {stats.cardPayments > 0 && (
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600">💳 {t('zReport.cardPaid')}</span>
+                      <span className="font-medium">{formatCurrency(stats.cardPayments)}</span>
+                    </div>
+                  )}
+                  {stats.cashPayments > 0 && (
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600">💵 {t('zReport.cashPaid')}</span>
+                      <span className="font-medium">{formatCurrency(stats.cashPayments)}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
+
+                <div className="text-center text-gray-500 text-sm pt-4">
+                  <p>{t('zReport.generatedOn')} {new Date().toLocaleString('nl-BE')}</p>
+                  <p className="mt-1">Vysion Horeca - ordervysion.com</p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-12 text-center">
+                <span className="text-6xl mb-4 block">📭</span>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('zReport.noOrders')}</h3>
+                <p className="text-gray-500">{t('zReport.noOrdersDesc')}</p>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Instructions */}
+          <div className="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-2xl print:hidden">
+            <h3 className="font-semibold text-blue-900 mb-3">💡 {t('zReport.howToUse')}</h3>
+            <ol className="text-blue-800 space-y-2 text-sm">
+              <li>1. {t('zReport.step1')}</li>
+              <li>2. {t('zReport.step2')}</li>
+              <li>3. {t('zReport.step3')} <strong>{stats ? formatCurrency(stats.total) : '€0.00'}</strong></li>
+              <li>4. {t('zReport.step4')} ({btwPercentage}%)</li>
+            </ol>
+            <p className="text-blue-600 text-xs mt-4">
+              ⚠️ {t('zReport.retention')}
+            </p>
+          </div>
         </div>
 
-        {/* Title */}
-        <div className="border-b-2 border-dashed border-gray-300 p-6 text-center">
-          <h3 className="text-2xl font-bold text-gray-900">Z-RAPPORT</h3>
-          <p className="text-lg text-gray-600">ONLINE VERKOPEN</p>
-          <p className="text-gray-500 mt-2">{formatDate(selectedDate)}</p>
+        {/* Sidebar - History */}
+        <div className={`lg:block ${showHistory ? 'block' : 'hidden'} print:hidden`}>
+          <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-6">
+            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              📚 {t('zReport.savedReports')}
+            </h3>
+            
+            {savedReports.length === 0 ? (
+              <p className="text-gray-500 text-sm">{t('zReport.noSavedReports')}</p>
+            ) : (
+              <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                {savedReports.map((report) => (
+                  <button
+                    key={report.id}
+                    onClick={() => setSelectedDate(report.report_date)}
+                    className={`w-full text-left p-3 rounded-xl transition-colors ${
+                      report.report_date === selectedDate 
+                        ? 'bg-orange-100 border-2 border-orange-500' 
+                        : 'bg-gray-50 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">{formatShortDate(report.report_date)}</span>
+                      <span className="text-green-600 font-bold">{formatCurrency(report.total)}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      {report.order_count} {t('zReport.orders')}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-400">
+                {t('zReport.totalSaved')}: {savedReports.length}
+              </p>
+            </div>
+          </div>
         </div>
-
-        {/* Stats */}
-        {stats && (
-          <div className="p-6 space-y-4">
-            {/* Order Count */}
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-gray-600">Aantal bestellingen</span>
-              <span className="font-bold text-lg">{stats.orderCount}</span>
-            </div>
-
-            {/* Separator */}
-            <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-            {/* Subtotal */}
-            <div className="flex justify-between items-center py-2">
-              <span className="text-gray-600">Subtotaal (excl. BTW)</span>
-              <span className="font-medium">{formatCurrency(stats.subtotal)}</span>
-            </div>
-
-            {/* BTW */}
-            {stats.taxLow > 0 && (
-              <div className="flex justify-between items-center py-2">
-                <span className="text-gray-600">BTW 6%</span>
-                <span className="font-medium">{formatCurrency(stats.taxLow)}</span>
-              </div>
-            )}
-            {stats.taxMid > 0 && (
-              <div className="flex justify-between items-center py-2">
-                <span className="text-gray-600">BTW 12%</span>
-                <span className="font-medium">{formatCurrency(stats.taxMid)}</span>
-              </div>
-            )}
-            {stats.taxHigh > 0 && (
-              <div className="flex justify-between items-center py-2">
-                <span className="text-gray-600">BTW 21%</span>
-                <span className="font-medium">{formatCurrency(stats.taxHigh)}</span>
-              </div>
-            )}
-
-            {/* Separator */}
-            <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-            {/* Total */}
-            <div className="flex justify-between items-center py-4 bg-gray-100 -mx-6 px-6">
-              <span className="text-xl font-bold text-gray-900">TOTAAL</span>
-              <span className="text-2xl font-bold text-green-600">{formatCurrency(stats.total)}</span>
-            </div>
-
-            {/* Separator */}
-            <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-            {/* Payment Methods */}
-            <div className="space-y-2">
-              <h4 className="font-semibold text-gray-900 mb-3">Betaalmethodes</h4>
-              
-              {stats.onlinePayments > 0 && (
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">💳 Online betaald</span>
-                  <span className="font-medium">{formatCurrency(stats.onlinePayments)}</span>
-                </div>
-              )}
-              {stats.cardPayments > 0 && (
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">💳 Kaart/PIN</span>
-                  <span className="font-medium">{formatCurrency(stats.cardPayments)}</span>
-                </div>
-              )}
-              {stats.cashPayments > 0 && (
-                <div className="flex justify-between items-center py-2">
-                  <span className="text-gray-600">💵 Contant</span>
-                  <span className="font-medium">{formatCurrency(stats.cashPayments)}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Separator */}
-            <div className="border-t-2 border-dashed border-gray-300 my-4"></div>
-
-            {/* Footer */}
-            <div className="text-center text-gray-500 text-sm pt-4">
-              <p>Gegenereerd op {new Date().toLocaleString('nl-BE')}</p>
-              <p className="mt-1">Vysion Horeca - ordervysion.com</p>
-            </div>
-          </div>
-        )}
-
-        {/* No orders */}
-        {stats && stats.orderCount === 0 && (
-          <div className="p-12 text-center">
-            <span className="text-6xl mb-4 block">📭</span>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Geen bestellingen</h3>
-            <p className="text-gray-500">Er zijn geen online bestellingen op deze dag.</p>
-          </div>
-        )}
-      </motion.div>
-
-      {/* Instructions */}
-      <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-2xl print:hidden">
-        <h3 className="font-semibold text-blue-900 mb-3">💡 Hoe invoeren in witte kassa?</h3>
-        <ol className="text-blue-800 space-y-2 text-sm">
-          <li>1. Print dit Z-rapport af of noteer het totaalbedrag</li>
-          <li>2. Open je witte kassa en maak een nieuwe verkoop aan</li>
-          <li>3. Voer in: "Online verkopen" met bedrag <strong>{stats ? formatCurrency(stats.total) : '€0.00'}</strong></li>
-          <li>4. Selecteer de juiste BTW-categorie ({btwPercentage}%)</li>
-          <li>5. Sluit de verkoop af met betaalmethode "Online"</li>
-        </ol>
-        <p className="text-blue-600 text-xs mt-4">
-          Tip: Doe dit elke dag aan het einde van de dienst voor een correcte administratie.
-        </p>
       </div>
 
       {/* Print Styles */}
       <style jsx global>{`
         @media print {
-          body * {
-            visibility: hidden;
-          }
-          .max-w-2xl, .max-w-2xl * {
-            visibility: visible;
-          }
-          .max-w-2xl {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 80mm;
-          }
-          .print\\:hidden {
-            display: none !important;
-          }
+          body * { visibility: hidden; }
+          .lg\\:col-span-2, .lg\\:col-span-2 * { visibility: visible; }
+          .lg\\:col-span-2 { position: absolute; left: 0; top: 0; width: 80mm; }
+          .print\\:hidden { display: none !important; }
         }
       `}</style>
     </div>
