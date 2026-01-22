@@ -76,7 +76,7 @@ export default function UrenPage() {
     absence_type: 'WORKED',
     clock_in: '',
     clock_out: '',
-    break_minutes: 30,
+    break_minutes: undefined,
     worked_hours: 0,
     absence_hours: 8,
     notes: '',
@@ -177,7 +177,7 @@ export default function UrenPage() {
         absence_type: existingEntry.absence_type,
         clock_in: existingEntry.clock_in || '',
         clock_out: existingEntry.clock_out || '',
-        break_minutes: existingEntry.break_minutes || 30,
+        break_minutes: existingEntry.break_minutes ?? undefined,
         worked_hours: existingEntry.worked_hours || 0,
         absence_hours: existingEntry.absence_hours || 8,
         notes: existingEntry.notes || '',
@@ -188,8 +188,8 @@ export default function UrenPage() {
         absence_type: 'WORKED',
         clock_in: '09:00',
         clock_out: '17:00',
-        break_minutes: 30,
-        worked_hours: 7.5,
+        break_minutes: undefined,
+        worked_hours: 8,
         absence_hours: 8,
         notes: '',
       })
@@ -1013,9 +1013,11 @@ Met vriendelijke groeten`,
                       <label className="block text-sm font-medium text-gray-700 mb-1">{t('urenPage.breakMin')}</label>
                       <input
                         type="number"
-                        value={entryForm.break_minutes || 0}
+                        value={entryForm.break_minutes ?? ''}
+                        placeholder="0"
                         onChange={(e) => {
-                          setEntryForm({ ...entryForm, break_minutes: parseInt(e.target.value) || 0 })
+                          const val = e.target.value === '' ? undefined : parseInt(e.target.value) || 0
+                          setEntryForm({ ...entryForm, break_minutes: val })
                           setTimeout(calculateWorkedHours, 0)
                         }}
                         onBlur={calculateWorkedHours}
