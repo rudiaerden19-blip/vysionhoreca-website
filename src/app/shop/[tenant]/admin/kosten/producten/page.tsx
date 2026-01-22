@@ -11,6 +11,7 @@ interface Product {
   name: string
   price: number
   category_id: string
+  price_multiplier: number | null
 }
 
 interface Ingredient {
@@ -42,6 +43,7 @@ interface ProductCostData {
   requiredPrice: number
   status: 'good' | 'low' | 'high'
   difference: number
+  usedMultiplier: number
 }
 
 export default function ProductCostsPage({ params }: { params: { tenant: string } }) {
@@ -59,6 +61,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   // For adding ingredients to product
   const [addingIngredient, setAddingIngredient] = useState<string>('')
   const [addingQuantity, setAddingQuantity] = useState<number>(1)
+
+  // Product multiplier editing
+  const [editingMultiplier, setEditingMultiplier] = useState<{[key: string]: string}>({})
 
   // Ingredient search state
   const [ingredientSearch, setIngredientSearch] = useState('')
@@ -92,7 +97,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
 
     // Load all data in parallel
     const [productsRes, ingredientsRes, categoriesRes, productIngsRes] = await Promise.all([
-      supabase.from('menu_products').select('id, name, price, category_id').eq('tenant_slug', params.tenant).order('name'),
+      supabase.from('menu_products').select('id, name, price, category_id, price_multiplier').eq('tenant_slug', params.tenant).order('name'),
       supabase.from('ingredients').select('*').eq('tenant_slug', params.tenant).order('name'),
       supabase.from('cost_categories').select('*').eq('tenant_slug', params.tenant),
       supabase.from('product_ingredients').select('*').eq('tenant_slug', params.tenant)
@@ -246,8 +251,10 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       }
     })
 
-    // Average multiplier or default
-    const avgMultiplier = ingredientCount > 0 ? totalMultiplier / ingredientCount : defaultMultiplier
+    // Use product-specific multiplier if set, otherwise use category average or default
+    const avgMultiplier = product.price_multiplier 
+      ? product.price_multiplier 
+      : (ingredientCount > 0 ? totalMultiplier / ingredientCount : defaultMultiplier)
     const requiredPrice = totalCost * avgMultiplier
 
     let status: 'good' | 'low' | 'high' = 'good'
@@ -270,7 +277,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       totalCost,
       requiredPrice,
       status,
-      difference
+      difference,
+      usedMultiplier: avgMultiplier
     }
   }
 
@@ -304,6 +312,11 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   async function updateIngredientQuantity(piId: string, quantity: number) {
     await supabase.from('product_ingredients').update({ quantity }).eq('id', piId)
     setProductIngredients(prev => prev.map(pi => pi.id === piId ? { ...pi, quantity } : pi))
+  }
+
+  async function updateProductMultiplier(productId: string, multiplier: number | null) {
+    await supabase.from('menu_products').update({ price_multiplier: multiplier }).eq('id', productId)
+    setProducts(prev => prev.map(p => p.id === productId ? { ...p, price_multiplier: multiplier } : p))
   }
 
   const filteredProducts = products.filter(p => 
@@ -411,6 +424,39 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               </div>
 
               <div className="flex items-center gap-6">
+                {/* Marge Input */}
+                <div className="text-center" onClick={(e) => e.stopPropagation()}>
+                  <div className="text-sm text-gray-500 mb-1">Marge</div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-gray-500">×</span>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={editingMultiplier[pc.product.id] !== undefined 
+                        ? editingMultiplier[pc.product.id] 
+                        : (pc.product.price_multiplier || '')}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(',', '.')
+                        if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                          setEditingMultiplier(prev => ({ ...prev, [pc.product.id]: val }))
+                        }
+                      }}
+                      onBlur={() => {
+                        const val = editingMultiplier[pc.product.id]
+                        if (val !== undefined) {
+                          updateProductMultiplier(pc.product.id, val === '' ? null : parseFloat(val) || null)
+                          setEditingMultiplier(prev => {
+                            const newVals = { ...prev }
+                            delete newVals[pc.product.id]
+                            return newVals
+                          })
+                        }
+                      }}
+                      placeholder="auto"
+                      className="w-16 px-2 py-1 text-center border-2 border-orange-200 rounded-lg font-bold focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    />
+                  </div>
+                </div>
                 {pc.ingredients.length > 0 && (
                   <>
                     <div className="text-right">
@@ -418,7 +464,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                       <div className="font-mono font-semibold">€{pc.totalCost.toFixed(2)}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-gray-500">{t('dashboard.productCosts.advisedPrice')}</div>
+                      <div className="text-sm text-gray-500">{t('dashboard.productCosts.advisedPrice')} (×{pc.usedMultiplier.toFixed(1)})</div>
                       <div className="font-mono font-semibold">€{pc.requiredPrice.toFixed(2)}</div>
                     </div>
                   </>
@@ -653,7 +699,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                             <div className="text-xl font-bold">€{pc.totalCost.toFixed(2)}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-gray-600">{t('dashboard.productCosts.advisedPrice')} (×{defaultMultiplier.toFixed(1)})</div>
+                            <div className="text-sm text-gray-600">{t('dashboard.productCosts.advisedPrice')} (×{pc.usedMultiplier.toFixed(1)})</div>
                             <div className="text-xl font-bold">€{pc.requiredPrice.toFixed(2)}</div>
                           </div>
                           <div>
