@@ -182,7 +182,7 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-24">
         {/* Profile Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -404,6 +404,17 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
           </button>
         </motion.div>
       </div>
+
+      {/* Floating Order Button */}
+      <Link
+        href={`/shop/${params.tenant}/menu`}
+        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 shadow-xl rounded-full px-8 py-4 font-bold text-white flex items-center gap-3 hover:scale-105 transition-transform"
+        style={{ backgroundColor: primaryColor }}
+      >
+        <span className="text-xl">🍟</span>
+        <span>{t('accountPage.orderNow')}</span>
+        <span className="text-xl">→</span>
+      </Link>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
