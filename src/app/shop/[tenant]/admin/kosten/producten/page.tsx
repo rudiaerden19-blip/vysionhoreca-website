@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+import { searchSupplierProducts, SupplierProduct } from '@/lib/admin-api'
 
 interface Product {
   id: string
@@ -59,9 +60,30 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   const [addingIngredient, setAddingIngredient] = useState<string>('')
   const [addingQuantity, setAddingQuantity] = useState<number>(1)
 
+  // Ingredient search state
+  const [ingredientSearch, setIngredientSearch] = useState('')
+  const [searchResults, setSearchResults] = useState<{
+    own: Ingredient[]
+    database: SupplierProduct[]
+  }>({ own: [], database: [] })
+  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [searching, setSearching] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     loadData()
   }, [params.tenant])
+
+  // Click outside to close search results
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchResults(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   async function loadData() {
     
@@ -88,6 +110,116 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     }
 
     setLoading(false)
+  }
+
+  // Search function for both own ingredients and database
+  async function handleIngredientSearch(query: string, productIngredientIds: string[]) {
+    setIngredientSearch(query)
+    
+    if (query.length < 2) {
+      setSearchResults({ own: [], database: [] })
+      setShowSearchResults(false)
+      return
+    }
+
+    setSearching(true)
+    setShowSearchResults(true)
+
+    // Search own ingredients (already loaded)
+    const ownResults = ingredients.filter(i => 
+      i.name.toLowerCase().includes(query.toLowerCase()) &&
+      !productIngredientIds.includes(i.id)
+    ).slice(0, 10)
+
+    // Search database
+    const dbResults = await searchSupplierProducts(query, undefined, 10)
+
+    setSearchResults({
+      own: ownResults,
+      database: dbResults
+    })
+    setSearching(false)
+  }
+
+  // Add ingredient from database (creates new ingredient first)
+  async function addDatabaseIngredient(product: SupplierProduct, productId: string) {
+    if (!businessId) return
+
+    // Check if already exists by article number
+    const existing = ingredients.find(i => i.notes?.includes(`Art. #${product.article_number}`))
+    
+    let ingredientId: string
+
+    if (existing) {
+      ingredientId = existing.id
+    } else {
+      // Create new ingredient
+      const { data: newIng } = await supabase
+        .from('ingredients')
+        .insert({
+          tenant_slug: businessId,
+          name: product.name,
+          unit: product.unit || 'stuk',
+          purchase_price: product.unit_price,
+          units_per_package: product.units_per_package,
+          package_price: product.package_price,
+          notes: `Art. #${product.article_number}`
+        })
+        .select()
+        .single()
+
+      if (!newIng) return
+      ingredientId = newIng.id
+      setIngredients(prev => [...prev, newIng].sort((a, b) => a.name.localeCompare(b.name)))
+    }
+
+    // Add to product
+    const { data: pi } = await supabase
+      .from('product_ingredients')
+      .insert({
+        tenant_slug: businessId,
+        product_id: productId,
+        ingredient_id: ingredientId,
+        quantity: addingQuantity
+      })
+      .select()
+      .single()
+
+    if (pi) {
+      setProductIngredients(prev => [...prev, pi])
+    }
+
+    // Reset search
+    setIngredientSearch('')
+    setSearchResults({ own: [], database: [] })
+    setShowSearchResults(false)
+    setAddingQuantity(1)
+  }
+
+  // Add own ingredient directly
+  async function addOwnIngredient(ingredient: Ingredient, productId: string) {
+    if (!businessId) return
+
+    const { data: pi } = await supabase
+      .from('product_ingredients')
+      .insert({
+        tenant_slug: businessId,
+        product_id: productId,
+        ingredient_id: ingredient.id,
+        quantity: addingQuantity
+      })
+      .select()
+      .single()
+
+    if (pi) {
+      setProductIngredients(prev => [...prev, pi])
+    }
+
+    // Reset search
+    setIngredientSearch('')
+    setSearchResults({ own: [], database: [] })
+    setShowSearchResults(false)
+    setAddingQuantity(1)
   }
 
   function getProductCostData(product: Product): ProductCostData {
@@ -375,39 +507,96 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                       <p className="text-gray-500 mb-4">Nog geen ingrediënten toegevoegd</p>
                     )}
 
-                    {/* Add Ingredient */}
-                    <div className="flex gap-3 items-center bg-white p-3 rounded-lg border">
-                      <select
-                        value={addingIngredient}
-                        onChange={(e) => setAddingIngredient(e.target.value)}
-                        className="flex-1 px-3 py-2 border rounded-lg"
-                      >
-                        <option value="">+ Ingrediënt toevoegen...</option>
-                        {ingredients
-                          .filter(i => !pc.ingredients.some(pi => pi.ingredient_id === i.id))
-                          .map(ing => (
-                            <option key={ing.id} value={ing.id}>
-                              {ing.name} (€{ing.purchase_price.toFixed(4)}/{ing.unit})
-                            </option>
-                          ))
-                        }
-                      </select>
-                      <input
-                        type="number"
-                        min="0.01"
-                        step="0.01"
-                        value={addingQuantity}
-                        onChange={(e) => setAddingQuantity(parseFloat(e.target.value) || 1)}
-                        className="w-20 px-3 py-2 border rounded-lg text-center"
-                        placeholder="Aantal"
-                      />
-                      <button
-                        onClick={addIngredientToProduct}
-                        disabled={!addingIngredient}
-                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
-                      >
-                        Toevoegen
-                      </button>
+                    {/* Add Ingredient - Search */}
+                    <div className="relative bg-white p-3 rounded-lg border" ref={searchRef}>
+                      <div className="flex gap-3 items-center">
+                        <div className="flex-1 relative">
+                          <input
+                            type="text"
+                            placeholder="🔍 Zoek ingrediënt (eigen of database)..."
+                            value={ingredientSearch}
+                            onChange={(e) => handleIngredientSearch(e.target.value, pc.ingredients.map(pi => pi.ingredient_id))}
+                            onFocus={() => ingredientSearch.length >= 2 && setShowSearchResults(true)}
+                            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+                          />
+                          {searching && (
+                            <div className="absolute right-3 top-3">
+                              <div className="animate-spin h-5 w-5 border-2 border-green-500 border-t-transparent rounded-full"></div>
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          type="number"
+                          min="0.01"
+                          step="0.01"
+                          value={addingQuantity}
+                          onChange={(e) => setAddingQuantity(parseFloat(e.target.value) || 1)}
+                          className="w-20 px-3 py-3 border rounded-lg text-center"
+                          placeholder="Aantal"
+                        />
+                      </div>
+
+                      {/* Search Results Dropdown */}
+                      {showSearchResults && (searchResults.own.length > 0 || searchResults.database.length > 0) && (
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border rounded-lg shadow-xl z-50 max-h-80 overflow-auto">
+                          {/* Own Ingredients */}
+                          {searchResults.own.length > 0 && (
+                            <div>
+                              <div className="px-3 py-2 bg-blue-50 text-sm font-semibold text-blue-700 sticky top-0">
+                                📦 Mijn Ingrediënten
+                              </div>
+                              {searchResults.own.map(ing => (
+                                <button
+                                  key={ing.id}
+                                  onClick={() => addOwnIngredient(ing, pc.product.id)}
+                                  className="w-full px-4 py-3 text-left hover:bg-blue-50 flex justify-between items-center border-b"
+                                >
+                                  <span className="font-medium">{ing.name}</span>
+                                  <span className="text-green-600 font-mono">€{ing.purchase_price.toFixed(4)}/{ing.unit}</span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Database Products */}
+                          {searchResults.database.length > 0 && (
+                            <div>
+                              <div className="px-3 py-2 bg-green-50 text-sm font-semibold text-green-700 sticky top-0">
+                                🔍 Leveranciers Database
+                              </div>
+                              {searchResults.database.map(product => {
+                                const alreadyOwned = ingredients.some(i => 
+                                  i.notes?.includes(`Art. #${product.article_number}`)
+                                )
+                                return (
+                                  <button
+                                    key={product.id}
+                                    onClick={() => addDatabaseIngredient(product, pc.product.id)}
+                                    className="w-full px-4 py-3 text-left hover:bg-green-50 flex justify-between items-center border-b"
+                                  >
+                                    <div>
+                                      <span className="font-medium">{product.name}</span>
+                                      {alreadyOwned && <span className="ml-2 text-xs text-green-600">(al toegevoegd)</span>}
+                                      <div className="text-xs text-gray-500">
+                                        Doos €{product.package_price.toFixed(2)} • {product.units_per_package}x
+                                      </div>
+                                    </div>
+                                    <span className="text-green-600 font-mono font-bold">€{product.unit_price.toFixed(4)}/st</span>
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* No results message */}
+                      {showSearchResults && ingredientSearch.length >= 2 && !searching && 
+                       searchResults.own.length === 0 && searchResults.database.length === 0 && (
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border rounded-lg shadow-xl z-50 p-4 text-center text-gray-500">
+                          Geen ingrediënten gevonden voor "{ingredientSearch}"
+                        </div>
+                      )}
                     </div>
 
                     {/* Summary */}
