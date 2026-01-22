@@ -2349,7 +2349,13 @@
     "files": "files",
     "noMedia": "No media yet",
     "noPhotosIn": "No photos in",
-    "uploadFirstPhotos": "Upload your first photos"
+    "uploadFirstPhotos": "Upload your first photos",
+    "imageDisplay": "Product Images",
+    "imageDisplayDesc": "Choose how product photos are displayed in the menu",
+    "imageCover": "Large photos",
+    "imageCoverDesc": "Photos fill the entire space (may crop)",
+    "imageContain": "Full product visible",
+    "imageContainDesc": "Complete photo visible (ideal for cans/bottles)"
   },
   "websiteTexts": {
     "title": "Texts",

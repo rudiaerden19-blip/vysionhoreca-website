@@ -5,6 +5,7 @@ import { useLanguage } from '@/i18n'
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 
 // =====================================================
 // AUTOMATISCHE IMAGE RESIZE FUNCTIE
@@ -100,12 +101,41 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
   const [newCategoryName, setNewCategoryName] = useState('')
   const [uploadCategory, setUploadCategory] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [settings, setSettings] = useState<TenantSettings | null>(null)
+  const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover')
+  const [savingDisplayMode, setSavingDisplayMode] = useState(false)
+  const [savedDisplayMode, setSavedDisplayMode] = useState(false)
 
-  // Load media on mount
+  // Load media and settings on mount
   useEffect(() => {
     loadMedia()
+    loadSettings()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
+
+  const loadSettings = async () => {
+    const data = await getTenantSettings(params.tenant)
+    if (data) {
+      setSettings(data)
+      setImageDisplayMode(data.image_display_mode || 'cover')
+    }
+  }
+
+  const saveDisplayMode = async (mode: 'cover' | 'contain') => {
+    if (!settings) return
+    setImageDisplayMode(mode)
+    setSavingDisplayMode(true)
+    
+    const updatedSettings = { ...settings, image_display_mode: mode }
+    const success = await saveTenantSettings(updatedSettings)
+    
+    if (success) {
+      setSettings(updatedSettings)
+      setSavedDisplayMode(true)
+      setTimeout(() => setSavedDisplayMode(false), 2000)
+    }
+    setSavingDisplayMode(false)
+  }
 
   const loadMedia = async () => {
     setLoading(true)
@@ -378,6 +408,62 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         {uploadCategory && (
           <p className="text-orange-500 text-sm mt-2">→ {t('websiteMedia.uploadingTo')}: <strong>{uploadCategory}</strong></p>
         )}
+      </motion.div>
+
+      {/* Image Display Mode Setting */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="bg-white rounded-2xl p-6 shadow-sm mb-6"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <span>🖼️</span> {t('websiteMedia.imageDisplay')}
+            </h3>
+            <p className="text-gray-500 text-sm">{t('websiteMedia.imageDisplayDesc')}</p>
+          </div>
+          {savedDisplayMode && (
+            <span className="text-green-500 text-sm font-medium">✓ {t('adminPages.common.saved')}</span>
+          )}
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4">
+          {/* Cover optie */}
+          <button
+            onClick={() => saveDisplayMode('cover')}
+            disabled={savingDisplayMode}
+            className={`p-4 rounded-xl border-2 transition-all text-left ${
+              imageDisplayMode === 'cover'
+                ? 'border-orange-500 bg-orange-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="w-full h-16 bg-gray-200 rounded-lg mb-3 overflow-hidden">
+              <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600" />
+            </div>
+            <p className="font-medium text-gray-900">{t('websiteMedia.imageCover')}</p>
+            <p className="text-xs text-gray-500">{t('websiteMedia.imageCoverDesc')}</p>
+          </button>
+          
+          {/* Contain optie */}
+          <button
+            onClick={() => saveDisplayMode('contain')}
+            disabled={savingDisplayMode}
+            className={`p-4 rounded-xl border-2 transition-all text-left ${
+              imageDisplayMode === 'contain'
+                ? 'border-orange-500 bg-orange-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="w-full h-16 bg-white border border-gray-200 rounded-lg mb-3 flex items-center justify-center">
+              <div className="w-10 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded" />
+            </div>
+            <p className="font-medium text-gray-900">{t('websiteMedia.imageContain')}</p>
+            <p className="text-xs text-gray-500">{t('websiteMedia.imageContainDesc')}</p>
+          </button>
+        </div>
       </motion.div>
 
       {/* Category Filter */}

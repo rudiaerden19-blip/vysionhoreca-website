@@ -2349,7 +2349,13 @@
     "files": "bestanden",
     "noMedia": "Nog geen media",
     "noPhotosIn": "Geen foto's in",
-    "uploadFirstPhotos": "Upload je eerste foto's"
+    "uploadFirstPhotos": "Upload je eerste foto's",
+    "imageDisplay": "Product Afbeeldingen",
+    "imageDisplayDesc": "Kies hoe productfoto's worden weergegeven in de menukaart",
+    "imageCover": "Grote foto's",
+    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
+    "imageContain": "Hele product zichtbaar",
+    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
   },
   "websiteTexts": {
     "title": "Teksten",
