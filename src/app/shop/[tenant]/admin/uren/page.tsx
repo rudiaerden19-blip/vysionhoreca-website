@@ -303,13 +303,23 @@ export default function UrenPage() {
   }
 
   // Calculate worked hours from clock in/out
-  function calculateWorkedHours() {
-    if (entryForm.clock_in && entryForm.clock_out) {
-      const [inH, inM] = entryForm.clock_in.split(':').map(Number)
-      const [outH, outM] = entryForm.clock_out.split(':').map(Number)
-      const totalMinutes = (outH * 60 + outM) - (inH * 60 + inM) - (entryForm.break_minutes || 0)
-      const hours = Math.max(0, totalMinutes / 60)
-      setEntryForm(prev => ({ ...prev, worked_hours: Math.round(hours * 100) / 100 }))
+  // Returns hours in HH.MM format (e.g., 7.45 = 7 hours 45 minutes)
+  function calculateWorkedHours(clockIn?: string, clockOut?: string, breakMin?: number) {
+    const inTime = clockIn || entryForm.clock_in
+    const outTime = clockOut || entryForm.clock_out
+    const breakMinutes = breakMin !== undefined ? breakMin : (entryForm.break_minutes || 0)
+    
+    if (inTime && outTime) {
+      const [inH, inM] = inTime.split(':').map(Number)
+      const [outH, outM] = outTime.split(':').map(Number)
+      const totalMinutes = (outH * 60 + outM) - (inH * 60 + inM) - breakMinutes
+      
+      // Convert to HH.MM format (7 hours 45 min = 7.45, not 7.75)
+      const hours = Math.floor(Math.max(0, totalMinutes) / 60)
+      const minutes = Math.max(0, totalMinutes) % 60
+      const hoursFormatted = hours + (minutes / 100) // 7.45 format
+      
+      setEntryForm(prev => ({ ...prev, worked_hours: Math.round(hoursFormatted * 100) / 100 }))
     }
   }
 
@@ -993,10 +1003,11 @@ Met vriendelijke groeten`,
                         type="time"
                         value={entryForm.clock_in || ''}
                         onChange={(e) => {
-                          setEntryForm({ ...entryForm, clock_in: e.target.value })
-                          setTimeout(calculateWorkedHours, 0)
+                          const newVal = e.target.value
+                          setEntryForm({ ...entryForm, clock_in: newVal })
+                          setTimeout(() => calculateWorkedHours(newVal, undefined, undefined), 0)
                         }}
-                        onBlur={calculateWorkedHours}
+                        onBlur={() => calculateWorkedHours()}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                       />
                     </div>
@@ -1006,10 +1017,11 @@ Met vriendelijke groeten`,
                         type="time"
                         value={entryForm.clock_out || ''}
                         onChange={(e) => {
-                          setEntryForm({ ...entryForm, clock_out: e.target.value })
-                          setTimeout(calculateWorkedHours, 0)
+                          const newVal = e.target.value
+                          setEntryForm({ ...entryForm, clock_out: newVal })
+                          setTimeout(() => calculateWorkedHours(undefined, newVal, undefined), 0)
                         }}
-                        onBlur={calculateWorkedHours}
+                        onBlur={() => calculateWorkedHours()}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                       />
                     </div>
@@ -1025,9 +1037,9 @@ Met vriendelijke groeten`,
                         onChange={(e) => {
                           const val = e.target.value === '' ? undefined : parseInt(e.target.value) || 0
                           setEntryForm({ ...entryForm, break_minutes: val })
-                          setTimeout(calculateWorkedHours, 0)
+                          setTimeout(() => calculateWorkedHours(undefined, undefined, val || 0), 0)
                         }}
-                        onBlur={calculateWorkedHours}
+                        onBlur={() => calculateWorkedHours()}
                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         min="0"
                         step="5"
