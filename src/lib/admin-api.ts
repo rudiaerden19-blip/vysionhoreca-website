@@ -1301,7 +1301,125 @@ export async function updateOrderStatus(
     return false
   }
   console.log('Order status updated successfully')
+  
+  // AUTOMATISCH: Update Z-rapport wanneer order completed wordt
+  if (status === 'completed') {
+    // Haal de order op om tenant_slug te krijgen
+    const { data: order } = await supabase
+      .from('orders')
+      .select('tenant_slug, created_at')
+      .eq('id', id)
+      .single()
+    
+    if (order) {
+      // Roep de automatische Z-rapport update aan
+      await autoUpdateZReport(order.tenant_slug, new Date(order.created_at).toISOString().split('T')[0])
+    }
+  }
+  
   return true
+}
+
+// AUTOMATISCH: Update Z-rapport voor een specifieke dag
+async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void> {
+  if (!supabase) return
+  
+  try {
+    const startOfDay = `${date}T00:00:00`
+    const endOfDay = `${date}T23:59:59`
+    
+    // Haal alle completed orders op voor deze dag
+    const { data: orders } = await supabase
+      .from('orders')
+      .select('id, total, payment_method')
+      .eq('tenant_slug', tenantSlug)
+      .gte('created_at', startOfDay)
+      .lte('created_at', endOfDay)
+      .eq('status', 'completed')
+    
+    if (!orders || orders.length === 0) return
+    
+    // Haal tenant settings op voor BTW
+    const { data: settings } = await supabase
+      .from('tenant_settings')
+      .select('btw_percentage, business_name, address, btw_number')
+      .eq('tenant_slug', tenantSlug)
+      .single()
+    
+    const btwPercentage = settings?.btw_percentage || 6
+    
+    // Bereken totalen
+    let total = 0
+    let cashPayments = 0
+    let onlinePayments = 0
+    let cardPayments = 0
+    const orderIds: string[] = []
+    
+    orders.forEach(order => {
+      orderIds.push(order.id)
+      const orderTotal = order.total || 0
+      total += orderTotal
+      
+      const paymentMethod = (order.payment_method || '').toLowerCase()
+      if (paymentMethod === 'cash' || paymentMethod === 'contant') {
+        cashPayments += orderTotal
+      } else if (paymentMethod === 'card' || paymentMethod === 'pin' || paymentMethod === 'kaart') {
+        cardPayments += orderTotal
+      } else {
+        onlinePayments += orderTotal
+      }
+    })
+    
+    const taxRate = btwPercentage / 100
+    const subtotal = total / (1 + taxRate)
+    const tax = total - subtotal
+    
+    // Genereer hash
+    const hashInput = JSON.stringify({
+      tenant: tenantSlug,
+      date: date,
+      orderCount: orders.length,
+      total: Math.round(total * 100),
+      orderIds: orderIds.sort(),
+      version: 'v1'
+    })
+    const encoder = new TextEncoder()
+    const dataBuffer = encoder.encode(hashInput)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    const reportHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    
+    // Upsert Z-rapport
+    await supabase
+      .from('z_reports')
+      .upsert({
+        tenant_slug: tenantSlug,
+        report_date: date,
+        order_count: orders.length,
+        subtotal: subtotal,
+        tax_low: btwPercentage === 6 ? tax : 0,
+        tax_mid: btwPercentage === 12 ? tax : 0,
+        tax_high: btwPercentage === 21 ? tax : 0,
+        total: total,
+        cash_payments: cashPayments,
+        card_payments: cardPayments,
+        online_payments: onlinePayments,
+        btw_percentage: btwPercentage,
+        business_name: settings?.business_name,
+        business_address: settings?.address,
+        btw_number: settings?.btw_number,
+        order_ids: orderIds,
+        report_hash: reportHash,
+        generated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'tenant_slug,report_date',
+        ignoreDuplicates: false
+      })
+    
+    console.log(`Z-rapport automatisch bijgewerkt voor ${tenantSlug} op ${date}: ${orders.length} bestellingen, €${total.toFixed(2)}`)
+  } catch (error) {
+    console.error('Fout bij automatisch bijwerken Z-rapport:', error)
+  }
 }
 
 // Confirm order (goedkeuren)
