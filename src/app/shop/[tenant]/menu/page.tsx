@@ -452,7 +452,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-t-3xl md:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
-              <div className="relative h-64 bg-white overflow-hidden">
+              <div className="relative h-64 bg-gray-100 overflow-hidden rounded-t-3xl md:rounded-t-3xl">
                 {selectedItem.image_url ? (
                   <Image
                     src={selectedItem.image_url}
@@ -460,7 +460,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     fill
                     sizes="(max-width: 768px) 100vw, 500px"
                     quality={80}
-                    className="object-contain p-4"
+                    className="object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-8xl">
