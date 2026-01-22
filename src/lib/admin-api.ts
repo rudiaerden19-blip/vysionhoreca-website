@@ -3154,3 +3154,64 @@ function generateGiftCardCode(): string {
   }
   return code // Format: XXXX-XXXX-XXXX
 }
+
+// =====================================================
+// SUPPLIER PRODUCTS DATABASE - Leveranciers zoeken
+// =====================================================
+export interface SupplierProduct {
+  id: string
+  article_number: string
+  name: string
+  package_price: number
+  units_per_package: number
+  unit_price: number
+  unit: string
+  unit_weight: string | null
+  category: string | null
+}
+
+export async function searchSupplierProducts(
+  searchQuery: string,
+  category?: string,
+  limit: number = 20
+): Promise<SupplierProduct[]> {
+  let query = supabase
+    .from('supplier_products')
+    .select('id, article_number, name, package_price, units_per_package, unit_price, unit, unit_weight, category')
+    .eq('is_available', true)
+  
+  if (searchQuery && searchQuery.trim()) {
+    query = query.ilike('name', `%${searchQuery.trim()}%`)
+  }
+  
+  if (category) {
+    query = query.eq('category', category)
+  }
+  
+  const { data, error } = await query
+    .order('name')
+    .limit(limit)
+  
+  if (error) {
+    console.error('Error searching supplier products:', error)
+    return []
+  }
+  
+  return data || []
+}
+
+export async function getSupplierProductCategories(): Promise<string[]> {
+  const { data, error } = await supabase
+    .from('supplier_products')
+    .select('category')
+    .not('category', 'is', null)
+  
+  if (error) {
+    console.error('Error fetching categories:', error)
+    return []
+  }
+  
+  // Get unique categories
+  const categories = [...new Set(data?.map(d => d.category).filter(Boolean))]
+  return categories.sort()
+}

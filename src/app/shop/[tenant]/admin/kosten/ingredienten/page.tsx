@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+import { searchSupplierProducts, getSupplierProductCategories, SupplierProduct } from '@/lib/admin-api'
 
 interface Ingredient {
   id: string
@@ -61,9 +62,68 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   const [importPreview, setImportPreview] = useState<Array<{name: string, articleNr: string, price: number}>>([])
   const [importing, setImporting] = useState(false)
 
+  // Database search state
+  const [showDatabaseSearch, setShowDatabaseSearch] = useState(false)
+  const [dbSearchQuery, setDbSearchQuery] = useState('')
+  const [dbSearchResults, setDbSearchResults] = useState<SupplierProduct[]>([])
+  const [dbCategories, setDbCategories] = useState<string[]>([])
+  const [dbSelectedCategory, setDbSelectedCategory] = useState('')
+  const [dbSearching, setDbSearching] = useState(false)
+  const [addingProduct, setAddingProduct] = useState<string | null>(null)
+
   useEffect(() => {
     loadData()
+    loadDbCategories()
   }, [params.tenant])
+
+  // Database search functions
+  async function loadDbCategories() {
+    const cats = await getSupplierProductCategories()
+    setDbCategories(cats)
+  }
+
+  async function handleDbSearch() {
+    if (!dbSearchQuery.trim() && !dbSelectedCategory) return
+    setDbSearching(true)
+    const results = await searchSupplierProducts(dbSearchQuery, dbSelectedCategory, 50)
+    setDbSearchResults(results)
+    setDbSearching(false)
+  }
+
+  async function addFromDatabase(product: SupplierProduct) {
+    if (!businessId) return
+    setAddingProduct(product.id)
+
+    // Check if already exists (by article number in notes)
+    const existingArticleNrs = ingredients
+      .map(i => i.notes?.match(/Art\. #(\d+)/)?.[1])
+      .filter(Boolean)
+    
+    if (existingArticleNrs.includes(product.article_number)) {
+      alert('Dit product bestaat al in je ingrediëntenlijst!')
+      setAddingProduct(null)
+      return
+    }
+
+    const { data } = await supabase
+      .from('ingredients')
+      .insert({
+        tenant_slug: businessId,
+        name: product.name,
+        unit: product.unit || 'stuk',
+        purchase_price: product.unit_price,
+        units_per_package: product.units_per_package,
+        package_price: product.package_price,
+        notes: `Art. #${product.article_number}`
+      })
+      .select()
+      .single()
+
+    if (data) {
+      setIngredients(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+    }
+    setAddingProduct(null)
+  }
 
   async function loadData() {
     
@@ -321,19 +381,160 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         </div>
         <div className="flex gap-3">
           <button
+            onClick={() => setShowDatabaseSearch(true)}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+          >
+            🔍 Zoek in Database
+          </button>
+          <button
             onClick={() => setShowImport(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
-            📥 Van Zon Import
+            📥 Excel Import
           </button>
           <button
             onClick={() => { resetForm(); setShowAddForm(true) }}
             className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
           >
-            + Ingrediënt toevoegen
+            + Handmatig
           </button>
         </div>
       </div>
+
+      {/* Database Search Modal */}
+      <AnimatePresence>
+        {showDatabaseSearch && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowDatabaseSearch(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-6 border-b bg-green-50">
+                <h2 className="text-xl font-bold text-gray-900">🔍 Zoek in Leveranciers Database</h2>
+                <p className="text-gray-600 mt-1">
+                  Zoek uit 334 frituurproducten met automatische prijsberekening per stuk
+                </p>
+              </div>
+              
+              <div className="p-6">
+                {/* Search bar */}
+                <div className="flex gap-3 mb-4">
+                  <input
+                    type="text"
+                    placeholder="Zoek bijv. hamburger, frikandel, saus..."
+                    value={dbSearchQuery}
+                    onChange={(e) => setDbSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleDbSearch()}
+                    className="flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500"
+                  />
+                  <select
+                    value={dbSelectedCategory}
+                    onChange={(e) => setDbSelectedCategory(e.target.value)}
+                    className="px-4 py-3 border rounded-xl focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">Alle categorieën</option>
+                    {dbCategories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleDbSearch}
+                    disabled={dbSearching}
+                    className="px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:opacity-50"
+                  >
+                    {dbSearching ? '...' : '🔍 Zoek'}
+                  </button>
+                </div>
+
+                {/* Results */}
+                <div className="max-h-[50vh] overflow-auto border rounded-xl">
+                  {dbSearchResults.length > 0 ? (
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-100 sticky top-0">
+                        <tr>
+                          <th className="px-3 py-2 text-left">Product</th>
+                          <th className="px-3 py-2 text-left">Categorie</th>
+                          <th className="px-3 py-2 text-right">Doos</th>
+                          <th className="px-3 py-2 text-center">Aantal</th>
+                          <th className="px-3 py-2 text-right font-bold text-green-700">Per stuk</th>
+                          <th className="px-3 py-2 text-center">Actie</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dbSearchResults.map((product) => {
+                          const alreadyAdded = ingredients.some(i => 
+                            i.notes?.includes(`Art. #${product.article_number}`)
+                          )
+                          return (
+                            <tr key={product.id} className={`border-t hover:bg-gray-50 ${alreadyAdded ? 'bg-green-50' : ''}`}>
+                              <td className="px-3 py-2 font-medium">{product.name}</td>
+                              <td className="px-3 py-2 text-gray-500">{product.category || '-'}</td>
+                              <td className="px-3 py-2 text-right font-mono">€{product.package_price.toFixed(2)}</td>
+                              <td className="px-3 py-2 text-center">{product.units_per_package}x</td>
+                              <td className="px-3 py-2 text-right font-mono font-bold text-green-600">
+                                €{product.unit_price.toFixed(4)}
+                              </td>
+                              <td className="px-3 py-2 text-center">
+                                {alreadyAdded ? (
+                                  <span className="text-green-600">✓ Toegevoegd</span>
+                                ) : (
+                                  <button
+                                    onClick={() => addFromDatabase(product)}
+                                    disabled={addingProduct === product.id}
+                                    className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 text-xs"
+                                  >
+                                    {addingProduct === product.id ? '...' : '+ Toevoegen'}
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">
+                      {dbSearchQuery || dbSelectedCategory ? (
+                        <>Geen producten gevonden. Probeer een andere zoekterm.</>
+                      ) : (
+                        <>
+                          <div className="text-4xl mb-2">🔍</div>
+                          <p>Typ een zoekterm en klik op zoeken</p>
+                          <p className="text-sm mt-2">bijv. "hamburger", "frikandel", "bicky saus"</p>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {dbSearchResults.length > 0 && (
+                  <p className="text-sm text-gray-500 mt-2">
+                    {dbSearchResults.length} producten gevonden
+                  </p>
+                )}
+              </div>
+              
+              <div className="p-6 border-t bg-gray-50 flex justify-end">
+                <button
+                  onClick={() => { setShowDatabaseSearch(false); setDbSearchQuery(''); setDbSearchResults([]) }}
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                >
+                  Sluiten
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Van Zon Import Modal */}
       <AnimatePresence>
