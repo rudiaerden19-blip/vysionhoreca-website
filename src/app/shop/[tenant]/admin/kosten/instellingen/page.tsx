@@ -19,8 +19,9 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [businessId, setBusinessId] = useState<string | null>(null)
-  const [newCategory, setNewCategory] = useState({ name: '', multiplier: '' as string | number })
+  const [newCategory, setNewCategory] = useState({ name: '', multiplier: '' })
   const [showAddForm, setShowAddForm] = useState(false)
+  const [editingValues, setEditingValues] = useState<{[key: string]: string}>({})
 
   useEffect(() => {
     loadData()
@@ -192,11 +193,22 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
               <input
                 type="text"
                 inputMode="decimal"
-                value={category.multiplier || ''}
+                value={editingValues[category.id] !== undefined ? editingValues[category.id] : (category.multiplier || '')}
                 onChange={(e) => {
                   const val = e.target.value.replace(',', '.')
                   if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setEditingValues(prev => ({ ...prev, [category.id]: val }))
+                  }
+                }}
+                onBlur={() => {
+                  const val = editingValues[category.id]
+                  if (val !== undefined) {
                     updateMultiplier(category.id, val === '' ? 0 : parseFloat(val) || 0)
+                    setEditingValues(prev => {
+                      const newVals = { ...prev }
+                      delete newVals[category.id]
+                      return newVals
+                    })
                   }
                 }}
                 placeholder="bijv. 3 of 2,5"
