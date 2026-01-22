@@ -6,6 +6,30 @@ import { supabase } from '@/lib/supabase'
 import { getTenantSettings } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 
+// KRITIEK: Hash functie voor integriteitsverificatie (fiscale compliance)
+async function generateReportHash(data: {
+  tenant: string
+  date: string
+  orderCount: number
+  total: number
+  orderIds: string[]
+}): Promise<string> {
+  const hashInput = JSON.stringify({
+    tenant: data.tenant,
+    date: data.date,
+    orderCount: data.orderCount,
+    total: Math.round(data.total * 100), // Cents voor precisie
+    orderIds: data.orderIds.sort(), // Sorteer voor consistentie
+    version: 'v1' // Versie voor toekomstige updates
+  })
+  
+  const encoder = new TextEncoder()
+  const dataBuffer = encoder.encode(hashInput)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
 interface DailyStats {
   date: string
   orderCount: number
@@ -17,6 +41,7 @@ interface DailyStats {
   cashPayments: number
   onlinePayments: number
   cardPayments: number
+  orderIds: string[] // KRITIEK: Audit trail voor fiscale compliance
 }
 
 interface SavedReport {
@@ -25,6 +50,8 @@ interface SavedReport {
   order_count: number
   total: number
   generated_at: string
+  order_ids?: string[]
+  report_hash?: string
 }
 
 export default function ZRapportPage({ params }: { params: { tenant: string } }) {
@@ -63,7 +90,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       .eq('tenant_slug', params.tenant)
       .gte('created_at', startOfDay)
       .lte('created_at', endOfDay)
-      .in('status', ['completed', 'ready', 'preparing', 'confirmed'])
+      // KRITIEK: Alleen 'completed' orders meetellen voor fiscale compliance
+      // Andere statussen (confirmed, preparing, ready) kunnen nog geweigerd worden!
+      .eq('status', 'completed')
 
     // Check if already saved
     const { data: existingReport } = await supabase
@@ -80,9 +109,13 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       let cashPayments = 0
       let onlinePayments = 0
       let cardPayments = 0
+      const orderIds: string[] = []
 
       orders.forEach(order => {
-        const orderTotal = order.total_amount || 0
+        // KRITIEK: Bewaar order ID voor audit trail
+        orderIds.push(order.id)
+        
+        const orderTotal = order.total || 0
         total += orderTotal
         
         const paymentMethod = (order.payment_method || '').toLowerCase()
@@ -110,6 +143,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         cashPayments,
         onlinePayments,
         cardPayments,
+        orderIds, // KRITIEK: Audit trail
       })
     }
 
@@ -119,7 +153,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const loadSavedReports = async () => {
     const { data } = await supabase
       .from('z_reports')
-      .select('id, report_date, order_count, total, generated_at')
+      .select('id, report_date, order_count, total, generated_at, order_ids, report_hash')
       .eq('tenant_slug', params.tenant)
       .order('report_date', { ascending: false })
       .limit(100)
@@ -133,6 +167,15 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     if (!stats || isAlreadySaved) return
 
     setSaving(true)
+
+    // KRITIEK: Genereer hash voor integriteitsverificatie (fiscale compliance)
+    const reportHash = await generateReportHash({
+      tenant: params.tenant,
+      date: selectedDate,
+      orderCount: stats.orderCount,
+      total: stats.total,
+      orderIds: stats.orderIds
+    })
 
     const { error } = await supabase
       .from('z_reports')
@@ -152,6 +195,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         business_name: businessInfo?.business_name,
         business_address: businessInfo?.address,
         btw_number: businessInfo?.btw_number,
+        // KRITIEK: Audit trail voor fiscale compliance
+        order_ids: stats.orderIds,
+        report_hash: reportHash,
       })
 
     if (!error) {
@@ -423,11 +469,17 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                     }`}
                   >
                     <div className="flex justify-between items-center">
-                      <span className="font-medium">{formatShortDate(report.report_date)}</span>
+                      <span className="font-medium flex items-center gap-1">
+                        {formatShortDate(report.report_date)}
+                        {report.report_hash && <span title="Geverifieerd" className="text-green-500">🔒</span>}
+                      </span>
                       <span className="text-green-600 font-bold">{formatCurrency(report.total)}</span>
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
                       {report.order_count} {t('zReport.orders')}
+                      {report.order_ids && report.order_ids.length > 0 && (
+                        <span className="ml-1 text-green-600">• {report.order_ids.length} IDs</span>
+                      )}
                     </div>
                   </button>
                 ))}
