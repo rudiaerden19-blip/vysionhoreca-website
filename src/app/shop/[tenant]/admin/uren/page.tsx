@@ -1057,12 +1057,10 @@ Met vriendelijke groeten`,
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{t('urenPage.workedHours')}</label>
                       <input
-                        type="number"
-                        value={entryForm.worked_hours || 0}
-                        onChange={(e) => setEntryForm({ ...entryForm, worked_hours: parseFloat(e.target.value) || 0 })}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-gray-50"
-                        step="0.5"
-                        min="0"
+                        type="text"
+                        value={formatHours(entryForm.worked_hours || 0)}
+                        readOnly
+                        className="w-full px-4 py-2 border rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed"
                       />
                     </div>
                   </div>
