@@ -334,24 +334,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              {filteredItems.map((item) => {
-                // Dranken/Desserts krijgen object-contain, rest object-cover
-                const containCategories = ['drank', 'drink', 'dessert', 'ijs', 'ice', 'bier', 'beer', 'frisdrank', 'soda', 'water', 'koffie', 'coffee', 'thee', 'tea', 'wijn', 'wine']
-                const useContain = containCategories.some(cat => 
-                  item.category_name.toLowerCase().includes(cat) || 
-                  item.name.toLowerCase().includes('blik') ||
-                  item.name.toLowerCase().includes('can') ||
-                  item.name.toLowerCase().includes('fles') ||
-                  item.name.toLowerCase().includes('bottle')
-                )
-                
-                return (
+              {filteredItems.map((item) => (
                 <div
                   key={item.id}
                   onClick={() => selectProduct(item)}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group"
                 >
-                  <div className={`relative h-48 overflow-hidden ${useContain ? 'bg-white' : 'bg-gray-100'}`}>
+                  <div className="relative h-48 overflow-hidden bg-gray-100">
                     {item.image_url ? (
                       <Image
                         src={item.image_url}
@@ -360,7 +349,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                         sizes="(max-width: 768px) 100vw, 50vw"
                         quality={75}
                         loading="lazy"
-                        className={useContain ? 'object-contain p-2' : 'object-cover'}
+                        className="object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-6xl">
@@ -441,7 +430,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     </div>
                   </div>
                 </div>
-              )})}
+              ))}}
           </div>
         )}
       </div>
@@ -463,17 +452,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-t-3xl md:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
-              {(() => {
-                const containCategories = ['drank', 'drink', 'dessert', 'ijs', 'ice', 'bier', 'beer', 'frisdrank', 'soda', 'water', 'koffie', 'coffee', 'thee', 'tea', 'wijn', 'wine']
-                const useContain = containCategories.some(cat => 
-                  selectedItem.category_name.toLowerCase().includes(cat) || 
-                  selectedItem.name.toLowerCase().includes('blik') ||
-                  selectedItem.name.toLowerCase().includes('can') ||
-                  selectedItem.name.toLowerCase().includes('fles') ||
-                  selectedItem.name.toLowerCase().includes('bottle')
-                )
-                return (
-              <div className={`relative h-64 overflow-hidden rounded-t-3xl md:rounded-t-3xl ${useContain ? 'bg-white' : 'bg-gray-100'}`}>
+              <div className="relative h-64 overflow-hidden rounded-t-3xl md:rounded-t-3xl bg-gray-100">
                 {selectedItem.image_url ? (
                   <Image
                     src={selectedItem.image_url}
@@ -481,7 +460,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     fill
                     sizes="(max-width: 768px) 100vw, 500px"
                     quality={80}
-                    className={useContain ? 'object-contain p-4' : 'object-cover'}
+                    className="object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-8xl">
@@ -500,8 +479,6 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   )}
                 </div>
               </div>
-                )
-              })()}
 
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
