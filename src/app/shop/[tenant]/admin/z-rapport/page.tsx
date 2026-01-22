@@ -58,7 +58,15 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  // Get today's date in local timezone (not UTC)
+  const getLocalDateString = (date: Date = new Date()) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+  
+  const [selectedDate, setSelectedDate] = useState(getLocalDateString())
   const [stats, setStats] = useState<DailyStats | null>(null)
   const [businessInfo, setBusinessInfo] = useState<any>(null)
   const [btwPercentage, setBtwPercentage] = useState(6)
@@ -239,17 +247,18 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const printZRapport = () => window.print()
 
   const goToPreviousDay = () => {
-    const date = new Date(selectedDate)
-    date.setDate(date.getDate() - 1)
-    setSelectedDate(date.toISOString().split('T')[0])
+    const [y, m, d] = selectedDate.split('-').map(Number)
+    const date = new Date(y, m - 1, d - 1)
+    setSelectedDate(getLocalDateString(date))
   }
 
   const goToNextDay = () => {
-    const date = new Date(selectedDate)
-    date.setDate(date.getDate() + 1)
-    const today = new Date().toISOString().split('T')[0]
-    if (date.toISOString().split('T')[0] <= today) {
-      setSelectedDate(date.toISOString().split('T')[0])
+    const [y, m, d] = selectedDate.split('-').map(Number)
+    const date = new Date(y, m - 1, d + 1)
+    const today = getLocalDateString()
+    const newDate = getLocalDateString(date)
+    if (newDate <= today) {
+      setSelectedDate(newDate)
     }
   }
 
@@ -318,12 +327,12 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              max={new Date().toISOString().split('T')[0]}
+              max={getLocalDateString()}
               className="px-4 py-3 border border-gray-200 rounded-xl text-center font-medium"
             />
             <button
               onClick={goToNextDay}
-              disabled={selectedDate === new Date().toISOString().split('T')[0]}
+              disabled={selectedDate === getLocalDateString()}
               className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl disabled:opacity-50"
             >→</button>
           </div>
