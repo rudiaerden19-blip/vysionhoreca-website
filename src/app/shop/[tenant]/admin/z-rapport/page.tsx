@@ -57,6 +57,7 @@ interface SavedReport {
 export default function ZRapportPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
+  const [syncing, setSyncing] = useState(false)
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [stats, setStats] = useState<DailyStats | null>(null)
   const [businessInfo, setBusinessInfo] = useState<any>(null)
@@ -157,6 +158,63 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     loadSavedReports()
   }
 
+  // Synchroniseer rapport met database (voor als automatische update niet heeft gewerkt)
+  const syncReport = async () => {
+    if (!stats || stats.orderCount === 0) return
+    
+    setSyncing(true)
+    
+    // Genereer hash
+    const hashInput = JSON.stringify({
+      tenant: params.tenant,
+      date: selectedDate,
+      orderCount: stats.orderCount,
+      total: Math.round(stats.total * 100),
+      orderIds: stats.orderIds.sort(),
+      version: 'v1'
+    })
+    const encoder = new TextEncoder()
+    const dataBuffer = encoder.encode(hashInput)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    const reportHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    
+    const { error } = await supabase
+      .from('z_reports')
+      .upsert({
+        tenant_slug: params.tenant,
+        report_date: selectedDate,
+        order_count: stats.orderCount,
+        subtotal: stats.subtotal,
+        tax_low: stats.taxLow,
+        tax_mid: stats.taxMid,
+        tax_high: stats.taxHigh,
+        total: stats.total,
+        cash_payments: stats.cashPayments,
+        card_payments: stats.cardPayments,
+        online_payments: stats.onlinePayments,
+        btw_percentage: btwPercentage,
+        business_name: businessInfo?.business_name,
+        business_address: businessInfo?.address,
+        btw_number: businessInfo?.btw_number,
+        order_ids: stats.orderIds,
+        report_hash: reportHash,
+        generated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'tenant_slug,report_date',
+        ignoreDuplicates: false
+      })
+    
+    if (!error) {
+      loadSavedReports()
+    } else {
+      console.error('Sync error:', error)
+      alert('Fout bij synchroniseren: ' + error.message)
+    }
+    
+    setSyncing(false)
+  }
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
     return date.toLocaleDateString('nl-BE', { 
@@ -239,6 +297,13 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             className="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-xl font-medium flex items-center gap-2"
           >
             🔄 {t('zReport.refresh')}
+          </button>
+          <button
+            onClick={syncReport}
+            disabled={syncing || !stats || stats.orderCount === 0}
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium flex items-center gap-2 disabled:bg-gray-300"
+          >
+            {syncing ? '⏳' : '💾'} {t('zReport.sync')}
           </button>
         </div>
       </div>

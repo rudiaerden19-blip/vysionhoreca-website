@@ -2371,6 +2371,7 @@
     "history": "Archive",
     "print": "Print",
     "refresh": "Refresh",
+    "sync": "Save",
     "autoUpdated": "Auto-updated",
     "alreadySaved": "Already saved",
     "savedToArchive": "Saved to archive",
