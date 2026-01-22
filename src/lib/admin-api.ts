@@ -3175,6 +3175,8 @@ export async function searchSupplierProducts(
   category?: string,
   limit: number = 20
 ): Promise<SupplierProduct[]> {
+  console.log('searchSupplierProducts called with:', searchQuery)
+  
   let query = supabase
     .from('supplier_products')
     .select('id, article_number, name, package_price, units_per_package, unit_price, unit, unit_weight, category')
@@ -3191,6 +3193,8 @@ export async function searchSupplierProducts(
   const { data, error } = await query
     .order('name')
     .limit(limit)
+  
+  console.log('Supabase response:', { data, error })
   
   if (error) {
     console.error('Error searching supplier products:', error)

@@ -118,7 +118,6 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     
     if (query.length < 2) {
       setSearchResults({ own: [], database: [] })
-      setShowSearchResults(false)
       return
     }
 
@@ -132,7 +131,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     ).slice(0, 10)
 
     // Search database
+    console.log('Searching for:', query)
     const dbResults = await searchSupplierProducts(query, undefined, 10)
+    console.log('Database results:', dbResults)
 
     setSearchResults({
       own: ownResults,
