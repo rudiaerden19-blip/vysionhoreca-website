@@ -134,30 +134,35 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     return mapping[leaveType] || 'OTHER'
   }
 
-  // Generate array of dates between start and end (inclusive) - pure string based
+  // Generate array of dates between start and end (inclusive) - simple string based
   const getDateRange = (startDateStr: string, endDateStr: string): string[] => {
+    // If same day, just return that day
+    if (startDateStr === endDateStr) {
+      console.log('Single day leave:', startDateStr)
+      return [startDateStr]
+    }
+    
     const dates: string[] = []
+    const [sy, sm, sd] = startDateStr.split('-').map(Number)
+    const [ey, em, ed] = endDateStr.split('-').map(Number)
     
-    // Parse as local date by adding time component
-    const parseLocalDate = (str: string) => {
-      const [y, m, d] = str.split('-').map(Number)
-      return new Date(y, m - 1, d, 12, 0, 0) // noon to avoid DST issues
-    }
+    // Create dates at noon to avoid timezone issues
+    let current = new Date(sy, sm - 1, sd, 12, 0, 0)
+    const end = new Date(ey, em - 1, ed, 12, 0, 0)
     
-    const formatLocalDate = (date: Date) => {
-      const y = date.getFullYear()
-      const m = String(date.getMonth() + 1).padStart(2, '0')
-      const d = String(date.getDate()).padStart(2, '0')
-      return `${y}-${m}-${d}`
-    }
+    // Safety limit to prevent infinite loops
+    let safety = 0
+    const maxDays = 365
     
-    const start = parseLocalDate(startDateStr)
-    const end = parseLocalDate(endDateStr)
-    
-    const current = new Date(start)
-    while (current <= end) {
-      dates.push(formatLocalDate(current))
-      current.setDate(current.getDate() + 1)
+    while (current <= end && safety < maxDays) {
+      const y = current.getFullYear()
+      const m = String(current.getMonth() + 1).padStart(2, '0')
+      const d = String(current.getDate()).padStart(2, '0')
+      dates.push(`${y}-${m}-${d}`)
+      
+      // Move to next day
+      current = new Date(current.getTime() + 24 * 60 * 60 * 1000)
+      safety++
     }
     
     console.log('Date range from', startDateStr, 'to', endDateStr, ':', dates)
