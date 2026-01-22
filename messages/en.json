@@ -215,6 +215,11 @@
       "title": "Professional accounting.",
       "description": "SCARDA accounting software fully integrated. Always up-to-date. Save 30% on accounting costs."
     },
+    "payroll": {
+      "tab": "Payroll",
+      "title": "Payroll management.",
+      "description": "Keep your payroll administration in order for every employee, directly connected to your chosen payroll office"
+    },
     "tryFree": "Try free",
     "clickToEnlarge": "Click to enlarge"
   },
@@ -307,6 +312,7 @@
       "3": { "you": "You give us your photos", "we": "We place them on your site" },
       "4": { "you": "You already have a website?", "we": "We integrate the order button" }
     },
+    "customBuildNote": "* You can also choose to build your platform at your own pace",
     "freeTitle": "We do this for FREE",
     "freeItems": {
       "1": "Free startup",
