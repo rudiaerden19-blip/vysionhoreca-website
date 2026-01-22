@@ -161,12 +161,34 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
       currentDate.setDate(currentDate.getDate() + 1)
     }
     
-    // Insert all entries (upsert to avoid duplicates)
+    // Insert all entries
     if (entries.length > 0) {
-      await supabase.from('staff_timesheet').upsert(entries, {
-        onConflict: 'tenant_slug,staff_id,date,absence_type',
-        ignoreDuplicates: false,
-      })
+      for (const entry of entries) {
+        // Check if entry already exists for this date
+        const { data: existing } = await supabase
+          .from('timesheet_entries')
+          .select('id')
+          .eq('tenant_slug', entry.tenant_slug)
+          .eq('staff_id', entry.staff_id)
+          .eq('date', entry.date)
+          .single()
+        
+        if (existing) {
+          // Update existing entry
+          await supabase
+            .from('timesheet_entries')
+            .update({
+              absence_type: entry.absence_type,
+              absence_hours: entry.absence_hours,
+              notes: entry.notes,
+              is_approved: true,
+            })
+            .eq('id', existing.id)
+        } else {
+          // Insert new entry
+          await supabase.from('timesheet_entries').insert(entry)
+        }
+      }
     }
   }
 
