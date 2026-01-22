@@ -333,9 +333,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">📊 Product Kostprijs Analyse</h1>
+        <h1 className="text-2xl font-bold text-gray-900">📊 {t('dashboard.productCosts.title')}</h1>
         <p className="text-gray-500 mt-1">
-          Alle producten uit je menu - klik om ingrediënten toe te voegen en je marge te berekenen
+          {t('dashboard.productCosts.subtitle')}
         </p>
       </div>
 
@@ -343,23 +343,23 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl p-4 shadow text-center">
           <div className="text-2xl font-bold text-gray-900">{stats.total}</div>
-          <div className="text-sm text-gray-500">Producten</div>
+          <div className="text-sm text-gray-500">{t('dashboard.productCosts.products')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow text-center">
           <div className="text-2xl font-bold text-blue-600">{stats.configured}</div>
-          <div className="text-sm text-gray-500">Geconfigureerd</div>
+          <div className="text-sm text-gray-500">{t('dashboard.productCosts.configured')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow text-center">
           <div className="text-2xl font-bold text-green-600">{stats.good}</div>
-          <div className="text-sm text-gray-500">Goed ✓</div>
+          <div className="text-sm text-gray-500">{t('dashboard.productCosts.good')} ✓</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow text-center">
           <div className="text-2xl font-bold text-red-600">{stats.low}</div>
-          <div className="text-sm text-gray-500">Te laag ⚠️</div>
+          <div className="text-sm text-gray-500">{t('dashboard.productCosts.tooLow')} ⚠️</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow text-center">
           <div className="text-2xl font-bold text-orange-600">{stats.high}</div>
-          <div className="text-sm text-gray-500">Te hoog</div>
+          <div className="text-sm text-gray-500">{t('dashboard.productCosts.tooHigh')}</div>
         </div>
       </div>
 
@@ -367,7 +367,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       <div className="relative">
         <input
           type="text"
-          placeholder="🔍 Zoek product..."
+          placeholder={`🔍 ${t('dashboard.productCosts.searchProduct')}`}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
@@ -405,7 +405,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 <div>
                   <h3 className="font-semibold text-gray-900">{pc.product.name}</h3>
                   <p className="text-sm text-gray-500">
-                    {pc.ingredients.length} ingrediënten
+                    {pc.ingredients.length} {t('dashboard.productCosts.ingredients')}
                   </p>
                 </div>
               </div>
@@ -414,17 +414,17 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 {pc.ingredients.length > 0 && (
                   <>
                     <div className="text-right">
-                      <div className="text-sm text-gray-500">Kostprijs</div>
+                      <div className="text-sm text-gray-500">{t('dashboard.productCosts.costPrice')}</div>
                       <div className="font-mono font-semibold">€{pc.totalCost.toFixed(2)}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm text-gray-500">Adviesprijs</div>
+                      <div className="text-sm text-gray-500">{t('dashboard.productCosts.advisedPrice')}</div>
                       <div className="font-mono font-semibold">€{pc.requiredPrice.toFixed(2)}</div>
                     </div>
                   </>
                 )}
                 <div className="text-right">
-                  <div className="text-sm text-gray-500">Verkoopprijs</div>
+                  <div className="text-sm text-gray-500">{t('dashboard.productCosts.sellingPrice')}</div>
                   <div className="font-mono font-bold text-lg">€{pc.product.price.toFixed(2)}</div>
                 </div>
                 {pc.ingredients.length > 0 && (
@@ -434,8 +434,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                     'bg-green-100 text-green-700'
                   }`}>
                     {pc.status === 'low' ? `↑ €${Math.abs(pc.difference).toFixed(2)}` :
-                     pc.status === 'high' ? `Hoog +€${pc.difference.toFixed(2)}` :
-                     '✓ Goed'}
+                     pc.status === 'high' ? `${t('dashboard.productCosts.high')} +€${pc.difference.toFixed(2)}` :
+                     `✓ ${t('dashboard.productCosts.good')}`}
                   </div>
                 )}
                 <div className="text-gray-400">
@@ -455,12 +455,12 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 >
                   <div className="p-4 bg-gray-50 overflow-visible">
                     <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-semibold">Ingrediënten in dit product:</h4>
+                      <h4 className="font-semibold">{t('dashboard.productCosts.ingredientsInProduct')}</h4>
                       {pc.ingredients.length > 0 && (
                         <button
                           onClick={async (e) => {
                             e.stopPropagation()
-                            if (!confirm('Alle ingrediënten van dit product verwijderen? (Het product zelf blijft bestaan in je winkel)')) return
+                            if (!confirm(t('dashboard.productCosts.confirmReset'))) return
                             for (const pi of pc.ingredients) {
                               await supabase.from('product_ingredients').delete().eq('id', pi.id)
                             }
@@ -468,7 +468,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           }}
                           className="text-sm text-red-500 hover:text-red-700 hover:underline"
                         >
-                          🗑️ Reset ingrediënten
+                          🗑️ {t('dashboard.productCosts.resetIngredients')}
                         </button>
                       )}
                     </div>
@@ -478,17 +478,17 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                       <table className="w-full mb-4">
                         <thead>
                           <tr className="text-left text-sm text-gray-500">
-                            <th className="pb-2">Ingrediënt</th>
-                            <th className="pb-2 text-center">Aantal</th>
-                            <th className="pb-2 text-right">Prijs/stuk</th>
-                            <th className="pb-2 text-right">Totaal</th>
+                            <th className="pb-2">{t('dashboard.productCosts.ingredient')}</th>
+                            <th className="pb-2 text-center">{t('dashboard.productCosts.quantity')}</th>
+                            <th className="pb-2 text-right">{t('dashboard.productCosts.pricePerUnit')}</th>
+                            <th className="pb-2 text-right">{t('dashboard.productCosts.total')}</th>
                             <th className="pb-2"></th>
                           </tr>
                         </thead>
                         <tbody>
                           {pc.ingredients.map((pi) => (
                             <tr key={pi.id} className="border-t border-gray-200">
-                              <td className="py-2">{pi.ingredient?.name || 'Onbekend'}</td>
+                              <td className="py-2">{pi.ingredient?.name || t('dashboard.productCosts.unknown')}</td>
                               <td className="py-2 text-center">
                                 <input
                                   type="number"
@@ -516,14 +516,14 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                             </tr>
                           ))}
                           <tr className="border-t-2 border-gray-300 font-bold">
-                            <td className="py-2" colSpan={3}>TOTAAL KOSTPRIJS</td>
+                            <td className="py-2" colSpan={3}>{t('dashboard.productCosts.totalCostPrice')}</td>
                             <td className="py-2 text-right font-mono">€{pc.totalCost.toFixed(2)}</td>
                             <td></td>
                           </tr>
                         </tbody>
                       </table>
                     ) : (
-                      <p className="text-gray-500 mb-4">Nog geen ingrediënten toegevoegd</p>
+                      <p className="text-gray-500 mb-4">{t('dashboard.productCosts.noIngredientsYet')}</p>
                     )}
 
                     {/* Add Ingredient - Search */}
@@ -532,7 +532,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                         <div className="flex-1 relative">
                           <input
                             type="text"
-                            placeholder="🔍 Typ om te zoeken (bijv. hamburger, saus, broodje)..."
+                            placeholder={`🔍 ${t('dashboard.productCosts.searchPlaceholder')}`}
                             value={ingredientSearch}
                             onChange={(e) => handleIngredientSearch(e.target.value, pc.ingredients.map(pi => pi.ingredient_id))}
                             onFocus={() => setShowSearchResults(true)}
@@ -563,8 +563,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           {ingredientSearch.length < 2 && (
                             <div className="p-4 text-center text-gray-500">
                               <div className="text-2xl mb-2">🔍</div>
-                              <p>Typ minstens 2 letters om te zoeken</p>
-                              <p className="text-sm mt-1">bijv. "ham", "fri", "sau"</p>
+                              <p>{t('dashboard.productCosts.typeToSearch')}</p>
+                              <p className="text-sm mt-1">{t('dashboard.productCosts.searchExample')}</p>
                             </div>
                           )}
 
@@ -572,7 +572,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           {ingredientSearch.length >= 2 && searching && (
                             <div className="p-4 text-center text-gray-500">
                               <div className="animate-spin h-8 w-8 border-2 border-green-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                              <p>Zoeken...</p>
+                              <p>{t('dashboard.productCosts.searching')}</p>
                             </div>
                           )}
 
@@ -580,7 +580,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           {ingredientSearch.length >= 2 && !searching && searchResults.own.length > 0 && (
                             <div>
                               <div className="px-3 py-2 bg-blue-50 text-sm font-semibold text-blue-700 sticky top-0">
-                                📦 Mijn Ingrediënten ({searchResults.own.length})
+                                📦 {t('dashboard.productCosts.myIngredients')} ({searchResults.own.length})
                               </div>
                               {searchResults.own.map(ing => (
                                 <button
@@ -599,7 +599,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           {ingredientSearch.length >= 2 && !searching && searchResults.database.length > 0 && (
                             <div>
                               <div className="px-3 py-2 bg-green-50 text-sm font-semibold text-green-700 sticky top-0">
-                                🔍 Leveranciers Database ({searchResults.database.length})
+                                🔍 {t('dashboard.productCosts.supplierDatabase')} ({searchResults.database.length})
                               </div>
                               {searchResults.database.map(product => {
                                 const alreadyOwned = ingredients.some(i => 
@@ -613,9 +613,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                                   >
                                     <div>
                                       <span className="font-medium">{product.name}</span>
-                                      {alreadyOwned && <span className="ml-2 text-xs text-green-600">(al toegevoegd)</span>}
+                                      {alreadyOwned && <span className="ml-2 text-xs text-green-600">({t('dashboard.productCosts.alreadyAdded')})</span>}
                                       <div className="text-xs text-gray-500">
-                                        Doos €{product.package_price.toFixed(2)} • {product.units_per_package}x
+                                        {t('dashboard.productCosts.box')} €{product.package_price.toFixed(2)} • {product.units_per_package}x
                                       </div>
                                     </div>
                                     <span className="text-green-600 font-mono font-bold">€{product.unit_price.toFixed(4)}/st</span>
@@ -630,9 +630,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                            searchResults.own.length === 0 && searchResults.database.length === 0 && (
                             <div className="p-4 text-center">
                               <div className="text-2xl mb-2">😕</div>
-                              <p className="text-gray-700 font-medium">Geen resultaten voor "{ingredientSearch}"</p>
+                              <p className="text-gray-700 font-medium">{t('dashboard.productCosts.noResults')} "{ingredientSearch}"</p>
                               <p className="text-sm text-gray-500 mt-1">
-                                Voer eerst de SQL uit in Supabase om de database te laden
+                                {t('dashboard.productCosts.runSqlFirst')}
                               </p>
                             </div>
                           )}
@@ -649,15 +649,15 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                       }`}>
                         <div className="grid grid-cols-3 gap-4 text-center">
                           <div>
-                            <div className="text-sm text-gray-600">Kostprijs</div>
+                            <div className="text-sm text-gray-600">{t('dashboard.productCosts.costPrice')}</div>
                             <div className="text-xl font-bold">€{pc.totalCost.toFixed(2)}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-gray-600">Adviesprijs (×{defaultMultiplier.toFixed(1)})</div>
+                            <div className="text-sm text-gray-600">{t('dashboard.productCosts.advisedPrice')} (×{defaultMultiplier.toFixed(1)})</div>
                             <div className="text-xl font-bold">€{pc.requiredPrice.toFixed(2)}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-gray-600">Jouw prijs</div>
+                            <div className="text-sm text-gray-600">{t('dashboard.productCosts.yourPrice')}</div>
                             <div className="text-xl font-bold">€{pc.product.price.toFixed(2)}</div>
                           </div>
                         </div>
@@ -666,9 +666,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           pc.status === 'high' ? 'text-orange-700' :
                           'text-green-700'
                         }`}>
-                          {pc.status === 'low' && `⚠️ Prijs te laag! Verhoog met €${Math.abs(pc.difference).toFixed(2)} naar €${pc.requiredPrice.toFixed(2)}`}
-                          {pc.status === 'high' && `💰 Hoge marge: +€${pc.difference.toFixed(2)} winst`}
-                          {pc.status === 'good' && `✓ Goede prijszetting! Marge: €${pc.difference.toFixed(2)}`}
+                          {pc.status === 'low' && `⚠️ ${t('dashboard.productCosts.priceTooLow').replace('{amount}', Math.abs(pc.difference).toFixed(2)).replace('{target}', pc.requiredPrice.toFixed(2))}`}
+                          {pc.status === 'high' && `💰 ${t('dashboard.productCosts.highMargin').replace('{amount}', pc.difference.toFixed(2))}`}
+                          {pc.status === 'good' && `✓ ${t('dashboard.productCosts.goodPricing').replace('{amount}', pc.difference.toFixed(2))}`}
                         </div>
                       </div>
                     )}
@@ -683,17 +683,17 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       {products.length === 0 && (
         <div className="text-center py-12 bg-white rounded-xl shadow">
           <div className="text-4xl mb-4">📦</div>
-          <h3 className="text-lg font-semibold text-gray-700">Geen producten gevonden</h3>
-          <p className="text-gray-500">Voeg eerst producten toe aan je menu</p>
+          <h3 className="text-lg font-semibold text-gray-700">{t('dashboard.productCosts.noProductsFound')}</h3>
+          <p className="text-gray-500">{t('dashboard.productCosts.addProductsFirst')}</p>
         </div>
       )}
 
       {ingredients.length === 0 && products.length > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
           <p className="text-yellow-800">
-            ⚠️ Je hebt nog geen ingrediënten toegevoegd. 
+            ⚠️ {t('dashboard.productCosts.noIngredientsWarning')} 
             <a href={`/shop/${params.tenant}/admin/kosten/ingredienten`} className="underline ml-1">
-              Voeg eerst ingrediënten toe
+              {t('dashboard.productCosts.addIngredientsFirst')}
             </a>
           </p>
         </div>

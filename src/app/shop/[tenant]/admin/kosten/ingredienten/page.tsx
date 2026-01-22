@@ -426,7 +426,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
               <div className="p-6 border-b bg-green-50">
                 <h2 className="text-xl font-bold text-gray-900">🔍 Zoek in Leveranciers Database</h2>
                 <p className="text-gray-600 mt-1">
-                  Zoek uit 334 frituurproducten met automatische prijsberekening per stuk
+                  Zoek uit 15.000 producten met automatische prijsberekening per stuk
                 </p>
               </div>
               
