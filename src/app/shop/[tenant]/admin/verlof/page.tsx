@@ -134,30 +134,33 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     return mapping[leaveType] || 'OTHER'
   }
 
-  // Helper to format date as YYYY-MM-DD without timezone issues
-  const formatDateString = (dateStr: string): string => {
-    // Input is already YYYY-MM-DD from date picker, just return it
-    return dateStr
-  }
-
-  // Generate array of dates between start and end (inclusive)
+  // Generate array of dates between start and end (inclusive) - pure string based
   const getDateRange = (startDateStr: string, endDateStr: string): string[] => {
     const dates: string[] = []
-    const [startYear, startMonth, startDay] = startDateStr.split('-').map(Number)
-    const [endYear, endMonth, endDay] = endDateStr.split('-').map(Number)
     
-    const start = new Date(startYear, startMonth - 1, startDay)
-    const end = new Date(endYear, endMonth - 1, endDay)
+    // Parse as local date by adding time component
+    const parseLocalDate = (str: string) => {
+      const [y, m, d] = str.split('-').map(Number)
+      return new Date(y, m - 1, d, 12, 0, 0) // noon to avoid DST issues
+    }
+    
+    const formatLocalDate = (date: Date) => {
+      const y = date.getFullYear()
+      const m = String(date.getMonth() + 1).padStart(2, '0')
+      const d = String(date.getDate()).padStart(2, '0')
+      return `${y}-${m}-${d}`
+    }
+    
+    const start = parseLocalDate(startDateStr)
+    const end = parseLocalDate(endDateStr)
     
     const current = new Date(start)
     while (current <= end) {
-      const year = current.getFullYear()
-      const month = String(current.getMonth() + 1).padStart(2, '0')
-      const day = String(current.getDate()).padStart(2, '0')
-      dates.push(`${year}-${month}-${day}`)
+      dates.push(formatLocalDate(current))
       current.setDate(current.getDate() + 1)
     }
     
+    console.log('Date range from', startDateStr, 'to', endDateStr, ':', dates)
     return dates
   }
 
