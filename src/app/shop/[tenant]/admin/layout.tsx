@@ -56,6 +56,7 @@ const menuItems = [
     categoryKey: 'marketing',
     icon: '📣',
     items: [
+      { nameKey: 'emailMarketing', href: '/marketing', icon: '📧' },
       { nameKey: 'qrCodes', href: '/qr-codes', icon: '📱' },
       { nameKey: 'promotions', href: '/promoties', icon: '🎁' },
       { nameKey: 'reviews', href: '/reviews', icon: '⭐' },
