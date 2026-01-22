@@ -11,16 +11,7 @@ interface CostCategory {
   multiplier: number
 }
 
-const defaultCategories = [
-  { name: 'Frietjes', multiplier: 3.2 },
-  { name: 'Snacks', multiplier: 3.5 },
-  { name: 'Vlees', multiplier: 3.0 },
-  { name: 'Broodjes', multiplier: 3.5 },
-  { name: 'Dranken', multiplier: 4.0 },
-  { name: 'Sauzen', multiplier: 5.0 },
-  { name: 'Groenten', multiplier: 4.0 },
-  { name: 'Verpakking', multiplier: 2.0 },
-]
+// Geen default categorieën meer - tenant vult zelf in
 
 export default function CostSettingsPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -47,24 +38,8 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
       .eq('tenant_slug', params.tenant)
       .order('name')
 
-    if (cats && cats.length > 0) {
+    if (cats) {
       setCategories(cats)
-    } else {
-      // Create default categories
-      const newCats = []
-      for (const cat of defaultCategories) {
-        const { data } = await supabase
-          .from('cost_categories')
-          .insert({
-            tenant_slug: params.tenant,
-            name: cat.name,
-            multiplier: cat.multiplier
-          })
-          .select()
-          .single()
-        if (data) newCats.push(data)
-      }
-      setCategories(newCats)
     }
 
     setLoading(false)
