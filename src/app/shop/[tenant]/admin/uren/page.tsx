@@ -168,21 +168,29 @@ export default function UrenPage() {
     return days
   }
 
+  // Helper to format date as YYYY-MM-DD without timezone issues
+  function formatLocalDate(date: Date): string {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   function getEntryForDate(date: Date): TimesheetEntry | undefined {
-    const dateStr = date.toISOString().split('T')[0]
+    const dateStr = formatLocalDate(date)
     return entries.find(e => e.date === dateStr)
   }
 
   // Get ALL entries for a date (multiple types possible)
   function getEntriesForDate(date: Date): TimesheetEntry[] {
-    const dateStr = date.toISOString().split('T')[0]
+    const dateStr = formatLocalDate(date)
     return entries.filter(e => e.date === dateStr)
   }
 
   const [editingEntry, setEditingEntry] = useState<TimesheetEntry | null>(null)
 
   function openEntryModal(date: Date, existingEntry?: TimesheetEntry) {
-    const dateStr = date.toISOString().split('T')[0]
+    const dateStr = formatLocalDate(date)
     setSelectedDate(dateStr)
     setEditingEntry(existingEntry || null)
     
