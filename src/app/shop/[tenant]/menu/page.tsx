@@ -430,7 +430,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     </div>
                   </div>
                 </div>
-              ))}}
+              ))}
           </div>
         )}
       </div>
