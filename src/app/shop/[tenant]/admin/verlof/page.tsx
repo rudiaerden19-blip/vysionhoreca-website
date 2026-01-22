@@ -120,8 +120,60 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     })
   }
 
+  // Map leave type to timesheet absence type
+  const mapLeaveTypeToAbsence = (leaveType: string): string => {
+    const mapping: Record<string, string> = {
+      'vacation': 'VACATION',
+      'sick': 'SICK',
+      'maternity': 'MATERNITY',
+      'paternity': 'PATERNITY',
+      'unpaid': 'UNPAID',
+      'bereavement': 'SHORT_LEAVE',
+      'other': 'OTHER',
+    }
+    return mapping[leaveType] || 'OTHER'
+  }
+
+  // Create timesheet entries for approved leave
+  const createTimesheetEntries = async (request: LeaveRequest) => {
+    const startDate = new Date(request.start_date)
+    const endDate = new Date(request.end_date)
+    const absenceType = mapLeaveTypeToAbsence(request.leave_type)
+    
+    const entries = []
+    const currentDate = new Date(startDate)
+    
+    while (currentDate <= endDate) {
+      // Skip weekends optionally (leave as working days for now)
+      const dateStr = currentDate.toISOString().split('T')[0]
+      
+      entries.push({
+        tenant_slug: params.tenant,
+        staff_id: request.staff_id,
+        date: dateStr,
+        absence_type: absenceType,
+        absence_hours: 8, // Default 8 hours per day
+        worked_hours: 0,
+        notes: `${t(`leave.types.${request.leave_type}`)}${request.reason ? ` - ${request.reason}` : ''}`,
+        is_approved: true,
+      })
+      
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+    
+    // Insert all entries (upsert to avoid duplicates)
+    if (entries.length > 0) {
+      await supabase.from('staff_timesheet').upsert(entries, {
+        onConflict: 'tenant_slug,staff_id,date,absence_type',
+        ignoreDuplicates: false,
+      })
+    }
+  }
+
   const handleApprove = async (request: LeaveRequest) => {
     setProcessing(true)
+    
+    // Update leave request status
     await supabase
       .from('leave_requests')
       .update({
@@ -129,6 +181,9 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
         reviewed_at: new Date().toISOString(),
       })
       .eq('id', request.id)
+    
+    // Create timesheet entries for the approved leave
+    await createTimesheetEntries(request)
     
     await loadData()
     setShowDetail(null)
@@ -158,6 +213,8 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     }
 
     setProcessing(true)
+    
+    // Insert leave request
     await supabase.from('leave_requests').insert({
       tenant_slug: params.tenant,
       staff_id: newRequest.staff_id,
@@ -168,6 +225,21 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
       status: newRequest.status,
       reviewed_at: newRequest.status === 'approved' ? new Date().toISOString() : null,
     })
+
+    // If approved, also create timesheet entries
+    if (newRequest.status === 'approved') {
+      await createTimesheetEntries({
+        id: '',
+        tenant_slug: params.tenant,
+        staff_id: newRequest.staff_id,
+        leave_type: newRequest.leave_type,
+        start_date: newRequest.start_date,
+        end_date: newRequest.end_date,
+        reason: newRequest.reason,
+        status: 'approved',
+        requested_at: new Date().toISOString(),
+      })
+    }
 
     await loadData()
     setShowNewRequest(false)
