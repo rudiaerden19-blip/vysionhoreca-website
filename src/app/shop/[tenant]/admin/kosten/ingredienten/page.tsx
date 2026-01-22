@@ -49,9 +49,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   const [formData, setFormData] = useState({
     name: '',
     unit: 'stuk',
-    purchase_price: 0,
-    units_per_package: 1,
-    package_price: 0,
+    purchase_price: '',
+    units_per_package: '',
+    package_price: '',
     cost_category_id: '',
     notes: ''
   })
@@ -155,9 +155,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     setFormData({
       name: '',
       unit: 'stuk',
-      purchase_price: 0,
-      units_per_package: 1,
-      package_price: 0,
+      purchase_price: '',
+      units_per_package: '',
+      package_price: '',
       cost_category_id: '',
       notes: ''
     })
@@ -169,9 +169,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     setFormData({
       name: ing.name,
       unit: ing.unit,
-      purchase_price: ing.purchase_price,
-      units_per_package: ing.units_per_package,
-      package_price: ing.package_price,
+      purchase_price: ing.purchase_price ? String(ing.purchase_price) : '',
+      units_per_package: ing.units_per_package ? String(ing.units_per_package) : '',
+      package_price: ing.package_price ? String(ing.package_price) : '',
       cost_category_id: ing.cost_category_id || '',
       notes: ing.notes || ''
     })
@@ -184,10 +184,15 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     
     setSaving(true)
 
+    // Parse string values to numbers
+    const purchasePrice = parseFloat(String(formData.purchase_price).replace(',', '.')) || 0
+    const packagePrice = parseFloat(String(formData.package_price).replace(',', '.')) || 0
+    const unitsPerPackage = parseInt(String(formData.units_per_package)) || 1
+
     // Calculate price per unit if package info is provided
-    let pricePerUnit = formData.purchase_price
-    if (formData.package_price > 0 && formData.units_per_package > 0) {
-      pricePerUnit = formData.package_price / formData.units_per_package
+    let pricePerUnit = purchasePrice
+    if (packagePrice > 0 && unitsPerPackage > 0) {
+      pricePerUnit = packagePrice / unitsPerPackage
     }
 
     const ingredientData = {
@@ -195,8 +200,8 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       name: formData.name,
       unit: formData.unit,
       purchase_price: pricePerUnit,
-      units_per_package: formData.units_per_package,
-      package_price: formData.package_price,
+      units_per_package: unitsPerPackage,
+      package_price: packagePrice,
       cost_category_id: formData.cost_category_id || null,
       notes: formData.notes || null
     }
@@ -708,15 +713,15 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                       <input
                         type="text"
                         inputMode="decimal"
-                        value={formData.purchase_price === 0 ? '' : formData.purchase_price}
+                        value={formData.purchase_price}
                         onChange={(e) => {
                           const val = e.target.value.replace(',', '.')
                           if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                            setFormData(prev => ({ ...prev, purchase_price: val === '' ? 0 : parseFloat(val) || 0 }))
+                            setFormData(prev => ({ ...prev, purchase_price: val }))
                           }
                         }}
                         className="w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
-                        placeholder="0.00"
+                        placeholder="bijv. 0,50"
                       />
                     </div>
                   </div>
@@ -727,15 +732,15 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                       <input
                         type="text"
                         inputMode="decimal"
-                        value={formData.package_price === 0 ? '' : formData.package_price}
+                        value={formData.package_price}
                         onChange={(e) => {
                           const val = e.target.value.replace(',', '.')
                           if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                            setFormData(prev => ({ ...prev, package_price: val === '' ? 0 : parseFloat(val) || 0 }))
+                            setFormData(prev => ({ ...prev, package_price: val }))
                           }
                         }}
                         className="w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
-                        placeholder="0.00"
+                        placeholder="bijv. 11,49"
                       />
                     </div>
                   </div>
@@ -744,21 +749,21 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                     <input
                       type="text"
                       inputMode="numeric"
-                      value={formData.units_per_package === 0 ? '' : formData.units_per_package}
+                      value={formData.units_per_package}
                       onChange={(e) => {
                         const val = e.target.value
                         if (val === '' || /^\d+$/.test(val)) {
-                          setFormData(prev => ({ ...prev, units_per_package: val === '' ? 1 : parseInt(val) || 1 }))
+                          setFormData(prev => ({ ...prev, units_per_package: val }))
                         }
                       }}
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
-                      placeholder="1"
+                      placeholder="bijv. 30"
                     />
                   </div>
                 </div>
-                {formData.package_price > 0 && formData.units_per_package > 0 && (
+                {parseFloat(String(formData.package_price).replace(',', '.')) > 0 && parseInt(String(formData.units_per_package)) > 0 && (
                   <p className="text-sm text-green-600 mt-2">
-                    ✓ Berekende prijs per {formData.unit}: €{(formData.package_price / formData.units_per_package).toFixed(4)}
+                    ✓ Berekende prijs per {formData.unit}: €{(parseFloat(String(formData.package_price).replace(',', '.')) / parseInt(String(formData.units_per_package))).toFixed(4)}
                   </p>
                 )}
               </div>
