@@ -48,6 +48,13 @@ const getAbsenceTypes = (t: (key: string) => string): { id: AbsenceType; label: 
   { id: 'OTHER', label: t('urenPage.absenceTypes.other'), color: '#a3a3a3', icon: '📝' },
 ]
 
+// Format time to HH:MM (remove seconds)
+const formatTime = (time: string | undefined | null): string => {
+  if (!time) return '-'
+  // If time has seconds (HH:MM:SS), take only HH:MM
+  return time.length > 5 ? time.slice(0, 5) : time
+}
+
 export default function UrenPage() {
   const { t } = useLanguage()
   const params = useParams()
@@ -313,8 +320,8 @@ export default function UrenPage() {
     const headers = ['Datum', 'Inkloktijd', 'Uitkloktijd', 'Pauze (min)', 'Gewerkte uren', 'Type', 'Notities']
     const rows = entries.map(e => [
       e.date,
-      e.clock_in || '',
-      e.clock_out || '',
+      formatTime(e.clock_in) === '-' ? '' : formatTime(e.clock_in),
+      formatTime(e.clock_out) === '-' ? '' : formatTime(e.clock_out),
       e.break_minutes || 0,
       e.worked_hours || e.absence_hours || 0,
       LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)?.label || e.absence_type,
@@ -398,8 +405,8 @@ Met vriendelijke groeten`,
       const headers = ['Datum', 'Inkloktijd', 'Uitkloktijd', 'Pauze (min)', 'Gewerkte uren', 'Type', 'Notities']
       const rows = entries.map(e => [
         e.date,
-        e.clock_in || '',
-        e.clock_out || '',
+        formatTime(e.clock_in) === '-' ? '' : formatTime(e.clock_in),
+        formatTime(e.clock_out) === '-' ? '' : formatTime(e.clock_out),
         e.break_minutes || 0,
         e.worked_hours || e.absence_hours || 0,
         LOCAL_ABSENCE_TYPES.find(at => at.id === e.absence_type)?.label || e.absence_type,
@@ -772,8 +779,8 @@ Met vriendelijke groeten`,
                   <td className="border border-gray-300 p-2">
                     <span style={{ color: absenceType?.color }}>{absenceType?.icon}</span> {absenceType?.label}
                   </td>
-                  <td className="border border-gray-300 p-2 text-center font-mono">{e.clock_in || '-'}</td>
-                  <td className="border border-gray-300 p-2 text-center font-mono">{e.clock_out || '-'}</td>
+                  <td className="border border-gray-300 p-2 text-center font-mono">{formatTime(e.clock_in)}</td>
+                  <td className="border border-gray-300 p-2 text-center font-mono">{formatTime(e.clock_out)}</td>
                   <td className="border border-gray-300 p-2 text-center">{e.break_minutes || 0}m</td>
                   <td className="border border-gray-300 p-2 text-center font-bold">{(e.worked_hours || e.absence_hours || 0).toFixed(1)}</td>
                   <td className="border border-gray-300 p-2 text-gray-600 text-xs">{e.notes || '-'}</td>
@@ -1201,8 +1208,8 @@ Met vriendelijke groeten`,
                     <td className="border border-gray-300 p-1">{date.toLocaleDateString()}</td>
                     <td className="border border-gray-300 p-1">{dayName}</td>
                     <td className="border border-gray-300 p-1">{absenceType?.label}</td>
-                    <td className="border border-gray-300 p-1 text-center font-mono">{e.clock_in || '-'}</td>
-                    <td className="border border-gray-300 p-1 text-center font-mono">{e.clock_out || '-'}</td>
+                    <td className="border border-gray-300 p-1 text-center font-mono">{formatTime(e.clock_in)}</td>
+                    <td className="border border-gray-300 p-1 text-center font-mono">{formatTime(e.clock_out)}</td>
                     <td className="border border-gray-300 p-1 text-center">{e.break_minutes || 0}m</td>
                     <td className="border border-gray-300 p-1 text-center font-bold">{(e.worked_hours || e.absence_hours || 0).toFixed(1)}</td>
                     <td className="border border-gray-300 p-1 text-center">{e.is_approved ? '✓' : ''}</td>
