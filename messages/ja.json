@@ -1791,6 +1791,7 @@
       "rewards": "報酬",
       "employees": "従業員",
       "timeTracking": "時間追跡",
+      "leaveManagement": "休暇管理",
       "vacancies": "求人",
       "costSettings": "マージン設定",
       "ingredients": "材料",
@@ -3569,6 +3570,65 @@
     "emailsSent": "メールを正常に送信しました！",
     "sendFailed": "送信失敗",
     "selectCustomersFirst": "まず顧客を選択してください",
+    "fillAllFields": "必須項目をすべて入力してください"
+  },
+  "leave": {
+    "title": "休暇管理",
+    "subtitle": "スタッフの休暇、病欠、その他の欠勤を管理",
+    "pendingRequests": "保留中の申請",
+    "yearOverview": "年間概要",
+    "newRequest": "新規休暇",
+    "registerLeave": "従業員の休暇または欠勤を登録",
+    "year": "年",
+    "employee": "従業員",
+    "allEmployees": "全従業員",
+    "status": "ステータス",
+    "filter": {
+      "all": "すべて",
+      "pending": "保留中",
+      "approved": "承認済み",
+      "rejected": "却下"
+    },
+    "types": {
+      "vacation": "休暇",
+      "sick": "病欠",
+      "maternity": "産休",
+      "paternity": "育休",
+      "unpaid": "無給休暇",
+      "bereavement": "忌引",
+      "other": "その他"
+    },
+    "status": {
+      "pending": "保留中",
+      "approved": "承認済み",
+      "rejected": "却下"
+    },
+    "statusMessage": {
+      "pending": "承認待ち",
+      "approved": "この休暇は承認されました",
+      "rejected": "この休暇は却下されました"
+    },
+    "days": "日",
+    "statsFor": "統計:",
+    "noLeaveYet": "今年はまだ休暇が登録されていません",
+    "requests": "休暇申請",
+    "noRequests": "申請なし",
+    "noRequestsDesc": "今年の休暇申請はまだありません",
+    "requestDetails": "申請詳細",
+    "type": "タイプ",
+    "startDate": "開始日",
+    "endDate": "終了日",
+    "totalDays": "合計日数",
+    "requestedAt": "申請日",
+    "reason": "理由",
+    "notes": "メモ",
+    "approve": "承認",
+    "reject": "却下",
+    "selectEmployee": "従業員を選択",
+    "reasonPlaceholder": "任意: 休暇の理由",
+    "initialStatus": "ステータス",
+    "statusHint": "直接登録の場合は「承認済み」を選択（例：病欠連絡）",
+    "add": "追加",
     "fillAllFields": "必須項目をすべて入力してください"
   }
 }

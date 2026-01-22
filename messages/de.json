@@ -1297,6 +1297,7 @@
       "rewards": "Belohnungen",
       "employees": "Mitarbeiter",
       "timeTracking": "Zeiterfassung",
+      "leaveManagement": "Urlaubsverwaltung",
       "vacancies": "Stellenangebote",
       "costSettings": "Margen-Einstellungen",
       "ingredients": "Zutaten",
@@ -3592,6 +3593,65 @@
     "emailsSent": "E-Mails erfolgreich gesendet!",
     "sendFailed": "Senden fehlgeschlagen",
     "selectCustomersFirst": "Wählen Sie zuerst Kunden aus",
+    "fillAllFields": "Füllen Sie alle Pflichtfelder aus"
+  },
+  "leave": {
+    "title": "Urlaubsverwaltung",
+    "subtitle": "Verwalten Sie Urlaub, Krankheit und andere Abwesenheiten Ihrer Mitarbeiter",
+    "pendingRequests": "ausstehende Anfragen",
+    "yearOverview": "Jahresübersicht",
+    "newRequest": "Neuer Urlaub",
+    "registerLeave": "Urlaub oder Abwesenheit für einen Mitarbeiter registrieren",
+    "year": "Jahr",
+    "employee": "Mitarbeiter",
+    "allEmployees": "Alle Mitarbeiter",
+    "status": "Status",
+    "filter": {
+      "all": "Alle",
+      "pending": "Ausstehend",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt"
+    },
+    "types": {
+      "vacation": "Urlaub",
+      "sick": "Krankheit",
+      "maternity": "Mutterschaftsurlaub",
+      "paternity": "Vaterschaftsurlaub",
+      "unpaid": "Unbezahlter Urlaub",
+      "bereavement": "Trauerurlaub",
+      "other": "Sonstiges"
+    },
+    "status": {
+      "pending": "Ausstehend",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt"
+    },
+    "statusMessage": {
+      "pending": "Wartet auf Genehmigung",
+      "approved": "Dieser Urlaub wurde genehmigt",
+      "rejected": "Dieser Urlaub wurde abgelehnt"
+    },
+    "days": "Tage",
+    "statsFor": "Statistiken für",
+    "noLeaveYet": "Dieses Jahr noch kein Urlaub registriert",
+    "requests": "Urlaubsanträge",
+    "noRequests": "Keine Anträge",
+    "noRequestsDesc": "Es gibt noch keine Urlaubsanträge für dieses Jahr",
+    "requestDetails": "Urlaubsantragsdetails",
+    "type": "Typ",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "totalDays": "Gesamttage",
+    "requestedAt": "Beantragt am",
+    "reason": "Grund",
+    "notes": "Notizen",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "selectEmployee": "Mitarbeiter auswählen",
+    "reasonPlaceholder": "Optional: Grund für Urlaub",
+    "initialStatus": "Status",
+    "statusHint": "Wählen Sie 'Genehmigt' für direkte Registrierung (z.B. Krankmeldung)",
+    "add": "Hinzufügen",
     "fillAllFields": "Füllen Sie alle Pflichtfelder aus"
   }
 }

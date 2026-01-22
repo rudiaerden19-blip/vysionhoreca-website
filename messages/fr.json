@@ -1297,6 +1297,7 @@
       "rewards": "Récompenses",
       "employees": "Employés",
       "timeTracking": "Suivi du temps",
+      "leaveManagement": "Gestion des congés",
       "vacancies": "Offres d'emploi",
       "costSettings": "Paramètres de marge",
       "ingredients": "Ingrédients",
@@ -3592,6 +3593,65 @@
     "emailsSent": "Emails envoyés avec succès!",
     "sendFailed": "Échec de l'envoi",
     "selectCustomersFirst": "Sélectionnez d'abord des clients",
+    "fillAllFields": "Remplissez tous les champs obligatoires"
+  },
+  "leave": {
+    "title": "Gestion des congés",
+    "subtitle": "Gérez les vacances, maladies et autres absences de votre personnel",
+    "pendingRequests": "demandes en attente",
+    "yearOverview": "Aperçu annuel",
+    "newRequest": "Nouveau congé",
+    "registerLeave": "Enregistrer un congé ou une absence pour un employé",
+    "year": "Année",
+    "employee": "Employé",
+    "allEmployees": "Tous les employés",
+    "status": "Statut",
+    "filter": {
+      "all": "Tout",
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Refusé"
+    },
+    "types": {
+      "vacation": "Vacances",
+      "sick": "Maladie",
+      "maternity": "Congé maternité",
+      "paternity": "Congé paternité",
+      "unpaid": "Congé sans solde",
+      "bereavement": "Congé de deuil",
+      "other": "Autre"
+    },
+    "status": {
+      "pending": "En attente",
+      "approved": "Approuvé",
+      "rejected": "Refusé"
+    },
+    "statusMessage": {
+      "pending": "En attente d'approbation",
+      "approved": "Ce congé a été approuvé",
+      "rejected": "Ce congé a été refusé"
+    },
+    "days": "jours",
+    "statsFor": "Statistiques pour",
+    "noLeaveYet": "Aucun congé enregistré cette année",
+    "requests": "Demandes de congé",
+    "noRequests": "Aucune demande",
+    "noRequestsDesc": "Il n'y a pas encore de demandes de congé pour cette année",
+    "requestDetails": "Détails de la demande",
+    "type": "Type",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "totalDays": "Total jours",
+    "requestedAt": "Demandé le",
+    "reason": "Raison",
+    "notes": "Notes",
+    "approve": "Approuver",
+    "reject": "Refuser",
+    "selectEmployee": "Sélectionner un employé",
+    "reasonPlaceholder": "Optionnel: raison du congé",
+    "initialStatus": "Statut",
+    "statusHint": "Choisissez 'Approuvé' pour enregistrement direct (ex: arrêt maladie)",
+    "add": "Ajouter",
     "fillAllFields": "Remplissez tous les champs obligatoires"
   }
 }

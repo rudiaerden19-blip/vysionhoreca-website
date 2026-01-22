@@ -1791,6 +1791,7 @@
       "rewards": "Recompensas",
       "employees": "Empleados",
       "timeTracking": "Control de tiempo",
+      "leaveManagement": "Gestión de permisos",
       "vacancies": "Vacantes",
       "costSettings": "Ajustes de margen",
       "ingredients": "Ingredientes",
@@ -3569,6 +3570,65 @@
     "emailsSent": "¡Emails enviados con éxito!",
     "sendFailed": "Error al enviar",
     "selectCustomersFirst": "Selecciona clientes primero",
+    "fillAllFields": "Completa todos los campos obligatorios"
+  },
+  "leave": {
+    "title": "Gestión de permisos",
+    "subtitle": "Gestiona vacaciones, bajas y otras ausencias de tu personal",
+    "pendingRequests": "solicitudes pendientes",
+    "yearOverview": "Vista anual",
+    "newRequest": "Nuevo permiso",
+    "registerLeave": "Registrar permiso o ausencia para un empleado",
+    "year": "Año",
+    "employee": "Empleado",
+    "allEmployees": "Todos los empleados",
+    "status": "Estado",
+    "filter": {
+      "all": "Todo",
+      "pending": "Pendiente",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
+    },
+    "types": {
+      "vacation": "Vacaciones",
+      "sick": "Baja por enfermedad",
+      "maternity": "Baja por maternidad",
+      "paternity": "Baja por paternidad",
+      "unpaid": "Permiso sin sueldo",
+      "bereavement": "Permiso por duelo",
+      "other": "Otro"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "approved": "Aprobado",
+      "rejected": "Rechazado"
+    },
+    "statusMessage": {
+      "pending": "Esperando aprobación",
+      "approved": "Este permiso ha sido aprobado",
+      "rejected": "Este permiso ha sido rechazado"
+    },
+    "days": "días",
+    "statsFor": "Estadísticas para",
+    "noLeaveYet": "Sin permisos registrados este año",
+    "requests": "Solicitudes de permiso",
+    "noRequests": "Sin solicitudes",
+    "noRequestsDesc": "No hay solicitudes de permiso para este año",
+    "requestDetails": "Detalles de la solicitud",
+    "type": "Tipo",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de fin",
+    "totalDays": "Total días",
+    "requestedAt": "Solicitado el",
+    "reason": "Motivo",
+    "notes": "Notas",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "selectEmployee": "Seleccionar empleado",
+    "reasonPlaceholder": "Opcional: motivo del permiso",
+    "initialStatus": "Estado",
+    "statusHint": "Elige 'Aprobado' para registro directo (ej: baja médica)",
+    "add": "Añadir",
     "fillAllFields": "Completa todos los campos obligatorios"
   }
 }

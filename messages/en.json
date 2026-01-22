@@ -1696,6 +1696,7 @@
       "rewards": "Rewards",
       "employees": "Employees",
       "timeTracking": "Time Tracking",
+      "leaveManagement": "Leave Management",
       "vacancies": "Vacancies",
       "costSettings": "Margin Settings",
       "ingredients": "Ingredients",
@@ -2432,6 +2433,65 @@
     "emailsSent": "Emails sent successfully!",
     "sendFailed": "Failed to send",
     "selectCustomersFirst": "Select customers first",
+    "fillAllFields": "Fill in all required fields"
+  },
+  "leave": {
+    "title": "Leave Management",
+    "subtitle": "Manage vacation, sick leave and other absences for your staff",
+    "pendingRequests": "pending requests",
+    "yearOverview": "Year Overview",
+    "newRequest": "New Leave",
+    "registerLeave": "Register leave or absence for an employee",
+    "year": "Year",
+    "employee": "Employee",
+    "allEmployees": "All employees",
+    "status": "Status",
+    "filter": {
+      "all": "All",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "types": {
+      "vacation": "Vacation",
+      "sick": "Sick Leave",
+      "maternity": "Maternity Leave",
+      "paternity": "Paternity Leave",
+      "unpaid": "Unpaid Leave",
+      "bereavement": "Bereavement Leave",
+      "other": "Other"
+    },
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "statusMessage": {
+      "pending": "Awaiting approval",
+      "approved": "This leave has been approved",
+      "rejected": "This leave has been rejected"
+    },
+    "days": "days",
+    "statsFor": "Statistics for",
+    "noLeaveYet": "No leave registered this year yet",
+    "requests": "Leave Requests",
+    "noRequests": "No requests",
+    "noRequestsDesc": "There are no leave requests for this year yet",
+    "requestDetails": "Leave Request Details",
+    "type": "Type",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "totalDays": "Total Days",
+    "requestedAt": "Requested At",
+    "reason": "Reason",
+    "notes": "Notes",
+    "approve": "Approve",
+    "reject": "Reject",
+    "selectEmployee": "Select an employee",
+    "reasonPlaceholder": "Optional: reason for leave",
+    "initialStatus": "Status",
+    "statusHint": "Choose 'Approved' for direct registration (e.g., sick call)",
+    "add": "Add",
     "fillAllFields": "Fill in all required fields"
   },
   "websiteTexts": {

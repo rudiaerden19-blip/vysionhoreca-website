@@ -1791,6 +1791,7 @@
       "rewards": "Premi",
       "employees": "Dipendenti",
       "timeTracking": "Monitoraggio ore",
+      "leaveManagement": "Gestione ferie",
       "vacancies": "Offerte di lavoro",
       "costSettings": "Impostazioni margine",
       "ingredients": "Ingredienti",
@@ -3569,6 +3570,65 @@
     "emailsSent": "Email inviate con successo!",
     "sendFailed": "Invio fallito",
     "selectCustomersFirst": "Seleziona prima i clienti",
+    "fillAllFields": "Compila tutti i campi obbligatori"
+  },
+  "leave": {
+    "title": "Gestione ferie",
+    "subtitle": "Gestisci ferie, malattia e altre assenze del tuo personale",
+    "pendingRequests": "richieste in sospeso",
+    "yearOverview": "Panoramica annuale",
+    "newRequest": "Nuovo permesso",
+    "registerLeave": "Registra ferie o assenza per un dipendente",
+    "year": "Anno",
+    "employee": "Dipendente",
+    "allEmployees": "Tutti i dipendenti",
+    "status": "Stato",
+    "filter": {
+      "all": "Tutto",
+      "pending": "In sospeso",
+      "approved": "Approvato",
+      "rejected": "Rifiutato"
+    },
+    "types": {
+      "vacation": "Ferie",
+      "sick": "Malattia",
+      "maternity": "Congedo maternità",
+      "paternity": "Congedo paternità",
+      "unpaid": "Permesso non retribuito",
+      "bereavement": "Congedo per lutto",
+      "other": "Altro"
+    },
+    "status": {
+      "pending": "In sospeso",
+      "approved": "Approvato",
+      "rejected": "Rifiutato"
+    },
+    "statusMessage": {
+      "pending": "In attesa di approvazione",
+      "approved": "Questo permesso è stato approvato",
+      "rejected": "Questo permesso è stato rifiutato"
+    },
+    "days": "giorni",
+    "statsFor": "Statistiche per",
+    "noLeaveYet": "Nessun permesso registrato quest'anno",
+    "requests": "Richieste di permesso",
+    "noRequests": "Nessuna richiesta",
+    "noRequestsDesc": "Non ci sono richieste di permesso per quest'anno",
+    "requestDetails": "Dettagli richiesta",
+    "type": "Tipo",
+    "startDate": "Data inizio",
+    "endDate": "Data fine",
+    "totalDays": "Giorni totali",
+    "requestedAt": "Richiesto il",
+    "reason": "Motivo",
+    "notes": "Note",
+    "approve": "Approva",
+    "reject": "Rifiuta",
+    "selectEmployee": "Seleziona dipendente",
+    "reasonPlaceholder": "Opzionale: motivo del permesso",
+    "initialStatus": "Stato",
+    "statusHint": "Scegli 'Approvato' per registrazione diretta (es: malattia)",
+    "add": "Aggiungi",
     "fillAllFields": "Compila tutti i campi obbligatori"
   }
 }

@@ -1791,6 +1791,7 @@
       "rewards": "奖励",
       "employees": "员工",
       "timeTracking": "时间跟踪",
+      "leaveManagement": "休假管理",
       "vacancies": "职位空缺",
       "costSettings": "利润率设置",
       "ingredients": "原料",
@@ -3569,6 +3570,65 @@
     "emailsSent": "邮件发送成功！",
     "sendFailed": "发送失败",
     "selectCustomersFirst": "请先选择客户",
+    "fillAllFields": "请填写所有必填项"
+  },
+  "leave": {
+    "title": "休假管理",
+    "subtitle": "管理员工的假期、病假和其他缺勤",
+    "pendingRequests": "待处理申请",
+    "yearOverview": "年度概览",
+    "newRequest": "新增休假",
+    "registerLeave": "为员工登记休假或缺勤",
+    "year": "年份",
+    "employee": "员工",
+    "allEmployees": "所有员工",
+    "status": "状态",
+    "filter": {
+      "all": "全部",
+      "pending": "待处理",
+      "approved": "已批准",
+      "rejected": "已拒绝"
+    },
+    "types": {
+      "vacation": "年假",
+      "sick": "病假",
+      "maternity": "产假",
+      "paternity": "陪产假",
+      "unpaid": "无薪假",
+      "bereavement": "丧假",
+      "other": "其他"
+    },
+    "status": {
+      "pending": "待处理",
+      "approved": "已批准",
+      "rejected": "已拒绝"
+    },
+    "statusMessage": {
+      "pending": "等待批准",
+      "approved": "此休假已批准",
+      "rejected": "此休假已拒绝"
+    },
+    "days": "天",
+    "statsFor": "统计:",
+    "noLeaveYet": "今年尚未登记休假",
+    "requests": "休假申请",
+    "noRequests": "无申请",
+    "noRequestsDesc": "今年暂无休假申请",
+    "requestDetails": "申请详情",
+    "type": "类型",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "totalDays": "总天数",
+    "requestedAt": "申请时间",
+    "reason": "原因",
+    "notes": "备注",
+    "approve": "批准",
+    "reject": "拒绝",
+    "selectEmployee": "选择员工",
+    "reasonPlaceholder": "可选：休假原因",
+    "initialStatus": "状态",
+    "statusHint": "选择"已批准"进行直接登记（如病假电话）",
+    "add": "添加",
     "fillAllFields": "请填写所有必填项"
   }
 }

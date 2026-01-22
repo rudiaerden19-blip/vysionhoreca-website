@@ -1791,6 +1791,7 @@
       "rewards": "المكافآت",
       "employees": "الموظفون",
       "timeTracking": "تتبع الوقت",
+      "leaveManagement": "إدارة الإجازات",
       "vacancies": "الوظائف الشاغرة",
       "costSettings": "إعدادات الهامش",
       "ingredients": "المكونات",
@@ -3569,6 +3570,65 @@
     "emailsSent": "تم إرسال الرسائل بنجاح!",
     "sendFailed": "فشل الإرسال",
     "selectCustomersFirst": "اختر العملاء أولاً",
+    "fillAllFields": "املأ جميع الحقول المطلوبة"
+  },
+  "leave": {
+    "title": "إدارة الإجازات",
+    "subtitle": "إدارة الإجازات والمرض وغياب الموظفين",
+    "pendingRequests": "طلبات معلقة",
+    "yearOverview": "نظرة عامة سنوية",
+    "newRequest": "إجازة جديدة",
+    "registerLeave": "تسجيل إجازة أو غياب لموظف",
+    "year": "السنة",
+    "employee": "الموظف",
+    "allEmployees": "جميع الموظفين",
+    "status": "الحالة",
+    "filter": {
+      "all": "الكل",
+      "pending": "معلق",
+      "approved": "موافق عليه",
+      "rejected": "مرفوض"
+    },
+    "types": {
+      "vacation": "إجازة",
+      "sick": "إجازة مرضية",
+      "maternity": "إجازة أمومة",
+      "paternity": "إجازة أبوة",
+      "unpaid": "إجازة بدون راتب",
+      "bereavement": "إجازة عزاء",
+      "other": "أخرى"
+    },
+    "status": {
+      "pending": "معلق",
+      "approved": "موافق عليه",
+      "rejected": "مرفوض"
+    },
+    "statusMessage": {
+      "pending": "في انتظار الموافقة",
+      "approved": "تمت الموافقة على هذه الإجازة",
+      "rejected": "تم رفض هذه الإجازة"
+    },
+    "days": "أيام",
+    "statsFor": "إحصائيات لـ",
+    "noLeaveYet": "لم يتم تسجيل إجازات هذا العام",
+    "requests": "طلبات الإجازة",
+    "noRequests": "لا توجد طلبات",
+    "noRequestsDesc": "لا توجد طلبات إجازة لهذا العام",
+    "requestDetails": "تفاصيل الطلب",
+    "type": "النوع",
+    "startDate": "تاريخ البداية",
+    "endDate": "تاريخ النهاية",
+    "totalDays": "إجمالي الأيام",
+    "requestedAt": "تم الطلب في",
+    "reason": "السبب",
+    "notes": "ملاحظات",
+    "approve": "موافقة",
+    "reject": "رفض",
+    "selectEmployee": "اختر موظف",
+    "reasonPlaceholder": "اختياري: سبب الإجازة",
+    "initialStatus": "الحالة",
+    "statusHint": "اختر 'موافق عليه' للتسجيل المباشر (مثل الإجازة المرضية)",
+    "add": "إضافة",
     "fillAllFields": "املأ جميع الحقول المطلوبة"
   }
 }

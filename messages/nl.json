@@ -1696,6 +1696,7 @@
       "rewards": "Beloningen",
       "employees": "Medewerkers",
       "timeTracking": "Uren registratie",
+      "leaveManagement": "Verlofbeheer",
       "vacancies": "Vacatures",
       "costSettings": "Marge Instellingen",
       "ingredients": "Ingrediënten",
@@ -2432,6 +2433,65 @@
     "emailsSent": "Emails succesvol verstuurd!",
     "sendFailed": "Versturen mislukt",
     "selectCustomersFirst": "Selecteer eerst klanten",
+    "fillAllFields": "Vul alle verplichte velden in"
+  },
+  "leave": {
+    "title": "Verlofbeheer",
+    "subtitle": "Beheer vakantie, ziekte en ander verlof van je personeel",
+    "pendingRequests": "openstaande aanvragen",
+    "yearOverview": "Jaaroverzicht",
+    "newRequest": "Nieuw verlof",
+    "registerLeave": "Registreer verlof of afwezigheid voor een medewerker",
+    "year": "Jaar",
+    "employee": "Medewerker",
+    "allEmployees": "Alle medewerkers",
+    "status": "Status",
+    "filter": {
+      "all": "Alles",
+      "pending": "Openstaand",
+      "approved": "Goedgekeurd",
+      "rejected": "Afgewezen"
+    },
+    "types": {
+      "vacation": "Vakantie",
+      "sick": "Ziekte",
+      "maternity": "Zwangerschapsverlof",
+      "paternity": "Vaderschapsverlof",
+      "unpaid": "Onbetaald verlof",
+      "bereavement": "Rouwverlof",
+      "other": "Overig"
+    },
+    "status": {
+      "pending": "Openstaand",
+      "approved": "Goedgekeurd",
+      "rejected": "Afgewezen"
+    },
+    "statusMessage": {
+      "pending": "Wacht op goedkeuring",
+      "approved": "Dit verlof is goedgekeurd",
+      "rejected": "Dit verlof is afgewezen"
+    },
+    "days": "dagen",
+    "statsFor": "Statistieken voor",
+    "noLeaveYet": "Nog geen verlof geregistreerd dit jaar",
+    "requests": "Verlofaanvragen",
+    "noRequests": "Geen aanvragen",
+    "noRequestsDesc": "Er zijn nog geen verlofaanvragen voor dit jaar",
+    "requestDetails": "Verlofaanvraag details",
+    "type": "Type",
+    "startDate": "Startdatum",
+    "endDate": "Einddatum",
+    "totalDays": "Totaal dagen",
+    "requestedAt": "Aangevraagd op",
+    "reason": "Reden",
+    "notes": "Notities",
+    "approve": "Goedkeuren",
+    "reject": "Afwijzen",
+    "selectEmployee": "Selecteer een medewerker",
+    "reasonPlaceholder": "Optioneel: reden voor verlof",
+    "initialStatus": "Status",
+    "statusHint": "Kies 'Goedgekeurd' voor directe registratie (bijv. ziekmelding)",
+    "add": "Toevoegen",
     "fillAllFields": "Vul alle verplichte velden in"
   },
   "websiteTexts": {
