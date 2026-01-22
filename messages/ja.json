@@ -3629,6 +3629,11 @@
     "initialStatus": "ステータス",
     "statusHint": "直接登録の場合は「承認済み」を選択（例：病欠連絡）",
     "add": "追加",
-    "fillAllFields": "必須項目をすべて入力してください"
+    "fillAllFields": "必須項目をすべて入力してください",
+    "delete": "削除",
+    "revoke": "取り消し",
+    "confirmRevoke": "この休暇を取り消しますか？カレンダーのエントリも削除されます。",
+    "confirmDelete": "この休暇申請を削除しますか？",
+    "revokedNote": "休暇取り消し済み"
   }
 }

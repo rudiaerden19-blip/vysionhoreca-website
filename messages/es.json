@@ -3629,6 +3629,11 @@
     "initialStatus": "Estado",
     "statusHint": "Elige 'Aprobado' para registro directo (ej: baja médica)",
     "add": "Añadir",
-    "fillAllFields": "Completa todos los campos obligatorios"
+    "fillAllFields": "Completa todos los campos obligatorios",
+    "delete": "Eliminar",
+    "revoke": "Revocar",
+    "confirmRevoke": "¿Seguro que quieres revocar este permiso? Las entradas del calendario también se eliminarán.",
+    "confirmDelete": "¿Seguro que quieres eliminar esta solicitud de permiso?",
+    "revokedNote": "Permiso revocado"
   }
 }

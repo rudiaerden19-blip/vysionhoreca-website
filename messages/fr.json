@@ -3652,6 +3652,11 @@
     "initialStatus": "Statut",
     "statusHint": "Choisissez 'Approuvé' pour enregistrement direct (ex: arrêt maladie)",
     "add": "Ajouter",
-    "fillAllFields": "Remplissez tous les champs obligatoires"
+    "fillAllFields": "Remplissez tous les champs obligatoires",
+    "delete": "Supprimer",
+    "revoke": "Révoquer",
+    "confirmRevoke": "Voulez-vous vraiment révoquer ce congé? Les entrées du calendrier seront également supprimées.",
+    "confirmDelete": "Voulez-vous vraiment supprimer cette demande de congé?",
+    "revokedNote": "Congé révoqué"
   }
 }

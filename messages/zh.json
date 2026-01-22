@@ -3629,6 +3629,11 @@
     "initialStatus": "状态",
     "statusHint": "选择「已批准」进行直接登记（如病假电话）",
     "add": "添加",
-    "fillAllFields": "请填写所有必填项"
+    "fillAllFields": "请填写所有必填项",
+    "delete": "删除",
+    "revoke": "撤销",
+    "confirmRevoke": "确定要撤销此休假吗？日历条目也将被删除。",
+    "confirmDelete": "确定要删除此休假申请吗？",
+    "revokedNote": "休假已撤销"
   }
 }

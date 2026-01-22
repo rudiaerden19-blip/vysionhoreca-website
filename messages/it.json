@@ -3629,6 +3629,11 @@
     "initialStatus": "Stato",
     "statusHint": "Scegli 'Approvato' per registrazione diretta (es: malattia)",
     "add": "Aggiungi",
-    "fillAllFields": "Compila tutti i campi obbligatori"
+    "fillAllFields": "Compila tutti i campi obbligatori",
+    "delete": "Elimina",
+    "revoke": "Revoca",
+    "confirmRevoke": "Sei sicuro di voler revocare questo permesso? Anche le voci del calendario verranno eliminate.",
+    "confirmDelete": "Sei sicuro di voler eliminare questa richiesta di permesso?",
+    "revokedNote": "Permesso revocato"
   }
 }

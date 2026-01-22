@@ -3652,6 +3652,11 @@
     "initialStatus": "Status",
     "statusHint": "Wählen Sie 'Genehmigt' für direkte Registrierung (z.B. Krankmeldung)",
     "add": "Hinzufügen",
-    "fillAllFields": "Füllen Sie alle Pflichtfelder aus"
+    "fillAllFields": "Füllen Sie alle Pflichtfelder aus",
+    "delete": "Löschen",
+    "revoke": "Widerrufen",
+    "confirmRevoke": "Möchten Sie diesen Urlaub wirklich widerrufen? Die Kalendereinträge werden ebenfalls gelöscht.",
+    "confirmDelete": "Möchten Sie diesen Urlaubsantrag wirklich löschen?",
+    "revokedNote": "Urlaub widerrufen"
   }
 }
