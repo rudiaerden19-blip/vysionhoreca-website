@@ -60,6 +60,8 @@ export interface TenantSettings {
   gift_cards_enabled?: boolean
   // Reserveringen aan/uit
   reservations_enabled?: boolean
+  // Betaalmethodes
+  payment_methods?: string[]
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {

@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
+import { supabase } from '@/lib/supabase'
 
 export default function BetalingPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
-  const [methods, setMethods] = useState({
+  const [methods, setMethods] = useState<{[key: string]: boolean}>({
     cash: true,
     bancontact: true,
     visa: false,
@@ -14,12 +15,75 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
     paypal: false,
     ideal: false,
   })
-  const [vatRate, setVatRate] = useState('6')
+  const [vatRate, setVatRate] = useState(6)
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    loadSettings()
+  }, [params.tenant])
+
+  async function loadSettings() {
+    const { data } = await supabase
+      .from('tenant_settings')
+      .select('payment_methods, btw_percentage')
+      .eq('tenant_slug', params.tenant)
+      .single()
+
+    if (data) {
+      // Load BTW percentage
+      if (data.btw_percentage) {
+        setVatRate(data.btw_percentage)
+      }
+
+      // Load payment methods
+      if (data.payment_methods && Array.isArray(data.payment_methods)) {
+        const loadedMethods: {[key: string]: boolean} = {
+          cash: false,
+          bancontact: false,
+          visa: false,
+          mastercard: false,
+          paypal: false,
+          ideal: false,
+        }
+        data.payment_methods.forEach((method: string) => {
+          if (method in loadedMethods) {
+            loadedMethods[method] = true
+          }
+        })
+        setMethods(loadedMethods)
+      }
+    }
+
+    setLoading(false)
+  }
 
   const handleSave = async () => {
     setSaving(true)
-    await new Promise(r => setTimeout(r, 1000))
+    setSaved(false)
+
+    // Convert methods object to array of enabled methods
+    const enabledMethods = Object.entries(methods)
+      .filter(([_, enabled]) => enabled)
+      .map(([method]) => method)
+
+    const { error } = await supabase
+      .from('tenant_settings')
+      .update({
+        payment_methods: enabledMethods,
+        btw_percentage: vatRate
+      })
+      .eq('tenant_slug', params.tenant)
+
+    if (error) {
+      console.error('Error saving payment settings:', error)
+      alert('Fout bij opslaan. Voer eerst de SQL migratie uit.')
+    } else {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    }
+
     setSaving(false)
   }
 
@@ -31,6 +95,14 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
     { id: 'paypal', name: t('adminPages.betaling.paypal'), icon: '🅿️', description: t('adminPages.betaling.paypalDesc') },
     { id: 'ideal', name: t('adminPages.betaling.ideal'), icon: '🏦', description: t('adminPages.betaling.idealDesc') },
   ]
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -44,9 +116,13 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           whileTap={{ scale: 0.98 }}
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+          className={`px-6 py-3 rounded-xl font-medium flex items-center gap-2 ${
+            saved 
+              ? 'bg-green-500 text-white' 
+              : 'bg-orange-500 hover:bg-orange-600 text-white'
+          }`}
         >
-          {saving ? '⏳' : '💾'} {t('adminPages.common.save')}
+          {saving ? '⏳' : saved ? '✓' : '💾'} {saved ? 'Opgeslagen!' : t('adminPages.common.save')}
         </motion.button>
       </div>
 
@@ -64,7 +140,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
             <label 
               key={method.id}
               className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-colors ${
-                methods[method.id as keyof typeof methods] 
+                methods[method.id] 
                   ? 'bg-orange-50 border-2 border-orange-500' 
                   : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
               }`}
@@ -78,7 +154,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
               </div>
               <input
                 type="checkbox"
-                checked={methods[method.id as keyof typeof methods]}
+                checked={methods[method.id] || false}
                 onChange={(e) => setMethods(prev => ({ ...prev, [method.id]: e.target.checked }))}
                 className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
               />
@@ -98,7 +174,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           <span>📊</span> {t('adminPages.betaling.vat')}
         </h2>
         <div className="grid grid-cols-3 gap-4">
-          {['6', '12', '21'].map((rate) => (
+          {[6, 12, 21].map((rate) => (
             <button
               key={rate}
               onClick={() => setVatRate(rate)}
@@ -124,9 +200,9 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         transition={{ delay: 0.2 }}
         className="mt-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-6 text-white"
       >
-        <h3 className="font-semibold text-lg mb-2">💡 {t('adminPages.betaling.paypalDesc')}</h3>
+        <h3 className="font-semibold text-lg mb-2">💡 Online Betalingen Activeren?</h3>
         <p className="text-white/80 mb-4">
-          Stripe / Mollie
+          Wij kunnen Stripe of Mollie voor je instellen zodat klanten online kunnen betalen.
         </p>
         <button className="bg-white text-blue-600 font-medium px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors">
           Contact
