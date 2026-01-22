@@ -7,14 +7,31 @@ import { motion } from 'framer-motion'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 
 const colorPresets = [
+  // Rij 1 - Warm
   { nameKey: 'orange', primary: '#FF6B35', secondary: '#FFA500' },
   { nameKey: 'red', primary: '#E53935', secondary: '#FF5252' },
+  { nameKey: 'coral', primary: '#FF6F61', secondary: '#FF8A80' },
+  { nameKey: 'amber', primary: '#FF8F00', secondary: '#FFB300' },
+  // Rij 2 - Koel
   { nameKey: 'blue', primary: '#1E88E5', secondary: '#42A5F5' },
+  { nameKey: 'indigo', primary: '#3949AB', secondary: '#5C6BC0' },
+  { nameKey: 'teal', primary: '#00897B', secondary: '#26A69A' },
+  { nameKey: 'cyan', primary: '#00ACC1', secondary: '#26C6DA' },
+  // Rij 3 - Natuur
   { nameKey: 'green', primary: '#43A047', secondary: '#66BB6A' },
+  { nameKey: 'lime', primary: '#7CB342', secondary: '#9CCC65' },
+  { nameKey: 'forest', primary: '#2E7D32', secondary: '#4CAF50' },
+  { nameKey: 'mint', primary: '#00BFA5', secondary: '#64FFDA' },
+  // Rij 4 - Luxe
   { nameKey: 'purple', primary: '#8E24AA', secondary: '#AB47BC' },
   { nameKey: 'pink', primary: '#D81B60', secondary: '#EC407A' },
-  { nameKey: 'teal', primary: '#00897B', secondary: '#26A69A' },
+  { nameKey: 'gold', primary: '#C9A227', secondary: '#D4AF37' },
+  { nameKey: 'bronze', primary: '#8D6E63', secondary: '#A1887F' },
+  // Rij 5 - Neutraal
   { nameKey: 'dark', primary: '#37474F', secondary: '#546E7A' },
+  { nameKey: 'black', primary: '#212121', secondary: '#424242' },
+  { nameKey: 'slate', primary: '#455A64', secondary: '#607D8B' },
+  { nameKey: 'brown', primary: '#5D4037', secondary: '#795548' },
 ]
 
 export default function DesignPage({ params }: { params: { tenant: string } }) {

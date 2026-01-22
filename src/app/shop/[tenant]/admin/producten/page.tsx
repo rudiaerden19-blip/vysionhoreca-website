@@ -336,6 +336,10 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   }
 
   const openEditModal = async (product: MenuProduct) => {
+    // Reload categories in case new ones were added
+    const freshCategories = await getMenuCategories(params.tenant)
+    setCategories(freshCategories)
+    
     setFormData({
       ...product,
     })
@@ -347,12 +351,16 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     }
   }
 
-  const openAddModal = () => {
+  const openAddModal = async () => {
+    // Reload categories in case new ones were added
+    const freshCategories = await getMenuCategories(params.tenant)
+    setCategories(freshCategories)
+    
     setFormData({
       name: '',
       description: '',
       price: 0,
-      category_id: categories[0]?.id || null,
+      category_id: freshCategories[0]?.id || null,
       image_url: '',
       is_active: true,
       is_popular: false,
