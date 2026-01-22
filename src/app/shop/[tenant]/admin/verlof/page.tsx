@@ -134,38 +134,49 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     return mapping[leaveType] || 'OTHER'
   }
 
-  // Generate array of dates between start and end (inclusive) - simple string based
+  // Generate array of dates between start and end (inclusive)
+  // Pure arithmetic - no Date objects to avoid timezone issues
   const getDateRange = (startDateStr: string, endDateStr: string): string[] => {
-    // If same day, just return that day
+    console.log('getDateRange called with:', startDateStr, 'to', endDateStr)
+    
+    // If same day, just return that day directly
     if (startDateStr === endDateStr) {
-      console.log('Single day leave:', startDateStr)
+      console.log('Single day - returning:', [startDateStr])
       return [startDateStr]
     }
     
+    // For multi-day ranges, calculate days between
     const dates: string[] = []
     const [sy, sm, sd] = startDateStr.split('-').map(Number)
     const [ey, em, ed] = endDateStr.split('-').map(Number)
     
-    // Create dates at noon to avoid timezone issues
-    let current = new Date(sy, sm - 1, sd, 12, 0, 0)
-    const end = new Date(ey, em - 1, ed, 12, 0, 0)
+    // Simple day counter
+    let year = sy
+    let month = sm
+    let day = sd
     
-    // Safety limit to prevent infinite loops
-    let safety = 0
-    const maxDays = 365
+    const daysInMonth = (y: number, m: number) => new Date(y, m, 0).getDate()
     
-    while (current <= end && safety < maxDays) {
-      const y = current.getFullYear()
-      const m = String(current.getMonth() + 1).padStart(2, '0')
-      const d = String(current.getDate()).padStart(2, '0')
-      dates.push(`${y}-${m}-${d}`)
+    for (let i = 0; i < 366; i++) { // Max 1 year safety
+      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+      dates.push(dateStr)
+      
+      // Check if we reached end date
+      if (year === ey && month === em && day === ed) break
       
       // Move to next day
-      current = new Date(current.getTime() + 24 * 60 * 60 * 1000)
-      safety++
+      day++
+      if (day > daysInMonth(year, month)) {
+        day = 1
+        month++
+        if (month > 12) {
+          month = 1
+          year++
+        }
+      }
     }
     
-    console.log('Date range from', startDateStr, 'to', endDateStr, ':', dates)
+    console.log('Multi-day range - returning:', dates)
     return dates
   }
 
