@@ -380,11 +380,12 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           <motion.div
             key={pc.product.id}
             layout
-            className={`bg-white rounded-xl shadow-lg overflow-hidden border-2 ${
+            className={`bg-white rounded-xl shadow-lg border-2 ${
               pc.status === 'low' ? 'border-red-300' :
               pc.status === 'high' ? 'border-orange-300' :
               pc.ingredients.length > 0 ? 'border-green-300' : 'border-gray-200'
             }`}
+            style={{ overflow: 'visible' }}
           >
             {/* Product Header */}
             <div
@@ -450,9 +451,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
-                  className="border-t border-gray-200"
+                  className="border-t border-gray-200 overflow-visible"
                 >
-                  <div className="p-4 bg-gray-50">
+                  <div className="p-4 bg-gray-50 overflow-visible">
                     <h4 className="font-semibold mb-3">Ingrediënten in dit product:</h4>
                     
                     {/* Ingredients List */}
