@@ -340,7 +340,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   onClick={() => selectProduct(item)}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group"
                 >
-                  <div className="relative h-48 overflow-hidden bg-white">
+                  <div className="relative h-56 overflow-hidden bg-white">
                     {item.image_url ? (
                       <Image
                         src={item.image_url}
@@ -349,7 +349,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                         sizes="(max-width: 768px) 100vw, 50vw"
                         quality={75}
                         loading="lazy"
-                        className="object-contain p-4"
+                        className="object-contain p-2"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-6xl">
