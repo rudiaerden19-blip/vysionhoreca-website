@@ -331,10 +331,14 @@ export async function saveMenuCategory(category: MenuCategory): Promise<MenuCate
     console.error('Error saving menu category:', error)
     return null
   }
+  
+  // Invalidate cache after successful save
+  cache.invalidate(cacheKey('menu_categories', category.tenant_slug))
+  
   return data
 }
 
-export async function deleteMenuCategory(id: string): Promise<boolean> {
+export async function deleteMenuCategory(id: string, tenantSlug?: string): Promise<boolean> {
   const { error } = await supabase
     .from('menu_categories')
     .delete()
@@ -344,6 +348,12 @@ export async function deleteMenuCategory(id: string): Promise<boolean> {
     console.error('Error deleting menu category:', error)
     return false
   }
+  
+  // Invalidate cache after successful delete
+  if (tenantSlug) {
+    cache.invalidate(cacheKey('menu_categories', tenantSlug))
+  }
+  
   return true
 }
 

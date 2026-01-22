@@ -35,7 +35,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
 
   const handleDelete = async (id: string) => {
     if (confirm(t('adminPages.categorieen.confirmDelete'))) {
-      const success = await deleteMenuCategory(id)
+      const success = await deleteMenuCategory(id, params.tenant)
       if (success) {
         setCategories(prev => prev.filter(c => c.id !== id))
       } else {
