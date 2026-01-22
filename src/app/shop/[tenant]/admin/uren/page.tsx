@@ -55,6 +55,14 @@ const formatTime = (time: string | undefined | null): string => {
   return time.length > 5 ? time.slice(0, 5) : time
 }
 
+// Format hours as HH,MM (e.g., 7.3 becomes "7,30", 7.45 stays "7,45")
+const formatHours = (hours: number | undefined | null): string => {
+  if (!hours && hours !== 0) return '0,00'
+  const h = Math.floor(hours)
+  const m = Math.round((hours - h) * 100) // Get the decimal part as minutes
+  return `${h},${m.toString().padStart(2, '0')}`
+}
+
 export default function UrenPage() {
   const { t } = useLanguage()
   const params = useParams()
@@ -314,12 +322,13 @@ export default function UrenPage() {
       const [outH, outM] = outTime.split(':').map(Number)
       const totalMinutes = (outH * 60 + outM) - (inH * 60 + inM) - breakMinutes
       
-      // Convert to HH.MM format (7 hours 45 min = 7.45, not 7.75)
+      // Convert to HH.MM format (7 hours 30 min = 7.30, not 7.3 or 7.5)
       const hours = Math.floor(Math.max(0, totalMinutes) / 60)
       const minutes = Math.max(0, totalMinutes) % 60
-      const hoursFormatted = hours + (minutes / 100) // 7.45 format
+      // Store as decimal for easy math, but format with padded minutes
+      const hoursFormatted = parseFloat(`${hours}.${minutes.toString().padStart(2, '0')}`)
       
-      setEntryForm(prev => ({ ...prev, worked_hours: Math.round(hoursFormatted * 100) / 100 }))
+      setEntryForm(prev => ({ ...prev, worked_hours: hoursFormatted }))
     }
   }
 
@@ -749,7 +758,7 @@ Met vriendelijke groeten`,
                         color: absenceType?.color
                       }}
                     >
-                      {absenceType?.icon} {entry.absence_type === 'WORKED' ? `${entry.worked_hours?.toFixed(1)}u` : `${entry.absence_hours || 8}u ${absenceType?.label}`}
+                      {absenceType?.icon} {entry.absence_type === 'WORKED' ? `${formatHours(entry.worked_hours)}u` : `${entry.absence_hours || 8}u ${absenceType?.label}`}
                       {entry.is_approved && <span className="ml-1">✓</span>}
                     </div>
                   )
@@ -792,7 +801,7 @@ Met vriendelijke groeten`,
                   <td className="border border-gray-300 p-2 text-center font-mono">{formatTime(e.clock_in)}</td>
                   <td className="border border-gray-300 p-2 text-center font-mono">{formatTime(e.clock_out)}</td>
                   <td className="border border-gray-300 p-2 text-center">{e.break_minutes || 0}m</td>
-                  <td className="border border-gray-300 p-2 text-center font-bold">{(e.worked_hours || e.absence_hours || 0).toFixed(1)}</td>
+                  <td className="border border-gray-300 p-2 text-center font-bold">{formatHours(e.worked_hours || e.absence_hours || 0)}</td>
                   <td className="border border-gray-300 p-2 text-gray-600 text-xs">{e.notes || '-'}</td>
                   <td className="border border-gray-300 p-2 text-center">{e.is_approved ? '✓' : ''}</td>
                 </tr>
@@ -924,7 +933,7 @@ Met vriendelijke groeten`,
                             <span className="font-medium">{absenceType?.label}</span>
                             <span className="text-gray-600">
                               {entry.absence_type === 'WORKED' 
-                                ? `${entry.worked_hours?.toFixed(1)}u` 
+                                ? `${formatHours(entry.worked_hours)}u` 
                                 : `${entry.absence_hours || 8}u`}
                             </span>
                           </div>
@@ -1223,7 +1232,7 @@ Met vriendelijke groeten`,
                     <td className="border border-gray-300 p-1 text-center font-mono">{formatTime(e.clock_in)}</td>
                     <td className="border border-gray-300 p-1 text-center font-mono">{formatTime(e.clock_out)}</td>
                     <td className="border border-gray-300 p-1 text-center">{e.break_minutes || 0}m</td>
-                    <td className="border border-gray-300 p-1 text-center font-bold">{(e.worked_hours || e.absence_hours || 0).toFixed(1)}</td>
+                    <td className="border border-gray-300 p-1 text-center font-bold">{formatHours(e.worked_hours || e.absence_hours || 0)}</td>
                     <td className="border border-gray-300 p-1 text-center">{e.is_approved ? '✓' : ''}</td>
                   </tr>
                 )
