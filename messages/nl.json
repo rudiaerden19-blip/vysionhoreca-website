@@ -2296,7 +2296,13 @@
     "previewFries": "Frieten",
     "previewSnacks": "Snacks",
     "orderNow": "Bestel Nu",
-    "viewFullWebsite": "Bekijk volledige website"
+    "viewFullWebsite": "Bekijk volledige website",
+    "imageDisplay": "Product Afbeeldingen",
+    "imageDisplayDesc": "Kies hoe productfoto's worden weergegeven in de menukaart",
+    "imageCover": "Grote foto's",
+    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
+    "imageContain": "Hele product zichtbaar",
+    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
   },
   "websiteMedia": {
     "title": "Foto's & Media",

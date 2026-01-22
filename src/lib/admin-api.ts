@@ -62,6 +62,8 @@ export interface TenantSettings {
   reservations_enabled?: boolean
   // Betaalmethodes
   payment_methods?: string[]
+  // Product afbeelding weergave: 'cover' (vult hele vak) of 'contain' (hele product zichtbaar)
+  image_display_mode?: 'cover' | 'contain'
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {

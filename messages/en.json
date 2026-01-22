@@ -2296,7 +2296,13 @@
     "previewFries": "Fries",
     "previewSnacks": "Snacks",
     "orderNow": "Order Now",
-    "viewFullWebsite": "View full website"
+    "viewFullWebsite": "View full website",
+    "imageDisplay": "Product Images",
+    "imageDisplayDesc": "Choose how product photos are displayed in the menu",
+    "imageCover": "Large photos",
+    "imageCoverDesc": "Photos fill the entire space (may crop)",
+    "imageContain": "Full product visible",
+    "imageContainDesc": "Complete photo visible (ideal for cans/bottles)"
   },
   "websiteMedia": {
     "title": "Photos & Media",

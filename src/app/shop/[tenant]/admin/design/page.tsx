@@ -43,6 +43,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
   const [settings, setSettings] = useState<TenantSettings | null>(null)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
   const [secondaryColor, setSecondaryColor] = useState('#FFA500')
+  const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover')
 
   // Load current settings
   useEffect(() => {
@@ -53,6 +54,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
         setSettings(data)
         setPrimaryColor(data.primary_color || '#FF6B35')
         setSecondaryColor(data.secondary_color || '#FFA500')
+        setImageDisplayMode(data.image_display_mode || 'cover')
       }
       setLoading(false)
     }
@@ -69,6 +71,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
       ...settings,
       primary_color: primaryColor,
       secondary_color: secondaryColor,
+      image_display_mode: imageDisplayMode,
     }
     
     const success = await saveTenantSettings(updatedSettings)
@@ -225,6 +228,53 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                   />
                 </div>
               </div>
+            </div>
+          </motion.div>
+
+          {/* Product Afbeelding Weergave */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="bg-white rounded-2xl p-6 shadow-sm"
+          >
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <span>🖼️</span> {t('websiteDesign.imageDisplay')}
+            </h2>
+            <p className="text-gray-500 text-sm mb-4">{t('websiteDesign.imageDisplayDesc')}</p>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {/* Cover optie */}
+              <button
+                onClick={() => { setImageDisplayMode('cover'); setSaved(false); }}
+                className={`p-4 rounded-xl border-2 transition-all text-left ${
+                  imageDisplayMode === 'cover'
+                    ? 'border-orange-500 bg-orange-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="w-full h-20 bg-gray-200 rounded-lg mb-3 overflow-hidden">
+                  <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600" />
+                </div>
+                <p className="font-medium text-gray-900">{t('websiteDesign.imageCover')}</p>
+                <p className="text-xs text-gray-500">{t('websiteDesign.imageCoverDesc')}</p>
+              </button>
+              
+              {/* Contain optie */}
+              <button
+                onClick={() => { setImageDisplayMode('contain'); setSaved(false); }}
+                className={`p-4 rounded-xl border-2 transition-all text-left ${
+                  imageDisplayMode === 'contain'
+                    ? 'border-orange-500 bg-orange-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="w-full h-20 bg-white border border-gray-200 rounded-lg mb-3 flex items-center justify-center">
+                  <div className="w-12 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded" />
+                </div>
+                <p className="font-medium text-gray-900">{t('websiteDesign.imageContain')}</p>
+                <p className="text-xs text-gray-500">{t('websiteDesign.imageContainDesc')}</p>
+              </button>
             </div>
           </motion.div>
 

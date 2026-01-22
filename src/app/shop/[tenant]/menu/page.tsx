@@ -45,6 +45,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
   const [loadingOptions, setLoadingOptions] = useState(false)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
+  const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover')
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
 
   // Save cart to localStorage whenever it changes
@@ -74,9 +75,12 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       
       setProductsWithOptions(optionProducts)
       
-      // Set primary color from tenant settings
+      // Set primary color and image display mode from tenant settings
       if (tenantData?.primary_color) {
         setPrimaryColor(tenantData.primary_color)
+      }
+      if (tenantData?.image_display_mode) {
+        setImageDisplayMode(tenantData.image_display_mode)
       }
 
       setCategories(categoriesData.filter(c => c.is_active))
@@ -340,7 +344,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   onClick={() => selectProduct(item)}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group"
                 >
-                  <div className="relative h-48 overflow-hidden bg-gray-100">
+                  <div className={`relative h-48 overflow-hidden ${imageDisplayMode === 'contain' ? 'bg-white' : 'bg-gray-100'}`}>
                     {item.image_url ? (
                       <Image
                         src={item.image_url}
@@ -349,7 +353,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                         sizes="(max-width: 768px) 100vw, 50vw"
                         quality={75}
                         loading="lazy"
-                        className="object-cover"
+                        className={imageDisplayMode === 'contain' ? 'object-contain p-2' : 'object-cover'}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-6xl">
@@ -452,7 +456,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-t-3xl md:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
-              <div className="relative h-64 overflow-hidden rounded-t-3xl md:rounded-t-3xl bg-gray-100">
+              <div className={`relative h-64 overflow-hidden rounded-t-3xl md:rounded-t-3xl ${imageDisplayMode === 'contain' ? 'bg-white' : 'bg-gray-100'}`}>
                 {selectedItem.image_url ? (
                   <Image
                     src={selectedItem.image_url}
@@ -460,7 +464,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     fill
                     sizes="(max-width: 768px) 100vw, 500px"
                     quality={80}
-                    className="object-cover"
+                    className={imageDisplayMode === 'contain' ? 'object-contain p-4' : 'object-cover'}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-8xl">
