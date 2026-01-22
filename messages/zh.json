@@ -3627,7 +3627,7 @@
     "selectEmployee": "选择员工",
     "reasonPlaceholder": "可选：休假原因",
     "initialStatus": "状态",
-    "statusHint": "选择"已批准"进行直接登记（如病假电话）",
+    "statusHint": "选择「已批准」进行直接登记（如病假电话）",
     "add": "添加",
     "fillAllFields": "请填写所有必填项"
   }
