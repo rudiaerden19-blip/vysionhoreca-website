@@ -19,7 +19,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [businessId, setBusinessId] = useState<string | null>(null)
-  const [newCategory, setNewCategory] = useState({ name: '', multiplier: 3.0 })
+  const [newCategory, setNewCategory] = useState({ name: '', multiplier: '' as string | number })
   const [showAddForm, setShowAddForm] = useState(false)
 
   useEffect(() => {
@@ -55,7 +55,13 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   }
 
   async function addCategory() {
-    if (!newCategory.name || !businessId) return
+    if (!newCategory.name || !newCategory.multiplier || !businessId) return
+    
+    const multiplierValue = typeof newCategory.multiplier === 'string' 
+      ? parseFloat(newCategory.multiplier.replace(',', '.')) 
+      : newCategory.multiplier
+    
+    if (!multiplierValue || multiplierValue <= 0) return
     
     setSaving(true)
     
@@ -64,14 +70,14 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
       .insert({
         tenant_slug: businessId,
         name: newCategory.name,
-        multiplier: newCategory.multiplier
+        multiplier: multiplierValue
       })
       .select()
       .single()
 
     if (data) {
       setCategories(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
-      setNewCategory({ name: '', multiplier: 3.0 })
+      setNewCategory({ name: '', multiplier: '' })
       setShowAddForm(false)
     }
     setSaving(false)
@@ -144,15 +150,16 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
                 onChange={(e) => {
                   const val = e.target.value.replace(',', '.')
                   if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                    setNewCategory(prev => ({ ...prev, multiplier: val === '' ? 3.0 : parseFloat(val) || 3.0 }))
+                    setNewCategory(prev => ({ ...prev, multiplier: val }))
                   }
                 }}
-                className="w-20 px-3 py-2 border rounded-lg text-center focus:ring-2 focus:ring-orange-500"
+                placeholder="bijv. 3 of 2,5"
+                className="w-28 px-3 py-2 border rounded-lg text-center focus:ring-2 focus:ring-orange-500"
               />
             </div>
             <button
               onClick={addCategory}
-              disabled={saving || !newCategory.name}
+              disabled={saving || !newCategory.name || !newCategory.multiplier}
               className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
             >
               {saving ? 'Opslaan...' : 'Toevoegen'}
@@ -185,13 +192,14 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
               <input
                 type="text"
                 inputMode="decimal"
-                value={category.multiplier}
+                value={category.multiplier || ''}
                 onChange={(e) => {
                   const val = e.target.value.replace(',', '.')
                   if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                    updateMultiplier(category.id, val === '' ? 1 : parseFloat(val) || 1)
+                    updateMultiplier(category.id, val === '' ? 0 : parseFloat(val) || 0)
                   }
                 }}
+                placeholder="bijv. 3 of 2,5"
                 className="flex-1 px-4 py-3 text-2xl font-bold text-center border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
