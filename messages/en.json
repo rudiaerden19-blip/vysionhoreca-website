@@ -1665,6 +1665,7 @@
       "staff": "STAFF",
       "costCalculation": "COST CALCULATION",
       "accounting": "ACCOUNTING",
+      "gksReports": "GKS REPORTS",
       "orders": "ORDERS",
       "statistics": "STATISTICS"
     },
@@ -1701,6 +1702,7 @@
       "scrada": "SCRADA",
       "orderList": "Orders",
       "reservations": "Reservations",
+      "zReport": "Z-Report",
       "businessAnalysis": "Business Analysis",
       "sales": "Sales",
       "popularItems": "Popular Items"

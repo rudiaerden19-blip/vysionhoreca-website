@@ -1665,6 +1665,7 @@
       "staff": "PERSONEEL",
       "costCalculation": "KOSTENBEREKENING",
       "accounting": "BOEKHOUDING",
+      "gksReports": "GKS RAPPORTEN",
       "orders": "BESTELLINGEN",
       "statistics": "STATISTIEKEN"
     },
@@ -1701,6 +1702,7 @@
       "scrada": "SCRADA",
       "orderList": "Bestellingen",
       "reservations": "Reserveringen",
+      "zReport": "Z-Rapport",
       "businessAnalysis": "Bedrijfsanalyse",
       "sales": "Verkoop",
       "popularItems": "Populaire items"

@@ -95,6 +95,13 @@ const menuItems = [
     ]
   },
   {
+    categoryKey: 'gksReports',
+    icon: '🧾',
+    items: [
+      { nameKey: 'zReport', href: '/z-rapport', icon: '📊' },
+    ]
+  },
+  {
     categoryKey: 'orders',
     icon: '📦',
     items: [
