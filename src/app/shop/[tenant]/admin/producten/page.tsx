@@ -230,6 +230,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     is_promo: false,
     promo_price: undefined,
     allergens: [],
+    image_display_mode: null,
   })
 
   // Load data on mount
@@ -367,6 +368,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       is_promo: false,
       promo_price: undefined,
       allergens: [],
+      image_display_mode: null,
     })
     setSelectedOptionIds([])
     setShowAddModal(true)
@@ -418,6 +420,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       promo_price: formData.is_promo ? (formData.promo_price || 0) : undefined,
       sort_order: editingProduct?.sort_order || products.length,
       allergens: formData.allergens || [],
+      image_display_mode: formData.image_display_mode || null,
     }
 
     const result = await saveMenuProduct(productData)
@@ -834,6 +837,48 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       </p>
                     </div>
                   )}
+
+                  {/* Afbeelding weergave */}
+                  <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                      🖼️ {t('adminPages.producten.imageDisplayMode')}
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, image_display_mode: null }))}
+                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          !formData.image_display_mode 
+                            ? 'bg-orange-500 text-white' 
+                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
+                        }`}
+                      >
+                        {t('adminPages.producten.imageDefault')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, image_display_mode: 'cover' }))}
+                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          formData.image_display_mode === 'cover' 
+                            ? 'bg-orange-500 text-white' 
+                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
+                        }`}
+                      >
+                        {t('adminPages.producten.imageCover')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, image_display_mode: 'contain' }))}
+                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          formData.image_display_mode === 'contain' 
+                            ? 'bg-orange-500 text-white' 
+                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
+                        }`}
+                      >
+                        {t('adminPages.producten.imageContain')}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
 

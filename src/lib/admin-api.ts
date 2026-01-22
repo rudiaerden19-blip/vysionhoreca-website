@@ -376,6 +376,7 @@ export interface MenuProduct {
   promo_price?: number
   sort_order: number
   allergens: string[]
+  image_display_mode?: 'cover' | 'contain' | null  // null = gebruik tenant instelling
 }
 
 export async function getMenuProducts(tenantSlug: string): Promise<MenuProduct[]> {

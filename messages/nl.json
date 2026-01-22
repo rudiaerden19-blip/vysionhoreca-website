@@ -1973,6 +1973,10 @@
       "statusAvailable": "✓ Beschikbaar",
       "statusPopular": "🔥 Populair",
       "statusPromo": "🎁 Promotie",
+      "imageDisplayMode": "Foto weergave",
+      "imageDefault": "Standaard",
+      "imageCover": "Groot",
+      "imageContain": "Volledig",
       "noProductsFound": "Geen producten gevonden",
       "adjustFilters": "Pas je filters aan of voeg een nieuw product toe"
     },

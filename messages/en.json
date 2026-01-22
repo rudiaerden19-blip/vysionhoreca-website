@@ -1973,6 +1973,10 @@
       "statusAvailable": "✓ Available",
       "statusPopular": "🔥 Popular",
       "statusPromo": "🎁 Promotion",
+      "imageDisplayMode": "Photo display",
+      "imageDefault": "Default",
+      "imageCover": "Large",
+      "imageContain": "Full",
       "noProductsFound": "No products found",
       "adjustFilters": "Adjust your filters or add a new product"
     },
