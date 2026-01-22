@@ -2229,7 +2229,13 @@
       "calculation": "Berechnung",
       "perWeek": "Pro Woche",
       "perMonth": "Pro Monat",
-      "saveContract": "Vertrag speichern"
+      "saveContract": "Vertrag speichern",
+      "commuteTitle": "Pendel-Kilometer",
+      "commuteDistance": "Einfache Strecke",
+      "commuteHint": "Von zu Hause zur Arbeit (einfache Fahrt)",
+      "kmRate": "Vergütung pro km",
+      "mealVouchers": "Essensgutscheine",
+      "mealVouchersHint": "Mitarbeiter hat Anspruch auf Essensgutscheine"
     },
     "contractTypes": {
       "permanent": "Festvertrag",

@@ -336,6 +336,11 @@ export default function UrenPage() {
   function exportToCSV() {
     if (!selectedStaff || entries.length === 0) return
     
+    // Calculate km totals for CSV
+    const csvWorkedDays = entries.filter(e => e.absence_type === 'WORKED').length
+    const csvCommuteKm = csvWorkedDays * (selectedStaff.commute_distance_km || 0) * 2
+    const csvKmAllowance = csvCommuteKm * (selectedStaff.km_rate || 0.4297)
+    
     const headers = ['Datum', 'Inkloktijd', 'Uitkloktijd', 'Pauze (min)', 'Gewerkte uren', 'Type', 'Notities']
     const rows = entries.map(e => [
       e.date,
@@ -347,7 +352,27 @@ export default function UrenPage() {
       e.notes || ''
     ])
     
-    const csvContent = [headers, ...rows].map(row => row.join(';')).join('\n')
+    // Add summary rows
+    const summaryRows = [
+      ['', '', '', '', '', '', ''],
+      ['SAMENVATTING', '', '', '', '', '', ''],
+      ['Gewerkte dagen', csvWorkedDays, '', '', '', '', ''],
+      ['Totaal gewerkte uren', entries.filter(e => e.absence_type === 'WORKED').reduce((sum, e) => sum + (e.worked_hours || 0), 0).toFixed(1), '', '', '', '', ''],
+    ]
+    
+    // Add km info if applicable
+    if (selectedStaff.commute_distance_km && selectedStaff.commute_distance_km > 0) {
+      summaryRows.push(['Woon-werk afstand (enkele reis)', `${selectedStaff.commute_distance_km} km`, '', '', '', '', ''])
+      summaryRows.push(['Totaal km (heen+terug)', `${csvCommuteKm.toFixed(1)} km`, '', '', '', '', ''])
+      summaryRows.push(['Km-vergoeding', `€${csvKmAllowance.toFixed(2)}`, '', '', '', '', ''])
+    }
+    
+    // Add meal vouchers if applicable
+    if (selectedStaff.has_meal_vouchers) {
+      summaryRows.push(['Maaltijdcheques', csvWorkedDays, '', '', '', '', ''])
+    }
+    
+    const csvContent = [headers, ...rows, ...summaryRows].map(row => row.join(';')).join('\n')
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -392,6 +417,25 @@ export default function UrenPage() {
   function openEmailModal() {
     if (!selectedStaff) return
     
+    // Calculate km for email
+    const emailWorkedDays = entries.filter(e => e.absence_type === 'WORKED').length
+    const emailCommuteKm = emailWorkedDays * (selectedStaff.commute_distance_km || 0) * 2
+    const emailKmAllowance = emailCommuteKm * (selectedStaff.km_rate || 0.4297)
+    
+    let kmInfo = ''
+    if (selectedStaff.commute_distance_km && selectedStaff.commute_distance_km > 0) {
+      kmInfo = `
+- Gewerkte dagen: ${emailWorkedDays}
+- Woon-werk km: ${emailCommuteKm.toFixed(1)} km
+- Km-vergoeding: €${emailKmAllowance.toFixed(2)}`
+    }
+    
+    let mealInfo = ''
+    if (selectedStaff.has_meal_vouchers) {
+      mealInfo = `
+- Maaltijdcheques: ${emailWorkedDays}`
+    }
+    
     setEmailForm({
       to: '',
       subject: `Urenregistratie ${selectedStaff.name} - ${MONTHS[selectedMonth - 1]} ${selectedYear}`,
@@ -403,7 +447,7 @@ Samenvatting:
 - Gewerkte uren: ${totalWorked.toFixed(1)}
 - Ziekte-uren: ${totalSick.toFixed(1)}
 - Vakantie-uren: ${totalVacation.toFixed(1)}
-- Totaal: ${totalHours.toFixed(1)} uren
+- Totaal: ${totalHours.toFixed(1)} uren${kmInfo}${mealInfo}
 
 Met vriendelijke groeten`,
     })
@@ -475,6 +519,14 @@ Met vriendelijke groeten`,
   const totalOther = entries.filter(e => !['WORKED', 'SICK', 'VACATION'].includes(e.absence_type)).reduce((sum, e) => sum + (e.absence_hours || e.worked_hours || 0), 0)
   const totalHours = totalWorked + totalSick + totalVacation + totalOther
   const approvedCount = entries.filter(e => e.is_approved).length
+  
+  // Kilometers berekening: aantal gewerkte dagen * woon-werk afstand * 2 (heen en terug)
+  const workedDaysCount = entries.filter(e => e.absence_type === 'WORKED').length
+  const commuteDistanceKm = selectedStaff?.commute_distance_km || 0
+  const totalCommuteKm = workedDaysCount * commuteDistanceKm * 2
+  const kmRate = selectedStaff?.km_rate || 0.4297
+  const totalCommuteAllowance = totalCommuteKm * kmRate
+  const hasMealVouchers = selectedStaff?.has_meal_vouchers || false
 
   if (loading && staff.length === 0) {
     return (
@@ -696,6 +748,43 @@ Met vriendelijke groeten`,
           )}
         </div>
       </div>
+
+      {/* Kilometers & Maaltijdcheques */}
+      {(commuteDistanceKm > 0 || hasMealVouchers) && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {commuteDistanceKm > 0 && (
+            <>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-200 print:border-black">
+                <div className="text-2xl font-bold text-purple-600">{workedDaysCount}</div>
+                <div className="text-gray-600 text-sm">{t('urenPage.workedDays')}</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-200 print:border-black">
+                <div className="text-2xl font-bold text-purple-600">{totalCommuteKm.toFixed(1)} km</div>
+                <div className="text-gray-600 text-sm">{t('urenPage.commuteKm')}</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {workedDaysCount} {t('urenPage.days')} × {commuteDistanceKm} km × 2
+                </div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-green-200 print:border-black">
+                <div className="text-2xl font-bold text-green-600">€{totalCommuteAllowance.toFixed(2)}</div>
+                <div className="text-gray-600 text-sm">{t('urenPage.commuteAllowance')}</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {totalCommuteKm.toFixed(1)} km × €{kmRate.toFixed(4)}
+                </div>
+              </div>
+            </>
+          )}
+          {hasMealVouchers && (
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-orange-200 print:border-black">
+              <div className="text-2xl font-bold text-orange-600">🍽️ {workedDaysCount}</div>
+              <div className="text-gray-600 text-sm">{t('urenPage.mealVouchers')}</div>
+              <div className="text-xs text-gray-500 mt-1">
+                {t('urenPage.mealVouchersCount')}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Status badges */}
       {monthlyTimesheet?.is_closed && (
@@ -1291,6 +1380,43 @@ Met vriendelijke groeten`,
               </div>
             )}
           </div>
+
+          {/* Kilometers & Maaltijdcheques Section */}
+          {(commuteDistanceKm > 0 || hasMealVouchers) && (
+            <div className="mb-6">
+              <h4 className="font-bold mb-2 text-sm">🚗 {t('urenPage.print.commuteAndBenefits')}</h4>
+              <table className="w-full text-xs border-collapse">
+                <tbody>
+                  {commuteDistanceKm > 0 && (
+                    <>
+                      <tr>
+                        <td className="border p-1">{t('urenPage.workedDays')}</td>
+                        <td className="border p-1 text-right font-mono">{workedDaysCount}</td>
+                      </tr>
+                      <tr>
+                        <td className="border p-1">{t('urenPage.print.commuteDistance')}</td>
+                        <td className="border p-1 text-right font-mono">{commuteDistanceKm} km</td>
+                      </tr>
+                      <tr>
+                        <td className="border p-1">{t('urenPage.commuteKm')}</td>
+                        <td className="border p-1 text-right font-mono">{totalCommuteKm.toFixed(1)} km</td>
+                      </tr>
+                      <tr className="font-bold bg-green-50">
+                        <td className="border p-1">{t('urenPage.commuteAllowance')}</td>
+                        <td className="border p-1 text-right font-mono text-green-600">€{totalCommuteAllowance.toFixed(2)}</td>
+                      </tr>
+                    </>
+                  )}
+                  {hasMealVouchers && (
+                    <tr className="bg-orange-50">
+                      <td className="border p-1">🍽️ {t('urenPage.mealVouchers')}</td>
+                      <td className="border p-1 text-right font-mono font-bold">{workedDaysCount}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           {/* Signature Section */}
           <div className="mt-8 pt-4 border-t">

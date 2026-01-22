@@ -2388,6 +2388,10 @@ export interface Staff {
   contract_start?: string
   contract_end?: string
   contract_notes?: string
+  // Woon-werk en maaltijdcheques
+  commute_distance_km?: number  // Enkele reis in km
+  has_meal_vouchers?: boolean   // Heeft recht op maaltijdcheques
+  km_rate?: number              // Vergoeding per km (standaard €0.4297)
   is_active: boolean
   created_at?: string
   updated_at?: string
@@ -2439,6 +2443,9 @@ export async function saveStaff(staff: Staff): Promise<Staff | null> {
         contract_start: staff.contract_start,
         contract_end: staff.contract_end,
         contract_notes: staff.contract_notes,
+        commute_distance_km: staff.commute_distance_km,
+        has_meal_vouchers: staff.has_meal_vouchers,
+        km_rate: staff.km_rate,
         is_active: staff.is_active,
         updated_at: new Date().toISOString(),
       })
@@ -2468,6 +2475,9 @@ export async function saveStaff(staff: Staff): Promise<Staff | null> {
         contract_start: staff.contract_start,
         contract_end: staff.contract_end,
         contract_notes: staff.contract_notes,
+        commute_distance_km: staff.commute_distance_km,
+        has_meal_vouchers: staff.has_meal_vouchers,
+        km_rate: staff.km_rate,
         is_active: staff.is_active ?? true,
       })
       .select()

@@ -2723,7 +2723,13 @@
       "calculation": "计算",
       "perWeek": "每周",
       "perMonth": "每月",
-      "saveContract": "保存合同"
+      "saveContract": "保存合同",
+      "commuteTitle": "通勤公里数",
+      "commuteDistance": "单程距离",
+      "commuteHint": "从家到公司（单程）",
+      "kmRate": "每公里补贴",
+      "mealVouchers": "餐券",
+      "mealVouchersHint": "员工有权获得餐券"
     },
     "contractTypes": {
       "permanent": "正式合同",

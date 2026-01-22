@@ -2723,7 +2723,13 @@
       "calculation": "Cálculo",
       "perWeek": "Por semana",
       "perMonth": "Por mes",
-      "saveContract": "Guardar contrato"
+      "saveContract": "Guardar contrato",
+      "commuteTitle": "Kilómetros de desplazamiento",
+      "commuteDistance": "Distancia ida",
+      "commuteHint": "De casa al trabajo (solo ida)",
+      "kmRate": "Tarifa por km",
+      "mealVouchers": "Vales de comida",
+      "mealVouchersHint": "El empleado tiene derecho a vales de comida"
     },
     "contractTypes": {
       "permanent": "Contrato indefinido",

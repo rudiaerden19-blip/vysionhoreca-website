@@ -2723,7 +2723,13 @@
       "calculation": "الحساب",
       "perWeek": "في الأسبوع",
       "perMonth": "في الشهر",
-      "saveContract": "حفظ العقد"
+      "saveContract": "حفظ العقد",
+      "commuteTitle": "كيلومترات التنقل",
+      "commuteDistance": "مسافة الذهاب",
+      "commuteHint": "من المنزل إلى العمل (ذهاب فقط)",
+      "kmRate": "السعر لكل كم",
+      "mealVouchers": "قسائم الطعام",
+      "mealVouchersHint": "الموظف يستحق قسائم الطعام"
     },
     "contractTypes": {
       "permanent": "عقد دائم",

@@ -2229,7 +2229,13 @@
       "calculation": "Calcul",
       "perWeek": "Par semaine",
       "perMonth": "Par mois",
-      "saveContract": "Enregistrer contrat"
+      "saveContract": "Enregistrer contrat",
+      "commuteTitle": "Kilomètres domicile-travail",
+      "commuteDistance": "Distance aller simple",
+      "commuteHint": "De la maison au travail (aller simple)",
+      "kmRate": "Indemnité par km",
+      "mealVouchers": "Chèques-repas",
+      "mealVouchersHint": "L'employé a droit aux chèques-repas"
     },
     "contractTypes": {
       "permanent": "CDI",

@@ -2723,7 +2723,13 @@
       "calculation": "計算",
       "perWeek": "週あたり",
       "perMonth": "月あたり",
-      "saveContract": "契約を保存"
+      "saveContract": "契約を保存",
+      "commuteTitle": "通勤距離",
+      "commuteDistance": "片道距離",
+      "commuteHint": "自宅から職場まで（片道）",
+      "kmRate": "km当たりの手当",
+      "mealVouchers": "食事券",
+      "mealVouchersHint": "従業員は食事券の対象です"
     },
     "contractTypes": {
       "permanent": "正社員",

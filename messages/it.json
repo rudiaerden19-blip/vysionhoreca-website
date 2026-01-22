@@ -2723,7 +2723,13 @@
       "calculation": "Calcolo",
       "perWeek": "A settimana",
       "perMonth": "Al mese",
-      "saveContract": "Salva contratto"
+      "saveContract": "Salva contratto",
+      "commuteTitle": "Chilometri casa-lavoro",
+      "commuteDistance": "Distanza solo andata",
+      "commuteHint": "Da casa al lavoro (solo andata)",
+      "kmRate": "Tariffa per km",
+      "mealVouchers": "Buoni pasto",
+      "mealVouchersHint": "Il dipendente ha diritto ai buoni pasto"
     },
     "contractTypes": {
       "permanent": "Tempo indeterminato",

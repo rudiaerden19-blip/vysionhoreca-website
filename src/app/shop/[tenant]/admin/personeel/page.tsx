@@ -69,6 +69,9 @@ export default function PersoneelPage() {
     contract_start: '',
     contract_end: '',
     contract_notes: '',
+    commute_distance_km: undefined,
+    has_meal_vouchers: false,
+    km_rate: 0.4297,
   })
 
   useEffect(() => {
@@ -120,6 +123,9 @@ export default function PersoneelPage() {
       contract_start: member.contract_start || '',
       contract_end: member.contract_end || '',
       contract_notes: member.contract_notes || '',
+      commute_distance_km: member.commute_distance_km,
+      has_meal_vouchers: member.has_meal_vouchers || false,
+      km_rate: member.km_rate || 0.4297,
     })
     setShowContractModal(true)
   }
@@ -172,6 +178,9 @@ export default function PersoneelPage() {
       contract_start: contractData.contract_start || undefined,
       contract_end: contractData.contract_end || undefined,
       contract_notes: contractData.contract_notes,
+      commute_distance_km: contractData.commute_distance_km,
+      has_meal_vouchers: contractData.has_meal_vouchers,
+      km_rate: contractData.km_rate,
     }
     
     const result = await saveStaff(staffData)
@@ -566,6 +575,57 @@ export default function PersoneelPage() {
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
+              </div>
+
+              {/* Woon-werk kilometers */}
+              <div className="border-t pt-4 mt-4">
+                <h4 className="font-medium text-gray-800 mb-3">🚗 {t('personeelPage.contractForm.commuteTitle')}</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.commuteDistance')}</label>
+                    <div className="flex">
+                      <input
+                        type="number"
+                        value={contractData.commute_distance_km || ''}
+                        onChange={(e) => setContractData({ ...contractData, commute_distance_km: parseFloat(e.target.value) || undefined })}
+                        className="flex-1 px-4 py-2 border rounded-l-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="25"
+                        step="0.1"
+                      />
+                      <span className="px-3 py-2 bg-gray-100 border border-l-0 rounded-r-lg text-gray-600">km</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{t('personeelPage.contractForm.commuteHint')}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{t('personeelPage.contractForm.kmRate')}</label>
+                    <div className="flex">
+                      <span className="px-3 py-2 bg-gray-100 border border-r-0 rounded-l-lg text-gray-600">€</span>
+                      <input
+                        type="number"
+                        value={contractData.km_rate || 0.4297}
+                        onChange={(e) => setContractData({ ...contractData, km_rate: parseFloat(e.target.value) || 0.4297 })}
+                        className="flex-1 px-4 py-2 border rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="0.4297"
+                        step="0.0001"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Maaltijdcheques */}
+              <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                <input
+                  type="checkbox"
+                  id="meal-vouchers"
+                  checked={contractData.has_meal_vouchers || false}
+                  onChange={(e) => setContractData({ ...contractData, has_meal_vouchers: e.target.checked })}
+                  className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                />
+                <label htmlFor="meal-vouchers" className="flex-1 cursor-pointer">
+                  <span className="font-medium text-gray-800">🍽️ {t('personeelPage.contractForm.mealVouchers')}</span>
+                  <p className="text-sm text-gray-500">{t('personeelPage.contractForm.mealVouchersHint')}</p>
+                </label>
               </div>
 
               <div>
