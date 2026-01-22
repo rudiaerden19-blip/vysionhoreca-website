@@ -2492,7 +2492,12 @@
     "initialStatus": "Status",
     "statusHint": "Choose 'Approved' for direct registration (e.g., sick call)",
     "add": "Add",
-    "fillAllFields": "Fill in all required fields"
+    "fillAllFields": "Fill in all required fields",
+    "delete": "Delete",
+    "revoke": "Revoke",
+    "confirmRevoke": "Are you sure you want to revoke this leave? Calendar entries will also be removed.",
+    "confirmDelete": "Are you sure you want to delete this leave request?",
+    "revokedNote": "Leave revoked"
   },
   "websiteTexts": {
     "title": "Texts",

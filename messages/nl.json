@@ -2492,7 +2492,12 @@
     "initialStatus": "Status",
     "statusHint": "Kies 'Goedgekeurd' voor directe registratie (bijv. ziekmelding)",
     "add": "Toevoegen",
-    "fillAllFields": "Vul alle verplichte velden in"
+    "fillAllFields": "Vul alle verplichte velden in",
+    "delete": "Verwijderen",
+    "revoke": "Intrekken",
+    "confirmRevoke": "Weet je zeker dat je dit verlof wilt intrekken? De kalender entries worden ook verwijderd.",
+    "confirmDelete": "Weet je zeker dat je dit verlof wilt verwijderen?",
+    "revokedNote": "Verlof ingetrokken"
   },
   "websiteTexts": {
     "title": "Teksten",

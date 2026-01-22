@@ -134,61 +134,95 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     return mapping[leaveType] || 'OTHER'
   }
 
+  // Helper to format date as YYYY-MM-DD without timezone issues
+  const formatDateString = (dateStr: string): string => {
+    // Input is already YYYY-MM-DD from date picker, just return it
+    return dateStr
+  }
+
+  // Generate array of dates between start and end (inclusive)
+  const getDateRange = (startDateStr: string, endDateStr: string): string[] => {
+    const dates: string[] = []
+    const [startYear, startMonth, startDay] = startDateStr.split('-').map(Number)
+    const [endYear, endMonth, endDay] = endDateStr.split('-').map(Number)
+    
+    const start = new Date(startYear, startMonth - 1, startDay)
+    const end = new Date(endYear, endMonth - 1, endDay)
+    
+    const current = new Date(start)
+    while (current <= end) {
+      const year = current.getFullYear()
+      const month = String(current.getMonth() + 1).padStart(2, '0')
+      const day = String(current.getDate()).padStart(2, '0')
+      dates.push(`${year}-${month}-${day}`)
+      current.setDate(current.getDate() + 1)
+    }
+    
+    return dates
+  }
+
   // Create timesheet entries for approved leave
   const createTimesheetEntries = async (request: LeaveRequest) => {
-    const startDate = new Date(request.start_date)
-    const endDate = new Date(request.end_date)
     const absenceType = mapLeaveTypeToAbsence(request.leave_type)
+    const dates = getDateRange(request.start_date, request.end_date)
     
-    const entries = []
-    const currentDate = new Date(startDate)
+    console.log('Creating timesheet entries for dates:', dates)
     
-    while (currentDate <= endDate) {
-      // Skip weekends optionally (leave as working days for now)
-      const dateStr = currentDate.toISOString().split('T')[0]
-      
-      entries.push({
+    for (const dateStr of dates) {
+      const entryData = {
         tenant_slug: params.tenant,
         staff_id: request.staff_id,
         date: dateStr,
         absence_type: absenceType,
-        absence_hours: 8, // Default 8 hours per day
+        absence_hours: 8,
         worked_hours: 0,
         notes: `${t(`leave.types.${request.leave_type}`)}${request.reason ? ` - ${request.reason}` : ''}`,
         is_approved: true,
-      })
-      
-      currentDate.setDate(currentDate.getDate() + 1)
-    }
-    
-    // Insert all entries
-    if (entries.length > 0) {
-      for (const entry of entries) {
-        // Check if entry already exists for this date
-        const { data: existing } = await supabase
-          .from('timesheet_entries')
-          .select('id')
-          .eq('tenant_slug', entry.tenant_slug)
-          .eq('staff_id', entry.staff_id)
-          .eq('date', entry.date)
-          .single()
-        
-        if (existing) {
-          // Update existing entry
-          await supabase
-            .from('timesheet_entries')
-            .update({
-              absence_type: entry.absence_type,
-              absence_hours: entry.absence_hours,
-              notes: entry.notes,
-              is_approved: true,
-            })
-            .eq('id', existing.id)
-        } else {
-          // Insert new entry
-          await supabase.from('timesheet_entries').insert(entry)
-        }
       }
+      
+      // Check if entry already exists for this date
+      const { data: existing } = await supabase
+        .from('timesheet_entries')
+        .select('id')
+        .eq('tenant_slug', params.tenant)
+        .eq('staff_id', request.staff_id)
+        .eq('date', dateStr)
+        .maybeSingle()
+      
+      if (existing) {
+        // Update existing entry
+        const { error } = await supabase
+          .from('timesheet_entries')
+          .update({
+            absence_type: absenceType,
+            absence_hours: 8,
+            notes: entryData.notes,
+            is_approved: true,
+          })
+          .eq('id', existing.id)
+        
+        if (error) console.error('Error updating entry:', error)
+      } else {
+        // Insert new entry
+        const { error } = await supabase.from('timesheet_entries').insert(entryData)
+        if (error) console.error('Error inserting entry:', error)
+      }
+    }
+  }
+
+  // Delete timesheet entries for a leave request
+  const deleteTimesheetEntries = async (request: LeaveRequest) => {
+    const absenceType = mapLeaveTypeToAbsence(request.leave_type)
+    const dates = getDateRange(request.start_date, request.end_date)
+    
+    for (const dateStr of dates) {
+      await supabase
+        .from('timesheet_entries')
+        .delete()
+        .eq('tenant_slug', params.tenant)
+        .eq('staff_id', request.staff_id)
+        .eq('date', dateStr)
+        .eq('absence_type', absenceType)
     }
   }
 
@@ -206,6 +240,50 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     
     // Create timesheet entries for the approved leave
     await createTimesheetEntries(request)
+    
+    await loadData()
+    setShowDetail(null)
+    setProcessing(false)
+  }
+
+  const handleRevoke = async (request: LeaveRequest) => {
+    if (!confirm(t('leave.confirmRevoke'))) return
+    
+    setProcessing(true)
+    
+    // Delete timesheet entries first
+    await deleteTimesheetEntries(request)
+    
+    // Update leave request status back to pending or delete it
+    await supabase
+      .from('leave_requests')
+      .update({
+        status: 'pending',
+        reviewed_at: null,
+        notes: t('leave.revokedNote'),
+      })
+      .eq('id', request.id)
+    
+    await loadData()
+    setShowDetail(null)
+    setProcessing(false)
+  }
+
+  const handleDelete = async (request: LeaveRequest) => {
+    if (!confirm(t('leave.confirmDelete'))) return
+    
+    setProcessing(true)
+    
+    // If it was approved, delete timesheet entries too
+    if (request.status === 'approved') {
+      await deleteTimesheetEntries(request)
+    }
+    
+    // Delete the leave request
+    await supabase
+      .from('leave_requests')
+      .delete()
+      .eq('id', request.id)
     
     await loadData()
     setShowDetail(null)
@@ -655,32 +733,52 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                 </div>
               </div>
 
-              <div className="p-6 border-t flex gap-3 justify-end">
+              <div className="p-6 border-t flex gap-3 justify-between">
                 <button
-                  onClick={() => setShowDetail(null)}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                  onClick={() => handleDelete(showDetail)}
+                  disabled={processing}
+                  className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition disabled:opacity-50"
                 >
-                  {t('adminPages.common.close')}
+                  🗑️ {t('leave.delete')}
                 </button>
                 
-                {showDetail.status === 'pending' && (
-                  <>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setShowDetail(null)}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                  >
+                    {t('adminPages.common.close')}
+                  </button>
+                  
+                  {showDetail.status === 'pending' && (
+                    <>
+                      <button
+                        onClick={() => handleReject(showDetail)}
+                        disabled={processing}
+                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
+                      >
+                        ✗ {t('leave.reject')}
+                      </button>
+                      <button
+                        onClick={() => handleApprove(showDetail)}
+                        disabled={processing}
+                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
+                      >
+                        ✓ {t('leave.approve')}
+                      </button>
+                    </>
+                  )}
+                  
+                  {showDetail.status === 'approved' && (
                     <button
-                      onClick={() => handleReject(showDetail)}
+                      onClick={() => handleRevoke(showDetail)}
                       disabled={processing}
-                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
+                      className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
                     >
-                      ✗ {t('leave.reject')}
+                      ↩️ {t('leave.revoke')}
                     </button>
-                    <button
-                      onClick={() => handleApprove(showDetail)}
-                      disabled={processing}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
-                    >
-                      ✓ {t('leave.approve')}
-                    </button>
-                  </>
-                )}
+                  )}
+                </div>
               </div>
             </motion.div>
           </div>
