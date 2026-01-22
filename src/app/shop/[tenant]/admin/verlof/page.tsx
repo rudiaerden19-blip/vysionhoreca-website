@@ -182,10 +182,14 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
 
   // Create timesheet entries for approved leave
   const createTimesheetEntries = async (request: LeaveRequest) => {
+    console.log('=== createTimesheetEntries ===')
+    console.log('Request start_date:', request.start_date)
+    console.log('Request end_date:', request.end_date)
+    
     const absenceType = mapLeaveTypeToAbsence(request.leave_type)
     const dates = getDateRange(request.start_date, request.end_date)
     
-    console.log('Creating timesheet entries for dates:', dates)
+    console.log('Dates to create:', dates)
     
     for (const dateStr of dates) {
       const entryData = {
@@ -223,8 +227,10 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
         if (error) console.error('Error updating entry:', error)
       } else {
         // Insert new entry
+        console.log('Inserting entry with date:', entryData.date)
         const { error } = await supabase.from('timesheet_entries').insert(entryData)
         if (error) console.error('Error inserting entry:', error)
+        else console.log('Successfully inserted entry for:', entryData.date)
       }
     }
   }
