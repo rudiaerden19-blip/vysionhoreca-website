@@ -163,11 +163,15 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
             <div className="flex items-center gap-2">
               <span className="text-gray-600">×</span>
               <input
-                type="number"
-                step="0.1"
-                min="1"
+                type="text"
+                inputMode="decimal"
                 value={newCategory.multiplier}
-                onChange={(e) => setNewCategory(prev => ({ ...prev, multiplier: parseFloat(e.target.value) || 3.0 }))}
+                onChange={(e) => {
+                  const val = e.target.value.replace(',', '.')
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setNewCategory(prev => ({ ...prev, multiplier: val === '' ? 3.0 : parseFloat(val) || 3.0 }))
+                  }
+                }}
                 className="w-20 px-3 py-2 border rounded-lg text-center focus:ring-2 focus:ring-orange-500"
               />
             </div>
@@ -204,11 +208,15 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
             <div className="flex items-center gap-3">
               <span className="text-gray-600 text-lg">×</span>
               <input
-                type="number"
-                step="0.1"
-                min="1"
+                type="text"
+                inputMode="decimal"
                 value={category.multiplier}
-                onChange={(e) => updateMultiplier(category.id, parseFloat(e.target.value) || 3.0)}
+                onChange={(e) => {
+                  const val = e.target.value.replace(',', '.')
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    updateMultiplier(category.id, val === '' ? 1 : parseFloat(val) || 1)
+                  }
+                }}
                 className="flex-1 px-4 py-3 text-2xl font-bold text-center border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               />
             </div>
