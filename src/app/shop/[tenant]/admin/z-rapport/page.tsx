@@ -64,8 +64,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [btwPercentage, setBtwPercentage] = useState(6)
   const [savedReports, setSavedReports] = useState<SavedReport[]>([])
   const [isAlreadySaved, setIsAlreadySaved] = useState(false)
+  const [savedOrderCount, setSavedOrderCount] = useState(0)
+  const [savedTotal, setSavedTotal] = useState(0)
   const [showHistory, setShowHistory] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
+  
+  // Check of er nieuwe bestellingen zijn sinds laatste opslag
+  const hasNewOrders = isAlreadySaved && stats && (stats.orderCount > savedOrderCount || stats.total !== savedTotal)
+  const needsUpdate = hasNewOrders
 
   useEffect(() => {
     loadData()
@@ -94,15 +100,17 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       // Andere statussen (confirmed, preparing, ready) kunnen nog geweigerd worden!
       .eq('status', 'completed')
 
-    // Check if already saved
+    // Check if already saved and compare order count
     const { data: existingReport } = await supabase
       .from('z_reports')
-      .select('id')
+      .select('id, order_count, total')
       .eq('tenant_slug', params.tenant)
       .eq('report_date', selectedDate)
       .single()
 
     setIsAlreadySaved(!!existingReport)
+    setSavedOrderCount(existingReport?.order_count || 0)
+    setSavedTotal(existingReport?.total || 0)
 
     if (orders) {
       let total = 0
@@ -164,7 +172,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   }
 
   const saveReport = async () => {
-    if (!stats || isAlreadySaved) return
+    if (!stats) return
 
     setSaving(true)
 
@@ -177,9 +185,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       orderIds: stats.orderIds
     })
 
+    // Gebruik upsert zodat het rapport kan worden bijgewerkt als er nieuwe bestellingen bijkomen
     const { error } = await supabase
       .from('z_reports')
-      .insert({
+      .upsert({
         tenant_slug: params.tenant,
         report_date: selectedDate,
         order_count: stats.orderCount,
@@ -198,6 +207,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         // KRITIEK: Audit trail voor fiscale compliance
         order_ids: stats.orderIds,
         report_hash: reportHash,
+        generated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'tenant_slug,report_date',
+        ignoreDuplicates: false
       })
 
     if (!error) {
@@ -205,6 +218,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
       loadSavedReports()
+    } else {
+      console.error('Error saving Z-report:', error)
+      alert('Fout bij opslaan: ' + error.message)
     }
 
     setSaving(false)
@@ -288,17 +304,19 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           </button>
           <button
             onClick={saveReport}
-            disabled={saving || isAlreadySaved || !stats || stats.orderCount === 0}
+            disabled={saving || (isAlreadySaved && !needsUpdate) || !stats || stats.orderCount === 0}
             className={`px-6 py-2 rounded-xl font-medium flex items-center gap-2 ${
-              isAlreadySaved 
+              needsUpdate
+                ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                : isAlreadySaved 
                 ? 'bg-green-100 text-green-600' 
                 : saveSuccess
                 ? 'bg-green-500 text-white'
                 : 'bg-orange-500 hover:bg-orange-600 text-white disabled:bg-gray-300'
             }`}
           >
-            {saving ? '⏳' : isAlreadySaved ? '✓' : saveSuccess ? '✓' : '💾'} 
-            {isAlreadySaved ? t('zReport.alreadySaved') : saveSuccess ? t('zReport.saved') : t('zReport.save')}
+            {saving ? '⏳' : needsUpdate ? '🔄' : isAlreadySaved ? '✓' : saveSuccess ? '✓' : '💾'} 
+            {needsUpdate ? t('zReport.update') : isAlreadySaved ? t('zReport.alreadySaved') : saveSuccess ? t('zReport.saved') : t('zReport.save')}
           </button>
         </div>
       </div>
@@ -343,9 +361,14 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <h3 className="text-2xl font-bold text-gray-900">{t('zReport.reportTitle')}</h3>
               <p className="text-lg text-gray-600">{t('zReport.onlineSales')}</p>
               <p className="text-gray-500 mt-2">{formatDate(selectedDate)}</p>
-              {isAlreadySaved && (
+              {isAlreadySaved && !needsUpdate && (
                 <span className="inline-block mt-2 px-3 py-1 bg-green-100 text-green-600 text-sm rounded-full">
                   ✓ {t('zReport.savedToArchive')}
+                </span>
+              )}
+              {needsUpdate && (
+                <span className="inline-block mt-2 px-3 py-1 bg-orange-100 text-orange-600 text-sm rounded-full">
+                  ⚠️ {t('zReport.newOrdersDetected')}
                 </span>
               )}
             </div>
