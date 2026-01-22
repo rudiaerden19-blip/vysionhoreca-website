@@ -454,7 +454,24 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   className="border-t border-gray-200 overflow-visible"
                 >
                   <div className="p-4 bg-gray-50 overflow-visible">
-                    <h4 className="font-semibold mb-3">Ingrediënten in dit product:</h4>
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-semibold">Ingrediënten in dit product:</h4>
+                      {pc.ingredients.length > 0 && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            if (!confirm('Alle ingrediënten van dit product verwijderen? (Het product zelf blijft bestaan in je winkel)')) return
+                            for (const pi of pc.ingredients) {
+                              await supabase.from('product_ingredients').delete().eq('id', pi.id)
+                            }
+                            setProductIngredients(prev => prev.filter(pi => pi.product_id !== pc.product.id))
+                          }}
+                          className="text-sm text-red-500 hover:text-red-700 hover:underline"
+                        >
+                          🗑️ Reset ingrediënten
+                        </button>
+                      )}
+                    </div>
                     
                     {/* Ingredients List */}
                     {pc.ingredients.length > 0 ? (
