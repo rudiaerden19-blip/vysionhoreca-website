@@ -513,11 +513,11 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                         <div className="flex-1 relative">
                           <input
                             type="text"
-                            placeholder="🔍 Zoek ingrediënt (eigen of database)..."
+                            placeholder="🔍 Typ om te zoeken (bijv. hamburger, saus, broodje)..."
                             value={ingredientSearch}
                             onChange={(e) => handleIngredientSearch(e.target.value, pc.ingredients.map(pi => pi.ingredient_id))}
-                            onFocus={() => ingredientSearch.length >= 2 && setShowSearchResults(true)}
-                            className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500"
+                            onFocus={() => setShowSearchResults(true)}
+                            className="w-full px-4 py-3 border-2 border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                           />
                           {searching && (
                             <div className="absolute right-3 top-3">
@@ -536,14 +536,32 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                         />
                       </div>
 
-                      {/* Search Results Dropdown */}
-                      {showSearchResults && (searchResults.own.length > 0 || searchResults.database.length > 0) && (
-                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border rounded-lg shadow-xl z-50 max-h-80 overflow-auto">
+                      {/* Search Results Dropdown - Always show when focused */}
+                      {showSearchResults && (
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border-2 border-green-300 rounded-lg shadow-xl z-50 max-h-80 overflow-auto">
+                          
+                          {/* Hint when not enough characters */}
+                          {ingredientSearch.length < 2 && (
+                            <div className="p-4 text-center text-gray-500">
+                              <div className="text-2xl mb-2">🔍</div>
+                              <p>Typ minstens 2 letters om te zoeken</p>
+                              <p className="text-sm mt-1">bijv. "ham", "fri", "sau"</p>
+                            </div>
+                          )}
+
+                          {/* Loading */}
+                          {ingredientSearch.length >= 2 && searching && (
+                            <div className="p-4 text-center text-gray-500">
+                              <div className="animate-spin h-8 w-8 border-2 border-green-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                              <p>Zoeken...</p>
+                            </div>
+                          )}
+
                           {/* Own Ingredients */}
-                          {searchResults.own.length > 0 && (
+                          {ingredientSearch.length >= 2 && !searching && searchResults.own.length > 0 && (
                             <div>
                               <div className="px-3 py-2 bg-blue-50 text-sm font-semibold text-blue-700 sticky top-0">
-                                📦 Mijn Ingrediënten
+                                📦 Mijn Ingrediënten ({searchResults.own.length})
                               </div>
                               {searchResults.own.map(ing => (
                                 <button
@@ -559,10 +577,10 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           )}
 
                           {/* Database Products */}
-                          {searchResults.database.length > 0 && (
+                          {ingredientSearch.length >= 2 && !searching && searchResults.database.length > 0 && (
                             <div>
                               <div className="px-3 py-2 bg-green-50 text-sm font-semibold text-green-700 sticky top-0">
-                                🔍 Leveranciers Database
+                                🔍 Leveranciers Database ({searchResults.database.length})
                               </div>
                               {searchResults.database.map(product => {
                                 const alreadyOwned = ingredients.some(i => 
@@ -587,14 +605,18 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                               })}
                             </div>
                           )}
-                        </div>
-                      )}
 
-                      {/* No results message */}
-                      {showSearchResults && ingredientSearch.length >= 2 && !searching && 
-                       searchResults.own.length === 0 && searchResults.database.length === 0 && (
-                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border rounded-lg shadow-xl z-50 p-4 text-center text-gray-500">
-                          Geen ingrediënten gevonden voor "{ingredientSearch}"
+                          {/* No results message */}
+                          {ingredientSearch.length >= 2 && !searching && 
+                           searchResults.own.length === 0 && searchResults.database.length === 0 && (
+                            <div className="p-4 text-center">
+                              <div className="text-2xl mb-2">😕</div>
+                              <p className="text-gray-700 font-medium">Geen resultaten voor "{ingredientSearch}"</p>
+                              <p className="text-sm text-gray-500 mt-1">
+                                Voer eerst de SQL uit in Supabase om de database te laden
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
