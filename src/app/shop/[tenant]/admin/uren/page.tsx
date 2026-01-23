@@ -16,6 +16,7 @@ import {
   reopenMonthlyTimesheet,
   getMonthlyTimesheet,
   markTimesheetExported,
+  getTenantSettings,
   Staff,
   TimesheetEntry,
   MonthlyTimesheet,
@@ -76,6 +77,7 @@ export default function UrenPage() {
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null)
   const [entries, setEntries] = useState<TimesheetEntry[]>([])
   const [monthlyTimesheet, setMonthlyTimesheet] = useState<MonthlyTimesheet | null>(null)
+  const [businessInfo, setBusinessInfo] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   
@@ -120,10 +122,18 @@ export default function UrenPage() {
 
   async function loadStaff() {
     setLoading(true)
-    const data = await getActiveStaff(tenant)
-    setStaff(data)
-    if (data.length > 0) {
-      setSelectedStaff(data[0])
+    
+    // Load staff and business info in parallel
+    const [staffData, tenantData] = await Promise.all([
+      getActiveStaff(tenant),
+      getTenantSettings(tenant)
+    ])
+    
+    setStaff(staffData)
+    setBusinessInfo(tenantData)
+    
+    if (staffData.length > 0) {
+      setSelectedStaff(staffData[0])
     }
     setLoading(false)
   }
@@ -672,8 +682,11 @@ Met vriendelijke groeten`,
               <p className="text-lg text-gray-700 mt-1">{MONTHS[selectedMonth - 1]} {selectedYear}</p>
             </div>
             <div className="text-right text-sm text-gray-600">
-              <div className="font-bold text-gray-800">Vysion Horeca</div>
-              <div>{t('urenPage.print.generated')}: {new Date().toLocaleDateString()}</div>
+              <div className="font-bold text-gray-800">{businessInfo?.business_name || tenant}</div>
+              {businessInfo?.address && <div>{businessInfo.address}</div>}
+              {businessInfo?.city && <div>{businessInfo.postal_code} {businessInfo.city}</div>}
+              {businessInfo?.vat_number && <div>BTW: {businessInfo.vat_number}</div>}
+              <div className="mt-1">{t('urenPage.print.generated')}: {new Date().toLocaleDateString()}</div>
             </div>
           </div>
         </div>
@@ -1242,8 +1255,11 @@ Met vriendelijke groeten`,
                 <p className="text-base text-gray-700">{MONTHS[selectedMonth - 1]} {selectedYear}</p>
               </div>
               <div className="text-right text-xs text-gray-600">
-                <div className="font-bold text-gray-800 text-sm">Vysion Horeca</div>
-                <div>{t('urenPage.print.generated')}: {new Date().toLocaleDateString()}</div>
+                <div className="font-bold text-gray-800 text-sm">{businessInfo?.business_name || tenant}</div>
+                {businessInfo?.address && <div>{businessInfo.address}</div>}
+                {businessInfo?.city && <div>{businessInfo.postal_code} {businessInfo.city}</div>}
+                {businessInfo?.vat_number && <div>BTW: {businessInfo.vat_number}</div>}
+                <div className="mt-1">{t('urenPage.print.generated')}: {new Date().toLocaleDateString()}</div>
               </div>
             </div>
           </div>
