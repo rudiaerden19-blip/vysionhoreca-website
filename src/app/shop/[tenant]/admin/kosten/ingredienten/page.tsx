@@ -71,6 +71,28 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   const [dbSearching, setDbSearching] = useState(false)
   const [addingProduct, setAddingProduct] = useState<string | null>(null)
 
+  // Invoice scanner state
+  const [showInvoiceScanner, setShowInvoiceScanner] = useState(false)
+  const [scanningInvoice, setScanningInvoice] = useState(false)
+  const [invoicePreview, setInvoicePreview] = useState<string | null>(null)
+  const [invoiceResults, setInvoiceResults] = useState<{
+    supplier?: string
+    invoiceDate?: string
+    invoiceNumber?: string
+    totalAmount?: number
+    items: Array<{
+      name: string
+      quantity: number
+      unit: string
+      pricePerUnit: number
+      totalPrice: number
+      vatPercentage: number
+      selected: boolean
+    }>
+  } | null>(null)
+  const [addingFromInvoice, setAddingFromInvoice] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     loadData()
     loadDbCategories()
@@ -88,6 +110,133 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     const results = await searchSupplierProducts(dbSearchQuery, dbSelectedCategory, 50)
     setDbSearchResults(results)
     setDbSearching(false)
+  }
+
+  // Invoice scanner functions
+  async function handleInvoiceUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Check file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+    if (!validTypes.includes(file.type)) {
+      alert('Alleen JPG, PNG, WebP of PDF bestanden zijn toegestaan')
+      return
+    }
+
+    // Convert to base64
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      const base64 = (event.target?.result as string).split(',')[1]
+      setInvoicePreview(event.target?.result as string)
+      setScanningInvoice(true)
+      setInvoiceResults(null)
+
+      try {
+        const response = await fetch('/api/analyze-invoice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            image: base64, 
+            mimeType: file.type 
+          })
+        })
+
+        const data = await response.json()
+
+        if (data.success && data.items) {
+          setInvoiceResults({
+            supplier: data.supplier,
+            invoiceDate: data.invoiceDate,
+            invoiceNumber: data.invoiceNumber,
+            totalAmount: data.totalAmount,
+            items: data.items.map((item: any) => ({ ...item, selected: true }))
+          })
+        } else {
+          alert(data.error || 'Kon factuur niet analyseren')
+        }
+      } catch (error) {
+        console.error('Invoice scan error:', error)
+        alert('Er ging iets mis bij het scannen')
+      } finally {
+        setScanningInvoice(false)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function toggleInvoiceItem(index: number) {
+    if (!invoiceResults) return
+    setInvoiceResults({
+      ...invoiceResults,
+      items: invoiceResults.items.map((item, i) => 
+        i === index ? { ...item, selected: !item.selected } : item
+      )
+    })
+  }
+
+  async function addInvoiceItemsToIngredients() {
+    if (!invoiceResults || !businessId) return
+    
+    const selectedItems = invoiceResults.items.filter(item => item.selected)
+    if (selectedItems.length === 0) {
+      alert('Selecteer minstens één item om toe te voegen')
+      return
+    }
+
+    setAddingFromInvoice(true)
+    let added = 0
+    let skipped = 0
+
+    for (const item of selectedItems) {
+      // Check if already exists (by name similarity)
+      const existingNames = ingredients.map(i => i.name.toLowerCase())
+      const nameExists = existingNames.some(name => 
+        name === item.name.toLowerCase() || 
+        name.includes(item.name.toLowerCase()) ||
+        item.name.toLowerCase().includes(name)
+      )
+
+      if (nameExists) {
+        skipped++
+        continue
+      }
+
+      const { data } = await supabase
+        .from('ingredients')
+        .insert({
+          tenant_slug: businessId,
+          name: item.name,
+          unit: item.unit || 'stuk',
+          purchase_price: item.pricePerUnit,
+          units_per_package: item.quantity,
+          package_price: item.totalPrice,
+          notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : null
+        })
+        .select()
+        .single()
+
+      if (data) {
+        setIngredients(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+        added++
+      }
+    }
+
+    setAddingFromInvoice(false)
+    
+    if (skipped > 0) {
+      alert(`${added} ingrediënten toegevoegd, ${skipped} dubbelen overgeslagen`)
+    } else {
+      alert(`${added} ingrediënten toegevoegd!`)
+    }
+
+    // Reset scanner
+    setShowInvoiceScanner(false)
+    setInvoicePreview(null)
+    setInvoiceResults(null)
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   async function addFromDatabase(product: SupplierProduct) {
@@ -384,7 +533,13 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             Beheer alle ingrediënten met hun inkoopprijzen
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
+          <button
+            onClick={() => setShowInvoiceScanner(true)}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+          >
+            📸 Scan Factuur
+          </button>
           <button
             onClick={() => setShowDatabaseSearch(true)}
             className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
@@ -535,6 +690,215 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                 >
                   Sluiten
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Invoice Scanner Modal */}
+      <AnimatePresence>
+        {showInvoiceScanner && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => {
+              if (!scanningInvoice && !addingFromInvoice) {
+                setShowInvoiceScanner(false)
+                setInvoicePreview(null)
+                setInvoiceResults(null)
+              }
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-6 border-b bg-purple-50">
+                <h2 className="text-xl font-bold text-gray-900">📸 Factuur Scanner</h2>
+                <p className="text-gray-600 mt-1">
+                  Upload een foto of PDF van je leveranciersfactuur - AI herkent automatisch alle producten
+                </p>
+              </div>
+              
+              <div className="p-6 max-h-[60vh] overflow-auto">
+                {/* Upload area */}
+                {!invoicePreview && !scanningInvoice && (
+                  <div 
+                    className="border-2 border-dashed border-purple-300 rounded-xl p-12 text-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      onChange={handleInvoiceUpload}
+                      className="hidden"
+                    />
+                    <div className="text-6xl mb-4">📄</div>
+                    <p className="text-lg font-semibold text-gray-700">
+                      Klik om factuur te uploaden
+                    </p>
+                    <p className="text-gray-500 mt-2">
+                      of sleep een bestand hierheen
+                    </p>
+                    <p className="text-sm text-gray-400 mt-4">
+                      Ondersteund: JPG, PNG, WebP, PDF
+                    </p>
+                  </div>
+                )}
+
+                {/* Scanning indicator */}
+                {scanningInvoice && (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-200 border-t-purple-600 mx-auto mb-4"></div>
+                    <p className="text-lg font-semibold text-gray-700">
+                      AI analyseert factuur...
+                    </p>
+                    <p className="text-gray-500 mt-2">
+                      Even geduld, dit kan 10-20 seconden duren
+                    </p>
+                  </div>
+                )}
+
+                {/* Results */}
+                {invoiceResults && !scanningInvoice && (
+                  <div className="space-y-4">
+                    {/* Invoice info */}
+                    {(invoiceResults.supplier || invoiceResults.invoiceDate || invoiceResults.invoiceNumber) && (
+                      <div className="bg-gray-50 rounded-xl p-4 flex flex-wrap gap-6">
+                        {invoiceResults.supplier && (
+                          <div>
+                            <span className="text-sm text-gray-500">Leverancier:</span>
+                            <p className="font-semibold">{invoiceResults.supplier}</p>
+                          </div>
+                        )}
+                        {invoiceResults.invoiceDate && (
+                          <div>
+                            <span className="text-sm text-gray-500">Datum:</span>
+                            <p className="font-semibold">{invoiceResults.invoiceDate}</p>
+                          </div>
+                        )}
+                        {invoiceResults.invoiceNumber && (
+                          <div>
+                            <span className="text-sm text-gray-500">Factuurnummer:</span>
+                            <p className="font-semibold">{invoiceResults.invoiceNumber}</p>
+                          </div>
+                        )}
+                        {invoiceResults.totalAmount && (
+                          <div>
+                            <span className="text-sm text-gray-500">Totaal:</span>
+                            <p className="font-semibold text-green-600">€{invoiceResults.totalAmount.toFixed(2)}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Items table */}
+                    <div className="border rounded-xl overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-gray-100">
+                          <tr>
+                            <th className="px-3 py-2 text-left w-10">
+                              <input
+                                type="checkbox"
+                                checked={invoiceResults.items.every(i => i.selected)}
+                                onChange={(e) => {
+                                  setInvoiceResults({
+                                    ...invoiceResults,
+                                    items: invoiceResults.items.map(item => ({ ...item, selected: e.target.checked }))
+                                  })
+                                }}
+                                className="rounded"
+                              />
+                            </th>
+                            <th className="px-3 py-2 text-left">Product</th>
+                            <th className="px-3 py-2 text-center">Aantal</th>
+                            <th className="px-3 py-2 text-left">Eenheid</th>
+                            <th className="px-3 py-2 text-right">Per stuk</th>
+                            <th className="px-3 py-2 text-right">Totaal</th>
+                            <th className="px-3 py-2 text-center">BTW</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {invoiceResults.items.map((item, index) => (
+                            <tr 
+                              key={index} 
+                              className={`border-t ${item.selected ? 'bg-green-50' : 'bg-gray-50 opacity-60'}`}
+                            >
+                              <td className="px-3 py-2">
+                                <input
+                                  type="checkbox"
+                                  checked={item.selected}
+                                  onChange={() => toggleInvoiceItem(index)}
+                                  className="rounded"
+                                />
+                              </td>
+                              <td className="px-3 py-2 font-medium">{item.name}</td>
+                              <td className="px-3 py-2 text-center">{item.quantity}</td>
+                              <td className="px-3 py-2">{item.unit}</td>
+                              <td className="px-3 py-2 text-right font-mono">€{item.pricePerUnit.toFixed(4)}</td>
+                              <td className="px-3 py-2 text-right font-mono">€{item.totalPrice.toFixed(2)}</td>
+                              <td className="px-3 py-2 text-center">{item.vatPercentage}%</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p className="text-sm text-gray-500">
+                      {invoiceResults.items.filter(i => i.selected).length} van {invoiceResults.items.length} items geselecteerd
+                    </p>
+
+                    {/* New scan button */}
+                    <button
+                      onClick={() => {
+                        setInvoicePreview(null)
+                        setInvoiceResults(null)
+                        if (fileInputRef.current) fileInputRef.current.value = ''
+                      }}
+                      className="text-purple-600 hover:text-purple-700 text-sm"
+                    >
+                      ↺ Andere factuur scannen
+                    </button>
+                  </div>
+                )}
+              </div>
+              
+              <div className="p-6 border-t bg-gray-50 flex justify-between">
+                <button
+                  onClick={() => {
+                    setShowInvoiceScanner(false)
+                    setInvoicePreview(null)
+                    setInvoiceResults(null)
+                    if (fileInputRef.current) fileInputRef.current.value = ''
+                  }}
+                  disabled={scanningInvoice || addingFromInvoice}
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                >
+                  Annuleren
+                </button>
+                {invoiceResults && (
+                  <button
+                    onClick={addInvoiceItemsToIngredients}
+                    disabled={addingFromInvoice || invoiceResults.items.filter(i => i.selected).length === 0}
+                    className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 flex items-center gap-2"
+                  >
+                    {addingFromInvoice ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        Toevoegen...
+                      </>
+                    ) : (
+                      `${invoiceResults.items.filter(i => i.selected).length} items toevoegen`
+                    )}
+                  </button>
+                )}
               </div>
             </motion.div>
           </motion.div>

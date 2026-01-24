@@ -23,6 +23,7 @@
     "next": "^14",
     "next-intl": "^4.6.1",
     "nodemailer": "^7.0.12",
+    "openai": "^6.16.0",
     "react": "^18",
     "react-dom": "^18",
     "stripe": "^20.2.0"
