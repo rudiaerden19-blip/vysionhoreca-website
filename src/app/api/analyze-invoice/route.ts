@@ -41,26 +41,44 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
 
     console.log(`Analyzing invoice, image size: ${imageSizeMB.toFixed(2)}MB`)
 
-    const prompt = `Lees deze factuur en geef ALLEEN de omschrijving en prijs per regel.
+    const prompt = `Je bent een factuur-lezer voor groothandel facturen. Lees ELKE regel op deze factuur.
 
-KOPIEER DE OMSCHRIJVING EXACT zoals die op de factuur staat, inclusief codes zoals 30X100G, 24X150G, 96X20G, etc.
+KOLOMMEN OP DE FACTUUR:
+- "Art. Nr." = artikelnummer
+- "Omschrijving" = productnaam met verpakkingsinfo (bijv. "BRAADWORST WIT 24X150G VR")
+- "Aantal" = hoeveel DOZEN er zijn gekocht (1, 2, 3, etc.)
+- "Eh" = eenheid (CU, WUK, etc.)
+- "Ehp" = PRIJS PER DOOS (dit is de prijs voor 1 doos!)
+- "Subtotaal" = Aantal × Ehp (NIET gebruiken!)
 
-Retourneer ALLEEN JSON (geen markdown, geen tekst):
+BELANGRIJK - PRIJS PER DOOS:
+- Neem ALTIJD de "Ehp" kolom (prijs per 1 doos)
+- NOOIT het subtotaal nemen!
+- Als Aantal=2 en Ehp=26.36, dan is prijs_per_doos=26.36 (NIET 52.72!)
+
+Retourneer ALLEEN JSON:
 {
   "supplier": "leverancier naam",
   "items": [
     {
-      "omschrijving": "HAMBURGER 30X100G VAN ZON",
-      "prijs": 11.47
+      "omschrijving": "BRAADWORST WIT 24X150G VR",
+      "aantal_dozen": 1,
+      "prijs_per_doos": 29.47
+    },
+    {
+      "omschrijving": "STUK 21X135G (KALKOENST) VAN ZON",
+      "aantal_dozen": 2,
+      "prijs_per_doos": 26.36
     }
   ]
 }
 
 REGELS:
-1. omschrijving = KOPIEER EXACT van de factuur (bijv. "HAMBURGER 30X100G VAN ZON", "BITTERBALLEN 20% 96X20G PB")
-2. prijs = de eenheidsprijs (Ehp kolom), niet de totaalprijs
-3. Als er meerdere dozen zijn gekocht, neem de prijs per doos (Ehp), niet het totaal
-4. GEEN berekeningen, GEEN interpretatie, alleen kopiëren`
+1. omschrijving = KOPIEER EXACT inclusief codes zoals 24X150G, 30X100G, 21X135G, 250ST, etc.
+2. aantal_dozen = de waarde uit kolom "Aantal" (hoeveel dozen gekocht)
+3. prijs_per_doos = de waarde uit kolom "Ehp" (prijs voor 1 doos, NIET subtotaal!)
+4. Lees ALLE regels, niet alleen de eerste paar
+5. GEEN berekeningen doen, alleen kopiëren wat er staat`
 
     // Direct REST API call to Gemini (using v1beta for wider model support)
     const response = await fetch(
@@ -137,73 +155,77 @@ REGELS:
 
     // Parse everything from the omschrijving (description) that AI copied
     const validatedItems = (parsed.items || []).map((item: any) => {
+      // Get data from AI - now with explicit prijs_per_doos
       const omschrijving = item.omschrijving || item.originalText || item.name || ''
-      const prijs = Number(item.prijs) || Number(item.ehp) || Number(item.totalPrice) || 0
+      // Prioritize prijs_per_doos, fallback to older field names
+      // Note: We use prijs_per_doos (Ehp column) - this is ALWAYS the price for 1 box
+      // regardless of how many boxes were purchased (aantal_dozen)
+      const prijsPerDoos = Number(item.prijs_per_doos) || Number(item.prijs) || Number(item.ehp) || 0
       
-      console.log(`Processing: "${omschrijving}" - prijs: €${prijs}`)
+      console.log(`\n=== Processing: "${omschrijving}" ===`)
+      console.log(`Prijs per doos (Ehp): €${prijsPerDoos.toFixed(2)}`)
       
       // Extract units per box from patterns in the description
-      let unitsPerBox = 1
+      // This tells us how many ITEMS are in ONE box
+      let stuksPerDoos = 1
       let unit = 'stuk'
-      let productName = omschrijving
       
-      // Pattern 1: ANY NUMBERxNUMBER pattern with optional unit
-      // Matches: 30X33CL, 24X150G, 96X20G, 24X25CL, 4X11X100G, 250ST, etc.
-      // The first number is ALWAYS the quantity
+      // Pattern 1: NUMBERxNUMBER pattern (e.g., 24X150G, 30X100G, 21X135G)
+      // The FIRST number = how many items per box
       const packMatch = omschrijving.match(/(\d+)\s*[xX]\s*\d+/i)
       if (packMatch) {
-        unitsPerBox = parseInt(packMatch[1], 10)
-        console.log(`Found NxN pattern in "${omschrijving}": ${unitsPerBox} stuks per doos`)
+        stuksPerDoos = parseInt(packMatch[1], 10)
+        console.log(`Patroon gevonden "${packMatch[0]}": ${stuksPerDoos} stuks per doos`)
       }
       
       // Pattern 2: 250ST, 100ST (number followed by ST = stuks)
-      if (unitsPerBox === 1) {
+      if (stuksPerDoos === 1) {
         const stMatch = omschrijving.match(/(\d+)\s*ST\b/i)
         if (stMatch) {
-          unitsPerBox = parseInt(stMatch[1], 10)
-          console.log(`Found ST pattern in "${omschrijving}": ${unitsPerBox} stuks`)
+          stuksPerDoos = parseInt(stMatch[1], 10)
+          console.log(`ST patroon gevonden: ${stuksPerDoos} stuks per doos`)
         }
       }
       
-      // Pattern 3: 10L, 2.5KG, 10KG (single volume/weight - no X pattern)
-      if (unitsPerBox === 1 && !omschrijving.match(/\d+\s*[xX]/i)) {
+      // Pattern 3: Volume (10L, 2.5L) - only if no X pattern
+      if (stuksPerDoos === 1 && !omschrijving.match(/\d+\s*[xX]/i)) {
         const volumeMatch = omschrijving.match(/(\d+(?:[,.]\d+)?)\s*(L|LTR|LITER)\b/i)
         if (volumeMatch) {
-          unitsPerBox = parseFloat(volumeMatch[1].replace(',', '.'))
+          stuksPerDoos = parseFloat(volumeMatch[1].replace(',', '.'))
           unit = 'liter'
-          console.log(`Found volume in "${omschrijving}": ${unitsPerBox} liter`)
+          console.log(`Volume gevonden: ${stuksPerDoos} liter`)
         }
       }
       
-      if (unitsPerBox === 1 && !omschrijving.match(/\d+\s*[xX]/i)) {
+      // Pattern 4: Weight (10KG, 2.5KG) - only if no X pattern
+      if (stuksPerDoos === 1 && !omschrijving.match(/\d+\s*[xX]/i)) {
         const weightMatch = omschrijving.match(/(\d+(?:[,.]\d+)?)\s*(KG|KILO)\b/i)
         if (weightMatch) {
-          unitsPerBox = parseFloat(weightMatch[1].replace(',', '.'))
+          stuksPerDoos = parseFloat(weightMatch[1].replace(',', '.'))
           unit = 'kg'
-          console.log(`Found weight in "${omschrijving}": ${unitsPerBox} kg`)
+          console.log(`Gewicht gevonden: ${stuksPerDoos} kg`)
         }
       }
       
-      // Clean up product name - remove quantity/weight info
-      productName = omschrijving
-        .replace(/\d+\s*[xX]\s*[\d,.]+\s*(G|GR|KG|CL|ML|L|CC)?\b/gi, '') // Remove 30X33CL, 24X150G, etc.
-        .replace(/\d+\s*ST\b/gi, '') // Remove 250ST
-        .replace(/\d+(?:[,.]\d+)?\s*(KG|L|LTR|LITER|KILO|ML|CL|GR|GRAM|CC)\b/gi, '') // Remove weights
-        .replace(/\s*(VR|PB|CU|BLIK|PET|SLEEK)\s*$/i, '') // Remove unit codes at end
-        .replace(/\s+/g, ' ') // Clean up spaces
-        .trim()
+      // CALCULATE PRICE PER UNIT
+      // prijsPerDoos = price for 1 box (from Ehp column)
+      // stuksPerDoos = items in 1 box (from description like 24X150G)
+      // pricePerUnit = prijsPerDoos / stuksPerDoos
+      const pricePerUnit = stuksPerDoos > 0 ? prijsPerDoos / stuksPerDoos : prijsPerDoos
       
-      // Calculate price per unit
-      const pricePerUnit = unitsPerBox > 0 ? prijs / unitsPerBox : prijs
+      console.log(`\nBEREKENING:`)
+      console.log(`Prijs per doos: €${prijsPerDoos.toFixed(2)}`)
+      console.log(`Stuks per doos: ${stuksPerDoos}`)
+      console.log(`Prijs per stuk: €${prijsPerDoos.toFixed(2)} / ${stuksPerDoos} = €${pricePerUnit.toFixed(4)}`)
       
-      console.log(`RESULT: "${productName}": €${prijs.toFixed(2)} / ${unitsPerBox} ${unit} = €${pricePerUnit.toFixed(4)} per ${unit}`)
-      
+      // Keep the full original description as the name
+      // This preserves all the info like "BRAADWORST WIT 24X150G VR"
       return {
-        name: productName || omschrijving,
-        quantity: unitsPerBox,
+        name: omschrijving.trim(),
+        quantity: stuksPerDoos,
         unit: unit,
         pricePerUnit: pricePerUnit,
-        totalPrice: prijs,
+        totalPrice: prijsPerDoos,
         vatPercentage: 6
       }
     })
