@@ -87,6 +87,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   })
   const [savingStandardPrices, setSavingStandardPrices] = useState(false)
   const [standardPricesSaved, setStandardPricesSaved] = useState(false)
+  const [addingStandardItem, setAddingStandardItem] = useState<string | null>(null)
+  const [draggedItem, setDraggedItem] = useState<{ name: string, price: number } | null>(null)
+  const [dropTargetProduct, setDropTargetProduct] = useState<string | null>(null)
 
   useEffect(() => {
     loadData()
@@ -151,6 +154,86 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       console.error('Failed to save standard prices:', e)
     }
     setSavingStandardPrices(false)
+  }
+
+  // Add standard price item to product
+  async function addStandardPriceToProduct(name: string, price: number, productId: string) {
+    if (!businessId) return
+    setAddingStandardItem(name)
+
+    // Check if ingredient already exists with this name
+    let ingredient = ingredients.find(i => i.name.toLowerCase() === name.toLowerCase())
+    
+    if (!ingredient) {
+      // Create new ingredient
+      const { data: newIng } = await supabase
+        .from('ingredients')
+        .insert({
+          tenant_slug: businessId,
+          name: name,
+          unit: 'stuk',
+          purchase_price: price,
+          notes: 'Standaardprijs'
+        })
+        .select()
+        .single()
+      
+      if (newIng) {
+        ingredient = newIng
+        setIngredients(prev => [...prev, newIng].sort((a, b) => a.name.localeCompare(b.name)))
+      }
+    }
+
+    if (ingredient) {
+      // Check if already added to this product
+      const alreadyAdded = productIngredients.some(
+        pi => pi.product_id === productId && pi.ingredient_id === ingredient!.id
+      )
+
+      if (!alreadyAdded) {
+        // Add to product
+        const { data: pi } = await supabase
+          .from('product_ingredients')
+          .insert({
+            tenant_slug: businessId,
+            product_id: productId,
+            ingredient_id: ingredient.id,
+            quantity: 1
+          })
+          .select()
+          .single()
+
+        if (pi) {
+          setProductIngredients(prev => [...prev, pi])
+        }
+      }
+    }
+
+    setAddingStandardItem(null)
+    setDraggedItem(null)
+    setDropTargetProduct(null)
+  }
+
+  // Handle drag start
+  function handleDragStart(e: React.DragEvent, name: string, price: number) {
+    setDraggedItem({ name, price })
+    e.dataTransfer.effectAllowed = 'copy'
+    e.dataTransfer.setData('text/plain', JSON.stringify({ name, price }))
+  }
+
+  // Handle drag end
+  function handleDragEnd() {
+    setDraggedItem(null)
+    setDropTargetProduct(null)
+  }
+
+  // Handle drop on product
+  function handleDrop(e: React.DragEvent, productId: string) {
+    e.preventDefault()
+    if (draggedItem) {
+      addStandardPriceToProduct(draggedItem.name, draggedItem.price, productId)
+    }
+    setDropTargetProduct(null)
   }
 
   // Search function for both own ingredients and database
@@ -426,9 +509,14 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       {/* Vaste Standaardprijzen Kader */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-blue-900 flex items-center gap-2">
-            💰 Vaste Standaardprijzen
-          </h3>
+          <div>
+            <h3 className="font-semibold text-blue-900 flex items-center gap-2">
+              💰 Vaste Standaardprijzen
+            </h3>
+            <p className="text-sm text-blue-600 mt-1">
+              👆 Sleep een prijs naar het product hieronder om toe te voegen
+            </p>
+          </div>
           <button
             onClick={saveStandardPrices}
             disabled={savingStandardPrices}
@@ -449,145 +537,49 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
-          {/* Saus */}
-          <div className="bg-white rounded-lg p-2 shadow-sm">
-            <label className="block text-xs text-gray-600 mb-1">Saus</label>
-            <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">€</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={standardPrices.saus}
-                onChange={(e) => {
-                  const val = e.target.value.replace(',', '.')
-                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                    setStandardPrices(prev => ({ ...prev, saus: parseFloat(val) || 0 }))
-                  }
-                }}
-                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
-              />
+          {/* Draggable items */}
+          {[
+            { key: 'saus', label: 'Saus', price: standardPrices.saus },
+            { key: 'sla', label: 'Sla', price: standardPrices.sla },
+            { key: 'tomaat', label: 'Tomaat', price: standardPrices.tomaat },
+            { key: 'ei', label: 'Ei', price: standardPrices.ei },
+            { key: 'potje_saus', label: 'Potje saus', price: standardPrices.potje_saus },
+            { key: 'verpakking', label: 'Verpakking', price: standardPrices.verpakking },
+            { key: 'kosten_per_stuk', label: 'Kosten/stuk', price: standardPrices.kosten_per_stuk },
+          ].map((item) => (
+            <div
+              key={item.key}
+              draggable
+              onDragStart={(e) => handleDragStart(e, item.label, item.price)}
+              onDragEnd={handleDragEnd}
+              className={`bg-white rounded-lg p-2 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md hover:scale-105 transition-all border-2 ${
+                draggedItem?.name === item.label ? 'border-blue-500 bg-blue-50' : 'border-transparent hover:border-blue-300'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs text-gray-600 font-medium">{item.label}</label>
+                <span className="text-xs text-blue-500">⋮⋮</span>
+              </div>
+              <div className="flex items-center">
+                <span className="text-gray-400 text-sm mr-1">€</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={item.price}
+                  onClick={(e) => e.stopPropagation()}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(',', '.')
+                    if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                      setStandardPrices(prev => ({ ...prev, [item.key]: parseFloat(val) || 0 }))
+                    }
+                  }}
+                  className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
+                  draggable={false}
+                />
+              </div>
             </div>
-          </div>
-          
-          {/* Sla */}
-          <div className="bg-white rounded-lg p-2 shadow-sm">
-            <label className="block text-xs text-gray-600 mb-1">Sla</label>
-            <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">€</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={standardPrices.sla}
-                onChange={(e) => {
-                  const val = e.target.value.replace(',', '.')
-                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                    setStandardPrices(prev => ({ ...prev, sla: parseFloat(val) || 0 }))
-                  }
-                }}
-                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
-              />
-            </div>
-          </div>
-          
-          {/* Tomaat */}
-          <div className="bg-white rounded-lg p-2 shadow-sm">
-            <label className="block text-xs text-gray-600 mb-1">Tomaat</label>
-            <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">€</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={standardPrices.tomaat}
-                onChange={(e) => {
-                  const val = e.target.value.replace(',', '.')
-                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                    setStandardPrices(prev => ({ ...prev, tomaat: parseFloat(val) || 0 }))
-                  }
-                }}
-                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
-              />
-            </div>
-          </div>
-          
-          {/* Ei */}
-          <div className="bg-white rounded-lg p-2 shadow-sm">
-            <label className="block text-xs text-gray-600 mb-1">Ei</label>
-            <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">€</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={standardPrices.ei}
-                onChange={(e) => {
-                  const val = e.target.value.replace(',', '.')
-                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                    setStandardPrices(prev => ({ ...prev, ei: parseFloat(val) || 0 }))
-                  }
-                }}
-                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
-              />
-            </div>
-          </div>
-          
-          {/* Potje saus */}
-          <div className="bg-white rounded-lg p-2 shadow-sm">
-            <label className="block text-xs text-gray-600 mb-1">Potje saus</label>
-            <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">€</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={standardPrices.potje_saus}
-                onChange={(e) => {
-                  const val = e.target.value.replace(',', '.')
-                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                    setStandardPrices(prev => ({ ...prev, potje_saus: parseFloat(val) || 0 }))
-                  }
-                }}
-                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
-              />
-            </div>
-          </div>
-          
-          {/* Verpakking */}
-          <div className="bg-white rounded-lg p-2 shadow-sm">
-            <label className="block text-xs text-gray-600 mb-1">Verpakking</label>
-            <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">€</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={standardPrices.verpakking}
-                onChange={(e) => {
-                  const val = e.target.value.replace(',', '.')
-                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                    setStandardPrices(prev => ({ ...prev, verpakking: parseFloat(val) || 0 }))
-                  }
-                }}
-                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
-              />
-            </div>
-          </div>
-          
-          {/* Kosten per stuk */}
-          <div className="bg-white rounded-lg p-2 shadow-sm">
-            <label className="block text-xs text-gray-600 mb-1">Kosten/stuk</label>
-            <div className="flex items-center">
-              <span className="text-gray-400 text-sm mr-1">€</span>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={standardPrices.kosten_per_stuk}
-                onChange={(e) => {
-                  const val = e.target.value.replace(',', '.')
-                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                    setStandardPrices(prev => ({ ...prev, kosten_per_stuk: parseFloat(val) || 0 }))
-                  }
-                }}
-                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
-              />
-            </div>
-          </div>
+          ))}
         </div>
         
         <p className="text-xs text-blue-700 mt-3 italic">
@@ -601,10 +593,19 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           <motion.div
             key={pc.product.id}
             layout
-            className={`bg-white rounded-xl shadow-lg border-2 ${
-              pc.status === 'low' ? 'border-red-300' :
-              pc.status === 'high' ? 'border-orange-300' :
-              pc.ingredients.length > 0 ? 'border-green-300' : 'border-gray-200'
+            onDragOver={(e) => {
+              e.preventDefault()
+              e.dataTransfer.dropEffect = 'copy'
+              setDropTargetProduct(pc.product.id)
+            }}
+            onDragLeave={() => setDropTargetProduct(null)}
+            onDrop={(e) => handleDrop(e, pc.product.id)}
+            className={`bg-white rounded-xl shadow-lg border-2 transition-all ${
+              dropTargetProduct === pc.product.id 
+                ? 'border-blue-500 bg-blue-50 scale-[1.02] shadow-xl' 
+                : pc.status === 'low' ? 'border-red-300' :
+                  pc.status === 'high' ? 'border-orange-300' :
+                  pc.ingredients.length > 0 ? 'border-green-300' : 'border-gray-200'
             }`}
             style={{ overflow: 'visible' }}
           >
