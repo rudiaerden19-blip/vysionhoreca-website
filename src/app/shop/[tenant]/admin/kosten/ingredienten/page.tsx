@@ -463,54 +463,76 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     setIngredients(prev => prev.filter(i => i.id !== id))
   }
 
-  // Parse Van Zon copied text
+  // Parse Van Zon copied text (factuur format)
   function parseVanZonText(text: string) {
-    const products: Array<{name: string, articleNr: string, price: number}> = []
+    const products: Array<{name: string, articleNr: string, price: number, unitsPerBox: number}> = []
     
-    // Split by product patterns - look for price patterns
-    const lines = text.split('\n').filter(l => l.trim())
+    // Join all text and split by lines
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l)
     
-    let currentName = ''
-    let currentArticleNr = ''
-    
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim()
+    let i = 0
+    while (i < lines.length) {
+      const line = lines[i]
       
-      // Check for article number pattern (number followed by status)
-      const articleMatch = line.match(/^(\d+)\s+(Op voorraad|Beperkte voorraad|Volgens beschikbaarheid)/)
-      if (articleMatch) {
-        currentArticleNr = articleMatch[1]
-        // Previous non-empty line that's not a duplicate is the name
-        for (let j = i - 1; j >= 0; j--) {
-          const prevLine = lines[j].trim()
-          if (prevLine && !prevLine.endsWith('.') && !prevLine.match(/^Prijs|^€|maateenheid|Aantal|Verwijder|−|\+|^CU$|^WUK$/)) {
-            currentName = prevLine
-            break
-          }
+      // Pattern 1: Line with article number at start, followed by product info and prices
+      // Example: "1277 RED BULL 24X25CL BLIK 1 CU 32.3160 5.00 30.7 30.7 6 %"
+      const fullLineMatch = line.match(/^(\d+)\s+(.+?)\s+(\d+)\s+CU\s+([\d.,]+)\s+[\d.,]+\s+[\d.,]+\s+[\d.,]+\s+\d+\s*%?/)
+      if (fullLineMatch) {
+        const articleNr = fullLineMatch[1]
+        const name = fullLineMatch[2].trim()
+        const priceStr = fullLineMatch[4].replace(',', '.')
+        const price = parseFloat(priceStr)
+        
+        // Extract units per box from name (e.g., 24X25CL = 24 units)
+        const unitsMatch = name.match(/(\d+)\s*[xX]\s*\d+/)
+        const unitsPerBox = unitsMatch ? parseInt(unitsMatch[1], 10) : 1
+        
+        if (!products.some(p => p.articleNr === articleNr)) {
+          products.push({ name, articleNr, price, unitsPerBox })
         }
+        i++
         continue
       }
       
-      // Check for price pattern
-      const priceMatch = line.match(/€\s*(\d+)[,.](\d{2})/)
-      if (priceMatch && currentName && currentArticleNr) {
-        const price = parseFloat(`${priceMatch[1]}.${priceMatch[2]}`)
+      // Pattern 2: Product name on one line, details on next
+      // Line 1: "WHOPPER SESAM 24X82G"
+      // Line 2: "2 CU 11.8880 5.00 22.59 22.59 6 %"
+      const nextLine = lines[i + 1] || ''
+      const detailsMatch = nextLine.match(/^(\d+)\s+CU\s+([\d.,]+)\s+[\d.,]+\s+[\d.,]+\s+[\d.,]+\s+\d+\s*%?/)
+      
+      if (detailsMatch && !line.match(/^\d+\s+CU/)) {
+        const name = line
+        const priceStr = detailsMatch[2].replace(',', '.')
+        const price = parseFloat(priceStr)
+        const articleNr = `auto-${Date.now()}-${i}`
         
-        // Clean up name - remove trailing dot
-        let cleanName = currentName.replace(/\.$/, '').trim()
+        // Extract units per box from name
+        const unitsMatch = name.match(/(\d+)\s*[xX]\s*\d+/)
+        const unitsPerBox = unitsMatch ? parseInt(unitsMatch[1], 10) : 1
         
-        // Don't add duplicates
-        if (!products.some(p => p.articleNr === currentArticleNr)) {
-          products.push({
-            name: cleanName,
-            articleNr: currentArticleNr,
-            price: price
-          })
-        }
-        
-        currentName = ''
-        currentArticleNr = ''
+        products.push({ name, articleNr, price, unitsPerBox })
+        i += 2 // Skip the details line
+        continue
       }
+      
+      // Pattern 3: Simple line with prices - look for product with CU and prices
+      // Example: "25848 COCA COLA 30X33CL SLEEK BLIK 1 CU 25.1540 5.00 23.89 23.89 6 %"
+      const simpleMatch = line.match(/(\d*)\s*(.+?)\s+\d+\s+CU\s+([\d.,]+)/)
+      if (simpleMatch) {
+        const articleNr = simpleMatch[1] || `auto-${Date.now()}-${i}`
+        const name = simpleMatch[2].trim()
+        const priceStr = simpleMatch[3].replace(',', '.')
+        const price = parseFloat(priceStr)
+        
+        const unitsMatch = name.match(/(\d+)\s*[xX]\s*\d+/)
+        const unitsPerBox = unitsMatch ? parseInt(unitsMatch[1], 10) : 1
+        
+        if (!products.some(p => p.name === name)) {
+          products.push({ name, articleNr, price, unitsPerBox })
+        }
+      }
+      
+      i++
     }
     
     return products
@@ -547,14 +569,17 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         continue
       }
       
+      // Calculate price per unit
+      const pricePerUnit = product.unitsPerBox > 1 ? product.price / product.unitsPerBox : product.price
+      
       const { data } = await supabase
         .from('ingredients')
         .insert({
           tenant_slug: businessId,
           name: product.name,
-          unit: 'doos',
-          purchase_price: product.price,
-          units_per_package: 1,
+          unit: 'stuk',
+          purchase_price: pricePerUnit,
+          units_per_package: product.unitsPerBox,
           package_price: product.price,
           notes: `Van Zon #${product.articleNr}`
         })
@@ -1124,19 +1149,26 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                       <table className="w-full text-sm">
                         <thead className="bg-gray-100 sticky top-0">
                           <tr>
-                            <th className="px-2 py-1 text-left">Art.Nr</th>
                             <th className="px-2 py-1 text-left">Naam</th>
-                            <th className="px-2 py-1 text-right">Prijs</th>
+                            <th className="px-2 py-1 text-center">St/doos</th>
+                            <th className="px-2 py-1 text-right">Doosprijs</th>
+                            <th className="px-2 py-1 text-right bg-green-100">Per stuk</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {importPreview.map((p, i) => (
-                            <tr key={i} className="border-t">
-                              <td className="px-2 py-1 font-mono text-gray-500">{p.articleNr}</td>
-                              <td className="px-2 py-1">{p.name}</td>
-                              <td className="px-2 py-1 text-right font-mono">€{p.price.toFixed(2)}</td>
-                            </tr>
-                          ))}
+                          {importPreview.map((p, i) => {
+                            const pricePerUnit = p.unitsPerBox > 1 ? p.price / p.unitsPerBox : p.price
+                            return (
+                              <tr key={i} className="border-t">
+                                <td className="px-2 py-1">{p.name}</td>
+                                <td className="px-2 py-1 text-center">{p.unitsPerBox}</td>
+                                <td className="px-2 py-1 text-right font-mono">€{p.price.toFixed(2)}</td>
+                                <td className="px-2 py-1 text-right font-mono font-bold text-green-700 bg-green-50">
+                                  €{pricePerUnit.toFixed(4)}
+                                </td>
+                              </tr>
+                            )
+                          })}
                         </tbody>
                       </table>
                     ) : (
