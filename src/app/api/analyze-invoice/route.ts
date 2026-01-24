@@ -42,16 +42,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
     console.log(`Analyzing invoice, image size: ${imageSizeMB.toFixed(2)}MB`)
 
     const prompt = `Je bent een expert in het analyseren van leveranciersfacturen voor horecazaken.
-Analyseer de factuur en extraheer alle producten/ingrediënten met hun prijzen.
 
-BELANGRIJK: Facturen hebben vaak meerdere kolommen:
-- Omschrijving (bijv. "HAMBURGER 30X100G VAN ZON")
-- Aantal (bijv. "2" dozen/colli)
-- Eenheid (CU, ST, KG, L)
-- Prijs per stuk/doos (bijv. €10.90)
-- Totaal bedrag (bijv. €21.80)
+Deze factuur heeft kolommen: Omschrijving | Aantal | Eh | Ehp | % | Subtotaal | % | Total | BTW
 
-Retourneer ALLEEN een valid JSON object:
+LEES DE KOLOMMEN ZORGVULDIG:
+- "Aantal" = hoeveel dozen/colli besteld (bijv. 2)
+- "Ehp" = Eenheidsprijs = prijs per 1 doos (bijv. €11.47)
+- "Total" = totaalbedrag (Aantal x Ehp)
+
+Retourneer ALLEEN JSON:
 {
   "supplier": "naam leverancier",
   "invoiceDate": "YYYY-MM-DD",
@@ -61,21 +60,26 @@ Retourneer ALLEEN een valid JSON object:
     {
       "originalText": "HAMBURGER 30X100G VAN ZON",
       "name": "Hamburger",
-      "boxesOrdered": 2,
-      "pricePerBox": 10.90,
-      "totalPrice": 21.80,
+      "aantal": 2,
+      "ehp": 11.47,
+      "total": 21.80,
       "vatPercentage": 6
     }
   ]
 }
 
-KRITIEKE REGELS:
-1. originalText = EXACTE tekst van de factuur (met 30X100G, 24X150G, etc.)
-2. boxesOrdered = aantal DOZEN/COLLI gekocht (de "Aantal" kolom, vaak 1 of 2)
-3. pricePerBox = prijs voor 1 DOOS (niet het totaal als meerdere dozen)
-4. totalPrice = totaalbedrag voor die regel
-5. Als boxesOrdered=2 en totalPrice=21.80, dan pricePerBox=10.90
-6. Geef ALLEEN JSON terug, geen markdown`
+VOORBEELDEN uit deze factuur:
+- "HAMBURGER 30X100G VAN ZON" met Aantal=2, Ehp=11.4740, Total=21.80
+  → originalText="HAMBURGER 30X100G VAN ZON", name="Hamburger", aantal=2, ehp=11.47, total=21.80
+- "BITTERBALLEN 20% 96X20G PB" met Aantal=1, Ehp=13.5420, Total=12.86
+  → originalText="BITTERBALLEN 20% 96X20G PB", name="Bitterballen", aantal=1, ehp=13.54, total=12.86
+- "BRAADWORST WIT 24X150G VR" met Aantal=1, Ehp=29.4740, Total=28.00
+  → originalText="BRAADWORST WIT 24X150G VR", name="Braadworst wit", aantal=1, ehp=29.47, total=28.00
+
+BELANGRIJK:
+- ehp = de waarde uit de "Ehp" kolom (prijs per doos)
+- aantal = de waarde uit de "Aantal" kolom
+- Geef ALLEEN JSON terug, geen markdown of tekst`
 
     // Direct REST API call to Gemini (using v1beta for wider model support)
     const response = await fetch(
@@ -153,14 +157,17 @@ KRITIEKE REGELS:
     // Parse quantity from originalText and calculate price per unit
     const validatedItems = (parsed.items || []).map((item: any) => {
       const originalText = item.originalText || item.name || ''
-      const totalPrice = Number(item.totalPrice) || 0
-      const boxesOrdered = Number(item.boxesOrdered) || 1
       
-      // Calculate price per box (use AI value or calculate from total)
-      let pricePerBox = Number(item.pricePerBox) || 0
-      if (pricePerBox === 0 && boxesOrdered > 0) {
-        pricePerBox = totalPrice / boxesOrdered
-      }
+      // Get values from AI - use new field names (ehp, aantal) or fallback to old names
+      const ehp = Number(item.ehp) || Number(item.pricePerBox) || 0
+      const aantal = Number(item.aantal) || Number(item.boxesOrdered) || 1
+      const total = Number(item.total) || Number(item.totalPrice) || 0
+      
+      // Price per box is the Ehp (eenheidsprijs) from the invoice
+      // If ehp is 0, calculate from total / aantal
+      let pricePerBox = ehp > 0 ? ehp : (aantal > 0 ? total / aantal : total)
+      
+      console.log(`AI parsed: ${item.name} - aantal=${aantal}, ehp=${ehp}, total=${total}, pricePerBox=${pricePerBox}`)
       
       // Try to extract units per box from patterns like "24X150G", "96X20G", "30X100G"
       let unitsPerBox = 1
@@ -175,20 +182,20 @@ KRITIEKE REGELS:
       
       // Pattern 2: 5EX140G (numberEXnumberg)
       if (unitsPerBox === 1) {
-        const packMatchE = originalText.match(/(\d+)\s*[eE]?[xX]\s*\d+\s*[gG]/i)
+        const packMatchE = originalText.match(/(\d+)\s*[eE][xX]\s*\d+\s*[gG]/i)
         if (packMatchE) {
           unitsPerBox = parseInt(packMatchE[1], 10)
           console.log(`Parsed units per box (E) from "${originalText}": ${unitsPerBox} stuks per doos`)
         }
       }
       
-      // Pattern 3: 10L, 10KG, 2.5KG (volume/weight - these are the units, not pieces)
+      // Pattern 3: 10L, 10KG, 2.5KG (volume/weight)
       if (unitsPerBox === 1) {
         const volumeMatch = originalText.match(/(\d+(?:[,.]\d+)?)\s*(L|LTR|LITER)\b/i)
         if (volumeMatch) {
           unitsPerBox = parseFloat(volumeMatch[1].replace(',', '.'))
           unit = 'liter'
-          console.log(`Parsed volume from "${originalText}": ${unitsPerBox} liter per doos`)
+          console.log(`Parsed volume from "${originalText}": ${unitsPerBox} liter`)
         }
       }
       
@@ -197,21 +204,21 @@ KRITIEKE REGELS:
         if (weightMatch) {
           unitsPerBox = parseFloat(weightMatch[1].replace(',', '.'))
           unit = 'kg'
-          console.log(`Parsed weight from "${originalText}": ${unitsPerBox} kg per doos`)
+          console.log(`Parsed weight from "${originalText}": ${unitsPerBox} kg`)
         }
       }
       
       // Calculate price per unit: pricePerBox / unitsPerBox
       const pricePerUnit = unitsPerBox > 0 ? pricePerBox / unitsPerBox : pricePerBox
       
-      console.log(`${item.name}: doos €${pricePerBox.toFixed(2)} / ${unitsPerBox} ${unit} = €${pricePerUnit.toFixed(4)} per ${unit}`)
+      console.log(`RESULT: ${item.name}: €${pricePerBox.toFixed(2)} per doos / ${unitsPerBox} ${unit} = €${pricePerUnit.toFixed(4)} per ${unit}`)
       
       return {
         name: item.name || originalText,
         quantity: unitsPerBox,
         unit: unit,
         pricePerUnit: pricePerUnit,
-        totalPrice: pricePerBox, // Store price per box, not total for multiple boxes
+        totalPrice: pricePerBox, // Store price per box
         vatPercentage: Number(item.vatPercentage) || 6
       }
     })
