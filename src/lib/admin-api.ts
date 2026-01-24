@@ -3406,7 +3406,6 @@ export async function searchSupplierProducts(
   let query = supabase
     .from('supplier_products')
     .select('id, article_number, name, package_price, units_per_package, unit_price, unit, unit_weight, category')
-    .eq('is_available', true)
   
   if (searchQuery && searchQuery.trim()) {
     query = query.ilike('name', `%${searchQuery.trim()}%`)
