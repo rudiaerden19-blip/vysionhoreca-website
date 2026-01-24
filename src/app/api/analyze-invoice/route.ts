@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Lazy initialization - only create client when needed (not during build)
+let openaiClient: OpenAI | null = null
+
+function getOpenAI(): OpenAI {
+  if (!openaiClient) {
+    openaiClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+  }
+  return openaiClient
+}
 
 export interface InvoiceItem {
   name: string
@@ -36,7 +44,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
       return NextResponse.json({ success: false, error: 'OpenAI API key niet geconfigureerd' }, { status: 500 })
     }
 
-    const response = await openai.chat.completions.create({
+    const response = await getOpenAI().chat.completions.create({
       model: 'gpt-4o',
       max_tokens: 4096,
       messages: [
