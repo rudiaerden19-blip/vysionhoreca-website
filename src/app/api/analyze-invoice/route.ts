@@ -1,16 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 // Lazy initialization - only create client when needed (not during build)
-let openaiClient: OpenAI | null = null
+let geminiClient: GoogleGenerativeAI | null = null
 
-function getOpenAI(): OpenAI {
-  if (!openaiClient) {
-    openaiClient = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    })
+function getGemini(): GoogleGenerativeAI {
+  if (!geminiClient) {
+    geminiClient = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '')
   }
-  return openaiClient
+  return geminiClient
 }
 
 export interface InvoiceItem {
@@ -40,9 +38,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
       return NextResponse.json({ success: false, error: 'Geen afbeelding ontvangen' }, { status: 400 })
     }
 
-    if (!process.env.OPENAI_API_KEY) {
-      console.error('OPENAI_API_KEY not set')
-      return NextResponse.json({ success: false, error: 'OpenAI API key niet geconfigureerd. Voeg OPENAI_API_KEY toe aan Vercel.' }, { status: 500 })
+    if (!process.env.GOOGLE_GEMINI_API_KEY) {
+      console.error('GOOGLE_GEMINI_API_KEY not set')
+      return NextResponse.json({ success: false, error: 'Google Gemini API key niet geconfigureerd. Voeg GOOGLE_GEMINI_API_KEY toe aan Vercel.' }, { status: 500 })
     }
 
     // Check image size (max 20MB base64)
@@ -51,18 +49,14 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
       return NextResponse.json({ success: false, error: 'Afbeelding is te groot (max 20MB). Gebruik een kleinere foto.' }, { status: 400 })
     }
 
-    console.log(`Analyzing invoice, image size: ${imageSizeMB.toFixed(2)}MB`)
+    console.log(`Analyzing invoice with Gemini, image size: ${imageSizeMB.toFixed(2)}MB`)
 
-    const response = await getOpenAI().chat.completions.create({
-      model: 'gpt-4o',
-      max_tokens: 4096,
-      messages: [
-        {
-          role: 'system',
-          content: `Je bent een expert in het analyseren van leveranciersfacturen voor horecazaken.
+    const model = getGemini().getGenerativeModel({ model: 'gemini-1.5-flash' })
+
+    const prompt = `Je bent een expert in het analyseren van leveranciersfacturen voor horecazaken.
 Analyseer de factuur en extraheer alle producten/ingrediënten met hun prijzen.
 
-Retourneer ALLEEN een valid JSON object met deze structuur:
+Retourneer ALLEEN een valid JSON object met deze structuur (geen andere tekst, geen markdown):
 {
   "supplier": "naam van de leverancier",
   "invoiceDate": "datum in YYYY-MM-DD formaat",
@@ -86,28 +80,20 @@ Belangrijke regels:
 - Als een product per doos wordt verkocht met X stuks erin, bereken dan de prijs per stuk
 - BTW is meestal 6% voor voedingsmiddelen, 21% voor non-food
 - Als je iets niet kunt lezen, sla het product dan over
-- Geef ALLEEN het JSON object terug, geen andere tekst`
-        },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: 'Analyseer deze leveranciersfactuur en extraheer alle producten met prijzen:'
-            },
-            {
-              type: 'image_url',
-              image_url: {
-                url: `data:${mimeType || 'image/jpeg'};base64,${image}`,
-                detail: 'high'
-              }
-            }
-          ]
-        }
-      ]
-    })
+- Geef ALLEEN het JSON object terug, geen andere tekst of markdown`
 
-    const content = response.choices[0]?.message?.content
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType: mimeType || 'image/jpeg',
+          data: image
+        }
+      }
+    ])
+
+    const response = await result.response
+    const content = response.text()
     
     if (!content) {
       return NextResponse.json({ success: false, error: 'Geen respons van AI' }, { status: 500 })
@@ -152,14 +138,12 @@ Belangrijke regels:
     // More specific error messages
     let errorMessage = 'Er ging iets mis bij het analyseren. Probeer opnieuw.'
     
-    if (error?.code === 'invalid_api_key' || error?.message?.includes('API key')) {
-      errorMessage = 'OpenAI API key is ongeldig. Controleer de configuratie.'
-    } else if (error?.code === 'insufficient_quota' || error?.message?.includes('quota')) {
-      errorMessage = 'OpenAI tegoed is op. Voeg credits toe aan je OpenAI account.'
-    } else if (error?.code === 'rate_limit_exceeded') {
-      errorMessage = 'Te veel requests. Wacht even en probeer opnieuw.'
-    } else if (error?.message?.includes('Could not process image')) {
-      errorMessage = 'Kon afbeelding niet verwerken. Probeer een andere foto.'
+    if (error?.message?.includes('API key')) {
+      errorMessage = 'Google Gemini API key is ongeldig. Controleer de configuratie.'
+    } else if (error?.message?.includes('quota') || error?.message?.includes('limit')) {
+      errorMessage = 'API limiet bereikt. Probeer later opnieuw.'
+    } else if (error?.message?.includes('Could not process image') || error?.message?.includes('Invalid image')) {
+      errorMessage = 'Kon afbeelding niet verwerken. Probeer een andere foto (JPG of PNG).'
     } else if (error?.message) {
       errorMessage = `Fout: ${error.message}`
     }
