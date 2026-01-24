@@ -41,8 +41,17 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
     }
 
     if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json({ success: false, error: 'OpenAI API key niet geconfigureerd' }, { status: 500 })
+      console.error('OPENAI_API_KEY not set')
+      return NextResponse.json({ success: false, error: 'OpenAI API key niet geconfigureerd. Voeg OPENAI_API_KEY toe aan Vercel.' }, { status: 500 })
     }
+
+    // Check image size (max 20MB base64)
+    const imageSizeMB = (image.length * 0.75) / (1024 * 1024)
+    if (imageSizeMB > 20) {
+      return NextResponse.json({ success: false, error: 'Afbeelding is te groot (max 20MB). Gebruik een kleinere foto.' }, { status: 400 })
+    }
+
+    console.log(`Analyzing invoice, image size: ${imageSizeMB.toFixed(2)}MB`)
 
     const response = await getOpenAI().chat.completions.create({
       model: 'gpt-4o',
@@ -137,11 +146,27 @@ Belangrijke regels:
       items: parsed.items || []
     })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Invoice analysis error:', error)
+    
+    // More specific error messages
+    let errorMessage = 'Er ging iets mis bij het analyseren. Probeer opnieuw.'
+    
+    if (error?.code === 'invalid_api_key' || error?.message?.includes('API key')) {
+      errorMessage = 'OpenAI API key is ongeldig. Controleer de configuratie.'
+    } else if (error?.code === 'insufficient_quota' || error?.message?.includes('quota')) {
+      errorMessage = 'OpenAI tegoed is op. Voeg credits toe aan je OpenAI account.'
+    } else if (error?.code === 'rate_limit_exceeded') {
+      errorMessage = 'Te veel requests. Wacht even en probeer opnieuw.'
+    } else if (error?.message?.includes('Could not process image')) {
+      errorMessage = 'Kon afbeelding niet verwerken. Probeer een andere foto.'
+    } else if (error?.message) {
+      errorMessage = `Fout: ${error.message}`
+    }
+    
     return NextResponse.json({ 
       success: false, 
-      error: 'Er ging iets mis bij het analyseren. Probeer opnieuw.' 
+      error: errorMessage
     }, { status: 500 })
   }
 }
