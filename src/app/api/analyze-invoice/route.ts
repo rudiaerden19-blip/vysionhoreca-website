@@ -1,15 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GoogleGenerativeAI } from '@google/generative-ai'
-
-// Lazy initialization - only create client when needed (not during build)
-let geminiClient: GoogleGenerativeAI | null = null
-
-function getGemini(): GoogleGenerativeAI {
-  if (!geminiClient) {
-    geminiClient = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_API_KEY || '')
-  }
-  return geminiClient
-}
 
 export interface InvoiceItem {
   name: string
@@ -38,20 +27,19 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
       return NextResponse.json({ success: false, error: 'Geen afbeelding ontvangen' }, { status: 400 })
     }
 
-    if (!process.env.GOOGLE_GEMINI_API_KEY) {
+    const apiKey = process.env.GOOGLE_GEMINI_API_KEY
+    if (!apiKey) {
       console.error('GOOGLE_GEMINI_API_KEY not set')
-      return NextResponse.json({ success: false, error: 'Google Gemini API key niet geconfigureerd. Voeg GOOGLE_GEMINI_API_KEY toe aan Vercel.' }, { status: 500 })
+      return NextResponse.json({ success: false, error: 'Google Gemini API key niet geconfigureerd.' }, { status: 500 })
     }
 
     // Check image size (max 20MB base64)
     const imageSizeMB = (image.length * 0.75) / (1024 * 1024)
     if (imageSizeMB > 20) {
-      return NextResponse.json({ success: false, error: 'Afbeelding is te groot (max 20MB). Gebruik een kleinere foto.' }, { status: 400 })
+      return NextResponse.json({ success: false, error: 'Afbeelding is te groot (max 20MB).' }, { status: 400 })
     }
 
-    console.log(`Analyzing invoice with Gemini, image size: ${imageSizeMB.toFixed(2)}MB`)
-
-    const model = getGemini().getGenerativeModel({ model: 'gemini-1.5-pro' })
+    console.log(`Analyzing invoice, image size: ${imageSizeMB.toFixed(2)}MB`)
 
     const prompt = `Je bent een expert in het analyseren van leveranciersfacturen voor horecazaken.
 Analyseer de factuur en extraheer alle producten/ingrediënten met hun prijzen.
@@ -82,27 +70,64 @@ Belangrijke regels:
 - Als je iets niet kunt lezen, sla het product dan over
 - Geef ALLEEN het JSON object terug, geen andere tekst of markdown`
 
-    const result = await model.generateContent([
-      prompt,
+    // Direct REST API call to Gemini
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
-        inlineData: {
-          mimeType: mimeType || 'image/jpeg',
-          data: image
-        }
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: prompt },
+                {
+                  inline_data: {
+                    mime_type: mimeType || 'image/jpeg',
+                    data: image
+                  }
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 4096,
+          }
+        })
       }
-    ])
+    )
 
-    const response = await result.response
-    const content = response.text()
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      console.error('Gemini API error:', response.status, errorData)
+      
+      if (response.status === 404) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Gemini API model niet beschikbaar. Controleer je API key.' 
+        }, { status: 500 })
+      }
+      
+      return NextResponse.json({ 
+        success: false, 
+        error: `API fout: ${errorData?.error?.message || response.statusText}` 
+      }, { status: 500 })
+    }
+
+    const data = await response.json()
+    const content = data?.candidates?.[0]?.content?.parts?.[0]?.text
     
     if (!content) {
+      console.error('No content in response:', data)
       return NextResponse.json({ success: false, error: 'Geen respons van AI' }, { status: 500 })
     }
 
     // Parse JSON from response
     let parsed
     try {
-      // Remove markdown code blocks if present
       let cleanContent = content.trim()
       if (cleanContent.startsWith('```json')) {
         cleanContent = cleanContent.slice(7)
@@ -134,23 +159,9 @@ Belangrijke regels:
 
   } catch (error: any) {
     console.error('Invoice analysis error:', error)
-    
-    // More specific error messages
-    let errorMessage = 'Er ging iets mis bij het analyseren. Probeer opnieuw.'
-    
-    if (error?.message?.includes('API key')) {
-      errorMessage = 'Google Gemini API key is ongeldig. Controleer de configuratie.'
-    } else if (error?.message?.includes('quota') || error?.message?.includes('limit')) {
-      errorMessage = 'API limiet bereikt. Probeer later opnieuw.'
-    } else if (error?.message?.includes('Could not process image') || error?.message?.includes('Invalid image')) {
-      errorMessage = 'Kon afbeelding niet verwerken. Probeer een andere foto (JPG of PNG).'
-    } else if (error?.message) {
-      errorMessage = `Fout: ${error.message}`
-    }
-    
     return NextResponse.json({ 
       success: false, 
-      error: errorMessage
+      error: `Fout: ${error?.message || 'Onbekende fout'}` 
     }, { status: 500 })
   }
 }
