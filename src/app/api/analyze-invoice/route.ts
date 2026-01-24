@@ -70,9 +70,9 @@ Belangrijke regels:
 - Als je iets niet kunt lezen, sla het product dan over
 - Geef ALLEEN het JSON object terug, geen andere tekst of markdown`
 
-    // Direct REST API call to Gemini
+    // Direct REST API call to Gemini (using v1beta for wider model support)
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
@@ -102,18 +102,13 @@ Belangrijke regels:
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      console.error('Gemini API error:', response.status, errorData)
+      console.error('Gemini API error:', response.status, JSON.stringify(errorData))
       
-      if (response.status === 404) {
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Gemini API model niet beschikbaar. Controleer je API key.' 
-        }, { status: 500 })
-      }
+      const errorMessage = errorData?.error?.message || response.statusText
       
       return NextResponse.json({ 
         success: false, 
-        error: `API fout: ${errorData?.error?.message || response.statusText}` 
+        error: `API fout (${response.status}): ${errorMessage}` 
       }, { status: 500 })
     }
 
