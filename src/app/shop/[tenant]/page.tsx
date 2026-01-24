@@ -47,11 +47,6 @@ interface Business {
   specialty_2_title?: string
   specialty_3_image?: string
   specialty_3_title?: string
-  // Image display modes (null = cover, 'cover', 'contain')
-  hero_image_display?: string | null
-  about_image_display?: string | null
-  specialty_image_display?: string | null
-  topseller_image_display?: string | null
   show_qr_codes?: boolean
   hiring_enabled?: boolean
   hiring_title?: string
@@ -428,11 +423,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         specialty_2_title: tenantData?.specialty_2_title || '',
         specialty_3_image: tenantData?.specialty_3_image || '',
         specialty_3_title: tenantData?.specialty_3_title || '',
-        // Image display modes
-        hero_image_display: tenantData?.hero_image_display || 'cover',
-        about_image_display: tenantData?.about_image_display || 'cover',
-        specialty_image_display: tenantData?.specialty_image_display || 'cover',
-        topseller_image_display: tenantData?.topseller_image_display || 'cover',
         show_qr_codes: tenantData?.show_qr_codes ?? true,
         hiring_enabled: tenantData?.hiring_enabled ?? false,
         hiring_title: tenantData?.hiring_title || '',
@@ -700,7 +690,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               priority={currentImageIndex === 0}
               sizes="100vw"
               quality={85}
-              className={`${business.hero_image_display === 'contain' ? 'object-contain' : 'object-cover'} object-center`}
+              className="object-cover object-center"
               style={{ objectPosition: 'center 30%' }}
             />
           </motion.div>
@@ -804,7 +794,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               </div>
 
               <div className="relative">
-                <div className="aspect-square rounded-3xl overflow-hidden shadow-2xl relative">
+                <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl relative">
                   <Image
                     src={business.about_image || "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800"}
                     alt="Onze frituur"
@@ -812,7 +802,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     sizes="(max-width: 768px) 100vw, 50vw"
                     quality={80}
                     loading="lazy"
-                    className={business.about_image_display === 'contain' ? 'object-contain' : 'object-cover'}
+                    className="object-cover"
                   />
                 </div>
               </div>
@@ -849,7 +839,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {/* Specialty 1 */}
               {business.specialty_1_image && (
                 <div className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
+                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/3]">
                     <Image 
                       src={business.specialty_1_image}
                       alt={business.specialty_1_title || t('shopPage.specialty')}
@@ -857,7 +847,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={80}
                       loading="lazy"
-                      className={`${business.specialty_image_display === 'contain' ? 'object-contain' : 'object-cover'} group-hover:scale-110 transition-transform duration-500`}
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -870,7 +860,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {/* Specialty 2 */}
               {business.specialty_2_image && (
                 <div className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
+                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/3]">
                     <Image 
                       src={business.specialty_2_image}
                       alt={business.specialty_2_title || t('shopPage.specialty')}
@@ -878,7 +868,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={80}
                       loading="lazy"
-                      className={`${business.specialty_image_display === 'contain' ? 'object-contain' : 'object-cover'} group-hover:scale-110 transition-transform duration-500`}
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -891,7 +881,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {/* Specialty 3 */}
               {business.specialty_3_image && (
                 <div className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-square">
+                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/3]">
                     <Image 
                       src={business.specialty_3_image}
                       alt={business.specialty_3_title || t('shopPage.specialty')}
@@ -899,7 +889,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={80}
                       loading="lazy"
-                      className={`${business.specialty_image_display === 'contain' ? 'object-contain' : 'object-cover'} group-hover:scale-110 transition-transform duration-500`}
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -1221,7 +1211,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 .map((imageUrl, index) => (
                   <div
                     key={index}
-                    className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow w-full relative h-72"
+                    className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow w-full relative aspect-[4/3]"
                   >
                     <Image
                       src={imageUrl!}
@@ -1230,7 +1220,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={80}
                       loading="lazy"
-                      className={business.topseller_image_display === 'contain' ? 'object-contain' : 'object-cover'}
+                      className="object-cover"
                     />
                   </div>
                 ))

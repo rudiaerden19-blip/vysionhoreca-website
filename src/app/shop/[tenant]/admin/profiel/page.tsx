@@ -47,11 +47,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     specialty_2_title: '',
     specialty_3_image: '',
     specialty_3_title: '',
-    // Image display modes (null = standaard, 'cover' = groot, 'contain' = volledig)
-    hero_image_display: null as string | null,
-    about_image_display: null as string | null,
-    specialty_image_display: null as string | null,
-    topseller_image_display: null as string | null,
   })
 
   useEffect(() => {
@@ -505,47 +500,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
             <span>🎠</span> Hero Slider Foto's
           </h2>
-          <p className="text-gray-500 text-sm mb-4">Deze foto's worden getoond als slideshow bovenaan je website</p>
-          
-          {/* Image Display Mode */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-            <label className="block text-sm font-medium text-gray-700 mb-2">🖼️ Foto weergave</label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, hero_image_display: null })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  !formData.hero_image_display 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Standaard
-              </button>
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, hero_image_display: 'cover' })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  formData.hero_image_display === 'cover' 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Groot
-              </button>
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, hero_image_display: 'contain' })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  formData.hero_image_display === 'contain' 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Volledig
-              </button>
-            </div>
-          </div>
+          <p className="text-gray-500 text-sm mb-6">Deze foto's worden getoond als slideshow bovenaan je website</p>
           
           <div className="grid md:grid-cols-3 gap-6">
             <div>
@@ -594,47 +549,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
             <span>👥</span> Over Ons Foto
           </h2>
-          <p className="text-gray-500 text-sm mb-4">Deze foto wordt getoond naast de "Over Ons" sectie</p>
-          
-          {/* Image Display Mode */}
-          <div className="mb-4 p-4 bg-gray-50 rounded-xl">
-            <label className="block text-sm font-medium text-gray-700 mb-2">🖼️ Foto weergave</label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, about_image_display: null })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  !formData.about_image_display 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Standaard
-              </button>
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, about_image_display: 'cover' })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  formData.about_image_display === 'cover' 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Groot
-              </button>
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, about_image_display: 'contain' })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  formData.about_image_display === 'contain' 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Volledig
-              </button>
-            </div>
-          </div>
+          <p className="text-gray-500 text-sm mb-6">Deze foto wordt getoond naast de "Over Ons" sectie</p>
           
           <MediaPicker
             tenantSlug={params.tenant}
@@ -656,47 +571,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
             <span>🏆</span> Best Verkochte Producten
           </h2>
-          <p className="text-gray-500 text-sm mb-4">Toon je 3 populairste producten op de homepage</p>
-          
-          {/* Image Display Mode */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-            <label className="block text-sm font-medium text-gray-700 mb-2">🖼️ Foto weergave</label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, topseller_image_display: null })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  !formData.topseller_image_display 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Standaard
-              </button>
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, topseller_image_display: 'cover' })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  formData.topseller_image_display === 'cover' 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Groot
-              </button>
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, topseller_image_display: 'contain' })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  formData.topseller_image_display === 'contain' 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Volledig
-              </button>
-            </div>
-          </div>
+          <p className="text-gray-500 text-sm mb-6">Toon je 3 populairste producten op de homepage</p>
           
           <div className="grid md:grid-cols-3 gap-6">
             <div>
@@ -745,47 +620,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
             <span>⭐</span> Onze Specialiteiten
           </h2>
-          <p className="text-gray-500 text-sm mb-4">Highlight 3 specialiteiten met foto en titel</p>
-          
-          {/* Image Display Mode */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-            <label className="block text-sm font-medium text-gray-700 mb-2">🖼️ Foto weergave</label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, specialty_image_display: null })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  !formData.specialty_image_display 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Standaard
-              </button>
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, specialty_image_display: 'cover' })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  formData.specialty_image_display === 'cover' 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Groot
-              </button>
-              <button
-                type="button"
-                onClick={() => { setFormData(prev => ({ ...prev, specialty_image_display: 'contain' })); setSaved(false) }}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  formData.specialty_image_display === 'contain' 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                Volledig
-              </button>
-            </div>
-          </div>
+          <p className="text-gray-500 text-sm mb-6">Highlight 3 specialiteiten met foto en titel</p>
           
           <div className="space-y-6">
             {/* Specialty 1 */}
