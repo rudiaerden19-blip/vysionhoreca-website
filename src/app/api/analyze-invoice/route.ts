@@ -147,46 +147,49 @@ REGELS:
       let unit = 'stuk'
       let productName = omschrijving
       
-      // Pattern 1: 30X100G, 24X150G, 96X20G (number X numberg) - most common
-      const packMatch = omschrijving.match(/(\d+)\s*[xX]\s*\d+\s*[gG]/i)
+      // Pattern 1: ANY NUMBERxNUMBER pattern with optional unit
+      // Matches: 30X33CL, 24X150G, 96X20G, 24X25CL, 4X11X100G, 250ST, etc.
+      // The first number is ALWAYS the quantity
+      const packMatch = omschrijving.match(/(\d+)\s*[xX]\s*\d+/i)
       if (packMatch) {
         unitsPerBox = parseInt(packMatch[1], 10)
-        console.log(`Found pack pattern in "${omschrijving}": ${unitsPerBox} stuks per doos`)
+        console.log(`Found NxN pattern in "${omschrijving}": ${unitsPerBox} stuks per doos`)
       }
       
-      // Pattern 2: 4X2.5KG, 4X2,5KG (boxes of weight)
+      // Pattern 2: 250ST, 100ST (number followed by ST = stuks)
       if (unitsPerBox === 1) {
-        const multiWeightMatch = omschrijving.match(/(\d+)\s*[xX]\s*[\d,.]+\s*(KG|L)/i)
-        if (multiWeightMatch) {
-          unitsPerBox = parseInt(multiWeightMatch[1], 10)
-          console.log(`Found multi-weight pattern in "${omschrijving}": ${unitsPerBox} units`)
+        const stMatch = omschrijving.match(/(\d+)\s*ST\b/i)
+        if (stMatch) {
+          unitsPerBox = parseInt(stMatch[1], 10)
+          console.log(`Found ST pattern in "${omschrijving}": ${unitsPerBox} stuks`)
         }
       }
       
-      // Pattern 3: 10L, 2.5KG, 10KG (single volume/weight - the whole thing)
-      if (unitsPerBox === 1) {
+      // Pattern 3: 10L, 2.5KG, 10KG (single volume/weight - no X pattern)
+      if (unitsPerBox === 1 && !omschrijving.match(/\d+\s*[xX]/i)) {
         const volumeMatch = omschrijving.match(/(\d+(?:[,.]\d+)?)\s*(L|LTR|LITER)\b/i)
-        if (volumeMatch && !omschrijving.match(/\d+\s*[xX]/i)) { // Only if not already matched a pack
+        if (volumeMatch) {
           unitsPerBox = parseFloat(volumeMatch[1].replace(',', '.'))
           unit = 'liter'
           console.log(`Found volume in "${omschrijving}": ${unitsPerBox} liter`)
         }
       }
       
-      if (unitsPerBox === 1) {
+      if (unitsPerBox === 1 && !omschrijving.match(/\d+\s*[xX]/i)) {
         const weightMatch = omschrijving.match(/(\d+(?:[,.]\d+)?)\s*(KG|KILO)\b/i)
-        if (weightMatch && !omschrijving.match(/\d+\s*[xX]/i)) { // Only if not already matched a pack
+        if (weightMatch) {
           unitsPerBox = parseFloat(weightMatch[1].replace(',', '.'))
           unit = 'kg'
           console.log(`Found weight in "${omschrijving}": ${unitsPerBox} kg`)
         }
       }
       
-      // Clean up product name - remove weight/quantity info
+      // Clean up product name - remove quantity/weight info
       productName = omschrijving
-        .replace(/\d+\s*[xX]\s*\d+\s*[gG]/gi, '') // Remove 30X100G
-        .replace(/\d+(?:[,.]\d+)?\s*(KG|L|LTR|LITER|KILO|ML|GR|GRAM)\b/gi, '') // Remove weights
-        .replace(/\s*(VR|PB|CU|ST)\s*$/i, '') // Remove unit codes at end
+        .replace(/\d+\s*[xX]\s*[\d,.]+\s*(G|GR|KG|CL|ML|L|CC)?\b/gi, '') // Remove 30X33CL, 24X150G, etc.
+        .replace(/\d+\s*ST\b/gi, '') // Remove 250ST
+        .replace(/\d+(?:[,.]\d+)?\s*(KG|L|LTR|LITER|KILO|ML|CL|GR|GRAM|CC)\b/gi, '') // Remove weights
+        .replace(/\s*(VR|PB|CU|BLIK|PET|SLEEK)\s*$/i, '') // Remove unit codes at end
         .replace(/\s+/g, ' ') // Clean up spaces
         .trim()
       

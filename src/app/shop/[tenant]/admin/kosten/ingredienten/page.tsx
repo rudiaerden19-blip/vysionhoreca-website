@@ -483,9 +483,15 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         const priceStr = fullLineMatch[4].replace(',', '.')
         const price = parseFloat(priceStr)
         
-        // Extract units per box from name (e.g., 24X25CL = 24 units)
+        // Extract units per box from name (e.g., 24X25CL = 24 units, 250ST = 250 units)
+        let unitsPerBox = 1
         const unitsMatch = name.match(/(\d+)\s*[xX]\s*\d+/)
-        const unitsPerBox = unitsMatch ? parseInt(unitsMatch[1], 10) : 1
+        const stMatch = name.match(/(\d+)\s*ST\b/i)
+        if (unitsMatch) {
+          unitsPerBox = parseInt(unitsMatch[1], 10)
+        } else if (stMatch) {
+          unitsPerBox = parseInt(stMatch[1], 10)
+        }
         
         if (!products.some(p => p.articleNr === articleNr)) {
           products.push({ name, articleNr, price, unitsPerBox })
@@ -507,8 +513,14 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         const articleNr = `auto-${Date.now()}-${i}`
         
         // Extract units per box from name
+        let unitsPerBox = 1
         const unitsMatch = name.match(/(\d+)\s*[xX]\s*\d+/)
-        const unitsPerBox = unitsMatch ? parseInt(unitsMatch[1], 10) : 1
+        const stMatch = name.match(/(\d+)\s*ST\b/i)
+        if (unitsMatch) {
+          unitsPerBox = parseInt(unitsMatch[1], 10)
+        } else if (stMatch) {
+          unitsPerBox = parseInt(stMatch[1], 10)
+        }
         
         products.push({ name, articleNr, price, unitsPerBox })
         i += 2 // Skip the details line
@@ -524,8 +536,14 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         const priceStr = simpleMatch[3].replace(',', '.')
         const price = parseFloat(priceStr)
         
+        let unitsPerBox = 1
         const unitsMatch = name.match(/(\d+)\s*[xX]\s*\d+/)
-        const unitsPerBox = unitsMatch ? parseInt(unitsMatch[1], 10) : 1
+        const stMatch = name.match(/(\d+)\s*ST\b/i)
+        if (unitsMatch) {
+          unitsPerBox = parseInt(unitsMatch[1], 10)
+        } else if (stMatch) {
+          unitsPerBox = parseInt(stMatch[1], 10)
+        }
         
         if (!products.some(p => p.name === name)) {
           products.push({ name, articleNr, price, unitsPerBox })
