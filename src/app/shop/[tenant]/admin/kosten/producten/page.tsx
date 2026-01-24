@@ -75,6 +75,19 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   const [searching, setSearching] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
 
+  // Vaste standaardprijzen state
+  const [standardPrices, setStandardPrices] = useState({
+    saus: 0.12,
+    sla: 0.13,
+    tomaat: 0.14,
+    ei: 0.12,
+    potje_saus: 0.16,
+    verpakking: 0.30,
+    kosten_per_stuk: 0.40
+  })
+  const [savingStandardPrices, setSavingStandardPrices] = useState(false)
+  const [standardPricesSaved, setStandardPricesSaved] = useState(false)
+
   useEffect(() => {
     loadData()
   }, [params.tenant])
@@ -114,7 +127,30 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       setDefaultMultiplier(avg)
     }
 
+    // Load standard prices from localStorage
+    try {
+      const savedPrices = localStorage.getItem(`standard_prices_${params.tenant}`)
+      if (savedPrices) {
+        setStandardPrices(JSON.parse(savedPrices))
+      }
+    } catch (e) {
+      console.error('Failed to load standard prices:', e)
+    }
+
     setLoading(false)
+  }
+
+  // Save standard prices to localStorage
+  async function saveStandardPrices() {
+    setSavingStandardPrices(true)
+    try {
+      localStorage.setItem(`standard_prices_${params.tenant}`, JSON.stringify(standardPrices))
+      setStandardPricesSaved(true)
+      setTimeout(() => setStandardPricesSaved(false), 2000)
+    } catch (e) {
+      console.error('Failed to save standard prices:', e)
+    }
+    setSavingStandardPrices(false)
   }
 
   // Search function for both own ingredients and database
@@ -385,6 +421,178 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
         />
+      </div>
+
+      {/* Vaste Standaardprijzen Kader */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-blue-900 flex items-center gap-2">
+            💰 Vaste Standaardprijzen
+          </h3>
+          <button
+            onClick={saveStandardPrices}
+            disabled={savingStandardPrices}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
+              standardPricesSaved 
+                ? 'bg-green-500 text-white' 
+                : 'bg-blue-500 text-white hover:bg-blue-600'
+            } disabled:opacity-50`}
+          >
+            {savingStandardPrices ? (
+              <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Opslaan...</>
+            ) : standardPricesSaved ? (
+              <>✓ Opgeslagen!</>
+            ) : (
+              <>💾 Opslaan</>
+            )}
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+          {/* Saus */}
+          <div className="bg-white rounded-lg p-2 shadow-sm">
+            <label className="block text-xs text-gray-600 mb-1">Saus</label>
+            <div className="flex items-center">
+              <span className="text-gray-400 text-sm mr-1">€</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={standardPrices.saus}
+                onChange={(e) => {
+                  const val = e.target.value.replace(',', '.')
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setStandardPrices(prev => ({ ...prev, saus: parseFloat(val) || 0 }))
+                  }
+                }}
+                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
+              />
+            </div>
+          </div>
+          
+          {/* Sla */}
+          <div className="bg-white rounded-lg p-2 shadow-sm">
+            <label className="block text-xs text-gray-600 mb-1">Sla</label>
+            <div className="flex items-center">
+              <span className="text-gray-400 text-sm mr-1">€</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={standardPrices.sla}
+                onChange={(e) => {
+                  const val = e.target.value.replace(',', '.')
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setStandardPrices(prev => ({ ...prev, sla: parseFloat(val) || 0 }))
+                  }
+                }}
+                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
+              />
+            </div>
+          </div>
+          
+          {/* Tomaat */}
+          <div className="bg-white rounded-lg p-2 shadow-sm">
+            <label className="block text-xs text-gray-600 mb-1">Tomaat</label>
+            <div className="flex items-center">
+              <span className="text-gray-400 text-sm mr-1">€</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={standardPrices.tomaat}
+                onChange={(e) => {
+                  const val = e.target.value.replace(',', '.')
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setStandardPrices(prev => ({ ...prev, tomaat: parseFloat(val) || 0 }))
+                  }
+                }}
+                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
+              />
+            </div>
+          </div>
+          
+          {/* Ei */}
+          <div className="bg-white rounded-lg p-2 shadow-sm">
+            <label className="block text-xs text-gray-600 mb-1">Ei</label>
+            <div className="flex items-center">
+              <span className="text-gray-400 text-sm mr-1">€</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={standardPrices.ei}
+                onChange={(e) => {
+                  const val = e.target.value.replace(',', '.')
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setStandardPrices(prev => ({ ...prev, ei: parseFloat(val) || 0 }))
+                  }
+                }}
+                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
+              />
+            </div>
+          </div>
+          
+          {/* Potje saus */}
+          <div className="bg-white rounded-lg p-2 shadow-sm">
+            <label className="block text-xs text-gray-600 mb-1">Potje saus</label>
+            <div className="flex items-center">
+              <span className="text-gray-400 text-sm mr-1">€</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={standardPrices.potje_saus}
+                onChange={(e) => {
+                  const val = e.target.value.replace(',', '.')
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setStandardPrices(prev => ({ ...prev, potje_saus: parseFloat(val) || 0 }))
+                  }
+                }}
+                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
+              />
+            </div>
+          </div>
+          
+          {/* Verpakking */}
+          <div className="bg-white rounded-lg p-2 shadow-sm">
+            <label className="block text-xs text-gray-600 mb-1">Verpakking</label>
+            <div className="flex items-center">
+              <span className="text-gray-400 text-sm mr-1">€</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={standardPrices.verpakking}
+                onChange={(e) => {
+                  const val = e.target.value.replace(',', '.')
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setStandardPrices(prev => ({ ...prev, verpakking: parseFloat(val) || 0 }))
+                  }
+                }}
+                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
+              />
+            </div>
+          </div>
+          
+          {/* Kosten per stuk */}
+          <div className="bg-white rounded-lg p-2 shadow-sm">
+            <label className="block text-xs text-gray-600 mb-1">Kosten/stuk</label>
+            <div className="flex items-center">
+              <span className="text-gray-400 text-sm mr-1">€</span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={standardPrices.kosten_per_stuk}
+                onChange={(e) => {
+                  const val = e.target.value.replace(',', '.')
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setStandardPrices(prev => ({ ...prev, kosten_per_stuk: parseFloat(val) || 0 }))
+                  }
+                }}
+                className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
+              />
+            </div>
+          </div>
+        </div>
+        
+        <p className="text-xs text-blue-700 mt-3 italic">
+          💡 Deze vaste prijzen zijn gecalculeerd door 150 frituristen. Indien u andere porties geeft kan dit handmatig aangepast worden.
+        </p>
       </div>
 
       {/* Products List */}
