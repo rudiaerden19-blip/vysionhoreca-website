@@ -587,6 +587,38 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     return cat ? cat.name : '-'
   }
 
+  async function deleteAllIngredients() {
+    if (!businessId) return
+    
+    const confirmed = window.confirm(
+      `⚠️ WAARSCHUWING!\n\nJe staat op het punt om ALLE ${ingredients.length} ingrediënten te verwijderen.\n\nDit kan niet ongedaan worden gemaakt!\n\nWeet je het zeker?`
+    )
+    
+    if (!confirmed) return
+    
+    // Double confirm
+    const doubleConfirm = window.confirm(
+      `🚨 LAATSTE WAARSCHUWING!\n\nAlle ingrediënten worden PERMANENT verwijderd.\n\nTyp OK om door te gaan.`
+    )
+    
+    if (!doubleConfirm) return
+    
+    try {
+      const { error } = await supabase
+        .from('ingredients')
+        .delete()
+        .eq('tenant_slug', businessId)
+      
+      if (error) throw error
+      
+      setIngredients([])
+      alert('✅ Alle ingrediënten zijn verwijderd.')
+    } catch (error) {
+      console.error('Delete error:', error)
+      alert('Er ging iets mis bij het verwijderen.')
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -630,6 +662,14 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
           >
             + Handmatig
           </button>
+          {ingredients.length > 0 && (
+            <button
+              onClick={deleteAllIngredients}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+            >
+              🗑️ Wis Alles
+            </button>
+          )}
         </div>
       </div>
 
