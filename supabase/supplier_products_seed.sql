@@ -109,8 +109,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01069', 'CHICKIES KIPSTAAFJES (FINGERS) + DOOSJE 120X19G VR', 120, 27.60, 'SNACKS'),
 ('ART01070', 'PROHALAL CHICKIES (FINGERS) 120X19G VR', 120, 36.00, 'SNACKS'),
 ('ART01071', 'CHICKEN NUGGETS 3X1KG + BAKJE BAKX', 150, 33.00, 'SNACKS'),
-('CHICKEN NUGGETS 2,8KG HENNY''S HOFKIP', 1, 34.78, 'SNACKS'),
-('CHICKEN FRIES (FINGERS) 2,45KG HENNY''S HOFKIP', 1, 35.39, 'SNACKS'),
 ('ART01072', 'CRUSTY CHICKEN STRIPS 2,5KG DV OVI', 1, 34.30, 'SNACKS'),
 ('ART01073', 'CHICKEN POPCORN SOUTHERN FRIED 1KG FARMCHIX', 1, 15.98, 'SNACKS'),
 
@@ -203,18 +201,14 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- VLEES & SNACKS - Drumsticks & Wings
 -- =====================================================
-('DRUMSTICK APIRIO 15ST HENNY''S HOFKIP', 15, 2.27, 'SNACKS'),
 ('ART01140', 'DRUMSTICK APIRIO HALAL 15X160G HIZLI', 15, 36.45, 'SNACKS'),
 ('ART01141', 'DRUMSTICK 5ST APERIO 20X200G VAN ZON', 100, 37.00, 'SNACKS'),
-('BIG WING STICK 10X325G HENNY''S HOFKIP', 10, 4.33, 'SNACKS'),
 ('ART01142', 'CHICKEN WINGS GEROOSTERD BBQ 1KG FARMCHIX', 1, 8.70, 'SNACKS'),
 ('ART01143', 'CHICKEN WINGS BONELESS 1KG FARMCHIX', 1, 17.62, 'SNACKS'),
 ('ART01144', 'CHICKEN WINGS KENTUCKY STYLE 2,5KG DV LA', 1, 26.66, 'SNACKS'),
 ('ART01145', 'CHICKEN WINGS BUFFALO STYLE 2,5KG DV LA', 1, 25.37, 'SNACKS'),
-('CHICKEN BONELESS WINGS BUCKET 6X576G HENNY''S', 6, 8.68, 'SNACKS'),
 ('ART01146', 'CHICKEN DOTS&WINGS AMERICAN STYLE 3KG', 1, 33.24, 'SNACKS'),
 ('ART01147', 'DOTS ON STICK XXL 15X260G OVI', 15, 36.90, 'SNACKS'),
-('CHICKEN CORN 36ST 2,88KG HENNY''S HOFKIP', 36, 1.10, 'SNACKS'),
 ('ART01148', 'CHICKEN CORNSTICK HALAL 36ST HIZLI', 36, 39.60, 'SNACKS'),
 
 -- =====================================================
@@ -271,7 +265,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01181', 'CRUMPY BURGER JALAPENO 20X115G VR', 20, 19.20, 'SNACKS'),
 ('ART01182', 'VISBROCHETTEN 22X110G VR', 22, 34.76, 'SNACKS'),
 ('ART01183', 'CORN DOG SMOKY MOUNTAINS 50X50G DV LA', 50, 47.00, 'SNACKS'),
-('HAM MAC & CHEESE BALLS 60X30G CASTEL D''ORO', 60, 0.48, 'SNACKS'),
 ('ART01184', 'PULLED PORK BITES 1KG SALOMON', 1, 14.71, 'SNACKS'),
 ('ART01185', 'PORK BELLY BURNT ENDS SMOKY MOUNTAINS 1KG DV LA', 1, 24.06, 'SNACKS'),
 ('ART01186', 'CRISPY CHICKEN CROQUETTE 50X20G BLEND', 50, 23.50, 'SNACKS'),
@@ -297,7 +290,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01202', 'FRIET DV TRADISTYLE 2,5KG MC CAIN', 1, 6.95, 'FRIET'),
 ('ART01203', 'FRIET DV STEAKHOUSE 2,5KG DV AVIKO', 1, 4.75, 'FRIET'),
 ('ART01204', 'FRIET DV BELGISCH HOME STYLE 2,5KG FARM', 1, 5.29, 'FRIET'),
-('FRIET DV FRY ''N DIP 2,5KG MC CAIN', 1, 6.38, 'FRIET'),
 ('ART01205', 'FRIET DV ARTISAN 12MM 2,5KG AVIKO', 1, 4.75, 'FRIET'),
 ('ART01206', 'FRIET DV SURECRISP 9MM 3/8 2,5KG MC CAIN', 1, 6.76, 'FRIET'),
 ('ART01207', 'FRIET DV 6MM ORIGINAL 2,5KG MC CAIN', 1, 6.76, 'FRIET'),
@@ -306,7 +298,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01210', 'FRIET DV ZOET 9,5MM 2,27KG AVIKO', 1, 12.09, 'FRIET'),
 ('ART01211', 'FRIET DV HOME STYLE RUSTIC SKIN ON 2,5KG FARM', 1, 5.46, 'FRIET'),
 ('ART01212', 'FRIET DV FINEST 5MM (FRIETGRAS) 1,5KG FARM', 1, 3.89, 'FRIET'),
-('FRIET DV FRY ''N DIP SKIN ON 2,5KG MC CAIN', 1, 6.57, 'FRIET'),
 ('ART01213', 'FRIET DV SURECRISP SKIN ON 9MM 2,5KG MC CAIN', 1, 6.78, 'FRIET'),
 ('ART01214', 'FRIET DV SURECRISP CRINCKLE 2,5KG MC CAIN', 1, 6.45, 'FRIET'),
 ('ART01215', 'FRIET DV CRISPY COATED 10MM 2,5KG FARM', 1, 5.49, 'FRIET'),
@@ -541,10 +532,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01408', 'MINUTE MAID APPEL 24X20CL GLAS', 24, 22.08, 'DRANKEN'),
 ('ART01409', 'MINUTE MAID ORANGE NECTAR 24X20CL GLAS', 24, 22.80, 'DRANKEN'),
 ('ART01410', 'MINUTE MAID ROZE POMPELMOES 24X20CL GLAS', 24, 20.88, 'DRANKEN'),
-('CHARLIE''S JUICE VERS SINAASAPPELSAP 1L', 1, 4.09, 'DRANKEN'),
-('CHARLIE''S JUICE VERS SINAASAPPELSAP 2L', 1, 7.57, 'DRANKEN'),
-('CHARLIE''S JUICE VERS LIMOENSAP 1L', 1, 7.87, 'DRANKEN'),
-('CHARLIE''S JUICE VERS CITROENSAP 1L', 1, 5.81, 'DRANKEN'),
 ('ART01411', 'PURE VERS APPEL-AARDBEISAP 1L', 1, 4.44, 'DRANKEN'),
 ('ART01412', 'PURE VERS ANANASSAP 1L', 1, 4.40, 'DRANKEN'),
 ('ART01413', 'PURE VERS ANANAS-GEMBER-CITROENSAP 6X25CL', 6, 9.12, 'DRANKEN'),
@@ -648,7 +635,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01483', 'BICKY HAMBURGERBROODJE BIG BUN SES. 3X15X74G MICRO', 45, 19.80, 'BAKKERIJ'),
 ('ART01484', 'BICKY HAMBURGERBROODJE ROYAL BUN 6X4X126G', 24, 24.48, 'BAKKERIJ'),
 ('ART01485', 'HAMBURGERBROODJE GEGLAZ. BRIOCHE BUN 45X75G DV LA', 45, 36.00, 'BAKKERIJ'),
-('B1048 HAMBURGERBROODJE BRIOCHE 30X90G B''DOR', 30, 0.66, 'BAKKERIJ'),
 ('ART01486', 'BIO HAMBURGERBROODJE MET SESAMZAAD 6X80G PUR PAIN', 6, 5.94, 'BAKKERIJ'),
 ('ART01487', 'BIO HAMBURGERBROODJE NATUUR 6X80G PUR PAIN', 6, 5.94, 'BAKKERIJ'),
 ('ART01488', 'BIO HAMBURGERBROODJE SESAM NIGELLA 6X80G PUR PAIN', 6, 5.94, 'BAKKERIJ'),
@@ -706,7 +692,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01532', 'PAST. 2469 BROODJE MEERZADEN GLUTENVRIJ 24X60G', 24, 31.68, 'BAKKERIJ'),
 ('ART01533', 'PAST. 221748 NAANTA WIT TARWEBROODJE 30X80G', 30, 24.90, 'BAKKERIJ'),
 ('ART01534', 'PAST. 225609 MINI SANDWICH WIT 4X28X25G', 112, 26.88, 'BAKKERIJ'),
-('B137 ITALIAANSE BOL 36X150G 5,4KG B''DOR', 36, 0.81, 'BAKKERIJ'),
 ('ART01535', 'LA LORRAINE 3782 BOERENPISTOLET WIT 75X65G', 75, 24.00, 'BAKKERIJ'),
 ('ART01536', 'LA LORRAINE 3783 BOERENPISTOLET BRUIN 75X65G', 75, 25.50, 'BAKKERIJ'),
 ('ART01537', 'LA LORRAINE 3942 PISTOLET WIT VGB 60X75G', 60, 16.80, 'BAKKERIJ'),
@@ -736,7 +721,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01561', 'QALITA MINI BROODJES TOP QUALITY MIX 125X34G', 125, 32.50, 'BAKKERIJ'),
 ('ART01562', 'QALITA MINI BROODJES CLASSIC MIX 125X34G', 125, 25.00, 'BAKKERIJ'),
 ('ART01563', 'PANESCO SANDWICH PREMIUM 80X55G', 80, 20.80, 'BAKKERIJ'),
-('MB19 ASSORTIMENT MINI LONGUETTES 60X40G B''DOR', 60, 0.40, 'BAKKERIJ'),
 ('ART01564', 'LA LORRAINE 2054 MINI SANDWICH FB 150X30G', 150, 36.00, 'BAKKERIJ'),
 ('ART01565', 'LA LORRAINE 4612 MINI MIX SOFT ROND TS 75X30G', 75, 18.00, 'BAKKERIJ'),
 ('ART01566', 'LA LORRAINE 7080 MINI MIX SOFT CARRE 75X40G', 75, 21.75, 'BAKKERIJ'),
@@ -823,7 +807,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- BAKKERIJ - Bagel
 -- =====================================================
-('B275 BAGEL SESAM 40X80G B''DOR', 40, 0.54, 'BAKKERIJ'),
 ('ART01630', 'BIO BAGEL NIGELLA VEGAN 6X90G PUR PAIN', 6, 6.72, 'BAKKERIJ'),
 
 -- =====================================================
@@ -869,7 +852,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01660', 'PAST. 229418 PINSA ROMANA 18X240G', 18, 48.60, 'BAKKERIJ'),
 ('ART01661', 'PINSA CLASSIC MINI 4X130G AMBIENT', 4, 5.84, 'BAKKERIJ'),
 ('ART01662', 'PINSA CLASSIC 2X230G AMBIENT', 2, 4.82, 'BAKKERIJ'),
-('B326/L44 FOCACCIA MEDITERRANEA 45X100G B''DOR', 45, 0.97, 'BAKKERIJ'),
 
 -- =====================================================
 -- BAKKERIJ - Croques
@@ -1031,12 +1013,9 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01784', 'COOK & BAKE ALL-IN MIX MEERGRANEN 2KG', 1, 8.83, 'BAKKERIJ'),
 ('ART01785', 'PIZZABLOEM FARINA CAPUTO BLAUW 25KG', 1, 32.75, 'BAKKERIJ'),
 ('ART01786', 'PIZZABLOEM FARINA CAPUTO ROSSA 25KG', 1, 33.73, 'BAKKERIJ'),
-('PIZZABLOEM SUPERIORE ''00'' 25KG 5 STAGIONI', 1, 39.64, 'BAKKERIJ'),
 ('ART01787', 'BLOEM MIX VR PIZZA/FOCCACIA GIST 500G IL MOLINO', 1, 0.91, 'BAKKERIJ'),
 ('ART01788', 'BLOEM MIX VOOR VERSE PASTA 1KG IL MOLINO', 1, 1.86, 'BAKKERIJ'),
 ('ART01789', 'PASTABLOEM SEMOLA RIMACINATA 10KG 5 STAGIONI', 1, 19.03, 'BAKKERIJ'),
-('PASTABLOEM ''00'' DI GRANO TENERO 1KG IL MOLINO', 1, 1.19, 'BAKKERIJ'),
-('PASTABLOEM ''00'' DI GRANO TENERO 5KG IL MOLINO', 1, 6.33, 'BAKKERIJ'),
 ('ART01790', 'BOEKWEITBLOEM 1KG SCHEURS', 1, 3.72, 'BAKKERIJ'),
 ('ART01791', 'SPELT BLOEM 900G SOUBRY', 1, 3.52, 'BAKKERIJ'),
 
@@ -1117,7 +1096,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01851', 'GRISSINI PIQUITOS ARTISANAAL 140G', 1, 1.56, 'BAKKERIJ'),
 ('ART01852', 'GRISSINI MIX PICOS 170G', 1, 1.56, 'BAKKERIJ'),
 ('ART01853', 'FORNACCINI OLIJFOLIE 150G', 1, 1.36, 'BAKKERIJ'),
-('CROUSTINI''S MET FIJNE KRUIDEN 500G DE NOTEKRAKER', 1, 19.65, 'BAKKERIJ'),
 
 -- =====================================================
 -- BAKKERIJ - Bruschetta & Aperodipper
@@ -1132,7 +1110,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01861', 'APERO STICKS ARTISANAAL NATUUR 1KG DV FOODS', 1, 12.23, 'BAKKERIJ'),
 ('ART01862', 'BROODJES KNOFLOOK PETERSELIE 160G DELI DI PAOLO', 1, 1.57, 'BAKKERIJ'),
 ('ART01863', 'BBQ BAKBROOD BIER 350G', 1, 3.13, 'BAKKERIJ'),
-('HAUST TOAST ''N CHIPS KNOFLOOK 125G DV FOODS', 1, 1.82, 'BAKKERIJ'),
 ('ART01864', 'VITAPOP KAAS EN PEPER 120G', 1, 1.35, 'BAKKERIJ'),
 ('ART01865', 'VITAPOP CHILI 120G', 1, 1.36, 'BAKKERIJ'),
 ('ART01866', 'FOSSIER ZAK ROZE BISCUIT 250G', 1, 6.16, 'BAKKERIJ'),
@@ -1180,8 +1157,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Mayonaise & Frietsaus
 -- =====================================================
-('MAYONAISE TUBE 850ML GOUDA''S GLORIE', 1, 3.93, 'SAUZEN'),
-('FRIETSAUS TUBE 850ML GOUDA''S GLORIE', 1, 2.57, 'SAUZEN'),
 ('ART01899', 'MAYO CHEF 10L PAUWELS', 1, 26.99, 'SAUZEN'),
 ('ART01900', 'FRIETSAUS 25% 10L OLIEHOORN', 1, 21.37, 'SAUZEN'),
 ('ART01901', 'FRIETSAUS 35% 10L OLIEHOORN', 1, 25.21, 'SAUZEN'),
@@ -1193,8 +1168,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Ketchup & Curry
 -- =====================================================
-('TOMATENKETCHUP TUBE 850ML GOUDA''S GLORIE', 1, 3.07, 'SAUZEN'),
-('CURRY KETCHUP TUBE 850ML GOUDA''S GLORIE', 1, 3.20, 'SAUZEN'),
 ('ART01906', 'TOMATENKETCHUP TUBE 425ML ZEISNER', 1, 3.03, 'SAUZEN'),
 ('ART01907', 'CURRY KETCHUP 3L PET VANDEMOORTELE', 1, 13.08, 'SAUZEN'),
 ('ART01908', 'TOMATENSAUS 1,275KG BLIK JIV', 1, 6.03, 'SAUZEN'),
@@ -1206,7 +1179,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Mosterd
 -- =====================================================
-('MOSTERD TUBE 850ML GOUDA''S GLORIE', 1, 2.72, 'SAUZEN'),
 ('ART01913', 'MOSTERD 1L TUBE MANNA', 1, 4.55, 'SAUZEN'),
 ('ART01914', 'MOSTERD 2L DL', 1, 12.37, 'SAUZEN'),
 ('ART01915', 'MOSTERD 3L EMMER ANDA', 1, 11.26, 'SAUZEN'),
@@ -1246,7 +1218,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01933', 'CLASSIC BEARNAISESAUS 6X250ML VERSTEGEN', 6, 24.54, 'SAUZEN'),
 ('ART01934', 'CLASSIC HOLLANDAISESAUS 3X1L VERSTEGEN', 3, 44.67, 'SAUZEN'),
 ('ART01935', 'HOLLANDAISESAUS 6X250ML VERSTEGEN', 6, 25.08, 'SAUZEN'),
-('GARDE D''OR HOLLANDAISE SAUS 1L KNORR PROF', 1, 6.99, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Satésaus & Speciale Sauzen
@@ -1347,10 +1318,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01993', 'VINAIGRETTE YOGHURT (YOGORETTE) 2L VANDEMOORTELE', 1, 11.76, 'SAUZEN'),
 ('ART01994', 'VINAIGRETTE MET BIESLOOK 2L ANDA', 1, 11.38, 'SAUZEN'),
 ('ART01995', 'VINAIGRETTE BIESLOOK 1L LA WILLIAM', 1, 7.41, 'SAUZEN'),
-('HELLMANN''S VINAIGRETTE CITRUS 1L', 1, 12.14, 'SAUZEN'),
-('HELLMANN''S VINAIGRETTE SESAM SOJA 1L', 1, 12.14, 'SAUZEN'),
-('HELLMANN''S VINAIGRETTE BALSAMICO AARDBEI 1L', 1, 12.14, 'SAUZEN'),
-('HELLMANN''S DRESSING CAESAR 1L', 1, 7.63, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Knorr Poeder & Kant-en-klaar
@@ -1363,7 +1330,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART02001', 'BECHAMELSAUS POEDER 1KG KNORR', 1, 12.74, 'SAUZEN'),
 ('ART02002', 'CHAMPIGNONSAUS POEDER 3 ZAKJES PER DOOSJE KNORR', 3, 4.11, 'SAUZEN'),
 ('ART02003', 'GROENE PEPERSAUS POEDER 3 ZAKJES PER DOOSJE KNORR', 3, 4.11, 'SAUZEN'),
-('GARDE D''OR CHAMPIGNONSAUS GARNITUUR 1L KNORR PROF', 1, 6.72, 'SAUZEN'),
 ('ART02004', 'RATATOUILLE 2,5KG KNORR PROF', 1, 25.18, 'SAUZEN'),
 
 -- =====================================================
@@ -1422,14 +1388,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - D''Lis Pastasauzen
 -- =====================================================
-('D''LIS BOLOGNAISE SAUS (KIP) 1KG', 1, 5.82, 'SAUZEN'),
-('D''LIS BOLOGNAISE SAUS HALAL 1KG', 1, 7.86, 'SAUZEN'),
-('D''LIS SAUS NAPOLITAANSE 1KG', 1, 5.65, 'SAUZEN'),
-('D''LIS KAASSAUS 1KG', 1, 7.17, 'SAUZEN'),
-('D''LIS SAUS CARBONARA 1KG', 1, 7.99, 'SAUZEN'),
-('D''LIS SAUS SCAMPI CREME 1KG', 1, 7.88, 'SAUZEN'),
-('D''LIS ARRABIATA SAUS 1KG', 1, 6.69, 'SAUZEN'),
-('D''LIS 4 KAZENSAUS 1KG', 1, 7.45, 'SAUZEN'),
 ('ART02042', 'BOLOGNAISE SAUS VERS TRAITEUR PIERROT 3,2KG', 1, 23.80, 'SAUZEN'),
 
 -- =====================================================
@@ -1540,8 +1498,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - D''Lis Sauzen Extra
 -- =====================================================
-('D''LIS FORESTIERE SAUS 1KG', 1, 8.88, 'SAUZEN'),
-('D''LIS WITLOOF KAAS/HAMSAUS BELGICA 1KG', 1, 8.54, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - DL Knijpflessen
@@ -1555,7 +1511,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 ('ART02111', 'MOSTERD AMORA DIJON EMMER 5KG', 1, 19.98, 'SAUZEN'),
 ('ART02112', 'VINAIGRETTE MET OLIJFOLIE 2L VANDEMOORTELE', 1, 14.63, 'SAUZEN'),
-('HELLMANN''S VINAIGRETTE BASILICUM 1L', 1, 12.14, 'SAUZEN'),
 ('ART02113', 'HAMAL VERSE TARTAARSAUS SPECIAAL 5KG', 1, 22.38, 'SAUZEN'),
 ('ART02114', 'PICKLES 2,4L VANDEMOORTELE', 1, 10.10, 'SAUZEN'),
 ('ART02115', 'HEINZ TOMATO FRITO 330ML', 1, 2.20, 'SAUZEN'),
@@ -1564,11 +1519,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - D''Lis Sauzen Extra 2
 -- =====================================================
-('D''LIS SAUS BEARNAISESAUS 1KG', 1, 5.98, 'SAUZEN'),
-('D''LIS SAUS PEPERROOMSAUS 1KG', 1, 7.52, 'SAUZEN'),
-('D''LIS CHAMPIGNONROOMSAUS ARCHIDUC 1KG', 1, 7.52, 'SAUZEN'),
-('D''LIS BANDIDO SAUS 1KG', 1, 7.73, 'SAUZEN'),
-('D''LIS BOLOGNAISE SAUS CLASSICO 1L', 1, 7.67, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - La William 3L PET
@@ -1604,7 +1554,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Knorr Poeder Extra
 -- =====================================================
-('VISSAUS A L''ARMORICAINE POEDER 1KG KNORR', 1, 36.69, 'SAUZEN'),
 ('ART02136', 'CHAMPIGNONSAUS POEDER 1,1KG KNORR', 1, 22.59, 'SAUZEN'),
 ('ART02137', 'JACHTSAUS POEDER 1,12KG KNORR', 1, 28.69, 'SAUZEN'),
 ('ART02138', 'STROGANOFFSAUS POEDER 1KG KNORR', 1, 26.12, 'SAUZEN'),
@@ -1648,7 +1597,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- SAUZEN - Overige Extra
 -- =====================================================
 ('ART02154', 'QALITA TOMATENKETCHUP 5,6KG', 1, 15.34, 'SAUZEN'),
-('HELLMANN''S VINAIGRETTE SJALOT RODE UI 1L', 1, 12.14, 'SAUZEN'),
 ('ART02155', 'HONIG BASIS BOTER-EIERSAUS 760G', 1, 20.03, 'SAUZEN'),
 ('ART02156', 'KNOFLOOKSAUS MET KAPPERTJES 1L', 1, 8.68, 'SAUZEN'),
 ('ART02157', 'TARTAAR VERS 5L NIKITA', 1, 16.49, 'SAUZEN'),
@@ -1674,8 +1622,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART02169', 'NANTUA SAUS POEDER 1KG KNORR GOURMET', 1, 29.08, 'SAUZEN'),
 ('ART02170', 'VIS VELOUTE 1KG KNORR GOURMET', 1, 27.91, 'SAUZEN'),
 ('ART02171', 'CHAMPIGNONSAUS POEDER 1KG KNORR GOURMET', 1, 24.58, 'SAUZEN'),
-('GARDE D''OR VISSAUS (NANTUA) 1L KNORR PROF', 1, 7.46, 'SAUZEN'),
-('GARDE D''OR RODE WIJNSAUS 1L KNORR PROF', 1, 7.49, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Heinz Flessen
@@ -1689,9 +1635,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - D''Lis Sauzen Extra 3
 -- =====================================================
-('D''LIS SAUS MASCARPONE ROSSO 1KG', 1, 7.77, 'SAUZEN'),
-('D''LIS SAUS CURRY 1KG', 1, 5.82, 'SAUZEN'),
-('D''LIS PRIMAVERA SAUS 1KG', 1, 5.96, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Altoni Italiaans
@@ -1808,7 +1751,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Knorr Prof Extra
 -- =====================================================
-('GARDE D''OR CURRYSAUS 1L KNORR PROF', 1, 7.51, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Overige Extra 3
@@ -1899,7 +1841,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 ('ART02289', 'HEINZ MAYO SERIOUSLY GOOD TOP DOWN 400ML', 1, 4.41, 'SAUZEN'),
 ('ART02290', 'BECHAMELSAUS 500ML', 1, 2.18, 'SAUZEN'),
-('CARDINI''S CAESAR DRESSING 1,1L', 1, 15.49, 'SAUZEN'),
 ('ART02291', 'CHICKEN LAVASAUS VERS 1,8KG JIV', 1, 15.27, 'SAUZEN'),
 
 -- =====================================================
@@ -1954,16 +1895,12 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Hellmann's
 -- =====================================================
-('HELLMANN''S DRESSING HONING MOSTERD 1L', 1, 7.76, 'SAUZEN'),
-('HELLMANN''S MAYONAISE REAL 10L', 1, 46.48, 'SAUZEN'),
-('HELLMANN''S MAYONAISE REAL 5L', 1, 36.32, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Heinz Grootverpakking
 -- =====================================================
 ('ART02313', 'HEINZ TOMATO KETCHUP 10L EMMER', 1, 49.44, 'SAUZEN'),
 ('ART02314', 'HEINZ SAUS-O-MAT MAYONAISE 80% 3X5L', 3, 65.25, 'SAUZEN'),
-('BULL''S EYE BBQ SAUS ORIGINAL 2L', 1, 17.08, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Golden Turtle Extra
@@ -1991,11 +1928,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - D'Lis Porties & Pasta Sauzen
 -- =====================================================
-('D''LIS BEARNAISE SAUS PORTIES 15X150G', 15, 1.50, 'SAUZEN'),
-('D''LIS QUATTRO FORMAGGI SAUS PORTIES 15X150G', 15, 1.60, 'SAUZEN'),
-('D''LIS CARBONARA SAUS PORTIES 15X150G', 15, 1.70, 'SAUZEN'),
-('D''LIS ARRABIATA SAUS PORTIES 15X150G', 15, 1.50, 'SAUZEN'),
-('D''LIS PESTO SAUS 1KG', 1, 12.20, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Specials
@@ -2021,23 +1953,16 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - D'Lis Porties Extra
 -- =====================================================
-('D''LIS BANDIDO SAUS PORTIES 15X150G', 15, 1.70, 'SAUZEN'),
-('D''LIS PESTO SAUS PORTIES 15X150G', 15, 2.25, 'SAUZEN'),
-('D''LIS BOLOGNESE CLASSICO SAUS PORTIES 15X150G', 15, 1.66, 'SAUZEN'),
-('D''LIS CHEDDARSAUS 1KG', 1, 7.30, 'SAUZEN'),
-('D''LIS BOLOGNAISE DU CHEF 1KG', 1, 7.53, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Tierenteyn Mosterd
 -- =====================================================
 ('ART02335', 'MOSTERD EXTRA 1KG TIERENTEYN', 1, 5.04, 'SAUZEN'),
 ('ART02336', 'MOSTERD STROPKES 1KG TIERENTEYN', 1, 3.62, 'SAUZEN'),
-('MOSTERD A L''ANCIENNE 950G TIERENTEYN', 1, 5.74, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Manna Sauzen Extra
 -- =====================================================
-('CH''EASY 1L TUBE MANNA', 1, 7.73, 'SAUZEN'),
 ('ART02337', 'HOT SHOT SAUS 3L PET MANNA', 1, 21.44, 'SAUZEN'),
 ('ART02338', 'TOMATAISE 3L PET MANNA', 1, 13.34, 'SAUZEN'),
 ('ART02339', 'TOMAGREC 2L MANNA', 1, 12.70, 'SAUZEN'),
@@ -2119,8 +2044,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART02370', 'SMOKY MOUNTAINS HEMP SAUCE 775ML LA FOODS', 1, 5.71, 'SAUZEN'),
 ('ART02371', 'SMOKY MOUNTAINS SPICY CHIPOTLE 2,5KG LA FOODS', 1, 19.31, 'SAUZEN'),
 ('ART02372', 'CHEDDAR CHEESE SAUCE 950G TUBE LA FOODS', 1, 12.25, 'SAUZEN'),
-('CHUNCKY SALSA MEDIUM PABLO''S 2,25KG LA FOODS', 1, 13.51, 'SAUZEN'),
-('EDDY''S BBQ SAUS ORIGINAL 3,75L LA FOODS', 1, 33.69, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Ballymaloe Relishes
@@ -2176,14 +2099,10 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- SAUZEN - Remia & Gouda's Glorie BIB
 -- =====================================================
 ('ART02395', 'FRIETSAUS ZOET 25% CLASSIC BIB 7,5L REMIA', 1, 18.54, 'SAUZEN'),
-('FRIETSAUS 35% B.I.B. 7,5L GOUDA''S GLORIE', 1, 19.65, 'SAUZEN'),
-('FRIETSAUS 25% B.I.B. 7,5L GOUDA''S GLORIE', 1, 18.73, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Hellmann's Dressings Extra
 -- =====================================================
-('HELLMANN''S DRESSING THOUSAND ISLANDS 1L', 1, 7.84, 'SAUZEN'),
-('HELLMANN''S DRESSING YOGHURT 1L', 1, 7.45, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Knorr Gourmet
@@ -2193,7 +2112,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - D'Lis Extra
 -- =====================================================
-('D''LIS THAI CURRY SAUS 1KG', 1, 7.44, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - La William Grootverpakking
@@ -2229,7 +2147,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Anda Tubes Extra
 -- =====================================================
-('JIM''S BURGER SAUS 1L TUBE ANDA', 1, 6.06, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Swad Indiase Sauzen
@@ -2245,7 +2162,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Koreaanse Sauzen
 -- =====================================================
-('KRUIDENPASTA PITTIG GOCHUJANG 500G O''FOOD', 1, 3.85, 'SAUZEN'),
 ('ART02415', 'KIMCHI SAUS PITTIG ZUUR 230ML SURASANG', 1, 4.85, 'SAUZEN'),
 
 -- =====================================================
@@ -2288,7 +2204,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - La Foods BBQ Extra
 -- =====================================================
-('EDDY''S BBQ SAUS CAMPFIRE 3,75L LA FOODS', 1, 33.69, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Pauwels Sausmaster & Sticks
@@ -2408,8 +2323,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Hellmann's Dressings Extra
 -- =====================================================
-('HELLMANN''S DRESSING KLASSIEK 1L', 1, 7.07, 'SAUZEN'),
-('HELLMANN''S DRESSING FIJNE KRUIDEN BIESLOOK 1L', 1, 6.93, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Delino Grootverpakking
@@ -2493,13 +2406,10 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- SAUZEN - La Foods Ranch & BBQ
 -- =====================================================
 ('ART02510', 'RANCH DRESSING 3,78L LA FOODS', 1, 35.52, 'SAUZEN'),
-('LILLIE''S Q HONEY GOLD 2L LA FOODS', 1, 15.87, 'SAUZEN'),
-('LILLIE''S Q SMOKY BARBECUE SAUS 2L LA FOODS', 1, 15.87, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Garde D'Or
 -- =====================================================
-('GARDE D''OR BRUINE PEPERSAUS GLUTENVRIJ 1L', 1, 9.35, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Delino Extra
@@ -2552,7 +2462,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Granoliva Dips Extra
 -- =====================================================
-('YOGHURTDIP MET MUNT CITROEN ZA''ATER 800G GRANOLIVA', 1, 10.91, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Zeisner Extra
@@ -2577,7 +2486,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- SAUZEN - SG BBQ Premium
 -- =====================================================
 ('ART02534', 'SG BOLD AND BEEFY BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
-('SG HOLY SMOKE THAT''S HOT BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
 ('ART02535', 'SG SMOKEYS FINEST BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
 ('ART02536', 'SG BLACKSTRAP COFFEE MOLASSES BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
 ('ART02537', 'SG BLACK CHERRY BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
@@ -2590,7 +2498,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Gouda's Glorie Extra
 -- =====================================================
-('BURGER SAUS ORIGINAL 850ML GOUDA''S GLORIE', 1, 3.85, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Mahall Extra
@@ -2648,7 +2555,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - D'Lis Extra
 -- =====================================================
-('D''LIS DIABOLIQUE SAUS 1KG', 1, 7.56, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - La Foods Smoky Mountains Extra
@@ -2695,12 +2601,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SAUZEN - Garde D'Or Knorr Prof Compleet
 -- =====================================================
-('GARDE D''OR WITTE WIJNSAUS 1L KNORR PROF', 1, 7.53, 'SAUZEN'),
-('GARDE D''OR KAASSAUS 1L KNORR PROF', 1, 8.69, 'SAUZEN'),
-('GARDE D''OR CHAMPIGNONSAUS Z. GARNITUUR 1L KNORR', 1, 7.46, 'SAUZEN'),
-('GARDE D''OR WITTE BASIS SAUS 1L KNORR PROF', 1, 7.29, 'SAUZEN'),
-('GARDE D''OR BEARNAISE SAUS 1L KNORR PROF', 1, 6.69, 'SAUZEN'),
-('GARDE D''OR PEPERROOMSAUS 1L KNORR', 1, 6.03, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Vandemoortele Tubes Extra
@@ -2862,12 +2762,8 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- OLIJFOLIE - A L'Olivier Premium
 -- =====================================================
-('OLIJFOLIE A L''OLIVIER KNOFLOOK & TIJM 250ML', 1, 12.71, 'OLIËN & VETTEN'),
-('OLIJFOLIE A L''OLIVIER HOJIBLANCA 250ML', 1, 10.68, 'OLIËN & VETTEN'),
-('OLIJFOLIE A L''OLIVIER CITROEN EN GEMBER 250ML', 1, 12.42, 'OLIËN & VETTEN'),
 ('A L''OLIVIER PORCINI & TRUFFEL 250ML', 1, 14.09, 'OLIËN & VETTEN'),
 ('A L''OLIVIER WALNOOTOLIE 500ML', 1, 26.67, 'OLIËN & VETTEN'),
-('BIO A L''OLIVIER BIO GEROOSTERDE SESAM OLIE 250ML', 1, 11.76, 'OLIËN & VETTEN'),
 
 -- =====================================================
 -- SESAMOLIE
@@ -3428,7 +3324,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART03048', 'TASTY FOOD CATERINGDOOS 45CM 10ST', 10, 14.50, 'VERPAKKING'),
 ('ART03049', 'TASTY FOOD CATERINGDOOS 55CM 10ST', 10, 16.90, 'VERPAKKING'),
 ('ART03050', 'GREEN DISH CATERINGDOOS 45CM 10ST', 10, 16.10, 'VERPAKKING'),
-('D''LIS PRESTIGE CATERING CUP 75ST 163ML', 75, 0.12, 'VERPAKKING'),
 ('ART03051', 'PARTYSCHAAL DECOR 365MM', 1, 8.22, 'VERPAKKING'),
 ('ART03052', 'PARTYSCHAAL DECOR 420MM', 1, 10.73, 'VERPAKKING'),
 ('ART03053', 'PARTYSCHAAL DECOR 460MM', 1, 12.59, 'VERPAKKING'),
@@ -3564,7 +3459,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 ('ART03148', 'ELASTIEKJES 1KG NR.18', 1, 10.16, 'VERPAKKING'),
 ('ART03149', 'PORTIEBEKER SLAGROOM 256ST LOOSE', 256, 17.92, 'VERPAKKING'),
-('REUZEBEKERS +/- 120ST ROND LOOSE''S', 120, 0.10, 'VERPAKKING'),
 ('ART03150', 'MULTI BAK 1/2KG + DEK 25ST DEPA', 25, 10.25, 'VERPAKKING'),
 ('ART03151', 'SCHAAL + DEKSEL ZWART 34X25X4CM 5ST', 5, 5.40, 'VERPAKKING'),
 ('ART03152', 'SCHAAL + DEKSEL ZWART 30X19X4CM 10ST', 10, 10.10, 'VERPAKKING'),
@@ -3736,13 +3630,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- SALADES - Cuisin'Easy
 -- =====================================================
-('CUISIN''EASY BELLA CIAO 1,25KG', 1, 9.23, 'SALADES'),
-('CUISIN''EASY GREEN VALLEY 1,25KG', 1, 7.33, 'SALADES'),
-('CUISIN''EASY INDIAN SUMMER 1,25KG', 1, 9.23, 'SALADES'),
-('CUISIN''EASY SPARTACUS 1,25KG', 1, 9.20, 'SALADES'),
-('CUISIN''EASY SULTAN OF SWING 1,25KG', 1, 7.94, 'SALADES'),
-('CUISIN''EASY SUNNY VIBES 1,25KG', 1, 7.32, 'SALADES'),
-('CUISIN''EASY NORDIC SOUL 1,25KG', 1, 7.01, 'SALADES'),
 
 -- =====================================================
 -- SALADES - Traiteur Pierrot
@@ -3829,9 +3716,7 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART03340', 'PASSATA GEZEEFDE TOMATEN 1KG ELVEA', 1, 3.05, 'CONSERVEN'),
 ('ART03341', 'PASSATA GEZEEFDE TOMATEN 2,55KG ELVEA', 1, 8.05, 'CONSERVEN'),
 ('ART03342', 'KERSTOMAAT 3L GALLETTO', 1, 5.40, 'CONSERVEN'),
-('KERSTOMAAT GEMARINEERD 1KG SUD''N''SOL', 1, 17.75, 'CONSERVEN'),
 ('ART03343', 'KERSTOMAAT 350G GRANOLIVA', 1, 6.79, 'CONSERVEN'),
-('TOMATEN GEMARINEERD 1KG SUD''N''SOL', 1, 14.72, 'CONSERVEN'),
 ('ART03344', 'QALITA ZONGEDROOGDE TOMATEN 1KG', 1, 10.19, 'CONSERVEN'),
 ('ART03345', 'ZONGEDROOGDE TOMATENPUREE 450G BRESC', 1, 6.49, 'CONSERVEN'),
 ('ART03346', 'TOMATEN SALSA 1KG BRESC', 1, 12.17, 'CONSERVEN'),
@@ -3897,7 +3782,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 ('ART03395', 'GROENTEMENGELING 3L NOLIKO', 1, 7.12, 'CONSERVEN'),
 ('ART03396', 'GROENTEMENGELING 6X1L NOLIKO', 1, 14.16, 'CONSERVEN'),
-('GROENTEMENGELING 6X1/2L D''AUCY', 1, 13.76, 'CONSERVEN'),
 ('ART03397', 'ERWTEN EXTRA FIJN 3L FRESHCAN', 1, 8.01, 'CONSERVEN'),
 ('ART03398', 'ERWTEN EXTRA FIJN 6X1L NOLIKO', 1, 16.19, 'CONSERVEN'),
 ('ART03399', 'ERWTEN EXTRA FIJN 6X1/2L NOLIKO', 1, 8.90, 'CONSERVEN'),
@@ -3977,7 +3861,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART03461', 'JALAPENO PEPERS SCHIJFJES 3KG DIADEM', 1, 7.36, 'CONSERVEN'),
 ('ART03462', 'PAPRIKA ROOD 470G BLIK', 1, 11.84, 'CONSERVEN'),
 ('ART03463', 'PAPRIKA ROOD GESNEDEN 2X2,4L KROON', 1, 19.72, 'CONSERVEN'),
-('PAPRIKA''S ROOD GEROOSTERD 500ML FIRST STATE', 1, 4.41, 'CONSERVEN'),
 ('ART03464', 'SWEETY DROPS 300G GRANOLIVA', 1, 9.66, 'CONSERVEN'),
 ('ART03465', 'ZOETE PEPERS MET ROOMKAAS 700G GRANOLIVA', 1, 17.31, 'CONSERVEN'),
 ('ART03466', 'ESPELETTE PIMENT POEDER 40G', 1, 7.73, 'CONSERVEN'),
@@ -4034,7 +3917,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART03509', 'DRUIVEN ONTPIT GEPELD 425G AVILA', 1, 2.22, 'CONSERVEN'),
 ('ART03510', 'NOORDKRIEKEN ONTPIT OP SIRO 680G/720ML GLAS NOLIKO', 1, 2.75, 'CONSERVEN'),
 ('ART03511', 'NOORDKRIEKEN ONTPIT ALLBAK 3KG', 1, 14.51, 'CONSERVEN'),
-('METER MOE''S KRIEKEPOT 745G', 1, 9.40, 'CONSERVEN'),
 ('ART03512', 'MANGO SCHIJVEN ALPHONSO 450G SWAD', 1, 3.22, 'CONSERVEN'),
 ('ART03513', 'MANGO PULP GEZOET ALPHONSO 450G SWAD', 1, 2.12, 'CONSERVEN'),
 
