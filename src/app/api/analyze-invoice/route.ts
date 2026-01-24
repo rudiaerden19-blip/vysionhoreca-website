@@ -44,30 +44,38 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
     const prompt = `Je bent een expert in het analyseren van leveranciersfacturen voor horecazaken.
 Analyseer de factuur en extraheer alle producten/ingrediënten met hun prijzen.
 
-BELANGRIJK: Geef voor elk item ook de EXACTE originele tekst van de factuur terug in "originalText".
+BELANGRIJK: Facturen hebben vaak meerdere kolommen:
+- Omschrijving (bijv. "HAMBURGER 30X100G VAN ZON")
+- Aantal (bijv. "2" dozen/colli)
+- Eenheid (CU, ST, KG, L)
+- Prijs per stuk/doos (bijv. €10.90)
+- Totaal bedrag (bijv. €21.80)
 
-Retourneer ALLEEN een valid JSON object met deze structuur (geen andere tekst, geen markdown):
+Retourneer ALLEEN een valid JSON object:
 {
-  "supplier": "naam van de leverancier",
-  "invoiceDate": "datum in YYYY-MM-DD formaat",
+  "supplier": "naam leverancier",
+  "invoiceDate": "YYYY-MM-DD",
   "invoiceNumber": "factuurnummer",
   "totalAmount": 123.45,
   "items": [
     {
-      "originalText": "BRAADWORST WIT 24X150G VR",
-      "name": "Braadworst wit",
-      "totalPrice": 28.00,
+      "originalText": "HAMBURGER 30X100G VAN ZON",
+      "name": "Hamburger",
+      "boxesOrdered": 2,
+      "pricePerBox": 10.90,
+      "totalPrice": 21.80,
       "vatPercentage": 6
     }
   ]
 }
 
-REGELS:
-1. originalText = kopieer de EXACTE tekst van de factuur (inclusief 24X150G, 96X20G, etc.)
-2. name = korte productnaam zonder gewicht/aantal
-3. totalPrice = het bedrag op de factuur voor die regel
-4. BTW is meestal 6% voor voedingsmiddelen, 21% voor non-food
-5. Geef ALLEEN het JSON object terug, geen andere tekst of markdown`
+KRITIEKE REGELS:
+1. originalText = EXACTE tekst van de factuur (met 30X100G, 24X150G, etc.)
+2. boxesOrdered = aantal DOZEN/COLLI gekocht (de "Aantal" kolom, vaak 1 of 2)
+3. pricePerBox = prijs voor 1 DOOS (niet het totaal als meerdere dozen)
+4. totalPrice = totaalbedrag voor die regel
+5. Als boxesOrdered=2 en totalPrice=21.80, dan pricePerBox=10.90
+6. Geef ALLEEN JSON terug, geen markdown`
 
     // Direct REST API call to Gemini (using v1beta for wider model support)
     const response = await fetch(
@@ -146,58 +154,64 @@ REGELS:
     const validatedItems = (parsed.items || []).map((item: any) => {
       const originalText = item.originalText || item.name || ''
       const totalPrice = Number(item.totalPrice) || 0
+      const boxesOrdered = Number(item.boxesOrdered) || 1
       
-      // Try to extract quantity from patterns like "24X150G", "96X20G", "30X100G", "5EX140G"
-      // Patterns: NUMBERxNUMBERg, NUMBER X NUMBERg, NUMBEReXNUMBERg
-      let quantity = 1
+      // Calculate price per box (use AI value or calculate from total)
+      let pricePerBox = Number(item.pricePerBox) || 0
+      if (pricePerBox === 0 && boxesOrdered > 0) {
+        pricePerBox = totalPrice / boxesOrdered
+      }
+      
+      // Try to extract units per box from patterns like "24X150G", "96X20G", "30X100G"
+      let unitsPerBox = 1
       let unit = 'stuk'
       
       // Pattern 1: 24X150G, 96X20G, 30X100G (number X numberg)
       const packMatch = originalText.match(/(\d+)\s*[xX]\s*\d+\s*[gG]/i)
       if (packMatch) {
-        quantity = parseInt(packMatch[1], 10)
-        console.log(`Parsed pack quantity from "${originalText}": ${quantity} stuks`)
+        unitsPerBox = parseInt(packMatch[1], 10)
+        console.log(`Parsed units per box from "${originalText}": ${unitsPerBox} stuks per doos`)
       }
       
-      // Pattern 2: 5EX140G (numberEXnumberg - E for "each" or typo)
-      if (quantity === 1) {
+      // Pattern 2: 5EX140G (numberEXnumberg)
+      if (unitsPerBox === 1) {
         const packMatchE = originalText.match(/(\d+)\s*[eE]?[xX]\s*\d+\s*[gG]/i)
         if (packMatchE) {
-          quantity = parseInt(packMatchE[1], 10)
-          console.log(`Parsed pack quantity (E) from "${originalText}": ${quantity} stuks`)
+          unitsPerBox = parseInt(packMatchE[1], 10)
+          console.log(`Parsed units per box (E) from "${originalText}": ${unitsPerBox} stuks per doos`)
         }
       }
       
-      // Pattern 3: 10L, 10KG, 2.5KG (volume/weight)
-      if (quantity === 1) {
+      // Pattern 3: 10L, 10KG, 2.5KG (volume/weight - these are the units, not pieces)
+      if (unitsPerBox === 1) {
         const volumeMatch = originalText.match(/(\d+(?:[,.]\d+)?)\s*(L|LTR|LITER)\b/i)
         if (volumeMatch) {
-          quantity = parseFloat(volumeMatch[1].replace(',', '.'))
+          unitsPerBox = parseFloat(volumeMatch[1].replace(',', '.'))
           unit = 'liter'
-          console.log(`Parsed volume from "${originalText}": ${quantity} liter`)
+          console.log(`Parsed volume from "${originalText}": ${unitsPerBox} liter per doos`)
         }
       }
       
-      if (quantity === 1) {
+      if (unitsPerBox === 1) {
         const weightMatch = originalText.match(/(\d+(?:[,.]\d+)?)\s*(KG|KILO)\b/i)
         if (weightMatch) {
-          quantity = parseFloat(weightMatch[1].replace(',', '.'))
+          unitsPerBox = parseFloat(weightMatch[1].replace(',', '.'))
           unit = 'kg'
-          console.log(`Parsed weight from "${originalText}": ${quantity} kg`)
+          console.log(`Parsed weight from "${originalText}": ${unitsPerBox} kg per doos`)
         }
       }
       
-      // Calculate price per unit
-      const pricePerUnit = quantity > 0 ? totalPrice / quantity : totalPrice
+      // Calculate price per unit: pricePerBox / unitsPerBox
+      const pricePerUnit = unitsPerBox > 0 ? pricePerBox / unitsPerBox : pricePerBox
       
-      console.log(`${item.name}: ${totalPrice} / ${quantity} = ${pricePerUnit.toFixed(4)} per ${unit}`)
+      console.log(`${item.name}: doos €${pricePerBox.toFixed(2)} / ${unitsPerBox} ${unit} = €${pricePerUnit.toFixed(4)} per ${unit}`)
       
       return {
         name: item.name || originalText,
-        quantity: quantity,
+        quantity: unitsPerBox,
         unit: unit,
         pricePerUnit: pricePerUnit,
-        totalPrice: totalPrice,
+        totalPrice: pricePerBox, // Store price per box, not total for multiple boxes
         vatPercentage: Number(item.vatPercentage) || 6
       }
     })
