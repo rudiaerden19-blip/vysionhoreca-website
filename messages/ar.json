@@ -3535,8 +3535,29 @@
     "savedReports": "Opgeslagen rapporten",
     "noSavedReports": "Nog geen rapporten opgeslagen",
     "orders": "bestellingen",
-    "totalSaved": "Totaal opgeslagen",
-    "vatNumber": "BTW"
+    "totalSaved": "إجمالي المحفوظ",
+    "vatNumber": "ضريبة القيمة المضافة"
+  },
+  "simulator": {
+    "title": "محاكي التكلفة",
+    "subtitle": "احسب تكلفة منتج جديد دون إضافته إلى القائمة",
+    "productName": "اسم المنتج (اختياري)",
+    "productNamePlaceholder": "مثال: همبرغر خاص جديد",
+    "margin": "الهامش",
+    "searchDatabase": "ابحث في مكوناتك",
+    "searchPlaceholder": "اكتب للبحث...",
+    "noResults": "لم يتم العثور على نتائج",
+    "dragHere": "اسحب المكونات هنا",
+    "orClick": "أو ابحث أعلاه أو انقر على زر سريع",
+    "ingredient": "مكون",
+    "quantity": "الكمية",
+    "pricePerUnit": "السعر/الوحدة",
+    "total": "المجموع",
+    "totalCost": "التكلفة الإجمالية",
+    "advisedPrice": "السعر الموصى به",
+    "quickAdd": "إضافة سريعة من مكوناتك",
+    "more": "المزيد",
+    "clear": "مسح"
   },
   "marketing": {
     "title": "التسويق عبر البريد الإلكتروني",

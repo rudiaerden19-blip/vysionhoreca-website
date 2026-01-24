@@ -3535,8 +3535,29 @@
     "savedReports": "Opgeslagen rapporten",
     "noSavedReports": "Nog geen rapporten opgeslagen",
     "orders": "bestellingen",
-    "totalSaved": "Totaal opgeslagen",
-    "vatNumber": "BTW"
+    "totalSaved": "Total guardado",
+    "vatNumber": "IVA"
+  },
+  "simulator": {
+    "title": "Simulador de costes",
+    "subtitle": "Calcule el coste de un nuevo producto sin añadirlo al menú",
+    "productName": "Nombre del producto (opcional)",
+    "productNamePlaceholder": "ej. Nueva Hamburguesa Especial",
+    "margin": "Margen",
+    "searchDatabase": "Buscar en tus ingredientes",
+    "searchPlaceholder": "Escriba para buscar...",
+    "noResults": "No se encontraron resultados",
+    "dragHere": "Arrastre ingredientes aquí",
+    "orClick": "O busque arriba o haga clic en un botón rápido",
+    "ingredient": "Ingrediente",
+    "quantity": "Cantidad",
+    "pricePerUnit": "Precio/unidad",
+    "total": "Total",
+    "totalCost": "COSTE TOTAL",
+    "advisedPrice": "PRECIO RECOMENDADO",
+    "quickAdd": "Añadir rápido desde tus ingredientes",
+    "more": "más",
+    "clear": "Vaciar"
   },
   "marketing": {
     "title": "Marketing por Email",

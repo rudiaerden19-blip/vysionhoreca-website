@@ -96,6 +96,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   const [simulatorItems, setSimulatorItems] = useState<Array<{ name: string, price: number, quantity: number }>>([])
   const [simulatorName, setSimulatorName] = useState('')
   const [simulatorMultiplier, setSimulatorMultiplier] = useState('3')
+  const [simulatorSearch, setSimulatorSearch] = useState('')
+  const [simulatorSearchResults, setSimulatorSearchResults] = useState<Ingredient[]>([])
+  const [simulatorSearching, setSimulatorSearching] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -281,6 +284,21 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   const simulatorTotalCost = simulatorItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
   const simulatorMultiplierNum = parseFloat(simulatorMultiplier.replace(',', '.')) || 3
   const simulatorAdvicedPrice = simulatorTotalCost * simulatorMultiplierNum
+
+  // Search ingredients for simulator
+  function handleSimulatorSearch(query: string) {
+    setSimulatorSearch(query)
+    if (query.length < 2) {
+      setSimulatorSearchResults([])
+      return
+    }
+    setSimulatorSearching(true)
+    const results = ingredients.filter(i => 
+      i.name.toLowerCase().includes(query.toLowerCase())
+    ).slice(0, 20)
+    setSimulatorSearchResults(results)
+    setSimulatorSearching(false)
+  }
 
   // Search function for both own ingredients and database
   async function handleIngredientSearch(query: string, productIngredientIds: string[]) {
@@ -641,8 +659,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           <div className="flex items-center gap-3">
             <span className="text-2xl">🧮</span>
             <div className="text-left">
-              <h3 className="font-semibold text-purple-900">Kostprijs Simulator</h3>
-              <p className="text-sm text-purple-600">Bereken de kosten van een nieuw product zonder het aan het menu toe te voegen</p>
+              <h3 className="font-semibold text-purple-900">{t('simulator.title')}</h3>
+              <p className="text-sm text-purple-600">{t('simulator.subtitle')}</p>
             </div>
           </div>
           <span className="text-purple-500 text-xl">{showSimulator ? '▲' : '▼'}</span>
@@ -667,17 +685,17 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 {/* Simulator Header */}
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex-1">
-                    <label className="block text-sm text-purple-700 mb-1">Product naam (optioneel)</label>
+                    <label className="block text-sm text-purple-700 mb-1">{t('simulator.productName')}</label>
                     <input
                       type="text"
                       value={simulatorName}
                       onChange={(e) => setSimulatorName(e.target.value)}
-                      placeholder="bijv. Nieuwe Hamburger Special"
+                      placeholder={t('simulator.productNamePlaceholder')}
                       className="w-full px-3 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
                   <div className="w-32">
-                    <label className="block text-sm text-purple-700 mb-1">Marge</label>
+                    <label className="block text-sm text-purple-700 mb-1">{t('simulator.margin')}</label>
                     <div className="flex items-center gap-1">
                       <span className="text-gray-500">×</span>
                       <input
@@ -694,11 +712,44 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   </div>
                 </div>
 
+                {/* Search in database */}
+                <div className="mb-4">
+                  <label className="block text-sm text-purple-700 mb-1">🔍 {t('simulator.searchDatabase')}</label>
+                  <input
+                    type="text"
+                    value={simulatorSearch}
+                    onChange={(e) => handleSimulatorSearch(e.target.value)}
+                    placeholder={t('simulator.searchPlaceholder')}
+                    className="w-full px-3 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  />
+                  {simulatorSearchResults.length > 0 && (
+                    <div className="mt-2 bg-white border border-purple-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {simulatorSearchResults.map(ing => (
+                        <button
+                          key={ing.id}
+                          onClick={() => {
+                            addIngredientToSimulator(ing)
+                            setSimulatorSearch('')
+                            setSimulatorSearchResults([])
+                          }}
+                          className="w-full px-3 py-2 text-left hover:bg-purple-50 flex justify-between items-center border-b border-purple-100 last:border-0"
+                        >
+                          <span className="font-medium">{ing.name}</span>
+                          <span className="text-purple-600 font-mono">€{ing.purchase_price.toFixed(4)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {simulatorSearch.length >= 2 && simulatorSearchResults.length === 0 && !simulatorSearching && (
+                    <p className="text-sm text-purple-400 mt-2">{t('simulator.noResults')}</p>
+                  )}
+                </div>
+
                 {/* Drop zone hint */}
                 {simulatorItems.length === 0 && (
                   <div className="border-2 border-dashed border-purple-300 rounded-lg p-8 text-center bg-white/50">
-                    <p className="text-purple-600 font-medium">👆 Sleep ingrediënten hierheen</p>
-                    <p className="text-sm text-purple-400 mt-1">Of klik op een ingrediënt in de lijst hieronder</p>
+                    <p className="text-purple-600 font-medium">👆 {t('simulator.dragHere')}</p>
+                    <p className="text-sm text-purple-400 mt-1">{t('simulator.orClick')}</p>
                   </div>
                 )}
 
@@ -708,10 +759,10 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                     <table className="w-full text-sm">
                       <thead className="bg-purple-50">
                         <tr>
-                          <th className="px-3 py-2 text-left">Ingrediënt</th>
-                          <th className="px-3 py-2 text-center w-24">Aantal</th>
-                          <th className="px-3 py-2 text-right w-28">Prijs/stuk</th>
-                          <th className="px-3 py-2 text-right w-28">Totaal</th>
+                          <th className="px-3 py-2 text-left">{t('simulator.ingredient')}</th>
+                          <th className="px-3 py-2 text-center w-24">{t('simulator.quantity')}</th>
+                          <th className="px-3 py-2 text-right w-28">{t('simulator.pricePerUnit')}</th>
+                          <th className="px-3 py-2 text-right w-28">{t('simulator.total')}</th>
                           <th className="px-3 py-2 w-10"></th>
                         </tr>
                       </thead>
@@ -748,13 +799,13 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                       </tbody>
                       <tfoot className="bg-purple-50 font-bold">
                         <tr className="border-t-2 border-purple-200">
-                          <td colSpan={3} className="px-3 py-2 text-right">TOTAAL KOSTPRIJS:</td>
+                          <td colSpan={3} className="px-3 py-2 text-right">{t('simulator.totalCost')}:</td>
                           <td className="px-3 py-2 text-right font-mono text-lg">€{simulatorTotalCost.toFixed(2)}</td>
                           <td></td>
                         </tr>
                         <tr>
                           <td colSpan={3} className="px-3 py-2 text-right text-purple-700">
-                            ADVIESPRIJS (×{simulatorMultiplierNum.toFixed(1)}):
+                            {t('simulator.advisedPrice')} (×{simulatorMultiplierNum.toFixed(1)}):
                           </td>
                           <td className="px-3 py-2 text-right font-mono text-lg text-purple-700">€{simulatorAdvicedPrice.toFixed(2)}</td>
                           <td></td>
@@ -767,9 +818,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 {/* Quick add from own ingredients */}
                 {ingredients.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-sm text-purple-700 mb-2">Snel toevoegen uit je ingrediënten:</p>
+                    <p className="text-sm text-purple-700 mb-2">{t('simulator.quickAdd')}:</p>
                     <div className="flex flex-wrap gap-2">
-                      {ingredients.slice(0, 10).map(ing => (
+                      {ingredients.slice(0, 8).map(ing => (
                         <button
                           key={ing.id}
                           onClick={() => addIngredientToSimulator(ing)}
@@ -778,8 +829,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           {ing.name} <span className="text-purple-500">€{ing.purchase_price.toFixed(2)}</span>
                         </button>
                       ))}
-                      {ingredients.length > 10 && (
-                        <span className="text-sm text-purple-400 py-1">+{ingredients.length - 10} meer...</span>
+                      {ingredients.length > 8 && (
+                        <span className="text-sm text-purple-400 py-1">+{ingredients.length - 8} {t('simulator.more')}...</span>
                       )}
                     </div>
                   </div>
@@ -795,7 +846,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                       }}
                       className="px-4 py-2 text-purple-600 hover:text-purple-800 text-sm"
                     >
-                      🗑️ Leegmaken
+                      🗑️ {t('simulator.clear')}
                     </button>
                   </div>
                 )}

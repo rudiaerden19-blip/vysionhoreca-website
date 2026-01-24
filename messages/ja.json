@@ -3535,8 +3535,29 @@
     "savedReports": "Opgeslagen rapporten",
     "noSavedReports": "Nog geen rapporten opgeslagen",
     "orders": "bestellingen",
-    "totalSaved": "Totaal opgeslagen",
-    "vatNumber": "BTW"
+    "totalSaved": "保存済み合計",
+    "vatNumber": "消費税"
+  },
+  "simulator": {
+    "title": "コストシミュレーター",
+    "subtitle": "メニューに追加せずに新製品のコストを計算",
+    "productName": "商品名（任意）",
+    "productNamePlaceholder": "例：新ハンバーガースペシャル",
+    "margin": "マージン",
+    "searchDatabase": "材料を検索",
+    "searchPlaceholder": "検索...",
+    "noResults": "結果が見つかりません",
+    "dragHere": "材料をここにドラッグ",
+    "orClick": "または上で検索するかクイックボタンをクリック",
+    "ingredient": "材料",
+    "quantity": "数量",
+    "pricePerUnit": "単価",
+    "total": "合計",
+    "totalCost": "総コスト",
+    "advisedPrice": "推奨価格",
+    "quickAdd": "材料からクイック追加",
+    "more": "もっと",
+    "clear": "クリア"
   },
   "marketing": {
     "title": "メールマーケティング",

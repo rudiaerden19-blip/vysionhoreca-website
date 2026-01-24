@@ -2403,6 +2403,27 @@
     "totalSaved": "Total saved",
     "vatNumber": "VAT"
   },
+  "simulator": {
+    "title": "Cost Simulator",
+    "subtitle": "Calculate the cost of a new product without adding it to the menu",
+    "productName": "Product name (optional)",
+    "productNamePlaceholder": "e.g. New Hamburger Special",
+    "margin": "Margin",
+    "searchDatabase": "Search your ingredients",
+    "searchPlaceholder": "Type to search...",
+    "noResults": "No results found",
+    "dragHere": "Drag ingredients here",
+    "orClick": "Or search above or click a quick button",
+    "ingredient": "Ingredient",
+    "quantity": "Quantity",
+    "pricePerUnit": "Price/unit",
+    "total": "Total",
+    "totalCost": "TOTAL COST",
+    "advisedPrice": "ADVISED PRICE",
+    "quickAdd": "Quick add from your ingredients",
+    "more": "more",
+    "clear": "Clear"
+  },
   "marketing": {
     "title": "Email Marketing",
     "subtitle": "Send promotions and offers to your customers",

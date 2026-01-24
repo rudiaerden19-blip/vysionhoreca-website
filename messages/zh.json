@@ -3535,8 +3535,29 @@
     "savedReports": "Opgeslagen rapporten",
     "noSavedReports": "Nog geen rapporten opgeslagen",
     "orders": "bestellingen",
-    "totalSaved": "Totaal opgeslagen",
-    "vatNumber": "BTW"
+    "totalSaved": "已保存总计",
+    "vatNumber": "增值税"
+  },
+  "simulator": {
+    "title": "成本模拟器",
+    "subtitle": "在不添加到菜单的情况下计算新产品的成本",
+    "productName": "产品名称（可选）",
+    "productNamePlaceholder": "例如：新汉堡特别版",
+    "margin": "利润率",
+    "searchDatabase": "搜索您的配料",
+    "searchPlaceholder": "输入搜索...",
+    "noResults": "未找到结果",
+    "dragHere": "将配料拖到这里",
+    "orClick": "或在上方搜索或点击快捷按钮",
+    "ingredient": "配料",
+    "quantity": "数量",
+    "pricePerUnit": "单价",
+    "total": "总计",
+    "totalCost": "总成本",
+    "advisedPrice": "建议价格",
+    "quickAdd": "从您的配料快速添加",
+    "more": "更多",
+    "clear": "清空"
   },
   "marketing": {
     "title": "电子邮件营销",
