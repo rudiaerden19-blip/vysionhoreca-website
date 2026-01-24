@@ -794,7 +794,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               </div>
 
               <div className="relative">
-                <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl relative">
+                <div className="aspect-video rounded-3xl overflow-hidden shadow-2xl relative">
                   <Image
                     src={business.about_image || "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800"}
                     alt="Onze frituur"
@@ -839,7 +839,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {/* Specialty 1 */}
               {business.specialty_1_image && (
                 <div className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/3]">
+                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-video">
                     <Image 
                       src={business.specialty_1_image}
                       alt={business.specialty_1_title || t('shopPage.specialty')}
@@ -860,7 +860,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {/* Specialty 2 */}
               {business.specialty_2_image && (
                 <div className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/3]">
+                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-video">
                     <Image 
                       src={business.specialty_2_image}
                       alt={business.specialty_2_title || t('shopPage.specialty')}
@@ -881,7 +881,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {/* Specialty 3 */}
               {business.specialty_3_image && (
                 <div className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/3]">
+                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-video">
                     <Image 
                       src={business.specialty_3_image}
                       alt={business.specialty_3_title || t('shopPage.specialty')}
@@ -1211,7 +1211,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 .map((imageUrl, index) => (
                   <div
                     key={index}
-                    className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow w-full relative aspect-[4/3]"
+                    className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow w-full relative aspect-video"
                   >
                     <Image
                       src={imageUrl!}
