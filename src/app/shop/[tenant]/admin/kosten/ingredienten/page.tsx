@@ -88,6 +88,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       totalPrice: number
       vatPercentage: number
       selected: boolean
+      portions?: number // Aantal porties dat uit de doos/emmer gaat
     }>
   } | null>(null)
   const [addingFromInvoice, setAddingFromInvoice] = useState(false)
@@ -204,6 +205,14 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     // 2. Process each item
     let updated = 0
     for (const item of selectedItems) {
+      // Bereken de juiste prijs en eenheid op basis van porties
+      // Als porties is ingevuld, gebruik die voor de berekening
+      const usesPortions = item.portions && item.portions > 0
+      const divider = usesPortions ? item.portions : item.quantity
+      const calculatedPricePerUnit = divider > 0 ? item.totalPrice / divider : item.totalPrice
+      const effectiveUnit = usesPortions ? 'portie' : (item.unit || 'stuk')
+      const effectiveQuantity = usesPortions ? item.portions! : item.quantity
+
       // Check if already exists (by name similarity)
       const existingIngredient = ingredients.find(i => {
         const existingName = i.name.toLowerCase()
@@ -220,9 +229,10 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         const { data } = await supabase
           .from('ingredients')
           .update({
-            purchase_price: item.pricePerUnit,
-            units_per_package: item.quantity,
+            purchase_price: calculatedPricePerUnit,
+            units_per_package: effectiveQuantity,
             package_price: item.totalPrice,
+            unit: effectiveUnit,
             notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : existingIngredient.notes
           })
           .eq('id', existingIngredient.id)
@@ -244,9 +254,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             invoice_scan_id: invoiceScan.id,
             tenant_slug: businessId,
             name: item.name,
-            quantity: item.quantity,
-            unit: item.unit || 'stuk',
-            price_per_unit: item.pricePerUnit,
+            quantity: effectiveQuantity,
+            unit: effectiveUnit,
+            price_per_unit: calculatedPricePerUnit,
             total_price: item.totalPrice,
             vat_percentage: item.vatPercentage,
             added_to_ingredients: true,
@@ -262,9 +272,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         .insert({
           tenant_slug: businessId,
           name: item.name,
-          unit: item.unit || 'stuk',
-          purchase_price: item.pricePerUnit,
-          units_per_package: item.quantity,
+          unit: effectiveUnit,
+          purchase_price: calculatedPricePerUnit,
+          units_per_package: effectiveQuantity,
           package_price: item.totalPrice,
           notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : null
         })
@@ -283,9 +293,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
           invoice_scan_id: invoiceScan.id,
           tenant_slug: businessId,
           name: item.name,
-          quantity: item.quantity,
-          unit: item.unit || 'stuk',
-          price_per_unit: item.pricePerUnit,
+          quantity: effectiveQuantity,
+          unit: effectiveUnit,
+          price_per_unit: calculatedPricePerUnit,
           total_price: item.totalPrice,
           vat_percentage: item.vatPercentage,
           added_to_ingredients: true,
@@ -951,7 +961,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                     {/* Info banner */}
                     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
                       <p className="font-medium text-yellow-800">⚠️ Controleer de waarden voordat je opslaat!</p>
-                      <p className="text-yellow-700">Pas "Stuks/doos" en "Doosprijs" aan indien nodig. Prijs per stuk wordt automatisch berekend.</p>
+                      <p className="text-yellow-700">Pas "Stuks/doos" en "Doosprijs" aan. Vul optioneel "Porties" in om de prijs per portie te berekenen.</p>
                     </div>
 
                     {/* Items table - editable */}
@@ -973,14 +983,18 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                               />
                             </th>
                             <th className="px-2 py-2 text-left">Product</th>
-                            <th className="px-2 py-2 text-center w-24">Stuks/doos</th>
-                            <th className="px-2 py-2 text-center w-28">Doosprijs</th>
+                            <th className="px-2 py-2 text-center w-20">Stuks/doos</th>
+                            <th className="px-2 py-2 text-center w-24">Doosprijs</th>
+                            <th className="px-2 py-2 text-center w-20 bg-blue-50">Porties</th>
                             <th className="px-2 py-2 text-right w-28 bg-green-100">Prijs/stuk</th>
                           </tr>
                         </thead>
                         <tbody>
                           {invoiceResults.items.map((item, index) => {
-                            const calculatedPrice = item.quantity > 0 ? item.totalPrice / item.quantity : item.totalPrice
+                            // Bereken prijs: als porties is ingevuld, gebruik die, anders stuks/doos
+                            const divider = item.portions && item.portions > 0 ? item.portions : item.quantity
+                            const calculatedPrice = divider > 0 ? item.totalPrice / divider : item.totalPrice
+                            const priceUnit = item.portions && item.portions > 0 ? 'portie' : item.unit
                             return (
                               <tr 
                                 key={index} 
@@ -1008,49 +1022,89 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                                 </td>
                                 <td className="px-2 py-2">
                                   <input
-                                    type="number"
-                                    value={item.quantity}
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={item.quantity === 0 ? '' : item.quantity}
                                     onChange={(e) => {
                                       const newItems = [...invoiceResults.items]
-                                      const newQuantity = Number(e.target.value) || 1
-                                      newItems[index] = { 
-                                        ...item, 
-                                        quantity: newQuantity,
-                                        pricePerUnit: item.totalPrice / newQuantity
+                                      const inputValue = e.target.value
+                                      // Sta lege input toe zodat gebruiker kan wissen
+                                      if (inputValue === '' || inputValue === '0') {
+                                        newItems[index] = { ...item, quantity: 0 }
+                                      } else {
+                                        const newQuantity = parseFloat(inputValue.replace(',', '.')) || 0
+                                        newItems[index] = { 
+                                          ...item, 
+                                          quantity: newQuantity,
+                                          pricePerUnit: newQuantity > 0 ? item.totalPrice / newQuantity : item.totalPrice
+                                        }
                                       }
                                       setInvoiceResults({ ...invoiceResults, items: newItems })
                                     }}
+                                    onBlur={(e) => {
+                                      // Bij verlaten veld, zet minimaal op 1 als leeg
+                                      if (e.target.value === '' || e.target.value === '0') {
+                                        const newItems = [...invoiceResults.items]
+                                        newItems[index] = { ...item, quantity: 1 }
+                                        setInvoiceResults({ ...invoiceResults, items: newItems })
+                                      }
+                                    }}
                                     className="w-full px-2 py-1 border rounded text-sm text-center"
-                                    min="1"
+                                    placeholder="1"
                                   />
                                 </td>
                                 <td className="px-2 py-2">
                                   <div className="flex items-center">
                                     <span className="text-gray-500 mr-1">€</span>
                                     <input
-                                      type="number"
-                                      step="0.01"
-                                      value={item.totalPrice.toFixed(2)}
+                                      type="text"
+                                      inputMode="decimal"
+                                      value={item.totalPrice === 0 ? '' : item.totalPrice.toFixed(2)}
                                       onChange={(e) => {
                                         const newItems = [...invoiceResults.items]
-                                        const newTotalPrice = Number(e.target.value) || 0
-                                        newItems[index] = { 
-                                          ...item, 
-                                          totalPrice: newTotalPrice,
-                                          pricePerUnit: newTotalPrice / item.quantity
+                                        const inputValue = e.target.value
+                                        if (inputValue === '') {
+                                          newItems[index] = { ...item, totalPrice: 0 }
+                                        } else {
+                                          const newTotalPrice = parseFloat(inputValue.replace(',', '.')) || 0
+                                          newItems[index] = { 
+                                            ...item, 
+                                            totalPrice: newTotalPrice,
+                                            pricePerUnit: item.quantity > 0 ? newTotalPrice / item.quantity : newTotalPrice
+                                          }
                                         }
                                         setInvoiceResults({ ...invoiceResults, items: newItems })
                                       }}
                                       className="w-full px-2 py-1 border rounded text-sm text-right"
-                                      min="0"
+                                      placeholder="0.00"
                                     />
                                   </div>
+                                </td>
+                                <td className="px-2 py-2 bg-blue-50">
+                                  <input
+                                    type="text"
+                                    inputMode="decimal"
+                                    value={item.portions === undefined || item.portions === 0 ? '' : item.portions}
+                                    onChange={(e) => {
+                                      const newItems = [...invoiceResults.items]
+                                      const inputValue = e.target.value
+                                      if (inputValue === '') {
+                                        newItems[index] = { ...item, portions: undefined }
+                                      } else {
+                                        const newPortions = parseFloat(inputValue.replace(',', '.')) || 0
+                                        newItems[index] = { ...item, portions: newPortions }
+                                      }
+                                      setInvoiceResults({ ...invoiceResults, items: newItems })
+                                    }}
+                                    className="w-full px-2 py-1 border border-blue-200 rounded text-sm text-center bg-white"
+                                    placeholder="—"
+                                  />
                                 </td>
                                 <td className="px-2 py-2 text-right bg-green-50">
                                   <span className="font-mono font-bold text-green-700">
                                     €{calculatedPrice.toFixed(4)}
                                   </span>
-                                  <span className="text-xs text-gray-500 ml-1">/{item.unit}</span>
+                                  <span className="text-xs text-gray-500 ml-1">/{priceUnit}</span>
                                 </td>
                               </tr>
                             )
