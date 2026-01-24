@@ -301,7 +301,6 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     if (added > 0) messages.push(`${added} nieuwe ingrediënten toegevoegd`)
     if (updated > 0) messages.push(`${updated} prijzen bijgewerkt`)
     alert(`${messages.join(', ')}!\nFactuur opgeslagen in historie.`)
-    }
 
     // Reset scanner
     setShowInvoiceScanner(false)
