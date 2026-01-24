@@ -52,29 +52,36 @@ Retourneer ALLEEN een valid JSON object met deze structuur (geen andere tekst, g
   "totalAmount": 123.45,
   "items": [
     {
-      "name": "productnaam (kort en duidelijk)",
-      "quantity": 5,
-      "unit": "stuk|kg|gram|liter|ml|doos|zak|fles",
-      "pricePerUnit": 2.50,
-      "totalPrice": 12.50,
+      "name": "productnaam (kort en duidelijk, zonder gewicht/aantal)",
+      "quantity": 24,
+      "unit": "stuk",
+      "pricePerUnit": 1.25,
+      "totalPrice": 30.00,
       "vatPercentage": 6
     }
   ]
 }
 
-KRITIEKE REGELS VOOR PRIJZEN:
-- pricePerUnit = de prijs voor 1 ENKELE eenheid (1 stuk, 1 kg, 1 liter)
-- totalPrice = het totaalbedrag op de factuur voor die regel
-- ALTIJD BEREKENEN: pricePerUnit = totalPrice / quantity
-- Voorbeeld: 96 stuks voor €12.86 totaal → pricePerUnit = €0.134 (12.86/96), NIET €12.86
-- Voorbeeld: 10 kg voor €26.76 totaal → pricePerUnit = €2.676 (26.76/10)
+KRITIEKE REGELS - LEES VERPAKKINGSNOTATIE:
+Groothandelfacturen gebruiken notaties zoals "24X150G" of "96X20G". Dit betekent AANTAL x GEWICHT PER STUK.
 
-Andere regels:
-- Gebruik Nederlandse productnamen
-- Kies de juiste eenheid (stuk voor individuele items, kg voor gewicht, liter voor vloeistoffen)
-- BTW is meestal 6% voor voedingsmiddelen, 21% voor non-food
-- Als je iets niet kunt lezen, sla het product dan over
-- Geef ALLEEN het JSON object terug, geen andere tekst of markdown`
+VOORBEELDEN:
+- "BRAADWORST WIT 24X150G" €28.00 → quantity=24, pricePerUnit=€1.17 (28/24), name="Braadworst wit"
+- "BITTERBALLEN 96X20G" €12.86 → quantity=96, pricePerUnit=€0.134 (12.86/96), name="Bitterballen"
+- "CERVELA ROOD 5X140G" €26.45 → quantity=5, pricePerUnit=€5.29 (26.45/5), name="Cervela rood"
+- "FISHBURGER 24X85G" €31.10 → quantity=24, pricePerUnit=€1.30 (31.10/24), name="Fishburger"
+- "HAMBURGER 30X100G" €13.20 → quantity=30, pricePerUnit=€0.44 (13.20/30), name="Hamburger"
+- "MAYONAISE 10L" €25.00 → quantity=10, unit="liter", pricePerUnit=€2.50 (25/10), name="Mayonaise"
+- "FRITUURVET 10KG" €26.76 → quantity=10, unit="kg", pricePerUnit=€2.68 (26.76/10), name="Frituurvet"
+
+REGELS:
+1. Zoek naar "NxG" of "NXG" patronen (bijv. 24X150G = 24 stuks)
+2. quantity = het AANTAL STUKS in de verpakking (24, 96, 30, etc.)
+3. pricePerUnit = totalPrice / quantity (prijs voor 1 STUK)
+4. unit = "stuk" voor individuele items, "kg" voor gewicht, "liter" voor vloeistoffen
+5. name = alleen de productnaam, zonder gewicht/aantal notatie
+6. BTW is meestal 6% voor voedingsmiddelen, 21% voor non-food
+7. Geef ALLEEN het JSON object terug, geen andere tekst of markdown`
 
     // Direct REST API call to Gemini (using v1beta for wider model support)
     const response = await fetch(
