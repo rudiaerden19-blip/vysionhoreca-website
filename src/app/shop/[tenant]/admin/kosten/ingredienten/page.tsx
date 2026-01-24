@@ -188,6 +188,21 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     let added = 0
     let skipped = 0
 
+    // 1. Save invoice scan to database
+    const { data: invoiceScan } = await supabase
+      .from('invoice_scans')
+      .insert({
+        tenant_slug: businessId,
+        supplier: invoiceResults.supplier || null,
+        invoice_number: invoiceResults.invoiceNumber || null,
+        invoice_date: invoiceResults.invoiceDate || null,
+        total_amount: invoiceResults.totalAmount || null,
+        status: 'completed'
+      })
+      .select()
+      .single()
+
+    // 2. Process each item
     for (const item of selectedItems) {
       // Check if already exists (by name similarity)
       const existingNames = ingredients.map(i => i.name.toLowerCase())
@@ -197,11 +212,28 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         item.name.toLowerCase().includes(name)
       )
 
+      let ingredientId: string | null = null
+
       if (nameExists) {
         skipped++
+        // Still save the invoice item but mark as not added
+        if (invoiceScan) {
+          await supabase.from('invoice_scan_items').insert({
+            invoice_scan_id: invoiceScan.id,
+            tenant_slug: businessId,
+            name: item.name,
+            quantity: item.quantity,
+            unit: item.unit || 'stuk',
+            price_per_unit: item.pricePerUnit,
+            total_price: item.totalPrice,
+            vat_percentage: item.vatPercentage,
+            added_to_ingredients: false
+          })
+        }
         continue
       }
 
+      // Add to ingredients
       const { data } = await supabase
         .from('ingredients')
         .insert({
@@ -218,16 +250,33 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
 
       if (data) {
         setIngredients(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)))
+        ingredientId = data.id
         added++
+      }
+
+      // 3. Save invoice item to database
+      if (invoiceScan) {
+        await supabase.from('invoice_scan_items').insert({
+          invoice_scan_id: invoiceScan.id,
+          tenant_slug: businessId,
+          name: item.name,
+          quantity: item.quantity,
+          unit: item.unit || 'stuk',
+          price_per_unit: item.pricePerUnit,
+          total_price: item.totalPrice,
+          vat_percentage: item.vatPercentage,
+          added_to_ingredients: true,
+          ingredient_id: ingredientId
+        })
       }
     }
 
     setAddingFromInvoice(false)
     
     if (skipped > 0) {
-      alert(`${added} ingrediënten toegevoegd, ${skipped} dubbelen overgeslagen`)
+      alert(`${added} ingrediënten toegevoegd, ${skipped} dubbelen overgeslagen.\nFactuur opgeslagen in historie.`)
     } else {
-      alert(`${added} ingrediënten toegevoegd!`)
+      alert(`${added} ingrediënten toegevoegd!\nFactuur opgeslagen in historie.`)
     }
 
     // Reset scanner
