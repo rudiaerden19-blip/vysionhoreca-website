@@ -1024,15 +1024,17 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                                   <input
                                     type="text"
                                     inputMode="decimal"
-                                    value={item.quantity === 0 ? '' : item.quantity}
-                                    onChange={(e) => {
+                                    defaultValue={item.quantity === 0 ? '' : item.quantity}
+                                    key={`qty-${index}-${item.name}`}
+                                    onBlur={(e) => {
                                       const newItems = [...invoiceResults.items]
                                       const inputValue = e.target.value
-                                      // Sta lege input toe zodat gebruiker kan wissen
+                                      // Bij verlaten veld, zet minimaal op 1 als leeg
                                       if (inputValue === '' || inputValue === '0') {
-                                        newItems[index] = { ...item, quantity: 0 }
+                                        newItems[index] = { ...item, quantity: 1 }
+                                        e.target.value = '1'
                                       } else {
-                                        const newQuantity = parseFloat(inputValue.replace(',', '.')) || 0
+                                        const newQuantity = parseFloat(inputValue.replace(',', '.')) || 1
                                         newItems[index] = { 
                                           ...item, 
                                           quantity: newQuantity,
@@ -1040,14 +1042,6 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                                         }
                                       }
                                       setInvoiceResults({ ...invoiceResults, items: newItems })
-                                    }}
-                                    onBlur={(e) => {
-                                      // Bij verlaten veld, zet minimaal op 1 als leeg
-                                      if (e.target.value === '' || e.target.value === '0') {
-                                        const newItems = [...invoiceResults.items]
-                                        newItems[index] = { ...item, quantity: 1 }
-                                        setInvoiceResults({ ...invoiceResults, items: newItems })
-                                      }
                                     }}
                                     className="w-full px-2 py-1 border rounded text-sm text-center"
                                     placeholder="1"
@@ -1059,8 +1053,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                                     <input
                                       type="text"
                                       inputMode="decimal"
-                                      value={item.totalPrice === 0 ? '' : item.totalPrice.toFixed(2)}
-                                      onChange={(e) => {
+                                      defaultValue={item.totalPrice === 0 ? '' : item.totalPrice.toFixed(2)}
+                                      key={`price-${index}-${item.name}`}
+                                      onBlur={(e) => {
                                         const newItems = [...invoiceResults.items]
                                         const inputValue = e.target.value
                                         if (inputValue === '') {
@@ -1084,8 +1079,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                                   <input
                                     type="text"
                                     inputMode="decimal"
-                                    value={item.portions === undefined || item.portions === 0 ? '' : item.portions}
-                                    onChange={(e) => {
+                                    defaultValue={item.portions === undefined || item.portions === 0 ? '' : item.portions}
+                                    key={`portions-${index}-${item.name}`}
+                                    onBlur={(e) => {
                                       const newItems = [...invoiceResults.items]
                                       const inputValue = e.target.value
                                       if (inputValue === '') {
