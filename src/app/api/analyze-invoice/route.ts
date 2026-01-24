@@ -51,7 +51,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
 
     console.log(`Analyzing invoice with Gemini, image size: ${imageSizeMB.toFixed(2)}MB`)
 
-    const model = getGemini().getGenerativeModel({ model: 'gemini-1.5-flash' })
+    const model = getGemini().getGenerativeModel({ model: 'gemini-1.5-flash-latest' })
 
     const prompt = `Je bent een expert in het analyseren van leveranciersfacturen voor horecazaken.
 Analyseer de factuur en extraheer alle producten/ingrediënten met hun prijzen.
