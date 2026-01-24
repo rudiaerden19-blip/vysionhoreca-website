@@ -911,12 +911,18 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                       </div>
                     )}
 
-                    {/* Items table */}
+                    {/* Info banner */}
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
+                      <p className="font-medium text-yellow-800">⚠️ Controleer de waarden voordat je opslaat!</p>
+                      <p className="text-yellow-700">Pas "Stuks/doos" en "Doosprijs" aan indien nodig. Prijs per stuk wordt automatisch berekend.</p>
+                    </div>
+
+                    {/* Items table - editable */}
                     <div className="border rounded-xl overflow-hidden">
                       <table className="w-full text-sm">
                         <thead className="bg-gray-100">
                           <tr>
-                            <th className="px-3 py-2 text-left w-10">
+                            <th className="px-2 py-2 text-left w-10">
                               <input
                                 type="checkbox"
                                 checked={invoiceResults.items.every(i => i.selected)}
@@ -929,36 +935,89 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                                 className="rounded"
                               />
                             </th>
-                            <th className="px-3 py-2 text-left">Product</th>
-                            <th className="px-3 py-2 text-center">Aantal</th>
-                            <th className="px-3 py-2 text-left">Eenheid</th>
-                            <th className="px-3 py-2 text-right">Prijs/eenheid</th>
-                            <th className="px-3 py-2 text-right">Totaal</th>
-                            <th className="px-3 py-2 text-center">BTW</th>
+                            <th className="px-2 py-2 text-left">Product</th>
+                            <th className="px-2 py-2 text-center w-24">Stuks/doos</th>
+                            <th className="px-2 py-2 text-center w-28">Doosprijs</th>
+                            <th className="px-2 py-2 text-right w-28 bg-green-100">Prijs/stuk</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {invoiceResults.items.map((item, index) => (
-                            <tr 
-                              key={index} 
-                              className={`border-t ${item.selected ? 'bg-green-50' : 'bg-gray-50 opacity-60'}`}
-                            >
-                              <td className="px-3 py-2">
-                                <input
-                                  type="checkbox"
-                                  checked={item.selected}
-                                  onChange={() => toggleInvoiceItem(index)}
-                                  className="rounded"
-                                />
-                              </td>
-                              <td className="px-3 py-2 font-medium">{item.name}</td>
-                              <td className="px-3 py-2 text-center">{item.quantity}</td>
-                              <td className="px-3 py-2">{item.unit}</td>
-                              <td className="px-3 py-2 text-right font-mono">€{item.pricePerUnit.toFixed(4)}</td>
-                              <td className="px-3 py-2 text-right font-mono">€{item.totalPrice.toFixed(2)}</td>
-                              <td className="px-3 py-2 text-center">{item.vatPercentage}%</td>
-                            </tr>
-                          ))}
+                          {invoiceResults.items.map((item, index) => {
+                            const calculatedPrice = item.quantity > 0 ? item.totalPrice / item.quantity : item.totalPrice
+                            return (
+                              <tr 
+                                key={index} 
+                                className={`border-t ${item.selected ? 'bg-white' : 'bg-gray-50 opacity-60'}`}
+                              >
+                                <td className="px-2 py-2">
+                                  <input
+                                    type="checkbox"
+                                    checked={item.selected}
+                                    onChange={() => toggleInvoiceItem(index)}
+                                    className="rounded"
+                                  />
+                                </td>
+                                <td className="px-2 py-2">
+                                  <input
+                                    type="text"
+                                    value={item.name}
+                                    onChange={(e) => {
+                                      const newItems = [...invoiceResults.items]
+                                      newItems[index] = { ...item, name: e.target.value }
+                                      setInvoiceResults({ ...invoiceResults, items: newItems })
+                                    }}
+                                    className="w-full px-2 py-1 border rounded text-sm font-medium"
+                                  />
+                                </td>
+                                <td className="px-2 py-2">
+                                  <input
+                                    type="number"
+                                    value={item.quantity}
+                                    onChange={(e) => {
+                                      const newItems = [...invoiceResults.items]
+                                      const newQuantity = Number(e.target.value) || 1
+                                      newItems[index] = { 
+                                        ...item, 
+                                        quantity: newQuantity,
+                                        pricePerUnit: item.totalPrice / newQuantity
+                                      }
+                                      setInvoiceResults({ ...invoiceResults, items: newItems })
+                                    }}
+                                    className="w-full px-2 py-1 border rounded text-sm text-center"
+                                    min="1"
+                                  />
+                                </td>
+                                <td className="px-2 py-2">
+                                  <div className="flex items-center">
+                                    <span className="text-gray-500 mr-1">€</span>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={item.totalPrice.toFixed(2)}
+                                      onChange={(e) => {
+                                        const newItems = [...invoiceResults.items]
+                                        const newTotalPrice = Number(e.target.value) || 0
+                                        newItems[index] = { 
+                                          ...item, 
+                                          totalPrice: newTotalPrice,
+                                          pricePerUnit: newTotalPrice / item.quantity
+                                        }
+                                        setInvoiceResults({ ...invoiceResults, items: newItems })
+                                      }}
+                                      className="w-full px-2 py-1 border rounded text-sm text-right"
+                                      min="0"
+                                    />
+                                  </div>
+                                </td>
+                                <td className="px-2 py-2 text-right bg-green-50">
+                                  <span className="font-mono font-bold text-green-700">
+                                    €{calculatedPrice.toFixed(4)}
+                                  </span>
+                                  <span className="text-xs text-gray-500 ml-1">/{item.unit}</span>
+                                </td>
+                              </tr>
+                            )
+                          })}
                         </tbody>
                       </table>
                     </div>
