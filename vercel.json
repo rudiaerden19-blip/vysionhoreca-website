@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/archive-z-reports",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
