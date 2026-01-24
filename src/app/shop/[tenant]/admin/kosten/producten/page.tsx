@@ -75,15 +75,15 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   const [searching, setSearching] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
 
-  // Vaste standaardprijzen state
+  // Vaste standaardprijzen state - stored as strings for editing
   const [standardPrices, setStandardPrices] = useState({
-    saus: 0.12,
-    sla: 0.13,
-    tomaat: 0.14,
-    ei: 0.12,
-    potje_saus: 0.16,
-    verpakking: 0.30,
-    kosten_per_stuk: 0.40
+    saus: '0.12',
+    sla: '0.13',
+    tomaat: '0.14',
+    ei: '0.12',
+    potje_saus: '0.16',
+    verpakking: '0.30',
+    kosten_per_stuk: '0.40'
   })
   const [savingStandardPrices, setSavingStandardPrices] = useState(false)
   const [standardPricesSaved, setStandardPricesSaved] = useState(false)
@@ -134,7 +134,13 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     try {
       const savedPrices = localStorage.getItem(`standard_prices_${params.tenant}`)
       if (savedPrices) {
-        setStandardPrices(JSON.parse(savedPrices))
+        const parsed = JSON.parse(savedPrices)
+        // Convert numbers to strings if needed (backwards compatibility)
+        const stringPrices: any = {}
+        for (const key of Object.keys(parsed)) {
+          stringPrices[key] = typeof parsed[key] === 'number' ? parsed[key].toString() : parsed[key]
+        }
+        setStandardPrices(prev => ({ ...prev, ...stringPrices }))
       }
     } catch (e) {
       console.error('Failed to load standard prices:', e)
@@ -550,7 +556,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
             <div
               key={item.key}
               draggable
-              onDragStart={(e) => handleDragStart(e, item.label, item.price)}
+              onDragStart={(e) => handleDragStart(e, item.label, parseFloat(item.price.replace(',', '.')) || 0)}
               onDragEnd={handleDragEnd}
               className={`bg-white rounded-lg p-2 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md hover:scale-105 transition-all border-2 ${
                 draggedItem?.name === item.label ? 'border-blue-500 bg-blue-50' : 'border-transparent hover:border-blue-300'
@@ -569,10 +575,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   onClick={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
                   onChange={(e) => {
+                    // Accept any input - allow user to fully clear and retype
                     const val = e.target.value.replace(',', '.')
-                    if (val === '' || /^\d*\.?\d*$/.test(val)) {
-                      setStandardPrices(prev => ({ ...prev, [item.key]: parseFloat(val) || 0 }))
-                    }
+                    setStandardPrices(prev => ({ ...prev, [item.key]: val }))
                   }}
                   className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
                   draggable={false}
