@@ -44,6 +44,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<AnalyzeIn
     const prompt = `Je bent een expert in het analyseren van leveranciersfacturen voor horecazaken.
 Analyseer de factuur en extraheer alle producten/ingrediënten met hun prijzen.
 
+BELANGRIJK: Geef voor elk item ook de EXACTE originele tekst van de factuur terug in "originalText".
+
 Retourneer ALLEEN een valid JSON object met deze structuur (geen andere tekst, geen markdown):
 {
   "supplier": "naam van de leverancier",
@@ -52,36 +54,20 @@ Retourneer ALLEEN een valid JSON object met deze structuur (geen andere tekst, g
   "totalAmount": 123.45,
   "items": [
     {
-      "name": "productnaam (kort en duidelijk, zonder gewicht/aantal)",
-      "quantity": 24,
-      "unit": "stuk",
-      "pricePerUnit": 1.25,
-      "totalPrice": 30.00,
+      "originalText": "BRAADWORST WIT 24X150G VR",
+      "name": "Braadworst wit",
+      "totalPrice": 28.00,
       "vatPercentage": 6
     }
   ]
 }
 
-KRITIEKE REGELS - LEES VERPAKKINGSNOTATIE:
-Groothandelfacturen gebruiken notaties zoals "24X150G" of "96X20G". Dit betekent AANTAL x GEWICHT PER STUK.
-
-VOORBEELDEN:
-- "BRAADWORST WIT 24X150G" €28.00 → quantity=24, pricePerUnit=€1.17 (28/24), name="Braadworst wit"
-- "BITTERBALLEN 96X20G" €12.86 → quantity=96, pricePerUnit=€0.134 (12.86/96), name="Bitterballen"
-- "CERVELA ROOD 5X140G" €26.45 → quantity=5, pricePerUnit=€5.29 (26.45/5), name="Cervela rood"
-- "FISHBURGER 24X85G" €31.10 → quantity=24, pricePerUnit=€1.30 (31.10/24), name="Fishburger"
-- "HAMBURGER 30X100G" €13.20 → quantity=30, pricePerUnit=€0.44 (13.20/30), name="Hamburger"
-- "MAYONAISE 10L" €25.00 → quantity=10, unit="liter", pricePerUnit=€2.50 (25/10), name="Mayonaise"
-- "FRITUURVET 10KG" €26.76 → quantity=10, unit="kg", pricePerUnit=€2.68 (26.76/10), name="Frituurvet"
-
 REGELS:
-1. Zoek naar "NxG" of "NXG" patronen (bijv. 24X150G = 24 stuks)
-2. quantity = het AANTAL STUKS in de verpakking (24, 96, 30, etc.)
-3. pricePerUnit = totalPrice / quantity (prijs voor 1 STUK)
-4. unit = "stuk" voor individuele items, "kg" voor gewicht, "liter" voor vloeistoffen
-5. name = alleen de productnaam, zonder gewicht/aantal notatie
-6. BTW is meestal 6% voor voedingsmiddelen, 21% voor non-food
-7. Geef ALLEEN het JSON object terug, geen andere tekst of markdown`
+1. originalText = kopieer de EXACTE tekst van de factuur (inclusief 24X150G, 96X20G, etc.)
+2. name = korte productnaam zonder gewicht/aantal
+3. totalPrice = het bedrag op de factuur voor die regel
+4. BTW is meestal 6% voor voedingsmiddelen, 21% voor non-food
+5. Geef ALLEEN het JSON object terug, geen andere tekst of markdown`
 
     // Direct REST API call to Gemini (using v1beta for wider model support)
     const response = await fetch(
@@ -156,30 +142,60 @@ REGELS:
       }, { status: 400 })
     }
 
-    // Validate and fix price calculations
+    // Parse quantity from originalText and calculate price per unit
     const validatedItems = (parsed.items || []).map((item: any) => {
-      const quantity = Number(item.quantity) || 1
+      const originalText = item.originalText || item.name || ''
       const totalPrice = Number(item.totalPrice) || 0
-      let pricePerUnit = Number(item.pricePerUnit) || 0
       
-      // Calculate correct price per unit from total / quantity
-      const calculatedPricePerUnit = quantity > 0 ? totalPrice / quantity : totalPrice
+      // Try to extract quantity from patterns like "24X150G", "96X20G", "30X100G", "5EX140G"
+      // Patterns: NUMBERxNUMBERg, NUMBER X NUMBERg, NUMBEReXNUMBERg
+      let quantity = 1
+      let unit = 'stuk'
       
-      // If AI got it wrong (pricePerUnit is same as totalPrice or way off), fix it
-      if (quantity > 1 && Math.abs(pricePerUnit - totalPrice) < 0.01) {
-        // AI returned totalPrice as pricePerUnit, fix it
-        pricePerUnit = calculatedPricePerUnit
-        console.log(`Fixed price for ${item.name}: ${totalPrice} / ${quantity} = ${pricePerUnit.toFixed(4)}`)
-      } else if (quantity > 1 && Math.abs(pricePerUnit * quantity - totalPrice) > totalPrice * 0.1) {
-        // pricePerUnit * quantity doesn't match totalPrice (>10% off), recalculate
-        pricePerUnit = calculatedPricePerUnit
-        console.log(`Recalculated price for ${item.name}: ${totalPrice} / ${quantity} = ${pricePerUnit.toFixed(4)}`)
+      // Pattern 1: 24X150G, 96X20G, 30X100G (number X numberg)
+      const packMatch = originalText.match(/(\d+)\s*[xX]\s*\d+\s*[gG]/i)
+      if (packMatch) {
+        quantity = parseInt(packMatch[1], 10)
+        console.log(`Parsed pack quantity from "${originalText}": ${quantity} stuks`)
       }
       
+      // Pattern 2: 5EX140G (numberEXnumberg - E for "each" or typo)
+      if (quantity === 1) {
+        const packMatchE = originalText.match(/(\d+)\s*[eE]?[xX]\s*\d+\s*[gG]/i)
+        if (packMatchE) {
+          quantity = parseInt(packMatchE[1], 10)
+          console.log(`Parsed pack quantity (E) from "${originalText}": ${quantity} stuks`)
+        }
+      }
+      
+      // Pattern 3: 10L, 10KG, 2.5KG (volume/weight)
+      if (quantity === 1) {
+        const volumeMatch = originalText.match(/(\d+(?:[,.]\d+)?)\s*(L|LTR|LITER)\b/i)
+        if (volumeMatch) {
+          quantity = parseFloat(volumeMatch[1].replace(',', '.'))
+          unit = 'liter'
+          console.log(`Parsed volume from "${originalText}": ${quantity} liter`)
+        }
+      }
+      
+      if (quantity === 1) {
+        const weightMatch = originalText.match(/(\d+(?:[,.]\d+)?)\s*(KG|KILO)\b/i)
+        if (weightMatch) {
+          quantity = parseFloat(weightMatch[1].replace(',', '.'))
+          unit = 'kg'
+          console.log(`Parsed weight from "${originalText}": ${quantity} kg`)
+        }
+      }
+      
+      // Calculate price per unit
+      const pricePerUnit = quantity > 0 ? totalPrice / quantity : totalPrice
+      
+      console.log(`${item.name}: ${totalPrice} / ${quantity} = ${pricePerUnit.toFixed(4)} per ${unit}`)
+      
       return {
-        name: item.name,
+        name: item.name || originalText,
         quantity: quantity,
-        unit: item.unit || 'stuk',
+        unit: unit,
         pricePerUnit: pricePerUnit,
         totalPrice: totalPrice,
         vatPercentage: Number(item.vatPercentage) || 6
