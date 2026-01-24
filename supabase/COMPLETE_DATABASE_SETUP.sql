@@ -679,43 +679,6 @@ CREATE INDEX IF NOT EXISTS idx_gift_cards_tenant ON gift_cards(tenant_slug);
 CREATE INDEX IF NOT EXISTS idx_gift_cards_code ON gift_cards(code);
 
 -- ============================================================
--- ROW LEVEL SECURITY - Alles openbaar voor nu
--- ============================================================
-ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
-ALTER TABLE business_profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tenant_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE opening_hours ENABLE ROW LEVEL SECURITY;
-ALTER TABLE menu_categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE menu_products ENABLE ROW LEVEL SECURITY;
-ALTER TABLE product_options ENABLE ROW LEVEL SECURITY;
-ALTER TABLE product_option_choices ENABLE ROW LEVEL SECURITY;
-ALTER TABLE product_option_links ENABLE ROW LEVEL SECURITY;
-ALTER TABLE delivery_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
-ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE shop_customers ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loyalty_rewards ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loyalty_redemptions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE promotions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
-ALTER TABLE qr_codes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tenant_media ENABLE ROW LEVEL SECURITY;
-ALTER TABLE tenant_texts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE reservations ENABLE ROW LEVEL SECURITY;
-ALTER TABLE gift_cards ENABLE ROW LEVEL SECURITY;
-ALTER TABLE team_members ENABLE ROW LEVEL SECURITY;
-ALTER TABLE staff ENABLE ROW LEVEL SECURITY;
-ALTER TABLE timesheet_entries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE monthly_timesheets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE daily_sales ENABLE ROW LEVEL SECURITY;
-ALTER TABLE fixed_costs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE variable_costs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE business_targets ENABLE ROW LEVEL SECURITY;
-ALTER TABLE z_reports ENABLE ROW LEVEL SECURITY;
-ALTER TABLE superadmins ENABLE ROW LEVEL SECURITY;
-
--- ============================================================
 -- COST SETTINGS - Standaard prijzen en simulator data
 -- ============================================================
 CREATE TABLE IF NOT EXISTS cost_settings (
@@ -740,21 +703,12 @@ CREATE TABLE IF NOT EXISTS cost_settings (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-ALTER TABLE cost_settings ENABLE ROW LEVEL SECURITY;
 CREATE INDEX IF NOT EXISTS idx_cost_settings_tenant ON cost_settings(tenant_slug);
 
--- Policies - Alles lezen/schrijven toestaan
-DO $$ 
-DECLARE
-  t TEXT;
-BEGIN
-  FOR t IN 
-    SELECT tablename FROM pg_tables WHERE schemaname = 'public'
-  LOOP
-    EXECUTE format('DROP POLICY IF EXISTS "Allow all" ON %I', t);
-    EXECUTE format('CREATE POLICY "Allow all" ON %I FOR ALL USING (true) WITH CHECK (true)', t);
-  END LOOP;
-END $$;
+-- ============================================================
+-- RLS IS UITGESCHAKELD - Geen policies nodig
+-- Beveiliging gebeurt via tenant_slug filtering in de app
+-- ============================================================
 
 -- ============================================================
 -- KLAAR! DATABASE IS VOLLEDIG OPGEZET
