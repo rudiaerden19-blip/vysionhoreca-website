@@ -104,6 +104,31 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     loadData()
   }, [params.tenant])
 
+  // Auto-save simulator data to Supabase (debounced)
+  useEffect(() => {
+    if (!loading) {
+      const timeoutId = setTimeout(async () => {
+        try {
+          const { error } = await supabase
+            .from('cost_settings')
+            .upsert({
+              tenant_slug: params.tenant,
+              simulator_items: simulatorItems,
+              simulator_name: simulatorName,
+              simulator_multiplier: parseFloat(simulatorMultiplier.replace(',', '.')) || 3,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'tenant_slug' })
+          
+          if (error) console.error('Failed to save simulator data:', error)
+        } catch (e) {
+          console.error('Failed to save simulator data:', e)
+        }
+      }, 1000) // Debounce 1 second
+      
+      return () => clearTimeout(timeoutId)
+    }
+  }, [simulatorItems, simulatorName, simulatorMultiplier, params.tenant, loading])
+
   // Click outside to close search results
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -139,30 +164,60 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       setDefaultMultiplier(avg)
     }
 
-    // Load standard prices from localStorage
+    // Load cost settings from Supabase
     try {
-      const savedPrices = localStorage.getItem(`standard_prices_${params.tenant}`)
-      if (savedPrices) {
-        const parsed = JSON.parse(savedPrices)
-        // Convert numbers to strings if needed (backwards compatibility)
-        const stringPrices: any = {}
-        for (const key of Object.keys(parsed)) {
-          stringPrices[key] = typeof parsed[key] === 'number' ? parsed[key].toString() : parsed[key]
-        }
-        setStandardPrices(prev => ({ ...prev, ...stringPrices }))
+      const { data: costSettings } = await supabase
+        .from('cost_settings')
+        .select('*')
+        .eq('tenant_slug', params.tenant)
+        .single()
+      
+      if (costSettings) {
+        // Load standard prices
+        setStandardPrices({
+          saus: costSettings.saus?.toString() || '0.12',
+          sla: costSettings.sla?.toString() || '0.13',
+          tomaat: costSettings.tomaat?.toString() || '0.14',
+          ei: costSettings.ei?.toString() || '0.12',
+          potje_saus: costSettings.potje_saus?.toString() || '0.16',
+          verpakking: costSettings.verpakking?.toString() || '0.30',
+          kosten_per_stuk: costSettings.kosten_per_stuk?.toString() || '0.40'
+        })
+        
+        // Load simulator data
+        if (costSettings.simulator_items) setSimulatorItems(costSettings.simulator_items)
+        if (costSettings.simulator_name) setSimulatorName(costSettings.simulator_name)
+        if (costSettings.simulator_multiplier) setSimulatorMultiplier(costSettings.simulator_multiplier.toString())
       }
     } catch (e) {
-      console.error('Failed to load standard prices:', e)
+      console.error('Failed to load cost settings:', e)
     }
 
     setLoading(false)
   }
 
-  // Save standard prices to localStorage
+  // Save standard prices to Supabase
   async function saveStandardPrices() {
     setSavingStandardPrices(true)
     try {
-      localStorage.setItem(`standard_prices_${params.tenant}`, JSON.stringify(standardPrices))
+      const priceData = {
+        tenant_slug: params.tenant,
+        saus: parseFloat(standardPrices.saus.replace(',', '.')) || 0.12,
+        sla: parseFloat(standardPrices.sla.replace(',', '.')) || 0.13,
+        tomaat: parseFloat(standardPrices.tomaat.replace(',', '.')) || 0.14,
+        ei: parseFloat(standardPrices.ei.replace(',', '.')) || 0.12,
+        potje_saus: parseFloat(standardPrices.potje_saus.replace(',', '.')) || 0.16,
+        verpakking: parseFloat(standardPrices.verpakking.replace(',', '.')) || 0.30,
+        kosten_per_stuk: parseFloat(standardPrices.kosten_per_stuk.replace(',', '.')) || 0.40,
+        updated_at: new Date().toISOString()
+      }
+      
+      const { error } = await supabase
+        .from('cost_settings')
+        .upsert(priceData, { onConflict: 'tenant_slug' })
+      
+      if (error) throw error
+      
       setStandardPricesSaved(true)
       setTimeout(() => setStandardPricesSaved(false), 2000)
     } catch (e) {
