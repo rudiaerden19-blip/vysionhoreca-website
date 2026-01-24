@@ -463,94 +463,88 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     setIngredients(prev => prev.filter(i => i.id !== id))
   }
 
-  // Parse Van Zon copied text (factuur format)
-  function parseVanZonText(text: string) {
+  // Parse table data (tab or space separated)
+  function parseTableText(text: string) {
     const products: Array<{name: string, articleNr: string, price: number, unitsPerBox: number}> = []
     
-    // Join all text and split by lines
     const lines = text.split('\n').map(l => l.trim()).filter(l => l)
     
-    let i = 0
-    while (i < lines.length) {
+    for (let i = 0; i < lines.length; i++) {
       const line = lines[i]
       
-      // Pattern 1: Line with article number at start, followed by product info and prices
-      // Example: "1277 RED BULL 24X25CL BLIK 1 CU 32.3160 5.00 30.7 30.7 6 %"
-      const fullLineMatch = line.match(/^(\d+)\s+(.+?)\s+(\d+)\s+CU\s+([\d.,]+)\s+[\d.,]+\s+[\d.,]+\s+[\d.,]+\s+\d+\s*%?/)
-      if (fullLineMatch) {
-        const articleNr = fullLineMatch[1]
-        const name = fullLineMatch[2].trim()
-        const priceStr = fullLineMatch[4].replace(',', '.')
-        const price = parseFloat(priceStr)
-        
-        // Extract units per box from name (e.g., 24X25CL = 24 units, 250ST = 250 units)
-        let unitsPerBox = 1
-        const unitsMatch = name.match(/(\d+)\s*[xX]\s*\d+/)
-        const stMatch = name.match(/(\d+)\s*ST\b/i)
-        if (unitsMatch) {
-          unitsPerBox = parseInt(unitsMatch[1], 10)
-        } else if (stMatch) {
-          unitsPerBox = parseInt(stMatch[1], 10)
-        }
-        
-        if (!products.some(p => p.articleNr === articleNr)) {
-          products.push({ name, articleNr, price, unitsPerBox })
-        }
-        i++
-        continue
+      // Skip header lines
+      if (line.match(/^Omschrijving|^Product|^Artikel/i)) continue
+      
+      // Split by tabs first, then try multiple spaces
+      let parts = line.split('\t')
+      if (parts.length < 3) {
+        parts = line.split(/\s{2,}/)
       }
       
-      // Pattern 2: Product name on one line, details on next
-      // Line 1: "WHOPPER SESAM 24X82G"
-      // Line 2: "2 CU 11.8880 5.00 22.59 22.59 6 %"
-      const nextLine = lines[i + 1] || ''
-      const detailsMatch = nextLine.match(/^(\d+)\s+CU\s+([\d.,]+)\s+[\d.,]+\s+[\d.,]+\s+[\d.,]+\s+\d+\s*%?/)
+      // Need at least: name, something, price
+      if (parts.length < 2) continue
       
-      if (detailsMatch && !line.match(/^\d+\s+CU/)) {
-        const name = line
-        const priceStr = detailsMatch[2].replace(',', '.')
-        const price = parseFloat(priceStr)
-        const articleNr = `auto-${Date.now()}-${i}`
-        
-        // Extract units per box from name
-        let unitsPerBox = 1
-        const unitsMatch = name.match(/(\d+)\s*[xX]\s*\d+/)
-        const stMatch = name.match(/(\d+)\s*ST\b/i)
-        if (unitsMatch) {
-          unitsPerBox = parseInt(unitsMatch[1], 10)
-        } else if (stMatch) {
-          unitsPerBox = parseInt(stMatch[1], 10)
-        }
-        
-        products.push({ name, articleNr, price, unitsPerBox })
-        i += 2 // Skip the details line
-        continue
-      }
+      // Find the omschrijving (longest text part, usually first)
+      const omschrijving = parts[0].trim()
+      if (!omschrijving || omschrijving.length < 3) continue
       
-      // Pattern 3: Simple line with prices - look for product with CU and prices
-      // Example: "25848 COCA COLA 30X33CL SLEEK BLIK 1 CU 25.1540 5.00 23.89 23.89 6 %"
-      const simpleMatch = line.match(/(\d*)\s*(.+?)\s+\d+\s+CU\s+([\d.,]+)/)
-      if (simpleMatch) {
-        const articleNr = simpleMatch[1] || `auto-${Date.now()}-${i}`
-        const name = simpleMatch[2].trim()
-        const priceStr = simpleMatch[3].replace(',', '.')
-        const price = parseFloat(priceStr)
-        
-        let unitsPerBox = 1
-        const unitsMatch = name.match(/(\d+)\s*[xX]\s*\d+/)
-        const stMatch = name.match(/(\d+)\s*ST\b/i)
-        if (unitsMatch) {
-          unitsPerBox = parseInt(unitsMatch[1], 10)
-        } else if (stMatch) {
-          unitsPerBox = parseInt(stMatch[1], 10)
-        }
-        
-        if (!products.some(p => p.name === name)) {
-          products.push({ name, articleNr, price, unitsPerBox })
+      // Find price - look for number with decimals
+      let price = 0
+      for (const part of parts) {
+        const priceMatch = part.trim().match(/^(\d+)[.,](\d{2,4})$/)
+        if (priceMatch) {
+          price = parseFloat(`${priceMatch[1]}.${priceMatch[2]}`)
+          break
         }
       }
       
-      i++
+      // If no price found, try to find in the line
+      if (price === 0) {
+        const allPrices = line.match(/(\d+)[.,](\d{4})/g) // Match prices like 25.1540
+        if (allPrices && allPrices.length > 0) {
+          price = parseFloat(allPrices[0].replace(',', '.'))
+        }
+      }
+      
+      if (price === 0) continue
+      
+      // Extract units per box from omschrijving
+      let unitsPerBox = 1
+      
+      // Pattern: 30X100G, 24X33CL, etc. - first number is quantity
+      const packMatch = omschrijving.match(/(\d+)\s*[xX]\s*\d+/)
+      if (packMatch) {
+        unitsPerBox = parseInt(packMatch[1], 10)
+      }
+      
+      // Pattern: 250ST
+      if (unitsPerBox === 1) {
+        const stMatch = omschrijving.match(/(\d+)\s*ST\b/i)
+        if (stMatch) {
+          unitsPerBox = parseInt(stMatch[1], 10)
+        }
+      }
+      
+      // Skip dimension-like patterns (205X120X36 = 3 parts with X)
+      const dimensionMatch = omschrijving.match(/(\d+)\s*[xX]\s*\d+\s*[xX]\s*\d+/)
+      if (dimensionMatch && unitsPerBox > 100) {
+        // This is probably dimensions, look for ST pattern instead
+        const stMatch = omschrijving.match(/(\d+)\s*ST\b/i)
+        if (stMatch) {
+          unitsPerBox = parseInt(stMatch[1], 10)
+        } else {
+          unitsPerBox = 1
+        }
+      }
+      
+      const articleNr = `row-${i}`
+      
+      products.push({
+        name: omschrijving,
+        articleNr,
+        price,
+        unitsPerBox
+      })
     }
     
     return products
@@ -558,7 +552,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
 
   function handleImportTextChange(text: string) {
     setImportText(text)
-    const parsed = parseVanZonText(text)
+    const parsed = parseTableText(text)
     setImportPreview(parsed)
   }
 
@@ -697,7 +691,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             onClick={() => setShowImport(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
           >
-            📥 Excel Import
+            📋 Plak Tabel
           </button>
           <button
             onClick={() => { resetForm(); setShowAddForm(true) }}
@@ -1137,9 +1131,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
               onClick={e => e.stopPropagation()}
             >
               <div className="p-6 border-b bg-blue-50">
-                <h2 className="text-xl font-bold text-gray-900">📥 Van Zon Import</h2>
+                <h2 className="text-xl font-bold text-gray-900">📋 Factuur Tabel Import</h2>
                 <p className="text-gray-600 mt-1">
-                  Kopieer je bestelgeschiedenis van shopvanzon.be en plak het hieronder
+                  Kopieer de tabel uit je PDF/Excel factuur en plak hieronder
                 </p>
               </div>
               
@@ -1153,7 +1147,11 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                     value={importText}
                     onChange={(e) => handleImportTextChange(e.target.value)}
                     className="w-full h-80 p-3 border rounded-lg text-sm font-mono"
-                    placeholder="Kopieer de producten van Van Zon en plak hier..."
+                    placeholder="Kopieer de tabel uit je factuur (PDF/Excel) en plak hier...
+
+Voorbeeld:
+HAMBURGER 30X100G VAN ZON    2    CU    11.4740    5.00    21.8
+BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                   />
                 </div>
                 
