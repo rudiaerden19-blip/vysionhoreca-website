@@ -973,7 +973,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 ('ART01753', 'A299C14 CHEESECAKE 1,6KG P. DU CHEF', 1, 31.19, 'BAKKERIJ'),
 ('ART01754', 'A302C12 TRIPLE CHOCOLATE CAKE 1,32KG MY ORIGINAL', 1, 28.35, 'BAKKERIJ'),
 ('ART01755', 'APPELTAART VELUWSE WENER PRESTIGE 1,8KG', 1, 9.65, 'BAKKERIJ'),
-('A238C12 HUNKY CHUNKY APPEL PIE 1,8KG B''DOR', 1, 24.19, 'BAKKERIJ'),
 ('ART01756', 'PAGOTINI TARTE TATIN APPEL 6X75G', 6, 15.96, 'BAKKERIJ'),
 ('ART01757', 'LA LORRAINE 4716 RIJSTTAARTJE TARTELETS 36X142G', 36, 34.20, 'BAKKERIJ'),
 
@@ -1995,7 +1994,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- SAUZEN - Altoni Italiaans Extra
 -- =====================================================
 ('ART02356', 'ALTONI FUNGHI PORCINI SAUS 1KG', 1, 9.21, 'SAUZEN'),
-('ALTONI BUTCHER''S BOLOGNAISE SAUS 2,5KG', 1, 24.59, 'SAUZEN'),
 
 -- =====================================================
 -- SAUZEN - Mahall & Bresc
@@ -2762,8 +2760,6 @@ INSERT INTO supplier_products (article_number, name, units_per_package, package_
 -- =====================================================
 -- OLIJFOLIE - A L'Olivier Premium
 -- =====================================================
-('A L''OLIVIER PORCINI & TRUFFEL 250ML', 1, 14.09, 'OLIËN & VETTEN'),
-('A L''OLIVIER WALNOOTOLIE 500ML', 1, 26.67, 'OLIËN & VETTEN'),
 
 -- =====================================================
 -- SESAMOLIE
