@@ -869,7 +869,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                             <th className="px-3 py-2 text-left">Product</th>
                             <th className="px-3 py-2 text-center">Aantal</th>
                             <th className="px-3 py-2 text-left">Eenheid</th>
-                            <th className="px-3 py-2 text-right">Per stuk</th>
+                            <th className="px-3 py-2 text-right">Prijs/eenheid</th>
                             <th className="px-3 py-2 text-right">Totaal</th>
                             <th className="px-3 py-2 text-center">BTW</th>
                           </tr>

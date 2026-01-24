@@ -62,10 +62,16 @@ Retourneer ALLEEN een valid JSON object met deze structuur (geen andere tekst, g
   ]
 }
 
-Belangrijke regels:
+KRITIEKE REGELS VOOR PRIJZEN:
+- pricePerUnit = de prijs voor 1 ENKELE eenheid (1 stuk, 1 kg, 1 liter)
+- totalPrice = het totaalbedrag op de factuur voor die regel
+- ALTIJD BEREKENEN: pricePerUnit = totalPrice / quantity
+- Voorbeeld: 96 stuks voor €12.86 totaal → pricePerUnit = €0.134 (12.86/96), NIET €12.86
+- Voorbeeld: 10 kg voor €26.76 totaal → pricePerUnit = €2.676 (26.76/10)
+
+Andere regels:
 - Gebruik Nederlandse productnamen
-- Kies de juiste eenheid (stuk voor individuele items, kg voor gewicht, liter voor vloeistoffen, doos voor verpakkingen)
-- Als een product per doos wordt verkocht met X stuks erin, bereken dan de prijs per stuk
+- Kies de juiste eenheid (stuk voor individuele items, kg voor gewicht, liter voor vloeistoffen)
 - BTW is meestal 6% voor voedingsmiddelen, 21% voor non-food
 - Als je iets niet kunt lezen, sla het product dan over
 - Geef ALLEEN het JSON object terug, geen andere tekst of markdown`
@@ -143,13 +149,43 @@ Belangrijke regels:
       }, { status: 400 })
     }
 
+    // Validate and fix price calculations
+    const validatedItems = (parsed.items || []).map((item: any) => {
+      const quantity = Number(item.quantity) || 1
+      const totalPrice = Number(item.totalPrice) || 0
+      let pricePerUnit = Number(item.pricePerUnit) || 0
+      
+      // Calculate correct price per unit from total / quantity
+      const calculatedPricePerUnit = quantity > 0 ? totalPrice / quantity : totalPrice
+      
+      // If AI got it wrong (pricePerUnit is same as totalPrice or way off), fix it
+      if (quantity > 1 && Math.abs(pricePerUnit - totalPrice) < 0.01) {
+        // AI returned totalPrice as pricePerUnit, fix it
+        pricePerUnit = calculatedPricePerUnit
+        console.log(`Fixed price for ${item.name}: ${totalPrice} / ${quantity} = ${pricePerUnit.toFixed(4)}`)
+      } else if (quantity > 1 && Math.abs(pricePerUnit * quantity - totalPrice) > totalPrice * 0.1) {
+        // pricePerUnit * quantity doesn't match totalPrice (>10% off), recalculate
+        pricePerUnit = calculatedPricePerUnit
+        console.log(`Recalculated price for ${item.name}: ${totalPrice} / ${quantity} = ${pricePerUnit.toFixed(4)}`)
+      }
+      
+      return {
+        name: item.name,
+        quantity: quantity,
+        unit: item.unit || 'stuk',
+        pricePerUnit: pricePerUnit,
+        totalPrice: totalPrice,
+        vatPercentage: Number(item.vatPercentage) || 6
+      }
+    })
+
     return NextResponse.json({
       success: true,
       supplier: parsed.supplier,
       invoiceDate: parsed.invoiceDate,
       invoiceNumber: parsed.invoiceNumber,
       totalAmount: parsed.totalAmount,
-      items: parsed.items || []
+      items: validatedItems
     })
 
   } catch (error: any) {
