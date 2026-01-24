@@ -1175,7 +1175,2933 @@ INSERT INTO supplier_products (name, units_per_package, unit_price, category) VA
 ('TAPENADE PAPRIKA 800G GRANOLIVA', 1, 10.78, 'BAKKERIJ'),
 ('TAPENADE PAPRIKA 400G GRANOLIVA', 1, 7.41, 'BAKKERIJ'),
 ('AIOLI 800G GRANOLIVA', 1, 7.24, 'BAKKERIJ'),
-('MADRAS 450G BRESC', 1, 6.78, 'BAKKERIJ');
+('MADRAS 450G BRESC', 1, 6.78, 'BAKKERIJ'),
+
+-- =====================================================
+-- SAUZEN - Mayonaise & Frietsaus
+-- =====================================================
+('MAYONAISE TUBE 850ML GOUDA''S GLORIE', 1, 3.93, 'SAUZEN'),
+('FRIETSAUS TUBE 850ML GOUDA''S GLORIE', 1, 2.57, 'SAUZEN'),
+('MAYO CHEF 10L PAUWELS', 1, 26.99, 'SAUZEN'),
+('FRIETSAUS 25% 10L OLIEHOORN', 1, 21.37, 'SAUZEN'),
+('FRIETSAUS 35% 10L OLIEHOORN', 1, 25.21, 'SAUZEN'),
+('FRIETSAUS 35% 10L VAN ZON', 1, 17.92, 'SAUZEN'),
+('MAYONAISE 2L DL', 1, 18.22, 'SAUZEN'),
+('MAYO TRAITEUR 4,9KG LA WILLIAM', 1, 23.04, 'SAUZEN'),
+('HEINZ PORTIES CUPS MAYONAISE 100X27ML', 100, 0.23, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Ketchup & Curry
+-- =====================================================
+('TOMATENKETCHUP TUBE 850ML GOUDA''S GLORIE', 1, 3.07, 'SAUZEN'),
+('CURRY KETCHUP TUBE 850ML GOUDA''S GLORIE', 1, 3.20, 'SAUZEN'),
+('TOMATENKETCHUP TUBE 425ML ZEISNER', 1, 3.03, 'SAUZEN'),
+('CURRY KETCHUP 3L PET VANDEMOORTELE', 1, 13.08, 'SAUZEN'),
+('TOMATENSAUS 1,275KG BLIK JIV', 1, 6.03, 'SAUZEN'),
+('HEINZ PORTIES CUPS TOMATENKETCHUP 100X21ML', 100, 0.25, 'SAUZEN'),
+('HEINZ PORTIE ZAKJES TOMATENKETCHUP 200X11G', 200, 0.18, 'SAUZEN'),
+('CLASSIC CURRY SAUS 3X1L VERSTEGEN', 3, 13.56, 'SAUZEN'),
+('CLASSIC CURRY SAUS 6X250ML VERSTEGEN', 6, 4.13, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Mosterd
+-- =====================================================
+('MOSTERD TUBE 850ML GOUDA''S GLORIE', 1, 2.72, 'SAUZEN'),
+('MOSTERD 1L TUBE MANNA', 1, 4.55, 'SAUZEN'),
+('MOSTERD 2L DL', 1, 12.37, 'SAUZEN'),
+('MOSTERD 3L EMMER ANDA', 1, 11.26, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Andalouse & Samurai
+-- =====================================================
+('ANDALOUSESAUS 5L BOX ANDA', 1, 29.27, 'SAUZEN'),
+('ANDALOUSESAUS 10L ANDA', 1, 51.24, 'SAUZEN'),
+('ANDALOUSESAUS 2X7,5L SAUSMASTER PAUWELS', 2, 29.28, 'SAUZEN'),
+('ANDALOUSE 5KG LA WILLIAM', 1, 31.98, 'SAUZEN'),
+('SAMURAI 5L BOX ANDA', 1, 27.19, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Tartaar & Cocktail
+-- =====================================================
+('TARTAAR CHEF 3KG LA WILLIAM', 1, 18.37, 'SAUZEN'),
+('TARTAAR MAISON 5L BOX ANDA', 1, 21.31, 'SAUZEN'),
+('TARTAAR 5KG LA WILLIAM', 1, 23.60, 'SAUZEN'),
+('COCKTAILSAUS 2L DL', 1, 18.10, 'SAUZEN'),
+('COCKTAILSAUS PORTIES CUPS 120X20ML VANDEMOORTELE', 120, 0.21, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pickles & Pili Pili
+-- =====================================================
+('PICKLES 3L EMMER ANDA', 1, 10.92, 'SAUZEN'),
+('PICKLES 2L DL', 1, 11.57, 'SAUZEN'),
+('PILI PILI 3L EMMER ANDA', 1, 12.67, 'SAUZEN'),
+('PILI-PILISAUS 5KG LA WILLIAM', 1, 24.72, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Premium Sauzen (Verstegen)
+-- =====================================================
+('CLASSIC PEPERSAUS 3X1L VERSTEGEN', 3, 14.05, 'SAUZEN'),
+('CLASSIC PEPERSAUS 6X250ML VERSTEGEN', 6, 3.98, 'SAUZEN'),
+('CLASSIC BEARNAISESAUS 3X1L VERSTEGEN', 3, 14.29, 'SAUZEN'),
+('CLASSIC BEARNAISESAUS 6X250ML VERSTEGEN', 6, 4.09, 'SAUZEN'),
+('CLASSIC HOLLANDAISESAUS 3X1L VERSTEGEN', 3, 14.89, 'SAUZEN'),
+('HOLLANDAISESAUS 6X250ML VERSTEGEN', 6, 4.18, 'SAUZEN'),
+('GARDE D''OR HOLLANDAISE SAUS 1L KNORR PROF', 1, 6.99, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Satésaus & Speciale Sauzen
+-- =====================================================
+('SATESAUS CLASSIC KANT-EN-KLAAR 2,5KG WIJKO', 1, 14.23, 'SAUZEN'),
+('AMERICAIN CHEF 4,9KG LA WILLIAM', 1, 32.88, 'SAUZEN'),
+('SAUS RICHE 5KG LA WILLIAM', 1, 26.13, 'SAUZEN'),
+('BRAZILSAUS 5KG LA WILLIAM', 1, 35.90, 'SAUZEN'),
+('MOSSELSAUS 2L NIKITA', 1, 7.26, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Americain
+-- =====================================================
+('AMERICAIN 650ML LA WILLIAM', 1, 8.92, 'SAUZEN'),
+('AMERICAIN CHEF 9,5KG LA WILLIAM', 1, 58.64, 'SAUZEN'),
+('AMERICAIN 3L PET VANDEMOORTELE', 1, 15.27, 'SAUZEN'),
+('SLOTTS AMERICAIN 2,8KG MANNA', 1, 15.93, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vandemoortele PET 3L
+-- =====================================================
+('PEPERSAUS 1L TUBE VANDEMOORTELE', 1, 6.48, 'SAUZEN'),
+('ANDALOUSE 3L PET VANDEMOORTELE', 1, 15.39, 'SAUZEN'),
+('BEARNAISESAUS 3L PET VANDEMOORTELE', 1, 17.79, 'SAUZEN'),
+('CURRYSAUS 3L PET VANDEMOORTELE', 1, 15.94, 'SAUZEN'),
+('SAMURAI 3L PET VANDEMOORTELE', 1, 17.59, 'SAUZEN'),
+('TOMATENKETCHUP 3L PET VANDEMOORTELE', 1, 13.77, 'SAUZEN'),
+('BOURGY HAMBURGERSAUS 3L PET VANDEMOORTELE', 1, 17.41, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William Tubes & Flessen
+-- =====================================================
+('ANDALOUSESAUS 650ML LA WILLIAM', 1, 8.73, 'SAUZEN'),
+('MARTINOSAUS 1L TUBE LA WILLIAM', 1, 6.59, 'SAUZEN'),
+('PILI-PILISAUS 3KG LA WILLIAM', 1, 13.34, 'SAUZEN'),
+('PICKLES 3KG LA WILLIAM', 1, 16.81, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Slotts (Manna) Emmers
+-- =====================================================
+('SLOTTS CURRY 2,6KG MANNA', 1, 11.92, 'SAUZEN'),
+('SLOTTS ANDALOUSE EXTRA 2,5KG MANNA', 1, 16.86, 'SAUZEN'),
+('SLOTTS BARBECUE SAUS 2,6KG MANNA', 1, 17.02, 'SAUZEN'),
+('SLOTTS COCKTAILSAUS 2,45KG MANNA', 1, 14.72, 'SAUZEN'),
+('SLOTTS CURRY KETCHUP 2,8KG MANNA', 1, 14.08, 'SAUZEN'),
+('SLOTTS LOOKSAUS PITTA 2,5KG MANNA', 1, 14.35, 'SAUZEN'),
+('SLOTTS MAYONAISE 2,45KG MANNA', 1, 16.53, 'SAUZEN'),
+('SLOTTS MOSTERD 2,7KG MANNA', 1, 10.61, 'SAUZEN'),
+('SLOTTS PEPERSAUS 2,6KG MANNA', 1, 14.69, 'SAUZEN'),
+('SLOTTS TARTAAR 2,6KG MANNA', 1, 12.01, 'SAUZEN'),
+('SLOTTS TOMATENKETCHUP 2,8KG MANNA', 1, 11.88, 'SAUZEN'),
+('SLOTTS MAMMOUTH (SNACKSAUS) 2,6KG MANNA', 1, 16.23, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Zeisner Ketchup Groot
+-- =====================================================
+('TOMATENKETCHUP TUBE 800ML ZEISNER', 1, 4.79, 'SAUZEN'),
+('TOMATENKETCHUP 2X5KG BIB ZEISNER', 2, 18.94, 'SAUZEN'),
+('TOMATENKETCHUP CAN 12KG ZEISNER', 1, 43.26, 'SAUZEN'),
+('TOMATENKETCHUP CAN 6KG ZEISNER', 1, 22.47, 'SAUZEN'),
+('CURRY KETCHUP TUBE 800ML ZEISNER', 1, 4.79, 'SAUZEN'),
+('CURRY KETCHUP 2X5KG BIB ZEISNER', 2, 18.95, 'SAUZEN'),
+('CURRY KETCHUP CAN 12KG ZEISNER', 1, 43.26, 'SAUZEN'),
+('CURRY KETCHUP TUBE 800ML HELA', 1, 3.69, 'SAUZEN'),
+('HEINZ TOMATENKETCHUP 10,2L', 1, 55.79, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pickles & Overige
+-- =====================================================
+('PICKLES 3L UYTTEWAAL', 1, 9.82, 'SAUZEN'),
+('COCKTAILSAUS ZONDER ALCOHOL 10L NIKITA', 1, 33.82, 'SAUZEN'),
+('ZIGEUNER-PROVENCAALSE SAUS 3L BECKERS', 1, 16.82, 'SAUZEN'),
+('ESPAGNOLE BELGIE 2KG VERSTEGEN', 1, 59.58, 'SAUZEN'),
+('ANDALOUSE 2L DL', 1, 18.16, 'SAUZEN'),
+('MAYO-SAUS 2L DL', 1, 14.99, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Barbecue & Satésaus
+-- =====================================================
+('BARBECUE SAUS 3L EMMER ANDA', 1, 15.18, 'SAUZEN'),
+('BARBECUESAUS 3KG WIJKO', 1, 17.16, 'SAUZEN'),
+('CLASSIC SATESAUS KANT-EN-KLAAR 2,7L VERSTEGEN', 1, 31.95, 'SAUZEN'),
+('CURRYSAUS CHINESE 12X355G MANNA', 12, 2.43, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Porties
+-- =====================================================
+('MOSTERD PORTIES CUPS 120X20G VANDEMOORTELE', 120, 0.21, 'SAUZEN'),
+('MAYONAISE EI PORTIES CUPS 120X40G VANDEMOORTELE', 120, 0.34, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vinaigrettes
+-- =====================================================
+('VINAIGRETTE BIESLOOK 2L VANDEMOORTELE', 1, 11.85, 'SAUZEN'),
+('VINAIGRETTE ITALIAN 2L VANDEMOORTELE', 1, 12.68, 'SAUZEN'),
+('VINAIGRETTE MOSTERDSAUS 2L VANDEMOORTELE', 1, 12.67, 'SAUZEN'),
+('VINAIGRETTE THOUSAND ISLANDS 2L VANDEMOORTELE', 1, 12.27, 'SAUZEN'),
+('VINAIGRETTE YOGHURT (YOGORETTE) 2L VANDEMOORTELE', 1, 11.76, 'SAUZEN'),
+('VINAIGRETTE MET BIESLOOK 2L ANDA', 1, 11.38, 'SAUZEN'),
+('VINAIGRETTE BIESLOOK 1L LA WILLIAM', 1, 7.41, 'SAUZEN'),
+('HELLMANN''S VINAIGRETTE CITRUS 1L', 1, 12.14, 'SAUZEN'),
+('HELLMANN''S VINAIGRETTE SESAM SOJA 1L', 1, 12.14, 'SAUZEN'),
+('HELLMANN''S VINAIGRETTE BALSAMICO AARDBEI 1L', 1, 12.14, 'SAUZEN'),
+('HELLMANN''S DRESSING CAESAR 1L', 1, 7.63, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Poeder & Kant-en-klaar
+-- =====================================================
+('COLL. IT. CARBONARASAUS POEDER 1,24KG KNORR', 1, 25.46, 'SAUZEN'),
+('CURRYSAUS POEDER 1,4KG KNORR', 1, 28.67, 'SAUZEN'),
+('GROENE PEPERSAUS POEDER 1,2KG KNORR', 1, 25.35, 'SAUZEN'),
+('KAASSAUS POEDER 1,2KG KNORR', 1, 40.52, 'SAUZEN'),
+('PEPERSAUS POEDER 1KG KNORR GOURMET', 1, 26.70, 'SAUZEN'),
+('BECHAMELSAUS POEDER 1KG KNORR', 1, 12.74, 'SAUZEN'),
+('CHAMPIGNONSAUS POEDER 3 ZAKJES PER DOOSJE KNORR', 3, 1.37, 'SAUZEN'),
+('GROENE PEPERSAUS POEDER 3 ZAKJES PER DOOSJE KNORR', 3, 1.37, 'SAUZEN'),
+('GARDE D''OR CHAMPIGNONSAUS GARNITUUR 1L KNORR PROF', 1, 6.72, 'SAUZEN'),
+('RATATOUILLE 2,5KG KNORR PROF', 1, 25.18, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels 3L PET
+-- =====================================================
+('AMERICAIN 3L PET PAUWELS', 1, 13.71, 'SAUZEN'),
+('ANDALOUSE 3L PET PAUWELS', 1, 14.28, 'SAUZEN'),
+('COCKTAILSAUS 3L PET PAUWELS', 1, 13.75, 'SAUZEN'),
+('CURRYSAUS 3L PET PAUWELS', 1, 13.85, 'SAUZEN'),
+('MAMMOUTH 3L PET PAUWELS', 1, 14.29, 'SAUZEN'),
+('HAMBURGER DRESSING 3L PET PAUWELS', 1, 15.23, 'SAUZEN'),
+('HAMBURGER HOTSAUS 3L PAUWELS', 1, 13.11, 'SAUZEN'),
+('HAMBURGER TRIPLESAUS 3L PET PAUWELS', 1, 14.99, 'SAUZEN'),
+('LOOKSAUS 3L PET PAUWELS', 1, 14.79, 'SAUZEN'),
+('MOSTERD 3L PET PAUWELS', 1, 13.07, 'SAUZEN'),
+('SAMURAISAUS 3L PET PAUWELS', 1, 14.86, 'SAUZEN'),
+('TARTAAR TRAITEUR 3L PET PAUWELS', 1, 13.94, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William Tubes 1L
+-- =====================================================
+('SAMURAI 1L TUBE LA WILLIAM', 1, 7.39, 'SAUZEN'),
+('PITTASAUS 1L TUBE LA WILLIAM', 1, 6.94, 'SAUZEN'),
+('PILI-PILISAUS 1L TUBE LA WILLIAM', 1, 5.66, 'SAUZEN'),
+('ANDALOUSE 1L TUBE LA WILLIAM', 1, 7.72, 'SAUZEN'),
+('PEPERSAUS 1L TUBE LA WILLIAM', 1, 6.72, 'SAUZEN'),
+('RICHE SAUS 1L TUBE LA WILLIAM', 1, 5.52, 'SAUZEN'),
+('BANZAI SAUS 1L TUBE LA WILLIAM', 1, 7.39, 'SAUZEN'),
+('TARTAAR 650ML LA WILLIAM', 1, 7.65, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vandemoortele Tubes 1L
+-- =====================================================
+('MARTINOSAUS 1L TUBE VANDEMOORTELE', 1, 5.82, 'SAUZEN'),
+('BEARNAISESAUS 1L TUBE VANDEMOORTELE', 1, 6.07, 'SAUZEN'),
+('CURRYSAUS 1L TUBE VANDEMOORTELE', 1, 5.69, 'SAUZEN'),
+('PILI-PILISAUS 1L TUBE VANDEMOORTELE', 1, 5.30, 'SAUZEN'),
+('TOMATAISE 1L TUBE VANDEMOORTELE', 1, 5.30, 'SAUZEN'),
+('AMERICAIN 1L TUBE VANDEMOORTELE', 1, 5.83, 'SAUZEN'),
+('TARTAAR 1L TUBE VANDEMOORTELE', 1, 5.38, 'SAUZEN'),
+('ANDALOUSE 1L TUBE VANDEMOORTELE', 1, 6.19, 'SAUZEN'),
+('TARTAAR 5L VANDEMOORTELE', 1, 22.25, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Tubes & Emmers
+-- =====================================================
+('FRIETSAUS 3L EMMER ANDA', 1, 10.62, 'SAUZEN'),
+('TOMATENKETCHUP 1L TUBE ANDA', 1, 5.71, 'SAUZEN'),
+('CALIFORNIA SAUS 3L EMMER ANDA', 1, 14.25, 'SAUZEN'),
+('MAYONAISE CHEF 650ML ANDA', 1, 5.08, 'SAUZEN'),
+('TARTAAR MAISON 650ML ANDA', 1, 4.89, 'SAUZEN'),
+('MAYONAISE MAISON 5L BOX ANDA', 1, 21.94, 'SAUZEN'),
+('MAYONAISE MAISON 1L TUBE ANDA', 1, 5.35, 'SAUZEN'),
+('HAMBURGERSAUS 1L TUBE ANDA', 1, 6.68, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - D''Lis Pastasauzen
+-- =====================================================
+('D''LIS BOLOGNAISE SAUS (KIP) 1KG', 1, 5.82, 'SAUZEN'),
+('D''LIS BOLOGNAISE SAUS HALAL 1KG', 1, 7.86, 'SAUZEN'),
+('D''LIS SAUS NAPOLITAANSE 1KG', 1, 5.65, 'SAUZEN'),
+('D''LIS KAASSAUS 1KG', 1, 7.17, 'SAUZEN'),
+('D''LIS SAUS CARBONARA 1KG', 1, 7.99, 'SAUZEN'),
+('D''LIS SAUS SCAMPI CREME 1KG', 1, 7.88, 'SAUZEN'),
+('D''LIS ARRABIATA SAUS 1KG', 1, 6.69, 'SAUZEN'),
+('D''LIS 4 KAZENSAUS 1KG', 1, 7.45, 'SAUZEN'),
+('BOLOGNAISE SAUS VERS TRAITEUR PIERROT 3,2KG', 1, 23.80, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Satésaus
+-- =====================================================
+('SATESAUS KANT-EN-KLAAR 3,3KG HELA', 1, 21.01, 'SAUZEN'),
+('SATESAUS PIKANT KANT-EN-KLAAR 3,3KG HELA', 1, 20.51, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Looksaus & Pittasaus
+-- =====================================================
+('LOOKSAUS PITTA 1L TUBE MANNA', 1, 6.73, 'SAUZEN'),
+('LOOKSAUS 850ML ELITE', 1, 5.09, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Overige Sauzen
+-- =====================================================
+('SLOTTS HOT SHOT SAUS 2,7KG MANNA', 1, 18.06, 'SAUZEN'),
+('TOMAGREC 700G MANNA', 1, 5.33, 'SAUZEN'),
+('QALITA MAYONAISE BELGISCHE 10L', 1, 25.49, 'SAUZEN'),
+('FRIETSAUS ZOET 5L MANNA', 1, 18.06, 'SAUZEN'),
+('MAYO-SAUS 10L DL', 1, 41.50, 'SAUZEN'),
+('MOSSELSAUS 10L NIKITA', 1, 24.53, 'SAUZEN'),
+('MOSTERD GROF 1,7KG NESTOR', 1, 10.70, 'SAUZEN'),
+('HONIG DEMI-GLACESAUS 1,1KG', 1, 23.97, 'SAUZEN'),
+('HONIG ESPAGNOLESAUS 935G', 1, 11.48, 'SAUZEN'),
+('HAMBURGERSAUS 5L BOX ANDA', 1, 29.05, 'SAUZEN'),
+('JOPPIESAUS 850ML TUBE', 1, 5.25, 'SAUZEN'),
+('CONNOISSEUR ZIGEUNERSAUS 2,7L VERSTEGEN', 1, 27.43, 'SAUZEN'),
+('PADDESTOELENSAUS 2,7L VERSTEGEN', 1, 36.11, 'SAUZEN'),
+('FRIETSAUS 25% 900ML OLIEHOORN', 1, 2.75, 'SAUZEN'),
+('MEZZO-MIX SAUS 1L TUBE', 1, 8.79, 'SAUZEN'),
+('TOMATENSAUS EMMER 5KG JERMAYO', 1, 20.18, 'SAUZEN'),
+('TARTAAR CHEF 4,9KG LA WILLIAM', 1, 27.96, 'SAUZEN'),
+('CURRY KETCHUP CAN 6KG ZEISNER', 1, 22.47, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Barbecue Sauzen
+-- =====================================================
+('BARBECUE SAUS TUBE 425ML ZEISNER', 1, 3.10, 'SAUZEN'),
+('BARBECUE SAUS 3KG MAURICE MATHIEU', 1, 14.90, 'SAUZEN'),
+('BARBECUE SAUS 680G MANNA', 1, 5.85, 'SAUZEN'),
+('HEINZ CLASSIC BARBECUE SAUS 220ML', 1, 2.92, 'SAUZEN'),
+('CHINESE SAUS TUBE 425ML ZEISNER', 1, 3.10, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Tabasco & Mosterd Specials
+-- =====================================================
+('TABASCO RODE PEPERSAUS 350ML MC ILHENNY', 1, 16.36, 'SAUZEN'),
+('MOSTERD 500G MEAUX POMMERY', 1, 9.98, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Tubes 1L
+-- =====================================================
+('BARBECUE SAUS 1L TUBE MANNA', 1, 6.54, 'SAUZEN'),
+('COCKTAILSAUS 1L TUBE MANNA', 1, 6.17, 'SAUZEN'),
+('CURRY KETCHUP 1L TUBE MANNA', 1, 5.48, 'SAUZEN'),
+('TOMATENKETCHUP 1L TUBE MANNA', 1, 4.95, 'SAUZEN'),
+('MAYONAISE 1L TUBE MANNA', 1, 7.19, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna 3L PET
+-- =====================================================
+('TARTAAR 3L PET MANNA', 1, 14.12, 'SAUZEN'),
+('SAMURAI 3L PET MANNA', 1, 18.33, 'SAUZEN'),
+('PICKLES 3L PET MANNA', 1, 14.16, 'SAUZEN'),
+('COCKTAILSAUS 3L PET MANNA', 1, 17.77, 'SAUZEN'),
+('LOOKSAUS PITTA 3L PET MANNA', 1, 19.72, 'SAUZEN'),
+('MAYONAISE 3L PET MANNA', 1, 20.68, 'SAUZEN'),
+('CURRY KETCHUP 3L PET MANNA', 1, 12.93, 'SAUZEN'),
+('TOMATENKETCHUP 3L PET MANNA', 1, 12.83, 'SAUZEN'),
+('MOSTERD 3L PET MANNA', 1, 12.80, 'SAUZEN'),
+('CURRY 3L PET MANNA', 1, 15.66, 'SAUZEN'),
+('ANDALOUSE EXTRA 3L PET MANNA', 1, 18.71, 'SAUZEN'),
+('BARBECUE SAUS 3L PET MANNA', 1, 18.60, 'SAUZEN'),
+('CURRYSAUS CHINESE 690G MANNA', 1, 4.20, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William Tubes Extra
+-- =====================================================
+('BARBECUE SAUS 1L TUBE LA WILLIAM', 1, 6.10, 'SAUZEN'),
+('MOSTERD 1L TUBE LA WILLIAM', 1, 4.86, 'SAUZEN'),
+('AMERICAIN CHEF 1L TUBE LA WILLIAM', 1, 7.77, 'SAUZEN'),
+('CURRYSAUS CHEF 1L TUBE LA WILLIAM', 1, 6.94, 'SAUZEN'),
+('COCKTAILSAUS CHEF 1L TUBE LA WILLIAM', 1, 7.76, 'SAUZEN'),
+('BRAZIL 1L TUBE LA WILLIAM', 1, 9.46, 'SAUZEN'),
+('CURRYSAUS CHEF 3KG LA WILLIAM', 1, 15.46, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels BIB & Extra
+-- =====================================================
+('HAMBURGER DRESSING 5L BIB PAUWELS', 1, 21.92, 'SAUZEN'),
+('HAMBURGER HOTSAUS 5L BIB PAUWELS', 1, 19.00, 'SAUZEN'),
+('TARTAAR DELUXE 5L BIB PAUWELS', 1, 23.12, 'SAUZEN'),
+('PICKLES BELGISCH 3L PET PAUWELS', 1, 9.90, 'SAUZEN'),
+('MAYONAISE PAUWELS 10L', 1, 32.21, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Prof Tomatensauzen
+-- =====================================================
+('PEPERONATA 2,6KG KNORR PROF', 1, 27.40, 'SAUZEN'),
+('PIZZA TOPPING 2,1KG BLIK KNORR PROF', 1, 12.19, 'SAUZEN'),
+('TOMATO PRONTO NAPOLETANA 2KG BLIK KNORR PROF', 1, 12.49, 'SAUZEN'),
+('TOMATINO BLIK 4KG KNORR PROF', 1, 20.40, 'SAUZEN'),
+('BEARNAISESAUS CALVE 2,7KG KNORR PROF', 1, 22.92, 'SAUZEN'),
+('ESPAGNOLESAUS POEDER 10KG KNORR 1-2-3', 1, 118.17, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - D''Lis Sauzen Extra
+-- =====================================================
+('D''LIS FORESTIERE SAUS 1KG', 1, 8.88, 'SAUZEN'),
+('D''LIS WITLOOF KAAS/HAMSAUS BELGICA 1KG', 1, 8.54, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - DL Knijpflessen
+-- =====================================================
+('DRESSING LICHT 450ML KNIJPFLES DL', 1, 4.45, 'SAUZEN'),
+('MOSTERD 450ML KNIJPFLES DL', 1, 3.35, 'SAUZEN'),
+('MAYONAISE EI 450ML KNIJPFLES DL', 1, 5.02, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Overige
+-- =====================================================
+('MOSTERD AMORA DIJON EMMER 5KG', 1, 19.98, 'SAUZEN'),
+('VINAIGRETTE MET OLIJFOLIE 2L VANDEMOORTELE', 1, 14.63, 'SAUZEN'),
+('HELLMANN''S VINAIGRETTE BASILICUM 1L', 1, 12.14, 'SAUZEN'),
+('HAMAL VERSE TARTAARSAUS SPECIAAL 5KG', 1, 22.38, 'SAUZEN'),
+('PICKLES 2,4L VANDEMOORTELE', 1, 10.10, 'SAUZEN'),
+('HEINZ TOMATO FRITO 330ML', 1, 2.20, 'SAUZEN'),
+('OYSTERSAUS 200ML SO THAI', 1, 4.35, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - D''Lis Sauzen Extra 2
+-- =====================================================
+('D''LIS SAUS BEARNAISESAUS 1KG', 1, 5.98, 'SAUZEN'),
+('D''LIS SAUS PEPERROOMSAUS 1KG', 1, 7.52, 'SAUZEN'),
+('D''LIS CHAMPIGNONROOMSAUS ARCHIDUC 1KG', 1, 7.52, 'SAUZEN'),
+('D''LIS BANDIDO SAUS 1KG', 1, 7.73, 'SAUZEN'),
+('D''LIS BOLOGNAISE SAUS CLASSICO 1L', 1, 7.67, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William 3L PET
+-- =====================================================
+('AMERICAIN CHEF 3L PET LA WILLIAM', 1, 21.34, 'SAUZEN'),
+('ANDALOUSE 3L PET LA WILLIAM', 1, 21.22, 'SAUZEN'),
+('MAYO TRAITEUR 3L PET LA WILLIAM', 1, 14.31, 'SAUZEN'),
+('TARTAAR 3L PET LA WILLIAM', 1, 14.05, 'SAUZEN'),
+('SAMURAI 3L PET LA WILLIAM', 1, 20.37, 'SAUZEN'),
+('AMERICAIN MAISON 3L PET LA WILLIAM', 1, 22.03, 'SAUZEN'),
+('COCKTAILSAUS CHEF 3L PET LA WILLIAM', 1, 21.41, 'SAUZEN'),
+('BRAZIL 3L PET LA WILLIAM', 1, 24.52, 'SAUZEN'),
+('RICHE SAUS 3L PET LA WILLIAM', 1, 13.87, 'SAUZEN'),
+('MAYONAISE TUBE 700ML LA WILLIAM', 1, 9.65, 'SAUZEN'),
+('SALSA DIABLA 1L LA WILLIAM', 1, 6.60, 'SAUZEN'),
+('HAMBURGERSAUS 1KG LA WILLIAM', 1, 7.85, 'SAUZEN'),
+('AMERICAIN MAISON (ROUGE) 1L TUBE LA WILLIAM', 1, 6.22, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Extra
+-- =====================================================
+('HAPPYSAUS 3L PET PAUWELS', 1, 12.97, 'SAUZEN'),
+('HAPPYSAUS 5L BIB PAUWELS', 1, 20.05, 'SAUZEN'),
+('BRAZILSAUS 5L BIB PAUWELS', 1, 24.08, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - DL Knijpflessen Extra
+-- =====================================================
+('SAMURAI LEPELSAUS 450ML KNIJPFLES DL', 1, 4.93, 'SAUZEN'),
+('MAYONAISE EI 750ML KNIJPFLES DL', 1, 7.13, 'SAUZEN'),
+('COCKTAIL LEPELSAUS 450ML KNIJPFLES DL', 1, 4.63, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Poeder Extra
+-- =====================================================
+('VISSAUS A L''ARMORICAINE POEDER 1KG KNORR', 1, 36.69, 'SAUZEN'),
+('CHAMPIGNONSAUS POEDER 1,1KG KNORR', 1, 22.59, 'SAUZEN'),
+('JACHTSAUS POEDER 1,12KG KNORR', 1, 28.69, 'SAUZEN'),
+('STROGANOFFSAUS POEDER 1KG KNORR', 1, 26.12, 'SAUZEN'),
+('COLL. IT. QUATTRO FORMAGGISAUS POEDER 1,17KG KNORR', 1, 38.78, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Tubes Extra
+-- =====================================================
+('MANNALOUSE 1L TUBE MANNA', 1, 6.92, 'SAUZEN'),
+('PEPERSAUS 1L TUBE MANNA', 1, 5.67, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vandemoortele Extra
+-- =====================================================
+('COCKTAILSAUS 1L TUBE VANDEMOORTELE', 1, 5.79, 'SAUZEN'),
+('HANNIBAL FRIKANDELSAUS 3L PET VANDEMOORTELE', 1, 16.50, 'SAUZEN'),
+('PEPERSAUS 3L PET VANDEMOORTELE', 1, 18.22, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Tubes Extra
+-- =====================================================
+('THAILANDAISE SAUS 1L TUBE ANDA', 1, 6.39, 'SAUZEN'),
+('CALABRIA BURGER SAUS 1L TUBE ANDA', 1, 6.29, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Bicky Bomber
+-- =====================================================
+('BICKY BOMBER DRESSING 2,5KG', 1, 20.69, 'SAUZEN'),
+('BICKY BOMBER KETCHUP 2,7KG', 1, 17.97, 'SAUZEN'),
+('BICKY BOMBER HOT SAUS 2,8KG', 1, 17.19, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Worcestershire & Tabasco
+-- =====================================================
+('WORCESTERSHIRESAUS 150ML LEA & PERRINS', 1, 4.43, 'SAUZEN'),
+('TABASCO RODE PEPERSAUS 150ML MC ILHENNY', 1, 9.13, 'SAUZEN'),
+('HEINZ WORCESTERSHIRESAUS 150ML', 1, 2.08, 'SAUZEN'),
+('CHILISAUS SRIRACHA MILD 455ML FLYING GOOSE', 1, 4.52, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Overige Extra
+-- =====================================================
+('QALITA TOMATENKETCHUP 5,6KG', 1, 15.34, 'SAUZEN'),
+('HELLMANN''S VINAIGRETTE SJALOT RODE UI 1L', 1, 12.14, 'SAUZEN'),
+('HONIG BASIS BOTER-EIERSAUS 760G', 1, 20.03, 'SAUZEN'),
+('KNOFLOOKSAUS MET KAPPERTJES 1L', 1, 8.68, 'SAUZEN'),
+('TARTAAR VERS 5L NIKITA', 1, 16.49, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Algerienne & Extra
+-- =====================================================
+('ALGERIENNE SAUS 5L BIB PAUWELS', 1, 22.67, 'SAUZEN'),
+('ALGERIENNE SAUS 3L PET PAUWELS', 1, 15.49, 'SAUZEN'),
+('SAMURAISAUS 10L EMMER PAUWELS', 1, 41.51, 'SAUZEN'),
+('TOMATEN KETCHUP 3L PET PAUWELS', 1, 12.40, 'SAUZEN'),
+('MAYONAISE 3L PET PAUWELS', 1, 13.45, 'SAUZEN'),
+('HAMBURGER GIGA 3L PET PAUWELS', 1, 14.81, 'SAUZEN'),
+('HAMBURGER GIGA 5L BIB PAUWELS', 1, 22.65, 'SAUZEN'),
+('ANDALOUSE CHEF BIB 5L PAUWELS', 1, 22.12, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Gourmet Poeder
+-- =====================================================
+('BOTERSAUS MET CITROEN POEDER 1KG KNORR', 1, 20.35, 'SAUZEN'),
+('HOLLANDAISESAUS POEDER 1,22KG KNORR', 1, 25.28, 'SAUZEN'),
+('DEMI-GLACESAUS POEDER 1KG KNORR GOURMET', 1, 26.07, 'SAUZEN'),
+('NANTUA SAUS POEDER 1KG KNORR GOURMET', 1, 29.08, 'SAUZEN'),
+('VIS VELOUTE 1KG KNORR GOURMET', 1, 27.91, 'SAUZEN'),
+('CHAMPIGNONSAUS POEDER 1KG KNORR GOURMET', 1, 24.58, 'SAUZEN'),
+('GARDE D''OR VISSAUS (NANTUA) 1L KNORR PROF', 1, 7.46, 'SAUZEN'),
+('GARDE D''OR RODE WIJNSAUS 1L KNORR PROF', 1, 7.49, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Heinz Flessen
+-- =====================================================
+('HEINZ BARBECUE SAUS 875ML', 1, 7.71, 'SAUZEN'),
+('HEINZ CURRY MANGO SAUS 875ML', 1, 7.71, 'SAUZEN'),
+('HEINZ MAYONAISE 875ML', 1, 6.16, 'SAUZEN'),
+('HEINZ PORTIE ZAKJES MAYONAISE 100X17ML', 100, 0.16, 'SAUZEN'),
+('HEINZ PORTIE ZAKJES MOSTERD 200X10ML', 200, 0.07, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - D''Lis Sauzen Extra 3
+-- =====================================================
+('D''LIS SAUS MASCARPONE ROSSO 1KG', 1, 7.77, 'SAUZEN'),
+('D''LIS SAUS CURRY 1KG', 1, 5.82, 'SAUZEN'),
+('D''LIS PRIMAVERA SAUS 1KG', 1, 5.96, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Altoni Italiaans
+-- =====================================================
+('ALTONI ITALIAANSE TOMAAT MASCARPONESAUS 1KG', 1, 9.21, 'SAUZEN'),
+('ALTONI ITALIAANSE CARBONARASAUS 1KG', 1, 9.21, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William Tubes Extra 2
+-- =====================================================
+('BEARNAISESAUS VERWARMBAAR 1L TUBE LA WILLIAM', 1, 8.59, 'SAUZEN'),
+('TRIPLE BC BURGERSAUS 1L TUBE LA WILLIAM', 1, 6.94, 'SAUZEN'),
+('MAYO ZOET 1L TUBE LA WILLIAM', 1, 5.60, 'SAUZEN'),
+('SWEET CURRY ONION SAUS 1L TUBE LA WILLIAM', 1, 7.28, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Tubes Extra 2
+-- =====================================================
+('BURGER SAUS 1L TUBE MANNA', 1, 6.82, 'SAUZEN'),
+('ALGERIENNE 1L TUBE MANNA', 1, 7.02, 'SAUZEN'),
+('BOLOGNAISE SAUS RESTO 3,2KG MANNA', 1, 23.30, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vandemoortele Extra 2
+-- =====================================================
+('MOSTERD 3L PET VANDEMOORTELE', 1, 13.25, 'SAUZEN'),
+('HAWAI SAUS 1L TUBE VANDEMOORTELE', 1, 6.06, 'SAUZEN'),
+('VINAIGRETTE BIESLOOK PORTIES 120X40ML VANDEMOORT.', 120, 0.33, 'SAUZEN'),
+('MOSSELSAUS PORTIES CUPS 120X40ML VANDEMOORTELE', 120, 0.34, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Overige Extra 2
+-- =====================================================
+('KUHLMANN TZATZIKI 1L VERS', 1, 9.78, 'SAUZEN'),
+('MOSSELSAUS 2L VAN HOVE', 1, 12.34, 'SAUZEN'),
+('BICKY TOSCAANSE SAUS TUBE 840ML', 1, 8.39, 'SAUZEN'),
+('HAMAL BOLOGNAISE SAUS 2,5KG', 1, 18.85, 'SAUZEN'),
+('SAMURAI 2L PET DL', 1, 17.93, 'SAUZEN'),
+('NACHO KAASSAUS 3KG', 1, 22.21, 'SAUZEN'),
+('COCKTAILSAUS 10L VAN ZON', 1, 27.25, 'SAUZEN'),
+('COCKTAILSAUS 2L NIKITA', 1, 9.59, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Tabasco Extra
+-- =====================================================
+('TABASCO RODE PEPERSAUS 60ML MC ILHENNY', 1, 3.55, 'SAUZEN'),
+('TABASCO GROENE PEPER SAUS 60ML MC ILHENNY', 1, 3.55, 'SAUZEN'),
+('JAMBALLASAUS 850ML TUBE', 1, 6.29, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Tubes 1L Compleet
+-- =====================================================
+('PEPERSAUS 1L TUBE ANDA', 1, 7.48, 'SAUZEN'),
+('AIOLI SAUS 1L TUBE ANDA', 1, 6.61, 'SAUZEN'),
+('AMERICAIN CHEF SAUS 1L TUBE ANDA', 1, 6.76, 'SAUZEN'),
+('ANDALOUSE SAUS 1L TUBE ANDA', 1, 7.06, 'SAUZEN'),
+('BARBECUE SAUS 1L TUBE ANDA', 1, 6.29, 'SAUZEN'),
+('BRAZILSAUS 1L TUBE ANDA', 1, 7.74, 'SAUZEN'),
+('CHICKENBURGERSAUS 1L TUBE ANDA', 1, 6.88, 'SAUZEN'),
+('COCKTAIL SAUS 1L TUBE ANDA', 1, 6.56, 'SAUZEN'),
+('CURRY KETCHUP 1L TUBE ANDA', 1, 5.71, 'SAUZEN'),
+('EXTRA AMERICAIN SAUS 1L TUBE ANDA', 1, 6.77, 'SAUZEN'),
+('MOSTERD SAUS 1L TUBE ANDA', 1, 4.75, 'SAUZEN'),
+('PILI PILI SAUS 1L TUBE ANDA', 1, 5.45, 'SAUZEN'),
+('RICHE SAUS 1L TUBE ANDA', 1, 6.30, 'SAUZEN'),
+('SAMURAI 1L TUBE ANDA', 1, 6.66, 'SAUZEN'),
+('TARTAAR MAISON 1L TUBE ANDA', 1, 5.69, 'SAUZEN'),
+('COCKTAIL HALAL 1L TUBE ANDA', 1, 6.56, 'SAUZEN'),
+('MAYO CHEF 10L ANDA', 1, 39.94, 'SAUZEN'),
+('COCKTAILSAUS 2,9KG PET ANDA', 1, 16.80, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Extra 2
+-- =====================================================
+('ANDALOUSE CHEF 3L PET PAUWELS', 1, 14.51, 'SAUZEN'),
+('CURRY KETCHUP 3L PET PAUWELS', 1, 11.84, 'SAUZEN'),
+('ANDALOUSE 10L EMMER PAUWELS', 1, 38.23, 'SAUZEN'),
+('COCKTAILSAUS 10L EMMER PAUWELS', 1, 33.98, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William Extra
+-- =====================================================
+('PITTASAUS 3L PET LA WILLIAM', 1, 16.38, 'SAUZEN'),
+('TARTAAR 1L TUBE LA WILLIAM', 1, 6.20, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Extra
+-- =====================================================
+('AMERICAIN 3L PET MANNA', 1, 16.84, 'SAUZEN'),
+('MAYONAISE CHEF 10L MANNA', 1, 37.63, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Heinz Extra
+-- =====================================================
+('HEINZ BARBECUE SAUS 2,15L', 1, 16.90, 'SAUZEN'),
+('HEINZ BURGER RELISH 2,15L', 1, 13.94, 'SAUZEN'),
+('HEINZ TOMATO SALSA 2,15L', 1, 16.90, 'SAUZEN'),
+('HEINZ TOMATO FRITO 2L', 1, 10.31, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Hamal Sauzen
+-- =====================================================
+('HAMAL TOMAAT MASCARPONE SAUS 3KG', 1, 25.93, 'SAUZEN'),
+('HAMAL ARRABIATA SAUS 3KG', 1, 15.85, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Aziatische Sauzen
+-- =====================================================
+('GOLDEN TURTLE THAISE PAD THAI SAUS 1L', 1, 13.37, 'SAUZEN'),
+('GOLDEN TURTLE JAPANSE TERIYAKISAUS 1L', 1, 7.37, 'SAUZEN'),
+('KIKKOMAN YAKITORI 250ML', 1, 5.14, 'SAUZEN'),
+('MAYONAISE SRIRACHA 455ML FLYING GOOSE', 1, 4.72, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Prof Extra
+-- =====================================================
+('GARDE D''OR CURRYSAUS 1L KNORR PROF', 1, 7.51, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Overige Extra 3
+-- =====================================================
+('WATER MET ORANJEBLOESEM AROMA 245ML', 1, 1.06, 'SAUZEN'),
+('WORCESTERSHIRESAUS 568ML LEA & PERRINS', 1, 13.61, 'SAUZEN'),
+('DALLAS SAUS 3L', 1, 19.44, 'SAUZEN'),
+('BRUINE SAUS GOURMET GLUTENVRIJ LACOTSEVRIJ 280G SU', 1, 9.18, 'SAUZEN'),
+('TOMATENKETCHUP 2L DL', 1, 11.26, 'SAUZEN'),
+('JAMBALLASAUS 2,5KG', 1, 18.20, 'SAUZEN'),
+('SAUS VOOR FILET AMERICAIN 5L JERMAYO', 1, 31.39, 'SAUZEN'),
+('MAMMOETSAUS 880ML BECKERS', 1, 7.12, 'SAUZEN'),
+('SAUS TAPAS BRAVA FERRER 320G', 1, 3.47, 'SAUZEN'),
+('PIZZASAUS 10/12 GEKRUID 4KG FIRST STATE', 1, 9.82, 'SAUZEN'),
+('NACHOS SALSA DIPSAUS 2,05KG HOMBRE', 1, 16.54, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda 2,9KG PET
+-- =====================================================
+('ANDALOUSESAUS 2,9KG PET ANDA', 1, 18.11, 'SAUZEN'),
+('SAUS RICHE 2,9KG PET ANDA', 1, 15.16, 'SAUZEN'),
+('SAMURAI 2,9KG PET ANDA', 1, 17.03, 'SAUZEN'),
+('TARTAAR MAISON 2,9KG PET ANDA', 1, 13.74, 'SAUZEN'),
+('AMERICAIN CHEF 2,9KG PET ANDA', 1, 17.41, 'SAUZEN'),
+('VINAIGRETTE MET BIESLOOK 1L TUBE ANDA', 1, 6.07, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Tubes 1L Compleet
+-- =====================================================
+('AMERICAIN 1L PAUWELS', 1, 5.82, 'SAUZEN'),
+('ANDALOUSE 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('ANDALOUSE CHEF 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('BARBECUE SAUS 1L TUBE PAUWELS', 1, 4.62, 'SAUZEN'),
+('BRAZILSAUS 1L TUBE PAUWELS', 1, 5.43, 'SAUZEN'),
+('COCKTAILSAUS 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('CURRY KETCHUP 1L TUBE PAUWELS', 1, 4.21, 'SAUZEN'),
+('HAMBURGER GIGA 1L TUBE PAUWELS', 1, 5.43, 'SAUZEN'),
+('HAMBURGER TRIPLE SAUS 1L TUBE PAUWELS', 1, 5.43, 'SAUZEN'),
+('HOT MAMMOUTH SAUS 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('TOMATENKETCHUP 1L TUBE PAUWELS', 1, 4.21, 'SAUZEN'),
+('LOEMPIASAUS 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('MAMMOUTH 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('MAYONAISE 1L TUBE PAUWELS', 1, 5.15, 'SAUZEN'),
+('MOSTERD TUBE 1L TUBE PAUWELS', 1, 4.36, 'SAUZEN'),
+('PEPERSAUS 1L TUBE PAUWELS', 1, 5.33, 'SAUZEN'),
+('SAMURAI 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('HAPPYSAUS 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('TARTAAR DE LUXE 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('TOSCAANSE SAUS 1L TUBE PAUWELS', 1, 5.43, 'SAUZEN'),
+('BBQ SNACK 3L PET PAUWELS', 1, 15.28, 'SAUZEN'),
+('FRIETSAUS ZOET HOLLANDSE 35% 10L PAUWELS', 1, 28.69, 'SAUZEN'),
+('TARTAAR DE LUXE 10L PAUWELS', 1, 36.43, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - DL Knijpflessen Extra
+-- =====================================================
+('MARTINO SAUS 750ML KNIJPFLES DL', 1, 4.98, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Hela & Zeisner
+-- =====================================================
+('CURRY KETCHUP TUBE 500ML HELA', 1, 3.05, 'SAUZEN'),
+('CURRY KETCHUP EMMER 10KG HELA', 1, 34.53, 'SAUZEN'),
+('CURRY KETCHUP HOT TUBE 425ML ZEISNER', 1, 2.95, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Aziatische Sauzen Extra
+-- =====================================================
+('GOLDEN TURTLE HOISINSAUS 1L', 1, 9.55, 'SAUZEN'),
+('CHILISAUS SRIRACHA EXTRA PIKANT 455ML FLYING GOOSE', 1, 4.65, 'SAUZEN'),
+('KIKKOMAN SESAM SAUS 1L', 1, 14.28, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Granoliva Spreads
+-- =====================================================
+('GUACAMOLE 800G GRANOLIVA', 1, 10.79, 'SAUZEN'),
+('HOUMOUS PITTIG 400G GRANOLIVA', 1, 5.20, 'SAUZEN'),
+('PESTO VERDE SPREAD 800G GRANOLIVA', 1, 13.40, 'SAUZEN'),
+('HOUMOUS BASILICUM 800G GRANOLIVA', 1, 8.24, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Extra 2
+-- =====================================================
+('JAMMIESAUS 3L PET MANNA', 1, 19.09, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Heinz & Overige
+-- =====================================================
+('HEINZ MAYO SERIOUSLY GOOD TOP DOWN 400ML', 1, 4.41, 'SAUZEN'),
+('BECHAMELSAUS 500ML', 1, 2.18, 'SAUZEN'),
+('CARDINI''S CAESAR DRESSING 1,1L', 1, 15.49, 'SAUZEN'),
+('CHICKEN LAVASAUS VERS 1,8KG JIV', 1, 15.27, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Porties Extra
+-- =====================================================
+('MAYONAISE PORTIES CUPS 120X20ML VANDEMOORTELE', 120, 0.21, 'SAUZEN'),
+('TOMATENKETCHUP PORTIES CUPS 120X20ML VANDEMOORTELE', 120, 0.18, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William Extra
+-- =====================================================
+('MAYO TRAITEUR 11L LA WILLIAM', 1, 32.90, 'SAUZEN'),
+('ANDALOUSE 9,8KG LA WILLIAM', 1, 58.06, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Tubes Extra
+-- =====================================================
+('LOOKSAUS 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('MAYONAISE TRUFFEL 1L TUBE PAUWELS', 1, 7.17, 'SAUZEN'),
+('MAYONAISE JALAPENO 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Extra
+-- =====================================================
+('MAYONAISE TRUFFEL 1L TUBE MANNA', 1, 7.76, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La Foods Amerikaans/Mexicaans
+-- =====================================================
+('SMOKY MOUNTAINS SWEET PICKLE DELUX 2,1KG LA FOODS', 1, 14.97, 'SAUZEN'),
+('AMB. MEX. SALSA PIKANT 2,89KG BLIK LA FOODS', 1, 12.37, 'SAUZEN'),
+('CHEDDAR CHEESE SAUCE PINATA 3KG BLIK LA FOODS', 1, 18.73, 'SAUZEN'),
+('BALLYMALOE COUNTRY TOMATO RELISH 3KG LA FOODS', 1, 27.15, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Tubes Extra
+-- =====================================================
+('SMOKEY BARBECUE SAUS 1L TUBE ANDA', 1, 6.42, 'SAUZEN'),
+('CALIFORNIA TRIPLE BURGER SAUS 1L TUBE ANDA', 1, 5.96, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Remia Burger Sauzen Compleet
+-- =====================================================
+('FRIETSAUS 5.0 FRITESLIJN 5% TUBE 800ML REMIA', 1, 3.82, 'SAUZEN'),
+('BURGER WILD BILL AMERICAN GARLIC SAUS 800ML REMIA', 1, 4.02, 'SAUZEN'),
+('BURGER TUCKER JOE RELISH SAUS 800ML REMIA', 1, 4.02, 'SAUZEN'),
+('BURGER SMOKEY HOT COCKTAIL SAUS 800ML REMIA', 1, 4.02, 'SAUZEN'),
+('BURGER BLACK JACK SMOKEY BBQ SAUS 800ML REMIA', 1, 3.99, 'SAUZEN'),
+('BURGER CREAMY BACON SAUS 800ML REMIA', 1, 4.02, 'SAUZEN'),
+('BURGER SWEET DALTON BBQ HONEY SAUS 800ML REMIA', 1, 4.02, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Hellmann's
+-- =====================================================
+('HELLMANN''S DRESSING HONING MOSTERD 1L', 1, 7.76, 'SAUZEN'),
+('HELLMANN''S MAYONAISE REAL 10L', 1, 46.48, 'SAUZEN'),
+('HELLMANN''S MAYONAISE REAL 5L', 1, 36.32, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Heinz Grootverpakking
+-- =====================================================
+('HEINZ TOMATO KETCHUP 10L EMMER', 1, 49.44, 'SAUZEN'),
+('HEINZ SAUS-O-MAT MAYONAISE 80% 3X5L', 3, 21.75, 'SAUZEN'),
+('BULL''S EYE BBQ SAUS ORIGINAL 2L', 1, 17.08, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Golden Turtle Extra
+-- =====================================================
+('GOLDEN TURTLE SATESAUS 1L', 1, 10.47, 'SAUZEN'),
+('GOLDEN TURTLE CITROENGRAS GEMBER SAUS 1L', 1, 11.52, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Professioneel
+-- =====================================================
+('DEMI-GLACE VLOEIBAAR 1L KNORR PROF', 1, 6.19, 'SAUZEN'),
+('CURRYSAUS POEDER 4 ZAKJES PER DOOSJE KNORR', 4, 1.25, 'SAUZEN'),
+('WITTE SAUS POEDER 4 ZAKJES PER DOOSJE KNORR', 4, 1.25, 'SAUZEN'),
+('VISSAUS POEDER 4 ZAKJES PER DOOSJE KNORR', 4, 1.25, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Altoni Italiaanse Sauzen
+-- =====================================================
+('ALTONI ITALIAANSE POMODORE SAUS 2,5KG', 1, 12.64, 'SAUZEN'),
+('ALTONI ITALIAANSE BOLOGNAISE SAUS 1KG', 1, 9.59, 'SAUZEN'),
+('ALTONI ITALIAANSE BOLOGNAISE SAUS 2,5KG', 1, 23.01, 'SAUZEN'),
+('ALTONI ITALIAANSE TOMATENSAUS MET GROENTEN 1KG', 1, 7.19, 'SAUZEN'),
+('ALTONI ITALIAANSE ARRABIATA SAUS 1KG', 1, 7.19, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - D'Lis Porties & Pasta Sauzen
+-- =====================================================
+('D''LIS BEARNAISE SAUS PORTIES 15X150G', 15, 1.50, 'SAUZEN'),
+('D''LIS QUATTRO FORMAGGI SAUS PORTIES 15X150G', 15, 1.60, 'SAUZEN'),
+('D''LIS CARBONARA SAUS PORTIES 15X150G', 15, 1.70, 'SAUZEN'),
+('D''LIS ARRABIATA SAUS PORTIES 15X150G', 15, 1.50, 'SAUZEN'),
+('D''LIS PESTO SAUS 1KG', 1, 12.20, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Specials
+-- =====================================================
+('HEKS N KAAS 1KG', 1, 17.90, 'SAUZEN'),
+('JOPPIESAUS BEETJE PITTIG 850ML TUBE', 1, 5.22, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Grootverpakking & Extra
+-- =====================================================
+('MAYONAISE 110 10L PAUWELS', 1, 37.63, 'SAUZEN'),
+('CURRYSAUS 1L TUBE PAUWELS', 1, 4.98, 'SAUZEN'),
+('VEGAN MAYO 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('MARTINOSAUS 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('HARISSA SAUS 500ML TUBE PAUWELS', 1, 4.06, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William Tubes
+-- =====================================================
+('TOSCA SAUS 1L TUBE LA WILLIAM', 1, 7.45, 'SAUZEN'),
+('CHIMAYOSAUS 1L TUBE LA WILLIAM', 1, 8.54, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - D'Lis Porties Extra
+-- =====================================================
+('D''LIS BANDIDO SAUS PORTIES 15X150G', 15, 1.70, 'SAUZEN'),
+('D''LIS PESTO SAUS PORTIES 15X150G', 15, 2.25, 'SAUZEN'),
+('D''LIS BOLOGNESE CLASSICO SAUS PORTIES 15X150G', 15, 1.66, 'SAUZEN'),
+('D''LIS CHEDDARSAUS 1KG', 1, 7.30, 'SAUZEN'),
+('D''LIS BOLOGNAISE DU CHEF 1KG', 1, 7.53, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Tierenteyn Mosterd
+-- =====================================================
+('MOSTERD EXTRA 1KG TIERENTEYN', 1, 5.04, 'SAUZEN'),
+('MOSTERD STROPKES 1KG TIERENTEYN', 1, 3.62, 'SAUZEN'),
+('MOSTERD A L''ANCIENNE 950G TIERENTEYN', 1, 5.74, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Sauzen Extra
+-- =====================================================
+('CH''EASY 1L TUBE MANNA', 1, 7.73, 'SAUZEN'),
+('HOT SHOT SAUS 3L PET MANNA', 1, 21.44, 'SAUZEN'),
+('TOMATAISE 3L PET MANNA', 1, 13.34, 'SAUZEN'),
+('TOMAGREC 2L MANNA', 1, 12.70, 'SAUZEN'),
+('BOLOGNAISE SAUS 2L MANNA', 1, 15.31, 'SAUZEN'),
+('CURRYSAUS CHINESE 2L MANNA', 1, 9.39, 'SAUZEN'),
+('GROENTENSAUS 2L MANNA', 1, 19.13, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Tubes 400ML & Extra
+-- =====================================================
+('ANDALOUSE SAUS 400ML TUBE ANDA', 1, 4.30, 'SAUZEN'),
+('MAYONAISE MAISON 400ML TUBE ANDA', 1, 3.57, 'SAUZEN'),
+('SAMURAI 400ML TUBE ANDA', 1, 4.09, 'SAUZEN'),
+('TARTAAR MAISON 400ML TUBE ANDA', 1, 3.69, 'SAUZEN'),
+('MISTERY SAUS 1L TUBE ANDA', 1, 5.83, 'SAUZEN'),
+('HANNIBAL SAUS 1L TUBE ANDA', 1, 6.20, 'SAUZEN'),
+('HANNIBAL SAUS 3L EMMER ANDA', 1, 15.76, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - DL Chef Rene & Ketchup
+-- =====================================================
+('COCKTAILSAUS CHEF RENE 5L DL', 1, 27.65, 'SAUZEN'),
+('TARTAAR CHEF RENE 5L DL', 1, 24.77, 'SAUZEN'),
+('KETCHUP TOMATO 440ML KNIJPFLES DL', 1, 3.69, 'SAUZEN'),
+('TOMATENKETCHUP 5L DL', 1, 23.28, 'SAUZEN'),
+('CURRY KETCHUP 5L DL', 1, 25.08, 'SAUZEN'),
+('CURRY KETCHUP 2L DL', 1, 11.37, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Altoni Italiaans Extra
+-- =====================================================
+('ALTONI FUNGHI PORCINI SAUS 1KG', 1, 9.21, 'SAUZEN'),
+('ALTONI BUTCHER''S BOLOGNAISE SAUS 2,5KG', 1, 24.59, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Mahall & Bresc
+-- =====================================================
+('BOLOGNAISE SAUS 1,89KG MAHALL', 1, 14.63, 'SAUZEN'),
+('CHUNKY SALSA TOMATO SAUS 1KG BRESC', 1, 12.94, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Verstegen Cups
+-- =====================================================
+('PEPERSAUS BELGIE CUP 6X80ML VERSTEGEN', 6, 1.18, 'SAUZEN'),
+('CHAMPIGNONSAUS CUP 6X80ML VERSTEGEN', 6, 1.50, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Zeisner Extra
+-- =====================================================
+('SCHASCHLIKSAUS TUBE 800ML ZEISNER', 1, 4.79, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Heinz Extra
+-- =====================================================
+('HEINZ SWEET CHILLI SAUS 875ML', 1, 7.07, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Granoliva Tartinades
+-- =====================================================
+('KAASTARTINADE GROEN 800G GRANOLIVIA', 1, 11.59, 'SAUZEN'),
+('KAASTARTINADE ROOD 800G GRANOLIVA', 1, 11.59, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vandemoortele Dressings
+-- =====================================================
+('VINAIGRETTE HONING MOSTERD 2L VANDEMOORTELE', 1, 13.18, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Thai Dancer & Heks'n Kaas Extra
+-- =====================================================
+('WASABI MAYO SAUS 200ML THAI DANCER', 1, 2.49, 'SAUZEN'),
+('HEKS N KAAS 100G', 1, 1.84, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La Foods Smoky Mountains & BBQ
+-- =====================================================
+('SMOKY MOUNTAINS AMERICAN MOSTERD 550G LA FOODS', 1, 5.39, 'SAUZEN'),
+('BBQ SAUS HICKORY SMOKY MOUNTAINS 2,5KG LA FOODS', 1, 17.99, 'SAUZEN'),
+('SMOKY MOUNTAINS HEMP SAUCE 775ML LA FOODS', 1, 5.71, 'SAUZEN'),
+('SMOKY MOUNTAINS SPICY CHIPOTLE 2,5KG LA FOODS', 1, 19.31, 'SAUZEN'),
+('CHEDDAR CHEESE SAUCE 950G TUBE LA FOODS', 1, 12.25, 'SAUZEN'),
+('CHUNCKY SALSA MEDIUM PABLO''S 2,25KG LA FOODS', 1, 13.51, 'SAUZEN'),
+('EDDY''S BBQ SAUS ORIGINAL 3,75L LA FOODS', 1, 33.69, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Ballymaloe Relishes
+-- =====================================================
+('BALLYMALOE JALAPENO PEPPER RELISH 2,75KG LA FOODS', 1, 27.15, 'SAUZEN'),
+('BALLYMALOE HAMBURGERSAUS 960ML TUBE LA FOODS', 1, 10.22, 'SAUZEN'),
+('BALLYMALOE MANGO RELISH 1,25KG LA FOODS', 1, 16.30, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Grootverpakking Extra
+-- =====================================================
+('MAYONAISE TRAITEUR 10L PAUWELS', 1, 34.50, 'SAUZEN'),
+('TOMATENKETCHUP 2X7,5L SAUSMASTER PAUWELS', 2, 23.49, 'SAUZEN'),
+('CURRY KETCHUP 2X7,5L SAUSMASTER PAUWELS', 2, 23.49, 'SAUZEN'),
+('MAYO TRAITEUR 10L PAUWELS', 1, 28.48, 'SAUZEN'),
+('LOOKSAUS 10L PAUWELS', 1, 30.98, 'SAUZEN'),
+('BRAZILSAUS 3L PET PAUWELS', 1, 16.41, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Grootverpakking
+-- =====================================================
+('FRIETSAUS GROEN 10L ANDA', 1, 28.29, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - JIV Verse Sauzen
+-- =====================================================
+('BOLOGNAISE SAUS 1,8KG VERS JIV', 1, 12.57, 'SAUZEN'),
+('BOLOGNAISE SAUS VEGGIE VERS 1,8KG JIV', 1, 12.89, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Tubes Extra
+-- =====================================================
+('AMERICAIN 1L TUBE MANNA', 1, 7.23, 'SAUZEN'),
+('MAMMOUTH SNACKSAUS 1L TUBE MANNA', 1, 7.23, 'SAUZEN'),
+('TARTAAR 1L TUBE MANNA', 1, 7.23, 'SAUZEN'),
+('BOLOGNAISE SAUS CHEF POUCH 2KG MANNA', 1, 15.46, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vandemoortele BIB
+-- =====================================================
+('MAYONAISE BIB 2X7,5L VANDEMOORTELE', 2, 36.51, 'SAUZEN'),
+('ANDALOUSE BIB 2X7,5L VANDEMOORTELE', 2, 36.36, 'SAUZEN'),
+('TARTAAR BIB 2X7,5L VANDEMOORTELE', 2, 32.95, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Heinz Extra
+-- =====================================================
+('HEINZ MAYONAISE SERIOUSLY GOOD TOP DOWN 800ML', 1, 6.55, 'SAUZEN'),
+('HEINZ MAYONAISE PROFESSIONAL 10L', 1, 34.90, 'SAUZEN'),
+('HEINZ TOMATENKETCHUP PLASTIEK TUBE 875ML', 1, 4.54, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Remia & Gouda's Glorie BIB
+-- =====================================================
+('FRIETSAUS ZOET 25% CLASSIC BIB 7,5L REMIA', 1, 18.54, 'SAUZEN'),
+('FRIETSAUS 35% B.I.B. 7,5L GOUDA''S GLORIE', 1, 19.65, 'SAUZEN'),
+('FRIETSAUS 25% B.I.B. 7,5L GOUDA''S GLORIE', 1, 18.73, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Hellmann's Dressings Extra
+-- =====================================================
+('HELLMANN''S DRESSING THOUSAND ISLANDS 1L', 1, 7.84, 'SAUZEN'),
+('HELLMANN''S DRESSING YOGHURT 1L', 1, 7.45, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Gourmet
+-- =====================================================
+('HOLLANDAISESAUS 1,12KG KNORR GOURMET', 1, 27.47, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - D'Lis Extra
+-- =====================================================
+('D''LIS THAI CURRY SAUS 1KG', 1, 7.44, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William Grootverpakking
+-- =====================================================
+('TARTAAR CHEF 9,5KG LA WILLIAM', 1, 47.48, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Hamal
+-- =====================================================
+('HAMAL MARTINOSAUS 2KG', 1, 11.12, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Connoisseur & Specials
+-- =====================================================
+('CONNOISSEUR ASIAN BLACK PEPPER SAUS 875ML', 1, 15.40, 'SAUZEN'),
+('SQ BALSAMICO SAUS TRUFFEL 100ML', 1, 4.79, 'SAUZEN'),
+('MOSSELSAUS 275ML', 1, 3.00, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Van Zon Verse Sauzen
+-- =====================================================
+('VAN ZON STROGANOFFSAUS 2L VERS', 1, 15.18, 'SAUZEN'),
+('VAN ZON ZOETZURE SAUS 2L VERS', 1, 15.06, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Maurice Mathieu
+-- =====================================================
+('MAYONAISE MAISON 5KG MAURICE MATHIEU', 1, 22.50, 'SAUZEN'),
+('TARTAAR MAISON 5KG MAURICE MATHIEU', 1, 28.23, 'SAUZEN'),
+('COCKTAIL MAISON 5KG MAURICE MATHIEU', 1, 22.50, 'SAUZEN'),
+('BARBECUE MAISON 5KG MAURICE MATHIEU', 1, 24.78, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Tubes Extra
+-- =====================================================
+('JIM''S BURGER SAUS 1L TUBE ANDA', 1, 6.06, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Swad Indiase Sauzen
+-- =====================================================
+('SAUS BUTTER CHICKEN 250G SWAD', 1, 2.70, 'SAUZEN'),
+('SAUS VINDALOO CURRY 250G SWAD', 1, 2.50, 'SAUZEN'),
+('SAUS GOAN FISH CURRY 250G SWAD', 1, 2.84, 'SAUZEN'),
+('SAUS KORMA CURRY 250G SWAD', 1, 2.54, 'SAUZEN'),
+('SAUS TIKKA MASALA 250G SWAD', 1, 2.84, 'SAUZEN'),
+('KNOFLOOKPASTA 300G SWAD', 1, 2.04, 'SAUZEN'),
+('GEMBERPASTA 300G SWAD', 1, 2.04, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Koreaanse Sauzen
+-- =====================================================
+('KRUIDENPASTA PITTIG GOCHUJANG 500G O''FOOD', 1, 3.85, 'SAUZEN'),
+('KIMCHI SAUS PITTIG ZUUR 230ML SURASANG', 1, 4.85, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Ballymaloe Extra
+-- =====================================================
+('BALLYMALOE IRISH STOUT SAUS 960ML TUBE LA FOODS', 1, 13.93, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Delino Compleet
+-- =====================================================
+('BEARNAISE SAUS 3KG EMMER DELINO', 1, 14.38, 'SAUZEN'),
+('MOSSELSAUS 2L PET DELINO', 1, 9.18, 'SAUZEN'),
+('BIESLOOKVINAIGRETTE 2L PET DELINO', 1, 9.28, 'SAUZEN'),
+('HONING-MOSTERDVINAIGRETTE 2L PET DELINO', 1, 9.62, 'SAUZEN'),
+('SALSA AZTECA 1L TUBE DELINO', 1, 6.21, 'SAUZEN'),
+('PESTO DRESSING 1L TUBE DELINO', 1, 6.55, 'SAUZEN'),
+('THOUSAND ISLANDS VINAIGRETTE 2L TUBE DELINO', 1, 9.21, 'SAUZEN'),
+('MOSTERDSAUS WARM 3KG EMMER DELINO', 1, 15.86, 'SAUZEN'),
+('ANDALOUSE SAUS 1L TUBE DELINO', 1, 5.51, 'SAUZEN'),
+('SAMURAI 1L TUBE DELINO', 1, 5.60, 'SAUZEN'),
+('PORTOSAUS 3KG EMMER DELINO', 1, 18.45, 'SAUZEN'),
+('BLACK PEPPER 1L TUBE DELINO', 1, 5.61, 'SAUZEN'),
+('BIESLOOKVINAIGRETTE 1L TUBE DELINO', 1, 5.26, 'SAUZEN'),
+('CAESAR DRESSING 1L TUBE DELINO', 1, 6.78, 'SAUZEN'),
+('TARTAAR 1L TUBE DELINO', 1, 4.74, 'SAUZEN'),
+('CREAMY BASISVINAIGRETTE 2L PET DELINO', 1, 9.40, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Maurice Mathieu Extra
+-- =====================================================
+('TOMATENSAUS 3KG MAURICE MATHIEU', 1, 12.74, 'SAUZEN'),
+('VITELLO TONNATO SAUS 1KG MAURICE MATHIEU', 1, 14.46, 'SAUZEN'),
+('VITELLO TONNATO DRESSING 500ML MAURICE MATHIEU', 1, 8.25, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Wijko
+-- =====================================================
+('SATESAUS PASTA 3,125KG WIJKO', 1, 25.79, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La Foods BBQ Extra
+-- =====================================================
+('EDDY''S BBQ SAUS CAMPFIRE 3,75L LA FOODS', 1, 33.69, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Sausmaster & Sticks
+-- =====================================================
+('MAYONAISE 2X7,5L SAUSMASTER PAUWELS', 2, 27.81, 'SAUZEN'),
+('CHEDDAR SAUS 1L TUBE PAUWELS', 1, 5.12, 'SAUZEN'),
+('KETCHUP STICKS 200X20ML PAUWELS', 200, 0.07, 'SAUZEN'),
+('MAYONAISE STICKS 200X20ML PAUWELS', 200, 0.11, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - DL Dressings
+-- =====================================================
+('MAYO DRESSING ORION 5L DL', 1, 29.03, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Slotts
+-- =====================================================
+('SLOTTS MARTINOSAUS 3,05KG MANNA', 1, 13.33, 'SAUZEN'),
+('SLOTTS SAMURAI 2,6KG MANNA', 1, 12.55, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vandemoortele Tubes
+-- =====================================================
+('CURRY KETCHUP 1L TUBE VANDEMOORTELE', 1, 4.66, 'SAUZEN'),
+('TOMATENKETCHUP 1L TUBE VANDEMOORTELE', 1, 4.89, 'SAUZEN'),
+('MAYONAISE 1L TUBE VANDEMOORTELE', 1, 6.39, 'SAUZEN'),
+('MOSTERD 1L TUBE VANDEMOORTELE', 1, 4.39, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Granoliva Dips Extra
+-- =====================================================
+('HOUMOUS ORIGINAL 1,2KG GRANOLIVA', 1, 9.64, 'SAUZEN'),
+('DIP ZOETE AARDAPPEL 800G GRANOLIVA', 1, 9.83, 'SAUZEN'),
+('DIP FETA GEGRILDE PAPRIKA 800G GRANOLIVA', 1, 10.91, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Mexicaans & Guacamole
+-- =====================================================
+('NACHO SALSA HOT DIP ANTICA CANTINA 300G', 1, 1.71, 'SAUZEN'),
+('GUACAMOLE NATIVE 500G', 1, 8.09, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Yamamori
+-- =====================================================
+('WORCESTER SAUS 500ML YAMAMORI', 1, 3.51, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Yamamori & Aziatisch Extra
+-- =====================================================
+('TONKATSU SAUS 500ML YAMAMORI', 1, 3.51, 'SAUZEN'),
+('SOJASAUS 150ML AYUKO', 1, 1.10, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Flying Goose Sriracha Extra
+-- =====================================================
+('CHILISAUS SRIRACHA HENNEP GROEN 455ML FLYING GOOSE', 1, 4.96, 'SAUZEN'),
+('CHILISAUS SRIRACHA KIMCHI ROOD 455ML FLYING GOOSE', 1, 4.92, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Oliviana
+-- =====================================================
+('OLIVIANA ENSALADA GREEN 1,1KG', 1, 22.53, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Ballymaloe Relishes Extra
+-- =====================================================
+('BALLYMALOE RED ROOT RELISH 1,2KG LA FOODS', 1, 14.69, 'SAUZEN'),
+('BALLYMALOE ORIGINAL RELISH SAUS 960G TUBE LA FOODS', 1, 10.80, 'SAUZEN'),
+('BALLYMALOE PEPPER RELISH SAUS 960ML TUBE LA FOODS', 1, 10.79, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Extra
+-- =====================================================
+('VINAIGRETTE BIESLOOK 1L PAUWELS', 1, 4.91, 'SAUZEN'),
+('TARTAAR DE LUXE 3L PET PAUWELS', 1, 15.48, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Maurice Mathieu Dressings Compleet
+-- =====================================================
+('SALEE DRESSING MOSSELSAUS 500ML MAURICE MATHIEU', 1, 5.01, 'SAUZEN'),
+('PICKLES MAYONAISE 500ML MAURICE MATHIEU', 1, 5.01, 'SAUZEN'),
+('STEAK TARTAAR DRESSING 500ML MAURICE MATHIEU', 1, 5.51, 'SAUZEN'),
+('CAESER DRESSING 500ML MAURICE MATHIEU', 1, 7.01, 'SAUZEN'),
+('KIMCHI MAYONAISE 500ML MAURICE MATHIEU', 1, 8.02, 'SAUZEN'),
+('TRUFFELMAYONAISE 500ML MAURICE MATHIEU', 1, 9.02, 'SAUZEN'),
+('SRIRACHA MAYONAISE 500ML MAURICE MATHIEU', 1, 5.17, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels BIB Systeem
+-- =====================================================
+('ANDALOUSE 2X5L BIB PAUWELS', 2, 20.09, 'SAUZEN'),
+('CURRY KETCHUP 2X5L BIB PAUWELS', 2, 15.20, 'SAUZEN'),
+('TOMATENKETCHUP 2X5L BIB PAUWELS', 2, 15.20, 'SAUZEN'),
+('MAYONAISE 2X5L BIB PAUWELS', 2, 19.40, 'SAUZEN'),
+('SAMURAI 2X5L BIB PAUWELS', 2, 20.57, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Extra
+-- =====================================================
+('HAMBURGER SAUS 3L EMMER ANDA', 1, 18.44, 'SAUZEN'),
+('HOT PITA SAUS 1L TUBE ANDA', 1, 6.38, 'SAUZEN'),
+('PITA SAUS 1L TUBE ANDA', 1, 6.17, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La Foods Buffalo & BBQ
+-- =====================================================
+('BUFFALO WING SAUS 3L LA FOODS', 1, 22.08, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Prof Extra
+-- =====================================================
+('TOMATENSAUS POEDER 1KG KNORR PROF', 1, 26.11, 'SAUZEN'),
+('ARRABBIATA SAUS 2,2L KNORR PROF', 1, 18.14, 'SAUZEN'),
+('TOMATO BASIL SAUS 2,2L KNORR PROF', 1, 17.92, 'SAUZEN'),
+('SWEET & SOUR SAUS 2,2L KNORR PROF', 1, 19.77, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Hellmann's Dressings Extra
+-- =====================================================
+('HELLMANN''S DRESSING KLASSIEK 1L', 1, 7.07, 'SAUZEN'),
+('HELLMANN''S DRESSING FIJNE KRUIDEN BIESLOOK 1L', 1, 6.93, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Delino Grootverpakking
+-- =====================================================
+('MAYONAISE MAISON 5L EMMER DELINO', 1, 17.35, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - DL Chef Rene
+-- =====================================================
+('MAYONAISE CHEF RENE 5L DL', 1, 27.94, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Slotts Extra
+-- =====================================================
+('SLOTTS JAMMIE 2,725KG MANNA', 1, 15.97, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Granoliva Tapenade
+-- =====================================================
+('TAPENADE PIQUILLO 800G GRANOLIVA', 1, 11.50, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Heinz Extra
+-- =====================================================
+('HEINZ CLASSIC BURGER SAUS 875ML', 1, 10.21, 'SAUZEN'),
+('HEINZ MOSTERD BARBECUE SAUS 875ML', 1, 8.51, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Deldiche Medline
+-- =====================================================
+('MEDLINE BABAGANOUSH 450G DELDICHE', 1, 5.40, 'SAUZEN'),
+('MEDLINE MUHAMMARA 450G DELDICHE', 1, 7.43, 'SAUZEN'),
+('MEDLINE HUMMUS MEDITERRAANS 450G DELDICHE', 1, 5.37, 'SAUZEN'),
+('MEDLINE HUMMUS RODE BIET 450G DELDICHE', 1, 6.10, 'SAUZEN'),
+('MEDLINE HUMMUS TIKKA MASALA 450G DELDICHE', 1, 5.82, 'SAUZEN'),
+('MEDLINE PESTO POMPOEN GEITENKAAS 450G DELDICHE', 1, 7.90, 'SAUZEN'),
+('MEDLINE TOMATEN TARTAAR 450G DELDICHE', 1, 7.94, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Espinaler Spaans
+-- =====================================================
+('ESPINALER BRAVA SAUS 140G', 1, 4.44, 'SAUZEN'),
+('ESPINALER AILI I OILI 140G', 1, 4.44, 'SAUZEN'),
+('ESPINALER OLIJF GEVULD MET ANSJOVIS 3X50G', 3, 1.27, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Jack Daniel's BBQ
+-- =====================================================
+('JACK DANIELS BBQ HONEY SAUCE 473ML', 1, 5.41, 'SAUZEN'),
+('JACK DANIELS BBQ ORIGINAL SAUCE 473ML', 1, 5.41, 'SAUZEN'),
+('JACK DANIELS BBQ SWEET & SPICY SAUCE 473ML', 1, 5.41, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Weber
+-- =====================================================
+('WEBER HOT AND FRUITY STEAKSAUCE 240ML', 1, 3.59, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Qalita
+-- =====================================================
+('QALITA VERSE TARTAARSAUS SPECIAAL 5KG', 1, 14.00, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Miracoli
+-- =====================================================
+('MIRACOLI PICCANTE SAUS 450G', 1, 3.92, 'SAUZEN'),
+('MIRACOLI ITALIANO SAUS 450G', 1, 3.92, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Altoni Extra
+-- =====================================================
+('ALTONI CACIO E PEPE SAUS 1KG', 1, 9.21, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Heinz Grootverpakking Extra
+-- =====================================================
+('HEINZ TOMATENKETCHUP 4L', 1, 25.85, 'SAUZEN'),
+('HEINZ SAUS-O-MAT TOMATENKETCHUP 3X5L', 3, 19.62, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La Foods Ranch & BBQ
+-- =====================================================
+('RANCH DRESSING 3,78L LA FOODS', 1, 35.52, 'SAUZEN'),
+('LILLIE''S Q HONEY GOLD 2L LA FOODS', 1, 15.87, 'SAUZEN'),
+('LILLIE''S Q SMOKY BARBECUE SAUS 2L LA FOODS', 1, 15.87, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Garde D'Or
+-- =====================================================
+('GARDE D''OR BRUINE PEPERSAUS GLUTENVRIJ 1L', 1, 9.35, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Delino Extra
+-- =====================================================
+('THAI RED CURRY SAUS 3KG EMMER DELINO', 1, 20.58, 'SAUZEN'),
+('ASIAN PEPPER SAUS 1L TUBE DELINO', 1, 6.51, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vandemoortele Vinaigrettes & Sauzen
+-- =====================================================
+('VINAIGRETTE BALSAMICO 1L VANDEMOORTELE', 1, 7.35, 'SAUZEN'),
+('VINAIGRETTE YOGORETTE 1L VANDEMOORTELE', 1, 7.12, 'SAUZEN'),
+('VINAIGRETTE BIESLOOK 1L VANDEMOORTELE', 1, 7.15, 'SAUZEN'),
+('VINAIGRETTE CAESAR 1L VANDEMOORTELE', 1, 7.96, 'SAUZEN'),
+('BARBECUE SAUS 1L TUBE VANDEMOORTELE', 1, 6.21, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Prof Extra
+-- =====================================================
+('TOMAAT PROVENCALE SAUS POEDER 900G KNORR PROF', 1, 20.88, 'SAUZEN'),
+('SALADE MIX TUINKRUIDEN VINAIGRETTE 500G KNORR', 1, 20.62, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Tabasco McIlhenny
+-- =====================================================
+('TABASCO SRIRACHA 566G MC ILHENNY', 1, 6.94, 'SAUZEN'),
+('TABASCO SWEET & SPICY SQUEEZE 312G MC ILHENNY', 1, 4.00, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Deldiche Medline Extra
+-- =====================================================
+('MEDLINE HUMMUS 450G DELDICHE', 1, 4.99, 'SAUZEN'),
+('MEDLINE ZOETE AARDAPPELDIP 450G DELDICHE', 1, 5.35, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - DL Extra
+-- =====================================================
+('TARTAAR 2L DL', 1, 15.28, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Sausmaster Extra
+-- =====================================================
+('MAYO CHEF 2X7,5L SAUSMASTER PAUWELS', 2, 25.39, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Extra
+-- =====================================================
+('ALGERIENNE SAUS 1L TUBE ANDA', 1, 6.39, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Granoliva Dips Extra
+-- =====================================================
+('YOGHURTDIP MET MUNT CITROEN ZA''ATER 800G GRANOLIVA', 1, 10.91, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Zeisner Extra
+-- =====================================================
+('SPECIAL BURGER SAUS 425ML ZEISNER', 1, 2.73, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Bicky
+-- =====================================================
+('BICKY DRESSING TUBE 900ML', 1, 7.39, 'SAUZEN'),
+('BICKY HOT SAUS TUBE 840ML', 1, 5.79, 'SAUZEN'),
+('BICKY KETCHUP TUBE 900ML', 1, 6.79, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Poco Loco & Mister Nachos
+-- =====================================================
+('SALSA MEDIUM 2,05KG POCO LOCO', 1, 8.21, 'SAUZEN'),
+('MISTER NACHOS JALAPENO KAASSAUS 330ML', 1, 1.87, 'SAUZEN'),
+('DORITOS SPICY CREAMY GUACAMOLE 270G', 1, 3.39, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - SG BBQ Premium
+-- =====================================================
+('SG BOLD AND BEEFY BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
+('SG HOLY SMOKE THAT''S HOT BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
+('SG SMOKEYS FINEST BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
+('SG BLACKSTRAP COFFEE MOLASSES BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
+('SG BLACK CHERRY BBQ SAUCE 500ML', 1, 8.23, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Coertjens Theo
+-- =====================================================
+('ZOETZURE SAUS 1100G GLAS COERTJENS THEO', 1, 7.13, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Gouda's Glorie Extra
+-- =====================================================
+('BURGER SAUS ORIGINAL 850ML GOUDA''S GLORIE', 1, 3.85, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Mahall Extra
+-- =====================================================
+('BOLOGNAISE SAUS CHEF POUCH 2KG MAHALL', 1, 18.77, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Hela Extra
+-- =====================================================
+('JALAPENOSAUS PITTIG TUBE 800ML HELA', 1, 5.71, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Hela Extra
+-- =====================================================
+('WASABISAUS MET MIERIKSWORTEL TUBE 800ML HELA', 1, 5.71, 'SAUZEN'),
+('BURGERSAUS MET UI TUBE 800ML HELA', 1, 5.71, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - DL Extra
+-- =====================================================
+('MOSSELSAUS 2L DL', 1, 15.28, 'SAUZEN'),
+('BURGERSAUS 2L DL', 1, 15.28, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - DV La Guacamole
+-- =====================================================
+('SPUITZAK GUACAMOLE 8X500G DV LA', 8, 5.94, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Robsaus
+-- =====================================================
+('ROBSAUS 950ML', 1, 6.50, 'SAUZEN'),
+('ROBSAUS 3L', 1, 18.87, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Beyco
+-- =====================================================
+('ZOETE PEPERSAUS 700G BEYCO', 1, 4.75, 'SAUZEN'),
+('PIKANTE PEPERSAUS 700G BEYCO', 1, 4.75, 'SAUZEN'),
+('TOMATENSAUS 830G BEYCO', 1, 2.09, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La William Extra
+-- =====================================================
+('ALGERIENNE SAUS 1L TUBE LA WILLIAM', 1, 6.77, 'SAUZEN'),
+('HARAKIRI SAUS 1L TUBE LA WILLIAM', 1, 7.70, 'SAUZEN'),
+('MOSTERD ZACHT 3,2KG LA WILLIAM', 1, 8.68, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Van Zon Verse Fruitsauzen
+-- =====================================================
+('VAN ZON KRIEKENSAUS VERS 3KG', 1, 29.36, 'SAUZEN'),
+('VAN ZON VEENBESSENSAUS VERS 3KG', 1, 34.36, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - D'Lis Extra
+-- =====================================================
+('D''LIS DIABOLIQUE SAUS 1KG', 1, 7.56, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - La Foods Smoky Mountains Extra
+-- =====================================================
+('BACON JAM SMOKY MOUNTAINS 1,3KG LA FOODS', 1, 27.27, 'SAUZEN'),
+('BIG EASY SAUS SMOKY MOUNTAINS 960ML LA FOODS', 1, 13.80, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Delisauce Verse Sauzen
+-- =====================================================
+('VERSE BOTER BEARNAISE 800ML DELISAUCE', 1, 10.06, 'SAUZEN'),
+('VERSE BOTER HOLLANDAISE 800ML DELISAUCE', 1, 10.14, 'SAUZEN'),
+('VERSE CHAMPIGNONROOMSAUS 800ML DELISAUCE', 1, 7.65, 'SAUZEN'),
+('VERSE PEPERROOMSAUS 800ML DELISAUCE', 1, 7.52, 'SAUZEN'),
+('VERSE BLANKE BOTERSAUS 800ML DELISAUCE', 1, 8.63, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Antica Cantina Extra
+-- =====================================================
+('NACHO SALSA MEDIUM DIP ANTICA CANTINA 300G', 1, 1.71, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Manna Extra
+-- =====================================================
+('VOLCANO 1L TUBE MANNA', 1, 6.39, 'SAUZEN'),
+('MARTINOSAUS 1L TUBE MANNA', 1, 6.04, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Pauwels Extra
+-- =====================================================
+('BURGER SMOKEY PEPPER 3L PET PAUWELS', 1, 13.52, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Knorr Gourmet & Prof Compleet
+-- =====================================================
+('POIVRADE VOOR WILD 1,26 KG KNORR GOURMET', 1, 31.92, 'SAUZEN'),
+('WITTE WIJN SAUS POEDER 1,05 KNORR', 1, 24.66, 'SAUZEN'),
+('WITTE SAUS POEDER 1KG KNORR', 1, 12.20, 'SAUZEN'),
+('ESPAGNOLESAUS POEDER 1,35KG KNORR', 1, 22.72, 'SAUZEN'),
+('DEMI-GLACESAUS POEDER 1,475KG KNORR', 1, 21.46, 'SAUZEN'),
+('DEMI-GLACESAUS POEDER 10KG KNORR 1-2-3', 1, 105.75, 'SAUZEN'),
+('TOMATINO 3KG KNORR PROF', 1, 12.37, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Garde D'Or Knorr Prof Compleet
+-- =====================================================
+('GARDE D''OR WITTE WIJNSAUS 1L KNORR PROF', 1, 7.53, 'SAUZEN'),
+('GARDE D''OR KAASSAUS 1L KNORR PROF', 1, 8.69, 'SAUZEN'),
+('GARDE D''OR CHAMPIGNONSAUS Z. GARNITUUR 1L KNORR', 1, 7.46, 'SAUZEN'),
+('GARDE D''OR WITTE BASIS SAUS 1L KNORR PROF', 1, 7.29, 'SAUZEN'),
+('GARDE D''OR BEARNAISE SAUS 1L KNORR PROF', 1, 6.69, 'SAUZEN'),
+('GARDE D''OR PEPERROOMSAUS 1L KNORR', 1, 6.03, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Vandemoortele Tubes Extra
+-- =====================================================
+('FRIETSAUS ZOET 3L PET VANDEMOORTELE', 1, 13.14, 'SAUZEN'),
+('KNOFLOOKSAUS 1L TUBE VANDEMOORTELE', 1, 5.00, 'SAUZEN'),
+('SAMURAISAUS 1L TUBE VANDEMOORTELE', 1, 6.19, 'SAUZEN'),
+('FRIETSAUS ZOET 1L TUBE VANDEMOORTELE', 1, 4.75, 'SAUZEN'),
+('HANNIBAL FRIKANDELSAUS 1L TUBE VANDEMOORTELE', 1, 5.73, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Anda Grootverpakking Extra
+-- =====================================================
+('MAYO DRESSING 10L ANDA', 1, 33.67, 'SAUZEN'),
+('TARTAAR MAISON 10L ANDA', 1, 31.47, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Zeisner Extra
+-- =====================================================
+('CURRY KETCHUP 425ML ZEISNER', 1, 3.03, 'SAUZEN'),
+
+-- =====================================================
+-- SAUZEN - Laatste Toevoegingen
+-- =====================================================
+('MAYONAISE MAISON 10L ANDA', 1, 32.59, 'SAUZEN'),
+('TOMATO PRONTO NAPOLETANA 3KG KNORR PROF', 1, 15.19, 'SAUZEN'),
+
+-- =====================================================
+-- OLIËN, VETTEN & AZIJN
+-- =====================================================
+
+-- =====================================================
+-- VETTEN - Palm & Mix
+-- =====================================================
+('VET PALM 4X2,5KG VAN ZON', 4, 5.44, 'OLIËN & VETTEN'),
+('VET PALM 4X2,5KG DELIZIO', 4, 6.05, 'OLIËN & VETTEN'),
+('VET RISSO PALM 4X2,5KG', 4, 7.04, 'OLIËN & VETTEN'),
+('VET MIX FRITUUR 4X2,5KG DELIZIO', 4, 5.87, 'OLIËN & VETTEN'),
+('VET MIX ORANJE 4X2,5KG PAUWELS', 4, 7.06, 'OLIËN & VETTEN'),
+('VET MIX FRI 4X2,5KG VAN ZON', 4, 5.35, 'OLIËN & VETTEN'),
+('VET PALMAX 4X2,5KG PAUWELS', 4, 7.10, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- VETTEN - Runds
+-- =====================================================
+('VET RUNDS 100% ZUIVER ONGERAFFINEERD VADA 10KG', 1, 22.26, 'OLIËN & VETTEN'),
+('VET FRITUUR RUNDS 4X2,5KG VAN ZON', 4, 4.81, 'OLIËN & VETTEN'),
+('VET RUNDS BLAUW 4X2,5KG BAND BELGRAS', 4, 5.17, 'OLIËN & VETTEN'),
+('VET RUNDS 12,5KG BANDVET BAETEN', 1, 27.73, 'OLIËN & VETTEN'),
+('VET RUNDS 100% GERAFFINEERD 4X2,5KG DELIZIO', 4, 5.50, 'OLIËN & VETTEN'),
+('VET RUNDS 12,5KG BAND BELGRAS', 1, 26.49, 'OLIËN & VETTEN'),
+('VET RUNDS OSSEWIT 4X2,5KG BAETEN', 4, 6.04, 'OLIËN & VETTEN'),
+('VET RUNDS HALAL 4X2,5KG DELIZIO', 4, 7.03, 'OLIËN & VETTEN'),
+('VET RUNDS 12,5KG GROEN FRIBEL', 1, 30.59, 'OLIËN & VETTEN'),
+('VET RISSO FRI ROOD 4X2,5KG', 4, 6.75, 'OLIËN & VETTEN'),
+('VET HALF VLOEIBAAR RISSO LONGLIFE 10L', 1, 44.13, 'OLIËN & VETTEN'),
+('VET FRITUUR VLOEIBAAR CHEF BEEF 10L DELIZIO', 1, 23.22, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- FRITUUROLIE - Risso
+-- =====================================================
+('OLIE RISSO BUFFET 3L', 1, 11.00, 'OLIËN & VETTEN'),
+('FRITUUROLIE RISSO CHEF 5L', 1, 19.98, 'OLIËN & VETTEN'),
+('FRITUUROLIE RISSO CHEF 25L', 1, 87.21, 'OLIËN & VETTEN'),
+('FRITUUROLIE RISSO BALANCE 15L', 1, 67.43, 'OLIËN & VETTEN'),
+('FRITUUROLIE RISSO CHEF 15L', 1, 54.30, 'OLIËN & VETTEN'),
+('FRITUUROLIE RISSO CHEF 10L', 1, 41.33, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- FRITUUROLIE - Delizio
+-- =====================================================
+('FRITUUROLIE CHEF 15L DELIZIO', 1, 35.99, 'OLIËN & VETTEN'),
+('FRITUUROLIE CHEF 5L PET DELIZIO', 1, 13.09, 'OLIËN & VETTEN'),
+('FRITUUROLIE CHEF 10L DELIZIO', 1, 25.13, 'OLIËN & VETTEN'),
+('FRITUUROLIE FRIT 15L DELIZIO', 1, 31.41, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- FRITUUROLIE - Van Zon & Overige
+-- =====================================================
+('FRITUUROLIE 15L BOX VAN ZON CHEF', 1, 32.58, 'OLIËN & VETTEN'),
+('FRITUUROLIE FRIBEL CULINAIR 15L', 1, 36.18, 'OLIËN & VETTEN'),
+('QALITA FRITUUROLIE 10L', 1, 19.59, 'OLIËN & VETTEN'),
+('BECEL FRITUUROLIE 2L', 1, 15.34, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- ZONNEBLOEMOLIE
+-- =====================================================
+('ZONNEBLOEMOLIE 15L DELIZIO', 1, 33.28, 'OLIËN & VETTEN'),
+('ZONNEBLOEMOLIE 3L PET DELIZIO', 1, 7.19, 'OLIËN & VETTEN'),
+('ZONNEBLOEMOLIE 1L DELIZIO', 1, 2.70, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- SOJAOLIE
+-- =====================================================
+('SOJAOLIE 15L DELIZIO', 1, 32.47, 'OLIËN & VETTEN'),
+('SOJAOLIE 3L PET DELIZIO', 1, 7.32, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- ARACHIDEOLIE (Pindaolie)
+-- =====================================================
+('ARACHIDEOLIE 15L DELIZIO', 1, 51.42, 'OLIËN & VETTEN'),
+('ARACHIDEOLIE 25L VANDEMOORTELE', 1, 145.73, 'OLIËN & VETTEN'),
+('ARACHIDEOLIE 3L PET DELIZIO', 1, 10.90, 'OLIËN & VETTEN'),
+('ARACHIDEOLIE 25L DELIZIO', 1, 77.79, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- MAISOLIE
+-- =====================================================
+('MAISOLIE 3L PET DELIZIO', 1, 7.61, 'OLIËN & VETTEN'),
+('MAISOLIE 15L DELIZIO', 1, 35.09, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- DRUIVENPITOLIE
+-- =====================================================
+('DRUIVENPITOLIE 5L MAISTRE & CAMOUS', 1, 50.63, 'OLIËN & VETTEN'),
+('DRUIVENPITOLIE 5L PET DELIZIO', 1, 20.39, 'OLIËN & VETTEN'),
+('DRUIVENPITOLIE 1L DELIZIO', 1, 4.43, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- OLIJFOLIE - Bertolli
+-- =====================================================
+('OLIJFOLIE BERTOLLI CLASSICO 3L', 1, 36.31, 'OLIËN & VETTEN'),
+('OLIJFOLIE BERTOLLI CLASSICO 2L PET', 1, 24.56, 'OLIËN & VETTEN'),
+('OLIJFOLIE BERTOLLI CLASSICO 1L', 1, 12.66, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- OLIJFOLIE - Delizio
+-- =====================================================
+('OLIJFOLIE EXTRA VIERGE 1L DELIZIO', 1, 6.09, 'OLIËN & VETTEN'),
+('OLIJFOLIE MIX 1L DELIZIO', 1, 3.25, 'OLIËN & VETTEN'),
+('OLIJFOLIE MIX 5L PET DELIZIO', 1, 14.51, 'OLIËN & VETTEN'),
+('OLIJFOLIE POMACE 1L DELIZIO', 1, 4.14, 'OLIËN & VETTEN'),
+('OLIJFOLIE POMACE 5L PET DELIZIO', 1, 19.14, 'OLIËN & VETTEN'),
+('OLIJFOLIE EXTRA VIERGE 5L DELIZIO', 1, 28.72, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- OLIJFOLIE - Premium & Specialty
+-- =====================================================
+('OLIJFOLIE 100% SAN MICHELE 1L', 1, 11.43, 'OLIËN & VETTEN'),
+('OLIJFOLIE EXTRA VIERGE 250ML', 1, 2.99, 'OLIËN & VETTEN'),
+('OLIJFOLIE 100% ARBEQUINA 5L', 1, 90.82, 'OLIËN & VETTEN'),
+('OLIJFOLIE GRIEKS EXTRA VIERGE 1L GLAS', 1, 9.76, 'OLIËN & VETTEN'),
+('OLIJFOLIE GRIEKS EXTRA VIERGE 5L BLIK', 1, 45.06, 'OLIËN & VETTEN'),
+('OLIJFOLIE EXTRA VIERGE 100% ARBEQUINA CO&OIL 5L', 1, 58.86, 'OLIËN & VETTEN'),
+('OLIJFOLIE EXTRA VIERGE 100% ARBEQUINA CO&OIL 2L', 1, 28.62, 'OLIËN & VETTEN'),
+('OLIJFOLIE EXTRA VIERGE PICUAL BUSS BIB 3L', 1, 34.37, 'OLIËN & VETTEN'),
+('OLIJFOLIE LESIEUR PIZZA 500ML', 1, 9.60, 'OLIËN & VETTEN'),
+('OLIJFOLIE COLAVITA EXTRA KNOFLOOK 250ML', 1, 4.41, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- OLIJFOLIE - Qalita
+-- =====================================================
+('QALITA OLIJFOLIE EXTRA VIERGE 1L', 1, 5.74, 'OLIËN & VETTEN'),
+('QALITA OLIJFOLIE EXTRA VIERGE 5L', 1, 28.69, 'OLIËN & VETTEN'),
+('QALITA OLIJFOLIE POMACE 1L', 1, 3.28, 'OLIËN & VETTEN'),
+('QALITA OLIJFOLIE POMACE 5L', 1, 15.67, 'OLIËN & VETTEN'),
+('QALITA OLIJFOLIE 100% ARBEQUINA 5L', 1, 38.75, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- OLIJFOLIE - A L'Olivier Premium
+-- =====================================================
+('OLIJFOLIE A L''OLIVIER KNOFLOOK & TIJM 250ML', 1, 12.71, 'OLIËN & VETTEN'),
+('OLIJFOLIE A L''OLIVIER HOJIBLANCA 250ML', 1, 10.68, 'OLIËN & VETTEN'),
+('OLIJFOLIE A L''OLIVIER CITROEN EN GEMBER 250ML', 1, 12.42, 'OLIËN & VETTEN'),
+('A L''OLIVIER PORCINI & TRUFFEL 250ML', 1, 14.09, 'OLIËN & VETTEN'),
+('A L''OLIVIER WALNOOTOLIE 500ML', 1, 26.67, 'OLIËN & VETTEN'),
+('BIO A L''OLIVIER BIO GEROOSTERDE SESAM OLIE 250ML', 1, 11.76, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- SESAMOLIE
+-- =====================================================
+('GOLDEN TURTLE SESAMOLIE 1L', 1, 10.58, 'OLIËN & VETTEN'),
+('SESAMOLIE GEROOSTERD 250ML INTERNAT. COLLECTION', 1, 7.40, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- SPECIALE OLIËN - Gronn
+-- =====================================================
+('PREI OLIE 250ML GRONN', 1, 4.65, 'OLIËN & VETTEN'),
+('BASILICUM OLIE 250ML GRONN', 1, 6.17, 'OLIËN & VETTEN'),
+('THAISE OLIE 250ML GRONN', 1, 5.60, 'OLIËN & VETTEN'),
+('DILLE OLIE 250ML GRONN', 1, 6.55, 'OLIËN & VETTEN'),
+('CHILI OLIE 250ML GRONN', 1, 7.12, 'OLIËN & VETTEN'),
+('PETERSELIE OLIE 250ML GRONN', 1, 6.17, 'OLIËN & VETTEN'),
+('DRAGON OLIE 250ML GRONN', 1, 7.50, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- OVERIGE OLIËN
+-- =====================================================
+('FONDUE EN GRILL OLIE 1L MAISTRE & CAMOUS', 1, 9.84, 'OLIËN & VETTEN'),
+('KOOLZAAD EN WALNOTENOLIE 50CL MAISTRE & CAMOUS', 1, 4.86, 'OLIËN & VETTEN'),
+('KOKOSVET 500ML VEGAN', 1, 3.98, 'OLIËN & VETTEN'),
+('PIZZAIOLO + GIETER 250ML', 1, 6.09, 'OLIËN & VETTEN'),
+('PIZZA OLIE 250ML DELI DI PAOLO', 1, 2.59, 'OLIËN & VETTEN'),
+('PIZZA OLIE PIKANT STICKS 1000X4ML COLONA', 1000, 0.04, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- BAK- & LOSSINGSMIDDELEN
+-- =====================================================
+('BUNWAX SPRAY (LOSSINGSMIDDEL) 600ML DELIZIO', 1, 3.56, 'OLIËN & VETTEN'),
+('GRILL GEL CITRUSVRUCHTEN 50CL', 1, 35.45, 'OLIËN & VETTEN'),
+('GOURMET SPRAY (BAKMIDDEL) 600ML DELIZIO', 1, 3.37, 'OLIËN & VETTEN'),
+
+-- =====================================================
+-- ROOM & MARGARINE
+-- =====================================================
+('SLAGROOM SPUITBUS RISSO CHANTY 700ML', 1, 6.19, 'ZUIVEL'),
+('ROOM RISSO CHANTY DUO VEGAN 1L', 1, 4.84, 'ZUIVEL'),
+
+-- =====================================================
+-- AZIJN - Basis
+-- =====================================================
+('AZIJN FLES 3/4L BLAUWE HAND', 1, 2.69, 'AZIJN'),
+('AZIJN 7% 10L ST-MARTINUS', 1, 8.25, 'AZIJN'),
+('AZIJN 7% 1,5L ST-MARTINUS', 1, 0.89, 'AZIJN'),
+('AZIJN 10L BLAUWE HAND', 1, 12.14, 'AZIJN'),
+
+-- =====================================================
+-- AZIJN - Specialty (Fuchs)
+-- =====================================================
+('DRAGONAZIJN 6% 50CL FUCHS', 1, 2.38, 'AZIJN'),
+('FRAMBOZENAZIJN 6% 50CL FUCHS PET', 1, 2.13, 'AZIJN'),
+
+-- =====================================================
+-- AZIJN - De Nigris
+-- =====================================================
+('FRAMBOZENAZIJN 1L DE NIGRIS', 1, 3.15, 'AZIJN'),
+('FRAMBOZENAZIJN 500ML DE NIGRIS', 1, 2.17, 'AZIJN'),
+('WITTE WIJNAZIJN 1L DE NIGRIS', 1, 2.29, 'AZIJN'),
+('WITTE WIJNAZIJN 500ML DE NIGRIS', 1, 1.92, 'AZIJN'),
+('RODE WIJNAZIJN 1L DE NIGRIS', 1, 2.22, 'AZIJN'),
+('RODE WIJNAZIJN 500ML DE NIGRIS', 1, 1.61, 'AZIJN'),
+('SHERRY AZIJN 50CL DE NIGRIS', 1, 3.56, 'AZIJN'),
+('APPELAZIJN 50CL DE NIGRIS', 1, 2.50, 'AZIJN'),
+
+-- =====================================================
+-- AZIJN - Kilikya
+-- =====================================================
+('DRUIVENAZIJN 1L KILIKYA', 1, 1.47, 'AZIJN'),
+('APPELAZIJN 1L KILIKYA', 1, 1.47, 'AZIJN'),
+('WITTE AZIJN 1L KILIKYA', 1, 1.05, 'AZIJN'),
+
+-- =====================================================
+-- AZIJN - Rijstazijn & Sushi
+-- =====================================================
+('RIJSTAZIJN SUSHI PUUR MIZKAN 500ML', 1, 3.90, 'AZIJN'),
+('GOLDEN TURTLE AZIJN SUSHI SEASONING 1L', 1, 4.28, 'AZIJN'),
+
+-- =====================================================
+-- AZIJN - Wijnazijn Premium (Forum)
+-- =====================================================
+('FORUM CABERNET SAUVIGNON RODE WIJNAZIJN 1L', 1, 20.85, 'AZIJN'),
+('FORUM CHARDONNAY WITTE WIJNAZIJN 1L', 1, 26.41, 'AZIJN'),
+('FORUM MERLOT RODE WIJNAZIJN 500ML', 1, 11.72, 'AZIJN'),
+('WILDE MANGO AZIJN CO&OIL 250ML', 1, 18.18, 'AZIJN'),
+
+-- =====================================================
+-- BALSAMICO AZIJN
+-- =====================================================
+('BALSAMICO AZIJN BLAUW 250ML DE NIGRIS', 1, 3.91, 'AZIJN'),
+('BALSAMICO AZIJN GOUD 250ML DE NIGRIS', 1, 5.66, 'AZIJN'),
+('BALSAMICO AZIJN PLATINA 65% 250ML DE NIGRIS', 1, 9.11, 'AZIJN'),
+('BALSAMICO DI MODENA 500ML PONTI', 1, 5.60, 'AZIJN'),
+('ACETO BALSAMICO 35% SPRAY 250G', 1, 3.15, 'AZIJN'),
+('VINCOTTO ORIGINALE 250ML', 1, 10.65, 'AZIJN'),
+
+-- =====================================================
+-- BALSAMICO CREMA & DRESSINGS
+-- =====================================================
+('BALSAMICO CREAM SAUS 950G TOCHI', 1, 12.06, 'AZIJN'),
+('BALSAMICO DRESSING BIANCA 500ML PONTI', 1, 5.92, 'AZIJN'),
+('BALSAMICO CREMA 500ML PONTI', 1, 8.66, 'AZIJN'),
+('BALSAMICO CREAM SAUS FOREST FRUITS 100ML', 1, 4.82, 'AZIJN'),
+('SQ BALSAMICO SAUS KLASSIEK 100ML', 1, 4.84, 'AZIJN'),
+('GLAZE ORIGINEEL 500ML', 1, 3.70, 'AZIJN'),
+
+-- =====================================================
+-- ZOETZUURTJES
+-- =====================================================
+('ZOETZUURTJE BASIC 1KG ZAK', 1, 9.51, 'CONSERVEN'),
+('ZOETZUURTJE THAI STYLE HERBS AND SPICES 1KG ZAK', 1, 15.85, 'CONSERVEN'),
+('ZOETZUURTJE BARBECUE SPICES MIX 1KG ZAK', 1, 15.85, 'CONSERVEN'),
+('ZOETZUURTJE LEMON WITH GARLIC 1KG ZAK', 1, 15.85, 'CONSERVEN'),
+
+-- =====================================================
+-- VERPAKKING & DISPOSABLES
+-- =====================================================
+
+-- =====================================================
+-- PLASTIEK BAKJES - Depa
+-- =====================================================
+('DEPA A50/30 PLASTIEK BAKJES 20X14X4CM 250ST', 250, 0.05, 'VERPAKKING'),
+('DEPA A16S FRIK BAKJE WIT 190CC 208X55X32MM 250ST', 250, 0.02, 'VERPAKKING'),
+('DEPA A16N FRIK BAKJE WIT 300CC 204X70X33MM 250ST', 250, 0.02, 'VERPAKKING'),
+('DEPA A7 BAKJE WIT 250CC 12,1X9,2X3,1CM 250ST', 250, 0.02, 'VERPAKKING'),
+('DEPA A5 BAKJE WIT 200CC 142X68X34MM 250ST', 250, 0.02, 'VERPAKKING'),
+('DEPA A9 BAKJE ZWART 325CC 145X95X36MM 250ST', 250, 0.02, 'VERPAKKING'),
+('DEPA A13 BAKJE WIT 430CC 162X110X35MM 250ST', 250, 0.03, 'VERPAKKING'),
+('DEPA A14 BAKJE WIT 460CC 190X121X36MM 250ST', 250, 0.04, 'VERPAKKING'),
+('DEPA A21 BAKJE WIT 750CC 205X120X36MM 250ST', 250, 0.05, 'VERPAKKING'),
+('DEPA A20 BAKJE WIT (A14+SAUS) 250ST', 250, 0.05, 'VERPAKKING'),
+('DEPA A19 FRIK BAKJE DUBBEL WIT 250ST', 250, 0.04, 'VERPAKKING'),
+
+-- =====================================================
+-- PLASTIEK BAKJES - Grootverpakking
+-- =====================================================
+('A13 PLASTIEK BAKJES 16,3X11,1X3,6CM 1000ST', 1000, 0.06, 'VERPAKKING'),
+('A14 PLASTIEK BAKJES 12,5X18X4,5CM 1000ST', 1000, 0.07, 'VERPAKKING'),
+('A15 PLASTIEK BAKJE 18,9X12,1X3,5CM 1000ST', 1000, 0.07, 'VERPAKKING'),
+('A16 PLASTIEK BAKJES BREED 21,5X6,8X3,5CM 1000ST', 1000, 0.04, 'VERPAKKING'),
+('A16D PLASTIEK BAKJES 2-VAKS 20,3X9,5X3,5CM 1000ST', 1000, 0.07, 'VERPAKKING'),
+('A16L PLASTIEK BAKJES LANG 6,5X24X2,8CM 1000ST', 1000, 0.05, 'VERPAKKING'),
+('A18 PLASTIEK BAKJES 9,5X20,3X3,3CM 1000ST', 1000, 0.06, 'VERPAKKING'),
+('A2 PLASTIEK BAKJES 8,3X8,3X3,6CM 135CC 2X500ST', 1000, 0.03, 'VERPAKKING'),
+('A23 PLASTIEK BAKJE 2-VAKS 9,5X17X3,3CM 1000ST', 1000, 0.05, 'VERPAKKING'),
+('A8 WIT PLASTIEK BAKJES 8X28,5X3,7CM 1000ST', 1000, 0.07, 'VERPAKKING'),
+('A8 ZWART PLASTIEK BAKJE 30X10CM 500ST DUPLAST', 500, 0.14, 'VERPAKKING'),
+('A16N PLASTIEK BAKJES MIDDEL 6,8X20,3X3,4CM 2000ST', 2000, 0.04, 'VERPAKKING'),
+('A4/A7N WIT PLASTIEK BAKJES 12,2X9,5X3,3 2000ST', 2000, 0.04, 'VERPAKKING'),
+('A16S PLASTIEK BAKJES SMALL 20,3X5,4X2,8CM 2000ST', 2000, 0.04, 'VERPAKKING'),
+('A1 PLASTIEK BAKJES 5,8X10,2X2,2CM 1000ST', 1000, 0.02, 'VERPAKKING'),
+('A20 PLASTIEK BAKJE 2-VAKS 20,5X12,2X3,6CM 500ST', 500, 0.09, 'VERPAKKING'),
+('A16 ZWART PLASTIEK BAKJE 21,5X7X3,5CM 1000ST', 1000, 0.04, 'VERPAKKING'),
+
+-- =====================================================
+-- KARTONNEN BAKJES - Raviers
+-- =====================================================
+('RAVIER 75 BAKJE KARTON 10X7X4CM 250ST', 250, 0.02, 'VERPAKKING'),
+('RAVIER 80 BAKJE KARTON 11X6X4,7CM 250ST', 250, 0.03, 'VERPAKKING'),
+('RAVIER 85 BAKJE KARTON 12X7X4,5CM 250ST', 250, 0.03, 'VERPAKKING'),
+('RAVIER 90 BAKJE KARTON 13,5X7X4CM 250ST', 250, 0.03, 'VERPAKKING'),
+('RAVIER 92 BAKJE KARTON 12,5X8X5CM 250ST', 250, 0.03, 'VERPAKKING'),
+('RAVIER 93 BAKJE KARTON 15X9X5CM 250ST', 250, 0.04, 'VERPAKKING'),
+('RAVIER 94 BAKJE KARTON 16,5X10,5X6CM 100ST', 100, 0.06, 'VERPAKKING'),
+('F1 BAKJE KARTON 10X6X4CM 250ST', 250, 0.03, 'VERPAKKING'),
+
+-- =====================================================
+-- KARTONNEN BAKJES - Bruin ECO
+-- =====================================================
+('RAVIER 80 F0 BAKJE KARTON BRUIN 11X6X4,5CM 250ST', 250, 0.03, 'VERPAKKING'),
+('RAVIER 92 BAKJE KARTON BRUIN 12,5X8,5X5CM 250ST', 250, 0.05, 'VERPAKKING'),
+('RAVIER 75 BAKJE KARTON BRUIN 10,2X7X3,8CM 250ST', 250, 0.03, 'VERPAKKING'),
+('RAVIER 93 BAKJE KARTON BRUIN 15X9X5CM 250ST', 250, 0.05, 'VERPAKKING'),
+('RAVIER 85 BAKJE KARTON BRUIN 12X7X4,5CM 250ST', 250, 0.03, 'VERPAKKING'),
+('RAVIER 90 BAKJE KARTON BRUIN 13,5X7X4,5CM 250ST', 250, 0.03, 'VERPAKKING'),
+('A16 BAKJE KARTON BRUIN 17X4X3,5CM 250ST', 250, 0.04, 'VERPAKKING'),
+('A16L BAKJE KARTON BRUIN 21X4X3,5CM 250ST', 250, 0.04, 'VERPAKKING'),
+('A16S BAKJE KARTON BRUIN 18X2,2X3,5CM 250ST', 250, 0.04, 'VERPAKKING'),
+('A18 BAKJE KARTON BRUIN 17X6X3,5CM 250ST', 250, 0.05, 'VERPAKKING'),
+('A5 BAKJE KARTON BRUIN 11X4,5X3,5CM 250ST', 250, 0.03, 'VERPAKKING'),
+('A7 BAKJE KARTON BRUIN 9X6X3CM 250ST', 250, 0.03, 'VERPAKKING'),
+('A9 BAKJE KARTON BRUIN 12X7X3,5CM 250ST', 250, 0.04, 'VERPAKKING'),
+('A8 BAKJE KARTON BRUIN 25,5X6X3,4CM 100ST', 100, 0.06, 'VERPAKKING'),
+('A2 BAKJE KARTON BRUIN ALT 6,5X6,5X3,5CM 100ST', 100, 0.04, 'VERPAKKING'),
+('A16 BAKJE KARTON BRUIN ALT 18,5X4X3,5CM 250ST', 250, 0.03, 'VERPAKKING'),
+('A16 BAKJE KARTON WIT 18,5X4X3,5CM 250ST', 250, 0.03, 'VERPAKKING'),
+('A20 BAKJE KARTON BRUIN ECO (A14+SAUS) 100ST', 100, 0.09, 'VERPAKKING'),
+
+-- =====================================================
+-- FRIETZAKJES
+-- =====================================================
+('FRIETZAKJES NR 19 1000ST', 1000, 0.04, 'VERPAKKING'),
+('FRIETZAKJES NR 20 1000ST', 1000, 0.03, 'VERPAKKING'),
+('FRIETZAKJES NR 21 1000ST', 1000, 0.02, 'VERPAKKING'),
+('FRIETZAKJES NR 22 1000ST', 1000, 0.02, 'VERPAKKING'),
+('FRIETZAKJES NR 23 1000ST', 1000, 0.02, 'VERPAKKING'),
+('FRIETZAKJES NR 24 1000ST', 1000, 0.02, 'VERPAKKING'),
+('FRIETZAKJES NR 25 1000ST', 1000, 0.01, 'VERPAKKING'),
+('FRIETZAKJES NR 26 1000ST', 1000, 0.01, 'VERPAKKING'),
+('FRIETZAKJES NR 27 1000ST', 1000, 0.01, 'VERPAKKING'),
+('TIP 1 FRIETZAKJES KARTON 1000ST', 1000, 0.03, 'VERPAKKING'),
+('TIP 2 FRIETZAKJES KARTON 1000ST', 1000, 0.02, 'VERPAKKING'),
+('FRIETZAK KRANTENPAPIER BEDRUKKING 17CM 5KG 1500ST', 1500, 0.03, 'VERPAKKING'),
+('FRIETZAK KRANTENPAPIER BEDRUKKING 21CM 5KG 1000ST', 1000, 0.04, 'VERPAKKING'),
+
+-- =====================================================
+-- HAMBURGER DOZEN & BAKKEN
+-- =====================================================
+('ISIMO HAMB.BOX 1453 MP10 WIT 135X125X74MM 100ST', 100, 0.07, 'VERPAKKING'),
+('ISIMO HAMB.BOX R/H 1673 IP8 WIT 125X215X65 125ST', 125, 0.10, 'VERPAKKING'),
+('ISIMO HAMB.BOX 1659 HP6 CHAMP 145X135X80MM 125ST', 125, 0.09, 'VERPAKKING'),
+('ISIMO HAMB.BOX 1512 GIANT WIT 207X204X100MM 100ST', 100, 0.24, 'VERPAKKING'),
+('ISIMO HAMB.BOX 1675 IP9 WIT 155X185X75MM 125ST', 125, 0.11, 'VERPAKKING'),
+('HAMBURGERBAK BRUIN ECO 9X9X8CM 100ST', 100, 0.10, 'VERPAKKING'),
+('HAMBURGERBAK BRUIN ECO 11X11X8CM 100ST', 100, 0.11, 'VERPAKKING'),
+('HAMBURGERBAK BRUIN ECO 13X13X9CM 100ST', 100, 0.13, 'VERPAKKING'),
+('HAMBURGERBAK BRUIN ECO 14,5X14,5X8CM 100ST', 100, 0.16, 'VERPAKKING'),
+('HAMBURGERBAK BRUIN ECO 21X7,6X6,5CM 100ST', 100, 0.12, 'VERPAKKING'),
+('HAMBURGERBAK ZWART 12X12X8CM 100ST', 100, 0.19, 'VERPAKKING'),
+('HAMBURGERBAK VZ 12X12X8CM 125ST KARTON', 125, 0.13, 'VERPAKKING'),
+('HAMBURGERBOX BAMBOE PAPIER 118X115MM 125ST', 125, 0.21, 'VERPAKKING'),
+('TASTY HAMBURGERBAK KARTON 9X9X7CM 100ST', 100, 0.14, 'VERPAKKING'),
+('TASTY HAMBURGERBAK KARTON 11,5X11,5X7CM 100ST', 100, 0.14, 'VERPAKKING'),
+('TASTY HAMBURGERBAK KARTON 12X12X10CM 100ST', 100, 0.17, 'VERPAKKING'),
+('HAMBURGERPAPIER 29X41CM 3000ST', 3000, 0.03, 'VERPAKKING'),
+('HAMBURGERPAPIER WORDS 33X34CM 1000ST', 1000, 0.04, 'VERPAKKING'),
+('HAMBURGERPAPIER ACAPULCO 30X30CM 1000ST LA FOODS', 1000, 0.07, 'VERPAKKING'),
+('HAMBURGERPAPIER NEW YORK 30X30CM 1000ST LA FOODS', 1000, 0.06, 'VERPAKKING'),
+('HAMBURGER-PITA ZAKJES KLEIN 500ST', 500, 0.01, 'VERPAKKING'),
+
+-- =====================================================
+-- MICROSCHALEN
+-- =====================================================
+('MICROSCHAAL RH 1000CC 50ST', 50, 0.10, 'VERPAKKING'),
+('MICROSCHAAL RH 750CC 50ST', 50, 0.10, 'VERPAKKING'),
+('MICROSCHAAL RH 500CC 50ST', 50, 0.10, 'VERPAKKING'),
+('DEKSEL MICROSCHAAL RH 50ST', 50, 0.06, 'VERPAKKING'),
+('MICROSCHAAL VIERKANT 500CC 50ST', 50, 0.06, 'VERPAKKING'),
+('DEKSEL MICROSCHAAL VIERKANT 500CC 50ST', 50, 0.03, 'VERPAKKING'),
+
+-- =====================================================
+-- MAALTIJDBOXEN & MENUSCHALEN
+-- =====================================================
+('TAKE HOME BOX 1631 CREAM 3-VAK 245X210X72MM 100ST', 100, 0.15, 'VERPAKKING'),
+('TAKE HOME BOX 1630 CREAM 2-VAK 245X210X72MM 100ST', 100, 0.15, 'VERPAKKING'),
+('TAKE HOME BOX 1629 CREAM 1-VAK 245X210X72MM 100ST', 100, 0.15, 'VERPAKKING'),
+('PLASTIEK MENUSCHAAL 3-VAKS FOODYBOX 50ST', 50, 0.25, 'VERPAKKING'),
+('PLASTIEK MENUSCHAAL 1-VAKS FOODYBOX 50ST', 50, 0.25, 'VERPAKKING'),
+('PLASTIEK MENUSCHAAL 2-VAKS FOODYBOX 50ST', 50, 0.25, 'VERPAKKING'),
+('MAALTIJDBOX 2-VAKS PP 240X150X40MM 500/250ML 50ST', 50, 0.20, 'VERPAKKING'),
+('MAALTIJDBOX 1-VAKS PP 240X150X40MM 800ML 50ST', 50, 0.20, 'VERPAKKING'),
+('DEKSEL MAALTIJDBOX ART 66664-66666 RPET 50ST', 50, 0.18, 'VERPAKKING'),
+('MAALTIJDBOX BRUIN CLASSIC 1200ML 40ST BAGASSE', 40, 0.25, 'VERPAKKING'),
+
+-- =====================================================
+-- ALUMINIUM BAKKEN
+-- =====================================================
+('BAK MAALTIJD ALU RECHTH 250CC 100ST', 100, 0.07, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 450CC 100ST', 100, 0.09, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 850CC 100ST PLOOI', 100, 0.14, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 850CC 100ST', 100, 0.14, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 1100CC H36 100ST', 100, 0.18, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 1500CC 100ST', 100, 0.30, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 2000CC 100ST', 100, 0.27, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 2-VAKS H38 100ST', 100, 0.24, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 1/2 GASTRO 100ST', 100, 0.45, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 605CC 50ST', 50, 0.19, 'VERPAKKING'),
+('BAK MAALTIJD ALU RECHTH 1350CC 50ST', 50, 0.34, 'VERPAKKING'),
+('BAK MAALTIJD ALU ZWART RH 605CC 50ST', 50, 0.26, 'VERPAKKING'),
+('BAK MAALTIJD ALU ZWART RH 725CC 50ST', 50, 0.35, 'VERPAKKING'),
+('BAK MAALTIJD ALU ZWART RH 940CC 50ST', 50, 0.40, 'VERPAKKING'),
+('BAK MAALTIJD ALU ZWART RH 1000CC 50ST', 50, 0.49, 'VERPAKKING'),
+('BAK MAALTIJD FRIETGRAS 100ST', 100, 0.36, 'VERPAKKING'),
+('SOEPPOT ALU 400CC 115ST', 115, 0.09, 'VERPAKKING'),
+('ALU SCHELP ST JACOBS (COQUILLE)100ST', 100, 0.12, 'VERPAKKING'),
+('ALU SCHAALTJE (CREME BRULEE) 100ST', 100, 0.07, 'VERPAKKING'),
+('ALUMINIUM OVALE SCHOTEL 35CM 10ST', 10, 0.51, 'VERPAKKING'),
+('ALUMINIUM RONDE SCHOTEL 22CM 100ST', 100, 0.16, 'VERPAKKING'),
+('ALUMINIUM RONDE SCHOTEL 23CM 155ST', 155, 0.19, 'VERPAKKING'),
+('CATERING SCHAAL ALUMINIUM 45CM 10ST', 10, 0.63, 'VERPAKKING'),
+('CATERING SCHAAL ALU 55CM 10ST', 10, 1.25, 'VERPAKKING'),
+('ALUMINIUM GRILL/BBQ SCHAAL 10ST', 10, 0.30, 'VERPAKKING'),
+
+-- =====================================================
+-- DEKSELS ALUMINIUM BAKKEN
+-- =====================================================
+('DEKSEL KARTON/ALU VR BAK ALU 250CC 100ST', 100, 0.03, 'VERPAKKING'),
+('DEKSEL KARTON/ALU VR BAK ALU 450CC 100ST', 100, 0.04, 'VERPAKKING'),
+('DEKSEL KARTON/ALU VR BAK ALU 850CC 100ST', 100, 0.06, 'VERPAKKING'),
+('DEKSEL KARTON/ALU VR BAK ALU 1500CC 100ST', 100, 0.09, 'VERPAKKING'),
+('DEKSEL KARTON/ALU VR BAK ALU 2000CC 100ST', 100, 0.10, 'VERPAKKING'),
+('DEKSEL ALU VR BAK ALU 100ST', 100, 0.12, 'VERPAKKING'),
+('DEKSEL ALU VR BAK ALU 1/2 GASTRO 100ST', 100, 0.27, 'VERPAKKING'),
+('DEKSEL ALU SOEPPOT ALU 400CC 100ST', 100, 0.08, 'VERPAKKING'),
+('DEKSEL PET VR BAK ALU 605CC 50ST', 50, 0.20, 'VERPAKKING'),
+('DEKSEL PET VR BAK ALU 1000CC 50ST', 50, 0.25, 'VERPAKKING'),
+('DEKSEL PET VR BAK ALU 1350CC 50ST', 50, 0.28, 'VERPAKKING'),
+('DEKSEL PET VR BAK ALU 100ST', 100, 0.23, 'VERPAKKING'),
+('DEKSEL RPET VR BAK ALU ZWART 940CC 50ST', 50, 0.29, 'VERPAKKING'),
+('DEKSEL VOOR BAK MAALTIJD FRIETGRAS 100ST', 100, 0.22, 'VERPAKKING'),
+
+-- =====================================================
+-- INPAKPAPIER - Foodpack
+-- =====================================================
+('INPAKPAPIER FOODPACK 20/20 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 20/30 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 25/25 10KG', 1, 16.68, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 25/30 10KG', 1, 16.68, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 30/40 10KG', 1, 16.68, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 35/45 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 40/40 10KG', 1, 16.68, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 40/45 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 40/50 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 40/60 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 45/50 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 50/60 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 50/70 10KG', 1, 16.68, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 55/65 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 55/70 10KG', 1, 16.36, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK 60/80 10KG', 1, 16.36, 'VERPAKKING'),
+
+-- =====================================================
+-- INPAKPAPIER - Bruin ECO
+-- =====================================================
+('INPAKPAPIER FOODPACK BRUIN ECO 20/20 10KG', 1, 29.25, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK BRUIN ECO 40/50 10KG', 1, 29.25, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK BRUIN ECO 50/60 10KG', 1, 29.25, 'VERPAKKING'),
+('INPAKPAPIER FOODPACK BRUIN ECO 50/70 10KG', 1, 28.86, 'VERPAKKING'),
+
+-- =====================================================
+-- INPAKPAPIER - Overig
+-- =====================================================
+('OMPAKPAPIER MAAT 60/70 10KG', 1, 16.36, 'VERPAKKING'),
+('OMPAKPAPIER MAAT 20/30 10KG', 1, 16.36, 'VERPAKKING'),
+('OMPAKPAPIER MAAT 25/30 10KG', 1, 16.68, 'VERPAKKING'),
+('OMPAKPAPIER MAAT 55/65 10KG', 1, 16.36, 'VERPAKKING'),
+('DUPLEX PAPIER 40X50CM 15KG ROOD/WIT', 1, 41.88, 'VERPAKKING'),
+('DUPLEX PAPIER 40X32CM 15KG ROOD/WIT', 1, 41.15, 'VERPAKKING'),
+('BEDRUKT DUPLEX PAPIER 40X48CM 15KG SMOS', 1, 41.15, 'VERPAKKING'),
+('INPAKPAPIER DUPLEX BRUIN GELIJND 40X48CM 15KG', 1, 47.24, 'VERPAKKING'),
+('INPAKPAPIER OP ROL 40CM BREED 10KG', 1, 25.19, 'VERPAKKING'),
+('INPAKPAPIER OP ROL 50CM BREED 12,5KG', 1, 29.90, 'VERPAKKING'),
+('INPAKPAPIER OP ROL 60CM BREED 15KG', 1, 35.37, 'VERPAKKING'),
+('BEDR. 40/52 INPAKPAPIER VZ 10KG', 1, 31.96, 'VERPAKKING'),
+('INPAKPAPIER NEWS PAPER VETVRIJ 30/30 300ST', 300, 0.04, 'VERPAKKING'),
+('TASTY INPAKPAPIER 30,5X35,5CM 1000ST', 1000, 0.04, 'VERPAKKING'),
+
+-- =====================================================
+-- INPAKZAKKEN
+-- =====================================================
+('2P INPAKZAK WIT (1 POND) 13,5X27CM 10KG', 1, 31.48, 'VERPAKKING'),
+('S42 INPAKZAK WIT P15 23X46CM 10KG', 1, 29.92, 'VERPAKKING'),
+('S43 INPAKZAK WIT P12 23X37CM 10KG', 1, 29.92, 'VERPAKKING'),
+('S45 INPAKZAK WIT P8 17X36,5CM 10KG', 1, 29.92, 'VERPAKKING'),
+('P10 INPAKZAK WIT 16,5X43CM 10KG', 1, 29.47, 'VERPAKKING'),
+('INPAKZAKKEN WIT KRAFT 20P 25X46CM 10KG', 1, 28.99, 'VERPAKKING'),
+('25P INPAKZAK WIT 24X53CM 10KG', 1, 30.76, 'VERPAKKING'),
+('20P INPAKZAK BRUIN 25X46CM 10KG', 1, 33.20, 'VERPAKKING'),
+('15P INPAKZAK BRUIN 22X46CM 10KG', 1, 33.20, 'VERPAKKING'),
+('8P INPAKZAK BRUIN 17X40CM 10KG', 1, 33.20, 'VERPAKKING'),
+('BEDRUKT 4P INPAKZAKKEN VZ 14X34CM 10KG', 1, 32.00, 'VERPAKKING'),
+('BEDRUKT 6P INPAKZAKKEN VZ 17X34CM 10KG', 1, 32.00, 'VERPAKKING'),
+('BEDRUKT 8P INPAKZAKKEN VZ 17X41CM 10KG', 1, 32.00, 'VERPAKKING'),
+('BEDRUKT 12P INPAKZAKKEN VZ 22X41CM 10KG', 1, 32.00, 'VERPAKKING'),
+('BEDRUKT 15P INPAKZAKKEN VZ 22X46CM 10KG', 1, 32.00, 'VERPAKKING'),
+('BEDRUKT SPECIALZAKJES VZ 10X34 2400ST', 2400, 0.01, 'VERPAKKING'),
+('SPECIALZAKJES XL VZ 10X41CM 10KG', 1, 31.75, 'VERPAKKING'),
+
+-- =====================================================
+-- STOKBROOD & KIPZAKKEN
+-- =====================================================
+('SP44 1/2 STOKBROOD INPAKZAKKEN VZ 14X41 BEDR. 10KG', 1, 31.75, 'VERPAKKING'),
+('STOKBROODZAK HALF VZ 40X12,5CM 1000ST', 1000, 0.03, 'VERPAKKING'),
+('STOKBROODZAK VZ 1/2 40X12,5CM PARAFINE 1000ST', 1000, 0.04, 'VERPAKKING'),
+('BEDRUKT SP47 GROTE STOKBROOD ZAK VZ 14X49CM 10KG', 1, 32.00, 'VERPAKKING'),
+('KIPZAKKEN GROOT V MICROGOLF 100ST SMAKELIJK', 100, 0.11, 'VERPAKKING'),
+('KIPZAKKEN KLEIN 100ST 1/2 KIP DEPA', 100, 0.08, 'VERPAKKING'),
+('SMOSZAK VZ 48CM 1000ST', 1000, 0.04, 'VERPAKKING'),
+
+-- =====================================================
+-- CUPS & POTJES - Saus
+-- =====================================================
+('CUPS ROND TRANSPARANT 50ML 50ST DUPLAST', 50, 0.02, 'VERPAKKING'),
+('CUPS ROND TRANSPARANT 80ML 50ST DUPLAST', 50, 0.02, 'VERPAKKING'),
+('DEKSEL ROND POTJE TRANSPARANT 50ST', 50, 0.02, 'VERPAKKING'),
+('CUPS MICRO BOXX ROND 30CC TRANSPARANT PP 50ST', 50, 0.02, 'VERPAKKING'),
+('DEKSEL VOOR CUPS MICRO BOXX TRANSPARANT 30CC 50ST', 50, 0.01, 'VERPAKKING'),
+('CUPS + GARANTIESLUITING 180CC 36ST', 36, 0.20, 'VERPAKKING'),
+('PORTIE POTJE G85 GERIBT 80CC CRISTAL 50ST', 50, 0.04, 'VERPAKKING'),
+('DEKSEL PORTIE POTJE 80CC 100ST', 100, 0.03, 'VERPAKKING'),
+('CUPS R/H 150CC HELDER RPP 108R 100ST', 100, 0.04, 'VERPAKKING'),
+('CUPS R/H 200CC HELDER RPP 108R 100ST', 100, 0.06, 'VERPAKKING'),
+('CUPS R/H 250CC HELDER RPP 108R 100ST', 100, 0.06, 'VERPAKKING'),
+('CUPS R/H 300CC HELDER RPP 108R 100ST', 100, 0.07, 'VERPAKKING'),
+('DEKSEL VOOR CUPS R/H HELDER RPP 108R 100ST', 100, 0.03, 'VERPAKKING'),
+('CUPS ROND 125CC HELDER RPP 101R 100ST', 100, 0.05, 'VERPAKKING'),
+('CUPS ROND 200CC HELDER RPP 101R 100ST', 100, 0.05, 'VERPAKKING'),
+('CUPS ROND 250CC HELDER RPP 101R 100ST', 100, 0.06, 'VERPAKKING'),
+('DEKSEL VOOR CUP ROND HELDER RPP 101R 100ST', 100, 0.04, 'VERPAKKING'),
+('PAPIEREN SAUSPOTJE WIT 30ML 44XH27MM 200ST', 200, 0.02, 'VERPAKKING'),
+('PAPIEREN SAUSPOTJE WIT 60ML 58XH36MM 200ST', 200, 0.03, 'VERPAKKING'),
+('PAPIEREN SAUSPOTJE BRUIN 30ML 44XH27MM 200ST', 200, 0.02, 'VERPAKKING'),
+('PAPIEREN SAUSPOTJE BRUIN 60ML 58XH36MM 200ST', 200, 0.03, 'VERPAKKING'),
+('PAPIEREN SAUSPOTJE ZWART 30ML 44XH27MM 200ST', 200, 0.02, 'VERPAKKING'),
+('PAPIEREN SAUSPOTJE ZWART 60ML 58XH36MM 200ST', 200, 0.03, 'VERPAKKING'),
+
+-- =====================================================
+-- SOEPBEKERS & POTTEN
+-- =====================================================
+('SOEPPOT 500CC PP TRANSP. HERBR 25ST DUPLAST', 25, 0.15, 'VERPAKKING'),
+('SOEPPOT 1L PP TRANSP. HERBRUIKBAAR 25ST DUPLAST', 25, 0.26, 'VERPAKKING'),
+('SOEPPOT 1000CC RPP TRANSP. +DEKSEL HERBR. 20ST', 20, 0.47, 'VERPAKKING'),
+('DEKSEL SOEPPOT 500CC PP TRANSP. HERBR 25ST DUPLAST', 25, 0.11, 'VERPAKKING'),
+('DEKSEL VOOR SOEPPOT 1000+500+350CC PP 25ST DUPLAST', 25, 0.09, 'VERPAKKING'),
+('SOEPBEKER BAMBOE PAPIER 750ML 25ST', 25, 0.12, 'VERPAKKING'),
+('DEKSEL SOEPBEKER BAMBOE PAPIER 97MM 25ST', 25, 0.10, 'VERPAKKING'),
+('DEKSEL SOEPBEKER BAMBOE PAPIER 90MM 25ST', 25, 0.11, 'VERPAKKING'),
+('DEKSEL SOEPBEKER BAMBOE PAPIER 117MM 25ST', 25, 0.12, 'VERPAKKING'),
+('SOEPBEKER KARTON BRUINE KRAFT 360ML 50ST', 50, 0.08, 'VERPAKKING'),
+('SOEPBEKER KARTON BRUINE KRAFT 480ML 50ST', 50, 0.10, 'VERPAKKING'),
+('SOEP-& PASTABEKER PP HERBRUIKBAAR ZWART 500CC 25ST', 25, 0.11, 'VERPAKKING'),
+('SOEPKOP PP HERBRUIKBAAR ZWART 15,6CM PP 12ST', 12, 0.21, 'VERPAKKING'),
+('DEKSEL SOEPKOP PP HERBRUIKBAAR TRANSPARANT 12ST', 12, 0.22, 'VERPAKKING'),
+
+-- =====================================================
+-- PASTABEKERS
+-- =====================================================
+('PASTABEKERS KARTON LARGE 750ML 50ST', 50, 0.25, 'VERPAKKING'),
+('PASTABEKERS KARTON SMALL 460ML 50ST', 50, 0.20, 'VERPAKKING'),
+('PASTABEKER RETRO SMALL 460ML 50ST', 50, 0.18, 'VERPAKKING'),
+('PASTABEKER RETRO LARGE 750ML 50ST', 50, 0.22, 'VERPAKKING'),
+('PASTABEKER RETRO EXTRA LARGE 920ML 50ST', 50, 0.25, 'VERPAKKING'),
+('BIODORE PASTA BOX KRAFTPAPIER 750ML 50ST', 50, 0.30, 'VERPAKKING'),
+
+-- =====================================================
+-- SALADEBAKKEN
+-- =====================================================
+('SALADEBAK+DEK ZWART 23CM H.8CM 180ST DUNI', 180, 0.59, 'VERPAKKING'),
+('SALADEBAK + DEK ZWART 19CM H.6CM 270ST OCTAV. DUNI', 270, 0.47, 'VERPAKKING'),
+('SALADEBAK + DEK ZWART 23CM H.5CM 190ST OCTAV. DUNI', 190, 0.52, 'VERPAKKING'),
+('SALADSHAKER + DEKSEL 300CC 25ST DEPA', 25, 0.19, 'VERPAKKING'),
+('SALADEBAK VIERKANT BAMBOE FSC PAPIER 1250ML 25ST', 25, 0.32, 'VERPAKKING'),
+('SALADEBAK+DEK GRIJS MICRO 532ML 25ST VISTA DUNI', 25, 0.38, 'VERPAKKING'),
+('SALADEBAK+DEK GRIJS 830ML 23CM H5CM 35ST OCT.DUNI', 35, 0.82, 'VERPAKKING'),
+('SALADEBAK+DEK GRIJS 795ML 19CM H7CM 35ST OCT.DUNI', 35, 0.69, 'VERPAKKING'),
+('DEKSEL VIERKANT PET VOOR SALADEBAK 25ST', 25, 0.15, 'VERPAKKING'),
+('DEKSEL SALADEBAK PP 150MM 25ST', 25, 0.07, 'VERPAKKING'),
+('SALADE BOWL RPET HELDER 500CC 50ST', 50, 0.16, 'VERPAKKING'),
+('SALADE BOWL 750CC RPET HELDER 19CM 50ST', 50, 0.23, 'VERPAKKING'),
+('SALADE BOWL KARTON BRUINE KRAFT 370ML 50ST', 50, 0.09, 'VERPAKKING'),
+('SALADE BOWL KARTON BRUIN 500ML 50ST', 50, 0.09, 'VERPAKKING'),
+('SALADE BOWL KARTON BRUIN 750ML 50ST', 50, 0.10, 'VERPAKKING'),
+('SALADE BOWL KARTON BRUIN 960ML 50ST', 50, 0.11, 'VERPAKKING'),
+('DEKSEL PET VR SALADE BOWL BRUINE KRAFT 50ST', 50, 0.05, 'VERPAKKING'),
+('DEKSEL PET VR SALADE BOWL KARTON 50ST', 50, 0.07, 'VERPAKKING'),
+
+-- =====================================================
+-- RIPBOXX & TULPPOTJES
+-- =====================================================
+('RIPBOXX 375CC HELDER 50ST', 50, 0.14, 'VERPAKKING'),
+('RIPBOXX 500CC HELDER 50ST', 50, 0.15, 'VERPAKKING'),
+('RIPBOXX 750CC HELDER 50ST', 50, 0.20, 'VERPAKKING'),
+('RIPBOXX 1000CC HELDER 50ST', 50, 0.17, 'VERPAKKING'),
+('TULPPOTJE 150CC 250ST HELDER', 250, 0.09, 'VERPAKKING'),
+('TULPPOTJE 350CC 50ST HELDER', 50, 0.20, 'VERPAKKING'),
+('TULPPOTJE 350CC 50ST ZWART', 50, 0.20, 'VERPAKKING'),
+
+-- =====================================================
+-- BEKERS - Warme Dranken
+-- =====================================================
+('BEKER WARME DRANKEN KARTON 110ML 50ST DESIGN GROEN', 50, 0.02, 'VERPAKKING'),
+('BEKER WARME DRANKEN KARTON 180ML 50ST DESIGN ROOD', 50, 0.03, 'VERPAKKING'),
+('BEKER WARME DRANKEN KARTON 250ML 50ST DESIGN OKER', 50, 0.04, 'VERPAKKING'),
+('BEKER WARME DRANKEN KARTON 360ML 50ST DESIGN BLAUW', 50, 0.06, 'VERPAKKING'),
+('BEKER BAMBOE PAPIER 100ML 100ST', 100, 0.03, 'VERPAKKING'),
+('CUP BAMBOE PAPIER 250ML 50ST', 50, 0.13, 'VERPAKKING'),
+('CUP BAMBOE FSC PAPIER 150ML 50ST', 50, 0.13, 'VERPAKKING'),
+('DEKSEL PET CUP BAMBOE PAPIER 50ST', 50, 0.04, 'VERPAKKING'),
+('DEKSEL BEKER CAFE IZZA 24CL 100ST', 100, 0.06, 'VERPAKKING'),
+('D.E DEKSEL VOOR BEKER KARTON ZWART 180CC 100ST', 100, 0.05, 'VERPAKKING'),
+('DEKSEL ZWART KOFFIEBEKER 90MM 50ST', 50, 0.04, 'VERPAKKING'),
+('DEKSEL ZWART KOFFIEBEKER 80MM 50ST', 50, 0.03, 'VERPAKKING'),
+('DEKSEL DOME WARME DRANKEN D62MM 50ST WIT', 50, 0.02, 'VERPAKKING'),
+('DEKSEL DOME WARME DRANKEN D73MM 50ST WIT', 50, 0.03, 'VERPAKKING'),
+
+-- =====================================================
+-- BEKERS - Koude Dranken
+-- =====================================================
+('MILKSHAKEBEKER ENJOY 500CC 50ST PET', 50, 0.11, 'VERPAKKING'),
+('BEKER KOUDE DRANKEN KARTON 300CC 50ST', 50, 0.08, 'VERPAKKING'),
+('BEKER KOUDE DRANKEN KARTON 400CC 50ST', 50, 0.08, 'VERPAKKING'),
+('BEKER KOUDE DRANKEN KARTON 500CC 50ST', 50, 0.09, 'VERPAKKING'),
+('BEKER KOUDE DRANKEN TRANSP. 300ML 50ST PET', 50, 0.10, 'VERPAKKING'),
+('BEKER KOUDE DRANKEN TRANSP. 400ML 50ST PET', 50, 0.11, 'VERPAKKING'),
+('DEKSEL BEKER KOUDE DRANKEN KRUISGAT TRANSP. 150ST', 150, 0.03, 'VERPAKKING'),
+('DEKSEL DOME RPET 95MM 50ST', 50, 0.03, 'VERPAKKING'),
+('BIERBEKER RPP HERBRUIKBAAR TRANSP. 200CC 50ST', 50, 0.08, 'VERPAKKING'),
+
+-- =====================================================
+-- IJSBEKERS
+-- =====================================================
+('IJSBAK WIT 1L EURO 50ST', 50, 0.10, 'VERPAKKING'),
+('IJSBAK CADDY 5L 15ST', 15, 0.88, 'VERPAKKING'),
+('DEKSEL VOOR CADDY IJSBAK 5L WIT 15ST', 15, 0.51, 'VERPAKKING'),
+('IJSBEKER ICE IS (N)ICE KARTON 100ML 50ST', 50, 0.04, 'VERPAKKING'),
+('IJSBEKER ICE IS (N)ICE KARTON 150ML 50ST', 50, 0.05, 'VERPAKKING'),
+('IJSBEKER ICE IS (N)ICE KARTON 200ML 50ST', 50, 0.05, 'VERPAKKING'),
+('IJSBEKER KARTON 160CC PASTELMIX 25ST', 25, 0.07, 'VERPAKKING'),
+('IJSBEKER KARTON 245CC PASTELMIX 25ST', 25, 0.08, 'VERPAKKING'),
+('IJSBEKER KARTON 360CC PASTELMIX 25ST', 25, 0.09, 'VERPAKKING'),
+
+-- =====================================================
+-- RIETJES
+-- =====================================================
+('RIETJE BAMBOE 15CM 25ST', 25, 0.14, 'VERPAKKING'),
+('RIETJE BAMBOE 18CM 25ST', 25, 0.15, 'VERPAKKING'),
+('ECO RIETJE BAMBOE D0,8XH15CM 20ST + 1 BORSTEL', 20, 0.39, 'VERPAKKING'),
+('RIETJES RVS RECHT GOUD 21,4CM 10ST + BORSTEL', 10, 2.10, 'VERPAKKING'),
+('RIETJE PAPIER STREEP D8MM 23CM 100ST', 100, 0.02, 'VERPAKKING'),
+('RIETJE PAPIER STREEP ASS. D6MM 23CM 100ST', 100, 0.02, 'VERPAKKING'),
+('RIETJE PAPIER ASS. D10MM 24CM 100ST', 100, 0.03, 'VERPAKKING'),
+('RIETJES (BUIGZ) PAPIER STREEP ASS. D6MM 24CM 200ST', 200, 0.02, 'VERPAKKING'),
+('RIETJES (BUIGZ.) PAPIER ASS. D8MM 24CM 100ST', 100, 0.03, 'VERPAKKING'),
+('DRINKRIETJE PAPIER ZWART 15CM 200ST', 200, 0.01, 'VERPAKKING'),
+('RIETJE RECHT KARTON WIT D8MM 25CM 100ST', 100, 0.05, 'VERPAKKING'),
+('REFORK DRINKRIETJE BRUIN D6MM 20CM 100ST', 100, 0.05, 'VERPAKKING'),
+('REFORK DRINKRIETJE BRUIN D8MM 24CM 100ST', 100, 0.08, 'VERPAKKING'),
+('REFORK DRINKRIETJE ZWART D8MM 15CM 100ST', 100, 0.05, 'VERPAKKING'),
+('REFORK DRINKRIETJE ZWART D6MM 20CM 100ST', 100, 0.05, 'VERPAKKING'),
+('REFORK DRINKRIETJE ZWART D8MM 24CM 100ST', 100, 0.08, 'VERPAKKING'),
+('RIETJE COMPOSTEERBAAR ZWART 25CM 150ST', 150, 0.04, 'VERPAKKING'),
+
+-- =====================================================
+-- BESTEK
+-- =====================================================
+('BAMBOE EETSTOKJES 100 PAAR', 100, 0.04, 'VERPAKKING'),
+('BAMBOE EETSTOKJES WIT HERBRUIKBAAR 10ST', 10, 0.08, 'VERPAKKING'),
+('MINI VORK BAMBOE 9CM 200ST', 200, 0.04, 'VERPAKKING'),
+('MINI LEPEL BAMBOE 9CM 200ST', 200, 0.05, 'VERPAKKING'),
+('SNACKVORK BAMBOE 13,5CM 100ST', 100, 0.04, 'VERPAKKING'),
+('MES PAPIER GREAT TO GO BRUIN 16,5CM 100ST', 100, 0.14, 'VERPAKKING'),
+('LEPEL PAPIER GREAT TO GO BRUIN 16,5CM 100ST', 100, 0.14, 'VERPAKKING'),
+
+-- =====================================================
+-- CATERING SCHALEN & BORDEN
+-- =====================================================
+('CATERING SCHAAL 6H OVAAL ZWART 1165 35CM 10ST', 10, 0.35, 'VERPAKKING'),
+('CATERING DEKSEL V. SCHAAL 1171 35CM 10ST', 10, 0.42, 'VERPAKKING'),
+('CATERING SCHAAL 6H OVAAL ZWART 1166 45CM 10ST', 10, 0.65, 'VERPAKKING'),
+('CATERING DEKSEL V. SCHAAL 1172 45CM 10ST', 10, 0.82, 'VERPAKKING'),
+('CATERING SCHAAL 6H OVAAL ZWART 1167 55CM 10ST', 10, 1.15, 'VERPAKKING'),
+('CATERING DEKSEL V. SCHAAL 1173 55CM 10ST', 10, 1.41, 'VERPAKKING'),
+('CATERING SCHAAL PALM 35X24XH2,5CM 10ST', 10, 0.80, 'VERPAKKING'),
+('CATERING SCHAAL PALM 45X29XH2,5CM 5ST', 5, 1.33, 'VERPAKKING'),
+('TASTY FOOD CATERINGDOOS 35CM 10ST', 10, 0.81, 'VERPAKKING'),
+('TASTY FOOD CATERINGDOOS 45CM 10ST', 10, 1.45, 'VERPAKKING'),
+('TASTY FOOD CATERINGDOOS 55CM 10ST', 10, 1.69, 'VERPAKKING'),
+('GREEN DISH CATERINGDOOS 45CM 10ST', 10, 1.61, 'VERPAKKING'),
+('D''LIS PRESTIGE CATERING CUP 75ST 163ML', 75, 0.12, 'VERPAKKING'),
+('PARTYSCHAAL DECOR 365MM', 1, 8.22, 'VERPAKKING'),
+('PARTYSCHAAL DECOR 420MM', 1, 10.73, 'VERPAKKING'),
+('PARTYSCHAAL DECOR 460MM', 1, 12.59, 'VERPAKKING'),
+('PARTYSCHAAL DECOR 510MM', 1, 15.72, 'VERPAKKING'),
+('PARTYSCHAAL DECOR 560MM', 1, 18.51, 'VERPAKKING'),
+('PARTYSCHAAL DECOR 610MM', 1, 21.24, 'VERPAKKING'),
+('PARTYSCHAAL DECOR 655MM', 1, 24.51, 'VERPAKKING'),
+('PARTYSCHAAL DECOR 705MM', 1, 27.38, 'VERPAKKING'),
+
+-- =====================================================
+-- BORDEN - Bagasse & Bepulp
+-- =====================================================
+('BORD WIT VIERKANT 26CM 50ST BAGASSE', 50, 0.19, 'VERPAKKING'),
+('CUP ROND 140ML 50ST BAGASSE', 50, 0.06, 'VERPAKKING'),
+('DEKSEL RONDE CUP 140ML 50ST BAGASSE', 50, 0.02, 'VERPAKKING'),
+('SCHAAL WIT 680ML 50ST BAGASSE', 50, 0.13, 'VERPAKKING'),
+('SCHAAL WIT 900ML 50ST BAGASSE', 50, 0.14, 'VERPAKKING'),
+('SCHAAL WIT 1000ML 50ST BAGASSE', 50, 0.12, 'VERPAKKING'),
+('SCHAAL WIT 1150ML 50ST BAGASSE', 50, 0.18, 'VERPAKKING'),
+('BORD NATUREL VIERKANT 15CM 50ST BEPULP', 50, 0.08, 'VERPAKKING'),
+('BORD NATUREL VIERKANT 20CM 50ST BEPULP', 50, 0.11, 'VERPAKKING'),
+('BORD NATUREL VIERKANT 26CM 40ST BEPULP', 40, 0.18, 'VERPAKKING'),
+('BORD NATUREL ROND D18CMXH1,2CM 50ST BEPULP', 50, 0.05, 'VERPAKKING'),
+('BORD NATUREL ROND D20CMXH2CM 50ST BEPULP', 50, 0.13, 'VERPAKKING'),
+('BORD DIEP NATUREL ROND D18CMXH4CM 50ST BEPULP', 50, 0.11, 'VERPAKKING'),
+('BOWL NATUREL D11,4CMXH4,4CM 200ML 50ST BEPULP', 50, 0.06, 'VERPAKKING'),
+('BOWL NATUREL D15CMXH4CM 400ML 50ST BEPULP', 50, 0.07, 'VERPAKKING'),
+
+-- =====================================================
+-- BORDEN - Palm & Fine Dine
+-- =====================================================
+('FINE DINE BORD PALMBLAD 22,5X12XH2,5CM 20ST', 20, 0.31, 'VERPAKKING'),
+('FINE DINE BORD PALMBLAD 26X14XH2,5CM 10ST', 10, 0.50, 'VERPAKKING'),
+('FINE DINE BORD PALMBLAD 33,5X18XH2,5CM 10ST', 10, 0.75, 'VERPAKKING'),
+('PALM TIPJE ROND D55XH20MM 3,5CL 40ST', 40, 0.16, 'VERPAKKING'),
+('PALM TIPJE ROND D70XH25MM 6CL 40ST', 40, 0.17, 'VERPAKKING'),
+('COCONUT KOM ROND D80-130XH60-90MM 200ML 10ST', 10, 0.77, 'VERPAKKING'),
+
+-- =====================================================
+-- BORDEN - Herbruikbaar
+-- =====================================================
+('WIJNGLAS PP OP VOET HERBRUIKBAAR TRANSP 150CC 12ST', 12, 0.13, 'VERPAKKING'),
+('WIJNGLAS PP OP VOET HERBRUIKBAAR TRANSP 200CC 12ST', 12, 0.18, 'VERPAKKING'),
+('CHAMPAGNEGLAS PP HERBRUIKBAAR TRANSP 135CC 10ST', 10, 0.32, 'VERPAKKING'),
+('BORD PP HERBRUIKBAAR ZWART 22CM 12ST', 12, 0.24, 'VERPAKKING'),
+('DEKSEL VOOR BORD PP HERBRUIKBAAR TRANSPARANT 12ST', 12, 0.26, 'VERPAKKING'),
+('FONDUEBORD ROND 5-VAKS PET ZWART 50ST DUPLAST', 50, 0.58, 'VERPAKKING'),
+('DEKSEL FONDUEBORD 5-VAKS 50ST DUPLAST', 50, 0.63, 'VERPAKKING'),
+
+-- =====================================================
+-- VACUUMZAKKEN
+-- =====================================================
+('VACUUMZAKKEN 16X20CM 100ST ITC', 100, 0.04, 'VERPAKKING'),
+('VACUUMZAKKEN 18X27CM 100ST ITC', 100, 0.06, 'VERPAKKING'),
+('VACUUMZAKKEN 20X30CM 100ST ITC', 100, 0.08, 'VERPAKKING'),
+('VACUUMZAKKEN 25X40CM 100ST ITC', 100, 0.13, 'VERPAKKING'),
+('VACUUMZAKKEN 30X40CM 100ST ITC', 100, 0.16, 'VERPAKKING'),
+('VACUUMZAKKEN RELIEF 150X250MM 100ST HENDI', 100, 0.10, 'VERPAKKING'),
+('VACUUMZAKKEN RELIEF 250X350MM 100ST HENDI', 100, 0.23, 'VERPAKKING'),
+('KOOKZAKKEN 40X50CM 100ST', 100, 0.45, 'VERPAKKING'),
+
+-- =====================================================
+-- DIEPVRIESZAKJES & DRAAGZAKKEN
+-- =====================================================
+('DIEPVRIESZAKJES 14X4X26CM 1000ST', 1000, 0.02, 'VERPAKKING'),
+('DIEPVRIESZAKJES 14X4X35CM 1000ST', 1000, 0.03, 'VERPAKKING'),
+('DIEPVRIESZAKJES 14X4X38CM 1000ST', 1000, 0.03, 'VERPAKKING'),
+('DIEPVRIESZAKJES 18X4X50CM 1000ST', 1000, 0.04, 'VERPAKKING'),
+('PAPIEREN DRAAGZAK BRUIN 26X17X26CM 250ST', 250, 0.08, 'VERPAKKING'),
+('PAPIEREN DRAAGZAK BRUIN 32X17X25CM 250ST', 250, 0.10, 'VERPAKKING'),
+('PAPIEREN DRAAGZAK BRUIN KRAFT 32X22X26CM 250ST', 250, 0.10, 'VERPAKKING'),
+('PAPIEREN DRAAGZAK WIT 26X17X25CM 250ST', 250, 0.09, 'VERPAKKING'),
+('PAPIEREN DRAAGZAK WIT 32X17X25CM 250ST', 250, 0.10, 'VERPAKKING'),
+('DRAAGTAS BRUINE KRAFT 36+33X32CM 200ST', 200, 0.66, 'VERPAKKING'),
+('PAPIEREN BROODZAK BRUIN 340X160X100MM 100ST', 100, 0.05, 'VERPAKKING'),
+('BIODORE HEMDDRAAGTAS GROEN 27/7X50CM 100ST', 100, 0.12, 'VERPAKKING'),
+('ISO-VRIESDRAAGTAS 50X42X10,5CM 18L P.ST', 1, 1.63, 'VERPAKKING'),
+
+-- =====================================================
+-- FOLIE & BAKPAPIER
+-- =====================================================
+('FATA EASY FOIL ROLL 50X50CM', 1, 23.48, 'VERPAKKING'),
+('CARTA FATA FOIL ROLL 50CMX10M', 1, 25.78, 'VERPAKKING'),
+('SAUZEN FOLIE 13X13CM 2500ST', 2500, 0.004, 'VERPAKKING'),
+('ALUMINIUM FOLIE 30CM 3X150M WRAPMASTER', 3, 25.63, 'VERPAKKING'),
+('ALUMINIUM FOLIE 45CM 3X150M WRAPMASTER', 3, 34.91, 'VERPAKKING'),
+('ALUMINIUM FOLIE 44CMX150M 11MY', 1, 18.99, 'VERPAKKING'),
+('ALUMINIUM FOLIE 29CMX250M 11MY', 1, 21.61, 'VERPAKKING'),
+('VERSHOUDFOLIE 30CM 3X300M WRAPMASTER', 3, 13.37, 'VERPAKKING'),
+('VERSHOUDFOLIE 45CM 3X300M WRAPMASTER', 3, 17.16, 'VERPAKKING'),
+('VERSHOUDFOLIE 30CMX300M SLIDER', 1, 6.17, 'VERPAKKING'),
+('VERSHOUDFOLIE 45CMX300M SLIDER', 1, 8.74, 'VERPAKKING'),
+('BAKPAPIER 45CM 3X50M WRAPMASTER', 3, 12.90, 'VERPAKKING'),
+('BAKPAPIER OP ROL 40CMX200M', 1, 24.28, 'VERPAKKING'),
+('BAKPAPIER OP FORMAAT 40X60CM 500ST', 500, 0.07, 'VERPAKKING'),
+('INPAKFOLIE BOPP HELDER 50CMX50M', 1, 9.30, 'VERPAKKING'),
+
+-- =====================================================
+-- PIZZA DOZEN
+-- =====================================================
+('PIZZA DOZEN KARTON 26,5X26,5X3CM 200ST', 200, 0.24, 'VERPAKKING'),
+('PIZZA DOZEN KARTON 29X29X4CM 100ST', 100, 0.29, 'VERPAKKING'),
+('PIZZA DOZEN KARTON 33X33X4CM 100ST', 100, 0.33, 'VERPAKKING'),
+('CALZONE DOZEN KARTON 30X16X10CM 100ST', 100, 0.34, 'VERPAKKING'),
+
+-- =====================================================
+-- LABELFRESH STICKERS
+-- =====================================================
+('LABELFRESH STICKER PRO MAANDAG 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER PRO DINSDAG 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER PRO WOENSDAG 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER PRO DONDERDAG 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER PRO VRIJDAG 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER PRO ZATERDAG 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER PRO ZONDAG 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER EASY MAANDAG 1000ST', 1000, 0.008, 'VERPAKKING'),
+('LABELFRESH STICKER EASY DINSDAG 1000ST', 1000, 0.008, 'VERPAKKING'),
+('LABELFRESH STICKER EASY WOENSDAG 1000ST', 1000, 0.008, 'VERPAKKING'),
+('LABELFRESH STICKER EASY DONDERDAG 1000ST', 1000, 0.008, 'VERPAKKING'),
+('LABELFRESH STICKER EASY VRIJDAG 1000ST', 1000, 0.008, 'VERPAKKING'),
+('LABELFRESH STICKER EASY ZATERDAG 1000ST', 1000, 0.008, 'VERPAKKING'),
+('LABELFRESH STICKER EASY ZONDAG 1000ST', 1000, 0.008, 'VERPAKKING'),
+('LABELFRESH STICKER ALLERGENEN 70X45MM 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER WARNING 70X45MM 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER WARNING DIEPVRIES 500ST', 500, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER EXPRESS 7 DAGEN NL/FR 7X250ST', 1750, 0.02, 'VERPAKKING'),
+('LABELFRESH STICKER PRO OPLOSBAAR 7 DAGEN EN 250ST', 250, 0.06, 'VERPAKKING'),
+('LABELFRESH INOX DISPENSER 7 DAGEN', 1, 66.42, 'VERPAKKING'),
+('LABELFRESH MINI DISPENSER INOX', 1, 24.14, 'VERPAKKING'),
+
+-- =====================================================
+-- OVERIG VERPAKKINGSMATERIAAL
+-- =====================================================
+('ELASTIEKJES 1KG NR.18', 1, 10.16, 'VERPAKKING'),
+('PORTIEBEKER SLAGROOM 256ST LOOSE', 256, 0.07, 'VERPAKKING'),
+('REUZEBEKERS +/- 120ST ROND LOOSE''S', 120, 0.10, 'VERPAKKING'),
+('MULTI BAK 1/2KG + DEK 25ST DEPA', 25, 0.41, 'VERPAKKING'),
+('SCHAAL + DEKSEL ZWART 34X25X4CM 5ST', 5, 1.08, 'VERPAKKING'),
+('SCHAAL + DEKSEL ZWART 30X19X4CM 10ST', 10, 1.01, 'VERPAKKING'),
+('VRIESDOOS 2,5L 16ST', 16, 0.63, 'VERPAKKING'),
+('DEKSEL VRIESDOOS 2,5-5L PP WIT 16ST', 16, 0.46, 'VERPAKKING'),
+('VERSHOUDDOOS HERM. GN1/6 MET POMP PP H150MM', 1, 16.21, 'VERPAKKING'),
+('VERSHOUDDOOS HERM. GN1/9 MET POMP 1,5L PP H190MM', 1, 15.43, 'VERPAKKING'),
+('VERSHOUDDOOS GN1/1 H10CM 13,7L HERMETISCH ARAVEN', 1, 18.94, 'VERPAKKING'),
+('THERMOBOX ALL-ROUND 80L 625X425X300MM ZWART', 1, 105.63, 'VERPAKKING'),
+('VOUWBAK WE LOVE FOOD 52,5X35,5X29,5CM 46L ZWART', 1, 16.99, 'VERPAKKING'),
+('LEGE POT ROND + DEKSEL 3L', 1, 2.48, 'VERPAKKING'),
+('FLES MET DOP VERZEGELBAAR 250ML 22ST RPET', 22, 0.36, 'VERPAKKING'),
+('CUP HOUDER 4-VAKS 75ST DUNI', 75, 0.23, 'VERPAKKING'),
+('KARTONNEN VOUWDOOS 350X250X250MM 25ST', 25, 0.72, 'VERPAKKING'),
+('KASSAROLLEN THERMO 57X40X12MM 50ST', 50, 0.72, 'VERPAKKING'),
+('KASSAROLLEN THERMO 80X80X12MM 50ST', 50, 1.56, 'VERPAKKING'),
+('PAPIER DISCOVERY A4 75G WIT 500 VELLEN', 500, 0.01, 'VERPAKKING'),
+('SLAGERSROL 30X24CM 300M 2ST', 2, 4.89, 'VERPAKKING'),
+('VLAGGETJES WIT 500ST', 500, 0.008, 'VERPAKKING'),
+('COCKTAILPRIKKER PARASOL 10CM 150ST', 150, 0.04, 'VERPAKKING'),
+('SERVEERPLATEAU BAMBOE 20 GAATS 500X150X85MM', 1, 10.19, 'VERPAKKING'),
+('SNACKENVELOP BRUIN 15X15CM 100ST DEPA', 100, 0.02, 'VERPAKKING'),
+('WRAP CUP BAMBOE PAPIER 120X85MM 50ST', 50, 0.12, 'VERPAKKING'),
+('APERITIEFBAKJE KARTON KOVA 6CL 56ST', 56, 0.18, 'VERPAKKING'),
+('SAUSCUP CONISH 6CL 5X5XH4,5CM 40ST BAGASTRO', 40, 0.05, 'VERPAKKING'),
+('PLASTIEK APERITIEFSCHAALTJE LAKE 90ST TRANSPARANT', 90, 0.26, 'VERPAKKING'),
+('DESSERTCUP (VOETBEKER) 150CC PS 25ST', 25, 0.12, 'VERPAKKING'),
+('DEKSEL DESSERTCUP (VOETBEKER) 150CC 25ST', 25, 0.05, 'VERPAKKING'),
+('BONBONKUIPJES CUVET WIT D58MM 26/16MM 1000ST', 1000, 0.004, 'VERPAKKING'),
+('BONBONKUIPJES CUVET WIT D88MM 40/24MM 1000ST', 1000, 0.006, 'VERPAKKING'),
+('BONBONKUIPJES CUVET WIT D120MM 65/27MM 1000ST', 1000, 0.014, 'VERPAKKING'),
+('PUNTZAKJES HOUT FSC 45X90/130MM 100ST', 100, 0.06, 'VERPAKKING'),
+('PUNTZAKJES HOUT FSC 60X115/170MM 75ST', 75, 0.09, 'VERPAKKING'),
+('BLOKBODEMZAKJES TRANSP. OPP 40MY 6X2,2XH20CM 250ST', 250, 0.04, 'VERPAKKING'),
+('TIPZAKKEN VOOR SNOEP 18X37CM NEUTRAAL 250ST', 250, 0.04, 'VERPAKKING'),
+('TIPZAKKEN VOOR SNOEP 25X46CM NEUTRAAL 250ST', 250, 0.06, 'VERPAKKING'),
+('KRAFTZAKKEN (1KG) 180X285MM BRUIN 250ST', 250, 0.06, 'VERPAKKING'),
+('ECOSY BROODJESZAKJE 14XH15CM C&T', 1, 6.14, 'VERPAKKING'),
+('KLEEFBANDAPPARAAT', 1, 6.61, 'VERPAKKING'),
+('KLEEFBAND PVC 19MMX66M 6ST', 6, 1.32, 'VERPAKKING'),
+
+-- =====================================================
+-- GUACAMOLE & KIDS PRODUCTEN
+-- =====================================================
+('GUACAMOLE BAKJE 500G DV LA', 1, 5.41, 'SAUZEN'),
+('GUACAMOLE UHP ZAKKEN 1KG DV LA', 1, 10.12, 'SAUZEN'),
+('KIDSBOX MENUDOOSJES SUNNY SNACK 48ST VAN ZON', 48, 0.41, 'VERPAKKING'),
+('KIDSBOX MENUDOOSJES 204X110X120MM 48ST', 48, 0.34, 'VERPAKKING'),
+('SPEELGOED KIDS BOX 48ST', 48, 0.24, 'VERPAKKING'),
+('SPEELGOED SUNNY BOX MEISJES 48ST', 48, 0.67, 'VERPAKKING'),
+('SPEELGOED SUNNY BOX JONGENS 48ST', 48, 0.67, 'VERPAKKING'),
+('CADEAUVERPAKKING WIJNDOOS PLAT 3 FLESSEN ZWART', 1, 2.56, 'VERPAKKING'),
+
+-- =====================================================
+-- TRAITEUR SALADES
+-- =====================================================
+
+-- =====================================================
+-- SALADES - Hamal Kip
+-- =====================================================
+('HAMAL KIP SALADE 1KG', 1, 12.64, 'SALADES'),
+('HAMAL KIP ANDALOUSE SALADE 1KG', 1, 12.64, 'SALADES'),
+('HAMAL KIP CURRY SALADE 1KG', 1, 12.69, 'SALADES'),
+('HAMAL KIP HAWAI SALADE 1KG', 1, 12.64, 'SALADES'),
+('HAMAL KIP PIKANT SALADE 1KG', 1, 12.64, 'SALADES'),
+('HAMAL KIP SAMOURAI 1KG', 1, 13.27, 'SALADES'),
+('HAMAL KIPSALADE MET HONING EN MOSTERD 1KG', 1, 13.27, 'SALADES'),
+('HAMAL KIPSALADE GROENE PESTO 1KG', 1, 13.27, 'SALADES'),
+('HAMAL ATELIER GEBRADEN KIPSALADE 1KG', 1, 14.63, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Hamal Vis & Zeevruchten
+-- =====================================================
+('HAMAL GARNAALSALADE 1KG', 1, 26.97, 'SALADES'),
+('HAMAL ROZE GARNAALSALADE 1KG', 1, 17.92, 'SALADES'),
+('HAMAL ROZE GARNAAL COCKTAIL SALADE 1KG', 1, 15.93, 'SALADES'),
+('HAMAL GEROOKTE ATLANTISCHE ZALMSALADE 1KG', 1, 18.21, 'SALADES'),
+('HAMAL ZALMSALADE 1KG', 1, 15.49, 'SALADES'),
+('HAMAL TONIJN MAYONAISE SALADE 1KG', 1, 15.01, 'SALADES'),
+('HAMAL TONIJN PIKANTSALADE 1KG', 1, 15.01, 'SALADES'),
+('HAMAL TONIJN COCKTAILSALADE 1KG', 1, 15.01, 'SALADES'),
+('HAMAL SURIMI SALADE 1KG', 1, 13.10, 'SALADES'),
+('HAMAL SURIMI SALADE MET KRAB 1KG', 1, 14.70, 'SALADES'),
+('HAMAL SCAMPI IN LOOKSAUS 1KG', 1, 21.02, 'SALADES'),
+('HAMAL SCAMPI DIABLO 1KG', 1, 21.02, 'SALADES'),
+('HAMAL HARING SALADE 1KG', 1, 11.20, 'SALADES'),
+('HAMAL NOORDZEESALADE 1KG', 1, 12.77, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Hamal Overig
+-- =====================================================
+('HAMAL SELDERSALADE 1KG', 1, 8.13, 'SALADES'),
+('HAMAL AARDAPPELSALADE 1KG', 1, 5.29, 'SALADES'),
+('HAMAL AARDAPPELSALADE 5KG', 1, 24.94, 'SALADES'),
+('HAMAL MAALTIJD RODE BIETENSLA 1,5KG', 1, 11.84, 'SALADES'),
+('HAMAL AMERICANO/SPREAD MAISON 1,5KG', 1, 15.59, 'SALADES'),
+('HAMAL ATELIER BREYDELHAMSALADE 1KG', 1, 15.76, 'SALADES'),
+('HAMAL EIERSALADE 1KG', 1, 11.36, 'SALADES'),
+('HAMAL EIERSALADE MET SPEK 1KG', 1, 16.71, 'SALADES'),
+('HAMAL VLEESSALADE 1KG', 1, 10.38, 'SALADES'),
+('HAMAL PITA SALADE 1KG', 1, 13.02, 'SALADES'),
+('HAMAL PITA PIKANT SALADE 1KG', 1, 13.89, 'SALADES'),
+('HAMAL LENTE SALADE 1KG', 1, 8.56, 'SALADES'),
+('HAMAL KOMKOMMERSALADE 1KG', 1, 9.35, 'SALADES'),
+('HAMAL HAM-PREI SALADE 1KG', 1, 10.25, 'SALADES'),
+('HAMAL BALLETJES IN TOMATENSAUS SALADE 1KG', 1, 13.07, 'SALADES'),
+('HAMAL ZUIDERSE PENNE 1,25KG', 1, 9.97, 'SALADES'),
+('HAMAL COLESLAW 1,5KG', 1, 9.79, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Van Zon Kip
+-- =====================================================
+('VAN ZON KIPSALADE 1KG', 1, 10.99, 'SALADES'),
+('VAN ZON KIP ANDALOUSE SALADE 1KG', 1, 10.99, 'SALADES'),
+('VAN ZON KIP CURRY SALADE 1KG', 1, 10.77, 'SALADES'),
+('VAN ZON KIP HAWAI SALADE 1KG', 1, 10.99, 'SALADES'),
+('VAN ZON KIP SAMOURAI 1KG', 1, 10.32, 'SALADES'),
+('VAN ZON KIPPENBALLETJES IN BBQ SAUS 1KG', 1, 10.64, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Van Zon Overig
+-- =====================================================
+('VAN ZON AARDAPPELSALADE 1KG', 1, 5.90, 'SALADES'),
+('VAN ZON PITA PIKANT SALADE 1KG', 1, 12.53, 'SALADES'),
+('VAN ZON PITASALADE 1KG', 1, 12.23, 'SALADES'),
+('VAN ZON VLEESSALADE 1KG', 1, 9.79, 'SALADES'),
+('VAN ZON ROZE TIJGERGARNAAL IN LOOKSAUS 1KG', 1, 21.39, 'SALADES'),
+('VAN ZON GEBRAAD IN MOSTERDSAUS 1KG', 1, 12.95, 'SALADES'),
+('VAN ZON TONIJN MAYONAISE SALADE 1KG', 1, 13.56, 'SALADES'),
+('VAN ZON TONIJN PIKANT SALADE 1KG', 1, 13.21, 'SALADES'),
+('VAN ZON TONIJN COCKTAIL SALADE 1KG', 1, 13.21, 'SALADES'),
+('VAN ZON ATLANTISCHE ZALMSALADE 1KG', 1, 13.09, 'SALADES'),
+('VAN ZON SURIMI SALADE 1KG', 1, 11.65, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Bieze
+-- =====================================================
+('SALADE 4-JAARGETIJDEN 3KG BIEZE', 1, 19.79, 'SALADES'),
+('KOMKOMMER ROOM SALADE 3KG BIEZE', 1, 19.07, 'SALADES'),
+('FARMER SALADE 3KG BIEZE', 1, 15.52, 'SALADES'),
+('AMERICAN COLESLAW 3KG BIEZE', 1, 18.60, 'SALADES'),
+('GRIEKSE WITTE KOOL 3KG BIEZE', 1, 14.20, 'SALADES'),
+('AARDAPPELSALADE 3KG BIEZE', 1, 12.30, 'SALADES'),
+('RODE KOOL SALADE 3KG BIEZE', 1, 10.98, 'SALADES'),
+('COUSCOUS MAROKKAANSE STIJL 1KG BIEZE', 1, 8.17, 'SALADES'),
+('COUSCOUS INDIASE STIJL 1KG BIEZE', 1, 8.45, 'SALADES'),
+('QUINOA 1KG BIEZE', 1, 11.00, 'SALADES'),
+('PASTA PESTO 3KG BIEZE', 1, 17.00, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Maitre Olivier
+-- =====================================================
+('PASTASALADE PESTO 2KG MAITRE OLIVIER', 1, 13.58, 'SALADES'),
+('PASTASALADE POMODORINI 2KG MAITRE OLIVIER', 1, 11.43, 'SALADES'),
+('PASTASALADE TOSCANA 2KG MAITRE OLIVIER', 1, 10.70, 'SALADES'),
+('NOODLES LOVER 1,25KG MAITRE OLIVIER', 1, 9.82, 'SALADES'),
+('TABOULE ORIENTAL 2KG MAITRE OLIVIER', 1, 8.71, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Maurice Mathieu
+-- =====================================================
+('KIP CURRY SALADE 1KG MAURICE MATHIEU', 1, 12.62, 'SALADES'),
+('SURIMISALADE 1KG MAURICE MATHIEU', 1, 13.43, 'SALADES'),
+('TONIJNSALADE 1KG MAURICE MATHIEU', 1, 14.93, 'SALADES'),
+('BOUILLIESALADE 1KG MAURICE MATHIEU', 1, 16.54, 'SALADES'),
+('PITASALADE 1KG MAURICE MATHIEU', 1, 12.62, 'SALADES'),
+('EIERSALADE 1KG MAURICE MATHIEU', 1, 11.19, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Cuisin'Easy
+-- =====================================================
+('CUISIN''EASY BELLA CIAO 1,25KG', 1, 9.23, 'SALADES'),
+('CUISIN''EASY GREEN VALLEY 1,25KG', 1, 7.33, 'SALADES'),
+('CUISIN''EASY INDIAN SUMMER 1,25KG', 1, 9.23, 'SALADES'),
+('CUISIN''EASY SPARTACUS 1,25KG', 1, 9.20, 'SALADES'),
+('CUISIN''EASY SULTAN OF SWING 1,25KG', 1, 7.94, 'SALADES'),
+('CUISIN''EASY SUNNY VIBES 1,25KG', 1, 7.32, 'SALADES'),
+('CUISIN''EASY NORDIC SOUL 1,25KG', 1, 7.01, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Traiteur Pierrot
+-- =====================================================
+('SWEETPEPPERS GEVULD ROOMKAAS 1KG TRAITEUR PIERROT', 1, 19.58, 'SALADES'),
+('OLIJVEN ITALIA MIX 1KG TRAITEUR PIERROT', 1, 11.53, 'SALADES'),
+('PREPARE PREMIUM 180G TRAITEUR PIERROT', 1, 2.78, 'SALADES'),
+('PREPARE DU CHEF 1,25KG TRAITEUR PIERROT', 1, 13.01, 'SALADES'),
+
+-- =====================================================
+-- SALADES - Overig
+-- =====================================================
+('OCTOPUSSALADE 1KG EURO DELICES', 1, 18.88, 'SALADES'),
+('HOUMOUS ORIGINAL 800G GRANOLIVA', 1, 7.12, 'SALADES'),
+('TABOULE CITROEN EN MUNT 1KG', 1, 6.75, 'SALADES'),
+('PASTA SALADE PROVENCIAL 3KG POMBERG', 1, 23.55, 'SALADES'),
+
+-- =====================================================
+-- CONSERVEN
+-- =====================================================
+
+-- =====================================================
+-- CONSERVEN - Augurken & Ajuintjes
+-- =====================================================
+('AUGURKEN 50/60 10L NVR KROON', 1, 18.20, 'CONSERVEN'),
+('AUGURKEN 10,2L 50/60 UYTTEWAAL', 1, 18.38, 'CONSERVEN'),
+('AUGURKEN 680G KROON', 1, 2.50, 'CONSERVEN'),
+('AUGURKEN ZUUR ZEER FIJN 2,1L DL', 1, 14.07, 'CONSERVEN'),
+('AUGURKEN GROOT D ZOET ZUUR 2,65L UYTTEWAAL', 1, 7.28, 'CONSERVEN'),
+('AUGURKEN BLOKJES ZOET ZUUR 3L UYTTEWAAL', 1, 7.93, 'CONSERVEN'),
+('AUGURKEN GESN. FIJN (KOMKOMMER) 2,65L UYTTEWAAL', 1, 8.91, 'CONSERVEN'),
+('AUGURKEN DILL CHIPS GESNEDEN 3L UYTTEWAAL', 1, 7.06, 'CONSERVEN'),
+('AUGURKEN SANDWICH SLICES 2,65L UYTTEWAAL', 1, 10.89, 'CONSERVEN'),
+('AUGURKEN ZOET-ZUUR 2X2,4L KROON', 1, 15.34, 'CONSERVEN'),
+('AUGURKEN A KLEIN ZOET-ZUUR 2X2,5L KROON', 1, 22.83, 'CONSERVEN'),
+('AUGURKEN DILL CHIPS GESNEDEN 2X2,4L KROON', 1, 13.20, 'CONSERVEN'),
+('AUGURKEN SANDWICH ZOET-ZUUR 2X2,4L KROON', 1, 23.73, 'CONSERVEN'),
+('AUGURKEN GESN. FIJN (KOMKOMMER) 2X2,4L KROON', 1, 11.60, 'CONSERVEN'),
+('AUGURKEN EXTRA FIJN ZUUR 1,7L KUHNE', 1, 10.48, 'CONSERVEN'),
+('GURKENTOPF ZOETZUUR 1,7L KUHNE', 1, 5.09, 'CONSERVEN'),
+('QALITA AUGURKEN DILL CHIPS 2,65L', 1, 5.39, 'CONSERVEN'),
+('QALITA AUGURKEN GESN. FIJN (KOMKOMMER) 2,65L', 1, 6.29, 'CONSERVEN'),
+('BICKY AUGURK GESN. FIJN 2X2,3KG (KOMKOMMER)', 1, 15.21, 'CONSERVEN'),
+('AJUINTJES ZUUR 2,1L DL', 1, 14.98, 'CONSERVEN'),
+('AJUINTJES COCKTAIL ZOET ZUUR 2,65L UYTTEWAAL', 1, 9.14, 'CONSERVEN'),
+('AMSTERDAMSE AJUINTJES 2,65L UYTTEWAAL', 1, 8.46, 'CONSERVEN'),
+('AJUINTJES ZUUR 2,65L UYTTEWAAL', 1, 9.41, 'CONSERVEN'),
+('AJUINTJES ZOET-ZUUR 700G KROON', 1, 2.61, 'CONSERVEN'),
+('AJUINTJES ZOET-ZUUR 2X2,4L KROON', 1, 15.67, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Tomatenproducten
+-- =====================================================
+('TOMATEN GEPELD 1/2L DIADEM', 1, 0.88, 'CONSERVEN'),
+('TOMATEN GEPELD 6X1L DIADEM/VICTORIA', 1, 9.11, 'CONSERVEN'),
+('TOMATEN GEPELD 3L DIADEM', 1, 3.99, 'CONSERVEN'),
+('TOMATEN GEPELD 3L ELVEA', 1, 7.19, 'CONSERVEN'),
+('TOMATEN GEHAKT (BLOKJES) 3L DIADEM', 1, 4.19, 'CONSERVEN'),
+('TOMATEN PELATI POMODORE 2,5KG MUTTI', 1, 6.65, 'CONSERVEN'),
+('TOMATENPULP 3L FAGIANI', 1, 4.99, 'CONSERVEN'),
+('TOMATENPULP 10KG DUE FAGIANI', 1, 19.02, 'CONSERVEN'),
+('TOMATENPULP 2,5KG BLIK ELVEA', 1, 6.90, 'CONSERVEN'),
+('TOMATENPULP 10KG ELVEA ASEPTISCHE ZAK', 1, 28.91, 'CONSERVEN'),
+('TOMATENPULP EXTRA DIK 4,1KG ELVEA', 1, 11.42, 'CONSERVEN'),
+('TOMATENPULP / PASSATA 1KG BRIK DIADEM', 1, 1.65, 'CONSERVEN'),
+('TOMATENPULP POLPA DI POMODORE 2X5KG MUTTI', 1, 18.81, 'CONSERVEN'),
+('TOMATENPUREE 5L MAESTRO', 1, 8.07, 'CONSERVEN'),
+('TOMATENPUREE 6X1/2L DIADEM', 1, 6.16, 'CONSERVEN'),
+('TOMATENPUREE 6X1L DIADEM', 1, 10.25, 'CONSERVEN'),
+('TOMATENPUREE DUBBEL 800G 28/30% ELVEA', 1, 4.39, 'CONSERVEN'),
+('TOMATENPUREE DUBBEL 4,5KG 28/30% ELVEA', 1, 26.77, 'CONSERVEN'),
+('TOMATENPUREE DUBBEL 6X400G 28/30% ELVEA', 1, 14.55, 'CONSERVEN'),
+('TOMATENPUREE DUBBEL 28/30% 4X70G ELVEA', 1, 4.10, 'CONSERVEN'),
+('TOMATENBLOKJES 6X400G ELVEA', 1, 14.61, 'CONSERVEN'),
+('TOMATENBLOKJES 3X800G ELVEA', 1, 13.89, 'CONSERVEN'),
+('TOMATENBLOKJES 2,5KG ELVEA', 1, 7.09, 'CONSERVEN'),
+('TOMATENBLOKJES M/VERSE GROENTEN 3X800G ELVEA', 1, 16.15, 'CONSERVEN'),
+('CUBETTI TOMATENBLOKJES ITAL. KRUIDEN 6X400G ELVEA', 1, 23.33, 'CONSERVEN'),
+('CUBETTI TOMATENBLOKJES LOOK 6X400G ELVEA', 1, 23.33, 'CONSERVEN'),
+('TOMATEN PASSATA/POLPA 70CL MUTTI', 1, 2.05, 'CONSERVEN'),
+('TOMATEN PASSATA/POLPA CON BASILICO 70CL MUTTI', 1, 2.51, 'CONSERVEN'),
+('TOMATEN PASSATA/POLPA 2,5L MUTTI', 1, 5.23, 'CONSERVEN'),
+('TOMATEN PASSATA/POLPA 4,25L MUTTI', 1, 7.94, 'CONSERVEN'),
+('PASSATA GEZEEFDE TOMATEN 1KG ELVEA', 1, 3.05, 'CONSERVEN'),
+('PASSATA GEZEEFDE TOMATEN 2,55KG ELVEA', 1, 8.05, 'CONSERVEN'),
+('KERSTOMAAT 3L GALLETTO', 1, 5.40, 'CONSERVEN'),
+('KERSTOMAAT GEMARINEERD 1KG SUD''N''SOL', 1, 17.75, 'CONSERVEN'),
+('KERSTOMAAT 350G GRANOLIVA', 1, 6.79, 'CONSERVEN'),
+('TOMATEN GEMARINEERD 1KG SUD''N''SOL', 1, 14.72, 'CONSERVEN'),
+('QALITA ZONGEDROOGDE TOMATEN 1KG', 1, 10.19, 'CONSERVEN'),
+('ZONGEDROOGDE TOMATENPUREE 450G BRESC', 1, 6.49, 'CONSERVEN'),
+('TOMATEN SALSA 1KG BRESC', 1, 12.17, 'CONSERVEN'),
+('PIZZASAUS AROMATIZZATA 4,1KG MUTTI', 1, 28.71, 'CONSERVEN'),
+('PIZZASAUS CLASSICA NATUREL 4,1KG MUTTI', 1, 9.57, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Olijven
+-- =====================================================
+('OLIJVEN GROEN ONTPIT 370ML SEVILLANA', 1, 1.88, 'CONSERVEN'),
+('OLIJVEN GROEN ONTPIT 935ML SEVILLANA', 1, 4.30, 'CONSERVEN'),
+('OLIJVEN GROEN ONTPIT 4L GLAS SEVILLANA', 1, 18.81, 'CONSERVEN'),
+('OLIJVEN GROEN ONTPIT 4,4KG BLIK SEVILLANA', 1, 17.62, 'CONSERVEN'),
+('OLIJVEN GROEN GESNEDEN 2,85KG SEVILLANA', 1, 12.37, 'CONSERVEN'),
+('OLIJVEN GROEN M/ ROOD PIMENT 935ML SEVILLANA', 1, 4.83, 'CONSERVEN'),
+('OLIJVEN M/RODE PIMENT 370ML SEVILLANA', 1, 2.16, 'CONSERVEN'),
+('OLIJVEN M/RODE PIMENT 4L SEVILLANA', 1, 19.61, 'CONSERVEN'),
+('OLIJVEN ZWART ONTPIT 370ML SEVILLANA', 1, 1.88, 'CONSERVEN'),
+('OLIJVEN ZWART ONTPIT 935ML SEVILLANA', 1, 4.30, 'CONSERVEN'),
+('OLIJVEN ZWART ONTPIT 4L GLAS SEVILLANA', 1, 18.19, 'CONSERVEN'),
+('OLIJVEN ZWART ONTPIT 4,4KG BLIK SEVILLANA', 1, 17.98, 'CONSERVEN'),
+('OLIJVEN ZWART GESNEDEN 3KG A10 KAMIL', 1, 9.02, 'CONSERVEN'),
+('OLIJVEN ONTPIT GROEN NATUREL 1,8KG NOTEKRAKER', 1, 18.31, 'CONSERVEN'),
+('OLIJVEN ONTPIT KNOFLOOK 2KG DE NOTEKRAKER', 1, 28.37, 'CONSERVEN'),
+('OLIJVEN ONTPIT PROVENCALE 2KG DE NOTEKRAKER', 1, 28.37, 'CONSERVEN'),
+('OLIJVEN TAGGIASCA ZONDER PIT 950G', 1, 19.56, 'CONSERVEN'),
+('KONINGSOLIJVEN GROEN MET LOOKMARINADE 1KG', 1, 11.88, 'CONSERVEN'),
+('OLIJVEN GROEN +ZWART BASIL ONTPIT +-600G KUHLMANN', 1, 10.84, 'CONSERVEN'),
+('OLIJVENMIX BONT 750G KUHLMANN', 1, 16.22, 'CONSERVEN'),
+('OLIJVEN & KAAS 400G GRANOLIVA', 1, 6.76, 'CONSERVEN'),
+('OLIJVEN & GENOVESE BASILICUM 400G GRANOLIVA', 1, 6.29, 'CONSERVEN'),
+('OLIJVENMIX APERO 400G GRANOLIVA', 1, 6.36, 'CONSERVEN'),
+('OLIJVEN PITTIG 400G GRANOLIVA', 1, 5.89, 'CONSERVEN'),
+('OLIJVEN KNOFLOOK 400G GRANOLIVA', 1, 5.89, 'CONSERVEN'),
+('OLIJVEN KNOFLOOK 2,5KG GRANOLIVA', 1, 24.98, 'CONSERVEN'),
+('OLIJVEN MEDITERRAANS GEMARINEERD 800G GRANOLIVA', 1, 9.95, 'CONSERVEN'),
+('OLIJVEN PITTIG GEMARINEERD 800G GRANOLIVA', 1, 10.32, 'CONSERVEN'),
+('ZWARTE OLIJVEN EXTRA MET PIT 700G KOY SEFASI', 1, 4.70, 'CONSERVEN'),
+('GROENE OLIJVEN MET PIT 700G KOY SEFASI', 1, 5.42, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Tapenades & Pesto
+-- =====================================================
+('TAPENADE TOMAAT 400G GRANOLIVA', 1, 6.38, 'CONSERVEN'),
+('TAPENADE TOMAAT 800G GRANOLIVA', 1, 9.32, 'CONSERVEN'),
+('TAPENADE GROENE OLIJVEN 400G GRANOLIVA', 1, 7.42, 'CONSERVEN'),
+('TAPENADE ZWARTE OLIJVEN 400G GRANOLIVA', 1, 6.74, 'CONSERVEN'),
+('TAPENADE TOSCAANS 400G GRANOLIVA', 1, 5.71, 'CONSERVEN'),
+('TAPENADE ZOETE PEPERS ROOMKAAS 400G GRANOLIVA', 1, 8.27, 'CONSERVEN'),
+('TAPENADE ZOETE PEPER ROOMKAAS 800G GRANOLIVA', 1, 12.26, 'CONSERVEN'),
+('TAPENADE SWEETBITE 800G GRANOLIVA', 1, 11.50, 'CONSERVEN'),
+('PESTO VERDE SPREAD 400G GRANOLIVA', 1, 9.22, 'CONSERVEN'),
+('PESTO ROSSO SPREAD 400G GRANOLIVA', 1, 6.75, 'CONSERVEN'),
+('PESTO CULINAIR 800G GRANOLIVA', 1, 15.96, 'CONSERVEN'),
+('PESTO BASILICUM VEGAN 250G LISIMO', 1, 5.13, 'CONSERVEN'),
+('PESTO NOTEN 250G LISIMO', 1, 5.08, 'CONSERVEN'),
+('PESTO RUCOLA 250G LISIMO', 1, 4.99, 'CONSERVEN'),
+('TRUFFELTAPENADE SALSA 10% 500G TARTUFORO', 1, 11.52, 'CONSERVEN'),
+('SAUS TRUFFEL/CHAMPIGNON 500G TAPENADE', 1, 19.28, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Groenten
+-- =====================================================
+('GROENTEMENGELING 3L NOLIKO', 1, 7.12, 'CONSERVEN'),
+('GROENTEMENGELING 6X1L NOLIKO', 1, 14.16, 'CONSERVEN'),
+('GROENTEMENGELING 6X1/2L D''AUCY', 1, 13.76, 'CONSERVEN'),
+('ERWTEN EXTRA FIJN 3L FRESHCAN', 1, 8.01, 'CONSERVEN'),
+('ERWTEN EXTRA FIJN 6X1L NOLIKO', 1, 16.19, 'CONSERVEN'),
+('ERWTEN EXTRA FIJN 6X1/2L NOLIKO', 1, 8.90, 'CONSERVEN'),
+('ERWTEN+WORTELEN ZEER FIJN 3L NOLIKO', 1, 7.67, 'CONSERVEN'),
+('ERWTEN+WORTELEN EXTRA FIJN 6X1L FRESHCAN', 1, 15.38, 'CONSERVEN'),
+('ERWTEN+WORTELEN EXTRA FIJN 6X1/2L NOLIKO', 1, 9.31, 'CONSERVEN'),
+('ERWTEN MET WASABILAAGJE 140G BLIK', 1, 1.87, 'CONSERVEN'),
+('SPLITERWTEN VIVIEN PAILLE 5KG', 1, 12.82, 'CONSERVEN'),
+('PRINSESSENBONEN HEEL 3L FRESHCAN', 1, 6.50, 'CONSERVEN'),
+('PRINSESSENBONEN HEEL 5L FRESHCAN', 1, 8.97, 'CONSERVEN'),
+('PRINSESSENBONEN HEEL 6X1L (FRESHCAN)', 1, 14.16, 'CONSERVEN'),
+('PRINSESSENBONEN GEBROKEN 5L NOLIKO', 1, 6.65, 'CONSERVEN'),
+('PRINSESBONEN (SPERZIE) HEEL EX. FIJN 800G F. STATE', 1, 2.77, 'CONSERVEN'),
+('WITTE BONEN 3L NOLIKO', 1, 6.57, 'CONSERVEN'),
+('WITTE BONEN 6X1L NOLIKO', 1, 14.57, 'CONSERVEN'),
+('RODE BONEN KIDNEY 3X400G FIRST STATE', 1, 4.06, 'CONSERVEN'),
+('RODE BONEN KIDNEY 2,5KG FIRST STATE', 1, 6.54, 'CONSERVEN'),
+('KIKKERERWTEN LA PALMA 1/2L', 1, 0.81, 'CONSERVEN'),
+('KIKKERERWTEN LA PALMA 3L', 1, 3.71, 'CONSERVEN'),
+('KIKKERERWTEN 400G', 1, 1.41, 'CONSERVEN'),
+('KIKKERERWTEN 500G', 1, 2.61, 'CONSERVEN'),
+('KIKKERERWTEN 570G BEYCO', 1, 1.14, 'CONSERVEN'),
+('MAISKORRELS 3L FIRST STATE', 1, 5.69, 'CONSERVEN'),
+('MAISKORRELS 6X1/2L BLIK DIADEM', 1, 8.08, 'CONSERVEN'),
+('BABY MAIS 3X425G GOLDEN KEY', 1, 5.06, 'CONSERVEN'),
+('SPINAZIE 660G NOLIKO', 1, 2.11, 'CONSERVEN'),
+('AARDAPPELEN 3L NOLIKO', 1, 7.47, 'CONSERVEN'),
+('GERASPTE WORTEL 3L UYTTEWAAL / GUNDELSHEIM', 1, 6.30, 'CONSERVEN'),
+('GERASPTE SELDER 3L UYTTEWAAL', 1, 6.81, 'CONSERVEN'),
+('RODE BIET SCHIJFJES 2,65L POT UYTTEWAAL', 1, 5.87, 'CONSERVEN'),
+('RODE KOOL+APPEL 720ML HAK', 1, 3.13, 'CONSERVEN'),
+('ZUURKOOL 1L KRAMER', 1, 1.99, 'CONSERVEN'),
+('ZUURKOOL 10L KRAMER', 1, 17.06, 'CONSERVEN'),
+('ZUURKOOL IN WITTE WIJN 810G SAVICO', 1, 3.58, 'CONSERVEN'),
+('ZUURKOOL IN WITTE WIJN 3L SAVICO', 1, 14.27, 'CONSERVEN'),
+('WITTE KOOL SALADE 2X2,4L KROON', 1, 15.03, 'CONSERVEN'),
+('HOLLANDSE SALADE 2,65L UYTTEWAAL', 1, 7.91, 'CONSERVEN'),
+('ZIGEUNERSALADE 3L UYTTEWAAL', 1, 9.97, 'CONSERVEN'),
+('PAPRIKASALADE 2,65L KUHNE', 1, 11.87, 'CONSERVEN'),
+('SCHORSENEREN 6X1L FRESHCAN', 1, 21.04, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Champignons
+-- =====================================================
+('CHAMPIGNONS GESNEDEN MIDDEL 0,5L LUTECE', 1, 2.40, 'CONSERVEN'),
+('CHAMPIGNONS GESN.MIDDEL 6X1L LUTECE', 1, 27.16, 'CONSERVEN'),
+('CHAMPIGNONS GESNED. MIDDEL 2DE KEUS 3L GREENYARD', 1, 13.16, 'CONSERVEN'),
+('CHAMPIGNONS GESNED. HOTEL 3DE KEUS 3L GREENYARD', 1, 10.12, 'CONSERVEN'),
+('CHAMPIGNONS GESNED. MIDDEL 6X3L BLAUW FRESCO', 1, 56.44, 'CONSERVEN'),
+('CHAMPIGNONS SCHIJFJES HOTEL 1L DIADEM', 1, 2.69, 'CONSERVEN'),
+('CHAMPIGNONS SCHIJFJES HOTEL 6X3L DIADEM', 1, 43.71, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Asperges & Artisjokken
+-- =====================================================
+('ASPERGES HEEL 330G GLAS AVILA', 1, 2.06, 'CONSERVEN'),
+('ASPERGES HEEL 800ML LYS DE FRANCE', 1, 3.57, 'CONSERVEN'),
+('ASPERGES STUKKEN (CUTS EN TIPS) 3L LYS DE FRANCE', 1, 8.04, 'CONSERVEN'),
+('ASPERGES STUKKEN (CENTER CUTS) 3L A10 LYS D.FRANCE', 1, 7.42, 'CONSERVEN'),
+('ARTISJOK KWARTJES 3L', 1, 8.22, 'CONSERVEN'),
+('ARTISJOK HARTEN 6/8 3X390G AVILA', 1, 9.21, 'CONSERVEN'),
+('ARTISJOK BODEMS 5/7 3X390G AVILA', 1, 8.89, 'CONSERVEN'),
+('ARTISJOK HARTEN 25/30 3L DIADEM', 1, 11.46, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Pepers & Kappers
+-- =====================================================
+('GROENE PEPERS 60G BLIK AVILA', 1, 1.55, 'CONSERVEN'),
+('GROENE PEPERS BLIK 180G AVILA', 1, 2.57, 'CONSERVEN'),
+('GROENE PEPERS 800G BLIK AVILA', 1, 7.34, 'CONSERVEN'),
+('PEPERS GROEN OP SAP 210G VERSTEGEN', 1, 9.36, 'CONSERVEN'),
+('PEPERS GROEN OP SAP 850G VERSTEGEN', 1, 24.15, 'CONSERVEN'),
+('PEPERS GROEN 1,5KG DE NOTEKRAKER', 1, 13.99, 'CONSERVEN'),
+('JALAPENO GROENE PEPERS SCHIJVEN 2,75KG AVILA', 1, 9.87, 'CONSERVEN'),
+('JALAPENO GESN. SMOKY MOUNTAIN 2,89KG BLIK LA FOODS', 1, 9.53, 'CONSERVEN'),
+('JALAPENO CHILLIES GROEN 190G DON ENRICO MEXICO', 1, 2.39, 'CONSERVEN'),
+('JALAPENO PEPERS SCHIJFJES 3KG DIADEM', 1, 7.36, 'CONSERVEN'),
+('PAPRIKA ROOD 470G BLIK', 1, 11.84, 'CONSERVEN'),
+('PAPRIKA ROOD GESNEDEN 2X2,4L KROON', 1, 19.72, 'CONSERVEN'),
+('PAPRIKA''S ROOD GEROOSTERD 500ML FIRST STATE', 1, 4.41, 'CONSERVEN'),
+('SWEETY DROPS 300G GRANOLIVA', 1, 9.66, 'CONSERVEN'),
+('ZOETE PEPERS MET ROOMKAAS 700G GRANOLIVA', 1, 17.31, 'CONSERVEN'),
+('ESPELETTE PIMENT POEDER 40G', 1, 7.73, 'CONSERVEN'),
+('KAPPERTJES 1L DL', 1, 21.81, 'CONSERVEN'),
+('KAPPERTJES SURFINES 720G AVILA', 1, 5.90, 'CONSERVEN'),
+('KAPPERTJES NON PAREILLES 720G AVILA', 1, 6.11, 'CONSERVEN'),
+('KAPPERS CAPOTES DIK 720ML NESTOR', 1, 3.29, 'CONSERVEN'),
+('KAPPERAPPELTJES 2KG DE NOTEKRAKER', 1, 20.67, 'CONSERVEN'),
+('KAPPERAPPELTJES 720G DELICIAS', 1, 4.82, 'CONSERVEN'),
+('APPELKAPPERS 820ML DIADEM', 1, 6.17, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Aziatisch & Pickles
+-- =====================================================
+('ATJAR TJAMPOER 720G', 1, 3.89, 'CONSERVEN'),
+('ATJAR TJAMPOER 2X2,4L KROON', 1, 16.18, 'CONSERVEN'),
+('ATJAR TAUGE + PAPRIKA 2X2,4L KROON', 1, 15.52, 'CONSERVEN'),
+('BAMBOESCHEUTEN 567G BLIK', 1, 1.49, 'CONSERVEN'),
+('GEMBERBOLLETJES 250G', 1, 2.99, 'CONSERVEN'),
+('GEMBERSCHIJFJES IN AZIJN (PICKLED GINGER) 454G TD', 1, 3.84, 'CONSERVEN'),
+('PICKLES MIX 2,4KG KUHNE', 1, 14.87, 'CONSERVEN'),
+('LIMOEN PICKLES 300G SWAD', 1, 1.85, 'CONSERVEN'),
+('MANGO LIMOEN PICKLES 300G SWAD', 1, 2.01, 'CONSERVEN'),
+('POMPOENBLOKJES MET HONING 2,65L KUHNE', 1, 10.36, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Fruit
+-- =====================================================
+('ANANAS 4 SCHIJVEN 1/4L DIADEM', 1, 1.09, 'CONSERVEN'),
+('ANANAS 10 SCHIJVEN LICHTE SIROOP 6X567G DIADEM', 1, 11.73, 'CONSERVEN'),
+('ANANAS 3L A10 50/60 SCHIJVEN HERCULES (OP SIROOP)', 1, 8.55, 'CONSERVEN'),
+('ANANAS BLOKJES 6X1/2L DIADEM', 1, 10.92, 'CONSERVEN'),
+('ANANASBLOKJES TIDBITS 3L A10 HERCULES', 1, 8.25, 'CONSERVEN'),
+('PERZIKEN HALVE 3L DIADEM', 1, 5.72, 'CONSERVEN'),
+('PERZIKEN HALVE 6X1/2L DIADEM', 1, 7.29, 'CONSERVEN'),
+('PERZIKEN HALVE 6X1L DIADEM', 1, 11.33, 'CONSERVEN'),
+('PERZIKSCHIJFJES OP SIROOP 3L DIADEM/VICTORIA', 1, 6.77, 'CONSERVEN'),
+('PERZIKSCHIJFJES 6X1L DIADEM', 1, 11.73, 'CONSERVEN'),
+('PEREN HALVE 3L HERCULES', 1, 8.28, 'CONSERVEN'),
+('PEREN HALVE 6X1L DIADEM', 1, 17.40, 'CONSERVEN'),
+('PEREN HALVE 6X1/2L DIADEM', 1, 10.12, 'CONSERVEN'),
+('PEREN BABY 3X1/2L DIADEM', 1, 5.87, 'CONSERVEN'),
+('ABRIKOZEN 6X1L DIADEM', 1, 11.33, 'CONSERVEN'),
+('FRUITCOCKTAIL 3L HERCULES', 1, 5.66, 'CONSERVEN'),
+('FRUITCOCKTAIL 6X1L DIADEM', 1, 12.55, 'CONSERVEN'),
+('FRUITCOCKTAIL 6X1/2L DIADEM', 1, 6.88, 'CONSERVEN'),
+('MANDARIJNTJES 3X1/4L DIADEM', 1, 4.25, 'CONSERVEN'),
+('MANDARIJNTJES 3X1L DIADEM', 1, 9.92, 'CONSERVEN'),
+('MANDARIJNEN 3KG A10 DIADEM', 1, 10.34, 'CONSERVEN'),
+('APPELS HEEL SIROOP 2,85KG DIADEM', 1, 7.14, 'CONSERVEN'),
+('HELE RODE STOOFPEREN 0,5L AVILA', 1, 2.71, 'CONSERVEN'),
+('HELE RODE STOOFPEREN 2,65KG AVILA', 1, 14.86, 'CONSERVEN'),
+('VIJGEN HEEL 0,5L AVILA', 1, 2.44, 'CONSERVEN'),
+('DRUIVEN ONTPIT GEPELD 425G AVILA', 1, 2.22, 'CONSERVEN'),
+('NOORDKRIEKEN ONTPIT OP SIRO 680G/720ML GLAS NOLIKO', 1, 2.75, 'CONSERVEN'),
+('NOORDKRIEKEN ONTPIT ALLBAK 3KG', 1, 14.51, 'CONSERVEN'),
+('METER MOE''S KRIEKEPOT 745G', 1, 9.40, 'CONSERVEN'),
+('MANGO SCHIJVEN ALPHONSO 450G SWAD', 1, 3.22, 'CONSERVEN'),
+('MANGO PULP GEZOET ALPHONSO 450G SWAD', 1, 2.12, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Appelmoes & Compote
+-- =====================================================
+('APPELCOMPOTE 1/4L GLAS NOLIKO', 1, 1.29, 'CONSERVEN'),
+('APPELCOMPOTE 720ML GLAS NOLIKO', 1, 2.76, 'CONSERVEN'),
+('APPELCOMPOTE 1L BLIK MATERNE', 1, 2.51, 'CONSERVEN'),
+('APPELCOMPOTE 3L BLIK MATERNE', 1, 6.37, 'CONSERVEN'),
+('APPELMOES 1/4 GLAS NOLIKO', 1, 1.24, 'CONSERVEN'),
+('APPELMOES 3/4L GLAS NOLIKO', 1, 1.85, 'CONSERVEN'),
+('APPELMOES 1L BLIK NOLIKO', 1, 2.11, 'CONSERVEN'),
+('APPELMOES 3L NOLIKO', 1, 7.36, 'CONSERVEN'),
+('PRUIMENPUREE 925G MATERNE', 1, 5.98, 'CONSERVEN'),
+('KASTANJEPUREE 439G', 1, 4.47, 'CONSERVEN'),
+('KASTANJECREME 1KG', 1, 9.62, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Cocktailkersen & Fruitbereidingen
+-- =====================================================
+('MARASCHINO COCKTAILKERSEN M/STEEL 950G AVILA', 1, 8.82, 'CONSERVEN'),
+('MARASCHINO COCKTAILKERSEN Z/STEEL 950G AVILA', 1, 8.45, 'CONSERVEN'),
+('MARASCHINO COCKTAILKERSEN M/STEEL 1,9KG AVILA', 1, 18.51, 'CONSERVEN'),
+('MARASCHINO COCKTAIL KERSEN Z/STEEL 1,9KG AVILA', 1, 14.69, 'CONSERVEN'),
+('AMARENA KERSEN 850G AVILA', 1, 13.07, 'CONSERVEN'),
+('FRUITBEREIDING KRIEKEN 1,15KG COLAC SUNDAE', 1, 10.41, 'CONSERVEN'),
+('FRUITBEREIDING ROTE GRUTZE 1,15KG COLAC SUNDAE', 1, 8.29, 'CONSERVEN'),
+('FRUITBEREIDING RUM-ROZIJN 1,15KG COLAC SUNDAE', 1, 9.46, 'CONSERVEN'),
+('FRUITBEREIDING TROPICAL 1,15KG COLAC SUNDAE', 1, 10.14, 'CONSERVEN'),
+('FRUITBEREIDING BOSVRUCHTEN 1,15KG COLAC SUNDAE', 1, 9.69, 'CONSERVEN'),
+('WALNOTEN IN ESDOORNSIROOP 1,15KG COLAC SUNDAE', 1, 15.83, 'CONSERVEN'),
+('VEENBESSEN NATUUR 400G COLAC', 1, 3.98, 'CONSERVEN'),
+('VEENBESSEN NATUUR 1,15KG COLAC', 1, 10.84, 'CONSERVEN'),
+('VEENBESSEN MET APPELBLOKJES 1,15KG COLAC', 1, 8.92, 'CONSERVEN'),
+('VEENBESSEN BEREID 2,9KG COLAC', 1, 26.34, 'CONSERVEN'),
+('COOK & BAKE ABRICOTAGE GEEL 300G', 1, 7.84, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Gedroogd Fruit & Noten
+-- =====================================================
+('ROZIJNEN ZWART 2KG DE NOTEKRAKER', 1, 13.89, 'CONSERVEN'),
+('ROZIJNEN GOLDEN 2KG DE NOTEKRAKER', 1, 17.39, 'CONSERVEN'),
+('PRUIMEN ONTPIT 200G BONNER', 1, 2.94, 'CONSERVEN'),
+('PRUIMEN ONTPIT 2,5KG DE NOTEKRAKER', 1, 32.61, 'CONSERVEN'),
+('ABRIKOZEN NR.1 2,5KG DE NOTEKRAKER', 1, 47.73, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Truffel & Specials
+-- =====================================================
+('TRUFFEL WIT CONDIMENT 250ML OLIE', 1, 12.54, 'CONSERVEN'),
+('TRUFFEL ZWART CONDIMENT 250ML OLIE', 1, 10.84, 'CONSERVEN'),
+('TRUFFEL ZOMER ZWART SCHILFER 90G', 1, 16.08, 'CONSERVEN'),
+('SAP TRUFFEL ZWART 80G', 1, 14.88, 'CONSERVEN'),
+('BEARNAISE EXTRACT 1L FLES', 1, 8.79, 'CONSERVEN'),
+('SAUS AIOLI 220G LISIMO', 1, 2.66, 'CONSERVEN'),
+('GRANAATAPPELMELASSE 680G KILIKYA', 1, 2.09, 'CONSERVEN'),
+('NDUJA SMEERBARE SALAMI MET CALABRESE PEPER 135G', 1, 4.15, 'CONSERVEN'),
+
+-- =====================================================
+-- CONSERVEN - Houmous & Salsa
+-- =====================================================
+('HOUMOUS PITTIG 800G GRANOLIVIA', 1, 7.90, 'CONSERVEN'),
+('HOUMOUS RAS EL HANOUT & ABRIKOOS 800G GRANOLIVA', 1, 8.30, 'CONSERVEN'),
+('HOUMOUS ZOUGH PETERSELIE &KORIANDER 800G GRANOLIVA', 1, 8.24, 'CONSERVEN'),
+('SALSA TOMAAT PAPRIKA MATBUCHA 800G GRANOLIVA', 1, 11.60, 'CONSERVEN'),
+('MANGO EN HABANERO SALSA 1KG BRESC', 1, 12.80, 'CONSERVEN');
 
 -- Verify count
 -- SELECT COUNT(*) as total_products FROM supplier_products;
