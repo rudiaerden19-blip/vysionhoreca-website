@@ -6,10 +6,10 @@
 TRUNCATE supplier_products CASCADE;
 
 -- Insert all products
--- Format: (name, units_per_package, unit_price, category)
--- unit_price = package_price / units_per_package
+-- Format: (name, units_per_package, package_price, category)
+-- unit_price wordt automatisch berekend (package_price / units_per_package)
 
-INSERT INTO supplier_products (name, units_per_package, unit_price, category) VALUES
+INSERT INTO supplier_products (name, units_per_package, package_price, category) VALUES
 
 -- =====================================================
 -- VLEES & SNACKS - Hamburgers
