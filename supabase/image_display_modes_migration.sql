@@ -1,17 +1,15 @@
--- Image zoom levels per sectie
--- Waarde is een percentage: 50-150 (default 100)
--- 50 = uitgezoomd (meer van foto zichtbaar)
--- 100 = normaal
--- 150 = ingezoomd (dichter bij foto)
+-- Image display modes per sectie
+-- NULL of 'cover' = foto vult volledig (kan bijsnijden)
+-- 'contain' = volledige foto zichtbaar
 
--- Voeg zoom level kolommen toe aan tenant_settings
+-- Voeg display mode kolommen toe aan tenant_settings
 ALTER TABLE tenant_settings 
-ADD COLUMN IF NOT EXISTS hero_image_display VARCHAR(10) DEFAULT '100',
-ADD COLUMN IF NOT EXISTS about_image_display VARCHAR(10) DEFAULT '100',
-ADD COLUMN IF NOT EXISTS specialty_image_display VARCHAR(10) DEFAULT '100',
-ADD COLUMN IF NOT EXISTS topseller_image_display VARCHAR(10) DEFAULT '100';
+ADD COLUMN IF NOT EXISTS hero_image_display VARCHAR(20) DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS about_image_display VARCHAR(20) DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS specialty_image_display VARCHAR(20) DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS topseller_image_display VARCHAR(20) DEFAULT NULL;
 
-COMMENT ON COLUMN tenant_settings.hero_image_display IS 'Zoom level voor hero slider: 50-150 (percentage)';
-COMMENT ON COLUMN tenant_settings.about_image_display IS 'Zoom level voor over ons foto: 50-150 (percentage)';
-COMMENT ON COLUMN tenant_settings.specialty_image_display IS 'Zoom level voor specialiteiten: 50-150 (percentage)';
-COMMENT ON COLUMN tenant_settings.topseller_image_display IS 'Zoom level voor top sellers: 50-150 (percentage)';
+COMMENT ON COLUMN tenant_settings.hero_image_display IS 'Display mode voor hero slider: NULL/cover = vullend, contain = volledig';
+COMMENT ON COLUMN tenant_settings.about_image_display IS 'Display mode voor over ons foto: NULL/cover = vullend, contain = volledig';
+COMMENT ON COLUMN tenant_settings.specialty_image_display IS 'Display mode voor specialiteiten: NULL/cover = vullend, contain = volledig';
+COMMENT ON COLUMN tenant_settings.topseller_image_display IS 'Display mode voor top sellers: NULL/cover = vullend, contain = volledig';
