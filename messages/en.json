@@ -2409,7 +2409,7 @@
     "productName": "Product name (optional)",
     "productNamePlaceholder": "e.g. New Hamburger Special",
     "margin": "Margin",
-    "searchDatabase": "Search your ingredients",
+    "searchDatabase": "Search in database",
     "searchPlaceholder": "Type to search...",
     "noResults": "No results found",
     "dragHere": "Drag ingredients here",

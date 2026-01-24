@@ -3544,7 +3544,7 @@
     "productName": "Nombre del producto (opcional)",
     "productNamePlaceholder": "ej. Nueva Hamburguesa Especial",
     "margin": "Margen",
-    "searchDatabase": "Buscar en tus ingredientes",
+    "searchDatabase": "Buscar en base de datos",
     "searchPlaceholder": "Escriba para buscar...",
     "noResults": "No se encontraron resultados",
     "dragHere": "Arrastre ingredientes aquí",
