@@ -1320,16 +1320,46 @@ export async function updateOrderStatus(
   return true
 }
 
+// Helper functie om hash te genereren (werkt in Node.js en browser)
+async function generateSimpleHash(input: string): Promise<string> {
+  try {
+    // Probeer Web Crypto API (werkt in moderne Node.js en browsers)
+    if (typeof crypto !== 'undefined' && crypto.subtle) {
+      const encoder = new TextEncoder()
+      const dataBuffer = encoder.encode(input)
+      const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    }
+  } catch (e) {
+    console.warn('crypto.subtle niet beschikbaar, gebruik fallback hash')
+  }
+  
+  // Fallback: simpele hash voor als crypto.subtle niet werkt
+  let hash = 0
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+  }
+  return Math.abs(hash).toString(16).padStart(16, '0')
+}
+
 // AUTOMATISCH: Update Z-rapport voor een specifieke dag
 async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void> {
-  if (!supabase) return
+  if (!supabase) {
+    console.error('autoUpdateZReport: Supabase niet beschikbaar')
+    return
+  }
+  
+  console.log(`autoUpdateZReport: Start voor ${tenantSlug} op ${date}`)
   
   try {
     const startOfDay = `${date}T00:00:00`
     const endOfDay = `${date}T23:59:59`
     
     // Haal alle completed orders op voor deze dag
-    const { data: orders } = await supabase
+    const { data: orders, error: ordersError } = await supabase
       .from('orders')
       .select('id, total, payment_method')
       .eq('tenant_slug', tenantSlug)
@@ -1337,7 +1367,17 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
       .lte('created_at', endOfDay)
       .eq('status', 'completed')
     
-    if (!orders || orders.length === 0) return
+    if (ordersError) {
+      console.error('autoUpdateZReport: Fout bij ophalen orders:', ordersError)
+      return
+    }
+    
+    console.log(`autoUpdateZReport: ${orders?.length || 0} completed orders gevonden`)
+    
+    if (!orders || orders.length === 0) {
+      console.log('autoUpdateZReport: Geen completed orders, skip update')
+      return
+    }
     
     // Haal tenant settings op voor BTW
     const { data: settings } = await supabase
@@ -1383,14 +1423,12 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
       orderIds: orderIds.sort(),
       version: 'v1'
     })
-    const encoder = new TextEncoder()
-    const dataBuffer = encoder.encode(hashInput)
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const reportHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    const reportHash = await generateSimpleHash(hashInput)
+    
+    console.log(`autoUpdateZReport: Upsert z_report voor ${tenantSlug}, ${date}, total: €${total.toFixed(2)}`)
     
     // Upsert Z-rapport
-    await supabase
+    const { error: upsertError } = await supabase
       .from('z_reports')
       .upsert({
         tenant_slug: tenantSlug,
@@ -1416,9 +1454,52 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
         ignoreDuplicates: false
       })
     
-    console.log(`Z-rapport automatisch bijgewerkt voor ${tenantSlug} op ${date}: ${orders.length} bestellingen, €${total.toFixed(2)}`)
+    if (upsertError) {
+      console.error('autoUpdateZReport: Fout bij upsert:', upsertError)
+      
+      // Probeer insert als fallback (voor als unique constraint niet bestaat)
+      console.log('autoUpdateZReport: Probeer delete+insert als fallback...')
+      
+      // Delete bestaand rapport voor deze dag
+      await supabase
+        .from('z_reports')
+        .delete()
+        .eq('tenant_slug', tenantSlug)
+        .eq('report_date', date)
+      
+      // Insert nieuw rapport
+      const { error: insertError } = await supabase
+        .from('z_reports')
+        .insert({
+          tenant_slug: tenantSlug,
+          report_date: date,
+          order_count: orders.length,
+          subtotal: subtotal,
+          tax_low: btwPercentage === 6 ? tax : 0,
+          tax_mid: btwPercentage === 12 ? tax : 0,
+          tax_high: btwPercentage === 21 ? tax : 0,
+          total: total,
+          cash_payments: cashPayments,
+          card_payments: cardPayments,
+          online_payments: onlinePayments,
+          btw_percentage: btwPercentage,
+          business_name: settings?.business_name,
+          business_address: settings?.address,
+          btw_number: settings?.btw_number,
+          order_ids: orderIds,
+          report_hash: reportHash,
+          generated_at: new Date().toISOString(),
+        })
+      
+      if (insertError) {
+        console.error('autoUpdateZReport: Fallback insert ook gefaald:', insertError)
+        return
+      }
+    }
+    
+    console.log(`✅ Z-rapport automatisch bijgewerkt voor ${tenantSlug} op ${date}: ${orders.length} bestellingen, €${total.toFixed(2)}`)
   } catch (error) {
-    console.error('Fout bij automatisch bijwerken Z-rapport:', error)
+    console.error('autoUpdateZReport: Onverwachte fout:', error)
   }
 }
 
