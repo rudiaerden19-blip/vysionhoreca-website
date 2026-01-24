@@ -91,6 +91,12 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   const [draggedItem, setDraggedItem] = useState<{ name: string, price: number } | null>(null)
   const [dropTargetProduct, setDropTargetProduct] = useState<string | null>(null)
 
+  // Simulatie calculator state
+  const [showSimulator, setShowSimulator] = useState(false)
+  const [simulatorItems, setSimulatorItems] = useState<Array<{ name: string, price: number, quantity: number }>>([])
+  const [simulatorName, setSimulatorName] = useState('')
+  const [simulatorMultiplier, setSimulatorMultiplier] = useState('3')
+
   useEffect(() => {
     loadData()
   }, [params.tenant])
@@ -241,6 +247,40 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     }
     setDropTargetProduct(null)
   }
+
+  // Handle drop on simulator
+  function handleDropOnSimulator(e: React.DragEvent) {
+    e.preventDefault()
+    if (draggedItem) {
+      // Check if already exists
+      const existing = simulatorItems.find(i => i.name === draggedItem.name)
+      if (existing) {
+        setSimulatorItems(prev => prev.map(i => 
+          i.name === draggedItem.name ? { ...i, quantity: i.quantity + 1 } : i
+        ))
+      } else {
+        setSimulatorItems(prev => [...prev, { name: draggedItem.name, price: draggedItem.price, quantity: 1 }])
+      }
+    }
+    setDraggedItem(null)
+  }
+
+  // Add ingredient to simulator manually
+  function addIngredientToSimulator(ingredient: Ingredient) {
+    const existing = simulatorItems.find(i => i.name === ingredient.name)
+    if (existing) {
+      setSimulatorItems(prev => prev.map(i => 
+        i.name === ingredient.name ? { ...i, quantity: i.quantity + 1 } : i
+      ))
+    } else {
+      setSimulatorItems(prev => [...prev, { name: ingredient.name, price: ingredient.purchase_price, quantity: 1 }])
+    }
+  }
+
+  // Calculate simulator totals
+  const simulatorTotalCost = simulatorItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const simulatorMultiplierNum = parseFloat(simulatorMultiplier.replace(',', '.')) || 3
+  const simulatorAdvicedPrice = simulatorTotalCost * simulatorMultiplierNum
 
   // Search function for both own ingredients and database
   async function handleIngredientSearch(query: string, productIngredientIds: string[]) {
@@ -590,6 +630,179 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         <p className="text-xs text-blue-700 mt-3 italic">
           💡 Deze vaste prijzen zijn gecalculeerd door 150 frituristen. Indien u andere porties geeft kan dit handmatig aangepast worden.
         </p>
+      </div>
+
+      {/* Simulatie Calculator */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 shadow-sm overflow-hidden">
+        <button
+          onClick={() => setShowSimulator(!showSimulator)}
+          className="w-full p-4 flex items-center justify-between hover:bg-purple-100/50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🧮</span>
+            <div className="text-left">
+              <h3 className="font-semibold text-purple-900">Kostprijs Simulator</h3>
+              <p className="text-sm text-purple-600">Bereken de kosten van een nieuw product zonder het aan het menu toe te voegen</p>
+            </div>
+          </div>
+          <span className="text-purple-500 text-xl">{showSimulator ? '▲' : '▼'}</span>
+        </button>
+
+        <AnimatePresence>
+          {showSimulator && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="border-t border-purple-200"
+            >
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  e.dataTransfer.dropEffect = 'copy'
+                }}
+                onDrop={handleDropOnSimulator}
+                className={`p-4 ${draggedItem ? 'bg-purple-100 border-2 border-dashed border-purple-400' : ''}`}
+              >
+                {/* Simulator Header */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="flex-1">
+                    <label className="block text-sm text-purple-700 mb-1">Product naam (optioneel)</label>
+                    <input
+                      type="text"
+                      value={simulatorName}
+                      onChange={(e) => setSimulatorName(e.target.value)}
+                      placeholder="bijv. Nieuwe Hamburger Special"
+                      className="w-full px-3 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div className="w-32">
+                    <label className="block text-sm text-purple-700 mb-1">Marge</label>
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-500">×</span>
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={simulatorMultiplier}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(',', '.')
+                          setSimulatorMultiplier(val)
+                        }}
+                        className="w-full px-2 py-2 border border-purple-200 rounded-lg text-center font-bold focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Drop zone hint */}
+                {simulatorItems.length === 0 && (
+                  <div className="border-2 border-dashed border-purple-300 rounded-lg p-8 text-center bg-white/50">
+                    <p className="text-purple-600 font-medium">👆 Sleep ingrediënten hierheen</p>
+                    <p className="text-sm text-purple-400 mt-1">Of klik op een ingrediënt in de lijst hieronder</p>
+                  </div>
+                )}
+
+                {/* Simulator Items */}
+                {simulatorItems.length > 0 && (
+                  <div className="bg-white rounded-lg border border-purple-200 overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-purple-50">
+                        <tr>
+                          <th className="px-3 py-2 text-left">Ingrediënt</th>
+                          <th className="px-3 py-2 text-center w-24">Aantal</th>
+                          <th className="px-3 py-2 text-right w-28">Prijs/stuk</th>
+                          <th className="px-3 py-2 text-right w-28">Totaal</th>
+                          <th className="px-3 py-2 w-10"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {simulatorItems.map((item, idx) => (
+                          <tr key={idx} className="border-t border-purple-100">
+                            <td className="px-3 py-2 font-medium">{item.name}</td>
+                            <td className="px-3 py-2">
+                              <input
+                                type="text"
+                                inputMode="decimal"
+                                value={item.quantity}
+                                onChange={(e) => {
+                                  const val = parseFloat(e.target.value.replace(',', '.')) || 0
+                                  setSimulatorItems(prev => prev.map((i, index) => 
+                                    index === idx ? { ...i, quantity: val } : i
+                                  ))
+                                }}
+                                className="w-full px-2 py-1 border rounded text-center"
+                              />
+                            </td>
+                            <td className="px-3 py-2 text-right font-mono">€{item.price.toFixed(4)}</td>
+                            <td className="px-3 py-2 text-right font-mono font-bold">€{(item.price * item.quantity).toFixed(2)}</td>
+                            <td className="px-3 py-2">
+                              <button
+                                onClick={() => setSimulatorItems(prev => prev.filter((_, index) => index !== idx))}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                ×
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      <tfoot className="bg-purple-50 font-bold">
+                        <tr className="border-t-2 border-purple-200">
+                          <td colSpan={3} className="px-3 py-2 text-right">TOTAAL KOSTPRIJS:</td>
+                          <td className="px-3 py-2 text-right font-mono text-lg">€{simulatorTotalCost.toFixed(2)}</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td colSpan={3} className="px-3 py-2 text-right text-purple-700">
+                            ADVIESPRIJS (×{simulatorMultiplierNum.toFixed(1)}):
+                          </td>
+                          <td className="px-3 py-2 text-right font-mono text-lg text-purple-700">€{simulatorAdvicedPrice.toFixed(2)}</td>
+                          <td></td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                )}
+
+                {/* Quick add from own ingredients */}
+                {ingredients.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm text-purple-700 mb-2">Snel toevoegen uit je ingrediënten:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {ingredients.slice(0, 10).map(ing => (
+                        <button
+                          key={ing.id}
+                          onClick={() => addIngredientToSimulator(ing)}
+                          className="px-3 py-1 bg-white border border-purple-200 rounded-full text-sm hover:bg-purple-100 hover:border-purple-400 transition-colors"
+                        >
+                          {ing.name} <span className="text-purple-500">€{ing.purchase_price.toFixed(2)}</span>
+                        </button>
+                      ))}
+                      {ingredients.length > 10 && (
+                        <span className="text-sm text-purple-400 py-1">+{ingredients.length - 10} meer...</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Clear button */}
+                {simulatorItems.length > 0 && (
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={() => {
+                        setSimulatorItems([])
+                        setSimulatorName('')
+                      }}
+                      className="px-4 py-2 text-purple-600 hover:text-purple-800 text-sm"
+                    >
+                      🗑️ Leegmaken
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Products List */}
