@@ -89,7 +89,7 @@ function SortableProductCard({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-white rounded-2xl shadow-sm overflow-hidden ${isDragging ? 'shadow-xl ring-2 ring-orange-500' : ''}`}
+      className={`bg-white rounded-2xl shadow-sm overflow-hidden ${isDragging ? 'shadow-xl ring-2 ring-blue-500' : ''}`}
     >
       {/* Drag Handle */}
       <div 
@@ -122,7 +122,7 @@ function SortableProductCard({
             </span>
           )}
           {product.is_popular && (
-            <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+            <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full">
               🔥 POPULAIR
             </span>
           )}
@@ -150,7 +150,7 @@ function SortableProductCard({
                 <span className="text-green-500 font-bold text-lg block">€{product.promo_price.toFixed(2)}</span>
               </>
             ) : (
-              <span className="text-orange-500 font-bold text-lg">€{product.price.toFixed(2)}</span>
+              <span className="text-blue-600 font-bold text-lg">€{product.price.toFixed(2)}</span>
             )}
           </div>
         </div>
@@ -174,7 +174,7 @@ function SortableProductCard({
               onClick={onTogglePopular}
               className={`p-2 rounded-lg transition-colors ${
                 product.is_popular 
-                  ? 'bg-orange-100 text-orange-600' 
+                  ? 'bg-blue-100 text-blue-600' 
                   : 'bg-gray-100 text-gray-400'
               }`}
               title={product.is_popular ? 'Populair' : 'Niet populair'}
@@ -455,7 +455,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -475,7 +475,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={openAddModal}
-          className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl flex items-center gap-2"
+          className="bg-blue-700 hover:bg-blue-800 text-white font-medium px-6 py-3 rounded-xl flex items-center gap-2"
         >
           <span>➕</span>
           <span>{t('adminPages.producten.newProduct')}</span>
@@ -499,7 +499,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('adminPages.producten.searchPlaceholder')}
-            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -509,7 +509,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
             onClick={() => setSelectedCategory('Alle')}
             className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
               selectedCategory === 'Alle'
-                ? 'bg-orange-500 text-white'
+                ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
@@ -531,7 +531,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
               onClick={() => setSelectedCategory(cat.name)}
               className={`px-4 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
                 selectedCategory === cat.name
-                  ? 'bg-orange-500 text-white'
+                  ? 'bg-blue-600 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -575,7 +575,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
           <p className="text-gray-500 mb-6">{t('adminPages.producten.adjustFilters')}</p>
           <button
             onClick={openAddModal}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl"
+            className="bg-blue-700 hover:bg-blue-800 text-white font-medium px-6 py-3 rounded-xl"
           >
             + {t('adminPages.producten.newProduct')}
           </button>
@@ -627,7 +627,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                       const capitalized = val.charAt(0).toUpperCase() + val.slice(1)
                       setFormData(prev => ({ ...prev, name: capitalized }))
                     }}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder={t('adminPages.producten.namePlaceholder')}
                   />
                 </div>
@@ -641,7 +641,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     value={formData.description || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     placeholder={t('adminPages.producten.descriptionPlaceholder')}
                   />
                 </div>
@@ -659,7 +659,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         step="0.01"
                         value={formData.price || ''}
                         onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                        className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="0.00"
                       />
                     </div>
@@ -671,7 +671,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                     <select
                       value={formData.category_id || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value || null }))}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="">{t('adminPages.producten.selectCategory')}</option>
                       {categories.map(cat => (
@@ -708,7 +708,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           key={option.id} 
                           className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors ${
                             selectedOptionIds.includes(option.id!)
-                              ? 'border-orange-500 bg-orange-50'
+                              ? 'border-blue-500 bg-blue-50'
                               : 'border-gray-200 hover:bg-gray-50'
                           }`}
                         >
@@ -716,7 +716,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             type="checkbox"
                             checked={selectedOptionIds.includes(option.id!)}
                             onChange={() => toggleOptionSelection(option.id!)}
-                            className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                            className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                           />
                           <div className="flex-1">
                             <span className="font-medium text-gray-900">{option.name}</span>
@@ -759,7 +759,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                           key={allergen.id}
                           className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
                             isSelected
-                              ? 'bg-orange-50 border-2 border-orange-500'
+                              ? 'bg-blue-50 border-2 border-blue-500'
                               : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
                           }`}
                         >
@@ -770,7 +770,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                             className="sr-only"
                           />
                           <span className="text-lg">{allergen.icon}</span>
-                          <span className={`text-sm font-medium ${isSelected ? 'text-orange-700' : 'text-gray-600'}`}>
+                          <span className={`text-sm font-medium ${isSelected ? 'text-blue-700' : 'text-gray-600'}`}>
                             {allergenName}
                           </span>
                         </label>
@@ -849,7 +849,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         onClick={() => setFormData(prev => ({ ...prev, image_display_mode: null }))}
                         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           !formData.image_display_mode 
-                            ? 'bg-orange-500 text-white' 
+                            ? 'bg-blue-600 text-white' 
                             : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
                         }`}
                       >
@@ -860,7 +860,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         onClick={() => setFormData(prev => ({ ...prev, image_display_mode: 'cover' }))}
                         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           formData.image_display_mode === 'cover' 
-                            ? 'bg-orange-500 text-white' 
+                            ? 'bg-blue-600 text-white' 
                             : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
                         }`}
                       >
@@ -871,7 +871,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         onClick={() => setFormData(prev => ({ ...prev, image_display_mode: 'contain' }))}
                         className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           formData.image_display_mode === 'contain' 
-                            ? 'bg-orange-500 text-white' 
+                            ? 'bg-blue-600 text-white' 
                             : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
                         }`}
                       >
@@ -893,7 +893,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 <button 
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
                 >
                   {saving ? (
                     <>
