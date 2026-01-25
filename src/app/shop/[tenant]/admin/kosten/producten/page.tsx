@@ -98,6 +98,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   const [simulatorMultiplier, setSimulatorMultiplier] = useState('3')
   const [simulatorSearch, setSimulatorSearch] = useState('')
   const [simulatorSearchResults, setSimulatorSearchResults] = useState<Ingredient[]>([])
+  const [simulatorDatabaseResults, setSimulatorDatabaseResults] = useState<SupplierProduct[]>([])
   const [simulatorSearching, setSimulatorSearching] = useState(false)
 
   useEffect(() => {
@@ -358,18 +359,26 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   const simulatorMultiplierNum = parseFloat(simulatorMultiplier.replace(',', '.')) || 3
   const simulatorAdvicedPrice = simulatorTotalCost * simulatorMultiplierNum
 
-  // Search ingredients for simulator
-  function handleSimulatorSearch(query: string) {
+  // Search ingredients for simulator - search in supplier_products database
+  async function handleSimulatorSearch(query: string) {
     setSimulatorSearch(query)
     if (query.length < 2) {
       setSimulatorSearchResults([])
+      setSimulatorDatabaseResults([])
       return
     }
     setSimulatorSearching(true)
-    const results = ingredients.filter(i => 
+    
+    // Search own ingredients
+    const ownResults = ingredients.filter(i => 
       i.name.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 20)
-    setSimulatorSearchResults(results)
+    ).slice(0, 10)
+    setSimulatorSearchResults(ownResults)
+    
+    // Search supplier_products database
+    const dbResults = await searchSupplierProducts(query, undefined, 20)
+    setSimulatorDatabaseResults(dbResults)
+    
     setSimulatorSearching(false)
   }
 
@@ -795,25 +804,63 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                     placeholder={t('simulator.searchPlaceholder')}
                     className="w-full px-3 py-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500"
                   />
-                  {simulatorSearchResults.length > 0 && (
-                    <div className="mt-2 bg-white border border-purple-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                      {simulatorSearchResults.map(ing => (
-                        <button
-                          key={ing.id}
-                          onClick={() => {
-                            addIngredientToSimulator(ing)
-                            setSimulatorSearch('')
-                            setSimulatorSearchResults([])
-                          }}
-                          className="w-full px-3 py-2 text-left hover:bg-purple-50 flex justify-between items-center border-b border-purple-100 last:border-0"
-                        >
-                          <span className="font-medium">{ing.name}</span>
-                          <span className="text-purple-600 font-mono">€{ing.purchase_price.toFixed(4)}</span>
-                        </button>
-                      ))}
+                  {simulatorSearching && (
+                    <p className="text-sm text-purple-400 mt-2">Zoeken...</p>
+                  )}
+                  {(simulatorSearchResults.length > 0 || simulatorDatabaseResults.length > 0) && (
+                    <div className="mt-2 bg-white border border-purple-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+                      {/* Eigen ingrediënten */}
+                      {simulatorSearchResults.length > 0 && (
+                        <>
+                          <div className="px-3 py-1 bg-green-50 text-green-700 text-xs font-medium">Jouw ingrediënten</div>
+                          {simulatorSearchResults.map(ing => (
+                            <button
+                              key={ing.id}
+                              onClick={() => {
+                                addIngredientToSimulator(ing)
+                                setSimulatorSearch('')
+                                setSimulatorSearchResults([])
+                                setSimulatorDatabaseResults([])
+                              }}
+                              className="w-full px-3 py-2 text-left hover:bg-green-50 flex justify-between items-center border-b border-purple-100"
+                            >
+                              <span className="font-medium">{ing.name}</span>
+                              <span className="text-green-600 font-mono">€{ing.purchase_price.toFixed(4)}</span>
+                            </button>
+                          ))}
+                        </>
+                      )}
+                      {/* Database producten */}
+                      {simulatorDatabaseResults.length > 0 && (
+                        <>
+                          <div className="px-3 py-1 bg-purple-50 text-purple-700 text-xs font-medium">Database ({simulatorDatabaseResults.length} resultaten)</div>
+                          {simulatorDatabaseResults.map(prod => (
+                            <button
+                              key={prod.id}
+                              onClick={() => {
+                                setSimulatorItems(prev => [...prev, { 
+                                  name: prod.name, 
+                                  price: prod.unit_price || 0, 
+                                  quantity: 1 
+                                }])
+                                setSimulatorSearch('')
+                                setSimulatorSearchResults([])
+                                setSimulatorDatabaseResults([])
+                              }}
+                              className="w-full px-3 py-2 text-left hover:bg-purple-50 flex justify-between items-center border-b border-purple-100"
+                            >
+                              <div>
+                                <span className="font-medium">{prod.name}</span>
+                                <span className="text-xs text-gray-500 ml-2">{prod.unit}</span>
+                              </div>
+                              <span className="text-purple-600 font-mono">€{(prod.unit_price || 0).toFixed(4)}</span>
+                            </button>
+                          ))}
+                        </>
+                      )}
                     </div>
                   )}
-                  {simulatorSearch.length >= 2 && simulatorSearchResults.length === 0 && !simulatorSearching && (
+                  {simulatorSearch.length >= 2 && simulatorSearchResults.length === 0 && simulatorDatabaseResults.length === 0 && !simulatorSearching && (
                     <p className="text-sm text-purple-400 mt-2">{t('simulator.noResults')}</p>
                   )}
                 </div>
