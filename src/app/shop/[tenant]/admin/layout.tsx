@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import TrialBanner from '@/components/TrialBanner'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
+import { supabase } from '@/lib/supabase'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -333,7 +334,8 @@ function FlyoutMenu({
   tenant, 
   isActive, 
   onClose,
-  t 
+  t,
+  pendingReservations = 0
 }: { 
   section: typeof menuItems[0]
   categoryName: string
@@ -343,6 +345,7 @@ function FlyoutMenu({
   isActive: (href: string) => boolean
   onClose: () => void
   t: (key: string) => string
+  pendingReservations?: number
 }) {
   const menuRef = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState({ top: 0, left: 0 })
@@ -416,6 +419,12 @@ function FlyoutMenu({
                 <span className="text-sm font-medium flex items-center gap-2">
                   {t(`admin.menu.${item.nameKey}`)}
                   {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
+                  {/* Badge voor pending reserveringen */}
+                  {item.nameKey === 'reservations' && pendingReservations > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                      {pendingReservations}
+                    </span>
+                  )}
                 </span>
               </Link>
             </li>
@@ -444,8 +453,27 @@ function SidebarContent({
   const pathname = usePathname()
   const [expandedSections, setExpandedSections] = useState<string[]>([])
   const [isLangOpen, setIsLangOpen] = useState(false)
+  const [pendingReservations, setPendingReservations] = useState(0)
   const langRef = useRef<HTMLDivElement>(null)
   const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
+
+  // Load pending reservations count
+  useEffect(() => {
+    async function loadPendingCount() {
+      const { count } = await supabase
+        .from('reservations')
+        .select('*', { count: 'exact', head: true })
+        .eq('tenant_slug', tenant)
+        .eq('status', 'pending')
+      
+      setPendingReservations(count || 0)
+    }
+    loadPendingCount()
+    
+    // Poll every 30 seconds
+    const interval = setInterval(loadPendingCount, 30000)
+    return () => clearInterval(interval)
+  }, [tenant])
 
   // Close language dropdown when clicking outside
   useEffect(() => {
@@ -542,6 +570,12 @@ function SidebarContent({
                   {!collapsed && (
                     <span className="font-semibold text-sm uppercase tracking-wide">{categoryName}</span>
                   )}
+                  {/* Badge voor pending reserveringen bij Bestellingen categorie */}
+                  {section.categoryKey === 'orders' && pendingReservations > 0 && (
+                    <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center animate-pulse">
+                      {pendingReservations}
+                    </span>
+                  )}
                 </div>
                 {!collapsed && (
                   <svg 
@@ -569,6 +603,7 @@ function SidebarContent({
                     toggleSection(section.categoryKey)
                   }}
                   t={t}
+                  pendingReservations={pendingReservations}
                 />
               )}
             </div>

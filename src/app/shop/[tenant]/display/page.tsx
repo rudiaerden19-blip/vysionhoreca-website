@@ -41,6 +41,19 @@ interface BusinessSettings {
   btw_percentage?: number
 }
 
+interface Reservation {
+  id: string
+  customer_name: string
+  customer_email?: string
+  customer_phone?: string
+  reservation_date: string
+  reservation_time: string
+  party_size: number
+  notes?: string
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  created_at: string
+}
+
 export default function ShopDisplayPage({ params }: { params: { tenant: string } }) {
   const { t, locale } = useLanguage()
   
@@ -74,6 +87,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [printerIP, setPrinterIP] = useState<string | null>(null)
   const [showPrinterSettings, setShowPrinterSettings] = useState(false)
   const [printerStatus, setPrinterStatus] = useState<'unknown' | 'online' | 'offline'>('unknown')
+  const [reservations, setReservations] = useState<Reservation[]>([])
+  const [showReservationsModal, setShowReservationsModal] = useState(false)
   const audioContextRef = useRef<AudioContext | null>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -103,6 +118,40 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       checkPrinterStatus(savedIP)
     }
   }, [params.tenant])
+
+  // Load pending reservations
+  useEffect(() => {
+    async function loadReservations() {
+      const { data } = await supabase
+        .from('reservations')
+        .select('*')
+        .eq('tenant_slug', params.tenant)
+        .eq('status', 'pending')
+        .order('reservation_date', { ascending: true })
+        .order('reservation_time', { ascending: true })
+      
+      if (data) {
+        setReservations(data)
+      }
+    }
+    loadReservations()
+    
+    // Poll every 30 seconds
+    const interval = setInterval(loadReservations, 30000)
+    return () => clearInterval(interval)
+  }, [params.tenant])
+
+  // Update reservation status
+  async function updateReservationStatus(id: string, status: 'confirmed' | 'cancelled') {
+    const { error } = await supabase
+      .from('reservations')
+      .update({ status })
+      .eq('id', id)
+    
+    if (!error) {
+      setReservations(prev => prev.filter(r => r.id !== id))
+    }
+  }
 
   // Check printer status via server proxy (avoids mixed content)
   async function checkPrinterStatus(ip: string) {
@@ -952,6 +1001,19 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               🖨️ {printerStatus === 'online' ? 'Online' : printerStatus === 'offline' ? 'Offline' : 'Instellen'}
             </button>
 
+            {/* Reserveringen knop */}
+            <button
+              onClick={() => setShowReservationsModal(true)}
+              className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold relative"
+            >
+              📅 Reserveringen
+              {reservations.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center animate-pulse">
+                  {reservations.length}
+                </span>
+              )}
+            </button>
+
             {/* Links */}
             <Link
               href={`/shop/${params.tenant}/admin`}
@@ -1466,6 +1528,111 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                 >
                   {tx('reject')}
                 </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Reserveringen Modal */}
+        {showReservationsModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowReservationsModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-gray-800 rounded-3xl max-w-2xl w-full max-h-[80vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-6 border-b border-gray-700 flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold">📅 Reserveringen</h2>
+                  <p className="text-gray-400">Wachtend op goedkeuring</p>
+                </div>
+                <button
+                  onClick={() => setShowReservationsModal(false)}
+                  className="p-2 hover:bg-gray-700 rounded-lg text-gray-400"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="p-6 overflow-y-auto max-h-[60vh]">
+                {reservations.length === 0 ? (
+                  <div className="text-center py-12">
+                    <span className="text-6xl mb-4 block">✓</span>
+                    <p className="text-xl text-gray-400">Geen wachtende reserveringen</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {reservations.map((reservation) => (
+                      <div
+                        key={reservation.id}
+                        className="bg-gray-700 rounded-2xl p-4"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="text-2xl">👤</span>
+                              <div>
+                                <h3 className="font-bold text-lg">{reservation.customer_name}</h3>
+                                <p className="text-gray-400 text-sm">
+                                  {reservation.party_size} {reservation.party_size === 1 ? 'persoon' : 'personen'}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <div className="flex items-center gap-2">
+                                <span>📅</span>
+                                <span>{new Date(reservation.reservation_date).toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span>🕐</span>
+                                <span>{reservation.reservation_time.slice(0, 5)}</span>
+                              </div>
+                              {reservation.customer_phone && (
+                                <div className="flex items-center gap-2">
+                                  <span>📞</span>
+                                  <a href={`tel:${reservation.customer_phone}`} className="text-blue-400 hover:underline">{reservation.customer_phone}</a>
+                                </div>
+                              )}
+                              {reservation.customer_email && (
+                                <div className="flex items-center gap-2">
+                                  <span>📧</span>
+                                  <span className="text-gray-400 truncate">{reservation.customer_email}</span>
+                                </div>
+                              )}
+                            </div>
+                            {reservation.notes && (
+                              <div className="mt-2 p-2 bg-gray-600 rounded-lg text-sm">
+                                <span className="text-gray-400">Opmerking:</span> {reservation.notes}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            <button
+                              onClick={() => updateReservationStatus(reservation.id, 'confirmed')}
+                              className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-xl font-bold flex items-center gap-2"
+                            >
+                              ✓ Goedkeuren
+                            </button>
+                            <button
+                              onClick={() => updateReservationStatus(reservation.id, 'cancelled')}
+                              className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-xl font-bold flex items-center gap-2"
+                            >
+                              ✕ Afwijzen
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>
