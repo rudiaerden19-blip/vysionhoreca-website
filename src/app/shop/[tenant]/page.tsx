@@ -28,6 +28,7 @@ interface Business {
   social_facebook: string
   social_instagram: string
   social_tiktok: string
+  website_url: string
   delivery_enabled: boolean
   pickup_enabled: boolean
   dine_in_enabled: boolean
@@ -409,6 +410,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         social_facebook: tenantData?.facebook_url || '',
         social_instagram: tenantData?.instagram_url || '',
         social_tiktok: tenantData?.tiktok_url || '',
+        website_url: tenantData?.website_url || '',
         delivery_enabled: deliveryData?.delivery_enabled === true,
         pickup_enabled: deliveryData?.pickup_enabled === true,
         dine_in_enabled: false,
@@ -1491,6 +1493,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       className="w-12 h-12 bg-white/10 hover:bg-black rounded-xl flex items-center justify-center transition-colors"
                     >
                       <span className="text-xl">🎵</span>
+                    </a>
+                  )}
+                  {business.website_url && (
+                    <a 
+                      href={business.website_url.startsWith('http') ? business.website_url : `https://${business.website_url}`}
+                      target="_blank"
+                      className="w-12 h-12 bg-white/10 hover:bg-green-600 rounded-xl flex items-center justify-center transition-colors"
+                    >
+                      <span className="text-xl">🌐</span>
                     </a>
                   )}
                 </div>
