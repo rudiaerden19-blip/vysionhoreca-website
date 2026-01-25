@@ -40,8 +40,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [loading, setLoading] = useState(true)
   const [initialLoadDone, setInitialLoadDone] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [soundEnabled, setSoundEnabled] = useState(false)
-  const [audioReady, setAudioReady] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [audioReady, setAudioReady] = useState(true)
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [printerIP, setPrinterIP] = useState<string | null>(null)
   const [showPrinterSettings, setShowPrinterSettings] = useState(false)
@@ -57,13 +57,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return () => clearInterval(interval)
   }, [])
 
-  // Load initial data
+  // Load initial data - GELUID ALTIJD AAN
   useEffect(() => {
     loadData()
-    const savedSound = localStorage.getItem(`keuken_sound_${params.tenant}`)
-    if (savedSound === 'true') {
-      setSoundEnabled(true)
-    }
+    // Geluid ALTIJD aan - geen localStorage check
+    setSoundEnabled(true)
+    setAudioReady(true)
+    localStorage.setItem(`keuken_sound_${params.tenant}`, 'true')
+    
     // Load printer IP
     const savedIP = localStorage.getItem(`printer_ip_${params.tenant}`)
     if (savedIP) {
@@ -146,7 +147,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   // Continuous alert for new orders - plays every 5 seconds
   useEffect(() => {
-    if (newOrderIds.size > 0 && soundEnabled && audioReady) {
+    // ALTIJD geluid bij nieuwe bestellingen - geen conditie checks
+    if (newOrderIds.size > 0) {
       // Play immediately
       playAlertSound()
       
@@ -166,7 +168,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         clearInterval(alertIntervalRef.current)
       }
     }
-  }, [newOrderIds.size, soundEnabled, audioReady])
+  }, [newOrderIds.size])
 
   // Polling - check for orders every 3 seconds
   // Only starts AFTER initial load is complete
@@ -201,9 +203,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             trulyNewOrders.forEach(order => {
               setNewOrderIds(prev => new Set([...prev, order.id]))
             })
-            if (soundEnabled && audioReady) {
-              playAlertSound()
-            }
+            // ALTIJD geluid spelen bij nieuwe bestelling
+            playAlertSound()
           }
           
           setOrders(parsed)
@@ -469,21 +470,13 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Sound Toggle */}
-            {!soundEnabled ? (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={enableSound}
-                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold flex items-center gap-2 text-sm"
-              >
-                🔔 {tx('soundOn')}
-              </motion.button>
-            ) : (
-              <span className="px-3 py-2 bg-green-500/30 text-green-300 rounded-xl flex items-center gap-2 text-sm">
-                🔊 {tx('soundEnabled')}
-              </span>
-            )}
+            {/* Sound - ALTIJD AAN */}
+            <span 
+              onClick={enableSound}
+              className="px-3 py-2 bg-green-500/30 text-green-300 rounded-xl flex items-center gap-2 text-sm cursor-pointer"
+            >
+              🔊 {tx('soundEnabled')}
+            </span>
 
             {/* Order count */}
             <div className="px-4 py-2 bg-white/20 rounded-xl font-bold">

@@ -230,8 +230,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   // Play repeating sound when there are new orders
   useEffect(() => {
-    // Only play if sound is enabled AND audio is ready (user has interacted)
-    if (hasNewOrders && soundEnabled && audioReady) {
+    // ALTIJD geluid bij nieuwe bestellingen - geen conditie checks
+    if (hasNewOrders) {
       // Play immediately
       playSound()
       
@@ -251,7 +251,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         clearInterval(audioIntervalRef.current)
       }
     }
-  }, [hasNewOrders, soundEnabled, audioReady])
+  }, [hasNewOrders])
 
   // Request notification permission
   useEffect(() => {
