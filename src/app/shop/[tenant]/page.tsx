@@ -1466,6 +1466,24 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </a>
                 )}
 
+                {business.website_url && (
+                  <a 
+                    href={business.website_url.startsWith('http') ? business.website_url : `https://${business.website_url}`}
+                    target="_blank"
+                    className="flex items-start gap-4 group"
+                  >
+                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center group-hover:bg-green-500 transition-colors">
+                      <span className="text-xl">🌐</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold group-hover:text-green-400 transition-colors">
+                        {business.website_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                      </p>
+                      <p className="text-white/60 text-sm">{t('shopPage.visitWebsite') || 'Bezoek onze website'}</p>
+                    </div>
+                  </a>
+                )}
+
                 {/* Social Media */}
                 <div className="flex gap-4 pt-4">
                   {business.social_facebook && (
@@ -1493,15 +1511,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       className="w-12 h-12 bg-white/10 hover:bg-black rounded-xl flex items-center justify-center transition-colors"
                     >
                       <span className="text-xl">🎵</span>
-                    </a>
-                  )}
-                  {business.website_url && (
-                    <a 
-                      href={business.website_url.startsWith('http') ? business.website_url : `https://${business.website_url}`}
-                      target="_blank"
-                      className="w-12 h-12 bg-white/10 hover:bg-green-600 rounded-xl flex items-center justify-center transition-colors"
-                    >
-                      <span className="text-xl">🌐</span>
                     </a>
                   )}
                 </div>
