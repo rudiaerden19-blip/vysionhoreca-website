@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import TrialBanner from '@/components/TrialBanner'
 import { useLanguage } from '@/i18n'
+import { getTenantSettings } from '@/lib/admin-api'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -115,9 +116,22 @@ const menuItems = [
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
+  const { t } = useLanguage()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [tenantExists, setTenantExists] = useState<boolean | null>(null)
+  const [loading, setLoading] = useState(true)
   const baseUrl = `/shop/${params.tenant}/admin`
+
+  // Check of tenant bestaat
+  useEffect(() => {
+    async function checkTenant() {
+      const tenantData = await getTenantSettings(params.tenant)
+      setTenantExists(tenantData !== null)
+      setLoading(false)
+    }
+    checkTenant()
+  }, [params.tenant])
 
   const isActive = (href: string) => {
     const fullPath = `${baseUrl}${href}`
@@ -125,6 +139,40 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       return pathname === baseUrl || pathname === `${baseUrl}/`
     }
     return pathname.startsWith(fullPath)
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Laden...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Tenant niet gevonden
+  if (!tenantExists) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center"
+        >
+          <span className="text-6xl mb-6 block">🔍</span>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('shopPage.notFoundTitle') || 'Shop niet gevonden'}</h1>
+          <p className="text-gray-600 mb-6">
+            {t('shopPage.notFoundDescription') || 'Deze shop bestaat niet of is verwijderd.'}
+          </p>
+          <a href="https://www.vysionhoreca.com" className="text-orange-500 hover:text-orange-600 font-medium inline-block">
+            ← {t('shopPage.backToVysion') || 'Terug naar Vysion'}
+          </a>
+        </motion.div>
+      </div>
+    )
   }
 
   return (
