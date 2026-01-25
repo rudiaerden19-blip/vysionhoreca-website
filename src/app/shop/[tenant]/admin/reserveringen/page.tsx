@@ -65,10 +65,15 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
     setSavingSettings(true)
     const newValue = !reservationsEnabled
     
+    // Gebruik upsert zodat het werkt als er nog geen record is
     const { error } = await supabase
       .from('tenant_settings')
-      .update({ reservations_enabled: newValue })
-      .eq('tenant_slug', params.tenant)
+      .upsert({ 
+        tenant_slug: params.tenant,
+        reservations_enabled: newValue 
+      }, { 
+        onConflict: 'tenant_slug' 
+      })
     
     if (!error) {
       setReservationsEnabled(newValue)
