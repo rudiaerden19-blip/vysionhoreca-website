@@ -3,13 +3,14 @@
 import { useLanguage } from '@/i18n'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getPromotions, savePromotion, togglePromotionActive, deletePromotion, Promotion, getTenantSettings, saveTenantSettings } from '@/lib/admin-api'
+import { getPromotions, savePromotion, togglePromotionActive, deletePromotion, Promotion, getTenantSettings, saveTenantSettings, getMenuProducts, MenuProduct } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
 import Image from 'next/image'
 
 export default function PromotiesPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const [promos, setPromos] = useState<Promotion[]>([])
+  const [products, setProducts] = useState<MenuProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingPromo, setEditingPromo] = useState<Promotion | null>(null)
@@ -19,8 +20,9 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
     name: '',
     description: '',
     image_url: '',
-    type: 'percentage' as 'percentage' | 'fixed' | 'freeItem',
-    value: 10,
+    type: 'fixedPrice' as 'percentage' | 'fixed' | 'freeItem' | 'fixedPrice',
+    value: 2,
+    product_id: '',
     min_order_amount: 0,
     expires_at: '',
   })
@@ -33,13 +35,15 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   async function loadData() {
     setLoading(true)
     
-    // Laad promoties en instellingen
-    const [promosData, settings] = await Promise.all([
+    // Laad promoties, producten en instellingen
+    const [promosData, productsData, settings] = await Promise.all([
       getPromotions(params.tenant),
+      getMenuProducts(params.tenant),
       getTenantSettings(params.tenant)
     ])
     
     setPromos(promosData)
+    setProducts(productsData.filter(p => p.is_active))
     setPromotionsEnabled(settings?.promotions_enabled !== false) // Default true
     setLoading(false)
   }
@@ -78,8 +82,9 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       name: '',
       description: '',
       image_url: '',
-      type: 'percentage',
-      value: 10,
+      type: 'fixedPrice',
+      value: 2,
+      product_id: '',
       min_order_amount: 0,
       expires_at: '',
     })
@@ -94,6 +99,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       image_url: promo.image_url || '',
       type: promo.type,
       value: promo.value,
+      product_id: promo.product_id || '',
       min_order_amount: promo.min_order_amount || 0,
       expires_at: promo.expires_at ? promo.expires_at.split('T')[0] : '',
     })
@@ -106,16 +112,27 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       return
     }
     
+    // Bij fixedPrice moet een product gekozen zijn
+    if (formData.type === 'fixedPrice' && !formData.product_id) {
+      alert('Kies een product voor deze promotie')
+      return
+    }
+    
     setSaving(true)
+    
+    // Vind product naam voor weergave
+    const selectedProduct = products.find(p => p.id === formData.product_id)
     
     const promoData: Promotion = {
       id: editingPromo?.id,
       tenant_slug: params.tenant,
       name: formData.name,
       description: formData.description,
-      image_url: formData.image_url,
+      image_url: formData.image_url || selectedProduct?.image_url, // Gebruik product foto als geen foto
       type: formData.type,
       value: formData.value,
+      product_id: formData.product_id || undefined,
+      product_name: selectedProduct?.name,
       min_order_amount: formData.min_order_amount,
       max_usage_per_customer: 1,
       usage_count: editingPromo?.usage_count || 0,
@@ -417,8 +434,21 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
 
                 {/* Type Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Type korting</label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Type promotie</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, type: 'fixedPrice' }))}
+                      className={`p-3 rounded-xl border-2 text-center transition-all ${
+                        formData.type === 'fixedPrice'
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <span className="text-2xl block mb-1">🏷️</span>
+                      <span className="text-sm font-medium">Vaste prijs</span>
+                      <span className="text-xs text-gray-500 block">bijv. Frikandel €2</span>
+                    </button>
                     <button
                       type="button"
                       onClick={() => setFormData(prev => ({ ...prev, type: 'percentage' }))}
@@ -430,39 +460,53 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     >
                       <span className="text-2xl block mb-1">%</span>
                       <span className="text-sm font-medium">Percentage</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, type: 'fixed' }))}
-                      className={`p-3 rounded-xl border-2 text-center transition-all ${
-                        formData.type === 'fixed'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <span className="text-2xl block mb-1">€</span>
-                      <span className="text-sm font-medium">Vast bedrag</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, type: 'freeItem' }))}
-                      className={`p-3 rounded-xl border-2 text-center transition-all ${
-                        formData.type === 'freeItem'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <span className="text-2xl block mb-1">🎁</span>
-                      <span className="text-sm font-medium">Gratis item</span>
+                      <span className="text-xs text-gray-500 block">bijv. 20% korting</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Value (for percentage and fixed) */}
+                {/* Product selectie - alleen voor fixedPrice */}
+                {formData.type === 'fixedPrice' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Kies product <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={formData.product_id}
+                      onChange={(e) => {
+                        const product = products.find(p => p.id === e.target.value)
+                        setFormData(prev => ({ 
+                          ...prev, 
+                          product_id: e.target.value,
+                          // Auto-fill naam als leeg
+                          name: prev.name || (product ? `${product.name} actie` : ''),
+                          // Gebruik product foto als geen foto
+                          image_url: prev.image_url || product?.image_url || ''
+                        }))
+                      }}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">-- Kies een product --</option>
+                      {products.map(product => (
+                        <option key={product.id} value={product.id}>
+                          {product.name} (normaal €{product.price.toFixed(2)})
+                        </option>
+                      ))}
+                    </select>
+                    {formData.product_id && (
+                      <p className="text-xs text-green-600 mt-1">
+                        ✓ Klanten kunnen dit product bestellen voor de actieprijs
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Prijs/Waarde */}
                 {formData.type !== 'freeItem' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {formData.type === 'percentage' ? 'Percentage (%)' : 'Bedrag (€)'}
+                      {formData.type === 'fixedPrice' ? 'Actieprijs (€)' : 
+                       formData.type === 'percentage' ? 'Percentage (%)' : 'Korting (€)'}
                     </label>
                     <input
                       type="text"

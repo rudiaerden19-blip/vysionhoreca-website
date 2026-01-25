@@ -917,8 +917,10 @@ export interface Promotion {
   code?: string // Optioneel - niet meer verplicht
   description?: string // Beschrijving van de aanbieding
   image_url?: string // Foto van de aanbieding
-  type: 'percentage' | 'fixed' | 'freeItem'
-  value: number
+  type: 'percentage' | 'fixed' | 'freeItem' | 'fixedPrice' // fixedPrice = vaste prijs voor product
+  value: number // Bij fixedPrice = de nieuwe prijs (bijv. 2 voor €2)
+  product_id?: string // Gekoppeld product
+  product_name?: string // Naam van gekoppeld product (voor weergave)
   free_item_id?: string
   min_order_amount: number
   max_discount?: number
@@ -976,6 +978,7 @@ export async function savePromotion(promotion: Promotion): Promise<Promotion | n
         code: promotion.code ? promotion.code.toUpperCase() : null,
         type: promotion.type,
         value: promotion.value,
+        product_id: promotion.product_id || null,
         free_item_id: promotion.free_item_id,
         min_order_amount: promotion.min_order_amount,
         max_discount: promotion.max_discount,
@@ -1006,6 +1009,7 @@ export async function savePromotion(promotion: Promotion): Promise<Promotion | n
         code: promotion.code ? promotion.code.toUpperCase() : null,
         type: promotion.type,
         value: promotion.value,
+        product_id: promotion.product_id || null,
         free_item_id: promotion.free_item_id,
         min_order_amount: promotion.min_order_amount,
         max_discount: promotion.max_discount,

@@ -359,51 +359,127 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
       {/* Menu Items Grid */}
       <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32">
-        {/* Promoties weergave - responsive */}
+        {/* Promoties weergave - responsive & klikbaar */}
         {activeCategory === 'promo' && promotions.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {promotions.map((promo) => (
-              <div
-                key={promo.id}
-                className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all"
-              >
-                <div className="relative h-40 sm:h-48 overflow-hidden bg-gray-100">
-                  {promo.image_url ? (
-                    <Image
-                      src={promo.image_url}
-                      alt={promo.name}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      quality={75}
-                      loading="lazy"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-5xl sm:text-6xl bg-gradient-to-br from-green-400 to-green-600">
-                      🎁
+            {promotions.map((promo) => {
+              // Vind het gekoppelde product
+              const linkedProduct = promo.product_id 
+                ? menuItems.find(item => item.id === promo.product_id)
+                : null
+              
+              // Bereken de prijs
+              const promoPrice = promo.type === 'fixedPrice' ? promo.value : 
+                                 promo.type === 'percentage' && linkedProduct ? linkedProduct.price * (1 - promo.value / 100) :
+                                 promo.type === 'fixed' && linkedProduct ? Math.max(0, linkedProduct.price - promo.value) :
+                                 0
+              
+              return (
+                <div
+                  key={promo.id}
+                  onClick={() => {
+                    // Als er een gekoppeld product is, voeg toe aan winkelwagen
+                    if (linkedProduct && promo.type === 'fixedPrice') {
+                      const promoItem: MenuItem = {
+                        ...linkedProduct,
+                        name: `${promo.name}`,
+                        price: promoPrice,
+                        is_promo: true,
+                      }
+                      // Direct toevoegen aan cart
+                      setCart(prev => {
+                        const existing = prev.find(c => 
+                          c.item.id === linkedProduct.id && 
+                          c.item.price === promoPrice
+                        )
+                        if (existing) {
+                          return prev.map(c => 
+                            c.item.id === linkedProduct.id && c.item.price === promoPrice
+                              ? { ...c, quantity: c.quantity + 1 }
+                              : c
+                          )
+                        }
+                        return [...prev, { 
+                          item: promoItem, 
+                          quantity: 1, 
+                          selectedOptions: [],
+                          totalPrice: promoPrice
+                        }]
+                      })
+                      // Toon cart
+                      setCartOpen(true)
+                    }
+                  }}
+                  className={`bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all ${
+                    linkedProduct ? 'cursor-pointer active:scale-[0.98]' : ''
+                  }`}
+                >
+                  <div className="relative h-40 sm:h-48 overflow-hidden bg-gray-100">
+                    {promo.image_url ? (
+                      <Image
+                        src={promo.image_url}
+                        alt={promo.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        quality={75}
+                        loading="lazy"
+                        className="object-cover"
+                      />
+                    ) : linkedProduct?.image_url ? (
+                      <Image
+                        src={linkedProduct.image_url}
+                        alt={promo.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        quality={75}
+                        loading="lazy"
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-5xl sm:text-6xl bg-gradient-to-br from-green-400 to-green-600">
+                        🎁
+                      </div>
+                    )}
+                    {/* Prijs badge */}
+                    <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
+                      <span className="bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg">
+                        {promo.type === 'fixedPrice' ? `€${promo.value.toFixed(2)}` :
+                         promo.type === 'percentage' ? `-${promo.value}%` :
+                         promo.type === 'fixed' ? `-€${promo.value}` : t('menuPage.free')}
+                      </span>
                     </div>
-                  )}
-                  {/* Korting badge */}
-                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-                    <span className="bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg">
-                      {promo.type === 'percentage' ? `-${promo.value}%` :
-                       promo.type === 'fixed' ? `-€${promo.value}` : t('menuPage.free')}
-                    </span>
+                    {/* Normale prijs doorgestreept */}
+                    {linkedProduct && promo.type === 'fixedPrice' && (
+                      <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+                        <span className="bg-gray-800/70 text-white text-xs px-2 py-1 rounded-full line-through">
+                          €{linkedProduct.price.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 sm:p-4">
+                    <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1">{promo.name}</h3>
+                    {promo.description && (
+                      <p className="text-gray-500 text-xs sm:text-sm line-clamp-2">{promo.description}</p>
+                    )}
+                    {/* Bestel knop voor klikbare promoties */}
+                    {linkedProduct && promo.type === 'fixedPrice' && (
+                      <button
+                        style={{ backgroundColor: primaryColor }}
+                        className="w-full mt-3 py-2 text-white font-medium rounded-lg text-sm hover:opacity-90 transition-opacity"
+                      >
+                        + Toevoegen €{promo.value.toFixed(2)}
+                      </button>
+                    )}
+                    {promo.min_order_amount > 0 && (
+                      <p className="text-orange-600 text-xs sm:text-sm mt-2 font-medium">
+                        Min. bestelling: €{promo.min_order_amount.toFixed(2)}
+                      </p>
+                    )}
                   </div>
                 </div>
-                <div className="p-3 sm:p-4">
-                  <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1">{promo.name}</h3>
-                  {promo.description && (
-                    <p className="text-gray-500 text-xs sm:text-sm line-clamp-2">{promo.description}</p>
-                  )}
-                  {promo.min_order_amount > 0 && (
-                    <p className="text-orange-600 text-xs sm:text-sm mt-2 font-medium">
-                      Min. bestelling: €{promo.min_order_amount.toFixed(2)}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : menuItems.length === 0 ? (
           <div className="text-center py-20">
