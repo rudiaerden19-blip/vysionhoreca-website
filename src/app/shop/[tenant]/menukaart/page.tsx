@@ -26,6 +26,12 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
         getMenuProducts(params.tenant)
       ])
       
+      // Check of tenant bestaat - redirect naar niet gevonden als settingsData null is
+      if (!settingsData) {
+        window.location.href = `/shop/${params.tenant}`
+        return
+      }
+      
       setSettings(settingsData)
       setCategories(categoriesData.sort((a, b) => a.sort_order - b.sort_order))
       setProducts(productsData.filter(p => p.is_active).sort((a, b) => a.sort_order - b.sort_order))

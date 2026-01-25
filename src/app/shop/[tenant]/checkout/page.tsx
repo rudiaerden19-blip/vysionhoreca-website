@@ -70,6 +70,13 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       getDeliverySettings(params.tenant),
       getShopStatus(params.tenant),
     ])
+    
+    // Check of tenant bestaat - redirect naar niet gevonden als tenant null is
+    if (!tenant) {
+      window.location.href = `/shop/${params.tenant}`
+      return
+    }
+    
     setTenantSettings(tenant)
     setDeliverySettings(delivery)
     setShopStatus(status)

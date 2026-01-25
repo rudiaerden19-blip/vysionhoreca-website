@@ -3335,6 +3335,8 @@
     "blocked": "Deze winkel is momenteel niet beschikbaar",
     "blockedTitle": "Shop Tijdelijk Niet Beschikbaar",
     "blockedDescription": "Deze webshop is momenteel niet actief. Neem contact op met de eigenaar voor meer informatie.",
+    "notFoundTitle": "Shop niet gevonden",
+    "notFoundDescription": "Deze shop bestaat niet of is verwijderd.",
     "backToVysion": "Terug naar Vysion",
     "menu": "Menu",
     "account": "Account",

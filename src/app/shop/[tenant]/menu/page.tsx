@@ -76,6 +76,12 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       
       setProductsWithOptions(optionProducts)
       
+      // Check of tenant bestaat - redirect naar niet gevonden als tenantData null is
+      if (!tenantData) {
+        window.location.href = `/shop/${params.tenant}`
+        return
+      }
+      
       // Set primary color and image display mode from tenant settings
       if (tenantData?.primary_color) {
         setPrimaryColor(tenantData.primary_color)

@@ -3183,6 +3183,8 @@
     "blocked": "Questo negozio non è attualmente disponibile",
     "blockedTitle": "Negozio Temporaneamente Non Disponibile",
     "blockedDescription": "Questo negozio online non è attualmente attivo. Contattare il proprietario per ulteriori informazioni.",
+    "notFoundTitle": "Negozio non trovato",
+    "notFoundDescription": "Questo negozio non esiste o è stato rimosso.",
     "backToVysion": "Torna a Vysion",
     "menu": "Menu",
     "account": "Account",

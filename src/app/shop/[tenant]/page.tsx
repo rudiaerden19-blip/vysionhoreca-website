@@ -353,6 +353,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           getVisibleReviews(params.tenant),
         ])
 
+        // Check of tenant bestaat - als tenantData null is, bestaat de tenant niet
+        if (!tenantData) {
+          setBusiness(null)
+          setLoading(false)
+          return
+        }
+
       // Converteer openingstijden naar het juiste formaat
         const openingHoursMap: Record<string, { open?: string; close?: string; closed?: boolean; hasShift2?: boolean; open2?: string; close2?: string; hasBreak?: boolean; breakStart?: string; breakEnd?: string }> = {}
       dayNamesNL.forEach((dayName, index) => {
@@ -572,7 +579,26 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     )
   }
 
-  if (!business) return null
+  if (!business) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center"
+        >
+          <span className="text-6xl mb-6 block">🔍</span>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('shopPage.notFoundTitle') || 'Shop niet gevonden'}</h1>
+          <p className="text-gray-600 mb-6">
+            {t('shopPage.notFoundDescription') || 'Deze shop bestaat niet of is verwijderd.'}
+          </p>
+          <Link href="/" className="text-orange-500 hover:text-orange-600 font-medium">
+            ← {t('shopPage.backToVysion') || 'Terug naar Vysion'}
+          </Link>
+        </motion.div>
+      </div>
+    )
+  }
 
   const todayHours = business.opening_hours[getDayName()]
 

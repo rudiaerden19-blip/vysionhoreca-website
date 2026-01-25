@@ -2689,6 +2689,8 @@
     "blocked": "Dieser Shop ist derzeit nicht verfügbar",
     "blockedTitle": "Shop Vorübergehend Nicht Verfügbar",
     "blockedDescription": "Dieser Webshop ist derzeit nicht aktiv. Bitte kontaktieren Sie den Inhaber für weitere Informationen.",
+    "notFoundTitle": "Shop nicht gefunden",
+    "notFoundDescription": "Dieser Shop existiert nicht oder wurde entfernt.",
     "backToVysion": "Zurück zu Vysion",
     "menu": "Menü",
     "account": "Konto",

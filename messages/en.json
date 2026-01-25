@@ -3335,6 +3335,8 @@
     "blocked": "This shop is currently unavailable",
     "blockedTitle": "Shop Temporarily Unavailable",
     "blockedDescription": "This webshop is currently not active. Please contact the owner for more information.",
+    "notFoundTitle": "Shop not found",
+    "notFoundDescription": "This shop does not exist or has been removed.",
     "backToVysion": "Back to Vysion",
     "menu": "Menu",
     "account": "Account",

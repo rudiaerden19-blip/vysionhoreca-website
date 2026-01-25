@@ -2689,6 +2689,8 @@
     "blocked": "Cette boutique est actuellement indisponible",
     "blockedTitle": "Boutique Temporairement Indisponible",
     "blockedDescription": "Cette boutique en ligne n'est actuellement pas active. Veuillez contacter le propriétaire pour plus d'informations.",
+    "notFoundTitle": "Boutique introuvable",
+    "notFoundDescription": "Cette boutique n'existe pas ou a été supprimée.",
     "backToVysion": "Retour à Vysion",
     "menu": "Menu",
     "account": "Compte",
