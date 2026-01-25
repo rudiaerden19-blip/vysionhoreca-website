@@ -65,30 +65,53 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   }, [isOpen, loadMedia])
 
   const handleUpload = async (file: File) => {
-    if (!file || !supabase) return
+    if (!file) {
+      console.error('Geen bestand geselecteerd')
+      return
+    }
+    if (!supabase) {
+      console.error('Supabase niet beschikbaar')
+      alert('Database connectie mislukt')
+      return
+    }
     
     setUploading(true)
     setShowOptions(false)
     
     try {
+      // Bepaal bestandsextensie - camera foto's kunnen .jpg, .jpeg, .heic, etc. zijn
+      let fileExt = 'jpg'
+      if (file.name && file.name.includes('.')) {
+        fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+      } else if (file.type) {
+        // Gebruik MIME type als fallback (bijv. image/jpeg -> jpeg)
+        fileExt = file.type.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg'
+      }
+      
       // Genereer unieke bestandsnaam
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${tenantSlug}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+      const timestamp = Date.now()
+      const randomId = Math.random().toString(36).substring(2, 8)
+      const fileName = `${tenantSlug}/${timestamp}-${randomId}.${fileExt}`
+      
+      console.log('Uploading file:', fileName, 'Size:', file.size, 'Type:', file.type)
       
       // Upload naar Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('media')
         .upload(fileName, file, {
           cacheControl: '31536000',
-          upsert: false
+          upsert: false,
+          contentType: file.type || 'image/jpeg'
         })
       
       if (uploadError) {
         console.error('Upload error:', uploadError)
-        alert('Upload mislukt. Probeer opnieuw.')
+        alert(`Upload mislukt: ${uploadError.message}`)
         setUploading(false)
         return
       }
+      
+      console.log('Upload success:', uploadData)
       
       // Haal publieke URL op
       const { data: urlData } = supabase.storage
@@ -96,20 +119,27 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
         .getPublicUrl(fileName)
       
       const publicUrl = urlData.publicUrl
+      console.log('Public URL:', publicUrl)
       
       // Sla op in tenant_media tabel
-      await supabase
+      const displayName = file.name || `Foto ${new Date().toLocaleDateString('nl-NL')}`
+      const { error: dbError } = await supabase
         .from('tenant_media')
         .insert({
           tenant_slug: tenantSlug,
           url: publicUrl,
           file_url: publicUrl,
-          name: file.name,
-          file_name: file.name,
+          name: displayName,
+          file_name: displayName,
           category: 'Uploads',
-          file_size: file.size,
-          file_type: file.type
+          file_size: file.size || 0,
+          file_type: file.type || 'image/jpeg'
         })
+      
+      if (dbError) {
+        console.error('Database error:', dbError)
+        // Foto is wel geüpload, dus we gebruiken hem toch
+      }
       
       // Selecteer direct de geüploade foto
       onChange(publicUrl)
@@ -119,10 +149,11 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       
     } catch (error) {
       console.error('Upload failed:', error)
-      alert('Upload mislukt. Probeer opnieuw.')
+      alert('Upload mislukt. Controleer je internetverbinding en probeer opnieuw.')
+    } finally {
+      // Zorg dat uploading ALTIJD op false gezet wordt
+      setUploading(false)
     }
-    
-    setUploading(false)
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
