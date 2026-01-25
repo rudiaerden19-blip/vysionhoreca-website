@@ -412,43 +412,34 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
     setSearching(false)
   }
 
-  // Add ingredient from database (creates new ingredient first)
+  // Add ingredient from database - ALTIJD nieuw ingrediënt aanmaken
   async function addDatabaseIngredient(product: SupplierProduct, productId: string) {
     if (!businessId) return
     
-    console.log('Adding database ingredient:', product.name, 'Article:', product.article_number)
+    console.log('Adding database ingredient:', product.name)
 
-    // Check if already exists by article number - only if article_number exists
-    const existing = product.article_number 
-      ? ingredients.find(i => i.notes?.includes(`Art. #${product.article_number}`))
-      : null
-    
-    let ingredientId: string
+    // ALTIJD nieuw ingrediënt aanmaken met de juiste naam
+    const { data: newIng } = await supabase
+      .from('ingredients')
+      .insert({
+        tenant_slug: businessId,
+        name: product.name,
+        unit: product.unit || 'stuk',
+        purchase_price: product.unit_price || 0,
+        units_per_package: product.units_per_package || 1,
+        package_price: product.package_price || 0,
+        notes: product.article_number ? `Art. #${product.article_number}` : ''
+      })
+      .select()
+      .single()
 
-    if (existing) {
-      console.log('Found existing ingredient:', existing.name)
-      ingredientId = existing.id
-    } else {
-      console.log('Creating new ingredient:', product.name)
-      // Create new ingredient
-      const { data: newIng } = await supabase
-        .from('ingredients')
-        .insert({
-          tenant_slug: businessId,
-          name: product.name,
-          unit: product.unit || 'stuk',
-          purchase_price: product.unit_price,
-          units_per_package: product.units_per_package,
-          package_price: product.package_price,
-          notes: `Art. #${product.article_number}`
-        })
-        .select()
-        .single()
-
-      if (!newIng) return
-      ingredientId = newIng.id
-      setIngredients(prev => [...prev, newIng].sort((a, b) => a.name.localeCompare(b.name)))
+    if (!newIng) {
+      console.error('Failed to create ingredient')
+      return
     }
+    
+    const ingredientId = newIng.id
+    setIngredients(prev => [...prev, newIng].sort((a, b) => a.name.localeCompare(b.name)))
 
     // Add to product
     const { data: pi } = await supabase
