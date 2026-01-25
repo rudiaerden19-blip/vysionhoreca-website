@@ -32,6 +32,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   const [uploading, setUploading] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -211,6 +212,63 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
 
   const clearImage = () => {
     onChange('')
+  }
+
+  // Verwijder foto uit media bibliotheek (werkt voor alle tenants)
+  const deleteMedia = async (e: React.MouseEvent, item: MediaItem) => {
+    e.stopPropagation() // Voorkom selectie van de foto
+    
+    if (!confirm('Weet je zeker dat je deze foto wilt verwijderen?')) {
+      return
+    }
+    
+    setDeletingId(item.id)
+    
+    try {
+      // 1. Verwijder uit tenant_media tabel
+      const { error: dbError } = await supabase
+        .from('tenant_media')
+        .delete()
+        .eq('id', item.id)
+        .eq('tenant_slug', tenantSlug) // Extra veiligheid: alleen eigen tenant
+      
+      if (dbError) {
+        console.error('Database delete error:', dbError)
+        alert('Fout bij verwijderen uit database')
+        setDeletingId(null)
+        return
+      }
+      
+      // 2. Probeer ook uit Storage te verwijderen (als het een Supabase URL is)
+      try {
+        const url = item.url
+        if (url.includes('supabase') && url.includes('/media/')) {
+          // Haal bestandsnaam uit URL: .../media/tenant-slug/filename.jpg
+          const pathMatch = url.match(/\/media\/(.+)$/)
+          if (pathMatch && pathMatch[1]) {
+            const storagePath = decodeURIComponent(pathMatch[1])
+            await supabase.storage.from('media').remove([storagePath])
+          }
+        }
+      } catch (storageError) {
+        // Storage verwijderen is niet kritisch, log alleen
+        console.warn('Storage delete warning:', storageError)
+      }
+      
+      // 3. Als de verwijderde foto geselecteerd was, wis de selectie
+      if (value === item.url) {
+        onChange('')
+      }
+      
+      // 4. Herlaad media bibliotheek
+      loadMedia()
+      
+    } catch (error: any) {
+      console.error('Delete error:', error)
+      alert('Fout bij verwijderen: ' + (error?.message || 'Onbekende fout'))
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   const filteredMedia = selectedCategory === 'alle' 
@@ -486,7 +544,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => selectImage(item.url)}
-                        className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all bg-gray-100 ${
+                        className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all bg-gray-100 group ${
                           value === item.url ? 'ring-blue-500 ring-4' : 'ring-transparent hover:ring-gray-300'
                         }`}
                       >
@@ -497,6 +555,29 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                           className="object-cover"
                           unoptimized
                         />
+                        {/* Delete button - verschijnt bij hover */}
+                        <button
+                          onClick={(e) => deleteMedia(e, item)}
+                          disabled={deletingId === item.id}
+                          className="absolute top-1 right-1 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg disabled:opacity-50"
+                          title="Verwijderen"
+                        >
+                          {deletingId === item.id ? (
+                            <motion.div
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 0.5, repeat: Infinity, ease: "linear" }}
+                              className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                            />
+                          ) : (
+                            <span className="text-sm">✕</span>
+                          )}
+                        </button>
+                        {/* Selected indicator */}
+                        {value === item.url && (
+                          <div className="absolute bottom-1 right-1 w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg">
+                            <span className="text-xs">✓</span>
+                          </div>
+                        )}
                       </motion.div>
                     ))}
                   </div>
