@@ -242,6 +242,29 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     )
   }
 
+  // Verwijder één foto direct
+  const deleteSingleMedia = async (e: React.MouseEvent, item: MediaItem) => {
+    e.stopPropagation() // Voorkom selectie
+    
+    if (!confirm('Weet je zeker dat je deze foto wilt verwijderen?')) return
+
+    try {
+      // Verwijder uit storage
+      const urlParts = item.url.split('/media/')
+      if (urlParts[1]) {
+        await supabase.storage.from('media').remove([urlParts[1]])
+      }
+      // Verwijder uit database
+      await supabase.from('tenant_media').delete().eq('id', item.id)
+      
+      // Herlaad
+      await loadMedia()
+    } catch (error) {
+      console.error('Delete error:', error)
+      alert('Fout bij verwijderen')
+    }
+  }
+
   const deleteSelected = async () => {
     if (!confirm(`${selectedItems.length} foto('s) verwijderen?`)) return
 
@@ -559,7 +582,15 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 loading="lazy"
               />
-              <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
+              {/* DELETE KNOP - altijd zichtbaar rechtsboven */}
+              <button
+                onClick={(e) => deleteSingleMedia(e, item)}
+                className="absolute top-2 right-2 w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-xl border-2 border-white z-20"
+                title="Verwijderen"
+              >
+                <span className="text-lg">🗑️</span>
+              </button>
+              <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity pointer-events-none ${
                 selectedItems.includes(item.id) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               }`}>
                 <span className="text-3xl text-white">
@@ -571,7 +602,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                   📁 {item.category}
                 </div>
               )}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 <p className="text-white text-xs truncate">{item.name}</p>
               </div>
             </motion.div>
@@ -613,6 +644,14 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 </span>
               )}
               <p className="text-sm text-gray-400">{formatDate(item.created_at)}</p>
+              {/* DELETE KNOP in list view */}
+              <button
+                onClick={(e) => deleteSingleMedia(e, item)}
+                className="w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-lg flex-shrink-0"
+                title="Verwijderen"
+              >
+                <span className="text-lg">🗑️</span>
+              </button>
             </div>
           ))}
         </div>

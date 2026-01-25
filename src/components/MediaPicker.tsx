@@ -555,21 +555,26 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                           className="object-cover"
                           unoptimized
                         />
-                        {/* Delete button - altijd zichtbaar (ook op touch devices) */}
+                        {/* Delete button - GROOT en DUIDELIJK ZICHTBAAR */}
                         <button
-                          onClick={(e) => deleteMedia(e, item)}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            deleteMedia(e, item)
+                          }}
                           disabled={deletingId === item.id}
-                          className="absolute top-1 right-1 w-8 h-8 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-full flex items-center justify-center shadow-lg disabled:opacity-50 z-10"
+                          className="absolute top-2 right-2 w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-xl border-2 border-white disabled:opacity-50"
+                          style={{ zIndex: 50 }}
                           title="Verwijderen"
                         >
                           {deletingId === item.id ? (
                             <motion.div
                               animate={{ rotate: 360 }}
                               transition={{ duration: 0.5, repeat: Infinity, ease: "linear" }}
-                              className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                             />
                           ) : (
-                            <span className="text-sm">✕</span>
+                            <span className="text-lg font-bold">🗑️</span>
                           )}
                         </button>
                         {/* Selected indicator */}
