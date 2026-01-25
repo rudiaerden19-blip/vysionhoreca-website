@@ -55,6 +55,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [earnedPoints, setEarnedPoints] = useState(0)
   const [loggedInCustomerId, setLoggedInCustomerId] = useState<string | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
+  const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>(['cash'])
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
 
@@ -80,6 +81,17 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     setTenantSettings(tenant)
     setDeliverySettings(delivery)
     setShopStatus(status)
+    
+    // Load enabled payment methods
+    if (tenant?.payment_methods && Array.isArray(tenant.payment_methods) && tenant.payment_methods.length > 0) {
+      setEnabledPaymentMethods(tenant.payment_methods)
+      // Set default payment method to first enabled one
+      if (tenant.payment_methods.includes('cash')) {
+        setPaymentMethod('cash')
+      } else {
+        setPaymentMethod('online')
+      }
+    }
     
     // Default to pickup if delivery is not enabled
     if (!delivery?.delivery_enabled) {
@@ -626,29 +638,91 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             >
               <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.paymentMethod')}</h2>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                <button
-                  onClick={() => setPaymentMethod('cash')}
-                  style={paymentMethod === 'cash' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
-                  className={`p-4 rounded-xl border-2 transition-all ${
-                    paymentMethod === 'cash' ? '' : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <span className="text-3xl block mb-2">💵</span>
-                  <span className="font-bold text-gray-900">{t('checkoutPage.cash')}</span>
-                  <span className="block text-sm text-gray-500">{orderType === 'pickup' ? t('checkoutPage.payAtPickup') : t('checkoutPage.payAtDelivery')}</span>
-                </button>
+                {/* Cash optie - alleen tonen als ingeschakeld */}
+                {enabledPaymentMethods.includes('cash') && (
+                  <button
+                    onClick={() => setPaymentMethod('cash')}
+                    style={paymentMethod === 'cash' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      paymentMethod === 'cash' ? '' : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-3xl block mb-2">💵</span>
+                    <span className="font-bold text-gray-900">{t('checkoutPage.cash')}</span>
+                    <span className="block text-sm text-gray-500">{orderType === 'pickup' ? t('checkoutPage.payAtPickup') : t('checkoutPage.payAtDelivery')}</span>
+                  </button>
+                )}
                 
-                <button
-                  onClick={() => setPaymentMethod('online')}
-                  style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
-                  className={`p-4 rounded-xl border-2 transition-all ${
-                    paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <span className="text-3xl block mb-2">💳</span>
-                  <span className="font-bold text-gray-900">{t('checkoutPage.online')}</span>
-                  <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
-                </button>
+                {/* Online betaling opties */}
+                {enabledPaymentMethods.includes('bancontact') && (
+                  <button
+                    onClick={() => setPaymentMethod('online')}
+                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-3xl block mb-2">💳</span>
+                    <span className="font-bold text-gray-900">Bancontact</span>
+                    <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
+                  </button>
+                )}
+                
+                {enabledPaymentMethods.includes('visa') && (
+                  <button
+                    onClick={() => setPaymentMethod('online')}
+                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-3xl block mb-2">💳</span>
+                    <span className="font-bold text-gray-900">Visa</span>
+                    <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
+                  </button>
+                )}
+                
+                {enabledPaymentMethods.includes('mastercard') && (
+                  <button
+                    onClick={() => setPaymentMethod('online')}
+                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-3xl block mb-2">💳</span>
+                    <span className="font-bold text-gray-900">Mastercard</span>
+                    <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
+                  </button>
+                )}
+                
+                {enabledPaymentMethods.includes('paypal') && (
+                  <button
+                    onClick={() => setPaymentMethod('online')}
+                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-3xl block mb-2">🅿️</span>
+                    <span className="font-bold text-gray-900">PayPal</span>
+                    <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
+                  </button>
+                )}
+                
+                {enabledPaymentMethods.includes('ideal') && (
+                  <button
+                    onClick={() => setPaymentMethod('online')}
+                    style={paymentMethod === 'online' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
+                    className={`p-4 rounded-xl border-2 transition-all ${
+                      paymentMethod === 'online' ? '' : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="text-3xl block mb-2">🏦</span>
+                    <span className="font-bold text-gray-900">iDEAL</span>
+                    <span className="block text-sm text-gray-500">{t('checkoutPage.securePayment')}</span>
+                  </button>
+                )}
               </div>
               
               {paymentMethod === 'online' && (
