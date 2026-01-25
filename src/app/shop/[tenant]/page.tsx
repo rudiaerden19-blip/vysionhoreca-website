@@ -56,6 +56,11 @@ interface Business {
   gift_cards_enabled?: boolean
   stripe_public_key?: string
   reservations_enabled?: boolean
+  // SEO
+  seo_title?: string
+  seo_description?: string
+  seo_keywords?: string
+  seo_og_image?: string
 }
 
 interface Review {
@@ -440,6 +445,11 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         gift_cards_enabled: tenantData?.gift_cards_enabled ?? false,
         stripe_public_key: tenantData?.stripe_public_key || '',
         reservations_enabled: tenantData?.reservations_enabled !== false, // Default true
+        // SEO
+        seo_title: tenantData?.seo_title || '',
+        seo_description: tenantData?.seo_description || '',
+        seo_keywords: tenantData?.seo_keywords || '',
+        seo_og_image: tenantData?.seo_og_image || '',
       })
 
       // Team members ophalen
@@ -506,6 +516,85 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     return () => clearInterval(interval)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
+
+  // SEO: Update document title en meta tags
+  useEffect(() => {
+    if (!business.name) return
+
+    // Document title
+    const seoTitle = business.seo_title || `${business.name} | ${business.tagline || 'Bestel Online'}`
+    document.title = seoTitle
+
+    // Meta description
+    const seoDescription = business.seo_description || business.description || `Bestel online bij ${business.name}. ${business.tagline || ''}`
+    let metaDesc = document.querySelector('meta[name="description"]')
+    if (metaDesc) {
+      metaDesc.setAttribute('content', seoDescription)
+    } else {
+      metaDesc = document.createElement('meta')
+      metaDesc.setAttribute('name', 'description')
+      metaDesc.setAttribute('content', seoDescription)
+      document.head.appendChild(metaDesc)
+    }
+
+    // Meta keywords
+    if (business.seo_keywords) {
+      let metaKeywords = document.querySelector('meta[name="keywords"]')
+      if (metaKeywords) {
+        metaKeywords.setAttribute('content', business.seo_keywords)
+      } else {
+        metaKeywords = document.createElement('meta')
+        metaKeywords.setAttribute('name', 'keywords')
+        metaKeywords.setAttribute('content', business.seo_keywords)
+        document.head.appendChild(metaKeywords)
+      }
+    }
+
+    // Open Graph tags
+    const updateOGTag = (property: string, content: string) => {
+      let tag = document.querySelector(`meta[property="${property}"]`)
+      if (tag) {
+        tag.setAttribute('content', content)
+      } else {
+        tag = document.createElement('meta')
+        tag.setAttribute('property', property)
+        tag.setAttribute('content', content)
+        document.head.appendChild(tag)
+      }
+    }
+
+    updateOGTag('og:title', seoTitle)
+    updateOGTag('og:description', seoDescription)
+    updateOGTag('og:type', 'website')
+    updateOGTag('og:url', `https://www.vysionhoreca.com/shop/${params.tenant}`)
+    
+    if (business.seo_og_image) {
+      updateOGTag('og:image', business.seo_og_image)
+    } else if (business.logo_url) {
+      updateOGTag('og:image', business.logo_url)
+    }
+
+    // Twitter Card
+    const updateTwitterTag = (name: string, content: string) => {
+      let tag = document.querySelector(`meta[name="${name}"]`)
+      if (tag) {
+        tag.setAttribute('content', content)
+      } else {
+        tag = document.createElement('meta')
+        tag.setAttribute('name', name)
+        tag.setAttribute('content', content)
+        document.head.appendChild(tag)
+      }
+    }
+
+    updateTwitterTag('twitter:card', 'summary_large_image')
+    updateTwitterTag('twitter:title', seoTitle)
+    updateTwitterTag('twitter:description', seoDescription)
+    if (business.seo_og_image || business.logo_url) {
+      updateTwitterTag('twitter:image', business.seo_og_image || business.logo_url)
+    }
+
+  }, [business, params.tenant])
 
   const getDayName = () => {
     // JavaScript: 0=Sunday, 1=Monday, etc.
