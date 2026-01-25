@@ -204,9 +204,12 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         <p className="text-white/80 mb-4">
           Wij kunnen Stripe of Mollie voor je instellen zodat klanten online kunnen betalen.
         </p>
-        <button className="bg-white text-blue-600 font-medium px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors">
-          Contact
-        </button>
+        <a 
+          href="mailto:info@vysionhoreca.com?subject=Online%20Betalingen%20Activeren"
+          className="inline-block bg-white text-blue-600 font-medium px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors"
+        >
+          📧 Contact
+        </a>
       </motion.div>
     </div>
   )
