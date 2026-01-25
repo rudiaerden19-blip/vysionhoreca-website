@@ -75,7 +75,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
-  const [audioReady, setAudioReady] = useState(false)
+  const [audioReady, setAudioReady] = useState(true)
+  const [audioActivated, setAudioActivated] = useState(false)
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [rejectionNotes, setRejectionNotes] = useState('')
@@ -728,6 +729,59 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           />
           <p className="text-gray-500">{t('ordersPage.loading')}</p>
         </div>
+      </div>
+    )
+  }
+
+  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - gebruiker MOET klikken
+  if (!audioActivated) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] p-4">
+        <motion.button
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            // Activeer AudioContext met user gesture (VEREIST voor iOS/Safari)
+            try {
+              const AudioContext = window.AudioContext || (window as any).webkitAudioContext
+              if (AudioContext) {
+                const ctx = new AudioContext()
+                const osc = ctx.createOscillator()
+                const gain = ctx.createGain()
+                gain.gain.value = 0.01
+                osc.connect(gain)
+                gain.connect(ctx.destination)
+                osc.start()
+                osc.stop(ctx.currentTime + 0.1)
+              }
+            } catch (e) {
+              console.log('Audio activation:', e)
+            }
+            
+            setAudioActivated(true)
+            setSoundEnabled(true)
+            setAudioReady(true)
+            playSound()
+          }}
+          className="bg-blue-500 hover:bg-blue-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
+        >
+          <motion.div
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="text-7xl mb-6"
+          >
+            🔔
+          </motion.div>
+          <h1 className="text-2xl font-bold mb-4">Tik om geluid te activeren</h1>
+          <p className="text-lg opacity-80 mb-6">
+            Je ontvangt meldingen bij nieuwe bestellingen
+          </p>
+          <div className="bg-white/20 rounded-xl px-6 py-3 inline-block">
+            <span className="text-lg font-bold">▶️ START</span>
+          </div>
+        </motion.button>
       </div>
     )
   }

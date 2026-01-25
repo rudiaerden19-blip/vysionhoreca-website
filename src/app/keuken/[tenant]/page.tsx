@@ -42,6 +42,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [currentTime, setCurrentTime] = useState(new Date())
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [audioReady, setAudioReady] = useState(true)
+  const [audioActivated, setAudioActivated] = useState(false)
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [printerIP, setPrinterIP] = useState<string | null>(null)
   const [showPrinterSettings, setShowPrinterSettings] = useState(false)
@@ -450,6 +451,59 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full"
         />
+      </div>
+    )
+  }
+
+  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - gebruiker MOET klikken
+  if (!audioActivated) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
+        <motion.button
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            // Activeer AudioContext met user gesture (VEREIST voor iOS/Safari)
+            try {
+              const AudioContext = window.AudioContext || (window as any).webkitAudioContext
+              if (AudioContext) {
+                const ctx = new AudioContext()
+                const osc = ctx.createOscillator()
+                const gain = ctx.createGain()
+                gain.gain.value = 0.01
+                osc.connect(gain)
+                gain.connect(ctx.destination)
+                osc.start()
+                osc.stop(ctx.currentTime + 0.1)
+              }
+            } catch (e) {
+              console.log('Audio activation:', e)
+            }
+            
+            setAudioActivated(true)
+            setSoundEnabled(true)
+            setAudioReady(true)
+            playAlertSound()
+          }}
+          className="bg-blue-500 hover:bg-blue-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
+        >
+          <motion.div
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="text-8xl mb-6"
+          >
+            👨‍🍳
+          </motion.div>
+          <h1 className="text-3xl font-bold mb-4">Tik om te starten</h1>
+          <p className="text-xl opacity-80 mb-6">
+            Geluidsmeldingen worden geactiveerd
+          </p>
+          <div className="bg-white/20 rounded-xl px-6 py-3 inline-block">
+            <span className="text-lg font-bold">▶️ START KEUKEN</span>
+          </div>
+        </motion.button>
       </div>
     )
   }
