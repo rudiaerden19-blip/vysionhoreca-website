@@ -1468,7 +1468,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
                 {business.website_url && (
                   <a 
-                    href={business.website_url.startsWith('http') ? business.website_url : `https://${business.website_url}`}
+                    href={
+                      // Als het een ordervysion.com URL is, gebruik de juiste vysionhoreca.com URL
+                      business.website_url.includes('ordervysion.com') 
+                        ? `https://www.vysionhoreca.com/shop/${params.tenant}`
+                        : business.website_url.startsWith('http') 
+                          ? business.website_url 
+                          : `https://${business.website_url}`
+                    }
                     target="_blank"
                     className="flex items-start gap-4 group"
                   >
@@ -1477,7 +1484,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     </div>
                     <div>
                       <p className="font-semibold group-hover:text-green-400 transition-colors">
-                        {business.website_url.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                        {business.website_url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '')}
                       </p>
                       <p className="text-white/60 text-sm">{t('shopPage.visitWebsite') || 'Bezoek onze website'}</p>
                     </div>
