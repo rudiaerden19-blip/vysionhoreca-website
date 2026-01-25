@@ -703,12 +703,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   return (
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-white">
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href={`/shop/${params.tenant}`} className="flex items-center gap-3">
+      {/* Fixed Header - Clean & Compact */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
+          {/* Logo */}
+          <Link href={`/shop/${params.tenant}`} className="flex items-center gap-2 sm:gap-3">
             {business.logo_url && (
-              <div className="relative w-10 h-10">
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10">
                 <Image 
                   src={business.logo_url} 
                   alt={business.name} 
@@ -718,25 +719,67 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 />
               </div>
             )}
-            <span className="text-white font-bold text-lg hidden sm:block">{business.name}</span>
+            <span className="text-white font-bold text-sm sm:text-lg hidden sm:block">{business.name}</span>
           </Link>
           
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Language Switcher */}
+          {/* Navigation buttons - all same style */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Promoties - alleen icoon op mobiel */}
+            {business.promotions_enabled && promotions.length > 0 && (
+              <button
+                onClick={() => setShowPromotionsModal(true)}
+                style={{ backgroundColor: business.primary_color }}
+                className="text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:opacity-90 transition-opacity flex items-center gap-1"
+              >
+                <span>🎁</span>
+                <span className="hidden sm:inline">{t('shopPage.promotions')}</span>
+              </button>
+            )}
+            
+            {/* Menu */}
+            <Link 
+              href={`/shop/${params.tenant}/menu`}
+              style={{ backgroundColor: business.primary_color }}
+              className="text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:opacity-90 transition-opacity flex items-center gap-1"
+            >
+              <span>🍟</span>
+              <span className="hidden sm:inline">{t('shopPage.menu')}</span>
+            </Link>
+            
+            {/* Account */}
+            <Link 
+              href={`/shop/${params.tenant}/account`}
+              className="bg-white/20 backdrop-blur-md text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:bg-white/30 transition-colors flex items-center gap-1"
+            >
+              <span>👤</span>
+              <span className="hidden sm:inline">{t('shopPage.account')}</span>
+            </Link>
+            
+            {/* Admin - alleen voor eigenaar */}
+            {isOwner && (
+              <Link 
+                href={`/shop/${params.tenant}/admin`}
+                className="bg-white/20 backdrop-blur-md text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:bg-white/30 transition-colors flex items-center gap-1"
+              >
+                <span>⚙️</span>
+                <span className="hidden sm:inline">{t('shopPage.admin')}</span>
+              </Link>
+            )}
+
+            {/* Language Switcher - fixed position rechts */}
             <div className="relative">
               <button
                 onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                className="bg-white/20 backdrop-blur-md text-white font-medium px-3 py-2 rounded-full text-sm hover:bg-white/30 transition-colors flex items-center gap-1"
+                className="bg-white/20 backdrop-blur-md text-white font-medium px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:bg-white/30 transition-colors flex items-center gap-1"
                 title={t('languageSwitcher.selectLanguage')}
               >
                 <span>{localeFlags[locale]}</span>
-                <span className="hidden sm:inline">{locale.toUpperCase()}</span>
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               
-              {/* Language Dropdown */}
+              {/* Language Dropdown - fixed rechts */}
               <AnimatePresence>
                 {showLanguageMenu && (
                   <motion.div
@@ -767,38 +810,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 )}
               </AnimatePresence>
             </div>
-
-            {isOwner && (
-              <Link 
-                href={`/shop/${params.tenant}/admin`}
-                className="bg-orange-500 text-white font-medium px-4 py-2 rounded-full text-sm hover:bg-orange-600 transition-colors flex items-center gap-2"
-              >
-                <span>⚙️</span>
-                <span className="hidden sm:inline">{t('shopPage.admin')}</span>
-              </Link>
-            )}
-{business.promotions_enabled && promotions.length > 0 && (
-                              <button
-                                onClick={() => setShowPromotionsModal(true)}
-                                className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-full text-sm transition-colors flex items-center gap-1"
-                              >
-                                🎁 {t('shopPage.promotions')}
-                              </button>
-                            )}
-                            <Link 
-                              href={`/shop/${params.tenant}/menu`}
-                              style={{ backgroundColor: business.primary_color }}
-                              className="text-white font-medium px-4 py-2 rounded-full text-sm hover:opacity-90 transition-opacity"
-                            >
-                              🍟 {t('shopPage.menu')}
-                            </Link>
-            <Link 
-              href={`/shop/${params.tenant}/account`}
-              className="bg-white/20 backdrop-blur-md text-white font-medium px-4 py-2 rounded-full text-sm hover:bg-white/30 transition-colors flex items-center gap-2"
-            >
-              <span>👤</span>
-              <span className="hidden sm:inline">{t('shopPage.account')}</span>
-            </Link>
           </div>
         </div>
       </header>
