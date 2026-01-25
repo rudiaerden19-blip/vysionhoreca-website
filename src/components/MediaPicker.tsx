@@ -544,7 +544,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={() => selectImage(item.url)}
-                        className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all bg-gray-100 group ${
+                        className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all bg-gray-100 ${
                           value === item.url ? 'ring-blue-500 ring-4' : 'ring-transparent hover:ring-gray-300'
                         }`}
                       >
@@ -555,11 +555,11 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                           className="object-cover"
                           unoptimized
                         />
-                        {/* Delete button - verschijnt bij hover */}
+                        {/* Delete button - altijd zichtbaar (ook op touch devices) */}
                         <button
                           onClick={(e) => deleteMedia(e, item)}
                           disabled={deletingId === item.id}
-                          className="absolute top-1 right-1 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg disabled:opacity-50"
+                          className="absolute top-1 right-1 w-8 h-8 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white rounded-full flex items-center justify-center shadow-lg disabled:opacity-50 z-10"
                           title="Verwijderen"
                         >
                           {deletingId === item.id ? (
