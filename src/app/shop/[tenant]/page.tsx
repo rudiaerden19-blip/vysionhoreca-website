@@ -55,6 +55,7 @@ interface Business {
   hiring_contact?: string
   gift_cards_enabled?: boolean
   stripe_public_key?: string
+  promotions_enabled?: boolean
   reservations_enabled?: boolean
   // SEO
   seo_title?: string
@@ -450,6 +451,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         hiring_contact: tenantData?.hiring_contact || '',
         gift_cards_enabled: tenantData?.gift_cards_enabled ?? false,
         stripe_public_key: tenantData?.stripe_public_key || '',
+        promotions_enabled: tenantData?.promotions_enabled !== false, // Default true
         reservations_enabled: tenantData?.reservations_enabled !== false, // Default true
         // SEO
         seo_title: tenantData?.seo_title || '',
@@ -775,7 +777,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <span className="hidden sm:inline">{t('shopPage.admin')}</span>
               </Link>
             )}
-{promotions.length > 0 && (
+{business.promotions_enabled && promotions.length > 0 && (
                               <button
                                 onClick={() => setShowPromotionsModal(true)}
                                 className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-full text-sm transition-colors flex items-center gap-1"

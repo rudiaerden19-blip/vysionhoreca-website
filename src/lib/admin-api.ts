@@ -58,6 +58,8 @@ export interface TenantSettings {
   stripe_secret_key?: string
   stripe_public_key?: string
   gift_cards_enabled?: boolean
+  // Promoties aan/uit in shop
+  promotions_enabled?: boolean
   // Reserveringen aan/uit
   reservations_enabled?: boolean
   // Betaalmethodes

@@ -3,7 +3,7 @@
 import { useLanguage } from '@/i18n'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getPromotions, savePromotion, togglePromotionActive, deletePromotion, Promotion } from '@/lib/admin-api'
+import { getPromotions, savePromotion, togglePromotionActive, deletePromotion, Promotion, getTenantSettings, saveTenantSettings } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
 import Image from 'next/image'
 
@@ -14,6 +14,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   const [showModal, setShowModal] = useState(false)
   const [editingPromo, setEditingPromo] = useState<Promotion | null>(null)
   const [saving, setSaving] = useState(false)
+  const [promotionsEnabled, setPromotionsEnabled] = useState(true)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -25,15 +26,32 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   })
 
   useEffect(() => {
-    loadPromotions()
+    loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
-  async function loadPromotions() {
+  async function loadData() {
     setLoading(true)
-    const data = await getPromotions(params.tenant)
-    setPromos(data)
+    
+    // Laad promoties en instellingen
+    const [promosData, settings] = await Promise.all([
+      getPromotions(params.tenant),
+      getTenantSettings(params.tenant)
+    ])
+    
+    setPromos(promosData)
+    setPromotionsEnabled(settings?.promotions_enabled !== false) // Default true
     setLoading(false)
+  }
+
+  const handleTogglePromotionsEnabled = async () => {
+    const newValue = !promotionsEnabled
+    setPromotionsEnabled(newValue)
+    
+    await saveTenantSettings({
+      tenant_slug: params.tenant,
+      promotions_enabled: newValue
+    })
   }
 
   const handleToggle = async (id: string, currentActive: boolean) => {
@@ -152,13 +170,37 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
         </motion.button>
       </div>
 
-      {/* Info Box */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-        <p className="text-blue-800 text-sm">
-          💡 <strong>Tip:</strong> Promoties die je hier aanmaakt worden getoond op je webshop. 
-          Klanten kunnen ze zien bij de &quot;Promoties&quot; knop. Zet promoties aan of uit met de schakelaar.
-        </p>
+      {/* Hoofdschakelaar - Promoties tonen in shop */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🎁</span>
+          <div>
+            <p className="font-semibold text-gray-900">Promoties tonen in webshop</p>
+            <p className="text-sm text-gray-500">
+              {promotionsEnabled ? 'Klanten zien de "Promoties" knop in je shop' : 'Promoties zijn verborgen voor klanten'}
+            </p>
+          </div>
+        </div>
+        <label className="relative inline-flex items-center cursor-pointer">
+          <input
+            type="checkbox"
+            checked={promotionsEnabled}
+            onChange={handleTogglePromotionsEnabled}
+            className="sr-only peer"
+          />
+          <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+        </label>
       </div>
+
+      {/* Info Box */}
+      {promotionsEnabled && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+          <p className="text-blue-800 text-sm">
+            💡 <strong>Tip:</strong> Promoties die je hier aanmaakt worden getoond op je webshop. 
+            Klanten kunnen ze zien bij de &quot;Promoties&quot; knop. Zet individuele promoties aan of uit met de schakelaar.
+          </p>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-4 mb-8">
