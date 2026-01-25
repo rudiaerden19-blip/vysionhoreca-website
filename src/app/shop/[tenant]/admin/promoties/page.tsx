@@ -14,7 +14,6 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   const [showModal, setShowModal] = useState(false)
   const [editingPromo, setEditingPromo] = useState<Promotion | null>(null)
   const [saving, setSaving] = useState(false)
-  const [showMediaPicker, setShowMediaPicker] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -339,35 +338,11 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 {/* Image */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Foto</label>
-                  <div 
-                    onClick={() => setShowMediaPicker(true)}
-                    className="border-2 border-dashed border-gray-300 rounded-xl p-4 cursor-pointer hover:border-blue-400 transition-colors"
-                  >
-                    {formData.image_url ? (
-                      <div className="relative aspect-video rounded-lg overflow-hidden">
-                        <Image
-                          src={formData.image_url}
-                          alt="Promotie"
-                          fill
-                          className="object-cover"
-                        />
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setFormData(prev => ({ ...prev, image_url: '' }))
-                          }}
-                          className="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-red-600"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="text-center py-6">
-                        <span className="text-4xl">📷</span>
-                        <p className="text-gray-500 mt-2">Klik om een foto te kiezen</p>
-                      </div>
-                    )}
-                  </div>
+                  <MediaPicker
+                    tenantSlug={params.tenant}
+                    value={formData.image_url || ''}
+                    onChange={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                  />
                 </div>
 
                 {/* Name */}
@@ -519,18 +494,6 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Media Picker */}
-      {showMediaPicker && (
-        <MediaPicker
-          tenantSlug={params.tenant}
-          onSelect={(url) => {
-            setFormData(prev => ({ ...prev, image_url: url }))
-            setShowMediaPicker(false)
-          }}
-          onClose={() => setShowMediaPicker(false)}
-        />
-      )}
     </div>
   )
 }
