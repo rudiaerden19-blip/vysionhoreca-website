@@ -65,6 +65,59 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
     }
   }, [isOpen, loadMedia])
 
+  // Comprimeer afbeelding voor snellere upload
+  const compressImage = async (file: File, maxWidth = 1200, quality = 0.8): Promise<File> => {
+    return new Promise((resolve) => {
+      // Als het geen afbeelding is, return origineel
+      if (!file.type.startsWith('image/')) {
+        resolve(file)
+        return
+      }
+      
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const img = document.createElement('img')
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          let width = img.width
+          let height = img.height
+          
+          // Schaal af als groter dan maxWidth
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width
+            width = maxWidth
+          }
+          
+          canvas.width = width
+          canvas.height = height
+          
+          const ctx = canvas.getContext('2d')
+          ctx?.drawImage(img, 0, 0, width, height)
+          
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const compressedFile = new File([blob], file.name || 'photo.jpg', {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                })
+                resolve(compressedFile)
+              } else {
+                resolve(file)
+              }
+            },
+            'image/jpeg',
+            quality
+          )
+        }
+        img.onerror = () => resolve(file)
+        img.src = e.target?.result as string
+      }
+      reader.onerror = () => resolve(file)
+      reader.readAsDataURL(file)
+    })
+  }
+
   const handleUpload = async (file: File) => {
     setErrorMessage(null)
     
@@ -81,27 +134,23 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
     setShowOptions(false)
     
     try {
-      // Bepaal bestandsextensie - camera foto's kunnen .jpg, .jpeg, .heic, etc. zijn
-      let fileExt = 'jpg'
-      if (file.name && file.name.includes('.')) {
-        fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-      } else if (file.type) {
-        // Gebruik MIME type als fallback (bijv. image/jpeg -> jpeg)
-        fileExt = file.type.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg'
-      }
+      // Comprimeer de afbeelding voor snellere upload (max 1200px breed, 80% kwaliteit)
+      const compressedFile = await compressImage(file, 1200, 0.8)
+      // Gecomprimeerde files zijn altijd JPEG
+      const fileExt = 'jpg'
       
       // Genereer unieke bestandsnaam
       const timestamp = Date.now()
       const randomId = Math.random().toString(36).substring(2, 8)
       const fileName = `${tenantSlug}/${timestamp}-${randomId}.${fileExt}`
       
-      // Upload naar Supabase Storage
+      // Upload gecomprimeerde file naar Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('media')
-        .upload(fileName, file, {
+        .upload(fileName, compressedFile, {
           cacheControl: '31536000',
           upsert: false,
-          contentType: file.type || 'image/jpeg'
+          contentType: 'image/jpeg'
         })
       
       if (uploadError) {
@@ -128,8 +177,8 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
           name: displayName,
           file_name: displayName,
           category: 'Uploads',
-          file_size: file.size || 0,
-          file_type: file.type || 'image/jpeg'
+          file_size: compressedFile.size || 0,
+          file_type: 'image/jpeg'
         })
       
       // Selecteer direct de geüploade foto
