@@ -1603,6 +1603,7 @@
     "copyright": "All rights reserved."
   },
   "adminDashboard": {
+    "welcome": "Welcome",
     "welcomeBack": "Welcome back!",
     "subtitle": "Here's an overview of your business today.",
     "viewAll": "View all",

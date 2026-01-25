@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+import { getTenantSettings } from '@/lib/admin-api'
 
 interface DashboardStats {
   todayOrders: number
@@ -31,6 +32,7 @@ interface RecentOrder {
 
 export default function AdminDashboard({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const [businessName, setBusinessName] = useState<string>('')
   const [stats, setStats] = useState<DashboardStats>({
     todayOrders: 0,
     todayRevenue: 0,
@@ -45,6 +47,21 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   })
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([])
   const [loading, setLoading] = useState(true)
+
+  // Haal de business name op
+  useEffect(() => {
+    async function loadBusinessName() {
+      const settings = await getTenantSettings(params.tenant)
+      if (settings?.business_name) {
+        // Haal alleen de voornaam/eerste woord uit de business name
+        // bijv. "Frituur Danny" -> "Danny"
+        const words = settings.business_name.split(' ')
+        const name = words.length > 1 ? words.slice(1).join(' ') : words[0]
+        setBusinessName(name)
+      }
+    }
+    loadBusinessName()
+  }, [params.tenant])
 
   useEffect(() => {
     loadDashboardData()
@@ -222,7 +239,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
           animate={{ opacity: 1, y: 0 }}
           className="text-3xl font-bold text-gray-900"
         >
-          {t('adminDashboard.welcomeBack')} 👋
+          {t('adminDashboard.welcome')} {businessName}
         </motion.h1>
         <p className="text-gray-500 mt-1">{t('adminDashboard.subtitle')}</p>
       </div>
