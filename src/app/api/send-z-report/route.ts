@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import nodemailer from 'nodemailer'
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,6 +24,17 @@ export async function POST(request: NextRequest) {
     if (!to) {
       return NextResponse.json({ error: 'E-mailadres is verplicht' }, { status: 400 })
     }
+
+    // Create transporter with Zoho SMTP
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.zoho.eu',
+      port: 465,
+      secure: true,
+      auth: {
+        user: process.env.ZOHO_EMAIL,
+        pass: process.env.ZOHO_PASSWORD,
+      },
+    })
 
     const formatCurrency = (amount: number) => `€${amount.toFixed(2)}`
 
@@ -110,9 +119,9 @@ export async function POST(request: NextRequest) {
       </html>
     `
 
-    await resend.emails.send({
-      from: 'Vysion Horeca <noreply@vysionhoreca.com>',
-      to: [to],
+    await transporter.sendMail({
+      from: `"${businessName || 'Vysion Horeca'}" <${process.env.ZOHO_EMAIL}>`,
+      to: to,
       subject: subject || `Z-Rapport - ${businessName}`,
       html: htmlContent,
     })

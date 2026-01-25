@@ -66,14 +66,14 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const paymentStatusConfig = useMemo(() => getPaymentStatusConfig(t), [t])
   const paymentMethodLabels = useMemo(() => getPaymentMethodLabels(t), [t])
   
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('active')
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all')
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [kitchenMode, setKitchenMode] = useState(false)
-  const [soundEnabled, setSoundEnabled] = useState(false)
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false)
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
   const [audioReady, setAudioReady] = useState(false)
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
@@ -117,11 +117,15 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     // Sound keeps playing until order is confirmed/rejected
   }
   
-  // Load sound preference from localStorage on mount
+  // Geluid en notificaties altijd aan bij laden
   useEffect(() => {
-    const savedSoundEnabled = localStorage.getItem(`sound_enabled_${params.tenant}`)
-    if (savedSoundEnabled === 'true') {
-      setSoundEnabled(true)
+    setSoundEnabled(true)
+    setNotificationsEnabled(true)
+    localStorage.setItem(`sound_enabled_${params.tenant}`, 'true')
+    
+    // Request notification permission on load
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
     }
   }, [params.tenant])
 
@@ -942,22 +946,22 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Notification toggle */}
+          {/* Notification - altijd aan */}
           <button
-            onClick={() => notificationsEnabled ? setNotificationsEnabled(false) : requestNotificationPermission()}
-            className={`p-2 rounded-xl transition-colors ${notificationsEnabled ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}
-            title="Browser notificaties"
+            onClick={requestNotificationPermission}
+            className="p-2 rounded-xl transition-colors bg-green-100 text-green-600"
+            title="Browser notificaties (altijd aan)"
           >
-            {notificationsEnabled ? '🔔' : '🔕'}
+            🔔
           </button>
           
-          {/* Sound toggle */}
+          {/* Sound - altijd aan */}
           <button
-            onClick={() => soundEnabled ? disableSound() : enableSound()}
-            className={`p-2 rounded-xl transition-colors ${soundEnabled && audioReady ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}
-            title="Geluid"
+            onClick={enableSound}
+            className="p-2 rounded-xl transition-colors bg-green-100 text-green-600"
+            title="Geluid (altijd aan)"
           >
-            {soundEnabled && audioReady ? '🔊' : '🔇'}
+            🔊
           </button>
 
           {/* Kitchen mode */}
