@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice } from '@/lib/admin-api'
+import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, getActivePromotions, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 
 interface MenuItem {
@@ -38,7 +38,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeCategory, setActiveCategory] = useState<string>('promo')
+  const [activeCategory, setActiveCategory] = useState<string>('')
   const [cart, setCart] = useState<CartItem[]>([])
   const [cartOpen, setCartOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
@@ -48,6 +48,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
   const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover')
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
+  const [promotions, setPromotions] = useState<Promotion[]>([])
+  const [promotionsEnabled, setPromotionsEnabled] = useState(true)
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
@@ -67,14 +69,17 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   useEffect(() => {
     async function loadData() {
-      const [categoriesData, productsData, tenantData, optionProducts] = await Promise.all([
+      const [categoriesData, productsData, tenantData, optionProducts, promotionsData] = await Promise.all([
         getMenuCategories(params.tenant),
         getMenuProducts(params.tenant),
         getTenantSettings(params.tenant),
         getProductsWithOptions(params.tenant),
+        getActivePromotions(params.tenant),
       ])
       
       setProductsWithOptions(optionProducts)
+      setPromotions(promotionsData)
+      setPromotionsEnabled(tenantData?.promotions_enabled !== false)
       
       // Check of tenant bestaat - redirect naar niet gevonden als tenantData null is
       if (!tenantData) {
@@ -115,6 +120,19 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         })
 
       setMenuItems(items)
+      
+      // Stel de default categorie in
+      const promoEnabled = tenantData?.promotions_enabled !== false
+      if (promoEnabled && promotionsData.length > 0) {
+        setActiveCategory('promo')
+      } else if (items.some(i => i.is_popular)) {
+        setActiveCategory('popular')
+      } else if (categoriesData.length > 0) {
+        setActiveCategory(categoriesData[0].id || 'all')
+      } else {
+        setActiveCategory('all')
+      }
+      
       setLoading(false)
     }
 
@@ -234,8 +252,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const cartTotal = cart.reduce((sum, c) => sum + (c.totalPrice * c.quantity), 0)
   const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0)
 
+  // Promo wordt apart gerenderd met echte promoties, niet producten
   const filteredItems = activeCategory === 'promo' 
-    ? menuItems.filter(i => i.is_promo)
+    ? [] // Promoties worden apart gerenderd
     : activeCategory === 'all' 
       ? menuItems 
       : activeCategory === 'popular'
@@ -295,16 +314,18 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         {/* Categories Bar */}
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <button
-              onClick={() => setActiveCategory('promo')}
-              className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
-                activeCategory === 'promo'
-                  ? 'bg-green-500 text-white shadow-md'
-                  : 'bg-green-100 text-green-700 active:bg-green-200'
-              }`}
-            >
-              🎁 {t('menuPage.promotions')}
-            </button>
+            {promotionsEnabled && promotions.length > 0 && (
+              <button
+                onClick={() => setActiveCategory('promo')}
+                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
+                  activeCategory === 'promo'
+                    ? 'bg-green-500 text-white shadow-md'
+                    : 'bg-green-100 text-green-700 active:bg-green-200'
+                }`}
+              >
+                🎁 {t('menuPage.promotions')}
+              </button>
+            )}
             {menuItems.some(i => i.is_popular) && (
               <button
                 onClick={() => setActiveCategory('popular')}
@@ -338,7 +359,53 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
       {/* Menu Items Grid */}
       <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32">
-        {menuItems.length === 0 ? (
+        {/* Promoties weergave */}
+        {activeCategory === 'promo' && promotions.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            {promotions.map((promo) => (
+              <div
+                key={promo.id}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all"
+              >
+                <div className="relative h-48 overflow-hidden bg-gray-100">
+                  {promo.image_url ? (
+                    <Image
+                      src={promo.image_url}
+                      alt={promo.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      quality={75}
+                      loading="lazy"
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-6xl bg-gradient-to-br from-green-400 to-green-600">
+                      🎁
+                    </div>
+                  )}
+                  {/* Korting badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className="bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      {promo.type === 'percentage' ? `-${promo.value}%` :
+                       promo.type === 'fixed' ? `-€${promo.value}` : t('menuPage.free')}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-bold text-lg text-gray-900 mb-1">{promo.name}</h3>
+                  {promo.description && (
+                    <p className="text-gray-500 text-sm line-clamp-2">{promo.description}</p>
+                  )}
+                  {promo.min_order_amount > 0 && (
+                    <p className="text-orange-600 text-sm mt-2 font-medium">
+                      Min. bestelling: €{promo.min_order_amount.toFixed(2)}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : menuItems.length === 0 ? (
           <div className="text-center py-20">
             <span className="text-6xl mb-4 block">🍟</span>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('menuPage.noProducts')}</h2>

@@ -329,14 +329,14 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
             )}
           </div>
           
-          {/* Options Dropdown - opent BOVEN het foto venster */}
+          {/* Options Dropdown - opent ONDER het foto venster */}
           <AnimatePresence>
             {showOptions && !uploading && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute bottom-full left-0 mb-2 bg-white rounded-xl shadow-xl border z-50 overflow-hidden min-w-[220px]"
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border z-50 overflow-hidden min-w-[220px]"
               >
                 {/* Upload from computer/device */}
                 <button
