@@ -57,7 +57,11 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         // bijv. "Frituur Danny" -> "Danny"
         const words = settings.business_name.split(' ')
         const name = words.length > 1 ? words.slice(1).join(' ') : words[0]
-        setBusinessName(name)
+        // Zorg dat elk woord met een hoofdletter begint
+        const capitalizedName = name.split(' ').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        ).join(' ')
+        setBusinessName(capitalizedName)
       }
     }
     loadBusinessName()
