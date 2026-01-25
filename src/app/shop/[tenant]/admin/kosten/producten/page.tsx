@@ -1198,7 +1198,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
 
                       {/* Search Results Dropdown - Always show when focused */}
                       {showSearchResults && (
-                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border-2 border-green-300 rounded-lg shadow-xl z-50 max-h-80 overflow-auto">
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border-2 border-green-300 rounded-lg shadow-xl z-50 max-h-[70vh] overflow-auto">
                           
                           {/* Hint when not enough characters */}
                           {ingredientSearch.length < 2 && (
@@ -1333,6 +1333,12 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           </p>
         </div>
       )}
+
+      {/* Extra scroll ruimte + footer */}
+      <div className="h-40"></div>
+      <div className="text-center text-xs text-gray-400 pb-8">
+        Vysion 2025
+      </div>
     </div>
   )
 }
