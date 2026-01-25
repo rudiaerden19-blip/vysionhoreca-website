@@ -31,6 +31,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -65,13 +66,14 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   }, [isOpen, loadMedia])
 
   const handleUpload = async (file: File) => {
+    setErrorMessage(null)
+    
     if (!file) {
-      console.error('Geen bestand geselecteerd')
+      setErrorMessage('Geen bestand geselecteerd')
       return
     }
     if (!supabase) {
-      console.error('Supabase niet beschikbaar')
-      alert('Database connectie mislukt')
+      setErrorMessage('Database niet verbonden')
       return
     }
     
@@ -93,10 +95,8 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       const randomId = Math.random().toString(36).substring(2, 8)
       const fileName = `${tenantSlug}/${timestamp}-${randomId}.${fileExt}`
       
-      console.log('Uploading file:', fileName, 'Size:', file.size, 'Type:', file.type)
-      
       // Upload naar Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('media')
         .upload(fileName, file, {
           cacheControl: '31536000',
@@ -105,13 +105,10 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
         })
       
       if (uploadError) {
-        console.error('Upload error:', uploadError)
-        alert(`Upload mislukt: ${uploadError.message}`)
+        setErrorMessage(`Upload fout: ${uploadError.message}`)
         setUploading(false)
         return
       }
-      
-      console.log('Upload success:', uploadData)
       
       // Haal publieke URL op
       const { data: urlData } = supabase.storage
@@ -119,11 +116,10 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
         .getPublicUrl(fileName)
       
       const publicUrl = urlData.publicUrl
-      console.log('Public URL:', publicUrl)
       
       // Sla op in tenant_media tabel
       const displayName = file.name || `Foto ${new Date().toLocaleDateString('nl-NL')}`
-      const { error: dbError } = await supabase
+      await supabase
         .from('tenant_media')
         .insert({
           tenant_slug: tenantSlug,
@@ -136,20 +132,14 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
           file_type: file.type || 'image/jpeg'
         })
       
-      if (dbError) {
-        console.error('Database error:', dbError)
-        // Foto is wel geüpload, dus we gebruiken hem toch
-      }
-      
       // Selecteer direct de geüploade foto
       onChange(publicUrl)
       
       // Herlaad media bibliotheek
       loadMedia()
       
-    } catch (error) {
-      console.error('Upload failed:', error)
-      alert('Upload mislukt. Controleer je internetverbinding en probeer opnieuw.')
+    } catch (error: any) {
+      setErrorMessage(`Fout: ${error?.message || 'Onbekende fout'}`)
     } finally {
       // Zorg dat uploading ALTIJD op false gezet wordt
       setUploading(false)
@@ -295,14 +285,30 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
           </AnimatePresence>
         </div>
         
-        {value && (
-          <button
-            onClick={clearImage}
-            className="text-red-500 hover:text-red-600 text-sm"
-          >
-            ✕ Verwijderen
-          </button>
-        )}
+        <div className="flex flex-col gap-2">
+          {value && (
+            <button
+              onClick={clearImage}
+              className="text-red-500 hover:text-red-600 text-sm"
+            >
+              ✕ Verwijderen
+            </button>
+          )}
+          
+          {/* Error message display */}
+          {errorMessage && (
+            <div className="bg-red-100 border border-red-300 text-red-700 px-3 py-2 rounded-lg text-sm max-w-[200px]">
+              <p className="font-medium">⚠️ Fout:</p>
+              <p className="text-xs mt-1">{errorMessage}</p>
+              <button 
+                onClick={() => setErrorMessage(null)}
+                className="text-xs underline mt-2"
+              >
+                Sluiten
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Click outside to close options */}
