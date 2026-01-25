@@ -641,6 +641,23 @@ export default function AbonnementPage() {
   const isExpired = status === 'expired' || status === 'EXPIRED'
   const hasOverdue = overdueInvoices.length > 0
 
+  // Check of abonnement bijna verloopt (binnen 7 dagen)
+  let expiringDays: number | null = null
+  let expiringDate = ''
+  if (isActive && subscription?.next_payment_at) {
+    const nextPayment = new Date(subscription.next_payment_at)
+    const now = new Date()
+    const diffDays = Math.ceil((nextPayment.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    if (diffDays <= 7 && diffDays > 0) {
+      expiringDays = diffDays
+      expiringDate = nextPayment.toLocaleDateString(locale === 'nl' ? 'nl-BE' : locale, {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      })
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -676,6 +693,31 @@ export default function AbonnementPage() {
                 className="mt-4 bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors"
               >
                 {t('payNow')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Warning Banner voor bijna verlopend abonnement */}
+      {expiringDays !== null && !hasOverdue && (
+        <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-2xl">⏰</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-amber-800">Uw abonnement loopt bijna af!</h3>
+              <p className="text-amber-700 mt-1">
+                Uw abonnement verloopt over <strong>{expiringDays} {expiringDays === 1 ? 'dag' : 'dagen'}</strong> ({expiringDate}).
+                Verleng op tijd om uw webshop online te houden.
+              </p>
+              <button
+                onClick={() => handleSubscribe(currentPlan)}
+                disabled={processing !== null}
+                className="mt-4 bg-amber-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-amber-700 transition-colors disabled:opacity-50"
+              >
+                {processing ? t('loading') : '💳 Nu Verlengen'}
               </button>
             </div>
           </div>

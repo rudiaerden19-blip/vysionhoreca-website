@@ -79,9 +79,13 @@ export default function AbonnementenPage() {
 
     const activeSubs = enrichedSubs.filter(s => s.status === 'active')
     const trialSubs = enrichedSubs.filter(s => s.status === 'trial')
+    // Tel ook actieve abonnementen die bijna verlopen
     const expiringSoon = enrichedSubs.filter(s => {
       if (s.status === 'trial' && s.trial_ends_at) {
         return new Date(s.trial_ends_at) <= weekFromNow
+      }
+      if (s.status === 'active' && s.next_payment_at) {
+        return new Date(s.next_payment_at) <= weekFromNow
       }
       return false
     })
@@ -117,6 +121,17 @@ export default function AbonnementenPage() {
 
   const filteredSubs = subscriptions.filter(sub => {
     if (filter === 'all') return true
+    if (filter === 'expiring') {
+      const now = new Date()
+      const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+      if (sub.status === 'trial' && sub.trial_ends_at) {
+        return new Date(sub.trial_ends_at) <= weekFromNow
+      }
+      if (sub.status === 'active' && sub.next_payment_at) {
+        return new Date(sub.next_payment_at) <= weekFromNow
+      }
+      return false
+    }
     return sub.status === filter
   })
 
@@ -204,6 +219,7 @@ export default function AbonnementenPage() {
             { key: 'all', label: 'Alle Abonnementen' },
             { key: 'active', label: 'Actieve Abonnementen' },
             { key: 'trial', label: 'Trial Abonnementen' },
+            { key: 'expiring', label: `⚠️ Verloopt Binnenkort (${stats.expiringSoon})` },
             { key: 'cancelled', label: 'Verwijderde Abonnementen' },
             { key: 'expired', label: 'Vervallen Abonnementen' },
           ].map((f) => (
@@ -212,8 +228,8 @@ export default function AbonnementenPage() {
               onClick={() => setFilter(f.key)}
               className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${
                 filter === f.key
-                  ? 'bg-orange-500 text-white'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                  ? f.key === 'expiring' ? 'bg-yellow-500 text-black' : 'bg-orange-500 text-white'
+                  : f.key === 'expiring' && stats.expiringSoon > 0 ? 'bg-yellow-900 text-yellow-300 hover:bg-yellow-800' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
               }`}
             >
               {f.label}
@@ -224,15 +240,33 @@ export default function AbonnementenPage() {
         {/* Subscriptions Grid */}
         <div className="grid gap-4">
           {filteredSubs.map((sub) => {
-            const daysLeft = sub.status === 'trial' ? getDaysUntilExpiry(sub.trial_ends_at) : null
+            // Bereken dagen tot verloop voor trial OF actief abonnement
+            let daysLeft: number | null = null
+            if (sub.status === 'trial' && sub.trial_ends_at) {
+              daysLeft = getDaysUntilExpiry(sub.trial_ends_at)
+            } else if (sub.status === 'active' && sub.next_payment_at) {
+              daysLeft = getDaysUntilExpiry(sub.next_payment_at)
+            }
+            const isExpiringSoon = daysLeft !== null && daysLeft <= 7 && daysLeft > 0
 
             return (
               <motion.div
                 key={sub.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-slate-800 rounded-2xl p-6 border border-slate-700"
+                className={`bg-slate-800 rounded-2xl p-6 border ${isExpiringSoon ? 'border-yellow-500 border-2' : 'border-slate-700'}`}
               >
+                {/* Waarschuwingsbanner voor bijna verlopend */}
+                {isExpiringSoon && (
+                  <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-xl p-3 mb-4 flex items-center gap-3">
+                    <span className="text-xl">⚠️</span>
+                    <div>
+                      <p className="text-yellow-300 font-bold text-sm">Abonnement verloopt over {daysLeft} {daysLeft === 1 ? 'dag' : 'dagen'}!</p>
+                      <p className="text-yellow-400/80 text-xs">Klant ontvangt automatisch een herinnering</p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center">
@@ -252,9 +286,14 @@ export default function AbonnementenPage() {
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(sub.status)}`}>
                           {sub.status}
                         </span>
-                        {daysLeft !== null && daysLeft <= 7 && (
-                          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">
-                            {daysLeft <= 0 ? 'Verlopen!' : `${daysLeft} dagen`}
+                        {daysLeft !== null && daysLeft <= 0 && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-500 text-white animate-pulse">
+                            Verlopen!
+                          </span>
+                        )}
+                        {isExpiringSoon && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-500 text-black">
+                            ⏰ {daysLeft} {daysLeft === 1 ? 'dag' : 'dagen'}
                           </span>
                         )}
                       </div>
@@ -277,10 +316,13 @@ export default function AbonnementenPage() {
                 </div>
 
                 {sub.next_payment_at && (
-                  <div className="mt-4 pt-4 border-t border-slate-700">
+                  <div className="mt-4 pt-4 border-t border-slate-700 flex items-center justify-between">
                     <p className="text-slate-400 text-sm">
-                      Volgende betaling: <span className="text-white">{new Date(sub.next_payment_at).toLocaleDateString('nl-BE')}</span>
+                      Volgende betaling: <span className={`${isExpiringSoon ? 'text-yellow-400 font-bold' : 'text-white'}`}>{new Date(sub.next_payment_at).toLocaleDateString('nl-BE')}</span>
                     </p>
+                    {isExpiringSoon && (
+                      <span className="text-yellow-400 text-xs">Email herinnering wordt automatisch verstuurd</span>
+                    )}
                   </div>
                 )}
               </motion.div>
