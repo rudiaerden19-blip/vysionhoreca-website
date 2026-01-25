@@ -415,15 +415,21 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   // Add ingredient from database (creates new ingredient first)
   async function addDatabaseIngredient(product: SupplierProduct, productId: string) {
     if (!businessId) return
+    
+    console.log('Adding database ingredient:', product.name, 'Article:', product.article_number)
 
-    // Check if already exists by article number
-    const existing = ingredients.find(i => i.notes?.includes(`Art. #${product.article_number}`))
+    // Check if already exists by article number - only if article_number exists
+    const existing = product.article_number 
+      ? ingredients.find(i => i.notes?.includes(`Art. #${product.article_number}`))
+      : null
     
     let ingredientId: string
 
     if (existing) {
+      console.log('Found existing ingredient:', existing.name)
       ingredientId = existing.id
     } else {
+      console.log('Creating new ingredient:', product.name)
       // Create new ingredient
       const { data: newIng } = await supabase
         .from('ingredients')
