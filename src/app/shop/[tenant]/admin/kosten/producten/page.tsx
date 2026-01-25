@@ -1335,7 +1335,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       )}
 
       {/* Extra scroll ruimte + footer */}
-      <div className="h-40"></div>
+      <div className="h-80"></div>
       <div className="text-center text-xs text-gray-400 pb-8">
         Vysion 2025
       </div>
