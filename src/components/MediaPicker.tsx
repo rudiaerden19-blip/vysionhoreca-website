@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase'
@@ -9,9 +9,9 @@ import { useLanguage } from '@/i18n'
 interface MediaItem {
   id: string
   url: string
-  file_url?: string  // Database kolom naam
+  file_url?: string
   name: string
-  file_name?: string // Database kolom naam
+  file_name?: string
   category: string
 }
 
@@ -29,6 +29,11 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   const [categories, setCategories] = useState<string[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('alle')
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [showOptions, setShowOptions] = useState(false)
+  
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
 
   const loadMedia = useCallback(async () => {
     setLoading(true)
@@ -42,11 +47,10 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
     if (!error && data) {
       setMedia(data.map(item => ({
         id: item.id,
-        url: item.url || item.file_url || '',  // Ondersteun beide kolom namen
+        url: item.url || item.file_url || '',
         name: item.name || item.file_name || 'Foto',
         category: item.category || ''
       })))
-      // Extract categories
       const cats = [...new Set(data.map(m => m.category).filter(c => c && c.trim() !== ''))]
       setCategories(cats)
     }
@@ -60,6 +64,76 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
     }
   }, [isOpen, loadMedia])
 
+  const handleUpload = async (file: File) => {
+    if (!file || !supabase) return
+    
+    setUploading(true)
+    setShowOptions(false)
+    
+    try {
+      // Genereer unieke bestandsnaam
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${tenantSlug}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+      
+      // Upload naar Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('media')
+        .upload(fileName, file, {
+          cacheControl: '31536000',
+          upsert: false
+        })
+      
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        alert('Upload mislukt. Probeer opnieuw.')
+        setUploading(false)
+        return
+      }
+      
+      // Haal publieke URL op
+      const { data: urlData } = supabase.storage
+        .from('media')
+        .getPublicUrl(fileName)
+      
+      const publicUrl = urlData.publicUrl
+      
+      // Sla op in tenant_media tabel
+      await supabase
+        .from('tenant_media')
+        .insert({
+          tenant_slug: tenantSlug,
+          url: publicUrl,
+          file_url: publicUrl,
+          name: file.name,
+          file_name: file.name,
+          category: 'Uploads',
+          file_size: file.size,
+          file_type: file.type
+        })
+      
+      // Selecteer direct de geüploade foto
+      onChange(publicUrl)
+      
+      // Herlaad media bibliotheek
+      loadMedia()
+      
+    } catch (error) {
+      console.error('Upload failed:', error)
+      alert('Upload mislukt. Probeer opnieuw.')
+    }
+    
+    setUploading(false)
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleUpload(file)
+    }
+    // Reset input
+    e.target.value = ''
+  }
+
   const selectImage = (url: string) => {
     onChange(url)
     setIsOpen(false)
@@ -69,7 +143,6 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
     onChange('')
   }
 
-  // Filter media
   const filteredMedia = selectedCategory === 'alle' 
     ? media 
     : media.filter(m => m.category === selectedCategory)
@@ -82,20 +155,107 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
         </label>
       )}
       
+      {/* Hidden file inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+      
       {/* Current Image Preview */}
       <div className="flex items-start gap-4">
-        <div 
-          onClick={() => setIsOpen(true)}
-          className="relative w-32 h-32 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer hover:border-orange-500 transition-colors overflow-hidden bg-gray-50"
-        >
-          {value ? (
-            <Image src={value} alt="Selected" fill className="object-cover" unoptimized />
-          ) : (
-            <div className="text-center p-2">
-              <span className="text-3xl block mb-1">📷</span>
-              <span className="text-xs text-gray-500">{t('mediaPicker.choosePhoto')}</span>
-            </div>
-          )}
+        <div className="relative">
+          <div 
+            onClick={() => setShowOptions(!showOptions)}
+            className={`relative w-32 h-32 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition-colors overflow-hidden bg-gray-50 ${
+              uploading ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-500'
+            }`}
+          >
+            {uploading ? (
+              <div className="text-center p-2">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"
+                />
+                <span className="text-xs text-blue-600">Uploaden...</span>
+              </div>
+            ) : value ? (
+              <Image src={value} alt="Selected" fill className="object-cover" unoptimized />
+            ) : (
+              <div className="text-center p-2">
+                <span className="text-3xl block mb-1">📷</span>
+                <span className="text-xs text-gray-500">{t('mediaPicker.choosePhoto') || 'Kies foto'}</span>
+              </div>
+            )}
+          </div>
+          
+          {/* Options Dropdown */}
+          <AnimatePresence>
+            {showOptions && !uploading && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border z-50 overflow-hidden min-w-[200px]"
+              >
+                {/* Upload from computer */}
+                <button
+                  onClick={() => {
+                    fileInputRef.current?.click()
+                    setShowOptions(false)
+                  }}
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                >
+                  <span className="text-xl">💻</span>
+                  <div>
+                    <p className="font-medium text-gray-900">Upload foto</p>
+                    <p className="text-xs text-gray-500">Vanaf computer</p>
+                  </div>
+                </button>
+                
+                {/* Take photo with camera */}
+                <button
+                  onClick={() => {
+                    cameraInputRef.current?.click()
+                    setShowOptions(false)
+                  }}
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors border-t"
+                >
+                  <span className="text-xl">📸</span>
+                  <div>
+                    <p className="font-medium text-gray-900">Maak foto</p>
+                    <p className="text-xs text-gray-500">Met camera</p>
+                  </div>
+                </button>
+                
+                {/* Choose from library */}
+                <button
+                  onClick={() => {
+                    setShowOptions(false)
+                    setIsOpen(true)
+                  }}
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors border-t"
+                >
+                  <span className="text-xl">🖼️</span>
+                  <div>
+                    <p className="font-medium text-gray-900">Kies uit bibliotheek</p>
+                    <p className="text-xs text-gray-500">Bestaande foto's</p>
+                  </div>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         
         {value && (
@@ -107,8 +267,16 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
           </button>
         )}
       </div>
+      
+      {/* Click outside to close options */}
+      {showOptions && (
+        <div 
+          className="fixed inset-0 z-40" 
+          onClick={() => setShowOptions(false)}
+        />
+      )}
 
-      {/* Modal */}
+      {/* Media Library Modal */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -128,12 +296,23 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
                 <h3 className="text-lg font-semibold">Kies een foto</h3>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
-                >
-                  ✕
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setIsOpen(false)
+                      setTimeout(() => fileInputRef.current?.click(), 100)
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
+                  >
+                    <span>📤</span> Upload nieuwe foto
+                  </button>
+                  <button
+                    onClick={() => setIsOpen(false)}
+                    className="p-2 hover:bg-gray-100 rounded-lg"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
 
               {/* Category Filter */}
@@ -144,7 +323,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                       onClick={() => setSelectedCategory('alle')}
                       className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                         selectedCategory === 'alle' 
-                          ? 'bg-orange-500 text-white' 
+                          ? 'bg-blue-600 text-white' 
                           : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                       }`}
                     >
@@ -156,7 +335,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                         onClick={() => setSelectedCategory(cat)}
                         className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
                           selectedCategory === cat 
-                            ? 'bg-orange-500 text-white' 
+                            ? 'bg-blue-600 text-white' 
                             : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                         }`}
                       >
@@ -174,17 +353,26 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+                      className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
                     />
                     <p className="text-gray-500">Laden...</p>
                   </div>
                 ) : filteredMedia.length === 0 ? (
                   <div className="text-center py-12">
                     <span className="text-6xl block mb-4">📷</span>
-                    <h4 className="font-semibold text-gray-900 mb-2">Nog geen foto&apos;s</h4>
-                    <p className="text-gray-500 text-sm">
-                      Upload eerst foto&apos;s via &quot;Foto&apos;s & Media&quot;
+                    <h4 className="font-semibold text-gray-900 mb-2">Nog geen foto's</h4>
+                    <p className="text-gray-500 text-sm mb-4">
+                      Upload je eerste foto
                     </p>
+                    <button
+                      onClick={() => {
+                        setIsOpen(false)
+                        setTimeout(() => fileInputRef.current?.click(), 100)
+                      }}
+                      className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      📤 Upload foto
+                    </button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -195,7 +383,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                         whileTap={{ scale: 0.97 }}
                         onClick={() => selectImage(item.url)}
                         className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer ring-2 transition-all bg-gray-100 ${
-                          value === item.url ? 'ring-orange-500 ring-4' : 'ring-transparent hover:ring-gray-300'
+                          value === item.url ? 'ring-blue-500 ring-4' : 'ring-transparent hover:ring-gray-300'
                         }`}
                       >
                         <Image
@@ -209,13 +397,6 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                     ))}
                   </div>
                 )}
-              </div>
-
-              {/* Footer */}
-              <div className="p-4 border-t bg-gray-50 flex-shrink-0">
-                <p className="text-sm text-gray-500 text-center">
-                  Geen foto? Ga naar <span className="text-orange-500 font-medium">Foto&apos;s & Media</span> om te uploaden
-                </p>
               </div>
             </motion.div>
           </motion.div>
