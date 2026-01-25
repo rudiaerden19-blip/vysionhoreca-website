@@ -64,6 +64,10 @@ ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS stripe_secret_key TEXT;
 ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS stripe_public_key TEXT;
 ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS gift_cards_enabled BOOLEAN DEFAULT false;
 
+-- Reserveringen & promoties aan/uit
+ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS reservations_enabled BOOLEAN DEFAULT true;
+ALTER TABLE tenant_settings ADD COLUMN IF NOT EXISTS promotions_enabled BOOLEAN DEFAULT true;
+
 -- ============================================================
 -- KLAAR! Alle kolommen zijn toegevoegd.
 -- ============================================================
