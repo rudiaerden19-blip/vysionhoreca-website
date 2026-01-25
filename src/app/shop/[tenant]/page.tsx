@@ -525,7 +525,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   // SEO: Update document title en meta tags
   useEffect(() => {
-    if (!business.name) return
+    if (!business || !business.name) return
 
     // Document title
     const seoTitle = business.seo_title || `${business.name} | ${business.tagline || 'Bestel Online'}`
