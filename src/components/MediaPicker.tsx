@@ -161,15 +161,16 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
         type="file"
         accept="image/*"
         onChange={handleFileSelect}
-        className="hidden"
+        style={{ display: 'none' }}
       />
+      {/* Camera input - capture attribuut opent camera op mobiel/tablet */}
       <input
         ref={cameraInputRef}
         type="file"
         accept="image/*"
-        capture="environment"
+        capture="user"
         onChange={handleFileSelect}
-        className="hidden"
+        style={{ display: 'none' }}
       />
       
       {/* Current Image Preview */}
@@ -212,8 +213,10 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                 {/* Upload from computer */}
                 <button
                   onClick={() => {
-                    fileInputRef.current?.click()
                     setShowOptions(false)
+                    setTimeout(() => {
+                      fileInputRef.current?.click()
+                    }, 100)
                   }}
                   className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors"
                 >
@@ -227,8 +230,11 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                 {/* Take photo with camera */}
                 <button
                   onClick={() => {
-                    cameraInputRef.current?.click()
                     setShowOptions(false)
+                    // Kleine delay zodat menu eerst sluit
+                    setTimeout(() => {
+                      cameraInputRef.current?.click()
+                    }, 100)
                   }}
                   className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors border-t"
                 >
