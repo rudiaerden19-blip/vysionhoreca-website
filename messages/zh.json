@@ -226,6 +226,13 @@
       "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
     }
   },
+  "costCalculator": {
+    "title": "终于来了",
+    "subtitle": "餐饮业成本计算器",
+    "description": "想准确了解您的采购价格和销售价格应该是多少才能创建盈利业务吗？使用我们新的成本计算器。输入采购价格或扫描采购发票，您会惊讶于结果。您还可以从我们超过15,000种产品的数据库中选择。",
+    "clickToEnlarge": "点击放大",
+    "tryFree": "免费试用"
+  },
   "testimonials": {
     "title": "餐饮业者信任Vysion",
     "quotes": {

@@ -226,6 +226,13 @@
       "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
     }
   },
+  "costCalculator": {
+    "title": "Enfin, il est là",
+    "subtitle": "Le calculateur de coûts pour l'hôtellerie",
+    "description": "Vous voulez savoir exactement quels sont vos prix d'achat et quels devraient être vos prix de vente pour créer une entreprise rentable ? Utilisez notre nouveau calculateur de coûts. Entrez le prix d'achat ou scannez votre facture d'achat et soyez étonné du résultat. Vous pouvez également choisir parmi notre base de données de 15 000+ produits.",
+    "clickToEnlarge": "Cliquez pour agrandir",
+    "tryFree": "Essayer gratuitement"
+  },
   "testimonials": {
     "title": "Les restaurateurs font confiance à Vysion",
     "quotes": {

@@ -964,6 +964,146 @@ function IndustrySection() {
   )
 }
 
+// Cost Calculator Section
+function CostCalculatorSection() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxImage, setLightboxImage] = useState('')
+  const { t } = useLanguage()
+  
+  const images = [
+    '/images/cost-calculator-1.png',
+    '/images/cost-calculator-2.png',
+    '/images/cost-calculator-3.png',
+    '/images/cost-calculator-4.png',
+  ]
+  
+  const goToPrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + images.length) % images.length)
+  }
+  
+  const goToNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % images.length)
+  }
+
+  const openLightbox = (image: string) => {
+    setLightboxImage(image)
+    setLightboxOpen(true)
+  }
+
+  return (
+    <section className="py-24 bg-gray-900 text-white overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-orange-400">
+            {t('costCalculator.title')}
+          </h2>
+          <p className="text-xl sm:text-2xl font-semibold text-white mb-6">
+            {t('costCalculator.subtitle')}
+          </p>
+          <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+            {t('costCalculator.description')}
+          </p>
+        </div>
+
+        {/* Image Carousel */}
+        <div className="relative max-w-4xl mx-auto">
+          {/* Left Arrow */}
+          <button
+            onClick={goToPrev}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          {/* Right Arrow */}
+          <button
+            onClick={goToNext}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          
+          {/* Images */}
+          <div className="overflow-hidden rounded-2xl mx-14">
+            <div 
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            >
+              {images.map((image, index) => (
+                <div key={index} className="w-full flex-shrink-0">
+                  <Image
+                    src={image}
+                    alt={`Cost Calculator Screenshot ${index + 1}`}
+                    width={1200}
+                    height={800}
+                    className="w-full h-auto rounded-2xl shadow-2xl cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => openLightbox(image)}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Click to enlarge */}
+          <p className="text-center text-gray-400 mt-4 text-sm">
+            {t('costCalculator.clickToEnlarge')}
+          </p>
+          
+          {/* Dots */}
+          <div className="flex justify-center gap-2 mt-4">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full transition-colors ${
+                  currentSlide === index ? 'bg-orange-500' : 'bg-white/30'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="text-center mt-12">
+          <Link
+            href="/registreer"
+            className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors"
+          >
+            {t('costCalculator.tryFree')}
+          </Link>
+        </div>
+      </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 text-white text-3xl hover:opacity-70"
+          >
+            ×
+          </button>
+          <Image
+            src={lightboxImage}
+            alt="Cost Calculator"
+            width={1600}
+            height={1000}
+            className="max-w-full max-h-full object-contain"
+          />
+        </div>
+      )}
+    </section>
+  )
+}
+
 // Testimonial Section
 function TestimonialSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -1289,6 +1429,7 @@ export default function HomePage() {
       <ButWaitSection />
       <ComparisonSection />
       <IndustrySection />
+      <CostCalculatorSection />
       <TestimonialSection />
       <CTASection />
       <ContactSection />

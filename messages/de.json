@@ -226,6 +226,13 @@
       "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
     }
   },
+  "costCalculator": {
+    "title": "Endlich ist er da",
+    "subtitle": "Der Kostenrechner für die Gastronomie",
+    "description": "Möchten Sie genau wissen, was Ihre Einkaufspreise sind und was Ihre Verkaufspreise sein sollten, um ein profitables Unternehmen zu schaffen? Nutzen Sie unseren neuen Kostenrechner. Geben Sie den Einkaufspreis ein oder scannen Sie Ihre Einkaufsrechnung und staunen Sie über das Ergebnis. Sie können auch aus unserer Datenbank mit 15.000+ Produkten wählen.",
+    "clickToEnlarge": "Klicken zum Vergrößern",
+    "tryFree": "Kostenlos testen"
+  },
   "testimonials": {
     "title": "Gastronomen vertrauen auf Vysion",
     "quotes": {

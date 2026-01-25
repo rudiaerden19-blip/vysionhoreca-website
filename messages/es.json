@@ -226,6 +226,13 @@
       "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
     }
   },
+  "costCalculator": {
+    "title": "Por fin está aquí",
+    "subtitle": "La calculadora de costes para hostelería",
+    "description": "¿Quieres saber exactamente cuáles son tus precios de compra y cuáles deberían ser tus precios de venta para crear un negocio rentable? Usa nuestra nueva calculadora de costes. Introduce el precio de compra o escanea tu factura de compra y sorpréndete con el resultado. También puedes elegir entre nuestra base de datos de más de 15.000 productos.",
+    "clickToEnlarge": "Haz clic para ampliar",
+    "tryFree": "Probar gratis"
+  },
   "testimonials": {
     "title": "Los hosteleros confían en Vysion",
     "quotes": {

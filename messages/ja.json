@@ -226,6 +226,13 @@
       "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
     }
   },
+  "costCalculator": {
+    "title": "ついに登場",
+    "subtitle": "飲食業向けコスト計算機",
+    "description": "仕入れ価格を正確に把握し、収益性の高いビジネスを構築するための販売価格を知りたいですか？新しいコスト計算機をお使いください。仕入れ価格を入力するか、仕入れ請求書をスキャンして、結果に驚いてください。15,000以上の製品データベースから選択することもできます。",
+    "clickToEnlarge": "クリックで拡大",
+    "tryFree": "無料で試す"
+  },
   "testimonials": {
     "title": "飲食業者はVysionを信頼しています",
     "quotes": {

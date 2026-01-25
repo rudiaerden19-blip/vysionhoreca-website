@@ -226,6 +226,13 @@
     "tryFree": "Try free",
     "clickToEnlarge": "Click to enlarge"
   },
+  "costCalculator": {
+    "title": "Finally, it's here",
+    "subtitle": "The cost calculator for hospitality",
+    "description": "Want to know exactly what your purchase prices are and what your selling prices should be to create a profitable business? Use our new cost calculator. Enter the purchase price or scan your purchase invoice and be amazed by the result. You can also choose from our database of 15,000+ products.",
+    "clickToEnlarge": "Click to enlarge",
+    "tryFree": "Try for free"
+  },
   "testimonials": {
     "title": "Hospitality entrepreneurs trust Vysion",
     "quotes": {

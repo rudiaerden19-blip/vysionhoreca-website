@@ -226,6 +226,13 @@
       "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
     }
   },
+  "costCalculator": {
+    "title": "أخيراً وصل",
+    "subtitle": "حاسبة التكاليف للضيافة",
+    "description": "هل تريد معرفة أسعار الشراء بالضبط وما يجب أن تكون عليه أسعار البيع لإنشاء عمل تجاري مربح؟ استخدم حاسبة التكاليف الجديدة. أدخل سعر الشراء أو امسح فاتورة الشراء وستندهش من النتيجة. يمكنك أيضًا الاختيار من قاعدة بياناتنا التي تضم أكثر من 15,000 منتج.",
+    "clickToEnlarge": "انقر للتكبير",
+    "tryFree": "جرب مجاناً"
+  },
   "testimonials": {
     "title": "أصحاب المطاعم يثقون بـ Vysion",
     "quotes": {
