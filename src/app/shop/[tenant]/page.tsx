@@ -592,9 +592,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <p className="text-gray-600 mb-6">
             {t('shopPage.notFoundDescription') || 'Deze shop bestaat niet of is verwijderd.'}
           </p>
-          <Link href="/" className="text-orange-500 hover:text-orange-600 font-medium">
+          <a href="https://www.vysionhoreca.com" className="text-orange-500 hover:text-orange-600 font-medium inline-block">
             ← {t('shopPage.backToVysion') || 'Terug naar Vysion'}
-          </Link>
+          </a>
         </motion.div>
       </div>
     )
