@@ -41,7 +41,7 @@ export default function ScradaPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -49,7 +49,7 @@ export default function ScradaPage() {
   if (!isPremium) {
     return (
       <div className="space-y-6">
-        <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-8 text-white">
+        <div className="bg-gradient-to-br from-blue-600 to-red-600 rounded-2xl p-8 text-white">
           <h1 className="text-3xl font-bold mb-4">📊 {t('scradaPage.title')}</h1>
           <p className="text-lg opacity-90 mb-6">
             {t('scradaPage.subtitle')}
@@ -69,7 +69,7 @@ export default function ScradaPage() {
             </ul>
             <a
               href="https://www.vysionhoreca.com/prijzen"
-              className="inline-block px-6 py-3 bg-white text-orange-600 font-bold rounded-lg hover:bg-gray-100 transition"
+              className="inline-block px-6 py-3 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-100 transition"
             >
               {t('scradaPage.upgradeToPremium')} →
             </a>

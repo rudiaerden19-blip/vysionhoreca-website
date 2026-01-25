@@ -81,7 +81,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -104,7 +104,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
           className={`px-6 py-3 rounded-xl font-medium flex items-center gap-2 transition-all ${
             saved 
               ? 'bg-green-500 text-white' 
-              : 'bg-orange-500 hover:bg-orange-600 text-white'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
           {saving ? (
@@ -152,7 +152,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
             type="text"
             value={seo.title}
             onChange={(e) => handleChange('title', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder={t('websiteSeo.pageTitlePlaceholder')}
           />
           <div className="flex justify-between mt-2">
@@ -172,7 +172,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
             value={seo.description}
             onChange={(e) => handleChange('description', e.target.value)}
             rows={3}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
             placeholder={t('websiteSeo.metaDescriptionPlaceholder')}
           />
           <div className="flex justify-between mt-2">
@@ -192,7 +192,7 @@ export default function SeoPage({ params }: { params: { tenant: string } }) {
             type="text"
             value={seo.keywords}
             onChange={(e) => handleChange('keywords', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder={t('websiteSeo.keywordsPlaceholder')}
           />
           <p className="text-sm text-gray-500 mt-2">{t('websiteSeo.keywordsDesc')}</p>

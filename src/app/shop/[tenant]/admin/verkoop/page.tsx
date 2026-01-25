@@ -66,7 +66,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -137,7 +137,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-gray-500">{t('salesPage.avgOrder')}</span>
-            <span className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">📊</span>
+            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">📊</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">€{stats.average_order.toFixed(2)}</p>
           <p className="text-gray-400 text-sm mt-1">{t('salesPage.perOrder')}</p>
@@ -166,7 +166,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
                   initial={{ height: 0 }}
                   animate={{ height: `${(day.revenue / maxRevenue) * 100}%` }}
                   transition={{ delay: i * 0.1, duration: 0.5 }}
-                  className={`w-full rounded-t-lg ${day.revenue === 0 ? 'bg-gray-200' : 'bg-orange-500'}`}
+                  className={`w-full rounded-t-lg ${day.revenue === 0 ? 'bg-gray-200' : 'bg-blue-600'}`}
                   style={{ minHeight: day.revenue > 0 ? '20px' : '4px' }}
                 />
                 <p className="mt-2 text-sm text-gray-500">{formatDayLabel(day.date)}</p>
@@ -202,7 +202,7 @@ export default function VerkoopPage({ params }: { params: { tenant: string } }) 
                   <p className="font-medium text-gray-900">{product.name}</p>
                   <div className="w-full bg-gray-100 rounded-full h-2 mt-1">
                     <div 
-                      className="bg-orange-500 h-2 rounded-full" 
+                      className="bg-blue-600 h-2 rounded-full" 
                       style={{ width: `${(product.revenue / (topProducts[0]?.revenue || 1)) * 100}%` }} 
                     />
                   </div>

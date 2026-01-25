@@ -303,7 +303,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white rounded-xl font-medium flex items-center gap-2"
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center gap-2"
           >
             {uploading ? `⏳ ${t('websiteMedia.optimizing')}` : `📤 ${t('websiteMedia.upload')}`}
           </button>
@@ -330,7 +330,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             onClick={() => setUploadCategory('')}
             className={`px-4 py-2 rounded-xl font-medium transition-all ${
               uploadCategory === '' 
-                ? 'bg-orange-500 text-white' 
+                ? 'bg-blue-600 text-white' 
                 : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
             }`}
           >
@@ -342,7 +342,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               onClick={() => setUploadCategory(cat)}
               className={`px-4 py-2 rounded-xl font-medium transition-all ${
                 uploadCategory === cat 
-                  ? 'bg-orange-500 text-white' 
+                  ? 'bg-blue-600 text-white' 
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
               }`}
             >
@@ -371,7 +371,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
                 placeholder={t('websiteMedia.folderNamePlaceholder')}
-                className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 autoFocus
               />
               <button
@@ -399,14 +399,14 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         onClick={() => fileInputRef.current?.click()}
-        className="border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center mb-8 hover:border-orange-500 transition-colors cursor-pointer bg-gray-50"
+        className="border-2 border-dashed border-gray-300 rounded-2xl p-12 text-center mb-8 hover:border-blue-500 transition-colors cursor-pointer bg-gray-50"
       >
         <span className="text-5xl mb-4 block">📷</span>
         <p className="text-gray-700 font-medium mb-2">{t('websiteMedia.dragFilesHere')}</p>
         <p className="text-gray-500 text-sm mb-4">{t('websiteMedia.orClickToUpload')}</p>
         <p className="text-gray-400 text-xs">{t('websiteMedia.supportedFormats')}</p>
         {uploadCategory && (
-          <p className="text-orange-500 text-sm mt-2">→ {t('websiteMedia.uploadingTo')}: <strong>{uploadCategory}</strong></p>
+          <p className="text-blue-600 text-sm mt-2">→ {t('websiteMedia.uploadingTo')}: <strong>{uploadCategory}</strong></p>
         )}
       </motion.div>
 
@@ -436,12 +436,12 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             disabled={savingDisplayMode}
             className={`p-4 rounded-xl border-2 transition-all text-left ${
               imageDisplayMode === 'cover'
-                ? 'border-orange-500 bg-orange-50'
+                ? 'border-blue-500 bg-blue-50'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >
             <div className="w-full h-16 bg-gray-200 rounded-lg mb-3 overflow-hidden">
-              <div className="w-full h-full bg-gradient-to-br from-orange-400 to-orange-600" />
+              <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-700" />
             </div>
             <p className="font-medium text-gray-900">{t('websiteMedia.imageCover')}</p>
             <p className="text-xs text-gray-500">{t('websiteMedia.imageCoverDesc')}</p>
@@ -453,12 +453,12 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
             disabled={savingDisplayMode}
             className={`p-4 rounded-xl border-2 transition-all text-left ${
               imageDisplayMode === 'contain'
-                ? 'border-orange-500 bg-orange-50'
+                ? 'border-blue-500 bg-blue-50'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >
             <div className="w-full h-16 bg-white border border-gray-200 rounded-lg mb-3 flex items-center justify-center">
-              <div className="w-10 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded" />
+              <div className="w-10 h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded" />
             </div>
             <p className="font-medium text-gray-900">{t('websiteMedia.imageContain')}</p>
             <p className="text-xs text-gray-500">{t('websiteMedia.imageContainDesc')}</p>
@@ -533,7 +533,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -550,7 +550,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               transition={{ delay: index * 0.03 }}
               onClick={() => toggleSelect(item.id)}
               className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer group bg-gray-100 ${
-                selectedItems.includes(item.id) ? 'ring-4 ring-orange-500' : ''
+                selectedItems.includes(item.id) ? 'ring-4 ring-blue-500' : ''
               }`}
             >
               <img
@@ -587,14 +587,14 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               key={item.id}
               onClick={() => toggleSelect(item.id)}
               className={`flex items-center gap-4 p-4 border-b hover:bg-gray-50 cursor-pointer ${
-                selectedItems.includes(item.id) ? 'bg-orange-50' : ''
+                selectedItems.includes(item.id) ? 'bg-blue-50' : ''
               }`}
             >
               <input
                 type="checkbox"
                 checked={selectedItems.includes(item.id)}
                 onChange={() => toggleSelect(item.id)}
-                className="w-5 h-5 rounded border-gray-300 text-orange-500"
+                className="w-5 h-5 rounded border-gray-300 text-blue-600"
               />
               <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                 <img

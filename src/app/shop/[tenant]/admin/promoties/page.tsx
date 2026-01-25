@@ -142,7 +142,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -161,7 +161,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={openCreateModal}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
         >
           ➕ {t('marketingPromo.newPromotion')}
         </motion.button>
@@ -184,7 +184,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           className="bg-white rounded-2xl p-4 shadow-sm"
         >
           <p className="text-gray-500 text-sm">{t('marketingPromo.totalUsed')}</p>
-          <p className="text-3xl font-bold text-orange-500">{totalUsage}</p>
+          <p className="text-3xl font-bold text-blue-600">{totalUsage}</p>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -211,7 +211,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={openCreateModal}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-xl"
           >
             + {t('marketingPromo.createFirst')}
           </motion.button>
@@ -335,7 +335,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                         onClick={() => setFormData(prev => ({ ...prev, type: type.id as 'percentage' | 'fixed' | 'freeItem' }))}
                         className={`p-3 rounded-xl border-2 text-center transition-all ${
                           formData.type === type.id
-                            ? 'border-orange-500 bg-orange-50'
+                            ? 'border-blue-500 bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -355,7 +355,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder={t('marketingPromo.namePlaceholder')}
                   />
                 </div>
@@ -368,7 +368,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       type="text"
                       value={formData.code}
                       onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
-                      className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono uppercase"
+                      className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono uppercase"
                       placeholder={t('marketingPromo.codePlaceholder')}
                     />
                     <button
@@ -391,7 +391,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       inputMode="decimal"
                       value={formData.value || ''}
                       onChange={(e) => setFormData(prev => ({ ...prev, value: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder={formData.type === 'percentage' ? t('marketingPromo.percentagePlaceholder') : t('marketingPromo.amountPlaceholder')}
                     />
                   </div>
@@ -407,7 +407,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     inputMode="decimal"
                     value={formData.min_order_amount || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, min_order_amount: parseFloat(e.target.value) || 0 }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder={t('marketingPromo.minOrderPlaceholder')}
                   />
                 </div>
@@ -422,7 +422,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     inputMode="numeric"
                     value={formData.max_usage || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, max_usage: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder={t('marketingPromo.maxUsagePlaceholder')}
                   />
                 </div>
@@ -436,7 +436,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     type="date"
                     value={formData.expires_at}
                     onChange={(e) => setFormData(prev => ({ ...prev, expires_at: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <p className="text-xs text-gray-500 mt-1">{t('marketingPromo.expiryPlaceholder')}</p>
                 </div>
@@ -454,7 +454,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                   whileTap={{ scale: 0.98 }}
                   onClick={handleSave}
                   disabled={saving || !formData.name.trim() || !formData.code.trim()}
-                  className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white rounded-xl font-medium flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center justify-center gap-2"
                 >
                   {saving ? (
                     <>

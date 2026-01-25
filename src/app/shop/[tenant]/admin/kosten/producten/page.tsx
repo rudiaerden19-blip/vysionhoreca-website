@@ -599,7 +599,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -633,7 +633,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           <div className="text-sm text-gray-500">{t('dashboard.productCosts.tooLow')} ⚠️</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow text-center">
-          <div className="text-2xl font-bold text-orange-600">{stats.high}</div>
+          <div className="text-2xl font-bold text-blue-600">{stats.high}</div>
           <div className="text-sm text-gray-500">{t('dashboard.productCosts.tooHigh')}</div>
         </div>
       </div>
@@ -645,7 +645,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           placeholder={`🔍 ${t('dashboard.productCosts.searchProduct')}`}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+          className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
@@ -990,7 +990,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               dropTargetProduct === pc.product.id 
                 ? 'border-blue-500 bg-blue-50 scale-[1.02] shadow-xl' 
                 : pc.status === 'low' ? 'border-red-300' :
-                  pc.status === 'high' ? 'border-orange-300' :
+                  pc.status === 'high' ? 'border-blue-300' :
                   pc.ingredients.length > 0 ? 'border-green-300' : 'border-gray-200'
             }`}
             style={{ overflow: 'visible' }}
@@ -1003,7 +1003,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               <div className="flex items-center gap-4">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
                   pc.status === 'low' ? 'bg-red-100' :
-                  pc.status === 'high' ? 'bg-orange-100' :
+                  pc.status === 'high' ? 'bg-blue-100' :
                   pc.ingredients.length > 0 ? 'bg-green-100' : 'bg-gray-100'
                 }`}>
                   {pc.status === 'low' ? '🔴' :
@@ -1048,7 +1048,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                         }
                       }}
                       placeholder="auto"
-                      className="w-16 px-2 py-1 text-center border-2 border-orange-200 rounded-lg font-bold focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                      className="w-16 px-2 py-1 text-center border-2 border-blue-200 rounded-lg font-bold focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
@@ -1071,7 +1071,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 {pc.ingredients.length > 0 && (
                   <div className={`px-3 py-1 rounded-full text-sm font-bold ${
                     pc.status === 'low' ? 'bg-red-100 text-red-700' :
-                    pc.status === 'high' ? 'bg-orange-100 text-orange-700' :
+                    pc.status === 'high' ? 'bg-blue-100 text-blue-700' :
                     'bg-green-100 text-green-700'
                   }`}>
                     {pc.status === 'low' ? `↑ €${Math.abs(pc.difference).toFixed(2)}` :
@@ -1279,7 +1279,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                     {pc.ingredients.length > 0 && (
                       <div className={`mt-4 p-4 rounded-lg ${
                         pc.status === 'low' ? 'bg-red-50 border border-red-200' :
-                        pc.status === 'high' ? 'bg-orange-50 border border-orange-200' :
+                        pc.status === 'high' ? 'bg-blue-50 border border-blue-200' :
                         'bg-green-50 border border-green-200'
                       }`}>
                         <div className="grid grid-cols-3 gap-4 text-center">
@@ -1298,7 +1298,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                         </div>
                         <div className={`mt-3 text-center text-lg font-bold ${
                           pc.status === 'low' ? 'text-red-700' :
-                          pc.status === 'high' ? 'text-orange-700' :
+                          pc.status === 'high' ? 'text-blue-700' :
                           'text-green-700'
                         }`}>
                           {pc.status === 'low' && `⚠️ ${t('dashboard.productCosts.priceTooLow').replace('{amount}', Math.abs(pc.difference).toFixed(2)).replace('{target}', pc.requiredPrice.toFixed(2))}`}

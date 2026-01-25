@@ -92,7 +92,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -116,7 +116,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
             saved 
               ? 'bg-green-500 text-white' 
-              : 'bg-orange-500 hover:bg-orange-600 text-white'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
           {saving ? (
@@ -171,7 +171,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="business_name"
                 value={formData.business_name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -184,7 +184,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="tagline"
                 value={formData.tagline || ''}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -197,7 +197,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.description}
                 onChange={handleChange}
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
               />
             </div>
 
@@ -219,7 +219,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                     name="primary_color"
                     value={formData.primary_color}
                     onChange={handleChange}
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="#ef4444"
                   />
                 </div>
@@ -242,7 +242,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                     name="secondary_color"
                     value={formData.secondary_color}
                     onChange={handleChange}
-                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="#dc2626"
                   />
                 </div>
@@ -272,7 +272,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -285,7 +285,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="postal_code"
                 value={formData.postal_code || ''}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -298,7 +298,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="city"
                 value={formData.city || ''}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -311,7 +311,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -324,7 +324,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -355,7 +355,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.btw_number || ''}
                 onChange={handleChange}
                 placeholder="BE0123.456.789"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
               <p className="text-xs text-gray-400 mt-1">Verplicht op kassabonnen in België</p>
             </div>
@@ -374,7 +374,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                   }))
                   setSaved(false)
                 }}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
                 <option value={6}>6% - Voeding (horeca, afhaal)</option>
                 <option value={12}>12% - Restaurant (ter plaatse)</option>
@@ -393,7 +393,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 value={formData.kvk_number || ''}
                 onChange={handleChange}
                 placeholder="0123.456.789"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -420,7 +420,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="facebook_url"
                 value={formData.facebook_url}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="https://facebook.com/..."
               />
             </div>
@@ -434,7 +434,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="instagram_url"
                 value={formData.instagram_url}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="https://instagram.com/..."
               />
             </div>
@@ -448,7 +448,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="tiktok_url"
                 value={formData.tiktok_url}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="https://tiktok.com/@..."
               />
             </div>
@@ -462,7 +462,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 name="website_url"
                 value={formData.website_url}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="https://..."
               />
             </div>
@@ -635,7 +635,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                     value={formData.specialty_1_title || ''}
                     onChange={handleChange}
                     placeholder="bijv. Huisgemaakte Pasta"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
                 <div>
@@ -664,7 +664,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                     value={formData.specialty_2_title || ''}
                     onChange={handleChange}
                     placeholder="bijv. Verse Visgerechten"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
                 <div>
@@ -693,7 +693,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                     value={formData.specialty_3_title || ''}
                     onChange={handleChange}
                     placeholder="bijv. Ambachtelijk Brood"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
                 <div>
@@ -717,7 +717,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 text-white"
+          className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 text-white"
         >
           <div className="flex items-center justify-between">
             <div>
@@ -727,7 +727,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             <a
               href={`/shop/${params.tenant}`}
               target="_blank"
-              className="bg-white text-orange-500 font-medium px-6 py-3 rounded-xl hover:bg-orange-50 transition-colors flex items-center gap-2"
+              className="bg-white text-blue-600 font-medium px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors flex items-center gap-2"
             >
               <span>{t('admin.viewWebsite')}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

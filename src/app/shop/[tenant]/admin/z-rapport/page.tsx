@@ -269,7 +269,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -289,7 +289,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <button
             onClick={() => setShowHistory(!showHistory)}
             className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${
-              showHistory ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              showHistory ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
             📚 {t('zReport.history')}
@@ -476,7 +476,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                     onClick={() => setSelectedDate(report.report_date)}
                     className={`w-full text-left p-3 rounded-xl transition-colors ${
                       report.report_date === selectedDate 
-                        ? 'bg-orange-100 border-2 border-orange-500' 
+                        ? 'bg-blue-100 border-2 border-blue-500' 
                         : 'bg-gray-50 hover:bg-gray-100'
                     }`}
                   >

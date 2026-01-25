@@ -99,7 +99,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -119,7 +119,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           className={`px-6 py-3 rounded-xl font-medium flex items-center gap-2 ${
             saved 
               ? 'bg-green-500 text-white' 
-              : 'bg-orange-500 hover:bg-orange-600 text-white'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
           {saving ? '⏳' : saved ? '✓' : '💾'} {saved ? 'Opgeslagen!' : t('adminPages.common.save')}
@@ -141,7 +141,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
               key={method.id}
               className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-colors ${
                 methods[method.id] 
-                  ? 'bg-orange-50 border-2 border-orange-500' 
+                  ? 'bg-blue-50 border-2 border-blue-500' 
                   : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
               }`}
             >
@@ -156,7 +156,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
                 type="checkbox"
                 checked={methods[method.id] || false}
                 onChange={(e) => setMethods(prev => ({ ...prev, [method.id]: e.target.checked }))}
-                className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
             </label>
           ))}
@@ -180,7 +180,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
               onClick={() => setVatRate(rate)}
               className={`p-4 rounded-xl font-bold text-xl transition-all ${
                 vatRate === rate 
-                  ? 'bg-orange-500 text-white' 
+                  ? 'bg-blue-600 text-white' 
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >

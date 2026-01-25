@@ -96,7 +96,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -120,7 +120,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl p-4 shadow-sm text-center col-span-2 md:col-span-1"
         >
-          <p className="text-4xl font-bold text-orange-500">{averageRating}</p>
+          <p className="text-4xl font-bold text-blue-600">{averageRating}</p>
           <div className="flex justify-center my-1">
             {[1,2,3,4,5].map(s => (
               <span key={s} className={s <= Math.round(Number(averageRating)) ? 'text-yellow-400' : 'text-gray-200'}>★</span>
@@ -156,7 +156,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
             onClick={() => setFilter(f.id as 'all' | 'visible' | 'hidden')}
             className={`px-4 py-2 rounded-xl font-medium transition-all ${
               filter === f.id
-                ? 'bg-orange-500 text-white'
+                ? 'bg-blue-600 text-white'
                 : 'bg-white text-gray-600 hover:bg-gray-50'
             }`}
           >
@@ -195,8 +195,8 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                      <span className="text-orange-500 font-bold text-lg">{review.customer_name[0]?.toUpperCase()}</span>
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-bold text-lg">{review.customer_name[0]?.toUpperCase()}</span>
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -237,11 +237,11 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
 
                 {/* Reply */}
                 {review.reply && (
-                  <div className="bg-orange-50 rounded-xl p-4 ml-8 mb-4">
-                    <p className="text-sm text-orange-700">
+                  <div className="bg-blue-50 rounded-xl p-4 ml-8 mb-4">
+                    <p className="text-sm text-blue-700">
                       <strong>Jouw reactie:</strong> {review.reply}
                     </p>
-                    <p className="text-xs text-orange-500 mt-1">{formatDate(review.replied_at)}</p>
+                    <p className="text-xs text-blue-600 mt-1">{formatDate(review.replied_at)}</p>
                   </div>
                 )}
 
@@ -253,7 +253,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                       onChange={(e) => setReplyText(e.target.value)}
                       placeholder="Schrijf een reactie..."
                       rows={3}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none mb-2"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none mb-2"
                     />
                     <div className="flex gap-2">
                       <motion.button
@@ -261,7 +261,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                         whileTap={{ scale: 0.98 }}
                         onClick={() => submitReply(review.id!)}
                         disabled={savingReply || !replyText.trim()}
-                        className="px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white rounded-lg font-medium flex items-center gap-2"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-lg font-medium flex items-center gap-2"
                       >
                         {savingReply ? (
                           <motion.div
@@ -285,7 +285,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                 ) : !review.reply && (
                   <button
                     onClick={() => setReplyingTo(review.id!)}
-                    className="text-orange-500 text-sm font-medium hover:underline ml-8"
+                    className="text-blue-600 text-sm font-medium hover:underline ml-8"
                   >
                     💬 Reageren
                   </button>

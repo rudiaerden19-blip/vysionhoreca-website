@@ -644,7 +644,7 @@ export default function AbonnementPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     )
   }
@@ -728,7 +728,7 @@ export default function AbonnementPage() {
             <p className="text-gray-600">
               {t('endsOn')} <strong>{trialEndDate}</strong>
               <br />
-              <span className="text-orange-600 font-medium">{daysLeft} {t('daysLeft')}</span>
+              <span className="text-blue-600 font-medium">{daysLeft} {t('daysLeft')}</span>
             </p>
           )}
           {isActive && subscription?.next_payment_at && (
@@ -752,7 +752,7 @@ export default function AbonnementPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">{t('outstanding')}</span>
-              <span className={`font-bold ${pendingInvoices.length > 0 ? 'text-orange-600' : 'text-gray-400'}`}>
+              <span className={`font-bold ${pendingInvoices.length > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
                 {pendingInvoices.length}
               </span>
             </div>
@@ -823,7 +823,7 @@ export default function AbonnementPage() {
       </div>
 
       {/* Factuur Betalen Knop - ALTIJD ZICHTBAAR */}
-      <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-6">
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h3 className="text-xl font-bold text-gray-900">{t('payInvoice')}</h3>
@@ -843,7 +843,7 @@ export default function AbonnementPage() {
               }
             }}
             disabled={processing !== null}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50 whitespace-nowrap"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50 whitespace-nowrap"
           >
             {processing && processing !== 'starter' && processing !== 'pro' ? t('loading') : `💳 ${t('payNow')}`}
           </button>
@@ -904,7 +904,7 @@ export default function AbonnementPage() {
                         <button
                           onClick={() => handlePayInvoice(invoice)}
                           disabled={processing === invoice.id}
-                          className="text-orange-600 hover:text-orange-700 font-medium text-sm"
+                          className="text-blue-600 hover:text-blue-700 font-medium text-sm"
                         >
                           {processing === invoice.id ? t('loading') : t('pay')}
                         </button>
@@ -927,7 +927,7 @@ export default function AbonnementPage() {
         <div className="flex flex-wrap gap-4">
           <a 
             href="mailto:info@vysionhoreca.com" 
-            className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -936,7 +936,7 @@ export default function AbonnementPage() {
           </a>
           <a 
             href="tel:+32492129383" 
-            className="inline-flex items-center gap-2 text-orange-600 hover:text-orange-700 font-medium"
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />

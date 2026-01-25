@@ -77,7 +77,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
       case 'paid': return 'bg-green-100 text-green-800'
       case 'used': return 'bg-gray-100 text-gray-800'
       case 'expired': return 'bg-red-100 text-red-800'
-      case 'pending_cash': return 'bg-orange-100 text-orange-800'
+      case 'pending_cash': return 'bg-blue-100 text-blue-800'
       default: return 'bg-yellow-100 text-yellow-800'
     }
   }
@@ -98,7 +98,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
         />
       </div>
     )
@@ -121,7 +121,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
             className={`px-6 py-3 rounded-xl font-medium flex items-center gap-2 ${
               saved 
                 ? 'bg-green-500 text-white' 
-                : 'bg-orange-500 hover:bg-orange-600 text-white'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
             {saving ? t('adminPages.common.saving') : saved ? `✓ ${t('adminPages.common.saved')}` : `💾 ${t('adminPages.common.save')}`}
@@ -135,7 +135,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           onClick={() => setActiveTab('instellingen')}
           className={`px-4 py-2 rounded-xl font-medium transition-colors ${
             activeTab === 'instellingen' 
-              ? 'bg-orange-500 text-white' 
+              ? 'bg-blue-600 text-white' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -145,7 +145,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
           onClick={() => setActiveTab('bonnen')}
           className={`px-4 py-2 rounded-xl font-medium transition-colors ${
             activeTab === 'bonnen' 
-              ? 'bg-orange-500 text-white' 
+              ? 'bg-blue-600 text-white' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
@@ -170,7 +170,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                 type="button"
                 onClick={() => setFormData(prev => ({ ...prev, gift_cards_enabled: !prev.gift_cards_enabled }))}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  formData.gift_cards_enabled ? 'bg-orange-500' : 'bg-gray-200'
+                  formData.gift_cards_enabled ? 'bg-blue-600' : 'bg-gray-200'
                 }`}
               >
                 <span
@@ -192,7 +192,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
             <h2 className="text-lg font-semibold text-gray-900 mb-2">💳 {t('websiteGiftCards.stripePayments')}</h2>
             <p className="text-gray-500 text-sm mb-6">
               {t('websiteGiftCards.stripeDesc')} 
-              <a href="https://dashboard.stripe.com/apikeys" target="_blank" className="text-orange-500 hover:underline ml-1">
+              <a href="https://dashboard.stripe.com/apikeys" target="_blank" className="text-blue-600 hover:underline ml-1">
                 {t('websiteGiftCards.getApiKeys')} →
               </a>
             </p>
@@ -206,7 +206,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                   type="text"
                   value={formData.stripe_public_key}
                   onChange={(e) => setFormData(prev => ({ ...prev, stripe_public_key: e.target.value }))}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono text-sm"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                   placeholder="pk_live_..."
                 />
               </div>
@@ -220,7 +220,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                     type={showSecretKey ? 'text' : 'password'}
                     value={formData.stripe_secret_key}
                     onChange={(e) => setFormData(prev => ({ ...prev, stripe_secret_key: e.target.value }))}
-                    className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono text-sm"
+                    className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                     placeholder="sk_live_..."
                   />
                   <button
@@ -242,16 +242,16 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-2xl p-6"
+              className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl p-6"
             >
-              <h3 className="font-semibold text-orange-900 mb-4 flex items-center gap-2">
+              <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
                 <span>👁️</span> Preview op website
               </h3>
               <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                <p className="text-sm text-orange-600 font-medium uppercase tracking-wider">Het perfecte cadeau</p>
+                <p className="text-sm text-blue-600 font-medium uppercase tracking-wider">Het perfecte cadeau</p>
                 <h4 className="text-2xl font-bold text-gray-900 mt-1">Geef iemand een verrassing</h4>
                 <p className="text-gray-600 mt-2">Bestel een cadeaubon en verras iemand met een heerlijke maaltijd</p>
-                <button className="mt-4 px-6 py-3 bg-orange-500 text-white font-medium rounded-xl">
+                <button className="mt-4 px-6 py-3 bg-blue-600 text-white font-medium rounded-xl">
                   🎁 Cadeaubon bestellen
                 </button>
               </div>
@@ -323,7 +323,7 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
                   className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-xl">
+                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-xl">
                       🎁
                     </div>
                     <div>

@@ -94,7 +94,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -111,7 +111,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           + Categorie toevoegen
         </button>
@@ -131,7 +131,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-xl shadow-lg p-6 border-2 border-orange-200"
+          className="bg-white rounded-xl shadow-lg p-6 border-2 border-blue-200"
         >
           <h3 className="font-semibold mb-4">Nieuwe categorie toevoegen</h3>
           <div className="flex gap-4">
@@ -140,7 +140,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
               placeholder="Categorienaam (bijv. Desserts)"
               value={newCategory.name}
               onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
-              className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
             <div className="flex items-center gap-2">
               <span className="text-gray-600">×</span>
@@ -155,7 +155,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
                   }
                 }}
                 placeholder="bijv. 3 of 2,5"
-                className="w-28 px-3 py-2 border rounded-lg text-center focus:ring-2 focus:ring-orange-500"
+                className="w-28 px-3 py-2 border rounded-lg text-center focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button
@@ -212,7 +212,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
                   }
                 }}
                 placeholder="bijv. 3 of 2,5"
-                className="flex-1 px-4 py-3 text-2xl font-bold text-center border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="flex-1 px-4 py-3 text-2xl font-bold text-center border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             

@@ -115,7 +115,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -219,14 +219,14 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                         type="time"
                         value={daySchedule.open_time}
                         onChange={(e) => updateDay(index, 'open_time', e.target.value)}
-                        className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                       <span className="text-gray-400">-</span>
                       <input
                         type="time"
                         value={daySchedule.close_time}
                         onChange={(e) => updateDay(index, 'close_time', e.target.value)}
-                        className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
 
@@ -275,14 +275,14 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                     type="time"
                     value={daySchedule.open_time_2 || '17:00'}
                     onChange={(e) => updateDay(index, 'open_time_2', e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                    className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                   <span className="text-gray-400">-</span>
                   <input
                     type="time"
                     value={daySchedule.close_time_2 || '21:00'}
                     onChange={(e) => updateDay(index, 'close_time_2', e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm"
+                    className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                 </motion.div>
               )}

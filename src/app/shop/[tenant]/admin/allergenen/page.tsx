@@ -50,7 +50,7 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
           whileTap={{ scale: 0.98 }}
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
         >
           {saving ? '⏳' : '💾'} {t('adminPages.common.save')}
         </motion.button>
@@ -76,14 +76,14 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
                 onClick={() => toggleAllergen(allergen.id)}
                 className={`p-4 rounded-xl text-left transition-all ${
                   allergen.enabled 
-                    ? 'bg-orange-50 border-2 border-orange-500' 
+                    ? 'bg-blue-50 border-2 border-blue-500' 
                     : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{allergen.icon}</span>
                   <div>
-                    <p className={`font-medium ${allergen.enabled ? 'text-orange-700' : 'text-gray-600'}`}>
+                    <p className={`font-medium ${allergen.enabled ? 'text-blue-700' : 'text-gray-600'}`}>
                       {allergenName}
                     </p>
                     <p className="text-xs text-gray-400">

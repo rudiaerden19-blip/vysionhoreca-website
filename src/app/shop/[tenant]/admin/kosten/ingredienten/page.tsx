@@ -669,7 +669,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -705,7 +705,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
           </button>
           <button
             onClick={() => { resetForm(); setShowAddForm(true) }}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             + Handmatig
           </button>
@@ -1273,7 +1273,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
           placeholder="🔍 Zoek ingrediënt..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+          className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
@@ -1284,7 +1284,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="bg-white rounded-xl shadow-lg p-6 border-2 border-orange-200"
+            className="bg-white rounded-xl shadow-lg p-6 border-2 border-blue-200"
           >
             <h3 className="font-semibold mb-4">
               {editingId ? 'Ingrediënt bewerken' : 'Nieuw ingrediënt toevoegen'}
@@ -1299,7 +1299,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                   placeholder="bijv. Hamburger vlees"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -1309,7 +1309,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                 <select
                   value={formData.unit}
                   onChange={(e) => setFormData(prev => ({ ...prev, unit: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   {unitOptions.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -1323,7 +1323,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                 <select
                   value={formData.cost_category_id}
                   onChange={(e) => setFormData(prev => ({ ...prev, cost_category_id: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">-- Selecteer --</option>
                   {categories.map(cat => (
@@ -1353,7 +1353,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                             setFormData(prev => ({ ...prev, purchase_price: val }))
                           }
                         }}
-                        className="w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                        className="w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                         placeholder="bijv. 0,50"
                       />
                     </div>
@@ -1372,7 +1372,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                             setFormData(prev => ({ ...prev, package_price: val }))
                           }
                         }}
-                        className="w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                        className="w-full pl-8 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                         placeholder="bijv. 11,49"
                       />
                     </div>
@@ -1389,7 +1389,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                           setFormData(prev => ({ ...prev, units_per_package: val }))
                         }
                       }}
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                       placeholder="bijv. 30"
                     />
                   </div>
@@ -1409,7 +1409,7 @@ BITTERBALLEN 96X20G PB       1    CU    13.5420    5.00    12.86"
                   placeholder="bijv. Leverancier: Sligro"
                   value={formData.notes}
                   onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>

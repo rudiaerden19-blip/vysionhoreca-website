@@ -114,7 +114,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
         />
       </div>
     )
@@ -135,7 +135,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
           className={`px-6 py-3 rounded-xl font-medium flex items-center gap-2 ${
             saved 
               ? 'bg-green-500 text-white' 
-              : 'bg-orange-500 hover:bg-orange-600 text-white'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
           {saving ? `⏳ ${t('adminPages.common.saving')}` : saved ? `✓ ${t('adminPages.common.saved')}` : `💾 ${t('adminPages.common.save')}`}
@@ -166,7 +166,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
                       onChange={(e) => handleChange(field.key, e.target.value)}
                       placeholder={field.placeholder}
                       rows={4}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     />
                   ) : (
                     <input
@@ -174,7 +174,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
                       value={texts[field.key as keyof TenantTexts] || ''}
                       onChange={(e) => handleChange(field.key, e.target.value)}
                       placeholder={field.placeholder}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   )}
                 </div>

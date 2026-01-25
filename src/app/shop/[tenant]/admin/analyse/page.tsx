@@ -43,7 +43,7 @@ const SECTOR_BENCHMARKS = {
 const getHealthStatus = (t: (key: string) => string) => ({
   EXCELLENT: { label: t('analysePage.health.excellent'), desc: t('analysePage.health.excellentDesc'), icon: '🌟', color: '#22c55e', bgColor: 'bg-green-50', borderColor: 'border-green-500' },
   GOOD: { label: t('analysePage.health.good'), desc: t('analysePage.health.goodDesc'), icon: '✅', color: '#3b82f6', bgColor: 'bg-blue-50', borderColor: 'border-blue-500' },
-  WARNING: { label: t('analysePage.health.warning'), desc: t('analysePage.health.warningDesc'), icon: '⚠️', color: '#f59e0b', bgColor: 'bg-orange-50', borderColor: 'border-orange-500' },
+  WARNING: { label: t('analysePage.health.warning'), desc: t('analysePage.health.warningDesc'), icon: '⚠️', color: '#f59e0b', bgColor: 'bg-blue-50', borderColor: 'border-blue-500' },
   CRITICAL: { label: t('analysePage.health.critical'), desc: t('analysePage.health.criticalDesc'), icon: '🚨', color: '#ef4444', bgColor: 'bg-red-50', borderColor: 'border-red-500' },
 })
 
@@ -448,7 +448,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -498,7 +498,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             onClick={() => setActiveTab(tab.id as TabType)}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               activeTab === tab.id
-                ? 'bg-orange-500 text-white shadow-md'
+                ? 'bg-blue-600 text-white shadow-md'
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
@@ -574,7 +574,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
               className="bg-white rounded-2xl p-5 shadow-sm"
             >
               <div className="text-sm text-gray-500 mb-1">📊 {t('analysePage.overview.profitMargin')}</div>
-              <div className={`text-2xl font-bold ${monthlyReport.profitMargin >= 22 ? 'text-green-600' : 'text-orange-600'}`}>
+              <div className={`text-2xl font-bold ${monthlyReport.profitMargin >= 22 ? 'text-green-600' : 'text-blue-600'}`}>
                 {monthlyReport.profitMargin.toFixed(1)}%
               </div>
               <div className="text-xs text-gray-400 mt-1">
@@ -604,7 +604,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <div className="text-sm text-gray-500">{t('analysePage.overview.online')}</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-orange-600">{monthlyReport.kassaOrders}</div>
+                  <div className="text-2xl font-bold text-blue-600">{monthlyReport.kassaOrders}</div>
                   <div className="text-sm text-gray-500">{t('analysePage.overview.kassa')}</div>
                 </div>
               </div>
@@ -625,7 +625,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <div className="text-sm text-gray-500">{t('analysePage.overview.perOrder')}</div>
                 </div>
                 {businessTargets && monthlyReport.averageTicket < businessTargets.target_average_ticket && (
-                  <div className="text-sm text-orange-600">
+                  <div className="text-sm text-blue-600">
                     {t('analysePage.overview.target')}: {formatCurrency(businessTargets.target_average_ticket)}
                   </div>
                 )}
@@ -732,7 +732,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
             <button
               onClick={() => openKassaModal()}
-              className="px-4 py-2 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
               ➕ {t('analysePage.kassa.newDay')}
             </button>
@@ -813,7 +813,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
             <button
               onClick={() => openFixedModal()}
-              className="px-4 py-2 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
               ➕ {t('analysePage.fixed.newCost')}
             </button>
@@ -889,7 +889,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
             </div>
             <button
               onClick={() => openVariableModal()}
-              className="px-4 py-2 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
             >
               ➕ {t('analysePage.variable.newPurchase')}
             </button>
@@ -1024,7 +1024,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.target_profit_margin || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, target_profit_margin: Number(e.target.value) }))}
                 placeholder="25"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.targetMarginHelp')}</p>
             </div>
@@ -1036,7 +1036,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.minimum_profit_margin || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, minimum_profit_margin: Number(e.target.value) }))}
                 placeholder="15"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.minMarginHelp')}</p>
             </div>
@@ -1048,7 +1048,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.max_personnel_percent || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, max_personnel_percent: Number(e.target.value) }))}
                 placeholder="30"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.maxPersonnelHelp')}</p>
             </div>
@@ -1060,7 +1060,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.max_ingredient_percent || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, max_ingredient_percent: Number(e.target.value) }))}
                 placeholder="35"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-sm text-gray-500 mt-1">{t('analysePage.settings.maxIngredientsHelp')}</p>
             </div>
@@ -1072,14 +1072,14 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 value={targetsForm.target_average_ticket || ''}
                 onChange={e => setTargetsForm(f => ({ ...f, target_average_ticket: Number(e.target.value) }))}
                 placeholder="15"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <button
               onClick={saveTargets}
               disabled={saving}
-              className="w-full px-6 py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 disabled:opacity-50 transition-colors"
+              className="w-full px-6 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               {saving ? t('analysePage.common.saving') : `💾 ${t('analysePage.settings.saveTargets')}`}
             </button>
@@ -1202,7 +1202,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <button
                     onClick={saveKassa}
                     disabled={saving}
-                    className="flex-1 px-4 py-3 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50"
                   >
                     {saving ? t('analysePage.common.saving') : `💾 ${t('analysePage.common.save')}`}
                   </button>
@@ -1297,7 +1297,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <button
                     onClick={saveFixed}
                     disabled={saving}
-                    className="flex-1 px-4 py-3 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50"
                   >
                     {saving ? t('analysePage.common.saving') : `💾 ${t('analysePage.common.save')}`}
                   </button>
@@ -1415,7 +1415,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <button
                     onClick={saveVariable}
                     disabled={saving}
-                    className="flex-1 px-4 py-3 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 disabled:opacity-50"
                   >
                     {saving ? t('analysePage.common.saving') : `💾 ${t('analysePage.common.save')}`}
                   </button>

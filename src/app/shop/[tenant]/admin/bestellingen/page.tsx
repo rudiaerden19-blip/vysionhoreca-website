@@ -22,8 +22,8 @@ const getStatusConfig = (t: (key: string) => string): Record<string, { bg: strin
   NEW: { bg: 'bg-blue-100', text: 'text-blue-700', label: `🆕 ${t('ordersPage.status.new')}`, next: 'confirmed' },
   confirmed: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: `✓ ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new' },
   CONFIRMED: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: `✓ ${t('ordersPage.status.confirmed')}`, next: 'preparing', prev: 'new' },
-  preparing: { bg: 'bg-orange-100', text: 'text-orange-700', label: `👨‍🍳 ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
-  PREPARING: { bg: 'bg-orange-100', text: 'text-orange-700', label: `👨‍🍳 ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
+  preparing: { bg: 'bg-blue-100', text: 'text-blue-700', label: `👨‍🍳 ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
+  PREPARING: { bg: 'bg-blue-100', text: 'text-blue-700', label: `👨‍🍳 ${t('ordersPage.status.preparing')}`, next: 'ready', prev: 'confirmed' },
   ready: { bg: 'bg-green-100', text: 'text-green-700', label: `✅ ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing' },
   READY: { bg: 'bg-green-100', text: 'text-green-700', label: `✅ ${t('ordersPage.status.ready')}`, next: 'completed', prev: 'preparing' },
   delivered: { bg: 'bg-purple-100', text: 'text-purple-700', label: `🚗 ${t('ordersPage.status.delivered')}`, next: 'completed' },
@@ -720,7 +720,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('ordersPage.loading')}</p>
         </div>
@@ -781,7 +781,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     : status === 'confirmed'
                     ? 'bg-yellow-500 text-gray-900'
                     : status === 'preparing'
-                    ? 'bg-orange-500 text-white'
+                    ? 'bg-blue-600 text-white'
                     : status === 'ready'
                     ? 'bg-green-500 text-white'
                     : 'bg-gray-700 text-white'
@@ -859,7 +859,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleUpdateStatus(order.id!, 'preparing')}
                       disabled={updatingId === order.id}
-                      className="col-span-2 p-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl text-xl font-bold"
+                      className="col-span-2 p-4 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xl font-bold"
                     >
                       👨‍🍳 {t('ordersPage.actions.startPreparation').toUpperCase()}
                     </motion.button>
@@ -1068,7 +1068,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     </div>
                     <p className="text-gray-500 mt-1">{formatTime(order.created_at)}</p>
                   </div>
-                  <p className="text-2xl font-bold text-orange-500">€{order.total?.toFixed(2) || '0.00'}</p>
+                  <p className="text-2xl font-bold text-blue-600">€{order.total?.toFixed(2) || '0.00'}</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
@@ -1080,7 +1080,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     )}
                     {order.customer_email && (
                       <p className="text-gray-600">
-                        <a href={`mailto:${order.customer_email}`} className="hover:text-orange-500">✉️ {order.customer_email}</a>
+                        <a href={`mailto:${order.customer_email}`} className="hover:text-blue-600">✉️ {order.customer_email}</a>
                       </p>
                     )}
                     {(order.delivery_address || order.customer_address) && (
@@ -1146,7 +1146,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleUpdateStatus(order.id!, config.next!)}
                       disabled={updatingId === order.id}
-                      className="flex-1 min-w-[200px] bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+                      className="flex-1 min-w-[200px] bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
                     >
                       {updatingId === order.id ? (
                         <motion.div
@@ -1269,8 +1269,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 </div>
 
                 {/* Items */}
-                <div className="bg-orange-50 rounded-xl p-5">
-                  <p className="text-sm text-orange-600 font-medium mb-3">🍟 {t('ordersPage.orderedProducts')}</p>
+                <div className="bg-blue-50 rounded-xl p-5">
+                  <p className="text-sm text-blue-600 font-medium mb-3">🍟 {t('ordersPage.orderedProducts')}</p>
                   {(() => {
                     const items = parseItems(selectedOrder)
                     return items.length > 0 ? (
@@ -1278,7 +1278,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         {items.map((item, i) => (
                           <div key={i} className="flex justify-between items-center bg-white p-3 rounded-lg">
                             <div>
-                              <span className="font-bold text-orange-600 mr-2">{item.quantity}x</span>
+                              <span className="font-bold text-blue-600 mr-2">{item.quantity}x</span>
                               <span className="text-gray-900 font-medium">{item.name || item.product_name}</span>
                             </div>
                             <span className="font-bold text-gray-900">€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
@@ -1317,7 +1317,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   )}
                   <div className="flex justify-between text-2xl font-bold text-gray-900 pt-3 border-t">
                     <span>{t('ordersPage.total')}</span>
-                    <span className="text-orange-500">€{selectedOrder.total?.toFixed(2) || '0.00'}</span>
+                    <span className="text-blue-600">€{selectedOrder.total?.toFixed(2) || '0.00'}</span>
                   </div>
                 </div>
               </div>

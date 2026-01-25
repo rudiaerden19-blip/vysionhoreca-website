@@ -99,7 +99,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -122,7 +122,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
             saved 
               ? 'bg-green-500 text-white' 
-              : 'bg-orange-500 hover:bg-orange-600 text-white'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
           {saving ? (
@@ -162,7 +162,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
           placeholder={t('adminPages.categorieen.newCategoryPlaceholder')}
-          className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           onKeyDown={(e) => e.key === 'Enter' && addCategory()}
         />
         <button
@@ -198,11 +198,11 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                       onBlur={() => setEditingId(null)}
                       onKeyDown={(e) => e.key === 'Enter' && setEditingId(null)}
                       autoFocus
-                      className="flex-1 px-3 py-2 border border-orange-500 rounded-lg focus:outline-none"
+                      className="flex-1 px-3 py-2 border border-blue-500 rounded-lg focus:outline-none"
                     />
                   ) : (
                     <span 
-                      className="flex-1 font-medium text-gray-900 cursor-pointer hover:text-orange-500"
+                      className="flex-1 font-medium text-gray-900 cursor-pointer hover:text-blue-600"
                       onClick={() => setEditingId(category.id!)}
                     >
                       {category.name}

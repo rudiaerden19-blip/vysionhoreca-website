@@ -109,7 +109,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
         />
       </div>
     )
@@ -131,7 +131,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={openAddModal}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-xl transition-colors flex items-center gap-2"
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors flex items-center gap-2"
         >
           <span>+</span>
           <span>{t('rewardsPage.addReward')}</span>
@@ -164,7 +164,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
           <p className="text-gray-500 mb-6">{t('rewardsPage.noRewardsDesc')}</p>
           <button
             onClick={openAddModal}
-            className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-xl transition-colors"
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors"
           >
             {t('rewardsPage.addFirstReward')}
           </button>
@@ -264,7 +264,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder={t('rewardsPage.form.namePlaceholder')}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -277,7 +277,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                     value={formData.description || ''}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder={t('rewardsPage.form.descriptionPlaceholder')}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -290,7 +290,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                     min="1"
                     value={formData.points_required}
                     onChange={(e) => setFormData({ ...formData, points_required: parseInt(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -310,7 +310,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                         onClick={() => setFormData({ ...formData, reward_type: type.value as LoyaltyReward['reward_type'] })}
                         className={`p-3 rounded-xl border-2 text-center transition-all ${
                           formData.reward_type === type.value
-                            ? 'border-orange-500 bg-orange-50'
+                            ? 'border-blue-500 bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -333,7 +333,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                       value={formData.reward_value || ''}
                       onChange={(e) => setFormData({ ...formData, reward_value: parseFloat(e.target.value) || 0 })}
                       placeholder={formData.reward_type === 'discount_fixed' ? '5.00' : '10'}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 )}
@@ -349,7 +349,7 @@ export default function BeloningenPage({ params }: { params: { tenant: string } 
                 <button
                   onClick={handleSave}
                   disabled={saving || !formData.name || !formData.points_required}
-                  className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors"
+                  className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-xl font-medium transition-colors"
                 >
                   {saving ? `${t('adminPages.common.save')}...` : t('adminPages.common.save')}
                 </button>

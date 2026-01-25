@@ -220,7 +220,7 @@ export default function PersoneelPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -235,7 +235,7 @@ export default function PersoneelPage() {
         </div>
         <button
           onClick={openAddModal}
-          className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition flex items-center gap-2"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
         >
           <span className="text-xl">+</span>
           <span>{t('personeelPage.addEmployee')}</span>
@@ -269,7 +269,7 @@ export default function PersoneelPage() {
             type="checkbox"
             checked={showInactive}
             onChange={(e) => setShowInactive(e.target.checked)}
-            className="w-4 h-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
           <span className="text-gray-700">{t('personeelPage.showInactive')}</span>
         </label>
@@ -283,7 +283,7 @@ export default function PersoneelPage() {
           <p className="text-gray-600 mb-6">{t('personeelPage.noEmployeesDesc')}</p>
           <button
             onClick={openAddModal}
-            className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             + {t('personeelPage.addFirstEmployee')}
           </button>
@@ -404,7 +404,7 @@ export default function PersoneelPage() {
                   type="text"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('personeelPage.form.namePlaceholder')}
                 />
               </div>
@@ -415,7 +415,7 @@ export default function PersoneelPage() {
                   type="email"
                   value={formData.email || ''}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('personeelPage.form.emailPlaceholder')}
                 />
               </div>
@@ -426,7 +426,7 @@ export default function PersoneelPage() {
                   type="tel"
                   value={formData.phone || ''}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('personeelPage.form.phonePlaceholder')}
                 />
               </div>
@@ -441,7 +441,7 @@ export default function PersoneelPage() {
                     type="text"
                     value={formData.pin || ''}
                     onChange={(e) => setFormData({ ...formData, pin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                    className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono text-xl tracking-widest"
+                    className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-xl tracking-widest"
                     placeholder={t('personeelPage.form.pinPlaceholder')}
                     maxLength={4}
                   />
@@ -461,7 +461,7 @@ export default function PersoneelPage() {
                 <select
                   value={formData.role || 'EMPLOYEE'}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as StaffRole })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {ROLES.map((role) => (
                     <option key={role.id} value={role.id}>{role.label}</option>
@@ -497,7 +497,7 @@ export default function PersoneelPage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
               >
                 {saving ? `${t('adminPages.common.saving')}...` : editingStaff ? t('urenPage.update') : t('urenPage.add')}
               </button>
@@ -522,7 +522,7 @@ export default function PersoneelPage() {
                 <select
                   value={contractData.contract_type || ''}
                   onChange={(e) => setContractData({ ...contractData, contract_type: e.target.value as ContractType || undefined })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">{t('personeelPage.contractForm.select')}</option>
                   {LOCAL_CONTRACT_TYPES.map((type) => (
@@ -538,7 +538,7 @@ export default function PersoneelPage() {
                     type="number"
                     value={contractData.hours_per_week || ''}
                     onChange={(e) => setContractData({ ...contractData, hours_per_week: parseFloat(e.target.value) || undefined })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="38"
                     step="0.5"
                   />
@@ -549,7 +549,7 @@ export default function PersoneelPage() {
                     type="number"
                     value={contractData.hourly_rate || ''}
                     onChange={(e) => setContractData({ ...contractData, hourly_rate: parseFloat(e.target.value) || undefined })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="15.00"
                     step="0.01"
                   />
@@ -563,7 +563,7 @@ export default function PersoneelPage() {
                     type="date"
                     value={contractData.contract_start || ''}
                     onChange={(e) => setContractData({ ...contractData, contract_start: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -572,7 +572,7 @@ export default function PersoneelPage() {
                     type="date"
                     value={contractData.contract_end || ''}
                     onChange={(e) => setContractData({ ...contractData, contract_end: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -588,7 +588,7 @@ export default function PersoneelPage() {
                         type="number"
                         value={contractData.commute_distance_km || ''}
                         onChange={(e) => setContractData({ ...contractData, commute_distance_km: parseFloat(e.target.value) || undefined })}
-                        className="flex-1 px-4 py-2 border rounded-l-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="flex-1 px-4 py-2 border rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="25"
                         step="0.1"
                       />
@@ -604,7 +604,7 @@ export default function PersoneelPage() {
                         type="number"
                         value={contractData.km_rate || 0.4297}
                         onChange={(e) => setContractData({ ...contractData, km_rate: parseFloat(e.target.value) || 0.4297 })}
-                        className="flex-1 px-4 py-2 border rounded-r-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="flex-1 px-4 py-2 border rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="0.4297"
                         step="0.0001"
                       />
@@ -620,7 +620,7 @@ export default function PersoneelPage() {
                   id="meal-vouchers"
                   checked={contractData.has_meal_vouchers || false}
                   onChange={(e) => setContractData({ ...contractData, has_meal_vouchers: e.target.checked })}
-                  className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <label htmlFor="meal-vouchers" className="flex-1 cursor-pointer">
                   <span className="font-medium text-gray-800">🍽️ {t('personeelPage.contractForm.mealVouchers')}</span>
@@ -634,7 +634,7 @@ export default function PersoneelPage() {
                   value={contractData.contract_notes || ''}
                   onChange={(e) => setContractData({ ...contractData, contract_notes: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('personeelPage.contractForm.notesPlaceholder')}
                 />
               </div>
@@ -660,7 +660,7 @@ export default function PersoneelPage() {
               <button
                 onClick={handleSaveContract}
                 disabled={saving}
-                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
               >
                 {saving ? `${t('adminPages.common.saving')}...` : t('personeelPage.contractForm.saveContract')}
               </button>

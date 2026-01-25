@@ -181,7 +181,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
         />
       </div>
     )
@@ -198,7 +198,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
         <button
           onClick={openComposer}
           disabled={selectedCustomers.size === 0}
-          className="px-6 py-3 bg-orange-500 text-white rounded-xl font-medium hover:bg-orange-600 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
         >
           ✉️ {t('marketing.composeEmail')} {selectedCustomers.size > 0 && `(${selectedCustomers.size})`}
         </button>
@@ -245,7 +245,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
               <h2 className="font-bold text-gray-800">👥 {t('marketing.customerList')}</h2>
               <button
                 onClick={toggleSelectAll}
-                className="text-sm text-orange-600 hover:text-orange-700"
+                className="text-sm text-blue-600 hover:text-blue-700"
               >
                 {selectedCustomers.size === customers.length ? t('marketing.deselectAll') : t('marketing.selectAll')}
               </button>
@@ -265,7 +265,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                     onClick={() => toggleCustomer(customer.id)}
                     className={`p-4 border-b cursor-pointer transition ${
                       selectedCustomers.has(customer.id)
-                        ? 'bg-orange-50 border-l-4 border-l-orange-500'
+                        ? 'bg-blue-50 border-l-4 border-l-blue-500'
                         : 'hover:bg-gray-50'
                     }`}
                   >
@@ -274,7 +274,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                         type="checkbox"
                         checked={selectedCustomers.has(customer.id)}
                         onChange={() => toggleCustomer(customer.id)}
-                        className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                        className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
                       <div className="flex-1">
                         <div className="font-medium text-gray-800">{customer.name}</div>
@@ -358,7 +358,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                   type="text"
                   value={emailForm.subject}
                   onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder={t('marketing.subjectPlaceholder')}
                 />
               </div>
@@ -371,19 +371,19 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                   value={emailForm.message}
                   onChange={(e) => setEmailForm({ ...emailForm, message: e.target.value })}
                   rows={10}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder={t('marketing.messagePlaceholder')}
                 />
               </div>
 
               {/* Promo Code Option */}
-              <div className="bg-orange-50 rounded-lg p-4">
+              <div className="bg-blue-50 rounded-lg p-4">
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={emailForm.includePromo}
                     onChange={(e) => setEmailForm({ ...emailForm, includePromo: e.target.checked })}
-                    className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <div>
                     <span className="font-medium text-gray-800">🎁 {t('marketing.includePromoCode')}</span>
@@ -401,7 +401,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                         type="text"
                         value={emailForm.promoCode}
                         onChange={(e) => setEmailForm({ ...emailForm, promoCode: e.target.value.toUpperCase() })}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 uppercase"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 uppercase"
                         placeholder="KORTING10"
                       />
                     </div>
@@ -413,7 +413,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
                         type="number"
                         value={emailForm.promoDiscount}
                         onChange={(e) => setEmailForm({ ...emailForm, promoDiscount: e.target.value })}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                         min="1"
                         max="100"
                       />
@@ -433,7 +433,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
               <button
                 onClick={sendEmails}
                 disabled={sending || !emailForm.subject || !emailForm.message}
-                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:bg-gray-300 flex items-center gap-2"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-300 flex items-center gap-2"
               >
                 {sending ? (
                   <>

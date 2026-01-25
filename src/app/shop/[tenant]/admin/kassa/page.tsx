@@ -56,7 +56,7 @@ export default function KassaLinkPage({ params }: { params: { tenant: string } }
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="w-full py-5 bg-orange-500 hover:bg-orange-600 rounded-2xl font-bold text-xl flex items-center justify-center gap-3"
+            className="w-full py-5 bg-blue-600 hover:bg-blue-700 rounded-2xl font-bold text-xl flex items-center justify-center gap-3"
           >
             <span>🚀</span>
             Open Kassa Display

@@ -153,7 +153,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
           />
         </div>
       </div>
@@ -208,9 +208,9 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
                 className={`rounded-2xl p-6 text-white ${
-                  i === 0 ? 'bg-gradient-to-br from-yellow-400 to-orange-500' :
+                  i === 0 ? 'bg-gradient-to-br from-yellow-400 to-blue-600' :
                   i === 1 ? 'bg-gradient-to-br from-gray-400 to-gray-600' :
-                  'bg-gradient-to-br from-orange-300 to-orange-500'
+                  'bg-gradient-to-br from-amber-400 to-amber-600'
                 }`}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -262,7 +262,7 @@ export default function PopulairPage({ params }: { params: { tenant: string } })
                   >
                     <td className="p-4">
                       <span className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${
-                        product.rank <= 3 ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-500'
+                        product.rank <= 3 ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-500'
                       }`}>
                         {product.rank}
                       </span>

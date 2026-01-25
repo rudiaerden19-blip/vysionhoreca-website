@@ -95,7 +95,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
         />
       </div>
     )
@@ -113,7 +113,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleAdd}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
         >
           <span>+</span>
           <span>{t('websiteTeam.addMember')}</span>
@@ -132,7 +132,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
           <p className="text-gray-500 mb-6">{t('websiteTeam.noMembersDesc')}</p>
           <button
             onClick={handleAdd}
-            className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium"
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium"
           >
             {t('websiteTeam.addFirstMember')}
           </button>
@@ -244,7 +244,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder={t('websiteTeam.namePlaceholder')}
                   />
                 </div>
@@ -258,7 +258,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
                     type="text"
                     value={formData.role}
                     onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder={t('websiteTeam.rolePlaceholder')}
                   />
                 </div>
@@ -275,7 +275,7 @@ export default function TeamPage({ params }: { params: { tenant: string } }) {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium disabled:opacity-50"
                 >
                   {saving ? t('adminPages.common.saving') : t('adminPages.common.save')}
                 </button>

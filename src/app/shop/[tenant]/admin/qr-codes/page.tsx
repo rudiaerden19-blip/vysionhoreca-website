@@ -147,7 +147,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -176,7 +176,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => openCreateModal(type.id)}
-            className="p-4 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow text-left border-2 border-transparent hover:border-orange-500"
+            className="p-4 bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow text-left border-2 border-transparent hover:border-blue-500"
           >
             <span className="text-3xl mb-2 block">{type.icon}</span>
             <p className="font-semibold text-gray-900">{type.name}</p>
@@ -231,7 +231,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
 
                 {/* Stats */}
                 <div className="text-right hidden sm:block">
-                  <p className="text-2xl font-bold text-orange-500">{qr.scans}</p>
+                  <p className="text-2xl font-bold text-blue-600">{qr.scans}</p>
                   <p className="text-sm text-gray-500">{t('marketingQr.scans')}</p>
                 </div>
 
@@ -241,7 +241,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => downloadQr(qr)}
-                    className="p-2 bg-orange-100 hover:bg-orange-200 text-orange-600 rounded-lg" 
+                    className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg" 
                     title="Download"
                   >
                     📥
@@ -320,7 +320,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder={t('marketingQr.namePlaceholder')}
                   />
                 </div>
@@ -335,7 +335,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                       min="1"
                       value={formData.table_number}
                       onChange={(e) => setFormData(prev => ({ ...prev, table_number: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="1"
                     />
                   </div>
@@ -367,7 +367,7 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                   whileTap={{ scale: 0.98 }}
                   onClick={handleCreate}
                   disabled={saving || !formData.name.trim()}
-                  className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white rounded-xl font-medium flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center justify-center gap-2"
                 >
                   {saving ? (
                     <>

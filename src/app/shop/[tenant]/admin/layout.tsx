@@ -146,7 +146,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Laden...</p>
         </div>
       </div>
@@ -167,7 +167,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           <p className="text-gray-600 mb-6">
             {t('shopPage.notFoundDescription') || 'Deze shop bestaat niet of is verwijderd.'}
           </p>
-          <a href="https://www.vysionhoreca.com" className="text-orange-500 hover:text-orange-600 font-medium inline-block">
+          <a href="https://www.vysionhoreca.com" className="text-blue-600 hover:text-blue-600 font-medium inline-block">
             ← {t('shopPage.backToVysion') || 'Terug naar Vysion'}
           </a>
         </motion.div>
@@ -193,7 +193,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         <span className="font-bold text-gray-900">Admin Panel</span>
         <Link 
           href={`/shop/${params.tenant}`}
-          className="p-2 hover:bg-gray-100 rounded-lg text-orange-500"
+          className="p-2 hover:bg-gray-100 rounded-lg text-blue-600"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -306,13 +306,13 @@ function LanguageSelector() {
                 setIsOpen(false)
               }}
               className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${
-                locale === langCode ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
+                locale === langCode ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
               }`}
             >
               <span className="text-lg">{localeFlags[langCode]}</span>
               <span className="text-sm">{localeNames[langCode]}</span>
               {locale === langCode && (
-                <svg className="w-4 h-4 ml-auto text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 ml-auto text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               )}
@@ -408,8 +408,8 @@ function FlyoutMenu({
                 onClick={onClose}
                 className={`flex items-center gap-3 px-4 py-2.5 transition-all ${
                   isActive(item.href)
-                    ? 'bg-orange-500 text-white'
-                    : 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
@@ -532,7 +532,7 @@ function SidebarContent({
                 onClick={() => !collapsed && toggleSection(section.categoryKey)}
                 className={`w-full flex items-center justify-between px-4 py-3 transition-all ${
                   hasActive 
-                    ? 'bg-orange-50 text-orange-600 border-l-4 border-orange-500' 
+                    ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-500' 
                     : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'
                 } ${collapsed ? 'justify-center' : ''}`}
                 title={collapsed ? categoryName : undefined}

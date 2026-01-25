@@ -66,7 +66,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -90,7 +90,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
           className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
             saved 
               ? 'bg-green-500 text-white' 
-              : 'bg-orange-500 hover:bg-orange-600 text-white'
+              : 'bg-blue-600 hover:bg-blue-700 text-white'
           }`}
         >
           {saving ? (
@@ -145,7 +145,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 onChange={(e) => handleChange('pickup_enabled', e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+              <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
             </label>
           </div>
 
@@ -160,7 +160,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                   min="0"
                   value={settings.pickup_time_minutes || ''}
                   onChange={(e) => handleChange('pickup_time_minutes', Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 onChange={(e) => handleChange('delivery_enabled', e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+              <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
             </label>
           </div>
 
@@ -204,7 +204,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                   min="0"
                   value={settings.delivery_time_minutes || ''}
                   onChange={(e) => handleChange('delivery_time_minutes', Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -220,7 +220,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                     step="0.01"
                     value={settings.delivery_fee || ''}
                     onChange={(e) => handleChange('delivery_fee', Math.max(0, parseFloat(e.target.value) || 0))}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -234,7 +234,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                   min="0"
                   value={settings.delivery_radius_km || ''}
                   onChange={(e) => handleChange('delivery_radius_km', Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -250,7 +250,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                     step="0.01"
                     value={settings.min_order_amount || ''}
                     onChange={(e) => handleChange('min_order_amount', Math.max(0, parseFloat(e.target.value) || 0))}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 type="checkbox"
                 checked={settings.payment_cash}
                 onChange={(e) => handleChange('payment_cash', e.target.checked)}
-                className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-2xl">💵</span>
               <div>
@@ -289,7 +289,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 type="checkbox"
                 checked={settings.payment_card}
                 onChange={(e) => handleChange('payment_card', e.target.checked)}
-                className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-2xl">💳</span>
               <div>
@@ -303,7 +303,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
                 type="checkbox"
                 checked={settings.payment_online}
                 onChange={(e) => handleChange('payment_online', e.target.checked)}
-                className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-2xl">🌐</span>
               <div>
@@ -319,7 +319,7 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 text-white"
+          className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 text-white"
         >
           <h3 className="font-semibold text-lg mb-4">Preview</h3>
           <div className="grid md:grid-cols-3 gap-4">

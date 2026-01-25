@@ -549,7 +549,7 @@ Met vriendelijke groeten`,
   if (loading && staff.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -562,7 +562,7 @@ Met vriendelijke groeten`,
         <p className="text-gray-600 mb-6">{t('urenPage.noStaffDesc')}</p>
         <a
           href={`/shop/${tenant}/admin/personeel`}
-          className="inline-block px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+          className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
         >
           {t('urenPage.goToStaff')}
         </a>
@@ -613,7 +613,7 @@ Met vriendelijke groeten`,
           <select
             value={selectedStaff?.id || ''}
             onChange={(e) => setSelectedStaff(staff.find(s => s.id === e.target.value) || null)}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             {staff.map(s => (
               <option key={s.id} value={s.id}>{s.name}</option>
@@ -626,7 +626,7 @@ Met vriendelijke groeten`,
           <select
             value={selectedMonth}
             onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             {MONTHS.map((m, i) => (
               <option key={i + 1} value={i + 1}>{m}</option>
@@ -639,7 +639,7 @@ Met vriendelijke groeten`,
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             {[2024, 2025, 2026, 2027].map(y => (
               <option key={y} value={y}>{y}</option>
@@ -659,7 +659,7 @@ Met vriendelijke groeten`,
         {monthlyTimesheet?.is_closed ? (
           <button
             onClick={() => setShowReopenModal(true)}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             🔓 {t('urenPage.reopenMonth')}
           </button>
@@ -730,9 +730,9 @@ Met vriendelijke groeten`,
             <div className="text-xl font-bold text-blue-700">{totalVacation.toFixed(1)}</div>
             <div className="text-xs text-blue-600">{t('urenPage.vacation')}</div>
           </div>
-          <div className="bg-orange-100 p-3 rounded text-center">
-            <div className="text-xl font-bold text-orange-700">{totalOther.toFixed(1)}</div>
-            <div className="text-xs text-orange-600">{t('urenPage.other')}</div>
+          <div className="bg-blue-100 p-3 rounded text-center">
+            <div className="text-xl font-bold text-blue-700">{totalOther.toFixed(1)}</div>
+            <div className="text-xs text-blue-600">{t('urenPage.other')}</div>
           </div>
           <div className="bg-gray-200 p-3 rounded text-center">
             <div className="text-xl font-bold text-gray-800">{totalHours.toFixed(1)}</div>
@@ -756,7 +756,7 @@ Met vriendelijke groeten`,
           <div className="text-gray-600 text-sm">{t('urenPage.vacation')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border print:border-black">
-          <div className="text-2xl font-bold text-orange-600">{totalOther.toFixed(1)}u</div>
+          <div className="text-2xl font-bold text-blue-600">{totalOther.toFixed(1)}u</div>
           <div className="text-gray-600 text-sm">{t('urenPage.other')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border print:border-black">
@@ -796,8 +796,8 @@ Met vriendelijke groeten`,
             </>
           )}
           {hasMealVouchers && (
-            <div className="bg-white rounded-xl p-4 shadow-sm border border-orange-200 print:border-black">
-              <div className="text-2xl font-bold text-orange-600">🍽️ {workedDaysCount}</div>
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-blue-200 print:border-black">
+              <div className="text-2xl font-bold text-blue-600">🍽️ {workedDaysCount}</div>
               <div className="text-gray-600 text-sm">{t('urenPage.mealVouchers')}</div>
               <div className="text-xs text-gray-500 mt-1">
                 {t('urenPage.mealVouchersCount')}
@@ -815,7 +815,7 @@ Met vriendelijke groeten`,
           </span>
           <button
             onClick={() => setShowReopenModal(true)}
-            className="px-3 py-1 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 transition"
+            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
           >
             🔓 {t('urenPage.print.reopen')}
           </button>
@@ -848,10 +848,10 @@ Met vriendelijke groeten`,
                   !inMonth ? 'bg-gray-50 text-gray-300' :
                   isWeekend ? 'bg-gray-50' :
                   ''
-                } ${inMonth && !monthlyTimesheet?.is_closed ? 'cursor-pointer hover:bg-orange-50' : ''} print:min-h-[60px]`}
+                } ${inMonth && !monthlyTimesheet?.is_closed ? 'cursor-pointer hover:bg-blue-50' : ''} print:min-h-[60px]`}
               >
                 <div className={`text-sm font-medium mb-1 ${
-                  isToday ? 'bg-orange-500 text-white w-7 h-7 rounded-full flex items-center justify-center' : ''
+                  isToday ? 'bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center' : ''
                 }`}>
                   {date.getDate()}
                 </div>
@@ -1104,7 +1104,7 @@ Met vriendelijke groeten`,
                 <select
                   value={entryForm.absence_type}
                   onChange={(e) => setEntryForm({ ...entryForm, absence_type: e.target.value as AbsenceType })}
-                  className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full mt-2 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {LOCAL_ABSENCE_TYPES.map(type => (
                     <option key={type.id} value={type.id}>{type.icon} {type.label}</option>
@@ -1127,7 +1127,7 @@ Met vriendelijke groeten`,
                           setTimeout(() => calculateWorkedHours(newVal, undefined, undefined), 0)
                         }}
                         onBlur={() => calculateWorkedHours()}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
                     <div>
@@ -1141,7 +1141,7 @@ Met vriendelijke groeten`,
                           setTimeout(() => calculateWorkedHours(undefined, newVal, undefined), 0)
                         }}
                         onBlur={() => calculateWorkedHours()}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
                   </div>
@@ -1159,7 +1159,7 @@ Met vriendelijke groeten`,
                           setTimeout(() => calculateWorkedHours(undefined, undefined, val || 0), 0)
                         }}
                         onBlur={() => calculateWorkedHours()}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         min="0"
                         step="5"
                       />
@@ -1185,7 +1185,7 @@ Met vriendelijke groeten`,
                     type="number"
                     value={entryForm.absence_hours || 8}
                     onChange={(e) => setEntryForm({ ...entryForm, absence_hours: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     step="0.5"
                     min="0"
                     max="24"
@@ -1200,7 +1200,7 @@ Met vriendelijke groeten`,
                   value={entryForm.notes || ''}
                   onChange={(e) => setEntryForm({ ...entryForm, notes: e.target.value })}
                   rows={2}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('urenPage.notesPlaceholder')}
                 />
               </div>
@@ -1234,7 +1234,7 @@ Met vriendelijke groeten`,
                 <button
                   onClick={handleSaveEntry}
                   disabled={saving}
-                  className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
                 >
                   {saving ? `${t('adminPages.common.saving')}...` : editingEntry ? t('urenPage.update') : t('urenPage.add')}
                 </button>
@@ -1305,9 +1305,9 @@ Met vriendelijke groeten`,
               <div className="text-lg font-bold text-blue-700">{totalVacation.toFixed(1)}</div>
               <div className="text-xs text-blue-600">{t('urenPage.vacation')}</div>
             </div>
-            <div className="bg-orange-100 p-2 rounded text-center">
-              <div className="text-lg font-bold text-orange-700">{totalOther.toFixed(1)}</div>
-              <div className="text-xs text-orange-600">{t('urenPage.other')}</div>
+            <div className="bg-blue-100 p-2 rounded text-center">
+              <div className="text-lg font-bold text-blue-700">{totalOther.toFixed(1)}</div>
+              <div className="text-xs text-blue-600">{t('urenPage.other')}</div>
             </div>
             <div className="bg-gray-200 p-2 rounded text-center">
               <div className="text-lg font-bold text-gray-800">{totalHours.toFixed(1)}</div>
@@ -1432,7 +1432,7 @@ Met vriendelijke groeten`,
                     </>
                   )}
                   {hasMealVouchers && (
-                    <tr className="bg-orange-50">
+                    <tr className="bg-blue-50">
                       <td className="border p-1">🍽️ {t('urenPage.mealVouchers')}</td>
                       <td className="border p-1 text-right font-mono font-bold">{workedDaysCount}</td>
                     </tr>
@@ -1461,7 +1461,7 @@ Met vriendelijke groeten`,
           {/* Footer */}
           <div className="mt-8 pt-4 border-t text-center text-xs text-gray-500">
             <p>{t('urenPage.print.documentGenerated')} {new Date().toLocaleDateString()} {t('urenPage.print.at')} {new Date().toLocaleTimeString()}</p>
-            <p className="text-orange-500 font-medium">www.vysionhoreca.com</p>
+            <p className="text-blue-600 font-medium">www.vysionhoreca.com</p>
           </div>
         </div>
       </div>
@@ -1480,8 +1480,8 @@ Met vriendelijke groeten`,
             </div>
             
             <div className="p-6 space-y-4">
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                <p className="text-orange-800 text-sm">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-blue-800 text-sm">
                   ⚠️ <strong>{t('adminPages.common.note')}:</strong> {t('urenPage.reopenWarning')}
                 </p>
               </div>
@@ -1493,7 +1493,7 @@ Met vriendelijke groeten`,
                 <select
                   value={reopenReason}
                   onChange={(e) => setReopenReason(e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 mb-2"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-2"
                 >
                   <option value="">Selecteer een reden...</option>
                   <option value="Correctie foute invoer">Correctie foute invoer</option>
@@ -1509,7 +1509,7 @@ Met vriendelijke groeten`,
                     value={reopenReason === 'Anders' ? '' : reopenReason}
                     onChange={(e) => setReopenReason(e.target.value)}
                     rows={2}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Beschrijf de reden..."
                   />
                 )}
@@ -1529,7 +1529,7 @@ Met vriendelijke groeten`,
               <button
                 onClick={handleReopenMonth}
                 disabled={saving || !reopenReason.trim()}
-                className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
               >
                 {saving ? `${t('adminPages.common.saving')}...` : `🔓 ${t('urenPage.print.reopen')}`}
               </button>
@@ -1560,7 +1560,7 @@ Met vriendelijke groeten`,
                   type="email"
                   value={emailForm.to}
                   onChange={(e) => setEmailForm({ ...emailForm, to: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="loonkantoor@voorbeeld.be"
                 />
               </div>
@@ -1571,7 +1571,7 @@ Met vriendelijke groeten`,
                   type="text"
                   value={emailForm.subject}
                   onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
@@ -1581,7 +1581,7 @@ Met vriendelijke groeten`,
                   value={emailForm.message}
                   onChange={(e) => setEmailForm({ ...emailForm, message: e.target.value })}
                   rows={8}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 

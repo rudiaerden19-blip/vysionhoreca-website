@@ -76,7 +76,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
         />
       </div>
     )
@@ -139,7 +139,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={`🔍 ${t('customersPage.search')}`}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
       </div>
 
@@ -178,7 +178,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
                   >
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold">
+                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
                           {customer.name.charAt(0).toUpperCase()}
                         </div>
                         <span className="font-medium text-gray-900">{customer.name}</span>
@@ -228,7 +228,7 @@ export default function KlantenPage({ params }: { params: { tenant: string } }) 
             <div className="p-6 border-b">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center text-2xl text-orange-600 font-bold">
+                  <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-2xl text-blue-600 font-bold">
                     {selectedCustomer.name.charAt(0).toUpperCase()}
                   </div>
                   <div>

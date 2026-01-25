@@ -232,7 +232,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
           />
         </div>
       </div>
@@ -271,7 +271,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
           <p className="text-gray-500">
             {pendingCount > 0 && <span className="text-yellow-600 font-medium">{pendingCount} {t('reservationsPage.pending')}</span>}
             {pendingCount > 0 && todayCount > 0 && ' • '}
-            {todayCount > 0 && <span className="text-orange-600 font-medium">{todayCount} {t('reservationsPage.today')}</span>}
+            {todayCount > 0 && <span className="text-blue-600 font-medium">{todayCount} {t('reservationsPage.today')}</span>}
             {pendingCount === 0 && todayCount === 0 && t('reservationsPage.manageReservations')}
           </p>
         </div>
@@ -333,16 +333,16 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                 transition={{ delay: index * 0.05 }}
                 className={`bg-white rounded-2xl p-6 shadow-sm ${
                   reservation.status === 'pending' ? 'ring-2 ring-yellow-400' : ''
-                } ${isToday ? 'border-l-4 border-orange-500' : ''}`}
+                } ${isToday ? 'border-l-4 border-blue-500' : ''}`}
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   {/* Left: Date & Time */}
                   <div className="flex items-center gap-4">
-                    <div className={`text-center p-4 rounded-xl ${isToday ? 'bg-orange-100' : 'bg-gray-100'}`}>
-                      <p className={`text-2xl font-bold ${isToday ? 'text-orange-600' : 'text-gray-900'}`}>
+                    <div className={`text-center p-4 rounded-xl ${isToday ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                      <p className={`text-2xl font-bold ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
                         {formatTime(reservation.reservation_time)}
                       </p>
-                      <p className={`text-sm font-medium ${isToday ? 'text-orange-600' : 'text-gray-500'}`}>
+                      <p className={`text-sm font-medium ${isToday ? 'text-blue-600' : 'text-gray-500'}`}>
                         {formatDate(reservation.reservation_date)}
                       </p>
                     </div>
@@ -364,7 +364,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                   {/* Right: Party size & Actions */}
                   <div className="flex items-center gap-4">
                     <div className="text-center">
-                      <p className="text-3xl font-bold text-orange-500">{reservation.party_size}</p>
+                      <p className="text-3xl font-bold text-blue-600">{reservation.party_size}</p>
                       <p className="text-sm text-gray-500">{t('reservationsPage.persons')}</p>
                     </div>
                     
@@ -477,9 +477,9 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
 
               <div className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-orange-50 rounded-xl p-4 text-center">
-                    <p className="text-3xl font-bold text-orange-600">{selectedReservation.party_size}</p>
-                    <p className="text-orange-600 text-sm">{t('reservationsPage.persons')}</p>
+                  <div className="bg-blue-50 rounded-xl p-4 text-center">
+                    <p className="text-3xl font-bold text-blue-600">{selectedReservation.party_size}</p>
+                    <p className="text-blue-600 text-sm">{t('reservationsPage.persons')}</p>
                   </div>
                   <div className={`rounded-xl p-4 text-center ${statusConfig[selectedReservation.status]?.bg}`}>
                     <p className={`text-lg font-bold ${statusConfig[selectedReservation.status]?.text}`}>

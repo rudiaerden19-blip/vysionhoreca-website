@@ -80,7 +80,7 @@ function SortableChoice({
           const capitalized = val.charAt(0).toUpperCase() + val.slice(1)
           onUpdate('name', capitalized)
         }}
-        className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent capitalize"
+        className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent capitalize"
         placeholder={placeholder}
       />
       <div className="relative w-28">
@@ -91,7 +91,7 @@ function SortableChoice({
           min="0"
           value={choice.price || ''}
           onChange={(e) => onUpdate('price', parseFloat(e.target.value) || 0)}
-          className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="0.00"
         />
       </div>
@@ -279,7 +279,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
           <p className="text-gray-500">{t('adminPages.common.loading')}</p>
         </div>
@@ -299,7 +299,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={openAddModal}
-          className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
         >
           <span>➕</span>
           <span>{t('adminPages.opties.addOption')}</span>
@@ -375,7 +375,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-xl"
                 >
                   <span className="text-gray-700">{choice.name}</span>
-                  <span className={`font-medium ${choice.price > 0 ? 'text-orange-500' : 'text-gray-400'}`}>
+                  <span className={`font-medium ${choice.price > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
                     {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('adminPages.opties.free')}
                   </span>
                 </div>
@@ -393,7 +393,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
           <p className="text-gray-500 mb-6">{t('adminPages.opties.noOptionsDesc')}</p>
           <button
             onClick={openAddModal}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-xl"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-xl"
           >
             {t('adminPages.opties.addFirstOption')}
           </button>
@@ -467,7 +467,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                       const capitalized = val.charAt(0).toUpperCase() + val.slice(1)
                       setFormData(prev => ({ ...prev, name: capitalized }))
                     }}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder={t('adminPages.opties.optionNamePlaceholder')}
                   />
                 </div>
@@ -481,7 +481,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                     <select
                       value={formData.type}
                       onChange={(e) => setFormData(prev => ({ ...prev, type: e.target.value as 'single' | 'multiple' }))}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="single">{t('adminPages.opties.singleChoice')}</option>
                       <option value="multiple">{t('adminPages.opties.multipleChoice')}</option>
@@ -497,7 +497,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                           type="checkbox"
                           checked={formData.required}
                           onChange={(e) => setFormData(prev => ({ ...prev, required: e.target.checked }))}
-                          className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                          className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <span>{t('adminPages.opties.mustChoose')}</span>
                       </label>
@@ -537,7 +537,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   </DndContext>
                   <button
                     onClick={addChoice}
-                    className="mt-3 w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors"
+                    className="mt-3 w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-blue-500 hover:text-blue-600 transition-colors"
                   >
                     {t('adminPages.opties.addChoice')}
                   </button>
@@ -555,7 +555,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors flex items-center gap-2"
                 >
                   {saving ? (
                     <>

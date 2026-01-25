@@ -35,7 +35,7 @@ const LEAVE_TYPES = [
   { value: 'paternity', icon: '👶', colorClass: 'bg-purple-100 text-purple-700' },
   { value: 'unpaid', icon: '💰', colorClass: 'bg-gray-100 text-gray-700' },
   { value: 'bereavement', icon: '🕯️', colorClass: 'bg-gray-200 text-gray-800' },
-  { value: 'other', icon: '📋', colorClass: 'bg-orange-100 text-orange-700' },
+  { value: 'other', icon: '📋', colorClass: 'bg-blue-100 text-blue-700' },
 ]
 
 export default function LeaveManagementPage({ params }: { params: { tenant: string } }) {
@@ -430,7 +430,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full"
+          className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
         />
       </div>
     )
@@ -446,7 +446,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
         </div>
         <div className="flex items-center gap-3">
           {pendingCount > 0 && (
-            <div className="bg-orange-100 text-orange-700 px-4 py-2 rounded-lg font-medium">
+            <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-medium">
               {pendingCount} {t('leave.pendingRequests')}
             </div>
           )}
@@ -454,7 +454,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
             onClick={() => setShowYearOverview(!showYearOverview)}
             className={`px-4 py-2 rounded-lg font-medium transition ${
               showYearOverview 
-                ? 'bg-orange-500 text-white' 
+                ? 'bg-blue-600 text-white' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
@@ -508,7 +508,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                 onClick={() => setFilter(status)}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition ${
                   filter === status
-                    ? status === 'pending' ? 'bg-orange-500 text-white'
+                    ? status === 'pending' ? 'bg-blue-600 text-white'
                     : status === 'approved' ? 'bg-green-500 text-white'
                     : status === 'rejected' ? 'bg-red-500 text-white'
                     : 'bg-gray-800 text-white'
@@ -656,7 +656,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
 
                     <div className="text-right">
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        request.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                        request.status === 'pending' ? 'bg-blue-100 text-blue-700' :
                         request.status === 'approved' ? 'bg-green-100 text-green-700' :
                         'bg-red-100 text-red-700'
                       }`}>
@@ -739,12 +739,12 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                 )}
 
                 <div className={`p-4 rounded-lg ${
-                  showDetail.status === 'pending' ? 'bg-orange-50' :
+                  showDetail.status === 'pending' ? 'bg-blue-50' :
                   showDetail.status === 'approved' ? 'bg-green-50' :
                   'bg-red-50'
                 }`}>
                   <span className={`font-medium ${
-                    showDetail.status === 'pending' ? 'text-orange-700' :
+                    showDetail.status === 'pending' ? 'text-blue-700' :
                     showDetail.status === 'approved' ? 'text-green-700' :
                     'text-red-700'
                   }`}>
@@ -798,7 +798,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                     <button
                       onClick={() => handleRevoke(showDetail)}
                       disabled={processing}
-                      className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition disabled:opacity-50"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
                     >
                       ↩️ {t('leave.revoke')}
                     </button>
@@ -835,7 +835,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                   <select
                     value={newRequest.staff_id}
                     onChange={(e) => setNewRequest({ ...newRequest, staff_id: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">{t('leave.selectEmployee')}</option>
                     {staff.map(s => (
@@ -856,7 +856,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                         onClick={() => setNewRequest({ ...newRequest, leave_type: lt.value })}
                         className={`p-3 rounded-lg border-2 transition text-left ${
                           newRequest.leave_type === lt.value
-                            ? 'border-orange-500 bg-orange-50'
+                            ? 'border-blue-500 bg-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -876,7 +876,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                       type="date"
                       value={newRequest.start_date}
                       onChange={(e) => setNewRequest({ ...newRequest, start_date: e.target.value })}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -888,7 +888,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                       value={newRequest.end_date}
                       onChange={(e) => setNewRequest({ ...newRequest, end_date: e.target.value })}
                       min={newRequest.start_date}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -901,7 +901,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                     value={newRequest.reason}
                     onChange={(e) => setNewRequest({ ...newRequest, reason: e.target.value })}
                     rows={3}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                     placeholder={t('leave.reasonPlaceholder')}
                   />
                 </div>
@@ -927,7 +927,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                       onClick={() => setNewRequest({ ...newRequest, status: 'pending' })}
                       className={`flex-1 py-2 px-4 rounded-lg border-2 transition ${
                         newRequest.status === 'pending'
-                          ? 'border-orange-500 bg-orange-50 text-orange-700'
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
                           : 'border-gray-200 text-gray-600'
                       }`}
                     >

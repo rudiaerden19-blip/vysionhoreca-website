@@ -229,7 +229,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     )
   }
@@ -258,7 +258,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-4">
             <span className="text-gray-500 text-sm">{t('adminDashboard.stats.ordersToday')}</span>
-            <span className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">📦</span>
+            <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">📦</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.todayOrders}</p>
           <p className={`text-sm mt-1 ${ordersChange.positive ? 'text-green-500' : 'text-red-500'}`}>
@@ -293,7 +293,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
             <span className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">⏳</span>
           </div>
           <p className="text-3xl font-bold text-gray-900">{stats.pendingOrders}</p>
-          <p className={`text-sm mt-1 ${stats.pendingOrders > 0 ? 'text-orange-500' : 'text-green-500'}`}>
+          <p className={`text-sm mt-1 ${stats.pendingOrders > 0 ? 'text-blue-600' : 'text-green-500'}`}>
             {stats.pendingOrders > 0 ? t('adminDashboard.stats.actionRequired') : t('adminDashboard.stats.allProcessed')}
           </p>
         </motion.div>
@@ -349,7 +349,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.recentOrders.title')}</h2>
-            <Link href={`/shop/${params.tenant}/admin/bestellingen`} className="text-orange-500 hover:text-orange-600 text-sm font-medium">
+            <Link href={`/shop/${params.tenant}/admin/bestellingen`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
               {t('adminDashboard.viewAll')} →
             </Link>
           </div>
@@ -363,8 +363,8 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
               {recentOrders.map((order) => (
                 <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <span className="text-orange-500 font-bold text-sm">{order.customer_name[0]?.toUpperCase()}</span>
+                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-bold text-sm">{order.customer_name[0]?.toUpperCase()}</span>
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">{order.order_number} · {order.customer_name}</p>
@@ -392,7 +392,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.popularItems.title')}</h2>
-            <Link href={`/shop/${params.tenant}/admin/verkoop`} className="text-orange-500 hover:text-orange-600 text-sm font-medium">
+            <Link href={`/shop/${params.tenant}/admin/verkoop`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
               {t('adminDashboard.viewAll')} →
             </Link>
           </div>
@@ -412,7 +412,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
                     <p className="font-medium text-gray-900">{item.name}</p>
                     <div className="w-full bg-gray-100 rounded-full h-2 mt-1">
                       <div 
-                        className="bg-orange-500 h-2 rounded-full" 
+                        className="bg-blue-600 h-2 rounded-full" 
                         style={{ width: `${(item.count / stats.popularItems[0].count) * 100}%` }}
                       />
                     </div>
