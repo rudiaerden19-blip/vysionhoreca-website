@@ -215,6 +215,20 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
         </motion.div>
       )}
 
+      {/* Tips om spam te voorkomen */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <h3 className="font-semibold text-blue-800 flex items-center gap-2 mb-2">
+          💡 Tips om spam te voorkomen
+        </h3>
+        <ul className="text-blue-700 text-sm space-y-1">
+          <li>• Verstuur niet te vaak (max 1-2x per maand)</li>
+          <li>• Gebruik een duidelijk onderwerp zonder HOOFDLETTERS of veel !!!</li>
+          <li>• Personaliseer je bericht met de naam van de klant</li>
+          <li>• Elke email bevat automatisch een uitschrijf-link (wettelijk verplicht)</li>
+          <li>• Emails worden met vertraging verstuurd om spam filters te vermijden</li>
+        </ul>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-4 shadow-sm border">

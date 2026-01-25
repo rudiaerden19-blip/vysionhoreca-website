@@ -53,44 +53,94 @@ export async function POST(request: NextRequest) {
       `
     }
 
-    // Send emails to all recipients
-    const results = await Promise.allSettled(
-      recipients.map(async (recipient: { email: string; name: string }) => {
+    // Unsubscribe URL voor GDPR compliance
+    const unsubscribeUrl = `https://www.vysionhoreca.com/shop/${tenantSlug}/account?unsubscribe=true`
+    
+    // Send emails met vertraging om spam filters te vermijden
+    const results: PromiseSettledResult<string>[] = []
+    
+    for (let i = 0; i < recipients.length; i++) {
+      const recipient = recipients[i] as { email: string; name: string }
+      
+      // Voeg kleine vertraging toe tussen emails (500ms per email)
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+      
+      try {
         const personalizedMessage = message.replace(/Beste klant/g, `Beste ${recipient.name}`)
         
         const htmlContent = `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #F97316; margin: 0;">${businessName || 'Vysion Horeca'}</h1>
-            </div>
-            
-            <div style="background: #f8f9fa; padding: 30px; border-radius: 12px;">
-              ${personalizedMessage.split('\n').map(line => `<p style="margin: 0 0 15px 0; color: #333; line-height: 1.6;">${line}</p>`).join('')}
-            </div>
-            
-            ${promoHtml}
-            
-            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-            
-            <p style="color: #999; font-size: 12px; text-align: center;">
-              Je ontvangt deze email omdat je een account hebt bij ${businessName || 'ons'}.
-              <br>
-              © ${new Date().getFullYear()} ${businessName || 'Vysion Horeca'}
-            </p>
-          </div>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4;">
+  <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <!-- Header met logo/naam -->
+    <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%); padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+      <h1 style="color: white; margin: 0; font-size: 24px;">${businessName || 'Vysion Horeca'}</h1>
+    </div>
+    
+    <!-- Content -->
+    <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      ${personalizedMessage.split('\n').map(line => 
+        line.trim() ? `<p style="margin: 0 0 15px 0; color: #333; line-height: 1.6; font-size: 15px;">${line}</p>` : '<br>'
+      ).join('')}
+      
+      ${promoHtml}
+      
+      <!-- CTA Button -->
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://www.vysionhoreca.com/shop/${tenantSlug}" 
+           style="display: inline-block; background: #1e3a5f; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+          Bekijk onze website
+        </a>
+      </div>
+    </div>
+    
+    <!-- Footer met unsubscribe -->
+    <div style="text-align: center; padding: 20px; color: #888; font-size: 12px;">
+      <p style="margin: 0 0 10px 0;">
+        Je ontvangt deze email omdat je klant bent bij ${businessName || 'ons'}.
+      </p>
+      <p style="margin: 0 0 10px 0;">
+        <a href="${unsubscribeUrl}" style="color: #888; text-decoration: underline;">
+          Uitschrijven voor marketing emails
+        </a>
+      </p>
+      <p style="margin: 0; color: #aaa;">
+        © ${new Date().getFullYear()} ${businessName || 'Vysion Horeca'} | Powered by Vysion Horeca
+      </p>
+    </div>
+  </div>
+</body>
+</html>
         `
 
+        // Verstuur email met extra headers om spam te voorkomen
         await transporter.sendMail({
           from: `"${businessName || 'Vysion Horeca'}" <${process.env.ZOHO_EMAIL}>`,
           to: recipient.email,
           subject: subject,
           html: htmlContent,
-          text: personalizedMessage,
+          text: `${personalizedMessage}\n\n---\nUitschrijven: ${unsubscribeUrl}`,
+          headers: {
+            'List-Unsubscribe': `<${unsubscribeUrl}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+            'Precedence': 'bulk',
+            'X-Mailer': 'Vysion Horeca Marketing',
+          },
         })
 
-        return recipient.email
-      })
-    )
+        results.push({ status: 'fulfilled', value: recipient.email })
+      } catch (error) {
+        console.error(`Failed to send to ${recipient.email}:`, error)
+        results.push({ status: 'rejected', reason: error })
+      }
+    }
 
     const successCount = results.filter(r => r.status === 'fulfilled').length
     const failedCount = results.filter(r => r.status === 'rejected').length
