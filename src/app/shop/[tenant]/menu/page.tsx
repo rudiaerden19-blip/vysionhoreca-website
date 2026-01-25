@@ -359,45 +359,45 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
       {/* Menu Items Grid */}
       <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32">
-        {/* Promoties weergave */}
+        {/* Promoties weergave - responsive */}
         {activeCategory === 'promo' && promotions.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {promotions.map((promo) => (
               <div
                 key={promo.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all"
+                className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all"
               >
-                <div className="relative h-48 overflow-hidden bg-gray-100">
+                <div className="relative h-40 sm:h-48 overflow-hidden bg-gray-100">
                   {promo.image_url ? (
                     <Image
                       src={promo.image_url}
                       alt={promo.name}
                       fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       quality={75}
                       loading="lazy"
                       className="object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-6xl bg-gradient-to-br from-green-400 to-green-600">
+                    <div className="w-full h-full flex items-center justify-center text-5xl sm:text-6xl bg-gradient-to-br from-green-400 to-green-600">
                       🎁
                     </div>
                   )}
                   {/* Korting badge */}
-                  <div className="absolute top-3 left-3">
-                    <span className="bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
+                  <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
+                    <span className="bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg">
                       {promo.type === 'percentage' ? `-${promo.value}%` :
                        promo.type === 'fixed' ? `-€${promo.value}` : t('menuPage.free')}
                     </span>
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-bold text-lg text-gray-900 mb-1">{promo.name}</h3>
+                <div className="p-3 sm:p-4">
+                  <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1">{promo.name}</h3>
                   {promo.description && (
-                    <p className="text-gray-500 text-sm line-clamp-2">{promo.description}</p>
+                    <p className="text-gray-500 text-xs sm:text-sm line-clamp-2">{promo.description}</p>
                   )}
                   {promo.min_order_amount > 0 && (
-                    <p className="text-orange-600 text-sm mt-2 font-medium">
+                    <p className="text-orange-600 text-xs sm:text-sm mt-2 font-medium">
                       Min. bestelling: €{promo.min_order_amount.toFixed(2)}
                     </p>
                   )}

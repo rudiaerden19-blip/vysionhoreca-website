@@ -154,72 +154,72 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-4xl mx-auto px-2 sm:px-0">
+      {/* Header - responsive */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🎁 Promoties & Aanbiedingen</h1>
-          <p className="text-gray-500">Maak aanbiedingen die klanten zien in je webshop</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">🎁 Promoties & Aanbiedingen</h1>
+          <p className="text-gray-500 text-sm sm:text-base">Maak aanbiedingen die klanten zien in je webshop</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={openCreateModal}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
+          className="px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto"
         >
           ➕ Nieuwe promotie
         </motion.button>
       </div>
 
-      {/* Hoofdschakelaar - Promoties tonen in shop */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">🎁</span>
-          <div>
-            <p className="font-semibold text-gray-900">Promoties tonen in webshop</p>
-            <p className="text-sm text-gray-500">
-              {promotionsEnabled ? 'Klanten zien de "Promoties" knop in je shop' : 'Promoties zijn verborgen voor klanten'}
+      {/* Hoofdschakelaar - Promoties tonen in shop - responsive */}
+      <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm mb-4 sm:mb-6 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <span className="text-xl sm:text-2xl flex-shrink-0">🎁</span>
+          <div className="min-w-0">
+            <p className="font-semibold text-gray-900 text-sm sm:text-base">Promoties tonen in webshop</p>
+            <p className="text-xs sm:text-sm text-gray-500 truncate">
+              {promotionsEnabled ? 'Klanten zien de "Promoties" knop' : 'Verborgen voor klanten'}
             </p>
           </div>
         </div>
-        <label className="relative inline-flex items-center cursor-pointer">
+        <label className="relative inline-flex items-center cursor-pointer flex-shrink-0">
           <input
             type="checkbox"
             checked={promotionsEnabled}
             onChange={handleTogglePromotionsEnabled}
             className="sr-only peer"
           />
-          <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500"></div>
+          <div className="w-12 sm:w-14 h-6 sm:h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 sm:after:h-6 after:w-5 sm:after:w-6 after:transition-all peer-checked:bg-green-500"></div>
         </label>
       </div>
 
-      {/* Info Box */}
+      {/* Info Box - responsive */}
       {promotionsEnabled && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-          <p className="text-blue-800 text-sm">
-            💡 <strong>Tip:</strong> Promoties die je hier aanmaakt worden getoond op je webshop. 
-            Klanten kunnen ze zien bij de &quot;Promoties&quot; knop. Zet individuele promoties aan of uit met de schakelaar.
+        <div className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+          <p className="text-blue-800 text-xs sm:text-sm">
+            💡 <strong>Tip:</strong> Promoties worden getoond in je webshop. Zet individuele promoties aan of uit met de schakelaar.
           </p>
         </div>
       )}
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      {/* Quick Stats - responsive */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 sm:mb-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl p-4 shadow-sm"
+          className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm"
         >
-          <p className="text-gray-500 text-sm">Actieve promoties</p>
-          <p className="text-3xl font-bold text-green-500">{activeCount}</p>
+          <p className="text-gray-500 text-xs sm:text-sm">Actieve promoties</p>
+          <p className="text-2xl sm:text-3xl font-bold text-green-500">{activeCount}</p>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white rounded-2xl p-4 shadow-sm"
+          className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm"
         >
-          <p className="text-gray-500 text-sm">Totaal promoties</p>
-          <p className="text-3xl font-bold text-blue-500">{promos.length}</p>
+          <p className="text-gray-500 text-xs sm:text-sm">Totaal promoties</p>
+          <p className="text-2xl sm:text-3xl font-bold text-blue-500">{promos.length}</p>
         </motion.div>
       </div>
 
@@ -255,36 +255,38 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 animate={{ opacity: 1, y: 0 }}
                 className={`bg-white rounded-2xl shadow-sm overflow-hidden ${!promo.is_active || isExpired ? 'opacity-60' : ''}`}
               >
-                <div className="flex">
+                {/* Mobile: stacked layout, Desktop: side-by-side */}
+                <div className="flex flex-col sm:flex-row">
                   {/* Image */}
-                  <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 bg-gray-100 relative">
+                  <div className="w-full sm:w-32 md:w-40 h-40 sm:h-32 md:h-40 flex-shrink-0 bg-gray-100 relative">
                     {promo.image_url ? (
                       <Image
                         src={promo.image_url}
                         alt={promo.name}
                         fill
+                        sizes="(max-width: 640px) 100vw, 160px"
                         className="object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-4xl">
+                      <div className="w-full h-full flex items-center justify-center text-5xl sm:text-4xl bg-gradient-to-br from-green-400 to-green-600">
                         🎁
                       </div>
                     )}
                     {/* Korting badge */}
-                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    <div className="absolute top-2 left-2 sm:top-2 sm:left-2 bg-red-500 text-white text-xs sm:text-xs font-bold px-2 py-1 rounded-full shadow-md">
                       {promo.type === 'percentage' ? `-${promo.value}%` :
                        promo.type === 'fixed' ? `-€${promo.value}` : 'GRATIS'}
                     </div>
                   </div>
 
                   {/* Content */}
-                  <div className="flex-1 p-4 flex flex-col justify-between">
+                  <div className="flex-1 p-3 sm:p-4 flex flex-col justify-between min-w-0">
                     <div>
                       <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h3 className="font-bold text-gray-900 text-lg">{promo.name}</h3>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-bold text-gray-900 text-base sm:text-lg truncate">{promo.name}</h3>
                           {promo.description && (
-                            <p className="text-gray-500 text-sm mt-1 line-clamp-2">{promo.description}</p>
+                            <p className="text-gray-500 text-xs sm:text-sm mt-1 line-clamp-2">{promo.description}</p>
                           )}
                         </div>
                         
@@ -362,21 +364,21 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-xl sm:rounded-2xl max-w-lg w-full mx-2 sm:mx-0 overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto"
             >
-              <div className="p-6 border-b flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">
+              <div className="p-4 sm:p-6 border-b flex items-center justify-between">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
                   {editingPromo ? 'Promotie bewerken' : 'Nieuwe promotie'}
                 </h2>
                 <button 
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl"
+                  className="text-gray-400 hover:text-gray-600 text-2xl p-1"
                 >
                   ×
                 </button>
               </div>
 
-              <div className="p-6 space-y-5">
+              <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
                 {/* Image */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Foto</label>

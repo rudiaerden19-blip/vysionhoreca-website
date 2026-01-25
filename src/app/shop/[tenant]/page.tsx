@@ -1761,41 +1761,42 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <p className="opacity-80">{t('shopPage.currentOffers')}</p>
               </div>
 
-              {/* Promoties lijst */}
-              <div className="p-4 max-h-[60vh] overflow-y-auto space-y-4">
+              {/* Promoties lijst - responsive */}
+              <div className="p-3 sm:p-4 max-h-[65vh] overflow-y-auto space-y-3 sm:space-y-4">
                 {promotions.map((promo) => (
                   <div 
                     key={promo.id}
-                    className="bg-gray-50 rounded-2xl overflow-hidden shadow-sm"
+                    className="bg-gray-50 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm"
                   >
                     {promo.image_url && (
-                      <div className="relative aspect-video">
+                      <div className="relative aspect-[16/10] sm:aspect-video">
                         <Image
                           src={promo.image_url}
                           alt={promo.name}
                           fill
+                          sizes="(max-width: 640px) 100vw, 400px"
                           className="object-cover"
                         />
                         {/* Korting badge */}
-                        <div className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
+                        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg">
                           {promo.type === 'percentage' ? `-${promo.value}%` :
                            promo.type === 'fixed' ? `-€${promo.value}` : t('shopPage.free')}
                         </div>
                       </div>
                     )}
-                    <div className="p-4">
-                      <h3 className="font-bold text-gray-900 text-lg">{promo.name}</h3>
+                    <div className="p-3 sm:p-4">
+                      <h3 className="font-bold text-gray-900 text-base sm:text-lg">{promo.name}</h3>
                       {promo.description && (
-                        <p className="text-gray-600 text-sm mt-1">{promo.description}</p>
+                        <p className="text-gray-600 text-xs sm:text-sm mt-1 line-clamp-2">{promo.description}</p>
                       )}
                       {promo.min_order_amount > 0 && (
-                        <p className="text-orange-600 text-sm mt-2 font-medium">
+                        <p className="text-orange-600 text-xs sm:text-sm mt-2 font-medium">
                           {t('shopPage.minOrder')}: €{promo.min_order_amount.toFixed(2)}
                         </p>
                       )}
                       {!promo.image_url && (
                         <div className="flex items-center gap-2 mt-2">
-                          <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                          <span className="bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 rounded-full">
                             {promo.type === 'percentage' ? `-${promo.value}%` :
                              promo.type === 'fixed' ? `-€${promo.value}` : t('shopPage.free')}
                           </span>
