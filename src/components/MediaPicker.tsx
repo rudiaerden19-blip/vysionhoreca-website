@@ -180,18 +180,18 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif"
         onChange={handleFileSelect}
-        style={{ display: 'none' }}
+        style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
       />
       {/* Camera input - capture attribuut opent camera op mobiel/tablet */}
       <input
         ref={cameraInputRef}
         type="file"
         accept="image/*"
-        capture="user"
+        capture
         onChange={handleFileSelect}
-        style={{ display: 'none' }}
+        style={{ position: 'absolute', left: '-9999px', opacity: 0 }}
       />
       
       {/* Current Image Preview */}
@@ -222,42 +222,54 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
             )}
           </div>
           
-          {/* Options Dropdown */}
+          {/* Options Dropdown - opent BOVEN het foto venster */}
           <AnimatePresence>
             {showOptions && !uploading && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border z-50 overflow-hidden min-w-[200px]"
+                exit={{ opacity: 0, y: 10 }}
+                className="absolute bottom-full left-0 mb-2 bg-white rounded-xl shadow-xl border z-50 overflow-hidden min-w-[220px]"
               >
-                {/* Upload from computer */}
+                {/* Upload from computer/device */}
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
                     setShowOptions(false)
+                    setErrorMessage(null)
                     setTimeout(() => {
-                      fileInputRef.current?.click()
-                    }, 100)
+                      if (fileInputRef.current) {
+                        fileInputRef.current.value = ''
+                        fileInputRef.current.click()
+                      }
+                    }, 200)
                   }}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors"
                 >
-                  <span className="text-xl">💻</span>
+                  <span className="text-xl">📁</span>
                   <div>
-                    <p className="font-medium text-gray-900">Upload foto</p>
-                    <p className="text-xs text-gray-500">Vanaf computer</p>
+                    <p className="font-medium text-gray-900">Kies foto</p>
+                    <p className="text-xs text-gray-500">Uit fotobibliotheek</p>
                   </div>
                 </button>
                 
                 {/* Take photo with camera */}
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
                     setShowOptions(false)
-                    // Kleine delay zodat menu eerst sluit
+                    setErrorMessage(null)
+                    // Langere delay voor iOS
                     setTimeout(() => {
-                      cameraInputRef.current?.click()
-                    }, 100)
+                      if (cameraInputRef.current) {
+                        cameraInputRef.current.value = ''
+                        cameraInputRef.current.click()
+                      }
+                    }, 200)
                   }}
-                  className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center gap-3 transition-colors border-t"
+                  className="w-full px-4 py-3 text-left hover:bg-gray-50 active:bg-gray-100 flex items-center gap-3 transition-colors border-t"
                 >
                   <span className="text-xl">📸</span>
                   <div>
