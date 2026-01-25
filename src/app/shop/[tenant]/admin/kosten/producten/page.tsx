@@ -106,10 +106,10 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
 
   // Auto-save simulator data to Supabase (debounced)
   useEffect(() => {
-    if (!loading) {
+    if (!loading && simulatorItems.length > 0) {
       const timeoutId = setTimeout(async () => {
         try {
-          const { error } = await supabase
+          await supabase
             .from('cost_settings')
             .upsert({
               tenant_slug: params.tenant,
@@ -118,13 +118,10 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               simulator_multiplier: parseFloat(simulatorMultiplier.replace(',', '.')) || 3,
               updated_at: new Date().toISOString()
             }, { onConflict: 'tenant_slug' })
-          
-          if (error) console.error('Failed to save simulator data:', error)
         } catch (e) {
           console.error('Failed to save simulator data:', e)
         }
-      }, 1000) // Debounce 1 second
-      
+      }, 1000)
       return () => clearTimeout(timeoutId)
     }
   }, [simulatorItems, simulatorName, simulatorMultiplier, params.tenant, loading])
@@ -164,16 +161,16 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
       setDefaultMultiplier(avg)
     }
 
-    // Load cost settings from Supabase
+    // Load cost settings - try Supabase first, fallback to localStorage
     try {
-      const { data: costSettings } = await supabase
+      const { data: costSettings, error } = await supabase
         .from('cost_settings')
         .select('*')
         .eq('tenant_slug', params.tenant)
-        .single()
+        .maybeSingle()
       
-      if (costSettings) {
-        // Load standard prices
+      if (costSettings && !error) {
+        // Load from Supabase
         setStandardPrices({
           saus: costSettings.saus?.toString() || '0.12',
           sla: costSettings.sla?.toString() || '0.13',
@@ -183,14 +180,38 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           verpakking: costSettings.verpakking?.toString() || '0.30',
           kosten_per_stuk: costSettings.kosten_per_stuk?.toString() || '0.40'
         })
-        
-        // Load simulator data
         if (costSettings.simulator_items) setSimulatorItems(costSettings.simulator_items)
         if (costSettings.simulator_name) setSimulatorName(costSettings.simulator_name)
         if (costSettings.simulator_multiplier) setSimulatorMultiplier(costSettings.simulator_multiplier.toString())
+      } else {
+        // Fallback to localStorage
+        const savedPrices = localStorage.getItem(`standard_prices_${params.tenant}`)
+        if (savedPrices) {
+          const parsed = JSON.parse(savedPrices)
+          const stringPrices: any = {}
+          for (const key of Object.keys(parsed)) {
+            stringPrices[key] = typeof parsed[key] === 'number' ? parsed[key].toString() : parsed[key]
+          }
+          setStandardPrices(prev => ({ ...prev, ...stringPrices }))
+        }
+        const savedSimulator = localStorage.getItem(`simulator_data_${params.tenant}`)
+        if (savedSimulator) {
+          const parsed = JSON.parse(savedSimulator)
+          if (parsed.items) setSimulatorItems(parsed.items)
+          if (parsed.name) setSimulatorName(parsed.name)
+          if (parsed.multiplier) setSimulatorMultiplier(parsed.multiplier)
+        }
       }
     } catch (e) {
       console.error('Failed to load cost settings:', e)
+      // Fallback to localStorage on any error
+      try {
+        const savedPrices = localStorage.getItem(`standard_prices_${params.tenant}`)
+        if (savedPrices) {
+          const parsed = JSON.parse(savedPrices)
+          setStandardPrices(prev => ({ ...prev, ...parsed }))
+        }
+      } catch {}
     }
 
     setLoading(false)
@@ -200,24 +221,21 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   async function saveStandardPrices() {
     setSavingStandardPrices(true)
     try {
-      const priceData = {
-        tenant_slug: params.tenant,
-        saus: parseFloat(standardPrices.saus.replace(',', '.')) || 0.12,
-        sla: parseFloat(standardPrices.sla.replace(',', '.')) || 0.13,
-        tomaat: parseFloat(standardPrices.tomaat.replace(',', '.')) || 0.14,
-        ei: parseFloat(standardPrices.ei.replace(',', '.')) || 0.12,
-        potje_saus: parseFloat(standardPrices.potje_saus.replace(',', '.')) || 0.16,
-        verpakking: parseFloat(standardPrices.verpakking.replace(',', '.')) || 0.30,
-        kosten_per_stuk: parseFloat(standardPrices.kosten_per_stuk.replace(',', '.')) || 0.40,
-        updated_at: new Date().toISOString()
-      }
-      
       const { error } = await supabase
         .from('cost_settings')
-        .upsert(priceData, { onConflict: 'tenant_slug' })
+        .upsert({
+          tenant_slug: params.tenant,
+          saus: parseFloat(standardPrices.saus.replace(',', '.')) || 0.12,
+          sla: parseFloat(standardPrices.sla.replace(',', '.')) || 0.13,
+          tomaat: parseFloat(standardPrices.tomaat.replace(',', '.')) || 0.14,
+          ei: parseFloat(standardPrices.ei.replace(',', '.')) || 0.12,
+          potje_saus: parseFloat(standardPrices.potje_saus.replace(',', '.')) || 0.16,
+          verpakking: parseFloat(standardPrices.verpakking.replace(',', '.')) || 0.30,
+          kosten_per_stuk: parseFloat(standardPrices.kosten_per_stuk.replace(',', '.')) || 0.40,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'tenant_slug' })
       
       if (error) throw error
-      
       setStandardPricesSaved(true)
       setTimeout(() => setStandardPricesSaved(false), 2000)
     } catch (e) {
