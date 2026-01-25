@@ -139,7 +139,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
           className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
             saved 
               ? 'bg-green-500 text-white' 
-              : 'bg-orange-500 hover:bg-orange-600 text-white'
+              : 'bg-blue-700 hover:bg-blue-800 text-white'
           }`}
         >
           {saving ? (
@@ -203,7 +203,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                       onChange={(e) => updateDay(index, 'is_open', e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                   </label>
                   <span className={`font-medium ${daySchedule.is_open ? 'text-gray-900' : 'text-gray-400'}`}>
                     {t(`adminPages.openingstijden.days.${dayKeys[index]}`)}
@@ -241,7 +241,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                       }}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         daySchedule.has_shift2 
-                          ? 'bg-orange-100 text-orange-600' 
+                          ? 'bg-blue-100 text-blue-600' 
                           : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                       }`}
                     >
@@ -296,7 +296,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mt-6 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 text-white"
+        className="mt-6 bg-gradient-to-r from-blue-700 to-blue-900 rounded-2xl p-6 text-white"
       >
         <h3 className="font-semibold text-lg mb-4">Preview</h3>
         <div className="bg-white/10 rounded-xl p-4">
