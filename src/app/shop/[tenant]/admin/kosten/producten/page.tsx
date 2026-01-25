@@ -1221,10 +1221,10 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           )}
 
                           {/* Own Ingredients */}
-                          {ingredientSearch.length >= 2 && !searching && searchResults.own.length > 0 && (
+                          {searchResults.own.length > 0 && (
                             <div>
                               <div className="px-3 py-2 bg-blue-50 text-sm font-semibold text-blue-700 sticky top-0">
-                                📦 {t('dashboard.productCosts.myIngredients')} ({searchResults.own.length})
+                                📦 Jouw ingrediënten ({searchResults.own.length})
                               </div>
                               {searchResults.own.map(ing => (
                                 <button
@@ -1239,33 +1239,27 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                             </div>
                           )}
 
-                          {/* Database Products */}
-                          {ingredientSearch.length >= 2 && !searching && searchResults.database.length > 0 && (
+                          {/* Database Products - ALTIJD TONEN ALS ER RESULTATEN ZIJN */}
+                          {searchResults.database.length > 0 && (
                             <div>
                               <div className="px-3 py-2 bg-green-50 text-sm font-semibold text-green-700 sticky top-0">
-                                🔍 {t('dashboard.productCosts.supplierDatabase')} ({searchResults.database.length})
+                                🔍 Database ({searchResults.database.length} producten)
                               </div>
-                              {searchResults.database.map(product => {
-                                const alreadyOwned = ingredients.some(i => 
-                                  i.notes?.includes(`Art. #${product.article_number}`)
-                                )
-                                return (
-                                  <button
-                                    key={product.id}
-                                    onClick={() => addDatabaseIngredient(product, pc.product.id)}
-                                    className="w-full px-4 py-3 text-left hover:bg-green-50 flex justify-between items-center border-b"
-                                  >
-                                    <div>
-                                      <span className="font-medium">{product.name}</span>
-                                      {alreadyOwned && <span className="ml-2 text-xs text-green-600">({t('dashboard.productCosts.alreadyAdded')})</span>}
-                                      <div className="text-xs text-gray-500">
-                                        {t('dashboard.productCosts.box')} €{product.package_price.toFixed(2)} • {product.units_per_package}x
-                                      </div>
+                              {searchResults.database.map(product => (
+                                <button
+                                  key={product.id}
+                                  onClick={() => addDatabaseIngredient(product, pc.product.id)}
+                                  className="w-full px-4 py-3 text-left hover:bg-green-50 flex justify-between items-center border-b"
+                                >
+                                  <div>
+                                    <span className="font-medium">{product.name}</span>
+                                    <div className="text-xs text-gray-500">
+                                      Doos €{product.package_price?.toFixed(2) || '0.00'} • {product.units_per_package || 1}x
                                     </div>
-                                    <span className="text-green-600 font-mono font-bold">€{product.unit_price.toFixed(4)}/st</span>
-                                  </button>
-                                )
-                              })}
+                                  </div>
+                                  <span className="text-green-600 font-mono font-bold">€{(product.unit_price || 0).toFixed(4)}/st</span>
+                                </button>
+                              ))}
                             </div>
                           )}
 
