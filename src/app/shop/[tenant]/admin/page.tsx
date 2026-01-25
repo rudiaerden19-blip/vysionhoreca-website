@@ -409,7 +409,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="mt-6 bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-6 text-white"
+        className="mt-6 bg-gradient-to-r from-blue-700 to-blue-900 rounded-2xl p-6 text-white"
       >
         <h2 className="text-lg font-semibold mb-4">{t('adminDashboard.thisWeek.title')}</h2>
         <div className="grid md:grid-cols-3 gap-6">
