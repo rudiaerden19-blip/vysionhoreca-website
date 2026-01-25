@@ -1036,11 +1036,9 @@ function CostCalculatorSection() {
             >
               {images.map((image, index) => (
                 <div key={index} className="w-full flex-shrink-0">
-                  <Image
+                  <img
                     src={image}
                     alt={`Cost Calculator Screenshot ${index + 1}`}
-                    width={1200}
-                    height={800}
                     className="w-full h-auto rounded-2xl shadow-2xl cursor-pointer hover:opacity-90 transition-opacity"
                     onClick={() => openLightbox(image)}
                   />
@@ -1070,12 +1068,12 @@ function CostCalculatorSection() {
 
         {/* CTA */}
         <div className="text-center mt-12">
-          <Link
+          <a
             href="/registreer"
             className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors"
           >
             {t('costCalculator.tryFree')}
-          </Link>
+          </a>
         </div>
       </div>
 
@@ -1091,11 +1089,9 @@ function CostCalculatorSection() {
           >
             ×
           </button>
-          <Image
+          <img
             src={lightboxImage}
             alt="Cost Calculator"
-            width={1600}
-            height={1000}
             className="max-w-full max-h-full object-contain"
           />
         </div>
