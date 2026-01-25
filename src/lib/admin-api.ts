@@ -912,7 +912,9 @@ export interface Promotion {
   id?: string
   tenant_slug: string
   name: string
-  code: string
+  code?: string // Optioneel - niet meer verplicht
+  description?: string // Beschrijving van de aanbieding
+  image_url?: string // Foto van de aanbieding
   type: 'percentage' | 'fixed' | 'freeItem'
   value: number
   free_item_id?: string
@@ -942,6 +944,24 @@ export async function getPromotions(tenantSlug: string): Promise<Promotion[]> {
   return data || []
 }
 
+// Haal alleen actieve promoties op voor de shop (niet verlopen)
+export async function getActivePromotions(tenantSlug: string): Promise<Promotion[]> {
+  const now = new Date().toISOString()
+  const { data, error } = await supabase
+    .from('promotions')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .eq('is_active', true)
+    .or(`expires_at.is.null,expires_at.gt.${now}`)
+    .order('created_at', { ascending: false })
+  
+  if (error) {
+    console.error('Error fetching active promotions:', error)
+    return []
+  }
+  return data || []
+}
+
 export async function savePromotion(promotion: Promotion): Promise<Promotion | null> {
   if (promotion.id) {
     // Update existing
@@ -949,7 +969,9 @@ export async function savePromotion(promotion: Promotion): Promise<Promotion | n
       .from('promotions')
       .update({
         name: promotion.name,
-        code: promotion.code.toUpperCase(),
+        description: promotion.description || null,
+        image_url: promotion.image_url || null,
+        code: promotion.code ? promotion.code.toUpperCase() : null,
         type: promotion.type,
         value: promotion.value,
         free_item_id: promotion.free_item_id,
@@ -977,7 +999,9 @@ export async function savePromotion(promotion: Promotion): Promise<Promotion | n
       .insert({
         tenant_slug: promotion.tenant_slug,
         name: promotion.name,
-        code: promotion.code.toUpperCase(),
+        description: promotion.description || null,
+        image_url: promotion.image_url || null,
+        code: promotion.code ? promotion.code.toUpperCase() : null,
         type: promotion.type,
         value: promotion.value,
         free_item_id: promotion.free_item_id,

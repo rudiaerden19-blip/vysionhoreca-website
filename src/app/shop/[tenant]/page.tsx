@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview } from '@/lib/admin-api'
+import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, getActivePromotions, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview, Promotion } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 
@@ -129,6 +129,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [reviews, setReviews] = useState<Review[]>([])
   const [popularItems, setPopularItems] = useState<PopularItem[]>([])
   const [teamMembers, setTeamMembers] = useState<{id: string, name: string, role?: string, photo_url?: string}[]>([])
+  const [promotions, setPromotions] = useState<Promotion[]>([])
+  const [showPromotionsModal, setShowPromotionsModal] = useState(false)
   const [showGiftCardModal, setShowGiftCardModal] = useState(false)
   const [giftCardForm, setGiftCardForm] = useState({
     occasion: '',
@@ -350,14 +352,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         }
 
         // Laad data uit Supabase
-        const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData] = await Promise.all([
+        const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData, promotionsData] = await Promise.all([
           getTenantSettings(params.tenant),
           getOpeningHours(params.tenant),
           getDeliverySettings(params.tenant),
           getMenuProducts(params.tenant),
           getTenantTexts(params.tenant),
           getVisibleReviews(params.tenant),
+          getActivePromotions(params.tenant),
         ])
+        
+        // Zet promoties
+        setPromotions(promotionsData)
 
         // Check of tenant bestaat - als tenantData null is, bestaat de tenant niet
         if (!tenantData) {
@@ -769,13 +775,21 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <span className="hidden sm:inline">{t('shopPage.admin')}</span>
               </Link>
             )}
-            <Link 
-              href={`/shop/${params.tenant}/menu`}
-              style={{ backgroundColor: business.primary_color }}
-              className="text-white font-medium px-4 py-2 rounded-full text-sm hover:opacity-90 transition-opacity"
-            >
-              🍟 {t('shopPage.menu')}
-            </Link>
+{promotions.length > 0 && (
+                              <button
+                                onClick={() => setShowPromotionsModal(true)}
+                                className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-full text-sm transition-colors flex items-center gap-1"
+                              >
+                                🎁 {t('shopPage.promotions')}
+                              </button>
+                            )}
+                            <Link 
+                              href={`/shop/${params.tenant}/menu`}
+                              style={{ backgroundColor: business.primary_color }}
+                              className="text-white font-medium px-4 py-2 rounded-full text-sm hover:opacity-90 transition-opacity"
+                            >
+                              🍟 {t('shopPage.menu')}
+                            </Link>
             <Link 
               href={`/shop/${params.tenant}/account`}
               className="bg-white/20 backdrop-blur-md text-white font-medium px-4 py-2 rounded-full text-sm hover:bg-white/30 transition-colors flex items-center gap-2"
@@ -1717,6 +1731,100 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </div>
       </footer>
+
+      {/* Promoties Modal */}
+      <AnimatePresence>
+        {showPromotionsModal && business && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowPromotionsModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden"
+            >
+              {/* Header */}
+              <div 
+                className="p-6 text-white text-center"
+                style={{ backgroundColor: business.primary_color }}
+              >
+                <span className="text-4xl">🎁</span>
+                <h2 className="text-2xl font-bold mt-2">{t('shopPage.promotions')}</h2>
+                <p className="opacity-80">{t('shopPage.currentOffers')}</p>
+              </div>
+
+              {/* Promoties lijst */}
+              <div className="p-4 max-h-[60vh] overflow-y-auto space-y-4">
+                {promotions.map((promo) => (
+                  <div 
+                    key={promo.id}
+                    className="bg-gray-50 rounded-2xl overflow-hidden shadow-sm"
+                  >
+                    {promo.image_url && (
+                      <div className="relative aspect-video">
+                        <Image
+                          src={promo.image_url}
+                          alt={promo.name}
+                          fill
+                          className="object-cover"
+                        />
+                        {/* Korting badge */}
+                        <div className="absolute top-3 left-3 bg-red-500 text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-lg">
+                          {promo.type === 'percentage' ? `-${promo.value}%` :
+                           promo.type === 'fixed' ? `-€${promo.value}` : t('shopPage.free')}
+                        </div>
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="font-bold text-gray-900 text-lg">{promo.name}</h3>
+                      {promo.description && (
+                        <p className="text-gray-600 text-sm mt-1">{promo.description}</p>
+                      )}
+                      {promo.min_order_amount > 0 && (
+                        <p className="text-orange-600 text-sm mt-2 font-medium">
+                          {t('shopPage.minOrder')}: €{promo.min_order_amount.toFixed(2)}
+                        </p>
+                      )}
+                      {!promo.image_url && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                            {promo.type === 'percentage' ? `-${promo.value}%` :
+                             promo.type === 'fixed' ? `-€${promo.value}` : t('shopPage.free')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="p-4 border-t">
+                <Link href={`/shop/${params.tenant}/menu`}>
+                  <button
+                    style={{ backgroundColor: business.primary_color }}
+                    className="w-full py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                  >
+                    🍟 {t('shopPage.orderNow')}
+                  </button>
+                </Link>
+                <button
+                  onClick={() => setShowPromotionsModal(false)}
+                  className="w-full mt-2 py-3 text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  {t('shopPage.close')}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Gift Card Modal */}
       <AnimatePresence>
