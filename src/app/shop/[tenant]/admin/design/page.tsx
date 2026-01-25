@@ -168,7 +168,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             <div className="grid grid-cols-4 gap-3 mb-6">
               {colorPresets.map((preset) => (
                 <button
-                  key={preset.name}
+                  key={preset.nameKey}
                   onClick={() => applyPreset(preset)}
                   className={`p-3 rounded-xl border-2 transition-all ${
                     primaryColor === preset.primary 

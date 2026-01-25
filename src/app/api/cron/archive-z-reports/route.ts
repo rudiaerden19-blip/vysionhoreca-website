@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get unique tenant slugs
-    const tenantSlugs = [...new Set(ordersWithTenants.map(o => o.tenant_slug))]
+    const tenantSlugs = Array.from(new Set(ordersWithTenants.map(o => o.tenant_slug)))
     console.log(`Found ${tenantSlugs.length} tenants with orders`)
 
     let archived = 0

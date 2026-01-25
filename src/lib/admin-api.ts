@@ -88,7 +88,7 @@ export async function getTenantSettings(tenantSlug: string): Promise<TenantSetti
   )
 }
 
-export async function saveTenantSettings(settings: TenantSettings): Promise<boolean> {
+export async function saveTenantSettings(settings: Partial<TenantSettings> & { tenant_slug: string }): Promise<boolean> {
   // Only include fields that definitely exist in the original database schema
   const safeSettings = {
     id: settings.id,
@@ -300,6 +300,7 @@ export interface MenuCategory {
   tenant_slug: string
   name: string
   description: string
+  icon?: string
   sort_order: number
   is_active: boolean
 }
@@ -3260,7 +3261,7 @@ export interface GiftCard {
   recipient_name?: string
   recipient_email: string
   stripe_payment_id?: string
-  status: 'pending' | 'paid' | 'used' | 'expired'
+  status: 'pending' | 'pending_cash' | 'paid' | 'used' | 'expired'
   is_sent?: boolean
   expires_at?: string
   used_at?: string

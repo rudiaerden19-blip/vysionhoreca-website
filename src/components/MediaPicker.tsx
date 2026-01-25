@@ -53,7 +53,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
         name: item.name || item.file_name || 'Foto',
         category: item.category || ''
       })))
-      const cats = [...new Set(data.map(m => m.category).filter(c => c && c.trim() !== ''))]
+      const cats = Array.from(new Set(data.map(m => m.category).filter(c => c && c.trim() !== '')))
       setCategories(cats)
     }
     

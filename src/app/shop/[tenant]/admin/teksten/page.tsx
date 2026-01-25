@@ -94,7 +94,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
     setSaving(false)
   }
 
-  const textFields = [
+  const textFields: { section: string; icon: string; fields: { key: string; label: string; placeholder: string; multiline?: boolean }[] }[] = [
     { section: t('websiteTexts.buttons'), icon: '🔘', fields: [
       { key: 'order_button_text', label: t('websiteTexts.orderButton'), placeholder: t('websiteTexts.orderButtonPlaceholder') },
       { key: 'pickup_label', label: t('websiteTexts.pickupLabel'), placeholder: t('websiteTexts.pickupPlaceholder') },

@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
+// Extended types for Stripe objects with all necessary properties
+interface StripeSubscriptionExtended extends Stripe.Subscription {
+  current_period_end: number
+}
+
+interface StripeInvoiceExtended extends Stripe.Invoice {
+  subscription: string | Stripe.Subscription | null
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Validate Supabase configuration
@@ -71,7 +80,7 @@ export async function POST(request: NextRequest) {
 
           if (tenantSlug) {
             // Get subscription details from Stripe
-            const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId)
+            const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId) as unknown as StripeSubscriptionExtended
             const currentPeriodEnd = new Date(stripeSubscription.current_period_end * 1000)
 
             // Update subscription in database
@@ -119,8 +128,8 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.paid': {
-        const invoice = event.data.object as Stripe.Invoice
-        const stripeSubscriptionId = invoice.subscription as string
+        const invoice = event.data.object as StripeInvoiceExtended
+        const stripeSubscriptionId = (typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as Stripe.Subscription)?.id) as string
 
         if (stripeSubscriptionId) {
           // Find subscription by Stripe ID
@@ -132,7 +141,7 @@ export async function POST(request: NextRequest) {
 
           if (sub) {
             // Get next payment date
-            const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId)
+            const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId) as unknown as StripeSubscriptionExtended
             const nextPayment = new Date(stripeSubscription.current_period_end * 1000)
 
             await supabase
@@ -150,8 +159,8 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice
-        const stripeSubscriptionId = invoice.subscription as string
+        const invoice = event.data.object as StripeInvoiceExtended
+        const stripeSubscriptionId = (typeof invoice.subscription === 'string' ? invoice.subscription : (invoice.subscription as Stripe.Subscription)?.id) as string
 
         if (stripeSubscriptionId) {
           const { data: sub } = await supabase
@@ -224,7 +233,7 @@ export async function POST(request: NextRequest) {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription
+        const subscription = event.data.object as Stripe.Subscription & { current_period_end: number }
         
         const { data: sub } = await supabase
           .from('subscriptions')

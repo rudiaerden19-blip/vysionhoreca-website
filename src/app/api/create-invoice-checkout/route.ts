@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
-})
-
 export async function POST(request: NextRequest) {
   try {
     const { tenantSlug, invoiceId, amount, description } = await request.json()
@@ -17,12 +13,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    if (!process.env.STRIPE_SECRET_KEY) {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+    if (!stripeSecretKey) {
       return NextResponse.json(
         { error: 'Stripe is niet geconfigureerd' },
         { status: 500 }
       )
     }
+
+    const stripe = new Stripe(stripeSecretKey)
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {

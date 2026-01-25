@@ -59,7 +59,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   // Import Van Zon state
   const [showImport, setShowImport] = useState(false)
   const [importText, setImportText] = useState('')
-  const [importPreview, setImportPreview] = useState<Array<{name: string, articleNr: string, price: number}>>([])
+  const [importPreview, setImportPreview] = useState<Array<{name: string, articleNr: string, price: number, unitsPerBox: number}>>([])
   const [importing, setImporting] = useState(false)
 
   // Database search state
@@ -209,7 +209,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       // Als porties is ingevuld, gebruik die voor de berekening
       const usesPortions = item.portions && item.portions > 0
       const divider = usesPortions ? item.portions : item.quantity
-      const calculatedPricePerUnit = divider > 0 ? item.totalPrice / divider : item.totalPrice
+      const calculatedPricePerUnit = (divider && divider > 0) ? item.totalPrice / divider : item.totalPrice
       const effectiveUnit = usesPortions ? 'portie' : (item.unit || 'stuk')
       const effectiveQuantity = usesPortions ? item.portions! : item.quantity
 

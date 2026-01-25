@@ -16,6 +16,9 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 // Run integration tests separately with actual HTTP requests
 const describeOrSkip = typeof Request === 'undefined' ? describe.skip : describe
 
+// Mock GET function for testing
+let GET: () => Promise<Response>
+
 // Basic test that doesn't require Next.js runtime
 describe('Health Check Configuration', () => {
   it('should have getServerSupabaseClient available', () => {
@@ -24,6 +27,11 @@ describe('Health Check Configuration', () => {
 })
 
 describeOrSkip('Health Check API (Integration)', () => {
+  beforeAll(async () => {
+    // Dynamic import to avoid issues when Request is not available
+    const healthModule = await import('@/app/api/health/route')
+    GET = healthModule.GET
+  })
   beforeEach(() => {
     jest.clearAllMocks()
   })

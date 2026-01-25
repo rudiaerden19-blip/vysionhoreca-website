@@ -41,7 +41,7 @@ function SortableChoice({
   id: string
   choice: ProductOptionChoice
   index: number
-  onUpdate: (field: string, value: any) => void
+  onUpdate: (field: keyof ProductOptionChoice | string, value: any) => void
   onRemove: () => void
   canRemove: boolean
   placeholder: string
@@ -526,7 +526,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                             id={`choice-${index}`}
                             choice={choice}
                             index={index}
-                            onUpdate={(field, value) => updateChoice(index, field, value)}
+                            onUpdate={(field, value) => updateChoice(index, field as keyof ProductOptionChoice, value)}
                             onRemove={() => removeChoice(index)}
                             canRemove={(formData.choices?.length || 0) > 1}
                             placeholder={t('adminPages.opties.choiceNamePlaceholder')}

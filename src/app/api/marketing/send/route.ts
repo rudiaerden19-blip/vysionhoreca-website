@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
     
     <!-- Content -->
     <div style="background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-      ${personalizedMessage.split('\n').map(line => 
+      ${personalizedMessage.split('\n').map((line: string) => 
         line.trim() ? `<p style="margin: 0 0 15px 0; color: #333; line-height: 1.6; font-size: 15px;">${line}</p>` : '<br>'
       ).join('')}
       

@@ -421,11 +421,11 @@ export default function UrenPage() {
     const fileName = `Urenregistratie_${selectedStaff.name.replace(/\s/g, '_')}_${selectedYear}-${String(selectedMonth).padStart(2, '0')}.pdf`
     
     const opt = {
-      margin: [10, 15, 10, 15],
+      margin: [10, 15, 10, 15] as [number, number, number, number],
       filename: fileName,
-      image: { type: 'jpeg', quality: 0.95 },
+      image: { type: 'jpeg' as const, quality: 0.95 },
       html2canvas: { scale: 1.5, useCORS: true, letterRendering: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
     }
     
     html2pdf().set(opt).from(element).save()
