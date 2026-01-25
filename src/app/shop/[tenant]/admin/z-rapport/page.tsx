@@ -72,6 +72,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [btwPercentage, setBtwPercentage] = useState(6)
   const [savedReports, setSavedReports] = useState<SavedReport[]>([])
   const [showHistory, setShowHistory] = useState(false)
+  const [showEmailModal, setShowEmailModal] = useState(false)
+  const [emailAddress, setEmailAddress] = useState('')
+  const [sendingEmail, setSendingEmail] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -246,6 +249,121 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   const printZRapport = () => window.print()
 
+  // Genereer HTML voor PDF/email
+  const generateReportHTML = () => {
+    if (!stats) return ''
+    
+    const taxRate = btwPercentage / 100
+    
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>Z-Rapport ${formatShortDate(selectedDate)}</title>
+        <style>
+          body { font-family: 'Courier New', monospace; max-width: 400px; margin: 0 auto; padding: 20px; }
+          .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 15px; }
+          .header h1 { margin: 0; font-size: 18px; }
+          .header p { margin: 5px 0; font-size: 12px; color: #666; }
+          .section { margin: 15px 0; }
+          .section-title { font-weight: bold; border-bottom: 1px solid #ccc; margin-bottom: 10px; }
+          .row { display: flex; justify-content: space-between; font-size: 14px; margin: 5px 0; }
+          .total-row { font-weight: bold; font-size: 16px; border-top: 2px solid #000; padding-top: 10px; margin-top: 10px; }
+          .footer { text-align: center; font-size: 10px; color: #666; border-top: 2px dashed #000; margin-top: 20px; padding-top: 15px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>${businessInfo?.business_name || 'Z-Rapport'}</h1>
+          <p>${businessInfo?.address || ''}</p>
+          ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>` : ''}
+          <p style="margin-top: 10px; font-weight: bold;">Z-RAPPORT</p>
+          <p>${formatDate(selectedDate)}</p>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">OMZET</div>
+          <div class="row"><span>Aantal transacties:</span><span>${stats.orderCount}</span></div>
+          <div class="row"><span>Subtotaal (excl. BTW):</span><span>${formatCurrency(stats.subtotal)}</span></div>
+          <div class="row"><span>BTW ${btwPercentage}%:</span><span>${formatCurrency(stats.total - stats.subtotal)}</span></div>
+          <div class="row total-row"><span>TOTAAL:</span><span>${formatCurrency(stats.total)}</span></div>
+        </div>
+        
+        <div class="section">
+          <div class="section-title">BETALINGEN</div>
+          <div class="row"><span>Contant:</span><span>${formatCurrency(stats.cashPayments)}</span></div>
+          <div class="row"><span>PIN/Kaart:</span><span>${formatCurrency(stats.cardPayments)}</span></div>
+          <div class="row"><span>Online:</span><span>${formatCurrency(stats.onlinePayments)}</span></div>
+        </div>
+        
+        <div class="footer">
+          <p>Gegenereerd: ${new Date().toLocaleString('nl-NL')}</p>
+          <p>Dit is een officieel kassarapport</p>
+        </div>
+      </body>
+      </html>
+    `
+  }
+
+  // Download als PDF (via print dialog met Save as PDF)
+  const downloadPDF = () => {
+    const html = generateReportHTML()
+    const printWindow = window.open('', '_blank')
+    if (printWindow) {
+      printWindow.document.write(html)
+      printWindow.document.close()
+      printWindow.focus()
+      setTimeout(() => {
+        printWindow.print()
+      }, 250)
+    }
+  }
+
+  // Verstuur per e-mail
+  const sendEmailReport = async () => {
+    if (!emailAddress || !stats) return
+    
+    setSendingEmail(true)
+    
+    try {
+      const response = await fetch('/api/send-z-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: emailAddress,
+          subject: `Z-Rapport ${formatShortDate(selectedDate)} - ${businessInfo?.business_name || params.tenant}`,
+          businessName: businessInfo?.business_name || params.tenant,
+          businessAddress: businessInfo?.address || '',
+          btwNumber: businessInfo?.btw_number || '',
+          date: selectedDate,
+          formattedDate: formatDate(selectedDate),
+          orderCount: stats.orderCount,
+          subtotal: stats.subtotal,
+          tax: stats.total - stats.subtotal,
+          btwPercentage,
+          total: stats.total,
+          cashPayments: stats.cashPayments,
+          cardPayments: stats.cardPayments,
+          onlinePayments: stats.onlinePayments,
+        })
+      })
+      
+      if (response.ok) {
+        alert('Z-Rapport verzonden naar ' + emailAddress)
+        setShowEmailModal(false)
+        setEmailAddress('')
+      } else {
+        const error = await response.json()
+        alert('Fout bij verzenden: ' + (error.message || 'Onbekende fout'))
+      }
+    } catch (error) {
+      alert('Fout bij verzenden. Probeer opnieuw.')
+    }
+    
+    setSendingEmail(false)
+  }
+
   const goToPreviousDay = () => {
     const [y, m, d] = selectedDate.split('-').map(Number)
     const date = new Date(y, m - 1, d - 1)
@@ -299,6 +417,23 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-medium flex items-center gap-2"
           >
             🖨️ {t('zReport.print')}
+          </button>
+          <button
+            onClick={downloadPDF}
+            disabled={!stats || stats.orderCount === 0}
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50"
+          >
+            📄 PDF
+          </button>
+          <button
+            onClick={() => {
+              setEmailAddress(businessInfo?.email || '')
+              setShowEmailModal(true)
+            }}
+            disabled={!stats || stats.orderCount === 0}
+            className="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-600 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50"
+          >
+            📧 E-mail
           </button>
           <button
             onClick={refreshData}
@@ -516,6 +651,84 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           .print\\:hidden { display: none !important; }
         }
       `}</style>
+
+      {/* Email Modal */}
+      <AnimatePresence>
+        {showEmailModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowEmailModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-xl font-bold mb-2">📧 Z-Rapport versturen</h2>
+              <p className="text-gray-500 text-sm mb-6">
+                Verstuur het Z-Rapport van {formatShortDate(selectedDate)} per e-mail
+              </p>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  E-mailadres
+                </label>
+                <input
+                  type="email"
+                  value={emailAddress}
+                  onChange={(e) => setEmailAddress(e.target.value)}
+                  placeholder="email@voorbeeld.nl"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {stats && (
+                <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Datum:</span>
+                    <span className="font-medium">{formatShortDate(selectedDate)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm mt-1">
+                    <span className="text-gray-600">Transacties:</span>
+                    <span className="font-medium">{stats.orderCount}</span>
+                  </div>
+                  <div className="flex justify-between text-sm mt-1">
+                    <span className="text-gray-600">Totaal:</span>
+                    <span className="font-bold text-green-600">{formatCurrency(stats.total)}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowEmailModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={sendEmailReport}
+                  disabled={!emailAddress || sendingEmail}
+                  className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium disabled:bg-gray-300 flex items-center justify-center gap-2"
+                >
+                  {sendingEmail ? (
+                    <>
+                      <span className="animate-spin">⏳</span> Verzenden...
+                    </>
+                  ) : (
+                    <>📧 Versturen</>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
