@@ -463,9 +463,15 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       {formData.type === 'percentage' ? 'Percentage (%)' : 'Bedrag (€)'}
                     </label>
                     <input
-                      type="number"
-                      value={formData.value || ''}
-                      onChange={(e) => setFormData(prev => ({ ...prev, value: parseFloat(e.target.value) || 0 }))}
+                      type="text"
+                      inputMode="decimal"
+                      value={formData.value}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(',', '.')
+                        if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                          setFormData(prev => ({ ...prev, value: val === '' ? 0 : parseFloat(val) || 0 }))
+                        }
+                      }}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder={formData.type === 'percentage' ? '10' : '5.00'}
                     />
