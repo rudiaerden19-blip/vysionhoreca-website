@@ -19,6 +19,8 @@ export default function RegisterPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [isLangOpen, setIsLangOpen] = useState(false)
+  const [showInstallPopup, setShowInstallPopup] = useState(false)
+  const [tenantSlug, setTenantSlug] = useState('')
   const langRef = useRef<HTMLDivElement>(null)
 
   // Read language from URL parameter on mount
@@ -139,19 +141,10 @@ export default function RegisterPage() {
       
       localStorage.setItem('vysion_tenant', JSON.stringify(data.tenant))
       
-      // ALTIJD naar tenant dashboard via subdomain - GEEN fallback naar admin dashboard!
+      // Show install popup first, then redirect
+      setTenantSlug(data.tenant.tenant_slug)
+      setShowInstallPopup(true)
       setSuccess(true)
-      setTimeout(() => {
-        // Always redirect to ordervysion.com subdomain (except localhost)
-        const isLocalhost = typeof window !== 'undefined' && 
-          (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1'))
-        
-        if (isLocalhost) {
-          router.push(`/shop/${data.tenant.tenant_slug}/admin`)
-        } else {
-          window.location.href = `https://${data.tenant.tenant_slug}.ordervysion.com/admin`
-        }
-      }, 2000)
       
     } catch (err) {
       setError(t('register.error'))
@@ -159,26 +152,104 @@ export default function RegisterPage() {
     }
   }
 
-  if (success) {
+  const handleContinueToDashboard = () => {
+    const isLocalhost = typeof window !== 'undefined' && 
+      (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1'))
+    
+    if (isLocalhost) {
+      router.push(`/shop/${tenantSlug}/admin`)
+    } else {
+      window.location.href = `https://${tenantSlug}.ordervysion.com/admin`
+    }
+  }
+
+  // TestFlight and Play Store links
+  const TESTFLIGHT_URL = process.env.NEXT_PUBLIC_TESTFLIGHT_LINK || 'https://testflight.apple.com/join/XXXXXX'
+  const PLAYSTORE_URL = process.env.NEXT_PUBLIC_PLAYSTORE_LINK || 'https://play.google.com/store/apps/details?id=com.vysionhoreca.bestelplatform'
+
+  if (success && showInstallPopup) {
     return (
       <main className="min-h-screen bg-dark flex flex-col">
-        <header className="p-6 flex items-center justify-between">
-          <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            {t('login.backToHome')}
-          </Link>
-        </header>
-
         <div className="flex-1 flex items-center justify-center px-4 py-12">
-          <div className="w-full max-w-md text-center">
-            <div className="p-6 bg-green-500/10 border border-green-500/30 rounded-lg">
-              <svg className="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <h3 className="text-xl font-bold text-white mb-2">{t('register.successTitle')}</h3>
-              <p className="text-gray-300">{t('register.successMessage')}</p>
+          <div className="w-full max-w-lg">
+            {/* Success checkmark */}
+            <div className="text-center mb-8">
+              <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">{t('register.successTitle')}</h2>
+              <p className="text-gray-400">Account aangemaakt! Installeer nu de app.</p>
+            </div>
+
+            {/* Install App Card */}
+            <div className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-2xl p-8">
+              <div className="text-center mb-6">
+                {/* Blue V Icon */}
+                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
+                  <span className="text-5xl font-bold text-white">V</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Installeer Vysion Bestelplatform</h3>
+                <p className="text-gray-400 text-sm">Download de app op uw tablet voor de beste ervaring</p>
+              </div>
+
+              {/* Download Buttons */}
+              <div className="space-y-4">
+                {/* iPad / iOS Button */}
+                <a
+                  href={TESTFLIGHT_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 w-full bg-black hover:bg-gray-900 text-white p-4 rounded-xl transition-all hover:scale-[1.02] border border-gray-700"
+                >
+                  <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                    <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                    </svg>
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="text-xs text-gray-400">Download voor</div>
+                    <div className="text-lg font-semibold">iPad & iPhone</div>
+                  </div>
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+
+                {/* Android Button */}
+                <a
+                  href={PLAYSTORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-4 w-full bg-black hover:bg-gray-900 text-white p-4 rounded-xl transition-all hover:scale-[1.02] border border-gray-700"
+                >
+                  <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                    <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 0 1 0 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.802 8.99l-2.303 2.303-8.635-8.635z"/>
+                    </svg>
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="text-xs text-gray-400">Download voor</div>
+                    <div className="text-lg font-semibold">Android Tablet</div>
+                  </div>
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+
+              {/* Continue Button */}
+              <button
+                onClick={handleContinueToDashboard}
+                className="w-full mt-6 bg-accent hover:bg-accent/90 text-white py-4 rounded-xl font-semibold transition-colors"
+              >
+                Doorgaan naar Dashboard →
+              </button>
+
+              <p className="text-center text-gray-500 text-xs mt-4">
+                U kunt de app ook later downloaden vanuit uw dashboard
+              </p>
             </div>
           </div>
         </div>
