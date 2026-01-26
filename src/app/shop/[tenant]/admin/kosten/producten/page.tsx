@@ -650,15 +650,19 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         />
       </div>
 
-      {/* Vaste Standaardprijzen Kader */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 shadow-sm">
+      {/* Vaste Standaardprijzen Kader - Sticky wanneer product open is */}
+      <div className={`bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 shadow-sm transition-all ${
+        selectedProduct ? 'sticky top-0 z-40 shadow-lg' : ''
+      }`}>
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="font-semibold text-blue-900 flex items-center gap-2">
               💰 Vaste Standaardprijzen
             </h3>
             <p className="text-sm text-blue-600 mt-1">
-              👆 Sleep een prijs naar het product hieronder om toe te voegen
+              {selectedProduct 
+                ? '👆 Dubbelklik om toe te voegen aan de geselecteerde kostenberekening'
+                : '👆 Open eerst een product hieronder, dubbelklik dan om toe te voegen'}
             </p>
           </div>
           <button
@@ -681,7 +685,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
-          {/* Draggable items */}
+          {/* Dubbelklik items */}
           {[
             { key: 'saus', label: 'Saus', price: standardPrices.saus },
             { key: 'sla', label: 'Sla', price: standardPrices.sla },
@@ -693,16 +697,21 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           ].map((item) => (
             <div
               key={item.key}
-              draggable
-              onDragStart={(e) => handleDragStart(e, item.label, parseFloat(item.price.replace(',', '.')) || 0)}
-              onDragEnd={handleDragEnd}
-              className={`bg-white rounded-lg p-2 shadow-sm cursor-grab active:cursor-grabbing hover:shadow-md hover:scale-105 transition-all border-2 ${
-                draggedItem?.name === item.label ? 'border-blue-500 bg-blue-50' : 'border-transparent hover:border-blue-300'
-              }`}
+              onDoubleClick={() => {
+                if (selectedProduct) {
+                  addStandardPriceToProduct(item.label, parseFloat(item.price.replace(',', '.')) || 0, selectedProduct)
+                }
+              }}
+              className={`bg-white rounded-lg p-2 shadow-sm transition-all border-2 ${
+                selectedProduct 
+                  ? 'cursor-pointer hover:shadow-md hover:scale-105 hover:border-green-400 hover:bg-green-50' 
+                  : 'cursor-not-allowed opacity-60'
+              } ${addingStandardItem === item.label ? 'border-green-500 bg-green-100' : 'border-transparent'}`}
+              title={selectedProduct ? 'Dubbelklik om toe te voegen' : 'Open eerst een product'}
             >
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs text-gray-600 font-medium">{item.label}</label>
-                <span className="text-xs text-blue-500">⋮⋮</span>
+                {selectedProduct && <span className="text-xs text-green-500">👆</span>}
               </div>
               <div className="flex items-center">
                 <span className="text-gray-400 text-sm mr-1">€</span>
@@ -711,14 +720,11 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   inputMode="decimal"
                   value={item.price}
                   onClick={(e) => e.stopPropagation()}
-                  onMouseDown={(e) => e.stopPropagation()}
                   onChange={(e) => {
-                    // Accept any input - allow user to fully clear and retype
                     const val = e.target.value.replace(',', '.')
                     setStandardPrices(prev => ({ ...prev, [item.key]: val }))
                   }}
                   className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
-                  draggable={false}
                 />
               </div>
             </div>
@@ -980,16 +986,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           <motion.div
             key={pc.product.id}
             layout
-            onDragOver={(e) => {
-              e.preventDefault()
-              e.dataTransfer.dropEffect = 'copy'
-              setDropTargetProduct(pc.product.id)
-            }}
-            onDragLeave={() => setDropTargetProduct(null)}
-            onDrop={(e) => handleDrop(e, pc.product.id)}
             className={`bg-white rounded-xl shadow-lg border-2 transition-all ${
-              dropTargetProduct === pc.product.id 
-                ? 'border-blue-500 bg-blue-50 scale-[1.02] shadow-xl' 
+              selectedProduct === pc.product.id
+                ? 'border-green-500 ring-2 ring-green-200' 
                 : pc.status === 'low' ? 'border-red-300' :
                   pc.status === 'high' ? 'border-blue-300' :
                   pc.ingredients.length > 0 ? 'border-green-300' : 'border-gray-200'
