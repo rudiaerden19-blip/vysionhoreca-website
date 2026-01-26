@@ -650,19 +650,19 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         />
       </div>
 
-      {/* Vaste Standaardprijzen Kader - Sticky wanneer product open is */}
+      {/* Vaste Standaardprijzen Kader - Fixed onderaan wanneer product open is */}
       <div className={`bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 shadow-sm transition-all ${
-        selectedProduct ? 'sticky top-0 z-40 shadow-lg' : ''
+        selectedProduct ? 'fixed bottom-0 left-0 right-0 z-50 shadow-2xl rounded-none border-t-4 border-blue-400' : ''
       }`}>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 max-w-7xl mx-auto">
           <div>
             <h3 className="font-semibold text-blue-900 flex items-center gap-2">
-              💰 Vaste Standaardprijzen
+              💰 {t('dashboard.productCosts.standardPricesTitle')}
             </h3>
             <p className="text-sm text-blue-600 mt-1">
               {selectedProduct 
-                ? '👆 Dubbelklik om toe te voegen aan de geselecteerde kostenberekening'
-                : '👆 Open eerst een product hieronder, dubbelklik dan om toe te voegen'}
+                ? `👆 ${t('dashboard.productCosts.doubleClickToAdd')}`
+                : `👆 ${t('dashboard.productCosts.openProductFirst')}`}
             </p>
           </div>
           <button
@@ -684,7 +684,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           </button>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 max-w-7xl mx-auto">
           {/* Dubbelklik items */}
           {[
             { key: 'saus', label: 'Saus', price: standardPrices.saus },
@@ -731,10 +731,13 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           ))}
         </div>
         
-        <p className="text-xs text-blue-700 mt-3 italic">
-          💡 Deze vaste prijzen zijn gecalculeerd door 150 frituristen. Indien u andere porties geeft kan dit handmatig aangepast worden.
+        <p className="text-xs text-blue-700 mt-3 italic max-w-7xl mx-auto">
+          💡 {t('dashboard.productCosts.standardPricesHint')}
         </p>
       </div>
+      
+      {/* Spacer voor fixed standaardprijzen panel */}
+      {selectedProduct && <div className="h-48"></div>}
 
       {/* Simulatie Calculator */}
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 shadow-sm overflow-hidden">

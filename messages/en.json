@@ -551,7 +551,11 @@
       "noProductsFound": "No products found",
       "addProductsFirst": "Add products to your menu first",
       "noIngredientsWarning": "You haven't added any ingredients yet.",
-      "addIngredientsFirst": "Add ingredients first"
+      "addIngredientsFirst": "Add ingredients first",
+      "standardPricesTitle": "Fixed Standard Prices",
+      "doubleClickToAdd": "Double-click to add to the selected cost calculation",
+      "openProductFirst": "Open a product below first, then double-click to add",
+      "standardPricesHint": "These fixed prices are calculated by 150 fryer operators. If you serve different portions, this can be adjusted manually."
     },
     "ingredients": {
       "title": "Ingredients",

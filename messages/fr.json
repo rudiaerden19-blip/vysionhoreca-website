@@ -562,8 +562,12 @@
       "goodPricing": "Goede prijszetting! Marge: €{amount}",
       "noProductsFound": "Geen producten gevonden",
       "addProductsFirst": "Voeg eerst producten toe aan je menu",
-      "noIngredientsWarning": "Je hebt nog geen ingrediënten toegevoegd.",
-      "addIngredientsFirst": "Voeg eerst ingrediënten toe"
+      "noIngredientsWarning": "Vous n'avez pas encore ajouté d'ingrédients.",
+      "addIngredientsFirst": "Ajoutez d'abord des ingrédients",
+      "standardPricesTitle": "Prix Standards Fixes",
+      "doubleClickToAdd": "Double-cliquez pour ajouter au calcul de coût sélectionné",
+      "openProductFirst": "Ouvrez d'abord un produit ci-dessous, puis double-cliquez pour ajouter",
+      "standardPricesHint": "Ces prix fixes sont calculés par 150 friteries. Si vous servez des portions différentes, cela peut être ajusté manuellement."
     },
     "ingredients": {
       "title": "Ingrediënten",

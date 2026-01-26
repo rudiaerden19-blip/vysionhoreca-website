@@ -563,7 +563,11 @@
       "noProductsFound": "لم يتم العثور على منتجات",
       "addProductsFirst": "أضف منتجات إلى قائمتك أولاً",
       "noIngredientsWarning": "لم تضف أي مكونات بعد.",
-      "addIngredientsFirst": "أضف المكونات أولاً"
+      "addIngredientsFirst": "أضف المكونات أولاً",
+      "standardPricesTitle": "الأسعار القياسية الثابتة",
+      "doubleClickToAdd": "انقر مرتين للإضافة إلى حساب التكلفة المحدد",
+      "openProductFirst": "افتح منتجاً أدناه أولاً، ثم انقر مرتين للإضافة",
+      "standardPricesHint": "تم حساب هذه الأسعار الثابتة من قبل 150 مشغل مقلاة. إذا كنت تقدم حصصاً مختلفة، يمكن تعديل ذلك يدوياً."
     },
     "ingredients": {
       "title": "Ingrediënten",

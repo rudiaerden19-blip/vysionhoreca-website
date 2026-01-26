@@ -563,7 +563,11 @@
       "noProductsFound": "未找到产品",
       "addProductsFirst": "请先在菜单中添加产品",
       "noIngredientsWarning": "您还没有添加任何配料。",
-      "addIngredientsFirst": "请先添加配料"
+      "addIngredientsFirst": "请先添加配料",
+      "standardPricesTitle": "固定标准价格",
+      "doubleClickToAdd": "双击添加到所选成本计算",
+      "openProductFirst": "先打开下方的产品，然后双击添加",
+      "standardPricesHint": "这些固定价格由150位炸锅操作员计算得出。如果您提供不同的份量，可以手动调整。"
     },
     "ingredients": {
       "title": "Ingrediënten",

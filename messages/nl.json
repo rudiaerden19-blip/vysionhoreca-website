@@ -551,7 +551,11 @@
       "noProductsFound": "Geen producten gevonden",
       "addProductsFirst": "Voeg eerst producten toe aan je menu",
       "noIngredientsWarning": "Je hebt nog geen ingrediënten toegevoegd.",
-      "addIngredientsFirst": "Voeg eerst ingrediënten toe"
+      "addIngredientsFirst": "Voeg eerst ingrediënten toe",
+      "standardPricesTitle": "Vaste Standaardprijzen",
+      "doubleClickToAdd": "Dubbelklik om toe te voegen aan de geselecteerde kostenberekening",
+      "openProductFirst": "Open eerst een product hieronder, dubbelklik dan om toe te voegen",
+      "standardPricesHint": "Deze vaste prijzen zijn gecalculeerd door 150 frituristen. Indien u andere porties geeft kan dit handmatig aangepast worden."
     },
     "ingredients": {
       "title": "Ingrediënten",

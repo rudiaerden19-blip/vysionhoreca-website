@@ -563,7 +563,11 @@
       "noProductsFound": "No se encontraron productos",
       "addProductsFirst": "Primero agrega productos a tu menú",
       "noIngredientsWarning": "Aún no has agregado ingredientes.",
-      "addIngredientsFirst": "Primero agrega ingredientes"
+      "addIngredientsFirst": "Primero agrega ingredientes",
+      "standardPricesTitle": "Precios Estándar Fijos",
+      "doubleClickToAdd": "Doble clic para añadir al cálculo de costos seleccionado",
+      "openProductFirst": "Primero abre un producto abajo, luego doble clic para añadir",
+      "standardPricesHint": "Estos precios fijos son calculados por 150 operadores de freidoras. Si sirves porciones diferentes, se puede ajustar manualmente."
     },
     "ingredients": {
       "title": "Ingrediënten",

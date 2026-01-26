@@ -562,8 +562,12 @@
       "goodPricing": "Goede prijszetting! Marge: €{amount}",
       "noProductsFound": "Keine Produkte gefunden",
       "addProductsFirst": "Voeg eerst producten toe aan je menu",
-      "noIngredientsWarning": "Je hebt nog geen ingrediënten toegevoegd.",
-      "addIngredientsFirst": "Voeg eerst ingrediënten toe"
+      "noIngredientsWarning": "Du hast noch keine Zutaten hinzugefügt.",
+      "addIngredientsFirst": "Füge zuerst Zutaten hinzu",
+      "standardPricesTitle": "Feste Standardpreise",
+      "doubleClickToAdd": "Doppelklick zum Hinzufügen zur ausgewählten Kostenberechnung",
+      "openProductFirst": "Öffne zuerst ein Produkt unten, dann doppelklicken zum Hinzufügen",
+      "standardPricesHint": "Diese Festpreise wurden von 150 Frittenbetreibern berechnet. Bei anderen Portionsgrößen kann dies manuell angepasst werden."
     },
     "ingredients": {
       "title": "Ingrediënten",

@@ -563,7 +563,11 @@
       "noProductsFound": "Nessun prodotto trovato",
       "addProductsFirst": "Prima aggiungi prodotti al tuo menu",
       "noIngredientsWarning": "Non hai ancora aggiunto ingredienti.",
-      "addIngredientsFirst": "Prima aggiungi ingredienti"
+      "addIngredientsFirst": "Prima aggiungi ingredienti",
+      "standardPricesTitle": "Prezzi Standard Fissi",
+      "doubleClickToAdd": "Doppio clic per aggiungere al calcolo costi selezionato",
+      "openProductFirst": "Prima apri un prodotto sotto, poi doppio clic per aggiungere",
+      "standardPricesHint": "Questi prezzi fissi sono calcolati da 150 operatori di friggitrice. Se servi porzioni diverse, può essere regolato manualmente."
     },
     "ingredients": {
       "title": "Ingrediënten",

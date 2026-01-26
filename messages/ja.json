@@ -563,7 +563,11 @@
       "noProductsFound": "商品が見つかりません",
       "addProductsFirst": "まずメニューに商品を追加してください",
       "noIngredientsWarning": "まだ材料を追加していません。",
-      "addIngredientsFirst": "まず材料を追加"
+      "addIngredientsFirst": "まず材料を追加",
+      "standardPricesTitle": "固定標準価格",
+      "doubleClickToAdd": "ダブルクリックで選択した原価計算に追加",
+      "openProductFirst": "まず下の商品を開いて、ダブルクリックで追加",
+      "standardPricesHint": "これらの固定価格は150人のフライヤーオペレーターによって計算されました。異なる分量を提供する場合は手動で調整できます。"
     },
     "ingredients": {
       "title": "Ingrediënten",
