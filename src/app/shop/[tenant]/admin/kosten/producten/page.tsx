@@ -762,24 +762,42 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         </p>
       </div>
       
-      {/* Spacer voor fixed standaardprijzen panel */}
-      {selectedProduct && <div className="h-48"></div>}
+      {/* Spacer voor fixed panels */}
+      {selectedProduct && !showSimulator && <div className="h-48"></div>}
+      {showSimulator && <div className="h-96"></div>}
 
-      {/* Simulatie Calculator */}
-      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 shadow-sm overflow-hidden">
-        <button
-          onClick={() => setShowSimulator(!showSimulator)}
-          className="w-full p-4 flex items-center justify-between hover:bg-purple-100/50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
+      {/* Simulatie Calculator - Fixed onderaan wanneer open */}
+      <div className={`bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 shadow-sm transition-all ${
+        showSimulator 
+          ? 'fixed bottom-0 left-0 right-0 z-50 shadow-2xl rounded-none border-t-4 border-purple-400 max-h-[70vh] overflow-hidden flex flex-col' 
+          : 'rounded-xl overflow-hidden'
+      }`}>
+        <div className="flex items-center justify-between p-3 sm:p-4 bg-purple-100/50 flex-shrink-0">
+          <button
+            onClick={() => setShowSimulator(!showSimulator)}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
             <span className="text-2xl">🧮</span>
             <div className="text-left">
               <h3 className="font-semibold text-purple-900">{t('simulator.title')}</h3>
               <p className="text-sm text-purple-600">{t('simulator.subtitle')}</p>
             </div>
+          </button>
+          <div className="flex items-center gap-2">
+            {showSimulator && (
+              <button
+                onClick={() => setShowSimulator(false)}
+                className="w-10 h-10 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center justify-center text-xl font-bold transition-all hover:scale-105"
+                title="Sluiten"
+              >
+                ✕
+              </button>
+            )}
+            {!showSimulator && (
+              <span className="text-purple-500 text-xl">▼</span>
+            )}
           </div>
-          <span className="text-purple-500 text-xl">{showSimulator ? '▲' : '▼'}</span>
-        </button>
+        </div>
 
         <AnimatePresence>
           {showSimulator && (
@@ -787,7 +805,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="border-t border-purple-200"
+              className="border-t border-purple-200 overflow-y-auto flex-1"
             >
               <div
                 onDragOver={(e) => {
@@ -795,7 +813,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   e.dataTransfer.dropEffect = 'copy'
                 }}
                 onDrop={handleDropOnSimulator}
-                className={`p-4 ${draggedItem ? 'bg-purple-100 border-2 border-dashed border-purple-400' : ''}`}
+                className={`p-4 max-w-7xl mx-auto ${draggedItem ? 'bg-purple-100 border-2 border-dashed border-purple-400' : ''}`}
               >
                 {/* Simulator Header */}
                 <div className="flex items-center gap-4 mb-4">
