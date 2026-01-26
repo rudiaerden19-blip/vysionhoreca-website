@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 
 export default function SuperAdminLogin() {
   const router = useRouter()
@@ -18,31 +17,24 @@ export default function SuperAdminLogin() {
     setLoading(true)
 
     try {
-      // Simple password check (in production, use proper hashing)
-      const { data, error: dbError } = await supabase
-        .from('super_admins')
-        .select('*')
-        .eq('email', email.toLowerCase())
-        .eq('password_hash', password)
-        .eq('is_active', true)
-        .single()
+      const response = await fetch('/api/auth/superadmin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      })
 
-      if (dbError || !data) {
-        setError('Onjuiste email of wachtwoord')
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || 'Onjuiste email of wachtwoord')
         setLoading(false)
         return
       }
 
-      // Update last login
-      await supabase
-        .from('super_admins')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', data.id)
-
       // Store session
-      localStorage.setItem('superadmin_id', data.id)
-      localStorage.setItem('superadmin_email', data.email)
-      localStorage.setItem('superadmin_name', data.name)
+      localStorage.setItem('superadmin_id', data.admin.id)
+      localStorage.setItem('superadmin_email', data.admin.email)
+      localStorage.setItem('superadmin_name', data.admin.name)
 
       router.push('/superadmin')
     } catch (err) {

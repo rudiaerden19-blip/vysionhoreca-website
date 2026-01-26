@@ -2,13 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+  const startTime = Date.now()
+  
   try {
     // Validate Supabase configuration
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      console.error('Stripe webhook failed: Supabase not configured')
+      logger.error('Stripe webhook failed: Supabase not configured', { requestId })
       return NextResponse.json(
         { error: 'Database not configured' },
         { status: 503 }
@@ -22,7 +26,7 @@ export async function POST(request: NextRequest) {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
 
     if (!stripeSecretKey) {
-      console.error('STRIPE_SECRET_KEY not configured')
+      logger.error('STRIPE_SECRET_KEY not configured', { requestId })
       return NextResponse.json(
         { error: 'Stripe not configured' },
         { status: 500 }
@@ -30,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!webhookSecret) {
-      console.error('STRIPE_WEBHOOK_SECRET not configured')
+      logger.error('STRIPE_WEBHOOK_SECRET not configured', { requestId })
       return NextResponse.json(
         { error: 'Webhook secret not configured' },
         { status: 500 }
@@ -38,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!signature) {
-      console.error('Missing stripe-signature header')
+      logger.warn('Missing stripe-signature header', { requestId })
       return NextResponse.json(
         { error: 'Missing signature' },
         { status: 400 }
@@ -53,12 +57,14 @@ export async function POST(request: NextRequest) {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error'
-      console.error('Webhook signature verification failed:', message)
+      logger.error('Webhook signature verification failed', { requestId, error: message })
       return NextResponse.json(
         { error: `Webhook signature verification failed: ${message}` },
         { status: 400 }
       )
     }
+    
+    logger.info('Stripe webhook received', { requestId, eventType: event.type, eventId: event.id })
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session
@@ -101,9 +107,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    logger.info('Stripe webhook processed successfully', { 
+      requestId, 
+      eventType: event.type,
+      duration: Date.now() - startTime 
+    })
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('Webhook error:', error)
+    logger.error('Webhook error', { 
+      requestId, 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      duration: Date.now() - startTime 
+    })
     return NextResponse.json(
       { error: 'Webhook processing failed' },
       { status: 500 }

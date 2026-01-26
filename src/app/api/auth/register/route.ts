@@ -5,6 +5,7 @@ import crypto from 'crypto'
 import nodemailer from 'nodemailer'
 import { registerRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { logger } from '@/lib/logger'
 
 // Secure password hashing with bcrypt
 async function hashPassword(password: string): Promise<string> {
@@ -12,12 +13,16 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+  const startTime = Date.now()
+  
   try {
     // Rate limiting: 3 registrations per hour per IP
     const clientIP = getClientIP(request)
     const rateLimitResult = await checkRateLimit(registerRateLimiter, clientIP)
     
     if (!rateLimitResult.success) {
+      logger.warn('Registration rate limited', { requestId, clientIP })
       return NextResponse.json(
         { error: 'Te veel registraties. Probeer het later opnieuw.' },
         { status: 429 }
@@ -42,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      console.error('Registration failed: Supabase not configured')
+      logger.error('Registration failed: Supabase not configured', { requestId })
       return NextResponse.json(
         { error: 'Database niet geconfigureerd. Neem contact op met support.' },
         { status: 503 }
@@ -134,14 +139,14 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (tenantError) {
-      console.error('Error creating tenant:', tenantError)
+      logger.error('Error creating tenant', { requestId, error: tenantError.message })
       return NextResponse.json(
         { error: `Fout bij aanmaken tenant: ${tenantError.message}` },
         { status: 500 }
       )
     }
 
-    console.log('Tenant created:', tenant)
+    logger.info('Tenant created', { requestId, tenantSlug, tenantId: tenant.id })
 
     // ========================================
     // 2. CREATE BUSINESS PROFILE (login account)
@@ -159,7 +164,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (profileError) {
-      console.error('Error creating business profile:', profileError)
+      logger.error('Error creating business profile', { requestId, error: profileError.message, tenantSlug })
       // Rollback tenant (maar alleen als het geen beschermde tenant is)
       if (!isProtectedTenant(tenantSlug)) {
         await supabase.from('tenants').delete().eq('id', tenant.id)
@@ -170,7 +175,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('Business profile created:', profile)
+    logger.info('Business profile created', { requestId, profileId: profile.id, tenantSlug })
 
     // ========================================
     // 3. CREATE TENANT SETTINGS (shop settings)
@@ -187,7 +192,7 @@ export async function POST(request: NextRequest) {
       })
 
     if (settingsError) {
-      console.error('Error creating tenant_settings:', settingsError)
+      logger.warn('Error creating tenant_settings', { requestId, error: settingsError.message, tenantSlug })
       // Don't fail - this is secondary
     }
 
@@ -206,7 +211,7 @@ export async function POST(request: NextRequest) {
       })
 
     if (subscriptionError) {
-      console.error('Error creating subscription:', subscriptionError)
+      logger.warn('Error creating subscription', { requestId, error: subscriptionError.message, tenantSlug })
       // Don't fail - this is secondary
     }
 
@@ -227,13 +232,24 @@ export async function POST(request: NextRequest) {
 
       await sendVerificationEmail(emailLower, businessName.trim(), verificationToken)
     } catch (emailError) {
-      console.error('Failed to send verification email:', emailError)
+      logger.warn('Failed to send verification email', { 
+        requestId, 
+        error: emailError instanceof Error ? emailError.message : 'Unknown error',
+        email: emailLower 
+      })
       // Don't fail registration - email can be resent
     }
 
     // ========================================
     // SUCCESS
     // ========================================
+    logger.info('Registration successful', { 
+      requestId, 
+      tenantSlug, 
+      tenantId: tenant.id,
+      duration: Date.now() - startTime 
+    })
+    
     return NextResponse.json({ 
       success: true,
       tenant: {
@@ -246,7 +262,11 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Registration error:', error)
+    logger.error('Registration error', { 
+      requestId, 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      duration: Date.now() - startTime 
+    })
     return NextResponse.json(
       { error: 'Er is een fout opgetreden' },
       { status: 500 }
@@ -332,5 +352,5 @@ Deze link is 24 uur geldig.
   }
 
   await transporter.sendMail(mailOptions)
-  console.log('Verification email sent to:', email)
+  logger.info('Verification email sent', { email })
 }

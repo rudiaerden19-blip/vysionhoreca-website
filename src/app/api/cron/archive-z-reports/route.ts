@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { logger } from '@/lib/logger'
 
 // Vercel Cron Job - runs daily at midnight
 // Configure in vercel.json: { "crons": [{ "path": "/api/cron/archive-z-reports", "schedule": "0 0 * * *" }] }
 
 export async function GET(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+  const startTime = Date.now()
+  
   try {
     // Verify cron secret for security
     const authHeader = request.headers.get('authorization')
@@ -13,38 +17,44 @@ export async function GET(request: NextRequest) {
     // Allow without secret in development, require in production
     if (process.env.NODE_ENV === 'production' && cronSecret) {
       if (authHeader !== `Bearer ${cronSecret}`) {
-        console.error('Cron job unauthorized: invalid secret')
+        logger.warn('Cron job unauthorized: invalid secret', { requestId })
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       }
     }
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
+      logger.error('Database not configured', { requestId })
       return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
     }
 
-    console.log('Starting Z-report archival cron job...')
+    logger.info('Starting Z-report archival cron job', { requestId })
 
     // Get yesterday's date (we archive the previous day)
     const yesterday = new Date()
     yesterday.setDate(yesterday.getDate() - 1)
     const yesterdayStr = yesterday.toISOString().split('T')[0]
 
-    console.log(`Archiving Z-reports for: ${yesterdayStr}`)
+    logger.info('Archiving Z-reports', { requestId, date: yesterdayStr })
 
-    // Get all tenants that have orders from yesterday
+    // Get all completed orders from yesterday with tenant info in ONE query
     const startOfDay = `${yesterdayStr}T00:00:00`
     const endOfDay = `${yesterdayStr}T23:59:59`
 
-    const { data: ordersWithTenants } = await supabase
+    const { data: allOrders, error: ordersError } = await supabase
       .from('orders')
-      .select('tenant_slug')
+      .select('id, tenant_slug, total, payment_method')
       .gte('created_at', startOfDay)
       .lte('created_at', endOfDay)
       .eq('status', 'completed')
 
-    if (!ordersWithTenants || ordersWithTenants.length === 0) {
-      console.log('No completed orders found for yesterday')
+    if (ordersError) {
+      logger.error('Failed to fetch orders', { requestId, error: ordersError.message })
+      return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
+    }
+
+    if (!allOrders || allOrders.length === 0) {
+      logger.info('No completed orders found for yesterday', { requestId, date: yesterdayStr })
       return NextResponse.json({ 
         success: true, 
         message: 'No orders to archive',
@@ -53,32 +63,53 @@ export async function GET(request: NextRequest) {
     }
 
     // Get unique tenant slugs
-    const tenantSlugs = Array.from(new Set(ordersWithTenants.map(o => o.tenant_slug)))
-    console.log(`Found ${tenantSlugs.length} tenants with orders`)
+    const tenantSlugs = Array.from(new Set(allOrders.map(o => o.tenant_slug)))
+    logger.info('Found tenants with orders', { requestId, tenantCount: tenantSlugs.length })
 
+    // Batch fetch all tenant settings in ONE query
+    const { data: allSettings } = await supabase
+      .from('tenant_settings')
+      .select('tenant_slug, btw_percentage, business_name, address, btw_number')
+      .in('tenant_slug', tenantSlugs)
+
+    // Create settings lookup map
+    const settingsMap = new Map(
+      (allSettings || []).map(s => [s.tenant_slug, s])
+    )
+
+    // Batch fetch existing z_reports in ONE query
+    const { data: existingReports } = await supabase
+      .from('z_reports')
+      .select('id, tenant_slug')
+      .eq('report_date', yesterdayStr)
+      .in('tenant_slug', tenantSlugs)
+
+    // Create existing reports lookup map
+    const existingReportsMap = new Map(
+      (existingReports || []).map(r => [r.tenant_slug, r.id])
+    )
+
+    // Group orders by tenant (in memory - much faster than individual queries)
+    const ordersByTenant = new Map<string, typeof allOrders>()
+    for (const order of allOrders) {
+      const existing = ordersByTenant.get(order.tenant_slug) || []
+      existing.push(order)
+      ordersByTenant.set(order.tenant_slug, existing)
+    }
+
+    // Process each tenant and prepare batch operations
+    const reportsToInsert: Array<Record<string, unknown>> = []
+    const reportsToUpdate: Array<{ id: string; data: Record<string, unknown> }> = []
+    
     let archived = 0
     let failed = 0
 
     for (const tenantSlug of tenantSlugs) {
       try {
-        // Get all completed orders for this tenant on this date
-        const { data: orders } = await supabase
-          .from('orders')
-          .select('id, total, payment_method')
-          .eq('tenant_slug', tenantSlug)
-          .gte('created_at', startOfDay)
-          .lte('created_at', endOfDay)
-          .eq('status', 'completed')
-
+        const orders = ordersByTenant.get(tenantSlug)
         if (!orders || orders.length === 0) continue
 
-        // Get tenant settings
-        const { data: settings } = await supabase
-          .from('tenant_settings')
-          .select('btw_percentage, business_name, address, btw_number')
-          .eq('tenant_slug', tenantSlug)
-          .single()
-
+        const settings = settingsMap.get(tenantSlug)
         const btwPercentage = settings?.btw_percentage || 6
 
         // Calculate totals
@@ -124,87 +155,114 @@ export async function GET(request: NextRequest) {
         }
         const reportHash = Math.abs(hash).toString(16).padStart(16, '0')
 
-        // Check if report already exists
-        const { data: existingReport } = await supabase
-          .from('z_reports')
-          .select('id')
-          .eq('tenant_slug', tenantSlug)
-          .eq('report_date', yesterdayStr)
-          .single()
-
-        if (existingReport) {
-          // Update existing
-          await supabase
-            .from('z_reports')
-            .update({
-              order_count: orders.length,
-              subtotal,
-              tax_low: btwPercentage === 6 ? tax : 0,
-              tax_mid: btwPercentage === 12 ? tax : 0,
-              tax_high: btwPercentage === 21 ? tax : 0,
-              total,
-              cash_payments: cashPayments,
-              card_payments: cardPayments,
-              online_payments: onlinePayments,
-              btw_percentage: btwPercentage,
-              business_name: settings?.business_name,
-              business_address: settings?.address,
-              btw_number: settings?.btw_number,
-              order_ids: orderIds,
-              report_hash: reportHash,
-              generated_at: new Date().toISOString(),
-              is_archived: true,
-              archived_at: new Date().toISOString(),
-            })
-            .eq('id', existingReport.id)
-        } else {
-          // Insert new
-          await supabase
-            .from('z_reports')
-            .insert({
-              tenant_slug: tenantSlug,
-              report_date: yesterdayStr,
-              order_count: orders.length,
-              subtotal,
-              tax_low: btwPercentage === 6 ? tax : 0,
-              tax_mid: btwPercentage === 12 ? tax : 0,
-              tax_high: btwPercentage === 21 ? tax : 0,
-              total,
-              cash_payments: cashPayments,
-              card_payments: cardPayments,
-              online_payments: onlinePayments,
-              btw_percentage: btwPercentage,
-              business_name: settings?.business_name,
-              business_address: settings?.address,
-              btw_number: settings?.btw_number,
-              order_ids: orderIds,
-              report_hash: reportHash,
-              generated_at: new Date().toISOString(),
-              is_archived: true,
-              archived_at: new Date().toISOString(),
-            })
+        const reportData = {
+          order_count: orders.length,
+          subtotal,
+          tax_low: btwPercentage === 6 ? tax : 0,
+          tax_mid: btwPercentage === 12 ? tax : 0,
+          tax_high: btwPercentage === 21 ? tax : 0,
+          total,
+          cash_payments: cashPayments,
+          card_payments: cardPayments,
+          online_payments: onlinePayments,
+          btw_percentage: btwPercentage,
+          business_name: settings?.business_name,
+          business_address: settings?.address,
+          btw_number: settings?.btw_number,
+          order_ids: orderIds,
+          report_hash: reportHash,
+          generated_at: new Date().toISOString(),
+          is_archived: true,
+          archived_at: new Date().toISOString(),
         }
 
-        console.log(`✅ Archived Z-report for ${tenantSlug}: ${orders.length} orders, €${total.toFixed(2)}`)
+        const existingId = existingReportsMap.get(tenantSlug)
+        if (existingId) {
+          reportsToUpdate.push({ id: existingId, data: reportData })
+        } else {
+          reportsToInsert.push({
+            tenant_slug: tenantSlug,
+            report_date: yesterdayStr,
+            ...reportData
+          })
+        }
+
+        logger.debug('Prepared Z-report', { 
+          requestId, 
+          tenantSlug, 
+          orderCount: orders.length, 
+          total: total.toFixed(2) 
+        })
         archived++
       } catch (error) {
-        console.error(`❌ Failed to archive Z-report for ${tenantSlug}:`, error)
+        logger.error('Failed to process tenant Z-report', { 
+          requestId, 
+          tenantSlug, 
+          error: error instanceof Error ? error.message : 'Unknown error' 
+        })
         failed++
       }
     }
 
-    console.log(`Cron job completed: ${archived} archived, ${failed} failed`)
+    // Batch insert new reports
+    if (reportsToInsert.length > 0) {
+      const { error: insertError } = await supabase
+        .from('z_reports')
+        .insert(reportsToInsert)
+
+      if (insertError) {
+        logger.error('Failed to batch insert Z-reports', { 
+          requestId, 
+          error: insertError.message,
+          count: reportsToInsert.length 
+        })
+        failed += reportsToInsert.length
+        archived -= reportsToInsert.length
+      } else {
+        logger.info('Batch inserted Z-reports', { requestId, count: reportsToInsert.length })
+      }
+    }
+
+    // Update existing reports (Supabase doesn't support batch update, so we do individual updates)
+    // But at least we've reduced the read queries significantly
+    for (const { id, data } of reportsToUpdate) {
+      const { error: updateError } = await supabase
+        .from('z_reports')
+        .update(data)
+        .eq('id', id)
+
+      if (updateError) {
+        logger.error('Failed to update Z-report', { requestId, id, error: updateError.message })
+        failed++
+        archived--
+      }
+    }
+
+    const duration = Date.now() - startTime
+    logger.info('Cron job completed', { 
+      requestId, 
+      date: yesterdayStr,
+      tenantsProcessed: tenantSlugs.length,
+      archived, 
+      failed,
+      duration 
+    })
 
     return NextResponse.json({
       success: true,
       date: yesterdayStr,
       tenantsProcessed: tenantSlugs.length,
       archived,
-      failed
+      failed,
+      duration
     })
 
   } catch (error) {
-    console.error('Cron job error:', error)
+    logger.error('Cron job error', { 
+      requestId, 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      duration: Date.now() - startTime 
+    })
     return NextResponse.json({ 
       error: 'Cron job failed', 
       details: error instanceof Error ? error.message : 'Unknown error'

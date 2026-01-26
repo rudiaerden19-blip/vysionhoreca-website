@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { loginRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { logger } from '@/lib/logger'
 
 // Legacy SHA-256 hash for backward compatibility
 async function hashPasswordLegacy(password: string): Promise<string> {
   const legacySalt = process.env.PASSWORD_LEGACY_SALT
   if (!legacySalt) {
-    console.error('PASSWORD_LEGACY_SALT not configured - legacy password verification will fail')
+    logger.error('PASSWORD_LEGACY_SALT not configured - legacy password verification will fail')
     throw new Error('Legacy password verification not configured')
   }
   const encoder = new TextEncoder()
@@ -27,12 +28,16 @@ async function verifyPassword(password: string, storedHash: string): Promise<boo
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+  const startTime = Date.now()
+  
   try {
     // Rate limiting: 5 login attempts per minute per IP
     const clientIP = getClientIP(request)
     const rateLimitResult = await checkRateLimit(loginRateLimiter, clientIP)
     
     if (!rateLimitResult.success) {
+      logger.warn('Login rate limited', { requestId, clientIP })
       return NextResponse.json(
         { error: 'Te veel login pogingen. Probeer het over een minuut opnieuw.' },
         { status: 429 }
@@ -50,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      console.error('Login failed: Supabase not configured')
+      logger.error('Login failed: Supabase not configured', { requestId })
       return NextResponse.json(
         { error: 'Database niet geconfigureerd. Neem contact op met support.' },
         { status: 503 }
@@ -67,7 +72,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (profileError) {
-      console.error('Error finding profile:', profileError)
+      logger.error('Error finding profile', { requestId, error: profileError.message })
       return NextResponse.json(
         { error: 'Database fout' },
         { status: 500 }
@@ -122,11 +127,19 @@ export async function POST(request: NextRequest) {
     }
 
     if (!tenantSlug) {
+      logger.warn('No tenant found for account', { requestId, email: emailLower })
       return NextResponse.json(
         { error: 'Geen tenant gevonden voor dit account. Neem contact op met support.' },
         { status: 404 }
       )
     }
+
+    logger.info('Login successful', { 
+      requestId, 
+      tenantSlug, 
+      profileId: profile.id,
+      duration: Date.now() - startTime 
+    })
 
     return NextResponse.json({
       tenant: {
@@ -140,7 +153,11 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Login error:', error)
+    logger.error('Login error', { 
+      requestId, 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      duration: Date.now() - startTime 
+    })
     return NextResponse.json(
       { error: 'Er is een fout opgetreden' },
       { status: 500 }

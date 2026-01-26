@@ -51,13 +51,21 @@ export const apiRateLimiter = redis
     })
   : null
 
+// Log once at startup if rate limiting is not configured
+if (!isConfigured && process.env.NODE_ENV === 'production') {
+  console.warn('[SECURITY WARNING] Rate limiting not configured - UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN required')
+}
+
 // Helper function to check rate limit
 export async function checkRateLimit(
   limiter: Ratelimit | null,
   identifier: string
 ): Promise<{ success: boolean; remaining?: number; reset?: number }> {
-  // If rate limiting is not configured, allow all requests
+  // If rate limiting is not configured, allow requests but log in production
   if (!limiter) {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn(`[SECURITY] Rate limiting bypassed for ${identifier} - Upstash not configured`)
+    }
     return { success: true }
   }
 
