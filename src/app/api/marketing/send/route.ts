@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+  
   try {
     const { 
       tenantSlug, 
@@ -19,6 +23,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
+      )
+    }
+
+    // Verify user has access to this tenant
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      logger.warn('Marketing send unauthorized', { requestId, tenantSlug, error: access.error })
+      return NextResponse.json(
+        { error: access.error || 'Geen toegang tot deze tenant' },
+        { status: 403 }
       )
     }
 
@@ -137,7 +151,11 @@ export async function POST(request: NextRequest) {
 
         results.push({ status: 'fulfilled', value: recipient.email })
       } catch (error) {
-        console.error(`Failed to send to ${recipient.email}:`, error)
+        logger.warn('Failed to send marketing email', { 
+          requestId, 
+          email: recipient.email, 
+          error: error instanceof Error ? error.message : 'Unknown error' 
+        })
         results.push({ status: 'rejected', reason: error })
       }
     }
@@ -160,7 +178,12 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    console.log(`Marketing emails sent: ${successCount} success, ${failedCount} failed`)
+    logger.info('Marketing campaign sent', { 
+      requestId, 
+      tenantSlug, 
+      successCount, 
+      failedCount 
+    })
 
     return NextResponse.json({
       success: true,
@@ -169,7 +192,10 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Marketing email error:', error)
+    logger.error('Marketing email error', { 
+      requestId, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    })
     return NextResponse.json(
       { error: 'Failed to send emails' },
       { status: 500 }

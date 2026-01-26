@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+  
   try {
     const { tenantSlug, invoiceId, amount, description } = await request.json()
 
@@ -10,6 +14,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Tenant slug, invoice ID en bedrag zijn verplicht' },
         { status: 400 }
+      )
+    }
+
+    // Verify user has access to this tenant
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      logger.warn('Invoice checkout unauthorized', { requestId, tenantSlug, error: access.error })
+      return NextResponse.json(
+        { error: access.error || 'Geen toegang tot deze tenant' },
+        { status: 403 }
       )
     }
 
@@ -25,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      console.error('Invoice checkout failed: Supabase not configured')
+      logger.error('Invoice checkout failed: Supabase not configured', { requestId })
       return NextResponse.json(
         { error: 'Database niet geconfigureerd. Neem contact op met support.' },
         { status: 503 }
@@ -96,10 +110,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url })
 
-  } catch (error: any) {
-    console.error('Invoice checkout error:', error)
+  } catch (error: unknown) {
+    logger.error('Invoice checkout error', { 
+      requestId, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    })
     return NextResponse.json(
-      { error: error.message || 'Er ging iets mis' },
+      { error: error instanceof Error ? error.message : 'Er ging iets mis' },
       { status: 500 }
     )
   }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
+import { logger } from '@/lib/logger'
 
 // Plan pricing in cents
 const planPrices: Record<string, number> = {
@@ -14,11 +16,13 @@ const planNames: Record<string, string> = {
 }
 
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID()
+  
   try {
     // Validate Supabase configuration
     const supabase = getServerSupabaseClient()
     if (!supabase) {
-      console.error('Subscription checkout failed: Supabase not configured')
+      logger.error('Subscription checkout failed: Supabase not configured', { requestId })
       return NextResponse.json(
         { error: 'Database niet geconfigureerd. Neem contact op met support.' },
         { status: 503 }
@@ -31,6 +35,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Ontbrekende gegevens' },
         { status: 400 }
+      )
+    }
+
+    // Verify user has access to this tenant
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      logger.warn('Subscription checkout unauthorized', { requestId, tenantSlug, error: access.error })
+      return NextResponse.json(
+        { error: access.error || 'Geen toegang tot deze tenant' },
+        { status: 403 }
       )
     }
 
@@ -51,7 +65,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (tenantError) {
-      console.error('Tenant lookup error:', tenantError, 'for slug:', tenantSlug)
+      logger.error('Tenant lookup error', { requestId, tenantSlug, error: tenantError.message })
       return NextResponse.json(
         { error: `Tenant niet gevonden: ${tenantSlug}` },
         { status: 404 }
@@ -127,10 +141,13 @@ export async function POST(request: NextRequest) {
       sessionId: session.id,
     })
 
-  } catch (error: any) {
-    console.error('Subscription checkout error:', error)
+  } catch (error: unknown) {
+    logger.error('Subscription checkout error', { 
+      requestId, 
+      error: error instanceof Error ? error.message : 'Unknown error' 
+    })
     return NextResponse.json(
-      { error: error?.message || 'Er ging iets mis bij het aanmaken van de betaling' },
+      { error: error instanceof Error ? error.message : 'Er ging iets mis bij het aanmaken van de betaling' },
       { status: 500 }
     )
   }
