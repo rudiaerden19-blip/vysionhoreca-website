@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings } from '@/lib/admin-api'
+import { getAuthHeaders } from '@/lib/auth-headers'
 
 interface Customer {
   id: string
@@ -133,7 +134,7 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
     try {
       const response = await fetch('/api/marketing/send', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           tenantSlug: params.tenant,
           recipients: selectedEmails,

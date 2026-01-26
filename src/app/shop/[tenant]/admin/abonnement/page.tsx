@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { useParams } from 'next/navigation'
 import { useLanguage } from '@/i18n'
+import { getAuthHeaders } from '@/lib/auth-headers'
 
 interface Subscription {
   id: string
@@ -562,7 +563,7 @@ export default function AbonnementPage() {
     try {
       const response = await fetch('/api/create-subscription-checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ tenantSlug, planId }),
       })
 
@@ -587,7 +588,7 @@ export default function AbonnementPage() {
     try {
       const response = await fetch('/api/create-invoice-checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           tenantSlug,
           invoiceId: invoice.id,
