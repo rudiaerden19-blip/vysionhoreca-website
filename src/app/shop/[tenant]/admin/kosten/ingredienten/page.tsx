@@ -97,6 +97,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   useEffect(() => {
     loadData()
     loadDbCategories()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   // Database search functions

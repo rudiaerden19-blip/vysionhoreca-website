@@ -79,6 +79,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   useEffect(() => {
     loadData()
     loadSavedReports()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, selectedDate])
 
   const loadData = async () => {

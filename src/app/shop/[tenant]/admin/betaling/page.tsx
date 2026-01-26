@@ -22,6 +22,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
 
   useEffect(() => {
     loadSettings()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
   async function loadSettings() {

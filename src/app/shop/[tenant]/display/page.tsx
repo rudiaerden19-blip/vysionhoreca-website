@@ -6,6 +6,12 @@ import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus, TenantSettings } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
+import { 
+  isAudioActivatedThisSession, 
+  activateAudio, 
+  playOrderNotificationSound,
+  setupAutoActivation
+} from '@/lib/audio-system'
 
 interface Order {
   id: string
@@ -81,8 +87,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [initialLoadDone, setInitialLoadDone] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [soundEnabled, setSoundEnabled] = useState(true)
-  const [audioReady, setAudioReady] = useState(true)
-  const [audioActivated, setAudioActivated] = useState(false)
+  // Check if already activated this session - skip activation screen if so
+  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
   const [printerIP, setPrinterIP] = useState<string | null>(null)
@@ -90,7 +96,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [printerStatus, setPrinterStatus] = useState<'unknown' | 'online' | 'offline'>('unknown')
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [showReservationsModal, setShowReservationsModal] = useState(false)
-  const audioContextRef = useRef<AudioContext | null>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   
@@ -114,9 +119,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   // GELUID ALTIJD AAN bij laden
   useEffect(() => {
     setSoundEnabled(true)
-    setAudioReady(true)
-    localStorage.setItem(`display_sound_${params.tenant}`, 'true')
-  }, [params.tenant])
+    
+    // If already activated this session, set up auto-activation on first interaction
+    if (audioActivated) {
+      const cleanup = setupAutoActivation()
+      return cleanup
+    }
+  }, [params.tenant, audioActivated])
 
   // Load printer IP from localStorage and check status
   useEffect(() => {
@@ -204,26 +213,18 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
-  // Mark audio ready after any user interaction
-  useEffect(() => {
-    const markReady = () => {
-      setAudioReady(true)
-      document.removeEventListener('click', markReady)
-    }
-    document.addEventListener('click', markReady)
-    return () => document.removeEventListener('click', markReady)
-  }, [])
 
   // Continuous alert sound for new orders - plays every 3 seconds
   useEffect(() => {
-    // ALTIJD geluid bij nieuwe bestellingen - geen conditie checks
+    // ALTIJD geluid bij nieuwe bestellingen
+    // KRITIEK: Altijd proberen geluid te spelen
     if (newOrderIds.size > 0) {
       // Play immediately
-      playAlertSound()
+      playOrderNotificationSound()
       
       // Then repeat every 3 seconds
       alertIntervalRef.current = setInterval(() => {
-        playAlertSound()
+        playOrderNotificationSound()
       }, 3000)
     } else {
       if (alertIntervalRef.current) {
@@ -275,7 +276,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               setNewOrderIds(prev => new Set([...prev, order.id]))
             })
             // ALTIJD geluid spelen bij nieuwe bestelling
-            playAlertSound()
+            playOrderNotificationSound()
           }
           
           setOrders(parsed)
@@ -293,7 +294,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         clearInterval(pollingIntervalRef.current)
       }
     }
-  }, [params.tenant, soundEnabled, audioReady, initialLoadDone])
+  }, [params.tenant, initialLoadDone])
 
   async function loadData() {
     try {
@@ -346,78 +347,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     setInitialLoadDone(true)
   }
 
-  // =========================================
-  // NOTIFICATION SOUND
-  // =========================================
-  
-  function playAlertSound() {
-    console.log('🔊 Playing sound...')
-    
-    // Method 1: Web Audio API - create beep directly
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext
-      if (AudioContext) {
-        const ctx = new AudioContext()
-        
-        // Create oscillator
-        const osc = ctx.createOscillator()
-        const gainNode = ctx.createGain()
-        
-        osc.connect(gainNode)
-        gainNode.connect(ctx.destination)
-        
-        // Loud beep
-        osc.frequency.value = 880
-        osc.type = 'square'
-        gainNode.gain.value = 0.8
-        
-        // Start immediately
-        osc.start(0)
-        osc.stop(ctx.currentTime + 0.3)
-        
-        // Second beep
-        setTimeout(() => {
-          try {
-            const osc2 = ctx.createOscillator()
-            const gain2 = ctx.createGain()
-            osc2.connect(gain2)
-            gain2.connect(ctx.destination)
-            osc2.frequency.value = 1100
-            osc2.type = 'square'
-            gain2.gain.value = 0.8
-            osc2.start(0)
-            osc2.stop(ctx.currentTime + 0.3)
-          } catch {
-            // Audio oscillator cleanup - non-critical, safe to ignore
-          }
-        }, 200)
-        
-        console.log('✅ Sound played via Web Audio')
-        return
-      }
-    } catch (e) {
-      console.error('Web Audio failed:', e)
-    }
-    
-    // Method 2: HTML Audio fallback
-    try {
-      const audio = new Audio('https://cdn.freesound.org/previews/352/352661_5121236-lq.mp3')
-      audio.volume = 1.0
-      audio.play()
-      console.log('✅ Sound played via HTML Audio')
-    } catch (e) {
-      console.error('HTML Audio failed:', e)
-    }
-  }
-
   function enableSound() {
-    console.log('🔊 Enabling sound...')
-    setAudioReady(true)
+    activateAudio()
     setSoundEnabled(true)
-    localStorage.setItem(`shop_display_sound_${params.tenant}`, 'true')
-    
-    // Play test sound
-    playAlertSound()
+    playOrderNotificationSound()
   }
 
   // EMAIL FUNCTION - BULLETPROOF with all required business info
@@ -879,7 +812,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     )
   }
 
-  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - gebruiker MOET klikken
+  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - alleen EERSTE KEER per sessie
   if (!audioActivated) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
@@ -889,31 +822,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => {
-            // Activeer AudioContext met user gesture (VEREIST voor iOS/Safari)
-            try {
-              const AudioContext = window.AudioContext || (window as any).webkitAudioContext
-              if (AudioContext) {
-                const ctx = new AudioContext()
-                // Speel stil geluid om context te activeren
-                const osc = ctx.createOscillator()
-                const gain = ctx.createGain()
-                gain.gain.value = 0.01 // Bijna stil
-                osc.connect(gain)
-                gain.connect(ctx.destination)
-                osc.start()
-                osc.stop(ctx.currentTime + 0.1)
-              }
-            } catch (e) {
-              console.log('Audio activation:', e)
-            }
-            
-            // Nu pas audio en display activeren
+            // Activeer shared audio system (VEREIST voor iOS/Safari)
+            activateAudio()
             setAudioActivated(true)
             setSoundEnabled(true)
-            setAudioReady(true)
-            
-            // Test geluid
-            playAlertSound()
+            playOrderNotificationSound()
           }}
           className="bg-orange-500 hover:bg-orange-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
         >

@@ -6,6 +6,12 @@ import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
+import { 
+  isAudioActivatedThisSession, 
+  activateAudio, 
+  playKitchenNotificationSound,
+  setupAutoActivation
+} from '@/lib/audio-system'
 
 interface Order {
   id: string
@@ -41,13 +47,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [initialLoadDone, setInitialLoadDone] = useState(false)
   const [currentTime, setCurrentTime] = useState(new Date())
   const [soundEnabled, setSoundEnabled] = useState(true)
-  const [audioReady, setAudioReady] = useState(true)
-  const [audioActivated, setAudioActivated] = useState(false)
+  // Check if already activated this session - skip activation screen if so
+  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [printerIP, setPrinterIP] = useState<string | null>(null)
   const [showPrinterSettings, setShowPrinterSettings] = useState(false)
   const [printerStatus, setPrinterStatus] = useState<'unknown' | 'online' | 'offline'>('unknown')
-  const audioContextRef = useRef<AudioContext | null>(null)
   const alertIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const printRef = useRef<HTMLDivElement>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
@@ -61,10 +66,13 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   // Load initial data - GELUID ALTIJD AAN
   useEffect(() => {
     loadData()
-    // Geluid ALTIJD aan - geen localStorage check
     setSoundEnabled(true)
-    setAudioReady(true)
-    localStorage.setItem(`keuken_sound_${params.tenant}`, 'true')
+    
+    // If already activated this session, set up auto-activation on first interaction
+    let cleanup: (() => void) | undefined
+    if (audioActivated) {
+      cleanup = setupAutoActivation()
+    }
     
     // Load printer IP
     const savedIP = localStorage.getItem(`printer_ip_${params.tenant}`)
@@ -72,8 +80,12 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
       setPrinterIP(savedIP)
       checkPrinterStatus(savedIP)
     }
+    
+    return () => {
+      if (cleanup) cleanup()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.tenant])
+  }, [params.tenant, audioActivated])
 
   // Check printer status via server proxy
   async function checkPrinterStatus(ip: string) {
@@ -136,26 +148,17 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     }
   }
 
-  // Mark audio ready after any click
-  useEffect(() => {
-    const markReady = () => {
-      setAudioReady(true)
-      document.removeEventListener('click', markReady)
-    }
-    document.addEventListener('click', markReady)
-    return () => document.removeEventListener('click', markReady)
-  }, [])
 
   // Continuous alert for new orders - plays every 5 seconds
+  // KRITIEK: Altijd proberen geluid te spelen
   useEffect(() => {
-    // ALTIJD geluid bij nieuwe bestellingen - geen conditie checks
     if (newOrderIds.size > 0) {
       // Play immediately
-      playAlertSound()
+      playKitchenNotificationSound()
       
       // Repeat every 5 seconds
       alertIntervalRef.current = setInterval(() => {
-        playAlertSound()
+        playKitchenNotificationSound()
       }, 5000)
     } else {
       if (alertIntervalRef.current) {
@@ -205,7 +208,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               setNewOrderIds(prev => new Set([...prev, order.id]))
             })
             // ALTIJD geluid spelen bij nieuwe bestelling
-            playAlertSound()
+            playKitchenNotificationSound()
           }
           
           setOrders(parsed)
@@ -221,7 +224,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return () => {
       clearInterval(pollInterval)
     }
-  }, [params.tenant, soundEnabled, audioReady, initialLoadDone])
+  }, [params.tenant, initialLoadDone])
 
   async function loadData() {
     try {
@@ -270,51 +273,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     setInitialLoadDone(true)
   }
 
-  // =========================================
-  // NOTIFICATION SOUND
-  // =========================================
-  
-  function playAlertSound() {
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext
-      if (AudioContext) {
-        const ctx = new AudioContext()
-        const osc = ctx.createOscillator()
-        const gainNode = ctx.createGain()
-        osc.connect(gainNode)
-        gainNode.connect(ctx.destination)
-        osc.frequency.value = 1000
-        osc.type = 'square'
-        gainNode.gain.value = 0.8
-        osc.start(0)
-        osc.stop(ctx.currentTime + 0.2)
-        
-        setTimeout(() => {
-          try {
-            const osc2 = ctx.createOscillator()
-            const gain2 = ctx.createGain()
-            osc2.connect(gain2)
-            gain2.connect(ctx.destination)
-            osc2.frequency.value = 1200
-            osc2.type = 'square'
-            gain2.gain.value = 0.8
-            osc2.start(0)
-            osc2.stop(ctx.currentTime + 0.2)
-          } catch {
-            // Audio oscillator cleanup - non-critical, safe to ignore
-          }
-        }, 150)
-      }
-    } catch (e) {
-      console.error('Audio error:', e)
-    }
-  }
-
   function enableSound() {
-    setAudioReady(true)
+    activateAudio()
     setSoundEnabled(true)
-    localStorage.setItem(`keuken_sound_${params.tenant}`, 'true')
-    playAlertSound()
+    playKitchenNotificationSound()
   }
 
   async function handleReady(order: Order) {
@@ -455,7 +417,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     )
   }
 
-  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - gebruiker MOET klikken
+  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - alleen EERSTE KEER per sessie
   if (!audioActivated) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
@@ -465,27 +427,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => {
-            // Activeer AudioContext met user gesture (VEREIST voor iOS/Safari)
-            try {
-              const AudioContext = window.AudioContext || (window as any).webkitAudioContext
-              if (AudioContext) {
-                const ctx = new AudioContext()
-                const osc = ctx.createOscillator()
-                const gain = ctx.createGain()
-                gain.gain.value = 0.01
-                osc.connect(gain)
-                gain.connect(ctx.destination)
-                osc.start()
-                osc.stop(ctx.currentTime + 0.1)
-              }
-            } catch (e) {
-              console.log('Audio activation:', e)
-            }
-            
+            // Activeer shared audio system (VEREIST voor iOS/Safari)
+            activateAudio()
             setAudioActivated(true)
             setSoundEnabled(true)
-            setAudioReady(true)
-            playAlertSound()
+            playKitchenNotificationSound()
           }}
           className="bg-blue-500 hover:bg-blue-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
         >

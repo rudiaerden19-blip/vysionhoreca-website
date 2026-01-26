@@ -5,6 +5,13 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getOrders, updateOrderStatus, confirmOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
+import { 
+  isAudioActivatedThisSession, 
+  activateAudio, 
+  playOrderNotificationSound,
+  setupAutoActivation,
+  isAudioReady
+} from '@/lib/audio-system'
 
 // Parse items from JSONB
 interface OrderItemJson {
@@ -75,8 +82,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
-  const [audioReady, setAudioReady] = useState(true)
-  const [audioActivated, setAudioActivated] = useState(false)
+  // Check if already activated this session - skip activation screen if so
+  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [rejectionNotes, setRejectionNotes] = useState('')
@@ -92,8 +99,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     { value: 'other', label: `📝 ${t('ordersPage.rejection.reasons.other')}` },
   ], [t])
   
-  // Audio refs
-  const audioContextRef = useRef<AudioContext | null>(null)
+  // Refs
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
@@ -118,53 +124,22 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     // Sound keeps playing until order is confirmed/rejected
   }
   
-  // Geluid en notificaties altijd aan bij laden
+  // Auto-initialize audio if already activated in this session
   useEffect(() => {
     setSoundEnabled(true)
     setNotificationsEnabled(true)
-    localStorage.setItem(`sound_enabled_${params.tenant}`, 'true')
     
     // Request notification permission on load
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission()
     }
-  }, [params.tenant])
-
-  // Auto-initialize audio on first user interaction (browser security requirement)
-  useEffect(() => {
-    const handleFirstInteraction = () => {
-      // Initialize audio context
-      if (!audioContextRef.current) {
-        try {
-          audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)()
-        } catch (e) {
-          console.error('Audio init error:', e)
-        }
-      }
-      // Resume if suspended
-      if (audioContextRef.current?.state === 'suspended') {
-        audioContextRef.current.resume()
-      }
-      // If sound was previously enabled, mark audio as ready
-      if (localStorage.getItem(`sound_enabled_${params.tenant}`) === 'true') {
-        setAudioReady(true)
-      }
-      // Remove listeners after first interaction
-      document.removeEventListener('click', handleFirstInteraction)
-      document.removeEventListener('touchstart', handleFirstInteraction)
-      document.removeEventListener('keydown', handleFirstInteraction)
+    
+    // If already activated this session, set up auto-activation on first interaction
+    if (audioActivated) {
+      const cleanup = setupAutoActivation()
+      return cleanup
     }
-
-    document.addEventListener('click', handleFirstInteraction)
-    document.addEventListener('touchstart', handleFirstInteraction)
-    document.addEventListener('keydown', handleFirstInteraction)
-
-    return () => {
-      document.removeEventListener('click', handleFirstInteraction)
-      document.removeEventListener('touchstart', handleFirstInteraction)
-      document.removeEventListener('keydown', handleFirstInteraction)
-    }
-  }, [params.tenant])
+  }, [params.tenant, audioActivated])
 
   // Helper: parse items from JSONB or array
   const parseItems = (order: Order): OrderItemJson[] => {
@@ -180,46 +155,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     return order.items as OrderItemJson[]
   }
 
-  // =========================================
-  // NOTIFICATION SOUND
-  // =========================================
-  
-  function playSound() {
-    try {
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext
-      if (AudioContext) {
-        const ctx = new AudioContext()
-        const osc = ctx.createOscillator()
-        const gainNode = ctx.createGain()
-        osc.connect(gainNode)
-        gainNode.connect(ctx.destination)
-        osc.frequency.value = 880
-        osc.type = 'square'
-        gainNode.gain.value = 0.8
-        osc.start(0)
-        osc.stop(ctx.currentTime + 0.3)
-        
-        setTimeout(() => {
-          try {
-            const osc2 = ctx.createOscillator()
-            const gain2 = ctx.createGain()
-            osc2.connect(gain2)
-            gain2.connect(ctx.destination)
-            osc2.frequency.value = 1100
-            osc2.type = 'square'
-            gain2.gain.value = 0.8
-            osc2.start(0)
-            osc2.stop(ctx.currentTime + 0.3)
-          } catch {
-            // Audio oscillator cleanup - non-critical, safe to ignore
-          }
-        }, 200)
-      }
-    } catch (e) {
-      console.error('Audio error:', e)
-    }
-  }
-  
   // Cleanup
   useEffect(() => {
     return () => {
@@ -230,14 +165,14 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   }, [])
 
   // Play repeating sound when there are new orders
+  // KRITIEK: Altijd proberen geluid te spelen - browser blokkeert automatisch als niet geactiveerd
   useEffect(() => {
-    // ALTIJD geluid bij nieuwe bestellingen - geen conditie checks
     if (hasNewOrders) {
       // Play immediately
-      playSound()
+      playOrderNotificationSound()
       
       // Repeat every 3 seconds
-      audioIntervalRef.current = setInterval(playSound, 3000)
+      audioIntervalRef.current = setInterval(playOrderNotificationSound, 3000)
       
     } else {
       // Stop sound
@@ -340,32 +275,21 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant]) // Only restart polling when tenant changes
 
-  // Enable sound
+  // Enable sound - uses shared audio system
   const enableSound = () => {
     setSoundEnabled(true)
-    setAudioReady(true)
-    localStorage.setItem(`sound_enabled_${params.tenant}`, 'true')
-    playSound()
+    activateAudio()
+    playOrderNotificationSound()
   }
   
   // Disable sound
   const disableSound = () => {
     setSoundEnabled(false)
-    setAudioReady(false)
-    localStorage.setItem(`sound_enabled_${params.tenant}`, 'false')
     if (audioIntervalRef.current) {
       clearInterval(audioIntervalRef.current)
       audioIntervalRef.current = null
     }
   }
-  
-  // Auto-init audio if previously enabled (needs user gesture first time only)
-  useEffect(() => {
-    if (soundEnabled && !audioReady) {
-      // User needs to click once to activate audio after page refresh
-      // This is a browser security requirement
-    }
-  }, [soundEnabled, audioReady])
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     setUpdatingId(orderId)
@@ -733,7 +657,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     )
   }
 
-  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - gebruiker MOET klikken
+  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - alleen EERSTE KEER per sessie
   if (!audioActivated) {
     return (
       <div className="flex items-center justify-center min-h-[400px] p-4">
@@ -743,27 +667,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => {
-            // Activeer AudioContext met user gesture (VEREIST voor iOS/Safari)
-            try {
-              const AudioContext = window.AudioContext || (window as any).webkitAudioContext
-              if (AudioContext) {
-                const ctx = new AudioContext()
-                const osc = ctx.createOscillator()
-                const gain = ctx.createGain()
-                gain.gain.value = 0.01
-                osc.connect(gain)
-                gain.connect(ctx.destination)
-                osc.start()
-                osc.stop(ctx.currentTime + 0.1)
-              }
-            } catch (e) {
-              console.log('Audio activation:', e)
-            }
-            
+            // Activeer shared audio system (VEREIST voor iOS/Safari)
+            activateAudio()
             setAudioActivated(true)
             setSoundEnabled(true)
-            setAudioReady(true)
-            playSound()
+            playOrderNotificationSound()
           }}
           className="bg-blue-500 hover:bg-blue-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
         >
@@ -807,9 +715,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           <div className="flex items-center gap-4">
             <button
               onClick={() => soundEnabled ? disableSound() : enableSound()}
-              className={`p-4 rounded-xl text-2xl ${soundEnabled && audioReady ? 'bg-green-500' : 'bg-gray-600'}`}
+              className={`p-4 rounded-xl text-2xl ${soundEnabled && isAudioReady() ? 'bg-green-500' : 'bg-gray-600'}`}
             >
-              {soundEnabled && audioReady ? '🔔' : '🔕'}
+              {soundEnabled && isAudioReady() ? '🔔' : '🔕'}
             </button>
             <button
               onClick={() => setKitchenMode(false)}
@@ -969,27 +877,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // Normal Mode
   return (
     <div className="max-w-5xl mx-auto">
-      {/* Sound activation prompt for iOS */}
-      {/* Show banner if sound not enabled OR if enabled but audio not ready (after refresh) */}
-      {(!soundEnabled || (soundEnabled && !audioReady)) && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-center justify-between"
-        >
-          <p className="text-yellow-800">
-            {soundEnabled && !audioReady 
-              ? `🔔 ${t('ordersPage.soundEnabled')}` 
-              : `🔔 ${t('ordersPage.soundPrompt')}`}
-          </p>
-          <button
-            onClick={enableSound}
-            className="px-4 py-2 bg-yellow-500 text-white rounded-lg font-medium"
-          >
-            {soundEnabled && !audioReady ? t('ordersPage.reactivate') : t('ordersPage.activate')}
-          </button>
-        </motion.div>
-      )}
+      {/* Sound status indicator - shows green when active */}
 
       <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
         <div>

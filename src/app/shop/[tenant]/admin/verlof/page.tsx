@@ -61,6 +61,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
 
   useEffect(() => {
     loadData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, selectedYear])
 
   async function loadData() {
