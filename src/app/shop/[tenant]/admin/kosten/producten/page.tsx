@@ -658,34 +658,51 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           <div>
             <h3 className="font-semibold text-blue-900 flex items-center gap-2">
               💰 {t('dashboard.productCosts.standardPricesTitle')}
+              {selectedProduct && (
+                <span className="ml-2 px-3 py-1 bg-green-500 text-white text-sm rounded-full">
+                  ➜ {products.find(p => p.id === selectedProduct)?.name}
+                </span>
+              )}
             </h3>
             <p className="text-sm text-blue-600 mt-1">
               {selectedProduct 
-                ? `👆 ${t('dashboard.productCosts.doubleClickToAdd')}`
-                : `👆 ${t('dashboard.productCosts.openProductFirst')}`}
+                ? `✅ Klik op + om toe te voegen aan "${products.find(p => p.id === selectedProduct)?.name}"`
+                : `⚠️ ${t('dashboard.productCosts.openProductFirst')}`}
             </p>
           </div>
-          <button
-            onClick={saveStandardPrices}
-            disabled={savingStandardPrices}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
-              standardPricesSaved 
-                ? 'bg-green-500 text-white' 
-                : 'bg-blue-500 text-white hover:bg-blue-600'
-            } disabled:opacity-50`}
-          >
-            {savingStandardPrices ? (
-              <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Opslaan...</>
-            ) : standardPricesSaved ? (
-              <>✓ Opgeslagen!</>
-            ) : (
-              <>💾 Opslaan</>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={saveStandardPrices}
+              disabled={savingStandardPrices}
+              className={`px-4 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
+                standardPricesSaved 
+                  ? 'bg-green-500 text-white' 
+                  : 'bg-blue-500 text-white hover:bg-blue-600'
+              } disabled:opacity-50`}
+            >
+              {savingStandardPrices ? (
+                <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Opslaan...</>
+              ) : standardPricesSaved ? (
+                <>✓ Opgeslagen!</>
+              ) : (
+                <>💾 Opslaan</>
+              )}
+            </button>
+            {/* Sluit knop - alleen tonen als panel fixed is */}
+            {selectedProduct && (
+              <button
+                onClick={() => setSelectedProduct(null)}
+                className="w-10 h-10 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center justify-center text-xl font-bold transition-all hover:scale-105"
+                title="Sluiten"
+              >
+                ✕
+              </button>
             )}
-          </button>
+          </div>
         </div>
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 max-w-7xl mx-auto">
-          {/* Dubbelklik items */}
+          {/* Klikbare items met aparte + knop */}
           {[
             { key: 'saus', label: 'Saus', price: standardPrices.saus },
             { key: 'sla', label: 'Sla', price: standardPrices.sla },
@@ -697,35 +714,44 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           ].map((item) => (
             <div
               key={item.key}
-              onDoubleClick={() => {
-                if (selectedProduct) {
-                  addStandardPriceToProduct(item.label, parseFloat(item.price.replace(',', '.')) || 0, selectedProduct)
-                }
-              }}
               className={`bg-white rounded-lg p-2 shadow-sm transition-all border-2 ${
-                selectedProduct 
-                  ? 'cursor-pointer hover:shadow-md hover:scale-105 hover:border-green-400 hover:bg-green-50' 
-                  : 'cursor-not-allowed opacity-60'
-              } ${addingStandardItem === item.label ? 'border-green-500 bg-green-100' : 'border-transparent'}`}
-              title={selectedProduct ? 'Dubbelklik om toe te voegen' : 'Open eerst een product'}
+                addingStandardItem === item.label ? 'border-green-500 bg-green-100' : 'border-transparent'
+              }`}
             >
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-xs text-gray-600 font-medium">{item.label}</label>
-                {selectedProduct && <span className="text-xs text-green-500">👆</span>}
               </div>
-              <div className="flex items-center">
-                <span className="text-gray-400 text-sm mr-1">€</span>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-400 text-sm">€</span>
                 <input
                   type="text"
                   inputMode="decimal"
                   value={item.price}
-                  onClick={(e) => e.stopPropagation()}
                   onChange={(e) => {
                     const val = e.target.value.replace(',', '.')
                     setStandardPrices(prev => ({ ...prev, [item.key]: val }))
                   }}
-                  className="w-full px-2 py-1 border rounded text-sm text-center font-mono"
+                  className="flex-1 min-w-0 px-2 py-1 border rounded text-sm text-center font-mono"
                 />
+                {/* Duidelijke + knop om toe te voegen */}
+                <button
+                  onClick={() => {
+                    if (selectedProduct) {
+                      addStandardPriceToProduct(item.label, parseFloat(item.price.replace(',', '.')) || 0, selectedProduct)
+                    }
+                  }}
+                  disabled={!selectedProduct || addingStandardItem === item.label}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold transition-all flex-shrink-0 ${
+                    selectedProduct 
+                      ? addingStandardItem === item.label
+                        ? 'bg-green-500 text-white'
+                        : 'bg-green-500 text-white hover:bg-green-600 hover:scale-110 active:scale-95'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                  title={selectedProduct ? `${item.label} toevoegen` : 'Open eerst een product'}
+                >
+                  {addingStandardItem === item.label ? '✓' : '+'}
+                </button>
               </div>
             </div>
           ))}
