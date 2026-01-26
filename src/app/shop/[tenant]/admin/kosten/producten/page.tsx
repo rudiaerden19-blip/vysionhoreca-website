@@ -701,7 +701,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           </div>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-7 gap-2 sm:gap-3 max-w-7xl mx-auto">
           {/* Klikbare items met aparte + knop */}
           {[
             { key: 'saus', label: 'Saus', price: standardPrices.saus },
@@ -714,15 +714,15 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           ].map((item) => (
             <div
               key={item.key}
-              className={`bg-white rounded-lg p-2 shadow-sm transition-all border-2 ${
+              className={`bg-white rounded-lg p-2 sm:p-3 shadow-sm transition-all border-2 ${
                 addingStandardItem === item.label ? 'border-green-500 bg-green-100' : 'border-transparent'
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs text-gray-600 font-medium">{item.label}</label>
+                <label className="block text-xs sm:text-sm text-gray-600 font-medium truncate">{item.label}</label>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-gray-400 text-sm">€</span>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 text-sm flex-shrink-0">€</span>
                 <input
                   type="text"
                   inputMode="decimal"
@@ -731,7 +731,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                     const val = e.target.value.replace(',', '.')
                     setStandardPrices(prev => ({ ...prev, [item.key]: val }))
                   }}
-                  className="flex-1 min-w-0 px-2 py-1 border rounded text-sm text-center font-mono"
+                  className="w-16 sm:w-20 px-1 sm:px-2 py-1.5 border rounded text-sm text-center font-mono"
                 />
                 {/* Duidelijke + knop om toe te voegen */}
                 <button
@@ -741,7 +741,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                     }
                   }}
                   disabled={!selectedProduct || addingStandardItem === item.label}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-lg font-bold transition-all flex-shrink-0 ${
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg font-bold transition-all flex-shrink-0 ${
                     selectedProduct 
                       ? addingStandardItem === item.label
                         ? 'bg-green-500 text-white'
