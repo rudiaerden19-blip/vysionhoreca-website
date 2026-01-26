@@ -650,9 +650,9 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         />
       </div>
 
-      {/* Vaste Standaardprijzen Kader - Fixed onderaan wanneer product open is */}
+      {/* Vaste Standaardprijzen Kader - Fixed onderaan wanneer product OF simulator open is */}
       <div className={`bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200 shadow-sm transition-all ${
-        selectedProduct ? 'fixed bottom-0 left-0 right-0 z-50 shadow-2xl rounded-none border-t-4 border-blue-400' : ''
+        (selectedProduct || showSimulator) ? 'fixed bottom-0 left-0 right-0 z-50 shadow-2xl rounded-none border-t-4 border-blue-400' : ''
       }`}>
         <div className="flex items-center justify-between mb-3 max-w-7xl mx-auto">
           <div>
@@ -663,11 +663,18 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   ➜ {products.find(p => p.id === selectedProduct)?.name}
                 </span>
               )}
+              {showSimulator && !selectedProduct && (
+                <span className="ml-2 px-3 py-1 bg-purple-500 text-white text-sm rounded-full">
+                  ➜ Simulator
+                </span>
+              )}
             </h3>
             <p className="text-sm text-blue-600 mt-1">
               {selectedProduct 
                 ? `✅ Klik op + om toe te voegen aan "${products.find(p => p.id === selectedProduct)?.name}"`
-                : `⚠️ ${t('dashboard.productCosts.openProductFirst')}`}
+                : showSimulator
+                  ? `✅ Klik op + om toe te voegen aan de Simulator`
+                  : `⚠️ ${t('dashboard.productCosts.openProductFirst')}`}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -689,9 +696,12 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               )}
             </button>
             {/* Sluit knop - alleen tonen als panel fixed is */}
-            {selectedProduct && (
+            {(selectedProduct || showSimulator) && (
               <button
-                onClick={() => setSelectedProduct(null)}
+                onClick={() => {
+                  setSelectedProduct(null)
+                  setShowSimulator(false)
+                }}
                 className="w-10 h-10 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center justify-center text-xl font-bold transition-all hover:scale-105"
                 title="Sluiten"
               >
@@ -736,19 +746,32 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                 {/* Duidelijke + knop om toe te voegen */}
                 <button
                   onClick={() => {
+                    const price = parseFloat(item.price.replace(',', '.')) || 0
                     if (selectedProduct) {
-                      addStandardPriceToProduct(item.label, parseFloat(item.price.replace(',', '.')) || 0, selectedProduct)
+                      addStandardPriceToProduct(item.label, price, selectedProduct)
+                    } else if (showSimulator) {
+                      // Voeg toe aan simulator
+                      const existing = simulatorItems.find(i => i.name === item.label)
+                      if (existing) {
+                        setSimulatorItems(prev => prev.map(i => 
+                          i.name === item.label ? { ...i, quantity: i.quantity + 1 } : i
+                        ))
+                      } else {
+                        setSimulatorItems(prev => [...prev, { name: item.label, price: price, quantity: 1 }])
+                      }
                     }
                   }}
-                  disabled={!selectedProduct || addingStandardItem === item.label}
+                  disabled={(!selectedProduct && !showSimulator) || addingStandardItem === item.label}
                   className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg font-bold transition-all flex-shrink-0 ${
-                    selectedProduct 
+                    (selectedProduct || showSimulator)
                       ? addingStandardItem === item.label
                         ? 'bg-green-500 text-white'
-                        : 'bg-green-500 text-white hover:bg-green-600 hover:scale-110 active:scale-95'
+                        : selectedProduct 
+                          ? 'bg-green-500 text-white hover:bg-green-600 hover:scale-110 active:scale-95'
+                          : 'bg-purple-500 text-white hover:bg-purple-600 hover:scale-110 active:scale-95'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
-                  title={selectedProduct ? `${item.label} toevoegen` : 'Open eerst een product'}
+                  title={selectedProduct ? `${item.label} toevoegen aan product` : showSimulator ? `${item.label} toevoegen aan simulator` : 'Open eerst een product of simulator'}
                 >
                   {addingStandardItem === item.label ? '✓' : '+'}
                 </button>
@@ -762,42 +785,24 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         </p>
       </div>
       
-      {/* Spacer voor fixed panels */}
-      {selectedProduct && !showSimulator && <div className="h-48"></div>}
-      {showSimulator && <div className="h-96"></div>}
+      {/* Spacer voor fixed standaardprijzen panel */}
+      {(selectedProduct || showSimulator) && <div className="h-48"></div>}
 
-      {/* Simulatie Calculator - Fixed onderaan wanneer open */}
-      <div className={`bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 shadow-sm transition-all ${
-        showSimulator 
-          ? 'fixed bottom-0 left-0 right-0 z-50 shadow-2xl rounded-none border-t-4 border-purple-400 max-h-[70vh] overflow-hidden flex flex-col' 
-          : 'rounded-xl overflow-hidden'
-      }`}>
-        <div className="flex items-center justify-between p-3 sm:p-4 bg-purple-100/50 flex-shrink-0">
-          <button
-            onClick={() => setShowSimulator(!showSimulator)}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-          >
+      {/* Simulatie Calculator - Normaal in de pagina */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 shadow-sm overflow-hidden">
+        <button
+          onClick={() => setShowSimulator(!showSimulator)}
+          className="w-full p-4 flex items-center justify-between hover:bg-purple-100/50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
             <span className="text-2xl">🧮</span>
             <div className="text-left">
               <h3 className="font-semibold text-purple-900">{t('simulator.title')}</h3>
               <p className="text-sm text-purple-600">{t('simulator.subtitle')}</p>
             </div>
-          </button>
-          <div className="flex items-center gap-2">
-            {showSimulator && (
-              <button
-                onClick={() => setShowSimulator(false)}
-                className="w-10 h-10 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center justify-center text-xl font-bold transition-all hover:scale-105"
-                title="Sluiten"
-              >
-                ✕
-              </button>
-            )}
-            {!showSimulator && (
-              <span className="text-purple-500 text-xl">▼</span>
-            )}
           </div>
-        </div>
+          <span className="text-purple-500 text-xl">{showSimulator ? '▲' : '▼'}</span>
+        </button>
 
         <AnimatePresence>
           {showSimulator && (
@@ -805,7 +810,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="border-t border-purple-200 overflow-y-auto flex-1"
+              className="border-t border-purple-200"
             >
               <div
                 onDragOver={(e) => {
@@ -813,7 +818,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                   e.dataTransfer.dropEffect = 'copy'
                 }}
                 onDrop={handleDropOnSimulator}
-                className={`p-4 max-w-7xl mx-auto ${draggedItem ? 'bg-purple-100 border-2 border-dashed border-purple-400' : ''}`}
+                className={`p-4 ${draggedItem ? 'bg-purple-100 border-2 border-dashed border-purple-400' : ''}`}
               >
                 {/* Simulator Header */}
                 <div className="flex items-center gap-4 mb-4">
