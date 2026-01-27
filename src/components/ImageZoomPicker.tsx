@@ -28,8 +28,8 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
     url: value?.url || '',
     zoom: value?.zoom || 1,
     positionX: value?.positionX ?? 50,
-    // Default 60% = toon meer van onderkant (tafels/stoelen) ipv bovenkant (plafond)
-    positionY: value?.positionY ?? 60,
+    // Default 50% = midden, klant kan zelf aanpassen
+    positionY: value?.positionY ?? 50,
   }
 
   const handleZoomChange = (newZoom: number) => {
@@ -103,10 +103,10 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
       {/* Zoom and Position Controls - only show if image is selected */}
       {settings.url && (
         <div className="space-y-3 p-3 bg-gray-50 rounded-xl border">
-          {/* Preview with drag-to-position */}
+          {/* Preview - toont exact hoe de hero slider eruit ziet */}
           <div className="relative">
             <p className="text-xs text-gray-500 mb-2">
-              📍 {settings.zoom !== 1 ? 'Sleep om te positioneren' : 'Zoom om te positioneren'}
+              👁️ Live preview (zoals het op je website wordt getoond)
             </p>
             <div
               ref={containerRef}
@@ -114,41 +114,35 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              onTouchStart={() => settings.zoom !== 1 && setIsDragging(true)}
+              onTouchStart={() => setIsDragging(true)}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleMouseUp}
-              className={`relative w-full h-32 rounded-lg overflow-hidden bg-gray-200 ${
-                settings.zoom !== 1 ? 'cursor-move' : 'cursor-default'
-              }`}
+              className="relative w-full h-32 rounded-lg overflow-hidden bg-gray-200 cursor-move"
               style={{ touchAction: 'none' }}
             >
-              <div
-                className="absolute inset-0"
+              {/* Deze preview toont exact hoe de foto op de website verschijnt */}
+              <Image
+                src={settings.url}
+                alt="Preview"
+                fill
+                className="object-cover"
                 style={{
-                  transform: `scale(${settings.zoom})`,
+                  objectPosition: `${settings.positionX}% ${settings.positionY}%`,
+                  transform: settings.zoom !== 1 ? `scale(${settings.zoom})` : undefined,
                   transformOrigin: `${settings.positionX}% ${settings.positionY}%`,
                 }}
-              >
-                <Image
-                  src={settings.url}
-                  alt="Preview"
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
+                unoptimized
+              />
               
               {/* Position indicator */}
-              {settings.zoom !== 1 && (
-                <div
-                  className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-lg pointer-events-none"
-                  style={{
-                    left: `${settings.positionX}%`,
-                    top: `${settings.positionY}%`,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                />
-              )}
+              <div
+                className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-lg pointer-events-none"
+                style={{
+                  left: `${settings.positionX}%`,
+                  top: `${settings.positionY}%`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
             </div>
           </div>
           
@@ -236,10 +230,10 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
           
           {/* Reset button */}
           <button
-            onClick={() => onChange({ ...settings, zoom: 1, positionX: 50, positionY: 60 })}
+            onClick={() => onChange({ ...settings, zoom: 1, positionX: 50, positionY: 50 })}
             className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            ↺ Reset naar standaard
+            ↺ Reset naar midden
           </button>
         </div>
       )}
@@ -249,19 +243,19 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
 
 // Helper function to parse stored JSON settings
 export function parseImageZoomSettings(json: string | null | undefined): ImageZoomSettings {
-  // Default positionY 60% = toon meer van onderkant (tafels/stoelen) ipv bovenkant (plafond)
-  if (!json) return { url: '', zoom: 1, positionX: 50, positionY: 60 }
+  // Default positionY 50% = midden, klant past zelf aan
+  if (!json) return { url: '', zoom: 1, positionX: 50, positionY: 50 }
   try {
     const parsed = JSON.parse(json)
     return {
       url: parsed.url || '',
       zoom: parsed.zoom || 1,
       positionX: parsed.positionX ?? 50,
-      positionY: parsed.positionY ?? 60,
+      positionY: parsed.positionY ?? 50,
     }
   } catch {
     // If it's just a URL string (old format), convert it
-    return { url: json, zoom: 1, positionX: 50, positionY: 60 }
+    return { url: json, zoom: 1, positionX: 50, positionY: 50 }
   }
 }
 

@@ -841,8 +841,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               const imgSettings = business.cover_images[currentImageIndex]
               const zoom = imgSettings?.zoom || 1
               const posX = imgSettings?.positionX ?? 50
-              // Default: 60% = toon meer van de onderkant waar tafels/stoelen zijn
-              const posY = imgSettings?.positionY ?? 60
+              // Default: 50% = midden, klant past aan via admin
+              const posY = imgSettings?.positionY ?? 50
               
               return (
                 <div className="absolute inset-0 overflow-hidden">
@@ -856,7 +856,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     className="object-cover"
                     style={{ 
                       // Object-position bepaalt welk deel van de foto zichtbaar is
-                      // posY 60% = focus op het onderste deel (tafels/stoelen)
                       objectPosition: `${posX}% ${posY}%`,
                       // Zoom alleen toepassen als het niet 100% is
                       transform: zoom !== 1 ? `scale(${zoom})` : undefined,
