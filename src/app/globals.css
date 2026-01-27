@@ -39,21 +39,19 @@ body {
   position: relative;
 }
 
-/* Fallback for browsers that don't support overflow: clip */
-@supports not (overflow: clip) {
+/* 
+  BELANGRIJK: We gebruiken overflow-x: clip NIET hidden!
+  overflow: hidden breekt position: sticky
+  overflow: clip breekt sticky NIET
+*/
+@supports not (overflow-x: clip) {
+  /* Alleen als clip niet ondersteund wordt, gebruik hidden als fallback */
   html, body {
     overflow-x: hidden;
   }
 }
 
-/* Force viewport constraint on everything */
-html {
-  overflow-x: hidden;
-}
-
 body {
-  overflow-x: hidden;
-  position: relative;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
