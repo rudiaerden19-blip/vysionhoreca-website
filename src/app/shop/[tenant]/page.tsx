@@ -842,13 +842,19 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               const zoom = imgSettings?.zoom || 1
               const posX = imgSettings?.positionX ?? 50
               const posY = imgSettings?.positionY ?? 50
+              
+              // Bij uitzoomen (< 100%) gebruiken we object-fit: contain om hele foto te tonen
+              // Bij inzoomen (> 100%) gebruiken we scale transform
+              const isZoomedOut = zoom < 1
+              const isZoomedIn = zoom > 1
+              
               return (
                 <div 
                   className="absolute inset-0 overflow-hidden"
-                  style={{
-                    transform: zoom > 1 ? `scale(${zoom})` : undefined,
+                  style={isZoomedIn ? {
+                    transform: `scale(${zoom})`,
                     transformOrigin: `${posX}% ${posY}%`,
-                  }}
+                  } : undefined}
                 >
                   <Image
                     src={imgSettings?.url || ''}
@@ -857,9 +863,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     priority={currentImageIndex === 0}
                     sizes="100vw"
                     quality={85}
-                    className="object-cover"
+                    className={isZoomedOut ? 'object-contain' : 'object-cover'}
                     style={{ 
-                      objectPosition: zoom > 1 ? `${posX}% ${posY}%` : 'center 30%'
+                      objectPosition: zoom !== 1 ? `${posX}% ${posY}%` : 'center 30%',
+                      // Bij uitzoomen: schaal de afbeelding kleiner
+                      transform: isZoomedOut ? `scale(${zoom})` : undefined,
+                      transformOrigin: isZoomedOut ? `${posX}% ${posY}%` : undefined,
                     }}
                   />
                 </div>

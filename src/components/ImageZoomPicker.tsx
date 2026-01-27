@@ -44,7 +44,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (settings.zoom <= 1) return // No dragging needed at 100%
+    if (settings.zoom === 1) return // No dragging needed at 100%
     setIsDragging(true)
   }
 
@@ -105,7 +105,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
           {/* Preview with drag-to-position */}
           <div className="relative">
             <p className="text-xs text-gray-500 mb-2">
-              📍 {settings.zoom > 1 ? 'Sleep om te positioneren' : 'Zoom in om te positioneren'}
+              📍 {settings.zoom !== 1 ? 'Sleep om te positioneren' : 'Zoom om te positioneren'}
             </p>
             <div
               ref={containerRef}
@@ -113,11 +113,11 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
-              onTouchStart={() => settings.zoom > 1 && setIsDragging(true)}
+              onTouchStart={() => settings.zoom !== 1 && setIsDragging(true)}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleMouseUp}
               className={`relative w-full h-32 rounded-lg overflow-hidden bg-gray-200 ${
-                settings.zoom > 1 ? 'cursor-move' : 'cursor-default'
+                settings.zoom !== 1 ? 'cursor-move' : 'cursor-default'
               }`}
               style={{ touchAction: 'none' }}
             >
@@ -138,7 +138,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               </div>
               
               {/* Position indicator */}
-              {settings.zoom > 1 && (
+              {settings.zoom !== 1 && (
                 <div
                   className="absolute w-4 h-4 bg-white border-2 border-blue-500 rounded-full shadow-lg pointer-events-none"
                   style={{
@@ -151,39 +151,48 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
             </div>
           </div>
           
-          {/* Zoom Slider */}
+          {/* Zoom Slider - van 50% (uitgezoomd) tot 150% (ingezoomd) */}
           <div>
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-gray-600 font-medium">🔍 Zoom</span>
-              <span className="text-xs text-gray-500 font-mono">{Math.round(settings.zoom * 100)}%</span>
+              <span className="text-xs text-gray-500 font-mono">
+                {Math.round(settings.zoom * 100)}% 
+                {settings.zoom < 1 ? ' (uitgezoomd)' : settings.zoom > 1 ? ' (ingezoomd)' : ' (normaal)'}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => handleZoomChange(Math.max(1, settings.zoom - 0.1))}
-                className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg hover:bg-gray-300 text-lg"
+                onClick={() => handleZoomChange(Math.max(0.5, settings.zoom - 0.1))}
+                className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg hover:bg-gray-300 text-lg font-bold"
+                title="Uitzoomen (meer zien)"
               >
                 −
               </button>
               <input
                 type="range"
-                min="100"
-                max="200"
+                min="50"
+                max="150"
                 step="5"
                 value={settings.zoom * 100}
                 onChange={(e) => handleZoomChange(parseInt(e.target.value) / 100)}
                 className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
               />
               <button
-                onClick={() => handleZoomChange(Math.min(2, settings.zoom + 0.1))}
-                className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg hover:bg-gray-300 text-lg"
+                onClick={() => handleZoomChange(Math.min(1.5, settings.zoom + 0.1))}
+                className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg hover:bg-gray-300 text-lg font-bold"
+                title="Inzoomen (minder zien)"
               >
                 +
               </button>
             </div>
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>← Meer zien</span>
+              <span>Minder zien →</span>
+            </div>
           </div>
           
-          {/* Quick position buttons */}
-          {settings.zoom > 1 && (
+          {/* Quick position buttons - tonen bij elke zoom anders dan 100% */}
+          {settings.zoom !== 1 && (
             <div>
               <span className="text-xs text-gray-600 font-medium block mb-2">📍 Snelle positie</span>
               <div className="grid grid-cols-3 gap-1">
