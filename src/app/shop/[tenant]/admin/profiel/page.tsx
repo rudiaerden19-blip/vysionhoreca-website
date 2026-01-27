@@ -579,34 +579,34 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           
           <div className="grid md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Product 1</label>
-              <MediaPicker
+              <ImageZoomPicker
                 tenantSlug={params.tenant}
-                value={formData.top_seller_1 || ''}
-                onChange={(url) => {
-                  setFormData(prev => ({ ...prev, top_seller_1: url }))
+                label="Product 1"
+                value={parseImageZoomSettings(formData.top_seller_1)}
+                onChange={(settings) => {
+                  setFormData(prev => ({ ...prev, top_seller_1: stringifyImageZoomSettings(settings) }))
                   setSaved(false)
                 }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Product 2</label>
-              <MediaPicker
+              <ImageZoomPicker
                 tenantSlug={params.tenant}
-                value={formData.top_seller_2 || ''}
-                onChange={(url) => {
-                  setFormData(prev => ({ ...prev, top_seller_2: url }))
+                label="Product 2"
+                value={parseImageZoomSettings(formData.top_seller_2)}
+                onChange={(settings) => {
+                  setFormData(prev => ({ ...prev, top_seller_2: stringifyImageZoomSettings(settings) }))
                   setSaved(false)
                 }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Product 3</label>
-              <MediaPicker
+              <ImageZoomPicker
                 tenantSlug={params.tenant}
-                value={formData.top_seller_3 || ''}
-                onChange={(url) => {
-                  setFormData(prev => ({ ...prev, top_seller_3: url }))
+                label="Product 3"
+                value={parseImageZoomSettings(formData.top_seller_3)}
+                onChange={(settings) => {
+                  setFormData(prev => ({ ...prev, top_seller_3: stringifyImageZoomSettings(settings) }))
                   setSaved(false)
                 }}
               />
@@ -644,11 +644,11 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Foto</label>
-                  <MediaPicker
+                  <ImageZoomPicker
                     tenantSlug={params.tenant}
-                    value={formData.specialty_1_image || ''}
-                    onChange={(url) => {
-                      setFormData(prev => ({ ...prev, specialty_1_image: url }))
+                    value={parseImageZoomSettings(formData.specialty_1_image)}
+                    onChange={(settings) => {
+                      setFormData(prev => ({ ...prev, specialty_1_image: stringifyImageZoomSettings(settings) }))
                       setSaved(false)
                     }}
                   />
@@ -673,11 +673,11 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Foto</label>
-                  <MediaPicker
+                  <ImageZoomPicker
                     tenantSlug={params.tenant}
-                    value={formData.specialty_2_image || ''}
-                    onChange={(url) => {
-                      setFormData(prev => ({ ...prev, specialty_2_image: url }))
+                    value={parseImageZoomSettings(formData.specialty_2_image)}
+                    onChange={(settings) => {
+                      setFormData(prev => ({ ...prev, specialty_2_image: stringifyImageZoomSettings(settings) }))
                       setSaved(false)
                     }}
                   />
@@ -702,11 +702,11 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1">Foto</label>
-                  <MediaPicker
+                  <ImageZoomPicker
                     tenantSlug={params.tenant}
-                    value={formData.specialty_3_image || ''}
-                    onChange={(url) => {
-                      setFormData(prev => ({ ...prev, specialty_3_image: url }))
+                    value={parseImageZoomSettings(formData.specialty_3_image)}
+                    onChange={(settings) => {
+                      setFormData(prev => ({ ...prev, specialty_3_image: stringifyImageZoomSettings(settings) }))
                       setSaved(false)
                     }}
                   />

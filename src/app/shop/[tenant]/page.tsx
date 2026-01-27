@@ -984,7 +984,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       )}
 
       {/* Specialiteiten Section */}
-      {(business.specialty_1_image || business.specialty_2_image || business.specialty_3_image) && (
+      {(parseImageZoomSettings(business.specialty_1_image).url || parseImageZoomSettings(business.specialty_2_image).url || parseImageZoomSettings(business.specialty_3_image).url) && (
         <section 
           className="py-12 sm:py-20 relative overflow-hidden"
           style={{ 
@@ -1009,67 +1009,94 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
               {/* Specialty 1 */}
-              {business.specialty_1_image && (
-                <div className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/5]">
-                    <Image 
-                      src={business.specialty_1_image}
-                      alt={business.specialty_1_title || t('shopPage.specialty')}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      quality={80}
-                      loading="lazy"
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-2xl font-bold text-white">{business.specialty_1_title || t('shopPage.specialty')}</h3>
+              {(() => {
+                const img = parseImageZoomSettings(business.specialty_1_image)
+                if (!img.url) return null
+                return (
+                  <div className="group cursor-pointer">
+                    <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/5]">
+                      <Image 
+                        src={img.url}
+                        alt={business.specialty_1_title || t('shopPage.specialty')}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        quality={80}
+                        loading="lazy"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        style={{
+                          objectPosition: `${img.positionX}% ${img.positionY}%`,
+                          transform: img.zoom !== 1 ? `scale(${img.zoom})` : undefined,
+                          transformOrigin: `${img.positionX}% ${img.positionY}%`,
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <h3 className="text-2xl font-bold text-white">{business.specialty_1_title || t('shopPage.specialty')}</h3>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )
+              })()}
 
               {/* Specialty 2 */}
-              {business.specialty_2_image && (
-                <div className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/5]">
-                    <Image 
-                      src={business.specialty_2_image}
-                      alt={business.specialty_2_title || t('shopPage.specialty')}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      quality={80}
-                      loading="lazy"
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-2xl font-bold text-white">{business.specialty_2_title || t('shopPage.specialty')}</h3>
+              {(() => {
+                const img = parseImageZoomSettings(business.specialty_2_image)
+                if (!img.url) return null
+                return (
+                  <div className="group cursor-pointer">
+                    <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/5]">
+                      <Image 
+                        src={img.url}
+                        alt={business.specialty_2_title || t('shopPage.specialty')}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        quality={80}
+                        loading="lazy"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        style={{
+                          objectPosition: `${img.positionX}% ${img.positionY}%`,
+                          transform: img.zoom !== 1 ? `scale(${img.zoom})` : undefined,
+                          transformOrigin: `${img.positionX}% ${img.positionY}%`,
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <h3 className="text-2xl font-bold text-white">{business.specialty_2_title || t('shopPage.specialty')}</h3>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )
+              })()}
 
               {/* Specialty 3 */}
-              {business.specialty_3_image && (
-                <div className="group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/5]">
-                    <Image 
-                      src={business.specialty_3_image}
-                      alt={business.specialty_3_title || t('shopPage.specialty')}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      quality={80}
-                      loading="lazy"
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-6">
-                      <h3 className="text-2xl font-bold text-white">{business.specialty_3_title || t('shopPage.specialty')}</h3>
+              {(() => {
+                const img = parseImageZoomSettings(business.specialty_3_image)
+                if (!img.url) return null
+                return (
+                  <div className="group cursor-pointer">
+                    <div className="relative overflow-hidden rounded-2xl shadow-lg aspect-[4/5]">
+                      <Image 
+                        src={img.url}
+                        alt={business.specialty_3_title || t('shopPage.specialty')}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        quality={80}
+                        loading="lazy"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        style={{
+                          objectPosition: `${img.positionX}% ${img.positionY}%`,
+                          transform: img.zoom !== 1 ? `scale(${img.zoom})` : undefined,
+                          transformOrigin: `${img.positionX}% ${img.positionY}%`,
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                      <div className="absolute bottom-0 left-0 right-0 p-6">
+                        <h3 className="text-2xl font-bold text-white">{business.specialty_3_title || t('shopPage.specialty')}</h3>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )
+              })()}
             </div>
           </div>
         </section>
@@ -1364,7 +1391,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </section>
 
       {/* Top Sellers Section */}
-      {business && (business.top_seller_1 || business.top_seller_2 || business.top_seller_3) && (
+      {business && (() => {
+        const topSellers = [business.top_seller_1, business.top_seller_2, business.top_seller_3]
+          .map(s => parseImageZoomSettings(s))
+          .filter(img => img.url)
+        return topSellers.length > 0
+      })() && (
         <section className="py-12 sm:py-20 bg-white">
           <div className="max-w-6xl mx-auto px-4">
             <div className="text-center mb-8 sm:mb-12">
@@ -1379,20 +1411,26 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
             <div className="grid md:grid-cols-3 gap-8 justify-items-center">
               {[business.top_seller_1, business.top_seller_2, business.top_seller_3]
-                .filter(url => url && url.trim() !== '')
-                .map((imageUrl, index) => (
+                .map(s => parseImageZoomSettings(s))
+                .filter(img => img.url)
+                .map((img, index) => (
                   <div
                     key={index}
                     className="overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-shadow w-full relative aspect-[4/5]"
                   >
                     <Image
-                      src={imageUrl!}
+                      src={img.url}
                       alt={`${t('shopPage.topSeller')} ${index + 1}`}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       quality={80}
                       loading="lazy"
                       className="object-cover"
+                      style={{
+                        objectPosition: `${img.positionX}% ${img.positionY}%`,
+                        transform: img.zoom !== 1 ? `scale(${img.zoom})` : undefined,
+                        transformOrigin: `${img.positionX}% ${img.positionY}%`,
+                      }}
                     />
                   </div>
                 ))
