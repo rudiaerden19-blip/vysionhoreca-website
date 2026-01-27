@@ -957,6 +957,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                                     index === idx ? { ...i, quantity: val } : i
                                   ))
                                 }}
+                                onFocus={(e) => e.target.select()}
                                 className="w-full px-2 py-1 border rounded text-center"
                               />
                             </td>
@@ -1189,6 +1190,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                                   step="0.01"
                                   value={pi.quantity}
                                   onChange={(e) => updateIngredientQuantity(pi.id, parseFloat(e.target.value) || 1)}
+                                  onFocus={(e) => e.target.select()}
                                   className="w-16 px-2 py-1 text-center border rounded"
                                 />
                               </td>
@@ -1243,6 +1245,7 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                           step="0.01"
                           value={addingQuantity}
                           onChange={(e) => setAddingQuantity(parseFloat(e.target.value) || 1)}
+                          onFocus={(e) => e.target.select()}
                           className="w-20 px-3 py-3 border rounded-lg text-center"
                           placeholder="Aantal"
                         />
