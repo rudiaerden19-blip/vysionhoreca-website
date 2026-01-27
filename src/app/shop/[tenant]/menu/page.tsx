@@ -51,17 +51,61 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [promotions, setPromotions] = useState<Promotion[]>([])
   const [promotionsEnabled, setPromotionsEnabled] = useState(true)
   const menuContentRef = useRef<HTMLDivElement>(null)
+  const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  const isScrollingToSection = useRef(false)
 
-  // Handler voor categorie wisselen - scrollt ook naar boven
+  // Scroll spy - update active category based on scroll position
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Skip als we handmatig naar een sectie scrollen
+        if (isScrollingToSection.current) return
+        
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
+            const categoryId = entry.target.getAttribute('data-category-id')
+            if (categoryId) {
+              setActiveCategory(categoryId)
+            }
+          }
+        })
+      },
+      {
+        rootMargin: '-120px 0px -50% 0px', // Boven de header
+        threshold: [0.3, 0.5, 0.7]
+      }
+    )
+
+    // Observe all sections
+    sectionRefs.current.forEach((el) => {
+      observer.observe(el)
+    })
+
+    return () => observer.disconnect()
+  }, [categories, promotions])
+
+  // Handler voor categorie klikken - scrollt naar sectie
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId)
-    // Scroll naar net onder de sticky header
-    if (menuContentRef.current) {
-      const headerHeight = 110 // Hoogte van sticky header + categories
-      const elementTop = menuContentRef.current.getBoundingClientRect().top + window.scrollY
-      window.scrollTo({ top: elementTop - headerHeight, behavior: 'smooth' })
-    } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+    isScrollingToSection.current = true
+    
+    const sectionEl = sectionRefs.current.get(categoryId)
+    if (sectionEl) {
+      const headerHeight = 120 // Sticky header hoogte
+      const elementTop = sectionEl.getBoundingClientRect().top + window.scrollY - headerHeight
+      window.scrollTo({ top: elementTop, behavior: 'smooth' })
+      
+      // Reset flag na scroll animatie
+      setTimeout(() => {
+        isScrollingToSection.current = false
+      }, 800)
+    }
+  }
+
+  // Ref setter voor secties
+  const setSectionRef = (categoryId: string) => (el: HTMLDivElement | null) => {
+    if (el) {
+      sectionRefs.current.set(categoryId, el)
     }
   }
 
@@ -266,15 +310,6 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const cartTotal = cart.reduce((sum, c) => sum + (c.totalPrice * c.quantity), 0)
   const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0)
 
-  // Promo wordt apart gerenderd met echte promoties, niet producten
-  const filteredItems = activeCategory === 'promo' 
-    ? [] // Promoties worden apart gerenderd
-    : activeCategory === 'all' 
-      ? menuItems 
-      : activeCategory === 'popular'
-        ? menuItems.filter(i => i.is_popular)
-        : menuItems.filter(i => i.category_id === activeCategory)
-
   const allergenIcons: Record<string, { icon: string, color: string, label: string }> = {
     gluten: { icon: '🌾', color: 'bg-amber-100 text-amber-800', label: 'Gluten' },
     ei: { icon: '🥚', color: 'bg-yellow-100 text-yellow-800', label: 'Ei' },
@@ -286,6 +321,70 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
     selderij: { icon: '🥬', color: 'bg-lime-100 text-lime-800', label: 'Selderij' },
     mosterd: { icon: '🟡', color: 'bg-yellow-100 text-yellow-800', label: 'Mosterd' },
     sesam: { icon: '⚪', color: 'bg-stone-100 text-stone-800', label: 'Sesam' },
+  }
+
+  // ProductCard component voor herbruikbaarheid
+  const ProductCard = ({ item }: { item: MenuItem }) => {
+    const itemDisplayMode = item.image_display_mode || imageDisplayMode
+    const useContain = itemDisplayMode === 'contain'
+    
+    return (
+      <div
+        onClick={() => selectProduct(item)}
+        className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group"
+      >
+        <div className={`relative h-48 overflow-hidden ${useContain ? 'bg-white' : 'bg-gray-100'}`}>
+          {item.image_url ? (
+            <Image
+              src={item.image_url}
+              alt={item.name}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              quality={75}
+              loading="lazy"
+              className={useContain ? 'object-contain p-2' : 'object-cover'}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-6xl">🍟</div>
+          )}
+          <div className="absolute top-3 left-3 flex gap-2">
+            {item.is_popular && (
+              <span style={{ backgroundColor: primaryColor }} className="text-white text-xs font-bold px-2 py-1 rounded-full">
+                🔥 POPULAIR
+              </span>
+            )}
+          </div>
+          {!item.is_available && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-full">{t('menuPage.soldOut')}</span>
+            </div>
+          )}
+        </div>
+        <div className="p-4">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-bold text-lg text-gray-900">{item.name}</h3>
+            <span style={{ color: primaryColor }} className="text-xl font-bold">€{item.price.toFixed(2)}</span>
+          </div>
+          <p className="text-gray-500 text-sm mb-3 line-clamp-2">{item.description}</p>
+          {item.allergens.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {item.allergens.map(allergen => (
+                <span key={allergen} className={`text-xs px-2 py-1 rounded-full ${allergenIcons[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}>
+                  {allergenIcons[allergen.toLowerCase()]?.icon || '⚠️'} {allergenIcons[allergen.toLowerCase()]?.label || allergen}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="mt-2 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: primaryColor }}>
+            {productsWithOptions.includes(item.id) ? (
+              <><span>⚙️</span><span>{t('menuPage.chooseOptions')}</span><span className="text-lg">→</span></>
+            ) : (
+              <><span>🛒</span><span>{t('menuPage.clickToOrder')}</span><span className="text-lg">→</span></>
+            )}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
@@ -378,240 +477,118 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         </div>
       </header>
 
-      {/* Menu Items Grid */}
-      <div ref={menuContentRef} className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32">
-        {/* Promoties weergave - responsive & klikbaar */}
-        {activeCategory === 'promo' && promotions.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {promotions.map((promo) => {
-              // Vind het gekoppelde product
-              const linkedProduct = promo.product_id 
-                ? menuItems.find(item => item.id === promo.product_id)
-                : null
-              
-              // Bereken de prijs
-              const promoPrice = promo.type === 'fixedPrice' ? promo.value : 
-                                 promo.type === 'percentage' && linkedProduct ? linkedProduct.price * (1 - promo.value / 100) :
-                                 promo.type === 'fixed' && linkedProduct ? Math.max(0, linkedProduct.price - promo.value) :
-                                 0
-              
-              return (
-                <div
-                  key={promo.id}
-                  onClick={() => {
-                    // Als er een gekoppeld product is, voeg toe aan winkelwagen
-                    if (linkedProduct && promo.type === 'fixedPrice') {
-                      const promoItem: MenuItem = {
-                        ...linkedProduct,
-                        name: `${promo.name}`,
-                        price: promoPrice,
-                        is_promo: true,
+      {/* Menu Items - Continuous scroll met section headers */}
+      <div ref={menuContentRef} className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32 space-y-8">
+        
+        {/* Promoties sectie */}
+        {promotionsEnabled && promotions.length > 0 && (
+          <section 
+            ref={setSectionRef('promo')} 
+            data-category-id="promo"
+            className="scroll-mt-32"
+          >
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              {promotions.map((promo) => {
+                const linkedProduct = promo.product_id 
+                  ? menuItems.find(item => item.id === promo.product_id)
+                  : null
+                const promoPrice = promo.type === 'fixedPrice' ? promo.value : 
+                                   promo.type === 'percentage' && linkedProduct ? linkedProduct.price * (1 - promo.value / 100) :
+                                   promo.type === 'fixed' && linkedProduct ? Math.max(0, linkedProduct.price - promo.value) : 0
+                return (
+                  <div
+                    key={promo.id}
+                    onClick={() => {
+                      if (linkedProduct && promo.type === 'fixedPrice') {
+                        const promoItem: MenuItem = { ...linkedProduct, name: promo.name, price: promoPrice, is_promo: true }
+                        setCart(prev => {
+                          const existing = prev.find(c => c.item.id === linkedProduct.id && c.item.price === promoPrice)
+                          if (existing) return prev.map(c => c.item.id === linkedProduct.id && c.item.price === promoPrice ? { ...c, quantity: c.quantity + 1 } : c)
+                          return [...prev, { item: promoItem, quantity: 1, selectedOptions: [], totalPrice: promoPrice }]
+                        })
+                        setCartOpen(true)
                       }
-                      // Direct toevoegen aan cart
-                      setCart(prev => {
-                        const existing = prev.find(c => 
-                          c.item.id === linkedProduct.id && 
-                          c.item.price === promoPrice
-                        )
-                        if (existing) {
-                          return prev.map(c => 
-                            c.item.id === linkedProduct.id && c.item.price === promoPrice
-                              ? { ...c, quantity: c.quantity + 1 }
-                              : c
-                          )
-                        }
-                        return [...prev, { 
-                          item: promoItem, 
-                          quantity: 1, 
-                          selectedOptions: [],
-                          totalPrice: promoPrice
-                        }]
-                      })
-                      // Toon cart
-                      setCartOpen(true)
-                    }
-                  }}
-                  className={`bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all ${
-                    linkedProduct ? 'cursor-pointer active:scale-[0.98]' : ''
-                  }`}
-                >
-                  <div className="relative h-40 sm:h-48 overflow-hidden bg-gray-100">
-                    {promo.image_url ? (
-                      <Image
-                        src={promo.image_url}
-                        alt={promo.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        quality={75}
-                        loading="lazy"
-                        className="object-cover"
-                      />
-                    ) : linkedProduct?.image_url ? (
-                      <Image
-                        src={linkedProduct.image_url}
-                        alt={promo.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        quality={75}
-                        loading="lazy"
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-5xl sm:text-6xl bg-gradient-to-br from-green-400 to-green-600">
-                        🎁
-                      </div>
-                    )}
-                    {/* Prijs badge */}
-                    <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-                      <span className="bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg">
-                        {promo.type === 'fixedPrice' ? `€${promo.value.toFixed(2)}` :
-                         promo.type === 'percentage' ? `-${promo.value}%` :
-                         promo.type === 'fixed' ? `-€${promo.value}` : t('menuPage.free')}
-                      </span>
-                    </div>
-                    {/* Normale prijs doorgestreept */}
-                    {linkedProduct && promo.type === 'fixedPrice' && (
-                      <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
-                        <span className="bg-gray-800/70 text-white text-xs px-2 py-1 rounded-full line-through">
-                          €{linkedProduct.price.toFixed(2)}
+                    }}
+                    className={`bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all ${linkedProduct ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+                  >
+                    <div className="relative h-40 sm:h-48 overflow-hidden bg-gray-100">
+                      {promo.image_url ? (
+                        <Image src={promo.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={75} loading="lazy" className="object-cover" />
+                      ) : linkedProduct?.image_url ? (
+                        <Image src={linkedProduct.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={75} loading="lazy" className="object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-green-400 to-green-600">🎁</div>
+                      )}
+                      <div className="absolute top-2 left-2">
+                        <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                          {promo.type === 'fixedPrice' ? `€${promo.value.toFixed(2)}` : promo.type === 'percentage' ? `-${promo.value}%` : promo.type === 'fixed' ? `-€${promo.value}` : t('menuPage.free')}
                         </span>
                       </div>
-                    )}
+                    </div>
+                    <div className="p-3 sm:p-4">
+                      <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1">{promo.name}</h3>
+                      {promo.description && <p className="text-gray-500 text-xs sm:text-sm line-clamp-2">{promo.description}</p>}
+                      {linkedProduct && promo.type === 'fixedPrice' && (
+                        <button style={{ backgroundColor: primaryColor }} className="w-full mt-3 py-2 text-white font-medium rounded-lg text-sm">
+                          + Toevoegen €{promo.value.toFixed(2)}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div className="p-3 sm:p-4">
-                    <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1">{promo.name}</h3>
-                    {promo.description && (
-                      <p className="text-gray-500 text-xs sm:text-sm line-clamp-2">{promo.description}</p>
-                    )}
-                    {/* Bestel knop voor klikbare promoties */}
-                    {linkedProduct && promo.type === 'fixedPrice' && (
-                      <button
-                        style={{ backgroundColor: primaryColor }}
-                        className="w-full mt-3 py-2 text-white font-medium rounded-lg text-sm hover:opacity-90 transition-opacity"
-                      >
-                        + Toevoegen €{promo.value.toFixed(2)}
-                      </button>
-                    )}
-                    {promo.min_order_amount > 0 && (
-                      <p className="text-orange-600 text-xs sm:text-sm mt-2 font-medium">
-                        Min. bestelling: €{promo.min_order_amount.toFixed(2)}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        ) : menuItems.length === 0 ? (
+                )
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Populair sectie */}
+        {menuItems.some(i => i.is_popular) && (
+          <section 
+            ref={setSectionRef('popular')} 
+            data-category-id="popular"
+            className="scroll-mt-32"
+          >
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span className="text-2xl">🔥</span> {t('menuPage.popular')}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {menuItems.filter(i => i.is_popular).map((item) => (
+                <ProductCard key={`popular-${item.id}`} item={item} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Categorie secties */}
+        {categories.map((category) => {
+          const categoryItems = menuItems.filter(i => i.category_id === category.id)
+          if (categoryItems.length === 0) return null
+          return (
+            <section 
+              key={category.id}
+              ref={setSectionRef(category.id!)} 
+              data-category-id={category.id}
+              className="scroll-mt-32"
+            >
+              <h2 className="text-xl font-bold text-gray-900 mb-4">{category.name}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {categoryItems.map((item) => (
+                  <ProductCard key={item.id} item={item} />
+                ))}
+              </div>
+            </section>
+          )
+        })}
+
+        {/* Geen producten message */}
+        {menuItems.length === 0 && promotions.length === 0 && (
           <div className="text-center py-20">
             <span className="text-6xl mb-4 block">🍟</span>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('menuPage.noProducts')}</h2>
             <p className="text-gray-500">{t('menuPage.noProductsDesc')}</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              {filteredItems.map((item) => {
-                // Per product display mode, fallback naar tenant instelling
-                const itemDisplayMode = item.image_display_mode || imageDisplayMode
-                const useContain = itemDisplayMode === 'contain'
-                
-                return (
-                <div
-                  key={item.id}
-                  onClick={() => selectProduct(item)}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group"
-                >
-                  <div className={`relative h-48 overflow-hidden ${useContain ? 'bg-white' : 'bg-gray-100'}`}>
-                    {item.image_url ? (
-                      <Image
-                        src={item.image_url}
-                        alt={item.name}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        quality={75}
-                        loading="lazy"
-                        className={useContain ? 'object-contain p-2' : 'object-cover'}
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-6xl">
-                        🍟
-                      </div>
-                    )}
-                    <div className="absolute top-3 left-3 flex gap-2">
-                      {item.is_popular && (
-                        <span style={{ backgroundColor: primaryColor }} className="text-white text-xs font-bold px-2 py-1 rounded-full">
-                          🔥 POPULAIR
-                        </span>
-                      )}
-                    </div>
-                    {!item.is_available && (
-                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                        <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-full">
-                          {t('menuPage.soldOut')}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-lg text-gray-900 transition-colors">
-                        {item.name}
-                        {item.is_promo && (
-                          <span className="ml-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                            PROMO
-                          </span>
-                        )}
-                      </h3>
-                      <div className="text-right">
-                        {item.is_promo && item.promo_price ? (
-                          <>
-                            <span className="text-gray-400 line-through text-sm block">€{item.price.toFixed(2)}</span>
-                            <span className="text-green-500 text-xl font-bold">€{item.promo_price.toFixed(2)}</span>
-                          </>
-                        ) : (
-                          <span style={{ color: primaryColor }} className="text-xl font-bold">
-                            €{item.price.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-gray-500 text-sm mb-3 line-clamp-2">
-                      {item.description}
-                    </p>
-                    {item.allergens.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mb-2">
-                        {item.allergens.map(allergen => (
-                          <span 
-                            key={allergen}
-                            className={`text-xs px-2 py-1 rounded-full ${allergenIcons[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}
-                          >
-                            {allergenIcons[allergen.toLowerCase()]?.icon || '⚠️'} {allergenIcons[allergen.toLowerCase()]?.label || allergen}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    {/* Indicator voor opties */}
-                    <div 
-                      className="mt-2 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all"
-                      style={{ color: primaryColor }}
-                    >
-                      {productsWithOptions.includes(item.id) ? (
-                        <>
-                          <span>⚙️</span>
-                          <span>{t('menuPage.chooseOptions')}</span>
-                          <span className="text-lg">→</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>🛒</span>
-                          <span>{t('menuPage.clickToOrder')}</span>
-                          <span className="text-lg">→</span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )})}
           </div>
         )}
       </div>
