@@ -28,7 +28,8 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
     url: value?.url || '',
     zoom: value?.zoom || 1,
     positionX: value?.positionX ?? 50,
-    positionY: value?.positionY ?? 50,
+    // Default 60% = toon meer van onderkant (tafels/stoelen) ipv bovenkant (plafond)
+    positionY: value?.positionY ?? 60,
   }
 
   const handleZoomChange = (newZoom: number) => {
@@ -191,41 +192,51 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
             </div>
           </div>
           
-          {/* Quick position buttons - tonen bij elke zoom anders dan 100% */}
-          {settings.zoom !== 1 && (
-            <div>
-              <span className="text-xs text-gray-600 font-medium block mb-2">📍 Snelle positie</span>
-              <div className="grid grid-cols-3 gap-1">
-                {[
-                  { label: '↖', x: 25, y: 25 },
-                  { label: '↑', x: 50, y: 25 },
-                  { label: '↗', x: 75, y: 25 },
-                  { label: '←', x: 25, y: 50 },
-                  { label: '●', x: 50, y: 50 },
-                  { label: '→', x: 75, y: 50 },
-                  { label: '↙', x: 25, y: 75 },
-                  { label: '↓', x: 50, y: 75 },
-                  { label: '↘', x: 75, y: 75 },
-                ].map((pos) => (
-                  <button
-                    key={`${pos.x}-${pos.y}`}
-                    onClick={() => handlePositionChange(pos.x, pos.y)}
-                    className={`p-2 rounded text-sm transition-colors ${
-                      Math.abs(settings.positionX - pos.x) < 10 && Math.abs(settings.positionY - pos.y) < 10
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 hover:bg-gray-300'
-                    }`}
-                  >
-                    {pos.label}
-                  </button>
-                ))}
-              </div>
+          {/* Verticale positie slider - altijd tonen */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-gray-600 font-medium">↕️ Verticale positie</span>
+              <span className="text-xs text-gray-500 font-mono">{settings.positionY}%</span>
             </div>
-          )}
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              value={settings.positionY}
+              onChange={(e) => handlePositionChange(settings.positionX, parseInt(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>Bovenkant (plafond)</span>
+              <span>Onderkant (tafels)</span>
+            </div>
+          </div>
+
+          {/* Horizontale positie slider */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-gray-600 font-medium">↔️ Horizontale positie</span>
+              <span className="text-xs text-gray-500 font-mono">{settings.positionX}%</span>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              step="5"
+              value={settings.positionX}
+              onChange={(e) => handlePositionChange(parseInt(e.target.value), settings.positionY)}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>Links</span>
+              <span>Rechts</span>
+            </div>
+          </div>
           
           {/* Reset button */}
           <button
-            onClick={() => onChange({ ...settings, zoom: 1, positionX: 50, positionY: 50 })}
+            onClick={() => onChange({ ...settings, zoom: 1, positionX: 50, positionY: 60 })}
             className="w-full py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           >
             ↺ Reset naar standaard
@@ -238,18 +249,19 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
 
 // Helper function to parse stored JSON settings
 export function parseImageZoomSettings(json: string | null | undefined): ImageZoomSettings {
-  if (!json) return { url: '', zoom: 1, positionX: 50, positionY: 50 }
+  // Default positionY 60% = toon meer van onderkant (tafels/stoelen) ipv bovenkant (plafond)
+  if (!json) return { url: '', zoom: 1, positionX: 50, positionY: 60 }
   try {
     const parsed = JSON.parse(json)
     return {
       url: parsed.url || '',
       zoom: parsed.zoom || 1,
       positionX: parsed.positionX ?? 50,
-      positionY: parsed.positionY ?? 50,
+      positionY: parsed.positionY ?? 60,
     }
   } catch {
     // If it's just a URL string (old format), convert it
-    return { url: json, zoom: 1, positionX: 50, positionY: 50 }
+    return { url: json, zoom: 1, positionX: 50, positionY: 60 }
   }
 }
 

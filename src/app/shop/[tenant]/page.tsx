@@ -841,21 +841,11 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               const imgSettings = business.cover_images[currentImageIndex]
               const zoom = imgSettings?.zoom || 1
               const posX = imgSettings?.positionX ?? 50
-              const posY = imgSettings?.positionY ?? 50
-              
-              // Bij uitzoomen (< 100%) gebruiken we object-fit: contain om hele foto te tonen
-              // Bij inzoomen (> 100%) gebruiken we scale transform
-              const isZoomedOut = zoom < 1
-              const isZoomedIn = zoom > 1
+              // Default: 60% = toon meer van de onderkant waar tafels/stoelen zijn
+              const posY = imgSettings?.positionY ?? 60
               
               return (
-                <div 
-                  className="absolute inset-0 overflow-hidden"
-                  style={isZoomedIn ? {
-                    transform: `scale(${zoom})`,
-                    transformOrigin: `${posX}% ${posY}%`,
-                  } : undefined}
-                >
+                <div className="absolute inset-0 overflow-hidden">
                   <Image
                     src={imgSettings?.url || ''}
                     alt={business.name}
@@ -863,12 +853,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     priority={currentImageIndex === 0}
                     sizes="100vw"
                     quality={85}
-                    className={isZoomedOut ? 'object-contain' : 'object-cover'}
+                    className="object-cover"
                     style={{ 
-                      objectPosition: zoom !== 1 ? `${posX}% ${posY}%` : 'center 30%',
-                      // Bij uitzoomen: schaal de afbeelding kleiner
-                      transform: isZoomedOut ? `scale(${zoom})` : undefined,
-                      transformOrigin: isZoomedOut ? `${posX}% ${posY}%` : undefined,
+                      // Object-position bepaalt welk deel van de foto zichtbaar is
+                      // posY 60% = focus op het onderste deel (tafels/stoelen)
+                      objectPosition: `${posX}% ${posY}%`,
+                      // Zoom alleen toepassen als het niet 100% is
+                      transform: zoom !== 1 ? `scale(${zoom})` : undefined,
+                      transformOrigin: `${posX}% ${posY}%`,
                     }}
                   />
                 </div>
