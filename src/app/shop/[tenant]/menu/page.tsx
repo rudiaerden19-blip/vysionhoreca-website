@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -50,6 +50,20 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
   const [promotions, setPromotions] = useState<Promotion[]>([])
   const [promotionsEnabled, setPromotionsEnabled] = useState(true)
+  const menuContentRef = useRef<HTMLDivElement>(null)
+
+  // Handler voor categorie wisselen - scrollt ook naar boven
+  const handleCategoryChange = (categoryId: string) => {
+    setActiveCategory(categoryId)
+    // Scroll naar net onder de sticky header
+    if (menuContentRef.current) {
+      const headerHeight = 110 // Hoogte van sticky header + categories
+      const elementTop = menuContentRef.current.getBoundingClientRect().top + window.scrollY
+      window.scrollTo({ top: elementTop - headerHeight, behavior: 'smooth' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
@@ -323,7 +337,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
             {promotionsEnabled && promotions.length > 0 && (
               <button
-                onClick={() => setActiveCategory('promo')}
+                onClick={() => handleCategoryChange('promo')}
                 className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
                   activeCategory === 'promo'
                     ? 'bg-green-500 text-white shadow-md'
@@ -335,7 +349,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             )}
             {menuItems.some(i => i.is_popular) && (
               <button
-                onClick={() => setActiveCategory('popular')}
+                onClick={() => handleCategoryChange('popular')}
                 style={activeCategory === 'popular' ? { backgroundColor: primaryColor } : {}}
                 className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
                   activeCategory === 'popular'
@@ -349,7 +363,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             {categories.map((cat) => (
               <button
                 key={cat.id}
-                onClick={() => setActiveCategory(cat.id!)}
+                onClick={() => handleCategoryChange(cat.id!)}
                 style={activeCategory === cat.id ? { backgroundColor: primaryColor } : {}}
                 className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
                   activeCategory === cat.id
@@ -365,7 +379,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       </header>
 
       {/* Menu Items Grid */}
-      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32">
+      <div ref={menuContentRef} className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32">
         {/* Promoties weergave - responsive & klikbaar */}
         {activeCategory === 'promo' && promotions.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
