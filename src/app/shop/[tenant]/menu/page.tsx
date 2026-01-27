@@ -700,9 +700,6 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                           {option.required && (
                             <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">{t('menuPage.required')}</span>
                           )}
-                          <span className="text-xs text-gray-500">
-                            {option.type === 'single' ? `(${t('menuPage.chooseSingle')})` : `(${t('menuPage.chooseMultiple')})`}
-                          </span>
                         </div>
                         <div className="space-y-2">
                           {option.choices?.map(choice => {
