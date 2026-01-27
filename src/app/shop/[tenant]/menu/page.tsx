@@ -56,33 +56,47 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   // Scroll spy - update active category based on scroll position
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        // Skip als we handmatig naar een sectie scrollen
-        if (isScrollingToSection.current) return
-        
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.3) {
-            const categoryId = entry.target.getAttribute('data-category-id')
-            if (categoryId) {
-              setActiveCategory(categoryId)
-            }
-          }
-        })
-      },
-      {
-        rootMargin: '-120px 0px -50% 0px', // Boven de header
-        threshold: [0.3, 0.5, 0.7]
+    const handleScroll = () => {
+      // Skip als we handmatig naar een sectie scrollen
+      if (isScrollingToSection.current) return
+      
+      const headerHeight = 130 // Sticky header hoogte
+      let currentSection = ''
+      
+      // Vind de sectie die het meest zichtbaar is (top is net onder de header)
+      sectionRefs.current.forEach((el, categoryId) => {
+        const rect = el.getBoundingClientRect()
+        // Check of de top van de sectie binnen het zichtbare gebied is
+        // of als de sectie de header passeert
+        if (rect.top <= headerHeight + 50 && rect.bottom > headerHeight) {
+          currentSection = categoryId
+        }
+      })
+      
+      if (currentSection && currentSection !== activeCategory) {
+        setActiveCategory(currentSection)
       }
-    )
+    }
 
-    // Observe all sections
-    sectionRefs.current.forEach((el) => {
-      observer.observe(el)
-    })
+    // Throttle de scroll handler voor performance
+    let ticking = false
+    const scrollListener = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll()
+          ticking = false
+        })
+        ticking = true
+      }
+    }
 
-    return () => observer.disconnect()
-  }, [categories, promotions])
+    window.addEventListener('scroll', scrollListener, { passive: true })
+    
+    // Initial check
+    handleScroll()
+
+    return () => window.removeEventListener('scroll', scrollListener)
+  }, [categories, promotions, activeCategory])
 
   // Handler voor categorie klikken - scrollt naar sectie
   const handleCategoryChange = (categoryId: string) => {
