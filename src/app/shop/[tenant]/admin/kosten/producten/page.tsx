@@ -957,7 +957,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                                     index === idx ? { ...i, quantity: val } : i
                                   ))
                                 }}
-                                onFocus={(e) => setTimeout(() => e.target.select(), 0)}
+                                onClick={(e) => (e.target as HTMLInputElement).setSelectionRange(0, 9999)}
+                                onFocus={(e) => e.target.setSelectionRange(0, 9999)}
                                 className="w-full px-2 py-1 border rounded text-center"
                               />
                             </td>
@@ -1193,11 +1194,10 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                                     const num = parseFloat(val)
                                     if (!isNaN(num) && num > 0) {
                                       updateIngredientQuantity(pi.id, num)
-                                    } else if (val === '' || val === '0') {
-                                      // Allow empty/zero temporarily while typing
                                     }
                                   }}
-                                  onFocus={(e) => setTimeout(() => e.target.select(), 0)}
+                                  onClick={(e) => (e.target as HTMLInputElement).setSelectionRange(0, 9999)}
+                                  onFocus={(e) => e.target.setSelectionRange(0, 9999)}
                                   className="w-16 px-2 py-1 text-center border rounded"
                                 />
                               </td>
@@ -1257,7 +1257,8 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                               setAddingQuantity(num)
                             }
                           }}
-                          onFocus={(e) => setTimeout(() => e.target.select(), 0)}
+                          onClick={(e) => (e.target as HTMLInputElement).setSelectionRange(0, 9999)}
+                          onFocus={(e) => e.target.setSelectionRange(0, 9999)}
                           className="w-20 px-3 py-3 border rounded-lg text-center"
                           placeholder="Aantal"
                         />
