@@ -289,35 +289,36 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sticky Header - alleen voor navigatie */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link href={`/shop/${params.tenant}`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>{t('menuPage.back')}</span>
-          </Link>
-          <h1 className="font-bold text-xl text-gray-900">{t('menuPage.menu')}</h1>
-          <Link 
-            href={`/shop/${params.tenant}/account`}
-            className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            <span>👤</span>
-            <span className="text-sm font-medium hidden sm:inline">{t('menuPage.account')}</span>
-          </Link>
-        </div>
-      </div>
-
-      {/* Sticky Categories Bar - apart voor betere scroll tracking */}
-      <div 
-        className="sticky z-50 bg-white shadow-md"
-        style={{ 
-          top: '52px', // Onder de header
-          WebkitBackfaceVisibility: 'hidden',
-          backfaceVisibility: 'hidden',
-        }}
+      {/* Sticky Header + Categories - SAMEN in 1 container voor iOS Safari */}
+      <header 
+        className="sticky top-0 z-50 bg-white shadow-md"
+        style={{
+          position: '-webkit-sticky',
+          WebkitTransform: 'translateZ(0)',
+          transform: 'translateZ(0)',
+        } as React.CSSProperties}
       >
+        {/* Navigation Bar */}
+        <div className="border-b border-gray-100">
+          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <Link href={`/shop/${params.tenant}`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>{t('menuPage.back')}</span>
+            </Link>
+            <h1 className="font-bold text-xl text-gray-900">{t('menuPage.menu')}</h1>
+            <Link 
+              href={`/shop/${params.tenant}/account`}
+              className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <span>👤</span>
+              <span className="text-sm font-medium hidden sm:inline">{t('menuPage.account')}</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Categories Bar */}
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
             {promotionsEnabled && promotions.length > 0 && (
@@ -361,7 +362,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             ))}
           </div>
         </div>
-      </div>
+      </header>
 
       {/* Menu Items Grid */}
       <div className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32">
