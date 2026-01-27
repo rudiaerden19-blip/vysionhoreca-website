@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
+import ImageZoomPicker, { parseImageZoomSettings, stringifyImageZoomSettings } from '@/components/ImageZoomPicker'
 import { useLanguage } from '@/i18n'
 
 export default function ProfielPage({ params }: { params: { tenant: string } }) {
@@ -500,38 +501,41 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
             <span>🎠</span> Hero Slider Foto's
           </h2>
-          <p className="text-gray-500 text-sm mb-6">Deze foto's worden getoond als slideshow bovenaan je website</p>
+          <p className="text-gray-500 text-sm mb-6">
+            Deze foto's worden getoond als slideshow bovenaan je website. 
+            <span className="text-blue-600 font-medium"> Gebruik de zoom slider om in/uit te zoomen en sleep om te positioneren.</span>
+          </p>
           
           <div className="grid md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Slide 1</label>
-              <MediaPicker
+              <ImageZoomPicker
                 tenantSlug={params.tenant}
-                value={formData.cover_image_1 || ''}
-                onChange={(url) => {
-                  setFormData(prev => ({ ...prev, cover_image_1: url }))
+                label="Slide 1"
+                value={parseImageZoomSettings(formData.cover_image_1)}
+                onChange={(settings) => {
+                  setFormData(prev => ({ ...prev, cover_image_1: stringifyImageZoomSettings(settings) }))
                   setSaved(false)
                 }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Slide 2</label>
-              <MediaPicker
+              <ImageZoomPicker
                 tenantSlug={params.tenant}
-                value={formData.cover_image_2 || ''}
-                onChange={(url) => {
-                  setFormData(prev => ({ ...prev, cover_image_2: url }))
+                label="Slide 2"
+                value={parseImageZoomSettings(formData.cover_image_2)}
+                onChange={(settings) => {
+                  setFormData(prev => ({ ...prev, cover_image_2: stringifyImageZoomSettings(settings) }))
                   setSaved(false)
                 }}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Slide 3</label>
-              <MediaPicker
+              <ImageZoomPicker
                 tenantSlug={params.tenant}
-                value={formData.cover_image_3 || ''}
-                onChange={(url) => {
-                  setFormData(prev => ({ ...prev, cover_image_3: url }))
+                label="Slide 3"
+                value={parseImageZoomSettings(formData.cover_image_3)}
+                onChange={(settings) => {
+                  setFormData(prev => ({ ...prev, cover_image_3: stringifyImageZoomSettings(settings) }))
                   setSaved(false)
                 }}
               />

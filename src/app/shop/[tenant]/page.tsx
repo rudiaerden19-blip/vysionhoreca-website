@@ -5,8 +5,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, getActivePromotions, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview, Promotion } from '@/lib/admin-api'
+import { parseImageZoomSettings } from '@/components/ImageZoomPicker'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+
+interface CoverImageSettings {
+  url: string
+  zoom: number
+  positionX: number
+  positionY: number
+}
 
 interface Business {
   id: string
@@ -14,7 +22,7 @@ interface Business {
   slug: string
   tagline: string
   logo_url: string
-  cover_images: string[]
+  cover_images: CoverImageSettings[]
   description: string
   story: string
   address: string
@@ -408,7 +416,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           tenantData?.cover_image_1,
           tenantData?.cover_image_2,
           tenantData?.cover_image_3,
-        ].filter((img): img is string => !!img && img.trim() !== ''),
+        ]
+          .map(img => parseImageZoomSettings(img))
+          .filter(settings => settings.url && settings.url.trim() !== ''),
         description: tenantData?.description || '',
         story: tenantData?.description || '',
         address: tenantData?.address || '',
@@ -827,16 +837,34 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             style={{ transform: `translateY(${scrollY * 0.3}px)` }}
             className="absolute inset-0"
           >
-            <Image
-              src={business.cover_images[currentImageIndex]}
-              alt={business.name}
-              fill
-              priority={currentImageIndex === 0}
-              sizes="100vw"
-              quality={85}
-              className="object-cover object-center"
-              style={{ objectPosition: 'center 30%' }}
-            />
+            {(() => {
+              const imgSettings = business.cover_images[currentImageIndex]
+              const zoom = imgSettings?.zoom || 1
+              const posX = imgSettings?.positionX ?? 50
+              const posY = imgSettings?.positionY ?? 50
+              return (
+                <div 
+                  className="absolute inset-0 overflow-hidden"
+                  style={{
+                    transform: zoom > 1 ? `scale(${zoom})` : undefined,
+                    transformOrigin: `${posX}% ${posY}%`,
+                  }}
+                >
+                  <Image
+                    src={imgSettings?.url || ''}
+                    alt={business.name}
+                    fill
+                    priority={currentImageIndex === 0}
+                    sizes="100vw"
+                    quality={85}
+                    className="object-cover"
+                    style={{ 
+                      objectPosition: zoom > 1 ? `${posX}% ${posY}%` : 'center 30%'
+                    }}
+                  />
+                </div>
+              )
+            })()}
           </motion.div>
         </AnimatePresence>
 
