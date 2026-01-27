@@ -950,15 +950,19 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                               <input
                                 type="text"
                                 inputMode="decimal"
-                                value={item.quantity}
-                                onChange={(e) => {
-                                  const val = parseFloat(e.target.value.replace(',', '.')) || 0
-                                  setSimulatorItems(prev => prev.map((i, index) => 
-                                    index === idx ? { ...i, quantity: val } : i
-                                  ))
+                                defaultValue={item.quantity}
+                                key={`sim-${idx}-${item.quantity}`}
+                                onFocus={(e) => { e.target.value = '' }}
+                                onBlur={(e) => {
+                                  const val = parseFloat(e.target.value.replace(',', '.'))
+                                  if (!isNaN(val) && val > 0) {
+                                    setSimulatorItems(prev => prev.map((i, index) => 
+                                      index === idx ? { ...i, quantity: val } : i
+                                    ))
+                                  } else {
+                                    e.target.value = String(item.quantity)
+                                  }
                                 }}
-                                onClick={(e) => (e.target as HTMLInputElement).setSelectionRange(0, 9999)}
-                                onFocus={(e) => e.target.setSelectionRange(0, 9999)}
                                 className="w-full px-2 py-1 border rounded text-center"
                               />
                             </td>
@@ -1188,16 +1192,18 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                                 <input
                                   type="text"
                                   inputMode="decimal"
-                                  value={pi.quantity}
-                                  onChange={(e) => {
+                                  defaultValue={pi.quantity}
+                                  key={`qty-${pi.id}-${pi.quantity}`}
+                                  onFocus={(e) => { e.target.value = '' }}
+                                  onBlur={(e) => {
                                     const val = e.target.value.replace(',', '.')
                                     const num = parseFloat(val)
                                     if (!isNaN(num) && num > 0) {
                                       updateIngredientQuantity(pi.id, num)
+                                    } else {
+                                      e.target.value = String(pi.quantity)
                                     }
                                   }}
-                                  onClick={(e) => (e.target as HTMLInputElement).setSelectionRange(0, 9999)}
-                                  onFocus={(e) => e.target.setSelectionRange(0, 9999)}
                                   className="w-16 px-2 py-1 text-center border rounded"
                                 />
                               </td>
@@ -1249,16 +1255,18 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
                         <input
                           type="text"
                           inputMode="decimal"
-                          value={addingQuantity}
-                          onChange={(e) => {
+                          defaultValue={addingQuantity}
+                          key={`adding-${addingQuantity}`}
+                          onFocus={(e) => { e.target.value = '' }}
+                          onBlur={(e) => {
                             const val = e.target.value.replace(',', '.')
                             const num = parseFloat(val)
                             if (!isNaN(num) && num > 0) {
                               setAddingQuantity(num)
+                            } else {
+                              e.target.value = String(addingQuantity)
                             }
                           }}
-                          onClick={(e) => (e.target as HTMLInputElement).setSelectionRange(0, 9999)}
-                          onFocus={(e) => e.target.setSelectionRange(0, 9999)}
                           className="w-20 px-3 py-3 border rounded-lg text-center"
                           placeholder="Aantal"
                         />
