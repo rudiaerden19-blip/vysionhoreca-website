@@ -256,10 +256,10 @@ function MenuItemCard({ product, primaryColor, t }: { product: MenuProduct; prim
               {hasPromo ? (
                 <>
                   <p className="text-white/40 text-xs line-through">€{product.price.toFixed(2)}</p>
-                  <p style={{ color: primaryColor }} className="font-bold text-sm">€{product.promo_price!.toFixed(2)}</p>
+                  <p className="font-bold text-sm text-white">€{product.promo_price!.toFixed(2)}</p>
                 </>
               ) : (
-                <p style={{ color: primaryColor }} className="font-bold text-sm">€{product.price.toFixed(2)}</p>
+                <p className="font-bold text-sm text-white">€{product.price.toFixed(2)}</p>
               )}
             </div>
           </div>
