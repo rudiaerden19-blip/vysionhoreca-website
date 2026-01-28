@@ -674,6 +674,13 @@ export default function SuperAdminDashboard() {
                       <td className="px-6 py-4">
                         <div className="flex gap-2 flex-wrap">
                           <Link
+                            href={`/shop/${tenant.tenant_slug}/admin`}
+                            target="_blank"
+                            className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition-colors font-medium"
+                          >
+                            🔑 Beheer
+                          </Link>
+                          <Link
                             href={`/superadmin/tenant/${tenant.tenant_slug}`}
                             className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors"
                           >

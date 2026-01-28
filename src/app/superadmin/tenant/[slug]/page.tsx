@@ -268,18 +268,18 @@ export default function TenantDetailPage() {
           </div>
           <div className="flex gap-2">
             <Link
-              href={`/shop/${slug}/admin`}
+              href={`/shop/${slug}`}
               target="_blank"
               className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-colors"
             >
-              Admin Panel
+              Bekijk Shop
             </Link>
             <Link
-              href={`/shop/${slug}`}
+              href={`/shop/${slug}/admin`}
               target="_blank"
-              className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors"
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-colors font-medium"
             >
-              Shop
+              🔑 Beheer Klant
             </Link>
           </div>
         </div>
