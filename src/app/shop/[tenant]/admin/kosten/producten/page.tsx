@@ -615,6 +615,32 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
         </p>
       </div>
 
+      {/* Search - Prominent bovenaan */}
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input
+          type="text"
+          placeholder={t('dashboard.productCosts.searchProduct') || "Zoek product..."}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-12 pr-4 py-4 text-lg border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white"
+        />
+        {searchTerm && (
+          <button
+            onClick={() => setSearchTerm('')}
+            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl p-4 shadow text-center">
@@ -637,17 +663,6 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
           <div className="text-2xl font-bold text-blue-600">{stats.high}</div>
           <div className="text-sm text-gray-500">{t('dashboard.productCosts.tooHigh')}</div>
         </div>
-      </div>
-
-      {/* Search */}
-      <div className="relative">
-        <input
-          type="text"
-          placeholder={`🔍 ${t('dashboard.productCosts.searchProduct')}`}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-        />
       </div>
 
       {/* Vaste Standaardprijzen Kader - Fixed onderaan wanneer product OF simulator open is */}
