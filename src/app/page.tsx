@@ -727,98 +727,6 @@ function StopSection() {
   )
 }
 
-// Igloo Section
-function IglooSection() {
-  const { locale } = useLanguage()
-  
-  return (
-    <section className="py-24 bg-gradient-to-b from-blue-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <p className="text-blue-600 text-lg font-semibold tracking-wider uppercase mb-4">
-            NIEUW BIJ VYSION
-          </p>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-            Wij verkopen ook<br />
-            <span className="text-blue-600">Iglo&apos;s!</span>
-          </h2>
-          <p className="text-xl sm:text-2xl text-gray-600 mt-6 max-w-3xl mx-auto">
-            Verleng je terrasseizoen met onze premium terras iglo&apos;s. Perfect voor restaurants, cafés en hotels.
-          </p>
-        </div>
-
-        {/* Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Left - Igloo Image */}
-          <div className="relative">
-            <div className="rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">
-              <img
-                src="https://images.unsplash.com/photo-1551524559-8af4e6624178?w=800&q=80"
-                alt="Vysion Terras Igloo"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-            {/* Price Badge */}
-            <div className="absolute -bottom-6 -right-6 bg-gradient-to-br from-blue-600 to-blue-800 text-white rounded-2xl p-6 shadow-xl">
-              <p className="text-sm font-medium opacity-90">Vanaf</p>
-              <p className="text-4xl font-bold">€2.499</p>
-              <p className="text-sm opacity-90">incl. BTW</p>
-            </div>
-          </div>
-
-          {/* Right - Skier Image & Features */}
-          <div className="space-y-8">
-            {/* Skier Image */}
-            <div className="rounded-3xl overflow-hidden shadow-xl aspect-[16/9]">
-              <img
-                src="https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&q=80"
-                alt="Skiër op de berg"
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-
-            {/* Features */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-blue-100">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Waarom een Vysion Igloo?</h3>
-              <ul className="space-y-4">
-                {[
-                  'Verleng je terrasseizoen tot 12 maanden',
-                  'Weerbestendig en duurzaam materiaal',
-                  'Eenvoudige installatie',
-                  'Inclusief verwarming & verlichting opties',
-                  'Capaciteit tot 10 personen',
-                  'Gratis adviesgesprek'
-                ].map((feature, index) => (
-                  <li key={index} className="flex items-center">
-                    <svg className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-gray-700 text-lg">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="text-center mt-16">
-          <a
-            href={`/registreer?lang=${locale}&interest=igloo`}
-            className="inline-block bg-blue-600 text-white px-10 py-5 rounded-full font-bold text-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
-          >
-            🏔️ Vraag een offerte aan
-          </a>
-          <p className="text-gray-500 mt-4">Of bel ons: +32 492 12 93 83</p>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 // But Wait Section
 function ButWaitSection() {
   const { t } = useLanguage()
@@ -1514,7 +1422,6 @@ export default function HomePage() {
       <OrderAppSection />
       <StopSection />
       <PricingSection />
-      <IglooSection />
       <ButWaitSection />
       <ComparisonSection />
       <IndustrySection />
