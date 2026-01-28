@@ -1720,7 +1720,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
             {/* Menu QR */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+            <Link href={`/shop/${params.tenant}/menukaart`} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer block">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart`)}`}
@@ -1731,10 +1731,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-5xl mb-3">🍟</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.viewMenu')}</h3>
               <p className="text-gray-600">{t('shopPage.scanToSeeMenu')}</p>
-            </div>
+            </Link>
 
             {/* Promoties QR */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+            <Link href={`/shop/${params.tenant}/menukaart?promo=1`} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer block">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart?promo=1`)}`}
@@ -1745,10 +1745,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-5xl mb-3">🎁</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.promotions')}</h3>
               <p className="text-gray-600">{t('shopPage.scanToSeeOffers')}</p>
-            </div>
+            </Link>
 
             {/* Review QR */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+            <Link href={`/shop/${params.tenant}/review`} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer block">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/review`)}`}
@@ -1759,7 +1759,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-5xl mb-3">⭐</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.giveReview')}</h3>
               <p className="text-gray-600">{t('shopPage.scanToReview')}</p>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
