@@ -141,10 +141,16 @@ export default function RegisterPage() {
       
       localStorage.setItem('vysion_tenant', JSON.stringify(data.tenant))
       
-      // Show install popup first, then redirect
+      // Direct redirect to dashboard (no install popup)
       setTenantSlug(data.tenant.tenant_slug)
-      setShowInstallPopup(true)
       setSuccess(true)
+      
+      // Redirect directly to admin
+      if (window.location.hostname === 'localhost') {
+        router.push(`/shop/${data.tenant.tenant_slug}/admin`)
+      } else {
+        window.location.href = `https://${data.tenant.tenant_slug}.ordervysion.com/admin`
+      }
       
     } catch (err) {
       setError(t('register.error'))
