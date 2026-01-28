@@ -752,23 +752,12 @@ function IglooSection() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left - Igloo Image */}
           <div className="relative">
-            <div className="rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-blue-100 to-blue-200 aspect-[4/3] flex items-center justify-center">
+            <div className="rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">
               <img
-                src="/images/igloo-terras.png"
+                src="https://images.unsplash.com/photo-1551524559-8af4e6624178?w=800&q=80"
                 alt="Vysion Terras Igloo"
                 className="w-full h-full object-cover"
                 loading="lazy"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement
-                  target.style.display = 'none'
-                  target.parentElement!.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full p-8 text-center">
-                      <span class="text-8xl mb-4">🏔️</span>
-                      <p class="text-blue-800 font-semibold text-xl">Terras Igloo</p>
-                      <p class="text-blue-600 text-sm mt-2">Afbeelding wordt binnenkort toegevoegd</p>
-                    </div>
-                  `
-                }}
               />
             </div>
             {/* Price Badge */}
@@ -782,23 +771,12 @@ function IglooSection() {
           {/* Right - Skier Image & Features */}
           <div className="space-y-8">
             {/* Skier Image */}
-            <div className="rounded-3xl overflow-hidden shadow-xl bg-gradient-to-br from-sky-100 to-sky-200 aspect-[16/9] flex items-center justify-center">
+            <div className="rounded-3xl overflow-hidden shadow-xl aspect-[16/9]">
               <img
-                src="/images/skier-mountain.png"
+                src="https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800&q=80"
                 alt="Skiër op de berg"
                 className="w-full h-full object-cover"
                 loading="lazy"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement
-                  target.style.display = 'none'
-                  target.parentElement!.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full p-8 text-center">
-                      <span class="text-8xl mb-4">⛷️</span>
-                      <p class="text-sky-800 font-semibold text-xl">Winterse sfeer</p>
-                      <p class="text-sky-600 text-sm mt-2">Afbeelding wordt binnenkort toegevoegd</p>
-                    </div>
-                  `
-                }}
               />
             </div>
 
