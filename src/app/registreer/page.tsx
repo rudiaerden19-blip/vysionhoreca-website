@@ -164,7 +164,7 @@ export default function RegisterPage() {
   }
 
   // TestFlight and Play Store links
-  const TESTFLIGHT_URL = process.env.NEXT_PUBLIC_TESTFLIGHT_LINK || 'https://testflight.apple.com/join/XXXXXX'
+  const TESTFLIGHT_URL = 'https://testflight.apple.com/join/dFSQPBK3'
   const PLAYSTORE_URL = process.env.NEXT_PUBLIC_PLAYSTORE_LINK || 'https://play.google.com/store/apps/details?id=com.vysionhoreca.bestelplatform'
 
   if (success && showInstallPopup) {

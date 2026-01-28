@@ -317,6 +317,19 @@ async function sendVerificationEmail(email: string, name: string, token: string)
         </div>
         
         <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #333;">📱 Download de App</h3>
+          <p style="color: #555; line-height: 1.6; margin-bottom: 15px;">
+            Installeer de Vysion app op je iPad of iPhone:
+          </p>
+          <a href="https://testflight.apple.com/join/dFSQPBK3" 
+             style="background-color: #000; color: white; padding: 12px 24px; 
+                    text-decoration: none; border-radius: 8px; font-weight: bold;
+                    display: inline-block;">
+            🍎 Download voor iPad/iPhone
+          </a>
+        </div>
+        
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="margin-top: 0; color: #333;">Wat kun je nu doen?</h3>
           <ul style="color: #555; line-height: 1.8;">
             <li>Producten toevoegen aan je menu</li>
@@ -344,6 +357,9 @@ Bedankt voor je registratie bij Vysion Horeca! Je proefperiode van 14 dagen is g
 
 Klik op deze link om je emailadres te bevestigen:
 ${verifyUrl}
+
+📱 Download de App voor iPad/iPhone:
+https://testflight.apple.com/join/dFSQPBK3
 
 Deze link is 24 uur geldig.
 
