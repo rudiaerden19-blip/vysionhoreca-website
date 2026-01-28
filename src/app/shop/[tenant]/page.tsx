@@ -1731,6 +1731,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-5xl mb-3">🍟</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.viewMenu')}</h3>
               <p className="text-gray-600">{t('shopPage.scanToSeeMenu')}</p>
+              <p className="text-sm text-gray-400 mt-2">of klik om te openen</p>
             </Link>
 
             {/* Promoties QR */}
@@ -1745,6 +1746,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-5xl mb-3">🎁</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.promotions')}</h3>
               <p className="text-gray-600">{t('shopPage.scanToSeeOffers')}</p>
+              <p className="text-sm text-gray-400 mt-2">of klik om te openen</p>
             </Link>
 
             {/* Review QR */}
@@ -1759,6 +1761,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <div className="text-5xl mb-3">⭐</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t('shopPage.giveReview')}</h3>
               <p className="text-gray-600">{t('shopPage.scanToReview')}</p>
+              <p className="text-sm text-gray-400 mt-2">of klik om te openen</p>
             </Link>
           </div>
         </div>
