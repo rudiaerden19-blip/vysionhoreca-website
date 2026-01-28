@@ -53,12 +53,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     async function loadBusinessName() {
       const settings = await getTenantSettings(params.tenant)
       if (settings?.business_name) {
-        // Haal alleen de voornaam/eerste woord uit de business name
-        // bijv. "Frituur Danny" -> "Danny"
-        const words = settings.business_name.split(' ')
-        const name = words.length > 1 ? words.slice(1).join(' ') : words[0]
+        // Toon de volledige business name (bijv. "Frituur Nolim")
         // Zorg dat elk woord met een hoofdletter begint
-        const capitalizedName = name.split(' ').map(word => 
+        const capitalizedName = settings.business_name.split(' ').map((word: string) => 
           word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
         ).join(' ')
         setBusinessName(capitalizedName)
