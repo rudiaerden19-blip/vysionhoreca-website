@@ -56,39 +56,11 @@ export async function POST(request: NextRequest) {
       `- ID: "${p.id}" | Naam: "${p.name}" | Prijs: €${p.price.toFixed(2)} | Categorie: ${p.category_name || 'Overig'}`
     ).join('\n')
 
-    const prompt = `Je krijgt een audio-opname van een klant die een bestelling plaatst bij een frituur/snackbar.
-
-STAP 1: Luister naar de audio en schrijf op wat de klant zegt.
-STAP 2: Match wat de klant bestelt met de beschikbare producten.
-
-BESCHIKBARE PRODUCTEN:
+    const prompt = `Luister naar de audio en match met producten. Producten:
 ${productList}
 
-MATCH REGELS:
-1. Match producten op basis van naam, ook met synoniemen:
-   - "friet" = "frieten" = "patat" = "frites"
-   - "frikandel" = "frikadel" 
-   - "mayo" = "mayonaise"
-   - "grote" / "klein" / "medium" = zoek naar formaat in productnaam
-2. Als de klant een aantal noemt, gebruik dat. Anders default naar 1.
-3. Sauzen/extras (mayo, ketchup, zout) → voeg toe als "extras"
-4. Niet te matchen items → in "not_matched"
-
-RETOURNEER ALLEEN GELDIGE JSON:
-{
-  "transcription": "wat de klant zei",
-  "matched": [
-    {
-      "product_id": "uuid-hier",
-      "product_name": "Grote Friet",
-      "quantity": 1,
-      "price": 4.50,
-      "extras": ["mayonaise", "zout"]
-    }
-  ],
-  "not_matched": ["items die niet gevonden werden"],
-  "total": 4.50
-}`
+JSON output:
+{"transcription":"tekst","matched":[{"product_id":"id","product_name":"naam","quantity":1,"price":0.00,"extras":[]}],"not_matched":[],"total":0.00}`
 
     // Call Gemini API with audio
     const response = await fetch(

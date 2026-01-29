@@ -119,7 +119,10 @@ export default function VoiceOrderButton({
       console.log('[Voice Order] Starting media recording...')
       
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: true // Simplified for iOS compatibility
+        audio: {
+          sampleRate: 16000, // Lower sample rate = smaller file
+          channelCount: 1,   // Mono = half the size
+        }
       })
       streamRef.current = stream
       console.log('[Voice Order] Got audio stream')
@@ -531,11 +534,12 @@ export default function VoiceOrderButton({
                   <div className="text-center py-12">
                     <motion.div
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
                       className="w-16 h-16 border-4 rounded-full mx-auto mb-4"
                       style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
                     />
                     <p className={textColor}>{t.processing}</p>
+                    <p className={`text-sm ${mutedColor} mt-2`}>Even geduld...</p>
                   </div>
                 )}
 
