@@ -70,7 +70,6 @@ export default function VoiceOrderButton({
   const [notMatched, setNotMatched] = useState<string[]>([])
   const [total, setTotal] = useState(0)
   const [error, setError] = useState('')
-  const [isSpeaking, setIsSpeaking] = useState(false)
   const [useServerProcessing, setUseServerProcessing] = useState(false)
   
   const recognitionRef = useRef<any>(null)
@@ -232,10 +231,7 @@ export default function VoiceOrderButton({
       setNotMatched(data.not_matched || [])
       setTotal(data.total || 0)
 
-      if (data.matched && data.matched.length > 0) {
-        const confirmText = generateConfirmationText(data.matched, data.total)
-        speakText(confirmText)
-      } else {
+      if (!data.matched || data.matched.length === 0) {
         setError(t.noProductsFound)
       }
 
@@ -341,10 +337,7 @@ export default function VoiceOrderButton({
       setNotMatched(data.not_matched || [])
       setTotal(data.total || 0)
 
-      if (data.matched && data.matched.length > 0) {
-        const confirmText = generateConfirmationText(data.matched, data.total)
-        speakText(confirmText)
-      } else {
+      if (!data.matched || data.matched.length === 0) {
         setError(t.noProductsFound)
       }
 
@@ -354,92 +347,6 @@ export default function VoiceOrderButton({
     } finally {
       setIsProcessing(false)
     }
-  }
-
-  // ===== Shared functions =====
-  const generateConfirmationText = (items: MatchedProduct[], total: number): string => {
-    const itemTexts = items.map(item => {
-      let text = `${item.quantity} ${item.product_name}`
-      if (item.extras && item.extras.length > 0) {
-        text += ` met ${item.extras.join(' en ')}`
-      }
-      return text
-    })
-
-    const itemList = itemTexts.length === 1 
-      ? itemTexts[0]
-      : itemTexts.slice(0, -1).join(', ') + ' en ' + itemTexts[itemTexts.length - 1]
-
-    const euros = Math.floor(total)
-    const cents = Math.round((total - euros) * 100)
-    const totalText = cents > 0 ? `${euros} euro ${cents}` : `${euros} euro`
-    
-    return `U heeft besteld: ${itemList}. Totaal ${totalText}. Wilt u afrekenen?`
-  }
-
-  // Store text to speak - will be spoken on next user interaction
-  const pendingSpeechRef = useRef<string | null>(null)
-
-  const speakText = (text: string) => {
-    // On iOS, we can't auto-play speech, so store it for the "Afspelen" button
-    pendingSpeechRef.current = text
-    setIsSpeaking(false)
-    
-    // Try to speak anyway (works on desktop)
-    if ('speechSynthesis' in window) {
-      try {
-        window.speechSynthesis.cancel()
-        
-        const utterance = new SpeechSynthesisUtterance(text)
-        utterance.lang = languageCodeMap[language] || 'nl-NL'
-        utterance.rate = 0.95
-        utterance.volume = 1
-
-        const voices = window.speechSynthesis.getVoices()
-        const langCode = languageCodeMap[language] || 'nl-NL'
-        const preferredVoice = voices.find(v => v.lang === langCode) || 
-                              voices.find(v => v.lang.startsWith(language.split('-')[0]))
-        
-        if (preferredVoice) {
-          utterance.voice = preferredVoice
-        }
-
-        utterance.onstart = () => setIsSpeaking(true)
-        utterance.onend = () => setIsSpeaking(false)
-        utterance.onerror = () => setIsSpeaking(false)
-
-        window.speechSynthesis.speak(utterance)
-      } catch (e) {
-        console.log('[Voice Order] Auto-speech failed, user can tap to hear')
-      }
-    }
-  }
-
-  // Manual speak button for iOS
-  const handleManualSpeak = () => {
-    if (!pendingSpeechRef.current || !('speechSynthesis' in window)) return
-    
-    window.speechSynthesis.cancel()
-    
-    const utterance = new SpeechSynthesisUtterance(pendingSpeechRef.current)
-    utterance.lang = languageCodeMap[language] || 'nl-NL'
-    utterance.rate = 0.95
-    utterance.volume = 1
-
-    const voices = window.speechSynthesis.getVoices()
-    const langCode = languageCodeMap[language] || 'nl-NL'
-    const preferredVoice = voices.find(v => v.lang === langCode) || 
-                          voices.find(v => v.lang.startsWith(language.split('-')[0]))
-    
-    if (preferredVoice) {
-      utterance.voice = preferredVoice
-    }
-
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
-
-    window.speechSynthesis.speak(utterance)
   }
 
   const handleConfirm = () => {
@@ -452,17 +359,14 @@ export default function VoiceOrderButton({
   }
 
   const handleRetry = () => {
-    window.speechSynthesis?.cancel()
     setError('')
     setTranscribedText('')
     setMatchedProducts([])
     setNotMatched([])
     setTotal(0)
-    setIsSpeaking(false)
   }
 
   const resetState = () => {
-    window.speechSynthesis?.cancel()
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop())
     }
@@ -474,7 +378,6 @@ export default function VoiceOrderButton({
     setNotMatched([])
     setTotal(0)
     setError('')
-    setIsSpeaking(false)
   }
 
   const bgColor = darkMode ? 'bg-[#1a1a1a]' : 'bg-white'
@@ -648,31 +551,17 @@ export default function VoiceOrderButton({
                       </p>
                     </div>
 
-                    {/* Play audio button + Speaking indicator */}
-                    <button
-                      onClick={handleManualSpeak}
-                      className={`w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${
-                        isSpeaking 
-                          ? 'bg-green-500 text-white' 
-                          : `${cardBg} ${textColor}`
-                      }`}
-                    >
-                      {isSpeaking ? (
-                        <>
-                          <motion.div
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ repeat: Infinity, duration: 0.5 }}
-                            className="w-3 h-3 rounded-full bg-white"
-                          />
-                          <span>Aan het spreken...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>🔊</span>
-                          <span>Beluister bestelling</span>
-                        </>
-                      )}
-                    </button>
+                    {/* Spoken confirmation text */}
+                    <div className={`${cardBg} rounded-xl p-4 border-2`} style={{ borderColor: primaryColor }}>
+                      <p className={`text-center font-medium ${textColor}`}>
+                        ✅ {matchedProducts.map(item => 
+                          `${item.quantity}x ${item.product_name}${item.extras?.length ? ` + ${item.extras.join(', ')}` : ''}`
+                        ).join(', ')}
+                      </p>
+                      <p className="text-center text-2xl font-bold mt-2" style={{ color: primaryColor }}>
+                        Totaal: €{total.toFixed(2)}
+                      </p>
+                    </div>
 
                     {/* Action buttons */}
                     <div className="flex gap-3">
