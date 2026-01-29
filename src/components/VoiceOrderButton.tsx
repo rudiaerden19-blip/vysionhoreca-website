@@ -81,7 +81,7 @@ export default function VoiceOrderButton({
   const recordingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null)
   
-  const MAX_RECORDING_SECONDS = 30
+  const MAX_RECORDING_SECONDS = 120  // 2 minuten - genoeg voor lange bestellingen
 
   const [isSpeaking, setIsSpeaking] = useState(false)
 
@@ -567,12 +567,12 @@ export default function VoiceOrderButton({
                       {isRecording ? '⏹️' : '🎤'}
                     </motion.button>
 
-                    <p className={`text-sm ${mutedColor}`}>
+                    <p className={`text-sm ${mutedColor} text-center`}>
                       {isRecording ? (
                         <>
-                          {t.listening} 
-                          <span className="ml-2 font-mono text-orange-500">
-                            {MAX_RECORDING_SECONDS - recordingSeconds}s
+                          <span className="block">{t.listening}</span>
+                          <span className="block mt-1 font-medium">
+                            Druk nogmaals op de knop als u klaar bent
                           </span>
                         </>
                       ) : t.speakNow}
