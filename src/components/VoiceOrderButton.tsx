@@ -78,9 +78,14 @@ export default function VoiceOrderButton({
 
   // Check browser support on mount
   useEffect(() => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
-    // Use server processing if Web Speech API is not available (iOS Safari, Firefox, etc.)
-    if (!SpeechRecognition) {
+    // Detect iOS/Safari - always use server processing for these
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    const isFirefox = /firefox/i.test(navigator.userAgent)
+    
+    // Web Speech API is unreliable on mobile, use server processing
+    if (isIOS || isSafari || isFirefox || !('webkitSpeechRecognition' in window)) {
+      console.log('[Voice Order] Using server processing (iOS/Safari/Firefox detected)')
       setUseServerProcessing(true)
     }
   }, [])
@@ -270,7 +275,7 @@ export default function VoiceOrderButton({
         await processTextWithServer(transcript)
       }
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = async (event: any) => {
         console.error('[Voice Order] Recognition error:', event.error)
         setIsRecording(false)
         
@@ -282,8 +287,14 @@ export default function VoiceOrderButton({
           setError('Netwerkfout. Controleer je internetverbinding.')
         } else if (event.error === 'aborted') {
           // User stopped, not an error
+        } else if (event.error === 'audio-capture') {
+          // Microphone issue - switch to server processing
+          console.log('[Voice Order] audio-capture error, switching to server processing')
+          setUseServerProcessing(true)
+          setError('Spraakherkenning niet beschikbaar op dit apparaat. Probeer opnieuw.')
         } else {
-          // Try fallback to server processing
+          // Any other error - switch to server processing
+          console.log('[Voice Order] Unknown error, switching to server processing')
           setUseServerProcessing(true)
           setError('Spraakherkenning niet beschikbaar. Probeer opnieuw.')
         }
