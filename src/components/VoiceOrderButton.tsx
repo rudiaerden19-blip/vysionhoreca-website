@@ -66,6 +66,7 @@ export default function VoiceOrderButton({
   const [isOpen, setIsOpen] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [recordingSeconds, setRecordingSeconds] = useState(0)
   const [transcribedText, setTranscribedText] = useState('')
   const [matchedProducts, setMatchedProducts] = useState<MatchedProduct[]>([])
   const [notMatched, setNotMatched] = useState<string[]>([])
@@ -77,6 +78,10 @@ export default function VoiceOrderButton({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
+  const recordingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  
+  const MAX_RECORDING_SECONDS = 30
 
   // Speak confirmation using best available Dutch voice
   const speakConfirmation = (items: MatchedProduct[], totalAmount: number) => {
@@ -163,6 +168,26 @@ export default function VoiceOrderButton({
     setMatchedProducts([])
     setNotMatched([])
 
+    // Clear any existing timeout and interval
+    if (recordingTimeoutRef.current) {
+      clearTimeout(recordingTimeoutRef.current)
+    }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current)
+    }
+
+    // Start countdown timer
+    setRecordingSeconds(0)
+    countdownIntervalRef.current = setInterval(() => {
+      setRecordingSeconds(prev => prev + 1)
+    }, 1000)
+
+    // Auto-stop after MAX_RECORDING_SECONDS
+    recordingTimeoutRef.current = setTimeout(() => {
+      console.log(`[Voice Order] Auto-stopping after ${MAX_RECORDING_SECONDS} seconds`)
+      stopRecording()
+    }, MAX_RECORDING_SECONDS * 1000)
+
     if (useServerProcessing) {
       // Use MediaRecorder for iOS/unsupported browsers
       await startMediaRecording()
@@ -173,6 +198,17 @@ export default function VoiceOrderButton({
   }
 
   const stopRecording = () => {
+    // Clear auto-stop timeout and countdown
+    if (recordingTimeoutRef.current) {
+      clearTimeout(recordingTimeoutRef.current)
+      recordingTimeoutRef.current = null
+    }
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current)
+      countdownIntervalRef.current = null
+    }
+    setRecordingSeconds(0)
+
     if (useServerProcessing) {
       stopMediaRecording()
     } else {
@@ -531,7 +567,14 @@ export default function VoiceOrderButton({
                     </motion.button>
 
                     <p className={`text-sm ${mutedColor}`}>
-                      {isRecording ? t.listening : t.speakNow}
+                      {isRecording ? (
+                        <>
+                          {t.listening} 
+                          <span className="ml-2 font-mono text-orange-500">
+                            {MAX_RECORDING_SECONDS - recordingSeconds}s
+                          </span>
+                        </>
+                      ) : t.speakNow}
                     </p>
 
                     {/* Example text */}
