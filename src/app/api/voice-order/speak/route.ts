@@ -8,60 +8,73 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Geen tekst' }, { status: 400 })
     }
 
-    const apiKey = process.env.GOOGLE_GEMINI_API_KEY
-    console.log('[TTS] API Key exists:', !!apiKey, 'Length:', apiKey?.length)
+    // Try Google Cloud TTS key first (for high-quality Wavenet voices)
+    const cloudApiKey = process.env.GOOGLE_CLOUD_API_KEY
+    const geminiApiKey = process.env.GOOGLE_GEMINI_API_KEY
     
-    if (!apiKey) {
-      return NextResponse.json({ success: false, error: 'API key mist in Vercel' }, { status: 500 })
-    }
-
-    // Use Google Cloud Text-to-Speech API
-    const response = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          input: { text },
-          voice: {
-            languageCode: 'nl-NL',
-            name: 'nl-NL-Wavenet-E', // Female Dutch voice - sounds very natural
-            ssmlGender: 'FEMALE'
-          },
-          audioConfig: {
-            audioEncoding: 'MP3',
-            speakingRate: 0.9,  // Iets langzamer voor duidelijkheid
-            pitch: 0  // Normale pitch
+    console.log('[TTS] Cloud API Key exists:', !!cloudApiKey, 'length:', cloudApiKey?.length)
+    console.log('[TTS] Gemini API Key exists:', !!geminiApiKey)
+    
+    let lastError = 'Geen API key geconfigureerd'
+    
+    // If we have a Cloud API key, use high-quality Wavenet TTS
+    if (cloudApiKey) {
+      console.log('[TTS] Trying Google Cloud Wavenet TTS...')
+      try {
+        const response = await fetch(
+          `https://texttospeech.googleapis.com/v1/text:synthesize?key=${cloudApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              input: { text },
+              voice: {
+                languageCode: 'nl-NL',
+                name: 'nl-NL-Wavenet-E',
+                ssmlGender: 'FEMALE'
+              },
+              audioConfig: {
+                audioEncoding: 'MP3',
+                speakingRate: 0.9,
+                pitch: 0
+              }
+            })
           }
-        })
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          console.log('[TTS] Cloud TTS SUCCESS!')
+          return NextResponse.json({
+            success: true,
+            audio: data.audioContent,
+            mimeType: 'audio/mp3'
+          })
+        }
+        
+        const errorData = await response.json().catch(() => ({}))
+        lastError = `Cloud TTS ${response.status}: ${errorData?.error?.message || 'Unknown error'}`
+        console.error('[TTS] Cloud TTS error:', lastError)
+      } catch (fetchError: any) {
+        lastError = `Cloud TTS fetch error: ${fetchError.message}`
+        console.error('[TTS]', lastError)
       }
-    )
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      console.error('[TTS] Google Cloud TTS error:', response.status, JSON.stringify(errorData))
-      
-      // Return specific error message with status code
-      const errorMsg = errorData?.error?.message || `TTS error ${response.status}`
-      return NextResponse.json({ 
-        success: false, 
-        error: `${response.status}: ${errorMsg}`
-      }, { status: 200 }) // Return 200 so frontend gets the error message
     }
-
-    const data = await response.json()
     
-    // Return base64 audio
+    // Return error with details so we can debug
+    console.log('[TTS] All methods failed, returning error:', lastError)
     return NextResponse.json({
-      success: true,
-      audio: data.audioContent, // base64 encoded MP3
-    })
+      success: false,
+      error: lastError,
+      fallback_text: text
+    }, { status: 200 })
 
   } catch (error: any) {
     console.error('[TTS] Error:', error)
     return NextResponse.json({ 
       success: false, 
-      error: error?.message || 'TTS mislukt' 
+      error: error?.message || 'TTS mislukt',
+      fallback_text: '' 
     }, { status: 500 })
   }
 }

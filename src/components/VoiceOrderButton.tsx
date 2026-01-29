@@ -110,7 +110,21 @@ export default function VoiceOrderButton({
     return `U heeft besteld: ${itemList}. Totaal ${totalText}.`
   }
 
-  // Google Cloud TTS - high quality voice
+  // Browser TTS fallback
+  const speakWithBrowser = (text: string) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = 'nl-NL'
+      utterance.rate = 0.9
+      utterance.onend = () => setIsSpeaking(false)
+      utterance.onerror = () => setIsSpeaking(false)
+      window.speechSynthesis.speak(utterance)
+    } else {
+      setIsSpeaking(false)
+    }
+  }
+
+  // Gemini TTS with browser fallback
   const speakConfirmation = async (items: MatchedProduct[], totalAmount: number) => {
     const text = buildConfirmationText(items, totalAmount)
     
@@ -129,7 +143,7 @@ export default function VoiceOrderButton({
     } catch {}
 
     try {
-      // Get TTS audio from our API
+      // Get TTS audio from our API (now using Gemini)
       const response = await fetch('/api/voice-order/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -139,18 +153,30 @@ export default function VoiceOrderButton({
       const data = await response.json()
       
       if (data.success && data.audio) {
-        // Set the real audio and play
-        audio.src = `data:audio/mp3;base64,${data.audio}`
+        // Set the real audio and play - handle different mime types
+        const mimeType = data.mimeType || 'audio/mp3'
+        audio.src = `data:${mimeType};base64,${data.audio}`
         audio.onended = () => setIsSpeaking(false)
-        audio.onerror = () => setIsSpeaking(false)
+        audio.onerror = () => {
+          console.log('[TTS] Audio playback failed, trying browser TTS')
+          speakWithBrowser(text)
+        }
         await audio.play()
+      } else if (data.fallback_text) {
+        // Use browser TTS as fallback
+        console.log('[TTS] API failed, using browser TTS. Error:', data.error)
+        speakWithBrowser(data.fallback_text)
       } else {
-        alert('Stem fout: ' + (data.error || 'Probeer opnieuw'))
-        setIsSpeaking(false)
+        // Show the specific error for debugging
+        const errorMsg = data.error || 'Onbekende fout'
+        console.log('[TTS] Error:', errorMsg)
+        alert(`TTS Debug: ${errorMsg}`)
+        speakWithBrowser(text)
       }
-    } catch (err) {
-      alert('Stem fout: Probeer opnieuw')
-      setIsSpeaking(false)
+    } catch (err: any) {
+      console.log('[TTS] Fetch error:', err)
+      alert(`TTS Fetch Error: ${err.message}`)
+      speakWithBrowser(text)
     }
   }
 
