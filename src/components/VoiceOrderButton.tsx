@@ -83,10 +83,8 @@ export default function VoiceOrderButton({
   
   const MAX_RECORDING_SECONDS = 30
 
-  // Speak confirmation using best available Dutch voice
+  // Speak confirmation using Google Translate TTS (sounds more natural)
   const speakConfirmation = (items: MatchedProduct[], totalAmount: number) => {
-    if (!('speechSynthesis' in window)) return
-
     // Build text
     const itemTexts = items.map(item => {
       let text = `${item.quantity} ${item.product_name}`
@@ -107,32 +105,35 @@ export default function VoiceOrderButton({
     const cents = Math.round((totalAmount - euros) * 100)
     const totalText = cents > 0 ? `${euros} euro ${cents}` : `${euros} euro`
     
-    const fullText = `${itemList}. Totaal ${totalText}.`
+    const fullText = `U heeft besteld: ${itemList}. Totaal ${totalText}.`
 
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel()
-
-    const utterance = new SpeechSynthesisUtterance(fullText)
-    utterance.lang = 'nl-NL'
-    utterance.rate = 0.9
-    utterance.pitch = 1.0
-    utterance.volume = 1.0
-
-    // Try to find best Dutch voice
-    const voices = window.speechSynthesis.getVoices()
-    const dutchVoices = voices.filter(v => v.lang.startsWith('nl'))
-    
-    // Prefer female voices (usually sound better)
-    const preferredVoice = dutchVoices.find(v => 
-      v.name.toLowerCase().includes('female') || 
-      v.name.toLowerCase().includes('vrouw') ||
-      v.name.includes('Ellen') ||
-      v.name.includes('Flo')
-    ) || dutchVoices[0]
-
-    if (preferredVoice) {
-      utterance.voice = preferredVoice
+    // Use Google Translate TTS (sounds much better than browser TTS)
+    try {
+      const audio = new Audio(
+        `https://translate.google.com/translate_tts?ie=UTF-8&tl=nl&client=tw-ob&q=${encodeURIComponent(fullText)}`
+      )
+      audio.play().catch(() => {
+        // Fallback to browser TTS if Google fails
+        fallbackBrowserTTS(fullText)
+      })
+    } catch {
+      fallbackBrowserTTS(fullText)
     }
+  }
+
+  // Fallback browser TTS
+  const fallbackBrowserTTS = (text: string) => {
+    if (!('speechSynthesis' in window)) return
+    
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = 'nl-NL'
+    utterance.rate = 0.85
+    utterance.pitch = 1.1
+
+    const voices = window.speechSynthesis.getVoices()
+    const dutchVoice = voices.find(v => v.lang.startsWith('nl'))
+    if (dutchVoice) utterance.voice = dutchVoice
 
     window.speechSynthesis.speak(utterance)
   }
