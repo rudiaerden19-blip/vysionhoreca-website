@@ -84,9 +84,97 @@ export default function VoiceOrderButton({
   const MAX_RECORDING_SECONDS = 30
 
   const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isListeningForConfirm, setIsListeningForConfirm] = useState(false)
 
-  // Speak confirmation - ALWAYS uses browser TTS (100% reliable)
-  const speakConfirmation = (items: MatchedProduct[], totalAmount: number) => {
+  // Get best Dutch voice
+  const getBestDutchVoice = () => {
+    const voices = window.speechSynthesis.getVoices()
+    const dutchVoices = voices.filter(v => v.lang.startsWith('nl'))
+    
+    if (dutchVoices.length > 0) {
+      return dutchVoices.find(v => v.name.includes('Google')) ||
+        dutchVoices.find(v => v.name.includes('Microsoft') && !v.name.includes('Online')) ||
+        dutchVoices.find(v => v.name.includes('Xander') || v.name.includes('Ellen') || v.name.includes('Claire')) ||
+        dutchVoices.find(v => !v.localService) ||
+        dutchVoices[0]
+    }
+    return null
+  }
+
+  // Speak text and return promise when done
+  const speakText = (text: string): Promise<void> => {
+    return new Promise((resolve) => {
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = 'nl-NL'
+      utterance.rate = 0.85
+      utterance.pitch = 1.05
+      utterance.volume = 1.0
+      
+      const voice = getBestDutchVoice()
+      if (voice) utterance.voice = voice
+      
+      utterance.onend = () => resolve()
+      utterance.onerror = () => resolve()
+      
+      window.speechSynthesis.speak(utterance)
+    })
+  }
+
+  // Listen for yes/no answer
+  const listenForConfirmation = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      
+      if (!SpeechRecognition) {
+        // No speech recognition, resolve as false (user can click button)
+        resolve(false)
+        return
+      }
+
+      setIsListeningForConfirm(true)
+      const recognition = new SpeechRecognition()
+      recognition.lang = 'nl-NL'
+      recognition.continuous = false
+      recognition.interimResults = false
+
+      let answered = false
+      
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript.toLowerCase()
+        console.log('[Voice Confirm] Heard:', transcript)
+        answered = true
+        
+        // Check for yes/no
+        if (transcript.includes('ja') || transcript.includes('yes') || transcript.includes('ok') || transcript.includes('oké') || transcript.includes('akkoord')) {
+          resolve(true)
+        } else if (transcript.includes('nee') || transcript.includes('no') || transcript.includes('niet') || transcript.includes('cancel')) {
+          resolve(false)
+        } else {
+          resolve(false) // Unknown answer = no
+        }
+      }
+
+      recognition.onerror = () => {
+        setIsListeningForConfirm(false)
+        resolve(false)
+      }
+
+      recognition.onend = () => {
+        setIsListeningForConfirm(false)
+        if (!answered) resolve(false)
+      }
+
+      // Auto-stop after 5 seconds
+      setTimeout(() => {
+        try { recognition.stop() } catch {}
+      }, 5000)
+
+      recognition.start()
+    })
+  }
+
+  // Speak confirmation with voice confirmation flow
+  const speakConfirmation = async (items: MatchedProduct[], totalAmount: number, askToConfirm = false) => {
     if (!('speechSynthesis' in window)) {
       alert('Spraak niet ondersteund op dit apparaat')
       return
@@ -116,35 +204,31 @@ export default function VoiceOrderButton({
 
     // Cancel any ongoing speech
     window.speechSynthesis.cancel()
+    setIsSpeaking(true)
 
-    const utterance = new SpeechSynthesisUtterance(fullText)
-    utterance.lang = 'nl-NL'
-    utterance.rate = 0.85  // Langzamer = duidelijker
-    utterance.pitch = 1.05  // Iets hoger = vriendelijker
-    utterance.volume = 1.0
+    // Speak the order
+    await speakText(fullText)
 
-    // Find best Dutch voice - prioritize high quality voices
-    const voices = window.speechSynthesis.getVoices()
-    const dutchVoices = voices.filter(v => v.lang.startsWith('nl'))
-    
-    if (dutchVoices.length > 0) {
-      // Quality ranking: Google > Microsoft > Apple > others
-      const preferredVoice = 
-        dutchVoices.find(v => v.name.includes('Google')) ||
-        dutchVoices.find(v => v.name.includes('Microsoft') && !v.name.includes('Online')) ||
-        dutchVoices.find(v => v.name.includes('Xander') || v.name.includes('Ellen') || v.name.includes('Claire')) ||
-        dutchVoices.find(v => !v.localService) || // Cloud voices are usually better
-        dutchVoices[0]
+    // If askToConfirm, ask and listen for response
+    if (askToConfirm) {
+      await speakText('Wilt u afrekenen? Zeg ja of nee.')
       
-      utterance.voice = preferredVoice
-      console.log('[TTS] Using voice:', preferredVoice?.name)
+      const confirmed = await listenForConfirmation()
+      
+      if (confirmed) {
+        await speakText('Oké, u wordt doorgestuurd naar de kassa.')
+        handleConfirm()
+      } else {
+        await speakText('Oké, geen probleem. U kunt de bestelling aanpassen.')
+      }
     }
 
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
+    setIsSpeaking(false)
+  }
 
-    window.speechSynthesis.speak(utterance)
+  // Simple speak for button click (no confirmation flow)
+  const speakOnly = (items: MatchedProduct[], totalAmount: number) => {
+    speakConfirmation(items, totalAmount, false)
   }
 
   // Load voices on mount (needed for some browsers)
@@ -344,8 +428,8 @@ export default function VoiceOrderButton({
       setTotal(data.total || 0)
 
       if (data.matched && data.matched.length > 0) {
-        // Speak the confirmation
-        speakConfirmation(data.matched, data.total || 0)
+        // Speak the confirmation and ask if they want to checkout
+        speakConfirmation(data.matched, data.total || 0, true)
       } else {
         setError(t.noProductsFound)
       }
@@ -453,8 +537,8 @@ export default function VoiceOrderButton({
       setTotal(data.total || 0)
 
       if (data.matched && data.matched.length > 0) {
-        // Speak the confirmation
-        speakConfirmation(data.matched, data.total || 0)
+        // Speak the confirmation and ask if they want to checkout
+        speakConfirmation(data.matched, data.total || 0, true)
       } else {
         setError(t.noProductsFound)
       }
@@ -704,13 +788,13 @@ export default function VoiceOrderButton({
 
                     {/* Listen again button */}
                     <button
-                      onClick={() => speakConfirmation(matchedProducts, total)}
-                      disabled={isSpeaking}
-                      className={`w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${cardBg} ${textColor} border-2 ${isSpeaking ? 'opacity-70' : ''}`}
+                      onClick={() => speakOnly(matchedProducts, total)}
+                      disabled={isSpeaking || isListeningForConfirm}
+                      className={`w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${cardBg} ${textColor} border-2 ${isSpeaking || isListeningForConfirm ? 'opacity-70' : ''}`}
                       style={{ borderColor: primaryColor }}
                     >
-                      <span>{isSpeaking ? '🔉' : '🔊'}</span>
-                      <span>{isSpeaking ? 'Aan het spreken...' : 'Beluister bestelling'}</span>
+                      <span>{isSpeaking ? '🔉' : isListeningForConfirm ? '🎤' : '🔊'}</span>
+                      <span>{isSpeaking ? 'Aan het spreken...' : isListeningForConfirm ? 'Luisteren...' : 'Beluister bestelling'}</span>
                     </button>
 
                     {/* Action buttons */}
