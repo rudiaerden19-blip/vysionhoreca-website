@@ -9,8 +9,10 @@ export async function POST(request: NextRequest) {
     }
 
     const apiKey = process.env.GOOGLE_GEMINI_API_KEY
+    console.log('[TTS] API Key exists:', !!apiKey, 'Length:', apiKey?.length)
+    
     if (!apiKey) {
-      return NextResponse.json({ success: false, error: 'API key niet geconfigureerd' }, { status: 500 })
+      return NextResponse.json({ success: false, error: 'API key mist in Vercel' }, { status: 500 })
     }
 
     // Use Google Cloud Text-to-Speech API
@@ -39,13 +41,12 @@ export async function POST(request: NextRequest) {
       const errorData = await response.json().catch(() => ({}))
       console.error('[TTS] Google Cloud TTS error:', response.status, JSON.stringify(errorData))
       
-      // Return specific error message
-      const errorMsg = errorData?.error?.message || 'Stem niet beschikbaar'
+      // Return specific error message with status code
+      const errorMsg = errorData?.error?.message || `TTS error ${response.status}`
       return NextResponse.json({ 
         success: false, 
-        error: errorMsg,
-        details: errorData
-      }, { status: response.status })
+        error: `${response.status}: ${errorMsg}`
+      }, { status: 200 }) // Return 200 so frontend gets the error message
     }
 
     const data = await response.json()
