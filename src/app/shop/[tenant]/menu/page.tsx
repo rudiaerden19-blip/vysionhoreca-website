@@ -803,7 +803,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               setCart(prev => [...prev, cartItem])
             }
           })
-          setCartOpen(true)
+        }}
+        onGoToCheckout={() => {
+          router.push(`/shop/${params.tenant}/checkout`)
         }}
         translations={{
           listening: 'Luisteren...',

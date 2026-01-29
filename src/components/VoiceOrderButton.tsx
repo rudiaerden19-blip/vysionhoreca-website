@@ -24,6 +24,7 @@ interface VoiceOrderButtonProps {
   primaryColor: string
   darkMode?: boolean
   onOrderConfirmed: (items: MatchedProduct[]) => void
+  onGoToCheckout: () => void
   translations: {
     listening: string
     processing: string
@@ -58,6 +59,7 @@ export default function VoiceOrderButton({
   primaryColor,
   darkMode = false,
   onOrderConfirmed,
+  onGoToCheckout,
   translations: t,
 }: VoiceOrderButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -384,30 +386,59 @@ export default function VoiceOrderButton({
     // Cancel any ongoing speech
     window.speechSynthesis.cancel()
 
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = languageCodeMap[language] || 'nl-NL'
-    utterance.rate = 0.9
-    utterance.pitch = 1
+    // Wait for voices to load (needed on some browsers)
+    const speak = () => {
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = languageCodeMap[language] || 'nl-NL'
+      utterance.rate = 0.95
+      utterance.pitch = 1
+      utterance.volume = 1
 
-    // Try to find a good voice for the language
-    const voices = window.speechSynthesis.getVoices()
-    const langCode = languageCodeMap[language] || 'nl-NL'
-    const preferredVoice = voices.find(v => v.lang === langCode) || 
-                          voices.find(v => v.lang.startsWith(language))
-    if (preferredVoice) {
-      utterance.voice = preferredVoice
+      // Try to find a good voice for the language
+      const voices = window.speechSynthesis.getVoices()
+      const langCode = languageCodeMap[language] || 'nl-NL'
+      
+      // Prefer female voices, they're usually clearer
+      const preferredVoice = voices.find(v => v.lang === langCode && v.name.includes('Female')) ||
+                            voices.find(v => v.lang === langCode) || 
+                            voices.find(v => v.lang.startsWith(language.split('-')[0]))
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice
+        console.log('[Voice Order] Using voice:', preferredVoice.name)
+      }
+
+      utterance.onstart = () => {
+        console.log('[Voice Order] Speaking started')
+        setIsSpeaking(true)
+      }
+      utterance.onend = () => {
+        console.log('[Voice Order] Speaking ended')
+        setIsSpeaking(false)
+      }
+      utterance.onerror = (e) => {
+        console.error('[Voice Order] Speech error:', e)
+        setIsSpeaking(false)
+      }
+
+      window.speechSynthesis.speak(utterance)
     }
 
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
-
-    window.speechSynthesis.speak(utterance)
+    // Voices might not be loaded yet
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = speak
+    } else {
+      speak()
+    }
   }
 
   const handleConfirm = () => {
     onOrderConfirmed(matchedProducts)
     resetState()
+    // Go to checkout after adding to cart
+    setTimeout(() => {
+      onGoToCheckout()
+    }, 100)
   }
 
   const handleRetry = () => {
