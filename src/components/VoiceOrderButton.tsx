@@ -85,13 +85,8 @@ export default function VoiceOrderButton({
 
   const [isSpeaking, setIsSpeaking] = useState(false)
 
-  // Simple, reliable TTS - just speaks the text
-  const speakConfirmation = (items: MatchedProduct[], totalAmount: number) => {
-    if (!('speechSynthesis' in window)) {
-      alert('Spraak niet ondersteund')
-      return
-    }
-
+  // Use Google Cloud TTS for high quality voice
+  const speakConfirmation = async (items: MatchedProduct[], totalAmount: number) => {
     // Build text
     const itemTexts = items.map(item => {
       let text = `${item.quantity} ${item.product_name}`
@@ -112,30 +107,35 @@ export default function VoiceOrderButton({
     const cents = Math.round((totalAmount - euros) * 100)
     const totalText = cents > 0 ? `${euros} euro ${cents}` : `${euros} euro`
     
-    const fullText = `U heeft besteld: ${itemList}. Totaal ${totalText}. Klik bevestigen om af te rekenen.`
+    const fullText = `U heeft besteld: ${itemList}. Totaal ${totalText}.`
 
-    // Stop any current speech
-    window.speechSynthesis.cancel()
+    setIsSpeaking(true)
 
-    // Create utterance
-    const utterance = new SpeechSynthesisUtterance(fullText)
-    utterance.lang = 'nl-NL'
-    utterance.rate = 0.9
-    utterance.volume = 1.0
+    try {
+      // Call our TTS API
+      const response = await fetch('/api/voice-order/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: fullText })
+      })
 
-    // Get Dutch voice
-    const voices = window.speechSynthesis.getVoices()
-    const dutchVoice = voices.find(v => v.lang.startsWith('nl'))
-    if (dutchVoice) {
-      utterance.voice = dutchVoice
+      const data = await response.json()
+      
+      if (data.success && data.audio) {
+        // Play the audio
+        const audio = new Audio(`data:audio/mp3;base64,${data.audio}`)
+        audio.onended = () => setIsSpeaking(false)
+        audio.onerror = () => setIsSpeaking(false)
+        await audio.play()
+      } else {
+        // Show error to user
+        alert('Stem niet beschikbaar: ' + (data.error || 'Onbekende fout'))
+        setIsSpeaking(false)
+      }
+    } catch (err) {
+      alert('Kon stem niet afspelen')
+      setIsSpeaking(false)
     }
-
-    utterance.onstart = () => setIsSpeaking(true)
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
-
-    // Speak!
-    window.speechSynthesis.speak(utterance)
   }
 
   // Load voices on mount (needed for some browsers)

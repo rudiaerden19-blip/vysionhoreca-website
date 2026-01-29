@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
           },
           audioConfig: {
             audioEncoding: 'MP3',
-            speakingRate: 0.95,
-            pitch: 0.5
+            speakingRate: 0.9,  // Iets langzamer voor duidelijkheid
+            pitch: 0  // Normale pitch
           }
         })
       }
