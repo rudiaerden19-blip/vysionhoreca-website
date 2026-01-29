@@ -107,7 +107,7 @@ export default function VoiceOrderButton({
     const cents = Math.round((totalAmount - euros) * 100)
     const totalText = cents > 0 ? `${euros} euro ${cents}` : `${euros} euro`
     
-    return `U heeft besteld: ${itemList}. Totaal ${totalText}.`
+    return `U heeft besteld: ${itemList}. Totaal ${totalText}. Druk op de knop bevestigen om uw bestelling te plaatsen.`
   }
 
   // Browser TTS fallback
