@@ -20,7 +20,7 @@
     "title": "Het bestelplatform dat geld oplevert.",
     "description": "Laat klanten bestellen hoe zij willen — online, aan tafel of voor afhalen. Alles komt automatisch binnen op één plek en jij hoeft alleen nog te bereiden.",
     "extras": "En dan… dit zit er ook gewoon bij:",
-    "extrasList": "• Je eigen website (klaar in jouw huisstijl)\n• Peppol-facturatie zonder boekhoudstress\n• Inzicht in omzet, piekmomenten en prestaties\n• Personeels- & urenregistratie\n• Volledige kostenberekening per product\n• Eigen reserveringsplatform\n• Push berichten\n• QR-codes\n• Geen losse systemen. Geen extra abonnementen.",
+    "extrasList": "• Je eigen website (klaar in jouw huisstijl)\n• Kostencalculator per product\n• Inzicht in omzet, piekmomenten en prestaties\n• Personeels- & urenregistratie\n• Weet of je te hoog of te laag geprijsd bent\n• Eigen reserveringsplatform\n• Push berichten\n• QR-codes\n• Geen losse systemen. Geen extra abonnementen.",
     "tagline": "Eén platform. Eén scherm. Volledige controle.",
     "ctaPrimary": "Start gratis proefperiode",
     "ctaSecondary": "Bekijk demo",
@@ -51,8 +51,8 @@
       "description": "Geïntegreerde betaalterminal. Bancontact, Visa, Mastercard, Mollie, Stripe - alles in één systeem."
     },
     "invoicing": {
-      "title": "Facturatie & Peppol",
-      "description": "Professionele Peppol facturen met één klik. Automatisch gekoppeld aan je boekhouding. B2B verzending."
+      "title": "Kostencalculator",
+      "description": "Bereken de kostprijs van je producten. Weet direct of je te hoog of te laag geprijsd bent. Volledige controle over je marges."
     },
     "staff": {
       "title": "Personeelsbeheer",
@@ -121,8 +121,7 @@
       "seo": "SEO vindbaarheid",
       "loyalty": "Klantenkaart & loyaliteit",
       "staff": "Personeel & loonadministratie",
-      "accounting": "SCRADA boekhoudsoftware",
-      "peppol": "Peppol facturatie",
+      "costCalculator": "Kostencalculator per product",
       "analytics": "Volledige bedrijfsanalyse",
       "reviews": "Reviews systeem",
       "languages": "Beschikbaar in 9 talen",
@@ -166,7 +165,7 @@
         "1": "SEO vindbaarheid",
         "2": "Klantenkaart & loyaliteit",
         "3": "Personeel & loonadministratie",
-        "4": "SCRADA & Peppol boekhouding",
+        "4": "Volledige kostencalculator",
         "5": "Volledige bedrijfsanalyse",
         "6": "Reviews",
         "7": "Volledige kostenberekening per product",
@@ -214,9 +213,9 @@
       "description": "Weet precies hoe gezond jouw zaak is. Vul je vaste kosten in, aankopen van leveranciers, leasingen, huur en meer. Krijg direct een analyse in realtime over je bedrijf."
     },
     "accounting": {
-      "tab": "Boekhouding",
-      "title": "Professionele boekhouding.",
-      "description": "SCARDA boekhoudsoftware volledig geïntegreerd. Altijd up-to-date. Bespaar 30% boekhoudkosten."
+      "tab": "Kostencalculator",
+      "title": "Bereken je productkosten.",
+      "description": "Weet precies wat elk product kost. De module vertelt je of je te hoog of te laag geprijsd bent. Volledige controle over je marges."
     },
     "payroll": {
       "tab": "Loonadministratie",
@@ -478,7 +477,7 @@
       "settings": "Instellingen",
       "accounting": "Boekhouding",
       "invoices": "Facturen",
-      "scarda": "SCARDa & Peppol",
+      "costCalculator": "Kostencalculator",
       "businessAnalysis": "Bedrijfsanalyse",
       "account": "Account"
     },

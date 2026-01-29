@@ -20,7 +20,7 @@
     "title": "The ordering platform that makes money.",
     "description": "Let customers order how they want — online, at the table or for takeaway. Everything comes in automatically in one place and you just need to prepare.",
     "extras": "And then… this is also included:",
-    "extrasList": "• Your own website (ready in your style)\n• Peppol invoicing without accounting stress\n• Insight into revenue, peak times and performance\n• Staff & time registration\n• Full cost calculation per product\n• Your own reservation platform\n• Push notifications\n• QR codes\n• No separate systems. No extra subscriptions.",
+    "extrasList": "• Your own website (ready in your style)\n• Cost calculator per product\n• Insight into revenue, peak times and performance\n• Staff & time registration\n• Know if you're priced too high or too low\n• Your own reservation platform\n• Push notifications\n• QR codes\n• No separate systems. No extra subscriptions.",
     "tagline": "One platform. One screen. Full control.",
     "ctaPrimary": "Start free trial",
     "ctaSecondary": "View demo",
@@ -51,8 +51,8 @@
       "description": "Integrated payment terminal. Bancontact, Visa, Mastercard, Mollie, Stripe - all in one system."
     },
     "invoicing": {
-      "title": "Invoicing & Peppol",
-      "description": "Professional Peppol invoices with one click. Automatically linked to your accounting. B2B shipping."
+      "title": "Cost Calculator",
+      "description": "Calculate the cost of your products. Know instantly if you're priced too high or too low. Full control over your margins."
     },
     "staff": {
       "title": "Staff management",
@@ -121,8 +121,7 @@
       "seo": "SEO visibility",
       "loyalty": "Customer card & loyalty",
       "staff": "Staff & payroll administration",
-      "accounting": "SCRADA accounting software",
-      "peppol": "Peppol invoicing",
+      "costCalculator": "Cost calculator per product",
       "analytics": "Full business analysis",
       "reviews": "Reviews system",
       "languages": "Available in 9 languages",
@@ -166,7 +165,7 @@
         "1": "SEO visibility",
         "2": "Customer card & loyalty",
         "3": "Staff & payroll administration",
-        "4": "SCRADA & Peppol accounting",
+        "4": "Full cost calculator",
         "5": "Full business analysis",
         "6": "Reviews",
         "7": "Full cost calculation per product",
@@ -214,9 +213,9 @@
       "description": "Know exactly how healthy your business is. Enter your fixed costs, supplier purchases, leases, rent and more. Get instant real-time analysis of your business."
     },
     "accounting": {
-      "tab": "Accounting",
-      "title": "Professional accounting.",
-      "description": "SCARDA accounting software fully integrated. Always up-to-date. Save 30% on accounting costs."
+      "tab": "Cost Calculator",
+      "title": "Calculate your product costs.",
+      "description": "Know exactly what each product costs. The module tells you if you're priced too high or too low. Full control over your margins."
     },
     "payroll": {
       "tab": "Payroll",
@@ -478,7 +477,7 @@
       "settings": "Settings",
       "accounting": "Accounting",
       "invoices": "Invoices",
-      "scarda": "SCARDa & Peppol",
+      "costCalculator": "Cost Calculator",
       "businessAnalysis": "Business Analysis",
       "account": "Account"
     },

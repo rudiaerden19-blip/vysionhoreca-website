@@ -817,7 +817,7 @@ function ButWaitSection() {
 function ComparisonSection() {
   const { t, locale } = useLanguage()
   
-  const featureKeys = ['online', 'website', 'terminal', 'kitchen', 'allergies', 'qr', 'promotions', 'reservation', 'inventory', 'seo', 'loyalty', 'staff', 'accounting', 'peppol', 'analytics', 'reviews', 'languages', 'training', 'commission']
+  const featureKeys = ['online', 'website', 'terminal', 'kitchen', 'allergies', 'qr', 'promotions', 'reservation', 'inventory', 'seo', 'loyalty', 'staff', 'costCalculator', 'analytics', 'reviews', 'languages', 'training', 'commission']
   
   const features = featureKeys.map(key => ({
     name: t(`comparison.features.${key}`),
@@ -909,7 +909,7 @@ function IndustrySection() {
     invoicing: { image: '/images/industry-invoicing.png' },
     ordering: { image: '/images/industry-ordering.png' },
     analytics: { image: '/images/industry-analytics.png' },
-    accounting: { image: '/images/industry-accounting.png' },
+    accounting: { image: '/images/cost-calculator-1.png' },
     payroll: { image: '/images/industry-payroll.png' },
   }
 

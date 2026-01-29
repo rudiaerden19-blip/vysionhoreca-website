@@ -18,16 +18,16 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Vysion Horeca | Alles-in-1: Bestelplatform, Gratis Website, Peppol Boekhouding, Personeel & Bedrijfsanalyse',
-  description: 'Vysion Horeca: Het complete alles-in-1 platform voor horeca. Bestelplatform, gratis website, Peppol boekhouding, personeelsbeheer en bedrijfsanalyse. Probeer 14 dagen gratis.',
-  keywords: 'kassa, horeca, restaurant, frituur, POS, betaalterminal, online bestellen, peppol, boekhouding, personeel, bedrijfsanalyse, België',
+  title: 'Vysion Horeca | Alles-in-1: Bestelplatform, Gratis Website, Kostencalculator, Personeel & Bedrijfsanalyse',
+  description: 'Vysion Horeca: Het complete alles-in-1 platform voor horeca. Bestelplatform, gratis website, kostencalculator, personeelsbeheer en bedrijfsanalyse. Probeer 14 dagen gratis.',
+  keywords: 'kassa, horeca, restaurant, frituur, POS, betaalterminal, online bestellen, kostencalculator, personeel, bedrijfsanalyse, België',
   icons: {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
   },
   openGraph: {
-    title: 'Vysion Horeca | Alles-in-1: Bestelplatform, Gratis Website, Peppol Boekhouding, Personeel & Bedrijfsanalyse',
-    description: 'Het complete alles-in-1 platform voor horeca. Bestelplatform, gratis website, Peppol boekhouding, personeel & bedrijfsanalyse.',
+    title: 'Vysion Horeca | Alles-in-1: Bestelplatform, Gratis Website, Kostencalculator, Personeel & Bedrijfsanalyse',
+    description: 'Het complete alles-in-1 platform voor horeca. Bestelplatform, gratis website, kostencalculator, personeel & bedrijfsanalyse.',
     type: 'website',
     locale: 'nl_BE',
   },
