@@ -692,6 +692,16 @@ export default function VoiceOrderButton({
                       </div>
                     </div>
 
+                    {/* Listen again button */}
+                    <button
+                      onClick={() => speakConfirmation(matchedProducts, total)}
+                      className={`w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${cardBg} ${textColor} border-2`}
+                      style={{ borderColor: primaryColor }}
+                    >
+                      <span>🔊</span>
+                      <span>Beluister bestelling</span>
+                    </button>
+
                     {/* Action buttons */}
                     <div className="flex gap-3">
                       <button
