@@ -806,17 +806,17 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           setCartOpen(true)
         }}
         translations={{
-          listening: t('voiceOrder.listening') || 'Luisteren...',
-          processing: t('voiceOrder.processing') || 'Verwerken...',
-          speakNow: t('voiceOrder.speakNow') || 'Spreek je bestelling in',
-          confirm: t('voiceOrder.confirm') || 'Bevestigen',
-          cancel: t('voiceOrder.cancel') || 'Annuleren',
-          retry: t('voiceOrder.retry') || 'Opnieuw',
-          total: t('voiceOrder.total') || 'Totaal',
-          noProductsFound: t('voiceOrder.noProductsFound') || 'Geen producten gevonden. Probeer opnieuw.',
-          orderSummary: t('voiceOrder.orderSummary') || 'Je bestelling:',
-          pressToSpeak: t('voiceOrder.pressToSpeak') || 'Houd ingedrukt om te spreken',
-          releaseToStop: t('voiceOrder.releaseToStop') || 'Laat los om te stoppen',
+          listening: 'Luisteren...',
+          processing: 'Verwerken...',
+          speakNow: 'Spreek je bestelling in',
+          confirm: 'Bevestigen',
+          cancel: 'Annuleren',
+          retry: 'Opnieuw',
+          total: 'Totaal',
+          noProductsFound: 'Geen producten gevonden. Probeer opnieuw.',
+          orderSummary: 'Je bestelling:',
+          pressToSpeak: 'Druk op de knop om te spreken',
+          releaseToStop: 'Druk nogmaals om te stoppen',
         }}
       />
 

@@ -120,11 +120,15 @@ export default function VoiceOrderButton({
         console.error('[Voice Order] Recognition error:', event.error)
         setIsRecording(false)
         if (event.error === 'no-speech') {
-          setError('Geen spraak gedetecteerd. Probeer opnieuw.')
-        } else if (event.error === 'not-allowed') {
-          setError('Geen toegang tot microfoon. Geef toestemming in je browser.')
+          setError('Geen spraak gedetecteerd. Druk op de knop en spreek duidelijk.')
+        } else if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+          setError('Geen toegang tot microfoon. Klik op het slot-icoontje in je browser en sta microfoon toe.')
+        } else if (event.error === 'network') {
+          setError('Netwerkfout. Controleer je internetverbinding.')
+        } else if (event.error === 'aborted') {
+          // User stopped, not an error
         } else {
-          setError('Spraakherkenning mislukt. Probeer opnieuw.')
+          setError(`Spraakherkenning mislukt (${event.error}). Probeer Chrome of Edge.`)
         }
       }
 
@@ -328,11 +332,13 @@ export default function VoiceOrderButton({
                     
                     {/* Big Record Button */}
                     <motion.button
-                      onMouseDown={startRecording}
-                      onMouseUp={stopRecording}
-                      onMouseLeave={stopRecording}
-                      onTouchStart={startRecording}
-                      onTouchEnd={stopRecording}
+                      onClick={() => {
+                        if (isRecording) {
+                          stopRecording()
+                        } else {
+                          startRecording()
+                        }
+                      }}
                       animate={isRecording ? { scale: [1, 1.1, 1] } : {}}
                       transition={isRecording ? { repeat: Infinity, duration: 1 } : {}}
                       className={`w-32 h-32 rounded-full mx-auto flex items-center justify-center text-white text-5xl shadow-lg transition-all ${
@@ -340,7 +346,7 @@ export default function VoiceOrderButton({
                       }`}
                       style={!isRecording ? { backgroundColor: primaryColor } : {}}
                     >
-                      {isRecording ? '🔴' : '🎤'}
+                      {isRecording ? '⏹️' : '🎤'}
                     </motion.button>
 
                     <p className={`text-sm ${mutedColor}`}>
