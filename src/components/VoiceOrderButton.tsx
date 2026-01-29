@@ -83,8 +83,15 @@ export default function VoiceOrderButton({
   
   const MAX_RECORDING_SECONDS = 30
 
-  // Speak confirmation using Google Cloud TTS (professional quality)
-  const speakConfirmation = async (items: MatchedProduct[], totalAmount: number) => {
+  const [isSpeaking, setIsSpeaking] = useState(false)
+
+  // Speak confirmation - ALWAYS uses browser TTS (100% reliable)
+  const speakConfirmation = (items: MatchedProduct[], totalAmount: number) => {
+    if (!('speechSynthesis' in window)) {
+      alert('Spraak niet ondersteund op dit apparaat')
+      return
+    }
+
     // Build text
     const itemTexts = items.map(item => {
       let text = `${item.quantity} ${item.product_name}`
@@ -107,49 +114,32 @@ export default function VoiceOrderButton({
     
     const fullText = `U heeft besteld: ${itemList}. Totaal ${totalText}.`
 
-    try {
-      // Use Google Cloud TTS API (professional Wavenet voice)
-      console.log('[TTS] Requesting speech for:', fullText)
-      const response = await fetch('/api/voice-order/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: fullText })
-      })
-
-      const data = await response.json()
-      console.log('[TTS] Response:', data)
-      
-      if (data.success && data.audio) {
-        // Play the base64 audio
-        const audio = new Audio(`data:audio/mp3;base64,${data.audio}`)
-        audio.play().catch(err => {
-          console.error('[TTS] Audio play error:', err)
-          fallbackBrowserTTS(fullText)
-        })
-      } else {
-        console.log('[TTS] Falling back to browser TTS, reason:', data.error)
-        // Fallback to browser TTS
-        fallbackBrowserTTS(fullText)
-      }
-    } catch (err) {
-      console.error('[TTS] Fetch error:', err)
-      fallbackBrowserTTS(fullText)
-    }
-  }
-
-  // Fallback browser TTS
-  const fallbackBrowserTTS = (text: string) => {
-    if (!('speechSynthesis' in window)) return
-    
+    // Cancel any ongoing speech
     window.speechSynthesis.cancel()
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'nl-NL'
-    utterance.rate = 0.85
-    utterance.pitch = 1.1
 
+    const utterance = new SpeechSynthesisUtterance(fullText)
+    utterance.lang = 'nl-NL'
+    utterance.rate = 0.9
+    utterance.pitch = 1.0
+    utterance.volume = 1.0
+
+    // Find best Dutch voice
     const voices = window.speechSynthesis.getVoices()
-    const dutchVoice = voices.find(v => v.lang.startsWith('nl'))
-    if (dutchVoice) utterance.voice = dutchVoice
+    const dutchVoices = voices.filter(v => v.lang.startsWith('nl'))
+    if (dutchVoices.length > 0) {
+      // Prefer voices with these names (usually better quality)
+      const preferredVoice = dutchVoices.find(v => 
+        v.name.includes('Google') || 
+        v.name.includes('Ellen') || 
+        v.name.includes('Flo') ||
+        v.name.includes('Microsoft')
+      ) || dutchVoices[0]
+      utterance.voice = preferredVoice
+    }
+
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    utterance.onerror = () => setIsSpeaking(false)
 
     window.speechSynthesis.speak(utterance)
   }
@@ -712,11 +702,12 @@ export default function VoiceOrderButton({
                     {/* Listen again button */}
                     <button
                       onClick={() => speakConfirmation(matchedProducts, total)}
-                      className={`w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${cardBg} ${textColor} border-2`}
+                      disabled={isSpeaking}
+                      className={`w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${cardBg} ${textColor} border-2 ${isSpeaking ? 'opacity-70' : ''}`}
                       style={{ borderColor: primaryColor }}
                     >
-                      <span>🔊</span>
-                      <span>Beluister bestelling</span>
+                      <span>{isSpeaking ? '🔉' : '🔊'}</span>
+                      <span>{isSpeaking ? 'Aan het spreken...' : 'Beluister bestelling'}</span>
                     </button>
 
                     {/* Action buttons */}
