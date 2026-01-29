@@ -111,61 +111,92 @@ export default function VoiceOrderButton({
   // ===== MediaRecorder approach (for iOS/Safari) =====
   const startMediaRecording = async () => {
     try {
+      console.log('[Voice Order] Starting media recording...')
+      
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-        } 
+        audio: true // Simplified for iOS compatibility
       })
       streamRef.current = stream
+      console.log('[Voice Order] Got audio stream')
 
-      // Try to use a supported format
-      let mimeType = 'audio/webm'
-      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-        mimeType = 'audio/webm;codecs=opus'
-      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-        mimeType = 'audio/mp4'
-      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
-        mimeType = 'audio/wav'
+      // Detect supported mime type - iOS Safari uses mp4
+      let mimeType = ''
+      const types = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm', 'audio/ogg']
+      for (const type of types) {
+        if (MediaRecorder.isTypeSupported(type)) {
+          mimeType = type
+          break
+        }
       }
+      console.log('[Voice Order] Using mimeType:', mimeType || 'default')
 
-      const mediaRecorder = new MediaRecorder(stream, { mimeType })
+      // Create MediaRecorder - don't specify mimeType if none supported (let browser decide)
+      const mediaRecorder = mimeType 
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream)
+      
       mediaRecorderRef.current = mediaRecorder
       audioChunksRef.current = []
 
       mediaRecorder.ondataavailable = (event) => {
+        console.log('[Voice Order] Data available:', event.data.size, 'bytes')
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data)
         }
       }
 
       mediaRecorder.onstop = async () => {
+        console.log('[Voice Order] Recording stopped, chunks:', audioChunksRef.current.length)
         // Stop all tracks
         stream.getTracks().forEach(track => track.stop())
         
         if (audioChunksRef.current.length > 0) {
-          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
+          const finalMimeType = mediaRecorder.mimeType || 'audio/mp4'
+          const audioBlob = new Blob(audioChunksRef.current, { type: finalMimeType })
+          console.log('[Voice Order] Audio blob size:', audioBlob.size, 'type:', finalMimeType)
           setIsProcessing(true)
           await processAudioWithServer(audioBlob)
+        } else {
+          setError('Geen audio opgenomen. Probeer opnieuw.')
         }
       }
 
-      mediaRecorder.start()
+      mediaRecorder.onerror = (event: any) => {
+        console.error('[Voice Order] MediaRecorder error:', event)
+        setError('Opname mislukt. Probeer opnieuw.')
+        setIsRecording(false)
+      }
+
+      // Start recording with timeslice to ensure ondataavailable fires
+      mediaRecorder.start(1000) // Get data every second
       setIsRecording(true)
+      console.log('[Voice Order] Recording started')
+      
     } catch (err: any) {
       console.error('[Voice Order] MediaRecorder error:', err)
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        setError('Geen toegang tot microfoon. Ga naar Instellingen > Safari > Microfoon en sta toegang toe.')
+        setError('Geen toegang tot microfoon. Tik op "Sta toe" wanneer Safari vraagt.')
+      } else if (err.name === 'NotFoundError') {
+        setError('Geen microfoon gevonden op dit apparaat.')
       } else {
-        setError('Kon microfoon niet starten. Controleer je instellingen.')
+        setError(`Kon microfoon niet starten: ${err.message}`)
       }
     }
   }
 
   const stopMediaRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop()
-      setIsRecording(false)
+    console.log('[Voice Order] Stopping recording...')
+    if (mediaRecorderRef.current) {
+      const state = mediaRecorderRef.current.state
+      console.log('[Voice Order] MediaRecorder state:', state)
+      if (state === 'recording') {
+        mediaRecorderRef.current.stop()
+        setIsRecording(false)
+      } else if (state === 'paused') {
+        mediaRecorderRef.current.resume()
+        mediaRecorderRef.current.stop()
+        setIsRecording(false)
+      }
     }
   }
 

@@ -32,15 +32,24 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await audioFile.arrayBuffer()
     const base64Audio = Buffer.from(arrayBuffer).toString('base64')
     
-    // Determine mime type
-    let mimeType = audioFile.type || 'audio/webm'
-    // Gemini supports: audio/wav, audio/mp3, audio/aiff, audio/aac, audio/ogg, audio/flac
-    // WebM with opus codec should work as audio/webm
-    if (mimeType === 'audio/webm;codecs=opus') {
+    // Determine mime type - normalize for Gemini compatibility
+    let mimeType = audioFile.type || 'audio/mp4'
+    
+    // Gemini 2.0 Flash supports many audio formats
+    // Normalize common variations
+    if (mimeType.includes('webm')) {
       mimeType = 'audio/webm'
+    } else if (mimeType.includes('mp4') || mimeType.includes('m4a') || mimeType.includes('aac')) {
+      mimeType = 'audio/mp4'
+    } else if (mimeType.includes('ogg') || mimeType.includes('opus')) {
+      mimeType = 'audio/ogg'
+    } else if (mimeType.includes('wav')) {
+      mimeType = 'audio/wav'
+    } else if (mimeType.includes('mp3') || mimeType.includes('mpeg')) {
+      mimeType = 'audio/mp3'
     }
 
-    console.log(`[Voice Order] Processing audio: ${audioFile.size} bytes, type: ${mimeType}`)
+    console.log(`[Voice Order] Processing audio: ${audioFile.size} bytes, original type: ${audioFile.type}, using: ${mimeType}`)
 
     // Create product list for Gemini
     const productList = products.map((p: Product) => 
