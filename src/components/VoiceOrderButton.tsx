@@ -119,22 +119,25 @@ export default function VoiceOrderButton({
 
     const utterance = new SpeechSynthesisUtterance(fullText)
     utterance.lang = 'nl-NL'
-    utterance.rate = 0.9
-    utterance.pitch = 1.0
+    utterance.rate = 0.85  // Langzamer = duidelijker
+    utterance.pitch = 1.05  // Iets hoger = vriendelijker
     utterance.volume = 1.0
 
-    // Find best Dutch voice
+    // Find best Dutch voice - prioritize high quality voices
     const voices = window.speechSynthesis.getVoices()
     const dutchVoices = voices.filter(v => v.lang.startsWith('nl'))
+    
     if (dutchVoices.length > 0) {
-      // Prefer voices with these names (usually better quality)
-      const preferredVoice = dutchVoices.find(v => 
-        v.name.includes('Google') || 
-        v.name.includes('Ellen') || 
-        v.name.includes('Flo') ||
-        v.name.includes('Microsoft')
-      ) || dutchVoices[0]
+      // Quality ranking: Google > Microsoft > Apple > others
+      const preferredVoice = 
+        dutchVoices.find(v => v.name.includes('Google')) ||
+        dutchVoices.find(v => v.name.includes('Microsoft') && !v.name.includes('Online')) ||
+        dutchVoices.find(v => v.name.includes('Xander') || v.name.includes('Ellen') || v.name.includes('Claire')) ||
+        dutchVoices.find(v => !v.localService) || // Cloud voices are usually better
+        dutchVoices[0]
+      
       utterance.voice = preferredVoice
+      console.log('[TTS] Using voice:', preferredVoice?.name)
     }
 
     utterance.onstart = () => setIsSpeaking(true)
