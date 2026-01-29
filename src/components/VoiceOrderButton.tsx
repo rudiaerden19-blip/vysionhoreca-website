@@ -124,22 +124,45 @@ export default function VoiceOrderButton({
     }
   }
 
-  // Cloud TTS with browser fallback
+  // Cloud TTS with Wavenet voice
   const speakConfirmation = async (items: MatchedProduct[], totalAmount: number) => {
     const text = buildConfirmationText(items, totalAmount)
     
     setIsSpeaking(true)
 
-    // On iOS, just use browser TTS directly - it's more reliable
+    // Create audio element
+    if (!audioRef.current) {
+      audioRef.current = new Audio()
+    }
+    const audio = audioRef.current
+
+    // On iOS, use GET endpoint (streaming audio URL) - works better than fetch + base64
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     
     if (isIOS) {
-      console.log('[TTS] iOS detected, using browser TTS directly')
-      speakWithBrowser(text)
+      console.log('[TTS] iOS detected, using streaming audio URL')
+      
+      // Use GET endpoint - iOS can play this directly as audio src
+      const audioUrl = `/api/voice-order/speak?text=${encodeURIComponent(text)}`
+      
+      audio.src = audioUrl
+      audio.onended = () => setIsSpeaking(false)
+      audio.onerror = (e) => {
+        console.log('[TTS] iOS audio error:', e)
+        // Fallback to browser TTS
+        speakWithBrowser(text)
+      }
+      
+      try {
+        await audio.play()
+      } catch (err: any) {
+        console.log('[TTS] iOS play error:', err.message)
+        speakWithBrowser(text)
+      }
       return
     }
 
-    // For non-iOS devices, try Cloud TTS first
+    // For non-iOS devices, use POST endpoint with base64
     try {
       const response = await fetch('/api/voice-order/speak', {
         method: 'POST',
@@ -150,11 +173,6 @@ export default function VoiceOrderButton({
       const data = await response.json()
       
       if (data.success && data.audio) {
-        // Create audio element and play
-        if (!audioRef.current) {
-          audioRef.current = new Audio()
-        }
-        const audio = audioRef.current
         const mimeType = data.mimeType || 'audio/mp3'
         audio.src = `data:${mimeType};base64,${data.audio}`
         audio.onended = () => setIsSpeaking(false)
@@ -164,7 +182,6 @@ export default function VoiceOrderButton({
         }
         await audio.play()
       } else {
-        // API failed, use browser TTS
         console.log('[TTS] API error:', data.error)
         speakWithBrowser(text)
       }
