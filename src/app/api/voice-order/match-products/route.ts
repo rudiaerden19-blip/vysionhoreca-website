@@ -34,35 +34,50 @@ export async function POST(request: NextRequest) {
     const prompt = `Je bent een slimme bestelassistent voor een frituur/snackbar. 
 De klant heeft het volgende gezegd: "${text}"
 
-Dit zijn de beschikbare producten:
+BESCHIKBARE PRODUCTEN:
 ${productList}
 
-TAAK: Match wat de klant zei met de beschikbare producten. 
+BELANGRIJKE REGELS:
 
-REGELS:
-1. Match producten op basis van naam, ook als de klant een afkorting of synoniem gebruikt
+1. Herken AANPASSINGEN (modifications) - dit zijn wijzigingen op het product:
+   - "zonder tomaat" → modifications: ["zonder tomaat"]
+   - "zonder ui" / "zonder uitjes" → modifications: ["zonder ui"]
+   - "zonder ei" → modifications: ["zonder ei"]
+   - "zonder sla" → modifications: ["zonder sla"]
+   - "extra saus" → modifications: ["extra saus"]
+   - "niet te krokant" → modifications: ["niet te krokant"]
+   - "goed doorbakken" → modifications: ["goed doorbakken"]
+
+2. Herken EXTRAS (sauzen/toppings die erbij komen):
+   - "met mayo" / "mayonaise" → extras: ["mayonaise"]
+   - "ketchup" → extras: ["ketchup"]
+   - "curry" / "currysaus" → extras: ["currysaus"]
+   - "zout" → extras: ["zout"]
+
+3. Match producten flexibel:
    - "friet" = "frieten" = "patat" = "frites"
-   - "frikandel" = "frikadel" = "curryworst speciaal" (als bedoeld)
-   - "mayo" = "mayonaise"
+   - "frikandel" = "frikadel"
+   - "speciaal" = product met ui/mayo/curry
    - "grote" / "klein" / "medium" = zoek naar formaat in productnaam
-2. Als de klant een aantal noemt, gebruik dat aantal. Anders default naar 1.
-3. Als de klant sauzen of extras noemt (mayo, ketchup, zout, etc.), voeg die toe als "extras"
-4. Als je een product NIET kunt matchen, negeer het maar meld het in "not_matched"
-5. Wees STRIKT: match alleen als je zeker bent
+
+4. Als geen aantal genoemd, default naar 1
+
+5. ALTIJD modifications array toevoegen, ook als leeg
 
 Retourneer ALLEEN geldige JSON:
 {
   "matched": [
     {
       "product_id": "uuid-hier",
-      "product_name": "Grote Friet",
+      "product_name": "Frikandel Speciaal",
       "quantity": 1,
-      "price": 4.50,
-      "extras": ["mayonaise", "zout"]
+      "price": 3.50,
+      "extras": ["mayonaise"],
+      "modifications": ["zonder ui", "zonder tomaat"]
     }
   ],
-  "not_matched": ["item dat niet gevonden werd"],
-  "total": 4.50
+  "not_matched": [],
+  "total": 3.50
 }`
 
     // Call Gemini API

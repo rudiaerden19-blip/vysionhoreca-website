@@ -56,11 +56,47 @@ export async function POST(request: NextRequest) {
       `- ID: "${p.id}" | Naam: "${p.name}" | Prijs: €${p.price.toFixed(2)} | Categorie: ${p.category_name || 'Overig'}`
     ).join('\n')
 
-    const prompt = `Luister naar de audio en match met producten. Producten:
+    const prompt = `Je bent een slimme bestelassistent voor een frituur/snackbar.
+Luister naar de audio en match wat de klant bestelt.
+
+BESCHIKBARE PRODUCTEN:
 ${productList}
 
-JSON output:
-{"transcription":"tekst","matched":[{"product_id":"id","product_name":"naam","quantity":1,"price":0.00,"extras":[]}],"not_matched":[],"total":0.00}`
+BELANGRIJKE REGELS:
+1. Herken AANPASSINGEN zoals:
+   - "zonder tomaat" → modifications: ["zonder tomaat"]
+   - "zonder ui" → modifications: ["zonder ui"]  
+   - "zonder ei" → modifications: ["zonder ei"]
+   - "extra saus" → modifications: ["extra saus"]
+   - "niet te krokant" → modifications: ["niet te krokant"]
+
+2. Herken EXTRAS (sauzen/toppings):
+   - "met mayo" → extras: ["mayonaise"]
+   - "en ketchup" → extras: ["ketchup"]
+
+3. Match producten flexibel:
+   - "friet" = "frieten" = "patat"
+   - "frikandel speciaal" zoek naar dat product
+   - "grote/klein/medium" = zoek naar formaat
+
+4. Als geen aantal genoemd, default naar 1
+
+RETOURNEER ALLEEN GELDIGE JSON:
+{
+  "transcription": "wat de klant zei",
+  "matched": [
+    {
+      "product_id": "uuid",
+      "product_name": "Frikandel Speciaal",
+      "quantity": 1,
+      "price": 3.50,
+      "extras": ["mayonaise"],
+      "modifications": ["zonder ui", "zonder tomaat"]
+    }
+  ],
+  "not_matched": [],
+  "total": 3.50
+}`
 
     // Call Gemini API with audio
     const response = await fetch(

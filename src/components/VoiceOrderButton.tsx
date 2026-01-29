@@ -16,6 +16,7 @@ interface MatchedProduct {
   quantity: number
   price: number
   extras?: string[]
+  modifications?: string[]
 }
 
 interface VoiceOrderButtonProps {
@@ -551,16 +552,30 @@ export default function VoiceOrderButton({
                       </p>
                     </div>
 
-                    {/* Spoken confirmation text */}
-                    <div className={`${cardBg} rounded-xl p-4 border-2`} style={{ borderColor: primaryColor }}>
-                      <p className={`text-center font-medium ${textColor}`}>
-                        ✅ {matchedProducts.map(item => 
-                          `${item.quantity}x ${item.product_name}${item.extras?.length ? ` + ${item.extras.join(', ')}` : ''}`
-                        ).join(', ')}
-                      </p>
-                      <p className="text-center text-2xl font-bold mt-2" style={{ color: primaryColor }}>
-                        Totaal: €{total.toFixed(2)}
-                      </p>
+                    {/* Order confirmation details */}
+                    <div className={`${cardBg} rounded-xl p-4 border-2 space-y-2`} style={{ borderColor: primaryColor }}>
+                      {matchedProducts.map((item, idx) => (
+                        <div key={idx} className={`${textColor}`}>
+                          <p className="font-bold text-lg">
+                            ✅ {item.quantity}x {item.product_name}
+                          </p>
+                          {item.extras && item.extras.length > 0 && (
+                            <p className="text-sm ml-6 opacity-80">
+                              + {item.extras.join(', ')}
+                            </p>
+                          )}
+                          {item.modifications && item.modifications.length > 0 && (
+                            <p className="text-sm ml-6 text-orange-500 font-medium">
+                              ⚠️ {item.modifications.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                      <div className="border-t pt-2 mt-2" style={{ borderColor: primaryColor }}>
+                        <p className="text-center text-2xl font-bold" style={{ color: primaryColor }}>
+                          Totaal: €{total.toFixed(2)}
+                        </p>
+                      </div>
                     </div>
 
                     {/* Action buttons */}
