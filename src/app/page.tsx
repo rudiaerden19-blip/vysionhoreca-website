@@ -477,11 +477,16 @@ function OrderAppSection() {
 // Pricing Section
 function PricingSection() {
   const { t, locale } = useLanguage()
+  const [isYearly, setIsYearly] = useState(false)
+  
+  const starterPrice = isYearly ? 79 * 12 : 79
+  const proPrice = isYearly ? 99 * 12 : 99
+  const periodLabel = isYearly ? '/jaar' : '/maand'
   
   return (
     <section id="prijzen" className="py-24 bg-[#2a2a3e] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
+        <div className="text-center mb-8">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             {t('pricing.title')}
           </h2>
@@ -490,9 +495,35 @@ function PricingSection() {
           </p>
         </div>
 
+        {/* Toggle Maandelijks / Jaarlijks */}
+        <div className="flex justify-center mb-12">
+          <div className="bg-[#1a1a2e] p-1 rounded-full inline-flex items-center">
+            <button
+              onClick={() => setIsYearly(false)}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                !isYearly 
+                  ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Maandelijks
+            </button>
+            <button
+              onClick={() => setIsYearly(true)}
+              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                isYearly 
+                  ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Jaarlijks
+            </button>
+          </div>
+        </div>
+
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
           
-          {/* Vysion Starter - €79 */}
+          {/* Vysion Starter */}
           <div className="bg-gradient-to-b from-[#2d4a3e] to-[#1e3a2f] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl">
             <div className="p-6 lg:p-8">
               <div className="flex items-center gap-3 mb-4">
@@ -504,8 +535,8 @@ function PricingSection() {
                 <h3 className="text-xl font-bold text-white">{t('pricing.starter.name')}</h3>
               </div>
               <div className="flex items-baseline mb-6">
-                <span className="text-5xl font-bold text-yellow-400">€79</span>
-                <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
+                <span className="text-5xl font-bold text-yellow-400">€{starterPrice}</span>
+                <span className="text-gray-400 ml-2">{periodLabel}</span>
               </div>
               
               <ul className="space-y-3 mb-8">
@@ -520,7 +551,7 @@ function PricingSection() {
               </ul>
               
               <a 
-                href={`/registreer?lang=${locale}&plan=starter`}
+                href={`/registreer?lang=${locale}&plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`}
                 className="block w-full bg-[#1a1a2e] text-white text-center py-4 rounded-full font-semibold hover:bg-[#0f0f1a] transition-colors"
               >
                 {t('pricing.chooseStarter')}
@@ -529,7 +560,7 @@ function PricingSection() {
             </div>
           </div>
 
-          {/* Vysion Pro - €99 - POPULAR */}
+          {/* Vysion Pro - POPULAR */}
           <div className="bg-gradient-to-b from-[#4a3f6e] to-[#2d2654] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl relative">
             {/* Popular badge */}
             <div className="absolute top-4 right-4 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
@@ -545,8 +576,8 @@ function PricingSection() {
                 <h3 className="text-xl font-bold text-white">{t('pricing.pro.name')}</h3>
               </div>
               <div className="flex items-baseline mb-6">
-                <span className="text-5xl font-bold text-purple-300">€99</span>
-                <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
+                <span className="text-5xl font-bold text-purple-300">€{proPrice}</span>
+                <span className="text-gray-400 ml-2">{periodLabel}</span>
               </div>
               
               <p className="text-purple-200 mb-4 flex items-center">
@@ -566,7 +597,7 @@ function PricingSection() {
               </ul>
               
               <a 
-                href={`/registreer?lang=${locale}&plan=pro`}
+                href={`/registreer?lang=${locale}&plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`}
                 className="block w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center py-4 rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-colors"
               >
                 {t('pricing.choosePro')}
