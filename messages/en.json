@@ -200,7 +200,7 @@
     "invoicing": {
       "tab": "Invoicing",
       "title": "Fast and professional invoicing.",
-      "description": "Create invoices for customers, credit notes and more. Connect directly with Peppol and send to the accountant in a fraction of seconds."
+      "description": "Create invoices for customers, credit notes and more. Send to the accountant in a fraction of seconds."
     },
     "ordering": {
       "tab": "Online ordering platform",
@@ -1715,7 +1715,7 @@
       "costSettings": "Margin Settings",
       "ingredients": "Ingredients",
       "productCosts": "Product Costs",
-      "scrada": "SCRADA",
+      "costCalculation": "Cost Calculation",
       "orderList": "Orders",
       "reservations": "Reservations",
       "zReport": "Z-Report",

@@ -200,7 +200,7 @@
     "invoicing": {
       "tab": "Facturatie",
       "title": "Snelle en professionele facturatie.",
-      "description": "Maak facturen aan voor klanten, creditnota's en meer. Koppel direct met Peppol en verstuur naar de boekhouder in een fractie van seconden."
+      "description": "Maak facturen aan voor klanten, creditnota's en meer. Verstuur direct naar de boekhouder in een fractie van seconden."
     },
     "ordering": {
       "tab": "Online bestelplatform",
@@ -1715,7 +1715,7 @@
       "costSettings": "Marge Instellingen",
       "ingredients": "Ingrediënten",
       "productCosts": "Product Kostprijs",
-      "scrada": "SCRADA",
+      "costCalculation": "Kostenberekening",
       "orderList": "Bestellingen",
       "reservations": "Reserveringen",
       "zReport": "Z-Rapport",
