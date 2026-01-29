@@ -78,6 +78,71 @@ export default function VoiceOrderButton({
   const audioChunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
 
+  // Speak confirmation using best available Dutch voice
+  const speakConfirmation = (items: MatchedProduct[], totalAmount: number) => {
+    if (!('speechSynthesis' in window)) return
+
+    // Build text
+    const itemTexts = items.map(item => {
+      let text = `${item.quantity} ${item.product_name}`
+      if (item.modifications && item.modifications.length > 0) {
+        text += `, ${item.modifications.join(', ')}`
+      }
+      if (item.extras && item.extras.length > 0) {
+        text += ` met ${item.extras.join(' en ')}`
+      }
+      return text
+    })
+
+    const itemList = itemTexts.length === 1 
+      ? itemTexts[0]
+      : itemTexts.slice(0, -1).join(', ') + ' en ' + itemTexts[itemTexts.length - 1]
+
+    const euros = Math.floor(totalAmount)
+    const cents = Math.round((totalAmount - euros) * 100)
+    const totalText = cents > 0 ? `${euros} euro ${cents}` : `${euros} euro`
+    
+    const fullText = `${itemList}. Totaal ${totalText}.`
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel()
+
+    const utterance = new SpeechSynthesisUtterance(fullText)
+    utterance.lang = 'nl-NL'
+    utterance.rate = 0.9
+    utterance.pitch = 1.0
+    utterance.volume = 1.0
+
+    // Try to find best Dutch voice
+    const voices = window.speechSynthesis.getVoices()
+    const dutchVoices = voices.filter(v => v.lang.startsWith('nl'))
+    
+    // Prefer female voices (usually sound better)
+    const preferredVoice = dutchVoices.find(v => 
+      v.name.toLowerCase().includes('female') || 
+      v.name.toLowerCase().includes('vrouw') ||
+      v.name.includes('Ellen') ||
+      v.name.includes('Flo')
+    ) || dutchVoices[0]
+
+    if (preferredVoice) {
+      utterance.voice = preferredVoice
+    }
+
+    window.speechSynthesis.speak(utterance)
+  }
+
+  // Load voices on mount (needed for some browsers)
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      // Chrome needs this to load voices
+      window.speechSynthesis.getVoices()
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices()
+      }
+    }
+  }, [])
+
   // Check browser support on mount
   useEffect(() => {
     // Detect iOS/Safari - always use server processing for these
@@ -232,7 +297,10 @@ export default function VoiceOrderButton({
       setNotMatched(data.not_matched || [])
       setTotal(data.total || 0)
 
-      if (!data.matched || data.matched.length === 0) {
+      if (data.matched && data.matched.length > 0) {
+        // Speak the confirmation
+        speakConfirmation(data.matched, data.total || 0)
+      } else {
         setError(t.noProductsFound)
       }
 
@@ -338,7 +406,10 @@ export default function VoiceOrderButton({
       setNotMatched(data.not_matched || [])
       setTotal(data.total || 0)
 
-      if (!data.matched || data.matched.length === 0) {
+      if (data.matched && data.matched.length > 0) {
+        // Speak the confirmation
+        speakConfirmation(data.matched, data.total || 0)
+      } else {
         setError(t.noProductsFound)
       }
 
