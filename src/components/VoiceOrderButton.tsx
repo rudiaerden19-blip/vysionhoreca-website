@@ -110,8 +110,12 @@ export default function VoiceOrderButton({
       utterance.pitch = 1.05
       utterance.volume = 1.0
       
-      const voice = getBestDutchVoice()
-      if (voice) utterance.voice = voice
+      // Get voices fresh each time
+      const voices = window.speechSynthesis.getVoices()
+      const dutchVoices = voices.filter(v => v.lang.startsWith('nl'))
+      if (dutchVoices.length > 0) {
+        utterance.voice = dutchVoices[0]
+      }
       
       utterance.onend = () => resolve()
       utterance.onerror = () => resolve()
