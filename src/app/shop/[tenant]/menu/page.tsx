@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, getActivePromotions, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
+import VoiceOrderButton from '@/components/VoiceOrderButton'
 
 interface MenuItem {
   id: string
@@ -776,6 +777,48 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Voice Order Button */}
+      <VoiceOrderButton
+        products={menuItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          category_name: item.category_name,
+        }))}
+        language={locale}
+        primaryColor={primaryColor}
+        darkMode={darkMode}
+        onOrderConfirmed={(items) => {
+          // Add matched products to cart
+          items.forEach(matchedItem => {
+            const menuItem = menuItems.find(m => m.id === matchedItem.product_id)
+            if (menuItem) {
+              const cartItem = {
+                item: menuItem,
+                quantity: matchedItem.quantity,
+                selectedOptions: [],
+                totalPrice: matchedItem.price,
+              }
+              setCart(prev => [...prev, cartItem])
+            }
+          })
+          setCartOpen(true)
+        }}
+        translations={{
+          listening: t('voiceOrder.listening') || 'Luisteren...',
+          processing: t('voiceOrder.processing') || 'Verwerken...',
+          speakNow: t('voiceOrder.speakNow') || 'Spreek je bestelling in',
+          confirm: t('voiceOrder.confirm') || 'Bevestigen',
+          cancel: t('voiceOrder.cancel') || 'Annuleren',
+          retry: t('voiceOrder.retry') || 'Opnieuw',
+          total: t('voiceOrder.total') || 'Totaal',
+          noProductsFound: t('voiceOrder.noProductsFound') || 'Geen producten gevonden. Probeer opnieuw.',
+          orderSummary: t('voiceOrder.orderSummary') || 'Je bestelling:',
+          pressToSpeak: t('voiceOrder.pressToSpeak') || 'Houd ingedrukt om te spreken',
+          releaseToStop: t('voiceOrder.releaseToStop') || 'Laat los om te stoppen',
+        }}
+      />
 
       {/* Cart Button */}
       <AnimatePresence>
