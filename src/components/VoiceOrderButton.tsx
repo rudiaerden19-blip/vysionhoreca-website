@@ -450,8 +450,7 @@ export default function VoiceOrderButton({
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-4 sm:bottom-28 sm:right-6 z-40 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-white text-2xl"
-        style={{ backgroundColor: primaryColor }}
+        className="fixed bottom-24 right-4 sm:bottom-28 sm:right-6 z-40 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-white text-2xl bg-red-500"
         aria-label="Bestel met spraak"
       >
         🎤
