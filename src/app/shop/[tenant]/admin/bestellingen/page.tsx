@@ -21,6 +21,8 @@ interface OrderItemJson {
   price?: number
   unit_price?: number
   total_price?: number
+  options?: { name: string; price: number }[]
+  notes?: string  // Voice order modifications like "zonder tomaat"
 }
 
 // Status config builder function (uses translations)
@@ -549,6 +551,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             <span>${item.quantity}x ${item.name || item.product_name}</span>
             <span>€${((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
           </div>
+          ${item.options && item.options.length > 0 ? `<div style="font-size: 10px; margin-left: 10px; color: #666;">+ ${item.options.map((o: any) => o.name).join(', ')}</div>` : ''}
+          ${item.notes ? `<div style="font-size: 10px; margin-left: 10px; font-weight: bold;">⚠️ ${item.notes}</div>` : ''}
         `).join('')}
         
         <div class="divider"></div>
@@ -790,9 +794,17 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   <div className="mb-4 p-3 bg-black/20 rounded-xl">
                     <p className="font-bold mb-2">{t('ordersPage.kitchen.products')}:</p>
                     {items.map((item, i) => (
-                      <div key={i} className="flex justify-between text-sm">
-                        <span>{item.quantity}x {item.name || item.product_name}</span>
-                        <span>€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                      <div key={i} className="text-sm mb-1">
+                        <div className="flex justify-between">
+                          <span>{item.quantity}x {item.name || item.product_name}</span>
+                          <span>€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                        </div>
+                        {item.options && item.options.length > 0 && (
+                          <div className="text-xs opacity-70 ml-4">+ {item.options.map(o => o.name).join(', ')}</div>
+                        )}
+                        {item.notes && (
+                          <div className="text-xs text-orange-300 font-bold ml-4">⚠️ {item.notes}</div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1040,11 +1052,19 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   <div className="bg-gray-50 rounded-xl p-4">
                     <p className="text-sm text-gray-500 mb-1">{t('ordersPage.order')} ({items.length} {t('ordersPage.items')})</p>
                     {items.length > 0 ? (
-                      <div className="space-y-1 max-h-32 overflow-y-auto">
+                      <div className="space-y-2 max-h-32 overflow-y-auto">
                         {items.map((item, i) => (
-                          <div key={i} className="flex justify-between text-sm text-gray-700">
-                            <span>{item.quantity}x {item.name || item.product_name}</span>
-                            <span>€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                          <div key={i} className="text-sm text-gray-700">
+                            <div className="flex justify-between">
+                              <span>{item.quantity}x {item.name || item.product_name}</span>
+                              <span>€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                            </div>
+                            {item.options && item.options.length > 0 && (
+                              <div className="text-xs text-gray-500 ml-4">+ {item.options.map(o => o.name).join(', ')}</div>
+                            )}
+                            {item.notes && (
+                              <div className="text-xs text-orange-500 font-medium ml-4">⚠️ {item.notes}</div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -1222,12 +1242,20 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     return items.length > 0 ? (
                       <div className="space-y-3">
                         {items.map((item, i) => (
-                          <div key={i} className="flex justify-between items-center bg-white p-3 rounded-lg">
-                            <div>
-                              <span className="font-bold text-blue-600 mr-2">{item.quantity}x</span>
-                              <span className="text-gray-900 font-medium">{item.name || item.product_name}</span>
+                          <div key={i} className="bg-white p-3 rounded-lg">
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <span className="font-bold text-blue-600 mr-2">{item.quantity}x</span>
+                                <span className="text-gray-900 font-medium">{item.name || item.product_name}</span>
+                              </div>
+                              <span className="font-bold text-gray-900">€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
                             </div>
-                            <span className="font-bold text-gray-900">€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                            {item.options && item.options.length > 0 && (
+                              <div className="text-sm text-gray-500 ml-8 mt-1">+ {item.options.map(o => o.name).join(', ')}</div>
+                            )}
+                            {item.notes && (
+                              <div className="text-sm text-orange-500 font-bold ml-8 mt-1">⚠️ {item.notes}</div>
+                            )}
                           </div>
                         ))}
                       </div>

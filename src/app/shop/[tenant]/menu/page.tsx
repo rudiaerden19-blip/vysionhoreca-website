@@ -30,6 +30,7 @@ interface CartItem {
   quantity: number
   selectedOptions: { option: ProductOption; choice: ProductOptionChoice }[]
   totalPrice: number
+  notes?: string  // For voice order modifications like "zonder tomaat"
 }
 
 export default function MenuPage({ params }: { params: { tenant: string } }) {
@@ -136,6 +137,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         options: c.selectedOptions.map(o => ({ name: o.choice.name, price: o.choice.price })),
         totalPrice: c.totalPrice,
         image_url: c.item.image_url,
+        notes: c.notes,  // Include voice order modifications
       }))
       localStorage.setItem(`cart_${params.tenant}`, JSON.stringify(cartForStorage))
     }
@@ -794,11 +796,21 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           items.forEach(matchedItem => {
             const menuItem = menuItems.find(m => m.id === matchedItem.product_id)
             if (menuItem) {
-              const cartItem = {
+              // Combine modifications and extras into notes
+              const noteParts: string[] = []
+              if (matchedItem.modifications && matchedItem.modifications.length > 0) {
+                noteParts.push(...matchedItem.modifications)
+              }
+              if (matchedItem.extras && matchedItem.extras.length > 0) {
+                noteParts.push(`+ ${matchedItem.extras.join(', ')}`)
+              }
+              
+              const cartItem: CartItem = {
                 item: menuItem,
                 quantity: matchedItem.quantity,
                 selectedOptions: [],
-                totalPrice: matchedItem.price,
+                totalPrice: matchedItem.price * matchedItem.quantity,
+                notes: noteParts.length > 0 ? noteParts.join(', ') : undefined,
               }
               setCart(prev => [...prev, cartItem])
             }
@@ -897,6 +909,11 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                           {cartItem.selectedOptions.length > 0 && (
                             <div className={`text-sm ${theme.textLight} mt-1`}>
                               {cartItem.selectedOptions.map(opt => opt.choice.name).join(', ')}
+                            </div>
+                          )}
+                          {cartItem.notes && (
+                            <div className="text-sm text-orange-500 font-medium mt-1">
+                              ⚠️ {cartItem.notes}
                             </div>
                           )}
                           <p style={darkMode ? {} : { color: primaryColor }} className={`font-bold ${darkMode ? 'text-white' : ''}`}>€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>

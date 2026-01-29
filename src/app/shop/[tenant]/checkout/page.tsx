@@ -16,6 +16,7 @@ interface CartItem {
   options?: { name: string; price: number }[]
   totalPrice: number
   image_url?: string
+  notes?: string  // Voice order modifications like "zonder tomaat"
 }
 
 interface CustomerInfo {
@@ -284,6 +285,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             quantity: item.quantity,
             price: item.price,
             options: item.options,
+            notes: item.notes,  // Voice order modifications
             total_price: item.totalPrice * item.quantity,
           })),
           subtotal: subtotal,
@@ -758,6 +760,9 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                       </div>
                       {item.options && item.options.length > 0 && (
                         <p className="text-sm text-gray-500">{item.options.map(o => o.name).join(', ')}</p>
+                      )}
+                      {item.notes && (
+                        <p className="text-sm text-orange-500 font-medium">⚠️ {item.notes}</p>
                       )}
                     </div>
                   </div>
