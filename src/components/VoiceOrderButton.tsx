@@ -124,26 +124,23 @@ export default function VoiceOrderButton({
     }
   }
 
-  // Gemini TTS with browser fallback
+  // Cloud TTS with browser fallback
   const speakConfirmation = async (items: MatchedProduct[], totalAmount: number) => {
     const text = buildConfirmationText(items, totalAmount)
     
     setIsSpeaking(true)
 
-    // Create audio element IMMEDIATELY in click handler (required for mobile)
-    if (!audioRef.current) {
-      audioRef.current = new Audio()
-    }
-    const audio = audioRef.current
+    // On iOS, just use browser TTS directly - it's more reliable
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     
-    // Play silent audio first to unlock audio on mobile
-    audio.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwmHAAAAAAD/+1DEAAAHAAGf9AAAIgAANIAAAARMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxB4AAADSAAAAAAAAANIAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7UMQ1AAABpAAAAAAAAA0gAAAABExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DESwAAA0gAAAAAAAAADSAAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ=='
-    try {
-      await audio.play()
-    } catch {}
+    if (isIOS) {
+      console.log('[TTS] iOS detected, using browser TTS directly')
+      speakWithBrowser(text)
+      return
+    }
 
+    // For non-iOS devices, try Cloud TTS first
     try {
-      // Get TTS audio from our API (now using Gemini)
       const response = await fetch('/api/voice-order/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -153,7 +150,11 @@ export default function VoiceOrderButton({
       const data = await response.json()
       
       if (data.success && data.audio) {
-        // Set the real audio and play - handle different mime types
+        // Create audio element and play
+        if (!audioRef.current) {
+          audioRef.current = new Audio()
+        }
+        const audio = audioRef.current
         const mimeType = data.mimeType || 'audio/mp3'
         audio.src = `data:${mimeType};base64,${data.audio}`
         audio.onended = () => setIsSpeaking(false)
@@ -162,20 +163,13 @@ export default function VoiceOrderButton({
           speakWithBrowser(text)
         }
         await audio.play()
-      } else if (data.fallback_text) {
-        // Use browser TTS as fallback
-        console.log('[TTS] API failed, using browser TTS. Error:', data.error)
-        speakWithBrowser(data.fallback_text)
       } else {
-        // Show the specific error for debugging
-        const errorMsg = data.error || 'Onbekende fout'
-        console.log('[TTS] Error:', errorMsg)
-        alert(`TTS Debug: ${errorMsg}`)
+        // API failed, use browser TTS
+        console.log('[TTS] API error:', data.error)
         speakWithBrowser(text)
       }
     } catch (err: any) {
-      console.log('[TTS] Fetch error:', err)
-      alert(`TTS Fetch Error: ${err.message}`)
+      console.log('[TTS] Fetch error:', err.message)
       speakWithBrowser(text)
     }
   }
