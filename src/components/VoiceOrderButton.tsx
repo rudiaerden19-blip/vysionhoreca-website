@@ -109,6 +109,7 @@ export default function VoiceOrderButton({
 
     try {
       // Use Google Cloud TTS API (professional Wavenet voice)
+      console.log('[TTS] Requesting speech for:', fullText)
       const response = await fetch('/api/voice-order/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -116,16 +117,22 @@ export default function VoiceOrderButton({
       })
 
       const data = await response.json()
+      console.log('[TTS] Response:', data)
       
       if (data.success && data.audio) {
         // Play the base64 audio
         const audio = new Audio(`data:audio/mp3;base64,${data.audio}`)
-        audio.play()
+        audio.play().catch(err => {
+          console.error('[TTS] Audio play error:', err)
+          fallbackBrowserTTS(fullText)
+        })
       } else {
+        console.log('[TTS] Falling back to browser TTS, reason:', data.error)
         // Fallback to browser TTS
         fallbackBrowserTTS(fullText)
       }
-    } catch {
+    } catch (err) {
+      console.error('[TTS] Fetch error:', err)
       fallbackBrowserTTS(fullText)
     }
   }

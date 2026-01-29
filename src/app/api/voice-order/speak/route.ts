@@ -38,10 +38,14 @@ export async function POST(request: NextRequest) {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('[TTS] Google Cloud TTS error:', response.status, JSON.stringify(errorData))
+      
+      // Return specific error message
+      const errorMsg = errorData?.error?.message || 'Stem niet beschikbaar'
       return NextResponse.json({ 
         success: false, 
-        error: 'Stem niet beschikbaar' 
-      }, { status: 500 })
+        error: errorMsg,
+        details: errorData
+      }, { status: response.status })
     }
 
     const data = await response.json()
