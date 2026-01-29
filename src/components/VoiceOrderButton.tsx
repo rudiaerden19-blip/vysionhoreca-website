@@ -84,6 +84,7 @@ export default function VoiceOrderButton({
   const MAX_RECORDING_SECONDS = 120  // 2 minuten - genoeg voor lange bestellingen
 
   const [isSpeaking, setIsSpeaking] = useState(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // Build confirmation text
   const buildConfirmationText = (items: MatchedProduct[], totalAmount: number): string => {
@@ -109,29 +110,48 @@ export default function VoiceOrderButton({
     return `U heeft besteld: ${itemList}. Totaal ${totalText}.`
   }
 
-  // Simple browser TTS - always works
-  const speakConfirmation = (items: MatchedProduct[], totalAmount: number) => {
-    if (!('speechSynthesis' in window)) {
-      alert('Spraak niet ondersteund op dit apparaat')
-      return
-    }
-
+  // Google Cloud TTS - high quality voice
+  const speakConfirmation = async (items: MatchedProduct[], totalAmount: number) => {
     const text = buildConfirmationText(items, totalAmount)
-
-    // Cancel any ongoing speech
-    window.speechSynthesis.cancel()
     
     setIsSpeaking(true)
 
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'nl-NL'
-    utterance.rate = 0.9
-    utterance.volume = 1.0
+    // Create audio element IMMEDIATELY in click handler (required for mobile)
+    if (!audioRef.current) {
+      audioRef.current = new Audio()
+    }
+    const audio = audioRef.current
+    
+    // Play silent audio first to unlock audio on mobile
+    audio.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwmHAAAAAAD/+1DEAAAHAAGf9AAAIgAANIAAAARMQU1FMy4xMDBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//tQxB4AAADSAAAAAAAAANIAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/7UMQ1AAABpAAAAAAAAA0gAAAABExBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVX/+1DESwAAA0gAAAAAAAAADSAAAAAATEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVQ=='
+    try {
+      await audio.play()
+    } catch {}
 
-    utterance.onend = () => setIsSpeaking(false)
-    utterance.onerror = () => setIsSpeaking(false)
+    try {
+      // Get TTS audio from our API
+      const response = await fetch('/api/voice-order/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      })
 
-    window.speechSynthesis.speak(utterance)
+      const data = await response.json()
+      
+      if (data.success && data.audio) {
+        // Set the real audio and play
+        audio.src = `data:audio/mp3;base64,${data.audio}`
+        audio.onended = () => setIsSpeaking(false)
+        audio.onerror = () => setIsSpeaking(false)
+        await audio.play()
+      } else {
+        alert('Stem fout: ' + (data.error || 'Probeer opnieuw'))
+        setIsSpeaking(false)
+      }
+    } catch (err) {
+      alert('Stem fout: Probeer opnieuw')
+      setIsSpeaking(false)
+    }
   }
 
   // Load voices on mount (needed for some browsers)
