@@ -92,13 +92,6 @@ const menuItems = [
     ]
   },
   {
-    categoryKey: 'accounting',
-    icon: '📒',
-    items: [
-      { nameKey: 'scrada', href: '/scrada', icon: '📊' },
-    ]
-  },
-  {
     categoryKey: 'gksReports',
     icon: '🧾',
     items: [
