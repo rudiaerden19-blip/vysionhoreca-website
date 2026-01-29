@@ -83,8 +83,8 @@ export default function VoiceOrderButton({
   
   const MAX_RECORDING_SECONDS = 30
 
-  // Speak confirmation using Google Translate TTS (sounds more natural)
-  const speakConfirmation = (items: MatchedProduct[], totalAmount: number) => {
+  // Speak confirmation using Google Cloud TTS (professional quality)
+  const speakConfirmation = async (items: MatchedProduct[], totalAmount: number) => {
     // Build text
     const itemTexts = items.map(item => {
       let text = `${item.quantity} ${item.product_name}`
@@ -107,15 +107,24 @@ export default function VoiceOrderButton({
     
     const fullText = `U heeft besteld: ${itemList}. Totaal ${totalText}.`
 
-    // Use Google Translate TTS (sounds much better than browser TTS)
     try {
-      const audio = new Audio(
-        `https://translate.google.com/translate_tts?ie=UTF-8&tl=nl&client=tw-ob&q=${encodeURIComponent(fullText)}`
-      )
-      audio.play().catch(() => {
-        // Fallback to browser TTS if Google fails
-        fallbackBrowserTTS(fullText)
+      // Use Google Cloud TTS API (professional Wavenet voice)
+      const response = await fetch('/api/voice-order/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: fullText })
       })
+
+      const data = await response.json()
+      
+      if (data.success && data.audio) {
+        // Play the base64 audio
+        const audio = new Audio(`data:audio/mp3;base64,${data.audio}`)
+        audio.play()
+      } else {
+        // Fallback to browser TTS
+        fallbackBrowserTTS(fullText)
+      }
     } catch {
       fallbackBrowserTTS(fullText)
     }
