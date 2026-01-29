@@ -98,10 +98,27 @@ Retourneer ALLEEN geldige JSON:
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      console.error('[Voice Order] Gemini API error:', response.status, errorData)
+      console.error('[Voice Order] Gemini API error:', response.status, JSON.stringify(errorData))
+      
+      const errorMessage = errorData?.error?.message || ''
+      
+      if (response.status === 429) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Te veel verzoeken. Wacht even en probeer opnieuw.' 
+        }, { status: 429 })
+      }
+      
+      if (response.status === 403 || errorMessage.includes('API key')) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'API configuratie fout. Neem contact op met support.' 
+        }, { status: 500 })
+      }
+      
       return NextResponse.json({ 
         success: false, 
-        error: 'AI service fout. Probeer opnieuw.' 
+        error: `Fout: ${response.status}. Probeer opnieuw.` 
       }, { status: 500 })
     }
 
