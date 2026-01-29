@@ -69,29 +69,152 @@ export default function VoiceOrderButton({
   const [total, setTotal] = useState(0)
   const [error, setError] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [isSupported, setIsSupported] = useState(true)
+  const [useServerProcessing, setUseServerProcessing] = useState(false)
   
   const recognitionRef = useRef<any>(null)
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
+  const streamRef = useRef<MediaStream | null>(null)
 
-  // Check browser support
+  // Check browser support on mount
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    // Use server processing if Web Speech API is not available (iOS Safari, Firefox, etc.)
     if (!SpeechRecognition) {
-      setIsSupported(false)
+      setUseServerProcessing(true)
     }
   }, [])
 
-  const startRecording = () => {
+  const startRecording = async () => {
+    setError('')
+    setTranscribedText('')
+    setMatchedProducts([])
+    setNotMatched([])
+
+    if (useServerProcessing) {
+      // Use MediaRecorder for iOS/unsupported browsers
+      await startMediaRecording()
+    } else {
+      // Use Web Speech API for Chrome/Edge
+      startSpeechRecognition()
+    }
+  }
+
+  const stopRecording = () => {
+    if (useServerProcessing) {
+      stopMediaRecording()
+    } else {
+      stopSpeechRecognition()
+    }
+  }
+
+  // ===== MediaRecorder approach (for iOS/Safari) =====
+  const startMediaRecording = async () => {
     try {
-      setError('')
-      setTranscribedText('')
-      setMatchedProducts([])
-      setNotMatched([])
-      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+        } 
+      })
+      streamRef.current = stream
+
+      // Try to use a supported format
+      let mimeType = 'audio/webm'
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        mimeType = 'audio/webm;codecs=opus'
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mimeType = 'audio/mp4'
+      } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+        mimeType = 'audio/wav'
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, { mimeType })
+      mediaRecorderRef.current = mediaRecorder
+      audioChunksRef.current = []
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data)
+        }
+      }
+
+      mediaRecorder.onstop = async () => {
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop())
+        
+        if (audioChunksRef.current.length > 0) {
+          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
+          setIsProcessing(true)
+          await processAudioWithServer(audioBlob)
+        }
+      }
+
+      mediaRecorder.start()
+      setIsRecording(true)
+    } catch (err: any) {
+      console.error('[Voice Order] MediaRecorder error:', err)
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setError('Geen toegang tot microfoon. Ga naar Instellingen > Safari > Microfoon en sta toegang toe.')
+      } else {
+        setError('Kon microfoon niet starten. Controleer je instellingen.')
+      }
+    }
+  }
+
+  const stopMediaRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop()
+      setIsRecording(false)
+    }
+  }
+
+  const processAudioWithServer = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData()
+      formData.append('audio', audioBlob, 'recording.webm')
+      formData.append('products', JSON.stringify(products))
+
+      const response = await fetch('/api/voice-order/process-audio', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.error || 'Verwerking mislukt')
+      }
+
+      setTranscribedText(data.transcription || '')
+      setMatchedProducts(data.matched || [])
+      setNotMatched(data.not_matched || [])
+      setTotal(data.total || 0)
+
+      if (data.matched && data.matched.length > 0) {
+        const confirmText = generateConfirmationText(data.matched, data.total)
+        speakText(confirmText)
+      } else {
+        setError(t.noProductsFound)
+      }
+
+    } catch (err: any) {
+      console.error('[Voice Order] Server processing error:', err)
+      setError(err.message || 'Er ging iets mis. Probeer opnieuw.')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  // ===== Web Speech API approach (for Chrome/Edge) =====
+  const startSpeechRecognition = () => {
+    try {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
       
       if (!SpeechRecognition) {
-        setError('Spraakherkenning wordt niet ondersteund in deze browser. Gebruik Chrome of Edge.')
+        // Fallback to server processing
+        setUseServerProcessing(true)
+        startMediaRecording()
         return
       }
 
@@ -113,12 +236,13 @@ export default function VoiceOrderButton({
         setTranscribedText(transcript)
         setIsRecording(false)
         setIsProcessing(true)
-        await processText(transcript)
+        await processTextWithServer(transcript)
       }
 
       recognition.onerror = (event: any) => {
         console.error('[Voice Order] Recognition error:', event.error)
         setIsRecording(false)
+        
         if (event.error === 'no-speech') {
           setError('Geen spraak gedetecteerd. Druk op de knop en spreek duidelijk.')
         } else if (event.error === 'not-allowed' || event.error === 'permission-denied') {
@@ -128,7 +252,9 @@ export default function VoiceOrderButton({
         } else if (event.error === 'aborted') {
           // User stopped, not an error
         } else {
-          setError(`Spraakherkenning mislukt (${event.error}). Probeer Chrome of Edge.`)
+          // Try fallback to server processing
+          setUseServerProcessing(true)
+          setError('Spraakherkenning niet beschikbaar. Probeer opnieuw.')
         }
       }
 
@@ -138,42 +264,38 @@ export default function VoiceOrderButton({
 
       recognition.start()
     } catch (err) {
-      console.error('[Voice Order] Start error:', err)
-      setError('Kon spraakherkenning niet starten.')
+      console.error('[Voice Order] Speech recognition error:', err)
+      setUseServerProcessing(true)
+      setError('Spraakherkenning niet beschikbaar. Probeer opnieuw.')
     }
   }
 
-  const stopRecording = () => {
+  const stopSpeechRecognition = () => {
     if (recognitionRef.current) {
       recognitionRef.current.stop()
     }
   }
 
-  const processText = async (text: string) => {
+  const processTextWithServer = async (text: string) => {
     try {
-      // Match products with Gemini
-      const matchRes = await fetch('/api/voice-order/match-products', {
+      const response = await fetch('/api/voice-order/match-products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: text,
-          products: products,
-        }),
+        body: JSON.stringify({ text, products }),
       })
 
-      const matchData = await matchRes.json()
+      const data = await response.json()
 
-      if (!matchData.success) {
-        throw new Error(matchData.error || 'Product matching mislukt')
+      if (!data.success) {
+        throw new Error(data.error || 'Product matching mislukt')
       }
 
-      setMatchedProducts(matchData.matched || [])
-      setNotMatched(matchData.not_matched || [])
-      setTotal(matchData.total || 0)
+      setMatchedProducts(data.matched || [])
+      setNotMatched(data.not_matched || [])
+      setTotal(data.total || 0)
 
-      // Speak the confirmation using Web Speech Synthesis
-      if (matchData.matched && matchData.matched.length > 0) {
-        const confirmText = generateConfirmationText(matchData.matched, matchData.total)
+      if (data.matched && data.matched.length > 0) {
+        const confirmText = generateConfirmationText(data.matched, data.total)
         speakText(confirmText)
       } else {
         setError(t.noProductsFound)
@@ -187,6 +309,7 @@ export default function VoiceOrderButton({
     }
   }
 
+  // ===== Shared functions =====
   const generateConfirmationText = (items: MatchedProduct[], total: number): string => {
     const itemTexts = items.map(item => {
       let text = `${item.quantity} ${item.product_name}`
@@ -221,7 +344,7 @@ export default function VoiceOrderButton({
     utterance.rate = 0.9
     utterance.pitch = 1
 
-    // Try to find a good Dutch voice
+    // Try to find a good voice for the language
     const voices = window.speechSynthesis.getVoices()
     const langCode = languageCodeMap[language] || 'nl-NL'
     const preferredVoice = voices.find(v => v.lang === langCode) || 
@@ -254,6 +377,9 @@ export default function VoiceOrderButton({
 
   const resetState = () => {
     window.speechSynthesis?.cancel()
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop())
+    }
     setIsOpen(false)
     setIsRecording(false)
     setIsProcessing(false)
@@ -263,11 +389,6 @@ export default function VoiceOrderButton({
     setTotal(0)
     setError('')
     setIsSpeaking(false)
-  }
-
-  // Don't render if not supported
-  if (!isSupported) {
-    return null
   }
 
   const bgColor = darkMode ? 'bg-[#1a1a1a]' : 'bg-white'
@@ -314,7 +435,7 @@ export default function VoiceOrderButton({
                   <h2 className={`text-xl font-bold ${textColor}`}>🎤 Spraakbestelling</h2>
                   <button 
                     onClick={resetState}
-                    className={`w-10 h-10 rounded-full ${cardBg} flex items-center justify-center ${textColor}`}
+                    className={`w-10 h-10 rounded-full ${cardBg} flex items-center justify-center ${textColor} text-xl`}
                   >
                     ×
                   </button>
@@ -426,8 +547,8 @@ export default function VoiceOrderButton({
 
                     {/* Not matched warning */}
                     {notMatched.length > 0 && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
-                        <p className="text-yellow-800 text-sm">
+                      <div className={`${darkMode ? 'bg-yellow-900/30 border-yellow-700' : 'bg-yellow-50 border-yellow-200'} border rounded-xl p-4`}>
+                        <p className={darkMode ? 'text-yellow-300' : 'text-yellow-800'} style={{ fontSize: '0.875rem' }}>
                           ⚠️ Niet gevonden: {notMatched.join(', ')}
                         </p>
                       </div>
