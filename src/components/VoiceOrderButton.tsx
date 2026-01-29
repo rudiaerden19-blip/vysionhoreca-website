@@ -377,59 +377,69 @@ export default function VoiceOrderButton({
     return `U heeft besteld: ${itemList}. Totaal ${totalText}. Wilt u afrekenen?`
   }
 
+  // Store text to speak - will be spoken on next user interaction
+  const pendingSpeechRef = useRef<string | null>(null)
+
   const speakText = (text: string) => {
-    if (!('speechSynthesis' in window)) {
-      console.warn('[Voice Order] Speech synthesis not supported')
-      return
-    }
+    // On iOS, we can't auto-play speech, so store it for the "Afspelen" button
+    pendingSpeechRef.current = text
+    setIsSpeaking(false)
+    
+    // Try to speak anyway (works on desktop)
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel()
+        
+        const utterance = new SpeechSynthesisUtterance(text)
+        utterance.lang = languageCodeMap[language] || 'nl-NL'
+        utterance.rate = 0.95
+        utterance.volume = 1
 
-    // Cancel any ongoing speech
+        const voices = window.speechSynthesis.getVoices()
+        const langCode = languageCodeMap[language] || 'nl-NL'
+        const preferredVoice = voices.find(v => v.lang === langCode) || 
+                              voices.find(v => v.lang.startsWith(language.split('-')[0]))
+        
+        if (preferredVoice) {
+          utterance.voice = preferredVoice
+        }
+
+        utterance.onstart = () => setIsSpeaking(true)
+        utterance.onend = () => setIsSpeaking(false)
+        utterance.onerror = () => setIsSpeaking(false)
+
+        window.speechSynthesis.speak(utterance)
+      } catch (e) {
+        console.log('[Voice Order] Auto-speech failed, user can tap to hear')
+      }
+    }
+  }
+
+  // Manual speak button for iOS
+  const handleManualSpeak = () => {
+    if (!pendingSpeechRef.current || !('speechSynthesis' in window)) return
+    
     window.speechSynthesis.cancel()
+    
+    const utterance = new SpeechSynthesisUtterance(pendingSpeechRef.current)
+    utterance.lang = languageCodeMap[language] || 'nl-NL'
+    utterance.rate = 0.95
+    utterance.volume = 1
 
-    // Wait for voices to load (needed on some browsers)
-    const speak = () => {
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = languageCodeMap[language] || 'nl-NL'
-      utterance.rate = 0.95
-      utterance.pitch = 1
-      utterance.volume = 1
-
-      // Try to find a good voice for the language
-      const voices = window.speechSynthesis.getVoices()
-      const langCode = languageCodeMap[language] || 'nl-NL'
-      
-      // Prefer female voices, they're usually clearer
-      const preferredVoice = voices.find(v => v.lang === langCode && v.name.includes('Female')) ||
-                            voices.find(v => v.lang === langCode) || 
-                            voices.find(v => v.lang.startsWith(language.split('-')[0]))
-      
-      if (preferredVoice) {
-        utterance.voice = preferredVoice
-        console.log('[Voice Order] Using voice:', preferredVoice.name)
-      }
-
-      utterance.onstart = () => {
-        console.log('[Voice Order] Speaking started')
-        setIsSpeaking(true)
-      }
-      utterance.onend = () => {
-        console.log('[Voice Order] Speaking ended')
-        setIsSpeaking(false)
-      }
-      utterance.onerror = (e) => {
-        console.error('[Voice Order] Speech error:', e)
-        setIsSpeaking(false)
-      }
-
-      window.speechSynthesis.speak(utterance)
+    const voices = window.speechSynthesis.getVoices()
+    const langCode = languageCodeMap[language] || 'nl-NL'
+    const preferredVoice = voices.find(v => v.lang === langCode) || 
+                          voices.find(v => v.lang.startsWith(language.split('-')[0]))
+    
+    if (preferredVoice) {
+      utterance.voice = preferredVoice
     }
 
-    // Voices might not be loaded yet
-    if (window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.onvoiceschanged = speak
-    } else {
-      speak()
-    }
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    utterance.onerror = () => setIsSpeaking(false)
+
+    window.speechSynthesis.speak(utterance)
   }
 
   const handleConfirm = () => {
@@ -638,18 +648,31 @@ export default function VoiceOrderButton({
                       </p>
                     </div>
 
-                    {/* Speaking indicator */}
-                    {isSpeaking && (
-                      <div className="flex items-center justify-center gap-2 py-2">
-                        <motion.div
-                          animate={{ scale: [1, 1.2, 1] }}
-                          transition={{ repeat: Infinity, duration: 0.5 }}
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: primaryColor }}
-                        />
-                        <p className={mutedColor}>Aan het spreken...</p>
-                      </div>
-                    )}
+                    {/* Play audio button + Speaking indicator */}
+                    <button
+                      onClick={handleManualSpeak}
+                      className={`w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${
+                        isSpeaking 
+                          ? 'bg-green-500 text-white' 
+                          : `${cardBg} ${textColor}`
+                      }`}
+                    >
+                      {isSpeaking ? (
+                        <>
+                          <motion.div
+                            animate={{ scale: [1, 1.2, 1] }}
+                            transition={{ repeat: Infinity, duration: 0.5 }}
+                            className="w-3 h-3 rounded-full bg-white"
+                          />
+                          <span>Aan het spreken...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>🔊</span>
+                          <span>Beluister bestelling</span>
+                        </>
+                      )}
+                    </button>
 
                     {/* Action buttons */}
                     <div className="flex gap-3">
