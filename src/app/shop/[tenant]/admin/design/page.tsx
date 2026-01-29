@@ -43,6 +43,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
   const [settings, setSettings] = useState<TenantSettings | null>(null)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
   const [secondaryColor, setSecondaryColor] = useState('#FFA500')
+  const [darkMode, setDarkMode] = useState(false)
 
   // Load current settings
   useEffect(() => {
@@ -53,6 +54,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
         setSettings(data)
         setPrimaryColor(data.primary_color || '#FF6B35')
         setSecondaryColor(data.secondary_color || '#FFA500')
+        setDarkMode(data.dark_mode || false)
       }
       setLoading(false)
     }
@@ -69,6 +71,7 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
       ...settings,
       primary_color: primaryColor,
       secondary_color: secondaryColor,
+      dark_mode: darkMode,
     }
     
     const success = await saveTenantSettings(updatedSettings)
@@ -228,11 +231,54 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             </div>
           </motion.div>
 
-          {/* Info */}
+          {/* Dark Mode Toggle */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
+            className="bg-white rounded-2xl p-6 shadow-sm"
+          >
+            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <span>🌙</span> {t('websiteDesign.darkMode') || 'Donker thema'}
+            </h2>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium text-gray-900">{t('websiteDesign.darkModeTitle') || 'Donker thema voor webshop'}</p>
+                <p className="text-sm text-gray-500">{t('websiteDesign.darkModeDesc') || 'Geef je shop een warme, donkere uitstraling'}</p>
+              </div>
+              <button
+                onClick={() => { setDarkMode(!darkMode); setSaved(false); }}
+                className={`relative w-14 h-8 rounded-full transition-colors ${
+                  darkMode ? 'bg-blue-600' : 'bg-gray-200'
+                }`}
+              >
+                <div 
+                  className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
+                    darkMode ? 'left-7' : 'left-1'
+                  }`}
+                />
+              </button>
+            </div>
+            {darkMode && (
+              <div className="mt-4 p-4 bg-[#1a1a1a] rounded-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#2a2a2a] flex items-center justify-center">
+                    <span style={{ color: primaryColor }}>🍟</span>
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-medium">Preview donker thema</p>
+                    <p className="text-gray-400 text-xs">Zo ziet je shop eruit</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
             className="bg-blue-50 border border-blue-200 rounded-2xl p-6"
           >
             <h3 className="font-semibold text-blue-900 mb-2">💡 {t('websiteDesign.tip')}</h3>
@@ -256,19 +302,19 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
             
             {/* Mini Preview */}
             <div 
-              className="rounded-xl overflow-hidden border bg-white"
+              className={`rounded-xl overflow-hidden border ${darkMode ? 'bg-[#0d0d0d] border-[#333]' : 'bg-white'}`}
               style={{ minHeight: '400px' }}
             >
               {/* Mini Header */}
               <div 
-                className="h-32 relative"
-                style={{ background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})` }}
+                className={`h-32 relative ${darkMode ? 'bg-[#1a1a1a]' : ''}`}
+                style={!darkMode ? { background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})` } : {}}
               >
                 <div className="absolute bottom-4 left-4">
-                  <div className="text-white text-xs font-bold mb-1">
+                  <div className={`text-xs font-bold mb-1 ${darkMode ? 'text-white' : 'text-white'}`}>
                     {settings?.business_name || 'Je Zaak Naam'}
                   </div>
-                  <div className="text-white/70 text-[10px]">{settings?.tagline || t('websiteDesign.taglineHere')}</div>
+                  <div className={`text-[10px] ${darkMode ? 'text-gray-400' : 'text-white/70'}`}>{settings?.tagline || t('websiteDesign.taglineHere')}</div>
                 </div>
               </div>
 
@@ -282,10 +328,10 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                   >
                     {t('websiteDesign.previewAll')}
                   </div>
-                  <div className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
+                  <div className={`px-3 py-1 text-xs font-medium rounded-full ${darkMode ? 'bg-[#2a2a2a] text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
                     {t('websiteDesign.previewFries')}
                   </div>
-                  <div className="px-3 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">
+                  <div className={`px-3 py-1 text-xs font-medium rounded-full ${darkMode ? 'bg-[#2a2a2a] text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
                     {t('websiteDesign.previewSnacks')}
                   </div>
                 </div>
@@ -295,11 +341,11 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
                   {[1, 2].map((i) => (
                     <div 
                       key={i} 
-                      className="bg-gray-50 rounded-xl overflow-hidden"
+                      className={`rounded-xl overflow-hidden ${darkMode ? 'bg-[#1a1a1a]' : 'bg-gray-50'}`}
                     >
-                      <div className="h-16 bg-gray-300" />
+                      <div className={`h-16 ${darkMode ? 'bg-[#2a2a2a]' : 'bg-gray-300'}`} />
                       <div className="p-2">
-                        <div className="h-2 w-16 bg-gray-200 rounded mb-1" />
+                        <div className={`h-2 w-16 rounded mb-1 ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`} />
                         <div 
                           className="h-2 w-10 rounded"
                           style={{ backgroundColor: primaryColor }}

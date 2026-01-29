@@ -66,6 +66,8 @@ export interface TenantSettings {
   payment_methods?: string[]
   // Product afbeelding weergave: 'cover' (vult hele vak) of 'contain' (hele product zichtbaar)
   image_display_mode?: 'cover' | 'contain'
+  // Donker thema voor webshop
+  dark_mode?: boolean
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {

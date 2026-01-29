@@ -47,6 +47,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [loadingOptions, setLoadingOptions] = useState(false)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
   const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover')
+  const [darkMode, setDarkMode] = useState(false)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
   const [promotions, setPromotions] = useState<Promotion[]>([])
   const [promotionsEnabled, setPromotionsEnabled] = useState(true)
@@ -159,12 +160,15 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         return
       }
       
-      // Set primary color and image display mode from tenant settings
+      // Set primary color, image display mode and dark mode from tenant settings
       if (tenantData?.primary_color) {
         setPrimaryColor(tenantData.primary_color)
       }
       if (tenantData?.image_display_mode) {
         setImageDisplayMode(tenantData.image_display_mode)
+      }
+      if (tenantData?.dark_mode) {
+        setDarkMode(tenantData.dark_mode)
       }
 
       setCategories(categoriesData.filter(c => c.is_active))
@@ -324,6 +328,21 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const cartTotal = cart.reduce((sum, c) => sum + (c.totalPrice * c.quantity), 0)
   const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0)
 
+  // Theme classes voor dark mode
+  const theme = {
+    bg: darkMode ? 'bg-[#0d0d0d]' : 'bg-gray-50',
+    header: darkMode ? 'bg-[#1a1a1a]' : 'bg-white',
+    card: darkMode ? 'bg-[#1a1a1a]' : 'bg-white',
+    cardHover: darkMode ? 'hover:bg-[#252525]' : 'hover:shadow-lg',
+    border: darkMode ? 'border-[#333]' : 'border-gray-100',
+    text: darkMode ? 'text-white' : 'text-gray-900',
+    textMuted: darkMode ? 'text-gray-400' : 'text-gray-600',
+    textLight: darkMode ? 'text-gray-500' : 'text-gray-500',
+    pill: darkMode ? 'bg-[#2a2a2a] text-gray-300' : 'bg-gray-100 text-gray-700',
+    pillHover: darkMode ? 'active:bg-[#333]' : 'active:bg-gray-200',
+    imageBg: darkMode ? 'bg-[#1a1a1a]' : 'bg-gray-100',
+  }
+
   const allergenIcons: Record<string, { icon: string, color: string, label: string }> = {
     gluten: { icon: '🌾', color: 'bg-amber-100 text-amber-800', label: 'Gluten' },
     ei: { icon: '🥚', color: 'bg-yellow-100 text-yellow-800', label: 'Ei' },
@@ -345,9 +364,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
     return (
       <div
         onClick={() => selectProduct(item)}
-        className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg active:scale-[0.98] transition-all cursor-pointer group"
+        className={`${theme.card} rounded-2xl overflow-hidden shadow-sm ${theme.cardHover} active:scale-[0.98] transition-all cursor-pointer group`}
       >
-        <div className={`relative h-48 overflow-hidden ${useContain ? 'bg-white' : 'bg-gray-100'}`}>
+        <div className={`relative h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
           {item.image_url ? (
             <Image
               src={item.image_url}
@@ -376,10 +395,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         </div>
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
-            <h3 className="font-bold text-lg text-gray-900">{item.name}</h3>
+            <h3 className={`font-bold text-lg ${theme.text}`}>{item.name}</h3>
             <span style={{ color: primaryColor }} className="text-xl font-bold">€{item.price.toFixed(2)}</span>
           </div>
-          <p className="text-gray-500 text-sm mb-3 line-clamp-2">{item.description}</p>
+          <p className={`${theme.textLight} text-sm mb-3 line-clamp-2`}>{item.description}</p>
           {item.allergens.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-2">
               {item.allergens.map(allergen => (
@@ -403,7 +422,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className={`min-h-screen ${theme.bg} flex items-center justify-center`}>
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -415,10 +434,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen ${theme.bg}`}>
       {/* Sticky Header + Categories - SAMEN in 1 container voor iOS Safari */}
       <header 
-        className="sticky top-0 z-50 bg-white shadow-md"
+        className={`sticky top-0 z-50 ${theme.header} shadow-md`}
         style={{
           position: '-webkit-sticky',
           WebkitTransform: 'translateZ(0)',
@@ -426,18 +445,18 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         } as React.CSSProperties}
       >
         {/* Navigation Bar */}
-        <div className="border-b border-gray-100">
+        <div className={`border-b ${theme.border}`}>
           <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <Link href={`/shop/${params.tenant}`} className="flex items-center gap-2 text-gray-600 hover:opacity-70 transition-colors">
+            <Link href={`/shop/${params.tenant}`} className={`flex items-center gap-2 ${theme.textMuted} hover:opacity-70 transition-colors`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               <span>{t('menuPage.back')}</span>
             </Link>
-            <h1 className="font-bold text-xl text-gray-900">{t('menuPage.menu')}</h1>
+            <h1 className={`font-bold text-xl ${theme.text}`}>{t('menuPage.menu')}</h1>
             <Link 
               href={`/shop/${params.tenant}/account`}
-              className="flex items-center gap-1 text-gray-600 hover:text-gray-900 transition-colors"
+              className={`flex items-center gap-1 ${theme.textMuted} hover:opacity-70 transition-colors`}
             >
               <span>👤</span>
               <span className="text-sm font-medium hidden sm:inline">{t('menuPage.account')}</span>
@@ -467,7 +486,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
                   activeCategory === 'popular'
                     ? 'text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 active:bg-gray-200'
+                    : `${theme.pill} ${theme.pillHover}`
                 }`}
               >
                 🔥 {t('menuPage.popular')}
@@ -481,7 +500,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
                   activeCategory === cat.id
                     ? 'text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 active:bg-gray-200'
+                    : `${theme.pill} ${theme.pillHover}`
                 }`}
               >
                 {cat.name}
@@ -501,7 +520,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             data-category-id="promo"
             className="scroll-mt-32"
           >
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className={`text-xl font-bold ${theme.text} mb-4 flex items-center gap-2`}>
               <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
@@ -526,9 +545,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                         setCartOpen(true)
                       }
                     }}
-                    className={`bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all ${linkedProduct ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+                    className={`${theme.card} rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ${theme.cardHover} transition-all ${linkedProduct ? 'cursor-pointer active:scale-[0.98]' : ''}`}
                   >
-                    <div className="relative h-40 sm:h-48 overflow-hidden bg-gray-100">
+                    <div className={`relative h-40 sm:h-48 overflow-hidden ${theme.imageBg}`}>
                       {promo.image_url ? (
                         <Image src={promo.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={75} loading="lazy" className="object-cover" />
                       ) : linkedProduct?.image_url ? (
@@ -543,8 +562,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                       </div>
                     </div>
                     <div className="p-3 sm:p-4">
-                      <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-1">{promo.name}</h3>
-                      {promo.description && <p className="text-gray-500 text-xs sm:text-sm line-clamp-2">{promo.description}</p>}
+                      <h3 className={`font-bold text-base sm:text-lg ${theme.text} mb-1`}>{promo.name}</h3>
+                      {promo.description && <p className={`${theme.textLight} text-xs sm:text-sm line-clamp-2`}>{promo.description}</p>}
                       {linkedProduct && promo.type === 'fixedPrice' && (
                         <button style={{ backgroundColor: primaryColor }} className="w-full mt-3 py-2 text-white font-medium rounded-lg text-sm">
                           + Toevoegen €{promo.value.toFixed(2)}
@@ -565,7 +584,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             data-category-id="popular"
             className="scroll-mt-32"
           >
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <h2 className={`text-xl font-bold ${theme.text} mb-4 flex items-center gap-2`}>
               <span className="text-2xl">🔥</span> {t('menuPage.popular')}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -587,7 +606,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               data-category-id={category.id}
               className="scroll-mt-32"
             >
-              <h2 className="text-xl font-bold text-gray-900 mb-4">{category.name}</h2>
+              <h2 className={`text-xl font-bold ${theme.text} mb-4`}>{category.name}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {categoryItems.map((item) => (
                   <ProductCard key={item.id} item={item} />
@@ -601,8 +620,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         {menuItems.length === 0 && promotions.length === 0 && (
           <div className="text-center py-20">
             <span className="text-6xl mb-4 block">🍟</span>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('menuPage.noProducts')}</h2>
-            <p className="text-gray-500">{t('menuPage.noProductsDesc')}</p>
+            <h2 className={`text-2xl font-bold ${theme.text} mb-2`}>{t('menuPage.noProducts')}</h2>
+            <p className={theme.textLight}>{t('menuPage.noProductsDesc')}</p>
           </div>
         )}
       </div>
@@ -622,13 +641,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-t-3xl md:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              className={`${theme.card} rounded-t-3xl md:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto`}
             >
               {(() => {
                 const selectedDisplayMode = selectedItem.image_display_mode || imageDisplayMode
                 const useContain = selectedDisplayMode === 'contain'
                 return (
-              <div className={`relative h-64 overflow-hidden rounded-t-3xl md:rounded-t-3xl ${useContain ? 'bg-white' : 'bg-gray-100'}`}>
+              <div className={`relative h-64 overflow-hidden rounded-t-3xl md:rounded-t-3xl ${useContain ? theme.card : theme.imageBg}`}>
                 {selectedItem.image_url ? (
                   <Image
                     src={selectedItem.image_url}
@@ -660,14 +679,14 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedItem.name}</h2>
+                  <h2 className={`text-2xl font-bold ${theme.text}`}>{selectedItem.name}</h2>
                   <span style={{ color: primaryColor }} className="text-2xl font-bold">€{selectedItem.price.toFixed(2)}</span>
                 </div>
-                <p className="text-gray-600 mb-6">{selectedItem.description}</p>
+                <p className={`${theme.textMuted} mb-6`}>{selectedItem.description}</p>
 
                 {selectedItem.allergens.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-2">{t('menuPage.allergens')}</h3>
+                    <h3 className={`font-semibold ${theme.text} mb-2`}>{t('menuPage.allergens')}</h3>
                     <div className="flex flex-wrap gap-2">
                       {selectedItem.allergens.map(allergen => (
                         <span 
@@ -694,9 +713,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 ) : productOptions.length > 0 && (
                   <div className="space-y-4 mb-6">
                     {productOptions.map(option => (
-                      <div key={option.id} className="border border-gray-200 rounded-xl p-4">
+                      <div key={option.id} className={`border ${theme.border} rounded-xl p-4`}>
                         <div className="flex items-center gap-2 mb-3">
-                          <h3 className="font-semibold text-gray-900">{option.name}</h3>
+                          <h3 className={`font-semibold ${theme.text}`}>{option.name}</h3>
                           {option.required && (
                             <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">{t('menuPage.required')}</span>
                           )}
@@ -714,7 +733,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                                 className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
                                   isSelected
                                     ? 'border-2'
-                                    : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
+                                    : `${darkMode ? 'bg-[#2a2a2a] hover:bg-[#333]' : 'bg-gray-50 hover:bg-gray-100'} border-2 border-transparent`
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
@@ -726,7 +745,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                                     style={{ accentColor: primaryColor }}
                                     className="w-5 h-5"
                                   />
-                                  <span className="font-medium text-gray-900">{choice.name}</span>
+                                  <span className={`font-medium ${theme.text}`}>{choice.name}</span>
                                 </div>
                                 <span style={choice.price > 0 ? { color: primaryColor } : {}} className={`font-medium ${choice.price <= 0 ? 'text-gray-400' : ''}`}>
                                   {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('menuPage.free')}
@@ -793,12 +812,12 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               onClick={(e) => e.stopPropagation()}
-              className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl"
+              className={`absolute right-0 top-0 h-full w-full max-w-md ${theme.card} shadow-2xl`}
             >
-              <div className="p-4 sm:p-6 border-b">
+              <div className={`p-4 sm:p-6 border-b ${theme.border}`}>
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{t('menuPage.yourOrder')}</h2>
-                  <button onClick={() => setCartOpen(false)} className="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center">
+                  <h2 className={`text-xl sm:text-2xl font-bold ${theme.text}`}>{t('menuPage.yourOrder')}</h2>
+                  <button onClick={() => setCartOpen(false)} className={`w-10 h-10 ${darkMode ? 'bg-[#2a2a2a] hover:bg-[#333]' : 'bg-gray-100 hover:bg-gray-200'} rounded-full flex items-center justify-center ${theme.text}`}>
                     <span className="text-2xl">×</span>
                   </button>
                 </div>
@@ -808,14 +827,14 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 {cart.length === 0 ? (
                   <div className="text-center py-12">
                     <span className="text-6xl mb-4 block">🛒</span>
-                    <p className="text-gray-500">{t('menuPage.emptyCart')}</p>
+                    <p className={theme.textLight}>{t('menuPage.emptyCart')}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {cart.map((cartItem, index) => (
-                      <motion.div key={index} layout className="flex gap-4 bg-gray-50 rounded-xl p-4">
+                      <motion.div key={index} layout className={`flex gap-4 ${darkMode ? 'bg-[#2a2a2a]' : 'bg-gray-50'} rounded-xl p-4`}>
                         {cartItem.item.image_url ? (
-                          <div className="relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg bg-white">
+                          <div className={`relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg ${theme.card}`}>
                             <Image 
                               src={cartItem.item.image_url} 
                               alt={cartItem.item.name} 
@@ -826,18 +845,18 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                             />
                           </div>
                         ) : (
-                          <div className="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center text-3xl">🍟</div>
+                          <div className={`w-20 h-20 ${darkMode ? 'bg-[#333]' : 'bg-gray-200'} rounded-lg flex items-center justify-center text-3xl`}>🍟</div>
                         )}
                         <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900">{cartItem.item.name}</h3>
+                          <h3 className={`font-semibold ${theme.text}`}>{cartItem.item.name}</h3>
                           {cartItem.selectedOptions.length > 0 && (
-                            <div className="text-sm text-gray-500 mt-1">
+                            <div className={`text-sm ${theme.textLight} mt-1`}>
                               {cartItem.selectedOptions.map(opt => opt.choice.name).join(', ')}
                             </div>
                           )}
                           <p style={{ color: primaryColor }} className="font-bold">€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
                           <div className="flex items-center gap-2 mt-2">
-                            <span className="text-gray-500">{t('menuPage.quantity')}: {cartItem.quantity}</span>
+                            <span className={theme.textLight}>{t('menuPage.quantity')}: {cartItem.quantity}</span>
                             <button onClick={() => removeFromCart(index)} className="text-red-500 text-sm hover:underline">{t('menuPage.remove')}</button>
                           </div>
                         </div>
@@ -848,10 +867,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               </div>
 
               {cart.length > 0 && (
-                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 bg-white border-t pb-safe">
+                <div className={`absolute bottom-0 left-0 right-0 p-4 sm:p-6 ${theme.card} border-t ${theme.border} pb-safe`}>
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-gray-600">{t('menuPage.subtotal')}</span>
-                    <span className="text-xl font-bold text-gray-900">€{cartTotal.toFixed(2)}</span>
+                    <span className={theme.textMuted}>{t('menuPage.subtotal')}</span>
+                    <span className={`text-xl font-bold ${theme.text}`}>€{cartTotal.toFixed(2)}</span>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
