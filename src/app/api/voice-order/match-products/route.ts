@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
 
 interface Product {
   id: string
@@ -8,17 +7,9 @@ interface Product {
   category_name?: string
 }
 
-interface MatchedProduct {
-  product_id: string
-  product_name: string
-  quantity: number
-  price: number
-  extras?: string[] // sauzen, toppings, etc.
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const { text, products, language } = await request.json()
+    const { text, products } = await request.json()
 
     if (!text || !products || products.length === 0) {
       return NextResponse.json({ 
@@ -27,18 +18,15 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    const apiKey = process.env.GOOGLE_GEMINI_API_KEY
+    if (!apiKey) {
       return NextResponse.json({ 
         success: false, 
-        error: 'OpenAI API key niet geconfigureerd' 
+        error: 'Google Gemini API key niet geconfigureerd' 
       }, { status: 500 })
     }
 
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    })
-
-    // Create a product list for GPT
+    // Create a product list for Gemini
     const productList = products.map((p: Product) => 
       `- ID: "${p.id}" | Naam: "${p.name}" | Prijs: €${p.price.toFixed(2)} | Categorie: ${p.category_name || 'Overig'}`
     ).join('\n')
@@ -77,17 +65,33 @@ Retourneer ALLEEN geldige JSON:
   "total": 4.50
 }`
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: 'Je bent een bestelassistent. Retourneer alleen JSON, geen uitleg.' },
-        { role: 'user', content: prompt }
-      ],
-      temperature: 0.1,
-      max_tokens: 1000,
-    })
+    // Call Gemini API
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 1000,
+          }
+        })
+      }
+    )
 
-    const responseText = completion.choices[0]?.message?.content || ''
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      console.error('[Voice Order] Gemini API error:', response.status, errorData)
+      return NextResponse.json({ 
+        success: false, 
+        error: 'AI service fout. Probeer opnieuw.' 
+      }, { status: 500 })
+    }
+
+    const data = await response.json()
+    const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text || ''
     
     // Parse JSON from response
     let parsed
@@ -103,7 +107,7 @@ Retourneer ALLEEN geldige JSON:
       }
       parsed = JSON.parse(cleanContent.trim())
     } catch {
-      console.error('[Voice Order] Failed to parse GPT response:', responseText)
+      console.error('[Voice Order] Failed to parse Gemini response:', responseText)
       return NextResponse.json({ 
         success: false, 
         error: 'Kon bestelling niet begrijpen. Probeer opnieuw.' 

@@ -39,6 +39,19 @@ interface VoiceOrderButtonProps {
   }
 }
 
+// Language code mapping for Web Speech API
+const languageCodeMap: Record<string, string> = {
+  nl: 'nl-NL',
+  en: 'en-US',
+  de: 'de-DE',
+  fr: 'fr-FR',
+  es: 'es-ES',
+  it: 'it-IT',
+  tr: 'tr-TR',
+  ar: 'ar-SA',
+  pl: 'pl-PL',
+}
+
 export default function VoiceOrderButton({
   products,
   language,
@@ -56,90 +69,91 @@ export default function VoiceOrderButton({
   const [total, setTotal] = useState(0)
   const [error, setError] = useState('')
   const [isSpeaking, setIsSpeaking] = useState(false)
+  const [isSupported, setIsSupported] = useState(true)
   
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
-  const audioChunksRef = useRef<Blob[]>([])
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const recognitionRef = useRef<any>(null)
 
-  // Cleanup on unmount
+  // Check browser support
   useEffect(() => {
-    return () => {
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-        mediaRecorderRef.current.stop()
-      }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      setIsSupported(false)
     }
   }, [])
 
-  const startRecording = async () => {
+  const startRecording = () => {
     try {
       setError('')
       setTranscribedText('')
       setMatchedProducts([])
       setNotMatched([])
       
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
-      mediaRecorderRef.current = mediaRecorder
-      audioChunksRef.current = []
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      
+      if (!SpeechRecognition) {
+        setError('Spraakherkenning wordt niet ondersteund in deze browser. Gebruik Chrome of Edge.')
+        return
+      }
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data)
+      const recognition = new SpeechRecognition()
+      recognitionRef.current = recognition
+      
+      recognition.lang = languageCodeMap[language] || 'nl-NL'
+      recognition.continuous = false
+      recognition.interimResults = false
+      recognition.maxAlternatives = 1
+
+      recognition.onstart = () => {
+        setIsRecording(true)
+      }
+
+      recognition.onresult = async (event: any) => {
+        const transcript = event.results[0][0].transcript
+        console.log('[Voice Order] Transcribed:', transcript)
+        setTranscribedText(transcript)
+        setIsRecording(false)
+        setIsProcessing(true)
+        await processText(transcript)
+      }
+
+      recognition.onerror = (event: any) => {
+        console.error('[Voice Order] Recognition error:', event.error)
+        setIsRecording(false)
+        if (event.error === 'no-speech') {
+          setError('Geen spraak gedetecteerd. Probeer opnieuw.')
+        } else if (event.error === 'not-allowed') {
+          setError('Geen toegang tot microfoon. Geef toestemming in je browser.')
+        } else {
+          setError('Spraakherkenning mislukt. Probeer opnieuw.')
         }
       }
 
-      mediaRecorder.onstop = async () => {
-        // Stop all tracks
-        stream.getTracks().forEach(track => track.stop())
-        
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
-        await processAudio(audioBlob)
+      recognition.onend = () => {
+        setIsRecording(false)
       }
 
-      mediaRecorder.start()
-      setIsRecording(true)
+      recognition.start()
     } catch (err) {
-      console.error('Microphone access error:', err)
-      setError('Geen toegang tot microfoon. Geef toestemming in je browser.')
+      console.error('[Voice Order] Start error:', err)
+      setError('Kon spraakherkenning niet starten.')
     }
   }
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop()
-      setIsRecording(false)
-      setIsProcessing(true)
+    if (recognitionRef.current) {
+      recognitionRef.current.stop()
     }
   }
 
-  const processAudio = async (audioBlob: Blob) => {
+  const processText = async (text: string) => {
     try {
-      // Step 1: Transcribe audio with Whisper
-      const formData = new FormData()
-      formData.append('audio', audioBlob, 'recording.webm')
-      formData.append('language', language)
-
-      const transcribeRes = await fetch('/api/voice-order/transcribe', {
-        method: 'POST',
-        body: formData,
-      })
-
-      const transcribeData = await transcribeRes.json()
-      
-      if (!transcribeData.success) {
-        throw new Error(transcribeData.error || 'Transcriptie mislukt')
-      }
-
-      setTranscribedText(transcribeData.text)
-
-      // Step 2: Match products with GPT
+      // Match products with Gemini
       const matchRes = await fetch('/api/voice-order/match-products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text: transcribeData.text,
+          text: text,
           products: products,
-          language: language,
         }),
       })
 
@@ -153,16 +167,16 @@ export default function VoiceOrderButton({
       setNotMatched(matchData.not_matched || [])
       setTotal(matchData.total || 0)
 
-      // Step 3: Speak the confirmation
+      // Speak the confirmation using Web Speech Synthesis
       if (matchData.matched && matchData.matched.length > 0) {
         const confirmText = generateConfirmationText(matchData.matched, matchData.total)
-        await speakText(confirmText)
+        speakText(confirmText)
       } else {
         setError(t.noProductsFound)
       }
 
     } catch (err: any) {
-      console.error('Voice order processing error:', err)
+      console.error('[Voice Order] Processing error:', err)
       setError(err.message || 'Er ging iets mis. Probeer opnieuw.')
     } finally {
       setIsProcessing(false)
@@ -182,46 +196,41 @@ export default function VoiceOrderButton({
       ? itemTexts[0]
       : itemTexts.slice(0, -1).join(', ') + ' en ' + itemTexts[itemTexts.length - 1]
 
-    const totalFormatted = total.toFixed(2).replace('.', ' euro ')
+    const euros = Math.floor(total)
+    const cents = Math.round((total - euros) * 100)
+    const totalText = cents > 0 ? `${euros} euro ${cents}` : `${euros} euro`
     
-    return `U heeft besteld: ${itemList}. Totaal ${totalFormatted} cent. Wilt u afrekenen?`
+    return `U heeft besteld: ${itemList}. Totaal ${totalText}. Wilt u afrekenen?`
   }
 
-  const speakText = async (text: string) => {
-    try {
-      setIsSpeaking(true)
-      
-      const res = await fetch('/api/voice-order/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, voice: 'nova' }),
-      })
-
-      if (!res.ok) {
-        throw new Error('TTS request failed')
-      }
-
-      const audioBlob = await res.blob()
-      const audioUrl = URL.createObjectURL(audioBlob)
-      
-      const audio = new Audio(audioUrl)
-      audioRef.current = audio
-      
-      audio.onended = () => {
-        setIsSpeaking(false)
-        URL.revokeObjectURL(audioUrl)
-      }
-      
-      audio.onerror = () => {
-        setIsSpeaking(false)
-        URL.revokeObjectURL(audioUrl)
-      }
-
-      await audio.play()
-    } catch (err) {
-      console.error('TTS error:', err)
-      setIsSpeaking(false)
+  const speakText = (text: string) => {
+    if (!('speechSynthesis' in window)) {
+      console.warn('[Voice Order] Speech synthesis not supported')
+      return
     }
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel()
+
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = languageCodeMap[language] || 'nl-NL'
+    utterance.rate = 0.9
+    utterance.pitch = 1
+
+    // Try to find a good Dutch voice
+    const voices = window.speechSynthesis.getVoices()
+    const langCode = languageCodeMap[language] || 'nl-NL'
+    const preferredVoice = voices.find(v => v.lang === langCode) || 
+                          voices.find(v => v.lang.startsWith(language))
+    if (preferredVoice) {
+      utterance.voice = preferredVoice
+    }
+
+    utterance.onstart = () => setIsSpeaking(true)
+    utterance.onend = () => setIsSpeaking(false)
+    utterance.onerror = () => setIsSpeaking(false)
+
+    window.speechSynthesis.speak(utterance)
   }
 
   const handleConfirm = () => {
@@ -230,14 +239,17 @@ export default function VoiceOrderButton({
   }
 
   const handleRetry = () => {
+    window.speechSynthesis?.cancel()
     setError('')
     setTranscribedText('')
     setMatchedProducts([])
     setNotMatched([])
     setTotal(0)
+    setIsSpeaking(false)
   }
 
   const resetState = () => {
+    window.speechSynthesis?.cancel()
     setIsOpen(false)
     setIsRecording(false)
     setIsProcessing(false)
@@ -247,10 +259,11 @@ export default function VoiceOrderButton({
     setTotal(0)
     setError('')
     setIsSpeaking(false)
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current = null
-    }
+  }
+
+  // Don't render if not supported
+  if (!isSupported) {
+    return null
   }
 
   const bgColor = darkMode ? 'bg-[#1a1a1a]' : 'bg-white'
@@ -292,7 +305,7 @@ export default function VoiceOrderButton({
               className={`${bgColor} rounded-3xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl`}
             >
               {/* Header */}
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className={`p-6 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                 <div className="flex items-center justify-between">
                   <h2 className={`text-xl font-bold ${textColor}`}>🎤 Spraakbestelling</h2>
                   <button 
@@ -317,6 +330,7 @@ export default function VoiceOrderButton({
                     <motion.button
                       onMouseDown={startRecording}
                       onMouseUp={stopRecording}
+                      onMouseLeave={stopRecording}
                       onTouchStart={startRecording}
                       onTouchEnd={stopRecording}
                       animate={isRecording ? { scale: [1, 1.1, 1] } : {}}
