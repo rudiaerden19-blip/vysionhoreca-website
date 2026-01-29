@@ -332,15 +332,15 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const theme = {
     bg: darkMode ? 'bg-[#0d0d0d]' : 'bg-gray-50',
     header: darkMode ? 'bg-[#1a1a1a]' : 'bg-white',
-    card: darkMode ? 'bg-[#1a1a1a]' : 'bg-white',
-    cardHover: darkMode ? 'hover:bg-[#252525]' : 'hover:shadow-lg',
-    border: darkMode ? 'border-[#333]' : 'border-gray-100',
+    card: darkMode ? 'bg-[#2a2a2a]' : 'bg-white',
+    cardHover: darkMode ? 'hover:bg-[#333]' : 'hover:shadow-lg',
+    border: darkMode ? 'border-[#444]' : 'border-gray-100',
     text: darkMode ? 'text-white' : 'text-gray-900',
-    textMuted: darkMode ? 'text-gray-400' : 'text-gray-600',
-    textLight: darkMode ? 'text-gray-500' : 'text-gray-500',
-    pill: darkMode ? 'bg-[#2a2a2a] text-gray-300' : 'bg-gray-100 text-gray-700',
-    pillHover: darkMode ? 'active:bg-[#333]' : 'active:bg-gray-200',
-    imageBg: darkMode ? 'bg-[#1a1a1a]' : 'bg-gray-100',
+    textMuted: darkMode ? 'text-gray-300' : 'text-gray-600',
+    textLight: darkMode ? 'text-gray-400' : 'text-gray-500',
+    pill: darkMode ? 'bg-[#3a3a3a] text-gray-200' : 'bg-gray-100 text-gray-700',
+    pillHover: darkMode ? 'active:bg-[#444]' : 'active:bg-gray-200',
+    imageBg: darkMode ? 'bg-[#222]' : 'bg-gray-100',
   }
 
   const allergenIcons: Record<string, { icon: string, color: string, label: string }> = {
@@ -396,7 +396,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h3 className={`font-bold text-lg ${theme.text}`}>{item.name}</h3>
-            <span style={{ color: primaryColor }} className="text-xl font-bold">€{item.price.toFixed(2)}</span>
+            <span style={darkMode ? {} : { color: primaryColor }} className={`text-xl font-bold ${darkMode ? 'text-white' : ''}`}>€{item.price.toFixed(2)}</span>
           </div>
           <p className={`${theme.textLight} text-sm mb-3 line-clamp-2`}>{item.description}</p>
           {item.allergens.length > 0 && (
@@ -408,7 +408,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               ))}
             </div>
           )}
-          <div className="mt-2 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: primaryColor }}>
+          <div className={`mt-2 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all ${darkMode ? 'text-white' : ''}`} style={darkMode ? {} : { color: primaryColor }}>
             {productsWithOptions.includes(item.id) ? (
               <><span>⚙️</span><span>{t('menuPage.chooseOptions')}</span><span className="text-lg">→</span></>
             ) : (
@@ -680,7 +680,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h2 className={`text-2xl font-bold ${theme.text}`}>{selectedItem.name}</h2>
-                  <span style={{ color: primaryColor }} className="text-2xl font-bold">€{selectedItem.price.toFixed(2)}</span>
+                  <span style={darkMode ? {} : { color: primaryColor }} className={`text-2xl font-bold ${darkMode ? 'text-white' : ''}`}>€{selectedItem.price.toFixed(2)}</span>
                 </div>
                 <p className={`${theme.textMuted} mb-6`}>{selectedItem.description}</p>
 
@@ -733,7 +733,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                                 className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
                                   isSelected
                                     ? 'border-2'
-                                    : `${darkMode ? 'bg-[#2a2a2a] hover:bg-[#333]' : 'bg-gray-50 hover:bg-gray-100'} border-2 border-transparent`
+                                    : `${darkMode ? 'bg-[#3a3a3a] hover:bg-[#444]' : 'bg-gray-50 hover:bg-gray-100'} border-2 border-transparent`
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
@@ -747,7 +747,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                                   />
                                   <span className={`font-medium ${theme.text}`}>{choice.name}</span>
                                 </div>
-                                <span style={choice.price > 0 ? { color: primaryColor } : {}} className={`font-medium ${choice.price <= 0 ? 'text-gray-400' : ''}`}>
+                                <span style={choice.price > 0 && !darkMode ? { color: primaryColor } : {}} className={`font-medium ${choice.price <= 0 ? 'text-gray-400' : darkMode ? 'text-white' : ''}`}>
                                   {choice.price > 0 ? `+€${choice.price.toFixed(2)}` : t('menuPage.free')}
                                 </span>
                               </label>
@@ -817,7 +817,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               <div className={`p-4 sm:p-6 border-b ${theme.border}`}>
                 <div className="flex items-center justify-between">
                   <h2 className={`text-xl sm:text-2xl font-bold ${theme.text}`}>{t('menuPage.yourOrder')}</h2>
-                  <button onClick={() => setCartOpen(false)} className={`w-10 h-10 ${darkMode ? 'bg-[#2a2a2a] hover:bg-[#333]' : 'bg-gray-100 hover:bg-gray-200'} rounded-full flex items-center justify-center ${theme.text}`}>
+                  <button onClick={() => setCartOpen(false)} className={`w-10 h-10 ${darkMode ? 'bg-[#3a3a3a] hover:bg-[#444]' : 'bg-gray-100 hover:bg-gray-200'} rounded-full flex items-center justify-center ${theme.text}`}>
                     <span className="text-2xl">×</span>
                   </button>
                 </div>
@@ -832,7 +832,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 ) : (
                   <div className="space-y-4">
                     {cart.map((cartItem, index) => (
-                      <motion.div key={index} layout className={`flex gap-4 ${darkMode ? 'bg-[#2a2a2a]' : 'bg-gray-50'} rounded-xl p-4`}>
+                      <motion.div key={index} layout className={`flex gap-4 ${darkMode ? 'bg-[#3a3a3a]' : 'bg-gray-50'} rounded-xl p-4`}>
                         {cartItem.item.image_url ? (
                           <div className={`relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg ${theme.card}`}>
                             <Image 
@@ -845,7 +845,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                             />
                           </div>
                         ) : (
-                          <div className={`w-20 h-20 ${darkMode ? 'bg-[#333]' : 'bg-gray-200'} rounded-lg flex items-center justify-center text-3xl`}>🍟</div>
+                          <div className={`w-20 h-20 ${darkMode ? 'bg-[#444]' : 'bg-gray-200'} rounded-lg flex items-center justify-center text-3xl`}>🍟</div>
                         )}
                         <div className="flex-1">
                           <h3 className={`font-semibold ${theme.text}`}>{cartItem.item.name}</h3>
@@ -854,7 +854,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                               {cartItem.selectedOptions.map(opt => opt.choice.name).join(', ')}
                             </div>
                           )}
-                          <p style={{ color: primaryColor }} className="font-bold">€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
+                          <p style={darkMode ? {} : { color: primaryColor }} className={`font-bold ${darkMode ? 'text-white' : ''}`}>€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
                           <div className="flex items-center gap-2 mt-2">
                             <span className={theme.textLight}>{t('menuPage.quantity')}: {cartItem.quantity}</span>
                             <button onClick={() => removeFromCart(index)} className="text-red-500 text-sm hover:underline">{t('menuPage.remove')}</button>
