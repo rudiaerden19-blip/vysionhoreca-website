@@ -1,17 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+// Wavenet voices per language (female, natural sounding)
+const wavenetVoices: Record<string, { name: string; gender: string }> = {
+  'nl-NL': { name: 'nl-NL-Wavenet-E', gender: 'FEMALE' },
+  'en-US': { name: 'en-US-Wavenet-F', gender: 'FEMALE' },
+  'de-DE': { name: 'de-DE-Wavenet-F', gender: 'FEMALE' },
+  'fr-FR': { name: 'fr-FR-Wavenet-E', gender: 'FEMALE' },
+  'es-ES': { name: 'es-ES-Wavenet-C', gender: 'FEMALE' },
+  'it-IT': { name: 'it-IT-Wavenet-B', gender: 'FEMALE' },
+  'tr-TR': { name: 'tr-TR-Wavenet-E', gender: 'FEMALE' },
+  'ar-XA': { name: 'ar-XA-Wavenet-A', gender: 'FEMALE' },  // Arabic (multi-region)
+  'pl-PL': { name: 'pl-PL-Wavenet-E', gender: 'FEMALE' },
+}
+
+// Map language codes (some need adjustment for Google TTS)
+function getLanguageCode(lang: string): string {
+  if (lang === 'ar-SA') return 'ar-XA'  // Arabic uses ar-XA in Google TTS
+  return lang
+}
+
 // POST - returns base64 audio (for non-iOS)
 export async function POST(request: NextRequest) {
   try {
-    const { text } = await request.json()
+    const { text, lang } = await request.json()
 
     if (!text) {
       return NextResponse.json({ success: false, error: 'Geen tekst' }, { status: 400 })
     }
 
     const cloudApiKey = process.env.GOOGLE_CLOUD_API_KEY
+    const langCode = getLanguageCode(lang || 'nl-NL')
+    const voice = wavenetVoices[langCode] || wavenetVoices['nl-NL']
     
-    console.log('[TTS POST] Cloud API Key exists:', !!cloudApiKey, 'length:', cloudApiKey?.length)
+    console.log('[TTS POST] Language:', langCode, 'Voice:', voice.name)
     
     if (!cloudApiKey) {
       return NextResponse.json({ 
@@ -29,9 +50,9 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             input: { text },
             voice: {
-              languageCode: 'nl-NL',
-              name: 'nl-NL-Wavenet-E',
-              ssmlGender: 'FEMALE'
+              languageCode: langCode,
+              name: voice.name,
+              ssmlGender: voice.gender
             },
             audioConfig: {
               audioEncoding: 'MP3',
@@ -79,15 +100,18 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const text = searchParams.get('text')
+    const lang = searchParams.get('lang') || 'nl-NL'
 
     if (!text) {
       return new NextResponse('Missing text parameter', { status: 400 })
     }
 
     const cloudApiKey = process.env.GOOGLE_CLOUD_API_KEY
+    const langCode = getLanguageCode(lang)
+    const voice = wavenetVoices[langCode] || wavenetVoices['nl-NL']
     
+    console.log('[TTS GET] Language:', langCode, 'Voice:', voice.name)
     console.log('[TTS GET] Text:', text.substring(0, 50), '...')
-    console.log('[TTS GET] Cloud API Key exists:', !!cloudApiKey)
     
     if (!cloudApiKey) {
       return new NextResponse('API key not configured', { status: 500 })
@@ -101,9 +125,9 @@ export async function GET(request: NextRequest) {
         body: JSON.stringify({
           input: { text },
           voice: {
-            languageCode: 'nl-NL',
-            name: 'nl-NL-Wavenet-E',
-            ssmlGender: 'FEMALE'
+            languageCode: langCode,
+            name: voice.name,
+            ssmlGender: voice.gender
           },
           audioConfig: {
             audioEncoding: 'MP3',

@@ -41,7 +41,7 @@ interface VoiceOrderButtonProps {
   }
 }
 
-// Language code mapping for Web Speech API
+// Language code mapping for Web Speech API and TTS
 const languageCodeMap: Record<string, string> = {
   nl: 'nl-NL',
   en: 'en-US',
@@ -52,6 +52,64 @@ const languageCodeMap: Record<string, string> = {
   tr: 'tr-TR',
   ar: 'ar-SA',
   pl: 'pl-PL',
+}
+
+// TTS confirmation text translations
+const ttsConfirmationTexts: Record<string, { ordered: string; total: string; euro: string; confirm: string }> = {
+  nl: {
+    ordered: 'U heeft besteld:',
+    total: 'Totaal',
+    euro: 'euro',
+    confirm: 'Druk op de knop bevestigen om uw bestelling te plaatsen.'
+  },
+  en: {
+    ordered: 'You have ordered:',
+    total: 'Total',
+    euro: 'euros',
+    confirm: 'Press the confirm button to place your order.'
+  },
+  de: {
+    ordered: 'Sie haben bestellt:',
+    total: 'Gesamt',
+    euro: 'Euro',
+    confirm: 'Drücken Sie die Bestätigungstaste um Ihre Bestellung aufzugeben.'
+  },
+  fr: {
+    ordered: 'Vous avez commandé:',
+    total: 'Total',
+    euro: 'euros',
+    confirm: 'Appuyez sur le bouton confirmer pour passer votre commande.'
+  },
+  es: {
+    ordered: 'Ha pedido:',
+    total: 'Total',
+    euro: 'euros',
+    confirm: 'Pulse el botón confirmar para realizar su pedido.'
+  },
+  it: {
+    ordered: 'Hai ordinato:',
+    total: 'Totale',
+    euro: 'euro',
+    confirm: 'Premi il pulsante conferma per effettuare il tuo ordine.'
+  },
+  tr: {
+    ordered: 'Sipariş ettiniz:',
+    total: 'Toplam',
+    euro: 'euro',
+    confirm: 'Siparişinizi vermek için onay butonuna basın.'
+  },
+  ar: {
+    ordered: 'لقد طلبت:',
+    total: 'المجموع',
+    euro: 'يورو',
+    confirm: 'اضغط على زر التأكيد لتقديم طلبك.'
+  },
+  pl: {
+    ordered: 'Zamówiłeś:',
+    total: 'Suma',
+    euro: 'euro',
+    confirm: 'Naciśnij przycisk potwierdź, aby złożyć zamówienie.'
+  },
 }
 
 export default function VoiceOrderButton({
@@ -86,28 +144,44 @@ export default function VoiceOrderButton({
   const [isSpeaking, setIsSpeaking] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  // Build confirmation text
+  // Build confirmation text in the correct language
   const buildConfirmationText = (items: MatchedProduct[], totalAmount: number): string => {
+    const texts = ttsConfirmationTexts[language] || ttsConfirmationTexts.nl
+    
+    // Connector words per language
+    const connectors: Record<string, { with: string; and: string }> = {
+      nl: { with: 'met', and: 'en' },
+      en: { with: 'with', and: 'and' },
+      de: { with: 'mit', and: 'und' },
+      fr: { with: 'avec', and: 'et' },
+      es: { with: 'con', and: 'y' },
+      it: { with: 'con', and: 'e' },
+      tr: { with: 'ile', and: 've' },
+      ar: { with: 'مع', and: 'و' },
+      pl: { with: 'z', and: 'i' },
+    }
+    const conn = connectors[language] || connectors.nl
+
     const itemTexts = items.map(item => {
       let text = `${item.quantity} ${item.product_name}`
       if (item.modifications && item.modifications.length > 0) {
         text += `, ${item.modifications.join(', ')}`
       }
       if (item.extras && item.extras.length > 0) {
-        text += ` met ${item.extras.join(' en ')}`
+        text += ` ${conn.with} ${item.extras.join(` ${conn.and} `)}`
       }
       return text
     })
 
     const itemList = itemTexts.length === 1 
       ? itemTexts[0]
-      : itemTexts.slice(0, -1).join(', ') + ' en ' + itemTexts[itemTexts.length - 1]
+      : itemTexts.slice(0, -1).join(', ') + ` ${conn.and} ` + itemTexts[itemTexts.length - 1]
 
     const euros = Math.floor(totalAmount)
     const cents = Math.round((totalAmount - euros) * 100)
-    const totalText = cents > 0 ? `${euros} euro ${cents}` : `${euros} euro`
+    const totalText = cents > 0 ? `${euros} ${texts.euro} ${cents}` : `${euros} ${texts.euro}`
     
-    return `U heeft besteld: ${itemList}. Totaal ${totalText}. Druk op de knop bevestigen om uw bestelling te plaatsen.`
+    return `${texts.ordered} ${itemList}. ${texts.total} ${totalText}. ${texts.confirm}`
   }
 
   // Browser TTS fallback
@@ -142,8 +216,9 @@ export default function VoiceOrderButton({
     if (isIOS) {
       console.log('[TTS] iOS detected, using streaming audio URL')
       
-      // Use GET endpoint - iOS can play this directly as audio src
-      const audioUrl = `/api/voice-order/speak?text=${encodeURIComponent(text)}`
+      // Use GET endpoint with language - iOS can play this directly as audio src
+      const langCode = languageCodeMap[language] || 'nl-NL'
+      const audioUrl = `/api/voice-order/speak?text=${encodeURIComponent(text)}&lang=${langCode}`
       
       audio.src = audioUrl
       audio.onended = () => setIsSpeaking(false)
@@ -164,10 +239,11 @@ export default function VoiceOrderButton({
 
     // For non-iOS devices, use POST endpoint with base64
     try {
+      const langCode = languageCodeMap[language] || 'nl-NL'
       const response = await fetch('/api/voice-order/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text, lang: langCode })
       })
 
       const data = await response.json()
