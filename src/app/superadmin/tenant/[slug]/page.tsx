@@ -67,7 +67,7 @@ export default function TenantDetailPage() {
     tenant_slug: slug,
     plan: 'starter',
     status: 'trial',
-    price_monthly: 79,
+    price_monthly: 69,
     billing_email: '',
     billing_name: '',
     billing_address: '',
@@ -195,7 +195,7 @@ export default function TenantDetailPage() {
         .insert({
           tenant_slug: slug,
           plan: 'starter',
-          price_monthly: 79,
+          price_monthly: 69,
           ...updates,
         })
     }
@@ -453,9 +453,8 @@ export default function TenantDetailPage() {
                   onChange={(e) => setSubForm({ ...subForm, plan: e.target.value, price_monthly: getPlanPrice(e.target.value) })}
                   className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
                 >
-                  <option value="starter">Starter - €79/maand</option>
-                  <option value="standaard">Standaard - €99/maand</option>
-                  <option value="pro">Pro - €129/maand</option>
+                  <option value="starter">Starter - €69/maand</option>
+                  <option value="pro">Pro - €79/maand</option>
                 </select>
               </div>
 

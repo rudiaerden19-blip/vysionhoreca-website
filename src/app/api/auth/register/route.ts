@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
         tenant_slug: tenantSlug,
         plan: 'starter',
         status: 'trial',
-        price_monthly: 79,
+        price_monthly: 69,
         trial_started_at: new Date().toISOString(),
         trial_ends_at: trialEndsAt.toISOString(),
       })

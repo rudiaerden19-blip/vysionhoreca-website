@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
               tenant_slug: tenantSlug,
               plan: planId || 'starter',
               status: 'active',
-              price_monthly: Math.round((stripeSubscription.items.data[0].price.unit_amount || 7900) / 100),
+              price_monthly: Math.round((stripeSubscription.items.data[0].price.unit_amount || 6900) / 100),
               stripe_subscription_id: stripeSubscriptionId,
               stripe_customer_id: session.customer as string,
               subscription_started_at: new Date().toISOString(),

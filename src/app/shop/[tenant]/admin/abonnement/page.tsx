@@ -743,7 +743,7 @@ export default function AbonnementPage() {
             </div>
           </div>
           <div className="text-3xl font-bold text-gray-900">
-            €{currentPlan === 'pro' || currentPlan === 'PRO' ? '99' : '79'}
+            €{currentPlan === 'pro' || currentPlan === 'PRO' ? '79' : '69'}
             <span className="text-base font-normal text-gray-500">{t('perMonth')}</span>
           </div>
         </div>
@@ -823,7 +823,7 @@ export default function AbonnementPage() {
             </div>
           </div>
           <div className="mb-6">
-            <span className="text-4xl font-bold text-yellow-400">€79</span>
+            <span className="text-4xl font-bold text-yellow-400">€69</span>
             <span className="text-gray-300 ml-2">{t('perMonth')}</span>
           </div>
           <button
@@ -852,7 +852,7 @@ export default function AbonnementPage() {
             </div>
           </div>
           <div className="mb-6">
-            <span className="text-4xl font-bold text-purple-300">€99</span>
+            <span className="text-4xl font-bold text-purple-300">€79</span>
             <span className="text-gray-300 ml-2">{t('perMonth')}</span>
           </div>
           <button
