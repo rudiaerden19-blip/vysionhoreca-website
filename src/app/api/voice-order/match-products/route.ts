@@ -80,21 +80,34 @@ Retourneer ALLEEN geldige JSON:
   "total": 3.50
 }`
 
-    // Call Gemini API
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 1000,
-          }
-        })
+    // Call Gemini API with retry logic
+    const callGemini = async (retryCount = 0): Promise<Response> => {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.1,
+              maxOutputTokens: 1000,
+            }
+          })
+        }
+      )
+      
+      // Retry on 429 (rate limit) up to 2 times
+      if (response.status === 429 && retryCount < 2) {
+        console.log(`[Voice Order] Rate limited, retrying in 2s (attempt ${retryCount + 1})`)
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        return callGemini(retryCount + 1)
       }
-    )
+      
+      return response
+    }
+
+    const response = await callGemini()
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
@@ -105,7 +118,7 @@ Retourneer ALLEEN geldige JSON:
       if (response.status === 429) {
         return NextResponse.json({ 
           success: false, 
-          error: 'Te veel verzoeken. Wacht even en probeer opnieuw.' 
+          error: 'Even druk. Wacht 5 seconden en probeer opnieuw.' 
         }, { status: 429 })
       }
       
