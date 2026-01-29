@@ -479,8 +479,8 @@ function PricingSection() {
   const { t, locale } = useLanguage()
   const [isYearly, setIsYearly] = useState(false)
   
-  const starterPrice = isYearly ? 79 * 12 : 79
-  const proPrice = isYearly ? 99 * 12 : 99
+  const starterPrice = isYearly ? 69 * 12 : 69
+  const proPrice = isYearly ? 79 * 12 : 79
   const periodLabel = isYearly ? '/jaar' : '/maand'
   
   return (
