@@ -47,6 +47,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li><a href="/over-ons" className="text-gray-400 hover:text-white transition-colors">{t('footer.about')}</a></li>
               <li><a href="#contact" className="text-gray-400 hover:text-white transition-colors">{t('footer.contact')}</a></li>
+              <li><a href="/support" className="text-gray-400 hover:text-white transition-colors">Support</a></li>
               <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors">{t('footer.privacy')}</a></li>
               <li><a href="/juridisch" className="text-gray-400 hover:text-white transition-colors">{t('footer.legal')}</a></li>
             </ul>
