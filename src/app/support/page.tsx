@@ -87,8 +87,8 @@ export default function SupportPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Email ons</h3>
               <p className="text-gray-600 mb-4">We reageren binnen 24 uur</p>
-              <a href="mailto:support@vysionhoreca.com" className="text-2xl font-bold text-accent hover:underline break-all">
-                support@vysionhoreca.com
+              <a href="mailto:info@vysionhoreca.com" className="text-2xl font-bold text-accent hover:underline break-all">
+                info@vysionhoreca.com
               </a>
               <p className="text-sm text-gray-500 mt-2">Voor niet-urgente vragen</p>
             </div>
