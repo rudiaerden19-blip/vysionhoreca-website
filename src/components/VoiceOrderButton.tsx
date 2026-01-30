@@ -463,12 +463,10 @@ export default function VoiceOrderButton({
       setNotMatched(data.not_matched || [])
       setTotal(data.total || 0)
 
-      if (data.matched && data.matched.length > 0) {
-        // Speak the confirmation and ask if they want to checkout
-        speakConfirmation(data.matched, data.total || 0)
-      } else {
+      if (data.matched && data.matched.length === 0) {
         setError(t.noProductsFound)
       }
+      // Geen TTS - alleen resultaten tonen
 
     } catch (err: any) {
       console.error('[Voice Order] Server processing error:', err)
@@ -572,12 +570,10 @@ export default function VoiceOrderButton({
       setNotMatched(data.not_matched || [])
       setTotal(data.total || 0)
 
-      if (data.matched && data.matched.length > 0) {
-        // Speak the confirmation and ask if they want to checkout
-        speakConfirmation(data.matched, data.total || 0)
-      } else {
+      if (data.matched && data.matched.length === 0) {
         setError(t.noProductsFound)
       }
+      // Geen TTS - alleen resultaten tonen
 
     } catch (err: any) {
       console.error('[Voice Order] Processing error:', err)
@@ -821,17 +817,6 @@ export default function VoiceOrderButton({
                         </p>
                       </div>
                     </div>
-
-                    {/* Listen again button */}
-                    <button
-                      onClick={() => speakConfirmation(matchedProducts, total)}
-                      disabled={isSpeaking}
-                      className={`w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${cardBg} ${textColor} border-2 ${isSpeaking ? 'opacity-70' : ''}`}
-                      style={{ borderColor: primaryColor }}
-                    >
-                      <span>{isSpeaking ? '🔉' : '🔊'}</span>
-                      <span>{isSpeaking ? 'Aan het spreken...' : 'Beluister bestelling'}</span>
-                    </button>
 
                     {/* Action buttons */}
                     <div className="flex gap-3">
