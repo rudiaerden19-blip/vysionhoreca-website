@@ -101,7 +101,8 @@
       "9": "Consultez vos ventes quotidiennes en temps réel",
       "10": "Gérez votre caisse à distance",
       "11": "Personnalisez votre app de commande selon vos préférences",
-      "12": "Tout disponible en 9 langues pour vous"
+      "12": "Le client peut dicter sa commande",
+      "13": "Tout disponible en 9 langues pour vous"
     }
   },
   "comparison": {
@@ -172,9 +173,10 @@
         "6": "Avis",
         "7": "Calcul complet des coûts par produit",
         "8": "Votre propre plateforme de réservation",
-        "9": "Notifications push",
-        "10": "Support prioritaire",
-        "11": "Formation gratuite complète"
+        "9": "Commande vocale pour les clients",
+        "10": "Notifications push",
+        "11": "Support prioritaire",
+        "12": "Formation gratuite complète"
       }
     },
     "faq": {

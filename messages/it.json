@@ -101,7 +101,8 @@
       "9": "Visualizza le vendite giornaliere in tempo reale",
       "10": "Gestisci la cassa da remoto",
       "11": "Personalizza l'app ordini secondo le tue preferenze",
-      "12": "Tutto disponibile in 9 lingue per te"
+      "12": "Il cliente può dettare il suo ordine",
+      "13": "Tutto disponibile in 9 lingue per te"
     }
   },
   "comparison": {
@@ -172,9 +173,10 @@
         "6": "Recensioni",
         "7": "Calcolo completo dei costi per prodotto",
         "8": "La tua piattaforma di prenotazione",
-        "9": "Notifiche push",
-        "10": "Supporto prioritario",
-        "11": "Formazione gratuita completa"
+        "9": "Ordine vocale per i clienti",
+        "10": "Notifiche push",
+        "11": "Supporto prioritario",
+        "12": "Formazione gratuita completa"
       }
     },
     "faq": {

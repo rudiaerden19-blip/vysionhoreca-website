@@ -80,7 +80,6 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/superadmin') ||
     pathname.startsWith('/kassa') ||
     pathname.startsWith('/keuken') ||
-    pathname.startsWith('/sentry-example-page') ||
     pathname.startsWith('/monitoring')
   ) {
     return NextResponse.next()

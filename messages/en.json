@@ -101,7 +101,8 @@
       "9": "View your daily sales in real-time",
       "10": "Manage your POS remotely",
       "11": "Customize your ordering app to your preferences",
-      "12": "Everything available in 9 languages for you"
+      "12": "Customers can speak their order",
+      "13": "Everything available in 9 languages for you"
     }
   },
   "comparison": {
@@ -171,9 +172,10 @@
         "6": "Reviews",
         "7": "Full cost calculation per product",
         "8": "Your own reservation platform",
-        "9": "Push notifications",
-        "10": "Priority support",
-        "11": "Full free training"
+        "9": "Voice ordering for customers",
+        "10": "Push notifications",
+        "11": "Priority support",
+        "12": "Full free training"
       }
     },
     "faq": {

@@ -101,7 +101,8 @@
       "9": "Ve tus ventas diarias en tiempo real",
       "10": "Gestiona tu caja de forma remota",
       "11": "Personaliza tu app de pedidos a tu gusto",
-      "12": "Todo disponible en 9 idiomas para ti"
+      "12": "El cliente puede dictar su pedido",
+      "13": "Todo disponible en 9 idiomas para ti"
     }
   },
   "comparison": {
@@ -172,9 +173,10 @@
         "6": "Reseñas",
         "7": "Cálculo completo de costos por producto",
         "8": "Tu propia plataforma de reservas",
-        "9": "Notificaciones push",
-        "10": "Soporte prioritario",
-        "11": "Formación gratuita completa"
+        "9": "Pedido por voz para clientes",
+        "10": "Notificaciones push",
+        "11": "Soporte prioritario",
+        "12": "Formación gratuita completa"
       }
     },
     "faq": {
