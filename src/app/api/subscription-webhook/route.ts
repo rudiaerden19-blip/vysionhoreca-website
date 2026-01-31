@@ -59,6 +59,7 @@ export async function POST(request: NextRequest) {
           const tenantSlug = session.metadata?.tenant_slug
 
           if (invoiceId) {
+            // Update invoice to paid
             await supabase
               .from('invoices')
               .update({
@@ -69,6 +70,34 @@ export async function POST(request: NextRequest) {
               .eq('id', invoiceId)
 
             console.log(`Invoice ${invoiceId} paid for ${tenantSlug}`)
+
+            // Check if there are any remaining unpaid invoices
+            const { data: unpaidInvoices } = await supabase
+              .from('invoices')
+              .select('id')
+              .eq('tenant_slug', tenantSlug)
+              .in('status', ['pending', 'overdue'])
+
+            // If no more unpaid invoices, reactivate subscription
+            if (!unpaidInvoices || unpaidInvoices.length === 0) {
+              // Update subscription status to active
+              await supabase
+                .from('subscriptions')
+                .update({
+                  status: 'active',
+                })
+                .eq('tenant_slug', tenantSlug)
+
+              // Also update tenants table
+              await supabase
+                .from('tenants')
+                .update({
+                  subscription_status: 'ACTIVE',
+                })
+                .eq('slug', tenantSlug)
+
+              console.log(`Subscription reactivated for ${tenantSlug} - all invoices paid`)
+            }
           }
         }
         

@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Subscription {
   id: string
@@ -493,6 +494,7 @@ const getSupabase = () => {
 
 export default function AbonnementPage() {
   const params = useParams()
+  const searchParams = useSearchParams()
   const tenantSlug = params.tenant as string
   const { t: globalT, locale } = useLanguage()
   
@@ -501,6 +503,30 @@ export default function AbonnementPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [showCancelled, setShowCancelled] = useState(false)
+  const [successType, setSuccessType] = useState<'subscription' | 'invoice'>('subscription')
+
+  // Check URL parameters for payment result
+  useEffect(() => {
+    const success = searchParams.get('success')
+    const payment = searchParams.get('payment')
+    const cancelled = searchParams.get('cancelled')
+    
+    if (success === 'true') {
+      setSuccessType('subscription')
+      setShowSuccess(true)
+      // Remove query params from URL without reload
+      window.history.replaceState({}, '', window.location.pathname)
+    } else if (payment === 'success') {
+      setSuccessType('invoice')
+      setShowSuccess(true)
+      window.history.replaceState({}, '', window.location.pathname)
+    } else if (cancelled === 'true' || payment === 'cancelled') {
+      setShowCancelled(true)
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     loadData()
@@ -674,6 +700,70 @@ export default function AbonnementPage() {
         <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
         <p className="text-gray-600 mt-2">{t('subtitle')}</p>
       </div>
+
+      {/* Success Banner */}
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-green-50 border-2 border-green-300 rounded-2xl p-6"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">✓</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-green-800">
+                  {successType === 'subscription' ? 'Abonnement geactiveerd!' : 'Factuur betaald!'}
+                </h3>
+                <p className="text-green-700 mt-1">
+                  {successType === 'subscription' 
+                    ? 'Bedankt voor je betaling! Je abonnement is nu actief en je hebt volledige toegang tot alle functies.'
+                    : 'Bedankt voor je betaling! Je factuur is succesvol betaald.'}
+                </p>
+                <button
+                  onClick={() => setShowSuccess(false)}
+                  className="mt-4 text-green-600 hover:text-green-700 font-medium text-sm"
+                >
+                  Sluiten
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Cancelled Banner */}
+      <AnimatePresence>
+        {showCancelled && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">⚠️</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-amber-800">Betaling geannuleerd</h3>
+                <p className="text-amber-700 mt-1">
+                  Je betaling is geannuleerd. Geen zorgen, er is niets afgeschreven. Je kunt het opnieuw proberen wanneer je klaar bent.
+                </p>
+                <button
+                  onClick={() => setShowCancelled(false)}
+                  className="mt-4 text-amber-600 hover:text-amber-700 font-medium text-sm"
+                >
+                  Sluiten
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Warning Banner for Overdue */}
       {hasOverdue && (
