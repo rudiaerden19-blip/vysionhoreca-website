@@ -106,8 +106,8 @@ export default function CadeaubonnenPage({ params }: { params: { tenant: string 
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      {/* Header - Sticky */}
+      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm -mx-4 px-4 py-4 mb-4 flex items-center justify-between border-b border-gray-100">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('websiteGiftCards.title')}</h1>
           <p className="text-gray-500">{t('websiteGiftCards.subtitle')}</p>
