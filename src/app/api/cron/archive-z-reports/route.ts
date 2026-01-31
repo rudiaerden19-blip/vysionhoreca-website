@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
+import { getDateBoundsForBelgium, getBelgiumDateString } from '@/lib/admin-api'
 
 // Vercel Cron Job - runs daily at midnight
 // Configure in vercel.json: { "crons": [{ "path": "/api/cron/archive-z-reports", "schedule": "0 0 * * *" }] }
@@ -30,22 +31,26 @@ export async function GET(request: NextRequest) {
 
     logger.info('Starting Z-report archival cron job', { requestId })
 
-    // Get yesterday's date (we archive the previous day)
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
-    const yesterdayStr = yesterday.toISOString().split('T')[0]
+    // Get yesterday's date IN BELGIUM TIMEZONE (we archive the previous day)
+    // KRITIEK: Gebruik Belgium timezone, niet UTC!
+    const now = new Date()
+    const todayBelgium = getBelgiumDateString(now)
+    // Get yesterday in Belgium timezone
+    const yesterdayDate = new Date(now)
+    yesterdayDate.setDate(yesterdayDate.getDate() - 1)
+    const yesterdayStr = getBelgiumDateString(yesterdayDate)
 
-    logger.info('Archiving Z-reports', { requestId, date: yesterdayStr })
+    logger.info('Archiving Z-reports', { requestId, date: yesterdayStr, todayBelgium })
 
-    // Get all completed orders from yesterday with tenant info in ONE query
-    const startOfDay = `${yesterdayStr}T00:00:00`
-    const endOfDay = `${yesterdayStr}T23:59:59`
+    // KRITIEK: Gebruik Belgium timezone voor correcte dag grenzen
+    const { startUTC, endUTC } = getDateBoundsForBelgium(yesterdayStr)
+    logger.info('Query bounds', { requestId, startUTC, endUTC })
 
     const { data: allOrders, error: ordersError } = await supabase
       .from('orders')
       .select('id, tenant_slug, total, payment_method')
-      .gte('created_at', startOfDay)
-      .lte('created_at', endOfDay)
+      .gte('created_at', startUTC)
+      .lte('created_at', endUTC)
       .eq('status', 'completed')
 
     if (ordersError) {

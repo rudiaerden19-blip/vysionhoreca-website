@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings } from '@/lib/admin-api'
+import { getTenantSettings, getDateBoundsForBelgium, getBelgiumDateString } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 
 // KRITIEK: Hash functie voor integriteitsverificatie (fiscale compliance)
@@ -91,15 +91,15 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       setBtwPercentage(settings.btw_percentage || 6)
     }
 
-    const startOfDay = `${selectedDate}T00:00:00`
-    const endOfDay = `${selectedDate}T23:59:59`
+    // KRITIEK: Gebruik Belgium timezone voor correcte dag grenzen
+    const { startUTC, endUTC } = getDateBoundsForBelgium(selectedDate)
 
     const { data: orders } = await supabase
       .from('orders')
       .select('*')
       .eq('tenant_slug', params.tenant)
-      .gte('created_at', startOfDay)
-      .lte('created_at', endOfDay)
+      .gte('created_at', startUTC)
+      .lte('created_at', endUTC)
       // KRITIEK: Alleen 'completed' orders meetellen voor fiscale compliance
       // Andere statussen (confirmed, preparing, ready) kunnen nog geweigerd worden!
       .eq('status', 'completed')

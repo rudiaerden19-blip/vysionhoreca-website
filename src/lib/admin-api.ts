@@ -3,6 +3,83 @@ import { cache, CACHE_TTL, cacheKey } from './cache'
 import bcrypt from 'bcryptjs'
 
 // =====================================================
+// TIMEZONE HELPER - KRITIEK VOOR CORRECTE DATUMS
+// België gebruikt CET (UTC+1) in winter, CEST (UTC+2) in zomer
+// =====================================================
+
+/**
+ * Converteert een lokale datum (YYYY-MM-DD) naar UTC start/eind tijden
+ * voor de Europe/Brussels timezone.
+ * 
+ * Dit is KRITIEK voor correcte dagelijkse rapporten!
+ * Een bestelling om 00:30 lokale tijd moet bij de juiste dag horen.
+ */
+export function getDateBoundsForBelgium(dateStr: string): { startUTC: string; endUTC: string } {
+  // Parse the date string
+  const [year, month, day] = dateStr.split('-').map(Number)
+  
+  // Create a date at noon on the given day to determine DST status
+  // We use noon to avoid edge cases around DST transitions
+  const noonLocal = new Date(year, month - 1, day, 12, 0, 0)
+  
+  // Get the timezone offset for this specific date
+  // getTimezoneOffset returns minutes, negative for timezones ahead of UTC
+  const offsetMinutes = noonLocal.getTimezoneOffset()
+  
+  // However, we're running on Vercel which is in UTC, so we need to
+  // calculate the Belgium offset explicitly
+  // Belgium is UTC+1 in winter (CET) and UTC+2 in summer (CEST)
+  
+  // Check if date is in DST (last Sunday of March to last Sunday of October)
+  const isDST = isBelgiumDST(year, month, day)
+  const belgiumOffsetHours = isDST ? 2 : 1
+  
+  // Start of day in Belgium (00:00:00) = (00:00:00 - offset) in UTC
+  // Example: Feb 1, 00:00:00 CET (UTC+1) = Jan 31, 23:00:00 UTC
+  const startHourUTC = 24 - belgiumOffsetHours // Previous day hour in UTC
+  const startDate = new Date(Date.UTC(year, month - 1, day - 1, startHourUTC, 0, 0))
+  
+  // End of day in Belgium (23:59:59) = (23:59:59 - offset) in UTC
+  // Example: Feb 1, 23:59:59 CET (UTC+1) = Feb 1, 22:59:59 UTC
+  const endHourUTC = 23 - belgiumOffsetHours
+  const endDate = new Date(Date.UTC(year, month - 1, day, endHourUTC, 59, 59))
+  
+  return {
+    startUTC: startDate.toISOString(),
+    endUTC: endDate.toISOString()
+  }
+}
+
+/**
+ * Check if a date is in Belgian Daylight Saving Time (CEST)
+ * DST runs from last Sunday of March at 02:00 to last Sunday of October at 03:00
+ */
+function isBelgiumDST(year: number, month: number, day: number): boolean {
+  // Find last Sunday of March
+  const marchLast = new Date(year, 2, 31) // March 31
+  const marchLastSunday = 31 - marchLast.getDay()
+  
+  // Find last Sunday of October
+  const octLast = new Date(year, 9, 31) // October 31
+  const octLastSunday = 31 - octLast.getDay()
+  
+  // Create date objects for DST boundaries
+  const dstStart = new Date(year, 2, marchLastSunday, 2, 0, 0) // March last Sunday 02:00
+  const dstEnd = new Date(year, 9, octLastSunday, 3, 0, 0) // October last Sunday 03:00
+  
+  const checkDate = new Date(year, month - 1, day, 12, 0, 0) // Noon on the check date
+  
+  return checkDate >= dstStart && checkDate < dstEnd
+}
+
+/**
+ * Get the current date in Belgium timezone as YYYY-MM-DD string
+ */
+export function getBelgiumDateString(date: Date = new Date()): string {
+  return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
+}
+
+// =====================================================
 // TENANT SETTINGS
 // =====================================================
 export interface TenantSettings {
@@ -1395,16 +1472,17 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
   console.log(`autoUpdateZReport: Start voor ${tenantSlug} op ${date}`)
   
   try {
-    const startOfDay = `${date}T00:00:00`
-    const endOfDay = `${date}T23:59:59`
+    // KRITIEK: Gebruik Belgium timezone voor correcte dag grenzen
+    const { startUTC, endUTC } = getDateBoundsForBelgium(date)
+    console.log(`autoUpdateZReport: Query van ${startUTC} tot ${endUTC}`)
     
     // Haal alle completed orders op voor deze dag
     const { data: orders, error: ordersError } = await supabase
       .from('orders')
       .select('id, total, payment_method')
       .eq('tenant_slug', tenantSlug)
-      .gte('created_at', startOfDay)
-      .lte('created_at', endOfDay)
+      .gte('created_at', startUTC)
+      .lte('created_at', endUTC)
       .eq('status', 'completed')
     
     if (ordersError) {
@@ -2438,16 +2516,21 @@ export async function calculateMonthlyReport(
   year: number, 
   month: number
 ): Promise<MonthlyReport> {
-  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
-  const endDate = new Date(year, month, 0).toISOString().split('T')[0] // Last day of month
+  const startDateStr = `${year}-${String(month).padStart(2, '0')}-01`
+  const lastDay = new Date(year, month, 0).getDate() // Last day of month
+  const endDateStr = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+  
+  // KRITIEK: Gebruik Belgium timezone voor correcte maand grenzen
+  const { startUTC } = getDateBoundsForBelgium(startDateStr)
+  const { endUTC } = getDateBoundsForBelgium(endDateStr)
   
   // 1. Get online shop revenue from orders
   const { data: ordersData } = await supabase
     .from('orders')
-    .select('total, status')
+    .select('total, status, payment_method')
     .eq('tenant_slug', tenantSlug)
-    .gte('created_at', `${startDate}T00:00:00`)
-    .lte('created_at', `${endDate}T23:59:59`)
+    .gte('created_at', startUTC)
+    .lte('created_at', endUTC)
     .not('status', 'in', '("cancelled","rejected")')
   
   const onlineRevenue = ordersData?.reduce((sum, o) => sum + (o.total || 0), 0) || 0
