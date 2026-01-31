@@ -66,6 +66,27 @@ export async function POST(request: NextRequest) {
     
     logger.info('Stripe webhook received', { requestId, eventType: event.type, eventId: event.id })
 
+    // SECURITY: Idempotency check - prevent duplicate event processing
+    const { data: existingEvent } = await supabase
+      .from('processed_webhook_events')
+      .select('id')
+      .eq('event_id', event.id)
+      .single()
+
+    if (existingEvent) {
+      logger.info('Webhook event already processed, skipping', { requestId, eventId: event.id })
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+
+    // Store event ID to prevent reprocessing
+    await supabase
+      .from('processed_webhook_events')
+      .insert({ 
+        event_id: event.id, 
+        event_type: event.type,
+        processed_at: new Date().toISOString()
+      })
+
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session
       

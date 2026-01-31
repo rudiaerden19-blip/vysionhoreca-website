@@ -114,7 +114,8 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'payment',
-      success_url: `${request.headers.get('origin')}/shop/${tenantSlug}?gift_card_success=true&code=${code}`,
+      // SECURITY: Don't expose gift card code in URL - fetch it after payment via gift_card_id
+      success_url: `${request.headers.get('origin')}/shop/${tenantSlug}?gift_card_success=true&gift_card_id=${giftCard.id}`,
       cancel_url: `${request.headers.get('origin')}/shop/${tenantSlug}?gift_card_cancelled=true`,
       customer_email: senderEmail,
       metadata: {

@@ -8,11 +8,11 @@ export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   
   try {
-    const { tenantSlug, invoiceId, amount, description } = await request.json()
+    const { tenantSlug, invoiceId, description } = await request.json()
 
-    if (!tenantSlug || !invoiceId || !amount) {
+    if (!tenantSlug || !invoiceId) {
       return NextResponse.json(
-        { error: 'Tenant slug, invoice ID en bedrag zijn verplicht' },
+        { error: 'Tenant slug en invoice ID zijn verplicht' },
         { status: 400 }
       )
     }
@@ -84,7 +84,8 @@ export async function POST(request: NextRequest) {
               name: description || `Factuur ${invoice.invoice_number}`,
               description: `Vysion Horeca - ${tenantSlug}`,
             },
-            unit_amount: Math.round(Number(amount) * 100), // Convert to cents
+            // SECURITY: Always use database amount, never trust client-supplied amount
+            unit_amount: Math.round(Number(invoice.amount) * 100), // Convert to cents
           },
           quantity: 1,
         },

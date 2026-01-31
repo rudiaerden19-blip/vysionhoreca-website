@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import { getServerSupabaseClient } from '@/lib/supabase-server'
 
 interface OrderItem {
   name?: string
@@ -15,6 +16,23 @@ interface OrderItem {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    
+    // SECURITY: Verify the request comes from a valid tenant
+    const tenantSlug = body.tenantSlug
+    if (tenantSlug) {
+      const supabase = getServerSupabaseClient()
+      if (supabase) {
+        const { data: tenant } = await supabase
+          .from('tenants')
+          .select('slug')
+          .eq('slug', tenantSlug)
+          .single()
+        
+        if (!tenant) {
+          return NextResponse.json({ error: 'Invalid tenant' }, { status: 403 })
+        }
+      }
+    }
     const { 
       customerEmail, 
       customerName,

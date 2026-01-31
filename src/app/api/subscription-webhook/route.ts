@@ -48,6 +48,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
     }
 
+    // SECURITY: Idempotency check - prevent duplicate event processing
+    // Check if we've already processed this event
+    const { data: existingEvent } = await supabase
+      .from('processed_webhook_events')
+      .select('id')
+      .eq('event_id', event.id)
+      .single()
+
+    if (existingEvent) {
+      console.log(`Webhook event ${event.id} already processed, skipping`)
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+
+    // Store event ID to prevent reprocessing (do this before processing to handle crashes)
+    await supabase
+      .from('processed_webhook_events')
+      .insert({ 
+        event_id: event.id, 
+        event_type: event.type,
+        processed_at: new Date().toISOString()
+      })
+      .select()
+      .single()
+
     // Handle the event
     switch (event.type) {
       case 'checkout.session.completed': {
