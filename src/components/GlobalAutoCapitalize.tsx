@@ -23,7 +23,7 @@ export function GlobalAutoCapitalize() {
       
       // Skip bepaalde input types
       const inputType = target.getAttribute('type')?.toLowerCase()
-      if (inputType === 'email' || inputType === 'password' || inputType === 'url' || inputType === 'number') {
+      if (inputType === 'email' || inputType === 'password' || inputType === 'url' || inputType === 'number' || inputType === 'checkbox' || inputType === 'radio' || inputType === 'range' || inputType === 'color' || inputType === 'file' || inputType === 'hidden') {
         return
       }
       
