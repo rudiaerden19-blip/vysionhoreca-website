@@ -74,36 +74,22 @@ export async function getTenantSettings(tenantSlug: string): Promise<TenantSetti
   return cache.getOrFetch(
     cacheKey('tenant_settings', tenantSlug),
     async () => {
-      // SECURITY: Explicitly select fields to prevent exposing sensitive data like stripe_secret_key
       const { data, error } = await supabase
         .from('tenant_settings')
-        .select(`
-          id, tenant_slug, business_name, tagline, description, logo_url,
-          primary_color, secondary_color, email, phone, address, postal_code, city, website,
-          facebook, instagram, minimum_order, delivery_fee, free_delivery_minimum,
-          delivery_radius, delivery_zones, opening_hours, special_hours, closed_dates,
-          btw_number, btw_percentage, legal_company_name, legal_address, legal_postal_code, legal_city,
-          privacy_policy_url, terms_url, cookie_policy_url, company_number,
-          order_confirmation_email, new_order_notification, marketing_consent_text,
-          default_language, supported_languages, currency, timezone,
-          stripe_public_key, stripe_connected, stripe_account_id,
-          seo_title, seo_description, seo_keywords, og_image_url,
-          custom_domain, domain_verified, analytics_id,
-          welcome_text, about_text, contact_text, footer_text,
-          show_allergens, show_nutritional_info, show_prep_time, show_spicy_indicator,
-          enable_reviews, enable_loyalty, loyalty_points_per_euro, loyalty_reward_threshold,
-          enable_reservations, reservation_settings, table_count, max_party_size,
-          enable_delivery, enable_pickup, enable_dine_in, enable_table_ordering,
-          enable_tips, tip_percentages, default_tip_percentage,
-          receipt_footer_text, receipt_show_qr, auto_print_orders, print_kitchen_tickets,
-          created_at, updated_at, dark_mode
-        `)
+        .select('*')
         .eq('tenant_slug', tenantSlug)
         .single()
       
       if (error) {
         console.error('Error fetching tenant settings:', error)
         return null
+      }
+      
+      // SECURITY: Remove sensitive fields before returning to prevent exposure
+      if (data) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { stripe_secret_key, ...safeData } = data as TenantSettings & { stripe_secret_key?: string }
+        return safeData as TenantSettings
       }
       return data
     },
