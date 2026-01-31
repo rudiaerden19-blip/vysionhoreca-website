@@ -108,45 +108,35 @@ export default function DesignPage({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header - Sticky */}
-      <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm -mx-4 px-4 py-4 mb-4 flex items-center justify-between border-b border-gray-100">
+    <div className="max-w-4xl mx-auto pb-24">
+      {/* Floating Save Button */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={handleSave}
+        disabled={saving}
+        className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-2xl font-medium shadow-2xl flex items-center gap-2 ${
+          saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+        }`}
+      >
+        {saving ? (
+          <>
+            <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} className="w-5 h-5 border-2 border-white border-t-transparent rounded-full" />
+            <span>{t('adminPages.common.saving')}</span>
+          </>
+        ) : saved ? (
+          <><span>✓</span><span>{t('adminPages.common.saved')}</span></>
+        ) : (
+          <><span>💾</span><span>{t('adminPages.common.save')}</span></>
+        )}
+      </motion.button>
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('websiteDesign.title')}</h1>
           <p className="text-gray-500">{t('websiteDesign.subtitle')}</p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleSave}
-          disabled={saving}
-          className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
-            saved 
-              ? 'bg-green-500 text-white' 
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
-          }`}
-        >
-          {saving ? (
-            <>
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-              />
-              <span>{t('adminPages.common.saving')}</span>
-            </>
-          ) : saved ? (
-            <>
-              <span>✓</span>
-              <span>{t('adminPages.common.saved')}</span>
-            </>
-          ) : (
-            <>
-              <span>💾</span>
-              <span>{t('adminPages.common.save')}</span>
-            </>
-          )}
-        </motion.button>
       </div>
 
       {/* Error Message */}
