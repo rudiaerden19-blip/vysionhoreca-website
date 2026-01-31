@@ -87,9 +87,9 @@ export async function getTenantSettings(tenantSlug: string): Promise<TenantSetti
       
       // SECURITY: Remove sensitive fields before returning to prevent exposure
       if (data) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { stripe_secret_key, ...safeData } = data as TenantSettings & { stripe_secret_key?: string }
-        return safeData as TenantSettings
+        const fullData = data as TenantSettings & { stripe_secret_key?: string }
+        delete fullData.stripe_secret_key
+        return fullData as TenantSettings
       }
       return data
     },
