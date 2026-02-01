@@ -64,14 +64,17 @@ export function ActionReceiver() {
         break
 
       case 'input':
-        if (element && 'value' in element) {
-          (element as HTMLInputElement).value = action.value || ''
-          // Trigger input event zodat React state update
-          element.dispatchEvent(new Event('input', { bubbles: true }))
-          element.dispatchEvent(new Event('change', { bubbles: true }))
-          
-          // Highlight het veld
-          highlightElement(element as HTMLElement, action.supportName)
+        if (element) {
+          const inputEl = element as HTMLInputElement
+          if ('value' in inputEl) {
+            inputEl.value = action.value || ''
+            // Trigger input event zodat React state update
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }))
+            inputEl.dispatchEvent(new Event('change', { bubbles: true }))
+            
+            // Highlight het veld
+            highlightElement(inputEl, action.supportName)
+          }
         }
         break
 
