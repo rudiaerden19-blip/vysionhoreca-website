@@ -12,51 +12,48 @@ export function ActionBroadcaster() {
 
   // Genereer een unieke CSS selector voor een element
   const getSelector = useCallback((element: Element): string => {
-    // Probeer ID eerst
-    if (element.id) {
-      return `#${element.id}`
-    }
-
-    // Probeer data-testid
-    const testId = element.getAttribute('data-testid')
-    if (testId) {
-      return `[data-testid="${testId}"]`
-    }
-
-    // Bouw een pad van parent naar element
-    const path: string[] = []
-    let current: Element | null = element
-
-    while (current && current !== document.body) {
-      let selector = current.tagName.toLowerCase()
-
-      // Voeg classes toe voor specificiteit
-      if (current.className && typeof current.className === 'string') {
-        const classes = current.className.split(' ').filter(c => 
-          c && !c.includes('hover') && !c.includes('focus') && !c.includes('active')
-        ).slice(0, 2)
-        if (classes.length) {
-          selector += '.' + classes.join('.')
-        }
+    try {
+      // Probeer ID eerst
+      if (element.id) {
+        return `#${CSS.escape(element.id)}`
       }
 
-      // Voeg nth-child toe voor uniekheid
-      const parent = current.parentElement
-      if (parent) {
-        const siblings = Array.from(parent.children).filter(
-          c => c.tagName === current!.tagName
+      // Probeer data-testid
+      const testId = element.getAttribute('data-testid')
+      if (testId) {
+        return `[data-testid="${testId}"]`
+      }
+
+      // Probeer name attribuut voor form elements
+      const name = element.getAttribute('name')
+      if (name) {
+        return `[name="${name}"]`
+      }
+
+      // Simpele fallback: gebruik alleen tag + eerste class
+      const tag = element.tagName.toLowerCase()
+      if (element.className && typeof element.className === 'string') {
+        const firstClass = element.className.split(' ').find(c => 
+          c && c.length > 2 && !c.includes(':') && !c.includes('[') && /^[a-zA-Z]/.test(c)
         )
-        if (siblings.length > 1) {
-          const index = siblings.indexOf(current) + 1
-          selector += `:nth-of-type(${index})`
+        if (firstClass) {
+          const selector = `${tag}.${CSS.escape(firstClass)}`
+          // Verify selector is valid
+          try {
+            document.querySelector(selector)
+            return selector
+          } catch {
+            // Invalid selector, continue
+          }
         }
       }
 
-      path.unshift(selector)
-      current = current.parentElement
+      // Laatste fallback: alleen tag naam
+      return tag
+    } catch (e) {
+      console.warn('Failed to generate selector:', e)
+      return 'body'
     }
-
-    return path.join(' > ')
   }, [])
 
   // Click handler

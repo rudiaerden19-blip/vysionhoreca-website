@@ -21,7 +21,7 @@ export function SupportControls() {
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        className="fixed bottom-4 right-4 z-[9999]"
+        className="fixed top-20 right-4 z-[9999]"
       >
         <div className="bg-red-600 text-white rounded-2xl shadow-2xl p-4 flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -53,7 +53,7 @@ export function SupportControls() {
     <motion.div
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
-      className="fixed bottom-4 right-4 z-[9999]"
+      className="fixed top-20 right-4 z-[9999]"
     >
       <AnimatePresence>
         {isExpanded ? (
