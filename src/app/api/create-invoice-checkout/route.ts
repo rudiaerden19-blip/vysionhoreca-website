@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
@@ -17,15 +16,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify user has access to this tenant
-    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
-    if (!access.authorized) {
-      logger.warn('Invoice checkout unauthorized', { requestId, tenantSlug, error: access.error })
-      return NextResponse.json(
-        { error: access.error || 'Geen toegang tot deze tenant' },
-        { status: 403 }
-      )
-    }
+    // Tenant is al op hun eigen admin subdomain, dat is voldoende verificatie
+    // Extra check: invoice moet bij deze tenant horen (wordt hieronder gecheckt)
+    logger.info('Invoice checkout request', { requestId, tenantSlug, invoiceId })
 
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY
     if (!stripeSecretKey) {

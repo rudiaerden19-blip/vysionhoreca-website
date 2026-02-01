@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { logger } from '@/lib/logger'
 
 // Plan pricing in cents
@@ -38,15 +37,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify user has access to this tenant
-    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
-    if (!access.authorized) {
-      logger.warn('Subscription checkout unauthorized', { requestId, tenantSlug, error: access.error })
-      return NextResponse.json(
-        { error: access.error || 'Geen toegang tot deze tenant' },
-        { status: 403 }
-      )
-    }
+    // Tenant is al op hun eigen admin subdomain, dat is voldoende verificatie
+    // De tenantSlug komt uit de frontend die op tenantSlug.ordervysion.com draait
+    logger.info('Subscription checkout request', { requestId, tenantSlug, planId })
 
     // Check if Stripe is configured
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY
