@@ -4,6 +4,7 @@ import './globals.css'
 import { LanguageProvider } from '@/i18n'
 import '@/lib/silence-console-prod' // Silence console.log in production
 import { GlobalAutoCapitalize } from '@/components/GlobalAutoCapitalize'
+import { PageViewTracker } from '@/components/PageViewTracker'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
         <LanguageProvider>
           <GlobalAutoCapitalize />
+          <PageViewTracker />
           {children}
         </LanguageProvider>
       </body>

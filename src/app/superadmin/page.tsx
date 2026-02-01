@@ -492,6 +492,12 @@ export default function SuperAdminDashboard() {
             >
               💳 Abonnementen
             </Link>
+            <Link
+              href="/superadmin/analytics"
+              className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-colors"
+            >
+              📊 Analytics
+            </Link>
             <button
               onClick={handleCleanupExpired}
               className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors border border-red-500/30"
