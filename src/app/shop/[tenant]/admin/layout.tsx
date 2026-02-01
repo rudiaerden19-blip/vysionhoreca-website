@@ -8,6 +8,7 @@ import TrialBanner from '@/components/TrialBanner'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
+import { SupportSessionWrapper } from '@/components/support'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -115,7 +116,14 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const baseUrl = `/shop/${params.tenant}/admin`
+
+  // Check of dit een superadmin is (voor support controls)
+  useEffect(() => {
+    const superadminId = localStorage.getItem('superadmin_id')
+    setIsSuperAdmin(!!superadminId)
+  }, [])
 
   // Check of tenant bestaat
   useEffect(() => {
@@ -170,6 +178,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }
 
   return (
+    <SupportSessionWrapper tenantSlug={params.tenant} showControls={isSuperAdmin}>
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
       {/* Trial Banner */}
       <TrialBanner tenantSlug={params.tenant} />
@@ -253,6 +262,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         </div>
       </main>
     </div>
+    </SupportSessionWrapper>
   )
 }
 
