@@ -28,6 +28,39 @@
     "trialInfo": "Gratis testen 14 dagen • Direct aan de slag",
     "clickToOpen": "Klik om te openen"
   },
+  "oneDayOnline": {
+    "title": "Ga op",
+    "titleAccent": "1 dag",
+    "titleEnd": "online met je bestelplatform",
+    "subtitle": "Waarom wachten als het vandaag kan?",
+    "cta": "Start vandaag nog →",
+    "benefits": {
+      "oneDay": {
+        "title": "Op 1 dag online",
+        "description": "Wacht niet weken op je bestelplatform. Wij helpen je en op 1 dag ben je online."
+      },
+      "noDeposit": {
+        "title": "Geen voorschotten",
+        "description": "Betaal geen voorschotten of installatiekosten zoals de meeste vragen. Bij ons is dit gratis."
+      },
+      "liveSupport": {
+        "title": "Live support",
+        "description": "Wacht niet dagen op support. Bij ons staan echte medewerkers je live te woord en herbouwen je software terwijl jij meekijkt."
+      },
+      "cancelAnytime": {
+        "title": "Maandelijks opzegbaar",
+        "description": "Geen lange contracten. Maandelijks opzegbaar zonder enige kost."
+      },
+      "growth": {
+        "title": "30% minder werk, 40% meer groei",
+        "description": "Het bestelplatform dat je 30% minder werk geeft maar je zaak 40% laat groeien."
+      },
+      "voiceOrder": {
+        "title": "Spraakbestelling",
+        "description": "Laat klanten hun bestelling inspreken. 10 keer sneller dan de meeste bestelplatformen."
+      }
+    }
+  },
   "features": {
     "title": "Bestelplatform aan 0% commissie",
     "subtitle": "Eén platform voor al je horecabehoeften. Geen losse systemen, geen gedoe. Maandelijks opzegbaar.",

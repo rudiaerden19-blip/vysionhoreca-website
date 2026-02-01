@@ -28,6 +28,39 @@
     "trialInfo": "Prova gratis 14 giorni • Inizia subito",
     "clickToOpen": "Clicca per aprire"
   },
+  "oneDayOnline": {
+    "title": "Vai online in",
+    "titleAccent": "1 giorno",
+    "titleEnd": "con la tua piattaforma ordini",
+    "subtitle": "Perché aspettare quando puoi iniziare oggi?",
+    "cta": "Inizia oggi →",
+    "benefits": {
+      "oneDay": {
+        "title": "Online in 1 giorno",
+        "description": "Non aspettare settimane per la tua piattaforma ordini. Ti aiutiamo e in 1 giorno sei online."
+      },
+      "noDeposit": {
+        "title": "Nessun anticipo",
+        "description": "Non pagare anticipi o costi di installazione come la maggior parte richiede. Da noi è gratis."
+      },
+      "liveSupport": {
+        "title": "Supporto live",
+        "description": "Non aspettare giorni per il supporto. Dipendenti reali ti aiutano in diretta e ricostruiscono il tuo software mentre guardi."
+      },
+      "cancelAnytime": {
+        "title": "Cancellabile mensilmente",
+        "description": "Nessun contratto lungo. Cancellabile mensilmente senza costi."
+      },
+      "growth": {
+        "title": "30% meno lavoro, 40% più crescita",
+        "description": "La piattaforma ordini che ti dà il 30% in meno di lavoro ma fa crescere la tua attività del 40%."
+      },
+      "voiceOrder": {
+        "title": "Ordine vocale",
+        "description": "Lascia che i clienti dettino il loro ordine. 10 volte più veloce della maggior parte delle piattaforme ordini."
+      }
+    }
+  },
   "features": {
     "title": "Piattaforma ordini con 0% di commissione",
     "subtitle": "Una piattaforma per tutte le tue esigenze di ristorazione. Nessun sistema separato, nessuna complicazione. Cancellabile mensilmente.",

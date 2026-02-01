@@ -28,6 +28,39 @@
     "trialInfo": "Essai gratuit 14 jours • Commencez immédiatement",
     "clickToOpen": "Cliquez pour ouvrir"
   },
+  "oneDayOnline": {
+    "title": "Soyez en ligne en",
+    "titleAccent": "1 jour",
+    "titleEnd": "avec votre plateforme de commande",
+    "subtitle": "Pourquoi attendre quand vous pouvez commencer aujourd'hui?",
+    "cta": "Commencer aujourd'hui →",
+    "benefits": {
+      "oneDay": {
+        "title": "En ligne en 1 jour",
+        "description": "N'attendez pas des semaines pour votre plateforme de commande. Nous vous aidons et vous êtes en ligne en 1 jour."
+      },
+      "noDeposit": {
+        "title": "Pas d'acompte",
+        "description": "Ne payez pas d'acomptes ou de frais d'installation comme la plupart le demandent. Chez nous c'est gratuit."
+      },
+      "liveSupport": {
+        "title": "Support en direct",
+        "description": "N'attendez pas des jours pour le support. De vrais employés vous aident en direct et reconstruisent votre logiciel pendant que vous regardez."
+      },
+      "cancelAnytime": {
+        "title": "Résiliable mensuellement",
+        "description": "Pas de longs contrats. Résiliable mensuellement sans frais."
+      },
+      "growth": {
+        "title": "30% moins de travail, 40% plus de croissance",
+        "description": "La plateforme de commande qui vous donne 30% moins de travail mais fait croître votre entreprise de 40%."
+      },
+      "voiceOrder": {
+        "title": "Commande vocale",
+        "description": "Laissez les clients dicter leur commande. 10 fois plus rapide que la plupart des plateformes de commande."
+      }
+    }
+  },
   "features": {
     "title": "Plateforme de commande à 0% de commission",
     "subtitle": "Une plateforme pour tous vos besoins en restauration. Pas de systèmes séparés, pas de tracas. Résiliable mensuellement.",

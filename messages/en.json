@@ -28,6 +28,39 @@
     "trialInfo": "Free trial 14 days • Get started immediately",
     "clickToOpen": "Click to open"
   },
+  "oneDayOnline": {
+    "title": "Go online in",
+    "titleAccent": "1 day",
+    "titleEnd": "with your ordering platform",
+    "subtitle": "Why wait when you can start today?",
+    "cta": "Start today →",
+    "benefits": {
+      "oneDay": {
+        "title": "Online in 1 day",
+        "description": "Don't wait weeks for your ordering platform. We help you and you're online in 1 day."
+      },
+      "noDeposit": {
+        "title": "No deposits",
+        "description": "Pay no deposits or installation costs like most charge. With us it's free."
+      },
+      "liveSupport": {
+        "title": "Live support",
+        "description": "Don't wait days for support. Real employees help you live and rebuild your software while you watch."
+      },
+      "cancelAnytime": {
+        "title": "Cancel anytime",
+        "description": "No long contracts. Cancel monthly without any cost."
+      },
+      "growth": {
+        "title": "30% less work, 40% more growth",
+        "description": "The ordering platform that gives you 30% less work but grows your business by 40%."
+      },
+      "voiceOrder": {
+        "title": "Voice ordering",
+        "description": "Let customers speak their order. 10 times faster than most ordering platforms."
+      }
+    }
+  },
   "features": {
     "title": "Ordering platform at 0% commission",
     "subtitle": "One platform for all your hospitality needs. No separate systems, no hassle. Cancel monthly.",

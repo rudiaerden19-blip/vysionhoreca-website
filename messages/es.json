@@ -28,6 +28,39 @@
     "trialInfo": "Prueba gratis 7 días • Empieza de inmediato",
     "clickToOpen": "Clic para abrir"
   },
+  "oneDayOnline": {
+    "title": "Ponte en línea en",
+    "titleAccent": "1 día",
+    "titleEnd": "con tu plataforma de pedidos",
+    "subtitle": "¿Por qué esperar si puedes empezar hoy?",
+    "cta": "Empieza hoy →",
+    "benefits": {
+      "oneDay": {
+        "title": "En línea en 1 día",
+        "description": "No esperes semanas para tu plataforma de pedidos. Te ayudamos y en 1 día estás en línea."
+      },
+      "noDeposit": {
+        "title": "Sin anticipos",
+        "description": "No pagues anticipos ni costes de instalación como la mayoría cobra. Con nosotros es gratis."
+      },
+      "liveSupport": {
+        "title": "Soporte en vivo",
+        "description": "No esperes días para soporte. Empleados reales te ayudan en vivo y reconstruyen tu software mientras miras."
+      },
+      "cancelAnytime": {
+        "title": "Cancelable mensualmente",
+        "description": "Sin contratos largos. Cancelable mensualmente sin coste alguno."
+      },
+      "growth": {
+        "title": "30% menos trabajo, 40% más crecimiento",
+        "description": "La plataforma de pedidos que te da 30% menos trabajo pero hace crecer tu negocio un 40%."
+      },
+      "voiceOrder": {
+        "title": "Pedido por voz",
+        "description": "Deja que los clientes dicten su pedido. 10 veces más rápido que la mayoría de plataformas de pedidos."
+      }
+    }
+  },
   "features": {
     "title": "Plataforma de pedidos con 0% de comisión",
     "subtitle": "Una plataforma para todas tus necesidades de hostelería. Sin sistemas separados, sin complicaciones. Cancelación mensual.",

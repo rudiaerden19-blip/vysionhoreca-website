@@ -28,6 +28,39 @@
     "trialInfo": "14 Tage kostenlos testen • Sofort loslegen",
     "clickToOpen": "Zum Öffnen klicken"
   },
+  "oneDayOnline": {
+    "title": "Gehen Sie in",
+    "titleAccent": "1 Tag",
+    "titleEnd": "online mit Ihrer Bestellplattform",
+    "subtitle": "Warum warten, wenn es heute geht?",
+    "cta": "Heute starten →",
+    "benefits": {
+      "oneDay": {
+        "title": "In 1 Tag online",
+        "description": "Warten Sie nicht wochenlang auf Ihre Bestellplattform. Wir helfen Ihnen und in 1 Tag sind Sie online."
+      },
+      "noDeposit": {
+        "title": "Keine Anzahlung",
+        "description": "Zahlen Sie keine Anzahlungen oder Installationskosten wie die meisten verlangen. Bei uns ist das kostenlos."
+      },
+      "liveSupport": {
+        "title": "Live-Support",
+        "description": "Warten Sie nicht tagelang auf Support. Echte Mitarbeiter helfen Ihnen live und bauen Ihre Software um, während Sie zuschauen."
+      },
+      "cancelAnytime": {
+        "title": "Monatlich kündbar",
+        "description": "Keine langen Verträge. Monatlich kündbar ohne Kosten."
+      },
+      "growth": {
+        "title": "30% weniger Arbeit, 40% mehr Wachstum",
+        "description": "Die Bestellplattform, die Ihnen 30% weniger Arbeit gibt, aber Ihr Geschäft um 40% wachsen lässt."
+      },
+      "voiceOrder": {
+        "title": "Sprachbestellung",
+        "description": "Lassen Sie Kunden ihre Bestellung einsprechen. 10-mal schneller als die meisten Bestellplattformen."
+      }
+    }
+  },
   "features": {
     "title": "Bestellplattform mit 0% Provision",
     "subtitle": "Eine Plattform für alle Ihre Gastronomiebedürfnisse. Keine separaten Systeme, kein Aufwand. Monatlich kündbar.",
