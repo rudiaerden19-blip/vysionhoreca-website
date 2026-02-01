@@ -10,48 +10,29 @@ import { useSupportSessionSafe } from './SupportSessionProvider'
 export function ActionBroadcaster() {
   const session = useSupportSessionSafe()
 
-  // Genereer een unieke CSS selector voor een element
+  // Genereer een simpele selector voor een element
   const getSelector = useCallback((element: Element): string => {
     try {
-      // Probeer ID eerst
-      if (element.id) {
-        return `#${CSS.escape(element.id)}`
+      // Alleen ID gebruiken als het simpel is
+      if (element.id && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(element.id)) {
+        return `#${element.id}`
       }
 
-      // Probeer data-testid
+      // Data-testid
       const testId = element.getAttribute('data-testid')
       if (testId) {
         return `[data-testid="${testId}"]`
       }
 
-      // Probeer name attribuut voor form elements
+      // Name attribuut
       const name = element.getAttribute('name')
-      if (name) {
+      if (name && /^[a-zA-Z][a-zA-Z0-9_-]*$/.test(name)) {
         return `[name="${name}"]`
       }
 
-      // Simpele fallback: gebruik alleen tag + eerste class
-      const tag = element.tagName.toLowerCase()
-      if (element.className && typeof element.className === 'string') {
-        const firstClass = element.className.split(' ').find(c => 
-          c && c.length > 2 && !c.includes(':') && !c.includes('[') && /^[a-zA-Z]/.test(c)
-        )
-        if (firstClass) {
-          const selector = `${tag}.${CSS.escape(firstClass)}`
-          // Verify selector is valid
-          try {
-            document.querySelector(selector)
-            return selector
-          } catch {
-            // Invalid selector, continue
-          }
-        }
-      }
-
-      // Laatste fallback: alleen tag naam
-      return tag
-    } catch (e) {
-      console.warn('Failed to generate selector:', e)
+      // Gewoon de tag
+      return element.tagName.toLowerCase()
+    } catch {
       return 'body'
     }
   }, [])

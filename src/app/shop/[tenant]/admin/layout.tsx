@@ -178,7 +178,12 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }
 
   return (
+    <>
+    {/* Support features - apart van layout, crasht nooit de app */}
     <SupportSessionWrapper tenantSlug={params.tenant} showControls={isSuperAdmin}>
+      <></>
+    </SupportSessionWrapper>
+    
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
       {/* Trial Banner */}
       <TrialBanner tenantSlug={params.tenant} />
@@ -262,7 +267,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         </div>
       </main>
     </div>
-    </SupportSessionWrapper>
+    </>
   )
 }
 
