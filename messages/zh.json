@@ -3253,6 +3253,12 @@
     "closesAt": "关门时间",
     "closedNow": "已关门",
     "opensAt": "开门时间",
+    "closed": {
+      "title": "我们已关门",
+      "ordersClosed": "无法再下单",
+      "message": "您目前无法下单。请选择其他日期下单。",
+      "opensAt": "重新开门时间"
+    },
     "pickup": "自取",
     "delivery": "配送",
     "ourStory": "我们的故事",

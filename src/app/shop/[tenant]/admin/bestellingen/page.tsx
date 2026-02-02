@@ -991,10 +991,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               <motion.div
                 key={order.id}
                 layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: -100 }}
-                transition={{ delay: index * 0.05 }}
                 className={`bg-white rounded-2xl p-6 shadow-sm ${
                   status === 'new' ? 'ring-2 ring-red-500 animate-pulse' : ''
                 }`}

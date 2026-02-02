@@ -3253,6 +3253,12 @@
     "closesAt": "Cierra a las",
     "closedNow": "Cerrado",
     "opensAt": "Abre a las",
+    "closed": {
+      "title": "Estamos cerrados",
+      "ordersClosed": "Ya no es posible hacer pedidos",
+      "message": "No puede pedir en este momento. Por favor, pida para otro día.",
+      "opensAt": "Abrimos de nuevo a las"
+    },
     "pickup": "Recogida",
     "delivery": "Entrega",
     "ourStory": "Nuestra historia",

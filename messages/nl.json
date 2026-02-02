@@ -3367,6 +3367,12 @@
     "closesAt": "Sluit om",
     "closedNow": "Gesloten",
     "opensAt": "Opent om",
+    "closed": {
+      "title": "Wij zijn gesloten",
+      "ordersClosed": "Bestellen is niet meer mogelijk",
+      "message": "U kunt momenteel niet bestellen. Bestel voor een andere dag.",
+      "opensAt": "We openen weer om"
+    },
     "pickup": "Afhalen",
     "delivery": "Levering",
     "ourStory": "Ons verhaal",

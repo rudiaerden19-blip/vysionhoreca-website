@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, getActivePromotions, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview, Promotion } from '@/lib/admin-api'
+import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, getActivePromotions, getShopStatus, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview, Promotion, ShopStatus } from '@/lib/admin-api'
 import { parseImageZoomSettings } from '@/components/ImageZoomPicker'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
@@ -106,6 +106,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [business, setBusiness] = useState<Business | null>(null)
+  const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
   
   // Formateer review datum met vertalingen
   const formatReviewDate = (dateString?: string) => {
@@ -361,7 +362,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         }
 
         // Laad data uit Supabase
-        const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData, promotionsData] = await Promise.all([
+        const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData, promotionsData, statusData] = await Promise.all([
           getTenantSettings(params.tenant),
           getOpeningHours(params.tenant),
           getDeliverySettings(params.tenant),
@@ -369,10 +370,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           getTenantTexts(params.tenant),
           getVisibleReviews(params.tenant),
           getActivePromotions(params.tenant),
+          getShopStatus(params.tenant),
         ])
         
-        // Zet promoties
+        // Zet promoties en shop status
         setPromotions(promotionsData)
+        setShopStatus(statusData)
 
         // Check of tenant bestaat - als tenantData null is, bestaat de tenant niet
         if (!tenantData) {
@@ -823,6 +826,33 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         </div>
       </header>
+
+      {/* Closed Shop Warning Banner - Show when shop is closed or orders are not allowed */}
+      {shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && (
+        <div className="fixed top-16 left-0 right-0 z-40 bg-red-600 text-white py-4 px-4 shadow-lg">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <span className="text-3xl">🚫</span>
+              <h2 className="text-xl sm:text-2xl font-bold">
+                {!shopStatus.isOpen 
+                  ? t('shopPage.closed.title')
+                  : t('shopPage.closed.ordersClosed')
+                }
+              </h2>
+              <span className="text-3xl">🚫</span>
+            </div>
+            <p className="text-white/90 text-sm sm:text-base">
+              {shopStatus.orderCutoffMessage || shopStatus.message || t('shopPage.closed.message')}
+            </p>
+            {shopStatus.opensAt && (
+              <p className="text-white/80 text-sm mt-2">
+                {t('shopPage.closed.opensAt')}: {shopStatus.opensAt}
+                {shopStatus.nextOpenDay && ` (${shopStatus.nextOpenDay})`}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Hero Section with Parallax */}
       <section className="relative h-screen min-h-[500px] sm:min-h-[700px] overflow-hidden">

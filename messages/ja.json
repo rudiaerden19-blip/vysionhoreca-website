@@ -3253,6 +3253,12 @@
     "closesAt": "閉店",
     "closedNow": "閉店中",
     "opensAt": "開店",
+    "closed": {
+      "title": "閉店しています",
+      "ordersClosed": "注文は終了しました",
+      "message": "現在ご注文いただけません。別の日にご注文ください。",
+      "opensAt": "再開時間"
+    },
     "pickup": "お持ち帰り",
     "delivery": "配達",
     "ourStory": "私たちの物語",

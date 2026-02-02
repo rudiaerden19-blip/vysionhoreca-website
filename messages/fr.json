@@ -2759,6 +2759,12 @@
     "closesAt": "Ferme à",
     "closedNow": "Fermé",
     "opensAt": "Ouvre à",
+    "closed": {
+      "title": "Nous sommes fermés",
+      "ordersClosed": "Les commandes ne sont plus possibles",
+      "message": "Vous ne pouvez pas commander pour le moment. Veuillez commander pour un autre jour.",
+      "opensAt": "Nous ouvrons à nouveau à"
+    },
     "pickup": "À emporter",
     "delivery": "Livraison",
     "ourStory": "Notre histoire",

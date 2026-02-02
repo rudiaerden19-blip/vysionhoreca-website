@@ -3367,6 +3367,12 @@
     "closesAt": "Closes at",
     "closedNow": "Closed",
     "opensAt": "Opens at",
+    "closed": {
+      "title": "We are closed",
+      "ordersClosed": "Orders are no longer possible",
+      "message": "You cannot order at this time. Please order for another day.",
+      "opensAt": "We open again at"
+    },
     "pickup": "Pickup",
     "delivery": "Delivery",
     "ourStory": "Our story",
