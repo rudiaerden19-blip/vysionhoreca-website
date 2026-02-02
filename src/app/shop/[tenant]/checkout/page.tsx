@@ -829,6 +829,14 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                 </div>
               )}
 
+              {/* Order Cutoff Warning - Shop is open but can't order anymore */}
+              {shopStatus && shopStatus.isOpen && shopStatus.canOrder === false && (
+                <div className="mt-4 p-4 bg-orange-50 border border-orange-300 rounded-xl text-orange-800 text-center">
+                  <div className="text-lg font-semibold mb-1">🛒 Bestellen niet meer mogelijk</div>
+                  <p>{shopStatus.orderCutoffMessage || 'U kunt vandaag niet meer bestellen.'}</p>
+                </div>
+              )}
+
               {/* Submit Button */}
               <motion.button
                 whileHover={{ scale: canSubmit() ? 1.02 : 1 }}

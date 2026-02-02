@@ -241,6 +241,8 @@ export interface OpeningHour {
   is_open: boolean
   open_time: string
   close_time: string
+  // Laatste besteltijd (optioneel - wanneer stoppen bestellingen)
+  last_order_time: string | null
   // Shift 2 (optioneel - voor twee openingstijden per dag)
   has_shift2: boolean
   open_time_2: string | null
@@ -286,7 +288,9 @@ export async function saveOpeningHours(hours: OpeningHour[]): Promise<boolean> {
 // Check if shop is currently open
 export interface ShopStatus {
   isOpen: boolean
+  canOrder: boolean  // Can customers still place orders?
   message: string
+  orderCutoffMessage?: string  // Message when order cutoff has passed
   opensAt?: string
   closesAt?: string
   nextOpenDay?: string
@@ -297,7 +301,7 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
   
   if (!hours || hours.length === 0) {
     // No opening hours set - assume open
-    return { isOpen: true, message: 'Open' }
+    return { isOpen: true, canOrder: true, message: 'Open' }
   }
   
   const now = new Date()
@@ -319,13 +323,14 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
       if (nextDayHours && nextDayHours.is_open) {
         return {
           isOpen: false,
+          canOrder: false,
           message: `Gesloten - Weer open ${dayNames[nextDay]} om ${nextDayHours.open_time}`,
           nextOpenDay: dayNames[nextDay],
           opensAt: nextDayHours.open_time
         }
       }
     }
-    return { isOpen: false, message: 'Momenteel gesloten' }
+    return { isOpen: false, canOrder: false, message: 'Momenteel gesloten' }
   }
   
   const openTime = todayHours.open_time
@@ -335,6 +340,7 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
   if (currentTimeStr < openTime) {
     return {
       isOpen: false,
+      canOrder: false,
       message: `Gesloten - We openen vandaag om ${openTime}`,
       opensAt: openTime
     }
@@ -350,13 +356,14 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
         const dayLabel = i === 1 ? 'morgen' : dayNames[nextDay]
         return {
           isOpen: false,
+          canOrder: false,
           message: `Gesloten - Weer open ${dayLabel} om ${nextDayHours.open_time}`,
           nextOpenDay: dayLabel,
           opensAt: nextDayHours.open_time
         }
       }
     }
-    return { isOpen: false, message: 'Momenteel gesloten' }
+    return { isOpen: false, canOrder: false, message: 'Momenteel gesloten' }
   }
   
   // Check break time
@@ -364,18 +371,75 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
     if (currentTimeStr >= todayHours.break_start && currentTimeStr < todayHours.break_end) {
       return {
         isOpen: false,
+        canOrder: false,
         message: `Pauze - We zijn weer open om ${todayHours.break_end}`,
         opensAt: todayHours.break_end
       }
     }
   }
   
-  // Shop is open!
+  // Calculate actual last order time
+  let lastOrderTime = closeTime
+  if (todayHours.last_order_time) {
+    if (todayHours.last_order_time === '15min') {
+      lastOrderTime = subtractMinutes(closeTime, 15)
+    } else if (todayHours.last_order_time === '30min') {
+      lastOrderTime = subtractMinutes(closeTime, 30)
+    } else if (todayHours.last_order_time === '45min') {
+      lastOrderTime = subtractMinutes(closeTime, 45)
+    } else if (todayHours.last_order_time === '60min') {
+      lastOrderTime = subtractMinutes(closeTime, 60)
+    } else if (todayHours.last_order_time.includes(':')) {
+      // Custom time like "19:30"
+      lastOrderTime = todayHours.last_order_time
+    }
+  }
+  
+  // Check if we're past the last order time
+  if (currentTimeStr >= lastOrderTime && currentTimeStr < closeTime) {
+    // Shop is open but can't order anymore
+    // Find next day's opening for the message
+    for (let i = 1; i <= 7; i++) {
+      const nextDay = (dayOfWeek + i) % 7
+      const nextDayHours = hours.find(h => h.day_of_week === nextDay)
+      if (nextDayHours && nextDayHours.is_open) {
+        const dayLabel = i === 1 ? 'morgen' : dayNames[nextDay]
+        return {
+          isOpen: true,
+          canOrder: false,
+          message: `Open tot ${closeTime}`,
+          orderCutoffMessage: `Bestellen is niet meer mogelijk voor vandaag. Bestel voor ${dayLabel}!`,
+          closesAt: closeTime,
+          nextOpenDay: dayLabel,
+          opensAt: nextDayHours.open_time
+        }
+      }
+    }
+    return {
+      isOpen: true,
+      canOrder: false,
+      message: `Open tot ${closeTime}`,
+      orderCutoffMessage: `Bestellen is niet meer mogelijk voor vandaag.`,
+      closesAt: closeTime
+    }
+  }
+  
+  // Shop is open and can order!
   return {
     isOpen: true,
+    canOrder: true,
     message: `Open tot ${closeTime}`,
     closesAt: closeTime
   }
+}
+
+// Helper function to subtract minutes from a time string
+function subtractMinutes(timeStr: string, minutes: number): string {
+  const [hours, mins] = timeStr.split(':').map(Number)
+  const date = new Date()
+  date.setHours(hours, mins, 0, 0)
+  date.setMinutes(date.getMinutes() - minutes)
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
 }
 
 // =====================================================

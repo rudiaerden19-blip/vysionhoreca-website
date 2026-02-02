@@ -1928,7 +1928,9 @@
       "closeTime": "Sluitingstijd",
       "addShift": "Tweede shift toevoegen",
       "shift1": "Shift 1",
-      "shift2": "Shift 2"
+      "shift2": "Shift 2",
+      "lastOrder": "Laatste besteltijd",
+      "sameAsClose": "Zelfde als sluitingstijd"
     },
     "levering": {
       "title": "Levering & Afhaal",
