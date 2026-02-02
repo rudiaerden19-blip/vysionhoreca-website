@@ -297,18 +297,18 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                   animate={{ opacity: 1, height: 'auto' }}
                   className="mt-4 ml-[156px] flex items-center gap-2"
                 >
-                  <span className="text-sm text-gray-500">🛒 {t('adminPages.openingstijden.lastOrder')}:</span>
+                  <span className="text-sm text-gray-500">🛒 {t('adminPages.openingstijden.customerCanOrderUntil')}:</span>
                   <select
                     value={daySchedule.last_order_time || ''}
                     onChange={(e) => updateDay(index, 'last_order_time', e.target.value || null)}
                     className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   >
-                    <option value="">{t('adminPages.openingstijden.sameAsClose')}</option>
-                    <option value="15min">15 min voor sluiting</option>
-                    <option value="30min">30 min voor sluiting</option>
-                    <option value="45min">45 min voor sluiting</option>
-                    <option value="60min">1 uur voor sluiting</option>
-                    <option value="custom">Eigen tijd:</option>
+                    <option value="">{t('adminPages.openingstijden.untilClosing')}</option>
+                    <option value="15min">{t('adminPages.openingstijden.min15BeforeClose')}</option>
+                    <option value="30min">{t('adminPages.openingstijden.min30BeforeClose')}</option>
+                    <option value="45min">{t('adminPages.openingstijden.min45BeforeClose')}</option>
+                    <option value="60min">{t('adminPages.openingstijden.hour1BeforeClose')}</option>
+                    <option value="custom">{t('adminPages.openingstijden.customTime')}</option>
                   </select>
                   {daySchedule.last_order_time && !['15min', '30min', '45min', '60min', ''].includes(daySchedule.last_order_time) && (
                     <input

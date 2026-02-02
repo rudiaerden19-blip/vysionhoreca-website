@@ -2022,7 +2022,14 @@
       "closeTime": "وقت الإغلاق",
       "addShift": "إضافة فترة ثانية",
       "shift1": "الفترة 1",
-      "shift2": "الفترة 2"
+      "shift2": "الفترة 2",
+      "customerCanOrderUntil": "يمكن للعميل الطلب حتى",
+      "untilClosing": "حتى وقت الإغلاق",
+      "min15BeforeClose": "15 دقيقة قبل الإغلاق",
+      "min30BeforeClose": "30 دقيقة قبل الإغلاق",
+      "min45BeforeClose": "45 دقيقة قبل الإغلاق",
+      "hour1BeforeClose": "ساعة واحدة قبل الإغلاق",
+      "customTime": "وقت مخصص"
     },
     "levering": {
       "title": "التوصيل والاستلام",

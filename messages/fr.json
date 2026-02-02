@@ -1528,7 +1528,14 @@
       "closeTime": "Heure de fermeture",
       "addShift": "Ajouter un deuxième service",
       "shift1": "Service 1",
-      "shift2": "Service 2"
+      "shift2": "Service 2",
+      "customerCanOrderUntil": "Le client peut commander jusqu'à",
+      "untilClosing": "Jusqu'à la fermeture",
+      "min15BeforeClose": "15 min avant fermeture",
+      "min30BeforeClose": "30 min avant fermeture",
+      "min45BeforeClose": "45 min avant fermeture",
+      "hour1BeforeClose": "1 heure avant fermeture",
+      "customTime": "Heure personnalisée"
     },
     "levering": {
       "title": "Livraison & Retrait",

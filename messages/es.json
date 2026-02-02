@@ -2022,7 +2022,14 @@
       "closeTime": "Hora de cierre",
       "addShift": "Añadir segundo turno",
       "shift1": "Turno 1",
-      "shift2": "Turno 2"
+      "shift2": "Turno 2",
+      "customerCanOrderUntil": "El cliente puede pedir hasta",
+      "untilClosing": "Hasta la hora de cierre",
+      "min15BeforeClose": "15 min antes del cierre",
+      "min30BeforeClose": "30 min antes del cierre",
+      "min45BeforeClose": "45 min antes del cierre",
+      "hour1BeforeClose": "1 hora antes del cierre",
+      "customTime": "Hora personalizada"
     },
     "levering": {
       "title": "Entrega y Recogida",

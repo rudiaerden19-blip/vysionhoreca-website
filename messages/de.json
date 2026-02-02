@@ -1528,7 +1528,14 @@
       "closeTime": "Schließzeit",
       "addShift": "Zweite Schicht hinzufügen",
       "shift1": "Schicht 1",
-      "shift2": "Schicht 2"
+      "shift2": "Schicht 2",
+      "customerCanOrderUntil": "Kunde kann bestellen bis",
+      "untilClosing": "Bis zur Schließung",
+      "min15BeforeClose": "15 Min. vor Schließung",
+      "min30BeforeClose": "30 Min. vor Schließung",
+      "min45BeforeClose": "45 Min. vor Schließung",
+      "hour1BeforeClose": "1 Stunde vor Schließung",
+      "customTime": "Eigene Zeit"
     },
     "levering": {
       "title": "Lieferung & Abholung",

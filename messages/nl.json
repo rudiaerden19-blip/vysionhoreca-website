@@ -1929,8 +1929,13 @@
       "addShift": "Tweede shift toevoegen",
       "shift1": "Shift 1",
       "shift2": "Shift 2",
-      "lastOrder": "Laatste besteltijd",
-      "sameAsClose": "Zelfde als sluitingstijd"
+      "customerCanOrderUntil": "Klant kan bestellen tot",
+      "untilClosing": "Tot sluitingstijd",
+      "min15BeforeClose": "15 min voor sluiting",
+      "min30BeforeClose": "30 min voor sluiting",
+      "min45BeforeClose": "45 min voor sluiting",
+      "hour1BeforeClose": "1 uur voor sluiting",
+      "customTime": "Eigen tijd"
     },
     "levering": {
       "title": "Levering & Afhaal",

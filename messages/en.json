@@ -1928,7 +1928,14 @@
       "closeTime": "Closing Time",
       "addShift": "Add Second Shift",
       "shift1": "Shift 1",
-      "shift2": "Shift 2"
+      "shift2": "Shift 2",
+      "customerCanOrderUntil": "Customer can order until",
+      "untilClosing": "Until closing time",
+      "min15BeforeClose": "15 min before closing",
+      "min30BeforeClose": "30 min before closing",
+      "min45BeforeClose": "45 min before closing",
+      "hour1BeforeClose": "1 hour before closing",
+      "customTime": "Custom time"
     },
     "levering": {
       "title": "Delivery & Pickup",

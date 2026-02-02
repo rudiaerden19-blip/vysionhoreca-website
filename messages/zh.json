@@ -2022,7 +2022,14 @@
       "closeTime": "结束时间",
       "addShift": "添加第二班次",
       "shift1": "班次1",
-      "shift2": "班次2"
+      "shift2": "班次2",
+      "customerCanOrderUntil": "客户可下单至",
+      "untilClosing": "直到关门",
+      "min15BeforeClose": "关门前15分钟",
+      "min30BeforeClose": "关门前30分钟",
+      "min45BeforeClose": "关门前45分钟",
+      "hour1BeforeClose": "关门前1小时",
+      "customTime": "自定义时间"
     },
     "levering": {
       "title": "配送和自取",

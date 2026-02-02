@@ -2022,7 +2022,14 @@
       "closeTime": "閉店時間",
       "addShift": "第2シフトを追加",
       "shift1": "シフト1",
-      "shift2": "シフト2"
+      "shift2": "シフト2",
+      "customerCanOrderUntil": "お客様は以下まで注文可能",
+      "untilClosing": "閉店時間まで",
+      "min15BeforeClose": "閉店15分前まで",
+      "min30BeforeClose": "閉店30分前まで",
+      "min45BeforeClose": "閉店45分前まで",
+      "hour1BeforeClose": "閉店1時間前まで",
+      "customTime": "カスタム時間"
     },
     "levering": {
       "title": "配達とテイクアウト",
