@@ -2754,6 +2754,8 @@
     "menu": "Menü",
     "account": "Konto",
     "admin": "Admin",
+    "shopClosedTitle": "Unser Geschäft ist geschlossen",
+    "shopClosedMessage": "Sie können heute nicht mehr bestellen. Bitte bestellen Sie für ein anderes Datum.",
     "closedToday": "Heute geschlossen",
     "openNow": "Jetzt geöffnet",
     "closesAt": "Schließt um",

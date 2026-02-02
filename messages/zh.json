@@ -3248,6 +3248,8 @@
     "menu": "菜单",
     "account": "账户",
     "admin": "管理",
+    "shopClosedTitle": "我们的店铺已关门",
+    "shopClosedMessage": "您今天无法下单。请选择其他日期下单。",
     "closedToday": "今日休息",
     "openNow": "营业中",
     "closesAt": "关门时间",

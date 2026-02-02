@@ -3362,6 +3362,8 @@
     "menu": "Menu",
     "account": "Account",
     "admin": "Admin",
+    "shopClosedTitle": "Our shop is closed",
+    "shopClosedMessage": "You cannot order today. Please order for another date.",
     "closedToday": "Closed today",
     "openNow": "Open now",
     "closesAt": "Closes at",

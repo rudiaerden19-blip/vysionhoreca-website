@@ -3248,6 +3248,8 @@
     "menu": "القائمة",
     "account": "الحساب",
     "admin": "الإدارة",
+    "shopClosedTitle": "متجرنا مغلق",
+    "shopClosedMessage": "لا يمكنك الطلب اليوم. يرجى الطلب لتاريخ آخر.",
     "closedToday": "مغلق اليوم",
     "openNow": "مفتوح الآن",
     "closesAt": "يغلق في",

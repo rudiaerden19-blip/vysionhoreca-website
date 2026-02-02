@@ -3248,6 +3248,8 @@
     "menu": "Menú",
     "account": "Cuenta",
     "admin": "Admin",
+    "shopClosedTitle": "Nuestro local está cerrado",
+    "shopClosedMessage": "No puede pedir hoy. Por favor, pida para otra fecha.",
     "closedToday": "Cerrado hoy",
     "openNow": "Abierto ahora",
     "closesAt": "Cierra a las",

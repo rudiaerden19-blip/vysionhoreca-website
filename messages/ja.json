@@ -3248,6 +3248,8 @@
     "menu": "メニュー",
     "account": "アカウント",
     "admin": "管理",
+    "shopClosedTitle": "当店は閉店中です",
+    "shopClosedMessage": "本日はご注文いただけません。別の日にご注文ください。",
     "closedToday": "本日休業",
     "openNow": "営業中",
     "closesAt": "閉店",

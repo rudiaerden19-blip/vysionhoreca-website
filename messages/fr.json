@@ -2754,6 +2754,8 @@
     "menu": "Menu",
     "account": "Compte",
     "admin": "Admin",
+    "shopClosedTitle": "Notre établissement est fermé",
+    "shopClosedMessage": "Vous ne pouvez plus commander aujourd'hui. Veuillez commander pour une autre date.",
     "closedToday": "Fermé aujourd'hui",
     "openNow": "Ouvert maintenant",
     "closesAt": "Ferme à",

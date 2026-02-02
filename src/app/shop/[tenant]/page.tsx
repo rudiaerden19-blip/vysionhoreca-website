@@ -834,22 +834,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <div className="flex items-center justify-center gap-3 mb-2">
               <span className="text-3xl">🚫</span>
               <h2 className="text-xl sm:text-2xl font-bold">
-                {!shopStatus.isOpen 
-                  ? t('shopPage.closed.title')
-                  : t('shopPage.closed.ordersClosed')
-                }
+                {t('shopPage.shopClosedTitle')}
               </h2>
               <span className="text-3xl">🚫</span>
             </div>
             <p className="text-white/90 text-sm sm:text-base">
-              {shopStatus.orderCutoffMessage || shopStatus.message || t('shopPage.closed.message')}
+              {t('shopPage.shopClosedMessage')}
             </p>
-            {shopStatus.opensAt && (
-              <p className="text-white/80 text-sm mt-2">
-                {t('shopPage.closed.opensAt')}: {shopStatus.opensAt}
-                {shopStatus.nextOpenDay && ` (${shopStatus.nextOpenDay})`}
-              </p>
-            )}
           </div>
         </div>
       )}

@@ -3362,6 +3362,8 @@
     "menu": "Menu",
     "account": "Account",
     "admin": "Admin",
+    "shopClosedTitle": "Onze zaak is gesloten",
+    "shopClosedMessage": "U kunt vandaag niet meer bestellen. Bestel voor een andere datum.",
     "closedToday": "Vandaag gesloten",
     "openNow": "Nu open",
     "closesAt": "Sluit om",
