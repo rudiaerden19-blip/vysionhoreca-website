@@ -296,6 +296,13 @@ export interface ShopStatus {
   nextOpenDay?: string
 }
 
+// Helper to format time as HH:MM (remove seconds if present)
+function formatTimeShort(time: string): string {
+  if (!time) return ''
+  // If time is like "11:30:00", return "11:30"
+  return time.slice(0, 5)
+}
+
 export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
   const hours = await getOpeningHours(tenantSlug)
   
@@ -324,9 +331,9 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
         return {
           isOpen: false,
           canOrder: false,
-          message: `Gesloten - Weer open ${dayNames[nextDay]} om ${nextDayHours.open_time}`,
-          nextOpenDay: dayNames[nextDay],
-          opensAt: nextDayHours.open_time
+message: `Gesloten - Weer open ${dayNames[nextDay]} om ${formatTimeShort(nextDayHours.open_time)}`,
+        nextOpenDay: dayNames[nextDay],
+          opensAt: formatTimeShort(nextDayHours.open_time)
         }
       }
     }
@@ -341,8 +348,8 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
     return {
       isOpen: false,
       canOrder: false,
-      message: `Gesloten - We openen vandaag om ${openTime}`,
-      opensAt: openTime
+      message: `Gesloten - We openen vandaag om ${formatTimeShort(openTime)}`,
+      opensAt: formatTimeShort(openTime)
     }
   }
   
@@ -357,9 +364,9 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
         return {
           isOpen: false,
           canOrder: false,
-          message: `Gesloten - Weer open ${dayLabel} om ${nextDayHours.open_time}`,
+          message: `Gesloten - Weer open ${dayLabel} om ${formatTimeShort(nextDayHours.open_time)}`,
           nextOpenDay: dayLabel,
-          opensAt: nextDayHours.open_time
+          opensAt: formatTimeShort(nextDayHours.open_time)
         }
       }
     }
@@ -372,8 +379,8 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
       return {
         isOpen: false,
         canOrder: false,
-        message: `Pauze - We zijn weer open om ${todayHours.break_end}`,
-        opensAt: todayHours.break_end
+        message: `Pauze - We zijn weer open om ${formatTimeShort(todayHours.break_end)}`,
+        opensAt: formatTimeShort(todayHours.break_end)
       }
     }
   }
@@ -407,20 +414,20 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
         return {
           isOpen: true,
           canOrder: false,
-          message: `Open tot ${closeTime}`,
+          message: `Open tot ${formatTimeShort(closeTime)}`,
           orderCutoffMessage: `Bestellen is niet meer mogelijk voor vandaag. Bestel voor ${dayLabel}!`,
-          closesAt: closeTime,
+          closesAt: formatTimeShort(closeTime),
           nextOpenDay: dayLabel,
-          opensAt: nextDayHours.open_time
+          opensAt: formatTimeShort(nextDayHours.open_time)
         }
       }
     }
     return {
       isOpen: true,
       canOrder: false,
-      message: `Open tot ${closeTime}`,
+      message: `Open tot ${formatTimeShort(closeTime)}`,
       orderCutoffMessage: `Bestellen is niet meer mogelijk voor vandaag.`,
-      closesAt: closeTime
+      closesAt: formatTimeShort(closeTime)
     }
   }
   
@@ -428,8 +435,8 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
   return {
     isOpen: true,
     canOrder: true,
-    message: `Open tot ${closeTime}`,
-    closesAt: closeTime
+    message: `Open tot ${formatTimeShort(closeTime)}`,
+    closesAt: formatTimeShort(closeTime)
   }
 }
 
