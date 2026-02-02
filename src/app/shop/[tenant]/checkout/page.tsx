@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { getTenantSettings, getDeliverySettings, getOpeningHours, TenantSettings, DeliverySettings, OpeningHour, addLoyaltyPoints, getCustomer, getShopStatus, ShopStatus } from '@/lib/admin-api'
+import { getTenantSettings, getDeliverySettings, TenantSettings, DeliverySettings, addLoyaltyPoints, getCustomer, getShopStatus, ShopStatus } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 
@@ -57,9 +57,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [loggedInCustomerId, setLoggedInCustomerId] = useState<string | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
   const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>(['cash'])
-  const [scheduledDate, setScheduledDate] = useState<string>('') // For ordering when shop is closed
-  const [openingHours, setOpeningHours] = useState<OpeningHour[]>([])
-  const [scheduledTime, setScheduledTime] = useState<string>('') // Specific time selection
+  const [scheduledDate, setScheduledDate] = useState<string>('') // Selected pickup date
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
 
@@ -70,11 +68,10 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   }, [params.tenant])
 
   async function loadData() {
-    const [tenant, delivery, status, hours] = await Promise.all([
+    const [tenant, delivery, status] = await Promise.all([
       getTenantSettings(params.tenant),
       getDeliverySettings(params.tenant),
       getShopStatus(params.tenant),
-      getOpeningHours(params.tenant),
     ])
     
     // Check of tenant bestaat - redirect naar niet gevonden als tenant null is
@@ -86,7 +83,6 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     setTenantSettings(tenant)
     setDeliverySettings(delivery)
     setShopStatus(status)
-    setOpeningHours(hours || [])
     
     // Set default scheduled date based on whether today is available
     const today = new Date().toISOString().split('T')[0]
@@ -295,7 +291,6 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           customer_notes: customerInfo.notes || null,
           order_type: orderType,
           scheduled_date: scheduledDate || null,  // Date for pickup/delivery
-          scheduled_time: scheduledTime || null,  // Specific time requested
           status: 'new',
           items: cart.map(item => ({
             name: item.name,
@@ -520,7 +515,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               )}
             </motion.div>
 
-            {/* Date & Time Picker - Always visible */}
+            {/* Date Picker - Simple calendar */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -528,124 +523,19 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             >
               <h2 className="text-lg font-bold text-gray-900 mb-4">📅 {t('checkoutPage.whenPickup')}</h2>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Date Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.date')}</label>
-                  <select
-                    value={scheduledDate}
-                    onChange={(e) => {
-                      setScheduledDate(e.target.value)
-                      setScheduledTime('') // Reset time when date changes
-                    }}
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    {/* Generate dates: today (if available) + next 7 days */}
-                    {[0, 1, 2, 3, 4, 5, 6, 7].map((daysAhead) => {
-                      const date = new Date()
-                      date.setDate(date.getDate() + daysAhead)
-                      const dateStr = date.toISOString().split('T')[0]
-                      
-                      // Get day of week for this date (0=Monday, 6=Sunday in our system)
-                      const jsDay = date.getDay()
-                      const dayOfWeek = jsDay === 0 ? 6 : jsDay - 1
-                      const dayHours = openingHours.find(h => h.day_of_week === dayOfWeek)
-                      
-                      // Skip if shop is closed on this day
-                      if (dayHours && !dayHours.is_open) return null
-                      
-                      // Check if today is still available (before last order time)
-                      const isTodayDisabled = daysAhead === 0 && shopStatus && !shopStatus.canOrder
-                      if (isTodayDisabled) return null
-                      
-                      const dayLabel = daysAhead === 0 
-                        ? t('checkoutPage.today')
-                        : daysAhead === 1 
-                          ? t('checkoutPage.tomorrow')
-                          : date.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'short' })
-                      
-                      return (
-                        <option key={dateStr} value={dateStr}>
-                          {dayLabel}
-                        </option>
-                      )
-                    })}
-                  </select>
-                </div>
-
-                {/* Time Selection - Dynamic based on opening hours */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.time')}</label>
-                  <select
-                    value={scheduledTime}
-                    onChange={(e) => setScheduledTime(e.target.value)}
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">{t('checkoutPage.asSoonAsPossible')}</option>
-                    {/* Generate time slots based on selected date's opening hours */}
-                    {(() => {
-                      if (!scheduledDate) return null
-                      
-                      const selectedDate = new Date(scheduledDate)
-                      const jsDay = selectedDate.getDay()
-                      const dayOfWeek = jsDay === 0 ? 6 : jsDay - 1
-                      const dayHours = openingHours.find(h => h.day_of_week === dayOfWeek)
-                      
-                      if (!dayHours || !dayHours.is_open) return null
-                      
-                      // Calculate last order time
-                      let lastOrderTime = dayHours.close_time
-                      if (dayHours.last_order_time) {
-                        if (dayHours.last_order_time === '15min') {
-                          const [h, m] = dayHours.close_time.split(':').map(Number)
-                          const mins = h * 60 + m - 15
-                          lastOrderTime = `${Math.floor(mins/60).toString().padStart(2,'0')}:${(mins%60).toString().padStart(2,'0')}`
-                        } else if (dayHours.last_order_time === '30min') {
-                          const [h, m] = dayHours.close_time.split(':').map(Number)
-                          const mins = h * 60 + m - 30
-                          lastOrderTime = `${Math.floor(mins/60).toString().padStart(2,'0')}:${(mins%60).toString().padStart(2,'0')}`
-                        } else if (dayHours.last_order_time === '45min') {
-                          const [h, m] = dayHours.close_time.split(':').map(Number)
-                          const mins = h * 60 + m - 45
-                          lastOrderTime = `${Math.floor(mins/60).toString().padStart(2,'0')}:${(mins%60).toString().padStart(2,'0')}`
-                        } else if (dayHours.last_order_time === '60min') {
-                          const [h, m] = dayHours.close_time.split(':').map(Number)
-                          const mins = h * 60 + m - 60
-                          lastOrderTime = `${Math.floor(mins/60).toString().padStart(2,'0')}:${(mins%60).toString().padStart(2,'0')}`
-                        } else if (dayHours.last_order_time.includes(':')) {
-                          lastOrderTime = dayHours.last_order_time
-                        }
-                      }
-                      
-                      // Generate 30-min slots from open to last order time
-                      const slots: string[] = []
-                      const [openH, openM] = dayHours.open_time.split(':').map(Number)
-                      const [lastH, lastM] = lastOrderTime.split(':').map(Number)
-                      
-                      let currentMins = openH * 60 + openM
-                      const lastMins = lastH * 60 + lastM
-                      
-                      // If today, start from now + 15 min (rounded to next 30min slot)
-                      const isToday = scheduledDate === new Date().toISOString().split('T')[0]
-                      if (isToday) {
-                        const now = new Date()
-                        const nowMins = now.getHours() * 60 + now.getMinutes() + 15
-                        currentMins = Math.max(currentMins, Math.ceil(nowMins / 30) * 30)
-                      }
-                      
-                      while (currentMins <= lastMins) {
-                        const h = Math.floor(currentMins / 60)
-                        const m = currentMins % 60
-                        slots.push(`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`)
-                        currentMins += 30
-                      }
-                      
-                      return slots.map(time => (
-                        <option key={time} value={time}>{time}</option>
-                      ))
-                    })()}
-                  </select>
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.date')}</label>
+                <input
+                  type="date"
+                  value={scheduledDate}
+                  onChange={(e) => setScheduledDate(e.target.value)}
+                  min={shopStatus?.canOrder 
+                    ? new Date().toISOString().split('T')[0] 
+                    : new Date(Date.now() + 86400000).toISOString().split('T')[0]
+                  }
+                  max={new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]}
+                  className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                />
               </div>
 
               {/* Info message when today is not available */}
