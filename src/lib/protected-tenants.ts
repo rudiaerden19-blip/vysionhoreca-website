@@ -6,8 +6,21 @@
 export const PROTECTED_TENANTS = [
   'frituurnolim',
   'frituur-nolim',
+  'skippsbv',
   'demo-frituur',
 ] as const
+
+// Admin accounts - nooit betalen, nooit verlopen
+export const ADMIN_TENANTS = [
+  'frituurnolim',
+  'skippsbv',
+] as const
+
+export function isAdminTenant(slug: string | null | undefined): boolean {
+  if (!slug) return false
+  const normalizedSlug = slug.toLowerCase().trim()
+  return ADMIN_TENANTS.some((a) => normalizedSlug === a)
+}
 
 export function isProtectedTenant(slug: string | null | undefined): boolean {
   if (!slug) return false

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { isProtectedTenant, getProtectionError } from '@/lib/protected-tenants'
+import { isProtectedTenant, isAdminTenant, getProtectionError } from '@/lib/protected-tenants'
 
 interface Tenant {
   id: string
@@ -617,9 +617,11 @@ export default function SuperAdminDashboard() {
                   const sub = getSubscription(tenant.tenant_slug)
                   return (
                     <tr key={tenant.id} className={`transition-colors ${tenant.is_blocked ? 'opacity-50' : ''} ${
-                      isPaid(sub) 
-                        ? 'bg-green-500/10 hover:bg-green-500/20 border-l-4 border-green-500' 
-                        : 'bg-red-500/10 hover:bg-red-500/20 border-l-4 border-red-500'
+                      isAdminTenant(tenant.tenant_slug)
+                        ? 'bg-purple-500/10 hover:bg-purple-500/20 border-l-4 border-purple-500'
+                        : isPaid(sub) 
+                          ? 'bg-green-500/10 hover:bg-green-500/20 border-l-4 border-green-500' 
+                          : 'bg-red-500/10 hover:bg-red-500/20 border-l-4 border-red-500'
                     }`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
@@ -653,24 +655,32 @@ export default function SuperAdminDashboard() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleTogglePaymentStatus(tenant, sub)}
-                            className={`px-3 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105 ${
-                              sub?.status === 'active'
-                                ? 'bg-green-500 hover:bg-green-600 text-white'
-                                : 'bg-red-500 hover:bg-red-600 text-white'
-                            }`}
-                          >
-                            {sub?.status === 'active' ? '✓ Betaald' : '✗ Niet betaald'}
-                          </button>
-                          {sub?.status !== 'active' && tenant.email && (
-                            <button
-                              onClick={() => handleSendPaymentReminder(tenant)}
-                              className="px-2 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-xs font-medium transition-all hover:scale-105"
-                              title="Stuur betalingsherinnering"
-                            >
-                              📧
-                            </button>
+                          {isAdminTenant(tenant.tenant_slug) ? (
+                            <span className="px-3 py-1 rounded-lg text-xs font-medium bg-purple-500 text-white">
+                              👑 Admin
+                            </span>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleTogglePaymentStatus(tenant, sub)}
+                                className={`px-3 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105 ${
+                                  sub?.status === 'active'
+                                    ? 'bg-green-500 hover:bg-green-600 text-white'
+                                    : 'bg-red-500 hover:bg-red-600 text-white'
+                                }`}
+                              >
+                                {sub?.status === 'active' ? '✓ Betaald' : '✗ Niet betaald'}
+                              </button>
+                              {sub?.status !== 'active' && tenant.email && (
+                                <button
+                                  onClick={() => handleSendPaymentReminder(tenant)}
+                                  className="px-2 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-xs font-medium transition-all hover:scale-105"
+                                  title="Stuur betalingsherinnering"
+                                >
+                                  📧
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </td>
