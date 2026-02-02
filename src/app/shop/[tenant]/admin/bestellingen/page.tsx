@@ -6,9 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getOrders, updateOrderStatus, confirmOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { 
-  initAudio,
+  activateAudioForIOS,
   prewarmAudio,
   playOrderNotification,
+  isAudioActivatedThisSession,
+  markAudioActivated,
   getSoundsEnabled
 } from '@/lib/sounds'
 
@@ -84,7 +86,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
   // Check if already activated this session - skip activation screen if so
-  const [audioActivated, setAudioActivated] = useState(() => getSoundsEnabled())
+  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [rejectionNotes, setRejectionNotes] = useState('')
@@ -278,7 +280,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // Enable sound - uses shared audio system
   const enableSound = () => {
     setSoundEnabled(true)
-    initAudio()
+    activateAudioForIOS()
     playOrderNotification()
   }
   
@@ -669,8 +671,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => {
-            // Activeer shared audio system (VEREIST voor iOS/Safari)
-            initAudio()
+            // KRITIEK: Activeer audio TIJDENS user gesture (VEREIST voor iOS/Safari)
+            activateAudioForIOS()
+            prewarmAudio()
+            markAudioActivated()
             setAudioActivated(true)
             setSoundEnabled(true)
             playOrderNotification()

@@ -7,10 +7,11 @@ import { getTenantSettings, updateOrderStatus } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { 
-  initAudio,
+  activateAudioForIOS,
   prewarmAudio,
   playOrderNotification,
-  getSoundsEnabled
+  isAudioActivatedThisSession,
+  markAudioActivated
 } from '@/lib/sounds'
 
 interface Order {
@@ -48,7 +49,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [currentTime, setCurrentTime] = useState(new Date())
   const [soundEnabled, setSoundEnabled] = useState(true)
   // Check if already activated this session - skip activation screen if so
-  const [audioActivated, setAudioActivated] = useState(() => getSoundsEnabled())
+  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [printerIP, setPrinterIP] = useState<string | null>(null)
   const [showPrinterSettings, setShowPrinterSettings] = useState(false)
@@ -269,7 +270,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   function enableSound() {
-    initAudio()
+    activateAudioForIOS()
     setSoundEnabled(true)
     playOrderNotification()
   }
@@ -422,8 +423,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => {
-            // Activeer shared audio system (VEREIST voor iOS/Safari)
-            initAudio()
+            // KRITIEK: Activeer audio TIJDENS user gesture (VEREIST voor iOS/Safari)
+            activateAudioForIOS()
+            prewarmAudio()
+            markAudioActivated()
             setAudioActivated(true)
             setSoundEnabled(true)
             playOrderNotification()

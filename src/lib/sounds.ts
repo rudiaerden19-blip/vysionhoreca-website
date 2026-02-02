@@ -16,11 +16,27 @@ let heartbeatInterval: NodeJS.Timeout | null = null;
 let audioContextResumePromise: Promise<void> | null = null;
 let heartbeatRefCount = 0; // Track hoeveel tenants heartbeat nodig hebben
 
+// Session storage key voor activatie tracking
+const AUDIO_SESSION_KEY = 'vysion_audio_session_activated';
+
 // Check if sounds are enabled (read from localStorage for performance)
 export const getSoundsEnabled = (): boolean => {
   if (typeof window === 'undefined') return true;
   const saved = localStorage.getItem('vysion_sounds_enabled');
   return saved !== 'false';
+};
+
+// Check of audio al geactiveerd is deze sessie (voor activatiescherm)
+export const isAudioActivatedThisSession = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return sessionStorage.getItem(AUDIO_SESSION_KEY) === 'true';
+};
+
+// Markeer audio als geactiveerd deze sessie
+export const markAudioActivated = (): void => {
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem(AUDIO_SESSION_KEY, 'true');
+  }
 };
 
 // Set sounds enabled state
@@ -277,6 +293,59 @@ export const initAudio = (): AudioContext | null => {
     startHeartbeat(); // Ref counting zorgt dat heartbeat blijft draaien
   }
   return ctx;
+};
+
+// KRITIEK: Activeer audio voor iOS - MOET aangeroepen worden TIJDENS user gesture (klik/tap)
+// Dit speelt een stil geluid om audio te "unlocken" op iOS/Safari
+export const activateAudioForIOS = (): void => {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    // 1. Maak AudioContext aan TIJDENS user gesture
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    
+    if (!audioContext) {
+      audioContext = new AudioContextClass();
+    }
+    
+    // 2. Resume als suspended
+    if (audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+    
+    // 3. Speel stil geluid om audio te "unlocken" (iOS vereiste)
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = 0.001; // Bijna stil
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.01);
+    
+    // 4. Pre-load HTML audio element (ook belangrijk voor iOS)
+    try {
+      const audio = new Audio('/notification.mp3');
+      audio.volume = 0.01;
+      audio.play().then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = 1;
+        htmlAudioPool.push(audio);
+      }).catch(() => {
+        // Ignore - sommige browsers blokkeren dit nog steeds
+      });
+    } catch (e) {
+      // Ignore
+    }
+    
+    // 5. Start heartbeat
+    startHeartbeat();
+    
+    console.log('[AUDIO] ✅ iOS audio geactiveerd');
+  } catch (e) {
+    console.error('[AUDIO] iOS activatie mislukt:', e);
+  }
 };
 
 // Pre-warm audio bij app start (aanroepen na user interaction)
