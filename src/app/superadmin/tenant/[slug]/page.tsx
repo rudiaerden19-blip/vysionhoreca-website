@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { isAdminTenant } from '@/lib/protected-tenants'
 
 interface TenantDetails {
   id: string
@@ -40,12 +41,6 @@ interface Subscription {
   next_payment_at: string
 }
 
-interface TenantStats {
-  totalOrders: number
-  totalRevenue: number
-  totalCustomers: number
-  totalProducts: number
-}
 
 export default function TenantDetailPage() {
   const router = useRouter()
@@ -56,12 +51,6 @@ export default function TenantDetailPage() {
   const [saving, setSaving] = useState(false)
   const [tenant, setTenant] = useState<TenantDetails | null>(null)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
-  const [stats, setStats] = useState<TenantStats>({
-    totalOrders: 0,
-    totalRevenue: 0,
-    totalCustomers: 0,
-    totalProducts: 0,
-  })
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
   const [subForm, setSubForm] = useState<Subscription>({
     tenant_slug: slug,
@@ -119,29 +108,6 @@ export default function TenantDetailPage() {
       setSubscription(subData)
       setSubForm(subData)
     }
-
-    // Load stats
-    const { data: ordersData } = await supabase
-      .from('orders')
-      .select('total')
-      .eq('tenant_slug', slug)
-
-    const { data: customersData } = await supabase
-      .from('shop_customers')
-      .select('id')
-      .eq('tenant_slug', slug)
-
-    const { data: productsData } = await supabase
-      .from('menu_products')
-      .select('id')
-      .eq('tenant_slug', slug)
-
-    setStats({
-      totalOrders: ordersData?.length || 0,
-      totalRevenue: ordersData?.reduce((sum, o) => sum + (o.total || 0), 0) || 0,
-      totalCustomers: customersData?.length || 0,
-      totalProducts: productsData?.length || 0,
-    })
 
     setLoading(false)
   }
@@ -286,26 +252,6 @@ export default function TenantDetailPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-            <p className="text-slate-400 text-sm">Orders</p>
-            <p className="text-3xl font-bold text-white mt-1">{stats.totalOrders}</p>
-          </div>
-          <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-            <p className="text-slate-400 text-sm">Omzet</p>
-            <p className="text-3xl font-bold text-green-400 mt-1">€{stats.totalRevenue.toFixed(2)}</p>
-          </div>
-          <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-            <p className="text-slate-400 text-sm">Klanten</p>
-            <p className="text-3xl font-bold text-white mt-1">{stats.totalCustomers}</p>
-          </div>
-          <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-            <p className="text-slate-400 text-sm">Producten</p>
-            <p className="text-3xl font-bold text-white mt-1">{stats.totalProducts}</p>
-          </div>
-        </div>
-
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Tenant Info */}
           <motion.div
@@ -365,7 +311,29 @@ export default function TenantDetailPage() {
               </button>
             </div>
 
-            {subscription ? (
+            {isAdminTenant(slug) ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-400 text-sm">Plan</p>
+                    <p className="text-2xl font-bold text-white">Admin</p>
+                  </div>
+                  <span className="px-4 py-2 rounded-full text-sm font-medium border bg-purple-100 text-purple-700 border-purple-200">
+                    👑 admin
+                  </span>
+                </div>
+
+                <div>
+                  <p className="text-slate-400 text-sm">Maandelijks bedrag</p>
+                  <p className="text-3xl font-bold text-green-400">€0/maand</p>
+                </div>
+
+                <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
+                  <p className="text-purple-400 text-sm">Status</p>
+                  <p className="text-white font-medium">Gratis account - Eindigt nooit</p>
+                </div>
+              </div>
+            ) : subscription ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
