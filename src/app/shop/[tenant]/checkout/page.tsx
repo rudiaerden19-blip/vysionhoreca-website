@@ -58,6 +58,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
   const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>(['cash'])
   const [scheduledDate, setScheduledDate] = useState<string>('') // Selected pickup date
+  const [scheduledTime, setScheduledTime] = useState<string>('') // Selected pickup time
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
 
@@ -291,6 +292,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           customer_notes: customerInfo.notes || null,
           order_type: orderType,
           scheduled_date: scheduledDate || null,  // Date for pickup/delivery
+          scheduled_time: scheduledTime || null,  // Time for pickup/delivery
           status: 'new',
           items: cart.map(item => ({
             name: item.name,
@@ -515,7 +517,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               )}
             </motion.div>
 
-            {/* Date Picker - Simple calendar */}
+            {/* Date & Time Picker */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -523,19 +525,33 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             >
               <h2 className="text-lg font-bold text-gray-900 mb-4">📅 {t('checkoutPage.whenPickup')}</h2>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.date')}</label>
-                <input
-                  type="date"
-                  value={scheduledDate}
-                  onChange={(e) => setScheduledDate(e.target.value)}
-                  min={shopStatus?.canOrder 
-                    ? new Date().toISOString().split('T')[0] 
-                    : new Date(Date.now() + 86400000).toISOString().split('T')[0]
-                  }
-                  max={new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]}
-                  className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-                />
+              <div className="space-y-4">
+                {/* Date picker */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.date')}</label>
+                  <input
+                    type="date"
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    min={shopStatus?.canOrder 
+                      ? new Date().toISOString().split('T')[0] 
+                      : new Date(Date.now() + 86400000).toISOString().split('T')[0]
+                    }
+                    max={new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]}
+                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                  />
+                </div>
+
+                {/* Time picker */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.time')}</label>
+                  <input
+                    type="time"
+                    value={scheduledTime}
+                    onChange={(e) => setScheduledTime(e.target.value)}
+                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                  />
+                </div>
               </div>
 
               {/* Info message when today is not available */}
