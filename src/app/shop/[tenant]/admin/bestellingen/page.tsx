@@ -6,12 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getOrders, updateOrderStatus, confirmOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { 
-  isAudioActivatedThisSession, 
-  activateAudio, 
-  playOrderNotificationSound,
-  setupAutoActivation,
-  isAudioReady
-} from '@/lib/audio-system'
+  initAudio,
+  prewarmAudio,
+  playOrderNotification,
+  getSoundsEnabled
+} from '@/lib/sounds'
 
 // Parse items from JSONB
 interface OrderItemJson {
@@ -85,7 +84,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
   // Check if already activated this session - skip activation screen if so
-  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
+  const [audioActivated, setAudioActivated] = useState(() => getSoundsEnabled())
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [rejectionNotes, setRejectionNotes] = useState('')
@@ -136,10 +135,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       Notification.requestPermission()
     }
     
-    // If already activated this session, set up auto-activation on first interaction
+    // Prewarm audio system bij laden (nieuwe robuuste methode)
     if (audioActivated) {
-      const cleanup = setupAutoActivation()
-      return cleanup
+      prewarmAudio()
     }
   }, [params.tenant, audioActivated])
 
@@ -171,10 +169,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   useEffect(() => {
     if (hasNewOrders) {
       // Play immediately
-      playOrderNotificationSound()
+      playOrderNotification()
       
       // Repeat every 3 seconds
-      audioIntervalRef.current = setInterval(playOrderNotificationSound, 3000)
+      audioIntervalRef.current = setInterval(playOrderNotification, 3000)
       
     } else {
       // Stop sound
@@ -280,8 +278,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // Enable sound - uses shared audio system
   const enableSound = () => {
     setSoundEnabled(true)
-    activateAudio()
-    playOrderNotificationSound()
+    initAudio()
+    playOrderNotification()
   }
   
   // Disable sound
@@ -672,10 +670,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           whileTap={{ scale: 0.95 }}
           onClick={() => {
             // Activeer shared audio system (VEREIST voor iOS/Safari)
-            activateAudio()
+            initAudio()
             setAudioActivated(true)
             setSoundEnabled(true)
-            playOrderNotificationSound()
+            playOrderNotification()
           }}
           className="bg-blue-500 hover:bg-blue-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
         >
@@ -719,9 +717,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           <div className="flex items-center gap-4">
             <button
               onClick={() => soundEnabled ? disableSound() : enableSound()}
-              className={`p-4 rounded-xl text-2xl ${soundEnabled && isAudioReady() ? 'bg-green-500' : 'bg-gray-600'}`}
+              className={`p-4 rounded-xl text-2xl ${soundEnabled && getSoundsEnabled() ? 'bg-green-500' : 'bg-gray-600'}`}
             >
-              {soundEnabled && isAudioReady() ? '🔔' : '🔕'}
+              {soundEnabled && getSoundsEnabled() ? '🔔' : '🔕'}
             </button>
             <button
               onClick={() => setKitchenMode(false)}

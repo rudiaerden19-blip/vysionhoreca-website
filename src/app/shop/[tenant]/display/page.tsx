@@ -7,11 +7,11 @@ import { getTenantSettings, updateOrderStatus, TenantSettings } from '@/lib/admi
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { 
-  isAudioActivatedThisSession, 
-  activateAudio, 
-  playOrderNotificationSound,
-  setupAutoActivation
-} from '@/lib/audio-system'
+  initAudio,
+  prewarmAudio,
+  playOrderNotification,
+  getSoundsEnabled
+} from '@/lib/sounds'
 
 interface Order {
   id: string
@@ -88,7 +88,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [currentTime, setCurrentTime] = useState(new Date())
   const [soundEnabled, setSoundEnabled] = useState(true)
   // Check if already activated this session - skip activation screen if so
-  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
+  const [audioActivated, setAudioActivated] = useState(() => getSoundsEnabled())
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
   const [printerIP, setPrinterIP] = useState<string | null>(null)
@@ -116,14 +116,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     }
   }, [params.tenant])
 
-  // GELUID ALTIJD AAN bij laden
+  // GELUID ALTIJD AAN bij laden + prewarm audio
   useEffect(() => {
     setSoundEnabled(true)
     
-    // If already activated this session, set up auto-activation on first interaction
+    // Prewarm audio system bij laden (nieuwe robuuste methode)
     if (audioActivated) {
-      const cleanup = setupAutoActivation()
-      return cleanup
+      prewarmAudio()
     }
   }, [params.tenant, audioActivated])
 
@@ -220,11 +219,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     // KRITIEK: Altijd proberen geluid te spelen
     if (newOrderIds.size > 0) {
       // Play immediately
-      playOrderNotificationSound()
+      playOrderNotification()
       
       // Then repeat every 3 seconds
       alertIntervalRef.current = setInterval(() => {
-        playOrderNotificationSound()
+        playOrderNotification()
       }, 3000)
     } else {
       if (alertIntervalRef.current) {
@@ -276,7 +275,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               setNewOrderIds(prev => new Set([...prev, order.id]))
             })
             // ALTIJD geluid spelen bij nieuwe bestelling
-            playOrderNotificationSound()
+            playOrderNotification()
           }
           
           setOrders(parsed)
@@ -348,9 +347,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   function enableSound() {
-    activateAudio()
+    initAudio()
     setSoundEnabled(true)
-    playOrderNotificationSound()
+    playOrderNotification()
   }
 
   // EMAIL FUNCTION - BULLETPROOF with all required business info
@@ -823,10 +822,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           whileTap={{ scale: 0.95 }}
           onClick={() => {
             // Activeer shared audio system (VEREIST voor iOS/Safari)
-            activateAudio()
+            initAudio()
             setAudioActivated(true)
             setSoundEnabled(true)
-            playOrderNotificationSound()
+            playOrderNotification()
           }}
           className="bg-orange-500 hover:bg-orange-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
         >

@@ -7,11 +7,11 @@ import { getTenantSettings, updateOrderStatus } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { 
-  isAudioActivatedThisSession, 
-  activateAudio, 
-  playKitchenNotificationSound,
-  setupAutoActivation
-} from '@/lib/audio-system'
+  initAudio,
+  prewarmAudio,
+  playOrderNotification,
+  getSoundsEnabled
+} from '@/lib/sounds'
 
 interface Order {
   id: string
@@ -48,7 +48,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   const [currentTime, setCurrentTime] = useState(new Date())
   const [soundEnabled, setSoundEnabled] = useState(true)
   // Check if already activated this session - skip activation screen if so
-  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
+  const [audioActivated, setAudioActivated] = useState(() => getSoundsEnabled())
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [printerIP, setPrinterIP] = useState<string | null>(null)
   const [showPrinterSettings, setShowPrinterSettings] = useState(false)
@@ -68,10 +68,9 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     loadData()
     setSoundEnabled(true)
     
-    // If already activated this session, set up auto-activation on first interaction
-    let cleanup: (() => void) | undefined
+    // Prewarm audio system bij laden (nieuwe robuuste methode)
     if (audioActivated) {
-      cleanup = setupAutoActivation()
+      prewarmAudio()
     }
     
     // Load printer IP
@@ -79,10 +78,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     if (savedIP) {
       setPrinterIP(savedIP)
       checkPrinterStatus(savedIP)
-    }
-    
-    return () => {
-      if (cleanup) cleanup()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, audioActivated])
@@ -154,11 +149,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   useEffect(() => {
     if (newOrderIds.size > 0) {
       // Play immediately
-      playKitchenNotificationSound()
+      playOrderNotification()
       
       // Repeat every 5 seconds
       alertIntervalRef.current = setInterval(() => {
-        playKitchenNotificationSound()
+        playOrderNotification()
       }, 5000)
     } else {
       if (alertIntervalRef.current) {
@@ -208,7 +203,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               setNewOrderIds(prev => new Set([...prev, order.id]))
             })
             // ALTIJD geluid spelen bij nieuwe bestelling
-            playKitchenNotificationSound()
+            playOrderNotification()
           }
           
           setOrders(parsed)
@@ -274,9 +269,9 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
   }
 
   function enableSound() {
-    activateAudio()
+    initAudio()
     setSoundEnabled(true)
-    playKitchenNotificationSound()
+    playOrderNotification()
   }
 
   async function handleReady(order: Order) {
@@ -428,10 +423,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           whileTap={{ scale: 0.95 }}
           onClick={() => {
             // Activeer shared audio system (VEREIST voor iOS/Safari)
-            activateAudio()
+            initAudio()
             setAudioActivated(true)
             setSoundEnabled(true)
-            playKitchenNotificationSound()
+            playOrderNotification()
           }}
           className="bg-blue-500 hover:bg-blue-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
         >
