@@ -3470,7 +3470,13 @@
     "selectDateForOrder": "اختر تاريخاً لطلبك",
     "tomorrow": "غداً",
     "orderScheduledFor": "طلبك مجدول لـ",
-    "selectDateRequired": "يرجى اختيار تاريخ لطلبك أولاً"
+    "selectDateRequired": "يرجى اختيار تاريخ لطلبك أولاً",
+    "whenPickup": "متى الاستلام؟",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "today": "اليوم",
+    "asSoonAsPossible": "في أقرب وقت ممكن",
+    "todayNotAvailable": "اليوم لم يعد متاحاً. يرجى اختيار تاريخ آخر."
   },
   "accountPage": {
     "login": "تسجيل الدخول",

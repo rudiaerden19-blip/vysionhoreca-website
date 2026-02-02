@@ -3470,7 +3470,13 @@
     "selectDateForOrder": "请选择您订单的日期",
     "tomorrow": "明天",
     "orderScheduledFor": "您的订单预定于",
-    "selectDateRequired": "请先选择订单日期"
+    "selectDateRequired": "请先选择订单日期",
+    "whenPickup": "什么时候取货？",
+    "date": "日期",
+    "time": "时间",
+    "today": "今天",
+    "asSoonAsPossible": "尽快",
+    "todayNotAvailable": "今天已无法选择。请选择其他日期。"
   },
   "accountPage": {
     "login": "登录",

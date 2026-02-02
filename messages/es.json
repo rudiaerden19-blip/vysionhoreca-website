@@ -3470,7 +3470,13 @@
     "selectDateForOrder": "Elija una fecha para su pedido",
     "tomorrow": "Mañana",
     "orderScheduledFor": "Su pedido está programado para",
-    "selectDateRequired": "Por favor, seleccione primero una fecha para su pedido"
+    "selectDateRequired": "Por favor, seleccione primero una fecha para su pedido",
+    "whenPickup": "¿Cuándo recoger?",
+    "date": "Fecha",
+    "time": "Hora",
+    "today": "Hoy",
+    "asSoonAsPossible": "Lo antes posible",
+    "todayNotAvailable": "Hoy ya no está disponible. Por favor, elija otra fecha."
   },
   "accountPage": {
     "login": "Iniciar sesión",

@@ -3589,7 +3589,13 @@
     "selectDateForOrder": "Kies een datum voor uw bestelling",
     "tomorrow": "Morgen",
     "orderScheduledFor": "Uw bestelling is gepland voor",
-    "selectDateRequired": "Kies eerst een datum voor uw bestelling"
+    "selectDateRequired": "Kies eerst een datum voor uw bestelling",
+    "whenPickup": "Wanneer afhalen?",
+    "date": "Datum",
+    "time": "Tijd",
+    "today": "Vandaag",
+    "asSoonAsPossible": "Zo snel mogelijk",
+    "todayNotAvailable": "Vandaag is niet meer beschikbaar. Kies een andere datum."
   },
   "accountPage": {
     "login": "Inloggen",

@@ -84,6 +84,15 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     setDeliverySettings(delivery)
     setShopStatus(status)
     
+    // Set default scheduled date based on whether today is available
+    const today = new Date().toISOString().split('T')[0]
+    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
+    if (status && status.canOrder) {
+      setScheduledDate(today)  // Today is available
+    } else {
+      setScheduledDate(tomorrow)  // Today not available, default to tomorrow
+    }
+    
     // Load enabled payment methods
     if (tenant?.payment_methods && Array.isArray(tenant.payment_methods) && tenant.payment_methods.length > 0) {
       setEnabledPaymentMethods(tenant.payment_methods)
@@ -165,19 +174,14 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     if (!customerInfo.name || !customerInfo.phone) return false
     if (orderType === 'delivery' && (!customerInfo.address || !customerInfo.postal_code || !customerInfo.city)) return false
     if (cart.length === 0) return false
-    // If shop is closed, require a scheduled date
-    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) {
-      if (!scheduledDate) return false
-    }
+    // Always require a scheduled date now
+    if (!scheduledDate) return false
     return true
   }
 
   const getSubmitError = () => {
     if (cart.length === 0) return t('checkoutPage.cartEmpty')
-    // If shop is closed, require date selection
-    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && !scheduledDate) {
-      return t('checkoutPage.selectDateRequired')
-    }
+    if (!scheduledDate) return t('checkoutPage.selectDateRequired')
     if (!customerInfo.name) return t('checkoutPage.fillName')
     if (!customerInfo.phone) return t('checkoutPage.fillPhone')
     if (orderType === 'delivery') {
@@ -511,52 +515,76 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               )}
             </motion.div>
 
-            {/* Date Picker - Show when shop is closed */}
-            {isShopClosed && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-orange-50 border-2 border-orange-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-3xl">📅</span>
-                  <div>
-                    <h2 className="text-lg font-bold text-orange-800">{t('checkoutPage.shopCurrentlyClosed')}</h2>
-                    <p className="text-orange-600 text-sm">{t('checkoutPage.selectDateForOrder')}</p>
-                  </div>
+            {/* Date & Time Picker - Always visible */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
+            >
+              <h2 className="text-lg font-bold text-gray-900 mb-4">📅 {t('checkoutPage.whenPickup')}</h2>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Date Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.date')}</label>
+                  <select
+                    value={scheduledDate}
+                    onChange={(e) => setScheduledDate(e.target.value)}
+                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {/* Generate dates: today (if available) + next 7 days */}
+                    {[0, 1, 2, 3, 4, 5, 6, 7].map((daysAhead) => {
+                      const date = new Date()
+                      date.setDate(date.getDate() + daysAhead)
+                      const dateStr = date.toISOString().split('T')[0]
+                      
+                      // Check if today is still available (before last order time)
+                      const isTodayDisabled = daysAhead === 0 && shopStatus && !shopStatus.canOrder
+                      
+                      if (isTodayDisabled) return null
+                      
+                      const dayLabel = daysAhead === 0 
+                        ? t('checkoutPage.today')
+                        : daysAhead === 1 
+                          ? t('checkoutPage.tomorrow')
+                          : date.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'short' })
+                      
+                      return (
+                        <option key={dateStr} value={dateStr}>
+                          {dayLabel}
+                        </option>
+                      )
+                    })}
+                  </select>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {/* Generate next 5 days buttons */}
-                  {[1, 2, 3, 4, 5].map((daysAhead) => {
-                    const date = new Date()
-                    date.setDate(date.getDate() + daysAhead)
-                    const dateStr = date.toISOString().split('T')[0]
-                    const dayName = daysAhead === 1 ? t('checkoutPage.tomorrow') : date.toLocaleDateString('nl-BE', { weekday: 'short' })
-                    const dateLabel = date.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })
-                    
-                    return (
-                      <button
-                        key={dateStr}
-                        onClick={() => setScheduledDate(dateStr)}
-                        className={`p-3 rounded-xl border-2 transition-all text-center ${
-                          scheduledDate === dateStr 
-                            ? 'border-orange-500 bg-orange-100 text-orange-800' 
-                            : 'border-gray-200 bg-white hover:border-orange-300'
-                        }`}
-                      >
-                        <span className="block font-bold text-sm">{dayName}</span>
-                        <span className="block text-xs text-gray-500">{dateLabel}</span>
-                      </button>
-                    )
-                  })}
+
+                {/* Time Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.time')}</label>
+                  <select
+                    value={scheduledDate ? scheduledDate.split('T')[1] || '' : ''}
+                    onChange={(e) => {
+                      const dateOnly = scheduledDate?.split('T')[0] || new Date().toISOString().split('T')[0]
+                      setScheduledDate(e.target.value ? `${dateOnly}T${e.target.value}` : dateOnly)
+                    }}
+                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">{t('checkoutPage.asSoonAsPossible')}</option>
+                    {/* Time slots from opening to last order time */}
+                    {['11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00'].map((time) => (
+                      <option key={time} value={time}>{time}</option>
+                    ))}
+                  </select>
                 </div>
-                {scheduledDate && (
-                  <div className="mt-4 p-3 bg-green-100 border border-green-300 rounded-xl text-green-800 text-sm text-center">
-                    ✅ {t('checkoutPage.orderScheduledFor')} <strong>{new Date(scheduledDate).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}</strong>
-                  </div>
-                )}
-              </motion.div>
-            )}
+              </div>
+
+              {/* Info message when today is not available */}
+              {shopStatus && !shopStatus.canOrder && (
+                <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-xl text-orange-800 text-sm">
+                  ⚠️ {t('checkoutPage.todayNotAvailable')}
+                </div>
+              )}
+            </motion.div>
 
             {/* Customer Info */}
             <motion.div

@@ -3584,7 +3584,13 @@
     "selectDateForOrder": "Choose a date for your order",
     "tomorrow": "Tomorrow",
     "orderScheduledFor": "Your order is scheduled for",
-    "selectDateRequired": "Please select a date for your order first"
+    "selectDateRequired": "Please select a date for your order first",
+    "whenPickup": "When to pick up?",
+    "date": "Date",
+    "time": "Time",
+    "today": "Today",
+    "asSoonAsPossible": "As soon as possible",
+    "todayNotAvailable": "Today is no longer available. Please choose another date."
   },
   "accountPage": {
     "login": "Log in",

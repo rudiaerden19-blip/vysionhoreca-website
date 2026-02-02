@@ -2976,7 +2976,13 @@
     "selectDateForOrder": "Choisissez une date pour votre commande",
     "tomorrow": "Demain",
     "orderScheduledFor": "Votre commande est prévue pour",
-    "selectDateRequired": "Veuillez d'abord sélectionner une date pour votre commande"
+    "selectDateRequired": "Veuillez d'abord sélectionner une date pour votre commande",
+    "whenPickup": "Quand récupérer?",
+    "date": "Date",
+    "time": "Heure",
+    "today": "Aujourd'hui",
+    "asSoonAsPossible": "Dès que possible",
+    "todayNotAvailable": "Aujourd'hui n'est plus disponible. Veuillez choisir une autre date."
   },
   "accountPage": {
     "login": "Se connecter",
