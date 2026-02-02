@@ -3465,7 +3465,12 @@
     "shopClosedDesc": "您目前无法下单。请稍后重试或选择其他日期下单。",
     "opensAgainAt": "重新开门时间",
     "backToShop": "返回商店",
-    "viewMenuForTomorrow": "查看明天的菜单"
+    "viewMenuForTomorrow": "查看明天的菜单",
+    "shopCurrentlyClosed": "我们的店铺目前关门中",
+    "selectDateForOrder": "请选择您订单的日期",
+    "tomorrow": "明天",
+    "orderScheduledFor": "您的订单预定于",
+    "selectDateRequired": "请先选择订单日期"
   },
   "accountPage": {
     "login": "登录",

@@ -2971,7 +2971,12 @@
     "shopClosedDesc": "Sie können derzeit nicht bestellen. Bitte versuchen Sie es später erneut oder bestellen Sie für einen anderen Tag.",
     "opensAgainAt": "Wir öffnen wieder um",
     "backToShop": "Zurück zum Geschäft",
-    "viewMenuForTomorrow": "Speisekarte für morgen ansehen"
+    "viewMenuForTomorrow": "Speisekarte für morgen ansehen",
+    "shopCurrentlyClosed": "Unser Geschäft ist derzeit geschlossen",
+    "selectDateForOrder": "Wählen Sie ein Datum für Ihre Bestellung",
+    "tomorrow": "Morgen",
+    "orderScheduledFor": "Ihre Bestellung ist geplant für",
+    "selectDateRequired": "Bitte wählen Sie zuerst ein Datum für Ihre Bestellung"
   },
   "accountPage": {
     "login": "Anmelden",

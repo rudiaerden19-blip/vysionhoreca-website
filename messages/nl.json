@@ -3584,7 +3584,12 @@
     "shopClosedDesc": "U kunt momenteel niet bestellen. Probeer het later opnieuw of bestel voor een andere dag.",
     "opensAgainAt": "We openen weer om",
     "backToShop": "Terug naar winkel",
-    "viewMenuForTomorrow": "Bekijk menu voor morgen"
+    "viewMenuForTomorrow": "Bekijk menu voor morgen",
+    "shopCurrentlyClosed": "Onze zaak is momenteel gesloten",
+    "selectDateForOrder": "Kies een datum voor uw bestelling",
+    "tomorrow": "Morgen",
+    "orderScheduledFor": "Uw bestelling is gepland voor",
+    "selectDateRequired": "Kies eerst een datum voor uw bestelling"
   },
   "accountPage": {
     "login": "Inloggen",

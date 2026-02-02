@@ -3579,7 +3579,12 @@
     "shopClosedDesc": "You cannot order at this time. Please try again later or order for another day.",
     "opensAgainAt": "We open again at",
     "backToShop": "Back to shop",
-    "viewMenuForTomorrow": "View menu for tomorrow"
+    "viewMenuForTomorrow": "View menu for tomorrow",
+    "shopCurrentlyClosed": "Our shop is currently closed",
+    "selectDateForOrder": "Choose a date for your order",
+    "tomorrow": "Tomorrow",
+    "orderScheduledFor": "Your order is scheduled for",
+    "selectDateRequired": "Please select a date for your order first"
   },
   "accountPage": {
     "login": "Log in",

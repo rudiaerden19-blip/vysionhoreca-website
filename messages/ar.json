@@ -3465,7 +3465,12 @@
     "shopClosedDesc": "لا يمكنك الطلب في الوقت الحالي. حاول مرة أخرى لاحقاً أو اطلب ليوم آخر.",
     "opensAgainAt": "نفتح مجدداً في",
     "backToShop": "العودة للمتجر",
-    "viewMenuForTomorrow": "عرض قائمة الغد"
+    "viewMenuForTomorrow": "عرض قائمة الغد",
+    "shopCurrentlyClosed": "متجرنا مغلق حالياً",
+    "selectDateForOrder": "اختر تاريخاً لطلبك",
+    "tomorrow": "غداً",
+    "orderScheduledFor": "طلبك مجدول لـ",
+    "selectDateRequired": "يرجى اختيار تاريخ لطلبك أولاً"
   },
   "accountPage": {
     "login": "تسجيل الدخول",

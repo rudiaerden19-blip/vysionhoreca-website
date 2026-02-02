@@ -3465,7 +3465,12 @@
     "shopClosedDesc": "現在ご注文いただけません。後でもう一度お試しいただくか、別の日にご注文ください。",
     "opensAgainAt": "再開時間",
     "backToShop": "店舗に戻る",
-    "viewMenuForTomorrow": "明日のメニューを見る"
+    "viewMenuForTomorrow": "明日のメニューを見る",
+    "shopCurrentlyClosed": "現在閉店中です",
+    "selectDateForOrder": "ご注文の日付を選択してください",
+    "tomorrow": "明日",
+    "orderScheduledFor": "ご注文予定日",
+    "selectDateRequired": "まずご注文の日付を選択してください"
   },
   "accountPage": {
     "login": "ログイン",

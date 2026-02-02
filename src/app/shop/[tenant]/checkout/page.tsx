@@ -57,6 +57,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [loggedInCustomerId, setLoggedInCustomerId] = useState<string | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
   const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>(['cash'])
+  const [scheduledDate, setScheduledDate] = useState<string>('') // For ordering when shop is closed
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
 
@@ -164,16 +165,18 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     if (!customerInfo.name || !customerInfo.phone) return false
     if (orderType === 'delivery' && (!customerInfo.address || !customerInfo.postal_code || !customerInfo.city)) return false
     if (cart.length === 0) return false
-    // Block ordering when shop is closed or order cutoff time has passed
-    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) return false
+    // If shop is closed, require a scheduled date
+    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) {
+      if (!scheduledDate) return false
+    }
     return true
   }
 
   const getSubmitError = () => {
     if (cart.length === 0) return t('checkoutPage.cartEmpty')
-    // Shop closed check FIRST - most important
-    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) {
-      return shopStatus.orderCutoffMessage || t('checkoutPage.shopClosed')
+    // If shop is closed, require date selection
+    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && !scheduledDate) {
+      return t('checkoutPage.selectDateRequired')
     }
     if (!customerInfo.name) return t('checkoutPage.fillName')
     if (!customerInfo.phone) return t('checkoutPage.fillPhone')
@@ -283,6 +286,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           customer_address: orderType === 'delivery' ? `${customerInfo.address}, ${customerInfo.postal_code} ${customerInfo.city}` : null,
           customer_notes: customerInfo.notes || null,
           order_type: orderType,
+          scheduled_date: scheduledDate || null,  // For orders placed when shop is closed
           status: 'new',
           items: cart.map(item => ({
             name: item.name,
@@ -435,52 +439,8 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     )
   }
 
-  // Shop closed - BLOCK ordering completely
-  if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) {
-    return (
-      <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-white rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl border-4 border-red-500"
-        >
-          <div className="w-24 h-24 bg-red-100 rounded-full mx-auto mb-6 flex items-center justify-center">
-            <span className="text-5xl">🚫</span>
-          </div>
-          <h1 className="text-3xl font-bold text-red-600 mb-4">
-            {!shopStatus.isOpen ? t('checkoutPage.shopClosedTitle') : t('checkoutPage.ordersClosedTitle')}
-          </h1>
-          <p className="text-gray-600 text-lg mb-6">
-            {shopStatus.orderCutoffMessage || shopStatus.message || t('checkoutPage.shopClosedDesc')}
-          </p>
-          {shopStatus.opensAt && (
-            <div className="bg-gray-100 rounded-2xl p-4 mb-6">
-              <p className="text-gray-500 text-sm">{t('checkoutPage.opensAgainAt')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {shopStatus.opensAt}
-                {shopStatus.nextOpenDay && <span className="text-lg font-normal text-gray-500"> ({shopStatus.nextOpenDay})</span>}
-              </p>
-            </div>
-          )}
-          <div className="space-y-3">
-            <Link
-              href={`/shop/${params.tenant}`}
-              style={{ backgroundColor: primaryColor }}
-              className="block w-full text-white font-bold py-4 rounded-2xl hover:opacity-90 transition-colors"
-            >
-              {t('checkoutPage.backToShop')}
-            </Link>
-            <Link
-              href={`/shop/${params.tenant}/menu`}
-              className="block w-full bg-gray-100 text-gray-700 font-medium py-4 rounded-2xl hover:bg-gray-200 transition-colors"
-            >
-              {t('checkoutPage.viewMenuForTomorrow')}
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-    )
-  }
+  // Shop is closed - user can still order but must select a future date
+  const isShopClosed = shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)
 
   return (
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
@@ -550,6 +510,53 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                 </div>
               )}
             </motion.div>
+
+            {/* Date Picker - Show when shop is closed */}
+            {isShopClosed && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-orange-50 border-2 border-orange-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">📅</span>
+                  <div>
+                    <h2 className="text-lg font-bold text-orange-800">{t('checkoutPage.shopCurrentlyClosed')}</h2>
+                    <p className="text-orange-600 text-sm">{t('checkoutPage.selectDateForOrder')}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {/* Generate next 5 days buttons */}
+                  {[1, 2, 3, 4, 5].map((daysAhead) => {
+                    const date = new Date()
+                    date.setDate(date.getDate() + daysAhead)
+                    const dateStr = date.toISOString().split('T')[0]
+                    const dayName = daysAhead === 1 ? t('checkoutPage.tomorrow') : date.toLocaleDateString('nl-BE', { weekday: 'short' })
+                    const dateLabel = date.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })
+                    
+                    return (
+                      <button
+                        key={dateStr}
+                        onClick={() => setScheduledDate(dateStr)}
+                        className={`p-3 rounded-xl border-2 transition-all text-center ${
+                          scheduledDate === dateStr 
+                            ? 'border-orange-500 bg-orange-100 text-orange-800' 
+                            : 'border-gray-200 bg-white hover:border-orange-300'
+                        }`}
+                      >
+                        <span className="block font-bold text-sm">{dayName}</span>
+                        <span className="block text-xs text-gray-500">{dateLabel}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+                {scheduledDate && (
+                  <div className="mt-4 p-3 bg-green-100 border border-green-300 rounded-xl text-green-800 text-sm text-center">
+                    ✅ {t('checkoutPage.orderScheduledFor')} <strong>{new Date(scheduledDate).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}</strong>
+                  </div>
+                )}
+              </motion.div>
+            )}
 
             {/* Customer Info */}
             <motion.div
