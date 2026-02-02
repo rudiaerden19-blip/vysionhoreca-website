@@ -107,6 +107,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [business, setBusiness] = useState<Business | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
+  const [showClosedBanner, setShowClosedBanner] = useState(true)
   
   // Formateer review datum met vertalingen
   const formatReviewDate = (dateString?: string) => {
@@ -342,6 +343,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Auto-hide closed banner after 5 seconds
+  useEffect(() => {
+    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) {
+      setShowClosedBanner(true) // Show on page load
+      const timer = setTimeout(() => {
+        setShowClosedBanner(false)
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [shopStatus])
 
   useEffect(() => {
     async function loadData() {
@@ -827,23 +839,31 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         </div>
       </header>
 
-      {/* Closed Shop Warning Banner - Show when shop is closed or orders are not allowed */}
-      {shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && (
-        <div className="fixed top-16 left-0 right-0 z-40 bg-red-600 text-white py-4 px-4 shadow-lg">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <span className="text-3xl">🚫</span>
-              <h2 className="text-xl sm:text-2xl font-bold">
-                {t('shopPage.shopClosedTitle')}
-              </h2>
-              <span className="text-3xl">🚫</span>
+      {/* Closed Shop Warning Banner - Show when shop is closed, fades after 5 seconds */}
+      <AnimatePresence>
+        {shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && showClosedBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+            className="fixed top-16 left-0 right-0 z-40 bg-red-600 text-white py-4 px-4 shadow-lg"
+          >
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <span className="text-3xl">🚫</span>
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  {t('shopPage.shopClosedTitle')}
+                </h2>
+                <span className="text-3xl">🚫</span>
+              </div>
+              <p className="text-white/90 text-sm sm:text-base">
+                {t('shopPage.shopClosedMessage')}
+              </p>
             </div>
-            <p className="text-white/90 text-sm sm:text-base">
-              {t('shopPage.shopClosedMessage')}
-            </p>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Hero Section with Parallax */}
       <section className="relative h-screen min-h-[500px] sm:min-h-[700px] overflow-hidden">
