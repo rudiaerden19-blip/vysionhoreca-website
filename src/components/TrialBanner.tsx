@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import Link from 'next/link'
+import { isAdminTenant } from '@/lib/protected-tenants'
 
 interface TrialBannerProps {
   tenantSlug: string
@@ -27,6 +28,9 @@ export default function TrialBanner({ tenantSlug }: TrialBannerProps) {
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [loading, setLoading] = useState(true)
   const [dismissed, setDismissed] = useState(false)
+  
+  // Check if admin tenant (before hooks finish)
+  const isAdmin = isAdminTenant(tenantSlug)
 
   useEffect(() => {
     async function loadSubscription() {
@@ -49,6 +53,8 @@ export default function TrialBanner({ tenantSlug }: TrialBannerProps) {
     loadSubscription()
   }, [tenantSlug])
 
+  // Admin accounts never show trial/subscription banners
+  if (isAdmin) return null
   if (loading || dismissed) return null
   if (!subscription) return null
 
