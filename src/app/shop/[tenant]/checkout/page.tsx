@@ -525,10 +525,10 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             >
               <h2 className="text-lg font-bold text-gray-900 mb-4">📅 {t('checkoutPage.whenPickup')}</h2>
               
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {/* Date picker */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.date')}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.date')}</label>
                   <input
                     type="date"
                     value={scheduledDate}
@@ -538,18 +538,18 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                       : new Date(Date.now() + 86400000).toISOString().split('T')[0]
                     }
                     max={new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]}
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                   />
                 </div>
 
                 {/* Time picker */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('checkoutPage.time')}</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.time')}</label>
                   <input
                     type="time"
                     value={scheduledTime}
                     onChange={(e) => setScheduledTime(e.target.value)}
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                   />
                 </div>
               </div>
