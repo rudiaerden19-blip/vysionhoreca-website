@@ -164,13 +164,17 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     if (!customerInfo.name || !customerInfo.phone) return false
     if (orderType === 'delivery' && (!customerInfo.address || !customerInfo.postal_code || !customerInfo.city)) return false
     if (cart.length === 0) return false
-    // Allow ordering even when closed for now - let the shop decide
-    // if (shopStatus && !shopStatus.isOpen) return false
+    // Block ordering when shop is closed or order cutoff time has passed
+    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) return false
     return true
   }
 
   const getSubmitError = () => {
     if (cart.length === 0) return t('checkoutPage.cartEmpty')
+    // Shop closed check FIRST - most important
+    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) {
+      return shopStatus.orderCutoffMessage || t('checkoutPage.shopClosed')
+    }
     if (!customerInfo.name) return t('checkoutPage.fillName')
     if (!customerInfo.phone) return t('checkoutPage.fillPhone')
     if (orderType === 'delivery') {
@@ -427,6 +431,53 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             {t('checkoutPage.viewMenu')}
           </Link>
         </div>
+      </div>
+    )
+  }
+
+  // Shop closed - BLOCK ordering completely
+  if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) {
+    return (
+      <div className="min-h-screen bg-red-50 flex items-center justify-center p-4">
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="bg-white rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl border-4 border-red-500"
+        >
+          <div className="w-24 h-24 bg-red-100 rounded-full mx-auto mb-6 flex items-center justify-center">
+            <span className="text-5xl">🚫</span>
+          </div>
+          <h1 className="text-3xl font-bold text-red-600 mb-4">
+            {!shopStatus.isOpen ? t('checkoutPage.shopClosedTitle') : t('checkoutPage.ordersClosedTitle')}
+          </h1>
+          <p className="text-gray-600 text-lg mb-6">
+            {shopStatus.orderCutoffMessage || shopStatus.message || t('checkoutPage.shopClosedDesc')}
+          </p>
+          {shopStatus.opensAt && (
+            <div className="bg-gray-100 rounded-2xl p-4 mb-6">
+              <p className="text-gray-500 text-sm">{t('checkoutPage.opensAgainAt')}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {shopStatus.opensAt}
+                {shopStatus.nextOpenDay && <span className="text-lg font-normal text-gray-500"> ({shopStatus.nextOpenDay})</span>}
+              </p>
+            </div>
+          )}
+          <div className="space-y-3">
+            <Link
+              href={`/shop/${params.tenant}`}
+              style={{ backgroundColor: primaryColor }}
+              className="block w-full text-white font-bold py-4 rounded-2xl hover:opacity-90 transition-colors"
+            >
+              {t('checkoutPage.backToShop')}
+            </Link>
+            <Link
+              href={`/shop/${params.tenant}/menu`}
+              className="block w-full bg-gray-100 text-gray-700 font-medium py-4 rounded-2xl hover:bg-gray-200 transition-colors"
+            >
+              {t('checkoutPage.viewMenuForTomorrow')}
+            </Link>
+          </div>
+        </motion.div>
       </div>
     )
   }

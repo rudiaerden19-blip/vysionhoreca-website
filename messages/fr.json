@@ -2962,7 +2962,14 @@
     "fillAddress": "Veuillez entrer votre adresse",
     "fillPostalCode": "Veuillez entrer votre code postal",
     "fillCity": "Veuillez entrer votre ville",
-    "somethingWentWrong": "Une erreur s'est produite. Veuillez réessayer."
+    "somethingWentWrong": "Une erreur s'est produite. Veuillez réessayer.",
+    "shopClosed": "Le magasin est fermé. Vous ne pouvez pas commander maintenant.",
+    "shopClosedTitle": "Magasin fermé",
+    "ordersClosedTitle": "Commandes plus possibles",
+    "shopClosedDesc": "Vous ne pouvez pas commander pour le moment. Réessayez plus tard ou commandez pour un autre jour.",
+    "opensAgainAt": "Nous ouvrons à nouveau à",
+    "backToShop": "Retour à la boutique",
+    "viewMenuForTomorrow": "Voir le menu pour demain"
   },
   "accountPage": {
     "login": "Se connecter",

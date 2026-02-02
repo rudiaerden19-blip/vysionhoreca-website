@@ -3456,7 +3456,14 @@
     "fillAddress": "请输入您的地址",
     "fillPostalCode": "请输入您的邮编",
     "fillCity": "请输入您的城市",
-    "somethingWentWrong": "出错了，请重试。"
+    "somethingWentWrong": "出错了，请重试。",
+    "shopClosed": "商店已关门。您现在无法下单。",
+    "shopClosedTitle": "商店已关门",
+    "ordersClosedTitle": "无法再下单",
+    "shopClosedDesc": "您目前无法下单。请稍后重试或选择其他日期下单。",
+    "opensAgainAt": "重新开门时间",
+    "backToShop": "返回商店",
+    "viewMenuForTomorrow": "查看明天的菜单"
   },
   "accountPage": {
     "login": "登录",

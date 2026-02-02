@@ -3456,7 +3456,14 @@
     "fillAddress": "住所を入力してください",
     "fillPostalCode": "郵便番号を入力してください",
     "fillCity": "市区町村を入力してください",
-    "somethingWentWrong": "エラーが発生しました。再試行してください。"
+    "somethingWentWrong": "エラーが発生しました。再試行してください。",
+    "shopClosed": "店舗は閉店中です。現在ご注文いただけません。",
+    "shopClosedTitle": "店舗閉店中",
+    "ordersClosedTitle": "注文受付終了",
+    "shopClosedDesc": "現在ご注文いただけません。後でもう一度お試しいただくか、別の日にご注文ください。",
+    "opensAgainAt": "再開時間",
+    "backToShop": "店舗に戻る",
+    "viewMenuForTomorrow": "明日のメニューを見る"
   },
   "accountPage": {
     "login": "ログイン",

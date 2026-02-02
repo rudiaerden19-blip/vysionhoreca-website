@@ -2962,7 +2962,14 @@
     "fillAddress": "Bitte gib deine Adresse ein",
     "fillPostalCode": "Bitte gib deine Postleitzahl ein",
     "fillCity": "Bitte gib deine Stadt ein",
-    "somethingWentWrong": "Etwas ist schief gelaufen. Bitte versuche es erneut."
+    "somethingWentWrong": "Etwas ist schief gelaufen. Bitte versuche es erneut.",
+    "shopClosed": "Das Geschäft ist geschlossen. Sie können jetzt nicht bestellen.",
+    "shopClosedTitle": "Geschäft geschlossen",
+    "ordersClosedTitle": "Bestellungen nicht mehr möglich",
+    "shopClosedDesc": "Sie können derzeit nicht bestellen. Bitte versuchen Sie es später erneut oder bestellen Sie für einen anderen Tag.",
+    "opensAgainAt": "Wir öffnen wieder um",
+    "backToShop": "Zurück zum Geschäft",
+    "viewMenuForTomorrow": "Speisekarte für morgen ansehen"
   },
   "accountPage": {
     "login": "Anmelden",

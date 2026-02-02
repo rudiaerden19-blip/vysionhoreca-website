@@ -3456,7 +3456,14 @@
     "fillAddress": "أدخل عنوانك",
     "fillPostalCode": "أدخل الرمز البريدي",
     "fillCity": "أدخل مدينتك",
-    "somethingWentWrong": "حدث خطأ. حاول مرة أخرى."
+    "somethingWentWrong": "حدث خطأ. حاول مرة أخرى.",
+    "shopClosed": "المتجر مغلق. لا يمكنك الطلب الآن.",
+    "shopClosedTitle": "المتجر مغلق",
+    "ordersClosedTitle": "الطلبات لم تعد ممكنة",
+    "shopClosedDesc": "لا يمكنك الطلب في الوقت الحالي. حاول مرة أخرى لاحقاً أو اطلب ليوم آخر.",
+    "opensAgainAt": "نفتح مجدداً في",
+    "backToShop": "العودة للمتجر",
+    "viewMenuForTomorrow": "عرض قائمة الغد"
   },
   "accountPage": {
     "login": "تسجيل الدخول",

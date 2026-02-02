@@ -3456,7 +3456,14 @@
     "fillAddress": "Inserisci il tuo indirizzo",
     "fillPostalCode": "Inserisci il tuo CAP",
     "fillCity": "Inserisci la tua città",
-    "somethingWentWrong": "Qualcosa è andato storto. Riprova."
+    "somethingWentWrong": "Qualcosa è andato storto. Riprova.",
+    "shopClosed": "Il negozio è chiuso. Non puoi ordinare ora.",
+    "shopClosedTitle": "Negozio chiuso",
+    "ordersClosedTitle": "Ordini non più possibili",
+    "shopClosedDesc": "Non puoi ordinare in questo momento. Riprova più tardi o ordina per un altro giorno.",
+    "opensAgainAt": "Riapriamo alle",
+    "backToShop": "Torna al negozio",
+    "viewMenuForTomorrow": "Vedi menu per domani"
   },
   "accountPage": {
     "login": "Accedi",

@@ -3575,7 +3575,14 @@
     "fillAddress": "Vul je adres in",
     "fillPostalCode": "Vul je postcode in",
     "fillCity": "Vul je stad in",
-    "somethingWentWrong": "Er ging iets mis. Probeer opnieuw."
+    "somethingWentWrong": "Er ging iets mis. Probeer opnieuw.",
+    "shopClosed": "De winkel is gesloten. U kunt nu niet bestellen.",
+    "shopClosedTitle": "Winkel gesloten",
+    "ordersClosedTitle": "Bestellen niet meer mogelijk",
+    "shopClosedDesc": "U kunt momenteel niet bestellen. Probeer het later opnieuw of bestel voor een andere dag.",
+    "opensAgainAt": "We openen weer om",
+    "backToShop": "Terug naar winkel",
+    "viewMenuForTomorrow": "Bekijk menu voor morgen"
   },
   "accountPage": {
     "login": "Inloggen",

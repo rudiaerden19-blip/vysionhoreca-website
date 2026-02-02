@@ -3570,7 +3570,14 @@
     "fillAddress": "Please enter your address",
     "fillPostalCode": "Please enter your postal code",
     "fillCity": "Please enter your city",
-    "somethingWentWrong": "Something went wrong. Please try again."
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "shopClosed": "The shop is closed. You cannot order now.",
+    "shopClosedTitle": "Shop closed",
+    "ordersClosedTitle": "Orders no longer possible",
+    "shopClosedDesc": "You cannot order at this time. Please try again later or order for another day.",
+    "opensAgainAt": "We open again at",
+    "backToShop": "Back to shop",
+    "viewMenuForTomorrow": "View menu for tomorrow"
   },
   "accountPage": {
     "login": "Log in",

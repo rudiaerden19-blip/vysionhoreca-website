@@ -3456,7 +3456,14 @@
     "fillAddress": "Introduce tu dirección",
     "fillPostalCode": "Introduce tu código postal",
     "fillCity": "Introduce tu ciudad",
-    "somethingWentWrong": "Algo salió mal. Inténtalo de nuevo."
+    "somethingWentWrong": "Algo salió mal. Inténtalo de nuevo.",
+    "shopClosed": "La tienda está cerrada. No puede pedir ahora.",
+    "shopClosedTitle": "Tienda cerrada",
+    "ordersClosedTitle": "Pedidos ya no posibles",
+    "shopClosedDesc": "No puede pedir en este momento. Inténtelo más tarde o pida para otro día.",
+    "opensAgainAt": "Abrimos de nuevo a las",
+    "backToShop": "Volver a la tienda",
+    "viewMenuForTomorrow": "Ver menú para mañana"
   },
   "accountPage": {
     "login": "Iniciar sesión",
