@@ -134,6 +134,44 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // ========================================
+    // SELF-HEALING: Ensure tenant_settings exists
+    // This fixes cases where the record was accidentally deleted
+    // ========================================
+    const { data: existingSettings } = await supabase
+      .from('tenant_settings')
+      .select('id')
+      .eq('tenant_slug', tenantSlug)
+      .maybeSingle()
+
+    if (!existingSettings) {
+      logger.warn('Missing tenant_settings - auto-creating', { requestId, tenantSlug })
+      
+      // Get tenant info for recreation
+      const { data: tenantInfo } = await supabase
+        .from('tenants')
+        .select('name, email, phone')
+        .eq('slug', tenantSlug)
+        .maybeSingle()
+
+      const { error: settingsError } = await supabase
+        .from('tenant_settings')
+        .insert({
+          tenant_slug: tenantSlug,
+          business_name: tenantInfo?.name || profile.name || tenantSlug,
+          email: tenantInfo?.email || profile.email,
+          phone: tenantInfo?.phone || '',
+          primary_color: '#FF6B35',
+          secondary_color: '#1a1a2e',
+        })
+
+      if (settingsError) {
+        logger.error('Failed to auto-create tenant_settings', { requestId, tenantSlug, error: settingsError.message })
+      } else {
+        logger.info('Auto-created missing tenant_settings', { requestId, tenantSlug })
+      }
+    }
+
     logger.info('Login successful', { 
       requestId, 
       tenantSlug, 
