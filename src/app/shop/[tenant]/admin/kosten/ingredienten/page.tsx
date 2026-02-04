@@ -75,6 +75,9 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   const [showInvoiceScanner, setShowInvoiceScanner] = useState(false)
   const [scanningInvoice, setScanningInvoice] = useState(false)
   const [invoicePreview, setInvoicePreview] = useState<string | null>(null)
+  const [scanCooldown, setScanCooldown] = useState(0)
+  const [scanError, setScanError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
   const [invoiceResults, setInvoiceResults] = useState<{
     supplier?: string
     invoiceDate?: string
@@ -126,6 +129,12 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       return
     }
 
+    // Check cooldown
+    if (scanCooldown > 0) {
+      alert(`Wacht nog ${scanCooldown} seconden voor de volgende scan`)
+      return
+    }
+
     // Convert to base64
     const reader = new FileReader()
     reader.onload = async (event) => {
@@ -133,6 +142,13 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
       setInvoicePreview(event.target?.result as string)
       setScanningInvoice(true)
       setInvoiceResults(null)
+      setScanError(null)
+
+      // Cancel any previous request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      abortControllerRef.current = new AbortController()
 
       try {
         const response = await fetch('/api/analyze-invoice', {
@@ -141,7 +157,8 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
           body: JSON.stringify({ 
             image: base64, 
             mimeType: file.type 
-          })
+          }),
+          signal: abortControllerRef.current.signal
         })
 
         const data = await response.json()
@@ -155,11 +172,23 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             items: data.items.map((item: any) => ({ ...item, selected: true }))
           })
         } else {
-          alert(data.error || 'Kon factuur niet analyseren')
+          setScanError(data.error || 'Kon factuur niet analyseren')
+          // Start cooldown on rate limit error
+          if (response.status === 429) {
+            let countdown = 30
+            setScanCooldown(countdown)
+            const timer = setInterval(() => {
+              countdown--
+              setScanCooldown(countdown)
+              if (countdown <= 0) clearInterval(timer)
+            }, 1000)
+          }
         }
-      } catch (error) {
-        console.error('Invoice scan error:', error)
-        alert('Er ging iets mis bij het scannen')
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error('Invoice scan error:', error)
+          setScanError('Er ging iets mis bij het scannen')
+        }
       } finally {
         setScanningInvoice(false)
       }

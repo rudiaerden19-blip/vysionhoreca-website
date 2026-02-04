@@ -120,6 +120,14 @@ REGELS:
       const errorData = await response.json().catch(() => ({}))
       console.error('Gemini API error:', response.status, JSON.stringify(errorData))
       
+      // Handle rate limiting (429) specifically
+      if (response.status === 429) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Even geduld! De AI is tijdelijk overbelast. Wacht 30 seconden en probeer opnieuw.' 
+        }, { status: 429 })
+      }
+      
       const errorMessage = errorData?.error?.message || response.statusText
       
       return NextResponse.json({ 
