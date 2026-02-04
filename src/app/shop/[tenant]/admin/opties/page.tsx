@@ -46,6 +46,11 @@ function SortableChoice({
   canRemove: boolean
   placeholder: string
 }) {
+  // Local state for price input to allow typing "0.50" without losing the "0"
+  const [priceInput, setPriceInput] = useState(() => 
+    choice.price && choice.price > 0 ? String(choice.price) : ''
+  )
+
   const {
     attributes,
     listeners,
@@ -86,12 +91,17 @@ function SortableChoice({
       <div className="relative w-28">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">€</span>
         <input
-          type="number"
-          step="0.01"
-          min="0"
-          value={choice.price !== undefined ? choice.price : ''}
-          onChange={(e) => onUpdate('price', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-          className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          type="text"
+          inputMode="decimal"
+          value={priceInput}
+          onChange={(e) => {
+            const val = e.target.value.replace(',', '.')
+            if (val === '' || /^\d*\.?\d*$/.test(val)) {
+              setPriceInput(val)
+              onUpdate('price', val === '' ? 0 : parseFloat(val) || 0)
+            }
+          }}
+          className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="0.00"
         />
       </div>
@@ -232,7 +242,10 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
       return
     }
 
-    const validChoices = formData.choices?.filter(c => c.name.trim() !== '') || []
+    const validChoices = formData.choices?.filter(c => c.name.trim() !== '').map(c => ({
+      ...c,
+      price: typeof c.price === 'number' ? c.price : 0
+    })) || []
     if (validChoices.length === 0) {
       setError(t('adminPages.opties.addAtLeastOne'))
       return
