@@ -89,9 +89,9 @@ function SortableChoice({
           type="number"
           step="0.01"
           min="0"
-          value={choice.price || ''}
-          onChange={(e) => onUpdate('price', parseFloat(e.target.value) || 0)}
-          className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={choice.price !== undefined ? choice.price : ''}
+          onChange={(e) => onUpdate('price', e.target.value === '' ? 0 : parseFloat(e.target.value))}
+          className="w-full pl-8 pr-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           placeholder="0.00"
         />
       </div>
