@@ -180,16 +180,6 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
           })
         } else {
           setScanError(data.error || 'Kon factuur niet analyseren')
-          // Start cooldown on rate limit error
-          if (response.status === 429) {
-            let countdown = 30
-            setScanCooldown(countdown)
-            const timer = setInterval(() => {
-              countdown--
-              setScanCooldown(countdown)
-              if (countdown <= 0) clearInterval(timer)
-            }, 1000)
-          }
         }
       } catch (error: any) {
         if (error.name !== 'AbortError') {
