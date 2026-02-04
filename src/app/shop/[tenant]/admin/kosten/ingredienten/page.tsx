@@ -75,7 +75,6 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   const [showInvoiceScanner, setShowInvoiceScanner] = useState(false)
   const [scanningInvoice, setScanningInvoice] = useState(false)
   const [invoicePreview, setInvoicePreview] = useState<string | null>(null)
-  const [scanCooldown, setScanCooldown] = useState(0)
   const [scanError, setScanError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
   const [invoiceResults, setInvoiceResults] = useState<{
@@ -118,6 +117,20 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   }
 
   // Invoice scanner functions
+  function closeInvoiceScanner() {
+    // Cancel any in-flight request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+    }
+    setShowInvoiceScanner(false)
+    setInvoicePreview(null)
+    setInvoiceResults(null)
+    setScanningInvoice(false)
+    setScanError(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
   async function handleInvoiceUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -126,12 +139,6 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
     if (!validTypes.includes(file.type)) {
       alert('Alleen JPG, PNG, WebP of PDF bestanden zijn toegestaan')
-      return
-    }
-
-    // Check cooldown
-    if (scanCooldown > 0) {
-      alert(`Wacht nog ${scanCooldown} seconden voor de volgende scan`)
       return
     }
 
@@ -343,12 +350,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
     alert(`${messages.join(', ')}!\nFactuur opgeslagen in historie.`)
 
     // Reset scanner
-    setShowInvoiceScanner(false)
-    setInvoicePreview(null)
-    setInvoiceResults(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+    closeInvoiceScanner()
   }
 
   async function addFromDatabase(product: SupplierProduct) {
@@ -894,10 +896,8 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             onClick={() => {
-              if (!scanningInvoice && !addingFromInvoice) {
-                setShowInvoiceScanner(false)
-                setInvoicePreview(null)
-                setInvoiceResults(null)
+              if (!addingFromInvoice) {
+                closeInvoiceScanner()
               }
             }}
           >
@@ -952,6 +952,24 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
                     <p className="text-gray-500 mt-2">
                       Even geduld, dit kan 10-20 seconden duren
                     </p>
+                  </div>
+                )}
+
+                {/* Error message */}
+                {scanError && !scanningInvoice && (
+                  <div className="text-center py-8">
+                    <div className="text-5xl mb-4">⚠️</div>
+                    <p className="text-lg font-semibold text-red-600 mb-2">{scanError}</p>
+                    <button
+                      onClick={() => {
+                        setScanError(null)
+                        setInvoicePreview(null)
+                        if (fileInputRef.current) fileInputRef.current.value = ''
+                      }}
+                      className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                    >
+                      Probeer opnieuw
+                    </button>
                   </div>
                 )}
 
@@ -1160,13 +1178,8 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
               
               <div className="p-6 border-t bg-gray-50 flex justify-between">
                 <button
-                  onClick={() => {
-                    setShowInvoiceScanner(false)
-                    setInvoicePreview(null)
-                    setInvoiceResults(null)
-                    if (fileInputRef.current) fileInputRef.current.value = ''
-                  }}
-                  disabled={scanningInvoice || addingFromInvoice}
+                  onClick={closeInvoiceScanner}
+                  disabled={addingFromInvoice}
                   className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
                 >
                   Annuleren

@@ -86,53 +86,64 @@ REGELS:
 4. Lees ALLE regels op de factuur
 5. GEEN berekeningen, alleen kopiëren`
 
-    // Direct REST API call to Gemini (using v1beta for wider model support)
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: prompt },
+    // Helper function to call Gemini API with retry
+    const callGeminiWithRetry = async (maxRetries = 3): Promise<Response> => {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              contents: [
                 {
-                  inline_data: {
-                    mime_type: mimeType || 'image/jpeg',
-                    data: image
-                  }
+                  parts: [
+                    { text: prompt },
+                    {
+                      inline_data: {
+                        mime_type: mimeType || 'image/jpeg',
+                        data: image
+                      }
+                    }
+                  ]
                 }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 4096,
+              ],
+              generationConfig: {
+                temperature: 0.1,
+                maxOutputTokens: 4096,
+              }
+            })
           }
-        })
+        )
+
+        // If rate limited (429), wait and retry
+        if (response.status === 429 && attempt < maxRetries) {
+          const waitTime = attempt * 5000 // 5s, 10s, 15s
+          console.log(`Rate limited, waiting ${waitTime/1000}s before retry ${attempt + 1}/${maxRetries}`)
+          await new Promise(resolve => setTimeout(resolve, waitTime))
+          continue
+        }
+
+        return response
       }
-    )
+      // Should never reach here, but TypeScript needs it
+      throw new Error('Max retries exceeded')
+    }
+
+    // Call Gemini with automatic retry on rate limit
+    const response = await callGeminiWithRetry(3)
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
       console.error('Gemini API error:', response.status, JSON.stringify(errorData))
       
-      // Handle rate limiting (429) specifically
-      if (response.status === 429) {
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Even geduld! De AI is tijdelijk overbelast. Wacht 30 seconden en probeer opnieuw.' 
-        }, { status: 429 })
-      }
-      
       const errorMessage = errorData?.error?.message || response.statusText
       
       return NextResponse.json({ 
         success: false, 
-        error: `API fout (${response.status}): ${errorMessage}` 
+        error: `API fout: ${errorMessage}` 
       }, { status: 500 })
     }
 
