@@ -503,6 +503,7 @@ export default function AbonnementPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
+  const [billingYearly, setBillingYearly] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [showCancelled, setShowCancelled] = useState(false)
   const [successType, setSuccessType] = useState<'subscription' | 'invoice'>('subscription')
@@ -583,14 +584,14 @@ export default function AbonnementPage() {
     setLoading(false)
   }
 
-  async function handleSubscribe(planId: string) {
+  async function handleSubscribe(planId: string, billing: string = 'monthly') {
     setProcessing(planId)
     
     try {
       const response = await fetch('/api/create-subscription-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        body: JSON.stringify({ tenantSlug, planId }),
+        body: JSON.stringify({ tenantSlug, planId, billing }),
       })
 
       const data = await response.json()
@@ -900,6 +901,40 @@ export default function AbonnementPage() {
       </div>
 
       {/* Abonnement Kopen - ALTIJD ZICHTBAAR */}
+      {/* Billing Toggle */}
+      <div className="flex flex-col items-center mb-6">
+        <div className="bg-gray-100 p-1 rounded-full inline-flex items-center">
+          <button
+            onClick={() => setBillingYearly(false)}
+            className={`px-5 py-2 rounded-full font-semibold transition-all text-sm ${
+              !billingYearly 
+                ? 'bg-white text-gray-900 shadow' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Maandelijks
+          </button>
+          <button
+            onClick={() => setBillingYearly(true)}
+            className={`px-5 py-2 rounded-full font-semibold transition-all text-sm relative ${
+              billingYearly 
+                ? 'bg-white text-gray-900 shadow' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Jaarlijks
+            <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+              -10%
+            </span>
+          </button>
+        </div>
+        {billingYearly && (
+          <p className="text-green-600 text-sm mt-2 font-medium">
+            ✓ Je bespaart 10% met een jaarabonnement!
+          </p>
+        )}
+      </div>
+
       <div className="grid md:grid-cols-2 gap-6">
         {/* Starter Plan */}
         <div className="bg-gradient-to-br from-[#1a2e1a] to-[#2d4a2d] rounded-2xl p-6 text-white">
@@ -913,11 +948,21 @@ export default function AbonnementPage() {
             </div>
           </div>
           <div className="mb-6">
-            <span className="text-4xl font-bold text-yellow-400">€59</span>
-            <span className="text-gray-300 ml-2">{t('perMonth')}</span>
+            {billingYearly ? (
+              <>
+                <span className="text-4xl font-bold text-yellow-400">€{Math.round(59 * 12 * 0.9)}</span>
+                <span className="text-gray-300 ml-2">/jaar</span>
+                <p className="text-green-300 text-sm mt-1">= €{Math.round(59 * 0.9)}/maand</p>
+              </>
+            ) : (
+              <>
+                <span className="text-4xl font-bold text-yellow-400">€59</span>
+                <span className="text-gray-300 ml-2">{t('perMonth')}</span>
+              </>
+            )}
           </div>
           <button
-            onClick={() => handleSubscribe('starter')}
+            onClick={() => handleSubscribe('starter', billingYearly ? 'yearly' : 'monthly')}
             disabled={processing !== null}
             className="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-900 py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
           >
@@ -942,11 +987,21 @@ export default function AbonnementPage() {
             </div>
           </div>
           <div className="mb-6">
-            <span className="text-4xl font-bold text-purple-300">€69</span>
-            <span className="text-gray-300 ml-2">{t('perMonth')}</span>
+            {billingYearly ? (
+              <>
+                <span className="text-4xl font-bold text-purple-300">€{Math.round(69 * 12 * 0.9)}</span>
+                <span className="text-gray-300 ml-2">/jaar</span>
+                <p className="text-purple-200 text-sm mt-1">= €{Math.round(69 * 0.9)}/maand</p>
+              </>
+            ) : (
+              <>
+                <span className="text-4xl font-bold text-purple-300">€69</span>
+                <span className="text-gray-300 ml-2">{t('perMonth')}</span>
+              </>
+            )}
           </div>
           <button
-            onClick={() => handleSubscribe('pro')}
+            onClick={() => handleSubscribe('pro', billingYearly ? 'yearly' : 'monthly')}
             disabled={processing !== null}
             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-4 rounded-xl font-bold text-lg transition-colors disabled:opacity-50"
           >

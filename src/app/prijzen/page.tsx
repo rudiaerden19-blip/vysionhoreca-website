@@ -1,11 +1,17 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import { useLanguage } from '@/i18n'
 
 export default function PrijzenPage() {
   const { t, locale } = useLanguage()
+  const [isYearly, setIsYearly] = useState(false)
+  
+  const starterMonthly = 59
+  const proMonthly = 69
+  const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
+  const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
 
   return (
     <div className="min-h-screen bg-[#1a1a2e]">
@@ -29,6 +35,41 @@ export default function PrijzenPage() {
       {/* Pricing Cards */}
       <section className="py-16 bg-gradient-to-b from-[#16213e] to-[#1a1a2e]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Toggle Maandelijks / Jaarlijks */}
+          <div className="flex flex-col items-center mb-12">
+            <div className="bg-[#0f0f1a] p-1 rounded-full inline-flex items-center">
+              <button
+                onClick={() => setIsYearly(false)}
+                className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                  !isYearly 
+                    ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Maandelijks
+              </button>
+              <button
+                onClick={() => setIsYearly(true)}
+                className={`px-6 py-3 rounded-full font-semibold transition-all relative ${
+                  isYearly 
+                    ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Jaarlijks
+                <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                  -10%
+                </span>
+              </button>
+            </div>
+            {isYearly && (
+              <p className="text-green-400 text-sm mt-3 font-medium">
+                ✓ Je bespaart 10% met een jaarabonnement!
+              </p>
+            )}
+          </div>
+
           <div className="grid md:grid-cols-2 gap-8">
             
             {/* Vysion Starter - €59 */}
@@ -43,9 +84,12 @@ export default function PrijzenPage() {
                   <h3 className="text-xl font-bold text-white">{t('pricing.starter.name')}</h3>
                 </div>
                 <div className="flex items-baseline mb-6">
-                  <span className="text-5xl font-bold text-yellow-400">€59</span>
-                  <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
+                  <span className="text-5xl font-bold text-yellow-400">€{starterPrice}</span>
+                  <span className="text-gray-400 ml-2">{isYearly ? '/jaar' : t('pricing.perMonth')}</span>
                 </div>
+                {isYearly && (
+                  <p className="text-green-300 text-sm mb-4">= €{Math.round(starterMonthly * 0.9)}/maand</p>
+                )}
                 
                 <ul className="space-y-3 mb-8">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((i) => (
@@ -84,9 +128,12 @@ export default function PrijzenPage() {
                   <h3 className="text-xl font-bold text-white">{t('pricing.pro.name')}</h3>
                 </div>
                 <div className="flex items-baseline mb-6">
-                  <span className="text-5xl font-bold text-purple-300">€69</span>
-                  <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
+                  <span className="text-5xl font-bold text-purple-300">€{proPrice}</span>
+                  <span className="text-gray-400 ml-2">{isYearly ? '/jaar' : t('pricing.perMonth')}</span>
                 </div>
+                {isYearly && (
+                  <p className="text-purple-200 text-sm mb-4">= €{Math.round(proMonthly * 0.9)}/maand</p>
+                )}
                 
                 <p className="text-purple-200 mb-4 flex items-center">
                   <span className="mr-2">✨</span>
