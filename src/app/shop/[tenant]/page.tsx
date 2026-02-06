@@ -780,16 +780,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               <span className="hidden sm:inline">{t('shopPage.account')}</span>
             </Link>
             
-            {/* Admin - alleen voor eigenaar */}
-            {isOwner && (
-              <Link 
-                href={`/shop/${params.tenant}/admin`}
-                className="bg-white/20 backdrop-blur-md text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:bg-white/30 transition-colors flex items-center gap-1"
-              >
-                <span>⚙️</span>
-                <span className="hidden sm:inline">{t('shopPage.admin')}</span>
-              </Link>
-            )}
+            {/* Admin knop verwijderd - eigenaar logt in via /login */}
 
             {/* Language Switcher - fixed position rechts */}
             <div className="relative">
