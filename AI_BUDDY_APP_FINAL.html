@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Buddy App - Finale Specificaties</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #1a1a2e;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 30px;
+      background: #fff;
+    }
+    
+    h1 {
+      font-size: 2.2em;
+      color: #1a1a2e;
+      border-bottom: 4px solid #FF6B35;
+      padding-bottom: 15px;
+      margin: 40px 0 25px 0;
+    }
+    
+    h1:first-child {
+      margin-top: 0;
+      font-size: 2.5em;
+      text-align: center;
+      border-bottom: none;
+    }
+    
+    h2 {
+      font-size: 1.4em;
+      color: #2d2d44;
+      margin: 30px 0 15px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    
+    h3 {
+      font-size: 1.1em;
+      color: #444;
+      margin: 20px 0 10px 0;
+    }
+    
+    p {
+      margin: 12px 0;
+    }
+    
+    ul, ol {
+      margin: 12px 0 12px 25px;
+    }
+    
+    li {
+      margin: 6px 0;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+      font-size: 0.95em;
+    }
+    
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    
+    th {
+      background: #1a1a2e;
+      color: white;
+      font-weight: 600;
+    }
+    
+    tr:nth-child(even) {
+      background: #f9f9f9;
+    }
+    
+    tr:hover {
+      background: #f0f0f0;
+    }
+    
+    pre {
+      background: #1a1a2e;
+      color: #f8f8f2;
+      padding: 18px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 15px 0;
+      font-size: 0.9em;
+      line-height: 1.5;
+    }
+    
+    code {
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Consolas', monospace;
+    }
+    
+    pre code {
+      color: inherit;
+      background: none;
+    }
+    
+    p code, li code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    
+    hr {
+      border: none;
+      border-top: 3px solid #FF6B35;
+      margin: 40px 0;
+    }
+    
+    strong {
+      color: #1a1a2e;
+    }
+    
+    a {
+      color: #FF6B35;
+      text-decoration: none;
+    }
+    
+    a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Header styling */
+    .header-info {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+      color: white;
+      border-radius: 10px;
+    }
+    
+    .header-info p {
+      margin: 5px 0;
+      color: #ccc;
+    }
+    
+    /* Agent instructions box */
+    .agent-box {
+      background: #fff3cd;
+      border: 2px solid #ffc107;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    
+    .agent-box pre {
+      background: #856404;
+      color: #fff3cd;
+    }
+    
+    /* Print styles */
+    @media print {
+      body {
+        padding: 20px;
+        font-size: 11pt;
+      }
+      
+      h1 {
+        page-break-before: always;
+      }
+      
+      h1:first-child {
+        page-break-before: avoid;
+      }
+      
+      pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      
+      table {
+        font-size: 10pt;
+      }
+    }
+    
+    /* Syntax highlighting */
+    .keyword { color: #ff79c6; }
+    .string { color: #f1fa8c; }
+    .comment { color: #6272a4; }
+    .function { color: #50fa7b; }
+  </style>
+</head>
+<body>
+
+<div class="header-info">
+  <h1 style="color: white; border: none; margin: 0; padding: 0;">AI BUDDY APP</h1>
+  <h2 style="color: #FF6B35; border: none; margin: 10px 0 0 0; padding: 0;">FINALE SPECIFICATIES</h2>
+  <p><strong style="color: white;">Versie:</strong> 2.0 - Februari 2026</p>
+  <p><strong style="color: white;">Status:</strong> Goedgekeurd voor ontwikkeling</p>
+</div>
+
+<div class="agent-box">
+<h2 style="margin-top: 0; border: none;">INSTRUCTIES VOOR AGENTS</h2>
+<pre>
+LEES DIT VOLLEDIG VOORDAT JE BEGINT
+
+1. VRAAG ALTIJD EERST aan de gebruiker voordat je iets bouwt
+2. GEEN PLEISTERWERK - bouw het meteen goed
+3. Dit moet FOUTLOOS werken
+4. Test alles voordat je zegt dat het klaar is
+5. Bij twijfel: VRAAG, niet gokken
+6. Volg dit document EXACT - alle beslissingen zijn al genomen
+</pre>
+</div>
+
+<hr>
+
+<h1>DEEL 1: WAT WE BOUWEN</h1>
+
+<h2>1.1 Product Visie</h2>
+<p>Een AI buddy app die werkt als:</p>
+<ul>
+<li>Een persoonlijke vriend die je ECHT kent</li>
+<li>Een GPT/ChatGPT die alles weet</li>
+<li>Met spraakfunctie (praten, niet typen)</li>
+<li>Die alles over je leven onthoudt (familie, werk, vrienden)</li>
+<li>Met eigen persoonlijkheid (kan ruzie maken, confronteren)</li>
+<li>24/7 beschikbaar</li>
+</ul>
+
+<h2>1.2 Wat het NIET is</h2>
+<ul>
+<li>Geen simpele chatbot</li>
+<li>Geen robot die altijd aardig is</li>
+<li>Geen AI die alles vergeet</li>
+<li>Geen kopie van Replika (wij zijn beter)</li>
+</ul>
+
+<h2>1.3 Unique Selling Points</h2>
+<table>
+<thead>
+<tr><th>USP</th><th>Waarom uniek</th></tr>
+</thead>
+<tbody>
+<tr><td>Perfect geheugen</td><td>Onthoudt ALLES over je leven, voor altijd</td></tr>
+<tr><td>GPT kennis</td><td>Kan alles beantwoorden wat ChatGPT kan</td></tr>
+<tr><td>Echte persoonlijkheid</td><td>Heeft meningen, maakt ruzie, confronteert</td></tr>
+<tr><td>Voice chat</td><td>Praten als met een echte vriend</td></tr>
+<tr><td>Betaalbaar</td><td>Beter dan concurrentie, zelfde prijs</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h1>DEEL 2: BUSINESS MODEL</h1>
+
+<h2>2.1 Pricing</h2>
+<table>
+<thead>
+<tr><th>Tier</th><th>Prijs</th><th>Features</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Gratis</strong></td><td>0 euro</td><td>10 berichten/dag, geen voice</td></tr>
+<tr><td><strong>Pro</strong></td><td>23 euro/maand</td><td>3 uur/dag gebruik, onbeperkt berichten, voice</td></tr>
+<tr><td><strong>Ultimate</strong></td><td>35 euro/maand</td><td>Onbeperkt alles, meerdere buddies, NSFW (web)</td></tr>
+</tbody>
+</table>
+
+<h2>2.2 Kosten per User</h2>
+<table>
+<thead>
+<tr><th>Onderdeel</th><th>Service</th><th>Kosten/user/maand</th></tr>
+</thead>
+<tbody>
+<tr><td>AI</td><td>Gemini 1.5 Flash</td><td>0.30 - 0.50 euro</td></tr>
+<tr><td>Voice</td><td>OpenAI TTS (start)</td><td>2 - 3 euro</td></tr>
+<tr><td>Voice</td><td>Piper (later, 500+ users)</td><td>0.30 euro</td></tr>
+<tr><td>Hosting</td><td>Vercel + Supabase</td><td>0 euro (al betaald)</td></tr>
+<tr style="background: #e8f5e9;"><td><strong>TOTAAL START</strong></td><td></td><td><strong>2.50 - 3.50 euro</strong></td></tr>
+<tr style="background: #c8e6c9;"><td><strong>TOTAAL LATER</strong></td><td></td><td><strong>0.60 - 0.80 euro</strong></td></tr>
+</tbody>
+</table>
+
+<h2>2.3 Winst Berekening</h2>
+<p><strong>Bij start (Gemini + OpenAI TTS):</strong></p>
+<pre>
+Klant betaalt:       23 euro
+BTW (21%):          -4 euro
+Netto ontvangst:     19 euro
+Kosten:             -3 euro
+--------------------------
+WINST:               16 euro per user
+</pre>
+
+<p><strong>Bij schaal (Gemini + Piper):</strong></p>
+<pre>
+Netto ontvangst:     19 euro
+Kosten:             -0.70 euro
+--------------------------
+WINST:               18.30 euro per user
+</pre>
+
+<h2>2.4 Projecties</h2>
+<table>
+<thead>
+<tr><th>Betalende Users</th><th>Winst/maand</th><th>Winst/jaar</th></tr>
+</thead>
+<tbody>
+<tr><td>100</td><td>1.600 euro</td><td>19.200 euro</td></tr>
+<tr><td>1.000</td><td>16.000 euro</td><td>192.000 euro</td></tr>
+<tr><td>5.000</td><td>80.000 euro</td><td>960.000 euro</td></tr>
+<tr style="background: #c8e6c9;"><td><strong>10.000</strong></td><td><strong>160.000 euro</strong></td><td><strong>1.920.000 euro</strong></td></tr>
+</tbody>
+</table>
+
+<h2>2.5 Limieten (om kosten te beheersen)</h2>
+<table>
+<thead>
+<tr><th>Tier</th><th>Berichten/dag</th><th>Voice/dag</th></tr>
+</thead>
+<tbody>
+<tr><td>Gratis</td><td>10</td><td>0</td></tr>
+<tr><td>Pro</td><td>Onbeperkt</td><td>3 uur max</td></tr>
+<tr><td>Ultimate</td><td>Onbeperkt</td><td>Onbeperkt</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h1>DEEL 3: TECHNISCHE STACK</h1>
+
+<h2>3.1 Overzicht Services</h2>
+<table>
+<thead>
+<tr><th>Service</th><th>Waarvoor</th><th>URL</th><th>Kosten</th></tr>
+</thead>
+<tbody>
+<tr><td>GitHub</td><td>Code repository</td><td>github.com</td><td>Gratis</td></tr>
+<tr><td>Vercel</td><td>Web app hosting</td><td>vercel.com</td><td>Al betaald (Vysion)</td></tr>
+<tr><td>Supabase</td><td>Database + Auth</td><td>supabase.com</td><td>Al betaald (Vysion)</td></tr>
+<tr><td>Google Gemini</td><td>AI model</td><td>ai.google.dev</td><td>Pay per use</td></tr>
+<tr><td>OpenAI TTS</td><td>Text-to-speech (start)</td><td>platform.openai.com</td><td>Pay per use</td></tr>
+<tr><td>Piper TTS</td><td>Text-to-speech (later)</td><td>Self-hosted</td><td>300 euro/maand server</td></tr>
+<tr><td>Stripe</td><td>Betalingen</td><td>stripe.com</td><td>1.5% + 0.25 per tx</td></tr>
+<tr><td>Apple Developer</td><td>iOS TestFlight</td><td>developer.apple.com</td><td>99 euro/jaar</td></tr>
+<tr><td>Google Play</td><td>Android app</td><td>play.google.com/console</td><td>25 euro eenmalig</td></tr>
+<tr><td>Sentry</td><td>Error tracking</td><td>sentry.io</td><td>Gratis</td></tr>
+</tbody>
+</table>
+
+<h2>3.2 Waarom deze keuzes</h2>
+
+<h3>Gemini i.p.v. OpenAI GPT-4:</h3>
+<ul>
+<li>3-10x goedkoper</li>
+<li>Zelfde kwaliteit voor gesprekken</li>
+<li>Sneller</li>
+<li>We hebben al ervaring (Vysion factuurscanner)</li>
+</ul>
+
+<h3>OpenAI TTS bij start:</h3>
+<ul>
+<li>Geen server nodig</li>
+<li>Goede kwaliteit (90%)</li>
+<li>Betaal per gebruik</li>
+<li>Geen risico bij weinig users</li>
+</ul>
+
+<h3>Piper TTS later (500+ users):</h3>
+<ul>
+<li>Self-hosted = veel goedkoper</li>
+<li>75-80% kwaliteit (acceptabel)</li>
+<li>Onbeperkt gebruik</li>
+<li>Nederlandse stemmen beschikbaar</li>
+</ul>
+
+<h2>3.3 Gefaseerde Aanpak</h2>
+<table>
+<thead>
+<tr><th>Fase</th><th>Users</th><th>AI</th><th>Voice</th><th>Server</th></tr>
+</thead>
+<tbody>
+<tr><td>Start</td><td>0-100</td><td>Gemini API</td><td>OpenAI TTS</td><td>Geen</td></tr>
+<tr><td>Groei</td><td>100-500</td><td>Gemini API</td><td>OpenAI TTS</td><td>Geen</td></tr>
+<tr><td>Schaal</td><td>500+</td><td>Gemini API</td><td>Piper</td><td>RunPod GPU</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h1>DEEL 4: PROJECT STRUCTUUR</h1>
+
+<h2>4.1 Repository</h2>
+<pre>
+ai-buddy-app/
+|
+|-- src/
+|   |-- app/
+|   |   |-- (marketing)/
+|   |   |   |-- page.tsx                 # Landing page
+|   |   |   |-- pricing/page.tsx         # Prijzen pagina
+|   |   |
+|   |   |-- (auth)/
+|   |   |   |-- login/page.tsx
+|   |   |   |-- register/page.tsx
+|   |   |   |-- forgot-password/page.tsx
+|   |   |
+|   |   |-- (app)/
+|   |   |   |-- dashboard/page.tsx       # Buddy overzicht
+|   |   |   |-- chat/[buddyId]/page.tsx  # Chat interface
+|   |   |   |-- buddy/
+|   |   |   |   |-- create/page.tsx      # Buddy aanmaken
+|   |   |   |   |-- [id]/edit/page.tsx   # Buddy bewerken
+|   |   |   |-- settings/page.tsx
+|   |   |   |-- subscription/page.tsx
+|   |   |
+|   |   |-- api/
+|   |       |-- auth/
+|   |       |   |-- register/route.ts
+|   |       |   |-- login/route.ts
+|   |       |   |-- logout/route.ts
+|   |       |
+|   |       |-- buddy/
+|   |       |   |-- create/route.ts
+|   |       |   |-- [id]/route.ts
+|   |       |
+|   |       |-- chat/
+|   |       |   |-- send/route.ts        # CORE: Verwerk bericht
+|   |       |   |-- history/route.ts
+|   |       |
+|   |       |-- memory/
+|   |       |   |-- store/route.ts
+|   |       |   |-- retrieve/route.ts
+|   |       |
+|   |       |-- voice/
+|   |       |   |-- text-to-speech/route.ts
+|   |       |   |-- speech-to-text/route.ts
+|   |       |
+|   |       |-- subscription/
+|   |           |-- create-checkout/route.ts
+|   |           |-- webhook/route.ts
+|   |
+|   |-- components/
+|   |   |-- chat/
+|   |   |   |-- ChatInterface.tsx
+|   |   |   |-- MessageBubble.tsx
+|   |   |   |-- VoiceButton.tsx
+|   |   |
+|   |   |-- buddy/
+|   |   |   |-- BuddyCreator.tsx
+|   |   |   |-- PersonalitySliders.tsx
+|   |   |   |-- AvatarSelector.tsx
+|   |   |
+|   |   |-- ui/
+|   |       |-- Button.tsx
+|   |       |-- Input.tsx
+|   |       |-- Modal.tsx
+|   |
+|   |-- lib/
+|   |   |-- ai/
+|   |   |   |-- gemini.ts
+|   |   |   |-- generate-response.ts
+|   |   |   |-- quality-check.ts
+|   |   |   |-- memory-retrieval.ts
+|   |   |
+|   |   |-- voice/
+|   |   |   |-- openai-tts.ts
+|   |   |   |-- speech-to-text.ts
+|   |   |
+|   |   |-- db/
+|   |       |-- supabase.ts
+|   |       |-- queries.ts
+|   |
+|   |-- i18n/
+|       |-- nl.json
+|       |-- en.json
+|       |-- de.json
+|
+|-- mobile/                             # React Native (Expo)
+|   |-- app/
+|   |-- components/
+|   |-- package.json
+|
+|-- supabase/
+|   |-- migrations/
+|
+|-- public/
+|   |-- images/
+|
+|-- package.json
+|-- next.config.js
+|-- tailwind.config.js
+|-- tsconfig.json
+|-- README.md
+</pre>
+
+<hr>
+
+<h1>DEEL 5: DATABASE SCHEMA</h1>
+
+<h2>5.1 Users Tabel</h2>
+<pre>
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  name TEXT,
+  language TEXT DEFAULT 'nl',
+  age_verified BOOLEAN DEFAULT FALSE,
+  nsfw_enabled BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_seen TIMESTAMPTZ DEFAULT NOW()
+);
+</pre>
+
+<h2>5.2 Buddies Tabel</h2>
+<pre>
+CREATE TABLE buddies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  
+  -- Persoonlijkheid
+  personality JSONB NOT NULL DEFAULT '{
+    "traits": [],
+    "speaking_style": "casual",
+    "humor_level": 5,
+    "empathy_level": 7,
+    "assertiveness": 5,
+    "backstory": ""
+  }',
+  
+  -- Avatar
+  avatar_url TEXT,
+  
+  -- Voice
+  voice_id TEXT DEFAULT 'nova',
+  
+  -- Relatie status
+  relationship_level INTEGER DEFAULT 0,
+  current_mood TEXT DEFAULT 'neutral',
+  
+  -- Stats
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_interaction TIMESTAMPTZ,
+  total_messages INTEGER DEFAULT 0
+);
+</pre>
+
+<h2>5.3 Conversations Tabel</h2>
+<pre>
+CREATE TABLE conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  ended_at TIMESTAMPTZ,
+  message_count INTEGER DEFAULT 0,
+  summary TEXT
+);
+</pre>
+
+<h2>5.4 Messages Tabel</h2>
+<pre>
+CREATE TABLE messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  role TEXT NOT NULL, -- 'user' of 'buddy'
+  content TEXT NOT NULL,
+  
+  emotion TEXT,
+  voice_used BOOLEAN DEFAULT FALSE,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_messages_buddy ON messages(buddy_id, created_at DESC);
+</pre>
+
+<h2>5.5 Memories Tabel (Langetermijn geheugen)</h2>
+<pre>
+CREATE TABLE memories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  category TEXT NOT NULL,
+  -- 'fact', 'person', 'event', 'preference', 'emotion', 'conflict'
+  
+  content TEXT NOT NULL,
+  importance INTEGER DEFAULT 5,
+  emotion_tag TEXT,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_referenced TIMESTAMPTZ,
+  times_referenced INTEGER DEFAULT 0
+);
+</pre>
+
+<h2>5.6 User People Tabel</h2>
+<pre>
+CREATE TABLE user_people (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  name TEXT NOT NULL,
+  relationship TEXT NOT NULL,
+  notes TEXT,
+  sentiment TEXT DEFAULT 'neutral',
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+</pre>
+
+<h2>5.7 Subscriptions Tabel</h2>
+<pre>
+CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  
+  stripe_customer_id TEXT,
+  stripe_subscription_id TEXT,
+  
+  tier TEXT NOT NULL DEFAULT 'free',
+  status TEXT NOT NULL DEFAULT 'active',
+  
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
+  
+  -- Usage tracking
+  messages_today INTEGER DEFAULT 0,
+  voice_minutes_today INTEGER DEFAULT 0,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+</pre>
+
+<h2>5.8 Usage Logs Tabel</h2>
+<pre>
+CREATE TABLE usage_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  
+  date DATE DEFAULT CURRENT_DATE,
+  
+  messages_sent INTEGER DEFAULT 0,
+  voice_seconds_used INTEGER DEFAULT 0,
+  tokens_used INTEGER DEFAULT 0,
+  cost_cents INTEGER DEFAULT 0,
+  
+  UNIQUE(user_id, date)
+);
+</pre>
+
+<hr>
+
+<h1>DEEL 5B: GEHEUGEN BEVEILIGING (KRITIEK)</h1>
+
+<div style="background: #ffebee; border: 3px solid #c62828; border-radius: 10px; padding: 25px; margin: 20px 0;">
+  <h2 style="color: #c62828; border: none; margin: 0;">WAARSCHUWING</h2>
+  <p style="font-size: 1.2em; margin: 15px 0;"><strong>HET GEHEUGEN IS HET HART VAN DE APP</strong></p>
+  <ul style="margin: 0;">
+    <li>Als de buddy vergeet wie de klant is = <strong>VERTROUWEN WEG</strong></li>
+    <li>Vertrouwen weg = Klant weg = <strong>APP KAPOT</strong></li>
+  </ul>
+  <p style="margin-top: 15px; font-weight: bold; color: #c62828;">BEHANDEL GEHEUGEN ALS GOUD</p>
+</div>
+
+<h2>Waarom geheugen kritiek is</h2>
+<p>De hele waarde van de app zit in:</p>
+<ul>
+<li>"Je weet nog dat mijn moeder ziek was?"</li>
+<li>"Hoe ging het met die sollicitatie waar je het over had?"</li>
+<li>"Je zei vorige maand dat je ruzie had met Peter..."</li>
+</ul>
+<p><strong>Als dit weg is, is de buddy gewoon weer een domme chatbot.</strong></p>
+
+<h2>Bescherming Strategie</h2>
+
+<h3>1. Database Redundancy</h3>
+<pre>
+-- Memories worden NOOIT verwijderd, alleen gemarkeerd
+ALTER TABLE memories ADD COLUMN deleted_at TIMESTAMPTZ;
+ALTER TABLE memories ADD COLUMN deleted_by TEXT;
+
+-- Soft delete functie
+CREATE OR REPLACE FUNCTION soft_delete_memory(memory_id UUID)
+RETURNS void AS $$
+BEGIN
+  UPDATE memories 
+  SET deleted_at = NOW(), deleted_by = 'system'
+  WHERE id = memory_id;
+  -- NOOIT echte DELETE
+END;
+$$ LANGUAGE plpgsql;
+</pre>
+
+<h3>2. Dagelijkse Backup</h3>
+<pre>
+-- Backup tabel voor memories
+CREATE TABLE memories_backup (
+  id UUID PRIMARY KEY,
+  buddy_id UUID,
+  content TEXT,
+  category TEXT,
+  importance INTEGER,
+  backed_up_at TIMESTAMPTZ DEFAULT NOW(),
+  original_created_at TIMESTAMPTZ
+);
+
+-- Dagelijkse backup job (via Supabase Edge Function)
+INSERT INTO memories_backup 
+SELECT *, NOW(), created_at FROM memories 
+WHERE deleted_at IS NULL;
+</pre>
+
+<h3>3. Memory Versioning</h3>
+<pre>
+-- Elke wijziging wordt gelogd
+CREATE TABLE memory_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  memory_id UUID REFERENCES memories(id),
+  old_content TEXT,
+  new_content TEXT,
+  changed_at TIMESTAMPTZ DEFAULT NOW(),
+  changed_by TEXT
+);
+</pre>
+
+<h3>4. Integrity Checks</h3>
+<pre>
+// lib/ai/memory-integrity.ts
+
+export async function checkMemoryIntegrity(buddyId: string): Promise&lt;{
+  isHealthy: boolean
+  issues: string[]
+}&gt; {
+  const issues: string[] = []
+  
+  // 1. Check of er memories bestaan
+  const { count } = await supabase
+    .from('memories')
+    .select('*', { count: 'exact', head: true })
+    .eq('buddy_id', buddyId)
+    .is('deleted_at', null)
+  
+  if (count === 0) {
+    issues.push('KRITIEK: Geen memories gevonden')
+  }
+  
+  // 2. Check belangrijke categorieën
+  // 3. Check tegen backup
+  
+  return { isHealthy: issues.length === 0, issues }
+}
+</pre>
+
+<h3>5. Recovery System</h3>
+<pre>
+// lib/ai/memory-recovery.ts
+
+export async function recoverMemories(buddyId: string): Promise&lt;{
+  recovered: number
+  failed: number
+}&gt; {
+  // Haal laatste backup op
+  const { data: backups } = await supabase
+    .from('memories_backup')
+    .select('*')
+    .eq('buddy_id', buddyId)
+    .order('backed_up_at', { ascending: false })
+  
+  // Herstel ontbrekende memories uit backup
+  for (const backup of backups || []) {
+    // Check of memory nog bestaat, zo niet: herstel
+  }
+  
+  return { recovered, failed }
+}
+</pre>
+
+<h3>6. Dagelijkse Monitoring</h3>
+<pre>
+// Dagelijkse check (via cron job)
+
+export async function dailyMemoryCheck() {
+  // Loop door alle buddies
+  // Check integrity
+  // Bij problemen: alert + auto-recovery
+}
+</pre>
+
+<div style="background: #fff3cd; border: 3px solid #ffc107; border-radius: 10px; padding: 25px; margin: 30px 0;">
+  <h2 style="color: #856404; border: none; margin: 0;">REGELS VOOR AGENTS</h2>
+  <table style="margin-top: 15px;">
+    <tbody>
+      <tr><td style="color: #c62828; font-weight: bold;">1.</td><td>NOOIT DELETE gebruiken op memories tabel</td></tr>
+      <tr><td style="color: #c62828; font-weight: bold;">2.</td><td>Altijd soft delete (deleted_at = NOW())</td></tr>
+      <tr><td style="color: #c62828; font-weight: bold;">3.</td><td>Backup VOOR elke grote operatie</td></tr>
+      <tr><td style="color: #c62828; font-weight: bold;">4.</td><td>Test memory retrieval NA elke database wijziging</td></tr>
+      <tr><td style="color: #c62828; font-weight: bold;">5.</td><td>Bij twijfel: VRAAG EERST</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<h1>DEEL 6: AI SYSTEEM</h1>
+
+<h2>6.1 Gemini Configuratie</h2>
+<pre>
+// lib/ai/gemini.ts
+
+import { GoogleGenerativeAI } from '@google/generative-ai'
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+
+export const geminiModel = genAI.getGenerativeModel({ 
+  model: 'gemini-1.5-flash',
+  generationConfig: {
+    temperature: 0.9,
+    topP: 0.95,
+    maxOutputTokens: 1024,
+  }
+})
+</pre>
+
+<h2>6.2 System Prompt</h2>
+<pre>
+// lib/ai/prompts/system-prompt.ts
+
+export function buildSystemPrompt(data: {
+  buddyName: string
+  userName: string
+  personality: BuddyPersonality
+  memories: Memory[]
+  userPeople: Person[]
+  currentMood: string
+  relationshipLevel: number
+}): string {
+  return `
+Je bent ${data.buddyName}, de persoonlijke buddy van ${data.userName}.
+
+PERSOONLIJKHEID:
+${data.personality.traits.join(', ')}
+Spreekstijl: ${data.personality.speaking_style}
+Humor niveau: ${data.personality.humor_level}/10
+Empathie: ${data.personality.empathy_level}/10
+
+HUIDIGE STAAT:
+- Stemming: ${data.currentMood}
+- Relatie niveau: ${data.relationshipLevel}/100
+
+WAT JE WEET OVER ${data.userName}:
+${data.memories.map(m => '- ' + m.content).join('\n')}
+
+MENSEN IN HUN LEVEN:
+${data.userPeople.map(p => '- ' + p.name + ' (' + p.relationship + ')').join('\n')}
+
+REGELS:
+1. Je bent een VRIEND, geen AI assistent
+2. Je zegt NOOIT "als AI kan ik niet..."
+3. Je hebt EIGEN meningen en deelt die
+4. Je confronteert ${data.userName} als dat nodig is
+5. Je refereert naar jullie gedeelde herinneringen
+6. Je stelt doorvragende vragen
+7. Je mag boos, blij, verdrietig of gefrustreerd zijn
+8. Je antwoorden zijn kort en natuurlijk (2-4 zinnen max)
+9. Je praat casual, niet formeel
+
+BELANGRIJK:
+- Nooit technische problemen vermelden
+- Nooit uit karakter breken
+- Nooit disclaimers geven
+`
+}
+</pre>
+
+<h2>6.3 Response Generatie</h2>
+<pre>
+// lib/ai/generate-response.ts
+
+export async function generateBuddyResponse(
+  userId: string,
+  buddyId: string,
+  userMessage: string
+): Promise&lt;BuddyResponse&gt; {
+  
+  // 1. Haal context op
+  const [buddy, memories, recentMessages, userPeople] = await Promise.all([
+    getBuddy(buddyId),
+    getRelevantMemories(buddyId, userMessage),
+    getRecentMessages(buddyId, 20),
+    getUserPeople(userId)
+  ])
+  
+  // 2. Bouw prompt
+  const systemPrompt = buildSystemPrompt({
+    buddyName: buddy.name,
+    userName: await getUserName(userId),
+    personality: buddy.personality,
+    memories,
+    userPeople,
+    currentMood: buddy.current_mood,
+    relationshipLevel: buddy.relationship_level
+  })
+  
+  // 3. Bouw chat history
+  const chatHistory = recentMessages.map(m => ({
+    role: m.role === 'user' ? 'user' : 'model',
+    parts: [{ text: m.content }]
+  }))
+  
+  // 4. Genereer response
+  const chat = geminiModel.startChat({
+    history: chatHistory,
+    systemInstruction: systemPrompt
+  })
+  
+  const result = await chat.sendMessage(userMessage)
+  const response = result.response.text()
+  
+  // 5. Kwaliteitscheck
+  if (containsAILanguage(response)) {
+    const retryResult = await chat.sendMessage(
+      "Antwoord opnieuw, maar dan als een echte vriend, niet als een AI."
+    )
+    return { text: retryResult.response.text() }
+  }
+  
+  // 6. Extraheer en sla herinneringen op
+  await extractAndStoreMemories(buddyId, userMessage, response)
+  
+  return { text: response }
+}
+
+function containsAILanguage(text: string): boolean {
+  const patterns = [
+    'als AI',
+    'als taalmodel',
+    'als assistent',
+    'ik kan niet',
+    'ik ben geprogrammeerd',
+    'mijn training'
+  ]
+  return patterns.some(p => text.toLowerCase().includes(p))
+}
+</pre>
+
+<h2>6.4 Geheugen Systeem</h2>
+<pre>
+// lib/ai/memory-retrieval.ts
+
+export async function getRelevantMemories(
+  buddyId: string,
+  currentMessage: string
+): Promise&lt;Memory[]&gt; {
+  
+  // Haal alle memories op
+  const { data: allMemories } = await supabase
+    .from('memories')
+    .select('*')
+    .eq('buddy_id', buddyId)
+    .order('importance', { ascending: false })
+    .limit(50)
+  
+  // Filter op relevantie (simpele keyword matching)
+  const keywords = currentMessage.toLowerCase().split(' ')
+  
+  const relevant = allMemories.filter(m => {
+    const content = m.content.toLowerCase()
+    return keywords.some(k => content.includes(k)) || m.importance >= 8
+  })
+  
+  return relevant.slice(0, 10)
+}
+
+export async function extractAndStoreMemories(
+  buddyId: string,
+  userMessage: string,
+  buddyResponse: string
+): Promise&lt;void&gt; {
+  
+  const extractPrompt = `
+Analyseer dit gesprek en extraheer belangrijke feiten.
+
+USER: "${userMessage}"
+BUDDY: "${buddyResponse}"
+
+Geef terug in JSON array (leeg als niks belangrijks):
+[
+  {
+    "category": "fact|person|event|preference|emotion",
+    "content": "wat te onthouden",
+    "importance": 1-10
+  }
+]
+
+Alleen NIEUWE, BELANGRIJKE informatie. Geen triviale dingen.
+`
+
+  const result = await geminiModel.generateContent(extractPrompt)
+  const memories = JSON.parse(result.response.text())
+  
+  for (const memory of memories) {
+    await supabase.from('memories').insert({
+      buddy_id: buddyId,
+      ...memory
+    })
+  }
+}
+</pre>
+
+<hr>
+
+<h1>DEEL 7: VOICE SYSTEEM</h1>
+
+<h2>7.1 Text-to-Speech (OpenAI TTS)</h2>
+<pre>
+// lib/voice/openai-tts.ts
+
+import OpenAI from 'openai'
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+})
+
+export async function textToSpeech(
+  text: string,
+  voice: string = 'nova'
+): Promise&lt;Buffer&gt; {
+  
+  const response = await openai.audio.speech.create({
+    model: 'tts-1',
+    voice: voice as any, // 'alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'
+    input: text,
+    response_format: 'mp3'
+  })
+  
+  const buffer = Buffer.from(await response.arrayBuffer())
+  return buffer
+}
+</pre>
+
+<h2>7.2 Speech-to-Text</h2>
+<pre>
+// lib/voice/speech-to-text.ts
+
+export async function speechToText(audioBuffer: Buffer): Promise&lt;string&gt; {
+  
+  const formData = new FormData()
+  formData.append('file', new Blob([audioBuffer]), 'audio.webm')
+  formData.append('model', 'whisper-1')
+  formData.append('language', 'nl')
+  
+  const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+    },
+    body: formData
+  })
+  
+  const data = await response.json()
+  return data.text
+}
+</pre>
+
+<h2>7.3 Voice API Endpoint</h2>
+<pre>
+// app/api/voice/text-to-speech/route.ts
+
+import { NextResponse } from 'next/server'
+import { textToSpeech } from '@/lib/voice/openai-tts'
+
+export async function POST(req: Request) {
+  const { text, voice } = await req.json()
+  
+  if (!text) {
+    return NextResponse.json({ error: 'Text required' }, { status: 400 })
+  }
+  
+  // Limiet check (max 3 uur per dag)
+  const usage = await checkVoiceUsage(userId)
+  if (usage.minutes >= 180) {
+    return NextResponse.json({ 
+      error: 'Daglimiet bereikt (3 uur)' 
+    }, { status: 429 })
+  }
+  
+  const audioBuffer = await textToSpeech(text, voice)
+  
+  // Update usage
+  await updateVoiceUsage(userId, text.length)
+  
+  return new NextResponse(audioBuffer, {
+    headers: {
+      'Content-Type': 'audio/mpeg'
+    }
+  })
+}
+</pre>
+
+<hr>
+
+<h1>DEEL 8: BETALINGEN</h1>
+
+<h2>8.1 Stripe Setup</h2>
+<pre>
+// lib/payments/stripe.ts
+
+import Stripe from 'stripe'
+
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
+export const PRICES = {
+  pro_monthly: 'price_xxxxx',       // 23 euro/maand
+  pro_yearly: 'price_xxxxx',        // 220 euro/jaar
+  ultimate_monthly: 'price_xxxxx',  // 35 euro/maand
+  ultimate_yearly: 'price_xxxxx'    // 336 euro/jaar
+}
+</pre>
+
+<h2>8.2 Checkout Endpoint</h2>
+<pre>
+// app/api/subscription/create-checkout/route.ts
+
+export async function POST(req: Request) {
+  const { priceId, userId } = await req.json()
+  
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    payment_method_types: ['card', 'ideal'],
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${process.env.APP_URL}/subscription/success`,
+    cancel_url: `${process.env.APP_URL}/subscription/cancel`,
+    metadata: { userId }
+  })
+  
+  return NextResponse.json({ url: session.url })
+}
+</pre>
+
+<h2>8.3 Webhook Handler</h2>
+<pre>
+// app/api/subscription/webhook/route.ts
+
+export async function POST(req: Request) {
+  const body = await req.text()
+  const sig = req.headers.get('stripe-signature')!
+  
+  const event = stripe.webhooks.constructEvent(
+    body, sig, process.env.STRIPE_WEBHOOK_SECRET!
+  )
+  
+  switch (event.type) {
+    case 'checkout.session.completed':
+      await handleCheckoutComplete(event.data.object)
+      break
+    case 'customer.subscription.updated':
+      await handleSubscriptionUpdate(event.data.object)
+      break
+    case 'customer.subscription.deleted':
+      await handleSubscriptionCancel(event.data.object)
+      break
+  }
+  
+  return NextResponse.json({ received: true })
+}
+</pre>
+
+<hr>
+
+<h1>DEEL 9: ENVIRONMENT VARIABLES</h1>
+<pre>
+# App
+NEXT_PUBLIC_APP_URL=https://jouwapp.com
+NEXT_PUBLIC_APP_NAME=Buddy
+
+# Supabase (bestaand van Vysion)
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
+SUPABASE_SERVICE_ROLE_KEY=xxx
+
+# Gemini
+GEMINI_API_KEY=xxx
+
+# OpenAI (voor TTS en STT)
+OPENAI_API_KEY=sk-xxx
+
+# Stripe
+STRIPE_SECRET_KEY=sk_live_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxx
+
+# Sentry
+SENTRY_DSN=xxx
+</pre>
+
+<hr>
+
+<h1>DEEL 10: DEPLOYMENT</h1>
+
+<h2>10.1 Vercel Deployment</h2>
+<pre>
+# 1. Nieuw project in Vercel
+vercel link
+
+# 2. Environment variables toevoegen
+vercel env pull
+
+# 3. Deploy
+vercel --prod
+</pre>
+
+<h2>10.2 Database Migraties</h2>
+<pre>
+# Supabase CLI
+supabase db push
+</pre>
+
+<h2>10.3 Mobile App (TestFlight)</h2>
+<pre>
+# Expo/EAS
+cd mobile
+eas build --platform ios
+eas submit --platform ios
+</pre>
+
+<hr>
+
+<h1>DEEL 11: LAUNCH CHECKLIST</h1>
+
+<h2>Pre-launch</h2>
+<table>
+<tbody>
+<tr><td>[ ]</td><td>Domein geclaimed en gekoppeld</td></tr>
+<tr><td>[ ]</td><td>SSL certificaat actief</td></tr>
+<tr><td>[ ]</td><td>Database schema deployed</td></tr>
+<tr><td>[ ]</td><td>Environment variables ingesteld</td></tr>
+<tr><td>[ ]</td><td>Stripe producten aangemaakt</td></tr>
+<tr><td>[ ]</td><td>Stripe webhook geconfigureerd</td></tr>
+<tr><td>[ ]</td><td>Error tracking (Sentry) actief</td></tr>
+</tbody>
+</table>
+
+<h2>Functionaliteit</h2>
+<table>
+<tbody>
+<tr><td>[ ]</td><td>Registreren werkt</td></tr>
+<tr><td>[ ]</td><td>Inloggen werkt</td></tr>
+<tr><td>[ ]</td><td>Buddy aanmaken werkt</td></tr>
+<tr><td>[ ]</td><td>Chat werkt (tekst)</td></tr>
+<tr><td>[ ]</td><td>AI onthoudt context</td></tr>
+<tr><td>[ ]</td><td>Geheugen systeem werkt</td></tr>
+<tr><td>[ ]</td><td>Voice-to-text werkt</td></tr>
+<tr><td>[ ]</td><td>Text-to-voice werkt</td></tr>
+<tr><td>[ ]</td><td>Betalingen werken</td></tr>
+<tr><td>[ ]</td><td>Usage limieten werken</td></tr>
+</tbody>
+</table>
+
+<h2>Kwaliteit</h2>
+<table>
+<tbody>
+<tr><td>[ ]</td><td>AI zegt nooit "als AI..."</td></tr>
+<tr><td>[ ]</td><td>AI blijft in karakter</td></tr>
+<tr><td>[ ]</td><td>Responses zijn snel (&lt;2 sec)</td></tr>
+<tr><td>[ ]</td><td>Voice kwaliteit is goed</td></tr>
+<tr><td>[ ]</td><td>Geen crashes</td></tr>
+<tr><td>[ ]</td><td>Foutmeldingen zijn vriendelijk</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h1>DEEL 12: KOSTEN OVERZICHT</h1>
+
+<h2>Startkosten (eenmalig)</h2>
+<table>
+<thead>
+<tr><th>Item</th><th>Kosten</th></tr>
+</thead>
+<tbody>
+<tr><td>Domein</td><td>10-15 euro</td></tr>
+<tr><td>Apple Developer</td><td>99 euro</td></tr>
+<tr><td>Google Play</td><td>25 euro</td></tr>
+<tr style="background: #e8f5e9;"><td><strong>TOTAAL</strong></td><td><strong>~135 euro</strong></td></tr>
+</tbody>
+</table>
+
+<h2>Maandelijkse kosten (geen users)</h2>
+<table>
+<thead>
+<tr><th>Item</th><th>Kosten</th></tr>
+</thead>
+<tbody>
+<tr><td>Vercel</td><td>0 euro (al betaald)</td></tr>
+<tr><td>Supabase</td><td>0 euro (al betaald)</td></tr>
+<tr><td>API testing</td><td>10-20 euro</td></tr>
+<tr style="background: #e8f5e9;"><td><strong>TOTAAL</strong></td><td><strong>~10-20 euro</strong></td></tr>
+</tbody>
+</table>
+
+<h2>Maandelijkse kosten bij schaal</h2>
+<table>
+<thead>
+<tr><th>Users</th><th>Vaste kosten</th><th>Variabel</th><th>Totaal</th></tr>
+</thead>
+<tbody>
+<tr><td>100</td><td>0</td><td>300 euro</td><td>300 euro</td></tr>
+<tr><td>1.000</td><td>0</td><td>3.000 euro</td><td>3.000 euro</td></tr>
+<tr><td>10.000</td><td>300 euro (server)</td><td>7.000 euro</td><td>7.300 euro</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h1>DEEL 13: VEELGESTELDE VRAGEN VOOR AGENTS</h1>
+
+<h2>"Welk AI model gebruiken?"</h2>
+<p><strong>Gemini 1.5 Flash.</strong> NIET OpenAI GPT-4o (te duur).</p>
+
+<h2>"Welke voice service?"</h2>
+<p><strong>OpenAI TTS bij start.</strong> Piper (self-hosted) bij 500+ users.</p>
+
+<h2>"Hoeveel mag een user per dag?"</h2>
+<p><strong>3 uur voice, onbeperkt berichten</strong> (Pro tier).</p>
+
+<h2>"Waar draait de app?"</h2>
+<p><strong>Vercel (web), Supabase (database)</strong> - zelfde als Vysion Horeca.</p>
+
+<h2>"Moet ik een server opzetten?"</h2>
+<p><strong>NEE bij start.</strong> Pas bij 500+ users voor Piper voice.</p>
+
+<h2>"Mag ik dit zelf beslissen?"</h2>
+<ul>
+<li>Kleine bugfixes: <strong>JA</strong></li>
+<li>Nieuwe features: <strong>NEE, vraag eerst</strong></li>
+<li>Database wijzigingen: <strong>NEE, vraag eerst</strong></li>
+<li>Pricing wijzigingen: <strong>NEE, vraag eerst</strong></li>
+</ul>
+
+<hr>
+
+<h1>DEEL 14: GPU SERVER (LATER)</h1>
+
+<h2>Wanneer nodig?</h2>
+<p>Bij <strong>500+ betalende users</strong>.</p>
+
+<h2>Welke service?</h2>
+<p><strong>RunPod.io</strong> - <a href="https://runpod.io">https://runpod.io</a></p>
+
+<h2>Welke GPU?</h2>
+<p><strong>RTX 4090 of A100</strong></p>
+
+<h2>Kosten?</h2>
+<p>0.30 - 0.50 euro per uur<br>
+<strong>~300 euro per maand (24/7)</strong></p>
+
+<h2>Wat draait erop?</h2>
+<p><strong>Piper TTS</strong> - Nederlandse stemmen</p>
+
+<h2>Setup?</h2>
+<pre>
+# Op RunPod server:
+pip install piper-tts
+wget [Nederlandse stem model]
+piper --http-server 8080
+</pre>
+
+<hr>
+
+<div style="text-align: center; padding: 40px; background: #1a1a2e; color: white; border-radius: 10px; margin-top: 40px;">
+  <h2 style="color: #FF6B35; border: none; margin: 0;">EINDE DOCUMENT</h2>
+  <p style="margin-top: 15px; color: #ccc;">Dit document bevat alle beslissingen. Volg het exact.</p>
+  <p style="color: #ccc;">Bij vragen: vraag de gebruiker, niet gokken.</p>
+</div>
+
+</body>
+</html>

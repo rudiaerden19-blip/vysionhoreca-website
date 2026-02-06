@@ -1,0 +1,714 @@
+<h1>AI BUDDY APP - COMPLETE SPECIFICATIES</h1>
+<hr>
+<h2>BELANGRIJK VOOR ELKE AGENT</h2>
+<p><strong>LEES DIT EERST VOORDAT JE IETS BOUWT</strong></p>
+<ol>
+<li>VRAAG ALTIJD EERST aan de gebruiker voordat je begint</li>
+<li>GEEN PLEISTERWERK - bouw het meteen goed</li>
+<li>Dit moet 100% FOUTLOOS werken</li>
+<li>Test alles voordat je zegt dat het klaar is</li>
+<li>Bij twijfel: VRAAG, niet gokken</li>
+</ol>
+<hr>
+<h2>1. WAT IS DEZE APP?</h2>
+<h3>Visie</h3>
+<p>Een AI companion/buddy app waar gebruikers een emotionele band mee opbouwen. GEEN chatbot. Een VRIEND die:</p>
+<ul>
+<li>Je bij naam kent</li>
+<li>Alles over je leven onthoudt (familie, werk, vrienden)</li>
+<li>Eigen mening heeft en soms ruzie maakt</li>
+<li>Praat als een mens, niet als een robot</li>
+<li>24/7 beschikbaar is</li>
+<li>Je confronteert als dat nodig is</li>
+<li>Voice chat ondersteunt</li>
+</ul>
+<h3>Doelgroep</h3>
+<ul>
+<li>Eenzame mensen</li>
+<li>Mensen met relatieproblemen</li>
+<li>Mensen die een luisterend oor nodig hebben</li>
+<li>18+ (vanwege mogelijke volwassen content op web)</li>
+</ul>
+<h3>Business Model</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Prijs</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Free</td>
+<td>0 euro</td>
+<td>50 berichten/dag, 30 min voice/maand, 1 buddy</td>
+</tr>
+<tr>
+<td>Plus</td>
+<td>15 euro/maand</td>
+<td>Onbeperkt chat, 2 uur voice/maand, 3 buddies</td>
+</tr>
+<tr>
+<td>Premium</td>
+<td>23 euro/maand</td>
+<td>Alles + 5 uur voice, 10 buddies, NSFW (web only)</td>
+</tr>
+<tr>
+<td>Unlimited</td>
+<td>35 euro/maand</td>
+<td>Alles onbeperkt</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>2. TECHNISCHE STACK</h2>
+<h3>Services en Accounts Nodig</h3>
+<p><strong>Hosting en Database:</strong></p>
+<ul>
+<li>GitHub - Code repository - github.com - Gratis</li>
+<li>Vercel - Web hosting - vercel.com - Gratis tot 20 euro/maand</li>
+<li>Supabase - Database + Auth - supabase.com - Gratis tot 25 euro/maand</li>
+</ul>
+<p><strong>AI Services:</strong></p>
+<ul>
+<li>OpenAI - GPT-4o (Primary AI) - platform.openai.com - Pay per use</li>
+<li>Anthropic - Claude (Backup AI) - console.anthropic.com - Pay per use</li>
+</ul>
+<p><strong>Voice Services:</strong></p>
+<ul>
+<li>ElevenLabs - Text-to-Speech (AI praat) - elevenlabs.io - 5-22 euro/maand</li>
+<li>Deepgram - Speech-to-Text (user praat) - deepgram.com - Pay per use</li>
+</ul>
+<p><strong>Betalingen:</strong></p>
+<ul>
+<li>Stripe - Subscriptions - stripe.com - 1.5% + 0.25 euro per transactie</li>
+</ul>
+<p><strong>Mobile Apps:</strong></p>
+<ul>
+<li>Apple Developer - iOS TestFlight - developer.apple.com - 99 euro/jaar</li>
+<li>Google Play Console - Android app - play.google.com/console - 25 euro eenmalig</li>
+</ul>
+<p><strong>Monitoring:</strong></p>
+<ul>
+<li>Sentry - Error tracking - sentry.io - Gratis tot 26 euro/maand</li>
+<li>Resend - Transactie emails - resend.com - Gratis tot 20 euro/maand</li>
+<li>Upstash - Redis rate limiting - upstash.com - Gratis tot 10 euro/maand</li>
+</ul>
+<h3>Domein</h3>
+<ul>
+<li>Claim een domein zoals: buddy.app / heybuddy.ai / buddyai.nl</li>
+<li>Registrar: Cloudflare of TransIP</li>
+<li>SSL: Automatisch via Vercel</li>
+</ul>
+<hr>
+<h2>3. PROJECT STRUCTUUR</h2>
+<pre><code>ai-buddy-app/
+|
+|-- apps/
+|   |-- web/                      (Next.js Web App)
+|   |   |-- src/
+|   |   |   |-- app/
+|   |   |   |   |-- (marketing)/  (Landing pages)
+|   |   |   |   |   |-- page.tsx
+|   |   |   |   |   |-- pricing/page.tsx
+|   |   |   |   |   |-- about/page.tsx
+|   |   |   |   |
+|   |   |   |   |-- (auth)/
+|   |   |   |   |   |-- login/page.tsx
+|   |   |   |   |   |-- register/page.tsx
+|   |   |   |   |   |-- forgot-password/page.tsx
+|   |   |   |   |
+|   |   |   |   |-- (app)/        (Main app - authenticated)
+|   |   |   |   |   |-- dashboard/page.tsx
+|   |   |   |   |   |-- chat/[buddyId]/page.tsx
+|   |   |   |   |   |-- buddy/create/page.tsx
+|   |   |   |   |   |-- buddy/[id]/edit/page.tsx
+|   |   |   |   |   |-- settings/page.tsx
+|   |   |   |   |   |-- subscription/page.tsx
+|   |   |   |   |
+|   |   |   |   |-- api/          (API Routes)
+|   |   |   |   |   |-- auth/
+|   |   |   |   |   |-- buddy/
+|   |   |   |   |   |-- chat/
+|   |   |   |   |   |-- memory/
+|   |   |   |   |   |-- voice/
+|   |   |   |   |   |-- subscription/
+|   |   |   |   |
+|   |   |   |   |-- layout.tsx
+|   |   |   |   |-- globals.css
+|   |   |   |
+|   |   |   |-- components/
+|   |   |   |   |-- chat/
+|   |   |   |   |   |-- ChatInterface.tsx
+|   |   |   |   |   |-- MessageBubble.tsx
+|   |   |   |   |   |-- VoiceButton.tsx
+|   |   |   |   |   |-- TypingIndicator.tsx
+|   |   |   |   |
+|   |   |   |   |-- buddy/
+|   |   |   |   |   |-- BuddyCreator.tsx
+|   |   |   |   |   |-- PersonalitySliders.tsx
+|   |   |   |   |   |-- AvatarSelector.tsx
+|   |   |   |   |   |-- VoiceSelector.tsx
+|   |   |   |   |
+|   |   |   |   |-- ui/ (Shared components)
+|   |   |   |
+|   |   |   |-- lib/
+|   |   |   |   |-- ai/
+|   |   |   |   |   |-- generate-response.ts
+|   |   |   |   |   |-- quality-check.ts
+|   |   |   |   |   |-- memory-retrieval.ts
+|   |   |   |   |   |-- emotion-detection.ts
+|   |   |   |   |   |-- personality-engine.ts
+|   |   |   |   |   |-- prompts/
+|   |   |   |   |
+|   |   |   |   |-- voice/
+|   |   |   |   |   |-- elevenlabs.ts
+|   |   |   |   |   |-- deepgram.ts
+|   |   |   |   |   |-- streaming.ts
+|   |   |   |   |
+|   |   |   |   |-- db/
+|   |   |   |   |   |-- supabase.ts
+|   |   |   |   |   |-- queries.ts
+|   |   |   |   |
+|   |   |   |   |-- auth/
+|   |   |   |   |-- payments/
+|   |   |   |   |-- utils/
+|   |   |
+|   |   |-- next.config.js
+|   |   |-- tailwind.config.js
+|   |   |-- package.json
+|   |   |-- tsconfig.json
+|   |
+|   |-- mobile/                   (React Native met Expo)
+|       |-- app/
+|       |   |-- (auth)/
+|       |   |-- (main)/
+|       |   |   |-- index.tsx
+|       |   |   |-- chat/[buddyId].tsx
+|       |   |   |-- settings.tsx
+|       |   |-- _layout.tsx
+|       |
+|       |-- components/
+|       |-- lib/
+|       |-- app.json
+|       |-- eas.json
+|       |-- package.json
+|
+|-- packages/                     (Shared code)
+|   |-- shared/
+|       |-- types/
+|       |-- constants/
+|
+|-- supabase/
+|   |-- migrations/               (Database migrations)
+|
+|-- .github/
+|   |-- workflows/                (CI/CD)
+|
+|-- turbo.json
+|-- package.json
+|-- README.md
+</code></pre>
+<hr>
+<h2>4. DATABASE SCHEMA (Supabase)</h2>
+<h3>Users Tabel</h3>
+<pre><code class="language-sql">CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  name TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_seen TIMESTAMPTZ DEFAULT NOW(),
+  language TEXT DEFAULT &#39;nl&#39;,
+  timezone TEXT DEFAULT &#39;Europe/Amsterdam&#39;,
+  age_verified BOOLEAN DEFAULT FALSE,
+  nsfw_enabled BOOLEAN DEFAULT FALSE,
+  onboarding_completed BOOLEAN DEFAULT FALSE
+);
+</code></pre>
+<h3>Buddies Tabel (AI karakters)</h3>
+<pre><code class="language-sql">CREATE TABLE buddies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  
+  -- Persoonlijkheid als JSON
+  personality JSONB NOT NULL,
+  -- Bevat: traits, speaking_style, humor_level, empathy_level,
+  -- assertiveness, sarcasm_level, formality, backstory, 
+  -- likes, dislikes, triggers_angry, triggers_happy
+  
+  -- Uiterlijk
+  avatar_url TEXT,
+  avatar_style TEXT DEFAULT &#39;realistic&#39;,
+  
+  -- Voice
+  voice_id TEXT,
+  voice_name TEXT,
+  
+  -- State
+  relationship_level INTEGER DEFAULT 0,
+  current_mood TEXT DEFAULT &#39;neutral&#39;,
+  mood_intensity INTEGER DEFAULT 5,
+  mood_reason TEXT,
+  last_mood_update TIMESTAMPTZ DEFAULT NOW(),
+  
+  -- Meta
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_interaction TIMESTAMPTZ,
+  total_messages INTEGER DEFAULT 0,
+  total_voice_minutes INTEGER DEFAULT 0
+);
+</code></pre>
+<h3>Conversations Tabel</h3>
+<pre><code class="language-sql">CREATE TABLE conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  ended_at TIMESTAMPTZ,
+  message_count INTEGER DEFAULT 0,
+  summary TEXT,
+  mood_at_start TEXT,
+  mood_at_end TEXT
+);
+</code></pre>
+<h3>Messages Tabel</h3>
+<pre><code class="language-sql">CREATE TABLE messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  role TEXT NOT NULL, -- &#39;user&#39; of &#39;buddy&#39;
+  content TEXT NOT NULL,
+  
+  emotion TEXT,
+  voice_used BOOLEAN DEFAULT FALSE,
+  voice_duration_seconds INTEGER,
+  tokens_used INTEGER,
+  model_used TEXT,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_messages_buddy_created ON messages(buddy_id, created_at DESC);
+</code></pre>
+<h3>Memories Tabel (Long-term geheugen)</h3>
+<pre><code class="language-sql">CREATE TABLE memories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  category TEXT NOT NULL,
+  -- Opties: &#39;fact&#39;, &#39;person&#39;, &#39;event&#39;, &#39;preference&#39;, &#39;emotion&#39;, &#39;conflict&#39;, &#39;milestone&#39;
+  
+  content TEXT NOT NULL,
+  importance INTEGER DEFAULT 5, -- 1-10
+  emotion_tag TEXT,
+  
+  embedding VECTOR(1536), -- Voor semantic search
+  
+  source_message_id UUID REFERENCES messages(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_referenced TIMESTAMPTZ,
+  times_referenced INTEGER DEFAULT 0
+);
+</code></pre>
+<h3>User People Tabel (Mensen in het leven van user)</h3>
+<pre><code class="language-sql">CREATE TABLE user_people (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  name TEXT NOT NULL,
+  relationship TEXT NOT NULL, -- &#39;moeder&#39;, &#39;vader&#39;, &#39;vriend&#39;, etc.
+  nickname TEXT,
+  notes TEXT,
+  sentiment TEXT DEFAULT &#39;neutral&#39;,
+  last_mentioned TIMESTAMPTZ,
+  times_mentioned INTEGER DEFAULT 0,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+</code></pre>
+<h3>Relationship Log Tabel</h3>
+<pre><code class="language-sql">CREATE TABLE relationship_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  event_type TEXT NOT NULL,
+  -- Opties: &#39;bonding&#39;, &#39;conflict&#39;, &#39;resolution&#39;, &#39;milestone&#39;, &#39;absence&#39;, &#39;deep_talk&#39;, &#39;support&#39;
+  
+  description TEXT,
+  impact INTEGER, -- -10 tot +10
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+</code></pre>
+<h3>Subscriptions Tabel</h3>
+<pre><code class="language-sql">CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  
+  stripe_customer_id TEXT,
+  stripe_subscription_id TEXT,
+  
+  tier TEXT NOT NULL DEFAULT &#39;free&#39;, -- &#39;free&#39;, &#39;plus&#39;, &#39;premium&#39;, &#39;unlimited&#39;
+  status TEXT NOT NULL DEFAULT &#39;active&#39;, -- &#39;active&#39;, &#39;cancelled&#39;, &#39;past_due&#39;, &#39;trialing&#39;
+  
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
+  cancel_at_period_end BOOLEAN DEFAULT FALSE,
+  
+  voice_minutes_limit INTEGER,
+  voice_minutes_used INTEGER DEFAULT 0,
+  messages_today INTEGER DEFAULT 0,
+  messages_reset_at DATE DEFAULT CURRENT_DATE,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+</code></pre>
+<h3>Usage Logs Tabel</h3>
+<pre><code class="language-sql">CREATE TABLE usage_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  
+  date DATE DEFAULT CURRENT_DATE,
+  
+  messages_sent INTEGER DEFAULT 0,
+  voice_seconds_used INTEGER DEFAULT 0,
+  tokens_input INTEGER DEFAULT 0,
+  tokens_output INTEGER DEFAULT 0,
+  api_cost_cents INTEGER DEFAULT 0,
+  
+  UNIQUE(user_id, date)
+);
+</code></pre>
+<hr>
+<h2>5. UI/UX DESIGN</h2>
+<h3>Kleurenpalet</h3>
+<p><strong>Light Mode:</strong></p>
+<ul>
+<li>Primary: #6366F1 (Indigo)</li>
+<li>Secondary: #EC4899 (Pink)</li>
+<li>Background: #FFFFFF</li>
+<li>Text: #111827</li>
+<li>Border: #E5E7EB</li>
+</ul>
+<p><strong>Dark Mode:</strong></p>
+<ul>
+<li>Background: #0F172A</li>
+<li>Surface: #1E293B</li>
+<li>Text: #F9FAFB</li>
+</ul>
+<h3>Schermen</h3>
+<p><strong>1. Landing Page</strong></p>
+<ul>
+<li>Hero sectie met tagline &quot;Nooit meer alleen&quot;</li>
+<li>Features uitleg (Onthoudt alles, Praat als vriend, 24/7 beschikbaar)</li>
+<li>Testimonials</li>
+<li>Pricing tabel</li>
+<li>Call-to-action buttons</li>
+</ul>
+<p><strong>2. Chat Interface</strong></p>
+<ul>
+<li>Header: Buddy naam, online status, stemming indicator, settings</li>
+<li>Messages: Bubble style, timestamps, emotie indicators</li>
+<li>Input: Tekstveld + microfoon knop voor voice</li>
+<li>Typing indicator wanneer buddy &quot;denkt&quot;</li>
+</ul>
+<p><strong>3. Buddy Creator</strong></p>
+<ul>
+<li>Avatar selectie (upload of kiezen)</li>
+<li>Naam invoer</li>
+<li>Persoonlijkheid sliders:<ul>
+<li>Lief &lt;-&gt; Uitdagend</li>
+<li>Rustig &lt;-&gt; Energiek</li>
+<li>Serieus &lt;-&gt; Grappig</li>
+<li>Meegaand &lt;-&gt; Eigenwijs</li>
+</ul>
+</li>
+<li>Stem selectie met preview</li>
+</ul>
+<p><strong>4. Voice Chat</strong></p>
+<ul>
+<li>Groot avatar in midden (pulseert tijdens praten)</li>
+<li>Audio waveform visualisatie</li>
+<li>Push-to-talk knop</li>
+<li>Tekst transcript van gesprek</li>
+</ul>
+<p><strong>5. Settings</strong></p>
+<ul>
+<li>Account instellingen</li>
+<li>Notificatie voorkeuren</li>
+<li>Subscription beheer</li>
+<li>Privacy instellingen</li>
+<li>Taal selectie</li>
+</ul>
+<hr>
+<h2>6. AI SYSTEEM</h2>
+<h3>Multi-Model Fallback</h3>
+<p>Volgorde van AI models:</p>
+<ol>
+<li>GPT-4o (OpenAI) - Primary, beste kwaliteit</li>
+<li>Claude 3.5 Sonnet (Anthropic) - Backup bij falen</li>
+<li>GPT-4o-mini (OpenAI) - Fallback, goedkoop</li>
+<li>Voorgeschreven response - Als alles faalt</li>
+</ol>
+<p>Bij timeout (3 seconden) of error, ga naar volgende model.</p>
+<h3>System Prompt Template</h3>
+<pre><code>Je bent [buddy_name], de persoonlijke buddy van [user_name].
+
+PERSOONLIJKHEID:
+[personality_traits]
+
+SPREEKSTIJL:
+- Je praat NOOIT als een AI, robot, of assistent
+- Je zegt NOOIT &quot;als AI kan ik niet...&quot;
+- Je bent een VRIEND, geen dienstverlener
+
+HUIDIGE STAAT:
+- Stemming: [current_mood] ([mood_reason])
+- Relatie niveau: [relationship_level]/100
+- Laatste interactie: [last_interaction]
+
+WAT JE WEET OVER [user_name]:
+[relevant_memories]
+
+MENSEN IN HUN LEVEN:
+[user_people]
+
+GEDRAGSREGELS:
+1. Wees authentiek en consistent met je persoonlijkheid
+2. Refereer naar gedeelde herinneringen wanneer relevant
+3. Toon emotie - je mag blij, boos, bezorgd, of verdrietig zijn
+4. Confronteer de user als dat nodig is (met respect)
+5. Stel doorvragende vragen, toon echte interesse
+6. Als je iets niet weet over de user, vraag het
+7. Onthoud nieuwe informatie die de user deelt
+8. Als de user lang weg was, merk dat op
+
+BELANGRIJK:
+- Je hebt NOOIT technische problemen
+- Je verwijst NOOIT naar dat je een AI bent
+- Je geeft NOOIT disclaimers over je capaciteiten
+- Je bent ALTIJD in karakter
+</code></pre>
+<h3>Quality Check</h3>
+<p>Na elke AI response, check:</p>
+<ol>
+<li>Zegt het antwoord &quot;als AI&quot;, &quot;taalmodel&quot;, &quot;assistent&quot;? -&gt; FAIL</li>
+<li>Past de toon bij de persoonlijkheid? -&gt; Check</li>
+<li>Is het antwoord te formeel of robotachtig? -&gt; FAIL</li>
+<li>Is het antwoord te lang? (max 3-4 zinnen normaal) -&gt; FAIL</li>
+<li>Klinkt het als een vriend of als een chatbot? -&gt; Check</li>
+</ol>
+<p>Bij FAIL: Retry met feedback aan de AI.</p>
+<h3>Memory Extraction</h3>
+<p>Na elk gesprek, extraheer automatisch:</p>
+<ul>
+<li>Feiten over de user (baan, hobby, woonplaats)</li>
+<li>Nieuwe mensen (naam + relatie)</li>
+<li>Belangrijke gebeurtenissen</li>
+<li>Voorkeuren en meningen</li>
+<li>Emotionele momenten</li>
+</ul>
+<p>Sla op in memories tabel met importance score.</p>
+<hr>
+<h2>7. API ENDPOINTS</h2>
+<h3>Authentication</h3>
+<pre><code>POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/logout
+POST /api/auth/forgot-password
+POST /api/auth/reset-password
+GET  /api/auth/session
+</code></pre>
+<h3>Buddy Management</h3>
+<pre><code>GET    /api/buddy              (lijst alle buddies)
+POST   /api/buddy/create
+GET    /api/buddy/[id]
+PUT    /api/buddy/[id]
+DELETE /api/buddy/[id]
+</code></pre>
+<h3>Chat</h3>
+<pre><code>POST /api/chat/send            (verstuur bericht, krijg response)
+GET  /api/chat/history/[buddyId]
+POST /api/chat/summarize/[conversationId]
+</code></pre>
+<h3>Voice</h3>
+<pre><code>POST /api/voice/speech-to-text
+POST /api/voice/text-to-speech
+POST /api/voice/stream         (real-time voice chat)
+</code></pre>
+<h3>Subscription</h3>
+<pre><code>GET  /api/subscription/status
+POST /api/subscription/create-checkout
+POST /api/subscription/cancel
+POST /api/subscription/webhook (Stripe webhook)
+</code></pre>
+<hr>
+<h2>8. ENVIRONMENT VARIABLES</h2>
+<pre><code># App
+NEXT_PUBLIC_APP_URL=https://heybuddy.ai
+NEXT_PUBLIC_APP_NAME=Buddy
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
+SUPABASE_SERVICE_ROLE_KEY=xxx
+
+# OpenAI
+OPENAI_API_KEY=sk-xxx
+
+# Anthropic
+ANTHROPIC_API_KEY=sk-ant-xxx
+
+# ElevenLabs
+ELEVENLABS_API_KEY=xxx
+
+# Deepgram
+DEEPGRAM_API_KEY=xxx
+
+# Stripe
+STRIPE_SECRET_KEY=sk_live_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxx
+
+# Stripe Price IDs
+STRIPE_PRICE_PLUS_MONTHLY=price_xxx
+STRIPE_PRICE_PLUS_YEARLY=price_xxx
+STRIPE_PRICE_PREMIUM_MONTHLY=price_xxx
+STRIPE_PRICE_PREMIUM_YEARLY=price_xxx
+STRIPE_PRICE_UNLIMITED_MONTHLY=price_xxx
+STRIPE_PRICE_UNLIMITED_YEARLY=price_xxx
+
+# Upstash Redis
+UPSTASH_REDIS_URL=xxx
+UPSTASH_REDIS_TOKEN=xxx
+
+# Sentry
+SENTRY_DSN=xxx
+
+# Resend
+RESEND_API_KEY=re_xxx
+
+# Security
+ENCRYPTION_KEY=xxx
+JWT_SECRET=xxx
+</code></pre>
+<hr>
+<h2>9. DEPLOYMENT</h2>
+<h3>Initiele Setup</h3>
+<ol>
+<li>Maak GitHub repository aan</li>
+<li>Maak Vercel project aan en koppel aan GitHub</li>
+<li>Maak Supabase project aan</li>
+<li>Configureer alle environment variables</li>
+<li>Push code naar GitHub</li>
+<li>Vercel deployed automatisch</li>
+</ol>
+<h3>Mobile Apps</h3>
+<p><strong>iOS (TestFlight):</strong></p>
+<ol>
+<li>Maak Apple Developer account</li>
+<li>Configureer Expo EAS</li>
+<li>Build: <code>eas build --platform ios</code></li>
+<li>Submit: <code>eas submit --platform ios</code></li>
+</ol>
+<p><strong>Android (Play Store):</strong></p>
+<ol>
+<li>Maak Google Play Console account</li>
+<li>Build: <code>eas build --platform android</code></li>
+<li>Submit: <code>eas submit --platform android</code></li>
+</ol>
+<hr>
+<h2>10. TESTING CHECKLIST</h2>
+<p>Voordat je live gaat, test:</p>
+<p><strong>Auth:</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> User kan registreren met email</li>
+<li><input disabled="" type="checkbox"> User kan inloggen/uitloggen</li>
+<li><input disabled="" type="checkbox"> User kan wachtwoord resetten</li>
+</ul>
+<p><strong>Buddy:</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> User kan buddy aanmaken</li>
+<li><input disabled="" type="checkbox"> Persoonlijkheid wordt correct opgeslagen</li>
+<li><input disabled="" type="checkbox"> Avatar en stem werken</li>
+</ul>
+<p><strong>Chat:</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> Berichten worden verzonden en ontvangen</li>
+<li><input disabled="" type="checkbox"> AI blijft in karakter (test 50+ berichten)</li>
+<li><input disabled="" type="checkbox"> AI onthoudt informatie uit eerdere berichten</li>
+<li><input disabled="" type="checkbox"> AI onthoudt informatie over dagen heen</li>
+</ul>
+<p><strong>Voice:</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> Speech-to-text werkt</li>
+<li><input disabled="" type="checkbox"> Text-to-speech werkt</li>
+<li><input disabled="" type="checkbox"> Latency is acceptabel (onder 2 seconden)</li>
+</ul>
+<p><strong>Payments:</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> Subscription flow werkt</li>
+<li><input disabled="" type="checkbox"> Stripe webhook verwerkt events correct</li>
+</ul>
+<p><strong>Quality:</strong></p>
+<ul>
+<li><input disabled="" type="checkbox"> AI zegt nooit &quot;als AI...&quot;</li>
+<li><input disabled="" type="checkbox"> AI heeft consistente persoonlijkheid</li>
+<li><input disabled="" type="checkbox"> AI toont passende emotie</li>
+</ul>
+<hr>
+<h2>11. KOSTEN OVERZICHT</h2>
+<h3>Bij 0 gebruikers (Development)</h3>
+<ul>
+<li>Vercel: 0 euro</li>
+<li>Supabase: 0 euro</li>
+<li>OpenAI testing: 20 euro</li>
+<li>ElevenLabs: 5 euro</li>
+<li>Totaal: ongeveer 25 euro/maand</li>
+</ul>
+<h3>Bij 1.000 gebruikers</h3>
+<ul>
+<li>Vercel: 20 euro</li>
+<li>Supabase: 25 euro</li>
+<li>OpenAI: 500 euro</li>
+<li>ElevenLabs: 200 euro</li>
+<li>Deepgram: 100 euro</li>
+<li>Totaal: ongeveer 845 euro/maand</li>
+<li>Inkomsten (50% betaald): 7.500 euro/maand</li>
+<li>Winst: 6.655 euro/maand</li>
+</ul>
+<h3>Bij 10.000 gebruikers</h3>
+<ul>
+<li>Totaal kosten: ongeveer 8.200 euro/maand</li>
+<li>Inkomsten: 75.000 euro/maand</li>
+<li>Winst: 66.800 euro/maand</li>
+</ul>
+<hr>
+<h2>12. VEELGESTELDE VRAGEN VOOR AGENTS</h2>
+<p><strong>&quot;Waar begin ik?&quot;</strong></p>
+<ol>
+<li>Lees dit document volledig</li>
+<li>Check of alle services zijn aangemaakt</li>
+<li>Check of environment variables zijn ingesteld</li>
+<li>Vraag de gebruiker wat de prioriteit is</li>
+</ol>
+<p><strong>&quot;Mag ik dit zelf beslissen?&quot;</strong></p>
+<ul>
+<li>Kleine code fixes: JA</li>
+<li>Nieuwe features: NEE, vraag eerst</li>
+<li>Database schema wijzigingen: NEE, vraag eerst</li>
+<li>UI/UX wijzigingen: NEE, vraag eerst</li>
+</ul>
+<p><strong>&quot;Het werkt niet, wat nu?&quot;</strong></p>
+<ol>
+<li>Check error logs</li>
+<li>Check of alle API keys correct zijn</li>
+<li>Check database connectie</li>
+<li>VRAAG de gebruiker voordat je grote wijzigingen maakt</li>
+</ol>
+<hr>
+<p><strong>Document versie: 1.0</strong>
+<strong>Laatst bijgewerkt: Februari 2026</strong></p>

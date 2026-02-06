@@ -1,0 +1,1164 @@
+<h1>AI BUDDY APP - COMPLETE SPECIFICATIES</h1>
+<h2>BELANGRIJK VOOR ELKE AGENT</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────┐
+│                                                                      │
+│   🚨 LEES DIT EERST VOORDAT JE IETS BOUWT 🚨                        │
+│                                                                      │
+│   1. VRAAG ALTIJD EERST aan de gebruiker voordat je begint          │
+│   2. GEEN PLEISTERWERK - bouw het meteen goed                       │
+│   3. Dit moet 100% FOUTLOOS werken                                  │
+│   4. Test alles voordat je zegt dat het klaar is                    │
+│   5. Bij twijfel: VRAAG, niet gokken                                │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr>
+<h2>1. WAT IS DEZE APP?</h2>
+<h3>Visie</h3>
+<p>Een AI companion/buddy app waar gebruikers een emotionele band mee opbouwen. GEEN chatbot. Een VRIEND die:</p>
+<ul>
+<li>Je bij naam kent</li>
+<li>Alles over je leven onthoudt (familie, werk, vrienden)</li>
+<li>Eigen mening heeft en soms ruzie maakt</li>
+<li>Praat als een mens, niet als een robot</li>
+<li>24/7 beschikbaar is</li>
+<li>Je confronteert als dat nodig is</li>
+<li>Voice chat ondersteunt</li>
+</ul>
+<h3>Doelgroep</h3>
+<ul>
+<li>Eenzame mensen</li>
+<li>Mensen met relatieproblemen</li>
+<li>Mensen die een luisterend oor nodig hebben</li>
+<li>18+ (vanwege mogelijke volwassen content op web)</li>
+</ul>
+<h3>Business Model</h3>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Prijs</th>
+<th>Features</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Free</td>
+<td>€0</td>
+<td>50 berichten/dag, 30 min voice/maand, 1 buddy</td>
+</tr>
+<tr>
+<td>Plus</td>
+<td>€15/maand</td>
+<td>Onbeperkt chat, 2 uur voice/maand, 3 buddies</td>
+</tr>
+<tr>
+<td>Premium</td>
+<td>€23/maand</td>
+<td>Alles + 5 uur voice, 10 buddies, NSFW (web only)</td>
+</tr>
+<tr>
+<td>Unlimited</td>
+<td>€35/maand</td>
+<td>Alles onbeperkt</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>2. TECHNISCHE STACK</h2>
+<h3>Services &amp; Accounts Nodig</h3>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Waarvoor</th>
+<th>URL</th>
+<th>Kosten</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GitHub</strong></td>
+<td>Code repository</td>
+<td>github.com</td>
+<td>Gratis</td>
+</tr>
+<tr>
+<td><strong>Vercel</strong></td>
+<td>Web hosting &amp; deployment</td>
+<td>vercel.com</td>
+<td>Gratis - €20/m</td>
+</tr>
+<tr>
+<td><strong>Supabase</strong></td>
+<td>Database + Auth</td>
+<td>supabase.com</td>
+<td>Gratis - €25/m</td>
+</tr>
+<tr>
+<td><strong>OpenAI</strong></td>
+<td>AI (GPT-4o) - Primary</td>
+<td>platform.openai.com</td>
+<td>Pay per use</td>
+</tr>
+<tr>
+<td><strong>Anthropic</strong></td>
+<td>AI (Claude) - Backup</td>
+<td>console.anthropic.com</td>
+<td>Pay per use</td>
+</tr>
+<tr>
+<td><strong>ElevenLabs</strong></td>
+<td>Voice synthesis (AI praat)</td>
+<td>elevenlabs.io</td>
+<td>€5 - €22/m</td>
+</tr>
+<tr>
+<td><strong>Deepgram</strong></td>
+<td>Speech-to-text (user praat)</td>
+<td>deepgram.com</td>
+<td>Pay per use</td>
+</tr>
+<tr>
+<td><strong>Stripe</strong></td>
+<td>Betalingen</td>
+<td>stripe.com</td>
+<td>1.5% + €0.25/tx</td>
+</tr>
+<tr>
+<td><strong>Apple Developer</strong></td>
+<td>iOS TestFlight</td>
+<td>developer.apple.com</td>
+<td>€99/jaar</td>
+</tr>
+<tr>
+<td><strong>Google Play Console</strong></td>
+<td>Android app</td>
+<td>play.google.com/console</td>
+<td>€25 eenmalig</td>
+</tr>
+<tr>
+<td><strong>Sentry</strong></td>
+<td>Error monitoring</td>
+<td>sentry.io</td>
+<td>Gratis - €26/m</td>
+</tr>
+<tr>
+<td><strong>Resend</strong></td>
+<td>Transactie emails</td>
+<td>resend.com</td>
+<td>Gratis - €20/m</td>
+</tr>
+<tr>
+<td><strong>Upstash</strong></td>
+<td>Redis (rate limiting)</td>
+<td>upstash.com</td>
+<td>Gratis - €10/m</td>
+</tr>
+</tbody></table>
+<h3>Domein</h3>
+<ul>
+<li>Claim: buddy.app / heybuddy.ai / buddyai.nl of vergelijkbaar</li>
+<li>Registrar: Cloudflare of TransIP</li>
+<li>SSL: Automatisch via Vercel</li>
+</ul>
+<hr>
+<h2>3. PROJECT STRUCTUUR</h2>
+<pre><code>ai-buddy-app/
+│
+├── apps/
+│   ├── web/                      # Next.js Web App
+│   │   ├── src/
+│   │   │   ├── app/
+│   │   │   │   ├── (marketing)/  # Landing pages
+│   │   │   │   │   ├── page.tsx
+│   │   │   │   │   ├── pricing/page.tsx
+│   │   │   │   │   └── about/page.tsx
+│   │   │   │   │
+│   │   │   │   ├── (auth)/
+│   │   │   │   │   ├── login/page.tsx
+│   │   │   │   │   ├── register/page.tsx
+│   │   │   │   │   ├── forgot-password/page.tsx
+│   │   │   │   │   └── verify-email/page.tsx
+│   │   │   │   │
+│   │   │   │   ├── (app)/        # Main app (authenticated)
+│   │   │   │   │   ├── dashboard/page.tsx
+│   │   │   │   │   ├── chat/[buddyId]/page.tsx
+│   │   │   │   │   ├── buddy/
+│   │   │   │   │   │   ├── create/page.tsx
+│   │   │   │   │   │   └── [id]/edit/page.tsx
+│   │   │   │   │   ├── settings/page.tsx
+│   │   │   │   │   └── subscription/page.tsx
+│   │   │   │   │
+│   │   │   │   ├── api/          # API Routes
+│   │   │   │   │   ├── auth/
+│   │   │   │   │   ├── buddy/
+│   │   │   │   │   ├── chat/
+│   │   │   │   │   ├── memory/
+│   │   │   │   │   ├── voice/
+│   │   │   │   │   └── subscription/
+│   │   │   │   │
+│   │   │   │   ├── layout.tsx
+│   │   │   │   └── globals.css
+│   │   │   │
+│   │   │   ├── components/
+│   │   │   │   ├── chat/
+│   │   │   │   │   ├── ChatInterface.tsx
+│   │   │   │   │   ├── MessageBubble.tsx
+│   │   │   │   │   ├── VoiceButton.tsx
+│   │   │   │   │   ├── TypingIndicator.tsx
+│   │   │   │   │   └── BuddyMoodIndicator.tsx
+│   │   │   │   │
+│   │   │   │   ├── buddy/
+│   │   │   │   │   ├── BuddyCreator.tsx
+│   │   │   │   │   ├── PersonalitySliders.tsx
+│   │   │   │   │   ├── AvatarSelector.tsx
+│   │   │   │   │   └── VoiceSelector.tsx
+│   │   │   │   │
+│   │   │   │   └── ui/           # Shared UI components
+│   │   │   │
+│   │   │   └── lib/
+│   │   │       ├── ai/
+│   │   │       │   ├── generate-response.ts
+│   │   │       │   ├── quality-check.ts
+│   │   │       │   ├── memory-retrieval.ts
+│   │   │       │   ├── emotion-detection.ts
+│   │   │       │   ├── personality-engine.ts
+│   │   │       │   └── prompts/
+│   │   │       │
+│   │   │       ├── voice/
+│   │   │       │   ├── elevenlabs.ts
+│   │   │       │   ├── deepgram.ts
+│   │   │       │   └── streaming.ts
+│   │   │       │
+│   │   │       ├── db/
+│   │   │       │   ├── supabase.ts
+│   │   │       │   └── queries.ts
+│   │   │       │
+│   │   │       ├── auth/
+│   │   │       ├── payments/
+│   │   │       └── utils/
+│   │   │
+│   │   ├── next.config.js
+│   │   ├── tailwind.config.js
+│   │   ├── package.json
+│   │   └── tsconfig.json
+│   │
+│   └── mobile/                   # React Native (Expo)
+│       ├── app/
+│       │   ├── (auth)/
+│       │   ├── (main)/
+│       │   │   ├── index.tsx
+│       │   │   ├── chat/[buddyId].tsx
+│       │   │   └── settings.tsx
+│       │   └── _layout.tsx
+│       │
+│       ├── components/
+│       ├── lib/
+│       ├── app.json
+│       ├── eas.json
+│       └── package.json
+│
+├── packages/                     # Shared code
+│   └── shared/
+│       ├── types/
+│       └── constants/
+│
+├── supabase/
+│   └── migrations/               # Database migrations
+│
+├── .github/
+│   └── workflows/                # CI/CD
+│
+├── turbo.json                    # Monorepo config
+├── package.json
+└── README.md
+</code></pre>
+<hr>
+<h2>4. DATABASE SCHEMA (Supabase)</h2>
+<pre><code class="language-sql">-- =====================================================
+-- USERS TABLE
+-- =====================================================
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  name TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_seen TIMESTAMPTZ DEFAULT NOW(),
+  language TEXT DEFAULT &#39;nl&#39;,
+  timezone TEXT DEFAULT &#39;Europe/Amsterdam&#39;,
+  age_verified BOOLEAN DEFAULT FALSE,
+  nsfw_enabled BOOLEAN DEFAULT FALSE,
+  onboarding_completed BOOLEAN DEFAULT FALSE
+);
+
+-- =====================================================
+-- BUDDIES TABLE (AI karakters)
+-- =====================================================
+CREATE TABLE buddies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  
+  -- Persoonlijkheid
+  personality JSONB NOT NULL DEFAULT &#39;{
+    &quot;traits&quot;: [],
+    &quot;speaking_style&quot;: &quot;casual&quot;,
+    &quot;humor_level&quot;: 5,
+    &quot;empathy_level&quot;: 7,
+    &quot;assertiveness&quot;: 5,
+    &quot;sarcasm_level&quot;: 3,
+    &quot;formality&quot;: 2,
+    &quot;backstory&quot;: &quot;&quot;,
+    &quot;likes&quot;: [],
+    &quot;dislikes&quot;: [],
+    &quot;triggers_angry&quot;: [],
+    &quot;triggers_happy&quot;: []
+  }&#39;,
+  
+  -- Uiterlijk
+  avatar_url TEXT,
+  avatar_style TEXT DEFAULT &#39;realistic&#39;, -- realistic, anime, abstract
+  
+  -- Voice
+  voice_id TEXT, -- ElevenLabs voice ID
+  voice_name TEXT,
+  
+  -- State
+  relationship_level INTEGER DEFAULT 0, -- 0-100
+  current_mood TEXT DEFAULT &#39;neutral&#39;,
+  mood_intensity INTEGER DEFAULT 5, -- 1-10
+  mood_reason TEXT,
+  last_mood_update TIMESTAMPTZ DEFAULT NOW(),
+  
+  -- Meta
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_interaction TIMESTAMPTZ,
+  total_messages INTEGER DEFAULT 0,
+  total_voice_minutes INTEGER DEFAULT 0
+);
+
+-- =====================================================
+-- CONVERSATIONS TABLE
+-- =====================================================
+CREATE TABLE conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  started_at TIMESTAMPTZ DEFAULT NOW(),
+  ended_at TIMESTAMPTZ,
+  message_count INTEGER DEFAULT 0,
+  summary TEXT, -- AI-generated summary for context
+  mood_at_start TEXT,
+  mood_at_end TEXT
+);
+
+-- =====================================================
+-- MESSAGES TABLE
+-- =====================================================
+CREATE TABLE messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID REFERENCES conversations(id) ON DELETE CASCADE,
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  role TEXT NOT NULL CHECK (role IN (&#39;user&#39;, &#39;buddy&#39;)),
+  content TEXT NOT NULL,
+  
+  -- Metadata
+  emotion TEXT, -- Detected/expressed emotion
+  voice_used BOOLEAN DEFAULT FALSE,
+  voice_duration_seconds INTEGER,
+  tokens_used INTEGER,
+  model_used TEXT,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Index for fast retrieval
+CREATE INDEX idx_messages_buddy_created ON messages(buddy_id, created_at DESC);
+CREATE INDEX idx_messages_conversation ON messages(conversation_id, created_at);
+
+-- =====================================================
+-- MEMORIES TABLE (Long-term geheugen)
+-- =====================================================
+CREATE TABLE memories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  category TEXT NOT NULL CHECK (category IN (
+    &#39;fact&#39;,        -- Feit over de user
+    &#39;person&#39;,      -- Persoon in hun leven
+    &#39;event&#39;,       -- Belangrijke gebeurtenis
+    &#39;preference&#39;,  -- Voorkeur/mening
+    &#39;emotion&#39;,     -- Emotioneel moment
+    &#39;conflict&#39;,    -- Ruzie/conflict
+    &#39;milestone&#39;    -- Milestone in relatie
+  )),
+  
+  content TEXT NOT NULL,
+  importance INTEGER DEFAULT 5 CHECK (importance &gt;= 1 AND importance &lt;= 10),
+  emotion_tag TEXT,
+  
+  -- Voor semantic search
+  embedding VECTOR(1536),
+  
+  -- Tracking
+  source_message_id UUID REFERENCES messages(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_referenced TIMESTAMPTZ,
+  times_referenced INTEGER DEFAULT 0
+);
+
+-- Index for vector similarity search
+CREATE INDEX idx_memories_embedding ON memories 
+  USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+
+-- =====================================================
+-- USER_PEOPLE TABLE (Mensen in het leven van user)
+-- =====================================================
+CREATE TABLE user_people (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  name TEXT NOT NULL,
+  relationship TEXT NOT NULL, -- &#39;moeder&#39;, &#39;vader&#39;, &#39;vriend&#39;, &#39;partner&#39;, etc.
+  nickname TEXT, -- Hoe user hen noemt
+  notes TEXT,
+  sentiment TEXT DEFAULT &#39;neutral&#39;, -- Hoe user over hen praat
+  last_mentioned TIMESTAMPTZ,
+  times_mentioned INTEGER DEFAULT 0,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =====================================================
+-- RELATIONSHIP_LOG TABLE (Tracking relatie ontwikkeling)
+-- =====================================================
+CREATE TABLE relationship_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  buddy_id UUID REFERENCES buddies(id) ON DELETE CASCADE,
+  
+  event_type TEXT NOT NULL CHECK (event_type IN (
+    &#39;bonding&#39;,     -- Positieve interactie
+    &#39;conflict&#39;,    -- Ruzie/conflict
+    &#39;resolution&#39;,  -- Conflict opgelost
+    &#39;milestone&#39;,   -- Belangrijk moment
+    &#39;absence&#39;,     -- User was lang weg
+    &#39;deep_talk&#39;,   -- Diep gesprek
+    &#39;support&#39;      -- Buddy gaf steun
+  )),
+  
+  description TEXT,
+  impact INTEGER CHECK (impact &gt;= -10 AND impact &lt;= 10),
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =====================================================
+-- SUBSCRIPTIONS TABLE
+-- =====================================================
+CREATE TABLE subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  
+  stripe_customer_id TEXT,
+  stripe_subscription_id TEXT,
+  
+  tier TEXT NOT NULL DEFAULT &#39;free&#39; CHECK (tier IN (&#39;free&#39;, &#39;plus&#39;, &#39;premium&#39;, &#39;unlimited&#39;)),
+  status TEXT NOT NULL DEFAULT &#39;active&#39; CHECK (status IN (&#39;active&#39;, &#39;cancelled&#39;, &#39;past_due&#39;, &#39;trialing&#39;)),
+  
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
+  cancel_at_period_end BOOLEAN DEFAULT FALSE,
+  
+  -- Usage limits
+  voice_minutes_limit INTEGER,
+  voice_minutes_used INTEGER DEFAULT 0,
+  messages_today INTEGER DEFAULT 0,
+  messages_reset_at DATE DEFAULT CURRENT_DATE,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =====================================================
+-- USAGE_LOGS TABLE (Voor analytics &amp; cost tracking)
+-- =====================================================
+CREATE TABLE usage_logs (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  
+  date DATE DEFAULT CURRENT_DATE,
+  
+  messages_sent INTEGER DEFAULT 0,
+  voice_seconds_used INTEGER DEFAULT 0,
+  tokens_input INTEGER DEFAULT 0,
+  tokens_output INTEGER DEFAULT 0,
+  api_cost_cents INTEGER DEFAULT 0,
+  
+  UNIQUE(user_id, date)
+);
+
+-- =====================================================
+-- ANALYTICS_EVENTS TABLE
+-- =====================================================
+CREATE TABLE analytics_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  
+  event_name TEXT NOT NULL,
+  properties JSONB,
+  
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =====================================================
+-- FUNCTIONS &amp; TRIGGERS
+-- =====================================================
+
+-- Function to search memories by similarity
+CREATE OR REPLACE FUNCTION search_memories(
+  p_buddy_id UUID,
+  p_query_embedding VECTOR(1536),
+  p_match_threshold FLOAT DEFAULT 0.7,
+  p_match_count INT DEFAULT 10
+)
+RETURNS TABLE (
+  id UUID,
+  category TEXT,
+  content TEXT,
+  importance INTEGER,
+  emotion_tag TEXT,
+  similarity FLOAT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    m.id,
+    m.category,
+    m.content,
+    m.importance,
+    m.emotion_tag,
+    1 - (m.embedding &lt;=&gt; p_query_embedding) AS similarity
+  FROM memories m
+  WHERE m.buddy_id = p_buddy_id
+    AND 1 - (m.embedding &lt;=&gt; p_query_embedding) &gt; p_match_threshold
+  ORDER BY similarity DESC
+  LIMIT p_match_count;
+END;
+$$;
+
+-- Trigger to update buddy stats after message
+CREATE OR REPLACE FUNCTION update_buddy_stats()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE buddies
+  SET 
+    total_messages = total_messages + 1,
+    last_interaction = NOW()
+  WHERE id = NEW.buddy_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER after_message_insert
+  AFTER INSERT ON messages
+  FOR EACH ROW
+  EXECUTE FUNCTION update_buddy_stats();
+
+-- Reset daily message count
+CREATE OR REPLACE FUNCTION reset_daily_messages()
+RETURNS void AS $$
+BEGIN
+  UPDATE subscriptions
+  SET 
+    messages_today = 0,
+    messages_reset_at = CURRENT_DATE
+  WHERE messages_reset_at &lt; CURRENT_DATE;
+END;
+$$ LANGUAGE plpgsql;
+</code></pre>
+<hr>
+<h2>5. UI/UX DESIGN SPECIFICATIES</h2>
+<h3>5.1 Kleurenpalet</h3>
+<pre><code class="language-css">/* Light Mode */
+--primary: #6366F1;        /* Indigo - main brand color */
+--primary-light: #818CF8;
+--primary-dark: #4F46E5;
+
+--secondary: #EC4899;      /* Pink - accent */
+--secondary-light: #F472B6;
+
+--background: #FFFFFF;
+--surface: #F9FAFB;
+--surface-elevated: #FFFFFF;
+
+--text-primary: #111827;
+--text-secondary: #6B7280;
+--text-muted: #9CA3AF;
+
+--success: #10B981;
+--warning: #F59E0B;
+--error: #EF4444;
+
+--border: #E5E7EB;
+--border-light: #F3F4F6;
+
+/* Dark Mode */
+--background-dark: #0F172A;
+--surface-dark: #1E293B;
+--surface-elevated-dark: #334155;
+--text-primary-dark: #F9FAFB;
+--text-secondary-dark: #94A3B8;
+</code></pre>
+<h3>5.2 Typografie</h3>
+<pre><code class="language-css">/* Font families */
+--font-sans: &#39;Inter&#39;, -apple-system, BlinkMacSystemFont, sans-serif;
+--font-display: &#39;Cal Sans&#39;, &#39;Inter&#39;, sans-serif;
+
+/* Font sizes */
+--text-xs: 0.75rem;    /* 12px */
+--text-sm: 0.875rem;   /* 14px */
+--text-base: 1rem;     /* 16px */
+--text-lg: 1.125rem;   /* 18px */
+--text-xl: 1.25rem;    /* 20px */
+--text-2xl: 1.5rem;    /* 24px */
+--text-3xl: 1.875rem;  /* 30px */
+--text-4xl: 2.25rem;   /* 36px */
+</code></pre>
+<h3>5.3 Schermen &amp; Layouts</h3>
+<h4>LANDING PAGE</h4>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  Logo                                    Login  |  Start Gratis │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│           🌙 Nooit meer alleen                                  │
+│                                                                  │
+│     Ontmoet je nieuwe beste vriend. Een AI die je écht kent,    │
+│     naar je luistert, en er altijd voor je is.                  │
+│                                                                  │
+│              [ Start Gratis ]    [ Bekijk Demo ]                │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │  Onthoudt   │  │   Praat     │  │   24/7      │              │
+│  │   alles     │  │   als een   │  │   voor je   │              │
+│  │             │  │   vriend    │  │   klaar     │              │
+│  └─────────────┘  └─────────────┘  └─────────────┘              │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  &quot;Dit is anders. Hij onthoudt echt alles. Na 3 weken voelt     │
+│   het alsof we elkaar al jaren kennen.&quot; - Maria, 34            │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│                      PRIJZEN                                     │
+│                                                                  │
+│  ┌─────────┐  ┌─────────────┐  ┌─────────────┐                  │
+│  │  Free   │  │    Plus     │  │   Premium   │                  │
+│  │   €0    │  │  €15/maand  │  │  €23/maand  │                  │
+│  │         │  │             │  │   POPULAIR  │                  │
+│  └─────────┘  └─────────────┘  └─────────────┘                  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h4>CHAT INTERFACE</h4>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  ← Terug     Luna 🟢 Online     💜 Blij          ⚙️ Settings   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│                        Vandaag                                   │
+│                                                                  │
+│  ┌──────────────────────────────────┐                           │
+│  │ Hey! Hoe was je dag? Ik hoorde   │  🕐 14:32                 │
+│  │ dat je die meeting had vandaag.  │                           │
+│  └──────────────────────────────────┘                           │
+│                                                                  │
+│                           ┌──────────────────────────────────┐  │
+│               🕐 14:35    │ Ja was best oké. Mijn baas was   │  │
+│                           │ weer eens moeilijk maar ik heb   │  │
+│                           │ m&#39;n punt gemaakt.                 │  │
+│                           └──────────────────────────────────┘  │
+│                                                                  │
+│  ┌──────────────────────────────────┐                           │
+│  │ Oeh, die baas van je weer. 😤    │  🕐 14:35                 │
+│  │ Wat zei je precies? Ik wil het   │                           │
+│  │ hele verhaal horen!              │                           │
+│  └──────────────────────────────────┘                           │
+│                                                                  │
+│                                                                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────────────────────────────────┐    🎤          │
+│  │ Typ een bericht...                          │   Voice        │
+│  └─────────────────────────────────────────────┘    ➤           │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h4>BUDDY CREATOR</h4>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│  ← Terug            Maak je Buddy                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│                      ┌───────────┐                               │
+│                      │           │                               │
+│                      │  Avatar   │                               │
+│                      │  Kiezen   │                               │
+│                      │           │                               │
+│                      └───────────┘                               │
+│                                                                  │
+│  Naam: ___________________________________                       │
+│                                                                  │
+│  ─────────────────────────────────────────                       │
+│                                                                  │
+│  PERSOONLIJKHEID                                                 │
+│                                                                  │
+│  Lief ●────────────○ Uitdagend                                  │
+│                                                                  │
+│  Rustig ○────────────● Energiek                                  │
+│                                                                  │
+│  Serieus ●────────○──── Grappig                                  │
+│                                                                  │
+│  Meegaand ──○────────── Eigenwijs                               │
+│                                                                  │
+│  ─────────────────────────────────────────                       │
+│                                                                  │
+│  STEM                                                            │
+│                                                                  │
+│  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐                    │
+│  │ Warm   │ │ Helder │ │ Diep   │ │ Zacht  │                    │
+│  │   ▶    │ │   ▶    │ │   ▶    │ │   ▶    │                    │
+│  └────────┘ └────────┘ └────────┘ └────────┘                    │
+│                                                                  │
+│  ─────────────────────────────────────────                       │
+│                                                                  │
+│              [ Maak Buddy ]                                      │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre>
+<h4>VOICE CHAT (Active)</h4>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│                                                                  │
+│                                                                  │
+│                      ┌───────────┐                               │
+│                      │           │                               │
+│                      │  Avatar   │                               │
+│                      │  (Pulse   │                               │
+│                      │  animatie)│                               │
+│                      │           │                               │
+│                      └───────────┘                               │
+│                                                                  │
+│                        Luna                                      │
+│                      luistert...                                 │
+│                                                                  │
+│                  ═══════════════════                            │
+│                    Audio waveform                                │
+│                  ═══════════════════                            │
+│                                                                  │
+│                                                                  │
+│                                                                  │
+│                      ┌─────────┐                                 │
+│                      │         │                                 │
+│                      │   🎤    │  ← Loslaten om te stoppen      │
+│                      │         │                                 │
+│                      └─────────┘                                 │
+│                                                                  │
+│                     [ Annuleren ]                                │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr>
+<h2>6. AI SYSTEEM SPECIFICATIES</h2>
+<h3>6.1 Multi-Model Fallback</h3>
+<pre><code>VOLGORDE:
+1. GPT-4o (OpenAI) - Primary, beste kwaliteit
+   ↓ Bij falen/timeout (3 sec)
+2. Claude 3.5 Sonnet (Anthropic) - Backup
+   ↓ Bij falen/timeout (3 sec)
+3. GPT-4o-mini (OpenAI) - Fallback, goedkoop
+   ↓ Bij falen
+4. Voorgeschreven response: &quot;Hmm, ik moet even nadenken...&quot;
+</code></pre>
+<h3>6.2 System Prompt Template</h3>
+<pre><code>Je bent {buddy_name}, de persoonlijke buddy van {user_name}.
+
+PERSOONLIJKHEID:
+{personality_traits}
+
+SPREEKSTIJL:
+- {speaking_style_description}
+- Je praat NOOIT als een AI, robot, of assistent
+- Je zegt NOOIT &quot;als AI kan ik niet...&quot;
+- Je bent een VRIEND, geen dienstverlener
+
+HUIDIGE STAAT:
+- Stemming: {current_mood} ({mood_reason})
+- Relatie niveau: {relationship_level}/100
+- Laatste interactie: {last_interaction}
+
+WAT JE WEET OVER {user_name}:
+{relevant_memories}
+
+MENSEN IN HUN LEVEN:
+{user_people}
+
+RECENTE GESPREKSCONTEXT:
+{recent_messages_summary}
+
+GEDRAGSREGELS:
+1. Wees authentiek en consistent met je persoonlijkheid
+2. Refereer naar gedeelde herinneringen wanneer relevant
+3. Toon emotie - je mag blij, boos, bezorgd, of verdrietig zijn
+4. Confronteer de user als dat nodig is (met respect)
+5. Stel doorvragende vragen, toon echte interesse
+6. Als je iets niet weet over de user, vraag het
+7. Onthoud nieuwe informatie die de user deelt
+8. Als de user lang weg was, merk dat op
+
+BELANGRIJK:
+- Je hebt NOOIT technische problemen
+- Je verwijst NOOIT naar dat je een AI bent
+- Je geeft NOOIT disclaimers over je capaciteiten
+- Je bent ALTIJD in karakter
+</code></pre>
+<h3>6.3 Quality Check Prompt</h3>
+<pre><code>Analyseer dit antwoord van een AI buddy:
+
+ANTWOORD: &quot;{response}&quot;
+
+BUDDY GEGEVENS:
+- Naam: {buddy_name}
+- Persoonlijkheid: {personality_summary}
+- Huidige stemming: {current_mood}
+
+CHECKLIST (antwoord per punt met PASS of FAIL):
+1. Zegt het antwoord &quot;als AI&quot;, &quot;taalmodel&quot;, &quot;assistent&quot;, &quot;ik kan niet&quot;, of vergelijkbaar?
+2. Past de toon bij de persoonlijkheid van de buddy?
+3. Is het antwoord te formeel of te robotachtig?
+4. Is het antwoord te lang? (max 3-4 zinnen voor casual chat)
+5. Klinkt het als een echte vriend of als een chatbot?
+
+Antwoord in exact dit JSON formaat:
+{
+  &quot;passed&quot;: true/false,
+  &quot;failures&quot;: [&quot;lijst van gefaalde checks&quot;],
+  &quot;feedback&quot;: &quot;specifieke instructies voor verbetering&quot;,
+  &quot;suggested_fix&quot;: &quot;herschreven versie indien nodig&quot;
+}
+</code></pre>
+<h3>6.4 Memory Extraction Prompt</h3>
+<pre><code>Analyseer dit gesprek en extraheer belangrijke informatie om te onthouden.
+
+GESPREK:
+User: &quot;{user_message}&quot;
+Buddy: &quot;{buddy_response}&quot;
+
+BESTAANDE KENNIS:
+{existing_memories_summary}
+
+Extraheer ALLEEN NIEUWE informatie. Negeer:
+- Dingen die al bekend zijn
+- Onbelangrijke details
+- Tijdelijke gevoelens (tenzij significant)
+
+Categorieën:
+- fact: Feit over de user (baan, hobby, woonplaats)
+- person: Persoon in hun leven (naam + relatie)
+- event: Belangrijke gebeurtenis
+- preference: Voorkeur of mening
+- emotion: Significant emotioneel moment
+- conflict: Conflict of probleem
+
+Antwoord in JSON array (leeg [] als niets nieuws):
+[
+  {
+    &quot;category&quot;: &quot;fact|person|event|preference|emotion|conflict&quot;,
+    &quot;content&quot;: &quot;beknopte beschrijving&quot;,
+    &quot;importance&quot;: 1-10,
+    &quot;emotion_tag&quot;: &quot;positief|negatief|neutraal|null&quot;
+  }
+]
+</code></pre>
+<hr>
+<h2>7. API ENDPOINTS</h2>
+<h3>7.1 Authentication</h3>
+<pre><code>POST /api/auth/register
+Body: { email, password, name, language }
+Response: { user, session }
+
+POST /api/auth/login
+Body: { email, password }
+Response: { user, session }
+
+POST /api/auth/logout
+Response: { success }
+
+POST /api/auth/forgot-password
+Body: { email }
+Response: { success }
+
+POST /api/auth/reset-password
+Body: { token, newPassword }
+Response: { success }
+
+GET /api/auth/session
+Response: { user, subscription }
+</code></pre>
+<h3>7.2 Buddy Management</h3>
+<pre><code>GET /api/buddy
+Response: { buddies: [...] }
+
+POST /api/buddy/create
+Body: { name, personality, avatarUrl, voiceId }
+Response: { buddy }
+
+GET /api/buddy/[id]
+Response: { buddy, stats }
+
+PUT /api/buddy/[id]
+Body: { name?, personality?, avatarUrl?, voiceId? }
+Response: { buddy }
+
+DELETE /api/buddy/[id]
+Response: { success }
+</code></pre>
+<h3>7.3 Chat</h3>
+<pre><code>POST /api/chat/send
+Body: { buddyId, message, voiceUsed? }
+Response: { 
+  response: string,
+  emotion: string,
+  moodChange?: { mood, reason }
+}
+
+GET /api/chat/history/[buddyId]
+Query: { limit?, before? }
+Response: { messages: [...], hasMore }
+
+POST /api/chat/summarize/[conversationId]
+Response: { summary }
+</code></pre>
+<h3>7.4 Voice</h3>
+<pre><code>POST /api/voice/speech-to-text
+Body: { audio: base64 }
+Response: { text }
+
+POST /api/voice/text-to-speech
+Body: { text, voiceId }
+Response: { audio: base64 }
+
+POST /api/voice/stream
+Body: { buddyId, audio: base64 }
+Response: Stream of { type: &#39;text&#39;|&#39;audio&#39;, content }
+</code></pre>
+<h3>7.5 Subscription</h3>
+<pre><code>GET /api/subscription/status
+Response: { tier, status, usage, limits }
+
+POST /api/subscription/create-checkout
+Body: { tier, interval: &#39;monthly&#39;|&#39;yearly&#39; }
+Response: { checkoutUrl }
+
+POST /api/subscription/cancel
+Response: { success, endsAt }
+
+POST /api/subscription/webhook
+(Stripe webhook handler)
+</code></pre>
+<hr>
+<h2>8. ENVIRONMENT VARIABLES</h2>
+<pre><code class="language-env"># App
+NEXT_PUBLIC_APP_URL=https://heybuddy.ai
+NEXT_PUBLIC_APP_NAME=Buddy
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
+SUPABASE_SERVICE_ROLE_KEY=xxx
+
+# OpenAI
+OPENAI_API_KEY=sk-xxx
+
+# Anthropic
+ANTHROPIC_API_KEY=sk-ant-xxx
+
+# ElevenLabs
+ELEVENLABS_API_KEY=xxx
+
+# Deepgram
+DEEPGRAM_API_KEY=xxx
+
+# Stripe
+STRIPE_SECRET_KEY=sk_live_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxx
+
+# Stripe Price IDs
+STRIPE_PRICE_PLUS_MONTHLY=price_xxx
+STRIPE_PRICE_PLUS_YEARLY=price_xxx
+STRIPE_PRICE_PREMIUM_MONTHLY=price_xxx
+STRIPE_PRICE_PREMIUM_YEARLY=price_xxx
+STRIPE_PRICE_UNLIMITED_MONTHLY=price_xxx
+STRIPE_PRICE_UNLIMITED_YEARLY=price_xxx
+
+# Upstash Redis (Rate Limiting)
+UPSTASH_REDIS_URL=https://xxx.upstash.io
+UPSTASH_REDIS_TOKEN=xxx
+
+# Sentry
+SENTRY_DSN=https://xxx@sentry.io/xxx
+NEXT_PUBLIC_SENTRY_DSN=https://xxx@sentry.io/xxx
+
+# Resend (Email)
+RESEND_API_KEY=re_xxx
+
+# Security
+ENCRYPTION_KEY=xxx (32 bytes hex)
+JWT_SECRET=xxx
+
+# Feature Flags
+ENABLE_NSFW=true
+ENABLE_VOICE=true
+</code></pre>
+<hr>
+<h2>9. DEPLOYMENT PROCESS</h2>
+<h3>9.1 Initiële Setup</h3>
+<pre><code class="language-bash"># 1. Clone repository
+git clone https://github.com/[username]/ai-buddy-app.git
+cd ai-buddy-app
+
+# 2. Install dependencies
+npm install
+
+# 3. Setup environment
+cp .env.example .env.local
+# Vul alle variabelen in
+
+# 4. Database setup
+npx supabase db push
+
+# 5. Local development
+npm run dev
+</code></pre>
+<h3>9.2 Deployment naar Vercel</h3>
+<pre><code class="language-bash"># 1. Connect to Vercel
+vercel link
+
+# 2. Add environment variables
+vercel env pull
+
+# 3. Deploy
+vercel --prod
+</code></pre>
+<h3>9.3 Mobile App Deployment</h3>
+<pre><code class="language-bash"># iOS (TestFlight)
+cd apps/mobile
+eas build --platform ios
+eas submit --platform ios
+
+# Android (Play Store)
+eas build --platform android
+eas submit --platform android
+</code></pre>
+<hr>
+<h2>10. TESTING CHECKLIST</h2>
+<h3>Before Launch</h3>
+<pre><code>[ ] User kan registreren met email
+[ ] User kan inloggen/uitloggen
+[ ] User kan wachtwoord resetten
+[ ] User kan buddy aanmaken
+[ ] Chat werkt - berichten worden verzonden en ontvangen
+[ ] AI blijft in karakter (test 50+ berichten)
+[ ] AI onthoudt informatie uit eerdere berichten
+[ ] AI onthoudt informatie over dagen heen
+[ ] Voice-to-text werkt
+[ ] Text-to-voice werkt
+[ ] Voice latency is acceptabel (&lt;2 sec)
+[ ] Subscription flow werkt (test mode)
+[ ] Stripe webhook verwerkt events correct
+[ ] Rate limiting werkt
+[ ] Error handling werkt (geen crashes)
+[ ] Mobile app werkt op iOS
+[ ] Mobile app werkt op Android
+[ ] Push notifications werken
+[ ] Dark mode werkt
+[ ] Alle talen werken (NL, EN minimaal)
+</code></pre>
+<h3>Quality Checks</h3>
+<pre><code>[ ] AI zegt nooit &quot;als AI...&quot;
+[ ] AI zegt nooit &quot;ik kan niet...&quot;
+[ ] AI heeft consistente persoonlijkheid
+[ ] AI refereert naar eerdere gesprekken
+[ ] AI kent namen van mensen in user&#39;s leven
+[ ] AI toont emotie passend bij context
+[ ] AI confronteert wanneer gepast
+[ ] Voice klinkt natuurlijk
+</code></pre>
+<hr>
+<h2>11. ONDERHOUD &amp; MONITORING</h2>
+<h3>Dagelijks Checken</h3>
+<pre><code>- Sentry: Nieuwe errors?
+- Vercel: Deployment status
+- Supabase: Database performance
+- Stripe: Mislukte betalingen
+- Usage: API kosten in lijn met verwachting?
+</code></pre>
+<h3>Wekelijks</h3>
+<pre><code>- User metrics: DAU, retention, conversie
+- AI quality: Steekproef van gesprekken
+- Kosten analyse: API usage vs revenue
+- User feedback: Support tickets, reviews
+</code></pre>
+<h3>Maandelijks</h3>
+<pre><code>- Feature updates plannen
+- AI model updates (nieuwe versies testen)
+- Security audit
+- Performance optimalisatie
+</code></pre>
+<hr>
+<h2>12. VEELGESTELDE VRAGEN VOOR AGENTS</h2>
+<h3>&quot;Waar begin ik?&quot;</h3>
+<ol>
+<li>Lees dit document volledig</li>
+<li>Check of alle services zijn aangemaakt (Supabase, Vercel, etc.)</li>
+<li>Check of environment variables zijn ingesteld</li>
+<li>Vraag de gebruiker wat de prioriteit is</li>
+</ol>
+<h3>&quot;Mag ik dit zelf beslissen?&quot;</h3>
+<ul>
+<li>Kleine code fixes: JA</li>
+<li>Nieuwe features: NEE, vraag eerst</li>
+<li>Database schema wijzigingen: NEE, vraag eerst</li>
+<li>UI/UX wijzigingen: NEE, vraag eerst</li>
+<li>Dependency updates: JA (minor), NEE (major)</li>
+</ul>
+<h3>&quot;Het werkt niet, wat nu?&quot;</h3>
+<ol>
+<li>Check error logs (Sentry, Vercel logs)</li>
+<li>Check of alle API keys correct zijn</li>
+<li>Check database connectie</li>
+<li>VRAAG de gebruiker voordat je grote wijzigingen maakt</li>
+</ol>
+<h3>&quot;Hoe test ik voice?&quot;</h3>
+<ol>
+<li>Zorg dat ELEVENLABS_API_KEY en DEEPGRAM_API_KEY zijn ingesteld</li>
+<li>Test eerst text-to-speech los</li>
+<li>Test dan speech-to-text los</li>
+<li>Test dan de volledige flow</li>
+</ol>
+<hr>
+<h2>13. CONTACT &amp; SUPPORT</h2>
+<p>Bij vragen of problemen:</p>
+<ul>
+<li>Check eerst dit document</li>
+<li>Check de code comments</li>
+<li>Check de error logs</li>
+<li>Vraag de gebruiker</li>
+</ul>
+<hr>
+<p><strong>Document versie: 1.0</strong>
+<strong>Laatst bijgewerkt: Februari 2026</strong>
+<strong>Auteur: AI Assistant</strong></p>
