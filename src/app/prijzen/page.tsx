@@ -31,7 +31,7 @@ export default function PrijzenPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             
-            {/* Vysion Starter - €69 */}
+            {/* Vysion Starter - €59 */}
             <div className="bg-gradient-to-b from-[#2d4a3e] to-[#1e3a2f] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl">
               <div className="p-6 lg:p-8">
                 <div className="flex items-center gap-3 mb-4">
@@ -43,7 +43,7 @@ export default function PrijzenPage() {
                   <h3 className="text-xl font-bold text-white">{t('pricing.starter.name')}</h3>
                 </div>
                 <div className="flex items-baseline mb-6">
-                  <span className="text-5xl font-bold text-yellow-400">€69</span>
+                  <span className="text-5xl font-bold text-yellow-400">€59</span>
                   <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
                 </div>
                 
@@ -68,7 +68,7 @@ export default function PrijzenPage() {
               </div>
             </div>
 
-            {/* Vysion Pro - €79 - POPULAR */}
+            {/* Vysion Pro - €69 - POPULAR */}
             <div className="bg-gradient-to-b from-[#4a3f6e] to-[#2d2654] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl relative">
               {/* Popular badge */}
               <div className="absolute top-4 right-4 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
@@ -84,7 +84,7 @@ export default function PrijzenPage() {
                   <h3 className="text-xl font-bold text-white">{t('pricing.pro.name')}</h3>
                 </div>
                 <div className="flex items-baseline mb-6">
-                  <span className="text-5xl font-bold text-purple-300">€79</span>
+                  <span className="text-5xl font-bold text-purple-300">€69</span>
                   <span className="text-gray-400 ml-2">{t('pricing.perMonth')}</span>
                 </div>
                 

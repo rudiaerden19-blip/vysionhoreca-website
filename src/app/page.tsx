@@ -530,8 +530,11 @@ function PricingSection() {
   const { t, locale } = useLanguage()
   const [isYearly, setIsYearly] = useState(false)
   
-  const starterPrice = isYearly ? 69 * 12 : 69
-  const proPrice = isYearly ? 79 * 12 : 79
+  // Jaarlijks = 10% korting
+  const starterMonthly = 59
+  const proMonthly = 69
+  const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
+  const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
   const periodLabel = isYearly ? '/jaar' : '/maand'
   
   return (
@@ -547,7 +550,7 @@ function PricingSection() {
         </div>
 
         {/* Toggle Maandelijks / Jaarlijks */}
-        <div className="flex justify-center mb-12">
+        <div className="flex flex-col items-center mb-12">
           <div className="bg-[#1a1a2e] p-1 rounded-full inline-flex items-center">
             <button
               onClick={() => setIsYearly(false)}
@@ -561,15 +564,23 @@ function PricingSection() {
             </button>
             <button
               onClick={() => setIsYearly(true)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all ${
+              className={`px-6 py-3 rounded-full font-semibold transition-all relative ${
                 isYearly 
                   ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
                   : 'text-gray-400 hover:text-white'
               }`}
             >
               Jaarlijks
+              <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                -10%
+              </span>
             </button>
           </div>
+          {isYearly && (
+            <p className="text-green-400 text-sm mt-3 font-medium">
+              ✓ Je bespaart 10% met een jaarabonnement!
+            </p>
+          )}
         </div>
 
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
@@ -936,7 +947,7 @@ function ComparisonSection() {
                 <th className="px-6 py-5 text-left font-semibold">{t('comparison.feature')}</th>
                 <th className="px-6 py-5 text-center">
                   <div className="text-accent font-bold text-lg">Vysion Horeca</div>
-                  <div className="text-sm text-gray-300">€69 - €79/maand</div>
+                  <div className="text-sm text-gray-300">€59 - €69/maand</div>
                 </th>
                 <th className="px-6 py-5 text-center">
                   <div className="font-semibold">Lightspeed</div>

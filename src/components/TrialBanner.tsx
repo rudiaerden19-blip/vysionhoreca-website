@@ -129,7 +129,7 @@ export default function TrialBanner({ tenantSlug }: TrialBannerProps) {
             <p className="text-sm text-gray-500 mb-2">Aanbevolen</p>
             <p className="text-2xl font-bold text-gray-900">Starter</p>
             <p className="text-3xl font-bold text-orange-500 mt-1">
-              €69<span className="text-base font-normal text-gray-500">/maand</span>
+              €59<span className="text-base font-normal text-gray-500">/maand</span>
             </p>
           </div>
 
