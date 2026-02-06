@@ -116,6 +116,11 @@
     "subtitle": "Finally a complete ecosystem for hospitality",
     "cta": "Discover the complete platform"
   },
+  "liveDemo": {
+    "title": "Want to see the software in action?",
+    "subtitle": "Check out a real chip shop running on Vysion Horeca",
+    "cta": "View Live Demo"
+  },
   "butWait": {
     "label": "Wait...",
     "title": "But... Vysion goes",

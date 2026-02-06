@@ -116,6 +116,11 @@
     "subtitle": "Enfin un écosystème complet pour l'horeca",
     "cta": "Découvrez la plateforme complète"
   },
+  "liveDemo": {
+    "title": "Vous voulez voir le logiciel en action?",
+    "subtitle": "Découvrez une vraie friterie fonctionnant avec Vysion Horeca",
+    "cta": "Voir la démo en direct"
+  },
   "butWait": {
     "label": "Attendez...",
     "title": "Mais... Vysion va",

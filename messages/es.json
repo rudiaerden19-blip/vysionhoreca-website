@@ -116,6 +116,11 @@
     "subtitle": "Finalmente un ecosistema completo para la hostelería",
     "cta": "Descubre la plataforma completa"
   },
+  "liveDemo": {
+    "title": "¿Quieres ver el software en acción?",
+    "subtitle": "Mira una freiduría real funcionando con Vysion Horeca",
+    "cta": "Ver demo en vivo"
+  },
   "butWait": {
     "label": "Espera...",
     "title": "Pero... Vysion va",

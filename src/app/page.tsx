@@ -671,10 +671,10 @@ function LiveDemoSection() {
     <section className="py-16 sm:py-20 bg-gradient-to-b from-[#1a1a2e] to-[#0f0f1a]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
-          Wil je de software in actie zien?
+          {t('liveDemo.title')}
         </h2>
         <p className="text-lg sm:text-xl text-gray-300 mb-8">
-          Bekijk een echte frituur die draait op Vysion Horeca
+          {t('liveDemo.subtitle')}
         </p>
         <a
           href="https://frituurnolim.ordervysion.com"
@@ -682,7 +682,7 @@ function LiveDemoSection() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-[0_0_30px_rgba(234,88,12,0.4)] hover:shadow-[0_0_50px_rgba(234,88,12,0.6)] hover:scale-105"
         >
-          <span>Bekijk Live Demo</span>
+          <span>{t('liveDemo.cta')}</span>
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
           </svg>
