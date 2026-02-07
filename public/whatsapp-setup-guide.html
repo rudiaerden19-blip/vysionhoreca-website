@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WhatsApp Ordering System - Vysion Setup Guide</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    h1 { color: #25D366; margin-bottom: 10px; font-size: 28px; }
+    h2 { color: #075E54; margin-top: 30px; margin-bottom: 15px; font-size: 20px; border-bottom: 2px solid #25D366; padding-bottom: 5px; }
+    h3 { color: #128C7E; margin-top: 20px; margin-bottom: 10px; font-size: 16px; }
+    p { margin-bottom: 10px; }
+    .header { text-align: center; margin-bottom: 40px; padding: 20px; background: linear-gradient(135deg, #25D366, #128C7E); color: white; border-radius: 10px; }
+    .header h1 { color: white; }
+    .header p { color: rgba(255,255,255,0.9); }
+    .box { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0; }
+    .box.warning { background: #fff3cd; border-left: 4px solid #ffc107; }
+    .box.success { background: #d4edda; border-left: 4px solid #28a745; }
+    .box.info { background: #e7f3ff; border-left: 4px solid #007bff; }
+    code { background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 14px; }
+    pre { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; overflow-x: auto; margin: 10px 0; }
+    pre code { background: none; color: inherit; }
+    ul, ol { margin-left: 20px; margin-bottom: 15px; }
+    li { margin-bottom: 5px; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #075E54; color: white; }
+    .checkmark { color: #28a745; }
+    .pending { color: #ffc107; }
+    .page-break { page-break-after: always; }
+    @media print {
+      body { padding: 20px; }
+      .box { break-inside: avoid; }
+      pre { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>💬 WhatsApp Ordering System</h1>
+  <p>Vysion Horeca - Complete Setup Guide</p>
+  <p><small>Datum: 7 februari 2026</small></p>
+</div>
+
+<h2>📋 Overzicht</h2>
+<p>Vysion heeft een WhatsApp bestelsysteem waarmee klanten kunnen bestellen via WhatsApp. Orders komen automatisch binnen op het keuken scherm (iPad).</p>
+
+<div class="box success">
+  <strong>Voordelen:</strong>
+  <ul>
+    <li>Klanten bestellen in hun eigen taal (Nederlands)</li>
+    <li>Geen app download nodig</li>
+    <li>Eerste 1000 berichten/maand GRATIS</li>
+    <li>Integratie met bestaand Vysion systeem</li>
+  </ul>
+</div>
+
+<h2>✅ Wat is Gebouwd</h2>
+
+<table>
+  <tr><th>Component</th><th>Status</th><th>Locatie</th></tr>
+  <tr><td>WhatsApp Webhook API</td><td class="checkmark">✅ Klaar</td><td><code>/api/whatsapp/webhook</code></td></tr>
+  <tr><td>Status Update API</td><td class="checkmark">✅ Klaar</td><td><code>/api/whatsapp/send-status</code></td></tr>
+  <tr><td>Admin Instellingen</td><td class="checkmark">✅ Klaar</td><td><code>/admin/whatsapp</code></td></tr>
+  <tr><td>QR Code Generator</td><td class="checkmark">✅ Klaar</td><td>In admin pagina</td></tr>
+  <tr><td>Database Tabellen</td><td class="checkmark">✅ Klaar</td><td>Supabase</td></tr>
+  <tr><td>Keuken Integratie</td><td class="checkmark">✅ Klaar</td><td>Notificatie bij "Klaar"</td></tr>
+</table>
+
+<h2>🔧 Meta Developer Setup</h2>
+
+<h3>Huidige Status</h3>
+<table>
+  <tr><th>Stap</th><th>Status</th></tr>
+  <tr><td>Meta Developer account</td><td class="checkmark">✅ Aangemaakt</td></tr>
+  <tr><td>Business Portfolio "Vysion"</td><td class="checkmark">✅ Aangemaakt</td></tr>
+  <tr><td>App "Vysion Ordering"</td><td class="checkmark">✅ Aangemaakt</td></tr>
+  <tr><td>WhatsApp Business Platform</td><td class="checkmark">✅ Toegevoegd</td></tr>
+  <tr><td>Access Token</td><td class="pending">⏳ Tijdelijk (24 uur)</td></tr>
+  <tr><td>Webhook configuratie</td><td class="pending">⏳ Nog te doen</td></tr>
+  <tr><td>Permanent token</td><td class="pending">⏳ Nog te doen</td></tr>
+</table>
+
+<div class="page-break"></div>
+
+<h2>🔑 Credentials (TIJDELIJK)</h2>
+
+<div class="box warning">
+  <strong>⚠️ Let op:</strong> Deze Access Token verloopt na 24 uur! Maak een permanent token aan.
+</div>
+
+<pre><code>Phone Number ID: 102703134715030
+WhatsApp Business Account ID: 798714469903435
+Test Phone Number: +1 555 172 5626
+
+Access Token (tijdelijk - verloopt 8 feb 2026):
+EAANJrZAFW6ccBQs1SMdqXuCJGM3SFCcdlg9kXpJ7wbrokhjQL45dZCHH
+xfmVgYV4uZBzXT7rmZwwmZCKQtKIr1bYkxuOM7gYezesh8ZyYyIyU4Yw
+MUdgQ9QwHUAGGMkfX9DEWM0a9TYlcJkAeeQ2h43DMO4gNu3nJEbY0Ut2
+lcPy9NbOcfpz3XGfcRLG9DTSFth60rx7rfQnZCdMtASkIxVzHJWw2H8k
+FyG4z3kahhIrsH2IAdPDJgCfkPIlHpuQW6J6L5boz97D1Li8LacUMuwn
+4n7ZBMngZDZD</code></pre>
+
+<h2>📝 Volgende Stappen</h2>
+
+<h3>Stap 1: Webhook Configureren</h3>
+<ol>
+  <li>Ga naar <a href="https://developers.facebook.com/apps">developers.facebook.com/apps</a></li>
+  <li>Selecteer "Vysion Ordering" app</li>
+  <li>Klik op "Configuration" in het linkermenu</li>
+  <li>Bij "Webhook" vul in:</li>
+</ol>
+
+<div class="box info">
+  <strong>Callback URL:</strong><br>
+  <code>https://vysionhoreca.com/api/whatsapp/webhook</code><br><br>
+  <strong>Verify Token:</strong><br>
+  <code>vysion_whatsapp_verify_2024</code>
+</div>
+
+<ol start="5">
+  <li>Klik "Verify and save"</li>
+  <li>Subscribe to: <code>messages</code></li>
+</ol>
+
+<h3>Stap 2: Vercel Environment Variable</h3>
+<ol>
+  <li>Ga naar Vercel dashboard</li>
+  <li>Project Settings → Environment Variables</li>
+  <li>Voeg toe:</li>
+</ol>
+<pre><code>WHATSAPP_VERIFY_TOKEN = vysion_whatsapp_verify_2024</code></pre>
+
+<h3>Stap 3: Permanent Token Maken</h3>
+<ol>
+  <li>Ga naar Business Settings in Meta</li>
+  <li>System Users → Add</li>
+  <li>Maak System User met WhatsApp permissions</li>
+  <li>Generate permanent token</li>
+  <li>Update in Vysion Admin</li>
+</ol>
+
+<div class="page-break"></div>
+
+<h2>🔄 Hoe Het Werkt</h2>
+
+<h3>Klant Flow</h3>
+<pre><code>1. 📱 Klant scant QR code op toonbank
+         ↓
+2. 💬 WhatsApp opent automatisch
+         ↓
+3. 🤖 Bot: "Welkom bij [Zaak]! Wat wil je bestellen?"
+         ↓
+4. 📋 Klant ziet menu met knoppen
+         ↓
+5. 🛒 Klant kiest producten → winkelwagen
+         ↓
+6. ✅ Klant rekent af (naam + bevestiging)
+         ↓
+7. 📺 Order verschijnt op keuken iPad
+         ↓
+8. 👨‍🍳 Eigenaar klikt "Klaar"
+         ↓
+9. 📲 Klant krijgt WhatsApp: "Je bestelling is klaar!"</code></pre>
+
+<h2>💰 Kosten</h2>
+
+<table>
+  <tr><th>Berichten/maand</th><th>Kosten voor jou</th></tr>
+  <tr><td>0 - 1000</td><td><strong>GRATIS</strong></td></tr>
+  <tr><td>1000+</td><td>~€0.03 per bericht</td></tr>
+</table>
+
+<div class="box success">
+  <strong>💡 Tip:</strong> De meeste kleine zaken (frituren, bakkers) blijven onder 1000 berichten/maand = €0 kosten!
+</div>
+
+<h2>📁 Bestanden</h2>
+
+<pre><code>src/app/api/whatsapp/
+├── webhook/route.ts          # Hoofdlogica
+└── send-status/route.ts      # Status updates
+
+src/app/shop/[tenant]/admin/
+└── whatsapp/page.tsx         # Admin pagina
+
+supabase/
+└── whatsapp_tables.sql       # Database (uitgevoerd)
+
+WHATSAPP_ORDERING_SETUP.md    # Deze documentatie</code></pre>
+
+<h2>🆘 Problemen?</h2>
+
+<div class="box info">
+  <strong>Webhook werkt niet?</strong>
+  <ul>
+    <li>Check of Vercel env variable is toegevoegd</li>
+    <li>Check of Vercel opnieuw is gedeployed</li>
+    <li>Check Meta webhook subscription</li>
+  </ul>
+</div>
+
+<div class="box info">
+  <strong>Bot antwoordt niet?</strong>
+  <ul>
+    <li>Check of WhatsApp is ingeschakeld in admin</li>
+    <li>Check of Phone Number ID correct is</li>
+    <li>Check of Access Token nog geldig is</li>
+  </ul>
+</div>
+
+<div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #666;">
+  <p>Vysion Horeca - WhatsApp Ordering System</p>
+  <p><small>Documentatie gemaakt op 7 februari 2026</small></p>
+</div>
+
+</body>
+</html>
