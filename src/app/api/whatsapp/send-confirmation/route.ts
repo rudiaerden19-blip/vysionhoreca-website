@@ -62,9 +62,9 @@ export async function POST(request: NextRequest) {
     // Build confirmation message
     const orderTypeText = orderType === 'pickup' ? '🏪 Ophalen' : '🚗 Bezorgen'
 
-    const confirmationMessage = `✅ *Bestelling Ontvangen!*
+    const confirmationMessage = `📨 *Bestelling Verzonden!*
 
-Bedankt voor je bestelling bij ${businessName}!
+Je bestelling bij ${businessName} is ontvangen.
 
 📋 *Bestelnummer:* #${orderNumber}
 ${orderTypeText}${scheduledText}
@@ -74,7 +74,8 @@ ${itemsList}
 
 💰 *Totaal:* €${total.toFixed(2)}
 
-⏳ We laten je weten wanneer je bestelling is bevestigd! 🍟`
+⏳ *Wacht op bevestiging van de zaak...*
+Je krijgt een bericht zodra de zaak je bestelling bevestigt!`
 
     // Send the confirmation via WhatsApp
     const response = await fetch(`${WHATSAPP_API_URL}/${tenant.phone_number_id}/messages`, {

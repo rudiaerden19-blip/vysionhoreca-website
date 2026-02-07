@@ -302,6 +302,24 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         o.id === orderId ? { ...o, status: newStatus } : o
       ))
       
+      // Send WhatsApp status update
+      if (order?.customer_phone && ['preparing', 'ready', 'delivering', 'delivered'].includes(newStatus)) {
+        try {
+          await fetch('/api/whatsapp/send-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tenantSlug: params.tenant,
+              customerPhone: order.customer_phone,
+              orderNumber: order.order_number,
+              status: newStatus,
+            }),
+          })
+        } catch (e) {
+          console.error('Failed to send WhatsApp status:', e)
+        }
+      }
+      
       // Send email when order is ready for pickup
       if (newStatus === 'ready' && order?.customer_email) {
         try {
@@ -352,6 +370,24 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       setOrders(prev => prev.map(o => 
         o.id === order.id ? { ...o, status: 'confirmed', confirmed_at: new Date().toISOString() } : o
       ))
+      
+      // Send WhatsApp confirmation to customer
+      if (order.customer_phone) {
+        try {
+          await fetch('/api/whatsapp/send-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tenantSlug: params.tenant,
+              customerPhone: order.customer_phone,
+              orderNumber: order.order_number,
+              status: 'confirmed',
+            }),
+          })
+        } catch (e) {
+          console.error('Failed to send WhatsApp confirmation:', e)
+        }
+      }
       
       // Send confirmation email to customer with full order details
       if (order.customer_email) {

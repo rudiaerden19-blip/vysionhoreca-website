@@ -60,6 +60,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [scheduledDate, setScheduledDate] = useState<string>('') // Selected pickup date
   const [scheduledTime, setScheduledTime] = useState<string>('') // Selected pickup time
   const [whatsappPhone, setWhatsappPhone] = useState<string | null>(null) // Phone from WhatsApp link
+  const [businessWhatsApp, setBusinessWhatsApp] = useState<string>('') // Business WhatsApp number
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
   
@@ -76,8 +77,18 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           phone: waPhone.startsWith('32') ? `+${waPhone}` : waPhone
         }))
       }
+      
+      // Fetch business WhatsApp number
+      fetch(`/api/whatsapp/settings?tenant=${params.tenant}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.data?.whatsapp_number) {
+            setBusinessWhatsApp(data.data.whatsapp_number.replace(/[^0-9]/g, ''))
+          }
+        })
+        .catch(err => console.error('Failed to fetch WhatsApp settings:', err))
     }
-  }, [])
+  }, [params.tenant])
 
   useEffect(() => {
     loadData()
@@ -357,9 +368,10 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       // Then clear cart from localStorage (state blijft zodat we geen "empty cart" zien)
       localStorage.removeItem(`cart_${params.tenant}`)
       
-      // Send WhatsApp confirmation if user came from WhatsApp or has phone
+      // Send WhatsApp confirmation and redirect back to WhatsApp
       if (customerInfo.phone) {
         try {
+          // First send the confirmation message
           await fetch('/api/whatsapp/send-confirmation', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -379,9 +391,15 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             })
           })
           console.log('✅ WhatsApp confirmation sent')
+          
+          // If user came from WhatsApp, redirect back after short delay
+          if (whatsappPhone && businessWhatsApp) {
+            setTimeout(() => {
+              window.location.href = `https://wa.me/${businessWhatsApp}`
+            }, 2000) // 2 second delay so user sees the confirmation
+          }
         } catch (waError) {
           console.error('WhatsApp confirmation failed:', waError)
-          // Don't block the order success - WhatsApp is optional
         }
       }
       
