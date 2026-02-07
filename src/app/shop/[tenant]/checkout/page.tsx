@@ -59,8 +59,25 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>(['cash'])
   const [scheduledDate, setScheduledDate] = useState<string>('') // Selected pickup date
   const [scheduledTime, setScheduledTime] = useState<string>('') // Selected pickup time
+  const [whatsappPhone, setWhatsappPhone] = useState<string | null>(null) // Phone from WhatsApp link
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
+  
+  // Check if user came from WhatsApp (has ?wa= parameter)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const waPhone = urlParams.get('wa')
+      if (waPhone) {
+        setWhatsappPhone(waPhone)
+        // Pre-fill phone number
+        setCustomerInfo(prev => ({
+          ...prev,
+          phone: waPhone.startsWith('32') ? `+${waPhone}` : waPhone
+        }))
+      }
+    }
+  }, [])
 
   useEffect(() => {
     loadData()
@@ -339,6 +356,34 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       
       // Then clear cart from localStorage (state blijft zodat we geen "empty cart" zien)
       localStorage.removeItem(`cart_${params.tenant}`)
+      
+      // Send WhatsApp confirmation if user came from WhatsApp or has phone
+      if (customerInfo.phone) {
+        try {
+          await fetch('/api/whatsapp/send-confirmation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tenantSlug: params.tenant,
+              customerPhone: customerInfo.phone,
+              orderNumber: order.order_number,
+              orderType: orderType,
+              total: total,
+              items: cart.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                total_price: item.totalPrice * item.quantity,
+              })),
+              scheduledDate: scheduledDate,
+              scheduledTime: scheduledTime,
+            })
+          })
+          console.log('✅ WhatsApp confirmation sent')
+        } catch (waError) {
+          console.error('WhatsApp confirmation failed:', waError)
+          // Don't block the order success - WhatsApp is optional
+        }
+      }
       
       // Scroll to top for mobile
       setTimeout(() => {
