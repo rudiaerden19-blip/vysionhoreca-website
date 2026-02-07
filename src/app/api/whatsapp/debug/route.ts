@@ -6,6 +6,9 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+const WHATSAPP_API_VERSION = 'v24.0'
+const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
+
 // Debug endpoint to check WhatsApp settings
 export async function GET(request: NextRequest) {
   try {
@@ -23,13 +26,33 @@ export async function GET(request: NextRequest) {
 
     // Check if test phone number ID exists
     const testPhoneId = '1027031347150330'
-    const hasTestNumber = settings?.some(s => s.phone_number_id === testPhoneId)
+    const tenant = settings?.find(s => s.phone_number_id === testPhoneId)
+
+    // Test the WhatsApp API connection if we have settings
+    let apiTest = null
+    if (tenant?.access_token) {
+      try {
+        const response = await fetch(`${WHATSAPP_API_URL}/${tenant.phone_number_id}`, {
+          headers: {
+            'Authorization': `Bearer ${tenant.access_token}`
+          }
+        })
+        const data = await response.json()
+        apiTest = {
+          status: response.status,
+          ok: response.ok,
+          response: data
+        }
+      } catch (err) {
+        apiTest = { error: String(err) }
+      }
+    }
 
     return NextResponse.json({
       status: 'ok',
       message: 'WhatsApp Debug Info',
       test_phone_number_id: testPhoneId,
-      test_number_configured: hasTestNumber,
+      test_number_configured: !!tenant,
       total_settings: settings?.length || 0,
       settings: settings?.map(s => ({
         tenant: s.tenant_slug,
@@ -38,7 +61,8 @@ export async function GET(request: NextRequest) {
         whatsapp_number: s.whatsapp_number,
         has_access_token: !!s.access_token && s.access_token.length > 10,
         access_token_length: s.access_token?.length || 0
-      }))
+      })),
+      api_test: apiTest
     })
   } catch (error) {
     return NextResponse.json({ 
