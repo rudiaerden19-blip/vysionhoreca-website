@@ -51,6 +51,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       status: 'ok',
       message: 'WhatsApp Debug Info',
+      verify_token_set: !!process.env.WHATSAPP_VERIFY_TOKEN,
+      verify_token_length: process.env.WHATSAPP_VERIFY_TOKEN?.length || 0,
       test_phone_number_id: testPhoneId,
       test_number_configured: !!tenant,
       total_settings: settings?.length || 0,
