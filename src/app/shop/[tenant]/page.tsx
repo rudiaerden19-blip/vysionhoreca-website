@@ -175,6 +175,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     }
   }, [params.tenant])
   
+  // Save WhatsApp phone if user came from WhatsApp link
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const waPhone = urlParams.get('wa')
+      if (waPhone) {
+        localStorage.setItem(`whatsapp_phone_${params.tenant}`, waPhone)
+      }
+    }
+  }, [params.tenant])
+  
   // Reservation form state
   const [reservationForm, setReservationForm] = useState({
     firstName: '',

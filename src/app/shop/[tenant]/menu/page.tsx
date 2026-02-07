@@ -57,6 +57,17 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const isScrollingToSection = useRef(false)
 
+  // Save WhatsApp phone if user came from WhatsApp link
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      const waPhone = urlParams.get('wa')
+      if (waPhone) {
+        localStorage.setItem(`whatsapp_phone_${params.tenant}`, waPhone)
+      }
+    }
+  }, [params.tenant])
+
   // Scroll spy - update active category based on scroll position
   useEffect(() => {
     const handleScroll = () => {

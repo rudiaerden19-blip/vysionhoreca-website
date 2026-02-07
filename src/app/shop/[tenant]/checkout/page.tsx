@@ -64,17 +64,23 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
   
-  // Check if user came from WhatsApp (has ?wa= parameter)
+  // Check if user came from WhatsApp (has ?wa= parameter or saved in localStorage)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search)
-      const waPhone = urlParams.get('wa')
+      let waPhone = urlParams.get('wa')
+      
+      // If not in URL, check localStorage (saved when user opened shop from WhatsApp)
+      if (!waPhone) {
+        waPhone = localStorage.getItem(`whatsapp_phone_${params.tenant}`)
+      }
+      
       if (waPhone) {
         setWhatsappPhone(waPhone)
         // Pre-fill phone number
         setCustomerInfo(prev => ({
           ...prev,
-          phone: waPhone.startsWith('32') ? `+${waPhone}` : waPhone
+          phone: waPhone!.startsWith('32') ? `+${waPhone}` : waPhone!
         }))
       }
       
