@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
+import QRCode from '@/components/QRCode'
 
 interface WhatsAppSettings {
   id?: string
@@ -12,6 +13,7 @@ interface WhatsAppSettings {
   phone_number_id: string
   access_token: string
   business_account_id: string
+  whatsapp_number: string  // The actual phone number for QR code
   is_active: boolean
   welcome_message: string
   order_confirmation_message: string
@@ -32,11 +34,15 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
     phone_number_id: '',
     access_token: '',
     business_account_id: '',
+    whatsapp_number: '',
     is_active: false,
     welcome_message: 'Welkom! Typ "menu" om onze menukaart te bekijken.',
     order_confirmation_message: 'Je bestelling is ontvangen! We laten je weten wanneer het klaar is.',
     ready_message: 'Je bestelling is klaar! Je kunt het nu ophalen.'
   })
+  
+  // QR Code ref for printing
+  const qrRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     loadSettings()
@@ -394,6 +400,28 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
         </div>
       </div>
 
+      {/* WhatsApp Number for QR */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
+        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <span>📞</span> WhatsApp Nummer
+        </h3>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Je WhatsApp Business telefoonnummer *
+          </label>
+          <input
+            type="tel"
+            value={formData.whatsapp_number}
+            onChange={(e) => setFormData(prev => ({ ...prev, whatsapp_number: e.target.value.replace(/[^0-9+]/g, '') }))}
+            placeholder="+32475123456"
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Internationaal formaat met landcode (bijv. +32 voor België, +31 voor Nederland)
+          </p>
+        </div>
+      </div>
+
       {/* QR Code Preview */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -402,16 +430,118 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
         <p className="text-gray-500 mb-4">
           Print deze QR code en plaats hem op je toonbank of tafels. Klanten scannen en kunnen direct bestellen via WhatsApp.
         </p>
-        <div className="flex items-center justify-center p-8 bg-gray-50 rounded-xl">
-          <div className="text-center">
-            <div className="w-48 h-48 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <span className="text-gray-400 text-sm">QR Code</span>
+        
+        {formData.whatsapp_number && formData.whatsapp_number.length > 8 ? (
+          <div className="flex flex-col lg:flex-row items-center gap-8">
+            {/* QR Code */}
+            <div ref={qrRef} className="bg-white p-6 rounded-2xl shadow-lg border-2 border-gray-100">
+              <div className="text-center mb-4">
+                <span className="text-4xl">💬</span>
+                <h4 className="font-bold text-gray-900 mt-2">Scan om te bestellen</h4>
+              </div>
+              <QRCode 
+                url={`https://wa.me/${formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hallo`}
+                size={200}
+                className="mx-auto"
+              />
+              <p className="text-center text-sm text-gray-500 mt-4">
+                Via WhatsApp
+              </p>
             </div>
-            <p className="text-sm text-gray-500">
-              QR code wordt gegenereerd zodra WhatsApp actief is
-            </p>
+
+            {/* Actions */}
+            <div className="flex-1 space-y-4">
+              <div className="bg-green-50 p-4 rounded-xl">
+                <h4 className="font-bold text-green-800 mb-2">✅ QR Code Klaar!</h4>
+                <p className="text-sm text-green-700">
+                  Klanten scannen deze code en openen direct een WhatsApp chat met je zaak.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <p className="text-sm text-gray-600 mb-2">
+                  <strong>Link:</strong>
+                </p>
+                <code className="text-xs bg-white px-3 py-2 rounded-lg block break-all">
+                  https://wa.me/{formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hallo
+                </code>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    const link = `https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=Hallo`
+                    navigator.clipboard.writeText(link)
+                    alert('Link gekopieerd!')
+                  }}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium flex items-center justify-center gap-2"
+                >
+                  📋 Kopieer Link
+                </button>
+                <button
+                  onClick={() => {
+                    if (qrRef.current) {
+                      const printWindow = window.open('', '_blank')
+                      if (printWindow) {
+                        printWindow.document.write(`
+                          <!DOCTYPE html>
+                          <html>
+                            <head>
+                              <title>WhatsApp QR Code</title>
+                              <style>
+                                body { 
+                                  display: flex; 
+                                  justify-content: center; 
+                                  align-items: center; 
+                                  min-height: 100vh; 
+                                  margin: 0;
+                                  font-family: Arial, sans-serif;
+                                }
+                                .container {
+                                  text-align: center;
+                                  padding: 40px;
+                                }
+                                h1 { font-size: 24px; margin-bottom: 20px; }
+                                p { color: #666; margin-top: 20px; }
+                              </style>
+                            </head>
+                            <body>
+                              <div class="container">
+                                <h1>💬 Scan om te bestellen</h1>
+                                ${qrRef.current.innerHTML}
+                                <p>Bestel via WhatsApp</p>
+                              </div>
+                            </body>
+                          </html>
+                        `)
+                        printWindow.document.close()
+                        printWindow.focus()
+                        setTimeout(() => {
+                          printWindow.print()
+                          printWindow.close()
+                        }, 500)
+                      }
+                    }
+                  }}
+                  className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium flex items-center justify-center gap-2"
+                >
+                  🖨️ Print QR Code
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex items-center justify-center p-8 bg-gray-50 rounded-xl">
+            <div className="text-center">
+              <div className="w-48 h-48 bg-white border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <span className="text-gray-400 text-4xl">📱</span>
+              </div>
+              <p className="text-sm text-gray-500">
+                Vul je WhatsApp nummer in om de QR code te genereren
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Save Button */}

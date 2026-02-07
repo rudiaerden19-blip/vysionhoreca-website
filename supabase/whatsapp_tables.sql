@@ -7,9 +7,10 @@
 CREATE TABLE IF NOT EXISTS whatsapp_settings (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   tenant_slug TEXT NOT NULL UNIQUE REFERENCES tenant_settings(tenant_slug) ON DELETE CASCADE,
-  phone_number_id TEXT NOT NULL,           -- WhatsApp Business Phone Number ID
+  phone_number_id TEXT NOT NULL,           -- WhatsApp Business Phone Number ID (Meta API)
   access_token TEXT NOT NULL,              -- Meta Access Token
   business_account_id TEXT,                -- Meta Business Account ID
+  whatsapp_number TEXT,                    -- Actual WhatsApp phone number (for QR code)
   webhook_verify_token TEXT,               -- Custom verify token
   is_active BOOLEAN DEFAULT true,
   welcome_message TEXT DEFAULT 'Welkom! Typ "menu" om onze menukaart te bekijken.',
