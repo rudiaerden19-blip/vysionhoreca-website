@@ -977,45 +977,4 @@ async function sendInteractiveList(
   }
 }
 
-// Export function to send order status updates
-export async function sendOrderStatusUpdate(
-  tenantSlug: string,
-  orderNumber: number,
-  customerPhone: string,
-  status: 'preparing' | 'ready' | 'completed'
-) {
-  // Get tenant's WhatsApp settings
-  const { data: settings } = await supabaseAdmin
-    .from('whatsapp_settings')
-    .select('*')
-    .eq('tenant_slug', tenantSlug)
-    .eq('is_active', true)
-    .single()
-
-  if (!settings) {
-    console.log('❌ No WhatsApp settings for tenant:', tenantSlug)
-    return false
-  }
-
-  let message = ''
-  switch (status) {
-    case 'preparing':
-      message = `👨‍🍳 Je bestelling #${orderNumber} wordt nu bereid!\n\nWe laten je weten wanneer het klaar is.`
-      break
-    case 'ready':
-      message = `🔔 *Je bestelling #${orderNumber} is KLAAR!*\n\nJe kunt het nu ophalen. Tot zo! 🎉`
-      break
-    case 'completed':
-      message = `✅ Bedankt voor je bestelling #${orderNumber}!\n\nWe hopen je snel weer te zien! 😊`
-      break
-  }
-
-  await sendTextMessage(
-    settings.phone_number_id,
-    customerPhone,
-    settings.access_token,
-    message
-  )
-
-  return true
-}
+// Note: Order status updates are handled via /api/whatsapp/send-status endpoint
