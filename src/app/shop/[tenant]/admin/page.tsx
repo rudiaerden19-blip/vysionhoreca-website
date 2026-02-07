@@ -191,7 +191,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   const quickActions = [
     { nameKey: 'addProduct', href: `/shop/${params.tenant}/admin/producten`, icon: '➕', color: 'bg-green-500' },
     { nameKey: 'openingHours', href: `/shop/${params.tenant}/admin/openingstijden`, icon: '🕐', color: 'bg-blue-500' },
-    { nameKey: 'createQr', href: `/shop/${params.tenant}/admin/qr-codes`, icon: '📱', color: 'bg-purple-500' },
+    { nameKey: 'whatsapp', href: `/shop/${params.tenant}/admin/whatsapp`, icon: '💬', color: 'bg-green-600' },
     { nameKey: 'startPromotion', href: `/shop/${params.tenant}/admin/promoties`, icon: '🎁', color: 'bg-pink-500' },
   ]
 

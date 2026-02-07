@@ -277,6 +277,22 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   async function handleReady(order: Order) {
     await updateOrderStatus(order.id, 'ready')
+    
+    // Send WhatsApp notification if order was from WhatsApp
+    try {
+      await fetch('/api/whatsapp/send-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tenantSlug: params.tenant,
+          orderId: order.id,
+          status: 'ready'
+        })
+      })
+    } catch (err) {
+      console.log('WhatsApp notification skipped')
+    }
+    
     setNewOrderIds(prev => {
       const next = new Set(prev)
       next.delete(order.id)
