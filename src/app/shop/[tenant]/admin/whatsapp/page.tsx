@@ -428,7 +428,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                 <h4 className="font-bold text-gray-900 mt-2">Scan om te bestellen</h4>
               </div>
               <QRCode 
-                url={`https://wa.me/${formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hallo`}
+                url={`https://wa.me/${formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=menu`}
                 size={200}
                 className="mx-auto"
               />
@@ -451,14 +451,14 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                   <strong>Link:</strong>
                 </p>
                 <code className="text-xs bg-white px-3 py-2 rounded-lg block break-all">
-                  https://wa.me/{formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hallo
+                  https://wa.me/{formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=menu
                 </code>
               </div>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => {
-                    const link = `https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=Hallo`
+                    const link = `https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=menu`
                     navigator.clipboard.writeText(link)
                     alert('Link gekopieerd!')
                   }}
