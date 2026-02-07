@@ -79,7 +79,7 @@ In Meta Developer Console → Configuration:
 
 ```
 Callback URL: https://vysionhoreca.com/api/whatsapp/webhook
-Verify Token: vysion_whatsapp_verify_2024
+Verify Token: vysionwhatsappverify2024
 ```
 
 Subscribe to:
@@ -89,7 +89,7 @@ Subscribe to:
 ### Vercel Environment Variables (NOG TE DOEN)
 
 ```
-WHATSAPP_VERIFY_TOKEN=vysion_whatsapp_verify_2024
+WHATSAPP_VERIFY_TOKEN=vysionwhatsappverify2024
 ```
 
 ---
@@ -173,7 +173,7 @@ src/app/keuken/[tenant]/page.tsx  # Aangepast voor WhatsApp notificaties
 3. Ga naar Configuration → Webhooks
 4. Vul in:
    - Callback URL: `https://vysionhoreca.com/api/whatsapp/webhook`
-   - Verify Token: `vysion_whatsapp_verify_2024`
+   - Verify Token: `vysionwhatsappverify2024`
 5. Klik "Verify and save"
 6. Subscribe to "messages"
 7. Voeg WHATSAPP_VERIFY_TOKEN toe in Vercel
