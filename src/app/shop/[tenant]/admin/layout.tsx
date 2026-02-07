@@ -55,6 +55,14 @@ const menuItems = [
     ]
   },
   {
+    categoryKey: 'whatsapp',
+    icon: '💬',
+    items: [
+      { nameKey: 'whatsappSettings', href: '/whatsapp', icon: '⚙️' },
+      { nameKey: 'whatsappQr', href: '/whatsapp#qr', icon: '📱' },
+    ]
+  },
+  {
     categoryKey: 'marketing',
     icon: '📣',
     items: [
