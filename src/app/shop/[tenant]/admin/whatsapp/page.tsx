@@ -450,12 +450,25 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                 <p className="text-sm text-gray-600 mb-2">
                   <strong>Link:</strong>
                 </p>
-                <code className="text-xs bg-white px-3 py-2 rounded-lg block break-all">
-                  https://wa.me/{formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen
-                </code>
+                <a 
+                  href={`https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs bg-white px-3 py-2 rounded-lg block break-all text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  https://wa.me/{formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen
+                </a>
               </div>
 
               <div className="flex gap-3">
+                <a
+                  href={`https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-3 bg-green-100 hover:bg-green-200 text-green-800 rounded-xl font-medium flex items-center justify-center gap-2"
+                >
+                  🔗 Open Link
+                </a>
                 <button
                   onClick={() => {
                     const link = `https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen`
