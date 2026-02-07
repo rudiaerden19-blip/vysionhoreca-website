@@ -9,6 +9,23 @@ const supabaseAdmin = createClient(
 const WHATSAPP_API_VERSION = 'v24.0'
 const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
 
+// Store last webhook for debugging
+let lastWebhook: any = null
+let lastWebhookTime: string | null = null
+
+// POST - store webhook for debugging
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json()
+    lastWebhook = body
+    lastWebhookTime = new Date().toISOString()
+    console.log('🔍 DEBUG webhook received:', JSON.stringify(body, null, 2))
+    return NextResponse.json({ stored: true })
+  } catch (e) {
+    return NextResponse.json({ error: String(e) })
+  }
+}
+
 // Debug endpoint to check WhatsApp settings
 export async function GET(request: NextRequest) {
   try {
@@ -64,7 +81,9 @@ export async function GET(request: NextRequest) {
         has_access_token: !!s.access_token && s.access_token.length > 10,
         access_token_length: s.access_token?.length || 0
       })),
-      api_test: apiTest
+      api_test: apiTest,
+      last_webhook_time: lastWebhookTime,
+      last_webhook: lastWebhook
     })
   } catch (error) {
     return NextResponse.json({ 
