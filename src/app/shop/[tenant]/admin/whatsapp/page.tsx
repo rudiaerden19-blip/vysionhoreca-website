@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import QRCode from '@/components/QRCode'
@@ -49,18 +48,13 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
   }, [params.tenant])
 
   async function loadSettings() {
-    if (!supabase) return
-
     try {
-      const { data, error } = await supabase
-        .from('whatsapp_settings')
-        .select('*')
-        .eq('tenant_slug', params.tenant)
-        .single()
+      const response = await fetch(`/api/whatsapp/settings?tenant=${params.tenant}`)
+      const result = await response.json()
 
-      if (data) {
-        setSettings(data)
-        setFormData(data)
+      if (result.data) {
+        setSettings(result.data)
+        setFormData(result.data)
       }
     } catch (err) {
       // No settings yet, that's fine
@@ -70,8 +64,6 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
   }
 
   async function handleSave() {
-    if (!supabase) return
-
     setSaving(true)
     setError('')
     setSaved(false)
@@ -82,24 +74,20 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
         tenant_slug: params.tenant
       }
 
-      if (settings?.id) {
-        // Update existing
-        const { error } = await supabase
-          .from('whatsapp_settings')
-          .update(saveData)
-          .eq('id', settings.id)
+      const response = await fetch('/api/whatsapp/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(saveData)
+      })
 
-        if (error) throw error
-      } else {
-        // Insert new
-        const { data, error } = await supabase
-          .from('whatsapp_settings')
-          .insert(saveData)
-          .select()
-          .single()
+      const result = await response.json()
 
-        if (error) throw error
-        setSettings(data)
+      if (!response.ok) {
+        throw new Error(result.error || 'Opslaan mislukt')
+      }
+
+      if (result.data) {
+        setSettings(result.data)
       }
 
       setSaved(true)
