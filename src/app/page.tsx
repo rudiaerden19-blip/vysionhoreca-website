@@ -248,7 +248,6 @@ function FeaturesSection() {
     { key: 'reports', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /> },
     { key: 'analytics', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /> },
     { key: 'payments', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" /> },
-    { key: 'invoicing', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /> },
     { key: 'staff', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /> },
     { key: 'kitchen', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /> },
     { key: 'loyalty', icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /> },
@@ -992,12 +991,11 @@ function ComparisonSection() {
 
 // Industry Section
 function IndustrySection() {
-  const [activeTab, setActiveTab] = useState('invoicing')
+  const [activeTab, setActiveTab] = useState('ordering')
   const [showLightbox, setShowLightbox] = useState(false)
   const { t, locale } = useLanguage()
   
   const industries = {
-    invoicing: { image: '/images/industry-invoicing.png' },
     ordering: { image: '/images/industry-ordering.png' },
     analytics: { image: '/images/industry-analytics.png' },
     accounting: { image: '/images/cost-calculator-1.png' },
@@ -1016,7 +1014,7 @@ function IndustrySection() {
         
         {/* Tabs */}
         <div className="flex flex-wrap gap-3 sm:gap-6 lg:gap-8 mb-12 justify-center lg:justify-start">
-          {['invoicing', 'ordering', 'analytics', 'accounting', 'payroll'].map((tab) => (
+          {['ordering', 'analytics', 'accounting', 'payroll'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
