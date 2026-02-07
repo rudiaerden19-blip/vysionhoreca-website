@@ -820,13 +820,16 @@ export async function POST(request: NextRequest) {
     const value = changes?.value
 
     if (!value) {
+      console.log('❌ No value in webhook body')
       return NextResponse.json({ status: 'no value' })
     }
 
     const businessPhoneId = value.metadata?.phone_number_id
+    console.log('📞 Business Phone ID:', businessPhoneId)
 
     if (value.messages) {
       for (const message of value.messages) {
+        console.log('📨 Processing message from:', message.from, 'type:', message.type)
         await handleIncomingMessage(message, businessPhoneId, value.contacts?.[0])
       }
     }
@@ -840,7 +843,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: 'ok' })
   } catch (error) {
     console.error('❌ WhatsApp webhook error:', error)
-    return NextResponse.json({ error: 'Internal error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal error', details: String(error) }, { status: 500 })
   }
 }
 
@@ -888,12 +891,32 @@ async function handleIncomingMessage(
 // =====================================================
 
 async function findTenantByWhatsAppPhone(phoneId: string) {
-  const { data } = await supabaseAdmin
+  console.log('🔍 Looking for tenant with phone_number_id:', phoneId)
+  
+  // First check all whatsapp_settings to see what's in the database
+  const { data: allSettings, error: allError } = await supabaseAdmin
+    .from('whatsapp_settings')
+    .select('tenant_slug, phone_number_id, is_active')
+  
+  console.log('📋 All WhatsApp settings in database:', JSON.stringify(allSettings, null, 2))
+  if (allError) console.log('❌ Error fetching all settings:', allError)
+  
+  const { data, error } = await supabaseAdmin
     .from('whatsapp_settings')
     .select('*')
     .eq('phone_number_id', phoneId)
     .eq('is_active', true)
     .single()
+  
+  if (error) {
+    console.log('❌ Error finding tenant:', error.message)
+  }
+  if (data) {
+    console.log('✅ Found tenant:', data.tenant_slug)
+  } else {
+    console.log('❌ No tenant found for phone_number_id:', phoneId)
+  }
+  
   return data
 }
 
