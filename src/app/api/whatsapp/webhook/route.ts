@@ -70,6 +70,9 @@ export async function POST(request: NextRequest) {
 
     console.log(`🏪 Tenant found: ${tenant.tenant_slug}`)
 
+    // Mark message as read (blue checkmarks for customer)
+    await markMessageAsRead(businessPhoneId, message.id, tenant.access_token)
+
     // Always send welcome message when customer sends anything
     await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName)
 
@@ -148,6 +151,31 @@ async function sendWelcomeWithShopLink(
   })
 
   console.log(`✅ Welcome message sent to ${toPhone}`)
+}
+
+// Mark message as read (blue checkmarks)
+async function markMessageAsRead(
+  phoneNumberId: string,
+  messageId: string,
+  accessToken: string
+) {
+  try {
+    await fetch(`${WHATSAPP_API_URL}/${phoneNumberId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        status: 'read',
+        message_id: messageId
+      })
+    })
+    console.log('✅ Message marked as read')
+  } catch (error) {
+    console.error('❌ Failed to mark as read:', error)
+  }
 }
 
 // Send image with CTA button (professional welcome)
