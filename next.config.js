@@ -8,7 +8,7 @@ const ContentSecurityPolicy = `
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' data: blob: https: http:;
   font-src 'self' https://fonts.gstatic.com data:;
-  connect-src 'self' https://*.supabase.co https://*.supabase.in https://api.stripe.com https://*.upstash.io wss://*.supabase.co https://*.sentry.io https://*.ingest.sentry.io;
+  connect-src 'self' https://*.supabase.co https://*.supabase.in https://api.stripe.com https://*.upstash.io wss://*.supabase.co https://*.sentry.io https://*.ingest.sentry.io https://graph.facebook.com;
   frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com;
   frame-ancestors 'self';
   form-action 'self';
