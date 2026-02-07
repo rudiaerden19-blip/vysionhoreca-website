@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     // Get all whatsapp_settings
     const { data: settings, error: settingsError } = await supabaseAdmin
       .from('whatsapp_settings')
-      .select('tenant_slug, phone_number_id, is_active, whatsapp_number')
+      .select('tenant_slug, phone_number_id, is_active, whatsapp_number, access_token')
     
     if (settingsError) {
       return NextResponse.json({ 
@@ -35,7 +35,9 @@ export async function GET(request: NextRequest) {
         tenant: s.tenant_slug,
         phone_number_id: s.phone_number_id,
         is_active: s.is_active,
-        whatsapp_number: s.whatsapp_number
+        whatsapp_number: s.whatsapp_number,
+        has_access_token: !!s.access_token && s.access_token.length > 10,
+        access_token_length: s.access_token?.length || 0
       }))
     })
   } catch (error) {
