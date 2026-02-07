@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`🏪 Tenant found: ${tenant.tenant_slug}`)
 
-    // Send welcome message with shop link
+    // Always send welcome message when customer sends anything
     await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName)
 
     return NextResponse.json({ status: 'ok' })
@@ -105,10 +105,29 @@ async function findTenantByWhatsAppPhone(phoneNumberId: string) {
     .eq('slug', data.tenant_slug)
     .single()
 
+  // Get tenant settings for cover image
+  const { data: tenantSettings } = await supabaseAdmin
+    .from('tenant_settings')
+    .select('cover_image_1, logo_url, business_name')
+    .eq('tenant_slug', data.tenant_slug)
+    .single()
+
+  // Parse cover image URL if it's JSON
+  let coverImageUrl = null
+  if (tenantSettings?.cover_image_1) {
+    try {
+      const parsed = JSON.parse(tenantSettings.cover_image_1)
+      coverImageUrl = parsed.url
+    } catch {
+      coverImageUrl = tenantSettings.cover_image_1
+    }
+  }
+
   return {
     ...data,
-    business_name: tenantData?.name || data.tenant_slug,
-    shop_url: `${BASE_URL}/shop/${data.tenant_slug}`
+    business_name: tenantSettings?.business_name || tenantData?.name || data.tenant_slug,
+    shop_url: `${BASE_URL}/shop/${data.tenant_slug}`,
+    cover_image_url: coverImageUrl || tenantSettings?.logo_url
   }
 }
 
@@ -120,25 +139,67 @@ async function sendWelcomeWithShopLink(
 ) {
   console.log(`📤 Sending welcome message to ${toPhone}`)
 
-  // First send an image with the welcome text
-  const welcomeText = `👋 Hallo ${customerName}!\n\nWelkom bij ${tenant.business_name}.\n\n🍟 Bekijk ons menu en bestel direct!`
-
-  // Send text message first
-  await sendTextMessage(phoneNumberId, toPhone, tenant.access_token, welcomeText)
-
-  // Then send the CTA button to open the shop
-  await sendCTAButton(phoneNumberId, toPhone, tenant.access_token, {
-    body: `Klik op de knop om te bestellen. Je bestelling wordt bevestigd via WhatsApp.`,
-    buttons: [
-      {
-        type: 'url',
-        title: '🍔 Bestellen',
-        url: `${tenant.shop_url}?wa=${toPhone}`
-      }
-    ]
+  // Send professional welcome with image + CTA button
+  await sendImageWithCTA(phoneNumberId, toPhone, tenant.access_token, {
+    imageUrl: tenant.cover_image_url,
+    body: `🍟 Welkom bij ${tenant.business_name}!\n\nBekijk ons menu en bestel direct. Je bestelling wordt bevestigd via WhatsApp.`,
+    buttonText: '🍔 BESTELLEN',
+    buttonUrl: `${tenant.shop_url}?wa=${toPhone}`
   })
 
   console.log(`✅ Welcome message sent to ${toPhone}`)
+}
+
+// Send image with CTA button (professional welcome)
+async function sendImageWithCTA(
+  phoneNumberId: string,
+  to: string,
+  accessToken: string,
+  content: { imageUrl?: string; body: string; buttonText: string; buttonUrl: string }
+) {
+  const messageBody: any = {
+    messaging_product: 'whatsapp',
+    recipient_type: 'individual',
+    to,
+    type: 'interactive',
+    interactive: {
+      type: 'cta_url',
+      body: { text: content.body },
+      action: {
+        name: 'cta_url',
+        parameters: {
+          display_text: content.buttonText,
+          url: content.buttonUrl
+        }
+      }
+    }
+  }
+
+  // Add image header if available
+  if (content.imageUrl) {
+    messageBody.interactive.header = {
+      type: 'image',
+      image: { link: content.imageUrl }
+    }
+  }
+
+  const response = await fetch(`${WHATSAPP_API_URL}/${phoneNumberId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(messageBody)
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    console.error('❌ WhatsApp Image+CTA API error:', error)
+    
+    // Fallback: send text with link
+    await sendTextMessage(phoneNumberId, to, accessToken, 
+      `${content.body}\n\n👉 ${content.buttonUrl}`)
+  }
 }
 
 // Send a text message
