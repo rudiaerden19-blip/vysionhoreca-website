@@ -309,50 +309,49 @@ async function findTenantByWhatsAppPhone(phoneNumberId: string) {
 }
 
 // Translations for welcome messages (all 9 languages)
-// Made larger with more spacing and text to fill screen
 const WELCOME_MESSAGES: Record<string, { body: string; button: string; tip: string }> = {
   nl: {
-    body: '🎉 *Welkom bij {business}!*\n\n━━━━━━━━━━━━━━━━━━━━\n\n📱 Bestel gemakkelijk via onze webshop\n\n✅ Kies je favoriete gerechten\n✅ Betaal veilig online of bij afhalen\n✅ Ontvang updates via WhatsApp\n\n━━━━━━━━━━━━━━━━━━━━\n\n👇 *Klik hieronder om te bestellen*',
+    body: 'Welkom bij {business}!\n\nKlik hieronder om te bestellen.\nJe krijgt bevestiging via WhatsApp.',
     button: '🍔 BESTELLEN',
-    tip: '💡 Tip: Stuur ons altijd BESTEL om de shop te openen!'
+    tip: '💡 Tip: Stuur ons altijd BESTEL, dan gaat de shop open!'
   },
   en: {
-    body: '🎉 *Welcome to {business}!*\n\n━━━━━━━━━━━━━━━━━━━━\n\n📱 Order easily via our webshop\n\n✅ Choose your favorite dishes\n✅ Pay securely online or at pickup\n✅ Receive updates via WhatsApp\n\n━━━━━━━━━━━━━━━━━━━━\n\n👇 *Click below to order*',
+    body: 'Welcome to {business}!\n\nClick below to order.\nYou will receive confirmation via WhatsApp.',
     button: '🍔 ORDER NOW',
-    tip: '💡 Tip: Always send ORDER to open the shop!'
+    tip: '💡 Tip: Always send us ORDER to open the shop!'
   },
   fr: {
-    body: '🎉 *Bienvenue chez {business}!*\n\n━━━━━━━━━━━━━━━━━━━━\n\n📱 Commandez facilement via notre boutique\n\n✅ Choisissez vos plats préférés\n✅ Payez en ligne ou au retrait\n✅ Recevez des mises à jour via WhatsApp\n\n━━━━━━━━━━━━━━━━━━━━\n\n👇 *Cliquez ci-dessous pour commander*',
+    body: 'Bienvenue chez {business}!\n\nCliquez ci-dessous pour commander.\nVous recevrez une confirmation via WhatsApp.',
     button: '🍔 COMMANDER',
-    tip: '💡 Conseil: Envoyez COMMANDER pour ouvrir la boutique!'
+    tip: '💡 Conseil: Envoyez-nous COMMANDER pour ouvrir la boutique!'
   },
   de: {
-    body: '🎉 *Willkommen bei {business}!*\n\n━━━━━━━━━━━━━━━━━━━━\n\n📱 Bestellen Sie einfach über unseren Webshop\n\n✅ Wählen Sie Ihre Lieblingsgerichte\n✅ Zahlen Sie sicher online oder bei Abholung\n✅ Erhalten Sie Updates via WhatsApp\n\n━━━━━━━━━━━━━━━━━━━━\n\n👇 *Klicken Sie unten um zu bestellen*',
+    body: 'Willkommen bei {business}!\n\nKlicken Sie unten, um zu bestellen.\nSie erhalten eine Bestätigung via WhatsApp.',
     button: '🍔 BESTELLEN',
-    tip: '💡 Tipp: Senden Sie BESTELLEN um den Shop zu öffnen!'
+    tip: '💡 Tipp: Senden Sie uns BESTELLEN um den Shop zu öffnen!'
   },
   es: {
-    body: '🎉 *¡Bienvenido a {business}!*\n\n━━━━━━━━━━━━━━━━━━━━\n\n📱 Pide fácilmente en nuestra tienda\n\n✅ Elige tus platos favoritos\n✅ Paga seguro online o al recoger\n✅ Recibe actualizaciones por WhatsApp\n\n━━━━━━━━━━━━━━━━━━━━\n\n👇 *Haz clic abajo para pedir*',
+    body: '¡Bienvenido a {business}!\n\nHaz clic abajo para pedir.\nRecibirás confirmación por WhatsApp.',
     button: '🍔 PEDIR',
-    tip: '💡 Consejo: ¡Envía PEDIR para abrir la tienda!'
+    tip: '💡 Consejo: ¡Envíanos PEDIR para abrir la tienda!'
   },
   it: {
-    body: '🎉 *Benvenuto da {business}!*\n\n━━━━━━━━━━━━━━━━━━━━\n\n📱 Ordina facilmente dal nostro negozio\n\n✅ Scegli i tuoi piatti preferiti\n✅ Paga sicuro online o al ritiro\n✅ Ricevi aggiornamenti via WhatsApp\n\n━━━━━━━━━━━━━━━━━━━━\n\n👇 *Clicca sotto per ordinare*',
+    body: 'Benvenuto da {business}!\n\nClicca sotto per ordinare.\nRiceverai conferma via WhatsApp.',
     button: '🍔 ORDINA',
-    tip: '💡 Consiglio: Invia ORDINA per aprire il negozio!'
+    tip: '💡 Consiglio: Inviaci ORDINA per aprire il negozio!'
   },
   ja: {
-    body: '🎉 *{business}へようこそ!*\n\n━━━━━━━━━━━━━━━━━━━━\n\n📱 ウェブショップで簡単注文\n\n✅ お気に入りの料理を選択\n✅ オンラインまたは受取時に安全にお支払い\n✅ WhatsAppで更新を受け取る\n\n━━━━━━━━━━━━━━━━━━━━\n\n👇 *下をクリックして注文*',
+    body: '{business}へようこそ!\n\n下のボタンをクリックしてご注文ください。\nWhatsAppで確認をお送りします。',
     button: '🍔 注文する',
     tip: '💡 ヒント: 注文と送信してショップを開きます!'
   },
   zh: {
-    body: '🎉 *欢迎来到 {business}!*\n\n━━━━━━━━━━━━━━━━━━━━\n\n📱 通过我们的网店轻松订购\n\n✅ 选择您喜爱的菜品\n✅ 在线或取货时安全付款\n✅ 通过WhatsApp接收更新\n\n━━━━━━━━━━━━━━━━━━━━\n\n👇 *点击下方下单*',
+    body: '欢迎来到 {business}!\n\n点击下方按钮下单。\n您将通过WhatsApp收到确认。',
     button: '🍔 下单',
     tip: '💡 提示: 发送 下单 打开商店!'
   },
   ar: {
-    body: '🎉 *مرحباً بك في {business}!*\n\n━━━━━━━━━━━━━━━━━━━━\n\n📱 اطلب بسهولة من متجرنا\n\n✅ اختر أطباقك المفضلة\n✅ ادفع بأمان عبر الإنترنت أو عند الاستلام\n✅ احصل على تحديثات عبر واتساب\n\n━━━━━━━━━━━━━━━━━━━━\n\n👇 *انقر أدناه للطلب*',
+    body: 'مرحباً بك في {business}!\n\nانقر أدناه للطلب.\nستتلقى تأكيداً عبر واتساب.',
     button: '🍔 اطلب الآن',
     tip: '💡 نصيحة: أرسل اطلب لفتح المتجر!'
   }
@@ -368,7 +367,7 @@ async function sendWelcomeWithShopLink(
   console.log(`📤 Sending welcome message to ${toPhone} in ${language}`)
 
   const messages = WELCOME_MESSAGES[language] || WELCOME_MESSAGES.nl
-  const bodyText = messages.body.replace('{business}', tenant.business_name)
+  const bodyText = `🍟 ${messages.body.replace('{business}', tenant.business_name)}\n\n${messages.tip}`
 
   // Send professional welcome with image + CTA button
   await sendImageWithCTA(phoneNumberId, toPhone, tenant.access_token, {
