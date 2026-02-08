@@ -86,6 +86,13 @@ export async function POST(request: NextRequest) {
     // Check if customer has a saved language preference
     const savedLanguage = await getCustomerLanguage(tenant.tenant_slug, fromPhone)
     
+    // Reset command - clears language preference
+    if (messageText === 'reset' || messageText === 'taal' || messageText === 'language') {
+      await clearCustomerLanguage(tenant.tenant_slug, fromPhone)
+      await sendLanguageMenu(businessPhoneId, fromPhone, tenant.access_token, tenant.business_name)
+      return NextResponse.json({ status: 'ok' })
+    }
+    
     // Check if customer is selecting a language (all 9 supported languages)
     const validLanguages = ['nl', 'en', 'fr', 'de', 'es', 'it', 'ja', 'zh', 'ar']
     if (validLanguages.includes(messageText)) {
@@ -126,6 +133,16 @@ async function getCustomerLanguage(tenantSlug: string, customerPhone: string): P
   
   // Language is stored in the JSONB data column
   return data?.data?.language || null
+}
+
+// Clear customer's language preference
+async function clearCustomerLanguage(tenantSlug: string, customerPhone: string) {
+  await supabaseAdmin
+    .from('whatsapp_sessions')
+    .delete()
+    .eq('tenant_slug', tenantSlug)
+    .eq('phone', customerPhone)
+  console.log(`🗑️ Cleared language preference for ${customerPhone}`)
 }
 
 // Save customer's language preference
