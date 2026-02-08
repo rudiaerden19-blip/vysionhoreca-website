@@ -83,21 +83,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    // Normalize tenant slug (remove hyphens for database lookup)
+    const normalizedSlug = tenantSlug.replace(/-/g, '')
+
     // Check if status is valid
     if (!STATUS_MESSAGES[status]) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
 
-    // Get tenant WhatsApp settings
-    const { data: tenant } = await supabaseAdmin
+    // Get tenant WhatsApp settings (try normalized slug first, then original)
+    let { data: tenant } = await supabaseAdmin
       .from('whatsapp_settings')
       .select('*')
-      .eq('tenant_slug', tenantSlug)
+      .eq('tenant_slug', normalizedSlug)
       .eq('is_active', true)
       .single()
 
+    // Fallback to original slug if not found
     if (!tenant) {
-      console.log('❌ No WhatsApp settings found for tenant:', tenantSlug)
+      const { data: tenantAlt } = await supabaseAdmin
+        .from('whatsapp_settings')
+        .select('*')
+        .eq('tenant_slug', tenantSlug)
+        .eq('is_active', true)
+        .single()
+      tenant = tenantAlt
+    }
+
+    if (!tenant) {
+      console.log('❌ No WhatsApp settings found for tenant:', tenantSlug, 'or', normalizedSlug)
       return NextResponse.json({ error: 'WhatsApp not configured' }, { status: 404 })
     }
 
@@ -105,7 +119,7 @@ export async function POST(request: NextRequest) {
     const { data: tenantData } = await supabaseAdmin
       .from('tenants')
       .select('name')
-      .eq('slug', tenantSlug)
+      .eq('slug', normalizedSlug)
       .single()
 
     const businessName = tenantData?.name || tenantSlug
