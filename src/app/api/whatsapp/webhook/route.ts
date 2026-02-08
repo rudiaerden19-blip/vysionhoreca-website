@@ -58,9 +58,18 @@ export async function POST(request: NextRequest) {
     const fromPhone = message.from
     const businessPhoneId = value.metadata?.phone_number_id
     const contactName = value.contacts?.[0]?.profile?.name || 'Klant'
-    const messageText = message.text?.body?.toLowerCase().trim() || ''
+    
+    // Get message text - can be from text message or interactive list selection
+    let messageText = ''
+    if (message.type === 'text') {
+      messageText = message.text?.body?.toLowerCase().trim() || ''
+    } else if (message.type === 'interactive') {
+      // User selected from a list or button
+      messageText = message.interactive?.list_reply?.id || 
+                    message.interactive?.button_reply?.id || ''
+    }
 
-    console.log(`📱 Message from ${fromPhone}: "${messageText}"`)
+    console.log(`📱 Message from ${fromPhone}: "${messageText}" (type: ${message.type})`)
 
     // Find tenant by WhatsApp phone number ID
     const tenant = await findTenantByWhatsAppPhone(businessPhoneId)
@@ -152,16 +161,58 @@ async function saveCustomerLanguage(tenantSlug: string, customerPhone: string, l
   console.log(`💾 Saved language preference: ${language} for ${customerPhone}`)
 }
 
-// Send language selection menu
+// Send language selection menu as interactive list
 async function sendLanguageMenu(
   phoneNumberId: string,
   toPhone: string,
   accessToken: string,
   businessName: string
 ) {
-  const menuText = `🌍 Welcome to ${businessName}!\n\nChoose your language:\n\n🇳🇱 Nederlands → "nl"\n🇬🇧 English → "en"\n🇫🇷 Français → "fr"\n🇩🇪 Deutsch → "de"\n🇪🇸 Español → "es"\n🇮🇹 Italiano → "it"\n🇯🇵 日本語 → "ja"\n🇨🇳 中文 → "zh"\n🇸🇦 العربية → "ar"`
+  const response = await fetch(`${WHATSAPP_API_URL}/${phoneNumberId}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: toPhone,
+      type: 'interactive',
+      interactive: {
+        type: 'list',
+        body: {
+          text: `🌍 Welcome to ${businessName}!\n\nChoose your language / Kies je taal:`
+        },
+        action: {
+          button: '🌍 Select Language',
+          sections: [{
+            title: 'Languages',
+            rows: [
+              { id: 'nl', title: '🇳🇱 Nederlands' },
+              { id: 'en', title: '🇬🇧 English' },
+              { id: 'fr', title: '🇫🇷 Français' },
+              { id: 'de', title: '🇩🇪 Deutsch' },
+              { id: 'es', title: '🇪🇸 Español' },
+              { id: 'it', title: '🇮🇹 Italiano' },
+              { id: 'ja', title: '🇯🇵 日本語' },
+              { id: 'zh', title: '🇨🇳 中文' },
+              { id: 'ar', title: '🇸🇦 العربية' }
+            ]
+          }]
+        }
+      }
+    })
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    console.error('❌ Language menu error:', error)
+    // Fallback to text message
+    await sendTextMessage(phoneNumberId, toPhone, accessToken,
+      `🌍 Welcome to ${businessName}!\n\nType your language code:\nnl / en / fr / de / es / it / ja / zh / ar`)
+  }
   
-  await sendTextMessage(phoneNumberId, toPhone, accessToken, menuText)
   console.log(`🌍 Language menu sent to ${toPhone}`)
 }
 
