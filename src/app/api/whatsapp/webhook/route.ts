@@ -313,47 +313,47 @@ const WELCOME_MESSAGES: Record<string, { body: string; button: string; tip: stri
   nl: {
     body: 'Welkom bij {business}!\n\nKlik hieronder om te bestellen.\nJe krijgt bevestiging via WhatsApp.',
     button: '🍔 BESTELLEN',
-    tip: '💡 Tip: Stuur ons altijd eerst een berichtje voordat je bestelt!'
+    tip: '💡 Tip: Stuur ons altijd BESTEL, dan gaat de shop open!'
   },
   en: {
     body: 'Welcome to {business}!\n\nClick below to order.\nYou will receive confirmation via WhatsApp.',
     button: '🍔 ORDER NOW',
-    tip: '💡 Tip: Always send us a message before ordering!'
+    tip: '💡 Tip: Always send us ORDER to open the shop!'
   },
   fr: {
     body: 'Bienvenue chez {business}!\n\nCliquez ci-dessous pour commander.\nVous recevrez une confirmation via WhatsApp.',
     button: '🍔 COMMANDER',
-    tip: '💡 Conseil: Envoyez-nous toujours un message avant de commander!'
+    tip: '💡 Conseil: Envoyez-nous COMMANDER pour ouvrir la boutique!'
   },
   de: {
     body: 'Willkommen bei {business}!\n\nKlicken Sie unten, um zu bestellen.\nSie erhalten eine Bestätigung via WhatsApp.',
     button: '🍔 BESTELLEN',
-    tip: '💡 Tipp: Senden Sie uns immer zuerst eine Nachricht bevor Sie bestellen!'
+    tip: '💡 Tipp: Senden Sie uns BESTELLEN um den Shop zu öffnen!'
   },
   es: {
     body: '¡Bienvenido a {business}!\n\nHaz clic abajo para pedir.\nRecibirás confirmación por WhatsApp.',
     button: '🍔 PEDIR',
-    tip: '💡 Consejo: ¡Envíanos siempre un mensaje antes de pedir!'
+    tip: '💡 Consejo: ¡Envíanos PEDIR para abrir la tienda!'
   },
   it: {
     body: 'Benvenuto da {business}!\n\nClicca sotto per ordinare.\nRiceverai conferma via WhatsApp.',
     button: '🍔 ORDINA',
-    tip: '💡 Consiglio: Inviaci sempre un messaggio prima di ordinare!'
+    tip: '💡 Consiglio: Inviaci ORDINA per aprire il negozio!'
   },
   ja: {
     body: '{business}へようこそ!\n\n下のボタンをクリックしてご注文ください。\nWhatsAppで確認をお送りします。',
     button: '🍔 注文する',
-    tip: '💡 ヒント: 注文する前に必ずメッセージを送ってください!'
+    tip: '💡 ヒント: 注文と送信してショップを開きます!'
   },
   zh: {
     body: '欢迎来到 {business}!\n\n点击下方按钮下单。\n您将通过WhatsApp收到确认。',
     button: '🍔 下单',
-    tip: '💡 提示: 下单前请先发送消息给我们!'
+    tip: '💡 提示: 发送 下单 打开商店!'
   },
   ar: {
     body: 'مرحباً بك في {business}!\n\nانقر أدناه للطلب.\nستتلقى تأكيداً عبر واتساب.',
     button: '🍔 اطلب الآن',
-    tip: '💡 نصيحة: أرسل لنا رسالة دائماً قبل الطلب!'
+    tip: '💡 نصيحة: أرسل اطلب لفتح المتجر!'
   }
 }
 
