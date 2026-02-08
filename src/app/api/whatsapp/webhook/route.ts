@@ -58,8 +58,9 @@ export async function POST(request: NextRequest) {
     const fromPhone = message.from
     const businessPhoneId = value.metadata?.phone_number_id
     const contactName = value.contacts?.[0]?.profile?.name || 'Klant'
+    const messageText = message.text?.body?.toLowerCase().trim() || ''
 
-    console.log(`📱 Message from ${fromPhone} to business ${businessPhoneId}`)
+    console.log(`📱 Message from ${fromPhone}: "${messageText}"`)
 
     // Find tenant by WhatsApp phone number ID
     const tenant = await findTenantByWhatsAppPhone(businessPhoneId)
@@ -73,8 +74,24 @@ export async function POST(request: NextRequest) {
     // Mark message as read (blue checkmarks for customer)
     await markMessageAsRead(businessPhoneId, message.id, tenant.access_token)
 
-    // Always send welcome message when customer sends anything
-    await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName)
+    // Check if customer has a saved language preference
+    const savedLanguage = await getCustomerLanguage(tenant.tenant_slug, fromPhone)
+    
+    // Check if customer is selecting a language
+    if (messageText === 'nl' || messageText === 'fr' || messageText === 'en') {
+      await saveCustomerLanguage(tenant.tenant_slug, fromPhone, messageText)
+      await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName, messageText)
+      return NextResponse.json({ status: 'ok' })
+    }
+    
+    // If no language saved, send language selection menu first
+    if (!savedLanguage) {
+      await sendLanguageMenu(businessPhoneId, fromPhone, tenant.access_token, tenant.business_name)
+      return NextResponse.json({ status: 'ok' })
+    }
+    
+    // Customer has language preference, send welcome in that language
+    await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName, savedLanguage)
 
     return NextResponse.json({ status: 'ok' })
 
@@ -87,6 +104,65 @@ export async function POST(request: NextRequest) {
 // =====================================================
 // HELPER FUNCTIONS
 // =====================================================
+
+// Get customer's saved language preference
+async function getCustomerLanguage(tenantSlug: string, customerPhone: string): Promise<string | null> {
+  const { data } = await supabaseAdmin
+    .from('whatsapp_sessions')
+    .select('data')
+    .eq('tenant_slug', tenantSlug)
+    .eq('phone', customerPhone)
+    .single()
+  
+  // Language is stored in the JSONB data column
+  return data?.data?.language || null
+}
+
+// Save customer's language preference
+async function saveCustomerLanguage(tenantSlug: string, customerPhone: string, language: string) {
+  // First check if session exists
+  const { data: existing } = await supabaseAdmin
+    .from('whatsapp_sessions')
+    .select('id, data')
+    .eq('tenant_slug', tenantSlug)
+    .eq('phone', customerPhone)
+    .single()
+  
+  if (existing) {
+    // Update existing session
+    await supabaseAdmin
+      .from('whatsapp_sessions')
+      .update({
+        data: { ...existing.data, language },
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', existing.id)
+  } else {
+    // Create new session
+    await supabaseAdmin
+      .from('whatsapp_sessions')
+      .insert({
+        tenant_slug: tenantSlug,
+        phone: customerPhone,
+        state: 'welcome',
+        data: { language }
+      })
+  }
+  console.log(`💾 Saved language preference: ${language} for ${customerPhone}`)
+}
+
+// Send language selection menu
+async function sendLanguageMenu(
+  phoneNumberId: string,
+  toPhone: string,
+  accessToken: string,
+  businessName: string
+) {
+  const menuText = `🌍 Welcome to ${businessName}!\n\nChoose your language / Kies je taal / Choisissez votre langue:\n\n🇳🇱 Nederlands → typ "nl"\n🇫🇷 Français → typ "fr"\n🇬🇧 English → typ "en"`
+  
+  await sendTextMessage(phoneNumberId, toPhone, accessToken, menuText)
+  console.log(`🌍 Language menu sent to ${toPhone}`)
+}
 
 async function findTenantByWhatsAppPhone(phoneNumberId: string) {
   const { data, error } = await supabaseAdmin
@@ -134,23 +210,46 @@ async function findTenantByWhatsAppPhone(phoneNumberId: string) {
   }
 }
 
+// Translations for welcome messages
+const WELCOME_MESSAGES: Record<string, { body: string; button: string; tip: string }> = {
+  nl: {
+    body: 'Welkom bij {business}!\n\nKlik hieronder om te bestellen.\nJe krijgt bevestiging via WhatsApp.',
+    button: '🍔 BESTELLEN',
+    tip: '💡 Tip: Stuur ons altijd eerst een berichtje voordat je bestelt!'
+  },
+  fr: {
+    body: 'Bienvenue chez {business}!\n\nCliquez ci-dessous pour commander.\nVous recevrez une confirmation via WhatsApp.',
+    button: '🍔 COMMANDER',
+    tip: '💡 Conseil: Envoyez-nous toujours un message avant de commander!'
+  },
+  en: {
+    body: 'Welcome to {business}!\n\nClick below to order.\nYou will receive confirmation via WhatsApp.',
+    button: '🍔 ORDER NOW',
+    tip: '💡 Tip: Always send us a message before ordering!'
+  }
+}
+
 async function sendWelcomeWithShopLink(
   phoneNumberId: string,
   toPhone: string,
   tenant: any,
-  customerName: string
+  customerName: string,
+  language: string = 'nl'
 ) {
-  console.log(`📤 Sending welcome message to ${toPhone}`)
+  console.log(`📤 Sending welcome message to ${toPhone} in ${language}`)
+
+  const messages = WELCOME_MESSAGES[language] || WELCOME_MESSAGES.nl
+  const bodyText = `🍟 ${messages.body.replace('{business}', tenant.business_name)}\n\n${messages.tip}`
 
   // Send professional welcome with image + CTA button
   await sendImageWithCTA(phoneNumberId, toPhone, tenant.access_token, {
     imageUrl: tenant.cover_image_url,
-    body: `🍟 Welkom bij ${tenant.business_name}!\n\nKlik hieronder om te bestellen.\nJe krijgt bevestiging via WhatsApp.\n\n💡 Tip: Stuur ons altijd eerst een berichtje voordat je bestelt!`,
-    buttonText: '🍔 BESTELLEN',
-    buttonUrl: `${tenant.shop_url}?wa=${toPhone}`
+    body: bodyText,
+    buttonText: messages.button,
+    buttonUrl: `${tenant.shop_url}?wa=${toPhone}&lang=${language}`
   })
 
-  console.log(`✅ Welcome message sent to ${toPhone}`)
+  console.log(`✅ Welcome message sent to ${toPhone} in ${language}`)
 }
 
 // Mark message as read (blue checkmarks)
