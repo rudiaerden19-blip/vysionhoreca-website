@@ -435,86 +435,75 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setUpdatingId(null)
   }
   
-  // Handle reject order (weigeren)
+  // Handle reject order (weigeren) - uses server-side API for reliability
   const handleRejectOrder = async () => {
     if (!rejectingOrder?.id || !rejectionReason) return
     setUpdatingId(rejectingOrder.id)
-    const success = await rejectOrder(rejectingOrder.id, rejectionReason, rejectionNotes)
-    if (success) {
-      setOrders(prev => prev.map(o => 
-        o.id === rejectingOrder.id ? { 
-          ...o, 
-          status: 'rejected', 
-          rejection_reason: rejectionReason,
-          rejection_notes: rejectionNotes,
-          rejected_at: new Date().toISOString() 
-        } : o
-      ))
+    
+    try {
+      // Use server-side API that handles both database update and WhatsApp
+      const response = await fetch('/api/orders/reject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: rejectingOrder.id,
+          tenantSlug: params.tenant,
+          rejectionReason: rejectionReason,
+          rejectionNotes: rejectionNotes,
+        }),
+      })
       
-      // Send rejection email to customer with business details
-      if (rejectingOrder.customer_email) {
-        try {
-          await fetch('/api/send-order-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              // Customer info
-              customerEmail: rejectingOrder.customer_email,
-              customerName: rejectingOrder.customer_name,
-              customerPhone: rejectingOrder.customer_phone,
-              // Order info
-              orderNumber: rejectingOrder.order_number,
-              orderType: rejectingOrder.order_type,
-              status: 'rejected',
-              // Business info (verplicht voor Belgische wetgeving)
-              businessName: tenantSettings?.business_name || 'Restaurant',
-              businessEmail: tenantSettings?.email,
-              businessPhone: tenantSettings?.phone,
-              businessAddress: tenantSettings?.address,
-              businessPostalCode: tenantSettings?.postal_code,
-              businessCity: tenantSettings?.city,
-              businessBtwNumber: tenantSettings?.btw_number,
-              // Rejection details
-              rejectionReason: rejectionReason,
-              rejectionNotes: rejectionNotes,
-              total: rejectingOrder.total,
-            }),
-          })
-        } catch (e) {
-          console.error('Failed to send rejection email:', e)
+      if (response.ok) {
+        setOrders(prev => prev.map(o => 
+          o.id === rejectingOrder.id ? { 
+            ...o, 
+            status: 'rejected', 
+            rejection_reason: rejectionReason,
+            rejection_notes: rejectionNotes,
+            rejected_at: new Date().toISOString() 
+          } : o
+        ))
+        
+        // Send rejection email to customer with business details
+        if (rejectingOrder.customer_email) {
+          try {
+            await fetch('/api/send-order-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                customerEmail: rejectingOrder.customer_email,
+                customerName: rejectingOrder.customer_name,
+                customerPhone: rejectingOrder.customer_phone,
+                orderNumber: rejectingOrder.order_number,
+                orderType: rejectingOrder.order_type,
+                status: 'rejected',
+                businessName: tenantSettings?.business_name || 'Restaurant',
+                businessEmail: tenantSettings?.email,
+                businessPhone: tenantSettings?.phone,
+                businessAddress: tenantSettings?.address,
+                businessPostalCode: tenantSettings?.postal_code,
+                businessCity: tenantSettings?.city,
+                businessBtwNumber: tenantSettings?.btw_number,
+                rejectionReason: rejectionReason,
+                rejectionNotes: rejectionNotes,
+                total: rejectingOrder.total,
+              }),
+            })
+          } catch (e) {
+            console.error('Failed to send rejection email:', e)
+          }
         }
-      }
-      
-      // Send WhatsApp rejection notification
-      console.log('📱 Checking WhatsApp rejection for phone:', rejectingOrder.customer_phone)
-      if (rejectingOrder.customer_phone) {
-        try {
-          console.log('📱 Sending WhatsApp rejection...')
-          const waResponse = await fetch('/api/whatsapp/send-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tenantSlug: params.tenant,
-              customerPhone: rejectingOrder.customer_phone,
-              orderNumber: rejectingOrder.order_number,
-              status: 'rejected',
-              rejectionReason: rejectionReason,
-            }),
-          })
-          console.log('📱 WhatsApp rejection response:', waResponse.status)
-        } catch (e) {
-          console.error('Failed to send WhatsApp rejection:', e)
-        }
+        
+        setRejectingOrder(null)
+        setRejectionReason('')
+        setRejectionNotes('')
       } else {
-        console.log('📱 No customer phone, skipping WhatsApp')
+        console.error('Failed to reject order')
       }
-      
-      // NOTE: Geen spaarpunten - die worden pas bij goedkeuring gegeven
-      
-      setRejectingOrder(null)
-      setRejectionReason('')
-      setRejectionNotes('')
+    } catch (e) {
+      console.error('Error rejecting order:', e)
     }
+    
     setUpdatingId(null)
   }
 
