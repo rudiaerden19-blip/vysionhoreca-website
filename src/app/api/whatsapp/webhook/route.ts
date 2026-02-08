@@ -145,7 +145,7 @@ async function sendWelcomeWithShopLink(
   // Send professional welcome with image + CTA button
   await sendImageWithCTA(phoneNumberId, toPhone, tenant.access_token, {
     imageUrl: tenant.cover_image_url,
-    body: `🍟 Welkom bij ${tenant.business_name}!\n\nBekijk ons menu en bestel direct. Je bestelling wordt bevestigd via WhatsApp.`,
+    body: `🍟 Welkom bij ${tenant.business_name}!\n\nKlik hieronder om te bestellen.\nJe krijgt bevestiging via WhatsApp.\n\n💡 Tip: Stuur ons altijd eerst een berichtje voordat je bestelt!`,
     buttonText: '🍔 BESTELLEN',
     buttonUrl: `${tenant.shop_url}?wa=${toPhone}`
   })
