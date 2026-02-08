@@ -486,9 +486,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       }
       
       // Send WhatsApp rejection notification
+      console.log('📱 Checking WhatsApp rejection for phone:', rejectingOrder.customer_phone)
       if (rejectingOrder.customer_phone) {
         try {
-          await fetch('/api/whatsapp/send-status', {
+          console.log('📱 Sending WhatsApp rejection...')
+          const waResponse = await fetch('/api/whatsapp/send-status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -499,9 +501,12 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               rejectionReason: rejectionReason,
             }),
           })
+          console.log('📱 WhatsApp rejection response:', waResponse.status)
         } catch (e) {
           console.error('Failed to send WhatsApp rejection:', e)
         }
+      } else {
+        console.log('📱 No customer phone, skipping WhatsApp')
       }
       
       // NOTE: Geen spaarpunten - die worden pas bij goedkeuring gegeven

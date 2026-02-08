@@ -77,9 +77,12 @@ Neem contact op met {businessName} voor meer informatie. Onze excuses voor het o
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
+    console.log('📨 WhatsApp send-status called with:', JSON.stringify(body))
+    
     const { tenantSlug, customerPhone, orderNumber, status, rejectionReason } = body
 
     if (!tenantSlug || !customerPhone || !orderNumber || !status) {
+      console.log('❌ Missing required fields:', { tenantSlug, customerPhone, orderNumber, status })
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
