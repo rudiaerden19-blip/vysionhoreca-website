@@ -14,6 +14,10 @@ const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
 // Base URL for the shop
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vysionhoreca.com'
 
+// Message deduplication - prevent processing same message twice
+const processedMessages = new Set<string>()
+const MESSAGE_CACHE_TTL = 60000 // 1 minute
+
 // =====================================================
 // WEBHOOK VERIFICATION (GET)
 // =====================================================
@@ -55,9 +59,18 @@ export async function POST(request: NextRequest) {
     }
 
     const message = value.messages[0]
+    const messageId = message.id
     const fromPhone = message.from
     const businessPhoneId = value.metadata?.phone_number_id
     const contactName = value.contacts?.[0]?.profile?.name || 'Klant'
+    
+    // Deduplication using in-memory cache (works within same serverless instance)
+    if (processedMessages.has(messageId)) {
+      console.log(`⏭️ Skipping duplicate message: ${messageId}`)
+      return NextResponse.json({ status: 'ok' })
+    }
+    processedMessages.add(messageId)
+    setTimeout(() => processedMessages.delete(messageId), MESSAGE_CACHE_TTL)
     
     // Get message text - can be from text message or interactive list selection
     let messageText = ''
@@ -225,12 +238,10 @@ async function sendLanguageMenu(
   if (!response.ok) {
     const error = await response.text()
     console.error('❌ Language menu error:', error)
-    // Fallback to text message
-    await sendTextMessage(phoneNumberId, toPhone, accessToken,
-      `🌍 Welcome to ${businessName}!\n\nType your language code:\nnl / en / fr / de / es / it / ja / zh / ar`)
+    // No fallback - only log the error
+  } else {
+    console.log(`🌍 Language menu sent to ${toPhone}`)
   }
-  
-  console.log(`🌍 Language menu sent to ${toPhone}`)
 }
 
 async function findTenantByWhatsAppPhone(phoneNumberId: string) {
