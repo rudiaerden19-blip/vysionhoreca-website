@@ -303,7 +303,7 @@ async function findTenantByWhatsAppPhone(phoneNumberId: string) {
   return {
     ...data,
     business_name: tenantSettings?.business_name || tenantData?.name || data.tenant_slug,
-    shop_url: `${BASE_URL}/shop/${data.tenant_slug}`,
+    shop_url: `${BASE_URL}/shop/${data.tenant_slug}/menu`,
     cover_image_url: coverImageUrl || tenantSettings?.logo_url
   }
 }

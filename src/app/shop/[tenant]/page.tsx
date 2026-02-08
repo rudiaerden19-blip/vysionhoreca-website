@@ -184,6 +184,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       
       if (waPhone) {
         localStorage.setItem(`whatsapp_phone_${params.tenant}`, waPhone)
+        
+        // ALWAYS start fresh at top when coming from WhatsApp
+        window.scrollTo(0, 0)
+        
+        // Clear URL params to prevent issues on refresh (keep clean URL)
+        const cleanUrl = window.location.pathname
+        window.history.replaceState({}, '', cleanUrl)
       }
       
       // Set language from URL parameter (from WhatsApp)
