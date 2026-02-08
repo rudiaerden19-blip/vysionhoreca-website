@@ -77,8 +77,9 @@ export async function POST(request: NextRequest) {
     // Check if customer has a saved language preference
     const savedLanguage = await getCustomerLanguage(tenant.tenant_slug, fromPhone)
     
-    // Check if customer is selecting a language
-    if (messageText === 'nl' || messageText === 'fr' || messageText === 'en') {
+    // Check if customer is selecting a language (all 9 supported languages)
+    const validLanguages = ['nl', 'en', 'fr', 'de', 'es', 'it', 'ja', 'zh', 'ar']
+    if (validLanguages.includes(messageText)) {
       await saveCustomerLanguage(tenant.tenant_slug, fromPhone, messageText)
       await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName, messageText)
       return NextResponse.json({ status: 'ok' })
@@ -158,7 +159,7 @@ async function sendLanguageMenu(
   accessToken: string,
   businessName: string
 ) {
-  const menuText = `🌍 Welcome to ${businessName}!\n\nChoose your language / Kies je taal / Choisissez votre langue:\n\n🇳🇱 Nederlands → typ "nl"\n🇫🇷 Français → typ "fr"\n🇬🇧 English → typ "en"`
+  const menuText = `🌍 Welcome to ${businessName}!\n\nChoose your language:\n\n🇳🇱 Nederlands → "nl"\n🇬🇧 English → "en"\n🇫🇷 Français → "fr"\n🇩🇪 Deutsch → "de"\n🇪🇸 Español → "es"\n🇮🇹 Italiano → "it"\n🇯🇵 日本語 → "ja"\n🇨🇳 中文 → "zh"\n🇸🇦 العربية → "ar"`
   
   await sendTextMessage(phoneNumberId, toPhone, accessToken, menuText)
   console.log(`🌍 Language menu sent to ${toPhone}`)
@@ -210,22 +211,52 @@ async function findTenantByWhatsAppPhone(phoneNumberId: string) {
   }
 }
 
-// Translations for welcome messages
+// Translations for welcome messages (all 9 languages)
 const WELCOME_MESSAGES: Record<string, { body: string; button: string; tip: string }> = {
   nl: {
     body: 'Welkom bij {business}!\n\nKlik hieronder om te bestellen.\nJe krijgt bevestiging via WhatsApp.',
     button: '🍔 BESTELLEN',
     tip: '💡 Tip: Stuur ons altijd eerst een berichtje voordat je bestelt!'
   },
+  en: {
+    body: 'Welcome to {business}!\n\nClick below to order.\nYou will receive confirmation via WhatsApp.',
+    button: '🍔 ORDER NOW',
+    tip: '💡 Tip: Always send us a message before ordering!'
+  },
   fr: {
     body: 'Bienvenue chez {business}!\n\nCliquez ci-dessous pour commander.\nVous recevrez une confirmation via WhatsApp.',
     button: '🍔 COMMANDER',
     tip: '💡 Conseil: Envoyez-nous toujours un message avant de commander!'
   },
-  en: {
-    body: 'Welcome to {business}!\n\nClick below to order.\nYou will receive confirmation via WhatsApp.',
-    button: '🍔 ORDER NOW',
-    tip: '💡 Tip: Always send us a message before ordering!'
+  de: {
+    body: 'Willkommen bei {business}!\n\nKlicken Sie unten, um zu bestellen.\nSie erhalten eine Bestätigung via WhatsApp.',
+    button: '🍔 BESTELLEN',
+    tip: '💡 Tipp: Senden Sie uns immer zuerst eine Nachricht bevor Sie bestellen!'
+  },
+  es: {
+    body: '¡Bienvenido a {business}!\n\nHaz clic abajo para pedir.\nRecibirás confirmación por WhatsApp.',
+    button: '🍔 PEDIR',
+    tip: '💡 Consejo: ¡Envíanos siempre un mensaje antes de pedir!'
+  },
+  it: {
+    body: 'Benvenuto da {business}!\n\nClicca sotto per ordinare.\nRiceverai conferma via WhatsApp.',
+    button: '🍔 ORDINA',
+    tip: '💡 Consiglio: Inviaci sempre un messaggio prima di ordinare!'
+  },
+  ja: {
+    body: '{business}へようこそ!\n\n下のボタンをクリックしてご注文ください。\nWhatsAppで確認をお送りします。',
+    button: '🍔 注文する',
+    tip: '💡 ヒント: 注文する前に必ずメッセージを送ってください!'
+  },
+  zh: {
+    body: '欢迎来到 {business}!\n\n点击下方按钮下单。\n您将通过WhatsApp收到确认。',
+    button: '🍔 下单',
+    tip: '💡 提示: 下单前请先发送消息给我们!'
+  },
+  ar: {
+    body: 'مرحباً بك في {business}!\n\nانقر أدناه للطلب.\nستتلقى تأكيداً عبر واتساب.',
+    button: '🍔 اطلب الآن',
+    tip: '💡 نصيحة: أرسل لنا رسالة دائماً قبل الطلب!'
   }
 }
 

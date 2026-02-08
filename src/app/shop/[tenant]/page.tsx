@@ -187,8 +187,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       }
       
       // Set language from URL parameter (from WhatsApp)
-      if (lang && ['nl', 'fr', 'en'].includes(lang)) {
-        setLocale(lang)
+      const validLocales = ['nl', 'en', 'fr', 'de', 'es', 'it', 'ja', 'zh', 'ar']
+      if (lang && validLocales.includes(lang)) {
+        setLocale(lang as 'nl' | 'en' | 'fr' | 'de' | 'es' | 'it' | 'ja' | 'zh' | 'ar')
       }
     }
   }, [params.tenant, setLocale])
