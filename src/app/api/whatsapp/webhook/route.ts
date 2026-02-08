@@ -15,8 +15,29 @@ const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vysionhoreca.com'
 
 // Message deduplication - prevent processing same message twice
-const processedMessages = new Set<string>()
+const processedMessages = new Map<string, number>()
 const MESSAGE_CACHE_TTL = 60000 // 1 minute
+
+// Clean old messages from cache periodically
+function cleanMessageCache() {
+  const now = Date.now()
+  for (const [id, timestamp] of processedMessages.entries()) {
+    if (now - timestamp > MESSAGE_CACHE_TTL) {
+      processedMessages.delete(id)
+    }
+  }
+}
+
+// Check if message was already processed
+function isMessageProcessed(messageId: string): boolean {
+  cleanMessageCache()
+  if (processedMessages.has(messageId)) {
+    console.log(`⚠️ Duplicate message ignored: ${messageId}`)
+    return true
+  }
+  processedMessages.set(messageId, Date.now())
+  return false
+}
 
 // =====================================================
 // WEBHOOK VERIFICATION (GET)
@@ -63,6 +84,11 @@ export async function POST(request: NextRequest) {
     const fromPhone = message.from
     const businessPhoneId = value.metadata?.phone_number_id
     const contactName = value.contacts?.[0]?.profile?.name || 'Klant'
+    
+    // DEDUPLICATION: Skip if already processed (Meta sometimes sends twice)
+    if (isMessageProcessed(messageId)) {
+      return NextResponse.json({ status: 'ok' })
+    }
     
     // Get message text - can be from text message or interactive list selection
     let messageText = ''
@@ -424,10 +450,7 @@ async function sendImageWithCTA(
   if (!response.ok) {
     const error = await response.text()
     console.error('❌ WhatsApp Image+CTA API error:', error)
-    
-    // Fallback: send text with link
-    await sendTextMessage(phoneNumberId, to, accessToken, 
-      `${content.body}\n\n👉 ${content.buttonUrl}`)
+    // Don't send fallback - prevents duplicate messages
   }
 }
 
