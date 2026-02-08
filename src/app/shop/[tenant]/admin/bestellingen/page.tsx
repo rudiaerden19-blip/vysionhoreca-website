@@ -302,23 +302,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         o.id === orderId ? { ...o, status: newStatus } : o
       ))
       
-      // Send WhatsApp status update
-      if (order?.customer_phone && ['preparing', 'ready', 'delivering', 'delivered'].includes(newStatus)) {
-        try {
-          await fetch('/api/whatsapp/send-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tenantSlug: params.tenant,
-              customerPhone: order.customer_phone,
-              orderNumber: order.order_number,
-              status: newStatus,
-            }),
-          })
-        } catch (e) {
-          console.error('Failed to send WhatsApp status:', e)
-        }
-      }
+      // WhatsApp status updates only for confirmed/rejected (handled in their own functions)
       
       // Send email when order is ready for pickup
       if (newStatus === 'ready' && order?.customer_email) {
@@ -498,6 +482,25 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           })
         } catch (e) {
           console.error('Failed to send rejection email:', e)
+        }
+      }
+      
+      // Send WhatsApp rejection notification
+      if (rejectingOrder.customer_phone) {
+        try {
+          await fetch('/api/whatsapp/send-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tenantSlug: params.tenant,
+              customerPhone: rejectingOrder.customer_phone,
+              orderNumber: rejectingOrder.order_number,
+              status: 'rejected',
+              rejectionReason: rejectionReason,
+            }),
+          })
+        } catch (e) {
+          console.error('Failed to send WhatsApp rejection:', e)
         }
       }
       

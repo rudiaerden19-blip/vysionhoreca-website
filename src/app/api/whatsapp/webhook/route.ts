@@ -64,14 +64,6 @@ export async function POST(request: NextRequest) {
     const businessPhoneId = value.metadata?.phone_number_id
     const contactName = value.contacts?.[0]?.profile?.name || 'Klant'
     
-    // Deduplication using in-memory cache (works within same serverless instance)
-    if (processedMessages.has(messageId)) {
-      console.log(`⏭️ Skipping duplicate message: ${messageId}`)
-      return NextResponse.json({ status: 'ok' })
-    }
-    processedMessages.add(messageId)
-    setTimeout(() => processedMessages.delete(messageId), MESSAGE_CACHE_TTL)
-    
     // Get message text - can be from text message or interactive list selection
     let messageText = ''
     if (message.type === 'text') {

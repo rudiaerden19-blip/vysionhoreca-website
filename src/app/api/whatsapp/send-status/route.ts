@@ -61,13 +61,23 @@ Smakelijk! 😋`
 Je bestelling #{orderNumber} is helaas geannuleerd.
 
 Neem contact op met {businessName} voor meer informatie.`
+  },
+  rejected: {
+    emoji: '❌',
+    nl: `❌ *Bestelling Afgewezen*
+
+Je bestelling #{orderNumber} is helaas afgewezen.
+
+Reden: {rejectionReason}
+
+Neem contact op met {businessName} voor meer informatie. Onze excuses voor het ongemak.`
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { tenantSlug, customerPhone, orderNumber, status } = body
+    const { tenantSlug, customerPhone, orderNumber, status, rejectionReason } = body
 
     if (!tenantSlug || !customerPhone || !orderNumber || !status) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -108,6 +118,7 @@ export async function POST(request: NextRequest) {
     const message = messageTemplate
       .replace(/{orderNumber}/g, orderNumber)
       .replace(/{businessName}/g, businessName)
+      .replace(/{rejectionReason}/g, rejectionReason || 'Niet gespecificeerd')
 
     // Send the message via WhatsApp
     const response = await fetch(`${WHATSAPP_API_URL}/${tenant.phone_number_id}/messages`, {
