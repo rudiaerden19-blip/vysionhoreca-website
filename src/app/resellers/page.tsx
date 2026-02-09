@@ -165,10 +165,10 @@ export default function ResellersPage() {
             <div className="mt-8 p-6 bg-dark/50 rounded-2xl">
               <h4 className="text-white font-bold mb-4">Rekenvoorbeeld:</h4>
               <div className="space-y-2 text-gray-300">
-                <p>• Klant betaalt €69/maand → Jij krijgt <span className="text-accent font-bold">€20,70/maand</span></p>
-                <p>• 10 klanten = <span className="text-accent font-bold">€207/maand passief inkomen</span></p>
-                <p>• 50 klanten = <span className="text-accent font-bold">€1.035/maand passief inkomen</span></p>
-                <p>• 100 klanten = <span className="text-accent font-bold">€2.070/maand passief inkomen</span></p>
+                <p>• Klant betaalt €79/maand → Jij krijgt <span className="text-accent font-bold">€23,70/maand</span></p>
+                <p>• 10 klanten = <span className="text-accent font-bold">€237/maand passief inkomen</span></p>
+                <p>• 50 klanten = <span className="text-accent font-bold">€1.185/maand passief inkomen</span></p>
+                <p>• 100 klanten = <span className="text-accent font-bold">€2.370/maand passief inkomen</span></p>
               </div>
             </div>
           </div>

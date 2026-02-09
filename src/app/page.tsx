@@ -946,7 +946,7 @@ function ComparisonSection() {
                 <th className="px-6 py-5 text-left font-semibold">{t('comparison.feature')}</th>
                 <th className="px-6 py-5 text-center">
                   <div className="text-accent font-bold text-lg">Vysion Horeca</div>
-                  <div className="text-sm text-gray-300">€59 - €69/maand</div>
+                  <div className="text-sm text-gray-300">€59 - €79/maand</div>
                 </th>
                 <th className="px-6 py-5 text-center">
                   <div className="font-semibold">Lightspeed</div>

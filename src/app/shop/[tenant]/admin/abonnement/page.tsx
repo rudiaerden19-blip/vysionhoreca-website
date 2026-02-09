@@ -989,13 +989,13 @@ export default function AbonnementPage() {
           <div className="mb-6">
             {billingYearly ? (
               <>
-                <span className="text-4xl font-bold text-purple-300">€{Math.round(69 * 12 * 0.9)}</span>
+                <span className="text-4xl font-bold text-purple-300">€{Math.round(79 * 12 * 0.9)}</span>
                 <span className="text-gray-300 ml-2">/jaar</span>
-                <p className="text-purple-200 text-sm mt-1">= €{Math.round(69 * 0.9)}/maand</p>
+                <p className="text-purple-200 text-sm mt-1">= €{Math.round(79 * 0.9)}/maand</p>
               </>
             ) : (
               <>
-                <span className="text-4xl font-bold text-purple-300">€69</span>
+                <span className="text-4xl font-bold text-purple-300">€79</span>
                 <span className="text-gray-300 ml-2">{t('perMonth')}</span>
               </>
             )}

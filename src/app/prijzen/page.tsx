@@ -9,7 +9,7 @@ export default function PrijzenPage() {
   const [isYearly, setIsYearly] = useState(false)
   
   const starterMonthly = 59
-  const proMonthly = 69
+  const proMonthly = 79
   const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
   const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
 

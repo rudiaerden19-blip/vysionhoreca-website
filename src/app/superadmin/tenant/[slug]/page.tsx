@@ -422,7 +422,7 @@ export default function TenantDetailPage() {
                   className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white"
                 >
                   <option value="starter">Starter - €59/maand</option>
-                  <option value="pro">Pro - €69/maand</option>
+                  <option value="pro">Pro - €79/maand</option>
                 </select>
               </div>
 

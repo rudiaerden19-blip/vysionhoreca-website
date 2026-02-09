@@ -5,7 +5,7 @@ import { logger } from '@/lib/logger'
 
 // Plan pricing in cents
 const planPrices: Record<string, number> = {
-  starter: 6900,  // €69
+  starter: 5900,  // €59
   pro: 7900,      // €79
 }
 
