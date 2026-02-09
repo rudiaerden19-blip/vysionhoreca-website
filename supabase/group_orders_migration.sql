@@ -160,36 +160,41 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Update session totals when orders change
+-- Update session totals when orders change (fixed for DELETE)
 CREATE OR REPLACE FUNCTION update_session_totals()
 RETURNS TRIGGER AS $$
 BEGIN
   IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-    UPDATE group_order_sessions 
-    SET 
-      total_orders = (SELECT COUNT(*) FROM orders WHERE group_session_id = NEW.group_session_id),
-      total_amount = (SELECT COALESCE(SUM(total), 0) FROM orders WHERE group_session_id = NEW.group_session_id)
-    WHERE id = NEW.group_session_id;
+    IF NEW.group_session_id IS NOT NULL THEN
+      UPDATE group_order_sessions 
+      SET 
+        total_orders = (SELECT COUNT(*) FROM orders WHERE group_session_id = NEW.group_session_id),
+        total_amount = (SELECT COALESCE(SUM(total), 0) FROM orders WHERE group_session_id = NEW.group_session_id)
+      WHERE id = NEW.group_session_id;
+    END IF;
+    RETURN NEW;
   END IF;
   
-  IF TG_OP = 'DELETE' AND OLD.group_session_id IS NOT NULL THEN
-    UPDATE group_order_sessions 
-    SET 
-      total_orders = (SELECT COUNT(*) FROM orders WHERE group_session_id = OLD.group_session_id),
-      total_amount = (SELECT COALESCE(SUM(total), 0) FROM orders WHERE group_session_id = OLD.group_session_id)
-    WHERE id = OLD.group_session_id;
+  IF TG_OP = 'DELETE' THEN
+    IF OLD.group_session_id IS NOT NULL THEN
+      UPDATE group_order_sessions 
+      SET 
+        total_orders = (SELECT COUNT(*) FROM orders WHERE group_session_id = OLD.group_session_id),
+        total_amount = (SELECT COALESCE(SUM(total), 0) FROM orders WHERE group_session_id = OLD.group_session_id)
+      WHERE id = OLD.group_session_id;
+    END IF;
+    RETURN OLD;
   END IF;
   
-  RETURN COALESCE(NEW, OLD);
+  RETURN NULL;
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger for updating session totals
+-- Trigger for updating session totals (no WHEN clause - logic is in function)
 DROP TRIGGER IF EXISTS orders_session_totals ON orders;
 CREATE TRIGGER orders_session_totals
   AFTER INSERT OR UPDATE OR DELETE ON orders
   FOR EACH ROW
-  WHEN (NEW.group_session_id IS NOT NULL OR OLD.group_session_id IS NOT NULL)
   EXECUTE FUNCTION update_session_totals();
 
 -- Updated_at trigger for order_groups
