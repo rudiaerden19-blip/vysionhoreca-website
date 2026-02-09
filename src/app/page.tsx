@@ -647,7 +647,7 @@ function PricingSection() {
               </p>
               
               <ul className="space-y-3 mb-8">
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
                   <li key={i} className="flex items-center">
                     <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -907,7 +907,7 @@ function ButWaitSection() {
 function ComparisonSection() {
   const { t, locale } = useLanguage()
   
-  const featureKeys = ['online', 'website', 'terminal', 'kitchen', 'allergies', 'qr', 'promotions', 'reservation', 'inventory', 'seo', 'loyalty', 'staff', 'costCalculator', 'analytics', 'reviews', 'languages', 'training', 'commission']
+  const featureKeys = ['online', 'website', 'terminal', 'kitchen', 'allergies', 'qr', 'promotions', 'reservation', 'inventory', 'seo', 'loyalty', 'staff', 'costCalculator', 'analytics', 'reviews', 'labels', 'groupOrders', 'languages', 'whatsapp', 'commission']
   
   const features = featureKeys.map(key => ({
     name: t(`comparison.features.${key}`),

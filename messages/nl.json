@@ -164,8 +164,10 @@
       "costCalculator": "Kostencalculator per product",
       "analytics": "Volledige bedrijfsanalyse",
       "reviews": "Reviews systeem",
+      "labels": "Label/sticker printer",
+      "groupOrders": "Groepsbestellingen",
       "languages": "Beschikbaar in 9 talen",
-      "training": "Gratis opleiding",
+      "whatsapp": "WhatsApp bestellen",
       "commission": "0% commissie"
     },
     "limited": "Beperkt"
@@ -211,9 +213,8 @@
         "7": "Volledige kostenberekening per product",
         "8": "Eigen reserveringsplatform",
         "9": "Gesproken bestelling voor de klant",
-        "10": "Push berichten",
-        "11": "Prioriteit support",
-        "12": "Volledige gratis opleiding"
+        "10": "Label/sticker printer per product",
+        "11": "Groepsbestellingen (bedrijven & scholen)"
       }
     },
     "faq": {

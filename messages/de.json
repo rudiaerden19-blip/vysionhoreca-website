@@ -164,8 +164,10 @@
       "peppol": "Peppol-Rechnungsstellung",
       "analytics": "Vollständige Geschäftsanalyse",
       "reviews": "Bewertungssystem",
+      "labels": "Etikettendrucker",
+      "groupOrders": "Gruppenbestellungen",
       "languages": "In 9 Sprachen verfügbar",
-      "training": "Kostenlose Schulung",
+      "whatsapp": "WhatsApp Bestellung",
       "commission": "0% Provision"
     },
     "limited": "Begrenzt"
@@ -211,9 +213,8 @@
         "7": "Vollständige Kostenberechnung pro Produkt",
         "8": "Eigene Reservierungsplattform",
         "9": "Sprachbestellung für Kunden",
-        "10": "Push-Benachrichtigungen",
-        "11": "Prioritäts-Support",
-        "12": "Vollständige kostenlose Schulung"
+        "10": "Etiketten-/Aufkleberdrucker pro Produkt",
+        "11": "Gruppenbestellungen (Firmen & Schulen)"
       }
     },
     "faq": {

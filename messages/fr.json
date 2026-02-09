@@ -164,8 +164,10 @@
       "peppol": "Facturation Peppol",
       "analytics": "Analyse commerciale complète",
       "reviews": "Système d'avis",
+      "labels": "Imprimante étiquettes",
+      "groupOrders": "Commandes groupées",
       "languages": "Disponible en 9 langues",
-      "training": "Formation gratuite",
+      "whatsapp": "Commande WhatsApp",
       "commission": "0% commission"
     },
     "limited": "Limité"
@@ -211,9 +213,8 @@
         "7": "Calcul complet des coûts par produit",
         "8": "Votre propre plateforme de réservation",
         "9": "Commande vocale pour les clients",
-        "10": "Notifications push",
-        "11": "Support prioritaire",
-        "12": "Formation gratuite complète"
+        "10": "Imprimante étiquettes/autocollants",
+        "11": "Commandes groupées (entreprises & écoles)"
       }
     },
     "faq": {

@@ -164,8 +164,10 @@
       "peppol": "Facturación Peppol",
       "analytics": "Análisis empresarial completo",
       "reviews": "Sistema de reseñas",
+      "labels": "Impresora de etiquetas",
+      "groupOrders": "Pedidos grupales",
       "languages": "Disponible en 9 idiomas",
-      "training": "Formación gratuita",
+      "whatsapp": "Pedidos por WhatsApp",
       "commission": "0% comisión"
     },
     "limited": "Limitado"
@@ -211,9 +213,8 @@
         "7": "Cálculo completo de costos por producto",
         "8": "Tu propia plataforma de reservas",
         "9": "Pedido por voz para clientes",
-        "10": "Notificaciones push",
-        "11": "Soporte prioritario",
-        "12": "Formación gratuita completa"
+        "10": "Impresora de etiquetas/pegatinas",
+        "11": "Pedidos grupales (empresas y colegios)"
       }
     },
     "faq": {

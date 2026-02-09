@@ -164,8 +164,10 @@
       "peppol": "Fatturazione Peppol",
       "analytics": "Analisi aziendale completa",
       "reviews": "Sistema recensioni",
+      "labels": "Stampante etichette",
+      "groupOrders": "Ordini di gruppo",
       "languages": "Disponibile in 9 lingue",
-      "training": "Formazione gratuita",
+      "whatsapp": "Ordini WhatsApp",
       "commission": "0% commissione"
     },
     "limited": "Limitato"
@@ -211,9 +213,8 @@
         "7": "Calcolo completo dei costi per prodotto",
         "8": "La tua piattaforma di prenotazione",
         "9": "Ordine vocale per i clienti",
-        "10": "Notifiche push",
-        "11": "Supporto prioritario",
-        "12": "Formazione gratuita completa"
+        "10": "Stampante etichette/adesivi",
+        "11": "Ordini di gruppo (aziende e scuole)"
       }
     },
     "faq": {

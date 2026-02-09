@@ -164,8 +164,10 @@
       "costCalculator": "Cost calculator per product",
       "analytics": "Full business analysis",
       "reviews": "Reviews system",
+      "labels": "Label/sticker printer",
+      "groupOrders": "Group orders",
       "languages": "Available in 9 languages",
-      "training": "Free training",
+      "whatsapp": "WhatsApp ordering",
       "commission": "0% commission"
     },
     "limited": "Limited"
@@ -211,9 +213,8 @@
         "7": "Full cost calculation per product",
         "8": "Your own reservation platform",
         "9": "Voice ordering for customers",
-        "10": "Push notifications",
-        "11": "Priority support",
-        "12": "Full free training"
+        "10": "Label/sticker printer per product",
+        "11": "Group orders (companies & schools)"
       }
     },
     "faq": {
