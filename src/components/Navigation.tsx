@@ -45,6 +45,7 @@ export default function Navigation() {
             <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">{t('nav.about')}</a>
             <a href="/#contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
             <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
+            <a href="/resellers" className="text-accent hover:text-accent/80 transition-colors font-medium">{t('nav.resellers')}</a>
           </div>
 
           {/* CTA Buttons */}
@@ -122,6 +123,7 @@ export default function Navigation() {
               <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">{t('nav.about')}</a>
               <a href="/#contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
               <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
+              <a href="/resellers" className="text-accent font-medium">{t('nav.resellers')}</a>
               
               {/* Mobile Language Selector */}
               <div className="border-t border-gray-700 pt-4">
