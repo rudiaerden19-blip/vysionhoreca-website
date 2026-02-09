@@ -994,17 +994,41 @@ function ComparisonSection() {
 function IndustrySection() {
   const [activeTab, setActiveTab] = useState('ordering')
   const [showLightbox, setShowLightbox] = useState(false)
+  const [lightboxIndex, setLightboxIndex] = useState(0)
   const { t, locale } = useLanguage()
   
-  const industries = {
-    ordering: { image: '/images/industry-ordering.png' },
-    analytics: { image: '/images/industry-analytics.png' },
-    accounting: { image: '/images/cost-calculator-1.png' },
-    payroll: { image: '/images/industry-payroll.png' },
-    whatsapp: { image: '/images/whatsapp-ordering.png' },
+  const industries: Record<string, { images: string[] }> = {
+    ordering: { images: ['/images/industry-ordering.png'] },
+    analytics: { images: ['/images/industry-analytics.png'] },
+    accounting: { images: ['/images/cost-calculator-1.png'] },
+    payroll: { images: ['/images/industry-payroll.png'] },
+    whatsapp: { images: [
+      '/images/whatsapp-1.png',
+      '/images/whatsapp-2.png',
+      '/images/whatsapp-3.png',
+      '/images/whatsapp-4.png',
+      '/images/whatsapp-5.png',
+      '/images/whatsapp-6.png',
+    ] },
   }
 
-  const current = industries[activeTab as keyof typeof industries]
+  const current = industries[activeTab]
+  const hasMultipleImages = current.images.length > 1
+
+  const openLightbox = (index: number) => {
+    setLightboxIndex(index)
+    setShowLightbox(true)
+  }
+
+  const goToPrev = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setLightboxIndex(lightboxIndex === 0 ? current.images.length - 1 : lightboxIndex - 1)
+  }
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setLightboxIndex(lightboxIndex === current.images.length - 1 ? 0 : lightboxIndex + 1)
+  }
 
   return (
     <section className="py-24 bg-white">
@@ -1048,30 +1072,76 @@ function IndustrySection() {
             </a>
           </div>
 
-          {/* Right content - Image */}
+          {/* Right content - Images */}
           <div className="relative text-center flex flex-col items-center justify-center">
-            <img
-              src={current.image}
-              alt={activeTab}
-              className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-xl cursor-pointer"
-              loading="lazy"
-              onClick={() => setShowLightbox(true)}
-            />
+            {hasMultipleImages ? (
+              /* Multiple thumbnails grid for WhatsApp */
+              <div className="grid grid-cols-3 gap-3 w-full max-w-[500px]">
+                {current.images.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`${activeTab} ${idx + 1}`}
+                    className="w-full h-32 sm:h-40 object-cover rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform border-2 border-gray-100"
+                    loading="lazy"
+                    onClick={() => openLightbox(idx)}
+                  />
+                ))}
+              </div>
+            ) : (
+              /* Single image for other tabs */
+              <img
+                src={current.images[0]}
+                alt={activeTab}
+                className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-xl cursor-pointer"
+                loading="lazy"
+                onClick={() => openLightbox(0)}
+              />
+            )}
             <p className="text-gray-500 text-sm mt-6">{t('industry.clickToEnlarge')}</p>
           </div>
         </div>
 
-        {/* Lightbox Modal */}
+        {/* Lightbox Modal with Navigation */}
         {showLightbox && (
           <div 
             className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
             onClick={() => setShowLightbox(false)}
           >
+            {/* Left Arrow */}
+            {hasMultipleImages && (
+              <button
+                onClick={goToPrev}
+                className="absolute left-4 sm:left-8 text-white hover:text-gray-300 p-2 z-10"
+                aria-label="Vorige"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 sm:h-14 sm:w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+
             <img
-              src={current.image}
+              src={current.images[lightboxIndex]}
               alt={activeTab}
               className="max-w-full max-h-full object-contain"
+              onClick={(e) => e.stopPropagation()}
             />
+
+            {/* Right Arrow */}
+            {hasMultipleImages && (
+              <button
+                onClick={goToNext}
+                className="absolute right-4 sm:right-8 text-white hover:text-gray-300 p-2 z-10"
+                aria-label="Volgende"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 sm:h-14 sm:w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+
+            {/* Close button */}
             <button 
               className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
               onClick={() => setShowLightbox(false)}
@@ -1079,6 +1149,13 @@ function IndustrySection() {
             >
               ×
             </button>
+
+            {/* Image counter */}
+            {hasMultipleImages && (
+              <div className="absolute bottom-4 text-white text-sm">
+                {lightboxIndex + 1} / {current.images.length}
+              </div>
+            )}
           </div>
         )}
       </div>
