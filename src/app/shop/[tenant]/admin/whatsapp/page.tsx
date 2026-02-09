@@ -428,7 +428,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                 <h4 className="font-bold text-gray-900 mt-2">Scan om te bestellen</h4>
               </div>
               <QRCode 
-                url={`https://wa.me/${formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen`}
+                url={`https://wa.me/${formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=BESTEL`}
                 size={200}
                 className="mx-auto"
               />
@@ -451,18 +451,18 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                   <strong>Link:</strong>
                 </p>
                 <a 
-                  href={`https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen`}
+                  href={`https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=BESTEL`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs bg-white px-3 py-2 rounded-lg block break-all text-blue-600 hover:text-blue-800 hover:underline"
                 >
-                  https://wa.me/{formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen
+                  https://wa.me/{formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=BESTEL
                 </a>
               </div>
 
               <div className="flex gap-3">
                 <a
-                  href={`https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen`}
+                  href={`https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=BESTEL`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 py-3 bg-green-100 hover:bg-green-200 text-green-800 rounded-xl font-medium flex items-center justify-center gap-2"

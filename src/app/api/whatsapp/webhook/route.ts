@@ -132,6 +132,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ status: 'ok' })
     }
     
+    // Quick order keywords - skip language menu, default to Dutch
+    const orderKeywords = ['bestel', 'bestellen', 'order', 'menu', 'hallo', 'hello', 'hi', 'hey']
+    if (!savedLanguage && orderKeywords.includes(messageText)) {
+      await saveCustomerLanguage(tenant.tenant_slug, fromPhone, 'nl')
+      await sendWelcomeWithShopLink(businessPhoneId, fromPhone, tenant, contactName, 'nl')
+      return NextResponse.json({ status: 'ok' })
+    }
+    
     // If no language saved, send language selection menu first
     if (!savedLanguage) {
       await sendLanguageMenu(businessPhoneId, fromPhone, tenant.access_token, tenant.business_name)
