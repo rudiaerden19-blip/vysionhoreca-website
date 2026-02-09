@@ -1817,7 +1817,8 @@
       "accounting": "会計",
       "orders": "注文",
       "statistics": "統計",
-      "gksReports": "GKS RAPPORTEN"
+      "gksReports": "GKS RAPPORTEN",
+      "groupOrders": "グループ注文"
     },
     "menu": {
       "dashboard": "ダッシュボード",
@@ -1857,7 +1858,10 @@
       "businessAnalysis": "ビジネス分析",
       "sales": "売上",
       "popularItems": "人気商品",
-      "zReport": "Z-Rapport"
+      "zReport": "Z-Rapport",
+      "groupsList": "グループ管理",
+      "groupSessions": "注文セッション",
+      "groupOrdersOverview": "グループ注文"
     },
     "viewWebsite": "あなたのショップを見る",
     "display": "ディスプレイ",

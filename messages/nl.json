@@ -1724,7 +1724,8 @@
       "accounting": "BOEKHOUDING",
       "gksReports": "GKS RAPPORTEN",
       "orders": "BESTELLINGEN",
-      "statistics": "STATISTIEKEN"
+      "statistics": "STATISTIEKEN",
+      "groupOrders": "GROEPSBESTELLINGEN"
     },
     "menu": {
       "dashboard": "Dashboard",
@@ -1766,7 +1767,10 @@
       "zReport": "Z-Rapport",
       "businessAnalysis": "Bedrijfsanalyse",
       "sales": "Verkoop",
-      "popularItems": "Populaire items"
+      "popularItems": "Populaire items",
+      "groupsList": "Groepen beheren",
+      "groupSessions": "Bestelsessies",
+      "groupOrdersOverview": "Groepsbestellingen"
     },
     "viewWebsite": "Bekijk je shop",
     "display": "Scherm",

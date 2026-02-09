@@ -1817,7 +1817,8 @@
       "accounting": "CONTABILIDAD",
       "orders": "PEDIDOS",
       "statistics": "ESTADÍSTICAS",
-      "gksReports": "GKS RAPPORTEN"
+      "gksReports": "GKS RAPPORTEN",
+      "groupOrders": "PEDIDOS GRUPALES"
     },
     "menu": {
       "dashboard": "Panel de control",
@@ -1857,7 +1858,10 @@
       "businessAnalysis": "Análisis del negocio",
       "sales": "Ventas",
       "popularItems": "Artículos populares",
-      "zReport": "Z-Rapport"
+      "zReport": "Z-Rapport",
+      "groupsList": "Gestionar grupos",
+      "groupSessions": "Sesiones de pedido",
+      "groupOrdersOverview": "Pedidos grupales"
     },
     "viewWebsite": "Ver tu tienda",
     "display": "Pantalla",

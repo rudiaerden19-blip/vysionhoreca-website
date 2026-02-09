@@ -1323,7 +1323,8 @@
       "accounting": "BUCHHALTUNG",
       "orders": "BESTELLUNGEN",
       "statistics": "STATISTIKEN",
-      "gksReports": "GKS RAPPORTEN"
+      "gksReports": "GKS RAPPORTEN",
+      "groupOrders": "GRUPPENBESTELLUNGEN"
     },
     "menu": {
       "dashboard": "Dashboard",
@@ -1363,7 +1364,10 @@
       "businessAnalysis": "Geschäftsanalyse",
       "sales": "Verkauf",
       "popularItems": "Beliebte Artikel",
-      "zReport": "Z-Rapport"
+      "zReport": "Z-Rapport",
+      "groupsList": "Gruppen verwalten",
+      "groupSessions": "Bestellsitzungen",
+      "groupOrdersOverview": "Gruppenbestellungen"
     },
     "viewWebsite": "Dein Shop ansehen",
     "display": "Bildschirm",

@@ -1323,7 +1323,8 @@
       "accounting": "COMPTABILITÉ",
       "orders": "COMMANDES",
       "statistics": "STATISTIQUES",
-      "gksReports": "GKS RAPPORTEN"
+      "gksReports": "GKS RAPPORTEN",
+      "groupOrders": "COMMANDES GROUPÉES"
     },
     "menu": {
       "dashboard": "Tableau de bord",
@@ -1363,7 +1364,10 @@
       "businessAnalysis": "Analyse commerciale",
       "sales": "Ventes",
       "popularItems": "Articles populaires",
-      "zReport": "Z-Rapport"
+      "zReport": "Z-Rapport",
+      "groupsList": "Gérer les groupes",
+      "groupSessions": "Sessions de commande",
+      "groupOrdersOverview": "Commandes groupées"
     },
     "viewWebsite": "Voir votre boutique",
     "display": "Écran",

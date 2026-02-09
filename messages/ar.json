@@ -1817,7 +1817,8 @@
       "accounting": "المحاسبة",
       "orders": "الطلبات",
       "statistics": "الإحصائيات",
-      "gksReports": "GKS RAPPORTEN"
+      "gksReports": "GKS RAPPORTEN",
+      "groupOrders": "طلبات المجموعة"
     },
     "menu": {
       "dashboard": "لوحة التحكم",
@@ -1857,7 +1858,10 @@
       "businessAnalysis": "تحليل الأعمال",
       "sales": "المبيعات",
       "popularItems": "العناصر الشائعة",
-      "zReport": "Z-Rapport"
+      "zReport": "Z-Rapport",
+      "groupsList": "إدارة المجموعات",
+      "groupSessions": "جلسات الطلب",
+      "groupOrdersOverview": "طلبات المجموعة"
     },
     "viewWebsite": "عرض متجرك",
     "display": "الشاشة",

@@ -1817,7 +1817,8 @@
       "accounting": "会计",
       "orders": "订单",
       "statistics": "统计",
-      "gksReports": "GKS RAPPORTEN"
+      "gksReports": "GKS RAPPORTEN",
+      "groupOrders": "团购订单"
     },
     "menu": {
       "dashboard": "仪表板",
@@ -1857,7 +1858,10 @@
       "businessAnalysis": "业务分析",
       "sales": "销售",
       "popularItems": "热门商品",
-      "zReport": "Z-Rapport"
+      "zReport": "Z-Rapport",
+      "groupsList": "管理群组",
+      "groupSessions": "订单会话",
+      "groupOrdersOverview": "团购订单"
     },
     "viewWebsite": "查看您的商店",
     "display": "显示屏",

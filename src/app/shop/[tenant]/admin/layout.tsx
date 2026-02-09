@@ -114,6 +114,15 @@ const menuItems = [
       { nameKey: 'reservations', href: '/reserveringen', icon: '📅' },
     ]
   },
+  {
+    categoryKey: 'groupOrders',
+    icon: '👥',
+    items: [
+      { nameKey: 'groupsList', href: '/groepen', icon: '🏢' },
+      { nameKey: 'groupSessions', href: '/groepen/sessies', icon: '📋' },
+      { nameKey: 'groupOrdersOverview', href: '/groepen/bestellingen', icon: '📦' },
+    ]
+  },
 ]
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {

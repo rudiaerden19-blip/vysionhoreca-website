@@ -1724,7 +1724,8 @@
       "accounting": "ACCOUNTING",
       "gksReports": "GKS REPORTS",
       "orders": "ORDERS",
-      "statistics": "STATISTICS"
+      "statistics": "STATISTICS",
+      "groupOrders": "GROUP ORDERS"
     },
     "menu": {
       "dashboard": "Dashboard",
@@ -1766,7 +1767,10 @@
       "zReport": "Z-Report",
       "businessAnalysis": "Business Analysis",
       "sales": "Sales",
-      "popularItems": "Popular Items"
+      "popularItems": "Popular Items",
+      "groupsList": "Manage Groups",
+      "groupSessions": "Order Sessions",
+      "groupOrdersOverview": "Group Orders"
     },
     "viewWebsite": "View your shop",
     "display": "Display",

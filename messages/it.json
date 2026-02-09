@@ -1817,7 +1817,8 @@
       "accounting": "CONTABILITÀ",
       "orders": "ORDINI",
       "statistics": "STATISTICHE",
-      "gksReports": "GKS RAPPORTEN"
+      "gksReports": "GKS RAPPORTEN",
+      "groupOrders": "ORDINI DI GRUPPO"
     },
     "menu": {
       "dashboard": "Dashboard",
@@ -1857,7 +1858,10 @@
       "businessAnalysis": "Analisi aziendale",
       "sales": "Vendite",
       "popularItems": "Articoli popolari",
-      "zReport": "Z-Rapport"
+      "zReport": "Z-Rapport",
+      "groupsList": "Gestisci gruppi",
+      "groupSessions": "Sessioni ordini",
+      "groupOrdersOverview": "Ordini di gruppo"
     },
     "viewWebsite": "Vedi il tuo negozio",
     "display": "Schermo",
