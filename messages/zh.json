@@ -103,6 +103,10 @@
     "gks": {
       "title": "您自己的网站",
       "description": "完全按照您的喜好定制。标志、颜色、照片、文字 - 一切都是您的风格。"
+    },
+    "whatsapp": {
+      "title": "通过WhatsApp订购",
+      "description": "让您的客户直接通过WhatsApp订购。查看菜单、付款和跟踪订单 - 一切都在WhatsApp中完成。无需App Store应用。"
     }
   },
   "stats": {

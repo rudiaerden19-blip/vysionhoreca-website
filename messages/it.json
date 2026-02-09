@@ -103,6 +103,10 @@
     "gks": {
       "title": "Il Tuo Sito Web",
       "description": "Completamente personalizzabile secondo i tuoi gusti. Logo, colori, foto, testi - tutto nel tuo stile."
+    },
+    "whatsapp": {
+      "title": "Ordina via WhatsApp",
+      "description": "Lascia che i tuoi clienti ordinino direttamente via WhatsApp. Vedere menu, pagare e seguire l'ordine - tutto in WhatsApp. Nessuna app nell'App Store necessaria."
     }
   },
   "stats": {

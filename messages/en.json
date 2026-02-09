@@ -104,6 +104,10 @@
     "gks": {
       "title": "Your Own Website",
       "description": "Fully customizable to your own taste. Logo, colors, photos, texts - everything in your style."
+    },
+    "whatsapp": {
+      "title": "Order via WhatsApp",
+      "description": "Let your customers order directly via WhatsApp. View menu, checkout and track orders - all in WhatsApp. No app in the App Store needed."
     }
   },
   "stats": {

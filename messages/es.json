@@ -103,6 +103,10 @@
     "gks": {
       "title": "Tu Propio Sitio Web",
       "description": "Totalmente personalizable a tu gusto. Logo, colores, fotos, textos - todo a tu estilo."
+    },
+    "whatsapp": {
+      "title": "Pedir por WhatsApp",
+      "description": "Deja que tus clientes pidan directamente por WhatsApp. Ver menú, pagar y seguir el pedido - todo en WhatsApp. Sin necesidad de app en la App Store."
     }
   },
   "stats": {

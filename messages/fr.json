@@ -103,6 +103,10 @@
     "gks": {
       "title": "Votre Propre Site Web",
       "description": "Entièrement personnalisable selon vos goûts. Logo, couleurs, photos, textes - tout dans votre style."
+    },
+    "whatsapp": {
+      "title": "Commander via WhatsApp",
+      "description": "Laissez vos clients commander directement via WhatsApp. Voir le menu, payer et suivre la commande - tout dans WhatsApp. Aucune app dans l'App Store nécessaire."
     }
   },
   "stats": {

@@ -103,6 +103,10 @@
     "gks": {
       "title": "あなた専用のウェブサイト",
       "description": "お好みに合わせて完全にカスタマイズ可能。ロゴ、色、写真、テキスト - すべてあなたのスタイルで。"
+    },
+    "whatsapp": {
+      "title": "WhatsAppで注文",
+      "description": "お客様がWhatsAppで直接注文できます。メニュー閲覧、支払い、注文追跡 - すべてWhatsAppで。App Storeのアプリは不要。"
     }
   },
   "stats": {

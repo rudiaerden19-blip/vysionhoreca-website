@@ -104,6 +104,10 @@
     "gks": {
       "title": "Je Eigen Website",
       "description": "Geheel aanpasbaar naar jouw eigen smaak. Logo, kleuren, foto's, teksten - alles in jouw stijl."
+    },
+    "whatsapp": {
+      "title": "Bestel via WhatsApp",
+      "description": "Laat je klanten rechtstreeks via WhatsApp bestellen. Menu bekijken, afrekenen en bestelling volgen - alles in WhatsApp. Geen app in de App Store nodig."
     }
   },
   "stats": {

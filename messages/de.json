@@ -103,6 +103,10 @@
     "gks": {
       "title": "Ihre Eigene Website",
       "description": "Vollständig anpassbar nach Ihrem Geschmack. Logo, Farben, Fotos, Texte - alles in Ihrem Stil."
+    },
+    "whatsapp": {
+      "title": "Bestellen über WhatsApp",
+      "description": "Lassen Sie Ihre Kunden direkt über WhatsApp bestellen. Menü ansehen, bezahlen und Bestellung verfolgen - alles in WhatsApp. Keine App im App Store nötig."
     }
   },
   "stats": {
