@@ -267,9 +267,14 @@
     "tryFree": "無料で試す",
     "clickToEnlarge": "クリックして拡大",
     "payroll": {
-      "tab": "Loonadministratie",
-      "title": "Loonadministratie.",
-      "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
+      "tab": "給与管理",
+      "title": "給与管理。",
+      "description": "すべての従業員の給与管理を整理し、選択した給与事務所に直接接続"
+    },
+    "whatsapp": {
+      "tab": "WhatsApp注文",
+      "title": "WhatsAppで注文。",
+      "description": "お客様がWhatsAppで注文、商品選択、支払いができます - すべてWhatsAppで。App Store不要。実証済み: 売上20%増、注文スピード向上。"
     }
   },
   "costCalculator": {

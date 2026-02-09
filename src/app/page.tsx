@@ -1001,6 +1001,7 @@ function IndustrySection() {
     analytics: { image: '/images/industry-analytics.png' },
     accounting: { image: '/images/cost-calculator-1.png' },
     payroll: { image: '/images/industry-payroll.png' },
+    whatsapp: { image: '/images/whatsapp-ordering.png' },
   }
 
   const current = industries[activeTab as keyof typeof industries]
@@ -1015,7 +1016,7 @@ function IndustrySection() {
         
         {/* Tabs */}
         <div className="flex flex-wrap gap-3 sm:gap-6 lg:gap-8 mb-12 justify-center lg:justify-start">
-          {['ordering', 'analytics', 'accounting', 'payroll'].map((tab) => (
+          {['ordering', 'analytics', 'accounting', 'payroll', 'whatsapp'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

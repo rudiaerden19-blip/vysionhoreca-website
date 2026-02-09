@@ -267,9 +267,14 @@
     "tryFree": "Essayer gratuitement",
     "clickToEnlarge": "Cliquez pour agrandir",
     "payroll": {
-      "tab": "Loonadministratie",
-      "title": "Loonadministratie.",
-      "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
+      "tab": "Gestion des salaires",
+      "title": "Gestion des salaires.",
+      "description": "Gardez votre administration salariale en ordre pour chaque employé, directement connectée à votre bureau de paie"
+    },
+    "whatsapp": {
+      "tab": "Commander via WhatsApp",
+      "title": "Commander via WhatsApp.",
+      "description": "Laissez vos clients commander via WhatsApp, choisir des produits et payer - tout dans WhatsApp. Pas besoin d'App Store. Résultats prouvés: 20% de chiffre d'affaires en plus et commandes plus rapides."
     }
   },
   "costCalculator": {

@@ -267,9 +267,14 @@
     "tryFree": "免费试用",
     "clickToEnlarge": "点击放大",
     "payroll": {
-      "tab": "Loonadministratie",
-      "title": "Loonadministratie.",
-      "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
+      "tab": "工资管理",
+      "title": "工资管理。",
+      "description": "为每位员工保持工资管理有序，直接连接到您选择的工资服务商"
+    },
+    "whatsapp": {
+      "tab": "WhatsApp订购",
+      "title": "通过WhatsApp订购。",
+      "description": "让您的客户通过WhatsApp订购、选择产品并付款 - 一切都在WhatsApp中完成。无需App Store。验证结果：收入增加20%，订单更快。"
     }
   },
   "costCalculator": {

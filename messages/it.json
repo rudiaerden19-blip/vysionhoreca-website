@@ -267,9 +267,14 @@
     "tryFree": "Prova gratis",
     "clickToEnlarge": "Clicca per ingrandire",
     "payroll": {
-      "tab": "Loonadministratie",
-      "title": "Loonadministratie.",
-      "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
+      "tab": "Gestione stipendi",
+      "title": "Gestione stipendi.",
+      "description": "Mantieni la tua amministrazione stipendi in ordine per ogni dipendente, collegata direttamente al tuo consulente paghe"
+    },
+    "whatsapp": {
+      "tab": "Ordina via WhatsApp",
+      "title": "Ordina via WhatsApp.",
+      "description": "Lascia che i tuoi clienti ordinino via WhatsApp, scelgano prodotti e paghino - tutto in WhatsApp. Nessun App Store necessario. Risultati provati: 20% in più di fatturato e ordini più veloci."
     }
   },
   "costCalculator": {

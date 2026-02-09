@@ -269,6 +269,11 @@
       "title": "Payroll management.",
       "description": "Keep your payroll administration in order for every employee, directly connected to your chosen payroll office"
     },
+    "whatsapp": {
+      "tab": "WhatsApp Ordering",
+      "title": "Order via WhatsApp.",
+      "description": "Let your customers order via WhatsApp, choose products and checkout - all in WhatsApp. No App Store needed. Proven results: 20% more revenue and faster orders."
+    },
     "tryFree": "Try free",
     "clickToEnlarge": "Click to enlarge"
   },

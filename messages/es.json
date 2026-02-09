@@ -267,9 +267,14 @@
     "tryFree": "Prueba gratis",
     "clickToEnlarge": "Clic para ampliar",
     "payroll": {
-      "tab": "Loonadministratie",
-      "title": "Loonadministratie.",
-      "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
+      "tab": "Nóminas",
+      "title": "Gestión de nóminas.",
+      "description": "Mantén tu administración de nóminas en orden para cada empleado, conectada directamente a tu gestoría"
+    },
+    "whatsapp": {
+      "tab": "Pedir por WhatsApp",
+      "title": "Pedir por WhatsApp.",
+      "description": "Deja que tus clientes pidan por WhatsApp, elijan productos y paguen - todo en WhatsApp. Sin App Store. Resultados probados: 20% más de ingresos y pedidos más rápidos."
     }
   },
   "costCalculator": {

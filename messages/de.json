@@ -267,9 +267,14 @@
     "tryFree": "Kostenlos testen",
     "clickToEnlarge": "Zum Vergrößern klicken",
     "payroll": {
-      "tab": "Loonadministratie",
-      "title": "Loonadministratie.",
-      "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
+      "tab": "Lohnbuchhaltung",
+      "title": "Lohnbuchhaltung.",
+      "description": "Halten Sie Ihre Lohnbuchhaltung für jeden Mitarbeiter in Ordnung, direkt verbunden mit Ihrem gewählten Lohnbüro"
+    },
+    "whatsapp": {
+      "tab": "WhatsApp Bestellen",
+      "title": "Bestellen über WhatsApp.",
+      "description": "Lassen Sie Ihre Kunden über WhatsApp bestellen, Produkte wählen und bezahlen - alles in WhatsApp. Kein App Store nötig. Bewährte Ergebnisse: 20% mehr Umsatz und schnellere Bestellungen."
     }
   },
   "costCalculator": {

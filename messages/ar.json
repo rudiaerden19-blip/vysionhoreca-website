@@ -267,9 +267,14 @@
     "tryFree": "جرب مجاناً",
     "clickToEnlarge": "انقر للتكبير",
     "payroll": {
-      "tab": "Loonadministratie",
-      "title": "Loonadministratie.",
-      "description": "Houd uw loonadministratie in orde voor iedere werknemer direct gekoppeld naar uw gekozen loonkantoor"
+      "tab": "إدارة الرواتب",
+      "title": "إدارة الرواتب.",
+      "description": "حافظ على إدارة رواتبك منظمة لكل موظف، متصلة مباشرة بمكتب الرواتب الخاص بك"
+    },
+    "whatsapp": {
+      "tab": "اطلب عبر واتساب",
+      "title": "اطلب عبر واتساب.",
+      "description": "دع عملاءك يطلبون عبر واتساب، يختارون المنتجات ويدفعون - كل شيء في واتساب. لا حاجة لمتجر التطبيقات. نتائج مثبتة: 20% إيرادات أكثر وطلبات أسرع."
     }
   },
   "costCalculator": {
