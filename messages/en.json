@@ -1770,7 +1770,8 @@
       "popularItems": "Popular Items",
       "groupsList": "Manage Groups",
       "groupSessions": "Order Sessions",
-      "groupOrdersOverview": "Group Orders"
+      "groupOrdersOverview": "Group Orders",
+      "labelPrinter": "Label Printer"
     },
     "viewWebsite": "View your shop",
     "display": "Display",
@@ -2050,6 +2051,7 @@
       "statusAvailable": "✓ Available",
       "statusPopular": "🔥 Popular",
       "statusPromo": "🎁 Promotion",
+      "printLabel": "Print label",
       "imageDisplayMode": "Photo display",
       "imageDefault": "Default",
       "imageCover": "Large",

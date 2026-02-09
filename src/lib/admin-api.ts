@@ -537,6 +537,7 @@ export interface MenuProduct {
   sort_order: number
   allergens: string[]
   image_display_mode?: 'cover' | 'contain' | null  // null = gebruik tenant instelling
+  print_label?: boolean  // Print sticker/label for this product
 }
 
 export async function getMenuProducts(tenantSlug: string): Promise<MenuProduct[]> {

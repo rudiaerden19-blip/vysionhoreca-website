@@ -1861,7 +1861,8 @@
       "zReport": "Z-Rapport",
       "groupsList": "Gestisci gruppi",
       "groupSessions": "Sessioni ordini",
-      "groupOrdersOverview": "Ordini di gruppo"
+      "groupOrdersOverview": "Ordini di gruppo",
+      "labelPrinter": "Stampante etichette"
     },
     "viewWebsite": "Vedi il tuo negozio",
     "display": "Schermo",
@@ -2139,6 +2140,7 @@
       "statusAvailable": "✓ Beschikbaar",
       "statusPopular": "🔥 Populair",
       "statusPromo": "🎁 Promotie",
+      "printLabel": "Stampa etichetta",
       "imageDisplayMode": "Foto weergave",
       "imageDefault": "Standaard",
       "imageCover": "Groot",

@@ -1861,7 +1861,8 @@
       "zReport": "Z-Rapport",
       "groupsList": "グループ管理",
       "groupSessions": "注文セッション",
-      "groupOrdersOverview": "グループ注文"
+      "groupOrdersOverview": "グループ注文",
+      "labelPrinter": "ラベルプリンター"
     },
     "viewWebsite": "あなたのショップを見る",
     "display": "ディスプレイ",
@@ -2139,6 +2140,7 @@
       "statusAvailable": "✓ Beschikbaar",
       "statusPopular": "🔥 Populair",
       "statusPromo": "🎁 Promotie",
+      "printLabel": "ラベル印刷",
       "imageDisplayMode": "Foto weergave",
       "imageDefault": "Standaard",
       "imageCover": "Groot",

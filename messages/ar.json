@@ -1861,7 +1861,8 @@
       "zReport": "Z-Rapport",
       "groupsList": "إدارة المجموعات",
       "groupSessions": "جلسات الطلب",
-      "groupOrdersOverview": "طلبات المجموعة"
+      "groupOrdersOverview": "طلبات المجموعة",
+      "labelPrinter": "طابعة الملصقات"
     },
     "viewWebsite": "عرض متجرك",
     "display": "الشاشة",
@@ -2139,6 +2140,7 @@
       "statusAvailable": "✓ Beschikbaar",
       "statusPopular": "🔥 Populair",
       "statusPromo": "🎁 Promotie",
+      "printLabel": "طباعة الملصق",
       "imageDisplayMode": "Foto weergave",
       "imageDefault": "Standaard",
       "imageCover": "Groot",

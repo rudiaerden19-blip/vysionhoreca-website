@@ -1367,7 +1367,8 @@
       "zReport": "Z-Rapport",
       "groupsList": "Gérer les groupes",
       "groupSessions": "Sessions de commande",
-      "groupOrdersOverview": "Commandes groupées"
+      "groupOrdersOverview": "Commandes groupées",
+      "labelPrinter": "Imprimante étiquettes"
     },
     "viewWebsite": "Voir votre boutique",
     "display": "Écran",
@@ -1645,6 +1646,7 @@
       "statusAvailable": "✓ Beschikbaar",
       "statusPopular": "🔥 Populair",
       "statusPromo": "🎁 Promotie",
+      "printLabel": "Imprimer étiquette",
       "imageDisplayMode": "Foto weergave",
       "imageDefault": "Standaard",
       "imageCover": "Groot",

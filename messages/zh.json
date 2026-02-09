@@ -1861,7 +1861,8 @@
       "zReport": "Z-Rapport",
       "groupsList": "管理群组",
       "groupSessions": "订单会话",
-      "groupOrdersOverview": "团购订单"
+      "groupOrdersOverview": "团购订单",
+      "labelPrinter": "标签打印机"
     },
     "viewWebsite": "查看您的商店",
     "display": "显示屏",
@@ -2139,6 +2140,7 @@
       "statusAvailable": "✓ Beschikbaar",
       "statusPopular": "🔥 Populair",
       "statusPromo": "🎁 Promotie",
+      "printLabel": "打印标签",
       "imageDisplayMode": "Foto weergave",
       "imageDefault": "Standaard",
       "imageCover": "Groot",

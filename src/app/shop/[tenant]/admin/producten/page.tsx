@@ -231,6 +231,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     promo_price: undefined,
     allergens: [],
     image_display_mode: null,
+    print_label: false,
   })
 
   // Load data on mount
@@ -369,6 +370,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       promo_price: undefined,
       allergens: [],
       image_display_mode: null,
+      print_label: false,
     })
     setSelectedOptionIds([])
     setShowAddModal(true)
@@ -421,6 +423,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       sort_order: editingProduct?.sort_order || products.length,
       allergens: formData.allergens || [],
       image_display_mode: formData.image_display_mode || null,
+      print_label: formData.print_label ?? false,
     }
 
     const result = await saveMenuProduct(productData)
@@ -811,6 +814,15 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                         className="rounded" 
                       />
                       <span>{t('adminPages.producten.statusPromo')}</span>
+                    </label>
+                    <label className="flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-xl cursor-pointer hover:bg-purple-200">
+                      <input 
+                        type="checkbox" 
+                        checked={formData.print_label ?? false}
+                        onChange={(e) => setFormData(prev => ({ ...prev, print_label: e.target.checked }))}
+                        className="rounded" 
+                      />
+                      <span>🏷️ {t('adminPages.producten.printLabel')}</span>
                     </label>
                   </div>
                   

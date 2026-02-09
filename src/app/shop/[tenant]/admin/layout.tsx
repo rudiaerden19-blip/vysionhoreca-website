@@ -121,6 +121,7 @@ const menuItems = [
       { nameKey: 'groupsList', href: '/groepen', icon: '🏢' },
       { nameKey: 'groupSessions', href: '/groepen/sessies', icon: '📋' },
       { nameKey: 'groupOrdersOverview', href: '/groepen/bestellingen', icon: '📦' },
+      { nameKey: 'labelPrinter', href: '/labels', icon: '🏷️' },
     ]
   },
 ]

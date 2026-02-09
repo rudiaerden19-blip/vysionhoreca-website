@@ -1367,7 +1367,8 @@
       "zReport": "Z-Rapport",
       "groupsList": "Gruppen verwalten",
       "groupSessions": "Bestellsitzungen",
-      "groupOrdersOverview": "Gruppenbestellungen"
+      "groupOrdersOverview": "Gruppenbestellungen",
+      "labelPrinter": "Etikettendrucker"
     },
     "viewWebsite": "Dein Shop ansehen",
     "display": "Bildschirm",
@@ -1645,6 +1646,7 @@
       "statusAvailable": "✓ Beschikbaar",
       "statusPopular": "🔥 Populair",
       "statusPromo": "🎁 Promotie",
+      "printLabel": "Etikett drucken",
       "imageDisplayMode": "Foto weergave",
       "imageDefault": "Standaard",
       "imageCover": "Groß",

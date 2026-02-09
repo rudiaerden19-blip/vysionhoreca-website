@@ -1770,7 +1770,8 @@
       "popularItems": "Populaire items",
       "groupsList": "Groepen beheren",
       "groupSessions": "Bestelsessies",
-      "groupOrdersOverview": "Groepsbestellingen"
+      "groupOrdersOverview": "Groepsbestellingen",
+      "labelPrinter": "Label Printer"
     },
     "viewWebsite": "Bekijk je shop",
     "display": "Scherm",
@@ -2050,6 +2051,7 @@
       "statusAvailable": "✓ Beschikbaar",
       "statusPopular": "🔥 Populair",
       "statusPromo": "🎁 Promotie",
+      "printLabel": "Print sticker",
       "imageDisplayMode": "Foto weergave",
       "imageDefault": "Standaard",
       "imageCover": "Groot",
