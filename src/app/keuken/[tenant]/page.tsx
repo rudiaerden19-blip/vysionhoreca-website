@@ -279,9 +279,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     await updateOrderStatus(order.id, 'ready')
     
     // Send WhatsApp notification that order is ready
+    console.log('🔔 handleReady called, customer_phone:', order.customer_phone)
     if (order.customer_phone) {
       try {
-        await fetch('/api/whatsapp/send-status', {
+        const response = await fetch('/api/whatsapp/send-status', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -291,10 +292,17 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             status: 'ready'
           })
         })
-        console.log('✅ WhatsApp ready notification sent')
+        const data = await response.json()
+        if (response.ok) {
+          console.log('✅ WhatsApp ready notification sent successfully:', data)
+        } else {
+          console.error('❌ WhatsApp ready notification failed:', response.status, data)
+        }
       } catch (err) {
-        console.error('Failed to send WhatsApp ready notification:', err)
+        console.error('❌ Failed to send WhatsApp ready notification:', err)
       }
+    } else {
+      console.log('⚠️ No customer_phone on order, skipping WhatsApp notification')
     }
     
     setNewOrderIds(prev => {
