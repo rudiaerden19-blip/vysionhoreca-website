@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS partner_applications (
   -- Application details
   experience TEXT, -- Their experience in sales/horeca
   motivation TEXT, -- Why they want to be a partner
-  expected_clients INTEGER, -- How many clients they expect to bring
+  expected_clients TEXT, -- How many clients they expect to bring (e.g. "1-10", "10-25")
   
   -- Status
   status TEXT DEFAULT 'new' CHECK (status IN ('new', 'reviewing', 'approved', 'rejected')),

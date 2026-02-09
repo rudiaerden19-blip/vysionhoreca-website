@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         website: website || null,
         experience: experience || null,
         motivation: motivation || null,
-        expected_clients: expected_clients ? parseInt(expected_clients) || null : null,
+        expected_clients: expected_clients || null,
         status: 'new',
       })
       .select()
