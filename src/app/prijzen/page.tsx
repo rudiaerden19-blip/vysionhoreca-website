@@ -112,7 +112,7 @@ export default function PrijzenPage() {
               </div>
             </div>
 
-            {/* Vysion Pro - €69 - POPULAR */}
+            {/* Vysion Pro - €79 - POPULAR */}
             <div className="bg-gradient-to-b from-[#4a3f6e] to-[#2d2654] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl relative">
               {/* Popular badge */}
               <div className="absolute top-4 right-4 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
