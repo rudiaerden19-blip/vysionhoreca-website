@@ -2213,7 +2213,8 @@ export interface DailySales {
 
 export async function getDailySales(tenantSlug: string, year: number, month: number): Promise<DailySales[]> {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
-  const endDate = `${year}-${String(month).padStart(2, '0')}-31`
+  const lastDay = new Date(year, month, 0).getDate() // Get actual last day of month
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
   
   const { data, error } = await supabase
     .from('daily_sales')
@@ -2235,13 +2236,26 @@ export async function saveDailySales(sales: DailySales): Promise<boolean> {
   
   console.log('💾 Saving daily sales:', { ...sales, total_revenue: totalRevenue })
   
+  // Build the record without undefined id to avoid upsert issues
+  const record: Record<string, unknown> = {
+    tenant_slug: sales.tenant_slug,
+    date: sales.date,
+    cash_revenue: sales.cash_revenue || 0,
+    card_revenue: sales.card_revenue || 0,
+    total_revenue: totalRevenue,
+    order_count: sales.order_count || 0,
+    notes: sales.notes || null,
+    updated_at: new Date().toISOString()
+  }
+  
+  // Only include id if it exists (for updates)
+  if (sales.id) {
+    record.id = sales.id
+  }
+  
   const { data, error } = await supabase
     .from('daily_sales')
-    .upsert({
-      ...sales,
-      total_revenue: totalRevenue,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'tenant_slug,date' })
+    .upsert(record, { onConflict: 'tenant_slug,date' })
     .select()
   
   if (error) {
@@ -2413,7 +2427,8 @@ export interface VariableCost {
 
 export async function getVariableCosts(tenantSlug: string, year: number, month: number): Promise<VariableCost[]> {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
-  const endDate = `${year}-${String(month).padStart(2, '0')}-31`
+  const lastDay = new Date(year, month, 0).getDate() // Get actual last day of month
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
   
   const { data, error } = await supabase
     .from('variable_costs')
