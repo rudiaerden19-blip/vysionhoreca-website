@@ -2233,18 +2233,24 @@ export async function getDailySales(tenantSlug: string, year: number, month: num
 export async function saveDailySales(sales: DailySales): Promise<boolean> {
   const totalRevenue = (sales.cash_revenue || 0) + (sales.card_revenue || 0)
   
-  const { error } = await supabase
+  console.log('💾 Saving daily sales:', { ...sales, total_revenue: totalRevenue })
+  
+  const { data, error } = await supabase
     .from('daily_sales')
     .upsert({
       ...sales,
       total_revenue: totalRevenue,
       updated_at: new Date().toISOString()
     }, { onConflict: 'tenant_slug,date' })
+    .select()
   
   if (error) {
-    console.error('Error saving daily sales:', error)
+    console.error('❌ Error saving daily sales:', error)
+    alert(`Fout bij opslaan: ${error.message}`)
     return false
   }
+  
+  console.log('✅ Daily sales saved:', data)
   return true
 }
 
