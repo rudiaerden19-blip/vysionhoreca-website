@@ -471,7 +471,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                 </a>
                 <button
                   onClick={() => {
-                    const link = `https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=ik%20wil%20bestellen`
+                    const link = `https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=BESTEL`
                     navigator.clipboard.writeText(link)
                     alert('Link gekopieerd!')
                   }}
