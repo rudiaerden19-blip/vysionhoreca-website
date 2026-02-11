@@ -688,7 +688,7 @@ function LiveDemoSection() {
           {t('liveDemo.subtitle')}
         </p>
         <a
-          href="https://frituurnolim.ordervysion.com"
+          href="https://frituurnolim.vercel.app/bestel/demo"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-[0_0_30px_rgba(234,88,12,0.4)] hover:shadow-[0_0_50px_rgba(234,88,12,0.6)] hover:scale-105"
