@@ -63,7 +63,7 @@ export default function KassaPage() {
       </section>
 
       {/* iPad Preview Section */}
-      <section className="py-20 bg-dark">
+      <section className="py-32 bg-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Text */}
@@ -119,7 +119,7 @@ export default function KassaPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-gray-900">
+      <section id="features" className="py-32 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
@@ -213,7 +213,7 @@ export default function KassaPage() {
       </section>
 
       {/* Live Demo Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-900 to-dark">
+      <section className="py-32 bg-gradient-to-b from-gray-900 to-dark">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
             Wil je de software in actie zien?
@@ -236,7 +236,7 @@ export default function KassaPage() {
       </section>
 
       {/* Pricing Section - Placeholder */}
-      <section className="py-20 bg-dark">
+      <section className="py-32 bg-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
@@ -306,7 +306,7 @@ export default function KassaPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-accent">
+      <section className="py-32 bg-accent">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
             Klaar om te starten?
