@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
-import jwt from 'jsonwebtoken'
 import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
@@ -10,34 +9,15 @@ import { logger } from '@/lib/logger'
  * POST /api/kassa/register
  * 
  * KASSA-SPECIFIEKE registratie - APART van bestelplatform!
- * 
- * Maakt:
- * 1. Tenant record
- * 2. Business profile (met kassa_url)
- * 3. Install token voor VysionPrint app
- * 
- * Stuurt:
- * - Verificatie email
- * - Installatie instructies
  */
-
-const JWT_SECRET = process.env.JWT_SECRET || process.env.INSTALL_TOKEN_SECRET || 'vysion-kassa-install-secret-2024'
 
 async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12)
 }
 
-function generateInstallToken(tenantId: string, businessId: string): string {
-  return jwt.sign(
-    { 
-      tenantId, 
-      businessId,
-      type: 'KASSA_INSTALL',
-      iat: Math.floor(Date.now() / 1000),
-    },
-    JWT_SECRET,
-    { expiresIn: '7d' } // Token geldig voor 7 dagen
-  )
+function generateInstallToken(): string {
+  // Genereer een veilige random token (geen JWT nodig)
+  return crypto.randomBytes(32).toString('hex')
 }
 
 export async function POST(request: NextRequest) {
@@ -104,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     if (existingSlug) {
       let counter = 2
-      while (true) {
+      while (counter < 100) {
         const newSlug = `${tenantSlug}${counter}`
         const { data: checkSlug } = await supabase
           .from('tenants')
@@ -117,12 +97,6 @@ export async function POST(request: NextRequest) {
           break
         }
         counter++
-        if (counter > 100) {
-          return NextResponse.json(
-            { error: 'Kon geen unieke slug genereren' },
-            { status: 400 }
-          )
-        }
       }
     }
 
@@ -142,7 +116,6 @@ export async function POST(request: NextRequest) {
         plan: 'starter',
         subscription_status: 'trial',
         trial_ends_at: trialEndsAt.toISOString(),
-        product_type: product || 'KASSA', // KASSA, BESTELPLATFORM, of BOTH
       })
       .select()
       .single()
@@ -156,8 +129,6 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. CREATE BUSINESS PROFILE
-    const kassaURL = `https://frituurnolim.vercel.app/kassa?business=${tenant.business_id || tenant.id}`
-    
     const { data: profile, error: profileError } = await supabase
       .from('business_profiles')
       .insert({
@@ -167,14 +138,12 @@ export async function POST(request: NextRequest) {
         phone: phone.trim(),
         tenant_slug: tenantSlug,
         vat_number: vatNumber || null,
-        kassa_url: kassaURL,
       })
       .select()
       .single()
 
     if (profileError) {
       logger.error('Error creating business profile', { requestId, error: profileError.message })
-      // Rollback tenant
       await supabase.from('tenants').delete().eq('id', tenant.id)
       return NextResponse.json(
         { error: `Fout bij aanmaken account: ${profileError.message}` },
@@ -183,36 +152,33 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. GENERATE INSTALL TOKEN
-    const installToken = generateInstallToken(tenant.id, profile.id)
+    const installToken = generateInstallToken()
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 dagen
 
-    // 4. STORE INSTALL TOKEN (voor validatie later)
+    // 4. STORE INSTALL TOKEN
     await supabase
       .from('install_tokens')
       .insert({
         token: installToken,
         tenant_id: tenant.id,
         business_id: profile.id,
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dagen
+        expires_at: expiresAt.toISOString(),
         used: false,
       })
-      .catch(() => {
-        // Tabel bestaat misschien nog niet - geen probleem
-        logger.warn('install_tokens table might not exist', { requestId })
+      .catch((err) => {
+        // Tabel bestaat misschien nog niet
+        logger.warn('Could not store install token', { requestId, error: err })
       })
 
     // 5. SEND WELCOME EMAIL
     try {
       await sendKassaWelcomeEmail(emailLower, businessName.trim(), installToken)
     } catch (emailError) {
-      logger.warn('Failed to send welcome email', { requestId, error: emailError })
+      logger.warn('Failed to send welcome email', { requestId })
     }
 
     // SUCCESS
-    logger.info('Kassa registration successful', { 
-      requestId, 
-      tenantSlug, 
-      tenantId: tenant.id,
-    })
+    logger.info('Kassa registration successful', { requestId, tenantSlug })
     
     return NextResponse.json({ 
       success: true,
@@ -222,14 +188,10 @@ export async function POST(request: NextRequest) {
         name: businessName.trim(),
         slug: tenantSlug,
       },
-      message: 'Account aangemaakt! Gebruik de installatiecode in de VysionPrint app.'
     })
 
   } catch (error) {
-    logger.error('Kassa registration error', { 
-      requestId, 
-      error: error instanceof Error ? error.message : 'Unknown error',
-    })
+    logger.error('Kassa registration error', { requestId, error: error instanceof Error ? error.message : 'Unknown' })
     return NextResponse.json(
       { error: 'Er is een fout opgetreden' },
       { status: 500 }
@@ -248,51 +210,31 @@ async function sendKassaWelcomeEmail(email: string, name: string, installToken: 
     },
   })
 
-  const mailOptions = {
+  await transporter.sendMail({
     from: `"Vysion Kassa" <${process.env.ZOHO_EMAIL}>`,
     to: email,
     subject: 'Welkom bij Vysion Kassa - Je activatiecode',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #F97316; margin: 0;">Vysion<span style="color: #666; font-weight: normal;">Kassa</span></h1>
-        </div>
+        <h1 style="color: #F97316;">Vysion<span style="color: #666; font-weight: normal;">Kassa</span></h1>
         
-        <h2 style="color: #333;">Welkom ${name}!</h2>
+        <h2>Welkom ${name}!</h2>
         
-        <p style="color: #555; line-height: 1.6;">
-          Je Vysion Kassa account is aangemaakt. Volg deze stappen om te starten:
-        </p>
+        <p>Je Vysion Kassa account is aangemaakt. Volg deze stappen:</p>
         
         <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3 style="margin-top: 0; color: #333;">Stap 1: Download de app</h3>
-          <p style="color: #555;">
-            Download <strong>VysionPrint</strong> uit de App Store op je iPad of iPhone.
-          </p>
+          <h3>Stap 1: Download de app</h3>
+          <p>Download <strong>VysionPrint</strong> uit de App Store op je iPad of iPhone.</p>
           
-          <h3 style="color: #333;">Stap 2: Voer je activatiecode in</h3>
-          <p style="color: #555;">Open de app en voer deze code in:</p>
-          
-          <div style="background: white; border: 2px dashed #F97316; border-radius: 8px; padding: 15px; text-align: center; margin: 10px 0;">
-            <code style="font-size: 14px; color: #333; word-break: break-all;">${installToken}</code>
+          <h3>Stap 2: Voer je activatiecode in</h3>
+          <div style="background: white; border: 2px dashed #F97316; border-radius: 8px; padding: 15px; text-align: center;">
+            <code style="font-size: 14px;">${installToken}</code>
           </div>
-          
           <p style="color: #888; font-size: 12px;">Deze code is 7 dagen geldig.</p>
         </div>
         
-        <p style="color: #555;">
-          Na activatie is je kassa direct klaar voor gebruik!
-        </p>
-        
-        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-        
-        <p style="color: #999; font-size: 12px; text-align: center;">
-          © ${new Date().getFullYear()} Vysion Group. Alle rechten voorbehouden.
-        </p>
+        <p style="color: #999; font-size: 12px;">© ${new Date().getFullYear()} Vysion Group</p>
       </div>
     `,
-  }
-
-  await transporter.sendMail(mailOptions)
-  logger.info('Kassa welcome email sent', { email })
+  })
 }

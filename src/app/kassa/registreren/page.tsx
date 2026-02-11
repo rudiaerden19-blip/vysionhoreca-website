@@ -2,20 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Monitor, Printer, CheckCircle2, Copy, ArrowRight, Apple } from 'lucide-react'
 
 /**
  * Kassa Registratie Pagina
  * 
  * APART van het bestelplatform registratie!
- * 
- * Flow:
- * 1. Klant vult formulier in
- * 2. Account wordt aangemaakt (tenant + business_profile)
- * 3. Install token wordt gegenereerd
- * 4. Klant krijgt instructies om VysionPrint app te downloaden
- * 5. Token invoeren in de app → kassa is klaar
  */
+
+const TESTFLIGHT_URL = 'https://testflight.apple.com/join/vysionprint'
 
 export default function KassaRegistrerenPage() {
   const [formData, setFormData] = useState({
@@ -24,7 +18,7 @@ export default function KassaRegistrerenPage() {
     phone: '',
     password: '',
     confirmPassword: '',
-    vatNumber: '', // BTW nummer (optioneel)
+    vatNumber: '',
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -79,7 +73,7 @@ export default function KassaRegistrerenPage() {
           phone: formData.phone.trim(),
           password: formData.password,
           vatNumber: formData.vatNumber.trim() || null,
-          product: 'KASSA', // Markeert dit als kassa-only registratie
+          product: 'KASSA',
         }),
       })
 
@@ -105,25 +99,27 @@ export default function KassaRegistrerenPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  // Success state - toon instructies
+  // Success state
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <main className="min-h-screen bg-dark flex items-center justify-center p-4">
         <div className="max-w-lg w-full">
           <div className="bg-white rounded-2xl shadow-2xl p-8">
             {/* Success header */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-8 h-8 text-green-600" />
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
               <h1 className="text-2xl font-bold text-gray-900">Account aangemaakt!</h1>
               <p className="text-gray-600 mt-2">Nog 2 stappen om je kassa te activeren</p>
             </div>
 
             {/* Step 1: Download app */}
-            <div className="bg-slate-50 rounded-xl p-6 mb-4">
+            <div className="bg-gray-50 rounded-xl p-6 mb-4">
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">
+                <div className="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold shrink-0">
                   1
                 </div>
                 <div>
@@ -132,12 +128,14 @@ export default function KassaRegistrerenPage() {
                     Download de VysionPrint app op je iPad of iPhone
                   </p>
                   <a 
-                    href="https://apps.apple.com/app/vysionprint" 
+                    href={TESTFLIGHT_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
                   >
-                    <Apple className="w-5 h-5" />
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                    </svg>
                     App Store
                   </a>
                 </div>
@@ -145,9 +143,9 @@ export default function KassaRegistrerenPage() {
             </div>
 
             {/* Step 2: Enter token */}
-            <div className="bg-slate-50 rounded-xl p-6 mb-6">
+            <div className="bg-gray-50 rounded-xl p-6 mb-6">
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center font-bold shrink-0">
+                <div className="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold shrink-0">
                   2
                 </div>
                 <div className="flex-1">
@@ -156,15 +154,23 @@ export default function KassaRegistrerenPage() {
                     Open de app en voer deze code in:
                   </p>
                   <div className="flex items-center gap-2">
-                    <code className="flex-1 bg-white border-2 border-dashed border-orange-300 rounded-lg px-4 py-3 font-mono text-lg text-center break-all">
+                    <code className="flex-1 bg-white border-2 border-dashed border-accent/50 rounded-lg px-4 py-3 font-mono text-sm text-center break-all">
                       {installToken}
                     </code>
                     <button
                       onClick={copyToken}
-                      className="p-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+                      className="p-3 bg-accent text-white rounded-lg hover:bg-accent/90 transition"
                       title="Kopieer code"
                     >
-                      {copied ? <CheckCircle2 className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                      {copied ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -173,167 +179,137 @@ export default function KassaRegistrerenPage() {
 
             {/* Email notice */}
             <p className="text-sm text-gray-500 text-center mb-6">
-              We hebben ook een email gestuurd naar <strong>{formData.email}</strong> met deze instructies.
+              We hebben ook een email gestuurd naar <strong>{formData.email}</strong>
             </p>
 
             {/* Support link */}
             <div className="text-center">
-              <Link 
-                href="/support" 
-                className="text-orange-600 hover:text-orange-700 font-medium"
-              >
+              <Link href="/support" className="text-accent hover:underline font-medium">
                 Hulp nodig? Neem contact op
               </Link>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     )
   }
 
   // Registration form
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="max-w-5xl w-full grid md:grid-cols-2 gap-8 items-center">
-        
-        {/* Left side - Info */}
-        <div className="text-white">
-          <h1 className="text-4xl font-bold mb-4">
-            Vysion <span className="text-orange-500">Kassa</span>
-          </h1>
-          <p className="text-xl text-slate-300 mb-8">
-            Professioneel kassasysteem voor horeca. Start vandaag met 14 dagen gratis proberen.
-          </p>
+    <main className="min-h-screen bg-dark flex flex-col">
+      {/* Header */}
+      <header className="p-6">
+        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Terug naar home
+        </Link>
+      </header>
 
-          <div className="space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center shrink-0">
-                <Monitor className="w-5 h-5 text-orange-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Werkt op iPad & iPhone</h3>
-                <p className="text-slate-400 text-sm">Download de VysionPrint app en je kassa is klaar</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center shrink-0">
-                <Printer className="w-5 h-5 text-orange-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Bonprinter support</h3>
-                <p className="text-slate-400 text-sm">Automatische herkenning van je printer</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center shrink-0">
-                <CheckCircle2 className="w-5 h-5 text-orange-400" />
-              </div>
-              <div>
-                <h3 className="font-semibold">GKS-ready</h3>
-                <p className="text-slate-400 text-sm">Klaar voor Belgische fiscale wetgeving</p>
-              </div>
-            </div>
+      {/* Form */}
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <div className="text-center mb-10">
+            <Link href="/">
+              <span className="text-3xl font-bold">
+                <span className="text-accent">Vysion</span>
+                <span className="text-gray-400 font-normal ml-1">Kassa</span>
+              </span>
+            </Link>
+            <p className="text-gray-400 mt-3">Registreer voor de kassa</p>
+            <p className="text-gray-500 text-sm mt-1">14 dagen gratis proberen</p>
           </div>
 
-          <div className="mt-8 text-sm text-slate-400">
-            Al een account? <Link href="/login" className="text-orange-400 hover:underline">Inloggen</Link>
-          </div>
-        </div>
-
-        {/* Right side - Form */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Registreren</h2>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Bedrijfsnaam *
               </label>
               <input
-                type="text"
                 name="businessName"
+                type="text"
                 value={formData.businessName}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                className="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-xl text-white focus:border-accent focus:ring-1 focus:ring-accent transition"
                 placeholder="Jouw zaak"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Email *
               </label>
               <input
-                type="email"
                 name="email"
+                type="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                className="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-xl text-white focus:border-accent focus:ring-1 focus:ring-accent transition"
                 placeholder="jouw@email.be"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Telefoonnummer *
               </label>
               <input
-                type="tel"
                 name="phone"
+                type="tel"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                className="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-xl text-white focus:border-accent focus:ring-1 focus:ring-accent transition"
                 placeholder="+32 ..."
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                BTW-nummer <span className="text-gray-400">(optioneel)</span>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                BTW-nummer <span className="text-gray-500">(optioneel)</span>
               </label>
               <input
-                type="text"
                 name="vatNumber"
+                type="text"
                 value={formData.vatNumber}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                className="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-xl text-white focus:border-accent focus:ring-1 focus:ring-accent transition"
                 placeholder="BE0123456789"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Wachtwoord *
                 </label>
                 <input
-                  type="password"
                   name="password"
+                  type="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                  className="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-xl text-white focus:border-accent focus:ring-1 focus:ring-accent transition"
                   placeholder="Min. 8 tekens"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Bevestig *
                 </label>
                 <input
-                  type="password"
                   name="confirmPassword"
+                  type="password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                  className="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-xl text-white focus:border-accent focus:ring-1 focus:ring-accent transition"
                   placeholder="Herhaal"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
@@ -341,25 +317,23 @@ export default function KassaRegistrerenPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-orange-500 text-white py-3 px-6 rounded-lg font-semibold hover:bg-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-accent hover:bg-accent/90 text-white py-4 rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? (
-                <span>Even geduld...</span>
-              ) : (
-                <>
-                  <span>Gratis proberen</span>
-                  <ArrowRight className="w-5 h-5" />
-                </>
-              )}
+              {isLoading ? 'Even geduld...' : 'Gratis proberen →'}
             </button>
 
             <p className="text-xs text-gray-500 text-center">
               Door te registreren ga je akkoord met onze{' '}
-              <Link href="/juridisch" className="underline">voorwaarden</Link>
+              <Link href="/juridisch" className="underline hover:text-gray-400">voorwaarden</Link>
             </p>
           </form>
+
+          <p className="text-center text-gray-500 text-sm mt-8">
+            Al een account?{' '}
+            <Link href="/login" className="text-accent hover:underline">Inloggen</Link>
+          </p>
         </div>
       </div>
-    </div>
+    </main>
   )
 }
