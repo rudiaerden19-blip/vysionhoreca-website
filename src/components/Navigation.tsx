@@ -46,7 +46,7 @@ export default function Navigation() {
             <a href="/#contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
             <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
             <a href="/resellers" className="text-gray-300 hover:text-white transition-colors">{t('nav.resellers')}</a>
-            <a href="/kassa/registreren" className="text-accent hover:text-accent/80 transition-colors font-medium">Kassa</a>
+            <a href="/kassa" className="text-accent hover:text-accent/80 transition-colors font-medium">Kassa</a>
           </div>
 
           {/* CTA Buttons */}
