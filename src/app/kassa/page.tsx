@@ -41,12 +41,14 @@ export default function KassaPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link 
-                href="/kassa/registreren" 
+              <a 
+                href="https://frituurnolim.vercel.app/registreer" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-xl font-semibold text-center transition"
               >
                 14 dagen gratis proberen
-              </Link>
+              </a>
               <a 
                 href="#features" 
                 className="border border-white/30 hover:bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-center transition"
@@ -311,12 +313,14 @@ export default function KassaPage() {
                     Beschikbaar in 9 talen
                   </li>
                 </ul>
-                <Link 
-                  href="/kassa/registreren"
-                  className="block w-full bg-accent hover:bg-accent/90 text-white py-4 rounded-xl font-semibold transition"
+                <a 
+                  href="https://frituurnolim.vercel.app/registreer"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-accent hover:bg-accent/90 text-white py-4 rounded-xl font-semibold transition text-center"
                 >
                   Start gratis proefperiode
-                </Link>
+                </a>
               </div>
             </div>
           </div>
@@ -332,12 +336,14 @@ export default function KassaPage() {
           <p className="text-xl text-white/80 mb-8">
             Probeer Vysion Kassa 14 dagen gratis. Geen creditcard nodig.
           </p>
-          <Link 
-            href="/kassa/registreren"
+          <a 
+            href="https://frituurnolim.vercel.app/registreer"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-block bg-white text-accent px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition"
           >
             Gratis proberen →
-          </Link>
+          </a>
         </div>
       </section>
 
