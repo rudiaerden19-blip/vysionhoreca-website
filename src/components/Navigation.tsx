@@ -38,7 +38,7 @@ export default function Navigation() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6 ml-auto">
             <a href="/" className="text-gray-300 hover:text-white transition-colors">{t('nav.home')}</a>
             <a href="/#functies" className="text-gray-300 hover:text-white transition-colors">{t('nav.features')}</a>
             <a href="/#prijzen" className="text-gray-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
@@ -93,9 +93,6 @@ export default function Navigation() {
             </div>
 
             <a href="/login" className="text-white hover:text-accent transition-colors">{t('nav.login')}</a>
-            <a href={`/registreer?lang=${locale}`} className="bg-accent hover:bg-accent/90 text-white px-6 py-2.5 rounded-full font-medium transition-all">
-              {t('nav.tryFree')}
-            </a>
           </div>
 
           {/* Mobile menu button */}
@@ -148,9 +145,6 @@ export default function Navigation() {
               </div>
 
               <a href="/login" className="text-gray-300 hover:text-white transition-colors">{t('nav.login')}</a>
-              <a href={`/registreer?lang=${locale}`} className="bg-accent text-white px-6 py-3 rounded-full font-medium text-center">
-                {t('nav.tryFree')}
-              </a>
             </div>
           </div>
         )}
