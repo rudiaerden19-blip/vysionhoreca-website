@@ -247,7 +247,7 @@ export default function KassaPage() {
             </p>
           </div>
           
-          <div className="max-w-md mx-auto">
+          <div className="max-w-xl mx-auto">
             <div className="bg-gradient-to-br from-accent/20 to-accent/5 rounded-3xl p-8 border border-accent/30">
               <div className="text-center">
                 <span className="text-accent font-medium">Kassa Pro</span>
@@ -255,24 +255,12 @@ export default function KassaPage() {
                   <span className="text-5xl font-bold text-white">€49</span>
                   <span className="text-gray-400">/maand</span>
                 </div>
-                <ul className="space-y-3 text-left mb-8">
+                <ul className="grid grid-cols-2 gap-3 text-left mb-8">
                   <li className="flex items-center gap-3 text-gray-300">
                     <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Onbeperkt producten
-                  </li>
-                  <li className="flex items-center gap-3 text-gray-300">
-                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Onbeperkt bestellingen
-                  </li>
-                  <li className="flex items-center gap-3 text-gray-300">
-                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Bonprinter support
+                    Online platform
                   </li>
                   <li className="flex items-center gap-3 text-gray-300">
                     <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,13 +272,43 @@ export default function KassaPage() {
                     <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Rapporten & statistieken
+                    Producten met foto's
                   </li>
                   <li className="flex items-center gap-3 text-gray-300">
                     <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Email support
+                    Voorraad beheer
+                  </li>
+                  <li className="flex items-center gap-3 text-gray-300">
+                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Personeelsregistratie
+                  </li>
+                  <li className="flex items-center gap-3 text-gray-300">
+                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Loonkantoor registratie
+                  </li>
+                  <li className="flex items-center gap-3 text-gray-300">
+                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Z-rapporten
+                  </li>
+                  <li className="flex items-center gap-3 text-gray-300">
+                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Bedrijfsanalyse
+                  </li>
+                  <li className="flex items-center gap-3 text-gray-300 col-span-2 justify-center">
+                    <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Beschikbaar in 9 talen
                   </li>
                 </ul>
                 <Link 
