@@ -62,6 +62,62 @@ export default function KassaPage() {
         </div>
       </section>
 
+      {/* iPad Preview Section */}
+      <section className="py-20 bg-dark">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Text */}
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+                Speciaal ontworpen voor <span className="text-accent">horeca</span>
+              </h2>
+              <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+                De Vysion Kassa is gebouwd door mensen die de horeca kennen. Met grote knoppen, 
+                duidelijke categorieën en een overzichtelijke layout kun je razendsnel bestellingen 
+                verwerken, zelfs tijdens de drukste momenten.
+              </p>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <svg className="w-6 h-6 text-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-gray-300">Categorieën met afbeeldingen voor snelle herkenning</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-6 h-6 text-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-gray-300">Numpad voor snelle invoer en handmatige bedragen</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-6 h-6 text-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-gray-300">Tafelkeuze en afhaal in één scherm</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <svg className="w-6 h-6 text-accent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-gray-300">Direct printen en afrekenen met één druk</span>
+                </li>
+              </ul>
+            </div>
+            
+            {/* Right: iPad Image */}
+            <div className="relative">
+              <div className="bg-gradient-to-br from-accent/20 to-transparent rounded-3xl p-4">
+                <img 
+                  src="/images/kassa-ipad.png" 
+                  alt="Vysion Kassa op iPad" 
+                  className="rounded-2xl shadow-2xl w-full"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-20 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
