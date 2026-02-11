@@ -224,7 +224,7 @@ export default function KassaPage() {
             Bekijk een echte frituur die draait op Vysion Kassa
           </p>
           <a 
-            href="https://frituurnolim.vercel.app/bestel/demo"
+            href="https://frituurnolim.vercel.app/kassa?business=149a3b43-6792-47e1-8e78-42d282643967"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-full font-semibold transition"
