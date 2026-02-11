@@ -209,17 +209,18 @@
       "name": "Vysion Pro",
       "allOfStarter": "Alles van Starter, plus:",
       "features": {
-        "1": "SEO vindbaarheid",
-        "2": "Klantenkaart & loyaliteit",
-        "3": "Personeel & loonadministratie",
-        "4": "Volledige kostencalculator",
-        "5": "Volledige bedrijfsanalyse",
-        "6": "Reviews",
-        "7": "Volledige kostenberekening per product",
-        "8": "Eigen reserveringsplatform",
-        "9": "Gesproken bestelling voor de klant",
-        "10": "Label/sticker printer per product",
-        "11": "Groepsbestellingen (bedrijven & scholen)"
+        "1": "Kassa licentie inbegrepen",
+        "2": "SEO vindbaarheid",
+        "3": "Klantenkaart & loyaliteit",
+        "4": "Personeel & loonadministratie",
+        "5": "Volledige kostencalculator",
+        "6": "Volledige bedrijfsanalyse",
+        "7": "Reviews",
+        "8": "Volledige kostenberekening per product",
+        "9": "Eigen reserveringsplatform",
+        "10": "Gesproken bestelling voor de klant",
+        "11": "Label/sticker printer per product",
+        "12": "Groepsbestellingen (bedrijven & scholen)"
       }
     },
     "faq": {
