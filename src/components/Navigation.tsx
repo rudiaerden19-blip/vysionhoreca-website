@@ -38,7 +38,7 @@ export default function Navigation() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6 ml-auto">
+          <div className="hidden md:flex items-center space-x-6 ml-12">
             <a href="/" className="text-gray-300 hover:text-white transition-colors">{t('nav.home')}</a>
             <a href="/#functies" className="text-gray-300 hover:text-white transition-colors">{t('nav.features')}</a>
             <a href="/#prijzen" className="text-gray-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
