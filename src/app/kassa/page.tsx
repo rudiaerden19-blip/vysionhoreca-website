@@ -179,9 +179,9 @@ export default function KassaPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">iPad & iPhone</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Alle Apparaten</h3>
               <p className="text-gray-400">
-                Werkt naadloos op alle Apple apparaten. Download de app en je bent klaar.
+                Werkt op iPad, iPhone, tablet en desktop. Download de app en je bent klaar.
               </p>
             </div>
 
