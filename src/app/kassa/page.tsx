@@ -156,6 +156,29 @@ export default function KassaPage() {
         </div>
       </section>
 
+      {/* Live Demo Section */}
+      <section className="py-20 bg-gradient-to-b from-gray-900 to-dark">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+            Wil je de software in actie zien?
+          </h2>
+          <p className="text-gray-400 mb-8">
+            Bekijk een echte frituur die draait op Vysion Kassa
+          </p>
+          <a 
+            href="https://frituurnolim.vercel.app/kassa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-full font-semibold transition"
+          >
+            Bekijk Live Demo
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        </div>
+      </section>
+
       {/* Pricing Section - Placeholder */}
       <section className="py-20 bg-dark">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
