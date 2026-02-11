@@ -155,8 +155,8 @@ export async function POST(request: NextRequest) {
     const installToken = generateInstallToken()
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 dagen
 
-    // 4. STORE INSTALL TOKEN
-    await supabase
+    // 4. STORE INSTALL TOKEN (optioneel - tabel bestaat misschien nog niet)
+    const { error: tokenError } = await supabase
       .from('install_tokens')
       .insert({
         token: installToken,
@@ -165,10 +165,10 @@ export async function POST(request: NextRequest) {
         expires_at: expiresAt.toISOString(),
         used: false,
       })
-      .catch((err) => {
-        // Tabel bestaat misschien nog niet
-        logger.warn('Could not store install token', { requestId, error: err })
-      })
+    
+    if (tokenError) {
+      logger.warn('Could not store install token', { requestId, error: tokenError.message })
+    }
 
     // 5. SEND WELCOME EMAIL
     try {
