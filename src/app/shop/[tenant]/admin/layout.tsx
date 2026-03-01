@@ -144,22 +144,30 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
   const [tenantPlan, setTenantPlan] = useState<string>('starter')
+  const [isTrial, setIsTrial] = useState<boolean>(false)
   const [loading, setLoading] = useState(true)
   const baseUrl = `/shop/${params.tenant}/admin`
 
-  // Check of tenant bestaat en laad plan
+  // Check of tenant bestaat en laad plan + trial status
   useEffect(() => {
     async function checkTenant() {
       const tenantData = await getTenantSettings(params.tenant)
       setTenantExists(tenantData !== null)
 
-      // Laad plan uit tenants tabel
+      // Laad plan en trial status uit tenants tabel
       const { data: tenantRow } = await supabase
         .from('tenants')
-        .select('plan')
+        .select('plan, subscription_status, trial_ends_at')
         .eq('slug', params.tenant)
         .single()
+
       if (tenantRow?.plan) setTenantPlan(tenantRow.plan.toLowerCase())
+
+      // Tijdens proefperiode: alle Pro features zichtbaar
+      const status = (tenantRow?.subscription_status || '').toLowerCase()
+      const trialEndsAt = tenantRow?.trial_ends_at
+      const inTrial = status === 'trial' && trialEndsAt && new Date(trialEndsAt) > new Date()
+      setIsTrial(!!inTrial)
 
       setLoading(false)
     }
@@ -257,6 +265,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
                 isActive={isActive} 
                 tenant={params.tenant}
                 tenantPlan={tenantPlan}
+                isTrial={isTrial}
                 onClose={() => setMobileMenuOpen(false)}
               />
             </motion.div>
@@ -271,6 +280,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           isActive={isActive} 
           tenant={params.tenant}
           tenantPlan={tenantPlan}
+          isTrial={isTrial}
           collapsed={!sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}
         />
@@ -370,6 +380,7 @@ function FlyoutMenu({
   onClose,
   t,
   isPro = false,
+  isTrial = false,
   pendingReservations = 0
 }: { 
   section: typeof menuItems[0]
@@ -381,6 +392,7 @@ function FlyoutMenu({
   onClose: () => void
   t: (key: string) => string
   isPro?: boolean
+  isTrial?: boolean
   pendingReservations?: number
 }) {
   const menuRef = useRef<HTMLDivElement>(null)
@@ -473,6 +485,9 @@ function FlyoutMenu({
                     </span>
                   )}
                 </span>
+                {itemIsProOnly && isTrial && (
+                  <span className="ml-auto text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">GRATIS</span>
+                )}
                 {isLocked && (
                   <span className="ml-auto text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">PRO</span>
                 )}
@@ -490,6 +505,7 @@ function SidebarContent({
   isActive, 
   tenant,
   tenantPlan = 'starter',
+  isTrial = false,
   collapsed = false,
   onClose,
   onToggle 
@@ -498,6 +514,7 @@ function SidebarContent({
   isActive: (href: string) => boolean
   tenant: string
   tenantPlan?: string
+  isTrial?: boolean
   collapsed?: boolean
   onClose?: () => void
   onToggle?: () => void
@@ -508,7 +525,8 @@ function SidebarContent({
   const [pendingReservations, setPendingReservations] = useState(0)
   const langRef = useRef<HTMLDivElement>(null)
   const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
-  const isPro = tenantPlan === 'pro'
+  // Tijdens proefperiode: alles zichtbaar (15 dagen gratis alle features)
+  const isPro = tenantPlan === 'pro' || isTrial
 
   // Load pending reservations count
   useEffect(() => {
@@ -635,7 +653,10 @@ function SidebarContent({
                       {pendingReservations}
                     </span>
                   )}
-                  {/* PRO badge voor Pro-only secties */}
+                  {/* Badge voor Pro-only secties */}
+                  {sectionIsProOnly && isTrial && !collapsed && (
+                    <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">GRATIS</span>
+                  )}
                   {sectionLocked && !collapsed && (
                     <span className="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">PRO</span>
                   )}
@@ -667,6 +688,7 @@ function SidebarContent({
                   }}
                   t={t}
                   isPro={isPro}
+                  isTrial={isTrial}
                   pendingReservations={pendingReservations}
                 />
               )}
