@@ -109,6 +109,7 @@ export default function TafelplanPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [savedMsg, setSavedMsg] = useState(false)
+  const [refreshToken, setRefreshToken] = useState(0)
 
   // Modals
   const [showAddSection, setShowAddSection] = useState(false)
@@ -130,11 +131,11 @@ export default function TafelplanPage() {
 
   useEffect(() => {
     loadBadges(agendaDate)
-  }, [tenantSlug, agendaDate, tables.length])
+  }, [tenantSlug, agendaDate, tables.length, refreshToken])
 
   useEffect(() => {
     if (selectedTable) loadAgenda(selectedTable.id, agendaDate)
-  }, [selectedTable?.id, agendaDate])
+  }, [selectedTable?.id, agendaDate, refreshToken])
 
   async function loadData() {
     const sb = getSupabase(); if (!sb) return
@@ -173,6 +174,7 @@ export default function TafelplanPage() {
   async function refreshAll() {
     if (selectedTable) await loadAgenda(selectedTable.id, agendaDate)
     await loadBadges(agendaDate)
+    setRefreshToken(t => t + 1)
   }
 
   // Drag
