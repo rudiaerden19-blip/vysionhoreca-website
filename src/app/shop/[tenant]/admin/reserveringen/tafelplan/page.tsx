@@ -104,12 +104,14 @@ export default function TafelplanPage() {
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null)
   const [agendaDate, setAgendaDate] = useState(new Date().toISOString().split('T')[0])
   const [agendaReservations, setAgendaReservations] = useState<TableReservation[]>([])
-  // Map: tableId → reservaties voor agendaDate (voor badges)
   const [badgeMap, setBadgeMap] = useState<Record<string, TableReservation[]>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [savedMsg, setSavedMsg] = useState(false)
   const [refreshToken, setRefreshToken] = useState(0)
+  // Archief
+  const [archiveFilter, setArchiveFilter] = useState<'none'|'dag'|'week'|'maand'|'jaar'>('none')
+  const [archiveData, setArchiveData] = useState<(TableReservation & { table_number?: string })[]>([])
 
   // Modals
   const [showAddSection, setShowAddSection] = useState(false)
@@ -290,6 +292,30 @@ export default function TafelplanPage() {
     await refreshAll()
   }
 
+  async function loadArchive(filter: 'dag'|'week'|'maand'|'jaar') {
+    const sb = getSupabase(); if (!sb) return
+    const now = new Date()
+    let from = new Date()
+    if (filter === 'dag') { from = new Date(now); from.setHours(0,0,0,0) }
+    else if (filter === 'week') { from = new Date(now); from.setDate(now.getDate() - 7) }
+    else if (filter === 'maand') { from = new Date(now); from.setMonth(now.getMonth() - 1) }
+    else if (filter === 'jaar') { from = new Date(now); from.setFullYear(now.getFullYear() - 1) }
+    const fromStr = from.toISOString().split('T')[0]
+    const toStr = now.toISOString().split('T')[0]
+    const { data } = await sb.from('reservations').select('*')
+      .eq('tenant_slug', tenantSlug)
+      .in('status', ['completed', 'cancelled'])
+      .gte('reservation_date', fromStr)
+      .lte('reservation_date', toStr)
+      .order('reservation_date', { ascending: false })
+    // Koppel tafelnummer
+    const enriched = (data || []).map((r: TableReservation) => {
+      const tbl = tables.find(t => t.id === r.table_id)
+      return { ...r, table_number: tbl?.table_number || '?' }
+    })
+    setArchiveData(enriched)
+  }
+
   function getTableColor(t: RestaurantTable) {
     if (!t.section_id) return '#6B7280'
     return sections.find(s => s.id === t.section_id)?.color || '#6B7280'
@@ -312,8 +338,8 @@ export default function TafelplanPage() {
           <h1 className="text-3xl font-bold text-gray-900">Tafelplan</h1>
           <p className="text-gray-500 mt-1">{tables.length} tafels</p>
         </div>
-        <div className="flex gap-3 items-center">
-          <input type="date" value={agendaDate} onChange={e => setAgendaDate(e.target.value)} className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
+        <div className="flex gap-3 items-center flex-wrap justify-end">
+          <input type="date" value={agendaDate} onChange={e => { setAgendaDate(e.target.value); setArchiveFilter('none') }} className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
           <button onClick={() => setShowAddSection(true)} className="px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50">+ Zone</button>
           <button onClick={() => { setTableForm({ table_number: `${tables.length + 1}`, seats: 4, shape: 'square', section_id: '' }); setShowAddTable(true) }} className="px-4 py-2 border-2 border-blue-200 text-blue-700 rounded-xl font-medium hover:bg-blue-50">+ Tafel</button>
           <button onClick={savePositions} disabled={saving} className={`px-6 py-2 rounded-xl font-bold transition-colors ${savedMsg ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} disabled:opacity-60`}>
@@ -322,13 +348,88 @@ export default function TafelplanPage() {
         </div>
       </div>
 
-      {/* Legenda */}
-      <div className="flex gap-5 text-xs font-medium text-gray-600">
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-500 inline-block" />Vrij</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-500 inline-block" />Gereserveerd</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-600 inline-block" />Bezet</span>
-        <span className="flex items-center gap-1.5"><span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-700 text-white text-[9px] font-bold">3</span>Aantal reservaties</span>
+      {/* Archief knoppen + Legenda rij */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        {/* Legenda */}
+        <div className="flex gap-5 text-xs font-medium text-gray-600">
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-500 inline-block" />Vrij</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-500 inline-block" />Gereserveerd</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-600 inline-block" />Bezet</span>
+        </div>
+        {/* Archief knoppen */}
+        <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+          <span className="text-xs font-bold text-gray-500 px-2">📦 Archief:</span>
+          {(['dag','week','maand','jaar'] as const).map(f => (
+            <button
+              key={f}
+              onClick={() => {
+                setArchiveFilter(f)
+                setSelectedTable(null)
+                loadArchive(f)
+              }}
+              className={`px-4 py-1.5 rounded-lg text-xs font-bold capitalize transition-colors ${archiveFilter === f ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              {f.charAt(0).toUpperCase() + f.slice(1)}
+            </button>
+          ))}
+          {archiveFilter !== 'none' && (
+            <button onClick={() => setArchiveFilter('none')} className="px-2 py-1.5 rounded-lg text-xs text-gray-400 hover:text-gray-600">✕</button>
+          )}
+        </div>
       </div>
+
+      {/* Archief weergave */}
+      {archiveFilter !== 'none' && (
+        <div className="bg-white rounded-2xl border-2 border-gray-200 overflow-hidden">
+          <div className="px-5 py-4 border-b bg-gray-50 flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-gray-900">Archief — {archiveFilter.charAt(0).toUpperCase() + archiveFilter.slice(1)}</h2>
+              <p className="text-sm text-gray-500">{archiveData.length} reservaties</p>
+            </div>
+            <button onClick={() => setArchiveFilter('none')} className="text-gray-400 hover:text-gray-600 text-xl font-bold">×</button>
+          </div>
+          {archiveData.length === 0 ? (
+            <div className="py-16 text-center text-gray-400">
+              <span className="text-4xl block mb-2">📭</span>
+              <p>Geen reservaties gevonden voor deze periode</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Datum</th>
+                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Uur</th>
+                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Tafel</th>
+                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Naam</th>
+                    <th className="text-left px-4 py-3 font-semibold text-gray-600">Tel</th>
+                    <th className="text-center px-4 py-3 font-semibold text-gray-600">Pers.</th>
+                    <th className="text-center px-4 py-3 font-semibold text-gray-600">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {archiveData.map((r, i) => (
+                    <tr key={r.id} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                      <td className="px-4 py-3 text-gray-700">{new Date(r.reservation_date + 'T12:00').toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                      <td className="px-4 py-3 text-gray-600">{r.time_from || r.reservation_time} {r.time_to ? `→ ${r.time_to}` : ''}</td>
+                      <td className="px-4 py-3 font-bold text-gray-800">#{(r as TableReservation & { table_number?: string }).table_number}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">{r.customer_name}</td>
+                      <td className="px-4 py-3 text-gray-600">{r.customer_phone || '—'}</td>
+                      <td className="px-4 py-3 text-center text-gray-700">{r.party_size}</td>
+                      <td className="px-4 py-3 text-center">
+                        {r.status === 'completed'
+                          ? <span className="bg-gray-200 text-gray-600 text-xs font-bold px-2 py-0.5 rounded-full">VOLTOOID</span>
+                          : <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">GEANNULEERD</span>
+                        }
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex gap-4">
         {/* Canvas */}
@@ -416,28 +517,24 @@ export default function TafelplanPage() {
                       <span className={`text-base font-black ${occupied ? 'text-red-700' : 'text-green-700'}`}>
                         {res.time_from || res.reservation_time} → {res.time_to || '?'}
                       </span>
-                      {occupied
-                        ? <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">AANWEZIG</span>
-                        : <span className="bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">GERESERVEERD</span>
-                      }
+                      <span className="text-xs text-gray-400">{res.party_size} pers.</span>
                     </div>
                     <p className="font-bold text-gray-900">{res.customer_name}</p>
                     <div className="text-sm text-gray-600 space-y-0.5 mt-1">
                       {res.customer_phone && <p>📱 {res.customer_phone}</p>}
-                      <p>👥 {res.party_size} personen</p>
                       {res.deposit_amount > 0 && <p className={res.deposit_paid ? 'text-green-700 font-medium' : 'text-amber-700 font-medium'}>💳 €{res.deposit_amount} {res.deposit_paid ? '✓ betaald' : '— openstaand'}</p>}
                       {res.notes && <p className="text-xs italic text-gray-400 mt-1">&quot;{res.notes}&quot;</p>}
                     </div>
                     <div className="flex gap-2 mt-3">
                       {!occupied ? (
-                        // Stap 1: Groen → gasten zijn er
-                        <button onClick={() => markOccupied(res)} className="flex-1 py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors">
-                          🔴 Gasten aanwezig
+                        // Groen: nog niet aanwezig → klik = gasten zijn er
+                        <button onClick={() => markOccupied(res)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 transition-colors">
+                          ✅ Gereserveerd
                         </button>
                       ) : (
-                        // Stap 2: Rood → tafel vrij (naar archief)
-                        <button onClick={() => releaseTable(res)} className="flex-1 py-2 bg-gray-700 text-white rounded-lg text-xs font-bold hover:bg-gray-800 transition-colors">
-                          ✓ Tafel vrijgeven
+                        // Rood: gasten aanwezig → klik = tafel vrij (archief)
+                        <button onClick={() => releaseTable(res)} className="flex-1 py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors">
+                          🔴 Gasten aanwezig — Tafel vrijgeven
                         </button>
                       )}
                       <button onClick={() => { setResForm({ customer_name: res.customer_name, customer_phone: res.customer_phone, customer_email: res.customer_email, party_size: res.party_size, date: res.reservation_date, time_from: res.time_from || res.reservation_time, time_to: res.time_to || '', notes: res.notes || '', deposit_amount: res.deposit_amount, deposit_paid: res.deposit_paid }); setEditingRes(res); setShowResForm(true) }} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs hover:bg-gray-50">✏️</button>
