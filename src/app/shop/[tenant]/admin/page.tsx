@@ -188,12 +188,6 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     cancelled: { bg: 'bg-red-100', text: 'text-red-700', labelKey: 'cancelled' },
   }
 
-  const quickActions = [
-    { nameKey: 'addProduct', href: `/shop/${params.tenant}/admin/producten`, icon: '➕', color: 'bg-green-500' },
-    { nameKey: 'openingHours', href: `/shop/${params.tenant}/admin/openingstijden`, icon: '🕐', color: 'bg-blue-500' },
-    { nameKey: 'whatsapp', href: `/shop/${params.tenant}/admin/whatsapp`, icon: '💬', color: 'bg-green-600' },
-    { nameKey: 'startPromotion', href: `/shop/${params.tenant}/admin/promoties`, icon: '🎁', color: 'bg-pink-500' },
-  ]
 
   function getTimeAgo(dateString: string): string {
     const date = new Date(dateString)
@@ -310,31 +304,6 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         </motion.div>
       </div>
 
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="mb-8"
-      >
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">{t('adminDashboard.quickActions.title')}</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {quickActions.map((action, index) => (
-            <Link key={action.nameKey} href={action.href}>
-              <motion.div
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <div className={`w-12 h-12 ${action.color} rounded-xl flex items-center justify-center text-2xl mb-3`}>
-                  {action.icon}
-                </div>
-                <p className="font-medium text-gray-900">{t(`adminDashboard.quickActions.${action.nameKey}`)}</p>
-              </motion.div>
-            </Link>
-          ))}
-        </div>
-      </motion.div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Recent Orders */}
