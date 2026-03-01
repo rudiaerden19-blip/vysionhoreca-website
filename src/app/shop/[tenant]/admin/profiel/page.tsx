@@ -386,19 +386,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               <p className="text-xs text-gray-400 mt-1">6% voor afhaalmaaltijden, 12% voor ter plaatse consumptie</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('adminPages.profiel.kvkNumber') || 'Ondernemingsnummer'}
-              </label>
-              <input
-                type="text"
-                name="kvk_number"
-                value={formData.kvk_number || ''}
-                onChange={handleChange}
-                placeholder="0123.456.789"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div>
           </div>
         </motion.div>
 
