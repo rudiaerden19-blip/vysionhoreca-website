@@ -115,6 +115,17 @@ const menuItems = [
     ]
   },
   {
+    categoryKey: 'reservationsPro',
+    icon: '🍽️',
+    proOnly: true,
+    items: [
+      { nameKey: 'tablePlan', href: '/reserveringen/tafelplan', icon: '🗺️', proOnly: true },
+      { nameKey: 'onlineBooking', href: '/reserveringen/online-boeking', icon: '📱', proOnly: true },
+      { nameKey: 'guestCrm', href: '/reserveringen/gasten', icon: '👤', proOnly: true },
+      { nameKey: 'noShow', href: '/reserveringen/no-show', icon: '🛡️', proOnly: true },
+    ]
+  },
+  {
     categoryKey: 'groupOrders',
     icon: '👥',
     items: [
@@ -132,14 +143,24 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
+  const [tenantPlan, setTenantPlan] = useState<string>('starter')
   const [loading, setLoading] = useState(true)
   const baseUrl = `/shop/${params.tenant}/admin`
 
-  // Check of tenant bestaat
+  // Check of tenant bestaat en laad plan
   useEffect(() => {
     async function checkTenant() {
       const tenantData = await getTenantSettings(params.tenant)
       setTenantExists(tenantData !== null)
+
+      // Laad plan uit tenants tabel
+      const { data: tenantRow } = await supabase
+        .from('tenants')
+        .select('plan')
+        .eq('slug', params.tenant)
+        .single()
+      if (tenantRow?.plan) setTenantPlan(tenantRow.plan.toLowerCase())
+
       setLoading(false)
     }
     checkTenant()
@@ -235,6 +256,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
                 baseUrl={baseUrl} 
                 isActive={isActive} 
                 tenant={params.tenant}
+                tenantPlan={tenantPlan}
                 onClose={() => setMobileMenuOpen(false)}
               />
             </motion.div>
@@ -248,6 +270,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           baseUrl={baseUrl} 
           isActive={isActive} 
           tenant={params.tenant}
+          tenantPlan={tenantPlan}
           collapsed={!sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}
         />
@@ -346,6 +369,7 @@ function FlyoutMenu({
   isActive, 
   onClose,
   t,
+  isPro = false,
   pendingReservations = 0
 }: { 
   section: typeof menuItems[0]
@@ -356,6 +380,7 @@ function FlyoutMenu({
   isActive: (href: string) => boolean
   onClose: () => void
   t: (key: string) => string
+  isPro?: boolean
   pendingReservations?: number
 }) {
   const menuRef = useRef<HTMLDivElement>(null)
@@ -407,8 +432,12 @@ function FlyoutMenu({
       </div>
       <ul>
         {section.items.map((item) => {
+          const itemIsProOnly = (item as { proOnly?: boolean }).proOnly
+          const isLocked = itemIsProOnly && !isPro
+
           const getHref = () => {
-            if (item.fullscreen) {
+            if (isLocked) return `${baseUrl}/abonnement?upgrade=pro`
+            if ((item as { fullscreen?: boolean }).fullscreen) {
               if (item.href === '/display') return `/shop/${tenant}/display`
               if (item.href === '/keuken') return `/keuken/${tenant}`
             }
@@ -421,22 +450,32 @@ function FlyoutMenu({
                 href={getHref()}
                 onClick={onClose}
                 className={`flex items-center gap-3 px-4 py-2.5 transition-all ${
-                  isActive(item.href)
+                  isLocked
+                    ? 'text-gray-400 hover:bg-purple-50 hover:text-purple-600'
+                    : isActive(item.href)
                     ? 'bg-blue-600 text-white'
                     : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
-                <span className="text-sm font-medium flex items-center gap-2">
-                  {t(`admin.menu.${item.nameKey}`)}
-                  {item.fullscreen && <span className="text-xs opacity-60">↗</span>}
-                  {/* Badge voor pending reserveringen */}
+                <span className="text-sm font-medium flex items-center gap-2 flex-1">
+                  {t(`admin.menu.${item.nameKey}`) !== `admin.menu.${item.nameKey}` 
+                    ? t(`admin.menu.${item.nameKey}`) 
+                    : item.nameKey === 'tablePlan' ? 'Tafelplan'
+                    : item.nameKey === 'onlineBooking' ? 'Online Boeking'
+                    : item.nameKey === 'guestCrm' ? 'Gasten CRM'
+                    : item.nameKey === 'noShow' ? 'No-show Bescherming'
+                    : item.nameKey}
+                  {(item as { fullscreen?: boolean }).fullscreen && <span className="text-xs opacity-60">↗</span>}
                   {item.nameKey === 'reservations' && pendingReservations > 0 && (
                     <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
                       {pendingReservations}
                     </span>
                   )}
                 </span>
+                {isLocked && (
+                  <span className="ml-auto text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">PRO</span>
+                )}
               </Link>
             </li>
           )
@@ -450,6 +489,7 @@ function SidebarContent({
   baseUrl, 
   isActive, 
   tenant,
+  tenantPlan = 'starter',
   collapsed = false,
   onClose,
   onToggle 
@@ -457,6 +497,7 @@ function SidebarContent({
   baseUrl: string
   isActive: (href: string) => boolean
   tenant: string
+  tenantPlan?: string
   collapsed?: boolean
   onClose?: () => void
   onToggle?: () => void
@@ -467,6 +508,7 @@ function SidebarContent({
   const [pendingReservations, setPendingReservations] = useState(0)
   const langRef = useRef<HTMLDivElement>(null)
   const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
+  const isPro = tenantPlan === 'pro'
 
   // Load pending reservations count
   useEffect(() => {
@@ -561,7 +603,11 @@ function SidebarContent({
         {menuItems.map((section, sectionIndex) => {
           const isExpanded = isSectionExpanded(section.categoryKey)
           const hasActive = hasActiveItemInSection(section)
-          const categoryName = t(`admin.categories.${section.categoryKey}`)
+          const sectionIsProOnly = (section as { proOnly?: boolean }).proOnly
+          const sectionLocked = sectionIsProOnly && !isPro
+          const categoryName = section.categoryKey === 'reservationsPro'
+            ? 'Reserveringen Pro'
+            : t(`admin.categories.${section.categoryKey}`)
           
           return (
             <div key={section.categoryKey} className="mb-1">
@@ -570,7 +616,9 @@ function SidebarContent({
                 id={`menu-btn-${section.categoryKey}`}
                 onClick={() => !collapsed && toggleSection(section.categoryKey)}
                 className={`w-full flex items-center justify-between px-4 py-3 transition-all ${
-                  hasActive 
+                  sectionLocked
+                    ? 'text-gray-400 hover:bg-purple-50 border-l-4 border-transparent'
+                    : hasActive 
                     ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-500' 
                     : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'
                 } ${collapsed ? 'justify-center' : ''}`}
@@ -586,6 +634,10 @@ function SidebarContent({
                     <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center animate-pulse">
                       {pendingReservations}
                     </span>
+                  )}
+                  {/* PRO badge voor Pro-only secties */}
+                  {sectionLocked && !collapsed && (
+                    <span className="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">PRO</span>
                   )}
                 </div>
                 {!collapsed && (
@@ -614,6 +666,7 @@ function SidebarContent({
                     toggleSection(section.categoryKey)
                   }}
                   t={t}
+                  isPro={isPro}
                   pendingReservations={pendingReservations}
                 />
               )}
