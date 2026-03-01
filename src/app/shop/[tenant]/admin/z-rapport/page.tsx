@@ -53,6 +53,11 @@ interface SavedReport {
   report_hash?: string
   is_closed?: boolean
   closed_at?: string
+  manual_cash?: number | null
+  manual_card?: number | null
+  manual_online?: number | null
+  manual_total?: number | null
+  kassa_saved_at?: string | null
 }
 
 export default function ZRapportPage({ params }: { params: { tenant: string } }) {
@@ -61,6 +66,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [syncing, setSyncing] = useState(false)
   const [closing, setClosing] = useState(false)
   const [showCloseConfirm, setShowCloseConfirm] = useState(false)
+  const [showKassaModal, setShowKassaModal] = useState(false)
+  const [kassaForm, setKassaForm] = useState({ cash: '', card: '', online: '' })
+  const [savingKassa, setSavingKassa] = useState(false)
+  const [archivePeriod, setArchivePeriod] = useState<'dag' | 'week' | 'maand' | 'jaar'>('dag')
 
   const getLocalDateString = (date: Date = new Date()) => {
     const year = date.getFullYear()
@@ -159,10 +168,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const loadSavedReports = async () => {
     const { data } = await supabase
       .from('z_reports')
-      .select('id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at')
+      .select('id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at, manual_cash, manual_card, manual_online, manual_total, kassa_saved_at')
       .eq('tenant_slug', params.tenant)
       .order('report_date', { ascending: false })
-      .limit(100)
+      .limit(400)
 
     if (data) setSavedReports(data)
   }
@@ -274,6 +283,149 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     }
 
     setClosing(false)
+  }
+
+  // Sla handmatige kassa invoer op
+  const saveKassaEntry = async () => {
+    setSavingKassa(true)
+    const cash = parseFloat(kassaForm.cash) || 0
+    const card = parseFloat(kassaForm.card) || 0
+    const online = parseFloat(kassaForm.online) || 0
+    const total = cash + card + online
+
+    const { error } = await supabase
+      .from('z_reports')
+      .upsert({
+        tenant_slug: params.tenant,
+        report_date: selectedDate,
+        // Online orders data (bewaar bestaande waarden via upsert)
+        order_count: stats?.orderCount || 0,
+        subtotal: stats?.subtotal || 0,
+        tax_low: stats?.taxLow || 0,
+        tax_mid: stats?.taxMid || 0,
+        tax_high: stats?.taxHigh || 0,
+        total: stats?.total || 0,
+        cash_payments: stats?.cashPayments || 0,
+        card_payments: stats?.cardPayments || 0,
+        online_payments: stats?.onlinePayments || 0,
+        btw_percentage: btwPercentage,
+        business_name: businessInfo?.business_name,
+        business_address: businessInfo?.address,
+        btw_number: businessInfo?.btw_number,
+        order_ids: stats?.orderIds || [],
+        generated_at: new Date().toISOString(),
+        // Handmatige kassa invoer
+        manual_cash: cash || null,
+        manual_card: card || null,
+        manual_online: online || null,
+        manual_total: total || null,
+        kassa_saved_at: new Date().toISOString(),
+      }, {
+        onConflict: 'tenant_slug,report_date',
+        ignoreDuplicates: false,
+      })
+
+    if (!error) {
+      await loadSavedReports()
+      setShowKassaModal(false)
+      setKassaForm({ cash: '', card: '', online: '' })
+    } else {
+      alert('Fout bij opslaan: ' + error.message)
+    }
+    setSavingKassa(false)
+  }
+
+  // Genereer kassa rapport HTML voor afdrukken
+  const printKassaReport = (report: SavedReport) => {
+    const html = `
+      <!DOCTYPE html><html><head><meta charset="utf-8">
+      <title>Kassa Rapport ${formatShortDate(report.report_date)}</title>
+      <style>
+        body { font-family: 'Courier New', monospace; max-width: 400px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 15px; }
+        .row { display: flex; justify-content: space-between; font-size: 14px; margin: 6px 0; }
+        .total-row { font-weight: bold; font-size: 16px; border-top: 2px solid #000; padding-top: 10px; margin-top: 10px; }
+        .section-title { font-weight: bold; margin: 12px 0 6px; border-bottom: 1px solid #ccc; }
+        .footer { text-align: center; font-size: 10px; color: #666; border-top: 2px dashed #000; margin-top: 20px; padding-top: 15px; }
+      </style></head><body>
+      <div class="header">
+        <h1>${businessInfo?.business_name || ''}</h1>
+        <p>${businessInfo?.address || ''}</p>
+        ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>` : ''}
+        <p><strong>KASSA RAPPORT</strong></p>
+        <p>${formatDate(report.report_date)}</p>
+        ${report.is_closed ? '<p>🔒 AFGESLOTEN</p>' : ''}
+      </div>
+      ${(report.manual_cash != null || report.manual_card != null || report.manual_online != null) ? `
+      <div class="section-title">HANDMATIGE KASSA INVOER</div>
+      ${report.manual_cash != null ? `<div class="row"><span>Contant:</span><span>€${(report.manual_cash || 0).toFixed(2)}</span></div>` : ''}
+      ${report.manual_card != null ? `<div class="row"><span>Kaart:</span><span>€${(report.manual_card || 0).toFixed(2)}</span></div>` : ''}
+      ${report.manual_online != null ? `<div class="row"><span>Online:</span><span>€${(report.manual_online || 0).toFixed(2)}</span></div>` : ''}
+      <div class="row total-row"><span>TOTAAL KASSA:</span><span>€${(report.manual_total || 0).toFixed(2)}</span></div>
+      ` : ''}
+      ${report.order_count > 0 ? `
+      <div class="section-title">ONLINE BESTELLINGEN</div>
+      <div class="row"><span>Aantal:</span><span>${report.order_count}</span></div>
+      <div class="row total-row"><span>TOTAAL ONLINE:</span><span>€${(report.total || 0).toFixed(2)}</span></div>
+      ` : ''}
+      <div class="row total-row" style="font-size:18px;margin-top:16px;"><span>GRAND TOTAL:</span><span>€${((report.manual_total || 0) + (report.total || 0)).toFixed(2)}</span></div>
+      <div class="footer">
+        <p>Gegenereerd: ${new Date().toLocaleString('nl-BE')}</p>
+        <p>Vysion Horeca - ordervysion.com</p>
+      </div></body></html>`
+    const w = window.open('', '_blank')
+    if (w) { w.document.write(html); w.document.close(); setTimeout(() => w.print(), 250) }
+  }
+
+  // Archief aggregatie per periode
+  const getAggregatedReports = () => {
+    if (archivePeriod === 'dag') return savedReports.map(r => ({
+      label: formatShortDate(r.report_date),
+      total: (r.total || 0) + (r.manual_total || 0),
+      onlineTotal: r.total || 0,
+      kassaTotal: r.manual_total || 0,
+      count: r.order_count || 0,
+      isClosed: r.is_closed,
+      reportDate: r.report_date,
+      report: r,
+    }))
+
+    const groups: Record<string, { label: string; total: number; onlineTotal: number; kassaTotal: number; count: number; reports: SavedReport[] }> = {}
+
+    savedReports.forEach(r => {
+      const d = new Date(r.report_date)
+      let key = ''
+      let label = ''
+      if (archivePeriod === 'week') {
+        const startOfYear = new Date(d.getFullYear(), 0, 1)
+        const week = Math.ceil(((d.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7)
+        key = `${d.getFullYear()}-W${week}`
+        label = `Week ${week} ${d.getFullYear()}`
+      } else if (archivePeriod === 'maand') {
+        key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        label = d.toLocaleDateString('nl-BE', { month: 'long', year: 'numeric' })
+      } else if (archivePeriod === 'jaar') {
+        key = `${d.getFullYear()}`
+        label = `${d.getFullYear()}`
+      }
+      if (!groups[key]) groups[key] = { label, total: 0, onlineTotal: 0, kassaTotal: 0, count: 0, reports: [] }
+      groups[key].total += (r.total || 0) + (r.manual_total || 0)
+      groups[key].onlineTotal += r.total || 0
+      groups[key].kassaTotal += r.manual_total || 0
+      groups[key].count += r.order_count || 0
+      groups[key].reports.push(r)
+    })
+
+    return Object.entries(groups).map(([key, g]) => ({
+      label: g.label,
+      total: g.total,
+      onlineTotal: g.onlineTotal,
+      kassaTotal: g.kassaTotal,
+      count: g.count,
+      isClosed: undefined as boolean | undefined,
+      reportDate: key,
+      report: null as SavedReport | null,
+    }))
   }
 
   const formatDate = (dateStr: string) => {
@@ -476,6 +628,13 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           >
             🔄 {t('zReport.refresh')}
           </button>
+          {/* KASSA INVOER */}
+          <button
+            onClick={() => { setKassaForm({ cash: '', card: '', online: '' }); setShowKassaModal(true) }}
+            className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium flex items-center gap-2"
+          >
+            🏧 Kassa invoer
+          </button>
           {/* OPSLAAN — geblokkeerd als dag afgesloten */}
           <button
             onClick={syncReport}
@@ -668,51 +827,73 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
         {/* Sidebar — Archief */}
         <div className={`lg:block ${showHistory ? 'block' : 'hidden'} print:hidden`}>
-          <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-6">
-            <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-white rounded-2xl shadow-sm p-4 sticky top-6">
+            <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
               📚 {t('zReport.savedReports')}
             </h3>
+
+            {/* Periodefilter */}
+            <div className="grid grid-cols-4 gap-1 mb-4">
+              {(['dag', 'week', 'maand', 'jaar'] as const).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setArchivePeriod(p)}
+                  className={`py-1.5 rounded-lg text-xs font-medium capitalize transition-colors ${
+                    archivePeriod === p ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {p.charAt(0).toUpperCase() + p.slice(1)}
+                </button>
+              ))}
+            </div>
 
             {savedReports.length === 0 ? (
               <p className="text-gray-500 text-sm">{t('zReport.noSavedReports')}</p>
             ) : (
-              <div className="space-y-2 max-h-[500px] overflow-y-auto">
-                {savedReports.map((report) => (
-                  <button
-                    key={report.id}
-                    onClick={() => setSelectedDate(report.report_date)}
-                    className={`w-full text-left p-3 rounded-xl transition-colors ${
-                      report.report_date === selectedDate
+              <div className="space-y-2 max-h-[460px] overflow-y-auto">
+                {getAggregatedReports().map((item, idx) => (
+                  <div
+                    key={item.reportDate + idx}
+                    className={`p-3 rounded-xl transition-colors ${
+                      archivePeriod === 'dag' && item.reportDate === selectedDate
                         ? 'bg-blue-100 border-2 border-blue-500'
-                        : 'bg-gray-50 hover:bg-gray-100'
+                        : 'bg-gray-50'
                     }`}
                   >
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium flex items-center gap-1">
-                        {formatShortDate(report.report_date)}
-                        {report.is_closed
-                          ? <span title="Dag afgesloten" className="text-green-600">🔒</span>
-                          : report.report_hash
-                            ? <span title="Geverifieerd" className="text-blue-500">✓</span>
-                            : null
-                        }
-                      </span>
-                      <span className="text-green-600 font-bold">{formatCurrency(report.total)}</span>
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => { if (archivePeriod === 'dag' && item.reportDate) setSelectedDate(item.reportDate) }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium text-sm flex items-center gap-1">
+                          {item.label}
+                          {item.isClosed && <span className="text-green-600 text-xs">🔒</span>}
+                        </span>
+                        <span className="text-green-600 font-bold text-sm">{formatCurrency(item.total)}</span>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1 space-y-0.5">
+                        {item.onlineTotal > 0 && <div>Online: {formatCurrency(item.onlineTotal)}</div>}
+                        {item.kassaTotal > 0 && <div>Kassa: {formatCurrency(item.kassaTotal)}</div>}
+                        <div>{item.count} bestellingen</div>
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                      <span>{report.order_count} {t('zReport.orders')}</span>
-                      {report.is_closed && (
-                        <span className="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">Afgesloten</span>
-                      )}
-                    </div>
-                  </button>
+                    {/* Rapport afdrukken knop — alleen op dag niveau */}
+                    {archivePeriod === 'dag' && item.report && (
+                      <button
+                        onClick={() => printKassaReport(item.report!)}
+                        className="mt-2 w-full py-1 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg font-medium"
+                      >
+                        🖨️ Rapport afdrukken
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
 
-            <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="mt-3 pt-3 border-t border-gray-100">
               <p className="text-xs text-gray-400">
-                {t('zReport.totalSaved')}: {savedReports.length} ·
+                Totaal: {savedReports.length} dagen ·
                 Afgesloten: {savedReports.filter(r => r.is_closed).length}
               </p>
             </div>
@@ -786,6 +967,113 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   ) : (
                     <>🔒 Bevestigen &amp; Afsluiten</>
                   )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* KASSA INVOER MODAL */}
+      <AnimatePresence>
+        {showKassaModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowKassaModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-md w-full p-6"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-3xl">🏧</span>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Kassa invoer</h2>
+                  <p className="text-gray-500 text-sm">{formatDate(selectedDate)}</p>
+                </div>
+              </div>
+
+              <p className="text-gray-500 text-sm mb-6">
+                Vul het kassabedrag in per betaalmethode na je shift.
+              </p>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">💵 Contant</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={kassaForm.cash}
+                      onChange={e => setKassaForm(p => ({ ...p, cash: e.target.value }))}
+                      placeholder=""
+                      className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">💳 Kaart</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={kassaForm.card}
+                      onChange={e => setKassaForm(p => ({ ...p, card: e.target.value }))}
+                      placeholder=""
+                      className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">🌐 Online</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">€</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={kassaForm.online}
+                      onChange={e => setKassaForm(p => ({ ...p, online: e.target.value }))}
+                      placeholder=""
+                      className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg"
+                    />
+                  </div>
+                </div>
+
+                {/* Totaal preview */}
+                {(kassaForm.cash || kassaForm.card || kassaForm.online) && (
+                  <div className="bg-orange-50 rounded-xl p-4 flex justify-between items-center">
+                    <span className="font-medium text-gray-700">Totaal kassa:</span>
+                    <span className="text-xl font-bold text-orange-600">
+                      {formatCurrency((parseFloat(kassaForm.cash) || 0) + (parseFloat(kassaForm.card) || 0) + (parseFloat(kassaForm.online) || 0))}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowKassaModal(false)}
+                  className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={saveKassaEntry}
+                  disabled={savingKassa || (!kassaForm.cash && !kassaForm.card && !kassaForm.online)}
+                  className="flex-1 px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold disabled:bg-gray-300 flex items-center justify-center gap-2"
+                >
+                  {savingKassa ? <><span className="animate-spin">⏳</span> Opslaan...</> : <>📊 Rapport opslaan</>}
                 </button>
               </div>
             </motion.div>
