@@ -20,8 +20,8 @@ interface RestaurantTable {
 }
 
 interface TableReservation {
-  id: string; table_id: string | null; name: string; phone: string; email: string
-  guests: number; reservation_date: string; reservation_time: string
+  id: string; table_id: string | null; customer_name: string; customer_phone: string; customer_email: string
+  party_size: number; reservation_date: string; reservation_time: string
   time_from: string | null; time_to: string | null; status: string
   notes: string | null; deposit_amount: number; deposit_paid: boolean; is_occupied: boolean
 }
@@ -120,7 +120,7 @@ export default function TafelplanPage() {
 
   const [sectionForm, setSectionForm] = useState({ name: '', color: SECTION_COLORS[0] })
   const [tableForm, setTableForm] = useState({ table_number: '', seats: 4, shape: 'square' as 'square'|'round'|'rectangle', section_id: '' })
-  const emptyResForm = () => ({ name: '', phone: '', email: '', guests: 2, date: agendaDate, time_from: '12:00', time_to: '14:00', notes: '', deposit_amount: 0, deposit_paid: false })
+  const emptyResForm = () => ({ customer_name: '', customer_phone: '', customer_email: '', party_size: 2, date: agendaDate, time_from: '12:00', time_to: '14:00', notes: '', deposit_amount: 0, deposit_paid: false })
   const [resForm, setResForm] = useState(emptyResForm())
 
   const dragging = useRef<{ id: string; sx: number; sy: number; ox: number; oy: number } | null>(null)
@@ -241,16 +241,25 @@ export default function TafelplanPage() {
   }
 
   async function saveReservation() {
-    if (!selectedTable || !resForm.name.trim()) return
+    if (!selectedTable || !resForm.customer_name.trim()) return
     const sb = getSupabase(); if (!sb) return
     const payload = {
       tenant_slug: tenantSlug, table_id: selectedTable.id,
-      name: resForm.name.trim(), phone: resForm.phone.trim(), email: resForm.email.trim(),
-      guests: resForm.guests, reservation_date: resForm.date,
-      reservation_time: resForm.time_from, time_from: resForm.time_from, time_to: resForm.time_to,
-      notes: resForm.notes.trim() || null, deposit_amount: resForm.deposit_amount,
-      deposit_paid: resForm.deposit_paid, status: 'confirmed', is_occupied: false,
+      customer_name: resForm.customer_name.trim(),
+      customer_phone: resForm.customer_phone.trim(),
+      customer_email: resForm.customer_email.trim(),
+      party_size: resForm.party_size,
+      reservation_date: resForm.date,
+      reservation_time: resForm.time_from,
+      time_from: resForm.time_from,
+      time_to: resForm.time_to,
+      notes: resForm.notes.trim() || null,
+      deposit_amount: resForm.deposit_amount,
+      deposit_paid: resForm.deposit_paid,
+      status: 'confirmed',
+      is_occupied: false,
     }
+    console.log('Saving reservation:', payload)
     if (editingRes) {
       await sb.from('reservations').update(payload).eq('id', editingRes.id)
     } else {
@@ -379,7 +388,7 @@ export default function TafelplanPage() {
                   <p className="text-sm text-gray-500">{selectedTable.seats} pl. · {sections.find(s => s.id === selectedTable.section_id)?.name || 'Geen zone'}</p>
                 </div>
                 <div className="flex gap-2 items-center">
-                  <button onClick={() => { setResForm({ ...emptyResForm(), guests: Math.min(selectedTable.seats, 2) }); setEditingRes(null); setShowResForm(true) }} className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700">+ Reservatie</button>
+                  <button onClick={() => { setResForm({ ...emptyResForm(), party_size: Math.min(selectedTable.seats, 2) }); setEditingRes(null); setShowResForm(true) }} className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700">+ Reservatie</button>
                   <button onClick={() => setSelectedTable(null)} className="p-1.5 hover:bg-gray-200 rounded-lg text-gray-400 text-xl leading-none">×</button>
                 </div>
               </div>
@@ -407,10 +416,10 @@ export default function TafelplanPage() {
                       {done && <span className="bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">VRIJ</span>}
                       {!occupied && !done && <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">BEVESTIGD</span>}
                     </div>
-                    <p className="font-bold text-gray-900">{res.name}</p>
+                    <p className="font-bold text-gray-900">{res.customer_name}</p>
                     <div className="text-sm text-gray-600 space-y-0.5 mt-1">
-                      {res.phone && <p>📱 {res.phone}</p>}
-                      <p>👥 {res.guests} personen</p>
+                      {res.customer_phone && <p>📱 {res.customer_phone}</p>}
+                      <p>👥 {res.party_size} personen</p>
                       {res.deposit_amount > 0 && <p className={res.deposit_paid ? 'text-green-700 font-medium' : 'text-amber-700 font-medium'}>💳 Voorschot €{res.deposit_amount} {res.deposit_paid ? '✓' : '— openstaand'}</p>}
                       {res.notes && <p className="text-xs italic text-gray-500">&quot;{res.notes}&quot;</p>}
                     </div>
@@ -420,7 +429,7 @@ export default function TafelplanPage() {
                           ? <button onClick={() => markOccupied(res)} className="flex-1 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700">🔴 Gasten aanwezig</button>
                           : <button onClick={() => releaseTable(res)} className="flex-1 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700">✓ Tafel vrijgeven</button>
                         }
-                        <button onClick={() => { setResForm({ name: res.name, phone: res.phone, email: res.email, guests: res.guests, date: res.reservation_date, time_from: res.time_from || res.reservation_time, time_to: res.time_to || '', notes: res.notes || '', deposit_amount: res.deposit_amount, deposit_paid: res.deposit_paid }); setEditingRes(res); setShowResForm(true) }} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs hover:bg-gray-50">✏️</button>
+                        <button onClick={() => { setResForm({ customer_name: res.customer_name, customer_phone: res.customer_phone, customer_email: res.customer_email, party_size: res.party_size, date: res.reservation_date, time_from: res.time_from || res.reservation_time, time_to: res.time_to || '', notes: res.notes || '', deposit_amount: res.deposit_amount, deposit_paid: res.deposit_paid }); setEditingRes(res); setShowResForm(true) }} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs hover:bg-gray-50">✏️</button>
                         <button onClick={() => cancelReservation(res)} className="px-3 py-1.5 bg-white border border-red-200 text-red-500 rounded-lg text-xs hover:bg-red-50">✕</button>
                       </div>
                     )}
@@ -477,12 +486,12 @@ export default function TafelplanPage() {
             <h3 className="text-xl font-bold mb-4">{editingRes ? 'Reservatie bewerken' : `Nieuwe reservatie — Tafel #${selectedTable?.table_number}`}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Naam *</label><input autoFocus value={resForm.name} onChange={e => setResForm(p => ({ ...p, name: e.target.value }))} placeholder="Voornaam Naam" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Telefoon</label><input value={resForm.phone} onChange={e => setResForm(p => ({ ...p, phone: e.target.value }))} placeholder="+32 4xx..." className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Naam *</label><input autoFocus value={resForm.customer_name} onChange={e => setResForm(p => ({ ...p, customer_name: e.target.value }))} placeholder="Voornaam Naam" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Telefoon</label><input value={resForm.customer_phone} onChange={e => setResForm(p => ({ ...p, customer_phone: e.target.value }))} placeholder="+32 4xx..." className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
               </div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" value={resForm.email} onChange={e => setResForm(p => ({ ...p, email: e.target.value }))} placeholder="naam@email.com" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
+              <div><label className="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" value={resForm.customer_email} onChange={e => setResForm(p => ({ ...p, customer_email: e.target.value }))} placeholder="naam@email.com" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-2">Personen</label>
-                <div className="flex items-center gap-4"><button onClick={() => setResForm(p => ({ ...p, guests: Math.max(1, p.guests - 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">−</button><span className="text-2xl font-bold w-8 text-center">{resForm.guests}</span><button onClick={() => setResForm(p => ({ ...p, guests: Math.min(selectedTable?.seats || 20, p.guests + 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">+</button><span className="text-sm text-gray-400">max {selectedTable?.seats}</span></div>
+                <div className="flex items-center gap-4"><button onClick={() => setResForm(p => ({ ...p, party_size: Math.max(1, p.party_size - 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">−</button><span className="text-2xl font-bold w-8 text-center">{resForm.party_size}</span><button onClick={() => setResForm(p => ({ ...p, party_size: Math.min(selectedTable?.seats || 20, p.party_size + 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">+</button><span className="text-sm text-gray-400">max {selectedTable?.seats}</span></div>
               </div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Datum</label><input type="date" value={resForm.date} onChange={e => setResForm(p => ({ ...p, date: e.target.value }))} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
               <div className="grid grid-cols-2 gap-3">
