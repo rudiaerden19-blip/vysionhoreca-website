@@ -11,116 +11,86 @@ const getSupabase = () => {
   return createClient(url, key)
 }
 
-interface Section {
-  id: string
-  name: string
-  color: string
-  sort_order: number
-}
+interface Section { id: string; name: string; color: string; sort_order: number }
 
 interface RestaurantTable {
-  id: string
-  section_id: string | null
-  table_number: string
-  seats: number
-  shape: 'square' | 'round' | 'rectangle'
-  pos_x: number
-  pos_y: number
-  is_active: boolean
+  id: string; section_id: string | null; table_number: string
+  seats: number; shape: 'square' | 'round' | 'rectangle'
+  pos_x: number; pos_y: number; is_active: boolean
 }
 
 interface TableReservation {
-  id: string
-  table_id: string | null
-  name: string
-  phone: string
-  email: string
-  guests: number
-  reservation_date: string
-  reservation_time: string
-  time_from: string | null
-  time_to: string | null
-  status: string
-  notes: string | null
-  deposit_amount: number
-  deposit_paid: boolean
-  is_occupied: boolean
-  released_at: string | null
+  id: string; table_id: string | null; name: string; phone: string; email: string
+  guests: number; reservation_date: string; reservation_time: string
+  time_from: string | null; time_to: string | null; status: string
+  notes: string | null; deposit_amount: number; deposit_paid: boolean; is_occupied: boolean
 }
 
 const SECTION_COLORS = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#06B6D4','#84CC16']
 const CANVAS_HEIGHT = 580
-const HOURS = Array.from({ length: 14 }, (_, i) => i + 9) // 09:00 – 22:00
 
-function timeToMinutes(t: string) {
-  const [h, m] = t.split(':').map(Number)
-  return h * 60 + (m || 0)
-}
-
-function minutesToTime(m: number) {
-  const h = Math.floor(m / 60).toString().padStart(2, '0')
-  const min = (m % 60).toString().padStart(2, '0')
-  return `${h}:${min}`
-}
-
-// Stoeltjes component
-function TableWithChairs({ table, color, isSelected, isOccupied, hasReservation }: {
-  table: RestaurantTable; color: string; isSelected: boolean; isOccupied: boolean; hasReservation: boolean
+function TableWithChairs({ table, color, isSelected, reservationCount, isOccupied }: {
+  table: RestaurantTable; color: string; isSelected: boolean; reservationCount: number; isOccupied: boolean
 }) {
-  const seats = table.seats
-  const shape = table.shape
-  const isRound = shape === 'round'
-  const isRect = shape === 'rectangle'
-  const tableW = isRect ? 110 : 72
-  const tableH = isRect ? 60 : 72
+  const { seats, shape } = table
+  const isRound = shape === 'round'; const isRect = shape === 'rectangle'
+  const tableW = isRect ? 110 : 72; const tableH = isRect ? 60 : 72
   const cW = 16; const cH = 11; const gap = 6
   const topCount = isRect ? Math.ceil(seats * 0.4) : Math.ceil(seats / 4)
   const bottomCount = isRect ? Math.ceil(seats * 0.4) : Math.ceil(seats / 4)
   const sideRem = Math.max(0, seats - topCount - bottomCount)
-  const leftCount = Math.floor(sideRem / 2)
-  const rightCount = sideRem - leftCount
+  const leftCount = Math.floor(sideRem / 2); const rightCount = sideRem - leftCount
   const padH = cH + gap; const padV = cH + gap
   const totalW = tableW + 2 * padV; const totalH = tableH + 2 * padH
 
-  const chairStyle = (s: React.CSSProperties): React.CSSProperties => ({
-    position: 'absolute', backgroundColor: '#9CA3AF', borderRadius: 4, ...s,
-  })
-  const chairsAlong = (count: number, length: number, start: number, axis: 'x' | 'y', crossPos: number, crossFixed: boolean, w: number, h: number) => {
-    if (count === 0) return []
-    const spacing = length / count
+  const cs = (s: React.CSSProperties): React.CSSProperties => ({ position: 'absolute', backgroundColor: '#9CA3AF', borderRadius: 4, ...s })
+  const along = (count: number, len: number, start: number, axis: 'x'|'y', cross: number, fixed: boolean, w: number, h: number) => {
+    if (!count) return []
+    const sp = len / count
     return Array.from({ length: count }, (_, i) => {
-      const center = spacing * i + spacing / 2
-      const main = start + center - (axis === 'x' ? w : h) / 2
+      const m = start + sp * i + sp / 2 - (axis === 'x' ? w : h) / 2
       return axis === 'x'
-        ? chairStyle({ left: main, top: crossFixed ? crossPos : undefined, bottom: !crossFixed ? crossPos : undefined, width: w, height: h })
-        : chairStyle({ top: main, left: crossFixed ? crossPos : undefined, right: !crossFixed ? crossPos : undefined, width: w, height: h })
+        ? cs({ left: m, top: fixed ? cross : undefined, bottom: !fixed ? cross : undefined, width: w, height: h })
+        : cs({ top: m, left: fixed ? cross : undefined, right: !fixed ? cross : undefined, width: w, height: h })
     })
   }
-  const allChairs = [
-    ...chairsAlong(topCount, tableW, padV, 'x', 0, true, cW, cH),
-    ...chairsAlong(bottomCount, tableW, padV, 'x', 0, false, cW, cH),
-    ...chairsAlong(leftCount, tableH, padH, 'y', 0, true, cH, cW),
-    ...chairsAlong(rightCount, tableH, padH, 'y', 0, false, cH, cW),
+
+  const chairs = [
+    ...along(topCount, tableW, padV, 'x', 0, true, cW, cH),
+    ...along(bottomCount, tableW, padV, 'x', 0, false, cW, cH),
+    ...along(leftCount, tableH, padH, 'y', 0, true, cH, cW),
+    ...along(rightCount, tableH, padH, 'y', 0, false, cH, cW),
   ]
 
-  const tableColor = isOccupied ? '#DC2626' : hasReservation ? '#D97706' : color
+  const tableColor = isOccupied ? '#DC2626' : reservationCount > 0 ? '#D97706' : color
 
   return (
     <div style={{ width: totalW, height: totalH, position: 'relative' }}>
-      {allChairs.map((s, i) => <div key={i} style={s} />)}
+      {chairs.map((s, i) => <div key={i} style={s} />)}
       <div style={{
         position: 'absolute', top: padH, left: padV, width: tableW, height: tableH,
-        backgroundColor: tableColor,
-        borderRadius: isRound ? '50%' : 10,
+        backgroundColor: tableColor, borderRadius: isRound ? '50%' : 10,
         border: isSelected ? '3px solid #1E3A5F' : '2px solid rgba(0,0,0,0.15)',
-        boxShadow: isSelected ? '0 0 0 3px rgba(30,58,95,0.35), 0 4px 16px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.18)',
+        boxShadow: isSelected ? '0 0 0 3px rgba(30,58,95,0.35),0 4px 16px rgba(0,0,0,0.25)' : '0 2px 8px rgba(0,0,0,0.18)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       }}>
         <span style={{ color: '#fff', fontWeight: 700, fontSize: 13, lineHeight: 1 }}>#{table.table_number}</span>
-        <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: 11, marginTop: 3 }}>{seats} pl.</span>
-        {isOccupied && <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 9, marginTop: 2 }}>BEZET</span>}
-        {!isOccupied && hasReservation && <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 9, marginTop: 2 }}>GERESERVEERD</span>}
+        <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: 10, marginTop: 2 }}>{seats} pl.</span>
       </div>
+      {/* Badge: aantal reservaties vandaag */}
+      {reservationCount > 0 && (
+        <div style={{
+          position: 'absolute', top: padH - 10, right: padV - 10,
+          width: 22, height: 22, borderRadius: '50%',
+          backgroundColor: isOccupied ? '#DC2626' : '#1D4ED8',
+          color: '#fff', fontSize: 11, fontWeight: 800,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: '2px solid #fff', zIndex: 20, boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+          cursor: 'pointer',
+        }}>
+          {reservationCount}
+        </div>
+      )}
     </div>
   )
 }
@@ -131,171 +101,191 @@ export default function TafelplanPage() {
 
   const [sections, setSections] = useState<Section[]>([])
   const [tables, setTables] = useState<RestaurantTable[]>([])
-  const [reservations, setReservations] = useState<TableReservation[]>([])
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null)
   const [agendaDate, setAgendaDate] = useState(new Date().toISOString().split('T')[0])
+  const [agendaReservations, setAgendaReservations] = useState<TableReservation[]>([])
+  // Map: tableId → reservaties voor agendaDate (voor badges)
+  const [badgeMap, setBadgeMap] = useState<Record<string, TableReservation[]>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [hasUnsaved, setHasUnsaved] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const [savedMsg, setSavedMsg] = useState(false)
 
   // Modals
   const [showAddSection, setShowAddSection] = useState(false)
   const [showAddTable, setShowAddTable] = useState(false)
-  const [showReservationForm, setShowReservationForm] = useState(false)
-  const [editingReservation, setEditingReservation] = useState<TableReservation | null>(null)
+  const [showResForm, setShowResForm] = useState(false)
+  const [editingRes, setEditingRes] = useState<TableReservation | null>(null)
   const [showDeleteTable, setShowDeleteTable] = useState(false)
 
-  // Forms
   const [sectionForm, setSectionForm] = useState({ name: '', color: SECTION_COLORS[0] })
   const [tableForm, setTableForm] = useState({ table_number: '', seats: 4, shape: 'square' as 'square'|'round'|'rectangle', section_id: '' })
-  const [resForm, setResForm] = useState({ name: '', phone: '', email: '', guests: 2, date: agendaDate, time_from: '12:00', time_to: '14:00', notes: '', deposit_amount: 0, deposit_paid: false })
+  const emptyResForm = () => ({ name: '', phone: '', email: '', guests: 2, date: agendaDate, time_from: '12:00', time_to: '14:00', notes: '', deposit_amount: 0, deposit_paid: false })
+  const [resForm, setResForm] = useState(emptyResForm())
 
-  const dragging = useRef<{ tableId: string; startMouseX: number; startMouseY: number; origX: number; origY: number } | null>(null)
+  const dragging = useRef<{ id: string; sx: number; sy: number; ox: number; oy: number } | null>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
+  const isDragging = useRef(false)
 
   useEffect(() => { loadData() }, [tenantSlug])
-  useEffect(() => { if (selectedTable) loadReservations(selectedTable.id, agendaDate) }, [selectedTable, agendaDate])
+
+  useEffect(() => {
+    loadBadges(agendaDate)
+  }, [tenantSlug, agendaDate, tables.length])
+
+  useEffect(() => {
+    if (selectedTable) loadAgenda(selectedTable.id, agendaDate)
+  }, [selectedTable?.id, agendaDate])
 
   async function loadData() {
-    const supabase = getSupabase(); if (!supabase) return
+    const sb = getSupabase(); if (!sb) return
     const [{ data: sec }, { data: tbl }] = await Promise.all([
-      supabase.from('restaurant_sections').select('*').eq('tenant_slug', tenantSlug).order('sort_order'),
-      supabase.from('restaurant_tables').select('*').eq('tenant_slug', tenantSlug).eq('is_active', true),
+      sb.from('restaurant_sections').select('*').eq('tenant_slug', tenantSlug).order('sort_order'),
+      sb.from('restaurant_tables').select('*').eq('tenant_slug', tenantSlug).eq('is_active', true),
     ])
-    setSections(sec || []); setTables(tbl || [])
+    setSections(sec || [])
+    setTables(tbl || [])
     setLoading(false)
   }
 
-  async function loadReservations(tableId: string, date: string) {
-    const supabase = getSupabase(); if (!supabase) return
-    const { data } = await supabase.from('reservations').select('*')
-      .eq('table_id', tableId).eq('reservation_date', date)
-      .order('time_from', { ascending: true })
-    setReservations(data || [])
+  async function loadBadges(date: string) {
+    const sb = getSupabase(); if (!sb) return
+    const { data } = await sb.from('reservations').select('*')
+      .eq('tenant_slug', tenantSlug).eq('reservation_date', date)
+      .neq('status', 'cancelled')
+    const map: Record<string, TableReservation[]> = {}
+    for (const r of data || []) {
+      if (r.table_id) {
+        if (!map[r.table_id]) map[r.table_id] = []
+        map[r.table_id].push(r)
+      }
+    }
+    setBadgeMap(map)
   }
 
-  const handleMouseDown = useCallback((e: React.MouseEvent, table: RestaurantTable) => {
+  async function loadAgenda(tableId: string, date: string) {
+    const sb = getSupabase(); if (!sb) return
+    const { data } = await sb.from('reservations').select('*')
+      .eq('table_id', tableId).eq('reservation_date', date)
+      .order('time_from', { ascending: true })
+    setAgendaReservations(data || [])
+  }
+
+  async function refreshAll() {
+    if (selectedTable) await loadAgenda(selectedTable.id, agendaDate)
+    await loadBadges(agendaDate)
+  }
+
+  // Drag
+  const onMouseDown = useCallback((e: React.MouseEvent, table: RestaurantTable) => {
     e.preventDefault(); e.stopPropagation()
-    dragging.current = { tableId: table.id, startMouseX: e.clientX, startMouseY: e.clientY, origX: table.pos_x, origY: table.pos_y }
+    isDragging.current = false
+    dragging.current = { id: table.id, sx: e.clientX, sy: e.clientY, ox: table.pos_x, oy: table.pos_y }
   }, [])
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+  const onMouseMove = useCallback((e: React.MouseEvent) => {
     if (!dragging.current) return
-    const dx = e.clientX - dragging.current.startMouseX
-    const dy = e.clientY - dragging.current.startMouseY
-    const newX = Math.max(0, dragging.current.origX + dx)
-    const newY = Math.max(0, dragging.current.origY + dy)
-    setTables(prev => prev.map(t => t.id === dragging.current!.tableId ? { ...t, pos_x: newX, pos_y: newY } : t))
-    setHasUnsaved(true)
+    const dx = e.clientX - dragging.current.sx; const dy = e.clientY - dragging.current.sy
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) isDragging.current = true
+    const newX = Math.max(0, dragging.current.ox + dx)
+    const newY = Math.max(0, dragging.current.oy + dy)
+    setTables(prev => prev.map(t => t.id === dragging.current!.id ? { ...t, pos_x: newX, pos_y: newY } : t))
   }, [])
 
-  const handleMouseUp = useCallback(() => { dragging.current = null }, [])
+  const onMouseUp = useCallback(() => { dragging.current = null }, [])
 
-  async function saveAll() {
+  const onTableClick = useCallback((e: React.MouseEvent, table: RestaurantTable) => {
+    e.stopPropagation()
+    if (isDragging.current) { isDragging.current = false; return }
+    setSelectedTable(table)
+  }, [])
+
+  async function savePositions() {
     setSaving(true)
-    const supabase = getSupabase(); if (!supabase) { setSaving(false); return }
-    await Promise.all(tables.map(t => supabase.from('restaurant_tables').update({ pos_x: t.pos_x, pos_y: t.pos_y }).eq('id', t.id)))
-    setSaving(false); setHasUnsaved(false); setSaved(true)
-    setTimeout(() => setSaved(false), 2500)
+    const sb = getSupabase()
+    if (sb) {
+      await Promise.all(tables.map(t => sb.from('restaurant_tables').update({ pos_x: t.pos_x, pos_y: t.pos_y }).eq('id', t.id)))
+    }
+    setSaving(false); setSavedMsg(true)
+    setTimeout(() => setSavedMsg(false), 2500)
   }
 
   async function addSection() {
     if (!sectionForm.name.trim()) return
-    const supabase = getSupabase(); if (!supabase) return
-    const { data } = await supabase.from('restaurant_sections').insert({ tenant_slug: tenantSlug, name: sectionForm.name.trim(), color: sectionForm.color, sort_order: sections.length }).select().single()
-    if (data) setSections(prev => [...prev, data])
+    const sb = getSupabase(); if (!sb) return
+    const { data } = await sb.from('restaurant_sections').insert({ tenant_slug: tenantSlug, name: sectionForm.name.trim(), color: sectionForm.color, sort_order: sections.length }).select().single()
+    if (data) setSections(p => [...p, data])
     setSectionForm({ name: '', color: SECTION_COLORS[0] }); setShowAddSection(false)
   }
 
   async function addTable() {
     if (!tableForm.table_number.trim()) return
-    const supabase = getSupabase(); if (!supabase) return
-    let posX = 30, posY = 30
-    outer: for (let row = 0; row < 5; row++) for (let col = 0; col < 8; col++) {
-      const x = 30 + col * 130, y = 30 + row * 130
-      if (!tables.some(t => Math.abs(t.pos_x - x) < 110 && Math.abs(t.pos_y - y) < 110)) { posX = x; posY = y; break outer }
+    const sb = getSupabase(); if (!sb) return
+    let px = 30, py = 30
+    outer: for (let r = 0; r < 5; r++) for (let c = 0; c < 8; c++) {
+      const x = 30 + c * 130, y = 30 + r * 130
+      if (!tables.some(t => Math.abs(t.pos_x - x) < 110 && Math.abs(t.pos_y - y) < 110)) { px = x; py = y; break outer }
     }
-    const { data } = await supabase.from('restaurant_tables').insert({ tenant_slug: tenantSlug, section_id: tableForm.section_id || null, table_number: tableForm.table_number.trim(), seats: tableForm.seats, shape: tableForm.shape, pos_x: posX, pos_y: posY, is_active: true }).select().single()
-    if (data) setTables(prev => [...prev, data])
+    const { data } = await sb.from('restaurant_tables').insert({ tenant_slug: tenantSlug, section_id: tableForm.section_id || null, table_number: tableForm.table_number.trim(), seats: tableForm.seats, shape: tableForm.shape, pos_x: px, pos_y: py, is_active: true }).select().single()
+    if (data) setTables(p => [...p, data])
     setTableForm({ table_number: '', seats: 4, shape: 'square', section_id: '' }); setShowAddTable(false)
   }
 
   async function deleteTable() {
     if (!selectedTable) return
-    const supabase = getSupabase(); if (!supabase) return
-    await supabase.from('restaurant_tables').update({ is_active: false }).eq('id', selectedTable.id)
-    setTables(prev => prev.filter(t => t.id !== selectedTable.id))
+    const sb = getSupabase(); if (!sb) return
+    await sb.from('restaurant_tables').update({ is_active: false }).eq('id', selectedTable.id)
+    setTables(p => p.filter(t => t.id !== selectedTable.id))
     setSelectedTable(null); setShowDeleteTable(false)
   }
 
   async function saveReservation() {
     if (!selectedTable || !resForm.name.trim()) return
-    const supabase = getSupabase(); if (!supabase) return
+    const sb = getSupabase(); if (!sb) return
     const payload = {
-      tenant_slug: tenantSlug,
-      table_id: selectedTable.id,
-      name: resForm.name.trim(),
-      phone: resForm.phone.trim(),
-      email: resForm.email.trim(),
-      guests: resForm.guests,
-      reservation_date: resForm.date,
-      reservation_time: resForm.time_from,
-      time_from: resForm.time_from,
-      time_to: resForm.time_to,
-      notes: resForm.notes.trim() || null,
-      deposit_amount: resForm.deposit_amount,
-      deposit_paid: resForm.deposit_paid,
-      status: 'confirmed',
-      is_occupied: false,
+      tenant_slug: tenantSlug, table_id: selectedTable.id,
+      name: resForm.name.trim(), phone: resForm.phone.trim(), email: resForm.email.trim(),
+      guests: resForm.guests, reservation_date: resForm.date,
+      reservation_time: resForm.time_from, time_from: resForm.time_from, time_to: resForm.time_to,
+      notes: resForm.notes.trim() || null, deposit_amount: resForm.deposit_amount,
+      deposit_paid: resForm.deposit_paid, status: 'confirmed', is_occupied: false,
     }
-    if (editingReservation) {
-      await supabase.from('reservations').update(payload).eq('id', editingReservation.id)
+    if (editingRes) {
+      await sb.from('reservations').update(payload).eq('id', editingRes.id)
     } else {
-      await supabase.from('reservations').insert(payload)
+      await sb.from('reservations').insert(payload)
     }
-    await loadReservations(selectedTable.id, agendaDate)
-    setShowReservationForm(false); setEditingReservation(null)
-    setResForm({ name: '', phone: '', email: '', guests: 2, date: agendaDate, time_from: '12:00', time_to: '14:00', notes: '', deposit_amount: 0, deposit_paid: false })
+    setShowResForm(false); setEditingRes(null); setResForm(emptyResForm())
+    await refreshAll()
   }
 
   async function markOccupied(res: TableReservation) {
-    const supabase = getSupabase(); if (!supabase || !selectedTable) return
-    await supabase.from('reservations').update({ is_occupied: true, status: 'confirmed' }).eq('id', res.id)
-    await loadReservations(selectedTable.id, agendaDate)
+    const sb = getSupabase(); if (!sb) return
+    await sb.from('reservations').update({ is_occupied: true }).eq('id', res.id)
+    await refreshAll()
   }
 
   async function releaseTable(res: TableReservation) {
-    const supabase = getSupabase(); if (!supabase || !selectedTable) return
-    await supabase.from('reservations').update({ is_occupied: false, status: 'completed', released_at: new Date().toISOString() }).eq('id', res.id)
-    await loadReservations(selectedTable.id, agendaDate)
+    const sb = getSupabase(); if (!sb) return
+    await sb.from('reservations').update({ is_occupied: false, status: 'completed', released_at: new Date().toISOString() }).eq('id', res.id)
+    await refreshAll()
   }
 
   async function cancelReservation(res: TableReservation) {
-    const supabase = getSupabase(); if (!supabase || !selectedTable) return
-    await supabase.from('reservations').update({ status: 'cancelled' }).eq('id', res.id)
-    await loadReservations(selectedTable.id, agendaDate)
+    const sb = getSupabase(); if (!sb) return
+    await sb.from('reservations').update({ status: 'cancelled' }).eq('id', res.id)
+    await refreshAll()
   }
 
-  function getTableColor(table: RestaurantTable) {
-    if (!table.section_id) return '#6B7280'
-    return sections.find(s => s.id === table.section_id)?.color || '#6B7280'
+  function getTableColor(t: RestaurantTable) {
+    if (!t.section_id) return '#6B7280'
+    return sections.find(s => s.id === t.section_id)?.color || '#6B7280'
   }
 
-  // Controleer of tafel bezet/gereserveerd is op vandaag
-  const todayStr = new Date().toISOString().split('T')[0]
-  const nowMin = new Date().getHours() * 60 + new Date().getMinutes()
-
-  function getTableStatus(tableId: string): 'occupied' | 'reserved' | 'free' {
-    // We don't load all reservations here for perf — color based on selectedTable only
-    return 'free'
-  }
-
-  const agendaReservations = reservations.filter(r => r.status !== 'cancelled')
+  const visibleReservations = agendaReservations.filter(r => r.status !== 'cancelled')
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
     </div>
   )
 
@@ -308,179 +298,128 @@ export default function TafelplanPage() {
           <p className="text-gray-500 mt-1">{tables.length} tafels</p>
         </div>
         <div className="flex gap-3 items-center">
-          {hasUnsaved && <span className="text-sm text-amber-600 font-medium">● Niet opgeslagen</span>}
-          <button onClick={() => setShowAddSection(true)} className="px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50 transition-colors">+ Zone</button>
-          <button onClick={() => { setTableForm({ table_number: `${tables.length + 1}`, seats: 4, shape: 'square', section_id: '' }); setShowAddTable(true) }} className="px-4 py-2 border-2 border-blue-200 text-blue-700 rounded-xl font-medium hover:bg-blue-50 transition-colors">+ Tafel</button>
-          <button onClick={saveAll} disabled={saving} className={`px-6 py-2 rounded-xl font-bold transition-colors ${saved ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} disabled:opacity-60`}>
-            {saving ? 'Opslaan...' : saved ? '✓ Opgeslagen' : '💾 Opslaan'}
+          <input type="date" value={agendaDate} onChange={e => setAgendaDate(e.target.value)} className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
+          <button onClick={() => setShowAddSection(true)} className="px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50">+ Zone</button>
+          <button onClick={() => { setTableForm({ table_number: `${tables.length + 1}`, seats: 4, shape: 'square', section_id: '' }); setShowAddTable(true) }} className="px-4 py-2 border-2 border-blue-200 text-blue-700 rounded-xl font-medium hover:bg-blue-50">+ Tafel</button>
+          <button onClick={savePositions} disabled={saving} className={`px-6 py-2 rounded-xl font-bold transition-colors ${savedMsg ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} disabled:opacity-60`}>
+            {saving ? 'Opslaan...' : savedMsg ? '✓ Opgeslagen' : '💾 Opslaan'}
           </button>
         </div>
       </div>
 
-      {/* Status legenda */}
-      <div className="flex gap-4 text-xs font-medium">
-        <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-500"></span>Vrij</div>
-        <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-500"></span>Gereserveerd</div>
-        <div className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-600"></span>Bezet</div>
+      {/* Legenda */}
+      <div className="flex gap-5 text-xs font-medium text-gray-600">
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-500 inline-block" />Vrij</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-amber-500 inline-block" />Gereserveerd</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-red-600 inline-block" />Bezet</span>
+        <span className="flex items-center gap-1.5"><span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-blue-700 text-white text-[9px] font-bold">3</span>Aantal reservaties</span>
       </div>
 
       <div className="flex gap-4">
-        {/* Tafelplan canvas */}
-        <div className={`${selectedTable ? 'flex-1' : 'w-full'} transition-all duration-300`}>
+        {/* Canvas */}
+        <div className="flex-1 min-w-0">
           <div
             ref={canvasRef}
             className="relative rounded-2xl overflow-hidden select-none"
             style={{ width: '100%', height: CANVAS_HEIGHT, border: '2px solid #A07840', boxShadow: '0 4px 20px rgba(0,0,0,0.15)' }}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onMouseLeave={onMouseUp}
             onClick={() => setSelectedTable(null)}
           >
-            {/* Laminaatvloer */}
-            <div className="absolute inset-0" style={{
-              backgroundColor: '#C8A97A',
-              backgroundImage: `repeating-linear-gradient(180deg, transparent 0px, transparent 39px, rgba(0,0,0,0.08) 39px, rgba(0,0,0,0.08) 40px)`,
-            }} />
+            <div className="absolute inset-0" style={{ backgroundColor: '#C8A97A', backgroundImage: 'repeating-linear-gradient(180deg,transparent 0px,transparent 39px,rgba(0,0,0,0.08) 39px,rgba(0,0,0,0.08) 40px)' }} />
 
             {tables.length === 0 && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center">
                 <div className="bg-black/40 backdrop-blur-sm rounded-2xl px-8 py-6 text-center text-white">
-                  <span className="text-5xl mb-3 block">🪑</span>
-                  <p className="font-medium">Nog geen tafels — klik op "+ Tafel"</p>
+                  <span className="text-5xl block mb-2">🪑</span>
+                  <p className="font-medium">Nog geen tafels — klik op &quot;+ Tafel&quot;</p>
                 </div>
               </div>
             )}
 
-            {tables.map(table => (
-              <div
-                key={table.id}
-                onMouseDown={(e) => handleMouseDown(e, table)}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setSelectedTable(table)
-                  setAgendaDate(new Date().toISOString().split('T')[0])
-                }}
-                className="absolute cursor-pointer"
-                style={{ left: table.pos_x, top: table.pos_y, zIndex: selectedTable?.id === table.id ? 10 : 1 }}
-              >
-                <TableWithChairs
-                  table={table}
-                  color={getTableColor(table)}
-                  isSelected={selectedTable?.id === table.id}
-                  isOccupied={false}
-                  hasReservation={false}
-                />
-              </div>
-            ))}
+            {tables.map(table => {
+              const tableResv = badgeMap[table.id] || []
+              const count = tableResv.length
+              const occupied = tableResv.some(r => r.is_occupied)
+              return (
+                <div
+                  key={table.id}
+                  onMouseDown={e => onMouseDown(e, table)}
+                  onClick={e => onTableClick(e, table)}
+                  className="absolute cursor-pointer"
+                  style={{ left: table.pos_x, top: table.pos_y, zIndex: selectedTable?.id === table.id ? 10 : 1 }}
+                >
+                  <TableWithChairs
+                    table={table}
+                    color={getTableColor(table)}
+                    isSelected={selectedTable?.id === table.id}
+                    reservationCount={count}
+                    isOccupied={occupied}
+                  />
+                </div>
+              )
+            })}
 
             <div className="absolute top-3 left-3 bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs text-white/90">
-              Klik op een tafel om de agenda te openen
+              Klik op tafel voor agenda · Sleep om te verplaatsen
             </div>
           </div>
         </div>
 
         {/* Agenda paneel */}
         {selectedTable && (
-          <div className="w-96 flex-shrink-0 bg-white rounded-2xl border-2 border-gray-200 flex flex-col overflow-hidden" style={{ height: CANVAS_HEIGHT }}>
-            {/* Agenda header */}
-            <div className="p-4 border-b border-gray-100 bg-gray-50">
-              <div className="flex items-center justify-between mb-3">
+          <div className="w-96 flex-shrink-0 bg-white rounded-2xl border-2 border-gray-200 flex flex-col" style={{ height: CANVAS_HEIGHT }}>
+            <div className="p-4 border-b bg-gray-50 flex-shrink-0">
+              <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="font-bold text-gray-900 text-lg">Tafel #{selectedTable.table_number}</h3>
-                  <p className="text-sm text-gray-500">{selectedTable.seats} plaatsen · {sections.find(s => s.id === selectedTable.section_id)?.name || 'Geen zone'}</p>
+                  <h3 className="font-bold text-lg text-gray-900">Tafel #{selectedTable.table_number}</h3>
+                  <p className="text-sm text-gray-500">{selectedTable.seats} pl. · {sections.find(s => s.id === selectedTable.section_id)?.name || 'Geen zone'}</p>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setResForm({ name: '', phone: '', email: '', guests: Math.min(selectedTable.seats, 2), date: agendaDate, time_from: '12:00', time_to: '14:00', notes: '', deposit_amount: 0, deposit_paid: false })
-                      setEditingReservation(null)
-                      setShowReservationForm(true)
-                    }}
-                    className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700"
-                  >
-                    + Reservatie
-                  </button>
-                  <button onClick={() => setSelectedTable(null)} className="p-1.5 hover:bg-gray-200 rounded-lg text-gray-500 text-lg leading-none">×</button>
+                <div className="flex gap-2 items-center">
+                  <button onClick={() => { setResForm({ ...emptyResForm(), guests: Math.min(selectedTable.seats, 2) }); setEditingRes(null); setShowResForm(true) }} className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700">+ Reservatie</button>
+                  <button onClick={() => setSelectedTable(null)} className="p-1.5 hover:bg-gray-200 rounded-lg text-gray-400 text-xl leading-none">×</button>
                 </div>
               </div>
-              {/* Datum selector */}
-              <input
-                type="date"
-                value={agendaDate}
-                onChange={e => setAgendaDate(e.target.value)}
-                className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
-              />
+              <input type="date" value={agendaDate} onChange={e => setAgendaDate(e.target.value)} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
             </div>
 
-            {/* Reservaties lijst */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {agendaReservations.length === 0 && (
-                <div className="text-center py-8 text-gray-400">
+              {visibleReservations.length === 0 ? (
+                <div className="text-center py-10 text-gray-400">
                   <span className="text-4xl block mb-2">📅</span>
-                  <p className="text-sm">Geen reservaties op {new Date(agendaDate + 'T12:00:00').toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-                  <button
-                    onClick={() => {
-                      setResForm({ name: '', phone: '', email: '', guests: Math.min(selectedTable.seats, 2), date: agendaDate, time_from: '12:00', time_to: '14:00', notes: '', deposit_amount: 0, deposit_paid: false })
-                      setEditingReservation(null)
-                      setShowReservationForm(true)
-                    }}
-                    className="mt-4 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-medium hover:bg-blue-100"
-                  >
-                    + Reservatie toevoegen
-                  </button>
+                  <p className="text-sm mb-4">{new Date(agendaDate + 'T12:00').toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+                  <p className="text-sm">Geen reservaties</p>
+                  <button onClick={() => { setResForm({ ...emptyResForm(), date: agendaDate }); setEditingRes(null); setShowResForm(true) }} className="mt-3 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-medium hover:bg-blue-100">+ Toevoegen</button>
                 </div>
-              )}
-
-              {agendaReservations.map(res => {
-                const isOccupied = res.is_occupied
-                const isCompleted = res.status === 'completed'
+              ) : visibleReservations.map(res => {
+                const occupied = res.is_occupied
+                const done = res.status === 'completed'
                 return (
-                  <div key={res.id} className={`rounded-2xl border-2 p-4 ${isOccupied ? 'border-red-200 bg-red-50' : isCompleted ? 'border-gray-200 bg-gray-50 opacity-60' : 'border-blue-200 bg-blue-50'}`}>
-                    {/* Tijdslot */}
+                  <div key={res.id} className={`rounded-2xl border-2 p-4 ${occupied ? 'border-red-200 bg-red-50' : done ? 'border-gray-200 bg-gray-50 opacity-60' : 'border-blue-200 bg-blue-50'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className={`text-lg font-black ${isOccupied ? 'text-red-700' : isCompleted ? 'text-gray-500' : 'text-blue-700'}`}>
+                      <span className={`text-base font-black ${occupied ? 'text-red-700' : done ? 'text-gray-500' : 'text-blue-700'}`}>
                         {res.time_from || res.reservation_time} → {res.time_to || '?'}
                       </span>
-                      {isOccupied && <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">BEZET</span>}
-                      {isCompleted && <span className="bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">VRIJGEGEVEN</span>}
-                      {!isOccupied && !isCompleted && <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">BEVESTIGD</span>}
+                      {occupied && <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">BEZET</span>}
+                      {done && <span className="bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">VRIJ</span>}
+                      {!occupied && !done && <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">BEVESTIGD</span>}
                     </div>
-
-                    {/* Klant info */}
-                    <div className="space-y-1 mb-3">
-                      <p className="font-bold text-gray-900">{res.name}</p>
-                      <p className="text-sm text-gray-600">📱 {res.phone || '—'}</p>
-                      <p className="text-sm text-gray-600">👥 {res.guests} personen</p>
-                      {res.deposit_amount > 0 && (
-                        <p className={`text-sm font-medium ${res.deposit_paid ? 'text-green-700' : 'text-amber-700'}`}>
-                          💳 Voorschot €{res.deposit_amount} {res.deposit_paid ? '✓ betaald' : '— openstaand'}
-                        </p>
-                      )}
-                      {res.notes && <p className="text-xs text-gray-500 italic mt-1">"{res.notes}"</p>}
+                    <p className="font-bold text-gray-900">{res.name}</p>
+                    <div className="text-sm text-gray-600 space-y-0.5 mt-1">
+                      {res.phone && <p>📱 {res.phone}</p>}
+                      <p>👥 {res.guests} personen</p>
+                      {res.deposit_amount > 0 && <p className={res.deposit_paid ? 'text-green-700 font-medium' : 'text-amber-700 font-medium'}>💳 Voorschot €{res.deposit_amount} {res.deposit_paid ? '✓' : '— openstaand'}</p>}
+                      {res.notes && <p className="text-xs italic text-gray-500">&quot;{res.notes}&quot;</p>}
                     </div>
-
-                    {/* Actieknoppen */}
-                    {!isCompleted && (
-                      <div className="flex gap-2">
-                        {!isOccupied && (
-                          <button onClick={() => markOccupied(res)} className="flex-1 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors">
-                            🔴 Gasten aanwezig
-                          </button>
-                        )}
-                        {isOccupied && (
-                          <button onClick={() => releaseTable(res)} className="flex-1 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 transition-colors">
-                            ✓ Tafel vrijgeven
-                          </button>
-                        )}
-                        <button
-                          onClick={() => {
-                            setResForm({ name: res.name, phone: res.phone, email: res.email, guests: res.guests, date: res.reservation_date, time_from: res.time_from || res.reservation_time, time_to: res.time_to || '', notes: res.notes || '', deposit_amount: res.deposit_amount, deposit_paid: res.deposit_paid })
-                            setEditingReservation(res)
-                            setShowReservationForm(true)
-                          }}
-                          className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-50"
-                        >✏️</button>
-                        <button onClick={() => cancelReservation(res)} className="px-3 py-1.5 bg-white border border-red-200 text-red-500 rounded-lg text-xs font-medium hover:bg-red-50">✕</button>
+                    {!done && (
+                      <div className="flex gap-2 mt-3">
+                        {!occupied
+                          ? <button onClick={() => markOccupied(res)} className="flex-1 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700">🔴 Gasten aanwezig</button>
+                          : <button onClick={() => releaseTable(res)} className="flex-1 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700">✓ Tafel vrijgeven</button>
+                        }
+                        <button onClick={() => { setResForm({ name: res.name, phone: res.phone, email: res.email, guests: res.guests, date: res.reservation_date, time_from: res.time_from || res.reservation_time, time_to: res.time_to || '', notes: res.notes || '', deposit_amount: res.deposit_amount, deposit_paid: res.deposit_paid }); setEditingRes(res); setShowResForm(true) }} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs hover:bg-gray-50">✏️</button>
+                        <button onClick={() => cancelReservation(res)} className="px-3 py-1.5 bg-white border border-red-200 text-red-500 rounded-lg text-xs hover:bg-red-50">✕</button>
                       </div>
                     )}
                   </div>
@@ -488,26 +427,21 @@ export default function TafelplanPage() {
               })}
             </div>
 
-            {/* Footer: tafel verwijderen */}
-            <div className="p-3 border-t border-gray-100">
-              <button onClick={() => setShowDeleteTable(true)} className="w-full py-2 text-red-500 text-xs font-medium hover:bg-red-50 rounded-lg transition-colors">
-                🗑️ Tafel verwijderen
-              </button>
+            <div className="p-3 border-t flex-shrink-0">
+              <button onClick={() => setShowDeleteTable(true)} className="w-full py-2 text-red-400 text-xs font-medium hover:bg-red-50 rounded-lg">🗑️ Tafel verwijderen</button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Modal: Zone toevoegen */}
+      {/* Modal: Zone */}
       {showAddSection && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowAddSection(false)}>
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
             <h3 className="text-xl font-bold mb-4">Zone toevoegen</h3>
             <div className="space-y-4">
               <input autoFocus value={sectionForm.name} onChange={e => setSectionForm(p => ({ ...p, name: e.target.value }))} onKeyDown={e => e.key === 'Enter' && addSection()} placeholder="bv. Terras, Binnen, VIP..." className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500" />
-              <div className="flex gap-2 flex-wrap">
-                {SECTION_COLORS.map(c => <button key={c} onClick={() => setSectionForm(p => ({ ...p, color: c }))} className="w-8 h-8 rounded-full transition-transform hover:scale-110" style={{ backgroundColor: c, outline: sectionForm.color === c ? '3px solid #1E3A5F' : 'none', outlineOffset: '2px' }} />)}
-              </div>
+              <div className="flex gap-2 flex-wrap">{SECTION_COLORS.map(c => <button key={c} onClick={() => setSectionForm(p => ({ ...p, color: c }))} className="w-8 h-8 rounded-full hover:scale-110 transition-transform" style={{ backgroundColor: c, outline: sectionForm.color === c ? '3px solid #1E3A5F' : 'none', outlineOffset: 2 }} />)}</div>
               <div className="flex gap-3"><button onClick={() => setShowAddSection(false)} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-700">Annuleren</button><button onClick={addSection} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold">Toevoegen</button></div>
             </div>
           </div>
@@ -520,9 +454,9 @@ export default function TafelplanPage() {
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
             <h3 className="text-xl font-bold mb-4">Tafel toevoegen</h3>
             <div className="space-y-4">
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Tafelnummer</label><input autoFocus value={tableForm.table_number} onChange={e => setTableForm(p => ({ ...p, table_number: e.target.value }))} placeholder="bv. 1, 2, T1..." className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500" /></div>
+              <div><label className="block text-sm font-medium text-gray-700 mb-1">Tafelnummer</label><input autoFocus value={tableForm.table_number} onChange={e => setTableForm(p => ({ ...p, table_number: e.target.value }))} placeholder="1, 2, T1..." className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500" /></div>
               <div><label className="block text-sm font-medium text-gray-700 mb-2">Plaatsen</label>
-                <div className="flex items-center gap-4"><button onClick={() => setTableForm(p => ({ ...p, seats: Math.max(1, p.seats - 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl hover:bg-gray-200">−</button><span className="text-3xl font-bold w-10 text-center">{tableForm.seats}</span><button onClick={() => setTableForm(p => ({ ...p, seats: Math.min(20, p.seats + 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl hover:bg-gray-200">+</button></div>
+                <div className="flex items-center gap-4"><button onClick={() => setTableForm(p => ({ ...p, seats: Math.max(1, p.seats - 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">−</button><span className="text-3xl font-bold w-10 text-center">{tableForm.seats}</span><button onClick={() => setTableForm(p => ({ ...p, seats: Math.min(20, p.seats + 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">+</button></div>
               </div>
               <div><label className="block text-sm font-medium text-gray-700 mb-2">Vorm</label>
                 <div className="grid grid-cols-3 gap-2">{(['square','round','rectangle'] as const).map(s => <button key={s} onClick={() => setTableForm(p => ({ ...p, shape: s }))} className={`py-3 rounded-xl text-sm font-medium border-2 ${tableForm.shape === s ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600'}`}>{s === 'square' ? '⬛ Vierkant' : s === 'round' ? '⚫ Rond' : '▬ Rechthoek'}</button>)}</div>
@@ -534,19 +468,19 @@ export default function TafelplanPage() {
         </div>
       )}
 
-      {/* Modal: Reservatie toevoegen/bewerken */}
-      {showReservationForm && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowReservationForm(false)}>
+      {/* Modal: Reservatie */}
+      {showResForm && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowResForm(false)}>
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl overflow-y-auto max-h-[90vh]" onClick={e => e.stopPropagation()}>
-            <h3 className="text-xl font-bold mb-4">{editingReservation ? 'Reservatie bewerken' : `Nieuwe reservatie — Tafel #${selectedTable?.table_number}`}</h3>
+            <h3 className="text-xl font-bold mb-4">{editingRes ? 'Reservatie bewerken' : `Nieuwe reservatie — Tafel #${selectedTable?.table_number}`}</h3>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Naam *</label><input autoFocus value={resForm.name} onChange={e => setResForm(p => ({ ...p, name: e.target.value }))} placeholder="Voornaam Naam" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Telefoon</label><input value={resForm.phone} onChange={e => setResForm(p => ({ ...p, phone: e.target.value }))} placeholder="+32 4xx xx xx xx" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
+                <div><label className="block text-sm font-medium text-gray-700 mb-1">Telefoon</label><input value={resForm.phone} onChange={e => setResForm(p => ({ ...p, phone: e.target.value }))} placeholder="+32 4xx..." className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
               </div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" value={resForm.email} onChange={e => setResForm(p => ({ ...p, email: e.target.value }))} placeholder="naam@email.com" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-2">Aantal personen</label>
-                <div className="flex items-center gap-4"><button onClick={() => setResForm(p => ({ ...p, guests: Math.max(1, p.guests - 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl hover:bg-gray-200">−</button><span className="text-2xl font-bold w-8 text-center">{resForm.guests}</span><button onClick={() => setResForm(p => ({ ...p, guests: Math.min(selectedTable?.seats || 20, p.guests + 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl hover:bg-gray-200">+</button><span className="text-sm text-gray-500">max {selectedTable?.seats} plaatsen</span></div>
+              <div><label className="block text-sm font-medium text-gray-700 mb-2">Personen</label>
+                <div className="flex items-center gap-4"><button onClick={() => setResForm(p => ({ ...p, guests: Math.max(1, p.guests - 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">−</button><span className="text-2xl font-bold w-8 text-center">{resForm.guests}</span><button onClick={() => setResForm(p => ({ ...p, guests: Math.min(selectedTable?.seats || 20, p.guests + 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">+</button><span className="text-sm text-gray-400">max {selectedTable?.seats}</span></div>
               </div>
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Datum</label><input type="date" value={resForm.date} onChange={e => setResForm(p => ({ ...p, date: e.target.value }))} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
               <div className="grid grid-cols-2 gap-3">
@@ -556,10 +490,10 @@ export default function TafelplanPage() {
               <div><label className="block text-sm font-medium text-gray-700 mb-1">Notities</label><textarea value={resForm.notes} onChange={e => setResForm(p => ({ ...p, notes: e.target.value }))} placeholder="Allergieën, speciale wensen..." rows={2} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500 resize-none" /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-sm font-medium text-gray-700 mb-1">Voorschot (€)</label><input type="number" min="0" step="5" value={resForm.deposit_amount || ''} onChange={e => setResForm(p => ({ ...p, deposit_amount: Number(e.target.value) }))} placeholder="0" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
-                <div className="flex items-end pb-2"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={resForm.deposit_paid} onChange={e => setResForm(p => ({ ...p, deposit_paid: e.target.checked }))} className="w-5 h-5 rounded" /><span className="text-sm font-medium text-gray-700">Voorschot betaald</span></label></div>
+                <div className="flex items-end pb-2"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={resForm.deposit_paid} onChange={e => setResForm(p => ({ ...p, deposit_paid: e.target.checked }))} className="w-5 h-5 rounded" /><span className="text-sm font-medium text-gray-700">Betaald</span></label></div>
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => { setShowReservationForm(false); setEditingReservation(null) }} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-700">Annuleren</button>
+                <button onClick={() => { setShowResForm(false); setEditingRes(null) }} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-700">Annuleren</button>
                 <button onClick={saveReservation} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700">Opslaan</button>
               </div>
             </div>
@@ -571,10 +505,10 @@ export default function TafelplanPage() {
       {showDeleteTable && selectedTable && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowDeleteTable(false)}>
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl text-center" onClick={e => e.stopPropagation()}>
-            <span className="text-5xl mb-4 block">🗑️</span>
+            <span className="text-5xl block mb-4">🗑️</span>
             <h3 className="text-xl font-bold mb-2">Tafel #{selectedTable.table_number} verwijderen?</h3>
-            <p className="text-gray-600 mb-6">Dit kan niet ongedaan gemaakt worden.</p>
-            <div className="flex gap-3"><button onClick={() => setShowDeleteTable(false)} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-700">Annuleren</button><button onClick={deleteTable} className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold">Verwijderen</button></div>
+            <p className="text-gray-600 mb-6">Dit kan niet ongedaan worden gemaakt.</p>
+            <div className="flex gap-3"><button onClick={() => setShowDeleteTable(false)} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium">Annuleren</button><button onClick={deleteTable} className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold">Verwijderen</button></div>
           </div>
         </div>
       )}
