@@ -79,6 +79,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all')
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [archiveMode, setArchiveMode] = useState(false)
+  const [archivePeriod, setArchivePeriod] = useState<'dag' | 'week' | 'maand' | 'jaar'>('dag')
+  const [archiveDate, setArchiveDate] = useState(() => new Date().toISOString().split('T')[0])
+  const [archiveOrders, setArchiveOrders] = useState<Order[]>([])
+  const [archiveLoading, setArchiveLoading] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [kitchenMode, setKitchenMode] = useState(false)
@@ -228,6 +233,36 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setTenantSettings(settingsData)
     setLoading(false)
   }, [params.tenant])
+
+  // Archief laden op basis van geselecteerde periode
+  const loadArchive = useCallback(async () => {
+    setArchiveLoading(true)
+    const d = new Date(archiveDate)
+    let from: Date, to: Date
+
+    if (archivePeriod === 'dag') {
+      from = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0)
+      to = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1, 12, 0, 0) // fiscale dag tot 12u
+    } else if (archivePeriod === 'week') {
+      const day = d.getDay() || 7
+      from = new Date(d.getFullYear(), d.getMonth(), d.getDate() - day + 1, 0, 0, 0)
+      to = new Date(from.getFullYear(), from.getMonth(), from.getDate() + 8, 0, 0, 0)
+    } else if (archivePeriod === 'maand') {
+      from = new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0)
+      to = new Date(d.getFullYear(), d.getMonth() + 1, 1, 12, 0, 0)
+    } else {
+      from = new Date(d.getFullYear(), 0, 1, 0, 0, 0)
+      to = new Date(d.getFullYear() + 1, 0, 1, 0, 0, 0)
+    }
+
+    const data = await getOrders(params.tenant, undefined, from.toISOString(), to.toISOString())
+    setArchiveOrders(data)
+    setArchiveLoading(false)
+  }, [params.tenant, archivePeriod, archiveDate])
+
+  useEffect(() => {
+    if (archiveMode) loadArchive()
+  }, [archiveMode, archivePeriod, archiveDate, loadArchive])
 
   useEffect(() => {
     loadOrders()
@@ -953,6 +988,16 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             🔊
           </button>
 
+          {/* Archief */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setArchiveMode(!archiveMode)}
+            className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${archiveMode ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+          >
+            📚 Archief
+          </motion.button>
+
           {/* Kitchen mode */}
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -990,6 +1035,103 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           </div>
         </div>
       </div>
+
+      {/* ARCHIEF */}
+      {archiveMode && (
+        <div className="mb-8 bg-white rounded-2xl shadow-sm p-6">
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            <h2 className="text-lg font-bold text-gray-900">📚 Archief bestellingen</h2>
+            {/* Periode tabs */}
+            <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+              {(['dag', 'week', 'maand', 'jaar'] as const).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setArchivePeriod(p)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors capitalize ${
+                    archivePeriod === p ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  {p.charAt(0).toUpperCase() + p.slice(1)}
+                </button>
+              ))}
+            </div>
+            {/* Datum kiezen */}
+            <input
+              type="date"
+              value={archiveDate}
+              onChange={e => setArchiveDate(e.target.value)}
+              max={new Date().toISOString().split('T')[0]}
+              className="px-3 py-2 border border-gray-200 rounded-xl text-sm"
+            />
+            <button onClick={loadArchive} className="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-xl text-sm font-medium">
+              🔄 Vernieuwen
+            </button>
+          </div>
+
+          {archiveLoading ? (
+            <div className="text-center py-8 text-gray-400">Laden...</div>
+          ) : archiveOrders.length === 0 ? (
+            <div className="text-center py-12">
+              <span className="text-5xl block mb-3">📭</span>
+              <p className="text-gray-500">Geen bestellingen gevonden voor deze periode</p>
+            </div>
+          ) : (
+            <>
+              {/* Samenvatting */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="bg-blue-50 rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-blue-700">{archiveOrders.length}</p>
+                  <p className="text-sm text-gray-500">Bestellingen</p>
+                </div>
+                <div className="bg-green-50 rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-green-700">
+                    €{archiveOrders.reduce((s, o) => s + (o.total || 0), 0).toFixed(2)}
+                  </p>
+                  <p className="text-sm text-gray-500">Totale omzet</p>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-gray-700">
+                    €{archiveOrders.length > 0 ? (archiveOrders.reduce((s, o) => s + (o.total || 0), 0) / archiveOrders.length).toFixed(2) : '0.00'}
+                  </p>
+                  <p className="text-sm text-gray-500">Gemiddelde</p>
+                </div>
+              </div>
+
+              {/* Bestellingen lijst */}
+              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                {archiveOrders.map(order => {
+                  const status = order.status?.toLowerCase() || 'new'
+                  const config = statusConfig[status] || statusConfig.new
+                  return (
+                    <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-gray-900">#{order.order_number || order.id?.slice(0, 6)}</span>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
+                          {config.label}
+                        </span>
+                        <span className="text-sm text-gray-600">{order.customer_name}</span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(order.created_at || '').toLocaleString('nl-BE')}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-gray-900">€{order.total?.toFixed(2)}</span>
+                        <button
+                          onClick={() => printReceipt(order)}
+                          className="p-2 bg-white hover:bg-gray-100 rounded-lg text-sm border border-gray-200"
+                          title="Kassabon afdrukken"
+                        >
+                          🖨️
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       {/* New orders alert */}
       {newCount > 0 && (

@@ -1435,7 +1435,7 @@ export interface Order {
   items?: OrderItem[] | { name: string; quantity: number; price: number }[]
 }
 
-export async function getOrders(tenantSlug: string, status?: string): Promise<Order[]> {
+export async function getOrders(tenantSlug: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Order[]> {
   let query = supabase
     .from('orders')
     .select('*')
@@ -1444,13 +1444,18 @@ export async function getOrders(tenantSlug: string, status?: string): Promise<Or
   
   if (status && status !== 'all') {
     if (status === 'active') {
-      query = query.not('status', 'in', '("completed","cancelled")')
+      query = query.not('status', 'in', '("completed","cancelled","rejected")')
     } else {
       query = query.eq('status', status)
     }
   }
-  
-  const { data, error } = await query.limit(100)
+
+  // Archief: filter op datumbereik
+  if (dateFrom) query = query.gte('created_at', dateFrom)
+  if (dateTo) query = query.lte('created_at', dateTo)
+
+  const limit = dateFrom ? 500 : 100
+  const { data, error } = await query.limit(limit)
   
   if (error) {
     console.error('Error fetching orders:', error)
