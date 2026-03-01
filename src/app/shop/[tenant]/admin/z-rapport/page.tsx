@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings, getDateBoundsForBelgium, getBelgiumDateString } from '@/lib/admin-api'
+import { getTenantSettings, getZRapportDateBounds, getBelgiumDateString } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 
-// KRITIEK: Hash functie voor integriteitsverificatie (fiscale compliance)
+// SHA-256 hash voor integriteitsverificatie (GKS compliance)
 async function generateReportHash(data: {
   tenant: string
   date: string
@@ -18,11 +18,10 @@ async function generateReportHash(data: {
     tenant: data.tenant,
     date: data.date,
     orderCount: data.orderCount,
-    total: Math.round(data.total * 100), // Cents voor precisie
-    orderIds: data.orderIds.sort(), // Sorteer voor consistentie
-    version: 'v1' // Versie voor toekomstige updates
+    total: Math.round(data.total * 100),
+    orderIds: data.orderIds.sort(),
+    version: 'v1'
   })
-  
   const encoder = new TextEncoder()
   const dataBuffer = encoder.encode(hashInput)
   const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
@@ -41,7 +40,7 @@ interface DailyStats {
   cashPayments: number
   onlinePayments: number
   cardPayments: number
-  orderIds: string[] // KRITIEK: Audit trail voor fiscale compliance
+  orderIds: string[]
 }
 
 interface SavedReport {
@@ -52,20 +51,24 @@ interface SavedReport {
   generated_at: string
   order_ids?: string[]
   report_hash?: string
+  is_closed?: boolean
+  closed_at?: string
 }
 
 export default function ZRapportPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [syncing, setSyncing] = useState(false)
-  // Get today's date in local timezone (not UTC)
+  const [closing, setClosing] = useState(false)
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false)
+
   const getLocalDateString = (date: Date = new Date()) => {
     const year = date.getFullYear()
     const month = String(date.getMonth() + 1).padStart(2, '0')
     const day = String(date.getDate()).padStart(2, '0')
     return `${year}-${month}-${day}`
   }
-  
+
   const [selectedDate, setSelectedDate] = useState(getLocalDateString())
   const [stats, setStats] = useState<DailyStats | null>(null)
   const [businessInfo, setBusinessInfo] = useState<any>(null)
@@ -75,6 +78,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const [showEmailModal, setShowEmailModal] = useState(false)
   const [emailAddress, setEmailAddress] = useState('')
   const [sendingEmail, setSendingEmail] = useState(false)
+  const [currentSavedReport, setCurrentSavedReport] = useState<SavedReport | null>(null)
 
   useEffect(() => {
     loadData()
@@ -82,17 +86,23 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant, selectedDate])
 
+  // Houd huidige opgeslagen rapport bij voor is_closed check
+  useEffect(() => {
+    const found = savedReports.find(r => r.report_date === selectedDate) || null
+    setCurrentSavedReport(found)
+  }, [savedReports, selectedDate])
+
   const loadData = async () => {
     setLoading(true)
-    
+
     const settings = await getTenantSettings(params.tenant)
     if (settings) {
       setBusinessInfo(settings)
       setBtwPercentage(settings.btw_percentage || 6)
     }
 
-    // KRITIEK: Gebruik Belgium timezone voor correcte dag grenzen
-    const { startUTC, endUTC } = getDateBoundsForBelgium(selectedDate)
+    // KRITIEK: Fiscale daggrens = 00:00 tot 12:00 de VOLGENDE dag (GKS compliant)
+    const { startUTC, endUTC } = getZRapportDateBounds(selectedDate)
 
     const { data: orders } = await supabase
       .from('orders')
@@ -100,10 +110,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       .eq('tenant_slug', params.tenant)
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
-      // KRITIEK: Alleen 'completed' orders meetellen voor fiscale compliance
-      // Andere statussen (confirmed, preparing, ready) kunnen nog geweigerd worden!
+      // KRITIEK: Alleen 'completed' orders voor fiscale compliance
       .eq('status', 'completed')
-
 
     if (orders) {
       let total = 0
@@ -113,12 +121,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       const orderIds: string[] = []
 
       orders.forEach(order => {
-        // KRITIEK: Bewaar order ID voor audit trail
         orderIds.push(order.id)
-        
         const orderTotal = order.total || 0
         total += orderTotal
-        
         const paymentMethod = (order.payment_method || '').toLowerCase()
         if (paymentMethod === 'cash' || paymentMethod === 'contant') {
           cashPayments += orderTotal
@@ -144,7 +149,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         cashPayments,
         onlinePayments,
         cardPayments,
-        orderIds, // KRITIEK: Audit trail
+        orderIds,
       })
     }
 
@@ -154,43 +159,34 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   const loadSavedReports = async () => {
     const { data } = await supabase
       .from('z_reports')
-      .select('id, report_date, order_count, total, generated_at, order_ids, report_hash')
+      .select('id, report_date, order_count, total, generated_at, order_ids, report_hash, is_closed, closed_at')
       .eq('tenant_slug', params.tenant)
       .order('report_date', { ascending: false })
       .limit(100)
 
-    if (data) {
-      setSavedReports(data)
-    }
+    if (data) setSavedReports(data)
   }
 
-  // Refresh data
   const refreshData = () => {
     loadData()
     loadSavedReports()
   }
 
-  // Synchroniseer rapport met database (voor als automatische update niet heeft gewerkt)
+  // Opslaan (kan meerdere keren, tot dag is afgesloten)
   const syncReport = async () => {
     if (!stats || stats.orderCount === 0) return
-    
+    if (currentSavedReport?.is_closed) return // Geblokkeerd voor gesloten dag
+
     setSyncing(true)
-    
-    // Genereer hash
-    const hashInput = JSON.stringify({
+
+    const reportHash = await generateReportHash({
       tenant: params.tenant,
       date: selectedDate,
       orderCount: stats.orderCount,
-      total: Math.round(stats.total * 100),
-      orderIds: stats.orderIds.sort(),
-      version: 'v1'
+      total: stats.total,
+      orderIds: stats.orderIds,
     })
-    const encoder = new TextEncoder()
-    const dataBuffer = encoder.encode(hashInput)
-    const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const reportHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-    
+
     const { error } = await supabase
       .from('z_reports')
       .upsert({
@@ -216,33 +212,86 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         onConflict: 'tenant_slug,report_date',
         ignoreDuplicates: false
       })
-    
+
     if (!error) {
-      loadSavedReports()
+      await loadSavedReports()
     } else {
-      console.error('Sync error:', error)
-      alert('Fout bij synchroniseren: ' + error.message)
+      alert('Fout bij opslaan: ' + error.message)
     }
-    
+
     setSyncing(false)
+  }
+
+  // DAG AFSLUITEN — onomkeerbaar, GKS compliant
+  const closeDay = async () => {
+    if (!stats) return
+    setClosing(true)
+
+    // Eerst opslaan met huidige data
+    const reportHash = await generateReportHash({
+      tenant: params.tenant,
+      date: selectedDate,
+      orderCount: stats.orderCount,
+      total: stats.total,
+      orderIds: stats.orderIds,
+    })
+
+    const closedAt = new Date().toISOString()
+
+    const { error } = await supabase
+      .from('z_reports')
+      .upsert({
+        tenant_slug: params.tenant,
+        report_date: selectedDate,
+        order_count: stats.orderCount,
+        subtotal: stats.subtotal,
+        tax_low: stats.taxLow,
+        tax_mid: stats.taxMid,
+        tax_high: stats.taxHigh,
+        total: stats.total,
+        cash_payments: stats.cashPayments,
+        card_payments: stats.cardPayments,
+        online_payments: stats.onlinePayments,
+        btw_percentage: btwPercentage,
+        business_name: businessInfo?.business_name,
+        business_address: businessInfo?.address,
+        btw_number: businessInfo?.btw_number,
+        order_ids: stats.orderIds,
+        report_hash: reportHash,
+        generated_at: closedAt,
+        is_closed: true,   // KRITIEK: Dag definitief afgesloten
+        closed_at: closedAt,
+      }, {
+        onConflict: 'tenant_slug,report_date',
+        ignoreDuplicates: false
+      })
+
+    if (!error) {
+      await loadSavedReports()
+      setShowCloseConfirm(false)
+    } else {
+      alert('Fout bij afsluiten: ' + error.message)
+    }
+
+    setClosing(false)
   }
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    return date.toLocaleDateString('nl-BE', { 
-      weekday: 'long', 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
+    return date.toLocaleDateString('nl-BE', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
     })
   }
 
   const formatShortDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    return date.toLocaleDateString('nl-BE', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric' 
+    return date.toLocaleDateString('nl-BE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
     })
   }
 
@@ -250,12 +299,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
   const printZRapport = () => window.print()
 
-  // Genereer HTML voor PDF/email
   const generateReportHTML = () => {
     if (!stats) return ''
-    
-    const taxRate = btwPercentage / 100
-    
     return `
       <!DOCTYPE html>
       <html>
@@ -272,6 +317,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           .row { display: flex; justify-content: space-between; font-size: 14px; margin: 5px 0; }
           .total-row { font-weight: bold; font-size: 16px; border-top: 2px solid #000; padding-top: 10px; margin-top: 10px; }
           .footer { text-align: center; font-size: 10px; color: #666; border-top: 2px dashed #000; margin-top: 20px; padding-top: 15px; }
+          .closed-badge { background: #16a34a; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; }
         </style>
       </head>
       <body>
@@ -279,10 +325,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <h1>${businessInfo?.business_name || 'Z-Rapport'}</h1>
           <p>${businessInfo?.address || ''}</p>
           ${businessInfo?.btw_number ? `<p>BTW: ${businessInfo.btw_number}</p>` : ''}
-          <p style="margin-top: 10px; font-weight: bold;">Z-RAPPORT</p>
+          <p style="margin-top: 10px; font-weight: bold;">Z-RAPPORT ONLINE VERKOPEN</p>
           <p>${formatDate(selectedDate)}</p>
+          ${currentSavedReport?.is_closed ? `<p><span class="closed-badge">✓ AFGESLOTEN</span></p>` : ''}
         </div>
-        
         <div class="section">
           <div class="section-title">OMZET</div>
           <div class="row"><span>Aantal transacties:</span><span>${stats.orderCount}</span></div>
@@ -290,24 +336,24 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           <div class="row"><span>BTW ${btwPercentage}%:</span><span>${formatCurrency(stats.total - stats.subtotal)}</span></div>
           <div class="row total-row"><span>TOTAAL:</span><span>${formatCurrency(stats.total)}</span></div>
         </div>
-        
         <div class="section">
           <div class="section-title">BETALINGEN</div>
           <div class="row"><span>Contant:</span><span>${formatCurrency(stats.cashPayments)}</span></div>
           <div class="row"><span>PIN/Kaart:</span><span>${formatCurrency(stats.cardPayments)}</span></div>
           <div class="row"><span>Online:</span><span>${formatCurrency(stats.onlinePayments)}</span></div>
         </div>
-        
         <div class="footer">
-          <p>Gegenereerd: ${new Date().toLocaleString('nl-NL')}</p>
-          <p>Dit is een officieel kassarapport</p>
+          <p>Dagperiode: ${formatShortDate(selectedDate)} 00:00 t/m ${formatShortDate(selectedDate)} +1dag 12:00</p>
+          <p>Gegenereerd: ${new Date().toLocaleString('nl-BE')}</p>
+          ${currentSavedReport?.closed_at ? `<p>Afgesloten: ${new Date(currentSavedReport.closed_at).toLocaleString('nl-BE')}</p>` : ''}
+          <p>Hash: ${currentSavedReport?.report_hash?.substring(0, 16) || 'n.v.t.'}...</p>
+          <p>Vysion Horeca - ordervysion.com</p>
         </div>
       </body>
       </html>
     `
   }
 
-  // Download als PDF (via print dialog met Save as PDF)
   const downloadPDF = () => {
     const html = generateReportHTML()
     const printWindow = window.open('', '_blank')
@@ -315,18 +361,13 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       printWindow.document.write(html)
       printWindow.document.close()
       printWindow.focus()
-      setTimeout(() => {
-        printWindow.print()
-      }, 250)
+      setTimeout(() => printWindow.print(), 250)
     }
   }
 
-  // Verstuur per e-mail
   const sendEmailReport = async () => {
     if (!emailAddress || !stats) return
-    
     setSendingEmail(true)
-    
     try {
       const response = await fetch('/api/send-z-report', {
         method: 'POST',
@@ -349,7 +390,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           onlinePayments: stats.onlinePayments,
         })
       })
-      
       if (response.ok) {
         alert('Z-Rapport verzonden naar ' + emailAddress)
         setShowEmailModal(false)
@@ -358,10 +398,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         const error = await response.json()
         alert('Fout bij verzenden: ' + (error.message || 'Onbekende fout'))
       }
-    } catch (error) {
+    } catch {
       alert('Fout bij verzenden. Probeer opnieuw.')
     }
-    
     setSendingEmail(false)
   }
 
@@ -376,10 +415,10 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
     const date = new Date(y, m - 1, d + 1)
     const today = getLocalDateString()
     const newDate = getLocalDateString(date)
-    if (newDate <= today) {
-      setSelectedDate(newDate)
-    }
+    if (newDate <= today) setSelectedDate(newDate)
   }
+
+  const isDayClosed = currentSavedReport?.is_closed === true
 
   if (loading) {
     return (
@@ -399,12 +438,12 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8 print:hidden">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8 print:hidden">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">🧾 {t('zReport.title')}</h1>
-          <p className="text-gray-500">{t('zReport.subtitle')}</p>
+          <p className="text-gray-500 text-sm">{t('zReport.subtitle')} · Fiscale dag: 00:00 t/m +1dag 12:00u</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setShowHistory(!showHistory)}
             className={`px-4 py-2 rounded-xl font-medium flex items-center gap-2 ${
@@ -413,10 +452,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           >
             📚 {t('zReport.history')}
           </button>
-          <button
-            onClick={printZRapport}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-medium flex items-center gap-2"
-          >
+          <button onClick={printZRapport} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-medium flex items-center gap-2">
             🖨️ {t('zReport.print')}
           </button>
           <button
@@ -427,10 +463,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             📄 PDF
           </button>
           <button
-            onClick={() => {
-              setEmailAddress(businessInfo?.email || '')
-              setShowEmailModal(true)
-            }}
+            onClick={() => { setEmailAddress(businessInfo?.email || ''); setShowEmailModal(true) }}
             disabled={!stats || stats.orderCount === 0}
             className="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-600 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50"
           >
@@ -443,15 +476,30 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           >
             🔄 {t('zReport.refresh')}
           </button>
+          {/* OPSLAAN — geblokkeerd als dag afgesloten */}
           <button
             onClick={syncReport}
-            disabled={syncing || !stats || stats.orderCount === 0}
-            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium flex items-center gap-2 disabled:bg-gray-300"
+            disabled={syncing || !stats || stats.orderCount === 0 || isDayClosed}
+            title={isDayClosed ? 'Dag is afgesloten — kan niet meer gewijzigd worden' : 'Rapport opslaan in archief'}
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium flex items-center gap-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {syncing ? '⏳' : '💾'} {t('zReport.sync')}
           </button>
         </div>
       </div>
+
+      {/* Gesloten dag banner */}
+      {isDayClosed && (
+        <div className="mb-6 p-4 bg-green-50 border-2 border-green-300 rounded-2xl flex items-center gap-3 print:hidden">
+          <span className="text-2xl">🔒</span>
+          <div>
+            <p className="font-bold text-green-800">Dag definitief afgesloten</p>
+            <p className="text-green-700 text-sm">
+              Afgesloten op {currentSavedReport?.closed_at ? new Date(currentSavedReport.closed_at).toLocaleString('nl-BE') : '—'} · Fiscale registratie immutabel (GKS compliant)
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Report */}
@@ -479,7 +527,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl shadow-lg overflow-hidden print:shadow-none"
           >
-            {/* Header */}
             <div className="bg-gray-900 text-white p-6 text-center">
               <h2 className="text-xl font-bold mb-1">{businessInfo?.business_name || 'Zaak'}</h2>
               <p className="text-gray-400 text-sm">{businessInfo?.address}</p>
@@ -488,17 +535,23 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               )}
             </div>
 
-            {/* Title */}
             <div className="border-b-2 border-dashed border-gray-300 p-6 text-center">
               <h3 className="text-2xl font-bold text-gray-900">{t('zReport.reportTitle')}</h3>
               <p className="text-lg text-gray-600">{t('zReport.onlineSales')}</p>
               <p className="text-gray-500 mt-2">{formatDate(selectedDate)}</p>
-              <span className="inline-block mt-2 px-3 py-1 bg-blue-100 text-blue-600 text-sm rounded-full">
-                🔄 {t('zReport.autoUpdated')}
-              </span>
+              <p className="text-xs text-gray-400 mt-1">Fiscale periode: 00:00u — +1dag 12:00u</p>
+              <div className="flex items-center justify-center gap-2 mt-2 flex-wrap">
+                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-600 text-sm rounded-full">
+                  🔄 {t('zReport.autoUpdated')}
+                </span>
+                {isDayClosed && (
+                  <span className="inline-block px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full font-medium">
+                    🔒 AFGESLOTEN
+                  </span>
+                )}
+              </div>
             </div>
 
-            {/* Stats */}
             {stats && stats.orderCount > 0 ? (
               <div className="p-6 space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -543,7 +596,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
                 <div className="space-y-2">
                   <h4 className="font-semibold text-gray-900 mb-3">{t('zReport.paymentMethods')}</h4>
-                  
                   {stats.onlinePayments > 0 && (
                     <div className="flex justify-between items-center py-2">
                       <span className="text-gray-600">💳 {t('zReport.onlinePaid')}</span>
@@ -570,6 +622,21 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   <p>{t('zReport.generatedOn')} {new Date().toLocaleString('nl-BE')}</p>
                   <p className="mt-1">Vysion Horeca - ordervysion.com</p>
                 </div>
+
+                {/* DAG AFSLUITEN KNOP */}
+                {!isDayClosed && (
+                  <div className="mt-6 pt-4 border-t-2 border-dashed border-gray-300 print:hidden">
+                    <button
+                      onClick={() => setShowCloseConfirm(true)}
+                      className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold text-lg rounded-xl flex items-center justify-center gap-3 transition-colors"
+                    >
+                      🔒 Dag afsluiten na shift
+                    </button>
+                    <p className="text-center text-xs text-gray-400 mt-2">
+                      ⚠️ Onomkeerbaar · Fiscale registratie wordt vergrendeld (GKS Belgische wetgeving)
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="p-12 text-center">
@@ -580,7 +647,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
             )}
           </motion.div>
 
-          {/* Instructions */}
+          {/* Instructies */}
           <div className="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-2xl print:hidden">
             <h3 className="font-semibold text-blue-900 mb-3">💡 {t('zReport.howToUse')}</h3>
             <ol className="text-blue-800 space-y-2 text-sm">
@@ -588,20 +655,21 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <li>2. {t('zReport.step2')}</li>
               <li>3. {t('zReport.step3')} <strong>{stats ? formatCurrency(stats.total) : '€0.00'}</strong></li>
               <li>4. {t('zReport.step4')} ({btwPercentage}%)</li>
+              <li>5. Klik op <strong>"Dag afsluiten"</strong> na je shift om de fiscale dag te vergrendelen</li>
             </ol>
             <p className="text-blue-600 text-xs mt-4">
-              ⚠️ {t('zReport.retention')}
+              ⚠️ Fiscale dag = 00:00u tot 12:00u de volgende dag · {t('zReport.retention')}
             </p>
           </div>
         </div>
 
-        {/* Sidebar - History */}
+        {/* Sidebar — Archief */}
         <div className={`lg:block ${showHistory ? 'block' : 'hidden'} print:hidden`}>
           <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-6">
             <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
               📚 {t('zReport.savedReports')}
             </h3>
-            
+
             {savedReports.length === 0 ? (
               <p className="text-gray-500 text-sm">{t('zReport.noSavedReports')}</p>
             ) : (
@@ -611,22 +679,27 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                     key={report.id}
                     onClick={() => setSelectedDate(report.report_date)}
                     className={`w-full text-left p-3 rounded-xl transition-colors ${
-                      report.report_date === selectedDate 
-                        ? 'bg-blue-100 border-2 border-blue-500' 
+                      report.report_date === selectedDate
+                        ? 'bg-blue-100 border-2 border-blue-500'
                         : 'bg-gray-50 hover:bg-gray-100'
                     }`}
                   >
                     <div className="flex justify-between items-center">
                       <span className="font-medium flex items-center gap-1">
                         {formatShortDate(report.report_date)}
-                        {report.report_hash && <span title="Geverifieerd" className="text-green-500">🔒</span>}
+                        {report.is_closed
+                          ? <span title="Dag afgesloten" className="text-green-600">🔒</span>
+                          : report.report_hash
+                            ? <span title="Geverifieerd" className="text-blue-500">✓</span>
+                            : null
+                        }
                       </span>
                       <span className="text-green-600 font-bold">{formatCurrency(report.total)}</span>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {report.order_count} {t('zReport.orders')}
-                      {report.order_ids && report.order_ids.length > 0 && (
-                        <span className="ml-1 text-green-600">• {report.order_ids.length} IDs</span>
+                    <div className="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                      <span>{report.order_count} {t('zReport.orders')}</span>
+                      {report.is_closed && (
+                        <span className="px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs">Afgesloten</span>
                       )}
                     </div>
                   </button>
@@ -636,14 +709,15 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
 
             <div className="mt-4 pt-4 border-t border-gray-100">
               <p className="text-xs text-gray-400">
-                {t('zReport.totalSaved')}: {savedReports.length}
+                {t('zReport.totalSaved')}: {savedReports.length} ·
+                Afgesloten: {savedReports.filter(r => r.is_closed).length}
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Print Styles */}
+      {/* Print stijlen */}
       <style jsx global>{`
         @media print {
           body * { visibility: hidden; }
@@ -652,6 +726,69 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           .print\\:hidden { display: none !important; }
         }
       `}</style>
+
+      {/* DAG AFSLUITEN bevestigingsmodal */}
+      <AnimatePresence>
+        {showCloseConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-md w-full p-6"
+            >
+              <div className="text-center mb-6">
+                <span className="text-5xl">🔒</span>
+                <h2 className="text-xl font-bold text-gray-900 mt-3">Dag afsluiten na shift</h2>
+                <p className="text-gray-500 text-sm mt-2">
+                  Je sluit de fiscale dag van <strong>{formatDate(selectedDate)}</strong> definitief af.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Bestellingen:</span>
+                  <span className="font-bold">{stats?.orderCount || 0}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Totaal omzet:</span>
+                  <span className="font-bold text-green-600">{formatCurrency(stats?.total || 0)}</span>
+                </div>
+              </div>
+
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-xs mb-6">
+                ⚠️ <strong>Onomkeerbaar!</strong> Na afsluiten kan dit rapport niet meer gewijzigd worden. Dit is vereist door de Belgische GKS-wetgeving (witte kassa).
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCloseConfirm(false)}
+                  disabled={closing}
+                  className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={closeDay}
+                  disabled={closing}
+                  className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold flex items-center justify-center gap-2"
+                >
+                  {closing ? (
+                    <><span className="animate-spin">⏳</span> Afsluiten...</>
+                  ) : (
+                    <>🔒 Bevestigen &amp; Afsluiten</>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Email Modal */}
       <AnimatePresence>
@@ -674,42 +811,25 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
               <p className="text-gray-500 text-sm mb-6">
                 Verstuur het Z-Rapport van {formatShortDate(selectedDate)} per e-mail
               </p>
-
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  E-mailadres
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">E-mailadres</label>
                 <input
                   type="email"
                   value={emailAddress}
                   onChange={(e) => setEmailAddress(e.target.value)}
-                  placeholder="email@voorbeeld.nl"
+                  placeholder="email@voorbeeld.be"
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
               {stats && (
                 <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Datum:</span>
-                    <span className="font-medium">{formatShortDate(selectedDate)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm mt-1">
-                    <span className="text-gray-600">Transacties:</span>
-                    <span className="font-medium">{stats.orderCount}</span>
-                  </div>
-                  <div className="flex justify-between text-sm mt-1">
-                    <span className="text-gray-600">Totaal:</span>
-                    <span className="font-bold text-green-600">{formatCurrency(stats.total)}</span>
-                  </div>
+                  <div className="flex justify-between text-sm"><span className="text-gray-600">Datum:</span><span className="font-medium">{formatShortDate(selectedDate)}</span></div>
+                  <div className="flex justify-between text-sm mt-1"><span className="text-gray-600">Transacties:</span><span className="font-medium">{stats.orderCount}</span></div>
+                  <div className="flex justify-between text-sm mt-1"><span className="text-gray-600">Totaal:</span><span className="font-bold text-green-600">{formatCurrency(stats.total)}</span></div>
                 </div>
               )}
-
               <div className="flex gap-3">
-                <button
-                  onClick={() => setShowEmailModal(false)}
-                  className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium"
-                >
+                <button onClick={() => setShowEmailModal(false)} className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium">
                   Annuleren
                 </button>
                 <button
@@ -717,13 +837,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   disabled={!emailAddress || sendingEmail}
                   className="flex-1 px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium disabled:bg-gray-300 flex items-center justify-center gap-2"
                 >
-                  {sendingEmail ? (
-                    <>
-                      <span className="animate-spin">⏳</span> Verzenden...
-                    </>
-                  ) : (
-                    <>📧 Versturen</>
-                  )}
+                  {sendingEmail ? <><span className="animate-spin">⏳</span> Verzenden...</> : <>📧 Versturen</>}
                 </button>
               </div>
             </motion.div>
