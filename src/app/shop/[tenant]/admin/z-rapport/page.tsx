@@ -485,6 +485,22 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
           >
             {syncing ? '⏳' : '💾'} {t('zReport.sync')}
           </button>
+          {/* AFSLUITEN — altijd zichtbaar naast opslaan */}
+          {isDayClosed ? (
+            <button
+              disabled
+              className="px-4 py-2 bg-gray-200 text-gray-500 rounded-xl font-medium flex items-center gap-2 cursor-not-allowed"
+            >
+              🔒 Afgesloten
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowCloseConfirm(true)}
+              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium flex items-center gap-2"
+            >
+              🔒 Afsluiten
+            </button>
+          )}
         </div>
       </div>
 
@@ -623,20 +639,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                   <p className="mt-1">Vysion Horeca - ordervysion.com</p>
                 </div>
 
-                {/* DAG AFSLUITEN KNOP */}
-                {!isDayClosed && (
-                  <div className="mt-6 pt-4 border-t-2 border-dashed border-gray-300 print:hidden">
-                    <button
-                      onClick={() => setShowCloseConfirm(true)}
-                      className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-bold text-lg rounded-xl flex items-center justify-center gap-3 transition-colors"
-                    >
-                      🔒 Dag afsluiten na shift
-                    </button>
-                    <p className="text-center text-xs text-gray-400 mt-2">
-                      ⚠️ Onomkeerbaar · Fiscale registratie wordt vergrendeld (GKS Belgische wetgeving)
-                    </p>
-                  </div>
-                )}
               </div>
             ) : (
               <div className="p-12 text-center">
@@ -645,6 +647,7 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
                 <p className="text-gray-500">{t('zReport.noOrdersDesc')}</p>
               </div>
             )}
+
           </motion.div>
 
           {/* Instructies */}
