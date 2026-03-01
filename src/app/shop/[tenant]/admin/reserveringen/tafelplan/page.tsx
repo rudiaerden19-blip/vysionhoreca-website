@@ -152,7 +152,7 @@ export default function TafelplanPage() {
     const sb = getSupabase(); if (!sb) return
     const { data } = await sb.from('reservations').select('*')
       .eq('tenant_slug', tenantSlug).eq('reservation_date', date)
-      .neq('status', 'cancelled')
+      .eq('status', 'confirmed')
     const map: Record<string, TableReservation[]> = {}
     for (const r of data || []) {
       if (r.table_id) {
@@ -167,6 +167,7 @@ export default function TafelplanPage() {
     const sb = getSupabase(); if (!sb) return
     const { data } = await sb.from('reservations').select('*')
       .eq('table_id', tableId).eq('reservation_date', date)
+      .in('status', ['confirmed', 'completed'])
       .order('time_from', { ascending: true })
     setAgendaReservations(data || [])
   }
@@ -269,12 +270,14 @@ export default function TafelplanPage() {
     await refreshAll()
   }
 
+  // Stap 1: Groen → Rood (gasten aangekomen)
   async function markOccupied(res: TableReservation) {
     const sb = getSupabase(); if (!sb) return
     await sb.from('reservations').update({ is_occupied: true }).eq('id', res.id)
     await refreshAll()
   }
 
+  // Stap 2: Rood → Tafel vrij (naar archief)
   async function releaseTable(res: TableReservation) {
     const sb = getSupabase(); if (!sb) return
     await sb.from('reservations').update({ is_occupied: false, status: 'completed', released_at: new Date().toISOString() }).eq('id', res.id)
@@ -292,7 +295,8 @@ export default function TafelplanPage() {
     return sections.find(s => s.id === t.section_id)?.color || '#6B7280'
   }
 
-  const visibleReservations = agendaReservations.filter(r => r.status !== 'cancelled')
+  const activeReservations = agendaReservations.filter(r => r.status === 'confirmed')
+  const archivedReservations = agendaReservations.filter(r => r.status === 'completed')
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -396,46 +400,68 @@ export default function TafelplanPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
-              {visibleReservations.length === 0 ? (
-                <div className="text-center py-10 text-gray-400">
+              {/* Actieve reservaties */}
+              {activeReservations.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
                   <span className="text-4xl block mb-2">📅</span>
-                  <p className="text-sm mb-4">{new Date(agendaDate + 'T12:00').toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-                  <p className="text-sm">Geen reservaties</p>
+                  <p className="text-sm mb-1">{new Date(agendaDate + 'T12:00').toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+                  <p className="text-sm">Geen actieve reservaties</p>
                   <button onClick={() => { setResForm({ ...emptyResForm(), date: agendaDate }); setEditingRes(null); setShowResForm(true) }} className="mt-3 px-4 py-2 bg-blue-50 text-blue-700 rounded-xl text-sm font-medium hover:bg-blue-100">+ Toevoegen</button>
                 </div>
-              ) : visibleReservations.map(res => {
+              ) : activeReservations.map(res => {
                 const occupied = res.is_occupied
-                const done = res.status === 'completed'
                 return (
-                  <div key={res.id} className={`rounded-2xl border-2 p-4 ${occupied ? 'border-red-200 bg-red-50' : done ? 'border-gray-200 bg-gray-50 opacity-60' : 'border-blue-200 bg-blue-50'}`}>
+                  <div key={res.id} className={`rounded-2xl border-2 p-4 ${occupied ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <span className={`text-base font-black ${occupied ? 'text-red-700' : done ? 'text-gray-500' : 'text-blue-700'}`}>
+                      <span className={`text-base font-black ${occupied ? 'text-red-700' : 'text-green-700'}`}>
                         {res.time_from || res.reservation_time} → {res.time_to || '?'}
                       </span>
-                      {occupied && <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">BEZET</span>}
-                      {done && <span className="bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">VRIJ</span>}
-                      {!occupied && !done && <span className="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">BEVESTIGD</span>}
+                      {occupied
+                        ? <span className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">AANWEZIG</span>
+                        : <span className="bg-green-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">GERESERVEERD</span>
+                      }
                     </div>
                     <p className="font-bold text-gray-900">{res.customer_name}</p>
                     <div className="text-sm text-gray-600 space-y-0.5 mt-1">
                       {res.customer_phone && <p>📱 {res.customer_phone}</p>}
                       <p>👥 {res.party_size} personen</p>
-                      {res.deposit_amount > 0 && <p className={res.deposit_paid ? 'text-green-700 font-medium' : 'text-amber-700 font-medium'}>💳 Voorschot €{res.deposit_amount} {res.deposit_paid ? '✓' : '— openstaand'}</p>}
-                      {res.notes && <p className="text-xs italic text-gray-500">&quot;{res.notes}&quot;</p>}
+                      {res.deposit_amount > 0 && <p className={res.deposit_paid ? 'text-green-700 font-medium' : 'text-amber-700 font-medium'}>💳 €{res.deposit_amount} {res.deposit_paid ? '✓ betaald' : '— openstaand'}</p>}
+                      {res.notes && <p className="text-xs italic text-gray-400 mt-1">&quot;{res.notes}&quot;</p>}
                     </div>
-                    {!done && (
-                      <div className="flex gap-2 mt-3">
-                        {!occupied
-                          ? <button onClick={() => markOccupied(res)} className="flex-1 py-1.5 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700">🔴 Gasten aanwezig</button>
-                          : <button onClick={() => releaseTable(res)} className="flex-1 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700">✓ Tafel vrijgeven</button>
-                        }
-                        <button onClick={() => { setResForm({ customer_name: res.customer_name, customer_phone: res.customer_phone, customer_email: res.customer_email, party_size: res.party_size, date: res.reservation_date, time_from: res.time_from || res.reservation_time, time_to: res.time_to || '', notes: res.notes || '', deposit_amount: res.deposit_amount, deposit_paid: res.deposit_paid }); setEditingRes(res); setShowResForm(true) }} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs hover:bg-gray-50">✏️</button>
-                        <button onClick={() => cancelReservation(res)} className="px-3 py-1.5 bg-white border border-red-200 text-red-500 rounded-lg text-xs hover:bg-red-50">✕</button>
-                      </div>
-                    )}
+                    <div className="flex gap-2 mt-3">
+                      {!occupied ? (
+                        // Stap 1: Groen → gasten zijn er
+                        <button onClick={() => markOccupied(res)} className="flex-1 py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors">
+                          🔴 Gasten aanwezig
+                        </button>
+                      ) : (
+                        // Stap 2: Rood → tafel vrij (naar archief)
+                        <button onClick={() => releaseTable(res)} className="flex-1 py-2 bg-gray-700 text-white rounded-lg text-xs font-bold hover:bg-gray-800 transition-colors">
+                          ✓ Tafel vrijgeven
+                        </button>
+                      )}
+                      <button onClick={() => { setResForm({ customer_name: res.customer_name, customer_phone: res.customer_phone, customer_email: res.customer_email, party_size: res.party_size, date: res.reservation_date, time_from: res.time_from || res.reservation_time, time_to: res.time_to || '', notes: res.notes || '', deposit_amount: res.deposit_amount, deposit_paid: res.deposit_paid }); setEditingRes(res); setShowResForm(true) }} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs hover:bg-gray-50">✏️</button>
+                      <button onClick={() => cancelReservation(res)} className="px-3 py-1.5 bg-white border border-red-200 text-red-400 rounded-lg text-xs hover:bg-red-50">✕</button>
+                    </div>
                   </div>
                 )
               })}
+
+              {/* Archief - voltooide reservaties */}
+              {archivedReservations.length > 0 && (
+                <div className="pt-3 border-t border-gray-200">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Archief vandaag ({archivedReservations.length})</p>
+                  {archivedReservations.map(res => (
+                    <div key={res.id} className="rounded-xl border border-gray-200 bg-gray-50 p-3 mb-2 opacity-60">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-bold text-gray-500">{res.time_from} → {res.time_to}</span>
+                        <span className="bg-gray-400 text-white text-xs font-bold px-2 py-0.5 rounded-full">VRIJ</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">{res.customer_name} · {res.party_size} pers.</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="p-3 border-t flex-shrink-0">
