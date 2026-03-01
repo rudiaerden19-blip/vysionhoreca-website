@@ -465,87 +465,27 @@ export default function TafelplanPage() {
             style={{
               width: '100%',
               height: CANVAS_HEIGHT,
-              border: '3px solid #8B6914',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+              border: '2px solid #A07840',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
             }}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
             onClick={() => setSelectedTable(null)}
           >
-            {/* Laminaatvloer achtergrond */}
-            <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                {/* Basiskleur plank */}
-                <linearGradient id="plank1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#C8975A"/>
-                  <stop offset="30%" stopColor="#BA8A4E"/>
-                  <stop offset="60%" stopColor="#C49558"/>
-                  <stop offset="100%" stopColor="#AE7E42"/>
-                </linearGradient>
-                <linearGradient id="plank2" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#D4A46A"/>
-                  <stop offset="40%" stopColor="#C49558"/>
-                  <stop offset="70%" stopColor="#BA8A4E"/>
-                  <stop offset="100%" stopColor="#C08A50"/>
-                </linearGradient>
-                <linearGradient id="plank3" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#BE8C4A"/>
-                  <stop offset="35%" stopColor="#C99A5C"/>
-                  <stop offset="65%" stopColor="#B8864A"/>
-                  <stop offset="100%" stopColor="#C49056"/>
-                </linearGradient>
-                <linearGradient id="grain" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="rgba(0,0,0,0)"/>
-                  <stop offset="20%" stopColor="rgba(0,0,0,0.03)"/>
-                  <stop offset="40%" stopColor="rgba(255,255,255,0.04)"/>
-                  <stop offset="60%" stopColor="rgba(0,0,0,0.02)"/>
-                  <stop offset="80%" stopColor="rgba(255,255,255,0.03)"/>
-                  <stop offset="100%" stopColor="rgba(0,0,0,0)"/>
-                </linearGradient>
-                <pattern id="laminate" x="0" y="0" width="240" height="120" patternUnits="userSpaceOnUse">
-                  {/* Rij 1 - plank A (start links) */}
-                  <rect x="0" y="0" width="238" height="38" fill="url(#plank1)"/>
-                  <rect x="0" y="0" width="238" height="38" fill="url(#grain)"/>
-                  {/* Rij 1 - plank B (half offset) */}
-                  <rect x="240" y="0" width="238" height="38" fill="url(#plank2)"/>
-
-                  {/* Naad rij 1 */}
-                  <rect x="0" y="38" width="480" height="1.5" fill="#8B6020" opacity="0.5"/>
-
-                  {/* Rij 2 - offset met 120px */}
-                  <rect x="-120" y="39.5" width="238" height="38" fill="url(#plank3)"/>
-                  <rect x="-120" y="39.5" width="238" height="38" fill="url(#grain)"/>
-                  <rect x="120" y="39.5" width="238" height="38" fill="url(#plank1)"/>
-                  <rect x="120" y="39.5" width="238" height="38" fill="url(#grain)"/>
-                  <rect x="360" y="39.5" width="238" height="38" fill="url(#plank2)"/>
-
-                  {/* Naad rij 2 */}
-                  <rect x="0" y="77.5" width="480" height="1.5" fill="#8B6020" opacity="0.5"/>
-
-                  {/* Rij 3 - offset met 60px */}
-                  <rect x="-60" y="79" width="238" height="38" fill="url(#plank2)"/>
-                  <rect x="-60" y="79" width="238" height="38" fill="url(#grain)"/>
-                  <rect x="180" y="79" width="238" height="38" fill="url(#plank3)"/>
-                  <rect x="180" y="79" width="238" height="38" fill="url(#grain)"/>
-
-                  {/* Verticale naden rij 1 */}
-                  <rect x="238" y="0" width="1.5" height="38" fill="#8B6020" opacity="0.4"/>
-                  {/* Verticale naden rij 2 */}
-                  <rect x="118" y="39.5" width="1.5" height="38" fill="#8B6020" opacity="0.4"/>
-                  <rect x="358" y="39.5" width="1.5" height="38" fill="#8B6020" opacity="0.4"/>
-                  {/* Verticale naden rij 3 */}
-                  <rect x="178" y="79" width="1.5" height="38" fill="#8B6020" opacity="0.4"/>
-                </pattern>
-                {/* Subtiele overlay voor diepte */}
-                <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
-                  <stop offset="0%" stopColor="rgba(0,0,0,0)"/>
-                  <stop offset="100%" stopColor="rgba(0,0,0,0.12)"/>
-                </radialGradient>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#laminate)"/>
-              <rect width="100%" height="100%" fill="url(#vignette)"/>
-            </svg>
+            {/* Effen laminaatvloer */}
+            <div className="absolute inset-0" style={{
+              backgroundColor: '#C8A97A',
+              backgroundImage: `
+                repeating-linear-gradient(
+                  180deg,
+                  transparent 0px,
+                  transparent 39px,
+                  rgba(0,0,0,0.08) 39px,
+                  rgba(0,0,0,0.08) 40px
+                )
+              `,
+            }} />
 
             {filteredTables.length === 0 && (
               <div className="absolute inset-0 flex flex-col items-center justify-center">
