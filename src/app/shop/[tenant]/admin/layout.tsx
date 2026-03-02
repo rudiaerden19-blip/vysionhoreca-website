@@ -115,17 +115,6 @@ const menuItems = [
     ]
   },
   {
-    categoryKey: 'reservationsPro',
-    icon: '🍽️',
-    proOnly: true,
-    items: [
-      { nameKey: 'tablePlan', href: '/reserveringen/tafelplan', icon: '🗺️', proOnly: true },
-      { nameKey: 'onlineBooking', href: '/reserveringen/online-boeking', icon: '📱', proOnly: true },
-      { nameKey: 'guestCrm', href: '/reserveringen/gasten', icon: '👤', proOnly: true },
-      { nameKey: 'noShow', href: '/reserveringen/no-show', icon: '🛡️', proOnly: true },
-    ]
-  },
-  {
     categoryKey: 'groupOrders',
     icon: '👥',
     items: [
