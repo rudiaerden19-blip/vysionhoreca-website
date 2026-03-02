@@ -120,17 +120,16 @@ export default function TafelplanPage() {
   const [assigningRes, setAssigningRes] = useState<TableReservation | null>(null)
   const [showOnlinePanel, setShowOnlinePanel] = useState(false)
 
-  // ── NOTIFICATIES: EXACT zelfde structuur als bestellingen/page.tsx ──
+  // ── NOTIFICATIES ──
   const [showNewResAlert, setShowNewResAlert] = useState(false)
   const [alertDismissed, setAlertDismissed] = useState(false)
   const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  const knownResIdsRef = useRef<Set<string>>(new Set())
-  // Tijdstip waarop de pagina geladen werd — alles daarna is "nieuw"
+  // Tijdstip waarop de pagina geladen werd — reservaties NA dit tijdstip zijn "nieuw"
   const pageLoadTimeRef = useRef(new Date().toISOString())
 
-  // Exact zoals hasNewOrders in bestellingen: berekend uit state, geen aparte boolean
+  // Berekend uit state — exact zoals hasNewOrders in bestellingen
   const hasNewReservations = unassigned.some(
     r => r.created_at && r.created_at > pageLoadTimeRef.current
   )
@@ -174,131 +173,56 @@ export default function TafelplanPage() {
 
   // ── EXACT ZELFDE ALS bestellingen/page.tsx ──
 
-  // Prewarm audio als al geactiveerd deze sessie
+  // Prewarm audio
   useEffect(() => {
     if (audioActivated) prewarmAudio()
+    return () => { if (audioIntervalRef.current) clearInterval(audioIntervalRef.current) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Cleanup audio interval bij unmount
+  // Oranje scherm — hasNewReservations is de enige bron van waarheid
   useEffect(() => {
-    return () => {
-      if (audioIntervalRef.current) clearInterval(audioIntervalRef.current)
-    }
-  }, [])
-
-  // Toon oranje scherm wanneer er nieuwe reservaties zijn (exact zoals bestellingen)
-  useEffect(() => {
-    if (hasNewReservations && !alertDismissed) {
-      setShowNewResAlert(true)
-    }
-    if (!hasNewReservations) {
-      setShowNewResAlert(false)
-      setAlertDismissed(false)
-    }
+    if (hasNewReservations && !alertDismissed) setShowNewResAlert(true)
+    if (!hasNewReservations) { setShowNewResAlert(false); setAlertDismissed(false) }
   }, [hasNewReservations, alertDismissed])
 
-  const dismissAlert = () => {
-    setShowNewResAlert(false)
-    setAlertDismissed(true)
-    setShowOnlinePanel(true)
-  }
-
-  // Speel geluid zolang er nieuwe reservaties zijn (exact zoals bestellingen)
+  // Geluid
   useEffect(() => {
     if (hasNewReservations) {
       playOrderNotification()
       audioIntervalRef.current = setInterval(playOrderNotification, 3000)
     } else {
-      if (audioIntervalRef.current) {
-        clearInterval(audioIntervalRef.current)
-        audioIntervalRef.current = null
-      }
+      if (audioIntervalRef.current) { clearInterval(audioIntervalRef.current); audioIntervalRef.current = null }
     }
-    return () => {
-      if (audioIntervalRef.current) clearInterval(audioIntervalRef.current)
-    }
+    return () => { if (audioIntervalRef.current) clearInterval(audioIntervalRef.current) }
   }, [hasNewReservations])
 
-  // POLLING elke 3 seconden — EXACT zelfde als bestellingen (meest betrouwbaar)
+  // Polling elke 3s — update ALLEEN unassigned state, al de rest is reactief via hasNewReservations
   useEffect(() => {
-    const pollForNewReservations = async () => {
+    const poll = async () => {
       try {
         const today = new Date().toISOString().split('T')[0]
         const res = await fetch(`/api/reserveringen/unassigned?tenant=${encodeURIComponent(tenantSlug)}&today=${today}`)
-        if (!res.ok) return
-        const { data } = await res.json()
-        const results: TableReservation[] = data || []
-
-        // Check voor nieuwe IDs die we nog niet kenden
-        const newFound = results.filter(r => !knownResIdsRef.current.has(r.id))
-        results.forEach(r => knownResIdsRef.current.add(r.id))
-
-        // Als er nieuwe zijn → alert tonen (setUnassigned triggert hasNewReservations recompute)
-        if (newFound.length > 0) {
-          setAlertDismissed(false)
-          setShowNewResAlert(true)
-        }
-
-        setUnassigned(results)
-      } catch (e) {
-        console.error('Reservatie polling error:', e)
-      }
+        if (res.ok) { const { data } = await res.json(); setUnassigned(data || []) }
+      } catch { /* ignore */ }
     }
-
-    // Initialiseer bekende IDs zodat bestaande reservaties geen alert triggeren
-    // (zelfde patroon als bestellingen: orders.forEach op mount)
-    pollingIntervalRef.current = setInterval(pollForNewReservations, 3000)
-    return () => {
-      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current)
-    }
+    pollingIntervalRef.current = setInterval(poll, 3000)
+    return () => { if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantSlug])
 
-  // ── EINDE EXACTE KOPIE ──
+  const dismissAlert = () => { setShowNewResAlert(false); setAlertDismissed(true); setShowOnlinePanel(true) }
 
-  // Real-time: luister naar INSERT (nieuwe reservaties) EN UPDATE
+  // Real-time UPDATE voor badges/agenda
   useEffect(() => {
     const sb = getSupabase()
     if (!sb || !tenantSlug) return
-
-    const channel = sb
-      .channel(`reservations-rt-${tenantSlug}`)
-      // Nieuwe reservatie binnenkomst → direct alert
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'reservations',
-        filter: `tenant_slug=eq.${tenantSlug}`,
-      }, async () => {
-        // Laad via API (service role) om RLS te omzeilen
-        const today = new Date().toISOString().split('T')[0]
-        const res = await fetch(`/api/reserveringen/unassigned?tenant=${encodeURIComponent(tenantSlug)}&today=${today}`)
-        if (!res.ok) return
-        const { data } = await res.json()
-        const results = data || []
-        const newFound = results.filter((r: { id: string }) => !knownResIdsRef.current.has(r.id))
-        results.forEach((r: { id: string }) => knownResIdsRef.current.add(r.id))
-        if (newFound.length > 0) {
-          setAlertDismissed(false)
-          setShowNewResAlert(true)
-        }
-        setUnassigned(results)
-      })
-      // Update → herlaad badges en agenda
-      .on('postgres_changes', {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'reservations',
-        filter: `tenant_slug=eq.${tenantSlug}`,
-      }, () => {
+    const channel = sb.channel(`reservations-rt-${tenantSlug}`)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'reservations', filter: `tenant_slug=eq.${tenantSlug}` }, () => {
         loadBadges(agendaDate)
         if (selectedTable) loadAgenda(selectedTable.id, agendaDate)
       })
-      .subscribe((status) => {
-        console.log('[TAFELPLAN] Real-time status:', status)
-      })
-
+      .subscribe()
     return () => { sb.removeChannel(channel) }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantSlug, agendaDate, selectedTable?.id])
