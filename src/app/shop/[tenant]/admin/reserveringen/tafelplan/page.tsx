@@ -204,26 +204,18 @@ export default function TafelplanPage() {
 
     const pollForNewReservations = async () => {
       try {
-        const sb = getSupabase(); if (!sb) return
         const today = new Date().toISOString().split('T')[0]
-        const { data } = await sb.from('reservations').select('*')
-          .eq('tenant_slug', tenantSlug)
-          .eq('status', 'confirmed')
-          .is('table_id', null)
-          .gte('reservation_date', today)
-          .order('reservation_date', { ascending: true })
-          .order('time_from', { ascending: true })
-
+        const res = await fetch(`/api/reserveringen/unassigned?tenant=${encodeURIComponent(tenantSlug)}&today=${today}`)
+        if (!res.ok) return
+        const { data } = await res.json()
         const results = data || []
-        const newFound = results.filter(r => !knownResIdsRef.current.has(r.id))
-        // Voeg alle IDs toe aan bekend
-        results.forEach(r => knownResIdsRef.current.add(r.id))
 
-        // Eerste poll: geen alert (alleen initialiseren)
-        // Vanaf tweede poll: alert als er echte nieuwe zijn
+        const newFound = results.filter((r: { id: string }) => !knownResIdsRef.current.has(r.id))
+        results.forEach((r: { id: string }) => knownResIdsRef.current.add(r.id))
+
         if (!isFirstPoll && newFound.length > 0) {
           setAlertDismissed(false)
-          setShowNewResAlert(true)   // direct zetten, net als bestellingen
+          setShowNewResAlert(true)
           setHasNewReservations(true)
         }
 
@@ -263,20 +255,21 @@ export default function TafelplanPage() {
         schema: 'public',
         table: 'reservations',
         filter: `tenant_slug=eq.${tenantSlug}`,
-      }, (payload) => {
-        console.log('[TAFELPLAN] Nieuwe reservatie INSERT ontvangen:', payload.new)
-        const newRes = payload.new as TableReservation
-        // Online reservaties zonder tafel → toon alert
-        if (!newRes.table_id) {
-          setUnassigned(prev => {
-            const already = prev.find(r => r.id === newRes.id)
-            if (already) return prev
-            return [...prev, newRes]
-          })
+      }, async () => {
+        // Laad via API (service role) om RLS te omzeilen
+        const today = new Date().toISOString().split('T')[0]
+        const res = await fetch(`/api/reserveringen/unassigned?tenant=${encodeURIComponent(tenantSlug)}&today=${today}`)
+        if (!res.ok) return
+        const { data } = await res.json()
+        const results = data || []
+        const newFound = results.filter((r: { id: string }) => !knownResIdsRef.current.has(r.id))
+        results.forEach((r: { id: string }) => knownResIdsRef.current.add(r.id))
+        if (newFound.length > 0) {
           setAlertDismissed(false)
           setShowNewResAlert(true)
           setHasNewReservations(true)
         }
+        setUnassigned(results)
       })
       // Update → herlaad badges en agenda
       .on('postgres_changes', {
@@ -523,25 +516,15 @@ export default function TafelplanPage() {
   }
 
   async function loadUnassigned(_date?: string) {
-    const sb = getSupabase(); if (!sb) return
-    const today = new Date().toISOString().split('T')[0]
-
-    // DEBUG: kijk wat er ÜBERHAUPT in de tabel zit voor deze tenant
-    const { data: allData, error: allError } = await sb.from('reservations').select('id,status,table_id,reservation_date,source,tenant_slug')
-      .eq('tenant_slug', tenantSlug)
-      .order('created_at', { ascending: false })
-      .limit(10)
-    console.log('[TAFELPLAN] DEBUG alle recente reservaties:', { allData, allError, tenantSlug, today })
-
-    const { data, error } = await sb.from('reservations').select('*')
-      .eq('tenant_slug', tenantSlug)
-      .eq('status', 'confirmed')
-      .is('table_id', null)
-      .gte('reservation_date', today)
-      .order('reservation_date', { ascending: true })
-      .order('time_from', { ascending: true })
-    console.log('[TAFELPLAN] loadUnassigned (filtered):', { count: data?.length, error, today })
-    setUnassigned(data || [])
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      const res = await fetch(`/api/reserveringen/unassigned?tenant=${encodeURIComponent(tenantSlug)}&today=${today}`)
+      if (!res.ok) return
+      const { data } = await res.json()
+      setUnassigned(data || [])
+    } catch (e) {
+      console.error('[TAFELPLAN] loadUnassigned error:', e)
+    }
   }
 
   function dismissAlert() {
