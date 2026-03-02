@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 
+// Alleen voor lezen (publieke anon key is ok voor SELECT)
 const getSupabase = () => createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -70,16 +71,19 @@ export default function BevestigPage() {
   async function bevestig() {
     if (!reservation) return
     setConfirming(true)
-    const sb = getSupabase()
-    await sb
-      .from('reservations')
-      .update({
-        confirmed_by_customer: true,
-        confirmed_at: new Date().toISOString(),
+    try {
+      // Server-side API aanroepen (omzeilt RLS, gebruikt service role)
+      const res = await fetch('/api/confirm-reservation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
       })
-      .eq('id', reservation.id)
-
-    setConfirmed(true)
+      if (res.ok) {
+        setConfirmed(true)
+      }
+    } catch (e) {
+      console.error('Bevestiging mislukt:', e)
+    }
     setConfirming(false)
   }
 
