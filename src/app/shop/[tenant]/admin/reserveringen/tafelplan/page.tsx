@@ -525,6 +525,14 @@ export default function TafelplanPage() {
   async function loadUnassigned(_date?: string) {
     const sb = getSupabase(); if (!sb) return
     const today = new Date().toISOString().split('T')[0]
+
+    // DEBUG: kijk wat er ÜBERHAUPT in de tabel zit voor deze tenant
+    const { data: allData, error: allError } = await sb.from('reservations').select('id,status,table_id,reservation_date,source,tenant_slug')
+      .eq('tenant_slug', tenantSlug)
+      .order('created_at', { ascending: false })
+      .limit(10)
+    console.log('[TAFELPLAN] DEBUG alle recente reservaties:', { allData, allError, tenantSlug, today })
+
     const { data, error } = await sb.from('reservations').select('*')
       .eq('tenant_slug', tenantSlug)
       .eq('status', 'confirmed')
@@ -532,7 +540,7 @@ export default function TafelplanPage() {
       .gte('reservation_date', today)
       .order('reservation_date', { ascending: true })
       .order('time_from', { ascending: true })
-    console.log('[TAFELPLAN] loadUnassigned:', { count: data?.length, error, today, tenantSlug })
+    console.log('[TAFELPLAN] loadUnassigned (filtered):', { count: data?.length, error, today })
     setUnassigned(data || [])
   }
 
