@@ -250,26 +250,50 @@ export default function TafelplanPage() {
 
   // --- EINDE EXACTE KOPIE ---
 
-  // Real-time: luister naar reservatiewijzigingen (bevestiging door klant, etc.)
+  // Real-time: luister naar INSERT (nieuwe reservaties) EN UPDATE
   useEffect(() => {
     const sb = getSupabase()
     if (!sb || !tenantSlug) return
 
     const channel = sb
-      .channel(`reservations-${tenantSlug}`)
+      .channel(`reservations-rt-${tenantSlug}`)
+      // Nieuwe reservatie binnenkomst → direct alert
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'reservations',
+        filter: `tenant_slug=eq.${tenantSlug}`,
+      }, (payload) => {
+        console.log('[TAFELPLAN] Nieuwe reservatie INSERT ontvangen:', payload.new)
+        const newRes = payload.new as TableReservation
+        // Online reservaties zonder tafel → toon alert
+        if (!newRes.table_id) {
+          setUnassigned(prev => {
+            const already = prev.find(r => r.id === newRes.id)
+            if (already) return prev
+            return [...prev, newRes]
+          })
+          setAlertDismissed(false)
+          setShowNewResAlert(true)
+          setHasNewReservations(true)
+        }
+      })
+      // Update → herlaad badges en agenda
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'reservations',
         filter: `tenant_slug=eq.${tenantSlug}`,
       }, () => {
-        // Herlaad badges en agenda bij elke wijziging
         loadBadges(agendaDate)
         if (selectedTable) loadAgenda(selectedTable.id, agendaDate)
       })
-      .subscribe()
+      .subscribe((status) => {
+        console.log('[TAFELPLAN] Real-time status:', status)
+      })
 
     return () => { sb.removeChannel(channel) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantSlug, agendaDate, selectedTable?.id])
 
   async function loadData() {
@@ -501,13 +525,14 @@ export default function TafelplanPage() {
   async function loadUnassigned(_date?: string) {
     const sb = getSupabase(); if (!sb) return
     const today = new Date().toISOString().split('T')[0]
-    const { data } = await sb.from('reservations').select('*')
+    const { data, error } = await sb.from('reservations').select('*')
       .eq('tenant_slug', tenantSlug)
       .eq('status', 'confirmed')
       .is('table_id', null)
       .gte('reservation_date', today)
       .order('reservation_date', { ascending: true })
       .order('time_from', { ascending: true })
+    console.log('[TAFELPLAN] loadUnassigned:', { count: data?.length, error, today, tenantSlug })
     setUnassigned(data || [])
   }
 
