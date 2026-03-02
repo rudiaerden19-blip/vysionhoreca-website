@@ -26,6 +26,7 @@ interface TableReservation {
   time_from: string | null; time_to: string | null; status: string
   notes: string | null; deposit_amount: number; deposit_paid: boolean; is_occupied: boolean
   confirmed_by_customer: boolean; confirmation_token: string | null; whatsapp_sent: boolean
+  created_at?: string; source?: string
 }
 
 const SECTION_COLORS = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#06B6D4','#84CC16']
@@ -118,14 +119,21 @@ export default function TafelplanPage() {
   const [unassigned, setUnassigned] = useState<TableReservation[]>([])
   const [assigningRes, setAssigningRes] = useState<TableReservation | null>(null)
   const [showOnlinePanel, setShowOnlinePanel] = useState(false)
-  // Notificaties nieuwe online reservaties — EXACT zelfde als bestellingen
+
+  // ── NOTIFICATIES: EXACT zelfde structuur als bestellingen/page.tsx ──
   const [showNewResAlert, setShowNewResAlert] = useState(false)
   const [alertDismissed, setAlertDismissed] = useState(false)
   const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const knownResIdsRef = useRef<Set<string>>(new Set())
-  const [hasNewReservations, setHasNewReservations] = useState(false)
+  // Tijdstip waarop de pagina geladen werd — alles daarna is "nieuw"
+  const pageLoadTimeRef = useRef(new Date().toISOString())
+
+  // Exact zoals hasNewOrders in bestellingen: berekend uit state, geen aparte boolean
+  const hasNewReservations = unassigned.some(
+    r => r.created_at && r.created_at > pageLoadTimeRef.current
+  )
 
   // Modals
   const [showAddSection, setShowAddSection] = useState(false)
@@ -164,15 +172,22 @@ export default function TafelplanPage() {
     return () => clearInterval(interval)
   }, [tenantSlug, agendaDate, selectedTable?.id])
 
-  // --- EXACT ZELFDE ALS BESTELLINGEN ---
+  // ── EXACT ZELFDE ALS bestellingen/page.tsx ──
 
-  // Prewarm audio als al geactiveerd
+  // Prewarm audio als al geactiveerd deze sessie
   useEffect(() => {
     if (audioActivated) prewarmAudio()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Effect 1: toon/verberg oranje scherm op basis van hasNewReservations
+  // Cleanup audio interval bij unmount
+  useEffect(() => {
+    return () => {
+      if (audioIntervalRef.current) clearInterval(audioIntervalRef.current)
+    }
+  }, [])
+
+  // Toon oranje scherm wanneer er nieuwe reservaties zijn (exact zoals bestellingen)
   useEffect(() => {
     if (hasNewReservations && !alertDismissed) {
       setShowNewResAlert(true)
@@ -183,49 +198,56 @@ export default function TafelplanPage() {
     }
   }, [hasNewReservations, alertDismissed])
 
-  // Effect 2: speel geluid zolang er nieuwe reservaties zijn
+  const dismissAlert = () => {
+    setShowNewResAlert(false)
+    setAlertDismissed(true)
+    setShowOnlinePanel(true)
+  }
+
+  // Speel geluid zolang er nieuwe reservaties zijn (exact zoals bestellingen)
   useEffect(() => {
     if (hasNewReservations) {
       playOrderNotification()
       audioIntervalRef.current = setInterval(playOrderNotification, 3000)
     } else {
-      if (audioIntervalRef.current) clearInterval(audioIntervalRef.current)
-      audioIntervalRef.current = null
+      if (audioIntervalRef.current) {
+        clearInterval(audioIntervalRef.current)
+        audioIntervalRef.current = null
+      }
     }
     return () => {
       if (audioIntervalRef.current) clearInterval(audioIntervalRef.current)
     }
   }, [hasNewReservations])
 
-  // Effect 3: polling elke 3 seconden — EXACT zelfde als bestellingen
+  // POLLING elke 3 seconden — EXACT zelfde als bestellingen (meest betrouwbaar)
   useEffect(() => {
-    // Eerste poll initialiseert knownResIdsRef zonder alert te tonen
-    let isFirstPoll = true
-
     const pollForNewReservations = async () => {
       try {
         const today = new Date().toISOString().split('T')[0]
         const res = await fetch(`/api/reserveringen/unassigned?tenant=${encodeURIComponent(tenantSlug)}&today=${today}`)
         if (!res.ok) return
         const { data } = await res.json()
-        const results = data || []
+        const results: TableReservation[] = data || []
 
-        const newFound = results.filter((r: { id: string }) => !knownResIdsRef.current.has(r.id))
-        results.forEach((r: { id: string }) => knownResIdsRef.current.add(r.id))
+        // Check voor nieuwe IDs die we nog niet kenden
+        const newFound = results.filter(r => !knownResIdsRef.current.has(r.id))
+        results.forEach(r => knownResIdsRef.current.add(r.id))
 
-        if (!isFirstPoll && newFound.length > 0) {
+        // Als er nieuwe zijn → alert tonen (setUnassigned triggert hasNewReservations recompute)
+        if (newFound.length > 0) {
           setAlertDismissed(false)
           setShowNewResAlert(true)
-          setHasNewReservations(true)
         }
 
-        isFirstPoll = false
         setUnassigned(results)
       } catch (e) {
         console.error('Reservatie polling error:', e)
       }
     }
 
+    // Initialiseer bekende IDs zodat bestaande reservaties geen alert triggeren
+    // (zelfde patroon als bestellingen: orders.forEach op mount)
     pollingIntervalRef.current = setInterval(pollForNewReservations, 3000)
     return () => {
       if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current)
@@ -233,14 +255,7 @@ export default function TafelplanPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantSlug])
 
-  // Reset als alle unassigned afgehandeld zijn
-  useEffect(() => {
-    if (unassigned.length === 0 && hasNewReservations) {
-      setHasNewReservations(false)
-    }
-  }, [unassigned.length, hasNewReservations])
-
-  // --- EINDE EXACTE KOPIE ---
+  // ── EINDE EXACTE KOPIE ──
 
   // Real-time: luister naar INSERT (nieuwe reservaties) EN UPDATE
   useEffect(() => {
@@ -525,12 +540,6 @@ export default function TafelplanPage() {
     } catch (e) {
       console.error('[TAFELPLAN] loadUnassigned error:', e)
     }
-  }
-
-  function dismissAlert() {
-    setShowNewResAlert(false)
-    setAlertDismissed(true)
-    setShowOnlinePanel(true)
   }
 
   function activateAudio() {
