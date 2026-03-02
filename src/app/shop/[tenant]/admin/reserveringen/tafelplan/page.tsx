@@ -141,6 +141,37 @@ export default function TafelplanPage() {
     if (selectedTable) loadAgenda(selectedTable.id, agendaDate)
   }, [selectedTable?.id, agendaDate, refreshToken])
 
+  // Polling elke 30s als backup (voor als real-time de verbinding verliest)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadBadges(agendaDate)
+      if (selectedTable) loadAgenda(selectedTable.id, agendaDate)
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [tenantSlug, agendaDate, selectedTable?.id])
+
+  // Real-time: luister naar reservatiewijzigingen (bevestiging door klant, etc.)
+  useEffect(() => {
+    const sb = getSupabase()
+    if (!sb || !tenantSlug) return
+
+    const channel = sb
+      .channel(`reservations-${tenantSlug}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'reservations',
+        filter: `tenant_slug=eq.${tenantSlug}`,
+      }, () => {
+        // Herlaad badges en agenda bij elke wijziging
+        loadBadges(agendaDate)
+        if (selectedTable) loadAgenda(selectedTable.id, agendaDate)
+      })
+      .subscribe()
+
+    return () => { sb.removeChannel(channel) }
+  }, [tenantSlug, agendaDate, selectedTable?.id])
+
   async function loadData() {
     const sb = getSupabase(); if (!sb) return
     const [{ data: sec }, { data: tbl }] = await Promise.all([
