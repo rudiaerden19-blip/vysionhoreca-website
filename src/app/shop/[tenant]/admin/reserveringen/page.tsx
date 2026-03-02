@@ -15,7 +15,7 @@ interface Reservation {
   reservation_time: string
   party_size: number
   notes?: string
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
   created_at: string
 }
 
@@ -24,6 +24,7 @@ const getStatusConfig = (t: (key: string) => string): Record<string, { bg: strin
   confirmed: { bg: 'bg-green-100', text: 'text-green-700', label: `✓ ${t('reservationsPage.status.confirmed')}` },
   cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: `❌ ${t('reservationsPage.status.cancelled')}` },
   completed: { bg: 'bg-gray-100', text: 'text-gray-700', label: `✔️ ${t('reservationsPage.status.completed')}` },
+  no_show: { bg: 'bg-purple-100', text: 'text-purple-700', label: `👻 No-show` },
 })
 
 export default function ReserveringenPage({ params }: { params: { tenant: string } }) {
@@ -94,7 +95,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
       .order('reservation_time', { ascending: true })
     
     if (filter === 'upcoming') {
-      query = query.gte('reservation_date', today).not('status', 'in', '("cancelled","completed")')
+      query = query.gte('reservation_date', today).not('status', 'in', '("cancelled","completed","no_show")')
     } else if (filter === 'today') {
       query = query.eq('reservation_date', today)
     }
@@ -230,6 +231,12 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
   const pendingCount = reservations.filter(r => r.status === 'pending').length
   const todayCount = reservations.filter(r => r.reservation_date === new Date().toISOString().split('T')[0]).length
 
+  // Controleer of de reservatietijd al gepasseerd is
+  const isPast = (date: string, time: string) => {
+    const reservationDateTime = new Date(`${date}T${time}`)
+    return reservationDateTime < new Date()
+  }
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto">
@@ -338,7 +345,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                 transition={{ delay: index * 0.05 }}
                 className={`bg-white rounded-2xl p-6 shadow-sm ${
                   reservation.status === 'pending' ? 'ring-2 ring-yellow-400' : ''
-                } ${isToday ? 'border-l-4 border-blue-500' : ''}`}
+                } ${reservation.status === 'no_show' ? 'ring-2 ring-purple-300 opacity-75' : ''} ${isToday ? 'border-l-4 border-blue-500' : ''}`}
               >
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   {/* Left: Date & Time */}
@@ -393,15 +400,26 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
                         </>
                       )}
                       {reservation.status === 'confirmed' && (
-                        <button
-                          onClick={() => updateStatus(reservation.id, 'completed')}
-                          disabled={updatingId === reservation.id}
-                          className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium text-sm disabled:opacity-50"
-                        >
-                          ✔️ {t('reservationsPage.actions.complete')}
-                        </button>
+                        <>
+                          <button
+                            onClick={() => updateStatus(reservation.id, 'completed')}
+                            disabled={updatingId === reservation.id}
+                            className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium text-sm disabled:opacity-50"
+                          >
+                            ✔️ {t('reservationsPage.actions.complete')}
+                          </button>
+                          {isPast(reservation.reservation_date, reservation.reservation_time) && (
+                            <button
+                              onClick={() => updateStatus(reservation.id, 'no_show')}
+                              disabled={updatingId === reservation.id}
+                              className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium text-sm disabled:opacity-50"
+                            >
+                              👻 No-show
+                            </button>
+                          )}
+                        </>
                       )}
-                      {(reservation.status === 'completed' || reservation.status === 'cancelled') && (
+                      {(reservation.status === 'completed' || reservation.status === 'cancelled' || reservation.status === 'no_show') && (
                         <button
                           onClick={() => deleteReservation(reservation.id)}
                           className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg font-medium text-sm"
