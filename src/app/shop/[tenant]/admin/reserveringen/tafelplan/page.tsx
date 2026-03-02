@@ -402,13 +402,16 @@ export default function TafelplanPage() {
     setArchiveData(enriched)
   }
 
-  async function loadUnassigned(date: string) {
+  async function loadUnassigned(_date?: string) {
     const sb = getSupabase(); if (!sb) return
+    const today = new Date().toISOString().split('T')[0]
+    // Laad ALLE toekomstige onassigned reservaties (niet alleen vandaag)
     const { data } = await sb.from('reservations').select('*')
       .eq('tenant_slug', tenantSlug)
-      .eq('reservation_date', date)
       .eq('status', 'confirmed')
       .is('table_id', null)
+      .gte('reservation_date', today)
+      .order('reservation_date', { ascending: true })
       .order('time_from', { ascending: true })
     setUnassigned(data || [])
   }
@@ -417,8 +420,10 @@ export default function TafelplanPage() {
     const sb = getSupabase(); if (!sb) return
     await sb.from('reservations').update({ table_id: tableId }).eq('id', res.id)
     setAssigningRes(null)
+    // Zet agenda op de datum van de reservatie zodat de badge zichtbaar wordt
+    setAgendaDate(res.reservation_date)
     await refreshAll()
-    await loadUnassigned(agendaDate)
+    await loadUnassigned()
   }
 
   function getTableColor(t: RestaurantTable) {
@@ -560,6 +565,7 @@ export default function TafelplanPage() {
                   <span className="font-bold text-gray-900 text-sm">{res.customer_name}</span>
                   <span className="text-xs text-amber-600 font-medium">{res.time_from} → {res.time_to}</span>
                 </div>
+                <p className="text-xs font-semibold text-amber-700 mb-1">📅 {new Date(res.reservation_date + 'T12:00').toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
                 <p className="text-xs text-gray-500 mb-2">👥 {res.party_size} pers. · 📱 {res.customer_phone}</p>
                 {res.notes && <p className="text-xs text-gray-400 italic mb-2">&quot;{res.notes}&quot;</p>}
                 <button
