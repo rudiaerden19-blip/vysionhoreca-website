@@ -122,17 +122,10 @@ export default function TafelplanPage() {
 
   // ── NOTIFICATIES ──
   const [showNewResAlert, setShowNewResAlert] = useState(false)
-  const [alertDismissed, setAlertDismissed] = useState(false)
   const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
   const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  // Tijdstip waarop de pagina geladen werd — reservaties NA dit tijdstip zijn "nieuw"
-  const pageLoadTimeRef = useRef(new Date().toISOString())
-
-  // Berekend uit state — exact zoals hasNewOrders in bestellingen
-  const hasNewReservations = unassigned.some(
-    r => r.created_at && r.created_at > pageLoadTimeRef.current
-  )
+  const prevCountRef = useRef(-1) // -1 = nog niet geïnitialiseerd
 
   // Modals
   const [showAddSection, setShowAddSection] = useState(false)
@@ -180,30 +173,40 @@ export default function TafelplanPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Oranje scherm — hasNewReservations is de enige bron van waarheid
+  // Geluid aan/uit op basis van showNewResAlert
   useEffect(() => {
-    if (hasNewReservations && !alertDismissed) setShowNewResAlert(true)
-    if (!hasNewReservations) { setShowNewResAlert(false); setAlertDismissed(false) }
-  }, [hasNewReservations, alertDismissed])
-
-  // Geluid
-  useEffect(() => {
-    if (hasNewReservations) {
+    if (showNewResAlert) {
       playOrderNotification()
       audioIntervalRef.current = setInterval(playOrderNotification, 3000)
     } else {
       if (audioIntervalRef.current) { clearInterval(audioIntervalRef.current); audioIntervalRef.current = null }
     }
     return () => { if (audioIntervalRef.current) clearInterval(audioIntervalRef.current) }
-  }, [hasNewReservations])
+  }, [showNewResAlert])
 
-  // Polling elke 3s — update ALLEEN unassigned state, al de rest is reactief via hasNewReservations
+  // Polling elke 3s — simpel: als aantal groeit → alert
   useEffect(() => {
     const poll = async () => {
       try {
         const today = new Date().toISOString().split('T')[0]
         const res = await fetch(`/api/reserveringen/unassigned?tenant=${encodeURIComponent(tenantSlug)}&today=${today}`)
-        if (res.ok) { const { data } = await res.json(); setUnassigned(data || []) }
+        if (!res.ok) return
+        const { data } = await res.json()
+        const results: TableReservation[] = data || []
+        const count = results.length
+
+        // Eerste poll: sla count op zonder alert
+        // Daarna: als count groeit → nieuwe reservatie!
+        if (prevCountRef.current === -1) {
+          prevCountRef.current = count
+        } else if (count > prevCountRef.current) {
+          prevCountRef.current = count
+          setShowNewResAlert(true)
+        } else {
+          prevCountRef.current = count
+        }
+
+        setUnassigned(results)
       } catch { /* ignore */ }
     }
     pollingIntervalRef.current = setInterval(poll, 3000)
@@ -211,7 +214,7 @@ export default function TafelplanPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantSlug])
 
-  const dismissAlert = () => { setShowNewResAlert(false); setAlertDismissed(true); setShowOnlinePanel(true) }
+  const dismissAlert = () => { setShowNewResAlert(false); setShowOnlinePanel(true) }
 
   // Real-time UPDATE voor badges/agenda
   useEffect(() => {
