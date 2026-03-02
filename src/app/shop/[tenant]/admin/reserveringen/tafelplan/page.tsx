@@ -396,6 +396,15 @@ export default function TafelplanPage() {
           <input type="date" value={agendaDate} onChange={e => { setAgendaDate(e.target.value); setArchiveFilter('none') }} className="border-2 border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500" />
           <button onClick={() => setShowAddSection(true)} className="px-4 py-2 border-2 border-gray-200 text-gray-700 rounded-xl font-medium hover:bg-gray-50">+ Zone</button>
           <button onClick={() => { setTableForm({ table_number: `${tables.length + 1}`, seats: 4, shape: 'square', section_id: '' }); setShowAddTable(true) }} className="px-4 py-2 border-2 border-blue-200 text-blue-700 rounded-xl font-medium hover:bg-blue-50">+ Tafel</button>
+          <button
+            onClick={() => {
+              const url = `${window.location.origin}/shop/${tenantSlug}/reserveren`
+              navigator.clipboard.writeText(url)
+              alert(`✅ Link gekopieerd!\n\n${url}\n\nDeel deze link met uw klanten.`)
+            }}
+            className="px-4 py-2 border-2 border-green-200 text-green-700 rounded-xl font-medium hover:bg-green-50"
+            title="Kopieer online boekingslink voor klanten"
+          >🔗 Boekingslink</button>
           <button onClick={savePositions} disabled={saving} className={`px-6 py-2 rounded-xl font-bold transition-colors ${savedMsg ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} disabled:opacity-60`}>
             {saving ? 'Opslaan...' : savedMsg ? '✓ Opgeslagen' : '💾 Opslaan'}
           </button>
