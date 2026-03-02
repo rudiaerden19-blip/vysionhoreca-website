@@ -1,0 +1,55 @@
+---
+description: Multi-tenant architectuur regels voor Vysion Horeca platform
+alwaysApply: true
+---
+
+# 🚨 MULTI-TENANT — ALTIJD CONTROLEREN
+
+Dit platform heeft 500+ tenants. Elke feature die je bouwt MOET werken voor ALLE tenants, niet alleen voor één.
+
+## Verplichte checklist bij ELKE nieuwe feature
+
+### Database
+- Elke tabel heeft `tenant_slug TEXT NOT NULL` kolom
+- Elke query filtert op `tenant_slug`
+- RLS policies zijn ingesteld op nieuwe tabellen
+
+### Plan & Trial
+- Nieuwe tenants starten met `subscription_status = 'trial'`, `trial_ends_at = NOW() + 15 days`, `plan = 'starter'`
+- Pro features checken: `plan = 'pro'` OF `subscription_status = 'trial' AND trial_ends_at > NOW()`
+- Bestaande tenants zonder trial/plan krijgen SQL update bij elke migratie
+
+### API routes
+- Accepteer altijd `tenantSlug` als parameter
+- Haal tenant-specifieke instellingen op (WhatsApp, SMTP, etc.)
+- Goede fallback als tenant een feature niet heeft geconfigureerd
+
+### UI
+- Pro-only features tonen een upgrade banner voor starter-tenants
+- Tijdens trial: alle Pro features zichtbaar met "GRATIS" badge
+- Nooit hardcoded tenant slug in code
+
+## ❌ VERBODEN
+```typescript
+// NOOIT doen — hardcoded of zonder tenant filter
+supabase.from('reservations').select('*')
+supabase.from('tables').insert({ name: 'Tafel 1' })
+```
+
+## ✅ VERPLICHT
+```typescript
+// ALTIJD filteren op tenant_slug
+supabase.from('reservations').select('*').eq('tenant_slug', tenantSlug)
+supabase.from('tables').insert({ tenant_slug: tenantSlug, name: 'Tafel 1' })
+```
+
+## Plan check patroon (layout.tsx)
+```typescript
+const isPro = tenantPlan === 'pro' || isTrial
+// isTrial = subscription_status === 'trial' && trial_ends_at > new Date()
+```
+
+## Bij elke nieuwe Pro feature
+1. Voeg `proOnly: true` toe aan menu item in `layout.tsx`
+2. Controleer of bestaande tenants hun trial/plan correct hebben
+3. Test met een starter-tenant én een pro-tenant
