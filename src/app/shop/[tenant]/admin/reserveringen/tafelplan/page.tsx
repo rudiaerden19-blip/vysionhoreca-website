@@ -113,6 +113,9 @@ export default function TafelplanPage() {
   // Archief
   const [archiveFilter, setArchiveFilter] = useState<'none'|'dag'|'week'|'maand'|'jaar'>('none')
   const [archiveData, setArchiveData] = useState<(TableReservation & { table_number?: string })[]>([])
+  // Online reservaties zonder tafel
+  const [unassigned, setUnassigned] = useState<TableReservation[]>([])
+  const [assigningRes, setAssigningRes] = useState<TableReservation | null>(null)
 
   // Modals
   const [showAddSection, setShowAddSection] = useState(false)
@@ -135,6 +138,7 @@ export default function TafelplanPage() {
 
   useEffect(() => {
     loadBadges(agendaDate)
+    loadUnassigned(agendaDate)
   }, [tenantSlug, agendaDate, tables.length, refreshToken])
 
   useEffect(() => {
@@ -398,6 +402,25 @@ export default function TafelplanPage() {
     setArchiveData(enriched)
   }
 
+  async function loadUnassigned(date: string) {
+    const sb = getSupabase(); if (!sb) return
+    const { data } = await sb.from('reservations').select('*')
+      .eq('tenant_slug', tenantSlug)
+      .eq('reservation_date', date)
+      .eq('status', 'confirmed')
+      .is('table_id', null)
+      .order('time_from', { ascending: true })
+    setUnassigned(data || [])
+  }
+
+  async function assignTable(res: TableReservation, tableId: string) {
+    const sb = getSupabase(); if (!sb) return
+    await sb.from('reservations').update({ table_id: tableId }).eq('id', res.id)
+    setAssigningRes(null)
+    await refreshAll()
+    await loadUnassigned(agendaDate)
+  }
+
   function getTableColor(t: RestaurantTable) {
     if (!t.section_id) return '#6B7280'
     return sections.find(s => s.id === t.section_id)?.color || '#6B7280'
@@ -519,6 +542,35 @@ export default function TafelplanPage() {
               </table>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Wachtrij: online reservaties zonder tafel */}
+      {unassigned.length > 0 && (
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">📬</span>
+            <h3 className="font-bold text-amber-900">Nieuwe online reservaties — tafel toewijzen</h3>
+            <span className="bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{unassigned.length}</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {unassigned.map(res => (
+              <div key={res.id} className="bg-white rounded-xl border border-amber-200 p-3">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-bold text-gray-900 text-sm">{res.customer_name}</span>
+                  <span className="text-xs text-amber-600 font-medium">{res.time_from} → {res.time_to}</span>
+                </div>
+                <p className="text-xs text-gray-500 mb-2">👥 {res.party_size} pers. · 📱 {res.customer_phone}</p>
+                {res.notes && <p className="text-xs text-gray-400 italic mb-2">&quot;{res.notes}&quot;</p>}
+                <button
+                  onClick={() => setAssigningRes(res)}
+                  className="w-full py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition-colors"
+                >
+                  🪑 Tafel toewijzen
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -788,6 +840,29 @@ export default function TafelplanPage() {
                 <button onClick={saveReservation} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700">Opslaan</button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Tafel toewijzen aan online reservatie */}
+      {assigningRes && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setAssigningRes(null)}>
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h3 className="text-xl font-bold mb-1">Tafel toewijzen</h3>
+            <p className="text-gray-500 text-sm mb-4">{assigningRes.customer_name} · {assigningRes.time_from} · {assigningRes.party_size} pers.</p>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {tables.map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => assignTable(assigningRes, t.id)}
+                  className="w-full flex items-center justify-between px-4 py-3 border-2 border-gray-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors text-left"
+                >
+                  <span className="font-bold text-gray-900">Tafel #{t.table_number}</span>
+                  <span className="text-sm text-gray-500">{t.seats} pl. · {sections.find(s => s.id === t.section_id)?.name || 'Geen zone'}</span>
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setAssigningRes(null)} className="w-full mt-4 py-2 border-2 border-gray-200 rounded-xl text-gray-600 font-medium hover:bg-gray-50">Annuleren</button>
           </div>
         </div>
       )}
