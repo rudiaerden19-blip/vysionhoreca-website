@@ -282,7 +282,6 @@ export default function TafelplanPage() {
         if (newFound.length > 0) {
           setAlertDismissed(false)
           setShowNewResAlert(true)
-          setHasNewReservations(true)
         }
         setUnassigned(results)
       })
