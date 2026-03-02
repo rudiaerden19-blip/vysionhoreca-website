@@ -11,13 +11,16 @@ const WHATSAPP_API_VERSION = 'v24.0'
 const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
 
 function getBaseUrl(request: NextRequest): string {
-  // Vercel productie
+  // 1. Handmatig ingesteld in Vercel env vars (meest betrouwbaar)
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL
-  // Vercel automatische URL
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  // Fallback: origin van het request zelf
+  // 2. Vercel productie-URL (stabiel, geen preview hash) 
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  // 3. Origin van het binnenkomende request (werkt altijd als de API vanuit de juiste URL wordt aangeroepen)
   const origin = request.headers.get('origin') || request.headers.get('referer')
-  if (origin) return new URL(origin).origin
+  if (origin) {
+    try { return new URL(origin).origin } catch {}
+  }
+  // 4. Vaste fallback productie-URL
   return 'https://vysionhoreca.be'
 }
 
