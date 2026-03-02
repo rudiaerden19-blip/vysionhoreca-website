@@ -83,7 +83,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.error || 'Opslaan mislukt')
+        throw new Error(result.error || t('whatsappPage.saveFailed'))
       }
 
       if (result.data) {
@@ -93,7 +93,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } catch (err: any) {
-      setError(err.message || 'Er ging iets mis bij het opslaan')
+      setError(err.message || t('whatsappPage.saveError'))
     }
 
     setSaving(false)
@@ -101,7 +101,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
 
   async function testConnection() {
     if (!formData.phone_number_id || !formData.access_token) {
-      setError('Vul eerst je Phone Number ID en Access Token in')
+      setError(t('whatsappPage.fillCredentials'))
       return
     }
 
@@ -121,12 +121,12 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       const data = await response.json()
 
       if (response.ok) {
-        alert(`✅ Verbinding succesvol!\n\nVerified Phone Number: ${data.verified_name || data.display_phone_number || 'OK'}`)
+        alert(`✅ ${t('whatsappPage.connectionSuccess')}\n\nVerified Phone Number: ${data.verified_name || data.display_phone_number || 'OK'}`)
       } else {
-        throw new Error(data.error?.message || 'Verbinding mislukt')
+        throw new Error(data.error?.message || t('whatsappPage.connectionFailed'))
       }
     } catch (err: any) {
-      setError(`Verbinding mislukt: ${err.message}`)
+      setError(`${t('whatsappPage.connectionFailed')}: ${err.message}`)
     }
 
     setSaving(false)
@@ -152,13 +152,13 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <span className="text-4xl">💬</span>
-          <h1 className="text-2xl font-bold text-gray-900">WhatsApp Bestellen</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('whatsappPage.title')}</h1>
           <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-bold rounded-full">
             PRO
           </span>
         </div>
         <p className="text-gray-500">
-          Laat klanten bestellen via WhatsApp. Orders komen automatisch in je keuken scherm.
+          {t('whatsappPage.subtitle')}
         </p>
       </div>
 
@@ -171,12 +171,12 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                {formData.is_active ? 'WhatsApp Actief' : 'WhatsApp Uitgeschakeld'}
+                {formData.is_active ? t('whatsappPage.statusActive') : t('whatsappPage.statusInactive')}
               </h2>
               <p className="text-gray-600">
                 {formData.is_active 
-                  ? 'Klanten kunnen nu bestellen via WhatsApp' 
-                  : 'Schakel in om WhatsApp bestellingen te ontvangen'}
+                  ? t('whatsappPage.statusActiveDesc')
+                  : t('whatsappPage.statusInactiveDesc')}
               </p>
             </div>
           </div>
@@ -203,35 +203,35 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {saved && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-600 flex items-center gap-3">
           <span className="text-xl">✅</span>
-          Instellingen opgeslagen!
+          {t('whatsappPage.savedSuccess')}
         </div>
       )}
 
       {/* Setup Instructions */}
       <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8">
         <h3 className="font-bold text-blue-900 mb-4 flex items-center gap-2">
-          <span>📋</span> Setup Instructies
+          <span>📋</span> {t('whatsappPage.setupTitle')}
         </h3>
         <ol className="space-y-3 text-blue-800">
           <li className="flex gap-3">
             <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">1</span>
-            <span>Maak een <a href="https://business.facebook.com" target="_blank" rel="noopener" className="underline font-bold">Meta Business Account</a> aan</span>
+            <span>{t('whatsappPage.setupStep1')}</span>
           </li>
           <li className="flex gap-3">
             <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">2</span>
-            <span>Ga naar <a href="https://developers.facebook.com/apps" target="_blank" rel="noopener" className="underline font-bold">Meta for Developers</a> en maak een app</span>
+            <span>{t('whatsappPage.setupStep2')}</span>
           </li>
           <li className="flex gap-3">
             <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">3</span>
-            <span>Voeg het WhatsApp product toe aan je app</span>
+            <span>{t('whatsappPage.setupStep3')}</span>
           </li>
           <li className="flex gap-3">
             <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">4</span>
-            <span>Kopieer je <strong>Phone Number ID</strong> en <strong>Access Token</strong></span>
+            <span>{t('whatsappPage.setupStep4')}</span>
           </li>
           <li className="flex gap-3">
             <span className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold shrink-0">5</span>
-            <span>Configureer de webhook URL hieronder in je Meta app</span>
+            <span>{t('whatsappPage.setupStep5')}</span>
           </li>
         </ol>
       </div>
@@ -239,7 +239,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* Webhook URL */}
       <div className="bg-gray-900 text-white rounded-2xl p-6 mb-8">
         <h3 className="font-bold mb-2 flex items-center gap-2">
-          <span>🔗</span> Webhook URL (kopieer naar Meta)
+          <span>🔗</span> {t('whatsappPage.webhookTitle')}
         </h3>
         <div className="flex gap-2">
           <input
@@ -251,11 +251,11 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
           <button
             onClick={() => {
               navigator.clipboard.writeText(webhookUrl)
-              alert('Webhook URL gekopieerd!')
+              alert(t('whatsappPage.webhookCopied'))
             }}
             className="px-4 py-3 bg-green-500 hover:bg-green-600 rounded-xl font-bold"
           >
-            📋 Kopieer
+            📋 {t('whatsappPage.copyLink')}
           </button>
         </div>
         <p className="text-gray-400 text-sm mt-3">
@@ -267,13 +267,13 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <span>🔑</span> API Instellingen
+            <span>🔑</span> {t('whatsappPage.apiSettings')}
           </h3>
           <button
             onClick={() => setShowTokens(!showTokens)}
             className="text-sm text-gray-500 hover:text-gray-700"
           >
-            {showTokens ? '🙈 Verbergen' : '👁️ Tonen'}
+            {showTokens ? `🙈 ${t('whatsappPage.hideTokens')}` : `👁️ ${t('whatsappPage.showTokens')}`}
           </button>
         </div>
 
@@ -290,7 +290,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Te vinden in Meta Developer Console → WhatsApp → API Setup
+              {t('whatsappPage.phoneNumberIdHint')}
             </p>
           </div>
 
@@ -306,13 +306,13 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono text-sm"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Maak een System User aan in Business Settings voor een permanente token
+              {t('whatsappPage.accessTokenHint')}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Business Account ID (optioneel)
+              {t('whatsappPage.businessAccountId')}
             </label>
             <input
               type="text"
@@ -336,7 +336,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
               />
             ) : (
               <>
-                <span>🔌</span> Test Verbinding
+                <span>🔌</span> {t('whatsappPage.testConnection')}
               </>
             )}
           </button>
@@ -346,13 +346,13 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* Custom Messages */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <span>💬</span> Automatische Berichten
+          <span>💬</span> {t('whatsappPage.autoMessages')}
         </h3>
 
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Welkomstbericht
+              {t('whatsappPage.welcomeMsg')}
             </label>
             <textarea
               value={formData.welcome_message}
@@ -364,7 +364,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Bevestigingsbericht (na bestelling)
+              {t('whatsappPage.confirmMsg')}
             </label>
             <textarea
               value={formData.order_confirmation_message}
@@ -376,7 +376,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Klaar-bericht (bestelling klaar)
+              {t('whatsappPage.readyMsg')}
             </label>
             <textarea
               value={formData.ready_message}
@@ -391,11 +391,11 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* WhatsApp Number for QR */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <span>📞</span> WhatsApp Nummer
+          <span>📞</span> {t('whatsappPage.numberTitle')}
         </h3>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Je WhatsApp Business telefoonnummer *
+            {t('whatsappPage.numberLabel')}
           </label>
           <input
             type="tel"
@@ -405,7 +405,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg"
           />
           <p className="text-xs text-gray-500 mt-1">
-            Internationaal formaat met landcode (bijv. +32 voor België, +31 voor Nederland)
+            {t('whatsappPage.numberHint')}
           </p>
         </div>
       </div>
@@ -413,10 +413,10 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
       {/* QR Code Preview */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-8">
         <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <span>📱</span> QR Code voor Klanten
+          <span>📱</span> {t('whatsappPage.qrTitle')}
         </h3>
         <p className="text-gray-500 mb-4">
-          Print deze QR code en plaats hem op je toonbank of tafels. Klanten scannen en kunnen direct bestellen via WhatsApp.
+          {t('whatsappPage.qrDesc')}
         </p>
         
         {formData.whatsapp_number && formData.whatsapp_number.length > 8 ? (
@@ -425,7 +425,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
             <div ref={qrRef} className="bg-white p-6 rounded-2xl shadow-lg border-2 border-gray-100">
               <div className="text-center mb-4">
                 <span className="text-4xl">💬</span>
-                <h4 className="font-bold text-gray-900 mt-2">Scan om te bestellen</h4>
+                <h4 className="font-bold text-gray-900 mt-2">{t('whatsappPage.scanToOrder')}</h4>
               </div>
               <QRCode 
                 url={`https://wa.me/${formData.whatsapp_number.replace(/[^0-9]/g, '')}?text=BESTEL`}
@@ -433,16 +433,16 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                 className="mx-auto"
               />
               <p className="text-center text-sm text-gray-500 mt-4">
-                Via WhatsApp
+                {t('whatsappPage.viaWhatsApp')}
               </p>
             </div>
 
             {/* Actions */}
             <div className="flex-1 space-y-4">
               <div className="bg-green-50 p-4 rounded-xl">
-                <h4 className="font-bold text-green-800 mb-2">✅ QR Code Klaar!</h4>
+                <h4 className="font-bold text-green-800 mb-2">✅ {t('whatsappPage.qrReady')}</h4>
                 <p className="text-sm text-green-700">
-                  Klanten scannen deze code en openen direct een WhatsApp chat met je zaak.
+                  {t('whatsappPage.qrReadyDesc')}
                 </p>
               </div>
 
@@ -467,17 +467,17 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                   rel="noopener noreferrer"
                   className="flex-1 py-3 bg-green-100 hover:bg-green-200 text-green-800 rounded-xl font-medium flex items-center justify-center gap-2"
                 >
-                  🔗 Open Link
+                  🔗 {t('whatsappPage.openLink')}
                 </a>
                 <button
                   onClick={() => {
                     const link = `https://wa.me/${formData.whatsapp_number?.replace(/[^0-9]/g, '')}?text=BESTEL`
                     navigator.clipboard.writeText(link)
-                    alert('Link gekopieerd!')
+                    alert(t('whatsappPage.linkCopied'))
                   }}
                   className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium flex items-center justify-center gap-2"
                 >
-                  📋 Kopieer Link
+                  📋 {t('whatsappPage.copyLink')}
                 </button>
                 <button
                   onClick={() => {
@@ -508,7 +508,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                             </head>
                             <body>
                               <div class="container">
-                                <h1>💬 Scan om te bestellen</h1>
+                                <h1>💬 {t('whatsappPage.scanToOrder')}</h1>
                                 ${qrRef.current.innerHTML}
                                 <p>Bestel via WhatsApp</p>
                               </div>
@@ -526,7 +526,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                   }}
                   className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium flex items-center justify-center gap-2"
                 >
-                  🖨️ Print QR Code
+                  🖨️ {t('whatsappPage.printQr')}
                 </button>
               </div>
             </div>
@@ -538,7 +538,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
                 <span className="text-gray-400 text-4xl">📱</span>
               </div>
               <p className="text-sm text-gray-500">
-                Vul je WhatsApp nummer in om de QR code te genereren
+                {t('whatsappPage.fillNumberFirst')}
               </p>
             </div>
           </div>
@@ -551,7 +551,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
           href={`/shop/${params.tenant}/admin`}
           className="px-6 py-3 text-gray-600 hover:bg-gray-100 rounded-xl font-medium"
         >
-          Annuleren
+          {t('common.cancel')}
         </Link>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -568,7 +568,7 @@ export default function WhatsAppSettingsPage({ params }: { params: { tenant: str
             />
           ) : (
             <>
-              <span>💾</span> Opslaan
+              <span>💾</span> {t('common.save')}
             </>
           )}
         </motion.button>
