@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
+import { activateAudioForIOS, playOrderNotification, isAudioActivatedThisSession, markAudioActivated } from '@/lib/sounds'
 
 const getSupabase = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -117,6 +118,12 @@ export default function TafelplanPage() {
   const [unassigned, setUnassigned] = useState<TableReservation[]>([])
   const [assigningRes, setAssigningRes] = useState<TableReservation | null>(null)
   const [showOnlinePanel, setShowOnlinePanel] = useState(false)
+  // Notificaties nieuwe online reservaties
+  const [showReservationAlert, setShowReservationAlert] = useState(false)
+  const [newReservationCount, setNewReservationCount] = useState(0)
+  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
+  const knownReservationIds = useRef<Set<string>>(new Set())
+  const alertSoundInterval = useRef<NodeJS.Timeout | null>(null)
 
   // Modals
   const [showAddSection, setShowAddSection] = useState(false)
@@ -406,7 +413,6 @@ export default function TafelplanPage() {
   async function loadUnassigned(_date?: string) {
     const sb = getSupabase(); if (!sb) return
     const today = new Date().toISOString().split('T')[0]
-    // Laad ALLE toekomstige onassigned reservaties (niet alleen vandaag)
     const { data } = await sb.from('reservations').select('*')
       .eq('tenant_slug', tenantSlug)
       .eq('status', 'confirmed')
@@ -414,7 +420,44 @@ export default function TafelplanPage() {
       .gte('reservation_date', today)
       .order('reservation_date', { ascending: true })
       .order('time_from', { ascending: true })
-    setUnassigned(data || [])
+
+    const results = data || []
+
+    // Detecteer NIEUWE reservaties die we nog niet kenden
+    const brandNew = results.filter(r => !knownReservationIds.current.has(r.id))
+    results.forEach(r => knownReservationIds.current.add(r.id))
+
+    if (brandNew.length > 0 && knownReservationIds.current.size > brandNew.length) {
+      // Er zijn echt nieuwe (niet bij eerste load)
+      setNewReservationCount(brandNew.length)
+      setShowReservationAlert(true)
+      // Speel geluid
+      if (audioActivated) {
+        playOrderNotification()
+        alertSoundInterval.current = setInterval(() => playOrderNotification(), 4000)
+        setTimeout(() => {
+          if (alertSoundInterval.current) clearInterval(alertSoundInterval.current)
+        }, 20000)
+      }
+    }
+
+    setUnassigned(results)
+  }
+
+  function dismissReservationAlert() {
+    setShowReservationAlert(false)
+    if (alertSoundInterval.current) {
+      clearInterval(alertSoundInterval.current)
+      alertSoundInterval.current = null
+    }
+    setShowOnlinePanel(true) // Open het online panel automatisch
+  }
+
+  function activateAudio() {
+    activateAudioForIOS()
+    markAudioActivated()
+    setAudioActivated(true)
+    playOrderNotification()
   }
 
   async function assignTable(res: TableReservation, tableId: string) {
@@ -921,6 +964,39 @@ export default function TafelplanPage() {
             <h3 className="text-xl font-bold mb-2">Tafel #{selectedTable.table_number} verwijderen?</h3>
             <p className="text-gray-600 mb-6">Dit kan niet ongedaan worden gemaakt.</p>
             <div className="flex gap-3"><button onClick={() => setShowDeleteTable(false)} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium">Annuleren</button><button onClick={deleteTable} className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold">Verwijderen</button></div>
+          </div>
+        </div>
+      )}
+
+      {/* Geluid activeren knop (eerste keer) */}
+      {!audioActivated && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+          <button
+            onClick={activateAudio}
+            className="px-6 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-full shadow-2xl text-sm flex items-center gap-2 animate-bounce"
+          >
+            🔔 Activeer geluidsmeldingen
+          </button>
+        </div>
+      )}
+
+      {/* Volledig scherm oranje alert bij nieuwe online reservatie */}
+      {showReservationAlert && (
+        <div
+          onClick={dismissReservationAlert}
+          className="fixed inset-0 z-[200] flex items-center justify-center cursor-pointer"
+          style={{ backgroundColor: 'rgba(249, 115, 22, 0.95)' }}
+        >
+          <div className="text-center text-white p-8">
+            <div className="text-9xl mb-8 inline-block animate-bounce">📅</div>
+            <h1 className="text-6xl md:text-8xl font-black mb-4">Nieuwe reservatie!</h1>
+            <p className="text-2xl md:text-3xl opacity-90 mb-8">
+              {newReservationCount} nieuwe online {newReservationCount === 1 ? 'reservatie' : 'reservaties'} wacht op een tafel
+            </p>
+            <div className="bg-white/20 rounded-2xl px-8 py-4 inline-block">
+              <p className="text-xl font-medium">Tik om te sluiten</p>
+              <p className="text-lg opacity-75 mt-1">Het online reservaties paneel opent automatisch</p>
+            </div>
           </div>
         </div>
       )}
