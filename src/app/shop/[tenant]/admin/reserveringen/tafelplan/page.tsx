@@ -197,8 +197,11 @@ export default function TafelplanPage() {
     }
   }, [hasNewReservations])
 
-  // Effect 3: polling elke 3 seconden — MEEST BETROUWBAAR
+  // Effect 3: polling elke 3 seconden — EXACT zelfde als bestellingen
   useEffect(() => {
+    // Eerste poll initialiseert knownResIdsRef zonder alert te tonen
+    let isFirstPoll = true
+
     const pollForNewReservations = async () => {
       try {
         const sb = getSupabase(); if (!sb) return
@@ -213,21 +216,23 @@ export default function TafelplanPage() {
 
         const results = data || []
         const newFound = results.filter(r => !knownResIdsRef.current.has(r.id))
+        // Voeg alle IDs toe aan bekend
         results.forEach(r => knownResIdsRef.current.add(r.id))
 
-        if (newFound.length > 0) {
+        // Eerste poll: geen alert (alleen initialiseren)
+        // Vanaf tweede poll: alert als er echte nieuwe zijn
+        if (!isFirstPoll && newFound.length > 0) {
           setAlertDismissed(false)
+          setShowNewResAlert(true)   // direct zetten, net als bestellingen
           setHasNewReservations(true)
         }
 
+        isFirstPoll = false
         setUnassigned(results)
       } catch (e) {
         console.error('Reservatie polling error:', e)
       }
     }
-
-    // Initialiseer bekende IDs van huidige staat (geen alert voor bestaande)
-    unassigned.forEach(r => knownResIdsRef.current.add(r.id))
 
     pollingIntervalRef.current = setInterval(pollForNewReservations, 3000)
     return () => {
@@ -236,7 +241,7 @@ export default function TafelplanPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantSlug])
 
-  // Reset hasNewReservations als alle onassigned afgehandeld zijn
+  // Reset als alle unassigned afgehandeld zijn
   useEffect(() => {
     if (unassigned.length === 0 && hasNewReservations) {
       setHasNewReservations(false)
