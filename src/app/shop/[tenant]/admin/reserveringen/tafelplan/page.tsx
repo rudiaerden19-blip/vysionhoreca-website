@@ -116,6 +116,7 @@ export default function TafelplanPage() {
   // Online reservaties zonder tafel
   const [unassigned, setUnassigned] = useState<TableReservation[]>([])
   const [assigningRes, setAssigningRes] = useState<TableReservation | null>(null)
+  const [showOnlinePanel, setShowOnlinePanel] = useState(false)
 
   // Modals
   const [showAddSection, setShowAddSection] = useState(false)
@@ -418,9 +419,17 @@ export default function TafelplanPage() {
 
   async function assignTable(res: TableReservation, tableId: string) {
     const sb = getSupabase(); if (!sb) return
-    await sb.from('reservations').update({ table_id: tableId }).eq('id', res.id)
+    // Reset whatsapp_sent zodat bevestigingsmail opnieuw verstuurd wordt met tafelnummer
+    await sb.from('reservations').update({ table_id: tableId, whatsapp_sent: false }).eq('id', res.id)
     setAssigningRes(null)
-    // Zet agenda op de datum van de reservatie zodat de badge zichtbaar wordt
+    // Stuur bevestigingsmail naar klant
+    if (res.customer_email || res.customer_phone) {
+      fetch('/api/whatsapp/send-reservation-confirmation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reservationId: res.id, tenantSlug }),
+      }).catch(() => {})
+    }
     setAgendaDate(res.reservation_date)
     await refreshAll()
     await loadUnassigned()
@@ -461,6 +470,19 @@ export default function TafelplanPage() {
             className="px-4 py-2 border-2 border-green-200 text-green-700 rounded-xl font-medium hover:bg-green-50"
             title="Kopieer online boekingslink voor klanten"
           >🔗 Boekingslink</button>
+
+          {/* Online reservaties knop met rode badge */}
+          <button
+            onClick={() => setShowOnlinePanel(true)}
+            className="relative px-4 py-2 border-2 border-orange-200 text-orange-700 rounded-xl font-medium hover:bg-orange-50"
+          >
+            📬 Online reservaties
+            {unassigned.length > 0 && (
+              <span className="absolute -top-2 -right-2 w-5 h-5 bg-red-600 text-white text-xs font-black rounded-full flex items-center justify-center">
+                {unassigned.length}
+              </span>
+            )}
+          </button>
           <button onClick={savePositions} disabled={saving} className={`px-6 py-2 rounded-xl font-bold transition-colors ${savedMsg ? 'bg-green-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'} disabled:opacity-60`}>
             {saving ? 'Opslaan...' : savedMsg ? '✓ Opgeslagen' : '💾 Opslaan'}
           </button>
@@ -550,35 +572,6 @@ export default function TafelplanPage() {
         </div>
       )}
 
-      {/* Wachtrij: online reservaties zonder tafel */}
-      {unassigned.length > 0 && (
-        <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">📬</span>
-            <h3 className="font-bold text-amber-900">Nieuwe online reservaties — tafel toewijzen</h3>
-            <span className="bg-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">{unassigned.length}</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {unassigned.map(res => (
-              <div key={res.id} className="bg-white rounded-xl border border-amber-200 p-3">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-gray-900 text-sm">{res.customer_name}</span>
-                  <span className="text-xs text-amber-600 font-medium">{res.time_from} → {res.time_to}</span>
-                </div>
-                <p className="text-xs font-semibold text-amber-700 mb-1">📅 {new Date(res.reservation_date + 'T12:00').toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
-                <p className="text-xs text-gray-500 mb-2">👥 {res.party_size} pers. · 📱 {res.customer_phone}</p>
-                {res.notes && <p className="text-xs text-gray-400 italic mb-2">&quot;{res.notes}&quot;</p>}
-                <button
-                  onClick={() => setAssigningRes(res)}
-                  className="w-full py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg transition-colors"
-                >
-                  🪑 Tafel toewijzen
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="flex gap-4">
         {/* Canvas */}
@@ -845,6 +838,53 @@ export default function TafelplanPage() {
                 <button onClick={() => { setShowResForm(false); setEditingRes(null); setResErrors({}) }} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-700">Annuleren</button>
                 <button onClick={saveReservation} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700">Opslaan</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Panel: Online reservaties zonder tafel */}
+      {showOnlinePanel && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center p-4" onClick={() => setShowOnlinePanel(false)}>
+          <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">📬 Online reservaties</h3>
+                <p className="text-sm text-gray-500">{unassigned.length === 0 ? 'Alle reservaties zijn toegewezen' : `${unassigned.length} wacht op tafeltoewijzing`}</p>
+              </div>
+              <button onClick={() => setShowOnlinePanel(false)} className="text-gray-400 hover:text-gray-600 text-2xl font-bold">×</button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-4 space-y-3">
+              {unassigned.length === 0 ? (
+                <div className="text-center py-12 text-gray-400">
+                  <span className="text-5xl block mb-3">✅</span>
+                  <p>Alle online reservaties zijn toegewezen aan een tafel</p>
+                </div>
+              ) : unassigned.map(res => (
+                <div key={res.id} className="border-2 border-orange-100 bg-orange-50 rounded-xl p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <p className="font-bold text-gray-900">{res.customer_name}</p>
+                      <p className="text-sm font-semibold text-orange-600 mt-0.5">
+                        📅 {new Date(res.reservation_date + 'T12:00').toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}
+                        {' · '}{res.time_from}{res.time_to ? ` → ${res.time_to}` : ''}
+                      </p>
+                      <div className="flex gap-4 mt-1 text-sm text-gray-600">
+                        <span>👥 {res.party_size} pers.</span>
+                        {res.customer_phone && <span>📱 {res.customer_phone}</span>}
+                        {res.customer_email && <span>📧 {res.customer_email}</span>}
+                      </div>
+                      {res.notes && <p className="text-xs text-gray-400 italic mt-1">&quot;{res.notes}&quot;</p>}
+                    </div>
+                    <button
+                      onClick={() => { setAssigningRes(res); setShowOnlinePanel(false) }}
+                      className="flex-shrink-0 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-xl transition-colors"
+                    >
+                      🪑 Tafel toewijzen
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
