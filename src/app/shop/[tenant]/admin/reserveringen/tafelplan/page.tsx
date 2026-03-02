@@ -24,6 +24,7 @@ interface TableReservation {
   party_size: number; reservation_date: string; reservation_time: string
   time_from: string | null; time_to: string | null; status: string
   notes: string | null; deposit_amount: number; deposit_paid: boolean; is_occupied: boolean
+  confirmed_by_customer: boolean; confirmation_token: string | null; whatsapp_sent: boolean
 }
 
 const SECTION_COLORS = ['#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6','#EC4899','#06B6D4','#84CC16']
@@ -278,6 +279,20 @@ export default function TafelplanPage() {
     }
     setShowResForm(false); setEditingRes(null); setResForm(emptyResForm()); setResErrors({})
     await refreshAll()
+
+    // Stuur WhatsApp bevestiging bij nieuwe reservatie (niet bij bewerken)
+    if (!editingRes && resForm.customer_phone.trim()) {
+      const { data: newest } = await sb.from('reservations')
+        .select('id').eq('tenant_slug', tenantSlug).eq('table_id', selectedTable.id)
+        .eq('reservation_date', resForm.date).order('created_at', { ascending: false }).limit(1).single()
+      if (newest) {
+        fetch('/api/whatsapp/send-reservation-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reservationId: newest.id, tenantSlug })
+        }).catch(() => {}) // Stille fout — WhatsApp is optioneel
+      }
+    }
   }
 
   // Stap 1: Groen → Rood (gasten aangekomen)
@@ -525,7 +540,14 @@ export default function TafelplanPage() {
                       <span className={`text-base font-black ${occupied ? 'text-red-700' : 'text-green-700'}`}>
                         {res.time_from || res.reservation_time} → {res.time_to || '?'}
                       </span>
-                      <span className="text-xs text-gray-400">{res.party_size} pers.</span>
+                      <div className="flex items-center gap-1.5">
+                        {res.confirmed_by_customer
+                          ? <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">✅ Bevestigd</span>
+                          : res.whatsapp_sent
+                            ? <span className="bg-blue-50 text-blue-500 text-xs font-medium px-2 py-0.5 rounded-full">💬 WA verzonden</span>
+                            : <span className="text-xs text-gray-400">{res.party_size} pers.</span>
+                        }
+                      </div>
                     </div>
                     <p className="font-bold text-gray-900">{res.customer_name}</p>
                     <div className="text-sm text-gray-600 space-y-0.5 mt-1">
@@ -544,6 +566,13 @@ export default function TafelplanPage() {
                         <button onClick={() => releaseTable(res)} className="flex-1 py-2 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700 transition-colors">
                           🔴 Gasten aanwezig — Tafel vrijgeven
                         </button>
+                      )}
+                      {!res.confirmed_by_customer && res.customer_phone && (
+                        <button
+                          title="WhatsApp bevestiging sturen"
+                          onClick={() => fetch('/api/whatsapp/send-reservation-confirmation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reservationId: res.id, tenantSlug }) }).then(() => refreshAll())}
+                          className="px-3 py-1.5 bg-green-50 border border-green-200 text-green-600 rounded-lg text-xs hover:bg-green-100"
+                        >💬</button>
                       )}
                       <button onClick={() => {
                         const parts = (res.customer_name || '').split(' ')
