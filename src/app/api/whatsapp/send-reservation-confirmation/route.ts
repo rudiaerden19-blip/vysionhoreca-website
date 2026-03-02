@@ -44,6 +44,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Reservation not found' }, { status: 404 })
     }
 
+    // Idempotentie: al verstuurd? Nooit twee keer sturen
+    if (res.whatsapp_sent) {
+      console.log('⏭️ Notification already sent for reservation:', reservationId)
+      return NextResponse.json({ success: true, skipped: true })
+    }
+
     // Haal restaurantgegevens op
     const { data: tenant } = await supabaseAdmin
       .from('tenants')
@@ -183,12 +189,12 @@ ${businessName}`
       }
     }
 
-    // === STAP 3: Update reservatie — markeer als verstuurd ===
+    // === STAP 3: Markeer als verstuurd — altijd true na elke notificatie (WA of email) ===
     await supabaseAdmin
       .from('reservations')
       .update({
-        whatsapp_sent: whatsappSent,
-        whatsapp_sent_at: whatsappSent ? new Date().toISOString() : null,
+        whatsapp_sent: true, // Gebruikt als "notification_sent" flag
+        whatsapp_sent_at: new Date().toISOString(),
       })
       .eq('id', reservationId)
 
