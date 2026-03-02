@@ -996,7 +996,7 @@ export default function TafelplanPage() {
       )}
 
       {/* Volledig scherm oranje alert — EXACT zelfde als bestellingen */}
-      {showNewResAlert && hasNewReservations && (
+      {showNewResAlert && (
         <div
           onClick={dismissAlert}
           className="fixed inset-0 z-[200] flex items-center justify-center cursor-pointer"
