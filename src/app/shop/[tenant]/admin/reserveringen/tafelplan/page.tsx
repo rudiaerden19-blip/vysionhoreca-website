@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import { activateAudioForIOS, playOrderNotification, isAudioActivatedThisSession, markAudioActivated } from '@/lib/sounds'
+import { activateAudioForIOS, prewarmAudio, playOrderNotification, isAudioActivatedThisSession, markAudioActivated } from '@/lib/sounds'
 
 const getSupabase = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -118,12 +118,14 @@ export default function TafelplanPage() {
   const [unassigned, setUnassigned] = useState<TableReservation[]>([])
   const [assigningRes, setAssigningRes] = useState<TableReservation | null>(null)
   const [showOnlinePanel, setShowOnlinePanel] = useState(false)
-  // Notificaties nieuwe online reservaties
-  const [showReservationAlert, setShowReservationAlert] = useState(false)
-  const [newReservationCount, setNewReservationCount] = useState(0)
+  // Notificaties nieuwe online reservaties — EXACT zelfde als bestellingen
+  const [showNewResAlert, setShowNewResAlert] = useState(false)
+  const [alertDismissed, setAlertDismissed] = useState(false)
   const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
-  const knownReservationIds = useRef<Set<string>>(new Set())
-  const alertSoundInterval = useRef<NodeJS.Timeout | null>(null)
+  const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const knownResIdsRef = useRef<Set<string>>(new Set())
+  const [hasNewReservations, setHasNewReservations] = useState(false)
 
   // Modals
   const [showAddSection, setShowAddSection] = useState(false)
@@ -161,6 +163,87 @@ export default function TafelplanPage() {
     }, 30000)
     return () => clearInterval(interval)
   }, [tenantSlug, agendaDate, selectedTable?.id])
+
+  // --- EXACT ZELFDE ALS BESTELLINGEN ---
+
+  // Prewarm audio als al geactiveerd
+  useEffect(() => {
+    if (audioActivated) prewarmAudio()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Effect 1: toon/verberg oranje scherm op basis van hasNewReservations
+  useEffect(() => {
+    if (hasNewReservations && !alertDismissed) {
+      setShowNewResAlert(true)
+    }
+    if (!hasNewReservations) {
+      setShowNewResAlert(false)
+      setAlertDismissed(false)
+    }
+  }, [hasNewReservations, alertDismissed])
+
+  // Effect 2: speel geluid zolang er nieuwe reservaties zijn
+  useEffect(() => {
+    if (hasNewReservations) {
+      playOrderNotification()
+      audioIntervalRef.current = setInterval(playOrderNotification, 3000)
+    } else {
+      if (audioIntervalRef.current) clearInterval(audioIntervalRef.current)
+      audioIntervalRef.current = null
+    }
+    return () => {
+      if (audioIntervalRef.current) clearInterval(audioIntervalRef.current)
+    }
+  }, [hasNewReservations])
+
+  // Effect 3: polling elke 3 seconden — MEEST BETROUWBAAR
+  useEffect(() => {
+    const pollForNewReservations = async () => {
+      try {
+        const sb = getSupabase(); if (!sb) return
+        const today = new Date().toISOString().split('T')[0]
+        const { data } = await sb.from('reservations').select('*')
+          .eq('tenant_slug', tenantSlug)
+          .eq('status', 'confirmed')
+          .is('table_id', null)
+          .gte('reservation_date', today)
+          .order('reservation_date', { ascending: true })
+          .order('time_from', { ascending: true })
+
+        const results = data || []
+        const newFound = results.filter(r => !knownResIdsRef.current.has(r.id))
+        results.forEach(r => knownResIdsRef.current.add(r.id))
+
+        if (newFound.length > 0) {
+          setAlertDismissed(false)
+          setHasNewReservations(true)
+        }
+
+        setUnassigned(results)
+      } catch (e) {
+        console.error('Reservatie polling error:', e)
+      }
+    }
+
+    // Initialiseer bekende IDs van huidige staat (geen alert voor bestaande)
+    unassigned.forEach(r => knownResIdsRef.current.add(r.id))
+
+    pollingIntervalRef.current = setInterval(pollForNewReservations, 3000)
+    return () => {
+      if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tenantSlug])
+
+  // Reset hasNewReservations als alle onassigned afgehandeld zijn
+  useEffect(() => {
+    if (unassigned.length === 0 && hasNewReservations) {
+      setHasNewReservations(false)
+    }
+  }, [unassigned.length, hasNewReservations])
+
+  // --- EINDE EXACTE KOPIE ---
 
   // Real-time: luister naar reservatiewijzigingen (bevestiging door klant, etc.)
   useEffect(() => {
@@ -420,37 +503,13 @@ export default function TafelplanPage() {
       .gte('reservation_date', today)
       .order('reservation_date', { ascending: true })
       .order('time_from', { ascending: true })
-
-    const results = data || []
-
-    // Detecteer NIEUWE reservaties die we nog niet kenden
-    const brandNew = results.filter(r => !knownReservationIds.current.has(r.id))
-    results.forEach(r => knownReservationIds.current.add(r.id))
-
-    if (brandNew.length > 0 && knownReservationIds.current.size > brandNew.length) {
-      // Er zijn echt nieuwe (niet bij eerste load)
-      setNewReservationCount(brandNew.length)
-      setShowReservationAlert(true)
-      // Speel geluid
-      if (audioActivated) {
-        playOrderNotification()
-        alertSoundInterval.current = setInterval(() => playOrderNotification(), 4000)
-        setTimeout(() => {
-          if (alertSoundInterval.current) clearInterval(alertSoundInterval.current)
-        }, 20000)
-      }
-    }
-
-    setUnassigned(results)
+    setUnassigned(data || [])
   }
 
-  function dismissReservationAlert() {
-    setShowReservationAlert(false)
-    if (alertSoundInterval.current) {
-      clearInterval(alertSoundInterval.current)
-      alertSoundInterval.current = null
-    }
-    setShowOnlinePanel(true) // Open het online panel automatisch
+  function dismissAlert() {
+    setShowNewResAlert(false)
+    setAlertDismissed(true)
+    setShowOnlinePanel(true)
   }
 
   function activateAudio() {
@@ -968,7 +1027,7 @@ export default function TafelplanPage() {
         </div>
       )}
 
-      {/* Geluid activeren knop (eerste keer) */}
+      {/* Geluid activeren knop (eerste keer) — zelfde als bestellingen */}
       {!audioActivated && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
           <button
@@ -980,22 +1039,29 @@ export default function TafelplanPage() {
         </div>
       )}
 
-      {/* Volledig scherm oranje alert bij nieuwe online reservatie */}
-      {showReservationAlert && (
+      {/* Volledig scherm oranje alert — EXACT zelfde als bestellingen */}
+      {showNewResAlert && hasNewReservations && (
         <div
-          onClick={dismissReservationAlert}
+          onClick={dismissAlert}
           className="fixed inset-0 z-[200] flex items-center justify-center cursor-pointer"
           style={{ backgroundColor: 'rgba(249, 115, 22, 0.95)' }}
         >
-          <div className="text-center text-white p-8">
-            <div className="text-9xl mb-8 inline-block animate-bounce">📅</div>
-            <h1 className="text-6xl md:text-8xl font-black mb-4">Nieuwe reservatie!</h1>
+          <div
+            className="text-center text-white p-8"
+            style={{ animation: 'pulse 0.8s ease-in-out infinite' }}
+          >
+            <div className="text-9xl mb-8" style={{ display: 'inline-block', animation: 'bounce 0.5s infinite' }}>
+              🔔
+            </div>
+            <h1 className="text-6xl md:text-8xl font-black mb-4">
+              Nieuwe reservatie!
+            </h1>
             <p className="text-2xl md:text-3xl opacity-90 mb-8">
-              {newReservationCount} nieuwe online {newReservationCount === 1 ? 'reservatie' : 'reservaties'} wacht op een tafel
+              {unassigned.length} online {unassigned.length === 1 ? 'reservatie' : 'reservaties'} wacht op een tafel
             </p>
             <div className="bg-white/20 rounded-2xl px-8 py-4 inline-block">
               <p className="text-xl font-medium">Tik om te sluiten</p>
-              <p className="text-lg opacity-75 mt-1">Het online reservaties paneel opent automatisch</p>
+              <p className="text-lg opacity-75 mt-1">Geluid stopt als alle reservaties toegewezen zijn</p>
             </div>
           </div>
         </div>
