@@ -122,8 +122,9 @@ export default function TafelplanPage() {
 
   const [sectionForm, setSectionForm] = useState({ name: '', color: SECTION_COLORS[0] })
   const [tableForm, setTableForm] = useState({ table_number: '', seats: 4, shape: 'square' as 'square'|'round'|'rectangle', section_id: '' })
-  const emptyResForm = () => ({ customer_name: '', customer_phone: '', customer_email: '', party_size: 2, date: agendaDate, time_from: '12:00', time_to: '14:00', notes: '', deposit_amount: 0, deposit_paid: false })
+  const emptyResForm = () => ({ customer_first_name: '', customer_last_name: '', customer_phone: '', customer_email: '', party_size: 2, date: agendaDate, time_from: '12:00', time_to: '14:00', notes: '', deposit_amount: 0, deposit_paid: false })
   const [resForm, setResForm] = useState(emptyResForm())
+  const [resErrors, setResErrors] = useState<Record<string, boolean>>({})
 
   const dragging = useRef<{ id: string; sx: number; sy: number; ox: number; oy: number } | null>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
@@ -244,11 +245,18 @@ export default function TafelplanPage() {
   }
 
   async function saveReservation() {
-    if (!selectedTable || !resForm.customer_name.trim()) return
+    const errors: Record<string, boolean> = {}
+    if (!resForm.customer_first_name.trim()) errors.first_name = true
+    if (!resForm.customer_last_name.trim()) errors.last_name = true
+    if (!resForm.customer_phone.trim()) errors.phone = true
+    if (Object.keys(errors).length > 0) { setResErrors(errors); return }
+    setResErrors({})
+    if (!selectedTable) return
     const sb = getSupabase(); if (!sb) return
+    const fullName = `${resForm.customer_first_name.trim()} ${resForm.customer_last_name.trim()}`
     const payload = {
       tenant_slug: tenantSlug, table_id: selectedTable.id,
-      customer_name: resForm.customer_name.trim(),
+      customer_name: fullName,
       customer_phone: resForm.customer_phone.trim(),
       customer_email: resForm.customer_email.trim(),
       party_size: resForm.party_size,
@@ -268,7 +276,7 @@ export default function TafelplanPage() {
     } else {
       await sb.from('reservations').insert(payload)
     }
-    setShowResForm(false); setEditingRes(null); setResForm(emptyResForm())
+    setShowResForm(false); setEditingRes(null); setResForm(emptyResForm()); setResErrors({})
     await refreshAll()
   }
 
@@ -537,7 +545,13 @@ export default function TafelplanPage() {
                           🔴 Gasten aanwezig — Tafel vrijgeven
                         </button>
                       )}
-                      <button onClick={() => { setResForm({ customer_name: res.customer_name, customer_phone: res.customer_phone, customer_email: res.customer_email, party_size: res.party_size, date: res.reservation_date, time_from: res.time_from || res.reservation_time, time_to: res.time_to || '', notes: res.notes || '', deposit_amount: res.deposit_amount, deposit_paid: res.deposit_paid }); setEditingRes(res); setShowResForm(true) }} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs hover:bg-gray-50">✏️</button>
+                      <button onClick={() => {
+                        const parts = (res.customer_name || '').split(' ')
+                        const firstName = parts[0] || ''
+                        const lastName = parts.slice(1).join(' ') || ''
+                        setResForm({ customer_first_name: firstName, customer_last_name: lastName, customer_phone: res.customer_phone, customer_email: res.customer_email, party_size: res.party_size, date: res.reservation_date, time_from: res.time_from || res.reservation_time, time_to: res.time_to || '', notes: res.notes || '', deposit_amount: res.deposit_amount, deposit_paid: res.deposit_paid })
+                        setEditingRes(res); setShowResForm(true)
+                      }} className="px-3 py-1.5 bg-white border border-gray-200 text-gray-600 rounded-lg text-xs hover:bg-gray-50">✏️</button>
                       <button onClick={() => cancelReservation(res)} className="px-3 py-1.5 bg-white border border-red-200 text-red-400 rounded-lg text-xs hover:bg-red-50">✕</button>
                     </div>
                   </div>
@@ -608,11 +622,53 @@ export default function TafelplanPage() {
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl overflow-y-auto max-h-[90vh]" onClick={e => e.stopPropagation()}>
             <h3 className="text-xl font-bold mb-4">{editingRes ? 'Reservatie bewerken' : `Nieuwe reservatie — Tafel #${selectedTable?.table_number}`}</h3>
             <div className="space-y-4">
+              {/* Voornaam + Achternaam */}
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Naam *</label><input autoFocus value={resForm.customer_name} onChange={e => setResForm(p => ({ ...p, customer_name: e.target.value }))} placeholder="Voornaam Naam" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Telefoon</label><input value={resForm.customer_phone} onChange={e => setResForm(p => ({ ...p, customer_phone: e.target.value }))} placeholder="+32 4xx..." className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Voornaam <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    autoFocus
+                    value={resForm.customer_first_name}
+                    onChange={e => { setResForm(p => ({ ...p, customer_first_name: e.target.value })); setResErrors(p => ({ ...p, first_name: false })) }}
+                    placeholder="Voornaam"
+                    className={`w-full border-2 rounded-xl px-3 py-2.5 focus:outline-none transition-colors ${resErrors.first_name ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                  />
+                  {resErrors.first_name && <p className="text-red-500 text-xs mt-1">Verplicht veld</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Achternaam <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    value={resForm.customer_last_name}
+                    onChange={e => { setResForm(p => ({ ...p, customer_last_name: e.target.value })); setResErrors(p => ({ ...p, last_name: false })) }}
+                    placeholder="Achternaam"
+                    className={`w-full border-2 rounded-xl px-3 py-2.5 focus:outline-none transition-colors ${resErrors.last_name ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                  />
+                  {resErrors.last_name && <p className="text-red-500 text-xs mt-1">Verplicht veld</p>}
+                </div>
               </div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" value={resForm.customer_email} onChange={e => setResForm(p => ({ ...p, customer_email: e.target.value }))} placeholder="naam@email.com" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" /></div>
+              {/* Telefoon + Email */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Telefoon <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    value={resForm.customer_phone}
+                    onChange={e => { setResForm(p => ({ ...p, customer_phone: e.target.value })); setResErrors(p => ({ ...p, phone: false })) }}
+                    placeholder="+32 4xx..."
+                    className={`w-full border-2 rounded-xl px-3 py-2.5 focus:outline-none transition-colors ${resErrors.phone ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'}`}
+                  />
+                  {resErrors.phone && <p className="text-red-500 text-xs mt-1">Verplicht veld</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input type="email" value={resForm.customer_email} onChange={e => setResForm(p => ({ ...p, customer_email: e.target.value }))} placeholder="naam@email.com" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-blue-500" />
+                </div>
+              </div>
               <div><label className="block text-sm font-medium text-gray-700 mb-2">Personen</label>
                 <div className="flex items-center gap-4"><button onClick={() => setResForm(p => ({ ...p, party_size: Math.max(1, p.party_size - 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">−</button><span className="text-2xl font-bold w-8 text-center">{resForm.party_size}</span><button onClick={() => setResForm(p => ({ ...p, party_size: Math.min(selectedTable?.seats || 20, p.party_size + 1) }))} className="w-10 h-10 bg-gray-100 rounded-xl font-bold text-xl">+</button><span className="text-sm text-gray-400">max {selectedTable?.seats}</span></div>
               </div>
@@ -627,7 +683,7 @@ export default function TafelplanPage() {
                 <div className="flex items-end pb-2"><label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={resForm.deposit_paid} onChange={e => setResForm(p => ({ ...p, deposit_paid: e.target.checked }))} className="w-5 h-5 rounded" /><span className="text-sm font-medium text-gray-700">Betaald</span></label></div>
               </div>
               <div className="flex gap-3 pt-2">
-                <button onClick={() => { setShowResForm(false); setEditingRes(null) }} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-700">Annuleren</button>
+                <button onClick={() => { setShowResForm(false); setEditingRes(null); setResErrors({}) }} className="flex-1 py-3 border-2 border-gray-200 rounded-xl font-medium text-gray-700">Annuleren</button>
                 <button onClick={saveReservation} className="flex-1 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700">Opslaan</button>
               </div>
             </div>
