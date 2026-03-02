@@ -1591,7 +1591,9 @@
       "ideal": "iDEAL",
       "idealDesc": "Niederländische Banken",
       "vat": "MwSt-Satz",
-      "vatRate": "MwSt-Prozentsatz"
+      "vatRate": "MwSt-Prozentsatz",
+      "onlinePaymentsTitle": "Online-Zahlungen Aktivieren?",
+      "onlinePaymentsDesc": "Wir können Stripe oder Mollie für Sie einrichten, damit Kunden online bezahlen können."
     },
     "categorieen": {
       "title": "Kategorien",

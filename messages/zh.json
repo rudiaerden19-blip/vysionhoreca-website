@@ -2085,7 +2085,9 @@
       "ideal": "iDEAL",
       "idealDesc": "荷兰银行",
       "vat": "税率",
-      "vatRate": "增值税率"
+      "vatRate": "增值税率",
+      "onlinePaymentsTitle": "开通在线支付？",
+      "onlinePaymentsDesc": "我们可以为您设置Stripe或Mollie，让客户在线支付。"
     },
     "categorieen": {
       "title": "分类",

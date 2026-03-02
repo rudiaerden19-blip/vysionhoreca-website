@@ -1591,7 +1591,9 @@
       "ideal": "iDEAL",
       "idealDesc": "Banques néerlandaises",
       "vat": "Taux de TVA",
-      "vatRate": "Pourcentage de TVA"
+      "vatRate": "Pourcentage de TVA",
+      "onlinePaymentsTitle": "Activer les Paiements en Ligne ?",
+      "onlinePaymentsDesc": "Nous pouvons configurer Stripe ou Mollie pour vous afin que les clients puissent payer en ligne."
     },
     "categorieen": {
       "title": "Catégories",

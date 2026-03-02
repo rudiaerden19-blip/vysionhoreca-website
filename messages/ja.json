@@ -2085,7 +2085,9 @@
       "ideal": "iDEAL",
       "idealDesc": "オランダの銀行",
       "vat": "税率",
-      "vatRate": "消費税率"
+      "vatRate": "消費税率",
+      "onlinePaymentsTitle": "オンライン決済を有効化しますか？",
+      "onlinePaymentsDesc": "StripeまたはMollieを設定して、お客様がオンラインで支払えるようにします。"
     },
     "categorieen": {
       "title": "カテゴリー",

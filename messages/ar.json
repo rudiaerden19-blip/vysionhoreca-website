@@ -2085,7 +2085,9 @@
       "ideal": "آيديال",
       "idealDesc": "البنوك الهولندية",
       "vat": "نسبة الضريبة",
-      "vatRate": "نسبة الضريبة المضافة"
+      "vatRate": "نسبة الضريبة المضافة",
+      "onlinePaymentsTitle": "تفعيل الدفع الإلكتروني؟",
+      "onlinePaymentsDesc": "يمكننا إعداد Stripe أو Mollie لك حتى يتمكن العملاء من الدفع عبر الإنترنت."
     },
     "categorieen": {
       "title": "الفئات",

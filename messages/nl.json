@@ -1997,7 +1997,9 @@
       "ideal": "iDEAL",
       "idealDesc": "Nederlandse banken",
       "vat": "BTW-tarief",
-      "vatRate": "BTW percentage"
+      "vatRate": "BTW percentage",
+      "onlinePaymentsTitle": "Online Betalingen Activeren?",
+      "onlinePaymentsDesc": "Wij kunnen Stripe of Mollie voor je instellen zodat klanten online kunnen betalen."
     },
     "categorieen": {
       "title": "Categorieën",

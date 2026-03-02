@@ -88,7 +88,7 @@ export default function TekstenPage({ params }: { params: { tenant: string } }) 
       setSaved(true)
       setTimeout(() => setSaved(false), 3000)
     } else {
-      alert('Opslaan mislukt: ' + error.message)
+      alert(t('adminPages.common.saveFailed') + ': ' + error.message)
     }
     
     setSaving(false)

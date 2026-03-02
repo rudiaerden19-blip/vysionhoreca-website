@@ -2085,7 +2085,9 @@
       "ideal": "iDEAL",
       "idealDesc": "Banche olandesi",
       "vat": "Aliquota IVA",
-      "vatRate": "Percentuale IVA"
+      "vatRate": "Percentuale IVA",
+      "onlinePaymentsTitle": "Attivare i Pagamenti Online?",
+      "onlinePaymentsDesc": "Possiamo configurare Stripe o Mollie per voi in modo che i clienti possano pagare online."
     },
     "categorieen": {
       "title": "Categorie",

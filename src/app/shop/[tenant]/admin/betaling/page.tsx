@@ -79,7 +79,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
 
     if (error) {
       console.error('Error saving payment settings:', error)
-      alert('Fout bij opslaan. Voer eerst de SQL migratie uit.')
+      alert(t('adminPages.common.saveFailed'))
     } else {
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
@@ -117,7 +117,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
           saved ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
         }`}
       >
-        {saving ? '⏳' : saved ? '✓' : '💾'} {saved ? 'Opgeslagen!' : t('adminPages.common.save')}
+        {saving ? '⏳' : saved ? '✓' : '💾'} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
       </motion.button>
 
       {/* Header */}
@@ -202,9 +202,9 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         transition={{ delay: 0.2 }}
         className="mt-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-6 text-white"
       >
-        <h3 className="font-semibold text-lg mb-2">💡 Online Betalingen Activeren?</h3>
+        <h3 className="font-semibold text-lg mb-2">💡 {t('adminPages.betaling.onlinePaymentsTitle')}</h3>
         <p className="text-white/80 mb-4">
-          Wij kunnen Stripe of Mollie voor je instellen zodat klanten online kunnen betalen.
+          {t('adminPages.betaling.onlinePaymentsDesc')}
         </p>
         <a 
           href="mailto:info@vysionhoreca.com?subject=Online%20Betalingen%20Activeren"

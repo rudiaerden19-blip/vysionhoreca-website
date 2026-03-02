@@ -2085,7 +2085,9 @@
       "ideal": "iDEAL",
       "idealDesc": "Bancos holandeses",
       "vat": "Tipo de IVA",
-      "vatRate": "Porcentaje de IVA"
+      "vatRate": "Porcentaje de IVA",
+      "onlinePaymentsTitle": "¿Activar Pagos en Línea?",
+      "onlinePaymentsDesc": "Podemos configurar Stripe o Mollie para que los clientes puedan pagar en línea."
     },
     "categorieen": {
       "title": "Categorías",

@@ -1996,7 +1996,9 @@
       "ideal": "iDEAL",
       "idealDesc": "Dutch banks",
       "vat": "VAT Rate",
-      "vatRate": "VAT percentage"
+      "vatRate": "VAT percentage",
+      "onlinePaymentsTitle": "Activate Online Payments?",
+      "onlinePaymentsDesc": "We can set up Stripe or Mollie for you so customers can pay online."
     },
     "categorieen": {
       "title": "Categories",
