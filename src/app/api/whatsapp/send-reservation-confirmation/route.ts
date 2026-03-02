@@ -66,7 +66,22 @@ export async function POST(request: NextRequest) {
     })
 
     const baseUrl = getBaseUrl(request)
-    const confirmUrl = `${baseUrl}/shop/${tenantSlug}/bevestig/${res.confirmation_token}`
+
+    // Zorg dat er altijd een geldig token is — genereer nieuw als het null is
+    let confirmationToken = res.confirmation_token
+    if (!confirmationToken) {
+      const { data: updated } = await supabaseAdmin
+        .from('reservations')
+        .update({ confirmation_token: crypto.randomUUID() })
+        .eq('id', res.id)
+        .select('confirmation_token')
+        .single()
+      confirmationToken = updated?.confirmation_token
+    }
+
+    const confirmUrl = confirmationToken
+      ? `${baseUrl}/shop/${tenantSlug}/bevestig/${confirmationToken}`
+      : null
 
     const timeStr = `${res.time_from || res.reservation_time}${res.time_to ? ` - ${res.time_to}` : ''}`
 
@@ -171,9 +186,14 @@ ${businessName}`
         ${res.notes ? `<tr><td style="padding:6px 0;color:#888;">Notitie:</td><td style="padding:6px 0;color:#555;font-style:italic;">${res.notes}</td></tr>` : ''}
       </table>
     </div>
+    ${confirmUrl ? `
     <div style="text-align:center;margin:30px 0;">
-      <a href="${confirmUrl}" style="display:inline-block;background:#16a34a;color:white;text-decoration:none;padding:16px 40px;border-radius:12px;font-size:18px;font-weight:bold;">✅ Bevestig mijn reservatie</a>
+      <a href="${confirmUrl}" style="display:inline-block;background:#16a34a;color:white;text-decoration:none;padding:16px 40px;border-radius:12px;font-size:18px;font-weight:bold;font-family:Arial,sans-serif;">&#x2705; Bevestig mijn reservatie</a>
     </div>
+    <div style="text-align:center;margin-top:8px;">
+      <p style="color:#888;font-size:12px;word-break:break-all;">Of kopieer deze link: ${confirmUrl}</p>
+    </div>
+    ` : ''}
     <p style="color:#888;font-size:13px;text-align:center;">Kan u niet komen? Bel ons dan zo snel mogelijk.${settings?.phone ? `<br><strong>${settings.phone}</strong>` : ''}</p>
   </div>
   <div style="background:#f8f9fa;padding:16px;text-align:center;border-top:1px solid #eee;">
