@@ -213,7 +213,7 @@ export default function TafelplanPage() {
     setRefreshToken(t => t + 1)
   }
 
-  // Drag
+  // Drag — Mouse
   const onMouseDown = useCallback((e: React.MouseEvent, table: RestaurantTable) => {
     e.preventDefault(); e.stopPropagation()
     isDragging.current = false
@@ -230,6 +230,34 @@ export default function TafelplanPage() {
   }, [])
 
   const onMouseUp = useCallback(() => { dragging.current = null }, [])
+
+  // Drag — Touch (iPad/iPhone)
+  const onTouchStart = useCallback((e: React.TouchEvent, table: RestaurantTable) => {
+    e.stopPropagation()
+    const touch = e.touches[0]
+    isDragging.current = false
+    dragging.current = { id: table.id, sx: touch.clientX, sy: touch.clientY, ox: table.pos_x, oy: table.pos_y }
+  }, [])
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragging.current) return
+    e.preventDefault()
+    const touch = e.touches[0]
+    const dx = touch.clientX - dragging.current.sx; const dy = touch.clientY - dragging.current.sy
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) isDragging.current = true
+    const newX = Math.max(0, dragging.current.ox + dx)
+    const newY = Math.max(0, dragging.current.oy + dy)
+    setTables(prev => prev.map(t => t.id === dragging.current!.id ? { ...t, pos_x: newX, pos_y: newY } : t))
+  }, [])
+
+  const onTouchEnd = useCallback((e: React.TouchEvent, table: RestaurantTable) => {
+    if (!isDragging.current) {
+      // Geen drag → tap op tafel = agenda openen
+      setSelectedTable(table)
+    }
+    isDragging.current = false
+    dragging.current = null
+  }, [])
 
   const onTableClick = useCallback((e: React.MouseEvent, table: RestaurantTable) => {
     e.stopPropagation()
@@ -504,6 +532,8 @@ export default function TafelplanPage() {
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
             onMouseLeave={onMouseUp}
+            onTouchMove={onTouchMove}
+            onTouchEnd={() => { dragging.current = null }}
             onClick={() => setSelectedTable(null)}
           >
             <div className="absolute inset-0" style={{ backgroundColor: '#C8A97A', backgroundImage: 'repeating-linear-gradient(180deg,transparent 0px,transparent 39px,rgba(0,0,0,0.08) 39px,rgba(0,0,0,0.08) 40px)' }} />
@@ -526,7 +556,9 @@ export default function TafelplanPage() {
                   key={table.id}
                   onMouseDown={e => onMouseDown(e, table)}
                   onClick={e => onTableClick(e, table)}
-                  className="absolute cursor-pointer"
+                  onTouchStart={e => onTouchStart(e, table)}
+                  onTouchEnd={e => onTouchEnd(e, table)}
+                  className="absolute cursor-pointer touch-none"
                   style={{ left: table.pos_x, top: table.pos_y, zIndex: selectedTable?.id === table.id ? 10 : 1 }}
                 >
                   <TableWithChairs
