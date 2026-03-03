@@ -4132,5 +4132,33 @@
     "ctaDesc": "今日Vysionリセラーになって稼ぎ始めましょう。",
     "ctaButton": "リセラーになる",
     "footerCopyright": "2026 Vysion Horeca. 全著作権所有。"
+  },
+  "shopOffline": {
+    "title": "オンラインステータス",
+    "subtitle": "お客様向けにショップをオンラインまたはオフラインに設定します",
+    "statusOnline": "ショップはオンライン",
+    "statusOffline": "ショップはオフライン",
+    "onlineDesc": "現在、お客様は注文できます",
+    "offlineDesc": "オンライン注文はブロックされています",
+    "goOffline": "オフラインにする",
+    "goOnline": "オンラインにする",
+    "popupTitle": "なぜショップをオフラインにしますか？",
+    "popupSubtitle": "お客様はショップでこの理由を見ます",
+    "reasonVolzet": "満席",
+    "reasonVolzetDesc": "本日はこれ以上新しい注文を受け付けません",
+    "reasonPanne": "故障 / 技術的な問題",
+    "reasonPanneDesc": "技術的な問題があります。できるだけ早く戻ります",
+    "reasonVakantie": "休暇",
+    "reasonVakantieDesc": "休暇のため一時的に閉店しています",
+    "reasonSluiting": "臨時休業",
+    "reasonSluitingDesc": "例外的な事情により閉店しています",
+    "cancel": "キャンセル",
+    "confirm": "確認",
+    "bannerVolzet": "満席 - 本日の新規注文は受け付けていません",
+    "bannerPanne": "一時的に閉店 - 技術的な問題",
+    "bannerVakantie": "休暇のため閉店",
+    "bannerSluiting": "臨時休業",
+    "bannerSubtitle": "現在、オンライン注文はできません。ご不便をおかけして申し訳ございません。",
+    "orderingBlocked": "現在注文できません"
   }
 }

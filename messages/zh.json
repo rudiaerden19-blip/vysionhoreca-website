@@ -4132,5 +4132,33 @@
     "ctaDesc": "今天就成为Vysion经销商，开始赚钱。",
     "ctaButton": "成为经销商",
     "footerCopyright": "2026 Vysion Horeca. 版权所有。"
+  },
+  "shopOffline": {
+    "title": "在线状态",
+    "subtitle": "为客户将您的商店设置为在线或离线",
+    "statusOnline": "商店在线",
+    "statusOffline": "商店离线",
+    "onlineDesc": "客户目前可以下订单",
+    "offlineDesc": "在线订购已被阻止",
+    "goOffline": "设置为离线",
+    "goOnline": "设置为在线",
+    "popupTitle": "为什么要将商店设置为离线？",
+    "popupSubtitle": "客户将在商店中看到此原因",
+    "reasonVolzet": "已满",
+    "reasonVolzetDesc": "我们今天不再接受新订单",
+    "reasonPanne": "故障 / 技术问题",
+    "reasonPanneDesc": "出现技术问题，我们将尽快恢复",
+    "reasonVakantie": "假期",
+    "reasonVakantieDesc": "我们因假期暂时关闭",
+    "reasonSluiting": "特殊关闭",
+    "reasonSluitingDesc": "由于特殊情况，我们已关闭",
+    "cancel": "取消",
+    "confirm": "确认",
+    "bannerVolzet": "已满 - 今天不再接受新订单",
+    "bannerPanne": "暂时关闭 - 技术问题",
+    "bannerVakantie": "因假期关闭",
+    "bannerSluiting": "特殊关闭",
+    "bannerSubtitle": "目前无法在线订购。对于带来的不便，我们深感抱歉。",
+    "orderingBlocked": "目前无法订购"
   }
 }

@@ -53,9 +53,18 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
   const [promotions, setPromotions] = useState<Promotion[]>([])
   const [promotionsEnabled, setPromotionsEnabled] = useState(true)
+  const [manualOffline, setManualOffline] = useState<{ is_offline: boolean; offline_reason: string | null } | null>(null)
   const menuContentRef = useRef<HTMLDivElement>(null)
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const isScrollingToSection = useRef(false)
+
+  // Fetch manual offline status
+  useEffect(() => {
+    fetch(`/api/shop-offline?tenant=${params.tenant}`)
+      .then(r => r.json())
+      .then(d => setManualOffline(d))
+      .catch(() => {})
+  }, [params.tenant])
 
   // Save WhatsApp phone and set language if user came from WhatsApp link
   useEffect(() => {
@@ -467,6 +476,32 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   return (
     <div className={`min-h-screen ${theme.bg}`}>
+      {/* Manual Offline Overlay */}
+      {manualOffline?.is_offline && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
+          <div className="bg-white rounded-3xl p-10 max-w-md w-full text-center shadow-2xl">
+            <div className="text-7xl mb-6">
+              {manualOffline.offline_reason === 'volzet' ? '🔴' :
+               manualOffline.offline_reason === 'panne' ? '🔧' :
+               manualOffline.offline_reason === 'vakantie' ? '🌴' : '⚠️'}
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
+               manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
+               manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
+               t('shopOffline.bannerSluiting')}
+            </h2>
+            <p className="text-gray-500 mb-8">{t('shopOffline.bannerSubtitle')}</p>
+            <a
+              href={`/shop/${params.tenant}`}
+              className="inline-block px-8 py-3 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-700 transition-all"
+            >
+              ← Terug
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Sticky Header + Categories - SAMEN in 1 container voor iOS Safari */}
       <header 
         className={`sticky top-0 z-50 ${theme.header} shadow-md`}

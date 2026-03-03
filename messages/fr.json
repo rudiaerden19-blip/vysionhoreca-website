@@ -4155,5 +4155,33 @@
     "ctaDesc": "Devenez Revendeur Vysion aujourd hui et commencez a gagner.",
     "ctaButton": "Devenir Revendeur",
     "footerCopyright": "2026 Vysion Horeca. Tous droits reserves."
+  },
+  "shopOffline": {
+    "title": "Statut en ligne",
+    "subtitle": "Mettez votre boutique en ligne ou hors ligne pour les clients",
+    "statusOnline": "Boutique EN LIGNE",
+    "statusOffline": "Boutique HORS LIGNE",
+    "onlineDesc": "Les clients peuvent passer des commandes",
+    "offlineDesc": "La commande en ligne est bloquee",
+    "goOffline": "Mettre hors ligne",
+    "goOnline": "Mettre en ligne",
+    "popupTitle": "Pourquoi mettez-vous la boutique hors ligne?",
+    "popupSubtitle": "Les clients verront cette raison dans la boutique",
+    "reasonVolzet": "Complet",
+    "reasonVolzetDesc": "Nous n acceptons plus de nouvelles commandes pour aujourd hui",
+    "reasonPanne": "Panne / Probleme technique",
+    "reasonPanneDesc": "Il y a un probleme technique, nous revenons le plus vite possible",
+    "reasonVakantie": "Vacances",
+    "reasonVakantieDesc": "Nous sommes temporairement fermes pour les vacances",
+    "reasonSluiting": "Fermeture exceptionnelle",
+    "reasonSluitingDesc": "Nous sommes fermes en raison d une circonstance exceptionnelle",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "bannerVolzet": "Complet - Plus de nouvelles commandes pour aujourd hui",
+    "bannerPanne": "Ferme temporairement - Probleme technique",
+    "bannerVakantie": "Ferme pour les vacances",
+    "bannerSluiting": "Fermeture exceptionnelle",
+    "bannerSubtitle": "La commande en ligne est actuellement impossible. Nous nous excusons pour le desagremen.",
+    "orderingBlocked": "Commande actuellement impossible"
   }
 }

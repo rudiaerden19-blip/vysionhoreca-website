@@ -4132,5 +4132,33 @@
     "ctaDesc": "Diventa Rivenditore Vysion oggi e inizia a guadagnare.",
     "ctaButton": "Diventa Rivenditore",
     "footerCopyright": "2026 Vysion Horeca. Tutti i diritti riservati."
+  },
+  "shopOffline": {
+    "title": "Stato online",
+    "subtitle": "Metti il tuo negozio online o offline per i clienti",
+    "statusOnline": "Negozio ONLINE",
+    "statusOffline": "Negozio OFFLINE",
+    "onlineDesc": "I clienti possono attualmente effettuare ordini",
+    "offlineDesc": "Gli ordini online sono bloccati",
+    "goOffline": "Vai offline",
+    "goOnline": "Vai online",
+    "popupTitle": "Perche metti il negozio offline?",
+    "popupSubtitle": "I clienti vedranno questo motivo nel negozio",
+    "reasonVolzet": "Al completo",
+    "reasonVolzetDesc": "Non accettiamo piu nuovi ordini per oggi",
+    "reasonPanne": "Guasto / Problema tecnico",
+    "reasonPanneDesc": "C e un problema tecnico, torniamo il prima possibile",
+    "reasonVakantie": "Vacanza",
+    "reasonVakantieDesc": "Siamo temporaneamente chiusi per vacanza",
+    "reasonSluiting": "Chiusura eccezionale",
+    "reasonSluitingDesc": "Siamo chiusi per una circostanza eccezionale",
+    "cancel": "Annulla",
+    "confirm": "Conferma",
+    "bannerVolzet": "Al completo - Nessun nuovo ordine per oggi",
+    "bannerPanne": "Temporaneamente chiuso - Problema tecnico",
+    "bannerVakantie": "Chiuso per vacanza",
+    "bannerSluiting": "Chiusura eccezionale",
+    "bannerSubtitle": "Gli ordini online non sono attualmente possibili. Ci scusiamo per il disagio.",
+    "orderingBlocked": "Ordini attualmente non disponibili"
   }
 }

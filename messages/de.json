@@ -4155,5 +4155,33 @@
     "ctaDesc": "Werden Sie noch heute Vysion Reseller und beginnen Sie zu verdienen.",
     "ctaButton": "Reseller werden",
     "footerCopyright": "2026 Vysion Horeca. Alle Rechte vorbehalten."
+  },
+  "shopOffline": {
+    "title": "Online-Status",
+    "subtitle": "Setzen Sie Ihren Shop online oder offline fuer Kunden",
+    "statusOnline": "Shop ist ONLINE",
+    "statusOffline": "Shop ist OFFLINE",
+    "onlineDesc": "Kunden koennen derzeit bestellen",
+    "offlineDesc": "Online-Bestellung ist gesperrt",
+    "goOffline": "Offline schalten",
+    "goOnline": "Online schalten",
+    "popupTitle": "Warum schalten Sie den Shop offline?",
+    "popupSubtitle": "Kunden sehen diesen Grund im Shop",
+    "reasonVolzet": "Ausgebucht",
+    "reasonVolzetDesc": "Wir nehmen heute keine neuen Bestellungen mehr an",
+    "reasonPanne": "Panne / Technisches Problem",
+    "reasonPanneDesc": "Es gibt ein technisches Problem, wir sind so schnell wie moeglich zurueck",
+    "reasonVakantie": "Urlaub",
+    "reasonVakantieDesc": "Wir sind voruebergehend fuer den Urlaub geschlossen",
+    "reasonSluiting": "Ausserordentliche Schliessung",
+    "reasonSluitingDesc": "Wir sind aufgrund eines ausserordentlichen Umstands geschlossen",
+    "cancel": "Abbrechen",
+    "confirm": "Bestaetigen",
+    "bannerVolzet": "Ausgebucht - Keine neuen Bestellungen mehr fuer heute",
+    "bannerPanne": "Voruebergehend geschlossen - Technisches Problem",
+    "bannerVakantie": "Wegen Urlaub geschlossen",
+    "bannerSluiting": "Ausserordentlich geschlossen",
+    "bannerSubtitle": "Online-Bestellung ist derzeit nicht moeglich. Wir entschuldigen uns fuer die Unannehmlichkeiten.",
+    "orderingBlocked": "Bestellen derzeit nicht moeglich"
   }
 }

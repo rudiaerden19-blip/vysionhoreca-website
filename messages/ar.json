@@ -4132,5 +4132,33 @@
     "ctaDesc": "اصبح موزعا لـ Vysion اليوم وابدا في الكسب.",
     "ctaButton": "اصبح موزعا",
     "footerCopyright": "2026 Vysion Horeca. جميع الحقوق محفوظة."
+  },
+  "shopOffline": {
+    "title": "الحالة الالكترونية",
+    "subtitle": "ضع متجرك عبر الانترنت او في وضع عدم الاتصال للعملاء",
+    "statusOnline": "المتجر متاح",
+    "statusOffline": "المتجر غير متاح",
+    "onlineDesc": "يمكن للعملاء الطلب حاليا",
+    "offlineDesc": "الطلب عبر الانترنت محظور",
+    "goOffline": "وضع عدم الاتصال",
+    "goOnline": "وضع الاتصال",
+    "popupTitle": "لماذا تضع المتجر في وضع عدم الاتصال؟",
+    "popupSubtitle": "سيرى العملاء هذا السبب في المتجر",
+    "reasonVolzet": "ممتلئ",
+    "reasonVolzetDesc": "لا نقبل طلبات جديدة لهذا اليوم",
+    "reasonPanne": "عطل / مشكلة تقنية",
+    "reasonPanneDesc": "هناك مشكلة تقنية، سنعود في اقرب وقت ممكن",
+    "reasonVakantie": "اجازة",
+    "reasonVakantieDesc": "نحن مغلقون مؤقتا للاجازة",
+    "reasonSluiting": "اغلاق استثنائي",
+    "reasonSluitingDesc": "نحن مغلقون بسبب ظرف استثنائي",
+    "cancel": "الغاء",
+    "confirm": "تاكيد",
+    "bannerVolzet": "ممتلئ - لا طلبات جديدة لهذا اليوم",
+    "bannerPanne": "مغلق مؤقتا - مشكلة تقنية",
+    "bannerVakantie": "مغلق للاجازة",
+    "bannerSluiting": "اغلاق استثنائي",
+    "bannerSubtitle": "الطلب عبر الانترنت غير ممكن حاليا. نعتذر عن الازعاج.",
+    "orderingBlocked": "الطلب غير متاح حاليا"
   }
 }

@@ -4132,5 +4132,33 @@
     "ctaDesc": "Conviertete hoy en Revendedor Vysion y empieza a ganar.",
     "ctaButton": "Convertirse en Revendedor",
     "footerCopyright": "2026 Vysion Horeca. Todos los derechos reservados."
+  },
+  "shopOffline": {
+    "title": "Estado en linea",
+    "subtitle": "Pon tu tienda en linea o fuera de linea para los clientes",
+    "statusOnline": "Tienda EN LINEA",
+    "statusOffline": "Tienda FUERA DE LINEA",
+    "onlineDesc": "Los clientes pueden hacer pedidos actualmente",
+    "offlineDesc": "Los pedidos en linea estan bloqueados",
+    "goOffline": "Poner fuera de linea",
+    "goOnline": "Poner en linea",
+    "popupTitle": "Por que pones la tienda fuera de linea?",
+    "popupSubtitle": "Los clientes veran este motivo en la tienda",
+    "reasonVolzet": "Completo",
+    "reasonVolzetDesc": "Ya no aceptamos nuevos pedidos por hoy",
+    "reasonPanne": "Averia / Problema tecnico",
+    "reasonPanneDesc": "Hay un problema tecnico, volvemos lo antes posible",
+    "reasonVakantie": "Vacaciones",
+    "reasonVakantieDesc": "Estamos temporalmente cerrados por vacaciones",
+    "reasonSluiting": "Cierre excepcional",
+    "reasonSluitingDesc": "Estamos cerrados por una circunstancia excepcional",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "bannerVolzet": "Completo - No hay nuevos pedidos por hoy",
+    "bannerPanne": "Cerrado temporalmente - Problema tecnico",
+    "bannerVakantie": "Cerrado por vacaciones",
+    "bannerSluiting": "Cierre excepcional",
+    "bannerSubtitle": "Los pedidos en linea no son posibles actualmente. Disculpe las molestias.",
+    "orderingBlocked": "Pedidos actualmente no disponibles"
   }
 }

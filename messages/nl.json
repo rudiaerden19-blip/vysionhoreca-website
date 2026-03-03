@@ -4115,5 +4115,33 @@
     "ctaDesc": "Word vandaag nog Vysion Reseller en begin met verdienen.",
     "ctaButton": "Word Reseller",
     "footerCopyright": "2026 Vysion Horeca. Alle rechten voorbehouden."
+  },
+  "shopOffline": {
+    "title": "Online Status",
+    "subtitle": "Zet je winkel online of offline voor klanten",
+    "statusOnline": "Winkel is ONLINE",
+    "statusOffline": "Winkel is OFFLINE",
+    "onlineDesc": "Klanten kunnen momenteel bestellen",
+    "offlineDesc": "Online bestellen is geblokkeerd",
+    "goOffline": "Zet offline",
+    "goOnline": "Zet online",
+    "popupTitle": "Waarom zet je de winkel offline?",
+    "popupSubtitle": "Klanten zien deze reden in de winkel",
+    "reasonVolzet": "Volzet",
+    "reasonVolzetDesc": "We accepteren geen nieuwe bestellingen meer vandaag",
+    "reasonPanne": "Panne / Technisch probleem",
+    "reasonPanneDesc": "Er is een technisch probleem, we zijn zo snel mogelijk terug",
+    "reasonVakantie": "Vakantie",
+    "reasonVakantieDesc": "We zijn tijdelijk gesloten voor vakantie",
+    "reasonSluiting": "Uitzonderlijke sluiting",
+    "reasonSluitingDesc": "We zijn gesloten wegens een uitzonderlijke omstandigheid",
+    "cancel": "Annuleren",
+    "confirm": "Bevestigen",
+    "bannerVolzet": "Volzet - Geen nieuwe bestellingen meer voor vandaag",
+    "bannerPanne": "Tijdelijk gesloten - Technisch probleem",
+    "bannerVakantie": "Gesloten wegens vakantie",
+    "bannerSluiting": "Uitzonderlijk gesloten",
+    "bannerSubtitle": "Online bestellen is momenteel niet mogelijk. Onze excuses voor het ongemak.",
+    "orderingBlocked": "Bestellen momenteel niet mogelijk"
   }
 }
