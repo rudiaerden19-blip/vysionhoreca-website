@@ -8,19 +8,20 @@ const supabaseAdmin = createClient(
 
 // Ensure the table exists
 async function ensureTable() {
-  await supabaseAdmin.rpc('exec_sql', {
-    sql: `
-      CREATE TABLE IF NOT EXISTS shop_offline_status (
-        tenant_slug TEXT PRIMARY KEY,
-        is_offline BOOLEAN DEFAULT FALSE,
-        offline_reason TEXT,
-        updated_at TIMESTAMPTZ DEFAULT NOW()
-      );
-    `
-  }).catch(() => {
+  try {
+    await supabaseAdmin.rpc('exec_sql', {
+      sql: `
+        CREATE TABLE IF NOT EXISTS shop_offline_status (
+          tenant_slug TEXT PRIMARY KEY,
+          is_offline BOOLEAN DEFAULT FALSE,
+          offline_reason TEXT,
+          updated_at TIMESTAMPTZ DEFAULT NOW()
+        );
+      `
+    })
+  } catch {
     // Table might already exist or exec_sql might not be available
-    // Fall through silently
-  })
+  }
 }
 
 export async function GET(request: NextRequest) {
