@@ -56,7 +56,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     start_date: '',
     end_date: '',
     reason: '',
-    status: 'approved' as 'pending' | 'approved',
+    status: 'approved' as 'approved' | 'rejected',
   })
 
   useEffect(() => {
@@ -339,6 +339,18 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
 
     setProcessing(true)
     
+    const leaveRecord = {
+      id: '',
+      tenant_slug: params.tenant,
+      staff_id: newRequest.staff_id,
+      leave_type: newRequest.leave_type,
+      start_date: newRequest.start_date,
+      end_date: newRequest.end_date,
+      reason: newRequest.reason,
+      status: newRequest.status as 'approved' | 'rejected',
+      requested_at: new Date().toISOString(),
+    }
+
     // Insert leave request
     await supabase.from('leave_requests').insert({
       tenant_slug: params.tenant,
@@ -348,22 +360,12 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
       end_date: newRequest.end_date,
       reason: newRequest.reason,
       status: newRequest.status,
-      reviewed_at: newRequest.status === 'approved' ? new Date().toISOString() : null,
+      reviewed_at: new Date().toISOString(),
     })
 
-    // If approved, also create timesheet entries
+    // If approved, create timesheet entries
     if (newRequest.status === 'approved') {
-      await createTimesheetEntries({
-        id: '',
-        tenant_slug: params.tenant,
-        staff_id: newRequest.staff_id,
-        leave_type: newRequest.leave_type,
-        start_date: newRequest.start_date,
-        end_date: newRequest.end_date,
-        reason: newRequest.reason,
-        status: 'approved',
-        requested_at: new Date().toISOString(),
-      })
+      await createTimesheetEntries(leaveRecord)
     }
 
     await loadData()
@@ -374,7 +376,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
       start_date: '',
       end_date: '',
       reason: '',
-      status: 'approved',
+      status: 'approved' as 'approved' | 'rejected',
     })
     setProcessing(false)
   }
@@ -934,14 +936,14 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                     </button>
                     <button
                       type="button"
-                      onClick={() => setNewRequest({ ...newRequest, status: 'pending' })}
+                      onClick={() => setNewRequest({ ...newRequest, status: 'rejected' })}
                       className={`flex-1 py-2 px-4 rounded-lg border-2 transition ${
-                        newRequest.status === 'pending'
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        newRequest.status === 'rejected'
+                          ? 'border-red-500 bg-red-50 text-red-700'
                           : 'border-gray-200 text-gray-600'
                       }`}
                     >
-                      ⏳ {t('leave.status.pending')}
+                      ✗ {t('leave.status.rejected')}
                     </button>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">{t('leave.statusHint')}</p>
