@@ -364,6 +364,11 @@ function StatsSection() {
             </div>
           ))}
         </div>
+        <div className="mt-10 text-center">
+          <p className="inline-block bg-gray-900 text-white text-sm sm:text-base font-semibold px-6 py-3 rounded-full">
+            {t('stats.award')}
+          </p>
+        </div>
       </div>
     </section>
   )
