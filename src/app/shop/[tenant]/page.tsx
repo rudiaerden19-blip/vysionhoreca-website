@@ -108,7 +108,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [business, setBusiness] = useState<Business | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
   const [showClosedBanner, setShowClosedBanner] = useState(true)
-  const [manualOffline, setManualOffline] = useState<{ is_offline: boolean; offline_reason: string | null } | null>(null)
+  const [manualOffline, setManualOffline] = useState<{ is_offline: boolean; offline_reason: string | null; offline_message?: string | null } | null>(null)
   
   // Formateer review datum met vertalingen
   const formatReviewDate = (dateString?: string) => {
@@ -377,6 +377,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       .then(r => r.json())
       .then(d => setManualOffline(d))
       .catch(() => {})
+    // Refresh every 60 seconds in case owner changes status
+    const interval = setInterval(() => {
+      fetch(`/api/shop-offline?tenant=${params.tenant}`)
+        .then(r => r.json())
+        .then(d => setManualOffline(d))
+        .catch(() => {})
+    }, 60000)
+    return () => clearInterval(interval)
   }, [params.tenant])
 
   // Auto-hide closed banner after 5 seconds (only for opening hours, not manual offline)
@@ -895,6 +903,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
                    manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
                    manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
+                   manualOffline.offline_reason === 'eigen' ? (manualOffline.offline_message || t('shopOffline.bannerEigen')) :
                    t('shopOffline.bannerSluiting')}
                 </h2>
                 <span className="text-3xl">
@@ -997,7 +1006,16 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               transition={{ delay: 0.2 }}
               className="mb-4"
             >
-              {todayHours?.closed ? (
+              {manualOffline?.is_offline ? (
+                <span className="inline-flex items-center gap-2 bg-orange-600/95 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
+                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                  {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
+                   manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
+                   manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
+                   manualOffline.offline_reason === 'eigen' ? ((manualOffline as any).offline_message || t('shopOffline.bannerEigen')) :
+                   t('shopOffline.bannerSluiting')}
+                </span>
+              ) : todayHours?.closed ? (
                 <span className="inline-flex items-center gap-2 bg-red-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                   {t('shopPage.closedToday')}

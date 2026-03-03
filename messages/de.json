@@ -4184,6 +4184,10 @@
     "bannerVakantie": "Wegen Urlaub geschlossen",
     "bannerSluiting": "Ausserordentlich geschlossen",
     "bannerSubtitle": "Online-Bestellung ist derzeit nicht moeglich. Wir entschuldigen uns fuer die Unannehmlichkeiten.",
-    "orderingBlocked": "Bestellen derzeit nicht moeglich"
+    "orderingBlocked": "Bestellen derzeit nicht moeglich",
+    "reasonEigen": "Eigene Nachricht",
+    "reasonEigenDesc": "Schreiben Sie Ihre eigene Nachricht fuer den Kunden",
+    "eigenPlaceholder": "z.B. Geschlossen wegen privatem Ereignis...",
+    "bannerEigen": "Voruebergehend geschlossen"
   }
 }

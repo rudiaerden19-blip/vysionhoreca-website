@@ -4161,6 +4161,10 @@
     "bannerVakantie": "因假期关闭",
     "bannerSluiting": "特殊关闭",
     "bannerSubtitle": "目前无法在线订购。对于带来的不便，我们深感抱歉。",
-    "orderingBlocked": "目前无法订购"
+    "orderingBlocked": "目前无法订购",
+    "reasonEigen": "自定义消息",
+    "reasonEigenDesc": "为客户写您自己的消息",
+    "eigenPlaceholder": "例如：因私人活动暂时关闭...",
+    "bannerEigen": "暂时关闭"
   }
 }

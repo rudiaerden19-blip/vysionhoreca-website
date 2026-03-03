@@ -4161,6 +4161,10 @@
     "bannerVakantie": "مغلق للاجازة",
     "bannerSluiting": "اغلاق استثنائي",
     "bannerSubtitle": "الطلب عبر الانترنت غير ممكن حاليا. نعتذر عن الازعاج.",
-    "orderingBlocked": "الطلب غير متاح حاليا"
+    "orderingBlocked": "الطلب غير متاح حاليا",
+    "reasonEigen": "رسالة مخصصة",
+    "reasonEigenDesc": "اكتب رسالتك الخاصة للعميل",
+    "eigenPlaceholder": "مثال: مغلق بسبب حدث خاص...",
+    "bannerEigen": "مغلق مؤقتا"
   }
 }

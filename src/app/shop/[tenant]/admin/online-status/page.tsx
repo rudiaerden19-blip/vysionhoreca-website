@@ -9,14 +9,17 @@ const REASONS = [
   { key: 'panne',    icon: '🔧', labelKey: 'reasonPanne',    descKey: 'reasonPanneDesc' },
   { key: 'vakantie', icon: '🌴', labelKey: 'reasonVakantie', descKey: 'reasonVakantieDesc' },
   { key: 'sluiting', icon: '⚠️', labelKey: 'reasonSluiting', descKey: 'reasonSluitingDesc' },
+  { key: 'eigen',    icon: '✏️', labelKey: 'reasonEigen',    descKey: 'reasonEigenDesc' },
 ]
 
 export default function OnlineStatusPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const [isOffline, setIsOffline] = useState(false)
   const [offlineReason, setOfflineReason] = useState<string | null>(null)
+  const [offlineMessage, setOfflineMessage] = useState<string | null>(null)
   const [showPopup, setShowPopup] = useState(false)
   const [selectedReason, setSelectedReason] = useState<string | null>(null)
+  const [customMessage, setCustomMessage] = useState('')
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -26,6 +29,7 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
       .then(d => {
         setIsOffline(d.is_offline ?? false)
         setOfflineReason(d.offline_reason ?? null)
+        setOfflineMessage(d.offline_message ?? null)
       })
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -36,6 +40,7 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
       goOnline()
     } else {
       setSelectedReason(null)
+      setCustomMessage('')
       setShowPopup(true)
     }
   }
@@ -49,24 +54,33 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
     })
     setIsOffline(false)
     setOfflineReason(null)
+    setOfflineMessage(null)
     setSaving(false)
   }
 
   const goOffline = async () => {
     if (!selectedReason) return
+    if (selectedReason === 'eigen' && !customMessage.trim()) return
     setSaving(true)
     await fetch('/api/shop-offline', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tenant: params.tenant, is_offline: true, offline_reason: selectedReason }),
+      body: JSON.stringify({
+        tenant: params.tenant,
+        is_offline: true,
+        offline_reason: selectedReason,
+        offline_message: selectedReason === 'eigen' ? customMessage.trim() : null,
+      }),
     })
     setIsOffline(true)
     setOfflineReason(selectedReason)
+    setOfflineMessage(selectedReason === 'eigen' ? customMessage.trim() : null)
     setShowPopup(false)
     setSaving(false)
   }
 
   const currentReason = REASONS.find(r => r.key === offlineReason)
+  const canConfirm = selectedReason && (selectedReason !== 'eigen' || customMessage.trim().length > 0)
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -95,7 +109,6 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
                 {isOffline ? t('shopOffline.offlineDesc') : t('shopOffline.onlineDesc')}
               </p>
             </div>
-            {/* Toggle switch */}
             <button
               onClick={handleToggle}
               disabled={saving}
@@ -103,11 +116,9 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
                 isOffline ? 'bg-red-500' : 'bg-green-500'
               } disabled:opacity-50`}
             >
-              <span
-                className={`absolute top-1 w-8 h-8 bg-white rounded-full shadow-md transition-all duration-300 ${
-                  isOffline ? 'left-11' : 'left-1'
-                }`}
-              />
+              <span className={`absolute top-1 w-8 h-8 bg-white rounded-full shadow-md transition-all duration-300 ${
+                isOffline ? 'left-11' : 'left-1'
+              }`} />
             </button>
           </div>
 
@@ -116,13 +127,16 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
             <div className="bg-red-100 border border-red-200 rounded-2xl p-5 mb-6 flex items-center gap-4">
               <span className="text-4xl">{currentReason.icon}</span>
               <div>
-                <p className="font-bold text-red-800 text-lg">{t(`shopOffline.${currentReason.labelKey}`)}</p>
+                <p className="font-bold text-red-800 text-lg">
+                  {currentReason.key === 'eigen' && offlineMessage
+                    ? offlineMessage
+                    : t(`shopOffline.${currentReason.labelKey}`)}
+                </p>
                 <p className="text-red-600 text-sm">{t(`shopOffline.${currentReason.descKey}`)}</p>
               </div>
             </div>
           )}
 
-          {/* Action button */}
           {isOffline ? (
             <button
               onClick={goOnline}
@@ -134,7 +148,7 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
             </button>
           ) : (
             <button
-              onClick={() => { setSelectedReason(null); setShowPopup(true) }}
+              onClick={() => { setSelectedReason(null); setCustomMessage(''); setShowPopup(true) }}
               disabled={saving}
               className="w-full py-4 bg-red-500 hover:bg-red-600 text-white rounded-2xl font-bold text-lg transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
@@ -144,7 +158,6 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
         </motion.div>
       )}
 
-      {/* Info box */}
       <div className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-5">
         <p className="text-blue-800 text-sm">
           💡 {t('shopOffline.subtitle')}
@@ -166,35 +179,56 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={e => e.stopPropagation()}
-              className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl"
+              className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto"
             >
               <h3 className="text-xl font-bold text-gray-900 mb-1">{t('shopOffline.popupTitle')}</h3>
               <p className="text-gray-500 text-sm mb-6">{t('shopOffline.popupSubtitle')}</p>
 
-              <div className="space-y-3 mb-8">
+              <div className="space-y-3 mb-4">
                 {REASONS.map(reason => (
-                  <button
-                    key={reason.key}
-                    onClick={() => setSelectedReason(reason.key)}
-                    className={`w-full flex items-start gap-4 p-4 rounded-2xl border-2 text-left transition-all ${
-                      selectedReason === reason.key
-                        ? 'border-red-500 bg-red-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    <span className="text-2xl mt-0.5">{reason.icon}</span>
-                    <div className="flex-1">
-                      <p className="font-bold text-gray-900">{t(`shopOffline.${reason.labelKey}`)}</p>
-                      <p className="text-gray-500 text-sm">{t(`shopOffline.${reason.descKey}`)}</p>
-                    </div>
-                    {selectedReason === reason.key && (
-                      <span className="text-red-500 text-xl font-bold">✓</span>
+                  <div key={reason.key}>
+                    <button
+                      onClick={() => setSelectedReason(reason.key)}
+                      className={`w-full flex items-start gap-4 p-4 rounded-2xl border-2 text-left transition-all ${
+                        selectedReason === reason.key
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className="text-2xl mt-0.5">{reason.icon}</span>
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-900">{t(`shopOffline.${reason.labelKey}`)}</p>
+                        <p className="text-gray-500 text-sm">{t(`shopOffline.${reason.descKey}`)}</p>
+                      </div>
+                      {selectedReason === reason.key && (
+                        <span className="text-red-500 text-xl font-bold">✓</span>
+                      )}
+                    </button>
+
+                    {/* Custom message textarea */}
+                    {reason.key === 'eigen' && selectedReason === 'eigen' && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="mt-2 px-1"
+                      >
+                        <textarea
+                          value={customMessage}
+                          onChange={e => setCustomMessage(e.target.value)}
+                          placeholder={t('shopOffline.eigenPlaceholder')}
+                          maxLength={120}
+                          rows={3}
+                          className="w-full px-4 py-3 border-2 border-red-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:border-red-500 resize-none text-sm"
+                          autoFocus
+                        />
+                        <p className="text-right text-xs text-gray-400 mt-1">{customMessage.length}/120</p>
+                      </motion.div>
                     )}
-                  </button>
+                  </div>
                 ))}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setShowPopup(false)}
                   className="flex-1 py-3 border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all"
@@ -203,7 +237,7 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
                 </button>
                 <button
                   onClick={goOffline}
-                  disabled={!selectedReason || saving}
+                  disabled={!canConfirm || saving}
                   className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {saving

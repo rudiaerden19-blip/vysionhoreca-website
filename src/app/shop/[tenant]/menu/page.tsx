@@ -53,7 +53,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
   const [promotions, setPromotions] = useState<Promotion[]>([])
   const [promotionsEnabled, setPromotionsEnabled] = useState(true)
-  const [manualOffline, setManualOffline] = useState<{ is_offline: boolean; offline_reason: string | null } | null>(null)
+  const [manualOffline, setManualOffline] = useState<{ is_offline: boolean; offline_reason: string | null; offline_message?: string | null } | null>(null)
   const menuContentRef = useRef<HTMLDivElement>(null)
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const isScrollingToSection = useRef(false)
@@ -489,6 +489,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
                manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
                manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
+               manualOffline.offline_reason === 'eigen' ? (manualOffline.offline_message || t('shopOffline.bannerEigen')) :
                t('shopOffline.bannerSluiting')}
             </h2>
             <p className="text-gray-500 mb-8">{t('shopOffline.bannerSubtitle')}</p>

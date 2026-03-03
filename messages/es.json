@@ -4161,6 +4161,10 @@
     "bannerVakantie": "Cerrado por vacaciones",
     "bannerSluiting": "Cierre excepcional",
     "bannerSubtitle": "Los pedidos en linea no son posibles actualmente. Disculpe las molestias.",
-    "orderingBlocked": "Pedidos actualmente no disponibles"
+    "orderingBlocked": "Pedidos actualmente no disponibles",
+    "reasonEigen": "Mensaje propio",
+    "reasonEigenDesc": "Escribe tu propio mensaje para el cliente",
+    "eigenPlaceholder": "ej. Cerrado por evento privado...",
+    "bannerEigen": "Cerrado temporalmente"
   }
 }

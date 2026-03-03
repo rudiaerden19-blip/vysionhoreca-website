@@ -4161,6 +4161,10 @@
     "bannerVakantie": "休暇のため閉店",
     "bannerSluiting": "臨時休業",
     "bannerSubtitle": "現在、オンライン注文はできません。ご不便をおかけして申し訳ございません。",
-    "orderingBlocked": "現在注文できません"
+    "orderingBlocked": "現在注文できません",
+    "reasonEigen": "カスタムメッセージ",
+    "reasonEigenDesc": "お客様への独自のメッセージを書いてください",
+    "eigenPlaceholder": "例：プライベートイベントのため休業中...",
+    "bannerEigen": "一時的に休業中"
   }
 }

@@ -4138,6 +4138,10 @@
     "bannerVakantie": "Closed for vacation",
     "bannerSluiting": "Exceptionally closed",
     "bannerSubtitle": "Online ordering is currently not possible. We apologize for the inconvenience.",
-    "orderingBlocked": "Ordering currently not possible"
+    "orderingBlocked": "Ordering currently not possible",
+    "reasonEigen": "Custom message",
+    "reasonEigenDesc": "Write your own message for the customer",
+    "eigenPlaceholder": "e.g. Closed for a private event...",
+    "bannerEigen": "Temporarily closed"
   }
 }

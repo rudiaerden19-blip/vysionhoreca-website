@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  const { tenant, is_offline, offline_reason } = body
+  const { tenant, is_offline, offline_reason, offline_message } = body
 
   if (!tenant) {
     return NextResponse.json({ error: 'Missing tenant' }, { status: 400 })
@@ -63,6 +63,7 @@ export async function POST(request: NextRequest) {
         tenant_slug: tenant,
         is_offline: is_offline ?? false,
         offline_reason: is_offline ? (offline_reason ?? null) : null,
+        offline_message: is_offline ? (offline_message ?? null) : null,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'tenant_slug' }

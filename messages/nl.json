@@ -4144,6 +4144,10 @@
     "bannerVakantie": "Gesloten wegens vakantie",
     "bannerSluiting": "Uitzonderlijk gesloten",
     "bannerSubtitle": "Online bestellen is momenteel niet mogelijk. Onze excuses voor het ongemak.",
-    "orderingBlocked": "Bestellen momenteel niet mogelijk"
+    "orderingBlocked": "Bestellen momenteel niet mogelijk",
+    "reasonEigen": "Eigen bericht",
+    "reasonEigenDesc": "Schrijf zelf een bericht voor de klant",
+    "eigenPlaceholder": "bv. Gesloten wegens privé-evenement...",
+    "bannerEigen": "Tijdelijk gesloten"
   }
 }

@@ -4184,6 +4184,10 @@
     "bannerVakantie": "Ferme pour les vacances",
     "bannerSluiting": "Fermeture exceptionnelle",
     "bannerSubtitle": "La commande en ligne est actuellement impossible. Nous nous excusons pour le desagremen.",
-    "orderingBlocked": "Commande actuellement impossible"
+    "orderingBlocked": "Commande actuellement impossible",
+    "reasonEigen": "Message personnalise",
+    "reasonEigenDesc": "Ecrivez votre propre message pour le client",
+    "eigenPlaceholder": "ex. Ferme pour un evenement prive...",
+    "bannerEigen": "Ferme temporairement"
   }
 }
