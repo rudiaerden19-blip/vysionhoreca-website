@@ -5,6 +5,26 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 
+const leaveApi = {
+  async fetch(tenant: string, year: number) {
+    const res = await fetch(`/api/leave?tenant=${tenant}&year=${year}`)
+    if (!res.ok) throw new Error(await res.text())
+    return res.json()
+  },
+  async post(tenant: string, action: string, payload: Record<string, unknown>) {
+    const res = await fetch('/api/leave', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, tenant, ...payload }),
+    })
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error || 'Onbekende fout')
+    }
+    return res.json()
+  },
+}
+
 interface Staff {
   id: string
   name: string
@@ -50,6 +70,8 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
   const [showYearOverview, setShowYearOverview] = useState(false)
   const [showNewRequest, setShowNewRequest] = useState(false)
   const [processing, setProcessing] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [actionSuccess, setActionSuccess] = useState<string | null>(null)
   const [newRequest, setNewRequest] = useState({
     staff_id: '',
     leave_type: 'vacation',
@@ -66,40 +88,40 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
 
   async function loadData() {
     setLoading(true)
+    try {
+      // Load staff via Supabase (read-only, usually allowed by anon)
+      const { data: staffData } = await supabase
+        .from('staff')
+        .select('*')
+        .eq('tenant_slug', params.tenant)
+        .order('name')
 
-    // Load staff
-    const { data: staffData } = await supabase
-      .from('staff')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .order('name')
+      const staffList = staffData || []
+      setStaff(staffList)
 
-    if (staffData) {
-      setStaff(staffData)
-    }
-
-    // Load leave requests for the year
-    const startOfYear = `${selectedYear}-01-01`
-    const endOfYear = `${selectedYear}-12-31`
-
-    const { data: requestsData } = await supabase
-      .from('leave_requests')
-      .select('*')
-      .eq('tenant_slug', params.tenant)
-      .gte('start_date', startOfYear)
-      .lte('start_date', endOfYear)
-      .order('requested_at', { ascending: false })
-
-    if (requestsData && staffData) {
-      // Attach staff info to requests
-      const enrichedRequests = requestsData.map(req => ({
+      // Load leave requests via API route (uses service role, bypasses RLS)
+      const requestsData: LeaveRequest[] = await leaveApi.fetch(params.tenant, selectedYear)
+      const enriched = requestsData.map(req => ({
         ...req,
-        staff: staffData.find(s => s.id === req.staff_id)
+        staff: staffList.find(s => s.id === req.staff_id),
       }))
-      setRequests(enrichedRequests)
+      setRequests(enriched)
+    } catch (e: unknown) {
+      console.error('loadData error:', e)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    setLoading(false)
+  function showSuccess(msg: string) {
+    setActionSuccess(msg)
+    setActionError(null)
+    setTimeout(() => setActionSuccess(null), 4000)
+  }
+
+  function showError(msg: string) {
+    setActionError(msg)
+    setActionSuccess(null)
   }
 
   const getLeaveType = (type: string) => {
@@ -121,214 +143,93 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     })
   }
 
-  // Map leave type to timesheet absence type
-  const mapLeaveTypeToAbsence = (leaveType: string): string => {
-    const mapping: Record<string, string> = {
-      'vacation': 'VACATION',
-      'sick': 'SICK',
-      'maternity': 'MATERNITY',
-      'paternity': 'PATERNITY',
-      'unpaid': 'UNPAID',
-      'bereavement': 'SHORT_LEAVE',
-      'other': 'OTHER',
-    }
-    return mapping[leaveType] || 'OTHER'
-  }
-
-  // Generate array of dates between start and end (inclusive)
-  // Pure arithmetic - no Date objects to avoid timezone issues
-  const getDateRange = (startDateStr: string, endDateStr: string): string[] => {
-    console.log('getDateRange called with:', startDateStr, 'to', endDateStr)
-    
-    // If same day, just return that day directly
-    if (startDateStr === endDateStr) {
-      console.log('Single day - returning:', [startDateStr])
-      return [startDateStr]
-    }
-    
-    // For multi-day ranges, calculate days between
-    const dates: string[] = []
-    const [sy, sm, sd] = startDateStr.split('-').map(Number)
-    const [ey, em, ed] = endDateStr.split('-').map(Number)
-    
-    // Simple day counter
-    let year = sy
-    let month = sm
-    let day = sd
-    
-    const daysInMonth = (y: number, m: number) => new Date(y, m, 0).getDate()
-    
-    for (let i = 0; i < 366; i++) { // Max 1 year safety
-      const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-      dates.push(dateStr)
-      
-      // Check if we reached end date
-      if (year === ey && month === em && day === ed) break
-      
-      // Move to next day
-      day++
-      if (day > daysInMonth(year, month)) {
-        day = 1
-        month++
-        if (month > 12) {
-          month = 1
-          year++
-        }
-      }
-    }
-    
-    console.log('Multi-day range - returning:', dates)
-    return dates
-  }
-
-  // Create timesheet entries for approved leave
-  const createTimesheetEntries = async (request: LeaveRequest) => {
-    console.log('=== createTimesheetEntries ===')
-    console.log('Request start_date:', request.start_date)
-    console.log('Request end_date:', request.end_date)
-    
-    const absenceType = mapLeaveTypeToAbsence(request.leave_type)
-    const dates = getDateRange(request.start_date, request.end_date)
-    
-    console.log('Dates to create:', dates)
-    
-    for (const dateStr of dates) {
-      const entryData = {
-        tenant_slug: params.tenant,
-        staff_id: request.staff_id,
-        date: dateStr,
-        absence_type: absenceType,
-        absence_hours: 8,
-        worked_hours: 0,
-        notes: `${t(`leave.types.${request.leave_type}`)}${request.reason ? ` - ${request.reason}` : ''}`,
-        is_approved: true,
-      }
-      
-      // Check if entry already exists for this date
-      const { data: existing } = await supabase
-        .from('timesheet_entries')
-        .select('id')
-        .eq('tenant_slug', params.tenant)
-        .eq('staff_id', request.staff_id)
-        .eq('date', dateStr)
-        .maybeSingle()
-      
-      if (existing) {
-        // Update existing entry
-        const { error } = await supabase
-          .from('timesheet_entries')
-          .update({
-            absence_type: absenceType,
-            absence_hours: 8,
-            notes: entryData.notes,
-            is_approved: true,
-          })
-          .eq('id', existing.id)
-        
-        if (error) console.error('Error updating entry:', error)
-      } else {
-        // Insert new entry
-        console.log('Inserting entry with date:', entryData.date)
-        const { error } = await supabase.from('timesheet_entries').insert(entryData)
-        if (error) console.error('Error inserting entry:', error)
-        else console.log('Successfully inserted entry for:', entryData.date)
-      }
-    }
-  }
-
-  // Delete timesheet entries for a leave request
-  const deleteTimesheetEntries = async (request: LeaveRequest) => {
-    const absenceType = mapLeaveTypeToAbsence(request.leave_type)
-    const dates = getDateRange(request.start_date, request.end_date)
-    
-    for (const dateStr of dates) {
-      await supabase
-        .from('timesheet_entries')
-        .delete()
-        .eq('tenant_slug', params.tenant)
-        .eq('staff_id', request.staff_id)
-        .eq('date', dateStr)
-        .eq('absence_type', absenceType)
-    }
-  }
-
   const handleApprove = async (request: LeaveRequest) => {
     setProcessing(true)
-    
-    // Update leave request status
-    await supabase
-      .from('leave_requests')
-      .update({
-        status: 'approved',
-        reviewed_at: new Date().toISOString(),
+    setActionError(null)
+    try {
+      await leaveApi.post(params.tenant, 'approve', {
+        id: request.id,
+        staff_id: request.staff_id,
+        leave_type: request.leave_type,
+        start_date: request.start_date,
+        end_date: request.end_date,
+        reason: request.reason,
       })
-      .eq('id', request.id)
-    
-    // Create timesheet entries for the approved leave
-    await createTimesheetEntries(request)
-    
-    await loadData()
-    setShowDetail(null)
-    setProcessing(false)
+      await loadData()
+      setShowDetail(null)
+      showSuccess('✓ Goedgekeurd & toegevoegd aan agenda!')
+    } catch (e: unknown) {
+      showError(`Fout: ${e instanceof Error ? e.message : String(e)}`)
+    } finally {
+      setProcessing(false)
+    }
   }
 
   const handleRejectApproved = async (request: LeaveRequest) => {
     if (!confirm(t('leave.confirmReject'))) return
-    
     setProcessing(true)
-    
-    // Remove timesheet entries since it's being rejected
-    await deleteTimesheetEntries(request)
-    
-    // Set status to rejected
-    await supabase
-      .from('leave_requests')
-      .update({
-        status: 'rejected',
-        reviewed_at: new Date().toISOString(),
+    setActionError(null)
+    try {
+      await leaveApi.post(params.tenant, 'reject', {
+        id: request.id,
+        staff_id: request.staff_id,
+        leave_type: request.leave_type,
+        start_date: request.start_date,
+        end_date: request.end_date,
       })
-      .eq('id', request.id)
-    
-    await loadData()
-    setShowDetail(null)
-    setProcessing(false)
-  }
-
-  const handleDelete = async (request: LeaveRequest) => {
-    if (!confirm(t('leave.confirmDelete'))) return
-    
-    setProcessing(true)
-    
-    // If it was approved, delete timesheet entries too
-    if (request.status === 'approved') {
-      await deleteTimesheetEntries(request)
+      await loadData()
+      setShowDetail(null)
+      showSuccess('✗ Afgewezen & verwijderd uit agenda!')
+    } catch (e: unknown) {
+      showError(`Fout: ${e instanceof Error ? e.message : String(e)}`)
+    } finally {
+      setProcessing(false)
     }
-    
-    // Delete the leave request
-    await supabase
-      .from('leave_requests')
-      .delete()
-      .eq('id', request.id)
-    
-    await loadData()
-    setShowDetail(null)
-    setProcessing(false)
   }
 
   const handleReject = async (request: LeaveRequest, notes?: string) => {
     setProcessing(true)
-    await supabase
-      .from('leave_requests')
-      .update({
-        status: 'rejected',
-        reviewed_at: new Date().toISOString(),
-        notes: notes,
+    setActionError(null)
+    try {
+      await leaveApi.post(params.tenant, 'reject', {
+        id: request.id,
+        staff_id: request.staff_id,
+        leave_type: request.leave_type,
+        start_date: request.start_date,
+        end_date: request.end_date,
+        notes,
       })
-      .eq('id', request.id)
-    
-    await loadData()
-    setShowDetail(null)
-    setProcessing(false)
+      await loadData()
+      setShowDetail(null)
+      showSuccess('✗ Afgewezen!')
+    } catch (e: unknown) {
+      showError(`Fout: ${e instanceof Error ? e.message : String(e)}`)
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  const handleDelete = async (request: LeaveRequest) => {
+    if (!confirm(t('leave.confirmDelete'))) return
+    setProcessing(true)
+    setActionError(null)
+    try {
+      await leaveApi.post(params.tenant, 'delete', {
+        id: request.id,
+        staff_id: request.staff_id,
+        leave_type: request.leave_type,
+        start_date: request.start_date,
+        end_date: request.end_date,
+        was_approved: request.status === 'approved',
+      })
+      await loadData()
+      setShowDetail(null)
+      showSuccess('🗑️ Verwijderd!')
+    } catch (e: unknown) {
+      showError(`Fout: ${e instanceof Error ? e.message : String(e)}`)
+    } finally {
+      setProcessing(false)
+    }
   }
 
   const handleSubmitNewRequest = async () => {
@@ -336,49 +237,33 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
       alert(t('leave.fillAllFields'))
       return
     }
-
     setProcessing(true)
-    
-    const leaveRecord = {
-      id: '',
-      tenant_slug: params.tenant,
-      staff_id: newRequest.staff_id,
-      leave_type: newRequest.leave_type,
-      start_date: newRequest.start_date,
-      end_date: newRequest.end_date,
-      reason: newRequest.reason,
-      status: newRequest.status as 'approved' | 'rejected',
-      requested_at: new Date().toISOString(),
+    setActionError(null)
+    try {
+      await leaveApi.post(params.tenant, 'create', {
+        staff_id: newRequest.staff_id,
+        leave_type: newRequest.leave_type,
+        start_date: newRequest.start_date,
+        end_date: newRequest.end_date,
+        reason: newRequest.reason,
+        status: newRequest.status,
+      })
+      await loadData()
+      setShowNewRequest(false)
+      setNewRequest({
+        staff_id: '',
+        leave_type: 'vacation',
+        start_date: '',
+        end_date: '',
+        reason: '',
+        status: 'approved',
+      })
+      showSuccess(newRequest.status === 'approved' ? '✓ Aangemaakt & in agenda!' : '✗ Aangemaakt als afgewezen!')
+    } catch (e: unknown) {
+      showError(`Fout: ${e instanceof Error ? e.message : String(e)}`)
+    } finally {
+      setProcessing(false)
     }
-
-    // Insert leave request
-    await supabase.from('leave_requests').insert({
-      tenant_slug: params.tenant,
-      staff_id: newRequest.staff_id,
-      leave_type: newRequest.leave_type,
-      start_date: newRequest.start_date,
-      end_date: newRequest.end_date,
-      reason: newRequest.reason,
-      status: newRequest.status,
-      reviewed_at: new Date().toISOString(),
-    })
-
-    // If approved, create timesheet entries
-    if (newRequest.status === 'approved') {
-      await createTimesheetEntries(leaveRecord)
-    }
-
-    await loadData()
-    setShowNewRequest(false)
-    setNewRequest({
-      staff_id: '',
-      leave_type: 'vacation',
-      start_date: '',
-      end_date: '',
-      reason: '',
-      status: 'approved' as 'approved' | 'rejected',
-    })
-    setProcessing(false)
   }
 
   const filteredRequests = requests.filter(req => {
@@ -440,6 +325,30 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
 
   return (
     <div className="space-y-6">
+      {/* Success/Error Banners */}
+      <AnimatePresence>
+        {actionSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-green-50 border border-green-300 text-green-800 px-4 py-3 rounded-xl font-medium"
+          >
+            {actionSuccess}
+          </motion.div>
+        )}
+        {actionError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-xl font-medium"
+          >
+            ❌ {actionError}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
