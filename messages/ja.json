@@ -1873,11 +1873,13 @@
       "groupsList": "グループ管理",
       "groupSessions": "注文セッション",
       "groupOrdersOverview": "グループ注文",
-      "labelPrinter": "ラベルプリンター"
+      "labelPrinter": "ラベルプリンター",
+      "onlineShopToggle": "オンラインショップ オン/オフ"
     },
     "viewWebsite": "あなたのショップを見る",
     "display": "ディスプレイ",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "onlineShopToggle": "オンラインショップ オン/オフ"
   },
   "mediaPicker": {
     "choosePhoto": "写真を選択"

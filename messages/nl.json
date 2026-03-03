@@ -1878,11 +1878,13 @@
       "groupsList": "Groepen beheren",
       "groupSessions": "Bestelsessies",
       "groupOrdersOverview": "Groepsbestellingen",
-      "labelPrinter": "Label Printer"
+      "labelPrinter": "Label Printer",
+      "onlineShopToggle": "Online shop aan/uit"
     },
     "viewWebsite": "Bekijk je shop",
     "display": "Scherm",
-    "logout": "Uitloggen"
+    "logout": "Uitloggen",
+    "onlineShopToggle": "Online shop aan/uit"
   },
   "mediaPicker": {
     "choosePhoto": "Kies foto"

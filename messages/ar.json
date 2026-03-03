@@ -1873,11 +1873,13 @@
       "groupsList": "إدارة المجموعات",
       "groupSessions": "جلسات الطلب",
       "groupOrdersOverview": "طلبات المجموعة",
-      "labelPrinter": "طابعة الملصقات"
+      "labelPrinter": "طابعة الملصقات",
+      "onlineShopToggle": "المتجر الإلكتروني تشغيل/إيقاف"
     },
     "viewWebsite": "عرض متجرك",
     "display": "الشاشة",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "onlineShopToggle": "المتجر الإلكتروني تشغيل/إيقاف"
   },
   "mediaPicker": {
     "choosePhoto": "اختر صورة"

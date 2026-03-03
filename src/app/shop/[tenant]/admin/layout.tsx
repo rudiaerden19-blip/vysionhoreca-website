@@ -32,6 +32,7 @@ const menuItems = [
     categoryKey: 'settings',
     icon: '⚙️',
     items: [
+      { nameKey: 'onlineShopToggle', href: '/online-status', icon: '🔴' },
       { nameKey: 'businessProfile', href: '/profiel', icon: '🏪' },
       { nameKey: 'openingHours', href: '/openingstijden', icon: '🕐' },
       { nameKey: 'deliveryPickup', href: '/levering', icon: '🚗' },

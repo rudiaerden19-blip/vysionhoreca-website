@@ -1877,11 +1877,13 @@
       "groupsList": "Manage Groups",
       "groupSessions": "Order Sessions",
       "groupOrdersOverview": "Group Orders",
-      "labelPrinter": "Label Printer"
+      "labelPrinter": "Label Printer",
+      "onlineShopToggle": "Online shop on/off"
     },
     "viewWebsite": "View your shop",
     "display": "Display",
-    "logout": "Logout"
+    "logout": "Logout",
+    "onlineShopToggle": "Online shop on/off"
   },
   "mediaPicker": {
     "choosePhoto": "Choose photo"

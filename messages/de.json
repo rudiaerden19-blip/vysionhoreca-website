@@ -1379,11 +1379,13 @@
       "groupsList": "Gruppen verwalten",
       "groupSessions": "Bestellsitzungen",
       "groupOrdersOverview": "Gruppenbestellungen",
-      "labelPrinter": "Etikettendrucker"
+      "labelPrinter": "Etikettendrucker",
+      "onlineShopToggle": "Online-Shop an/aus"
     },
     "viewWebsite": "Dein Shop ansehen",
     "display": "Bildschirm",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "onlineShopToggle": "Online-Shop an/aus"
   },
   "mediaPicker": {
     "choosePhoto": "Foto wählen"

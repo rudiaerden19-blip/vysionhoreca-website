@@ -1873,11 +1873,13 @@
       "groupsList": "管理群组",
       "groupSessions": "订单会话",
       "groupOrdersOverview": "团购订单",
-      "labelPrinter": "标签打印机"
+      "labelPrinter": "标签打印机",
+      "onlineShopToggle": "网店开启/关闭"
     },
     "viewWebsite": "查看您的商店",
     "display": "显示屏",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "onlineShopToggle": "网店开启/关闭"
   },
   "mediaPicker": {
     "choosePhoto": "选择照片"

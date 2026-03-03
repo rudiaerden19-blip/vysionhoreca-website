@@ -1379,11 +1379,13 @@
       "groupsList": "Gérer les groupes",
       "groupSessions": "Sessions de commande",
       "groupOrdersOverview": "Commandes groupées",
-      "labelPrinter": "Imprimante étiquettes"
+      "labelPrinter": "Imprimante étiquettes",
+      "onlineShopToggle": "Boutique en ligne on/off"
     },
     "viewWebsite": "Voir votre boutique",
     "display": "Écran",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "onlineShopToggle": "Boutique en ligne on/off"
   },
   "mediaPicker": {
     "choosePhoto": "Choisir photo"

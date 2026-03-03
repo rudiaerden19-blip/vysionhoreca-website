@@ -1873,11 +1873,13 @@
       "groupsList": "Gestionar grupos",
       "groupSessions": "Sesiones de pedido",
       "groupOrdersOverview": "Pedidos grupales",
-      "labelPrinter": "Impresora de etiquetas"
+      "labelPrinter": "Impresora de etiquetas",
+      "onlineShopToggle": "Tienda online on/off"
     },
     "viewWebsite": "Ver tu tienda",
     "display": "Pantalla",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "onlineShopToggle": "Tienda online on/off"
   },
   "mediaPicker": {
     "choosePhoto": "Elegir foto"
