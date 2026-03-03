@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { isProtectedTenant, isAdminTenant, getProtectionError } from '@/lib/protected-tenants'
+import { isProtectedTenant, isAdminTenant, isDemoTenant, getProtectionError } from '@/lib/protected-tenants'
 
 interface Tenant {
   id: string
@@ -617,20 +617,26 @@ export default function SuperAdminDashboard() {
                   const sub = getSubscription(tenant.tenant_slug)
                   return (
                     <tr key={tenant.id} className={`transition-colors ${tenant.is_blocked ? 'opacity-50' : ''} ${
-                      isAdminTenant(tenant.tenant_slug)
-                        ? 'bg-purple-500/10 hover:bg-purple-500/20 border-l-4 border-purple-500'
-                        : isPaid(sub) 
-                          ? 'bg-green-500/10 hover:bg-green-500/20 border-l-4 border-green-500' 
-                          : 'bg-red-500/10 hover:bg-red-500/20 border-l-4 border-red-500'
+                      isDemoTenant(tenant.tenant_slug)
+                        ? 'bg-blue-500/10 hover:bg-blue-500/20 border-l-4 border-blue-500'
+                        : isAdminTenant(tenant.tenant_slug)
+                          ? 'bg-purple-500/10 hover:bg-purple-500/20 border-l-4 border-purple-500'
+                          : isPaid(sub) 
+                            ? 'bg-green-500/10 hover:bg-green-500/20 border-l-4 border-green-500' 
+                            : 'bg-red-500/10 hover:bg-red-500/20 border-l-4 border-red-500'
                     }`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           {tenant.is_blocked && <span className="text-red-500">🚫</span>}
-                          {isProtectedTenant(tenant.tenant_slug) && <span className="text-yellow-500">⭐</span>}
+                          {isDemoTenant(tenant.tenant_slug) && <span className="text-blue-400">🎭</span>}
+                          {isProtectedTenant(tenant.tenant_slug) && !isDemoTenant(tenant.tenant_slug) && <span className="text-yellow-500">⭐</span>}
                           <div>
                             <p className="font-medium text-white flex items-center gap-2">
                               {tenant.business_name || 'Geen naam'}
-                              {isProtectedTenant(tenant.tenant_slug) && (
+                              {isDemoTenant(tenant.tenant_slug) && (
+                                <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full">DEMO</span>
+                              )}
+                              {isProtectedTenant(tenant.tenant_slug) && !isDemoTenant(tenant.tenant_slug) && (
                                 <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full">MAIN</span>
                               )}
                             </p>
@@ -656,8 +662,8 @@ export default function SuperAdminDashboard() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           {isAdminTenant(tenant.tenant_slug) ? (
-                            <span className="px-3 py-1 rounded-lg text-xs font-medium bg-purple-500 text-white">
-                              👑 Admin
+                            <span className={`px-3 py-1 rounded-lg text-xs font-medium ${isDemoTenant(tenant.tenant_slug) ? 'bg-blue-500 text-white' : 'bg-purple-500 text-white'}`}>
+                              {isDemoTenant(tenant.tenant_slug) ? '🎭 Demo' : '👑 Admin'}
                             </span>
                           ) : (
                             <>

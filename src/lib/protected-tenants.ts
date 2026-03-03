@@ -8,12 +8,19 @@ export const PROTECTED_TENANTS = [
   'frituur-nolim',
   'skippsbv',
   'demo-frituur',
+  'frituurbart',
 ] as const
 
 // Admin accounts - nooit betalen, nooit verlopen
 export const ADMIN_TENANTS = [
   'frituurnolim',
   'skippsbv',
+  'frituurbart',
+] as const
+
+// Demo accounts - publiek zichtbaar als live demo
+export const DEMO_TENANTS = [
+  'frituurbart',
 ] as const
 
 export function isAdminTenant(slug: string | null | undefined): boolean {
@@ -29,6 +36,12 @@ export function isProtectedTenant(slug: string | null | undefined): boolean {
     normalizedSlug === p || 
     normalizedSlug.startsWith(p)
   )
+}
+
+export function isDemoTenant(slug: string | null | undefined): boolean {
+  if (!slug) return false
+  const normalizedSlug = slug.toLowerCase().trim()
+  return DEMO_TENANTS.some((d) => normalizedSlug === d)
 }
 
 export function getProtectionError(slug: string): string {
