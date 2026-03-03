@@ -1029,7 +1029,7 @@
         "title": "3. Support Responstijden",
         "headers": {
           "priority": "Prioriteit",
-          "description": "Beschrijving",
+          "description": "Over ons tekst",
           "responseTime": "Responstijd"
         },
         "critical": {
@@ -1569,7 +1569,7 @@
     "form": {
       "name": "Naam van de beloning",
       "namePlaceholder": "Bijv. Gratis drankje",
-      "description": "Beschrijving",
+      "description": "Over ons tekst",
       "descriptionPlaceholder": "Bijv. Keuze uit frisdrank of koffie",
       "pointsRequired": "Aantal punten nodig",
       "rewardType": "Type beloning",
@@ -2011,7 +2011,7 @@
       "businessInfo": "Bedrijfsinformatie",
       "businessName": "Bedrijfsnaam",
       "tagline": "Header slogan (deze slogan komt direct onder je naam)",
-      "description": "Beschrijving",
+      "description": "Over ons tekst",
       "contactInfo": "Contactgegevens",
       "email": "E-mail",
       "phone": "Telefoon",
@@ -2104,7 +2104,7 @@
       "addCategory": "Categorie toevoegen",
       "editCategory": "Categorie bewerken",
       "name": "Naam",
-      "description": "Beschrijving",
+      "description": "Over ons tekst",
       "image": "Afbeelding",
       "order": "Volgorde",
       "noCategories": "Nog geen categorieën",
@@ -2126,7 +2126,7 @@
       "editProduct": "Product bewerken",
       "newProduct": "Nieuw product",
       "name": "Productnaam",
-      "description": "Beschrijving",
+      "description": "Over ons tekst",
       "price": "Prijs",
       "category": "Categorie",
       "image": "Afbeelding",
@@ -3098,7 +3098,7 @@
       "newPurchase": "Nieuwe Aankoop",
       "editPurchase": "Aankoop Bewerken",
       "category": "Categorie",
-      "description": "Beschrijving",
+      "description": "Over ons tekst",
       "descriptionPlaceholder": "Bv. Aardappelen week 3",
       "supplier": "Leverancier",
       "invoiceNumber": "Factuurnr.",
@@ -3391,7 +3391,7 @@
       "tip5": "Upload een aantrekkelijke afbeelding voor social media"
     },
     "addMetaDescription": "Voeg een meta beschrijving toe...",
-    "description": "Beschrijving"
+    "description": "Over ons tekst"
   },
   "shopPage": {
     "loading": "Laden...",
@@ -3822,7 +3822,7 @@
       "titleField": "Titel (optioneel)",
       "orderDeadline": "Deadline bestellen",
       "deliveryTime": "Gewenste levertijd",
-      "description": "Beschrijving",
+      "description": "Over ons tekst",
       "descriptionPlaceholder": "Extra info voor de groep...",
       "startSession": "Sessie starten",
       "starting": "Aanmaken...",
@@ -3946,7 +3946,7 @@
     "modalTitleEdit": "Promotie bewerken",
     "modalTitleNew": "Nieuwe promotie",
     "photo": "Foto",
-    "description": "Beschrijving",
+    "description": "Over ons tekst",
     "descriptionPlaceholder": "Beschrijf de aanbieding...",
     "promoType": "Type promotie",
     "typeFixedPrice": "Vaste prijs",

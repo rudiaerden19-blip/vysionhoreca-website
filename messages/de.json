@@ -1051,7 +1051,7 @@
     "form": {
       "name": "Name der Prämie",
       "namePlaceholder": "Z.B. Gratis Getränk",
-      "description": "Beschreibung",
+      "description": "Über uns Text",
       "descriptionPlaceholder": "Z.B. Wahl aus Softdrink oder Kaffee",
       "pointsRequired": "Benötigte Punkte",
       "rewardType": "Art der Prämie",
@@ -1511,7 +1511,7 @@
       "businessInfo": "Geschäftsinformationen",
       "businessName": "Geschäftsname",
       "tagline": "Header-Slogan (dieser Slogan erscheint direkt unter Ihrem Namen)",
-      "description": "Beschreibung",
+      "description": "Über uns Text",
       "contactInfo": "Kontaktinformationen",
       "email": "E-Mail",
       "phone": "Telefon",
@@ -1604,7 +1604,7 @@
       "addCategory": "Kategorie hinzufügen",
       "editCategory": "Kategorie bearbeiten",
       "name": "Name",
-      "description": "Beschreibung",
+      "description": "Über uns Text",
       "image": "Bild",
       "order": "Reihenfolge",
       "noCategories": "Noch keine Kategorien",
@@ -1625,7 +1625,7 @@
       "addProduct": "Produkt hinzufügen",
       "editProduct": "Produkt bearbeiten",
       "name": "Name",
-      "description": "Beschreibung",
+      "description": "Über uns Text",
       "price": "Preis",
       "category": "Kategorie",
       "image": "Bild",
@@ -1830,7 +1830,7 @@
       "firstInvoice": "Ihre erste Rechnung erscheint hier nach Ihrer ersten Zahlung",
       "invoiceNr": "Rechnungsnr.",
       "date": "Datum",
-      "description": "Beschreibung",
+      "description": "Über uns Text",
       "amount": "Betrag",
       "statusCol": "Status",
       "action": "Aktion",
@@ -2436,7 +2436,7 @@
       "title": "Einkäufe & Rechnungen",
       "newPurchase": "Neuer Einkauf",
       "category": "Kategorie",
-      "description": "Beschreibung",
+      "description": "Über uns Text",
       "supplier": "Lieferant",
       "invoiceNumber": "Rechnungsnr.",
       "amount": "Betrag (€)",
@@ -2767,7 +2767,7 @@
       "tip5": "Laden Sie ein attraktives Bild für Social Media hoch"
     },
     "addMetaDescription": "Meta-Beschreibung hinzufügen...",
-    "description": "Beschreibung"
+    "description": "Über uns Text"
   },
   "shopPage": {
     "loading": "Laden...",
@@ -3326,7 +3326,7 @@
         "title": "3. Support Responstijden",
         "headers": {
           "priority": "Prioriteit",
-          "description": "Beschrijving",
+          "description": "Über uns Text",
           "responseTime": "Responstijd"
         },
         "critical": {
@@ -3862,7 +3862,7 @@
       "titleField": "Titel (optional)",
       "orderDeadline": "Bestellfrist",
       "deliveryTime": "Gewünschte Lieferzeit",
-      "description": "Beschreibung",
+      "description": "Über uns Text",
       "descriptionPlaceholder": "Zusätzliche Infos für die Gruppe...",
       "startSession": "Sitzung starten",
       "starting": "Erstellen...",
@@ -3986,7 +3986,7 @@
     "modalTitleEdit": "Aktion bearbeiten",
     "modalTitleNew": "Neue Aktion",
     "photo": "Foto",
-    "description": "Beschreibung",
+    "description": "Über uns Text",
     "descriptionPlaceholder": "Beschreiben Sie das Angebot...",
     "promoType": "Aktionstyp",
     "typeFixedPrice": "Festpreis",

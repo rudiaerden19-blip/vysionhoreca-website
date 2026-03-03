@@ -1028,7 +1028,7 @@
         "title": "3. Tiempos de Respuesta de Soporte",
         "headers": {
           "priority": "Prioridad",
-          "description": "Descripción",
+          "description": "Texto sobre nosotros",
           "responseTime": "Tiempo de respuesta"
         },
         "critical": {
@@ -1568,7 +1568,7 @@
     "form": {
       "name": "Nombre de la recompensa",
       "namePlaceholder": "Ej. Bebida gratis",
-      "description": "Descripción",
+      "description": "Texto sobre nosotros",
       "descriptionPlaceholder": "Ej. Elección de refresco o café",
       "pointsRequired": "Puntos necesarios",
       "rewardType": "Tipo de recompensa",
@@ -2005,7 +2005,7 @@
       "businessInfo": "Información del negocio",
       "businessName": "Nombre del negocio",
       "tagline": "Eslogan",
-      "description": "Descripción",
+      "description": "Texto sobre nosotros",
       "contactInfo": "Información de contacto",
       "email": "Email",
       "phone": "Teléfono",
@@ -2098,7 +2098,7 @@
       "addCategory": "Añadir categoría",
       "editCategory": "Editar categoría",
       "name": "Nombre",
-      "description": "Descripción",
+      "description": "Texto sobre nosotros",
       "image": "Imagen",
       "order": "Orden",
       "noCategories": "Aún no hay categorías",
@@ -2119,7 +2119,7 @@
       "addProduct": "Añadir producto",
       "editProduct": "Editar producto",
       "name": "Nombre",
-      "description": "Descripción",
+      "description": "Texto sobre nosotros",
       "price": "Precio",
       "category": "Categoría",
       "image": "Imagen",
@@ -2324,7 +2324,7 @@
       "firstInvoice": "Tu primera factura aparecerá aquí después de tu primer pago",
       "invoiceNr": "N° factura",
       "date": "Fecha",
-      "description": "Descripción",
+      "description": "Texto sobre nosotros",
       "amount": "Importe",
       "statusCol": "Estado",
       "action": "Acción",
@@ -2930,7 +2930,7 @@
       "title": "Compras y Facturas",
       "newPurchase": "Nueva compra",
       "category": "Categoría",
-      "description": "Descripción",
+      "description": "Texto sobre nosotros",
       "supplier": "Proveedor",
       "invoiceNumber": "N° factura",
       "amount": "Monto (€)",
@@ -3261,7 +3261,7 @@
       "tip5": "Sube una imagen atractiva para redes sociales"
     },
     "addMetaDescription": "Añadir meta descripción...",
-    "description": "Descripción"
+    "description": "Texto sobre nosotros"
   },
   "shopPage": {
     "loading": "Cargando...",
@@ -3839,7 +3839,7 @@
       "titleField": "Título (opcional)",
       "orderDeadline": "Plazo de pedido",
       "deliveryTime": "Hora de entrega deseada",
-      "description": "Descripción",
+      "description": "Texto sobre nosotros",
       "descriptionPlaceholder": "Información adicional para el grupo...",
       "startSession": "Iniciar sesión",
       "starting": "Creando...",
@@ -3963,7 +3963,7 @@
     "modalTitleEdit": "Editar promoción",
     "modalTitleNew": "Nueva promoción",
     "photo": "Foto",
-    "description": "Descripción",
+    "description": "Texto sobre nosotros",
     "descriptionPlaceholder": "Describe la oferta...",
     "promoType": "Tipo de promoción",
     "typeFixedPrice": "Precio fijo",

@@ -1051,7 +1051,7 @@
     "form": {
       "name": "Nom de la récompense",
       "namePlaceholder": "Ex. Boisson gratuite",
-      "description": "Description",
+      "description": "Texte à propos de nous",
       "descriptionPlaceholder": "Ex. Choix de soda ou café",
       "pointsRequired": "Points requis",
       "rewardType": "Type de récompense",
@@ -1511,7 +1511,7 @@
       "businessInfo": "Informations sur l'entreprise",
       "businessName": "Nom de l'entreprise",
       "tagline": "Slogan d'en-tête (ce slogan apparaît directement sous votre nom)",
-      "description": "Description",
+      "description": "Texte à propos de nous",
       "contactInfo": "Coordonnées",
       "email": "E-mail",
       "phone": "Téléphone",
@@ -1604,7 +1604,7 @@
       "addCategory": "Ajouter une catégorie",
       "editCategory": "Modifier la catégorie",
       "name": "Nom",
-      "description": "Description",
+      "description": "Texte à propos de nous",
       "image": "Image",
       "order": "Ordre",
       "noCategories": "Pas encore de catégories",
@@ -1625,7 +1625,7 @@
       "addProduct": "Ajouter un produit",
       "editProduct": "Modifier le produit",
       "name": "Nom",
-      "description": "Description",
+      "description": "Texte à propos de nous",
       "price": "Prix",
       "category": "Catégorie",
       "image": "Image",
@@ -1830,7 +1830,7 @@
       "firstInvoice": "Votre première facture apparaîtra ici après votre premier paiement",
       "invoiceNr": "N° facture",
       "date": "Date",
-      "description": "Description",
+      "description": "Texte à propos de nous",
       "amount": "Montant",
       "statusCol": "Statut",
       "action": "Action",
@@ -2436,7 +2436,7 @@
       "title": "Achats & Factures",
       "newPurchase": "Nouvel achat",
       "category": "Catégorie",
-      "description": "Description",
+      "description": "Texte à propos de nous",
       "supplier": "Fournisseur",
       "invoiceNumber": "N° facture",
       "amount": "Montant (€)",
@@ -2767,7 +2767,7 @@
       "tip5": "Téléchargez une image attractive pour les réseaux sociaux"
     },
     "addMetaDescription": "Ajouter une méta description...",
-    "description": "Description"
+    "description": "Texte à propos de nous"
   },
   "shopPage": {
     "loading": "Chargement...",
@@ -3326,7 +3326,7 @@
         "title": "3. Support Responstijden",
         "headers": {
           "priority": "Prioriteit",
-          "description": "Beschrijving",
+          "description": "Texte à propos de nous",
           "responseTime": "Responstijd"
         },
         "critical": {
@@ -3862,7 +3862,7 @@
       "titleField": "Titre (optionnel)",
       "orderDeadline": "Délai de commande",
       "deliveryTime": "Heure de livraison souhaitée",
-      "description": "Description",
+      "description": "Texte à propos de nous",
       "descriptionPlaceholder": "Informations supplémentaires pour le groupe...",
       "startSession": "Démarrer la session",
       "starting": "Création...",
@@ -3986,7 +3986,7 @@
     "modalTitleEdit": "Modifier la promotion",
     "modalTitleNew": "Nouvelle promotion",
     "photo": "Photo",
-    "description": "Description",
+    "description": "Texte à propos de nous",
     "descriptionPlaceholder": "Décrivez l'offre...",
     "promoType": "Type de promotion",
     "typeFixedPrice": "Prix fixe",

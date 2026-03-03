@@ -1028,7 +1028,7 @@
         "title": "3. Support Response Times",
         "headers": {
           "priority": "Priority",
-          "description": "Description",
+          "description": "About us text",
           "responseTime": "Response Time"
         },
         "critical": {
@@ -1568,7 +1568,7 @@
     "form": {
       "name": "Reward name",
       "namePlaceholder": "E.g. Free drink",
-      "description": "Description",
+      "description": "About us text",
       "descriptionPlaceholder": "E.g. Choice of soft drink or coffee",
       "pointsRequired": "Points required",
       "rewardType": "Reward type",
@@ -2010,7 +2010,7 @@
       "businessInfo": "Business Information",
       "businessName": "Business Name",
       "tagline": "Header slogan (this slogan appears directly below your name)",
-      "description": "Description",
+      "description": "About us text",
       "contactInfo": "Contact Information",
       "email": "Email",
       "phone": "Phone",
@@ -2103,7 +2103,7 @@
       "addCategory": "Add Category",
       "editCategory": "Edit Category",
       "name": "Name",
-      "description": "Description",
+      "description": "About us text",
       "image": "Image",
       "order": "Order",
       "noCategories": "No categories yet",
@@ -2125,7 +2125,7 @@
       "editProduct": "Edit Product",
       "newProduct": "New product",
       "name": "Product name",
-      "description": "Description",
+      "description": "About us text",
       "price": "Price",
       "category": "Category",
       "image": "Image",
@@ -2329,7 +2329,7 @@
       "firstInvoice": "Your first invoice will appear here after your first payment",
       "invoiceNr": "Invoice no.",
       "date": "Date",
-      "description": "Description",
+      "description": "About us text",
       "amount": "Amount",
       "statusCol": "Status",
       "action": "Action",
@@ -3097,7 +3097,7 @@
       "newPurchase": "New Purchase",
       "editPurchase": "Edit Purchase",
       "category": "Category",
-      "description": "Description",
+      "description": "About us text",
       "descriptionPlaceholder": "E.g. Potatoes week 3",
       "supplier": "Supplier",
       "invoiceNumber": "Invoice No.",
@@ -3390,7 +3390,7 @@
       "tip5": "Upload an attractive image for social media"
     },
     "addMetaDescription": "Add a meta description...",
-    "description": "Description"
+    "description": "About us text"
   },
   "shopPage": {
     "loading": "Loading...",
@@ -3816,7 +3816,7 @@
       "titleField": "Title (optional)",
       "orderDeadline": "Order deadline",
       "deliveryTime": "Desired delivery time",
-      "description": "Description",
+      "description": "About us text",
       "descriptionPlaceholder": "Extra info for the group...",
       "startSession": "Start Session",
       "starting": "Creating...",
@@ -3940,7 +3940,7 @@
     "modalTitleEdit": "Edit promotion",
     "modalTitleNew": "New promotion",
     "photo": "Photo",
-    "description": "Description",
+    "description": "About us text",
     "descriptionPlaceholder": "Describe the offer...",
     "promoType": "Promotion type",
     "typeFixedPrice": "Fixed price",
