@@ -377,13 +377,13 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       .then(r => r.json())
       .then(d => setManualOffline(d))
       .catch(() => {})
-    // Refresh every 60 seconds in case owner changes status
+    // Refresh every 30 seconds in case owner changes status
     const interval = setInterval(() => {
       fetch(`/api/shop-offline?tenant=${params.tenant}`)
         .then(r => r.json())
         .then(d => setManualOffline(d))
         .catch(() => {})
-    }, 60000)
+    }, 30000)
     return () => clearInterval(interval)
   }, [params.tenant])
 

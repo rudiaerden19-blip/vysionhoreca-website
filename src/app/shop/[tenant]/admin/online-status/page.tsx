@@ -22,6 +22,9 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
   const [customMessage, setCustomMessage] = useState('')
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [needsMigration, setNeedsMigration] = useState(false)
 
   useEffect(() => {
     fetch(`/api/shop-offline?tenant=${params.tenant}`)
@@ -45,16 +48,36 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
     }
   }
 
-  const goOnline = async () => {
-    setSaving(true)
-    await fetch('/api/shop-offline', {
+  const saveStatus = async (payload: object) => {
+    setSaveError(null)
+    setSaveSuccess(false)
+    const res = await fetch('/api/shop-offline', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tenant: params.tenant, is_offline: false }),
+      body: JSON.stringify({ tenant: params.tenant, ...payload }),
     })
-    setIsOffline(false)
-    setOfflineReason(null)
-    setOfflineMessage(null)
+    const json = await res.json()
+    if (!res.ok || json.error) {
+      const msg = json.error ?? 'Onbekende fout'
+      setSaveError(msg)
+      if (msg.includes('does not exist') || msg.includes('migration')) {
+        setNeedsMigration(true)
+      }
+      return false
+    }
+    setSaveSuccess(true)
+    setTimeout(() => setSaveSuccess(false), 3000)
+    return true
+  }
+
+  const goOnline = async () => {
+    setSaving(true)
+    const ok = await saveStatus({ is_offline: false })
+    if (ok) {
+      setIsOffline(false)
+      setOfflineReason(null)
+      setOfflineMessage(null)
+    }
     setSaving(false)
   }
 
@@ -62,20 +85,17 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
     if (!selectedReason) return
     if (selectedReason === 'eigen' && !customMessage.trim()) return
     setSaving(true)
-    await fetch('/api/shop-offline', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tenant: params.tenant,
-        is_offline: true,
-        offline_reason: selectedReason,
-        offline_message: selectedReason === 'eigen' ? customMessage.trim() : null,
-      }),
+    const ok = await saveStatus({
+      is_offline: true,
+      offline_reason: selectedReason,
+      offline_message: selectedReason === 'eigen' ? customMessage.trim() : null,
     })
-    setIsOffline(true)
-    setOfflineReason(selectedReason)
-    setOfflineMessage(selectedReason === 'eigen' ? customMessage.trim() : null)
-    setShowPopup(false)
+    if (ok) {
+      setIsOffline(true)
+      setOfflineReason(selectedReason)
+      setOfflineMessage(selectedReason === 'eigen' ? customMessage.trim() : null)
+      setShowPopup(false)
+    }
     setSaving(false)
   }
 
@@ -86,6 +106,50 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
     <div className="max-w-2xl mx-auto">
       <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('shopOffline.title')}</h1>
       <p className="text-gray-600 mb-8">{t('shopOffline.subtitle')}</p>
+
+      {/* Migration warning */}
+      {needsMigration && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-5">
+          <p className="font-bold text-red-800 mb-2">⚠️ Database tabel ontbreekt</p>
+          <p className="text-red-700 text-sm mb-3">
+            Voer dit SQL-script uit in de Supabase SQL Editor om de tabel aan te maken:
+          </p>
+          <code className="block bg-red-100 rounded-xl p-3 text-xs text-red-900 whitespace-pre overflow-x-auto">
+{`CREATE TABLE IF NOT EXISTS shop_offline_status (
+  tenant_slug TEXT PRIMARY KEY,
+  is_offline BOOLEAN DEFAULT FALSE,
+  offline_reason TEXT,
+  offline_message TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE shop_offline_status
+  ADD COLUMN IF NOT EXISTS offline_message TEXT;`}
+          </code>
+        </div>
+      )}
+
+      {/* Save error */}
+      {saveError && !needsMigration && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
+          <span className="text-2xl">❌</span>
+          <p className="text-red-800 text-sm">{saveError}</p>
+        </div>
+      )}
+
+      {/* Save success */}
+      <AnimatePresence>
+        {saveSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="mb-6 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3"
+          >
+            <span className="text-2xl">✅</span>
+            <p className="text-green-800 text-sm font-semibold">Status opgeslagen en zichtbaar voor klanten.</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {loading ? (
         <div className="bg-white rounded-3xl p-10 border border-gray-200 flex items-center justify-center">
@@ -159,8 +223,8 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
       )}
 
       <div className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-5">
-        <p className="text-blue-800 text-sm">
-          💡 {t('shopOffline.subtitle')}
+        <p className="text-blue-800 text-sm font-medium">
+          💡 De status wordt onmiddellijk zichtbaar voor alle klanten in de webshop. Klanten kunnen niet bestellen wanneer de shop offline is.
         </p>
       </div>
 
@@ -205,7 +269,6 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
                       )}
                     </button>
 
-                    {/* Custom message textarea */}
                     {reason.key === 'eigen' && selectedReason === 'eigen' && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
@@ -227,6 +290,13 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
                   </div>
                 ))}
               </div>
+
+              {/* Inline save error inside popup */}
+              {saveError && !needsMigration && (
+                <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3">
+                  <p className="text-red-700 text-sm">❌ {saveError}</p>
+                </div>
+              )}
 
               <div className="flex gap-3 mt-6">
                 <button
