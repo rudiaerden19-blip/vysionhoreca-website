@@ -1510,7 +1510,7 @@
       "subtitle": "Gérez les informations de votre entreprise",
       "businessInfo": "Informations sur l'entreprise",
       "businessName": "Nom de l'entreprise",
-      "tagline": "Slogan",
+      "tagline": "Slogan d'en-tête (ce slogan apparaît directement sous votre nom)",
       "description": "Description",
       "contactInfo": "Coordonnées",
       "email": "E-mail",
