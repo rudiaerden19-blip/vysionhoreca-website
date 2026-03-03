@@ -2370,15 +2370,25 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       {/* Floating Order Button (Mobile) */}
       <div className="fixed bottom-4 left-3 right-3 sm:bottom-6 sm:left-4 sm:right-4 md:hidden z-50 pb-safe">
-        <Link href={`/shop/${params.tenant}/menu`}>
+        {manualOffline?.is_offline ? (
           <button
-            style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66` }}
-            className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-transform"
+            disabled
+            className="w-full text-white/60 font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 bg-gray-400 cursor-not-allowed"
           >
-            <span>🍟</span>
-            <span>{t('shopPage.startYourOrder')}</span>
+            <span>🚫</span>
+            <span>{t('shopOffline.orderingBlocked')}</span>
           </button>
-        </Link>
+        ) : (
+          <Link href={`/shop/${params.tenant}/menu`}>
+            <button
+              style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66` }}
+              className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-transform"
+            >
+              <span>🍟</span>
+              <span>{t('shopPage.startYourOrder')}</span>
+            </button>
+          </Link>
+        )}
       </div>
     </div>
   )
