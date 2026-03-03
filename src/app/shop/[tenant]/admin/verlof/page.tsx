@@ -272,21 +272,20 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
     setProcessing(false)
   }
 
-  const handleRevoke = async (request: LeaveRequest) => {
-    if (!confirm(t('leave.confirmRevoke'))) return
+  const handleRejectApproved = async (request: LeaveRequest) => {
+    if (!confirm(t('leave.confirmReject'))) return
     
     setProcessing(true)
     
-    // Delete timesheet entries first
+    // Remove timesheet entries since it's being rejected
     await deleteTimesheetEntries(request)
     
-    // Update leave request status back to pending or delete it
+    // Set status to rejected
     await supabase
       .from('leave_requests')
       .update({
-        status: 'pending',
-        reviewed_at: null,
-        notes: t('leave.revokedNote'),
+        status: 'rejected',
+        reviewed_at: new Date().toISOString(),
       })
       .eq('id', request.id)
     
@@ -794,14 +793,24 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                       </button>
                     </>
                   )}
-                  
+
                   {showDetail.status === 'approved' && (
                     <button
-                      onClick={() => handleRevoke(showDetail)}
+                      onClick={() => handleRejectApproved(showDetail)}
                       disabled={processing}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
                     >
-                      ↩️ {t('leave.revoke')}
+                      ✗ {t('leave.reject')}
+                    </button>
+                  )}
+
+                  {showDetail.status === 'rejected' && (
+                    <button
+                      onClick={() => handleApprove(showDetail)}
+                      disabled={processing}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
+                    >
+                      ✓ {t('leave.approve')}
                     </button>
                   )}
                 </div>

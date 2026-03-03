@@ -3785,7 +3785,8 @@
     "revoke": "Révoquer",
     "confirmRevoke": "Voulez-vous vraiment révoquer ce congé? Les entrées du calendrier seront également supprimées.",
     "confirmDelete": "Voulez-vous vraiment supprimer cette demande de congé?",
-    "revokedNote": "Congé révoqué"
+    "revokedNote": "Congé révoqué",
+    "confirmReject": "Êtes-vous sûr de vouloir refuser ce congé ? Les entrées de calendrier seront également supprimées."
   },
   "groupsModule": {
     "groups": {

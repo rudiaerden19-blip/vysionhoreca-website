@@ -3785,7 +3785,8 @@
     "revoke": "Widerrufen",
     "confirmRevoke": "Möchten Sie diesen Urlaub wirklich widerrufen? Die Kalendereinträge werden ebenfalls gelöscht.",
     "confirmDelete": "Möchten Sie diesen Urlaubsantrag wirklich löschen?",
-    "revokedNote": "Urlaub widerrufen"
+    "revokedNote": "Urlaub widerrufen",
+    "confirmReject": "Möchten Sie diesen Urlaub wirklich ablehnen? Kalendereinträge werden ebenfalls gelöscht."
   },
   "groupsModule": {
     "groups": {

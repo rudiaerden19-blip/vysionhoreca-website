@@ -2703,7 +2703,8 @@
     "revoke": "Intrekken",
     "confirmRevoke": "Weet je zeker dat je dit verlof wilt intrekken? De kalender entries worden ook verwijderd.",
     "confirmDelete": "Weet je zeker dat je dit verlof wilt verwijderen?",
-    "revokedNote": "Verlof ingetrokken"
+    "revokedNote": "Verlof ingetrokken",
+    "confirmReject": "Weet je zeker dat je dit verlof wilt weigeren? De kalenderentries worden ook verwijderd."
   },
   "websiteTexts": {
     "title": "Teksten",

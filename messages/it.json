@@ -3762,7 +3762,8 @@
     "revoke": "Revoca",
     "confirmRevoke": "Sei sicuro di voler revocare questo permesso? Anche le voci del calendario verranno eliminate.",
     "confirmDelete": "Sei sicuro di voler eliminare questa richiesta di permesso?",
-    "revokedNote": "Permesso revocato"
+    "revokedNote": "Permesso revocato",
+    "confirmReject": "Sei sicuro di voler rifiutare questo congedo? Le voci del calendario verranno rimosse."
   },
   "groupsModule": {
     "groups": {

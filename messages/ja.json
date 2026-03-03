@@ -3762,7 +3762,8 @@
     "revoke": "取り消し",
     "confirmRevoke": "この休暇を取り消しますか？カレンダーのエントリも削除されます。",
     "confirmDelete": "この休暇申請を削除しますか？",
-    "revokedNote": "休暇取り消し済み"
+    "revokedNote": "休暇取り消し済み",
+    "confirmReject": "この休暇を拒否してもよろしいですか？カレンダーエントリも削除されます。"
   },
   "groupsModule": {
     "groups": {

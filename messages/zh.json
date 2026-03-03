@@ -3762,7 +3762,8 @@
     "revoke": "撤销",
     "confirmRevoke": "确定要撤销此休假吗？日历条目也将被删除。",
     "confirmDelete": "确定要删除此休假申请吗？",
-    "revokedNote": "休假已撤销"
+    "revokedNote": "休假已撤销",
+    "confirmReject": "您确定要拒绝此假期吗？日历条目也将被删除。"
   },
   "groupsModule": {
     "groups": {

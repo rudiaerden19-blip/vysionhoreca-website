@@ -3762,7 +3762,8 @@
     "revoke": "Revocar",
     "confirmRevoke": "¿Seguro que quieres revocar este permiso? Las entradas del calendario también se eliminarán.",
     "confirmDelete": "¿Seguro que quieres eliminar esta solicitud de permiso?",
-    "revokedNote": "Permiso revocado"
+    "revokedNote": "Permiso revocado",
+    "confirmReject": "¿Estás seguro de que quieres rechazar esta baja? Las entradas del calendario también se eliminarán."
   },
   "groupsModule": {
     "groups": {
