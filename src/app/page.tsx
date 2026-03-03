@@ -364,7 +364,7 @@ function StatsSection() {
             </div>
           ))}
         </div>
-        <div className="mt-10 text-center">
+        <div className="mt-16 text-center">
           <p className="text-xl sm:text-2xl font-bold text-accent">
             {t('stats.award')}
           </p>
