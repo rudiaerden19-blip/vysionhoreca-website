@@ -72,6 +72,8 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
   const [processing, setProcessing] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
   const [actionSuccess, setActionSuccess] = useState<string | null>(null)
+  const [modalError, setModalError] = useState<string | null>(null)
+  const [needsMigration, setNeedsMigration] = useState(false)
   const [newRequest, setNewRequest] = useState({
     staff_id: '',
     leave_type: 'vacation',
@@ -107,7 +109,11 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
       }))
       setRequests(enriched)
     } catch (e: unknown) {
-      console.error('loadData error:', e)
+      const msg = e instanceof Error ? e.message : String(e)
+      console.error('loadData error:', msg)
+      if (msg.toLowerCase().includes('does not exist')) {
+        setNeedsMigration(true)
+      }
     } finally {
       setLoading(false)
     }
@@ -120,8 +126,16 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
   }
 
   function showError(msg: string) {
+    // Show error both on page AND inside modal if a modal is open
+    const isMissingTable = msg.toLowerCase().includes('does not exist') || msg.toLowerCase().includes('bestaat niet')
+    if (isMissingTable) setNeedsMigration(true)
+    setModalError(msg)
     setActionError(msg)
     setActionSuccess(null)
+  }
+
+  function clearModalError() {
+    setModalError(null)
   }
 
   const getLeaveType = (type: string) => {
@@ -337,7 +351,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
             {actionSuccess}
           </motion.div>
         )}
-        {actionError && (
+        {actionError && !needsMigration && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -348,6 +362,43 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Migration needed banner */}
+      {needsMigration && (
+        <div className="bg-orange-50 border-2 border-orange-400 rounded-xl p-5">
+          <h3 className="font-bold text-orange-800 text-lg mb-2">⚠️ Database tabel ontbreekt</h3>
+          <p className="text-orange-700 mb-3">
+            De tabel <code className="bg-orange-100 px-1 rounded">leave_requests</code> bestaat nog niet in je Supabase database.
+            Voer onderstaande SQL uit in de <strong>Supabase SQL Editor</strong>:
+          </p>
+          <pre className="bg-gray-900 text-green-400 p-4 rounded-lg text-xs overflow-x-auto mb-3 whitespace-pre-wrap">
+{`CREATE TABLE IF NOT EXISTS leave_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  tenant_slug TEXT NOT NULL,
+  staff_id UUID NOT NULL,
+  leave_type TEXT NOT NULL DEFAULT 'vacation',
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  reason TEXT,
+  notes TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',
+  requested_at TIMESTAMPTZ DEFAULT NOW(),
+  reviewed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_tenant ON leave_requests(tenant_slug);
+ALTER TABLE leave_requests ENABLE ROW LEVEL SECURITY;
+CREATE POLICY IF NOT EXISTS "Service role full access" ON leave_requests
+  FOR ALL USING (true) WITH CHECK (true);`}
+          </pre>
+          <button
+            onClick={() => { setNeedsMigration(false); setActionError(null); loadData() }}
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600"
+          >
+            ✓ SQL uitgevoerd, opnieuw proberen
+          </button>
+        </div>
+      )}
 
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -372,7 +423,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
             📅 {t('leave.yearOverview')}
           </button>
           <button
-            onClick={() => setShowNewRequest(true)}
+            onClick={() => { setShowNewRequest(true); clearModalError() }}
             className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition"
           >
             ➕ {t('leave.newRequest')}
@@ -544,7 +595,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
               return (
                 <div
                   key={request.id}
-                  onClick={() => setShowDetail(request)}
+                  onClick={() => { setShowDetail(request); clearModalError() }}
                   className="p-4 hover:bg-gray-50 cursor-pointer transition"
                 >
                   <div className="flex items-center gap-4">
@@ -669,18 +720,26 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                 </div>
               </div>
 
+              {/* Error inside modal */}
+              {modalError && (
+                <div className="mx-6 mb-4 bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg text-sm">
+                  ❌ <strong>Fout:</strong> {modalError}
+                  <button onClick={clearModalError} className="ml-2 text-red-500 hover:text-red-700">✕</button>
+                </div>
+              )}
+
               <div className="p-6 border-t flex gap-3 justify-between">
                 <button
                   onClick={() => handleDelete(showDetail)}
                   disabled={processing}
                   className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition disabled:opacity-50"
                 >
-                  🗑️ {t('leave.delete')}
+                  {processing ? '⏳' : '🗑️'} {t('leave.delete')}
                 </button>
                 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => setShowDetail(null)}
+                    onClick={() => { setShowDetail(null); clearModalError() }}
                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
                   >
                     {t('adminPages.common.close')}
@@ -693,14 +752,14 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                         disabled={processing}
                         className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
                       >
-                        ✗ {t('leave.reject')}
+                        {processing ? '⏳ Bezig...' : `✗ ${t('leave.reject')}`}
                       </button>
                       <button
                         onClick={() => handleApprove(showDetail)}
                         disabled={processing}
                         className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
                       >
-                        ✓ {t('leave.approve')}
+                        {processing ? '⏳ Bezig...' : `✓ ${t('leave.approve')}`}
                       </button>
                     </>
                   )}
@@ -711,7 +770,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                       disabled={processing}
                       className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition disabled:opacity-50"
                     >
-                      ✗ {t('leave.reject')}
+                      {processing ? '⏳ Bezig...' : `✗ ${t('leave.reject')}`}
                     </button>
                   )}
 
@@ -721,7 +780,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                       disabled={processing}
                       className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
                     >
-                      ✓ {t('leave.approve')}
+                      {processing ? '⏳ Bezig...' : `✓ ${t('leave.approve')}`}
                     </button>
                   )}
                 </div>
@@ -859,9 +918,17 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                 </div>
               </div>
 
+              {/* Error inside new request modal */}
+              {modalError && (
+                <div className="mx-6 mb-2 bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg text-sm">
+                  ❌ <strong>Fout:</strong> {modalError}
+                  <button onClick={clearModalError} className="ml-2 text-red-500 hover:text-red-700">✕</button>
+                </div>
+              )}
+
               <div className="p-6 border-t flex gap-3 justify-end">
                 <button
-                  onClick={() => setShowNewRequest(false)}
+                  onClick={() => { setShowNewRequest(false); clearModalError() }}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
                 >
                   {t('adminPages.common.cancel')}
@@ -871,7 +938,7 @@ export default function LeaveManagementPage({ params }: { params: { tenant: stri
                   disabled={processing || !newRequest.staff_id || !newRequest.start_date || !newRequest.end_date}
                   className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
                 >
-                  {processing ? '...' : `➕ ${t('leave.add')}`}
+                  {processing ? '⏳ Bezig...' : `➕ ${t('leave.add')}`}
                 </button>
               </div>
             </motion.div>
