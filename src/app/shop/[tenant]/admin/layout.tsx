@@ -87,7 +87,6 @@ const menuItems = [
     items: [
       { nameKey: 'employees', href: '/personeel', icon: '👥' },
       { nameKey: 'timeTracking', href: '/uren', icon: '⏰' },
-      { nameKey: 'leaveManagement', href: '/verlof', icon: '🏖️' },
       { nameKey: 'vacancies', href: '/vacatures', icon: '📢' },
     ]
   },
