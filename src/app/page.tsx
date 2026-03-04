@@ -371,6 +371,9 @@ function StatsSection() {
           <p className="mt-3 text-base sm:text-lg text-gray-600">
             {t('stats.award_sub')}
           </p>
+          <p className="mt-2 text-sm text-gray-400">
+            🌍 Beschikbaar in 9 talen
+          </p>
         </div>
       </div>
     </section>
