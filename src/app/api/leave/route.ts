@@ -6,30 +6,37 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Ensure tables exist
-async function ensureTables() {
-  try {
-    await supabaseAdmin.rpc('exec_sql', {
-      sql: `
-        CREATE TABLE IF NOT EXISTS leave_requests (
-          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-          tenant_slug TEXT NOT NULL,
-          staff_id UUID NOT NULL,
-          leave_type TEXT NOT NULL DEFAULT 'vacation',
-          start_date DATE NOT NULL,
-          end_date DATE NOT NULL,
-          reason TEXT,
-          notes TEXT,
-          status TEXT NOT NULL DEFAULT 'pending',
-          requested_at TIMESTAMPTZ DEFAULT NOW(),
-          reviewed_at TIMESTAMPTZ,
-          created_at TIMESTAMPTZ DEFAULT NOW()
-        );
-        CREATE INDEX IF NOT EXISTS idx_leave_requests_tenant ON leave_requests(tenant_slug);
-        CREATE INDEX IF NOT EXISTS idx_leave_requests_staff ON leave_requests(staff_id);
-      `
-    })
-  } catch { /* ignore */ }
+const MIGRATION_SQL = `
+CREATE TABLE IF NOT EXISTS leave_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  tenant_slug TEXT NOT NULL,
+  staff_id UUID NOT NULL,
+  leave_type TEXT NOT NULL DEFAULT 'vacation',
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  reason TEXT,
+  notes TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',
+  requested_at TIMESTAMPTZ DEFAULT NOW(),
+  reviewed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_tenant ON leave_requests(tenant_slug);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_staff ON leave_requests(staff_id);
+ALTER TABLE leave_requests ENABLE ROW LEVEL SECURITY;
+`.trim()
+
+// Check if leave_requests table exists - returns error message if not
+async function checkTable(): Promise<string | null> {
+  const { error } = await supabaseAdmin
+    .from('leave_requests')
+    .select('id')
+    .limit(1)
+
+  if (error && error.message.toLowerCase().includes('does not exist')) {
+    return `De tabel 'leave_requests' bestaat niet in Supabase. Voer deze SQL uit in de Supabase SQL Editor:\n\n${MIGRATION_SQL}`
+  }
+  return null
 }
 
 // GET: fetch leave requests for a tenant
@@ -40,7 +47,8 @@ export async function GET(request: NextRequest) {
 
   if (!tenant) return NextResponse.json({ error: 'Missing tenant' }, { status: 400 })
 
-  await ensureTables()
+  const tableError = await checkTable()
+  if (tableError) return NextResponse.json({ error: tableError }, { status: 500 })
 
   const { data, error } = await supabaseAdmin
     .from('leave_requests')
@@ -61,7 +69,8 @@ export async function POST(request: NextRequest) {
 
   if (!tenant) return NextResponse.json({ error: 'Missing tenant' }, { status: 400 })
 
-  await ensureTables()
+  const tableError = await checkTable()
+  if (tableError) return NextResponse.json({ error: tableError }, { status: 500 })
 
   if (action === 'create') {
     const { data, error } = await supabaseAdmin
