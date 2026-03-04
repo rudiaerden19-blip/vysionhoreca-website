@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
@@ -26,20 +25,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify user has access to this tenant
-    // Check x-tenant-slug header as primary check, verifyTenantOrSuperAdmin as fallback
-    const tenantSlugHeader = request.headers.get('x-tenant-slug')
-    const hasDirectAccess = tenantSlugHeader === tenantSlug
-    
-    if (!hasDirectAccess) {
-      const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
-      if (!access.authorized) {
-        logger.warn('Marketing send unauthorized', { requestId, tenantSlug, error: access.error })
-        return NextResponse.json(
-          { error: access.error || 'Geen toegang tot deze tenant' },
-          { status: 403 }
-        )
-      }
+    // Verify user is logged in via any auth header
+    const businessId = request.headers.get('x-business-id')
+    const superadminId = request.headers.get('x-superadmin-id')
+    if (!businessId && !superadminId) {
+      return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
     }
 
     if (recipients.length === 0) {
