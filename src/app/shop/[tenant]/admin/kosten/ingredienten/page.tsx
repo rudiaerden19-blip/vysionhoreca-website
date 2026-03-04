@@ -263,6 +263,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
             notes: invoiceResults.supplier ? `Leverancier: ${invoiceResults.supplier}` : existingIngredient.notes
           })
           .eq('id', existingIngredient.id)
+          .eq('tenant_slug', params.tenant)
           .select()
           .single()
 
@@ -465,6 +466,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
         .from('ingredients')
         .update(ingredientData)
         .eq('id', editingId)
+        .eq('tenant_slug', params.tenant)
         .select()
         .single()
 
@@ -491,7 +493,7 @@ export default function IngredientsPage({ params }: { params: { tenant: string }
   async function deleteIngredient(id: string) {
     if (!confirm('Weet je zeker dat je dit ingrediënt wilt verwijderen?')) return
     
-    await supabase.from('ingredients').delete().eq('id', id)
+    await supabase.from('ingredients').delete().eq('id', id).eq('tenant_slug', params.tenant)
     setIngredients(prev => prev.filter(i => i.id !== id))
   }
 
