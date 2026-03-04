@@ -8,11 +8,18 @@ import ImageZoomPicker, { parseImageZoomSettings, stringifyImageZoomSettings } f
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 
-const SMTP_PRESETS: Record<string, { host: string; port: number }> = {
-  'Zoho Mail': { host: 'smtp.zoho.eu', port: 465 },
-  'Gmail': { host: 'smtp.gmail.com', port: 587 },
-  'Outlook / Hotmail': { host: 'smtp-mail.outlook.com', port: 587 },
-  'Andere': { host: '', port: 465 },
+function detectSmtp(email: string): { host: string; port: number } | null {
+  const domain = email.split('@')[1]?.toLowerCase()
+  if (!domain) return null
+  if (domain === 'gmail.com' || domain === 'googlemail.com') return { host: 'smtp.gmail.com', port: 587 }
+  if (domain === 'outlook.com' || domain === 'hotmail.com' || domain === 'live.com' || domain === 'live.be' || domain === 'hotmail.be') return { host: 'smtp-mail.outlook.com', port: 587 }
+  if (domain === 'zoho.eu' || domain === 'zohomail.eu' || domain === 'zoho.com') return { host: 'smtp.zoho.eu', port: 465 }
+  if (domain === 'yahoo.com' || domain === 'yahoo.be' || domain === 'yahoo.fr') return { host: 'smtp.mail.yahoo.com', port: 465 }
+  if (domain === 'icloud.com' || domain === 'me.com') return { host: 'smtp.mail.me.com', port: 587 }
+  if (domain === 'telenet.be') return { host: 'smtp.telenet.be', port: 465 }
+  if (domain === 'skynet.be') return { host: 'smtp.skynet.be', port: 465 }
+  if (domain === 'proximus.be' || domain === 'scarlet.be') return { host: 'smtp.proximus.be', port: 465 }
+  return null
 }
 
 export default function ProfielPage({ params }: { params: { tenant: string } }) {
@@ -31,7 +38,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
     smtp_from_name: '',
   })
   const [smtpPasswordSet, setSmtpPasswordSet] = useState(false)
-  const [smtpPreset, setSmtpPreset] = useState('Zoho Mail')
+  const [smtpDetected, setSmtpDetected] = useState<string | null>(null)
   const [smtpSaving, setSmtpSaving] = useState(false)
   const [smtpSaved, setSmtpSaved] = useState(false)
   const [smtpError, setSmtpError] = useState('')
@@ -98,10 +105,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
             smtp_from_name: d.smtp_from_name || '',
           })
           setSmtpPasswordSet(d.smtp_password_set || false)
-          // Detecteer preset
-          const matchingPreset = Object.entries(SMTP_PRESETS).find(([, v]) => v.host === d.smtp_host)
-          if (matchingPreset) setSmtpPreset(matchingPreset[0])
-          else if (d.smtp_host) setSmtpPreset('Andere')
+          if (d.smtp_host) setSmtpDetected(d.smtp_host)
         }
       } catch {
         // stil falen
@@ -792,32 +796,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
           </p>
 
           <div className="space-y-4">
-            {/* Email provider preset */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email provider</label>
-              <select
-                value={smtpPreset}
-                onChange={(e) => {
-                  const preset = e.target.value
-                  setSmtpPreset(preset)
-                  const presetValues = SMTP_PRESETS[preset]
-                  if (presetValues.host) {
-                    setSmtpData(prev => ({ ...prev, smtp_host: presetValues.host, smtp_port: presetValues.port }))
-                  }
-                }}
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              >
-                {Object.keys(SMTP_PRESETS).map(p => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
-              {smtpPreset === 'Gmail' && (
-                <p className="text-xs text-amber-600 mt-1">
-                  ⚠️ Gmail vereist een &quot;App-wachtwoord&quot; (niet je gewone wachtwoord). Activeer dit via Google Account → Beveiliging → 2-staps-verificatie → App-wachtwoorden.
-                </p>
-              )}
-            </div>
-
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Jouw naam / bedrijfsnaam</label>
@@ -834,10 +812,26 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 <input
                   type="email"
                   value={smtpData.smtp_user}
-                  onChange={e => setSmtpData(prev => ({ ...prev, smtp_user: e.target.value }))}
+                  onChange={e => {
+                    const email = e.target.value
+                    setSmtpData(prev => ({ ...prev, smtp_user: email }))
+                    const detected = detectSmtp(email)
+                    if (detected) {
+                      setSmtpData(prev => ({ ...prev, smtp_user: email, smtp_host: detected.host, smtp_port: detected.port }))
+                      setSmtpDetected(detected.host)
+                    } else {
+                      setSmtpDetected(null)
+                    }
+                  }}
                   placeholder="info@jouwzaak.be"
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
+                {smtpDetected && (
+                  <p className="text-xs text-green-600 mt-1">✓ Server automatisch gevonden: {smtpDetected}</p>
+                )}
+                {smtpData.smtp_user && !smtpDetected && (
+                  <p className="text-xs text-gray-500 mt-1">Onbekende provider — vul SMTP server hieronder in.</p>
+                )}
               </div>
             </div>
 
@@ -855,18 +849,23 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 placeholder={smtpPasswordSet ? 'Laat leeg om huidig wachtwoord te behouden' : 'Voer wachtwoord in'}
                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
+              {smtpData.smtp_user?.includes('@gmail.com') && (
+                <p className="text-xs text-amber-600 mt-1">
+                  ⚠️ Gmail vereist een App-wachtwoord. Maak dit aan via: Google Account → Beveiliging → App-wachtwoorden.
+                </p>
+              )}
             </div>
 
-            {smtpPreset === 'Andere' && (
-              <div className="grid md:grid-cols-2 gap-4">
+            {smtpData.smtp_user && !smtpDetected && (
+              <div className="grid md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SMTP server</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">SMTP server (vraag aan je provider)</label>
                   <input
                     type="text"
                     value={smtpData.smtp_host}
                     onChange={e => setSmtpData(prev => ({ ...prev, smtp_host: e.target.value }))}
                     placeholder="bijv. smtp.mijnprovider.be"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
                   />
                 </div>
                 <div>
@@ -876,7 +875,7 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                     value={smtpData.smtp_port}
                     onChange={e => setSmtpData(prev => ({ ...prev, smtp_port: parseInt(e.target.value) }))}
                     placeholder="465"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
                   />
                 </div>
               </div>
