@@ -39,14 +39,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create email transporter
+    // Haal tenant SMTP instellingen op
+    const supabaseAdmin = getServerSupabaseClient()
+    let smtpHost = 'smtp.zoho.eu'
+    let smtpPort = 465
+    let smtpUser = process.env.ZOHO_EMAIL || ''
+    let smtpPass = process.env.ZOHO_PASSWORD || ''
+    let fromName = businessName || 'Vysion Horeca'
+
+    if (supabaseAdmin) {
+      const { data: smtpSettings } = await supabaseAdmin
+        .from('tenant_settings')
+        .select('smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name')
+        .eq('tenant_slug', tenantSlug)
+        .single()
+
+      if (smtpSettings?.smtp_host && smtpSettings?.smtp_user && smtpSettings?.smtp_password) {
+        smtpHost = smtpSettings.smtp_host
+        smtpPort = smtpSettings.smtp_port || 465
+        smtpUser = smtpSettings.smtp_user
+        smtpPass = smtpSettings.smtp_password
+        fromName = smtpSettings.smtp_from_name || businessName || 'Vysion Horeca'
+      } else if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
+        return NextResponse.json(
+          { error: 'Geen email ingesteld. Ga naar Profiel → Email instellingen en vul je emailgegevens in.' },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Create email transporter met tenant eigen of centrale SMTP
     const transporter = nodemailer.createTransport({
-      host: 'smtp.zoho.eu',
-      port: 465,
-      secure: true,
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
       auth: {
-        user: process.env.ZOHO_EMAIL,
-        pass: process.env.ZOHO_PASSWORD,
+        user: smtpUser,
+        pass: smtpPass,
       },
     })
 
@@ -131,14 +160,14 @@ export async function POST(request: NextRequest) {
         `
 
         await transporter.sendMail({
-          from: `"${businessName || 'Vysion Horeca'}" <${process.env.ZOHO_EMAIL}>`,
-          replyTo: process.env.ZOHO_EMAIL,
+          from: `"${fromName}" <${smtpUser}>`,
+          replyTo: smtpUser,
           to: recipient.email,
           subject: subject,
           html: htmlContent,
           text: `${personalizedMessage}\n\n---\nUitschrijven: ${unsubscribeUrl}`,
           headers: {
-            'List-Unsubscribe': `<mailto:${process.env.ZOHO_EMAIL}?subject=uitschrijven>, <${unsubscribeUrl}>`,
+            'List-Unsubscribe': `<mailto:${smtpUser}?subject=uitschrijven>, <${unsubscribeUrl}>`,
             'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
           },
         })
