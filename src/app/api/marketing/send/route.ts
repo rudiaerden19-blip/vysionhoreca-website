@@ -130,18 +130,16 @@ export async function POST(request: NextRequest) {
 </html>
         `
 
-        // Verstuur email met extra headers om spam te voorkomen
         await transporter.sendMail({
           from: `"${businessName || 'Vysion Horeca'}" <${process.env.ZOHO_EMAIL}>`,
+          replyTo: process.env.ZOHO_EMAIL,
           to: recipient.email,
           subject: subject,
           html: htmlContent,
           text: `${personalizedMessage}\n\n---\nUitschrijven: ${unsubscribeUrl}`,
           headers: {
-            'List-Unsubscribe': `<${unsubscribeUrl}>`,
+            'List-Unsubscribe': `<mailto:${process.env.ZOHO_EMAIL}?subject=uitschrijven>, <${unsubscribeUrl}>`,
             'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-            'Precedence': 'bulk',
-            'X-Mailer': 'Vysion Horeca Marketing',
           },
         })
 
