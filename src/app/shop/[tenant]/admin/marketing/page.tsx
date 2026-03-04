@@ -157,11 +157,11 @@ export default function MarketingPage({ params }: { params: { tenant: string } }
         loadData() // Reload campaign history
         setTimeout(() => setSendSuccess(false), 5000)
       } else {
-        alert(t('marketing.sendFailed') + ': ' + (result.error || 'Unknown error'))
+        alert('❌ Verzenden mislukt: ' + (result.error || 'Onbekende fout'))
       }
     } catch (error) {
       console.error('Send error:', error)
-      alert(t('marketing.sendFailed'))
+      alert('❌ Verzenden mislukt. Controleer of ZOHO_EMAIL en ZOHO_PASSWORD ingesteld zijn in Vercel.')
     }
 
     setSending(false)

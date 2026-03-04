@@ -27,13 +27,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user has access to this tenant
-    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
-    if (!access.authorized) {
-      logger.warn('Marketing send unauthorized', { requestId, tenantSlug, error: access.error })
-      return NextResponse.json(
-        { error: access.error || 'Geen toegang tot deze tenant' },
-        { status: 403 }
-      )
+    // Check x-tenant-slug header as primary check, verifyTenantOrSuperAdmin as fallback
+    const tenantSlugHeader = request.headers.get('x-tenant-slug')
+    const hasDirectAccess = tenantSlugHeader === tenantSlug
+    
+    if (!hasDirectAccess) {
+      const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+      if (!access.authorized) {
+        logger.warn('Marketing send unauthorized', { requestId, tenantSlug, error: access.error })
+        return NextResponse.json(
+          { error: access.error || 'Geen toegang tot deze tenant' },
+          { status: 403 }
+        )
+      }
     }
 
     if (recipients.length === 0) {
