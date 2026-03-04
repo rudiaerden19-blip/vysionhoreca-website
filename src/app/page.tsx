@@ -368,6 +368,9 @@ function StatsSection() {
           <p className="text-xl sm:text-2xl font-bold text-accent">
             {t('stats.award')}
           </p>
+          <p className="mt-3 text-base sm:text-lg text-gray-600">
+            {t('stats.award_sub')}
+          </p>
         </div>
       </div>
     </section>
