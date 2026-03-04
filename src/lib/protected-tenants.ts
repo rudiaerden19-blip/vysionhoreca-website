@@ -8,20 +8,16 @@ export const PROTECTED_TENANTS = [
   'frituur-nolim',
   'skippsbv',
   'demo-frituur',
-  'frituurbart',
 ] as const
 
 // Admin accounts - nooit betalen, nooit verlopen
 export const ADMIN_TENANTS = [
   'frituurnolim',
   'skippsbv',
-  'frituurbart',
 ] as const
 
 // Demo accounts - publiek zichtbaar als live demo
-export const DEMO_TENANTS = [
-  'frituurbart',
-] as const
+export const DEMO_TENANTS = [] as const
 
 export function isAdminTenant(slug: string | null | undefined): boolean {
   if (!slug) return false
