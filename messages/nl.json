@@ -1834,7 +1834,8 @@
       "gksReports": "GKS RAPPORTEN",
       "orders": "BESTELLINGEN",
       "statistics": "STATISTIEKEN",
-      "groupOrders": "GROEPSBESTELLINGEN"
+      "groupOrders": "GROEPSBESTELLINGEN",
+      "bonnenprinter": "BONNENPRINTER"
     },
     "menu": {
       "dashboard": "Dashboard",
@@ -1881,7 +1882,8 @@
       "groupSessions": "Bestelsessies",
       "groupOrdersOverview": "Groepsbestellingen",
       "labelPrinter": "Label Printer",
-      "onlineShopToggle": "Online shop aan/uit"
+      "onlineShopToggle": "Online shop aan/uit",
+      "bonnenprinter": "Bonnenprinter"
     },
     "viewWebsite": "Bekijk je shop",
     "display": "Scherm",

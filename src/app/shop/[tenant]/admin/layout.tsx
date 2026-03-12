@@ -124,6 +124,13 @@ const menuItems = [
       { nameKey: 'labelPrinter', href: '/labels', icon: '🏷️' },
     ]
   },
+  {
+    categoryKey: 'bonnenprinter',
+    icon: '🖨️',
+    items: [
+      { nameKey: 'bonnenprinter', href: '/bonnenprinter', icon: '🖨️' },
+    ]
+  },
 ]
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
