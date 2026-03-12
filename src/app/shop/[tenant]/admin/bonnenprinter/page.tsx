@@ -6,22 +6,22 @@ export default function BonnenprinterPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 p-4">
       <div>
-        <h1 className="text-2xl font-bold text-white">🖨️ Bonnenprinter</h1>
-        <p className="text-gray-400 mt-1">Stel uw bonnenprinter in voor automatisch printen van bestellingen</p>
+        <h1 className="text-2xl font-bold text-gray-900">🖨️ Bonnenprinter</h1>
+        <p className="text-gray-600 mt-1">Stel uw bonnenprinter in voor automatisch printen van bestellingen</p>
       </div>
 
       {/* Stap 1 */}
-      <div className="bg-white/5 rounded-2xl p-6 border border-white/10 space-y-4">
+      <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-orange-500 text-white font-bold flex items-center justify-center flex-shrink-0">1</div>
-          <h2 className="text-lg font-bold text-white">Download de Vysion Print App</h2>
+          <h2 className="text-lg font-bold text-gray-900">Download de Vysion Print App</h2>
         </div>
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-600 text-sm">
           Open deze link op uw iPad om de gratis Vysion Print App te installeren via TestFlight.
         </p>
-        <div className="bg-black/20 rounded-xl p-4 space-y-2">
-          <p className="text-sm font-medium text-white">Installatie stappen:</p>
-          <ol className="list-decimal list-inside space-y-1.5 text-sm text-gray-400">
+        <div className="bg-gray-50 rounded-xl p-4 space-y-2 border border-gray-200">
+          <p className="text-sm font-semibold text-gray-800">Installatie stappen:</p>
+          <ol className="list-decimal list-inside space-y-1.5 text-sm text-gray-700">
             <li>Open Safari op uw iPad</li>
             <li>Klik op de download knop hieronder</li>
             <li>Installeer TestFlight (gratis Apple app)</li>
@@ -43,12 +43,12 @@ export default function BonnenprinterPage() {
       </div>
 
       {/* Stap 2 */}
-      <div className="bg-white/5 rounded-2xl p-6 border border-white/10 space-y-4">
+      <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-orange-500 text-white font-bold flex items-center justify-center flex-shrink-0">2</div>
-          <h2 className="text-lg font-bold text-white">Printer verbinden</h2>
+          <h2 className="text-lg font-bold text-gray-900">Printer verbinden</h2>
         </div>
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-600 text-sm">
           Zorg dat uw bonnenprinter op hetzelfde WiFi netwerk zit als uw iPad.
         </p>
         <div className="space-y-3">
@@ -62,8 +62,8 @@ export default function BonnenprinterPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p className="text-sm font-medium text-white">{title}</p>
-                <p className="text-xs text-gray-400">{desc}</p>
+                <p className="text-sm font-semibold text-gray-900">{title}</p>
+                <p className="text-xs text-gray-500">{desc}</p>
               </div>
             </div>
           ))}
@@ -71,8 +71,8 @@ export default function BonnenprinterPage() {
       </div>
 
       {/* Hoe werkt het */}
-      <div className="bg-white/5 rounded-2xl p-6 border border-white/10 space-y-4">
-        <h2 className="text-lg font-bold text-white">Hoe werkt het automatisch printen?</h2>
+      <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+        <h2 className="text-lg font-bold text-gray-900">Hoe werkt het automatisch printen?</h2>
         <div className="space-y-3">
           {[
             'Klant bestelt via uw webshop of WhatsApp',
@@ -81,24 +81,24 @@ export default function BonnenprinterPage() {
             'Klant ontvangt zijn bon ✅',
           ].map((text, i) => (
             <div key={i} className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-orange-500/20 text-orange-400 text-sm font-bold flex items-center justify-center flex-shrink-0">
+              <div className="w-7 h-7 rounded-full bg-orange-100 text-orange-600 text-sm font-bold flex items-center justify-center flex-shrink-0">
                 {i + 1}
               </div>
-              <p className="text-sm text-gray-300">{text}</p>
+              <p className="text-sm text-gray-700">{text}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Support */}
-      <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-4 flex items-center justify-between">
+      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center justify-between">
         <div>
-          <p className="font-medium text-sm text-white">Hulp nodig bij het instellen?</p>
-          <p className="text-xs text-gray-400">Neem contact op met Vysion support</p>
+          <p className="font-semibold text-sm text-gray-900">Hulp nodig bij het instellen?</p>
+          <p className="text-xs text-gray-500">Neem contact op met Vysion support</p>
         </div>
         <a
           href="mailto:support@vysionhoreca.com"
-          className="text-blue-400 text-sm font-medium hover:underline"
+          className="text-blue-600 text-sm font-semibold hover:underline"
         >
           Contact →
         </a>
