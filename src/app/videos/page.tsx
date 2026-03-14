@@ -84,6 +84,15 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
+    id: 'de-shop',
+    titel: 'De shop',
+    beschrijving: 'Je online shop instellen en beheren',
+    icoon: '🛒',
+    videos: [
+      { titel: 'De shop', src: '/videos/de-shop.mp4' },
+    ],
+  },
+  {
     id: 'de-website',
     titel: 'De website',
     beschrijving: 'Je eigen website beheren en aanpassen',
