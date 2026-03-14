@@ -220,11 +220,13 @@ export default function VideosPage() {
               </button>
             </div>
             <video
-              src={actieveVideo.src}
+              key={actieveVideo.src}
               controls
-              autoPlay
               className="w-full aspect-video"
-            />
+              onLoadedMetadata={(e) => { (e.target as HTMLVideoElement).play().catch(() => {}) }}
+            >
+              <source src={actieveVideo.src} type="video/mp4" />
+            </video>
           </div>
         </div>
       )}
