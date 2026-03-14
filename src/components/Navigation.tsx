@@ -40,7 +40,7 @@ export default function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <a href="/" className="text-gray-300 hover:text-white transition-colors">{t('nav.home')}</a>
-            <a href="/videos" className="text-gray-300 hover:text-white transition-colors">{t('nav.videos')}</a>
+            <a href="/#functies" className="text-gray-300 hover:text-white transition-colors">{t('nav.features')}</a>
             <a href="/#prijzen" className="text-gray-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
             <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">{t('nav.about')}</a>
             <a href="/#contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
@@ -118,7 +118,7 @@ export default function Navigation() {
           <div className="md:hidden py-4 border-t border-gray-700">
             <div className="flex flex-col space-y-4">
               <a href="/" className="text-gray-300 hover:text-white transition-colors">{t('nav.home')}</a>
-              <a href="/videos" className="text-gray-300 hover:text-white transition-colors">{t('nav.videos')}</a>
+              <a href="/#functies" className="text-gray-300 hover:text-white transition-colors">{t('nav.features')}</a>
               <a href="/#prijzen" className="text-gray-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
               <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">{t('nav.about')}</a>
               <a href="/#contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
