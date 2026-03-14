@@ -84,6 +84,15 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
+    id: 'groepsbestellingen',
+    titel: 'Groepsbestellingen',
+    beschrijving: 'Bestellingen beheren voor groepen',
+    icoon: '👨‍👩‍👧‍👦',
+    videos: [
+      { titel: 'Groepsbestellingen', src: '/videos/groepsbestellingen.mp4' },
+    ],
+  },
+  {
     id: 'bestellingen',
     titel: 'Bestellingen',
     beschrijving: 'Bestellingen en reserveringen beheren',
