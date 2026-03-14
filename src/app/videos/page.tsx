@@ -63,6 +63,17 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
+    id: 'personeel',
+    titel: 'Personeel',
+    beschrijving: 'Medewerkers, uren en vacatures beheren',
+    icoon: '👥',
+    videos: [
+      { titel: 'Medewerker aanmaken', src: '/videos/medewerker-aanmaken.mp4' },
+      { titel: 'Uren registratie', src: '/videos/uren-registratie.mp4' },
+      { titel: 'Vacatures', src: '/videos/vacature.mp4' },
+    ],
+  },
+  {
     id: 'analyse',
     titel: 'Analyse & Rapporten',
     beschrijving: 'Omzet en statistieken bekijken',
