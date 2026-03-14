@@ -17,11 +17,16 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
-    id: 'kassa',
-    titel: 'Kassa',
-    beschrijving: 'Hoe je de kassa gebruikt',
+    id: 'modules',
+    titel: 'Modules',
+    beschrijving: 'Order scherm, analyse, verkoop en meer',
     icoon: '🖥️',
-    videos: [],
+    videos: [
+      { titel: 'Order scherm', src: '/videos/keukenscherm3.mp4' },
+      { titel: 'Bedrijfs analyse', src: '/videos/analyse-module4.mp4' },
+      { titel: 'Verkoop', src: '/videos/verkoop5.mp4' },
+      { titel: 'Populaire items', src: '/videos/populaire-items6.mp4' },
+    ],
   },
   {
     id: 'bestellingen',
