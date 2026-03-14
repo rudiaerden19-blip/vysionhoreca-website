@@ -84,6 +84,15 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
+    id: 'de-website',
+    titel: 'De website',
+    beschrijving: 'Je eigen website beheren en aanpassen',
+    icoon: '🌐',
+    videos: [
+      { titel: 'De website', src: '/videos/de-website.mp4' },
+    ],
+  },
+  {
     id: 'bonnenprinter',
     titel: 'Bonnenprinter',
     beschrijving: 'Bonnenprinter instellen en gebruiken',
