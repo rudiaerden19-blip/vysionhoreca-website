@@ -84,6 +84,15 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
+    id: 'bonnenprinter',
+    titel: 'Bonnenprinter',
+    beschrijving: 'Bonnenprinter instellen en gebruiken',
+    icoon: '🖨️',
+    videos: [
+      { titel: 'Bonnenprinter', src: '/videos/printer.mp4' },
+    ],
+  },
+  {
     id: 'groepsbestellingen',
     titel: 'Groepsbestellingen',
     beschrijving: 'Bestellingen beheren voor groepen',
