@@ -18,7 +18,7 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
   },
   {
     id: 'modules',
-    titel: 'Modules',
+    titel: 'Overzicht',
     beschrijving: 'Order scherm, analyse, verkoop en meer',
     icoon: '🖥️',
     videos: [
