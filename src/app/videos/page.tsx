@@ -163,17 +163,17 @@ export default function VideosPage() {
       {/* Categorieën */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {categorieen.map((cat) => (
               <div key={cat.id}>
                 <div
-                  className="bg-[#E3E3E3] rounded-2xl p-8 cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 flex flex-col min-h-[13rem]"
+                  className="bg-[#E3E3E3] rounded-2xl p-8 cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 flex flex-col h-56"
                   onClick={() => setActief(actief === cat.id ? null : cat.id)}
                 >
-                  <div className="text-5xl mb-4">{cat.icoon}</div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{cat.titel}</h2>
-                  <p className="text-gray-600 mb-4 flex-1">{cat.beschrijving}</p>
-                  <span className="text-accent font-medium text-sm">
+                  <div className="text-5xl mb-3">{cat.icoon}</div>
+                  <h2 className="text-xl font-bold text-gray-900 mb-1">{cat.titel}</h2>
+                  <p className="text-gray-600 text-sm flex-1 line-clamp-2">{cat.beschrijving}</p>
+                  <span className="text-accent font-medium text-sm mt-3">
                     {cat.videos.length} video{cat.videos.length !== 1 ? "'s" : ''}
                     {cat.videos.length === 0 ? ' — binnenkort beschikbaar' : ''}
                   </span>
