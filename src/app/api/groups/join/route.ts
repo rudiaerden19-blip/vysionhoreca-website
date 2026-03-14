@@ -1,13 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 // POST - Join a group using access code
 export async function POST(request: Request) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) {
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 503 })
+  }
+  const supabase = createClient(url, key)
+
   try {
     const body = await request.json()
     const { access_code, name, email, phone, department, employee_id } = body
