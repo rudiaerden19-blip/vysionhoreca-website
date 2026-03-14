@@ -74,6 +74,16 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
+    id: 'kostenberekening',
+    titel: 'Kostenberekening',
+    beschrijving: 'Ingrediënten en productprijzen berekenen',
+    icoon: '🧮',
+    videos: [
+      { titel: 'Ingrediënten berekening', src: '/videos/berekening1.mp4' },
+      { titel: 'Producten berekening', src: '/videos/prijs-berekening2.mp4' },
+    ],
+  },
+  {
     id: 'analyse',
     titel: 'Analyse & Rapporten',
     beschrijving: 'Omzet en statistieken bekijken',
