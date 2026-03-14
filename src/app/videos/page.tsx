@@ -84,6 +84,16 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
+    id: 'bestellingen',
+    titel: 'Bestellingen',
+    beschrijving: 'Bestellingen en reserveringen beheren',
+    icoon: '📋',
+    videos: [
+      { titel: 'Bestellingen', src: '/videos/bestellingen.mp4' },
+      { titel: 'Reserveringen', src: '/videos/reserveringen.mp4' },
+    ],
+  },
+  {
     id: 'z-rapporten',
     titel: 'Z Rapporten',
     beschrijving: 'Dagelijkse rapporten en afsluiting',
