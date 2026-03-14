@@ -364,6 +364,17 @@ function StatsSection() {
             </div>
           ))}
         </div>
+        <div className="mt-16 text-center">
+          <p className="text-xl sm:text-2xl font-bold text-accent">
+            {t('stats.award')}
+          </p>
+          <p className="mt-3 text-base sm:text-lg text-gray-600">
+            {t('stats.award_sub')}
+          </p>
+          <p className="mt-2 text-sm text-gray-400">
+            🌍 Beschikbaar in 9 talen
+          </p>
+        </div>
       </div>
     </section>
   )

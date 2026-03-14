@@ -1,45 +1,49 @@
--- Verlofaanvragen tabel
--- Voor het bijhouden van vakantie, ziekte, zwangerschapsverlof, etc.
+-- ============================================================
+-- VERLOF MODULE - leave_requests tabel
+-- Voer dit uit in de Supabase SQL Editor als de tabel ontbreekt
+-- ============================================================
 
 CREATE TABLE IF NOT EXISTS leave_requests (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_slug VARCHAR(100) NOT NULL,
-  staff_id UUID NOT NULL REFERENCES staff(id) ON DELETE CASCADE,
-  
-  -- Type verlof
-  leave_type VARCHAR(50) NOT NULL, -- vacation, sick, maternity, paternity, unpaid, bereavement, other
-  
-  -- Datums
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  tenant_slug TEXT NOT NULL,
+  staff_id UUID NOT NULL,
+  leave_type TEXT NOT NULL DEFAULT 'vacation',
   start_date DATE NOT NULL,
   end_date DATE NOT NULL,
-  
-  -- Details
   reason TEXT,
-  notes TEXT, -- Notities van werkgever
-  
-  -- Status
-  status VARCHAR(20) NOT NULL DEFAULT 'pending', -- pending, approved, rejected
-  
-  -- Tracking
-  requested_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  notes TEXT,
+  status TEXT NOT NULL DEFAULT 'pending',
+  requested_at TIMESTAMPTZ DEFAULT NOW(),
   reviewed_at TIMESTAMPTZ,
-  reviewed_by VARCHAR(255),
-  
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes
-CREATE INDEX IF NOT EXISTS idx_leave_requests_tenant ON leave_requests(tenant_slug);
-CREATE INDEX IF NOT EXISTS idx_leave_requests_staff ON leave_requests(staff_id);
-CREATE INDEX IF NOT EXISTS idx_leave_requests_dates ON leave_requests(tenant_slug, start_date, end_date);
-CREATE INDEX IF NOT EXISTS idx_leave_requests_status ON leave_requests(tenant_slug, status);
+-- Indexes voor performance (500+ tenants)
+CREATE INDEX IF NOT EXISTS idx_leave_requests_tenant
+  ON leave_requests(tenant_slug);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_staff
+  ON leave_requests(staff_id);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_dates
+  ON leave_requests(tenant_slug, start_date, end_date);
+CREATE INDEX IF NOT EXISTS idx_leave_requests_status
+  ON leave_requests(tenant_slug, status);
 
--- RLS
+-- RLS inschakelen
 ALTER TABLE leave_requests ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "leave_requests_all" ON leave_requests
-  FOR ALL USING (true) WITH CHECK (true);
+-- Service role krijgt volledige toegang (API routes gebruiken service role)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'leave_requests'
+    AND policyname = 'leave_requests_service_role'
+  ) THEN
+    CREATE POLICY "leave_requests_service_role" ON leave_requests
+      FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Trigger voor updated_at
 CREATE OR REPLACE FUNCTION update_leave_requests_updated_at()
@@ -50,9 +54,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trigger_leave_requests_updated_at ON leave_requests;
 CREATE TRIGGER trigger_leave_requests_updated_at
   BEFORE UPDATE ON leave_requests
   FOR EACH ROW
   EXECUTE FUNCTION update_leave_requests_updated_at();
 
-COMMENT ON TABLE leave_requests IS 'Verlofaanvragen van personeel per tenant';
+COMMENT ON TABLE leave_requests IS 'Verlofaanvragen van personeel per tenant. Geïsoleerd via tenant_slug.';

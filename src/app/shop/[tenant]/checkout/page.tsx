@@ -61,6 +61,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [scheduledTime, setScheduledTime] = useState<string>('') // Selected pickup time
   const [whatsappPhone, setWhatsappPhone] = useState<string | null>(null) // Phone from WhatsApp link
   const [businessWhatsApp, setBusinessWhatsApp] = useState<string>('') // Business WhatsApp number
+  const [radiusConfirmed, setRadiusConfirmed] = useState(false)
 
   const primaryColor = tenantSettings?.primary_color || '#FF6B35'
   
@@ -209,8 +210,11 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     if (!customerInfo.name || !customerInfo.phone) return false
     if (orderType === 'delivery' && (!customerInfo.address || !customerInfo.postal_code || !customerInfo.city)) return false
     if (cart.length === 0) return false
-    // Always require a scheduled date now
     if (!scheduledDate) return false
+    // Blokkeer als minimale bestelling niet bereikt bij bezorging
+    if (orderType === 'delivery' && deliverySettings?.min_order_amount && subtotal < deliverySettings.min_order_amount) return false
+    // Radius bevestiging verplicht bij bezorging
+    if (orderType === 'delivery' && !radiusConfirmed) return false
     return true
   }
 
@@ -223,6 +227,10 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       if (!customerInfo.address) return t('checkoutPage.fillAddress')
       if (!customerInfo.postal_code) return t('checkoutPage.fillPostalCode')
       if (!customerInfo.city) return t('checkoutPage.fillCity')
+      if (deliverySettings?.min_order_amount && subtotal < deliverySettings.min_order_amount)
+        return t('checkoutPage.minDeliveryNotMet') || `Minimale bestelling voor bezorging is €${deliverySettings.min_order_amount.toFixed(2)}`
+      if (deliverySettings?.delivery_radius_km && !radiusConfirmed)
+        return t('checkoutPage.radiusConfirmRequired') || 'Bevestig dat je binnen de bezorgradius woont'
     }
     return null
   }
@@ -337,6 +345,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
             total_price: item.totalPrice * item.quantity,
           })),
           subtotal: subtotal,
+          delivery_fee: orderType === 'delivery' ? (deliverySettings?.delivery_fee || 0) : 0,
           tax: 0,
           total: total,
           payment_method: paymentMethod === 'cash' ? 'cash' : 'online',
@@ -580,9 +589,23 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               </div>
               
               {orderType === 'delivery' && deliverySettings?.min_order_amount && subtotal < deliverySettings.min_order_amount && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-sm">
-                  ⚠️ {t('checkoutPage.minDelivery')} €{deliverySettings.min_order_amount.toFixed(2)}
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm font-medium">
+                  ⛔ {t('checkoutPage.minDelivery')} €{deliverySettings.min_order_amount.toFixed(2)} — {t('checkoutPage.minDeliveryNotMet') || 'Jouw bestelling is te laag voor bezorging.'}
                 </div>
+              )}
+
+              {orderType === 'delivery' && deliverySettings?.delivery_radius_km && (
+                <label className="mt-4 flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={radiusConfirmed}
+                    onChange={e => setRadiusConfirmed(e.target.checked)}
+                    className="mt-1 w-4 h-4 rounded accent-orange-500 flex-shrink-0"
+                  />
+                  <span className="text-sm text-gray-700">
+                    {t('checkoutPage.radiusConfirm') || `Ik bevestig dat ik binnen ${deliverySettings.delivery_radius_km} km van de zaak woon en in aanmerking kom voor bezorging.`}
+                  </span>
+                </label>
               )}
             </motion.div>
 

@@ -108,13 +108,13 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
 
   const handleSave = async () => {
     if (!formData.name.trim()) {
-      alert('Vul een naam in')
+      alert(t('promotiesPage.nameRequired'))
       return
     }
     
     // Bij fixedPrice moet een product gekozen zijn
     if (formData.type === 'fixedPrice' && !formData.product_id) {
-      alert('Kies een product voor deze promotie')
+      alert(t('promotiesPage.productRequired'))
       return
     }
     
@@ -164,7 +164,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"
           />
-          <p className="text-gray-500">Laden...</p>
+          <p className="text-gray-500">{t('promotiesPage.loading')}</p>
         </div>
       </div>
     )
@@ -175,8 +175,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       {/* Header - responsive */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">🎁 Promoties & Aanbiedingen</h1>
-          <p className="text-gray-500 text-sm sm:text-base">Maak aanbiedingen die klanten zien in je webshop</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">🎁 {t('promotiesPage.title')}</h1>
+          <p className="text-gray-500 text-sm sm:text-base">{t('promotiesPage.subtitle')}</p>
         </div>
         <motion.button
           whileHover={{ scale: 1.02 }}
@@ -184,7 +184,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           onClick={openCreateModal}
           className="px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center justify-center gap-2 text-sm sm:text-base w-full sm:w-auto"
         >
-          ➕ Nieuwe promotie
+          ➕ {t('promotiesPage.newPromo')}
         </motion.button>
       </div>
 
@@ -193,9 +193,9 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <span className="text-xl sm:text-2xl flex-shrink-0">🎁</span>
           <div className="min-w-0">
-            <p className="font-semibold text-gray-900 text-sm sm:text-base">Promoties tonen in webshop</p>
+            <p className="font-semibold text-gray-900 text-sm sm:text-base">{t('promotiesPage.showInShop')}</p>
             <p className="text-xs sm:text-sm text-gray-500 truncate">
-              {promotionsEnabled ? 'Klanten zien de "Promoties" knop' : 'Verborgen voor klanten'}
+              {promotionsEnabled ? t('promotiesPage.showInShopActiveDesc') : t('promotiesPage.showInShopInactiveDesc')}
             </p>
           </div>
         </div>
@@ -214,7 +214,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
       {promotionsEnabled && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
           <p className="text-blue-800 text-xs sm:text-sm">
-            💡 <strong>Tip:</strong> Promoties worden getoond in je webshop. Zet individuele promoties aan of uit met de schakelaar.
+            💡 {t('promotiesPage.tip')}
           </p>
         </div>
       )}
@@ -226,7 +226,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm"
         >
-          <p className="text-gray-500 text-xs sm:text-sm">Actieve promoties</p>
+          <p className="text-gray-500 text-xs sm:text-sm">{t('promotiesPage.activeCount')}</p>
           <p className="text-2xl sm:text-3xl font-bold text-green-500">{activeCount}</p>
         </motion.div>
         <motion.div
@@ -235,7 +235,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           transition={{ delay: 0.1 }}
           className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm"
         >
-          <p className="text-gray-500 text-xs sm:text-sm">Totaal promoties</p>
+          <p className="text-gray-500 text-xs sm:text-sm">{t('promotiesPage.totalCount')}</p>
           <p className="text-2xl sm:text-3xl font-bold text-blue-500">{promos.length}</p>
         </motion.div>
       </div>
@@ -248,15 +248,15 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
           className="text-center py-12 bg-white rounded-2xl shadow-sm"
         >
           <span className="text-6xl mb-4 block">🎁</span>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Nog geen promoties</h3>
-          <p className="text-gray-500 mb-6">Maak je eerste promotie aan om klanten te trekken</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">{t('promotiesPage.noPromos')}</h3>
+          <p className="text-gray-500 mb-6">{t('promotiesPage.noPromosDesc')}</p>
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={openCreateModal}
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-xl"
           >
-            + Maak eerste promotie
+            + {t('promotiesPage.createFirst')}
           </motion.button>
         </motion.div>
       ) : (
@@ -292,7 +292,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     {/* Korting badge */}
                     <div className="absolute top-2 left-2 sm:top-2 sm:left-2 bg-red-500 text-white text-xs sm:text-xs font-bold px-2 py-1 rounded-full shadow-md">
                       {promo.type === 'percentage' ? `-${promo.value}%` :
-                       promo.type === 'fixed' ? `-€${promo.value}` : 'GRATIS'}
+                       promo.type === 'fixed' ? `-€${promo.value}` : t('promotiesPage.free')}
                     </div>
                   </div>
 
@@ -323,21 +323,21 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       <div className="flex flex-wrap gap-2 mt-3">
                         {promo.is_active ? (
                           <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
-                            ✓ Zichtbaar in shop
+                            ✓ {t('promotiesPage.visibleInShop')}
                           </span>
                         ) : (
                           <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                            Verborgen
+                            {t('promotiesPage.hiddenLabel')}
                           </span>
                         )}
                         {isExpired && (
                           <span className="bg-red-100 text-red-600 text-xs px-2 py-1 rounded-full">
-                            Verlopen
+                            {t('promotiesPage.expired')}
                           </span>
                         )}
                         {promo.min_order_amount > 0 && (
                           <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
-                            Min. €{promo.min_order_amount}
+                            {t('promotiesPage.minOrder')} €{promo.min_order_amount}
                           </span>
                         )}
                       </div>
@@ -349,13 +349,13 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                         onClick={() => openEditModal(promo)}
                         className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium flex items-center gap-1"
                       >
-                        ✏️ Bewerken
+                        ✏️ {t('common.edit')}
                       </button>
                       <button
                         onClick={() => handleDelete(promo.id!)}
                         className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-sm font-medium flex items-center gap-1"
                       >
-                        🗑️ Verwijderen
+                        🗑️ {t('common.delete')}
                       </button>
                     </div>
                   </div>
@@ -385,7 +385,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
             >
               <div className="p-4 sm:p-6 border-b flex items-center justify-between">
                 <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-                  {editingPromo ? 'Promotie bewerken' : 'Nieuwe promotie'}
+                  {editingPromo ? t('promotiesPage.modalTitleEdit') : t('promotiesPage.modalTitleNew')}
                 </h2>
                 <button 
                   onClick={() => setShowModal(false)}
@@ -398,7 +398,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
               <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
                 {/* Image */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Foto</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('promotiesPage.photo')}</label>
                   <MediaPicker
                     tenantSlug={params.tenant}
                     value={formData.image_url || ''}
@@ -409,7 +409,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 {/* Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Naam <span className="text-red-500">*</span>
+                    {t('groupsModule.orders.colName')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -422,19 +422,19 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Beschrijving</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('promotiesPage.description')}</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     rows={3}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                    placeholder="Beschrijf de aanbieding..."
+                    placeholder={t('promotiesPage.descriptionPlaceholder')}
                   />
                 </div>
 
                 {/* Type Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Type promotie</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">{t('promotiesPage.promoType')}</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
@@ -446,8 +446,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       }`}
                     >
                       <span className="text-2xl block mb-1">🏷️</span>
-                      <span className="text-sm font-medium">Vaste prijs</span>
-                      <span className="text-xs text-gray-500 block">bijv. Frikandel €2</span>
+                      <span className="text-sm font-medium">{t('promotiesPage.typeFixedPrice')}</span>
+                      <span className="text-xs text-gray-500 block">{t('promotiesPage.typeFixedPriceExample')}</span>
                     </button>
                     <button
                       type="button"
@@ -459,8 +459,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                       }`}
                     >
                       <span className="text-2xl block mb-1">%</span>
-                      <span className="text-sm font-medium">Percentage</span>
-                      <span className="text-xs text-gray-500 block">bijv. 20% korting</span>
+                      <span className="text-sm font-medium">{t('promotiesPage.typePercentage')}</span>
+                      <span className="text-xs text-gray-500 block">{t('promotiesPage.typePercentageExample')}</span>
                     </button>
                   </div>
                 </div>
@@ -469,7 +469,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 {formData.type === 'fixedPrice' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Kies product <span className="text-red-500">*</span>
+                      {t('promotiesPage.chooseProduct')} <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={formData.product_id}
@@ -478,15 +478,13 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                         setFormData(prev => ({ 
                           ...prev, 
                           product_id: e.target.value,
-                          // Auto-fill naam als leeg
                           name: prev.name || (product ? `${product.name} actie` : ''),
-                          // Gebruik product foto als geen foto
                           image_url: prev.image_url || product?.image_url || ''
                         }))
                       }}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
-                      <option value="">-- Kies een product --</option>
+                      <option value="">{t('promotiesPage.selectProduct')}</option>
                       {products.map(product => (
                         <option key={product.id} value={product.id}>
                           {product.name} (normaal €{product.price.toFixed(2)})
@@ -495,7 +493,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     </select>
                     {formData.product_id && (
                       <p className="text-xs text-green-600 mt-1">
-                        ✓ Klanten kunnen dit product bestellen voor de actieprijs
+                        ✓ {t('promotiesPage.productSelected')}
                       </p>
                     )}
                   </div>
@@ -505,8 +503,8 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 {formData.type !== 'freeItem' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {formData.type === 'fixedPrice' ? 'Actieprijs (€)' : 
-                       formData.type === 'percentage' ? 'Percentage (%)' : 'Korting (€)'}
+                      {formData.type === 'fixedPrice' ? t('promotiesPage.salePrice') : 
+                       formData.type === 'percentage' ? t('promotiesPage.percentageValue') : t('promotiesPage.discountValue')}
                     </label>
                     <input
                       type="text"
@@ -527,21 +525,21 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                 {/* Min order amount */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Minimale bestelwaarde (€)
+                    {t('promotiesPage.minOrderAmount')}
                   </label>
                   <input
                     type="number"
                     value={formData.min_order_amount || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, min_order_amount: parseFloat(e.target.value) || 0 }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Leeg = geen minimum"
+                    placeholder={t('promotiesPage.minOrderPlaceholder')}
                   />
                 </div>
 
                 {/* Expiry */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vervaldatum
+                    {t('promotiesPage.expiryDate')}
                   </label>
                   <input
                     type="date"
@@ -549,7 +547,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                     onChange={(e) => setFormData(prev => ({ ...prev, expires_at: e.target.value }))}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Leeg = geen vervaldatum</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('promotiesPage.expiryPlaceholder')}</p>
                 </div>
               </div>
 
@@ -558,7 +556,7 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                   onClick={() => setShowModal(false)}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
                 >
-                  Annuleren
+                  {t('common.cancel')}
                 </button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -574,12 +572,12 @@ export default function PromotiesPage({ params }: { params: { tenant: string } }
                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                         className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                       />
-                      <span>Opslaan...</span>
+                      <span>{t('common.loading')}</span>
                     </>
                   ) : (
                     <>
                       <span>✓</span>
-                      <span>{editingPromo ? 'Opslaan' : 'Aanmaken'}</span>
+                      <span>{editingPromo ? t('common.save') : t('promotiesPage.create')}</span>
                     </>
                   )}
                 </motion.button>

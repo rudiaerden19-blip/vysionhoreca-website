@@ -506,6 +506,7 @@ export default function AbonnementPage() {
   const [billingYearly, setBillingYearly] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [showCancelled, setShowCancelled] = useState(false)
+  const [showUpgradeBanner, setShowUpgradeBanner] = useState(false)
   const [successType, setSuccessType] = useState<'subscription' | 'invoice'>('subscription')
 
   // Check URL parameters for payment result
@@ -513,11 +514,15 @@ export default function AbonnementPage() {
     const success = searchParams.get('success')
     const payment = searchParams.get('payment')
     const cancelled = searchParams.get('cancelled')
+    const upgrade = searchParams.get('upgrade')
     
-    if (success === 'true') {
+    if (upgrade === 'pro') {
+      setShowUpgradeBanner(true)
+      setBillingYearly(false)
+      window.history.replaceState({}, '', window.location.pathname)
+    } else if (success === 'true') {
       setSuccessType('subscription')
       setShowSuccess(true)
-      // Remove query params from URL without reload
       window.history.replaceState({}, '', window.location.pathname)
     } else if (payment === 'success') {
       setSuccessType('invoice')
@@ -701,6 +706,48 @@ export default function AbonnementPage() {
         <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
         <p className="text-gray-600 mt-2">{t('subtitle')}</p>
       </div>
+
+      {/* Upgrade Banner - wordt getoond wanneer tenant een Pro feature probeert te openen */}
+      <AnimatePresence>
+        {showUpgradeBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-2xl p-6"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl">✨</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-purple-900">Dit is een Pro functie</h3>
+                <p className="text-purple-700 mt-1">
+                  Het volledige reserveringssysteem met tafelplan, online boeking door klanten, no-show bescherming en gaste CRM is beschikbaar in <strong>Vysion Pro (€79/maand)</strong>.
+                </p>
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={() => {
+                      setShowUpgradeBanner(false)
+                      setBillingYearly(false)
+                      document.getElementById('pro-plan-card')?.scrollIntoView({ behavior: 'smooth' })
+                    }}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg font-bold text-sm transition-colors"
+                  >
+                    🛒 Upgrade naar Pro
+                  </button>
+                  <button
+                    onClick={() => setShowUpgradeBanner(false)}
+                    className="text-purple-600 hover:text-purple-700 font-medium text-sm"
+                  >
+                    Later
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Success Banner */}
       <AnimatePresence>
@@ -971,7 +1018,7 @@ export default function AbonnementPage() {
         </div>
 
         {/* Pro Plan */}
-        <div className="bg-gradient-to-br from-[#2d1f3d] to-[#4a2d6a] rounded-2xl p-6 text-white relative">
+        <div id="pro-plan-card" className="bg-gradient-to-br from-[#2d1f3d] to-[#4a2d6a] rounded-2xl p-6 text-white relative">
           <div className="absolute -top-3 right-6">
             <span className="bg-pink-500 text-white text-xs font-bold px-4 py-1.5 rounded-full">
               {t('popular')}

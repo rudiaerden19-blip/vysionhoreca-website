@@ -38,14 +38,15 @@ export default function Navigation() {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6 ml-12">
             <a href="/" className="text-gray-300 hover:text-white transition-colors">{t('nav.home')}</a>
             <a href="/#functies" className="text-gray-300 hover:text-white transition-colors">{t('nav.features')}</a>
             <a href="/#prijzen" className="text-gray-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
             <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">{t('nav.about')}</a>
             <a href="/#contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
             <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
-            <a href="/resellers" className="text-accent hover:text-accent/80 transition-colors font-medium">{t('nav.resellers')}</a>
+            <a href="/resellers" className="text-gray-300 hover:text-white transition-colors">{t('nav.resellers')}</a>
+            <a href="/kassa" className="text-accent hover:text-accent/80 transition-colors font-medium">Kassa</a>
           </div>
 
           {/* CTA Buttons */}
@@ -92,9 +93,6 @@ export default function Navigation() {
             </div>
 
             <a href="/login" className="text-white hover:text-accent transition-colors">{t('nav.login')}</a>
-            <a href={`/registreer?lang=${locale}`} className="bg-accent hover:bg-accent/90 text-white px-6 py-2.5 rounded-full font-medium transition-all">
-              {t('nav.tryFree')}
-            </a>
           </div>
 
           {/* Mobile menu button */}
@@ -147,9 +145,6 @@ export default function Navigation() {
               </div>
 
               <a href="/login" className="text-gray-300 hover:text-white transition-colors">{t('nav.login')}</a>
-              <a href={`/registreer?lang=${locale}`} className="bg-accent text-white px-6 py-3 rounded-full font-medium text-center">
-                {t('nav.tryFree')}
-              </a>
             </div>
           </div>
         )}

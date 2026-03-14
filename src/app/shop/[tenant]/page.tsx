@@ -108,6 +108,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [business, setBusiness] = useState<Business | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
   const [showClosedBanner, setShowClosedBanner] = useState(true)
+  const [manualOffline, setManualOffline] = useState<{ is_offline: boolean; offline_reason: string | null; offline_message?: string | null } | null>(null)
   
   // Formateer review datum met vertalingen
   const formatReviewDate = (dateString?: string) => {
@@ -370,16 +371,32 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Auto-hide closed banner after 5 seconds
+  // Fetch manual offline status
   useEffect(() => {
-    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)) {
-      setShowClosedBanner(true) // Show on page load
+    fetch(`/api/shop-offline?tenant=${params.tenant}`)
+      .then(r => r.json())
+      .then(d => setManualOffline(d))
+      .catch(() => {})
+    // Refresh every 30 seconds in case owner changes status
+    const interval = setInterval(() => {
+      fetch(`/api/shop-offline?tenant=${params.tenant}`)
+        .then(r => r.json())
+        .then(d => setManualOffline(d))
+        .catch(() => {})
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [params.tenant])
+
+  // Auto-hide closed banner after 5 seconds (only for opening hours, not manual offline)
+  useEffect(() => {
+    if (shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && !manualOffline?.is_offline) {
+      setShowClosedBanner(true)
       const timer = setTimeout(() => {
         setShowClosedBanner(false)
       }, 5000)
       return () => clearTimeout(timer)
     }
-  }, [shopStatus])
+  }, [shopStatus, manualOffline])
 
   useEffect(() => {
     async function loadData() {
@@ -788,14 +805,23 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             )}
             
             {/* Menu */}
-            <Link 
-              href={`/shop/${params.tenant}/menu`}
-              style={{ backgroundColor: business.primary_color }}
-              className="text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:opacity-90 transition-opacity flex items-center gap-1"
-            >
-              <span>🍟</span>
-              <span className="hidden sm:inline">{t('shopPage.menu')}</span>
-            </Link>
+            {manualOffline?.is_offline ? (
+              <span
+                className="text-white/50 font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm bg-white/10 flex items-center gap-1 cursor-not-allowed"
+              >
+                <span>🚫</span>
+                <span className="hidden sm:inline">{t('shopPage.menu')}</span>
+              </span>
+            ) : (
+              <Link 
+                href={`/shop/${params.tenant}/menu`}
+                style={{ backgroundColor: business.primary_color }}
+                className="text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:opacity-90 transition-opacity flex items-center gap-1"
+              >
+                <span>🍟</span>
+                <span className="hidden sm:inline">{t('shopPage.menu')}</span>
+              </Link>
+            )}
             
             {/* Account */}
             <Link 
@@ -856,9 +882,47 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         </div>
       </header>
 
-      {/* Closed Shop Warning Banner - Show when shop is closed, fades after 5 seconds */}
+      {/* Manual Offline Banner - always visible when manually offline */}
       <AnimatePresence>
-        {shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && showClosedBanner && (
+        {manualOffline?.is_offline && (
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5 }}
+            className="fixed top-16 left-0 right-0 z-40 bg-orange-600 text-white py-5 px-4 shadow-xl"
+          >
+            <div className="max-w-4xl mx-auto text-center">
+              <div className="flex items-center justify-center gap-3 mb-1">
+                <span className="text-3xl">
+                  {manualOffline.offline_reason === 'volzet' ? '🔴' :
+                   manualOffline.offline_reason === 'panne' ? '🔧' :
+                   manualOffline.offline_reason === 'vakantie' ? '🌴' : '⚠️'}
+                </span>
+                <h2 className="text-xl sm:text-2xl font-bold">
+                  {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
+                   manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
+                   manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
+                   manualOffline.offline_reason === 'eigen' ? (manualOffline.offline_message || t('shopOffline.bannerEigen')) :
+                   t('shopOffline.bannerSluiting')}
+                </h2>
+                <span className="text-3xl">
+                  {manualOffline.offline_reason === 'volzet' ? '🔴' :
+                   manualOffline.offline_reason === 'panne' ? '🔧' :
+                   manualOffline.offline_reason === 'vakantie' ? '🌴' : '⚠️'}
+                </span>
+              </div>
+              <p className="text-white/90 text-sm sm:text-base">
+                {t('shopOffline.bannerSubtitle')}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Closed Shop Warning Banner - Show when shop is closed based on opening hours */}
+      <AnimatePresence>
+        {shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && showClosedBanner && !manualOffline?.is_offline && (
           <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -942,7 +1006,16 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               transition={{ delay: 0.2 }}
               className="mb-4"
             >
-              {todayHours?.closed ? (
+              {manualOffline?.is_offline ? (
+                <span className="inline-flex items-center gap-2 bg-orange-600/95 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
+                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                  {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
+                   manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
+                   manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
+                   manualOffline.offline_reason === 'eigen' ? ((manualOffline as any).offline_message || t('shopOffline.bannerEigen')) :
+                   t('shopOffline.bannerSluiting')}
+                </span>
+              ) : todayHours?.closed ? (
                 <span className="inline-flex items-center gap-2 bg-red-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
                   <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                   {t('shopPage.closedToday')}
@@ -1836,18 +1909,25 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <p className="text-white/90 text-xl mb-8">
               {t('shopPage.orderNowOnline')}
             </p>
-            <Link href={`/shop/${params.tenant}/menu`}>
-              <button
-                style={{ color: business.primary_color }}
-                className="bg-white font-bold text-xl px-12 py-5 rounded-full shadow-2xl inline-flex items-center gap-3 hover:scale-105 active:scale-95 transition-transform"
-              >
-                <span>🍟</span>
-                <span>{t('shopPage.startYourOrder')}</span>
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </button>
-            </Link>
+            {manualOffline?.is_offline ? (
+              <div className="bg-white/20 backdrop-blur font-bold text-xl px-12 py-5 rounded-full inline-flex items-center gap-3 text-white/60 cursor-not-allowed select-none">
+                <span>🚫</span>
+                <span>{t('shopOffline.orderingBlocked')}</span>
+              </div>
+            ) : (
+              <Link href={`/shop/${params.tenant}/menu`}>
+                <button
+                  style={{ color: business.primary_color }}
+                  className="bg-white font-bold text-xl px-12 py-5 rounded-full shadow-2xl inline-flex items-center gap-3 hover:scale-105 active:scale-95 transition-transform"
+                >
+                  <span>🍟</span>
+                  <span>{t('shopPage.startYourOrder')}</span>
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </button>
+              </Link>
+            )}
           </div>
         </div>
       </section>
@@ -1947,14 +2027,20 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
               {/* Footer */}
               <div className="p-4 border-t">
-                <Link href={`/shop/${params.tenant}/menu`}>
-                  <button
-                    style={{ backgroundColor: business.primary_color }}
-                    className="w-full py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                  >
-                    🍟 {t('shopPage.orderNow')}
-                  </button>
-                </Link>
+                {manualOffline?.is_offline ? (
+                  <div className="w-full py-4 text-white/60 font-bold text-lg rounded-xl bg-gray-300 flex items-center justify-center gap-2 cursor-not-allowed">
+                    🚫 {t('shopOffline.orderingBlocked')}
+                  </div>
+                ) : (
+                  <Link href={`/shop/${params.tenant}/menu`}>
+                    <button
+                      style={{ backgroundColor: business.primary_color }}
+                      className="w-full py-4 text-white font-bold text-lg rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    >
+                      🍟 {t('shopPage.orderNow')}
+                    </button>
+                  </Link>
+                )}
                 <button
                   onClick={() => setShowPromotionsModal(false)}
                   className="w-full mt-2 py-3 text-gray-500 hover:text-gray-700 transition-colors"
@@ -2284,15 +2370,25 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       {/* Floating Order Button (Mobile) */}
       <div className="fixed bottom-4 left-3 right-3 sm:bottom-6 sm:left-4 sm:right-4 md:hidden z-50 pb-safe">
-        <Link href={`/shop/${params.tenant}/menu`}>
+        {manualOffline?.is_offline ? (
           <button
-            style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66` }}
-            className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-transform"
+            disabled
+            className="w-full text-white/60 font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 bg-gray-400 cursor-not-allowed"
           >
-            <span>🍟</span>
-            <span>{t('shopPage.startYourOrder')}</span>
+            <span>🚫</span>
+            <span>{t('shopOffline.orderingBlocked')}</span>
           </button>
-        </Link>
+        ) : (
+          <Link href={`/shop/${params.tenant}/menu`}>
+            <button
+              style={{ backgroundColor: business.primary_color, boxShadow: `0 25px 50px -12px ${business.primary_color}66` }}
+              className="w-full text-white font-bold py-4 rounded-2xl shadow-2xl flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-transform"
+            >
+              <span>🍟</span>
+              <span>{t('shopPage.startYourOrder')}</span>
+            </button>
+          </Link>
+        )}
       </div>
     </div>
   )

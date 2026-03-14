@@ -79,6 +79,31 @@ export function getBelgiumDateString(date: Date = new Date()): string {
   return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
 }
 
+/**
+ * Fiscale dag grenzen voor Z-Rapport (GKS compliant)
+ * Een fiscale dag loopt van 00:00 tot 12:00 de VOLGENDE dag.
+ * Dit zorgt dat nachtbestellingen (bv. 01:00u) bij de juiste dag horen.
+ * De eigenaar kan de dag afsluiten na zijn shift (uiterlijk 12u de volgende dag).
+ */
+export function getZRapportDateBounds(dateStr: string): { startUTC: string; endUTC: string } {
+  const [year, month, day] = dateStr.split('-').map(Number)
+
+  const isDST = isBelgiumDST(year, month, day)
+  const belgiumOffsetHours = isDST ? 2 : 1
+
+  // Start: 00:00 Belgium time = (24 - offset) UTC van de vorige dag
+  const startDate = new Date(Date.UTC(year, month - 1, day - 1, 24 - belgiumOffsetHours, 0, 0))
+
+  // Einde: 12:00 (noon) Belgium time VAN DE VOLGENDE DAG
+  // Nachtorders tot 12u de volgende dag horen bij deze fiscale dag
+  const endDate = new Date(Date.UTC(year, month - 1, day + 1, 12 - belgiumOffsetHours, 0, 0))
+
+  return {
+    startUTC: startDate.toISOString(),
+    endUTC: endDate.toISOString(),
+  }
+}
+
 // =====================================================
 // TENANT SETTINGS
 // =====================================================
@@ -1410,7 +1435,7 @@ export interface Order {
   items?: OrderItem[] | { name: string; quantity: number; price: number }[]
 }
 
-export async function getOrders(tenantSlug: string, status?: string): Promise<Order[]> {
+export async function getOrders(tenantSlug: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Order[]> {
   let query = supabase
     .from('orders')
     .select('*')
@@ -1419,13 +1444,18 @@ export async function getOrders(tenantSlug: string, status?: string): Promise<Or
   
   if (status && status !== 'all') {
     if (status === 'active') {
-      query = query.not('status', 'in', '("completed","cancelled")')
+      query = query.not('status', 'in', '("completed","cancelled","rejected")')
     } else {
       query = query.eq('status', status)
     }
   }
-  
-  const { data, error } = await query.limit(100)
+
+  // Archief: filter op datumbereik
+  if (dateFrom) query = query.gte('created_at', dateFrom)
+  if (dateTo) query = query.lte('created_at', dateTo)
+
+  const limit = dateFrom ? 500 : 100
+  const { data, error } = await query.limit(limit)
   
   if (error) {
     console.error('Error fetching orders:', error)

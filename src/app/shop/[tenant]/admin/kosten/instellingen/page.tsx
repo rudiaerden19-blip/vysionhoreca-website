@@ -86,7 +86,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
   }
 
   async function deleteCategory(id: string) {
-    if (!confirm('Weet je zeker dat je deze categorie wilt verwijderen?')) return
+    if (!confirm(t('kostenInstellingenPage.deleteConfirm'))) return
     
     await supabase.from('cost_categories').delete().eq('id', id)
     setCategories(prev => prev.filter(c => c.id !== id))
@@ -105,25 +105,25 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">🧮 Marge Instellingen</h1>
+          <h1 className="text-2xl font-bold text-gray-900">🧮 {t('kostenInstellingenPage.title')}</h1>
           <p className="text-gray-500 mt-1">
-            Stel per categorie in welke winstmarge je wilt behalen (multiplier)
+            {t('kostenInstellingenPage.subtitle')}
           </p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          + Categorie toevoegen
+          + {t('kostenInstellingenPage.addCategory')}
         </button>
       </div>
 
       {/* Info Box */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-        <h3 className="font-semibold text-blue-800 mb-2">💡 Hoe werkt het?</h3>
+        <h3 className="font-semibold text-blue-800 mb-2">💡 {t('kostenInstellingenPage.howTitle')}</h3>
         <p className="text-blue-700 text-sm">
-          De multiplier bepaalt hoeveel je verkoopprijs moet zijn t.o.v. de inkoopprijs.<br/>
-          <strong>Voorbeeld:</strong> Vlees kost €1.00 inkoop × 3.0 multiplier = €3.00 verkoopprijs nodig
+          {t('kostenInstellingenPage.howDesc')}<br/>
+          <strong>{t('kostenInstellingenPage.example')}:</strong> {t('kostenInstellingenPage.exampleDesc')}
         </p>
       </div>
 
@@ -134,11 +134,11 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-xl shadow-lg p-6 border-2 border-blue-200"
         >
-          <h3 className="font-semibold mb-4">Nieuwe categorie toevoegen</h3>
+          <h3 className="font-semibold mb-4">{t('kostenInstellingenPage.newCategoryTitle')}</h3>
           <div className="flex gap-4">
             <input
               type="text"
-              placeholder="Categorienaam (bijv. Desserts)"
+              placeholder={t('kostenInstellingenPage.categoryNamePlaceholder')}
               value={newCategory.name}
               onChange={(e) => setNewCategory(prev => ({ ...prev, name: e.target.value }))}
               className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -155,7 +155,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
                     setNewCategory(prev => ({ ...prev, multiplier: val }))
                   }
                 }}
-                placeholder="bijv. 3 of 2,5"
+                placeholder={t('kostenInstellingenPage.multiplierPlaceholder')}
                 className="w-28 px-3 py-2 border rounded-lg text-center focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -164,7 +164,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
               disabled={saving || !newCategory.name || !newCategory.multiplier}
               className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50"
             >
-              {saving ? 'Opslaan...' : 'Toevoegen'}
+              {saving ? t('kostenInstellingenPage.adding') : t('kostenInstellingenPage.add')}
             </button>
           </div>
         </motion.div>
@@ -212,13 +212,13 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
                     })
                   }
                 }}
-                placeholder="bijv. 3 of 2,5"
+                placeholder={t('kostenInstellingenPage.multiplierPlaceholder')}
                 className="flex-1 px-4 py-3 text-2xl font-bold text-center border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             
             <p className="text-sm text-gray-500 mt-3">
-              €1.00 inkoop → €{category.multiplier.toFixed(2)} verkoop
+              €1.00 {t('kostenInstellingenPage.buySell')} €{category.multiplier.toFixed(2)} {t('kostenInstellingenPage.sell')}
             </p>
           </motion.div>
         ))}
@@ -226,7 +226,7 @@ export default function CostSettingsPage({ params }: { params: { tenant: string 
 
       {categories.length === 0 && (
         <div className="text-center py-12 text-gray-500">
-          Geen categorieën gevonden. Voeg er een toe!
+          {t('kostenInstellingenPage.noCategories')}
         </div>
       )}
     </div>

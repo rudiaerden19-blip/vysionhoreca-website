@@ -211,7 +211,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">🏷️ Label Printer</h1>
-          <p className="text-gray-600">Print stickers voor producten</p>
+          <p className="text-gray-600">{t('labelsPage.subtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           {selectedLabels.size > 0 && (
@@ -219,7 +219,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
               onClick={() => printLabels(labels.filter(l => selectedLabels.has(l.id)))}
               className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-medium"
             >
-              🖨️ Print geselecteerd ({selectedLabels.size})
+              🖨️ {t('labelsPage.printSelected')} ({selectedLabels.size})
             </button>
           )}
           {labels.length > 0 && (
@@ -227,7 +227,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
               onClick={() => printLabels(labels)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-medium"
             >
-              🖨️ Print alles ({labels.length})
+              🖨️ {t('labelsPage.printAll')} ({labels.length})
             </button>
           )}
         </div>
@@ -237,15 +237,15 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl p-4 shadow-sm border">
           <div className="text-3xl font-bold text-purple-600">{labels.length}</div>
-          <div className="text-gray-500">Te printen</div>
+          <div className="text-gray-500">{t('labelsPage.toPrint')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border">
           <div className="text-3xl font-bold text-gray-900">{settings.label_width_mm}×{settings.label_height_mm}</div>
-          <div className="text-gray-500">Label formaat (mm)</div>
+          <div className="text-gray-500">{t('labelsPage.labelFormat')}</div>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm border">
           <div className="text-2xl font-bold text-gray-900 capitalize">{settings.label_printer_type}</div>
-          <div className="text-gray-500">Printer type</div>
+          <div className="text-gray-500">{t('labelsPage.printerType')}</div>
         </div>
       </div>
 
@@ -261,8 +261,8 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
           className="bg-gray-50 rounded-2xl p-12 text-center"
         >
           <span className="text-6xl mb-4 block">✅</span>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Geen labels te printen</h2>
-          <p className="text-gray-600">Nieuwe labels verschijnen hier automatisch bij bestellingen</p>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">{t('labelsPage.noLabels')}</h2>
+          <p className="text-gray-600">{t('labelsPage.noLabelsDesc')}</p>
         </motion.div>
       ) : (
         <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
@@ -274,7 +274,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
                 onChange={selectAll}
                 className="w-5 h-5 rounded"
               />
-              <span className="font-medium">Selecteer alles</span>
+              <span className="font-medium">{t('labelsPage.selectAll')}</span>
             </label>
           </div>
           
@@ -313,7 +313,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
                   onClick={() => printLabels([label])}
                   className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 text-sm font-medium"
                 >
-                  🖨️ Print
+                  🖨️ {t('labelsPage.print')}
                 </button>
               </motion.div>
             ))}
@@ -324,9 +324,9 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
       {/* Settings Link */}
       <div className="mt-6 text-center">
         <p className="text-gray-500 text-sm">
-          Label formaat aanpassen? Ga naar{' '}
+          {t('labelsPage.formatHint')}{' '}
           <a href={`/shop/${params.tenant}/admin/profiel`} className="text-blue-600 hover:underline">
-            Zaak profiel
+            {t('labelsPage.businessProfile')}
           </a>
         </p>
       </div>

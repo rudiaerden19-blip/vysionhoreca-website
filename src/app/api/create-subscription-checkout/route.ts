@@ -3,10 +3,16 @@ import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 
-// Plan pricing in cents
+// Plan pricing in cents (monthly)
 const planPrices: Record<string, number> = {
-  starter: 5900,  // €59
-  pro: 7900,      // €79
+  starter: 5900,  // €59/maand
+  pro: 7900,      // €79/maand
+}
+
+// Plan pricing in cents (yearly = monthly * 12 * 0.9)
+const planPricesYearly: Record<string, number> = {
+  starter: 63660, // €636.60/jaar (€59 * 12 * 0.9)
+  pro: 85320,     // €853.20/jaar (€79 * 12 * 0.9)
 }
 
 const planNames: Record<string, string> = {
@@ -28,7 +34,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { tenantSlug, planId } = await request.json()
+    const { tenantSlug, planId, billing } = await request.json()
+    const isYearly = billing === 'yearly'
 
     if (!tenantSlug || !planId) {
       return NextResponse.json(
@@ -86,7 +93,9 @@ export async function POST(request: NextRequest) {
       .eq('tenant_slug', tenantSlug)
       .single()
 
-    const price = planPrices[planId] || planPrices.starter
+    const price = isYearly
+      ? (planPricesYearly[planId] || planPricesYearly.starter)
+      : (planPrices[planId] || planPrices.starter)
     const planName = planNames[planId] || planNames.starter
 
     // Initialize Stripe
@@ -107,7 +116,7 @@ export async function POST(request: NextRequest) {
             },
             unit_amount: price,
             recurring: {
-              interval: 'month',
+              interval: isYearly ? 'year' : 'month',
             },
           },
           quantity: 1,

@@ -37,7 +37,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Weet je zeker dat je deze review wilt verwijderen?')) return
+    if (!confirm(t('common.delete') + '?')) return
     
     const success = await deleteReview(id)
     if (success) {
@@ -67,11 +67,11 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
     const diff = now.getTime() - date.getTime()
     const days = Math.floor(diff / (1000 * 60 * 60 * 24))
     
-    if (days === 0) return 'Vandaag'
-    if (days === 1) return 'Gisteren'
-    if (days < 7) return `${days} dagen geleden`
-    if (days < 30) return `${Math.floor(days / 7)} weken geleden`
-    return `${Math.floor(days / 30)} maanden geleden`
+    if (days === 0) return t('reviewsPage.today')
+    if (days === 1) return t('reviewsPage.yesterday')
+    if (days < 7) return `${days} ${t('reviewsPage.daysAgo')}`
+    if (days < 30) return `${Math.floor(days / 7)} ${t('reviewsPage.weeksAgo')}`
+    return `${Math.floor(days / 30)} ${t('reviewsPage.monthsAgo')}`
   }
 
   const filteredReviews = reviews.filter(r => {
@@ -126,7 +126,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
               <span key={s} className={s <= Math.round(Number(averageRating)) ? 'text-yellow-400' : 'text-gray-200'}>★</span>
             ))}
           </div>
-          <p className="text-sm text-gray-500">Gemiddeld ({reviews.length})</p>
+          <p className="text-sm text-gray-500">{t('reviewsPage.average')} ({reviews.length})</p>
         </motion.div>
         {ratingCounts.slice(0, 4).map((item, i) => (
           <motion.div
@@ -202,7 +202,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-gray-900">{review.customer_name}</p>
                         {review.is_verified && (
-                          <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">✓ Geverifieerd</span>
+                          <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full">✓ {t('reviewsPage.verified')}</span>
                         )}
                       </div>
                       <p className="text-sm text-gray-500">{formatDate(review.created_at)}</p>
@@ -217,14 +217,14 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                     <button
                       onClick={() => handleToggleVisible(review.id!, review.is_visible)}
                       className={`p-2 rounded-lg transition-colors ${review.is_visible ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
-                      title={review.is_visible ? 'Zichtbaar - Klik om te verbergen' : 'Verborgen - Klik om te tonen'}
+                      title={review.is_visible ? t('reviewsPage.visibleTooltip') : t('reviewsPage.hiddenTooltip')}
                     >
                       {review.is_visible ? '👁️' : '🙈'}
                     </button>
                     <button
                       onClick={() => handleDelete(review.id!)}
                       className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
-                      title="Verwijderen"
+                      title={t('common.delete')}
                     >
                       🗑️
                     </button>
@@ -239,7 +239,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                 {review.reply && (
                   <div className="bg-blue-50 rounded-xl p-4 ml-8 mb-4">
                     <p className="text-sm text-blue-700">
-                      <strong>Jouw reactie:</strong> {review.reply}
+                      <strong>{t('reviewsPage.yourReply')}:</strong> {review.reply}
                     </p>
                     <p className="text-xs text-blue-600 mt-1">{formatDate(review.replied_at)}</p>
                   </div>
@@ -251,7 +251,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                     <textarea
                       value={replyText}
                       onChange={(e) => setReplyText(e.target.value)}
-                      placeholder="Schrijf een reactie..."
+                      placeholder={t('reviewsPage.replyPlaceholder')}
                       rows={3}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none mb-2"
                     />
@@ -272,13 +272,13 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                         ) : (
                           '✓'
                         )}
-                        Versturen
+                        {t('reviewsPage.send')}
                       </motion.button>
                       <button
                         onClick={() => { setReplyingTo(null); setReplyText(''); }}
                         className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg font-medium hover:bg-gray-200"
                       >
-                        Annuleren
+                        {t('common.cancel')}
                       </button>
                     </div>
                   </div>
@@ -287,7 +287,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                     onClick={() => setReplyingTo(review.id!)}
                     className="text-blue-600 text-sm font-medium hover:underline ml-8"
                   >
-                    💬 Reageren
+                    💬 {t('reviewsPage.reply')}
                   </button>
                 )}
               </motion.div>

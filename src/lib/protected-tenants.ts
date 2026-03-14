@@ -16,6 +16,9 @@ export const ADMIN_TENANTS = [
   'skippsbv',
 ] as const
 
+// Demo accounts - publiek zichtbaar als live demo
+export const DEMO_TENANTS = [] as const
+
 export function isAdminTenant(slug: string | null | undefined): boolean {
   if (!slug) return false
   const normalizedSlug = slug.toLowerCase().trim()
@@ -29,6 +32,12 @@ export function isProtectedTenant(slug: string | null | undefined): boolean {
     normalizedSlug === p || 
     normalizedSlug.startsWith(p)
   )
+}
+
+export function isDemoTenant(slug: string | null | undefined): boolean {
+  if (!slug) return false
+  const normalizedSlug = slug.toLowerCase().trim()
+  return DEMO_TENANTS.some((d) => normalizedSlug === d)
 }
 
 export function getProtectionError(slug: string): string {

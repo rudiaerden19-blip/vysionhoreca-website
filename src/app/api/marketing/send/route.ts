@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
-import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
@@ -26,14 +25,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify user has access to this tenant
-    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
-    if (!access.authorized) {
-      logger.warn('Marketing send unauthorized', { requestId, tenantSlug, error: access.error })
-      return NextResponse.json(
-        { error: access.error || 'Geen toegang tot deze tenant' },
-        { status: 403 }
-      )
+    // Verify user is logged in via any auth header
+    const businessId = request.headers.get('x-business-id')
+    const superadminId = request.headers.get('x-superadmin-id')
+    if (!businessId && !superadminId) {
+      return NextResponse.json({ error: 'Niet ingelogd' }, { status: 401 })
     }
 
     if (recipients.length === 0) {
@@ -43,14 +39,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create email transporter
+    // Haal tenant SMTP instellingen op
+    const supabaseAdmin = getServerSupabaseClient()
+    let smtpHost = 'smtp.zoho.eu'
+    let smtpPort = 465
+    let smtpUser = process.env.ZOHO_EMAIL || ''
+    let smtpPass = process.env.ZOHO_PASSWORD || ''
+    let fromName = businessName || 'Vysion Horeca'
+
+    if (supabaseAdmin) {
+      const { data: smtpSettings } = await supabaseAdmin
+        .from('tenant_settings')
+        .select('smtp_host, smtp_port, smtp_user, smtp_password, smtp_from_name')
+        .eq('tenant_slug', tenantSlug)
+        .single()
+
+      if (smtpSettings?.smtp_host && smtpSettings?.smtp_user && smtpSettings?.smtp_password) {
+        smtpHost = smtpSettings.smtp_host
+        smtpPort = smtpSettings.smtp_port || 465
+        smtpUser = smtpSettings.smtp_user
+        smtpPass = smtpSettings.smtp_password
+        fromName = smtpSettings.smtp_from_name || businessName || 'Vysion Horeca'
+      } else if (!process.env.ZOHO_EMAIL || !process.env.ZOHO_PASSWORD) {
+        return NextResponse.json(
+          { error: 'Geen email ingesteld. Ga naar Profiel → Email instellingen en vul je emailgegevens in.' },
+          { status: 400 }
+        )
+      }
+    }
+
+    // Create email transporter met tenant eigen of centrale SMTP
     const transporter = nodemailer.createTransport({
-      host: 'smtp.zoho.eu',
-      port: 465,
-      secure: true,
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
       auth: {
-        user: process.env.ZOHO_EMAIL,
-        pass: process.env.ZOHO_PASSWORD,
+        user: smtpUser,
+        pass: smtpPass,
       },
     })
 
@@ -134,18 +159,16 @@ export async function POST(request: NextRequest) {
 </html>
         `
 
-        // Verstuur email met extra headers om spam te voorkomen
         await transporter.sendMail({
-          from: `"${businessName || 'Vysion Horeca'}" <${process.env.ZOHO_EMAIL}>`,
+          from: `"${fromName}" <${smtpUser}>`,
+          replyTo: smtpUser,
           to: recipient.email,
           subject: subject,
           html: htmlContent,
           text: `${personalizedMessage}\n\n---\nUitschrijven: ${unsubscribeUrl}`,
           headers: {
-            'List-Unsubscribe': `<${unsubscribeUrl}>`,
+            'List-Unsubscribe': `<mailto:${smtpUser}?subject=uitschrijven>, <${unsubscribeUrl}>`,
             'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-            'Precedence': 'bulk',
-            'X-Mailer': 'Vysion Horeca Marketing',
           },
         })
 

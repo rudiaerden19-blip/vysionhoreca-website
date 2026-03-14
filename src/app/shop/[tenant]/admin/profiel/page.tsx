@@ -6,6 +6,21 @@ import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/adm
 import MediaPicker from '@/components/MediaPicker'
 import ImageZoomPicker, { parseImageZoomSettings, stringifyImageZoomSettings } from '@/components/ImageZoomPicker'
 import { useLanguage } from '@/i18n'
+import { getAuthHeaders } from '@/lib/auth-headers'
+
+function detectSmtp(email: string): { host: string; port: number } | null {
+  const domain = email.split('@')[1]?.toLowerCase()
+  if (!domain) return null
+  if (domain === 'gmail.com' || domain === 'googlemail.com') return { host: 'smtp.gmail.com', port: 587 }
+  if (domain === 'outlook.com' || domain === 'hotmail.com' || domain === 'live.com' || domain === 'live.be' || domain === 'hotmail.be') return { host: 'smtp-mail.outlook.com', port: 587 }
+  if (domain === 'zoho.eu' || domain === 'zohomail.eu' || domain === 'zoho.com') return { host: 'smtp.zoho.eu', port: 465 }
+  if (domain === 'yahoo.com' || domain === 'yahoo.be' || domain === 'yahoo.fr') return { host: 'smtp.mail.yahoo.com', port: 465 }
+  if (domain === 'icloud.com' || domain === 'me.com') return { host: 'smtp.mail.me.com', port: 587 }
+  if (domain === 'telenet.be') return { host: 'smtp.telenet.be', port: 465 }
+  if (domain === 'skynet.be') return { host: 'smtp.skynet.be', port: 465 }
+  if (domain === 'proximus.be' || domain === 'scarlet.be') return { host: 'smtp.proximus.be', port: 465 }
+  return null
+}
 
 export default function ProfielPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -13,6 +28,20 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  // SMTP email instellingen (apart van profiel formData)
+  const [smtpData, setSmtpData] = useState({
+    smtp_host: '',
+    smtp_port: 465,
+    smtp_user: '',
+    smtp_password: '',
+    smtp_from_name: '',
+  })
+  const [smtpPasswordSet, setSmtpPasswordSet] = useState(false)
+  const [smtpDetected, setSmtpDetected] = useState<string | null>(null)
+  const [smtpSaving, setSmtpSaving] = useState(false)
+  const [smtpSaved, setSmtpSaved] = useState(false)
+  const [smtpError, setSmtpError] = useState('')
   
   const [formData, setFormData] = useState<TenantSettings>({
     tenant_slug: params.tenant,
@@ -60,6 +89,29 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
       setLoading(false)
     }
     loadData()
+
+    async function loadSmtp() {
+      try {
+        const res = await fetch(`/api/tenant/smtp?tenant=${params.tenant}`, {
+          headers: getAuthHeaders(),
+        })
+        if (res.ok) {
+          const d = await res.json()
+          setSmtpData({
+            smtp_host: d.smtp_host || '',
+            smtp_port: d.smtp_port || 465,
+            smtp_user: d.smtp_user || '',
+            smtp_password: '',
+            smtp_from_name: d.smtp_from_name || '',
+          })
+          setSmtpPasswordSet(d.smtp_password_set || false)
+          if (d.smtp_host) setSmtpDetected(d.smtp_host)
+        }
+      } catch {
+        // stil falen
+      }
+    }
+    loadSmtp()
   }, [params.tenant])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -84,6 +136,30 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
       setError(t('adminPages.common.saveFailed'))
     }
     setSaving(false)
+  }
+
+  const handleSmtpSave = async () => {
+    setSmtpSaving(true)
+    setSmtpError('')
+    try {
+      const res = await fetch('/api/tenant/smtp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({ tenantSlug: params.tenant, ...smtpData }),
+      })
+      const result = await res.json()
+      if (res.ok && result.success) {
+        setSmtpSaved(true)
+        setSmtpPasswordSet(true)
+        setSmtpData(prev => ({ ...prev, smtp_password: '' }))
+        setTimeout(() => setSmtpSaved(false), 3000)
+      } else {
+        setSmtpError(result.error || 'Opslaan mislukt')
+      }
+    } catch {
+      setSmtpError('Verbindingsfout')
+    }
+    setSmtpSaving(false)
   }
 
   if (loading) {
@@ -386,19 +462,6 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
               <p className="text-xs text-gray-400 mt-1">6% voor afhaalmaaltijden, 12% voor ter plaatse consumptie</p>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('adminPages.profiel.kvkNumber') || 'Ondernemingsnummer'}
-              </label>
-              <input
-                type="text"
-                name="kvk_number"
-                value={formData.kvk_number || ''}
-                onChange={handleChange}
-                placeholder="0123.456.789"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div>
           </div>
         </motion.div>
 
@@ -715,6 +778,120 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
                 </div>
               </div>
             </div>
+          </div>
+        </motion.div>
+
+        {/* Email SMTP Instellingen */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white rounded-2xl p-6 shadow-sm"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <span>📧</span> Email Marketing Instellingen
+          </h2>
+          <p className="text-gray-500 text-sm mb-6">
+            Vul hier jouw eigen emailgegevens in. Marketing emails worden dan verstuurd vanuit jouw eigen emailadres.
+          </p>
+
+          <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Jouw naam / bedrijfsnaam</label>
+                <input
+                  type="text"
+                  value={smtpData.smtp_from_name}
+                  onChange={e => setSmtpData(prev => ({ ...prev, smtp_from_name: e.target.value }))}
+                  placeholder="bijv. Frituur Ronny"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Emailadres</label>
+                <input
+                  type="email"
+                  value={smtpData.smtp_user}
+                  onChange={e => {
+                    const email = e.target.value
+                    setSmtpData(prev => ({ ...prev, smtp_user: email }))
+                    const detected = detectSmtp(email)
+                    if (detected) {
+                      setSmtpData(prev => ({ ...prev, smtp_user: email, smtp_host: detected.host, smtp_port: detected.port }))
+                      setSmtpDetected(detected.host)
+                    } else {
+                      setSmtpDetected(null)
+                    }
+                  }}
+                  placeholder="info@jouwzaak.be"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+                {smtpDetected && (
+                  <p className="text-xs text-green-600 mt-1">✓ Server automatisch gevonden: {smtpDetected}</p>
+                )}
+                {smtpData.smtp_user && !smtpDetected && (
+                  <p className="text-xs text-gray-500 mt-1">Onbekende provider — vul SMTP server hieronder in.</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Wachtwoord
+                {smtpPasswordSet && (
+                  <span className="ml-2 text-xs text-green-600 font-normal">✓ Wachtwoord is ingesteld</span>
+                )}
+              </label>
+              <input
+                type="password"
+                value={smtpData.smtp_password}
+                onChange={e => setSmtpData(prev => ({ ...prev, smtp_password: e.target.value }))}
+                placeholder={smtpPasswordSet ? 'Laat leeg om huidig wachtwoord te behouden' : 'Voer wachtwoord in'}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+              {smtpData.smtp_user?.includes('@gmail.com') && (
+                <p className="text-xs text-amber-600 mt-1">
+                  ⚠️ Gmail vereist een App-wachtwoord. Maak dit aan via: Google Account → Beveiliging → App-wachtwoorden.
+                </p>
+              )}
+            </div>
+
+            {smtpData.smtp_user && !smtpDetected && (
+              <div className="grid md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-xl">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">SMTP server (vraag aan je provider)</label>
+                  <input
+                    type="text"
+                    value={smtpData.smtp_host}
+                    onChange={e => setSmtpData(prev => ({ ...prev, smtp_host: e.target.value }))}
+                    placeholder="bijv. smtp.mijnprovider.be"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Poort</label>
+                  <input
+                    type="number"
+                    value={smtpData.smtp_port}
+                    onChange={e => setSmtpData(prev => ({ ...prev, smtp_port: parseInt(e.target.value) }))}
+                    placeholder="465"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
+                  />
+                </div>
+              </div>
+            )}
+
+            {smtpError && (
+              <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-xl">{smtpError}</p>
+            )}
+
+            <button
+              onClick={handleSmtpSave}
+              disabled={smtpSaving}
+              className="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {smtpSaving ? '⏳ Opslaan...' : smtpSaved ? '✓ Opgeslagen!' : '💾 Email instellingen opslaan'}
+            </button>
           </div>
         </motion.div>
 

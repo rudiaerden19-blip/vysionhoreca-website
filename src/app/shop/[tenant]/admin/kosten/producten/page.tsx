@@ -568,17 +568,17 @@ export default function ProductCostsPage({ params }: { params: { tenant: string 
   }
 
   async function removeIngredientFromProduct(piId: string) {
-    await supabase.from('product_ingredients').delete().eq('id', piId)
+    await supabase.from('product_ingredients').delete().eq('id', piId).eq('tenant_slug', params.tenant)
     setProductIngredients(prev => prev.filter(pi => pi.id !== piId))
   }
 
   async function updateIngredientQuantity(piId: string, quantity: number) {
-    await supabase.from('product_ingredients').update({ quantity }).eq('id', piId)
+    await supabase.from('product_ingredients').update({ quantity }).eq('id', piId).eq('tenant_slug', params.tenant)
     setProductIngredients(prev => prev.map(pi => pi.id === piId ? { ...pi, quantity } : pi))
   }
 
   async function updateProductMultiplier(productId: string, multiplier: number | null) {
-    await supabase.from('menu_products').update({ price_multiplier: multiplier }).eq('id', productId)
+    await supabase.from('menu_products').update({ price_multiplier: multiplier }).eq('id', productId).eq('tenant_slug', params.tenant)
     setProducts(prev => prev.map(p => p.id === productId ? { ...p, price_multiplier: multiplier } : p))
   }
 
