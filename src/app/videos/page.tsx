@@ -167,12 +167,12 @@ export default function VideosPage() {
             {categorieen.map((cat) => (
               <div key={cat.id}>
                 <div
-                  className="bg-[#E3E3E3] rounded-2xl p-8 cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 h-52 flex flex-col justify-between"
+                  className="bg-[#E3E3E3] rounded-2xl p-8 cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 flex flex-col min-h-[13rem]"
                   onClick={() => setActief(actief === cat.id ? null : cat.id)}
                 >
                   <div className="text-5xl mb-4">{cat.icoon}</div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">{cat.titel}</h2>
-                  <p className="text-gray-600 mb-4">{cat.beschrijving}</p>
+                  <p className="text-gray-600 mb-4 flex-1">{cat.beschrijving}</p>
                   <span className="text-accent font-medium text-sm">
                     {cat.videos.length} video{cat.videos.length !== 1 ? "'s" : ''}
                     {cat.videos.length === 0 ? ' — binnenkort beschikbaar' : ''}
