@@ -54,11 +54,13 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
-    id: 'personeel',
-    titel: 'Personeel',
-    beschrijving: 'Personeel en uren beheren',
-    icoon: '👥',
-    videos: [],
+    id: 'whatsapp-bestellingen',
+    titel: 'Whatsapp bestellingen',
+    beschrijving: 'Bestellingen via WhatsApp ontvangen en beheren',
+    icoon: '💬',
+    videos: [
+      { titel: 'WhatsApp', src: '/videos/whatsapp.mp4' },
+    ],
   },
   {
     id: 'analyse',
