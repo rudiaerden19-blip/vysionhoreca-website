@@ -45,11 +45,13 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
-    id: 'producten',
-    titel: 'Producten & Menu',
-    beschrijving: 'Producten en categorieën aanmaken',
+    id: 'menu',
+    titel: 'Menu',
+    beschrijving: 'Producten, categorieën en opties beheren',
     icoon: '🍽️',
-    videos: [],
+    videos: [
+      { titel: 'Producten, categorieën en opties', src: '/videos/producten.mp4' },
+    ],
   },
   {
     id: 'personeel',
