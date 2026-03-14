@@ -84,39 +84,12 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
-    id: 'de-shop',
-    titel: 'De shop',
-    beschrijving: 'Je online shop instellen en beheren',
-    icoon: '🛒',
+    id: 'z-rapporten',
+    titel: 'Z Rapporten',
+    beschrijving: 'Dagelijkse rapporten en afsluiting',
+    icoon: '📊',
     videos: [
-      { titel: 'De shop', src: '/videos/de-shop.mp4' },
-    ],
-  },
-  {
-    id: 'de-website',
-    titel: 'De website',
-    beschrijving: 'Je eigen website beheren en aanpassen',
-    icoon: '🌐',
-    videos: [
-      { titel: 'De website', src: '/videos/de-website.mp4' },
-    ],
-  },
-  {
-    id: 'bonnenprinter',
-    titel: 'Bonnenprinter',
-    beschrijving: 'Bonnenprinter instellen en gebruiken',
-    icoon: '🖨️',
-    videos: [
-      { titel: 'Bonnenprinter', src: '/videos/printer.mp4' },
-    ],
-  },
-  {
-    id: 'groepsbestellingen',
-    titel: 'Groepsbestellingen',
-    beschrijving: 'Bestellingen beheren voor groepen',
-    icoon: '👨‍👩‍👧‍👦',
-    videos: [
-      { titel: 'Groepsbestellingen', src: '/videos/groepsbestellingen.mp4' },
+      { titel: 'Z Rapport', src: '/videos/z-rapport.mp4' },
     ],
   },
   {
@@ -130,12 +103,39 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
-    id: 'z-rapporten',
-    titel: 'Z Rapporten',
-    beschrijving: 'Dagelijkse rapporten en afsluiting',
-    icoon: '📊',
+    id: 'groepsbestellingen',
+    titel: 'Groepsbestellingen',
+    beschrijving: 'Bestellingen beheren voor groepen',
+    icoon: '👨‍👩‍👧‍👦',
     videos: [
-      { titel: 'Z Rapport', src: '/videos/z-rapport.mp4' },
+      { titel: 'Groepsbestellingen', src: '/videos/groepsbestellingen.mp4' },
+    ],
+  },
+  {
+    id: 'bonnenprinter',
+    titel: 'Bonnenprinter',
+    beschrijving: 'Bonnenprinter instellen en gebruiken',
+    icoon: '🖨️',
+    videos: [
+      { titel: 'Bonnenprinter', src: '/videos/printer.mp4' },
+    ],
+  },
+  {
+    id: 'de-website',
+    titel: 'De website',
+    beschrijving: 'Je eigen website beheren en aanpassen',
+    icoon: '🌐',
+    videos: [
+      { titel: 'De website', src: '/videos/de-website.mp4' },
+    ],
+  },
+  {
+    id: 'de-shop',
+    titel: 'De shop',
+    beschrijving: 'Je online shop instellen en beheren',
+    icoon: '🛒',
+    videos: [
+      { titel: 'De shop', src: '/videos/de-shop.mp4' },
     ],
   },
 ]
@@ -163,11 +163,11 @@ export default function VideosPage() {
       {/* Categorieën */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
             {categorieen.map((cat) => (
               <div key={cat.id}>
                 <div
-                  className="bg-[#E3E3E3] rounded-2xl p-8 cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1"
+                  className="bg-[#E3E3E3] rounded-2xl p-8 cursor-pointer hover:shadow-lg transition-all hover:-translate-y-1 h-52 flex flex-col justify-between"
                   onClick={() => setActief(actief === cat.id ? null : cat.id)}
                 >
                   <div className="text-5xl mb-4">{cat.icoon}</div>
