@@ -84,11 +84,13 @@ const categorieen: { id: string; titel: string; beschrijving: string; icoon: str
     ],
   },
   {
-    id: 'analyse',
-    titel: 'Analyse & Rapporten',
-    beschrijving: 'Omzet en statistieken bekijken',
+    id: 'z-rapporten',
+    titel: 'Z Rapporten',
+    beschrijving: 'Dagelijkse rapporten en afsluiting',
     icoon: '📊',
-    videos: [],
+    videos: [
+      { titel: 'Z Rapport', src: '/videos/z-rapport.mp4' },
+    ],
   },
 ]
 
