@@ -48,7 +48,7 @@ function HeroSection() {
   }
   
   return (
-    <section className="bg-[#fdfdfd] min-h-screen flex items-center pt-20">
+    <section className="bg-[#e3e3e3] min-h-screen flex items-center pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         {/* Badges centered under navbar */}
         <div className="flex flex-wrap justify-center gap-4 sm:gap-8 lg:gap-16 mb-12 -mt-8">
@@ -81,7 +81,7 @@ function HeroSection() {
             <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
               {t('hero.description')}
             </p>
-            <div className="bg-gray-50 rounded-2xl p-6 mb-6 max-w-lg mx-auto lg:mx-0 text-left">
+            <div className="bg-white rounded-2xl p-6 mb-6 max-w-lg mx-auto lg:mx-0 text-left">
               <p className="text-base text-gray-800 font-semibold mb-4">
                 {t('hero.extras')}
               </p>
@@ -202,13 +202,13 @@ function OneDayOnlineSection() {
   ]
 
   return (
-    <section className="py-20 bg-gradient-to-b from-[#1a1a2e] to-[#16213e]">
+    <section className="py-20 bg-[#e3e3e3]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             {t('oneDayOnline.title')} <span className="text-accent">{t('oneDayOnline.titleAccent')}</span> {t('oneDayOnline.titleEnd')}
           </h2>
-          <p className="text-xl text-gray-400">
+          <p className="text-xl text-gray-600">
             {t('oneDayOnline.subtitle')}
           </p>
         </div>
@@ -217,11 +217,11 @@ function OneDayOnlineSection() {
           {benefits.map((benefit, index) => (
             <div 
               key={index}
-              className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all hover:scale-[1.02]"
+              className="bg-white border border-gray-200 rounded-2xl p-6 hover:bg-gray-50 transition-all hover:scale-[1.02]"
             >
               <div className="text-4xl mb-4">{benefit.icon}</div>
-              <h3 className="text-xl font-bold text-white mb-2">{t(`oneDayOnline.benefits.${benefit.key}.title`)}</h3>
-              <p className="text-gray-400">{t(`oneDayOnline.benefits.${benefit.key}.description`)}</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{t(`oneDayOnline.benefits.${benefit.key}.title`)}</h3>
+              <p className="text-gray-600">{t(`oneDayOnline.benefits.${benefit.key}.description`)}</p>
             </div>
           ))}
         </div>
@@ -256,13 +256,13 @@ function FeaturesSection() {
   ]
 
   return (
-    <section id="functies" className="py-24 bg-dark">
+    <section id="functies" className="py-24 bg-[#e3e3e3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             {t('features.title')}
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             {t('features.subtitle')}
           </p>
         </div>
@@ -435,14 +435,14 @@ function OrderAppSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-24 bg-dark overflow-hidden">
+    <section ref={sectionRef} className="py-24 bg-[#e3e3e3] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             {t('orderApp.title')}
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             {t('orderApp.subtitle')}
           </p>
         </div>
@@ -452,7 +452,7 @@ function OrderAppSection() {
           {images.map((src, index) => (
             <div
               key={index}
-              className="transition-all duration-700 ease-out cursor-pointer aspect-[9/16] relative overflow-hidden rounded-2xl bg-gray-800"
+              className="transition-all duration-700 ease-out cursor-pointer aspect-[9/16] relative overflow-hidden rounded-2xl bg-gray-300"
               style={{
                 opacity: visibleImages.includes(index) ? 1 : 0,
                 transform: visibleImages.includes(index) ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.95)',
@@ -469,7 +469,7 @@ function OrderAppSection() {
           ))}
         </div>
 
-        <p className="text-gray-400 text-sm text-center mt-6">{t('hero.clickToOpen')}</p>
+        <p className="text-gray-500 text-sm text-center mt-6">{t('hero.clickToOpen')}</p>
 
         {/* Lightbox with navigation */}
         {lightboxIndex !== null && (
@@ -549,26 +549,26 @@ function PricingSection() {
   const periodLabel = isYearly ? '/jaar' : '/maand'
   
   return (
-    <section id="prijzen" className="py-24 bg-[#2a2a3e] relative overflow-hidden">
+    <section id="prijzen" className="py-24 bg-[#e3e3e3] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             {t('pricing.title')}
           </h2>
-          <p className="text-xl text-gray-300">
+          <p className="text-xl text-gray-600">
             {t('pricing.subtitle')}
           </p>
         </div>
 
         {/* Toggle Maandelijks / Jaarlijks */}
         <div className="flex flex-col items-center mb-12">
-          <div className="bg-[#1a1a2e] p-1 rounded-full inline-flex items-center">
+          <div className="bg-gray-300 p-1 rounded-full inline-flex items-center">
             <button
               onClick={() => setIsYearly(false)}
               className={`px-6 py-3 rounded-full font-semibold transition-all ${
                 !isYearly 
                   ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Maandelijks
@@ -578,7 +578,7 @@ function PricingSection() {
               className={`px-6 py-3 rounded-full font-semibold transition-all relative ${
                 isYearly 
                   ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Jaarlijks
@@ -690,12 +690,12 @@ function LiveDemoSection() {
   const { t } = useLanguage()
   
   return (
-    <section className="py-16 sm:py-20 bg-gradient-to-b from-[#1a1a2e] to-[#0f0f1a]">
+    <section className="py-16 sm:py-20 bg-[#e3e3e3]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
           {t('liveDemo.title')}
         </h2>
-        <p className="text-lg sm:text-xl text-gray-300 mb-8">
+        <p className="text-lg sm:text-xl text-gray-600 mb-8">
           {t('liveDemo.subtitle')}
         </p>
         <a
@@ -754,7 +754,7 @@ function StopSection() {
   return (
     <section 
       ref={sectionRef}
-      className="relative bg-black min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative bg-[#e3e3e3] min-h-screen flex items-center justify-center overflow-hidden"
     >
       {/* STOP Text - Big and centered */}
       <div 
@@ -784,10 +784,10 @@ function StopSection() {
       >
         {/* Headline */}
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-4">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-4">
             {t('stop.headline')}
           </h2>
-          <p className="text-xl sm:text-2xl text-gray-300">
+          <p className="text-xl sm:text-2xl text-gray-600">
             {t('stop.subheadline')}
           </p>
         </div>
@@ -797,7 +797,7 @@ function StopSection() {
           {cardKeys.map((key, index) => (
             <div 
               key={key}
-              className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 hover:border-accent/50 transition-all duration-500 hover:scale-105"
+              className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-accent/50 transition-all duration-500 hover:scale-105"
               style={{
                 opacity: phase >= 3 ? 1 : 0,
                 transform: `translateY(${phase >= 3 ? 0 : 20}px)`,
@@ -806,8 +806,8 @@ function StopSection() {
             >
               <div className="flex items-center gap-4">
                 <div className="flex-1 text-left">
-                  <p className="text-gray-400 text-sm mb-1">{t(`stop.cards.${key}.you`)}</p>
-                  <p className="text-white font-bold text-lg flex items-center gap-2">
+                  <p className="text-gray-500 text-sm mb-1">{t(`stop.cards.${key}.you`)}</p>
+                  <p className="text-gray-900 font-bold text-lg flex items-center gap-2">
                     <svg className="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -821,7 +821,7 @@ function StopSection() {
         
         {/* Custom Build Note */}
         <div className="text-center mb-12 sm:mb-16">
-          <p className="text-gray-400 text-base sm:text-lg">
+          <p className="text-gray-500 text-base sm:text-lg">
             {t('stop.customBuildNote')}
           </p>
         </div>
@@ -840,11 +840,11 @@ function StopSection() {
           </h3>
           <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8">
             {freeKeys.map((key) => (
-              <div key={key} className="flex items-center gap-2 bg-black/40 px-4 py-2 rounded-full">
-                <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div key={key} className="flex items-center gap-2 bg-white/60 px-4 py-2 rounded-full">
+                <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-white font-medium text-sm sm:text-base">{t(`stop.freeItems.${key}`)}</span>
+                <span className="text-gray-900 font-medium text-sm sm:text-base">{t(`stop.freeItems.${key}`)}</span>
               </div>
             ))}
           </div>
@@ -867,18 +867,18 @@ function ButWaitSection() {
   const featureKeys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 
   return (
-    <section className="py-20 bg-dark overflow-hidden">
+    <section className="py-20 bg-[#e3e3e3] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
           <p className="text-accent text-lg font-semibold tracking-wider uppercase mb-4">
             {t('butWait.label')}
           </p>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
             {t('butWait.title')}<br />
             <span className="text-accent">{t('butWait.titleAccent')}</span>
           </h2>
-          <p className="text-xl sm:text-2xl text-gray-300 mt-6">
+          <p className="text-xl sm:text-2xl text-gray-600 mt-6">
             {t('butWait.subtitle')}
           </p>
         </div>
@@ -1042,7 +1042,7 @@ function IndustrySection() {
   }
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-[#e3e3e3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Title */}
         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12">
@@ -1202,16 +1202,16 @@ function CostCalculatorSection() {
   }
 
   return (
-    <section className="py-24 bg-gray-900 text-white overflow-hidden">
+    <section className="py-24 bg-[#e3e3e3] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-orange-400">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-orange-500">
             {t('costCalculator.title')}
           </h2>
-          <p className="text-xl sm:text-2xl font-semibold text-white mb-6">
+          <p className="text-xl sm:text-2xl font-semibold text-gray-900 mb-6">
             {t('costCalculator.subtitle')}
           </p>
-          <p className="text-lg text-gray-300 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             {t('costCalculator.description')}
           </p>
         </div>
@@ -1221,9 +1221,9 @@ function CostCalculatorSection() {
           {/* Left Arrow */}
           <button
             onClick={goToPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-gray-300 hover:bg-gray-400 rounded-full flex items-center justify-center transition-colors"
           >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -1231,9 +1231,9 @@ function CostCalculatorSection() {
           {/* Right Arrow */}
           <button
             onClick={goToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-gray-300 hover:bg-gray-400 rounded-full flex items-center justify-center transition-colors"
           >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -1258,7 +1258,7 @@ function CostCalculatorSection() {
           </div>
           
           {/* Click to enlarge */}
-          <p className="text-center text-gray-400 mt-4 text-sm">
+          <p className="text-center text-gray-500 mt-4 text-sm">
             {t('costCalculator.clickToEnlarge')}
           </p>
           
@@ -1269,7 +1269,7 @@ function CostCalculatorSection() {
                 key={index}
                 onClick={() => setCurrentSlide(index)}
                 className={`w-3 h-3 rounded-full transition-colors ${
-                  currentSlide === index ? 'bg-orange-500' : 'bg-white/30'
+                  currentSlide === index ? 'bg-orange-500' : 'bg-gray-400'
                 }`}
               />
             ))}
