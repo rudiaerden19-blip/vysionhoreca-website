@@ -426,7 +426,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       print_label: formData.print_label ?? false,
     }
 
-    const result = await saveMenuProduct(productData)
+    const { data: result, error: saveError } = await saveMenuProduct(productData)
     
     if (result) {
       // Save option links
@@ -441,7 +441,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       }
       closeModal()
     } else {
-      setError(t('adminPages.producten.saveFailed'))
+      setError(saveError || t('adminPages.producten.saveFailed'))
     }
     setSaving(false)
   }

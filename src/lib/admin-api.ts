@@ -629,10 +629,9 @@ export async function getMenuProducts(tenantSlug: string): Promise<MenuProduct[]
   )
 }
 
-export async function saveMenuProduct(product: MenuProduct): Promise<MenuProduct | null> {
+export async function saveMenuProduct(product: MenuProduct): Promise<{ data: MenuProduct | null; error?: string }> {
   const { is_promo, promo_price, image_display_mode, print_label, ...baseProduct } = product
 
-  // Probeer eerst met alle optionele kolommen
   const fullProduct = {
     ...baseProduct,
     ...(is_promo !== undefined && { is_promo }),
@@ -647,10 +646,10 @@ export async function saveMenuProduct(product: MenuProduct): Promise<MenuProduct
     .select()
     .single()
 
-  if (!error) return data
+  if (!error) return { data }
 
-  // Fallback: sla op zonder nieuwere kolommen die mogelijk nog niet bestaan
-  console.warn('Saving without optional columns:', error.message)
+  // Fallback zonder optionele kolommen
+  console.warn('Falling back, error was:', error.message)
   const { data: fallbackData, error: fallbackError } = await supabase
     .from('menu_products')
     .upsert(baseProduct)
@@ -659,9 +658,9 @@ export async function saveMenuProduct(product: MenuProduct): Promise<MenuProduct
 
   if (fallbackError) {
     console.error('Error saving menu product:', fallbackError)
-    return null
+    return { data: null, error: fallbackError.message }
   }
-  return fallbackData
+  return { data: fallbackData }
 }
 
 export async function deleteMenuProduct(id: string): Promise<boolean> {
