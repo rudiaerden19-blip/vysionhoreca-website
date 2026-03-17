@@ -399,12 +399,15 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   // ProductCard component voor herbruikbaarheid
   const ProductCard = ({ item }: { item: MenuItem }) => {
+    const itemDisplayMode = item.image_display_mode || imageDisplayMode
+    const useContain = itemDisplayMode === 'contain'
+
     return (
       <div
         onClick={() => selectProduct(item)}
         className={`${theme.card} rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.28)] ${theme.cardHover} active:scale-[0.98] transition-all cursor-pointer group`}
       >
-        <div className={`relative h-48 overflow-hidden ${theme.imageBg}`}>
+        <div className={`relative h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
           {item.image_url ? (
             <Image
               src={item.image_url}
@@ -413,7 +416,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               sizes="(max-width: 768px) 100vw, 50vw"
               quality={75}
               loading="lazy"
-              className="object-cover"
+              className={useContain ? 'object-contain p-2' : 'object-cover'}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-6xl">🍟</div>
@@ -724,8 +727,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               className={`${theme.card} rounded-t-3xl md:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto`}
             >
               {(() => {
+                const selectedDisplayMode = selectedItem.image_display_mode || imageDisplayMode
+                const useContain = selectedDisplayMode === 'contain'
                 return (
-              <div className={`relative h-64 overflow-hidden rounded-t-3xl md:rounded-t-3xl ${theme.imageBg}`}>
+              <div className={`relative h-64 overflow-hidden rounded-t-3xl md:rounded-t-3xl ${useContain ? theme.card : theme.imageBg}`}>
                 {selectedItem.image_url ? (
                   <Image
                     src={selectedItem.image_url}
@@ -733,7 +738,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     fill
                     sizes="(max-width: 768px) 100vw, 500px"
                     quality={80}
-                    className="object-cover"
+                    className={useContain ? 'object-contain p-4' : 'object-cover'}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-8xl">
