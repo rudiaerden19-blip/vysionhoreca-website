@@ -442,21 +442,44 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   const pdfInputRef = useRef<HTMLInputElement>(null)
   const pdfInputFixedRef = useRef<HTMLInputElement>(null)
 
-  // Upload PDF naar Supabase Storage — per tenant gescheiden
+  // Upload PDF naar bestaande media bucket — per tenant gescheiden
   const uploadPdfToStorage = async (file: File): Promise<string> => {
     const timestamp = Date.now()
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-    // Pad: invoices/{tenant_slug}/{timestamp}_{bestandsnaam}
-    const path = `${params.tenant}/${timestamp}_${safeName}`
+    const path = `${params.tenant}/invoices/${timestamp}_${safeName}`
     const { error } = await supabase.storage
-      .from('invoices')
+      .from('media')
       .upload(path, file, { contentType: 'application/pdf', upsert: false })
     if (error) {
       console.error('PDF storage upload fout:', error)
       return ''
     }
-    const { data: urlData } = supabase.storage.from('invoices').getPublicUrl(path)
+    const { data: urlData } = supabase.storage.from('media').getPublicUrl(path)
     return urlData?.publicUrl || ''
+  }
+
+  // Koppel PDF aan bestaande rij (variable of fixed cost)
+  const attachPdfRef = useRef<HTMLInputElement>(null)
+  const attachPdfFixedRef = useRef<HTMLInputElement>(null)
+  const [attachingId, setAttachingId] = useState<string | null>(null)
+  const [attachingFixedId, setAttachingFixedId] = useState<string | null>(null)
+
+  const handleAttachPdf = async (file: File, costId: string) => {
+    if (file.type !== 'application/pdf') return
+    const pdfUrl = await uploadPdfToStorage(file)
+    if (!pdfUrl) { alert('Upload mislukt'); return }
+    await supabase.from('variable_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
+    setVariableCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } : c))
+    setAttachingId(null)
+  }
+
+  const handleAttachPdfFixed = async (file: File, costId: string) => {
+    if (file.type !== 'application/pdf') return
+    const pdfUrl = await uploadPdfToStorage(file)
+    if (!pdfUrl) { alert('Upload mislukt'); return }
+    await supabase.from('fixed_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
+    setFixedCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } : c))
+    setAttachingFixedId(null)
   }
 
   const handlePdfUpload = async (file: File) => {
@@ -925,6 +948,16 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                   <h3 className="font-bold text-gray-900">{cost.name}</h3>
                   <p className="text-sm text-gray-500">{cat?.label}</p>
                   {cost.notes && <p className="text-xs text-gray-400 mt-2">{cost.notes}</p>}
+                  <input
+                    type="file" accept="application/pdf"
+                    className="hidden"
+                    ref={attachingFixedId === cost.id ? attachPdfFixedRef : undefined}
+                    onChange={e => {
+                      const f = e.target.files?.[0]
+                      if (f && cost.id) handleAttachPdfFixed(f, cost.id)
+                      e.target.value = ''
+                    }}
+                  />
                   <div className="flex gap-2 mt-4">
                     <button
                       onClick={() => openFixedModal(cost)}
@@ -932,16 +965,27 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     >
                       ✏️ {t('analysePage.fixed.edit')}
                     </button>
-                    {(cost as FixedCost & { pdf_url?: string }).pdf_url && (
+                    {(cost as FixedCost & { pdf_url?: string }).pdf_url ? (
                       <a
                         href={(cost as FixedCost & { pdf_url?: string }).pdf_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200"
-                        title="Bekijk factuur PDF"
+                        title="Bekijk factuur"
                       >
                         📄
                       </a>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setAttachingFixedId(cost.id!)
+                          setTimeout(() => attachPdfFixedRef.current?.click(), 50)
+                        }}
+                        className="px-3 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-medium hover:bg-blue-100 hover:text-blue-600"
+                        title="PDF factuur koppelen"
+                      >
+                        📎
+                      </button>
                     )}
                     <button
                       onClick={() => handleDeleteFixed(cost.id!)}
@@ -1022,20 +1066,42 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                           {formatCurrency(cost.amount)}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          {(cost as VariableCost & { pdf_url?: string }).pdf_url && (
+                          {/* Verborgen file input voor PDF koppelen */}
+                          <input
+                            type="file" accept="application/pdf"
+                            className="hidden"
+                            ref={attachingId === cost.id ? attachPdfRef : undefined}
+                            onChange={e => {
+                              const f = e.target.files?.[0]
+                              if (f && cost.id) handleAttachPdf(f, cost.id)
+                              e.target.value = ''
+                            }}
+                          />
+                          {(cost as VariableCost & { pdf_url?: string }).pdf_url ? (
                             <a
                               href={(cost as VariableCost & { pdf_url?: string }).pdf_url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-green-500 hover:text-green-700 mr-2"
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 mr-1"
                               title="Bekijk factuur PDF"
                             >
                               📄
                             </a>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setAttachingId(cost.id!)
+                                setTimeout(() => attachPdfRef.current?.click(), 50)
+                              }}
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 text-gray-400 hover:bg-blue-100 hover:text-blue-600 mr-1"
+                              title="PDF factuur koppelen"
+                            >
+                              📎
+                            </button>
                           )}
                           <button
                             onClick={() => openVariableModal(cost)}
-                            className="text-blue-500 hover:text-blue-700 mr-2"
+                            className="text-blue-500 hover:text-blue-700 mr-1"
                           >
                             ✏️
                           </button>
