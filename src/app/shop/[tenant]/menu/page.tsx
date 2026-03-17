@@ -405,7 +405,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
     return (
       <div
         onClick={() => selectProduct(item)}
-        className={`${theme.card} rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl ${theme.cardHover} active:scale-[0.98] transition-all cursor-pointer group`}
+        className={`${theme.card} rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.28)] ${theme.cardHover} active:scale-[0.98] transition-all cursor-pointer group`}
       >
         <div className={`relative h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
           {item.image_url ? (
@@ -590,7 +590,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           >
             <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-              <div className="flex-1 px-4 py-3 flex items-center gap-2" style={{ backgroundColor: primaryColor + '0d' }}>
+              <div className="flex-1 px-4 py-3 flex items-center gap-2" style={{ backgroundColor: primaryColor + '35' }}>
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
                   <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
                 </h2>
@@ -659,7 +659,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           >
             <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-              <div className="flex-1 px-4 py-3 flex items-center gap-2" style={{ backgroundColor: primaryColor + '0d' }}>
+              <div className="flex-1 px-4 py-3 flex items-center gap-2" style={{ backgroundColor: primaryColor + '35' }}>
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
                   <span className="text-2xl">🔥</span> {t('menuPage.popular')}
                 </h2>
@@ -686,7 +686,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             >
               <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
                 <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-                <div className="flex-1 px-4 py-3" style={{ backgroundColor: primaryColor + '0d' }}>
+                <div className="flex-1 px-4 py-3" style={{ backgroundColor: primaryColor + '35' }}>
                   <h2 className={`text-xl font-bold ${theme.text}`}>{category.name}</h2>
                 </div>
               </div>
