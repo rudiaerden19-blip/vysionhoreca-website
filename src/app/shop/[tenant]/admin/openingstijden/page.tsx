@@ -151,19 +151,22 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
     if (!singleDate) return
     setClosingError('')
     setSavingSingle(true)
-    const saved = await saveExceptionalClosing({
-      tenant_slug: params.tenant,
-      date: singleDate,
-      date_end: null,
-      reason: singleReason || 'Gesloten',
-      is_holiday: false,
-    })
-    if (saved) {
-      setClosings(prev => [...prev, saved].sort((a, b) => a.date.localeCompare(b.date)))
-      setSingleDate('')
-      setSingleReason('')
-    } else {
-      setClosingError('Opslaan mislukt — controleer of de datum al bestaat.')
+    try {
+      const saved = await saveExceptionalClosing({
+        tenant_slug: params.tenant,
+        date: singleDate,
+        date_end: null,
+        reason: singleReason || 'Gesloten',
+        is_holiday: false,
+      })
+      if (saved) {
+        setClosings(prev => [...prev, saved].sort((a, b) => a.date.localeCompare(b.date)))
+        setSingleDate('')
+        setSingleReason('')
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Onbekende fout'
+      setClosingError(`Opslaan mislukt: ${msg}`)
     }
     setSavingSingle(false)
   }
@@ -172,20 +175,23 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
     if (!newDateFrom || !newDateTo) return
     setClosingError('')
     setSavingClosing(true)
-    const saved = await saveExceptionalClosing({
-      tenant_slug: params.tenant,
-      date: newDateFrom,
-      date_end: newDateTo,
-      reason: newReason || 'Gesloten',
-      is_holiday: false,
-    })
-    if (saved) {
-      setClosings(prev => [...prev, saved].sort((a, b) => a.date.localeCompare(b.date)))
-      setNewDateFrom('')
-      setNewDateTo('')
-      setNewReason('')
-    } else {
-      setClosingError('Opslaan mislukt — controleer of de datum al bestaat.')
+    try {
+      const saved = await saveExceptionalClosing({
+        tenant_slug: params.tenant,
+        date: newDateFrom,
+        date_end: newDateTo,
+        reason: newReason || 'Gesloten',
+        is_holiday: false,
+      })
+      if (saved) {
+        setClosings(prev => [...prev, saved].sort((a, b) => a.date.localeCompare(b.date)))
+        setNewDateFrom('')
+        setNewDateTo('')
+        setNewReason('')
+      }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Onbekende fout'
+      setClosingError(`Opslaan mislukt: ${msg}`)
     }
     setSavingClosing(false)
   }

@@ -3738,7 +3738,8 @@ export async function saveExceptionalClosing(closing: ExceptionalClosing): Promi
 
   if (error) {
     console.error('Error saving exceptional closing:', error)
-    return null
+    // Gooi de fout zodat de UI hem kan tonen
+    throw new Error(error.message || 'Onbekende fout')
   }
   return data
 }
