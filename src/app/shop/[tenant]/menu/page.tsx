@@ -405,7 +405,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
     return (
       <div
         onClick={() => selectProduct(item)}
-        className={`${theme.card} rounded-2xl overflow-hidden shadow-md hover:shadow-xl ${theme.cardHover} active:scale-[0.98] transition-all cursor-pointer group`}
+        className={`${theme.card} rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl ${theme.cardHover} active:scale-[0.98] transition-all cursor-pointer group`}
       >
         <div className={`relative h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
           {item.image_url ? (
