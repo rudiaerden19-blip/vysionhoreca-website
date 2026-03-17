@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, getActivePromotions, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
+import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import VoiceOrderButton from '@/components/VoiceOrderButton'
 
@@ -49,6 +49,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [loadingOptions, setLoadingOptions] = useState(false)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
   const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover') // altijd cover als standaard
+  const [upcomingClosings, setUpcomingClosings] = useState<ExceptionalClosing[]>([])
   const [darkMode, setDarkMode] = useState(false)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
   const [promotions, setPromotions] = useState<Promotion[]>([])
@@ -183,13 +184,24 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   useEffect(() => {
     async function loadData() {
-      const [categoriesData, productsData, tenantData, optionProducts, promotionsData] = await Promise.all([
+      const [categoriesData, productsData, tenantData, optionProducts, promotionsData, closingsData] = await Promise.all([
         getMenuCategories(params.tenant),
         getMenuProducts(params.tenant),
         getTenantSettings(params.tenant),
         getProductsWithOptions(params.tenant),
         getActivePromotions(params.tenant),
+        getExceptionalClosings(params.tenant),
       ])
+
+      // Filter komende sluitingen (vanaf morgen, binnen 30 dagen)
+      const todayStr = new Date().toISOString().split('T')[0]
+      const in30Days = new Date(); in30Days.setDate(in30Days.getDate() + 30)
+      const in30DaysStr = in30Days.toISOString().split('T')[0]
+      const upcoming = (closingsData || []).filter(c => {
+        const startDate = c.date_end ? c.date_end : c.date
+        return startDate >= todayStr && c.date <= in30DaysStr
+      }).sort((a, b) => a.date.localeCompare(b.date))
+      setUpcomingClosings(upcoming)
       
       setProductsWithOptions(optionProducts)
       setPromotions(promotionsData)
@@ -581,6 +593,29 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       {/* Menu Items - Continuous scroll met section headers */}
       <div ref={menuContentRef} className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32 space-y-8">
         
+        {/* Aankondiging uitzonderlijke sluitingen */}
+        {upcomingClosings.length > 0 && (
+          <div className="mb-4 space-y-2">
+            {upcomingClosings.map((closing, i) => {
+              const dateFrom = new Date(closing.date)
+              const dateTo = closing.date_end ? new Date(closing.date_end) : null
+              const formatDate = (d: Date) => d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'long' })
+              const dateLabel = dateTo && closing.date_end !== closing.date
+                ? `${formatDate(dateFrom)} → ${formatDate(dateTo)}`
+                : formatDate(dateFrom)
+              return (
+                <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" style={{ backgroundColor: primaryColor + '20', borderLeft: `4px solid ${primaryColor}` }}>
+                  <span className="text-lg">📢</span>
+                  <span className={theme.text}>
+                    <strong>Gesloten op {dateLabel}</strong>
+                    {closing.reason ? ` — ${closing.reason}` : ''}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
         {/* Promoties sectie */}
         {promotionsEnabled && promotions.length > 0 && (
           <section 
