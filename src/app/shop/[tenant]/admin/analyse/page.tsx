@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/i18n'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   getDailySales,
@@ -427,6 +427,53 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       await deleteVariableCost(id)
       loadData()
     }
+  }
+
+  // PDF upload state
+  const [isParsingPdf, setIsParsingPdf] = useState(false)
+  const [isParsingPdfFixed, setIsParsingPdfFixed] = useState(false)
+  const pdfInputRef = useRef<HTMLInputElement>(null)
+  const pdfInputFixedRef = useRef<HTMLInputElement>(null)
+
+  const handlePdfUpload = async (file: File) => {
+    if (file.type !== 'application/pdf') return
+    setIsParsingPdf(true)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      form.append('tenant_slug', params.tenant)
+      const res = await fetch('/api/analyze-invoice-pdf', { method: 'POST', body: form })
+      const data = await res.json()
+      if (!res.ok || !data.success) { alert(data.error || 'PDF kon niet worden ingelezen'); return }
+      setVariableForm(f => ({
+        ...f,
+        supplier:       data.supplier      || f.supplier,
+        invoice_number: data.invoiceNumber  || f.invoice_number,
+        amount:         data.amount > 0    ? data.amount  : f.amount,
+        date:           data.invoiceDate   || f.date,
+        description:    data.description   || f.description,
+      }))
+    } catch { alert('Fout bij uploaden PDF') }
+    finally { setIsParsingPdf(false) }
+  }
+
+  const handlePdfUploadFixed = async (file: File) => {
+    if (file.type !== 'application/pdf') return
+    setIsParsingPdfFixed(true)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      form.append('tenant_slug', params.tenant)
+      const res = await fetch('/api/analyze-invoice-pdf', { method: 'POST', body: form })
+      const data = await res.json()
+      if (!res.ok || !data.success) { alert(data.error || 'PDF kon niet worden ingelezen'); return }
+      setFixedForm(f => ({
+        ...f,
+        name:   data.supplier || data.description || f.name,
+        amount: data.amount > 0 ? data.amount : f.amount,
+      }))
+    } catch { alert('Fout bij uploaden PDF') }
+    finally { setIsParsingPdfFixed(false) }
   }
 
   // Save targets
@@ -1235,6 +1282,20 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 <button onClick={() => setShowFixedModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
               </div>
               <div className="p-6 space-y-4">
+
+                {/* PDF Upload — alleen bij nieuwe kost */}
+                {!editingFixed && (
+                  <div>
+                    <input ref={pdfInputFixedRef} type="file" accept="application/pdf" className="hidden"
+                      onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUploadFixed(f); e.target.value = '' }} />
+                    <button type="button" onClick={() => pdfInputFixedRef.current?.click()} disabled={isParsingPdfFixed}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 text-sm font-medium">
+                      {isParsingPdfFixed ? '⏳ PDF wordt ingelezen...' : '📄 PDF factuur uploaden (automatisch invullen)'}
+                    </button>
+                    <p className="text-xs text-gray-400 mt-1 text-center">Peppol of gewone PDF — naam en bedrag worden automatisch ingevuld</p>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('analysePage.fixed.category')}</label>
                   <select
@@ -1330,6 +1391,20 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                 <button onClick={() => setShowVariableModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
               </div>
               <div className="p-6 space-y-4">
+
+                {/* PDF Upload — alleen bij nieuwe inkoop */}
+                {!editingVariable && (
+                  <div>
+                    <input ref={pdfInputRef} type="file" accept="application/pdf" className="hidden"
+                      onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfUpload(f); e.target.value = '' }} />
+                    <button type="button" onClick={() => pdfInputRef.current?.click()} disabled={isParsingPdf}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-blue-400 text-blue-600 hover:bg-blue-50 transition-colors disabled:opacity-50 text-sm font-medium">
+                      {isParsingPdf ? '⏳ PDF wordt ingelezen...' : '📄 PDF factuur uploaden (automatisch invullen)'}
+                    </button>
+                    <p className="text-xs text-gray-400 mt-1 text-center">Peppol of gewone PDF — leverancier, datum en bedrag worden automatisch ingevuld</p>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('analysePage.variable.category')}</label>
                   <select
