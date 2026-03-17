@@ -268,7 +268,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       const updated = { ...product, is_active: !product.is_active }
       const { data: result } = await saveMenuProduct(updated)
       if (result) {
-        setProducts(prev => prev.map(p => p.id === id ? result : p))
+        const saved = result
+        setProducts(prev => prev.map(p => p.id === id ? saved : p))
       }
     }
   }
@@ -279,7 +280,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
       const updated = { ...product, is_popular: !product.is_popular }
       const { data: result } = await saveMenuProduct(updated)
       if (result) {
-        setProducts(prev => prev.map(p => p.id === id ? result : p))
+        const saved = result
+        setProducts(prev => prev.map(p => p.id === id ? saved : p))
       }
     }
   }
