@@ -447,11 +447,14 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       if (!res.ok || !data.success) { alert(data.error || 'PDF kon niet worden ingelezen'); return }
       setVariableForm(f => ({
         ...f,
-        supplier:       data.supplier      || f.supplier,
-        invoice_number: data.invoiceNumber  || f.invoice_number,
-        amount:         data.amount > 0    ? data.amount  : f.amount,
-        date:           data.invoiceDate   || f.date,
-        description:    data.description   || f.description,
+        category:       data.variableCategory || f.category,
+        supplier:       data.supplier         || f.supplier,
+        invoice_number: data.invoiceNumber    || f.invoice_number,
+        amount:         data.amount > 0       ? data.amount : f.amount,
+        date:           data.invoiceDate      || f.date,
+        description:    data.supplier
+          ? `Factuur ${data.supplier}`.substring(0, 80)
+          : data.description || f.description,
       }))
     } catch { alert('Fout bij uploaden PDF') }
     finally { setIsParsingPdf(false) }
@@ -469,8 +472,9 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
       if (!res.ok || !data.success) { alert(data.error || 'PDF kon niet worden ingelezen'); return }
       setFixedForm(f => ({
         ...f,
-        name:   data.supplier || data.description || f.name,
-        amount: data.amount > 0 ? data.amount : f.amount,
+        category: data.fixedCategory || f.category,
+        name:     data.supplier || data.description || f.name,
+        amount:   data.amount > 0 ? data.amount : f.amount,
       }))
     } catch { alert('Fout bij uploaden PDF') }
     finally { setIsParsingPdfFixed(false) }

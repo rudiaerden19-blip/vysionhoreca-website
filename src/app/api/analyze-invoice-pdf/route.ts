@@ -20,6 +20,7 @@ export const maxDuration = 30
 function extractSupplier(text: string): string {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
 
+  // 1. Expliciete labels
   const labelPatterns = [
     /^(?:verkoper|leverancier|van|from|supplier|afzender)[:\s]+(.+)/i,
     /^(?:bedrijfsnaam|company|naam|name)[:\s]+(.+)/i,
@@ -30,18 +31,76 @@ function extractSupplier(text: string): string {
       if (m) return m[1].trim().substring(0, 100)
     }
   }
+
+  // 2. Lijn vóór BTW-nummer
   for (let i = 1; i < lines.length; i++) {
     if (/BTW[:\s-]*BE\s*0?\d{9}/i.test(lines[i]) || /\bBE\s*0\d{9}\b/i.test(lines[i])) {
       const prev = lines[i - 1]
       if (prev && prev.length > 2 && !/^\d/.test(prev)) return prev.substring(0, 100)
     }
   }
-  for (const line of lines.slice(0, 8)) {
-    if (line.length > 3 && !/^\d{1,2}[\/\-.]\d{1,2}/.test(line) && !/^factuur/i.test(line)) {
-      return line.substring(0, 100)
-    }
+
+  // 3. Bekende Belgische groothandels/leveranciers herkennen in tekst
+  const knownSuppliers = [
+    'Metro', 'Makro', 'Sligro', 'Bidfood', 'Hanos', 'Vandemoortele',
+    'Bofrost', 'Aviko', 'Lamb Weston', 'Farm Frites', 'Mydibel',
+    'Telenet', 'Proximus', 'Orange', 'VOO', 'Fluvius', 'ORES',
+    'Luminus', 'Engie', 'TotalEnergies', 'Belfius', 'KBC', 'ING', 'BNP',
+    'Vivaqua', 'De Watergroep', 'TMVW',
+  ]
+  for (const s of knownSuppliers) {
+    if (new RegExp(`\\b${s}\\b`, 'i').test(text)) return s
+  }
+
+  // 4. Eerste niet-triviale lijn bovenaan het document
+  const skipPatterns = [
+    /^\d{1,2}[\/\-.]\d{1,2}/,   // datum
+    /^factuur/i,
+    /^invoice/i,
+    /^tel[:\s]/i,
+    /^fax[:\s]/i,
+    /^www\./i,
+    /^http/i,
+    /^@/,
+    /^\+\d/,                      // telefoonnummer
+    /^[A-Z]{1,3}\d{3,}/,         // postcode-achtig
+  ]
+  for (const line of lines.slice(0, 15)) {
+    if (line.length < 3) continue
+    if (skipPatterns.some(p => p.test(line))) continue
+    // Bevat minstens 2 letters naast elkaar (echte naam)
+    if (/[A-Za-z]{2,}/.test(line)) return line.substring(0, 100)
   }
   return ''
+}
+
+// ── Categorie detectie ────────────────────────────────────────────
+
+type FixedCostCategory = 'RENT' | 'PERSONNEL' | 'ELECTRICITY' | 'GAS' | 'WATER' | 'INSURANCE' | 'LEASING' | 'LOAN' | 'SUBSCRIPTIONS' | 'OTHER'
+type VariableCostCategory = 'INGREDIENTS' | 'PACKAGING' | 'CLEANING' | 'MAINTENANCE' | 'MARKETING' | 'OTHER'
+
+function detectFixedCategory(text: string): FixedCostCategory {
+  const t = text.toLowerCase()
+  if (/\b(huur|verhuur|huurcontract|loyer|rent)\b/.test(t)) return 'RENT'
+  if (/\b(loon|personeel|werknemers|social|rsz|onss|payroll|salaris)\b/.test(t)) return 'PERSONNEL'
+  if (/\b(elektriciteit|electricité|stroom|kwh|kwa|energie|energy|fluvius|engie|luminus)\b/.test(t)) return 'ELECTRICITY'
+  if (/\b(aardgas|gas|m³|m3|gasmeter)\b/.test(t)) return 'GAS'
+  if (/\b(water|waterverbruik|m³|vivaqua|watergroep|tmvw)\b/.test(t)) return 'WATER'
+  if (/\b(verzekering|assurance|insurance|polis|ba |brand)\b/.test(t)) return 'INSURANCE'
+  if (/\b(leasing|lease|huurkoop|renting)\b/.test(t)) return 'LEASING'
+  if (/\b(lening|krediet|loan|credit|aflossing|intrest)\b/.test(t)) return 'LOAN'
+  if (/\b(abonnement|subscription|licentie|license|software|hosting|telenet|proximus|orange|voo)\b/.test(t)) return 'SUBSCRIPTIONS'
+  return 'OTHER'
+}
+
+function detectVariableCategory(text: string): VariableCostCategory {
+  const t = text.toLowerCase()
+  if (/\b(friet|frites|frieten|aardappel|vlees|kip|vis|groenten|metro|makro|sligro|bidfood|aviko|lamb weston|mydibel|bofrost|ingredient|voeding|levensmiddel)\b/.test(t)) return 'INGREDIENTS'
+  if (/\b(verpakking|packaging|zak|bakje|beker|folie|wrap|box|dozen|karton)\b/.test(t)) return 'PACKAGING'
+  if (/\b(schoonmaak|cleaning|poetsmiddel|zeep|desinfect|hygiëne|sanitair)\b/.test(t)) return 'CLEANING'
+  if (/\b(onderhoud|reparatie|maintenance|herstelling|technisch|installatie)\b/.test(t)) return 'MAINTENANCE'
+  if (/\b(marketing|reclame|advertentie|flyer|social media|drukwerk|publicité)\b/.test(t)) return 'MARKETING'
+  return 'OTHER'
 }
 
 function extractInvoiceNumber(text: string): string {
@@ -151,11 +210,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supplier      = extractSupplier(text)
-    const invoiceNumber = extractInvoiceNumber(text)
-    const invoiceDate   = extractDate(text)
-    const amount        = extractAmount(text)
-    const description   = supplier ? `Factuur ${supplier}`.substring(0, 80) : 'Aankoop leverancier'
+    const supplier        = extractSupplier(text)
+    const invoiceNumber   = extractInvoiceNumber(text)
+    const invoiceDate     = extractDate(text)
+    const amount          = extractAmount(text)
+    const description     = supplier ? `Factuur ${supplier}`.substring(0, 80) : 'Aankoop leverancier'
+    const fixedCategory   = detectFixedCategory(text)
+    const variableCategory = detectVariableCategory(text)
 
     return NextResponse.json({
       success: true,
@@ -164,6 +225,8 @@ export async function POST(request: NextRequest) {
       invoiceDate,
       amount,
       description,
+      fixedCategory,
+      variableCategory,
     })
 
   } catch (error) {
