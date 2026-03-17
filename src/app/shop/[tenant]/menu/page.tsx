@@ -371,7 +371,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   // Theme classes voor dark mode
   const theme = {
-    bg: darkMode ? 'bg-[#0d0d0d]' : 'bg-gray-50',
+    bg: darkMode ? 'bg-[#0d0d0d]' : 'bg-[#e3e3e3]',
     header: darkMode ? 'bg-[#1a1a1a]' : 'bg-white',
     card: darkMode ? 'bg-[#2a2a2a]' : 'bg-white',
     cardHover: darkMode ? 'hover:bg-[#333]' : 'hover:shadow-lg',
