@@ -81,10 +81,14 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
 
   // Exceptional closings state
   const [closings, setClosings] = useState<ExceptionalClosing[]>([])
+  const [singleDate, setSingleDate] = useState('')
+  const [singleReason, setSingleReason] = useState('')
+  const [savingSingle, setSavingSingle] = useState(false)
   const [newDateFrom, setNewDateFrom] = useState('')
   const [newDateTo, setNewDateTo] = useState('')
   const [newReason, setNewReason] = useState('')
   const [savingClosing, setSavingClosing] = useState(false)
+  const [closingError, setClosingError] = useState('')
   const currentYear = new Date().getFullYear()
   const [holidayYear, setHolidayYear] = useState(currentYear)
   const holidays = getBelgianHolidays(holidayYear)
@@ -143,13 +147,35 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
     }
   }
 
+  const addSingleClosing = async () => {
+    if (!singleDate) return
+    setClosingError('')
+    setSavingSingle(true)
+    const saved = await saveExceptionalClosing({
+      tenant_slug: params.tenant,
+      date: singleDate,
+      date_end: null,
+      reason: singleReason || 'Gesloten',
+      is_holiday: false,
+    })
+    if (saved) {
+      setClosings(prev => [...prev, saved].sort((a, b) => a.date.localeCompare(b.date)))
+      setSingleDate('')
+      setSingleReason('')
+    } else {
+      setClosingError('Opslaan mislukt — controleer of de datum al bestaat.')
+    }
+    setSavingSingle(false)
+  }
+
   const addCustomClosing = async () => {
-    if (!newDateFrom) return
+    if (!newDateFrom || !newDateTo) return
+    setClosingError('')
     setSavingClosing(true)
     const saved = await saveExceptionalClosing({
       tenant_slug: params.tenant,
       date: newDateFrom,
-      date_end: newDateTo && newDateTo > newDateFrom ? newDateTo : null,
+      date_end: newDateTo,
       reason: newReason || 'Gesloten',
       is_holiday: false,
     })
@@ -158,6 +184,8 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
       setNewDateFrom('')
       setNewDateTo('')
       setNewReason('')
+    } else {
+      setClosingError('Opslaan mislukt — controleer of de datum al bestaat.')
     }
     setSavingClosing(false)
   }
@@ -530,11 +558,45 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
           <p className="text-sm text-gray-500 mt-0.5">Voeg specifieke datums toe waarop u uitzonderlijk gesloten bent</p>
         </div>
 
-        {/* Toevoegen */}
-        <div className="p-6 border-b bg-gray-50">
+        {/* Rij 1: 1 dag gesloten */}
+        <div className="p-5 border-b bg-gray-50">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">1 dag gesloten</p>
           <div className="flex flex-wrap gap-3 items-end">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Gesloten van</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Datum</label>
+              <input
+                type="date"
+                value={singleDate}
+                onChange={e => setSingleDate(e.target.value)}
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+            </div>
+            <div className="flex-1 min-w-[160px]">
+              <label className="block text-xs font-medium text-gray-600 mb-1">Reden (optioneel)</label>
+              <input
+                type="text"
+                value={singleReason}
+                onChange={e => setSingleReason(e.target.value)}
+                placeholder="bv. Persoonlijk, onderhoud..."
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+            </div>
+            <button
+              onClick={addSingleClosing}
+              disabled={!singleDate || savingSingle}
+              className="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 disabled:opacity-50 transition-colors whitespace-nowrap"
+            >
+              {savingSingle ? '⏳ Opslaan...' : '+ Opslaan'}
+            </button>
+          </div>
+        </div>
+
+        {/* Rij 2: Periode gesloten */}
+        <div className="p-5 border-b bg-gray-50">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Periode gesloten (vakantie, verbouwing...)</p>
+          <div className="flex flex-wrap gap-3 items-end">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Van</label>
               <input
                 type="date"
                 value={newDateFrom}
@@ -542,21 +604,20 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                   setNewDateFrom(e.target.value)
                   if (newDateTo && newDateTo < e.target.value) setNewDateTo('')
                 }}
-                min={new Date().toISOString().split('T')[0]}
                 className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">tot en met</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Tot en met</label>
               <input
                 type="date"
                 value={newDateTo}
                 onChange={e => setNewDateTo(e.target.value)}
-                min={newDateFrom || new Date().toISOString().split('T')[0]}
+                min={newDateFrom || ''}
                 className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
-            <div className="flex-1 min-w-[140px]">
+            <div className="flex-1 min-w-[160px]">
               <label className="block text-xs font-medium text-gray-600 mb-1">Reden (optioneel)</label>
               <input
                 type="text"
@@ -568,13 +629,20 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
             </div>
             <button
               onClick={addCustomClosing}
-              disabled={!newDateFrom || savingClosing}
+              disabled={!newDateFrom || !newDateTo || savingClosing}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors whitespace-nowrap"
             >
-              {savingClosing ? '⏳ Opslaan...' : '+ Toevoegen'}
+              {savingClosing ? '⏳ Opslaan...' : '+ Opslaan'}
             </button>
           </div>
         </div>
+
+        {/* Foutmelding */}
+        {closingError && (
+          <div className="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+            {closingError}
+          </div>
+        )}
 
         {/* Lijst */}
         <div className="p-6">
