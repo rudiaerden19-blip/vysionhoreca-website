@@ -588,11 +588,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             data-category-id="promo"
             className="scroll-mt-32"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <span className="w-1.5 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-              <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
-                <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
-              </h2>
+            <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
+              <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
+              <div className="flex-1 px-4 py-3 flex items-center gap-2" style={{ backgroundColor: primaryColor + '18' }}>
+                <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
+                  <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
+                </h2>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {promotions.map((promo) => {
@@ -655,11 +657,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             data-category-id="popular"
             className="scroll-mt-32"
           >
-            <div className="flex items-center gap-3 mb-4">
-              <span className="w-1.5 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-              <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
-                <span className="text-2xl">🔥</span> {t('menuPage.popular')}
-              </h2>
+            <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
+              <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
+              <div className="flex-1 px-4 py-3 flex items-center gap-2" style={{ backgroundColor: primaryColor + '18' }}>
+                <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
+                  <span className="text-2xl">🔥</span> {t('menuPage.popular')}
+                </h2>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {menuItems.filter(i => i.is_popular).map((item) => (
@@ -680,9 +684,11 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               data-category-id={category.id}
               className="scroll-mt-32"
             >
-              <div className="flex items-center gap-3 mb-4">
-                <span className="w-1.5 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-                <h2 className={`text-xl font-bold ${theme.text}`}>{category.name}</h2>
+              <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
+                <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
+                <div className="flex-1 px-4 py-3" style={{ backgroundColor: primaryColor + '18' }}>
+                  <h2 className={`text-xl font-bold ${theme.text}`}>{category.name}</h2>
+                </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {categoryItems.map((item) => (
