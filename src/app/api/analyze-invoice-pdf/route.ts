@@ -14,9 +14,10 @@ import { NextRequest, NextResponse } from 'next/server'
 export const runtime = 'nodejs'
 export const maxDuration = 30
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 // pdf-parse heeft geen ESM default export — gebruik require voor CJS compatibiliteit
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require('pdf-parse') as (buffer: Buffer) => Promise<{ text: string }>
+/* eslint-enable @typescript-eslint/no-var-requires */
 
 // ── Extractie helpers ────────────────────────────────────────────
 
