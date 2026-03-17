@@ -467,19 +467,23 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   const handleAttachPdf = async (file: File, costId: string) => {
     if (file.type !== 'application/pdf') return
     const pdfUrl = await uploadPdfToStorage(file)
-    if (!pdfUrl) { alert('Upload mislukt'); return }
+    if (!pdfUrl) { alert('Upload mislukt — controleer of de SQL is uitgevoerd in Supabase'); return }
     await supabase.from('variable_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
     setVariableCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } : c))
     setAttachingId(null)
+    // Direct openen
+    window.open(pdfUrl, '_blank')
   }
 
   const handleAttachPdfFixed = async (file: File, costId: string) => {
     if (file.type !== 'application/pdf') return
     const pdfUrl = await uploadPdfToStorage(file)
-    if (!pdfUrl) { alert('Upload mislukt'); return }
+    if (!pdfUrl) { alert('Upload mislukt — controleer of de SQL is uitgevoerd in Supabase'); return }
     await supabase.from('fixed_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
     setFixedCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } : c))
     setAttachingFixedId(null)
+    // Direct openen
+    window.open(pdfUrl, '_blank')
   }
 
   const handlePdfUpload = async (file: File) => {
