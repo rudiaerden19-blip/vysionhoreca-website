@@ -538,9 +538,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             {promotionsEnabled && promotions.length > 0 && (
               <button
                 onClick={() => handleCategoryChange('promo')}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
+                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 shadow-[0_2px_8px_rgba(0,0,0,0.15)] ${
                   activeCategory === 'promo'
-                    ? 'bg-green-500 text-white shadow-md'
+                    ? 'bg-green-500 text-white'
                     : 'bg-green-100 text-green-700 active:bg-green-200'
                 }`}
               >
@@ -551,9 +551,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               <button
                 onClick={() => handleCategoryChange('popular')}
                 style={activeCategory === 'popular' ? { backgroundColor: primaryColor } : {}}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
+                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 shadow-[0_2px_8px_rgba(0,0,0,0.15)] ${
                   activeCategory === 'popular'
-                    ? 'text-white shadow-md'
+                    ? 'text-white'
                     : `${theme.pill} ${theme.pillHover}`
                 }`}
               >
@@ -565,9 +565,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.id!)}
                 style={activeCategory === cat.id ? { backgroundColor: primaryColor } : {}}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 ${
+                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 shadow-[0_2px_8px_rgba(0,0,0,0.15)] ${
                   activeCategory === cat.id
-                    ? 'text-white shadow-md'
+                    ? 'text-white'
                     : `${theme.pill} ${theme.pillHover}`
                 }`}
               >
