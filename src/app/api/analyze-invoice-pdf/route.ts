@@ -10,7 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { PDFParse } from 'pdf-parse'
+import { extractText } from 'unpdf'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
@@ -126,7 +126,6 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File | null
     const tenantSlug = formData.get('tenant_slug') as string | null
 
-    // MULTI-TENANT: tenant_slug is verplicht
     if (!tenantSlug) {
       return NextResponse.json({ success: false, error: 'tenant_slug ontbreekt' }, { status: 401 })
     }
@@ -140,11 +139,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Bestand te groot (max 10 MB)' }, { status: 400 })
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer())
-    const parser = new PDFParse({ data: buffer })
-    const pdfData = await parser.getText()
-    await parser.destroy()
-    const text = pdfData.text
+    const arrayBuffer = await file.arrayBuffer()
+    const uint8Array = new Uint8Array(arrayBuffer)
+
+    const { text } = await extractText(uint8Array, { mergePages: true })
 
     if (!text || text.trim().length < 20) {
       return NextResponse.json(
