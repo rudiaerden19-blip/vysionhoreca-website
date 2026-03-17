@@ -329,8 +329,52 @@ function formatTimeShort(time: string): string {
 }
 
 export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
-  const hours = await getOpeningHours(tenantSlug)
-  
+  const [hours, exceptionalClosings] = await Promise.all([
+    getOpeningHours(tenantSlug),
+    getExceptionalClosings(tenantSlug),
+  ])
+
+  // Check uitzonderlijke sluitingsdagen (feestdagen + eigen keuze)
+  const todayStr = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+  const exceptionalToday = exceptionalClosings.find(c => {
+    if (c.date === todayStr) return true
+    if (c.date_end) return todayStr >= c.date && todayStr <= c.date_end
+    return false
+  })
+  if (exceptionalToday) {
+    const reason = exceptionalToday.reason || 'Gesloten'
+    // Zoek volgende normale openingsdag
+    const now = new Date()
+    const jsDay = now.getDay()
+    const dayOfWeek = jsDay === 0 ? 6 : jsDay - 1
+    const dayNames = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
+    for (let i = 1; i <= 14; i++) {
+      const nextDay = (dayOfWeek + i) % 7
+      const nextDate = new Date(now)
+      nextDate.setDate(now.getDate() + i)
+      const nextDateStr = nextDate.toISOString().split('T')[0]
+      const isExceptional = exceptionalClosings.some(c => {
+        if (c.date === nextDateStr) return true
+        if (c.date_end) return nextDateStr >= c.date && nextDateStr <= c.date_end
+        return false
+      })
+      if (!isExceptional) {
+        const nextHours = hours?.find(h => h.day_of_week === nextDay)
+        if (nextHours?.is_open) {
+          const dayLabel = i === 1 ? 'morgen' : dayNames[nextDay]
+          return {
+            isOpen: false,
+            canOrder: false,
+            message: `${reason} — Weer open ${dayLabel} om ${formatTimeShort(nextHours.open_time)}`,
+            nextOpenDay: dayLabel,
+            opensAt: formatTimeShort(nextHours.open_time),
+          }
+        }
+      }
+    }
+    return { isOpen: false, canOrder: false, message: reason }
+  }
+
   if (!hours || hours.length === 0) {
     // No opening hours set - assume open
     return { isOpen: true, canOrder: true, message: 'Open' }
