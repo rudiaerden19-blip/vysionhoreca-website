@@ -340,6 +340,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         amount: cost.amount,
         notes: cost.notes || '',
         is_active: cost.is_active,
+        pdf_url: (cost as FixedCost & { pdf_url?: string }).pdf_url || '',
       })
     } else {
       setEditingFixed(null)
@@ -349,6 +350,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         amount: 0,
         notes: '',
         is_active: true,
+        pdf_url: '',
       })
     }
     setShowFixedModal(true)
