@@ -505,7 +505,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
       {/* Sticky Header + Categories - SAMEN in 1 container voor iOS Safari */}
       <header 
-        className={`sticky top-0 z-50 ${theme.header} shadow-md`}
+        className={`sticky top-0 z-50 ${theme.header} shadow-[0_4px_20px_rgba(0,0,0,0.18)]`}
         style={{
           position: '-webkit-sticky',
           WebkitTransform: 'translateZ(0)',
