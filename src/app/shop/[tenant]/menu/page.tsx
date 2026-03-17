@@ -588,9 +588,12 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             data-category-id="promo"
             className="scroll-mt-32"
           >
-            <h2 className={`text-xl font-bold ${theme.text} mb-4 flex items-center gap-2`}>
-              <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
-            </h2>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="w-1.5 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
+              <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
+                <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
+              </h2>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {promotions.map((promo) => {
                 const linkedProduct = promo.product_id 
@@ -652,9 +655,12 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             data-category-id="popular"
             className="scroll-mt-32"
           >
-            <h2 className={`text-xl font-bold ${theme.text} mb-4 flex items-center gap-2`}>
-              <span className="text-2xl">🔥</span> {t('menuPage.popular')}
-            </h2>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="w-1.5 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
+              <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
+                <span className="text-2xl">🔥</span> {t('menuPage.popular')}
+              </h2>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {menuItems.filter(i => i.is_popular).map((item) => (
                 <ProductCard key={`popular-${item.id}`} item={item} />
@@ -674,7 +680,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               data-category-id={category.id}
               className="scroll-mt-32"
             >
-              <h2 className={`text-xl font-bold ${theme.text} mb-4`}>{category.name}</h2>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-1.5 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
+                <h2 className={`text-xl font-bold ${theme.text}`}>{category.name}</h2>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {categoryItems.map((item) => (
                   <ProductCard key={item.id} item={item} />
