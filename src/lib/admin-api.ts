@@ -2451,6 +2451,7 @@ export interface VariableCost {
   amount: number
   date: string
   notes?: string
+  pdf_url?: string
   created_at?: string
   updated_at?: string
 }
@@ -2524,6 +2525,7 @@ export async function saveVariableCost(cost: VariableCost): Promise<VariableCost
         amount: cost.amount,
         date: cost.date,
         notes: cost.notes,
+        pdf_url: cost.pdf_url || null,
       })
       .select()
       .single()

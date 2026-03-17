@@ -4,6 +4,7 @@ import { useLanguage } from '@/i18n'
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { supabase } from '@/lib/supabase'
 import {
   getDailySales,
   saveDailySales,
@@ -187,6 +188,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     amount: 0,
     notes: '',
     is_active: true,
+    pdf_url: '' as string,
   })
 
   const [variableForm, setVariableForm] = useState({
@@ -197,6 +199,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     amount: 0,
     date: new Date().toISOString().split('T')[0],
     notes: '',
+    pdf_url: '' as string,
   })
 
   const [targetsForm, setTargetsForm] = useState({
@@ -388,6 +391,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         amount: cost.amount,
         date: cost.date,
         notes: cost.notes || '',
+        pdf_url: (cost as VariableCost & { pdf_url?: string }).pdf_url || '',
       })
     } else {
       setEditingVariable(null)
@@ -399,6 +403,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         amount: 0,
         date: new Date().toISOString().split('T')[0],
         notes: '',
+        pdf_url: '',
       })
     }
     setShowVariableModal(true)
@@ -435,16 +440,37 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   const pdfInputRef = useRef<HTMLInputElement>(null)
   const pdfInputFixedRef = useRef<HTMLInputElement>(null)
 
+  // Upload PDF naar Supabase Storage — per tenant gescheiden
+  const uploadPdfToStorage = async (file: File): Promise<string> => {
+    const timestamp = Date.now()
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+    // Pad: invoices/{tenant_slug}/{timestamp}_{bestandsnaam}
+    const path = `${params.tenant}/${timestamp}_${safeName}`
+    const { error } = await supabase.storage
+      .from('invoices')
+      .upload(path, file, { contentType: 'application/pdf', upsert: false })
+    if (error) {
+      console.error('PDF storage upload fout:', error)
+      return ''
+    }
+    const { data: urlData } = supabase.storage.from('invoices').getPublicUrl(path)
+    return urlData?.publicUrl || ''
+  }
+
   const handlePdfUpload = async (file: File) => {
     if (file.type !== 'application/pdf') return
     setIsParsingPdf(true)
     try {
-      const form = new FormData()
-      form.append('file', file)
-      form.append('tenant_slug', params.tenant)
-      const res = await fetch('/api/analyze-invoice-pdf', { method: 'POST', body: form })
-      const data = await res.json()
-      if (!res.ok || !data.success) { alert(data.error || 'PDF kon niet worden ingelezen'); return }
+      // Parallel: tekst analyseren + opslaan in storage
+      const [analysisRes, pdfUrl] = await Promise.all([
+        fetch('/api/analyze-invoice-pdf', {
+          method: 'POST',
+          body: (() => { const f = new FormData(); f.append('file', file); f.append('tenant_slug', params.tenant); return f })(),
+        }),
+        uploadPdfToStorage(file),
+      ])
+      const data = await analysisRes.json()
+      if (!analysisRes.ok || !data.success) { alert(data.error || 'PDF kon niet worden ingelezen'); return }
       setVariableForm(f => ({
         ...f,
         category:       data.variableCategory || f.category,
@@ -455,6 +481,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
         description:    data.supplier
           ? `Factuur ${data.supplier}`.substring(0, 80)
           : data.description || f.description,
+        pdf_url:        pdfUrl || f.pdf_url,
       }))
     } catch { alert('Fout bij uploaden PDF') }
     finally { setIsParsingPdf(false) }
@@ -464,17 +491,21 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     if (file.type !== 'application/pdf') return
     setIsParsingPdfFixed(true)
     try {
-      const form = new FormData()
-      form.append('file', file)
-      form.append('tenant_slug', params.tenant)
-      const res = await fetch('/api/analyze-invoice-pdf', { method: 'POST', body: form })
-      const data = await res.json()
-      if (!res.ok || !data.success) { alert(data.error || 'PDF kon niet worden ingelezen'); return }
+      const [analysisRes, pdfUrl] = await Promise.all([
+        fetch('/api/analyze-invoice-pdf', {
+          method: 'POST',
+          body: (() => { const f = new FormData(); f.append('file', file); f.append('tenant_slug', params.tenant); return f })(),
+        }),
+        uploadPdfToStorage(file),
+      ])
+      const data = await analysisRes.json()
+      if (!analysisRes.ok || !data.success) { alert(data.error || 'PDF kon niet worden ingelezen'); return }
       setFixedForm(f => ({
         ...f,
         category: data.fixedCategory || f.category,
         name:     data.supplier || data.description || f.name,
         amount:   data.amount > 0 ? data.amount : f.amount,
+        pdf_url:  pdfUrl || f.pdf_url,
       }))
     } catch { alert('Fout bij uploaden PDF') }
     finally { setIsParsingPdfFixed(false) }
@@ -899,6 +930,17 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                     >
                       ✏️ {t('analysePage.fixed.edit')}
                     </button>
+                    {(cost as FixedCost & { pdf_url?: string }).pdf_url && (
+                      <a
+                        href={(cost as FixedCost & { pdf_url?: string }).pdf_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200"
+                        title="Bekijk factuur PDF"
+                      >
+                        📄
+                      </a>
+                    )}
                     <button
                       onClick={() => handleDeleteFixed(cost.id!)}
                       className="px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200"
@@ -978,6 +1020,17 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                           {formatCurrency(cost.amount)}
                         </td>
                         <td className="px-4 py-3 text-center">
+                          {(cost as VariableCost & { pdf_url?: string }).pdf_url && (
+                            <a
+                              href={(cost as VariableCost & { pdf_url?: string }).pdf_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-green-500 hover:text-green-700 mr-2"
+                              title="Bekijk factuur PDF"
+                            >
+                              📄
+                            </a>
+                          )}
                           <button
                             onClick={() => openVariableModal(cost)}
                             className="text-blue-500 hover:text-blue-700 mr-2"
