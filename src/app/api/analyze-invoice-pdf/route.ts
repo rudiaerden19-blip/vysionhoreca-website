@@ -1,12 +1,11 @@
 /**
- * PDF Factuur Parser API
+ * PDF Factuur Parser API — powered by Gemini AI
  * POST /api/analyze-invoice-pdf
  *
- * Accepteert een PDF, leest de tekst uit en extraheert:
- * leverancier, factuurnummer, datum en bedrag.
+ * Leest tekst uit PDF via unpdf, stuurt naar Gemini AI voor slimme extractie.
+ * Veel betrouwbaarder dan regex voor alle factuurformaten.
  *
- * MULTI-TENANT: tenant_slug is verplicht — data wordt NOOIT
- * geschreven zonder geldige tenant. Elke tenant ziet alleen zijn eigen data.
+ * MULTI-TENANT: tenant_slug is verplicht.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -15,173 +14,8 @@ import { extractText } from 'unpdf'
 export const runtime = 'nodejs'
 export const maxDuration = 30
 
-// ── Extractie helpers ────────────────────────────────────────────
-
-function extractSupplier(text: string): string {
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
-
-  // 1. Expliciete labels
-  const labelPatterns = [
-    /^(?:verkoper|leverancier|van|from|supplier|afzender)[:\s]+(.+)/i,
-    /^(?:bedrijfsnaam|company|naam|name)[:\s]+(.+)/i,
-  ]
-  for (const line of lines) {
-    for (const pat of labelPatterns) {
-      const m = line.match(pat)
-      if (m) return m[1].trim().substring(0, 100)
-    }
-  }
-
-  // 2. Lijn vóór BTW-nummer
-  for (let i = 1; i < lines.length; i++) {
-    if (/BTW[:\s-]*BE\s*0?\d{9}/i.test(lines[i]) || /\bBE\s*0\d{9}\b/i.test(lines[i])) {
-      const prev = lines[i - 1]
-      if (prev && prev.length > 2 && !/^\d/.test(prev)) return prev.substring(0, 100)
-    }
-  }
-
-  // 3. Bekende Belgische groothandels herkennen — GEEN banken (staan in betaaldetails)
-  const knownSuppliers = [
-    'Metro', 'Makro', 'Sligro', 'Bidfood', 'Hanos', 'Vandemoortele',
-    'Bofrost', 'Aviko', 'Lamb Weston', 'Farm Frites', 'Mydibel',
-    'Telenet', 'Proximus', 'Orange', 'VOO', 'Fluvius', 'ORES',
-    'Luminus', 'Engie', 'TotalEnergies', 'Vivaqua', 'De Watergroep', 'TMVW',
-  ]
-  for (const s of knownSuppliers) {
-    if (new RegExp(`\\b${s}\\b`, 'i').test(text)) return s
-  }
-
-  // 4. Eerste niet-triviale lijn bovenaan het document
-  const skipPatterns = [
-    /^\d{1,2}[\/\-.]\d{1,2}/,        // datum
-    /^factuur/i,
-    /^invoice/i,
-    /^facture/i,
-    /^tel[:\s]/i,
-    /^fax[:\s]/i,
-    /^www\./i,
-    /^http/i,
-    /^@/,
-    /^\+\d/,                           // telefoonnummer
-    /^[A-Z]{1,3}\d{3,}/,              // postcode-achtig
-    /\b(BE|NL|FR|DE)\d{2}\s*\d{4}/,  // IBAN-nummer
-    /^(Belfius|KBC|ING|BNP|Argenta|Bpost|AXA|Crelan|Triodos)/i, // banken
-  ]
-  for (const line of lines.slice(0, 15)) {
-    if (line.length < 3) continue
-    if (skipPatterns.some(p => p.test(line))) continue
-    // Bevat minstens 2 letters naast elkaar (echte naam)
-    if (/[A-Za-z]{2,}/.test(line)) return line.substring(0, 100)
-  }
-  return ''
-}
-
-// ── Categorie detectie ────────────────────────────────────────────
-
-type FixedCostCategory = 'RENT' | 'PERSONNEL' | 'ELECTRICITY' | 'GAS' | 'WATER' | 'INSURANCE' | 'LEASING' | 'LOAN' | 'SUBSCRIPTIONS' | 'OTHER'
-type VariableCostCategory = 'INGREDIENTS' | 'PACKAGING' | 'CLEANING' | 'MAINTENANCE' | 'MARKETING' | 'OTHER'
-
-function detectFixedCategory(text: string): FixedCostCategory {
-  const t = text.toLowerCase()
-  if (/\b(huur|verhuur|huurcontract|loyer|rent)\b/.test(t)) return 'RENT'
-  if (/\b(loon|personeel|werknemers|social|rsz|onss|payroll|salaris)\b/.test(t)) return 'PERSONNEL'
-  if (/\b(elektriciteit|electricité|stroom|kwh|kwa|fluvius|engie|luminus)\b/.test(t)) return 'ELECTRICITY'
-  if (/\b(aardgas|gasmeter)\b/.test(t)) return 'GAS'
-  if (/\b(waterverbruik|vivaqua|watergroep|tmvw)\b/.test(t)) return 'WATER'
-  // Verzekering: enkel als het woord verzekering/polis/assurance letterlijk staat — IBAN is geen verzekering
-  if (/\b(verzekering|assurance|insurance|polis)\b/.test(t)) return 'INSURANCE'
-  if (/\b(leasing|lease|huurkoop|renting)\b/.test(t)) return 'LEASING'
-  if (/\b(lening|krediet|aflossing|intrest)\b/.test(t)) return 'LOAN'
-  if (/\b(abonnement|subscription|licentie|license|software|hosting|telenet|proximus|orange|voo)\b/.test(t)) return 'SUBSCRIPTIONS'
-  return 'OTHER'
-}
-
-function detectVariableCategory(text: string): VariableCostCategory {
-  const t = text.toLowerCase()
-  // Voeding/ingredients eerst — meest voorkomend in horeca
-  if (/\b(friet|frites|frieten|aardappel|aardappelen|vlees|kip|vis|groenten|groente|metro|makro|sligro|bidfood|aviko|lamb weston|mydibel|bofrost|ingredient|voeding|levensmiddel|nijs|fritureolie|olie)\b/.test(t)) return 'INGREDIENTS'
-  if (/\b(verpakking|packaging|zak|bakje|beker|folie|wrap|box|dozen|karton)\b/.test(t)) return 'PACKAGING'
-  if (/\b(schoonmaak|cleaning|poetsmiddel|zeep|desinfect|hygiëne|sanitair)\b/.test(t)) return 'CLEANING'
-  if (/\b(onderhoud|reparatie|maintenance|herstelling|technisch|installatie)\b/.test(t)) return 'MAINTENANCE'
-  if (/\b(marketing|reclame|advertentie|flyer|social media|drukwerk|publicité)\b/.test(t)) return 'MARKETING'
-  return 'OTHER'
-}
-
-function extractInvoiceNumber(text: string): string {
-  const patterns = [
-    /(?:factuurnummer|invoice\s*no\.?|inv\.?\s*no\.?|facture\s*n[o°]\.?|reference|ref\.?)[:\s#]*([A-Z0-9][-A-Z0-9\/_.]{2,25})/i,
-    /(?:nr\.?|number|nummer)[:\s#]*([A-Z0-9][-A-Z0-9\/_.]{2,25})/i,
-    /\b(INV[-\/]?\d{4,})\b/i,
-    /\b(FAC[-\/]?\d{4,})\b/i,
-    /\b(\d{4,}[-\/]\d{2,})\b/,
-  ]
-  for (const pat of patterns) {
-    const m = text.match(pat)
-    if (m) return m[1].trim().substring(0, 50)
-  }
-  return ''
-}
-
-function normalizeDate(raw: string): string {
-  const parts = raw.split(/[\/\-.]/)
-  if (parts.length !== 3) return ''
-  let day: string, month: string, year: string
-  if (parts[0].length === 4) {
-    ;[year, month, day] = parts
-  } else {
-    ;[day, month] = parts
-    year = parts[2].length === 4 ? parts[2] : parseInt(parts[2]) < 50 ? `20${parts[2]}` : `19${parts[2]}`
-  }
-  const d = parseInt(day), mo = parseInt(month), y = parseInt(year)
-  if (isNaN(d) || isNaN(mo) || isNaN(y) || mo < 1 || mo > 12 || d < 1 || d > 31) return ''
-  return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-}
-
-function extractDate(text: string): string {
-  const today = new Date().toISOString().split('T')[0]
-  const contextPatterns = [
-    /(?:factuurdatum|invoice\s*date|datum|date)[:\s]*(\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4})/i,
-    /(?:factuurdatum|invoice\s*date|datum|date)[:\s]*(\d{4}[\/\-.]\d{2}[\/\-.]\d{2})/i,
-  ]
-  for (const pat of contextPatterns) {
-    const m = text.match(pat)
-    if (m) return normalizeDate(m[1]) || today
-  }
-  const datePatterns = [
-    /\b(\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{4})\b/,
-    /\b(\d{4}[\/\-.]\d{2}[\/\-.]\d{2})\b/,
-  ]
-  for (const pat of datePatterns) {
-    const m = text.match(pat)
-    if (m) return normalizeDate(m[1]) || today
-  }
-  return today
-}
-
-function parseEuroAmount(raw: string): number {
-  let s = raw.trim()
-  if (/^\d{1,3}(\.\d{3})+(,\d{2})?$/.test(s)) s = s.replace(/\./g, '').replace(',', '.')
-  else if (/^\d{1,3}(,\d{3})+(\.\d{2})?$/.test(s)) s = s.replace(/,/g, '')
-  else s = s.replace(',', '.')
-  const v = parseFloat(s)
-  return isNaN(v) ? 0 : Math.round(v * 100) / 100
-}
-
-function extractAmount(text: string): number {
-  const contextPatterns = [
-    /(?:totaal\s*te\s*betalen|te\s*betalen|total\s*(?:amount\s*)?due|grand\s*total|total\s*incl\.?|bedrag\s*incl\.?)[:\s€$]*([0-9]{1,6}[,.]?[0-9]{0,3}(?:[,.][0-9]{2})?)/i,
-    /(?:totaal|total|subtotaal|subtotal)[:\s€$]*([0-9]{1,6}[,.]?[0-9]{0,3}(?:[,.][0-9]{2})?)/i,
-  ]
-  for (const pat of contextPatterns) {
-    const m = text.match(pat)
-    if (m) { const a = parseEuroAmount(m[1]); if (a > 0) return a }
-  }
-  const allAmounts = [...text.matchAll(/€\s*([0-9]{1,6}[,.]?[0-9]{0,3}(?:[,.][0-9]{2})?)/g)]
-    .map(m => parseEuroAmount(m[1])).filter(a => a > 0)
-  return allAmounts.length > 0 ? Math.max(...allAmounts) : 0
-}
-
-// ── POST handler ─────────────────────────────────────────────────
+const GEMINI_URL =
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 
 export async function POST(request: NextRequest) {
   try {
@@ -189,52 +23,137 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File | null
     const tenantSlug = formData.get('tenant_slug') as string | null
 
-    if (!tenantSlug) {
+    if (!tenantSlug)
       return NextResponse.json({ success: false, error: 'tenant_slug ontbreekt' }, { status: 401 })
-    }
-    if (!file) {
+    if (!file)
       return NextResponse.json({ success: false, error: 'Geen bestand ontvangen' }, { status: 400 })
-    }
-    if (file.type !== 'application/pdf') {
-      return NextResponse.json({ success: false, error: 'Alleen PDF bestanden worden ondersteund' }, { status: 400 })
-    }
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.type !== 'application/pdf')
+      return NextResponse.json({ success: false, error: 'Alleen PDF bestanden' }, { status: 400 })
+    if (file.size > 10 * 1024 * 1024)
       return NextResponse.json({ success: false, error: 'Bestand te groot (max 10 MB)' }, { status: 400 })
-    }
 
-    const arrayBuffer = await file.arrayBuffer()
-    const uint8Array = new Uint8Array(arrayBuffer)
-
+    // Tekst uitlezen uit PDF
+    const uint8Array = new Uint8Array(await file.arrayBuffer())
     const { text } = await extractText(uint8Array, { mergePages: true })
 
-    if (!text || text.trim().length < 20) {
+    if (!text || text.trim().length < 20)
       return NextResponse.json(
         { success: false, error: 'Kon geen tekst uitlezen. Is het een gescande afbeelding?' },
         { status: 422 }
       )
+
+    const apiKey = process.env.GOOGLE_GEMINI_API_KEY
+    if (!apiKey) {
+      // Geen Gemini key: fallback naar basis regex
+      return fallbackExtract(text)
     }
 
-    const supplier        = extractSupplier(text)
-    const invoiceNumber   = extractInvoiceNumber(text)
-    const invoiceDate     = extractDate(text)
-    const amount          = extractAmount(text)
-    const description     = supplier ? `Factuur ${supplier}`.substring(0, 80) : 'Aankoop leverancier'
-    const fixedCategory   = detectFixedCategory(text)
-    const variableCategory = detectVariableCategory(text)
+    // Gemini AI prompt
+    const prompt = `Je bent een factuur-assistent voor een Belgisch horecabedrijf.
+Analyseer deze factuurtekst en geef de gevraagde info terug als JSON.
+
+FACTUURTEKST:
+"""
+${text.substring(0, 3000)}
+"""
+
+Geef ENKEL dit JSON terug, geen uitleg:
+{
+  "supplier": "naam van de leverancier/verkoper (NIET de bank, NIET het horecabedrijf zelf)",
+  "invoiceNumber": "factuurnummer of leeg",
+  "invoiceDate": "datum in formaat YYYY-MM-DD of leeg",
+  "amount": getal (totaal te betalen bedrag incl BTW, enkel het getal zonder euroteken),
+  "description": "korte beschrijving van wat er gekocht werd (max 60 tekens)",
+  "fixedCategory": een van: "RENT"|"PERSONNEL"|"ELECTRICITY"|"GAS"|"WATER"|"INSURANCE"|"LEASING"|"LOAN"|"SUBSCRIPTIONS"|"OTHER",
+  "variableCategory": een van: "INGREDIENTS"|"PACKAGING"|"CLEANING"|"MAINTENANCE"|"MARKETING"|"OTHER"
+}
+
+REGELS:
+- supplier = de firma die de factuur STUURT (bovenaan de factuur), niet de bank
+- Als het een voedingsfactuur is (aardappelen, friet, vlees, groenten...) → variableCategory = "INGREDIENTS"
+- Als het een energiefactuur is → fixedCategory = "ELECTRICITY" of "GAS"
+- Als het een huurcontract is → fixedCategory = "RENT"
+- amount = het eindbedrag dat betaald moet worden (totaal incl BTW)
+- Geef NOOIT een bank (Belfius, KBC, ING...) als supplier`
+
+    const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 512 },
+      }),
+    })
+
+    if (!res.ok) {
+      console.error('[analyze-invoice-pdf] Gemini error:', res.status)
+      return fallbackExtract(text)
+    }
+
+    const geminiData = await res.json()
+    const raw = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+
+    // JSON uit het antwoord halen
+    const jsonMatch = raw.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      console.error('[analyze-invoice-pdf] Geen JSON in Gemini antwoord:', raw)
+      return fallbackExtract(text)
+    }
+
+    const parsed = JSON.parse(jsonMatch[0])
 
     return NextResponse.json({
       success: true,
-      supplier,
-      invoiceNumber,
-      invoiceDate,
-      amount,
-      description,
-      fixedCategory,
-      variableCategory,
+      supplier:          parsed.supplier          || '',
+      invoiceNumber:     parsed.invoiceNumber      || '',
+      invoiceDate:       parsed.invoiceDate        || new Date().toISOString().split('T')[0],
+      amount:            typeof parsed.amount === 'number' ? parsed.amount : parseFloat(parsed.amount) || 0,
+      description:       parsed.description        || (parsed.supplier ? `Factuur ${parsed.supplier}` : 'Aankoop leverancier'),
+      fixedCategory:     parsed.fixedCategory      || 'OTHER',
+      variableCategory:  parsed.variableCategory   || 'OTHER',
     })
 
   } catch (error) {
     console.error('[analyze-invoice-pdf] Error:', error)
     return NextResponse.json({ success: false, error: 'Fout bij verwerken van PDF' }, { status: 500 })
   }
+}
+
+// ── Fallback: minimale regex als Gemini niet beschikbaar is ───────
+
+function fallbackExtract(text: string): NextResponse {
+  const today = new Date().toISOString().split('T')[0]
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
+
+  // Bedrag: grootste getal met € teken
+  const amounts = [...text.matchAll(/€\s*([0-9]+[,.]?[0-9]*)/g)]
+    .map(m => parseFloat(m[1].replace(',', '.')))
+    .filter(n => n > 0)
+  const amount = amounts.length > 0 ? Math.max(...amounts) : 0
+
+  // Datum
+  const dateMatch = text.match(/\b(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})\b/)
+  const invoiceDate = dateMatch
+    ? `${dateMatch[3]}-${dateMatch[2].padStart(2, '0')}-${dateMatch[1].padStart(2, '0')}`
+    : today
+
+  // Leverancier: eerste zinnige lijn
+  const skipLine = (l: string) =>
+    l.length < 3 ||
+    /^\d/.test(l) ||
+    /^(factuur|invoice|tel|fax|www|http|BE\d{2})/i.test(l) ||
+    /IBAN|BIC|BTW/i.test(l)
+
+  const supplier = lines.find(l => !skipLine(l)) || ''
+
+  return NextResponse.json({
+    success: true,
+    supplier,
+    invoiceNumber: '',
+    invoiceDate,
+    amount,
+    description: supplier ? `Factuur ${supplier}`.substring(0, 80) : 'Aankoop leverancier',
+    fixedCategory: 'OTHER',
+    variableCategory: 'INGREDIENTS',
+  })
 }
