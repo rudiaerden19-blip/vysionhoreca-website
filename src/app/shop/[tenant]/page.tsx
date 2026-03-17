@@ -939,7 +939,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <span className="text-3xl">🚫</span>
               </div>
               <p className="text-white/90 text-sm sm:text-base">
-                {t('shopPage.shopClosedMessage')}
+                {shopStatus.message || t('shopPage.shopClosedMessage')}
               </p>
             </div>
           </motion.div>
