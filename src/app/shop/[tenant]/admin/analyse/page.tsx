@@ -442,20 +442,14 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   const pdfInputRef = useRef<HTMLInputElement>(null)
   const pdfInputFixedRef = useRef<HTMLInputElement>(null)
 
-  // Upload PDF naar bestaande media bucket — per tenant gescheiden
+  // Sla PDF op als base64 data URL — geen bucket configuratie nodig
   const uploadPdfToStorage = async (file: File): Promise<string> => {
-    const timestamp = Date.now()
-    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-    const path = `${params.tenant}/invoices/${timestamp}_${safeName}`
-    const { error } = await supabase.storage
-      .from('media')
-      .upload(path, file, { contentType: 'application/pdf', upsert: false })
-    if (error) {
-      console.error('PDF storage upload fout:', error)
-      return ''
-    }
-    const { data: urlData } = supabase.storage.from('media').getPublicUrl(path)
-    return urlData?.publicUrl || ''
+    return new Promise((resolve) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = () => resolve('')
+      reader.readAsDataURL(file)
+    })
   }
 
   // Koppel PDF aan bestaande rij (variable of fixed cost)
@@ -467,22 +461,20 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
   const handleAttachPdf = async (file: File, costId: string) => {
     if (file.type !== 'application/pdf') return
     const pdfUrl = await uploadPdfToStorage(file)
-    if (!pdfUrl) { alert('Upload mislukt — controleer of de SQL is uitgevoerd in Supabase'); return }
+    if (!pdfUrl) return
     await supabase.from('variable_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
-    setVariableCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } : c))
+    setVariableCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } as typeof c : c))
     setAttachingId(null)
-    // Direct openen
     window.open(pdfUrl, '_blank')
   }
 
   const handleAttachPdfFixed = async (file: File, costId: string) => {
     if (file.type !== 'application/pdf') return
     const pdfUrl = await uploadPdfToStorage(file)
-    if (!pdfUrl) { alert('Upload mislukt — controleer of de SQL is uitgevoerd in Supabase'); return }
+    if (!pdfUrl) return
     await supabase.from('fixed_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
-    setFixedCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } : c))
+    setFixedCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } as typeof c : c))
     setAttachingFixedId(null)
-    // Direct openen
     window.open(pdfUrl, '_blank')
   }
 
