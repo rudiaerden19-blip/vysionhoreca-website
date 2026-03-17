@@ -3723,16 +3723,19 @@ export async function getExceptionalClosings(tenantSlug: string): Promise<Except
 }
 
 export async function saveExceptionalClosing(closing: ExceptionalClosing): Promise<ExceptionalClosing | null> {
+  // Bouw het object op zonder date_end als het null is (voor compatibiliteit als kolom nog niet bestaat)
+  const payload: Record<string, unknown> = {
+    tenant_slug: closing.tenant_slug,
+    date: closing.date,
+    reason: closing.reason,
+    is_holiday: closing.is_holiday,
+    holiday_key: closing.holiday_key ?? null,
+  }
+  if (closing.date_end) payload.date_end = closing.date_end
+
   const { data, error } = await supabase
     .from('exceptional_closings')
-    .upsert({
-      tenant_slug: closing.tenant_slug,
-      date: closing.date,
-      date_end: closing.date_end ?? null,
-      reason: closing.reason,
-      is_holiday: closing.is_holiday,
-      holiday_key: closing.holiday_key ?? null,
-    }, { onConflict: 'tenant_slug,date' })
+    .upsert(payload, { onConflict: 'tenant_slug,date' })
     .select()
     .single()
 
