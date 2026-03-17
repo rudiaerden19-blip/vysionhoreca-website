@@ -3698,7 +3698,8 @@ export async function getSupplierProductCategories(): Promise<string[]> {
 export interface ExceptionalClosing {
   id?: string
   tenant_slug: string
-  date: string        // YYYY-MM-DD
+  date: string          // YYYY-MM-DD (startdatum)
+  date_end?: string | null // YYYY-MM-DD (einddatum, null = 1 dag)
   reason: string
   is_holiday: boolean
   holiday_key?: string | null
@@ -3725,6 +3726,7 @@ export async function saveExceptionalClosing(closing: ExceptionalClosing): Promi
     .upsert({
       tenant_slug: closing.tenant_slug,
       date: closing.date,
+      date_end: closing.date_end ?? null,
       reason: closing.reason,
       is_holiday: closing.is_holiday,
       holiday_key: closing.holiday_key ?? null,

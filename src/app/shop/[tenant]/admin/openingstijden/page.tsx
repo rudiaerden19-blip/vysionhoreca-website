@@ -81,7 +81,8 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
 
   // Exceptional closings state
   const [closings, setClosings] = useState<ExceptionalClosing[]>([])
-  const [newDate, setNewDate] = useState('')
+  const [newDateFrom, setNewDateFrom] = useState('')
+  const [newDateTo, setNewDateTo] = useState('')
   const [newReason, setNewReason] = useState('')
   const [savingClosing, setSavingClosing] = useState(false)
   const currentYear = new Date().getFullYear()
@@ -143,17 +144,19 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
   }
 
   const addCustomClosing = async () => {
-    if (!newDate) return
+    if (!newDateFrom) return
     setSavingClosing(true)
     const saved = await saveExceptionalClosing({
       tenant_slug: params.tenant,
-      date: newDate,
+      date: newDateFrom,
+      date_end: newDateTo && newDateTo > newDateFrom ? newDateTo : null,
       reason: newReason || 'Gesloten',
       is_holiday: false,
     })
     if (saved) {
       setClosings(prev => [...prev, saved].sort((a, b) => a.date.localeCompare(b.date)))
-      setNewDate('')
+      setNewDateFrom('')
+      setNewDateTo('')
       setNewReason('')
     }
     setSavingClosing(false)
@@ -162,6 +165,14 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
   const removeClosing = async (date: string) => {
     await deleteExceptionalClosing(params.tenant, date)
     setClosings(prev => prev.filter(c => c.date !== date))
+  }
+
+  const formatDateRange = (c: ExceptionalClosing) => {
+    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' }
+    const from = new Date(c.date).toLocaleDateString('nl-BE', opts)
+    if (!c.date_end || c.date_end === c.date) return from
+    const to = new Date(c.date_end).toLocaleDateString('nl-BE', opts)
+    return `${from} → ${to}`
   }
 
   const updateDay = (dayIndex: number, field: keyof OpeningHour, value: string | boolean | null) => {
@@ -523,16 +534,29 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
         <div className="p-6 border-b bg-gray-50">
           <div className="flex flex-wrap gap-3 items-end">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Datum</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Gesloten van</label>
               <input
                 type="date"
-                value={newDate}
-                onChange={e => setNewDate(e.target.value)}
+                value={newDateFrom}
+                onChange={e => {
+                  setNewDateFrom(e.target.value)
+                  if (newDateTo && newDateTo < e.target.value) setNewDateTo('')
+                }}
                 min={new Date().toISOString().split('T')[0]}
                 className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </div>
-            <div className="flex-1 min-w-[160px]">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">tot en met</label>
+              <input
+                type="date"
+                value={newDateTo}
+                onChange={e => setNewDateTo(e.target.value)}
+                min={newDateFrom || new Date().toISOString().split('T')[0]}
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+            </div>
+            <div className="flex-1 min-w-[140px]">
               <label className="block text-xs font-medium text-gray-600 mb-1">Reden (optioneel)</label>
               <input
                 type="text"
@@ -544,8 +568,8 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
             </div>
             <button
               onClick={addCustomClosing}
-              disabled={!newDate || savingClosing}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              disabled={!newDateFrom || savingClosing}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors whitespace-nowrap"
             >
               {savingClosing ? '⏳ Opslaan...' : '+ Toevoegen'}
             </button>
@@ -569,13 +593,11 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                       exit={{ opacity: 0, x: 10 }}
                       className="flex items-center justify-between px-4 py-3 bg-orange-50 border border-orange-200 rounded-xl"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-wrap">
                         <span className="text-sm font-semibold text-orange-700">
-                          {new Date(closing.date).toLocaleDateString('nl-BE', {
-                            weekday: 'short', day: 'numeric', month: 'long', year: 'numeric'
-                          })}
+                          📅 {formatDateRange(closing)}
                         </span>
-                        {closing.reason && (
+                        {closing.reason && closing.reason !== 'Gesloten' && (
                           <span className="text-xs text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">
                             {closing.reason}
                           </span>
@@ -583,7 +605,7 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                       </div>
                       <button
                         onClick={() => removeClosing(closing.date)}
-                        className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none"
+                        className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none ml-2"
                       >
                         ×
                       </button>
