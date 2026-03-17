@@ -3690,3 +3690,65 @@ export async function getSupplierProductCategories(): Promise<string[]> {
   const categories = [...new Set(data?.map(d => d.category).filter(Boolean))]
   return categories.sort()
 }
+
+// =====================================================
+// EXCEPTIONAL CLOSINGS (Uitzonderlijke sluitingsdagen)
+// =====================================================
+
+export interface ExceptionalClosing {
+  id?: string
+  tenant_slug: string
+  date: string        // YYYY-MM-DD
+  reason: string
+  is_holiday: boolean
+  holiday_key?: string | null
+  created_at?: string
+}
+
+export async function getExceptionalClosings(tenantSlug: string): Promise<ExceptionalClosing[]> {
+  const { data, error } = await supabase
+    .from('exceptional_closings')
+    .select('*')
+    .eq('tenant_slug', tenantSlug)
+    .order('date', { ascending: true })
+
+  if (error) {
+    console.error('Error fetching exceptional closings:', error)
+    return []
+  }
+  return data || []
+}
+
+export async function saveExceptionalClosing(closing: ExceptionalClosing): Promise<ExceptionalClosing | null> {
+  const { data, error } = await supabase
+    .from('exceptional_closings')
+    .upsert({
+      tenant_slug: closing.tenant_slug,
+      date: closing.date,
+      reason: closing.reason,
+      is_holiday: closing.is_holiday,
+      holiday_key: closing.holiday_key ?? null,
+    }, { onConflict: 'tenant_slug,date' })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error saving exceptional closing:', error)
+    return null
+  }
+  return data
+}
+
+export async function deleteExceptionalClosing(tenantSlug: string, date: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('exceptional_closings')
+    .delete()
+    .eq('tenant_slug', tenantSlug)
+    .eq('date', date)
+
+  if (error) {
+    console.error('Error deleting exceptional closing:', error)
+    return false
+  }
+  return true
+}

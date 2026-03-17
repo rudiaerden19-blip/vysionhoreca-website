@@ -1,9 +1,58 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { getOpeningHours, saveOpeningHours, OpeningHour } from '@/lib/admin-api'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  getOpeningHours, saveOpeningHours, OpeningHour,
+  getExceptionalClosings, saveExceptionalClosing, deleteExceptionalClosing, ExceptionalClosing,
+} from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
+
+// ── Belgische feestdagen ──────────────────────────────────────────
+
+function easterDate(year: number): Date {
+  const a = year % 19
+  const b = Math.floor(year / 100)
+  const c = year % 100
+  const d = Math.floor(b / 4)
+  const e = b % 4
+  const f = Math.floor((b + 8) / 25)
+  const g = Math.floor((b - f + 1) / 3)
+  const h = (19 * a + b - d - g + 15) % 30
+  const i = Math.floor(c / 4)
+  const k = c % 4
+  const l = (32 + 2 * e + 2 * i - h - k) % 7
+  const m = Math.floor((a + 11 * h + 22 * l) / 451)
+  const month = Math.floor((h + l - 7 * m + 114) / 31)
+  const day = ((h + l - 7 * m + 114) % 31) + 1
+  return new Date(year, month - 1, day)
+}
+
+function addDays(d: Date, n: number): Date {
+  const r = new Date(d)
+  r.setDate(r.getDate() + n)
+  return r
+}
+
+function fmt(d: Date): string {
+  return d.toISOString().split('T')[0]
+}
+
+function getBelgianHolidays(year: number): { key: string; label: string; date: string }[] {
+  const easter = easterDate(year)
+  return [
+    { key: 'nieuwjaar',       label: '🎆 Nieuwjaar',              date: `${year}-01-01` },
+    { key: 'paasmaandag',     label: '🐣 Paasmaandag',            date: fmt(addDays(easter, 1)) },
+    { key: 'dag_arbeid',      label: '🔨 Dag van de Arbeid',      date: `${year}-05-01` },
+    { key: 'hemelvaart',      label: '✝️ Hemelvaartsdag',          date: fmt(addDays(easter, 39)) },
+    { key: 'pinkstermaandag', label: '🕊️ Pinkstermaandag',         date: fmt(addDays(easter, 50)) },
+    { key: 'nationale_dag',   label: '🇧🇪 Nationale Feestdag',     date: `${year}-07-21` },
+    { key: 'olv_hemelvaart',  label: '🌸 OLV Hemelvaart',         date: `${year}-08-15` },
+    { key: 'allerheiligen',   label: '🕯️ Allerheiligen',           date: `${year}-11-01` },
+    { key: 'wapenstilstand',  label: '🎖️ Wapenstilstand',          date: `${year}-11-11` },
+    { key: 'kerstmis',        label: '🎄 Kerstmis',               date: `${year}-12-25` },
+  ]
+}
 
 export default function OpeningstijdenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -30,10 +79,22 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Exceptional closings state
+  const [closings, setClosings] = useState<ExceptionalClosing[]>([])
+  const [newDate, setNewDate] = useState('')
+  const [newReason, setNewReason] = useState('')
+  const [savingClosing, setSavingClosing] = useState(false)
+  const currentYear = new Date().getFullYear()
+  const [holidayYear, setHolidayYear] = useState(currentYear)
+  const holidays = getBelgianHolidays(holidayYear)
+
   useEffect(() => {
     async function loadData() {
       setLoading(true)
-      const data = await getOpeningHours(params.tenant)
+      const [data, exceptionals] = await Promise.all([
+        getOpeningHours(params.tenant),
+        getExceptionalClosings(params.tenant),
+      ])
       if (data && data.length > 0) {
         const merged = defaultHours.map(defaultHour => {
           const loaded = data.find(d => d.day_of_week === defaultHour.day_of_week)
@@ -56,11 +117,52 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
         })
         setSchedule(merged)
       }
+      setClosings(exceptionals)
       setLoading(false)
     }
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
+
+  const isDateClosed = (date: string) => closings.some(c => c.date === date)
+
+  const toggleHoliday = async (holiday: { key: string; label: string; date: string }) => {
+    if (isDateClosed(holiday.date)) {
+      await deleteExceptionalClosing(params.tenant, holiday.date)
+      setClosings(prev => prev.filter(c => c.date !== holiday.date))
+    } else {
+      const saved = await saveExceptionalClosing({
+        tenant_slug: params.tenant,
+        date: holiday.date,
+        reason: holiday.label.replace(/^.{2}\s*/, ''), // strip emoji
+        is_holiday: true,
+        holiday_key: holiday.key,
+      })
+      if (saved) setClosings(prev => [...prev, saved])
+    }
+  }
+
+  const addCustomClosing = async () => {
+    if (!newDate) return
+    setSavingClosing(true)
+    const saved = await saveExceptionalClosing({
+      tenant_slug: params.tenant,
+      date: newDate,
+      reason: newReason || 'Gesloten',
+      is_holiday: false,
+    })
+    if (saved) {
+      setClosings(prev => [...prev, saved].sort((a, b) => a.date.localeCompare(b.date)))
+      setNewDate('')
+      setNewReason('')
+    }
+    setSavingClosing(false)
+  }
+
+  const removeClosing = async (date: string) => {
+    await deleteExceptionalClosing(params.tenant, date)
+    setClosings(prev => prev.filter(c => c.date !== date))
+  }
 
   const updateDay = (dayIndex: number, field: keyof OpeningHour, value: string | boolean | null) => {
     setSchedule(prev => prev.map((day, i) => 
@@ -342,6 +444,171 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
               </div>
             ))}
           </div>
+        </div>
+      </motion.div>
+
+      {/* ── Belgische Feestdagen ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="mt-6 bg-white rounded-2xl shadow-sm overflow-hidden"
+      >
+        <div className="p-6 border-b flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              🇧🇪 Belgische feestdagen
+            </h2>
+            <p className="text-sm text-gray-500 mt-0.5">Selecteer feestdagen waarop u gesloten bent</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setHolidayYear(y => y - 1)}
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold"
+            >‹</button>
+            <span className="font-semibold text-gray-800 w-12 text-center">{holidayYear}</span>
+            <button
+              onClick={() => setHolidayYear(y => y + 1)}
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold"
+            >›</button>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {holidays.map(holiday => {
+              const closed = isDateClosed(holiday.date)
+              return (
+                <button
+                  key={holiday.key}
+                  onClick={() => toggleHoliday(holiday)}
+                  className={`flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all text-left ${
+                    closed
+                      ? 'border-red-400 bg-red-50 text-red-700'
+                      : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  <span className="font-medium text-sm">{holiday.label}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">
+                      {new Date(holiday.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
+                    </span>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                      closed ? 'bg-red-200 text-red-700' : 'bg-gray-200 text-gray-500'
+                    }`}>
+                      {closed ? 'Gesloten' : 'Open'}
+                    </span>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Uitzonderlijke sluitingsdagen ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+        className="mt-6 bg-white rounded-2xl shadow-sm overflow-hidden"
+      >
+        <div className="p-6 border-b">
+          <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            📅 Uitzonderlijke sluitingsdagen
+          </h2>
+          <p className="text-sm text-gray-500 mt-0.5">Voeg specifieke datums toe waarop u uitzonderlijk gesloten bent</p>
+        </div>
+
+        {/* Toevoegen */}
+        <div className="p-6 border-b bg-gray-50">
+          <div className="flex flex-wrap gap-3 items-end">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Datum</label>
+              <input
+                type="date"
+                value={newDate}
+                onChange={e => setNewDate(e.target.value)}
+                min={new Date().toISOString().split('T')[0]}
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+            </div>
+            <div className="flex-1 min-w-[160px]">
+              <label className="block text-xs font-medium text-gray-600 mb-1">Reden (optioneel)</label>
+              <input
+                type="text"
+                value={newReason}
+                onChange={e => setNewReason(e.target.value)}
+                placeholder="bv. Vakantie, verbouwing..."
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+            </div>
+            <button
+              onClick={addCustomClosing}
+              disabled={!newDate || savingClosing}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {savingClosing ? '⏳ Opslaan...' : '+ Toevoegen'}
+            </button>
+          </div>
+        </div>
+
+        {/* Lijst */}
+        <div className="p-6">
+          {closings.filter(c => !c.is_holiday).length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-4">Nog geen uitzonderlijke sluitingsdagen</p>
+          ) : (
+            <div className="space-y-2">
+              <AnimatePresence>
+                {closings
+                  .filter(c => !c.is_holiday)
+                  .map(closing => (
+                    <motion.div
+                      key={closing.date}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 10 }}
+                      className="flex items-center justify-between px-4 py-3 bg-orange-50 border border-orange-200 rounded-xl"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-semibold text-orange-700">
+                          {new Date(closing.date).toLocaleDateString('nl-BE', {
+                            weekday: 'short', day: 'numeric', month: 'long', year: 'numeric'
+                          })}
+                        </span>
+                        {closing.reason && (
+                          <span className="text-xs text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">
+                            {closing.reason}
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => removeClosing(closing.date)}
+                        className="text-gray-400 hover:text-red-500 transition-colors text-lg leading-none"
+                      >
+                        ×
+                      </button>
+                    </motion.div>
+                  ))}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Overzicht gesloten feestdagen */}
+          {closings.filter(c => c.is_holiday).length > 0 && (
+            <div className="mt-4 pt-4 border-t">
+              <p className="text-xs font-medium text-gray-500 mb-2">Gesloten op feestdagen:</p>
+              <div className="flex flex-wrap gap-2">
+                {closings
+                  .filter(c => c.is_holiday)
+                  .map(c => (
+                    <span key={c.date} className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full flex items-center gap-1">
+                      {new Date(c.date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })} — {c.reason}
+                      <button onClick={() => removeClosing(c.date)} className="ml-1 hover:text-red-800">×</button>
+                    </span>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
