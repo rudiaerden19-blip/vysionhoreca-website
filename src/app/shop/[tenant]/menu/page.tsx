@@ -48,7 +48,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
   const [loadingOptions, setLoadingOptions] = useState(false)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
-  const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover')
+  const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover') // altijd cover als standaard
   const [darkMode, setDarkMode] = useState(false)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
   const [promotions, setPromotions] = useState<Promotion[]>([])
@@ -399,7 +399,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
   // ProductCard component voor herbruikbaarheid
   const ProductCard = ({ item }: { item: MenuItem }) => {
-    const itemDisplayMode = item.image_display_mode || imageDisplayMode
+    const itemDisplayMode = item.image_display_mode === 'contain' ? 'contain' : 'cover'
     const useContain = itemDisplayMode === 'contain'
     
     return (
