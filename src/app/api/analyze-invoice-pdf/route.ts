@@ -10,11 +10,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { PDFParse } from 'pdf-parse'
 
 export const runtime = 'nodejs'
 export const maxDuration = 30
-
-const pdfParse = require('pdf-parse') as (buffer: Buffer) => Promise<{ text: string }> // CJS import
 
 // ── Extractie helpers ────────────────────────────────────────────
 
@@ -142,7 +141,9 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer())
-    const pdfData = await pdfParse(buffer)
+    const parser = new PDFParse({ data: buffer })
+    const pdfData = await parser.getText()
+    await parser.destroy()
     const text = pdfData.text
 
     if (!text || text.trim().length < 20) {
