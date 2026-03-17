@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes shimmer-right {
+  0% { transform: translateX(-100%); opacity: 0; }
+  30% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateX(400%); opacity: 0; }
+}
+
+.category-shimmer {
+  animation: shimmer-right 2.5s ease-in-out infinite;
+}
+
 :root {
   --primary: #3C4D6B;
   --primary-light: #4A5D7B;

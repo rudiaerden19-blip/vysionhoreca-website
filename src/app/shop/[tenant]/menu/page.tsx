@@ -590,7 +590,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           >
             <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-              <div className="flex-1 px-4 py-3 flex items-center gap-2" style={{ backgroundColor: primaryColor + '35' }}>
+              <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
+                <span className="category-shimmer absolute inset-y-0 w-12 rounded-full opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}99, transparent)`, left: 0 }}></span>
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
                   <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
                 </h2>
@@ -659,7 +660,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           >
             <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-              <div className="flex-1 px-4 py-3 flex items-center gap-2" style={{ backgroundColor: primaryColor + '35' }}>
+              <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
+                <span className="category-shimmer absolute inset-y-0 w-12 rounded-full opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}99, transparent)`, left: 0 }}></span>
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
                   <span className="text-2xl">🔥</span> {t('menuPage.popular')}
                 </h2>
@@ -686,7 +688,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             >
               <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
                 <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
-                <div className="flex-1 px-4 py-3" style={{ backgroundColor: primaryColor + '35' }}>
+                <div className="relative flex-1 px-4 py-3 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
+                  <span className="category-shimmer absolute inset-y-0 w-12 rounded-full opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}99, transparent)`, left: 0 }}></span>
                   <h2 className={`text-xl font-bold ${theme.text}`}>{category.name}</h2>
                 </div>
               </div>
