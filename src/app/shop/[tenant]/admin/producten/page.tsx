@@ -266,7 +266,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     const product = products.find(p => p.id === id)
     if (product) {
       const updated = { ...product, is_active: !product.is_active }
-      const result = await saveMenuProduct(updated)
+      const { data: result } = await saveMenuProduct(updated)
       if (result) {
         setProducts(prev => prev.map(p => p.id === id ? result : p))
       }
@@ -277,7 +277,7 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
     const product = products.find(p => p.id === id)
     if (product) {
       const updated = { ...product, is_popular: !product.is_popular }
-      const result = await saveMenuProduct(updated)
+      const { data: result } = await saveMenuProduct(updated)
       if (result) {
         setProducts(prev => prev.map(p => p.id === id ? result : p))
       }
