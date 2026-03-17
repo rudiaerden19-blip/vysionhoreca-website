@@ -2391,6 +2391,7 @@ export interface FixedCost {
   amount: number
   notes?: string
   is_active: boolean
+  pdf_url?: string
   created_at?: string
   updated_at?: string
 }
@@ -2419,6 +2420,7 @@ export async function saveFixedCost(cost: FixedCost): Promise<FixedCost | null> 
         amount: cost.amount,
         notes: cost.notes,
         is_active: cost.is_active,
+        pdf_url: cost.pdf_url || null,
         updated_at: new Date().toISOString()
       })
       .eq('id', cost.id)
@@ -2440,6 +2442,7 @@ export async function saveFixedCost(cost: FixedCost): Promise<FixedCost | null> 
         amount: cost.amount,
         notes: cost.notes,
         is_active: cost.is_active ?? true,
+        pdf_url: cost.pdf_url || null,
       })
       .select()
       .single()
@@ -2546,6 +2549,7 @@ export async function saveVariableCost(cost: VariableCost): Promise<VariableCost
         amount: cost.amount,
         date: cost.date,
         notes: cost.notes,
+        pdf_url: cost.pdf_url || null,
         updated_at: new Date().toISOString()
       })
       .eq('id', cost.id)
