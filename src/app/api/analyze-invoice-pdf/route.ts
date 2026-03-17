@@ -40,13 +40,12 @@ function extractSupplier(text: string): string {
     }
   }
 
-  // 3. Bekende Belgische groothandels/leveranciers herkennen in tekst
+  // 3. Bekende Belgische groothandels herkennen — GEEN banken (staan in betaaldetails)
   const knownSuppliers = [
     'Metro', 'Makro', 'Sligro', 'Bidfood', 'Hanos', 'Vandemoortele',
     'Bofrost', 'Aviko', 'Lamb Weston', 'Farm Frites', 'Mydibel',
     'Telenet', 'Proximus', 'Orange', 'VOO', 'Fluvius', 'ORES',
-    'Luminus', 'Engie', 'TotalEnergies', 'Belfius', 'KBC', 'ING', 'BNP',
-    'Vivaqua', 'De Watergroep', 'TMVW',
+    'Luminus', 'Engie', 'TotalEnergies', 'Vivaqua', 'De Watergroep', 'TMVW',
   ]
   for (const s of knownSuppliers) {
     if (new RegExp(`\\b${s}\\b`, 'i').test(text)) return s
@@ -54,16 +53,19 @@ function extractSupplier(text: string): string {
 
   // 4. Eerste niet-triviale lijn bovenaan het document
   const skipPatterns = [
-    /^\d{1,2}[\/\-.]\d{1,2}/,   // datum
+    /^\d{1,2}[\/\-.]\d{1,2}/,        // datum
     /^factuur/i,
     /^invoice/i,
+    /^facture/i,
     /^tel[:\s]/i,
     /^fax[:\s]/i,
     /^www\./i,
     /^http/i,
     /^@/,
-    /^\+\d/,                      // telefoonnummer
-    /^[A-Z]{1,3}\d{3,}/,         // postcode-achtig
+    /^\+\d/,                           // telefoonnummer
+    /^[A-Z]{1,3}\d{3,}/,              // postcode-achtig
+    /\b(BE|NL|FR|DE)\d{2}\s*\d{4}/,  // IBAN-nummer
+    /^(Belfius|KBC|ING|BNP|Argenta|Bpost|AXA|Crelan|Triodos)/i, // banken
   ]
   for (const line of lines.slice(0, 15)) {
     if (line.length < 3) continue
@@ -83,19 +85,21 @@ function detectFixedCategory(text: string): FixedCostCategory {
   const t = text.toLowerCase()
   if (/\b(huur|verhuur|huurcontract|loyer|rent)\b/.test(t)) return 'RENT'
   if (/\b(loon|personeel|werknemers|social|rsz|onss|payroll|salaris)\b/.test(t)) return 'PERSONNEL'
-  if (/\b(elektriciteit|electricité|stroom|kwh|kwa|energie|energy|fluvius|engie|luminus)\b/.test(t)) return 'ELECTRICITY'
-  if (/\b(aardgas|gas|m³|m3|gasmeter)\b/.test(t)) return 'GAS'
-  if (/\b(water|waterverbruik|m³|vivaqua|watergroep|tmvw)\b/.test(t)) return 'WATER'
-  if (/\b(verzekering|assurance|insurance|polis|ba |brand)\b/.test(t)) return 'INSURANCE'
+  if (/\b(elektriciteit|electricité|stroom|kwh|kwa|fluvius|engie|luminus)\b/.test(t)) return 'ELECTRICITY'
+  if (/\b(aardgas|gasmeter)\b/.test(t)) return 'GAS'
+  if (/\b(waterverbruik|vivaqua|watergroep|tmvw)\b/.test(t)) return 'WATER'
+  // Verzekering: enkel als het woord verzekering/polis/assurance letterlijk staat — IBAN is geen verzekering
+  if (/\b(verzekering|assurance|insurance|polis)\b/.test(t)) return 'INSURANCE'
   if (/\b(leasing|lease|huurkoop|renting)\b/.test(t)) return 'LEASING'
-  if (/\b(lening|krediet|loan|credit|aflossing|intrest)\b/.test(t)) return 'LOAN'
+  if (/\b(lening|krediet|aflossing|intrest)\b/.test(t)) return 'LOAN'
   if (/\b(abonnement|subscription|licentie|license|software|hosting|telenet|proximus|orange|voo)\b/.test(t)) return 'SUBSCRIPTIONS'
   return 'OTHER'
 }
 
 function detectVariableCategory(text: string): VariableCostCategory {
   const t = text.toLowerCase()
-  if (/\b(friet|frites|frieten|aardappel|vlees|kip|vis|groenten|metro|makro|sligro|bidfood|aviko|lamb weston|mydibel|bofrost|ingredient|voeding|levensmiddel)\b/.test(t)) return 'INGREDIENTS'
+  // Voeding/ingredients eerst — meest voorkomend in horeca
+  if (/\b(friet|frites|frieten|aardappel|aardappelen|vlees|kip|vis|groenten|groente|metro|makro|sligro|bidfood|aviko|lamb weston|mydibel|bofrost|ingredient|voeding|levensmiddel|nijs|fritureolie|olie)\b/.test(t)) return 'INGREDIENTS'
   if (/\b(verpakking|packaging|zak|bakje|beker|folie|wrap|box|dozen|karton)\b/.test(t)) return 'PACKAGING'
   if (/\b(schoonmaak|cleaning|poetsmiddel|zeep|desinfect|hygiëne|sanitair)\b/.test(t)) return 'CLEANING'
   if (/\b(onderhoud|reparatie|maintenance|herstelling|technisch|installatie)\b/.test(t)) return 'MAINTENANCE'
