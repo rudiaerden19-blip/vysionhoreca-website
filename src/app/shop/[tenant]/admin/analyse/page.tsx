@@ -452,6 +452,20 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     })
   }
 
+  const openPdfBlob = (dataUrl: string) => {
+    try {
+      const base64 = dataUrl.split(',')[1]
+      const binary = atob(base64)
+      const bytes = new Uint8Array(binary.length)
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i)
+      const blob = new Blob([bytes], { type: 'application/pdf' })
+      const blobUrl = URL.createObjectURL(blob)
+      window.open(blobUrl, '_blank')
+    } catch {
+      window.open(dataUrl, '_blank')
+    }
+  }
+
   // Koppel PDF aan bestaande rij (variable of fixed cost)
   const attachPdfRef = useRef<HTMLInputElement>(null)
   const attachPdfFixedRef = useRef<HTMLInputElement>(null)
@@ -465,7 +479,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     await supabase.from('variable_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
     setVariableCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } as typeof c : c))
     setAttachingId(null)
-    window.open(pdfUrl, '_blank')
+    openPdfBlob(pdfUrl)
   }
 
   const handleAttachPdfFixed = async (file: File, costId: string) => {
@@ -475,7 +489,7 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
     await supabase.from('fixed_costs').update({ pdf_url: pdfUrl }).eq('id', costId)
     setFixedCosts(prev => prev.map(c => c.id === costId ? { ...c, pdf_url: pdfUrl } as typeof c : c))
     setAttachingFixedId(null)
-    window.open(pdfUrl, '_blank')
+    openPdfBlob(pdfUrl)
   }
 
   const handlePdfUpload = async (file: File) => {
@@ -962,15 +976,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                       ✏️ {t('analysePage.fixed.edit')}
                     </button>
                     {(cost as FixedCost & { pdf_url?: string }).pdf_url ? (
-                      <a
-                        href={(cost as FixedCost & { pdf_url?: string }).pdf_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={() => openPdfBlob((cost as FixedCost & { pdf_url?: string }).pdf_url!)}
                         className="px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200"
                         title="Bekijk factuur"
                       >
                         📄
-                      </a>
+                      </button>
                     ) : (
                       <button
                         onClick={() => {
@@ -1074,15 +1086,13 @@ export default function AnalysePage({ params }: { params: { tenant: string } }) 
                             }}
                           />
                           {(cost as VariableCost & { pdf_url?: string }).pdf_url ? (
-                            <a
-                              href={(cost as VariableCost & { pdf_url?: string }).pdf_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={() => openPdfBlob((cost as VariableCost & { pdf_url?: string }).pdf_url!)}
                               className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 mr-1"
                               title="Bekijk factuur PDF"
                             >
                               📄
-                            </a>
+                            </button>
                           ) : (
                             <button
                               onClick={() => {
