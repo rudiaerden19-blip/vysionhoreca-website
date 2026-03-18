@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MenuProduct } from '@/lib/admin-api'
+import { MenuProduct, MenuCategory, getMenuCategories, getMenuProducts } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled } from '@/lib/sounds'
@@ -31,6 +31,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [langOpen, setLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
 
+  // Menu
+  const [categories, setCategories] = useState<MenuCategory[]>([])
+  const [products, setProducts] = useState<MenuProduct[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<MenuCategory | null>(null)
+  const [menuLoading, setMenuLoading] = useState(true)
+
   // Blokkeer body scroll (iPad Safari fix)
   useEffect(() => {
     const prev = document.body.style.overflow
@@ -41,6 +47,21 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       document.documentElement.style.overflow = ''
     }
   }, [])
+
+  // Laad categorieën en producten
+  useEffect(() => {
+    async function load() {
+      setMenuLoading(true)
+      const [cats, prods] = await Promise.all([
+        getMenuCategories(tenant),
+        getMenuProducts(tenant),
+      ])
+      setCategories(cats.filter(c => c.is_active))
+      setProducts(prods.filter(p => p.is_active))
+      setMenuLoading(false)
+    }
+    load()
+  }, [tenant])
 
   // Sound init
   useEffect(() => {
@@ -80,6 +101,14 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   // ── Cart ─────────────────────────────────────────────────────────────────
+  const addToCart = (product: MenuProduct) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.product.id === product.id)
+      if (existing) return prev.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
+      return [...prev, { product, quantity: 1 }]
+    })
+  }
+
   const updateQty = (productId: string, qty: number) => {
     if (qty <= 0) setCart(prev => prev.filter(i => i.product.id !== productId))
     else setCart(prev => prev.map(i => i.product.id === productId ? { ...i, quantity: qty } : i))
@@ -264,8 +293,98 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       {/* ── Body: midden + rechts ── */}
       <div className="flex flex-1 overflow-hidden min-h-0">
 
-        {/* Midden: lege ruimte (toekomst: categorieën/producten) */}
-        <div className="flex-1 bg-[#e3e3e3] min-h-0" />
+        {/* ── Midden: categorieën / producten ── */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+
+          {/* Sub-header: terugknop bij producten */}
+          {selectedCategory && (
+            <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2 bg-[#e3e3e3] border-b border-gray-300">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                ← Terug
+              </button>
+              <span className="text-lg font-bold text-gray-800">
+                {selectedCategory.icon && <span className="mr-1">{selectedCategory.icon}</span>}
+                {selectedCategory.name}
+              </span>
+            </div>
+          )}
+
+          {/* Grid */}
+          <div className="flex-1 overflow-y-auto p-3">
+            {menuLoading ? (
+              <div className="flex items-center justify-center h-full text-gray-400 text-lg">Laden...</div>
+            ) : !selectedCategory ? (
+              /* Categorieën grid */
+              categories.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                  <span className="text-5xl mb-3">📂</span>
+                  <p className="font-semibold">Nog geen categorieën</p>
+                  <p className="text-sm mt-1">Voeg categorieën toe via het Online Platform</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-3">
+                  {categories.map(cat => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat)}
+                      className="aspect-square flex flex-col items-center justify-center gap-2 bg-[#3C4D6B] hover:bg-[#2D3A52] text-white rounded-2xl shadow-md transition-colors p-4"
+                    >
+                      {cat.icon && <span className="text-4xl">{cat.icon}</span>}
+                      <span className="font-bold text-base text-center leading-tight">{cat.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )
+            ) : (
+              /* Producten grid */
+              (() => {
+                const filtered = products.filter(p => p.category_id === selectedCategory.id)
+                return filtered.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                    <span className="text-5xl mb-3">🍽️</span>
+                    <p className="font-semibold">Geen producten in deze categorie</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-3">
+                    {filtered.map(product => {
+                      const inCart = cart.find(i => i.product.id === product.id)
+                      return (
+                        <button
+                          key={product.id}
+                          onClick={() => addToCart(product)}
+                          className="flex flex-col bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow relative"
+                        >
+                          {/* Afbeelding of placeholder */}
+                          <div className="aspect-square w-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                            {product.image_url ? (
+                              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-4xl text-gray-300">🍽️</span>
+                            )}
+                          </div>
+                          {/* Badge */}
+                          {inCart && (
+                            <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#3C4D6B] text-white text-xs font-bold flex items-center justify-center shadow">
+                              {inCart.quantity}
+                            </div>
+                          )}
+                          {/* Info */}
+                          <div className="p-2 text-left">
+                            <p className="font-semibold text-sm text-gray-800 truncate">{product.name}</p>
+                            <p className="text-[#3C4D6B] font-bold text-sm">€{product.price.toFixed(2)}</p>
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )
+              })()
+            )}
+          </div>
+        </div>
 
         {/* ── Rechts: numpad / cart ── */}
         <div className="w-80 sm:w-96 lg:w-[380px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0 min-h-0 overflow-hidden">
