@@ -16,7 +16,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-[#e3e3e3] overflow-hidden">
+    <div className="-m-4 md:-m-6 -mb-96 flex flex-col bg-[#e3e3e3] overflow-hidden" style={{ height: 'calc(100vh - 80px)' }}>
 
       {/* ── Header: hamburger + Kassa + Vysion ── */}
       <div className="bg-white border-b border-gray-200 flex items-center px-4 h-14 flex-shrink-0 shadow-sm">
