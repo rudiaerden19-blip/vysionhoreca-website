@@ -618,19 +618,18 @@ function SidebarContent({
         {/* ── Kassa knop ── */}
         <div className="mb-1">
           <Link
-            href={`/kassa/${tenant}`}
-            className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 border-transparent text-gray-700 hover:bg-gray-50 ${collapsed ? 'justify-center' : ''}`}
+            href={`${baseUrl}/kassa`}
+            className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 ${
+              pathname.startsWith(`${baseUrl}/kassa`)
+                ? 'bg-blue-50 text-blue-600 border-blue-500'
+                : 'border-transparent text-gray-700 hover:bg-gray-50'
+            } ${collapsed ? 'justify-center' : ''}`}
             title={collapsed ? 'Kassa' : undefined}
           >
             <div className="flex items-center gap-3">
               <span className="text-xl">🖥️</span>
               {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">Kassa</span>}
             </div>
-            {!collapsed && (
-              <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            )}
           </Link>
         </div>
 
