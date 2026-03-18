@@ -1,10 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { MenuProduct } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
+import { useLanguage } from '@/i18n'
+import { getSoundsEnabled, setSoundsEnabled } from '@/lib/sounds'
 
 interface CartItem {
   product: MenuProduct
@@ -17,12 +19,54 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const tenant = params.tenant
   const router = useRouter()
   const baseUrl = `/shop/${tenant}/admin`
+  const { locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
 
   const [navOpen, setNavOpen] = useState(false)
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
+  const [soundsOn, setSoundsOn] = useState(true)
+  const [isOnline, setIsOnline] = useState<boolean | null>(null)
+  const [langOpen, setLangOpen] = useState(false)
+  const langRef = useRef<HTMLDivElement>(null)
+
+  // Sound init
+  useEffect(() => {
+    setSoundsOn(getSoundsEnabled())
+  }, [])
+
+  // Online status check
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const res = await fetch(`/api/shop/${tenant}/status`, { method: 'HEAD', cache: 'no-store' })
+        setIsOnline(res.ok)
+      } catch {
+        setIsOnline(false)
+      }
+    }
+    check()
+    const interval = setInterval(check, 30000)
+    return () => clearInterval(interval)
+  }, [tenant])
+
+  // Close language dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setLangOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  const toggleSound = () => {
+    const next = !soundsOn
+    setSoundsOn(next)
+    setSoundsEnabled(next)
+  }
 
   // ── Cart ─────────────────────────────────────────────────────────────────
   const updateQty = (productId: string, qty: number) => {
@@ -109,12 +153,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     <div className="flex h-screen bg-[#e3e3e3] overflow-hidden">
 
       {/* ── Links: hamburger kolom ── */}
-      <div className="flex flex-col bg-white border-r border-gray-200 shadow-sm w-16 flex-shrink-0 relative">
+      <div className="flex flex-col bg-[#e3e3e3] w-16 flex-shrink-0 relative">
 
         {/* Hamburger knop */}
         <button
           onClick={() => setNavOpen(o => !o)}
-          className="w-full h-16 flex items-center justify-center hover:bg-gray-100 transition-colors border-b border-gray-200"
+          className="w-full h-16 flex items-center justify-center hover:bg-gray-300 transition-colors rounded-xl"
         >
           <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -169,7 +213,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       {/* ── Midden: kassa header + lege ruimte ── */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200 flex items-center px-4 h-16 flex-shrink-0 shadow-sm">
+        <div className="bg-[#e3e3e3] flex items-center px-4 h-16 flex-shrink-0">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-[#3C4D6B] rounded-lg flex items-center justify-center">
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,6 +225,49 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           <div className="flex-1 flex justify-center">
             <span className="text-2xl font-black text-red-600 tracking-tight">Vysion</span>
             <span className="text-sm text-gray-400 self-end mb-0.5 ml-1">group</span>
+          </div>
+          {/* Rechts: online status + geluid + taal */}
+          <div className="flex items-center gap-2">
+            {/* Online status */}
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-sm font-medium text-gray-700">
+              <div className={`w-2 h-2 rounded-full ${isOnline === null ? 'bg-gray-400 animate-pulse' : isOnline ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span>{isOnline === null ? '...' : isOnline ? 'Online' : 'Offline'}</span>
+            </div>
+            {/* Geluid toggle */}
+            <button
+              onClick={toggleSound}
+              className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors ${soundsOn ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500'}`}
+              title={soundsOn ? 'Geluid aan' : 'Geluid uit'}
+            >
+              {soundsOn ? '🔔' : '🔕'}
+            </button>
+            {/* Taalknop */}
+            <div ref={langRef} className="relative">
+              <button
+                onClick={() => setLangOpen(o => !o)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <span className="text-base">{localeFlags[locale]}</span>
+                <span>{localeNames[locale]}</span>
+                <svg className={`w-3 h-3 text-gray-500 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {langOpen && (
+                <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 min-w-[160px] overflow-hidden">
+                  {locales.map(lang => (
+                    <button
+                      key={lang}
+                      onClick={() => { setLocale(lang); setLangOpen(false) }}
+                      className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 transition-colors text-sm ${locale === lang ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}`}
+                    >
+                      <span>{localeFlags[lang]}</span>
+                      <span>{localeNames[lang]}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
