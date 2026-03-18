@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { getMenuCategories, getMenuProducts, MenuCategory, MenuProduct } from '@/lib/admin-api'
+import { useState } from 'react'
+import Link from 'next/link'
+import { MenuProduct } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 
-// ── Types ──────────────────────────────────────────────────────────────────
 interface CartItem {
   product: MenuProduct
   quantity: number
@@ -13,36 +12,17 @@ interface CartItem {
 
 type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
 
-// ── Component ──────────────────────────────────────────────────────────────
 export default function KassaAdminPage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
+  const baseUrl = `/shop/${tenant}/admin`
 
-  // Data
-  const [categories, setCategories] = useState<MenuCategory[]>([])
-  const [products, setProducts] = useState<MenuProduct[]>([])
-
-  // UI state
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [navOpen, setNavOpen] = useState(false)
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
   const [numpadValue, setNumpadValue] = useState('')
-  const [leftOpen, setLeftOpen] = useState(true)
 
-  // Load data
-  useEffect(() => {
-    async function load() {
-      const [cats, prods] = await Promise.all([
-        getMenuCategories(tenant),
-        getMenuProducts(tenant),
-      ])
-      setCategories(cats.filter(c => c.is_active))
-      setProducts(prods.filter(p => p.is_active))
-    }
-    load()
-  }, [tenant])
-
-  // ── Cart helpers ──────────────────────────────────────────────────────────
+  // ── Cart ────────────────────────────────────────────────────────────────
   const addToCart = (product: MenuProduct) => {
     setCart(prev => {
       const existing = prev.find(i => i.product.id === product.id)
@@ -58,10 +38,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   const clearCart = () => setCart([])
 
-  // ── Totals ────────────────────────────────────────────────────────────────
   const total = cart.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
 
-  // ── Numpad ────────────────────────────────────────────────────────────────
+  // ── Numpad ──────────────────────────────────────────────────────────────
   const handleNumpad = (key: string) => {
     if (key === 'C') { setNumpadValue(''); return }
     if (key === '=') {
@@ -70,7 +49,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         // eslint-disable-next-line no-new-func
         const result = Function('"use strict"; return (' + expr + ')')()
         setNumpadValue(String(result))
-      } catch { /* invalid expression */ }
+      } catch { /* ongeldige expressie */ }
       return
     }
     if (['+', '-', '×'].includes(key)) {
@@ -107,19 +86,11 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     }
   }
 
-  // ── Order type cycle ──────────────────────────────────────────────────────
   const cycleOrderType = () => {
     const types: OrderType[] = ['DINE_IN', 'TAKEAWAY', 'DELIVERY']
-    const next = (types.indexOf(orderType) + 1) % types.length
-    setOrderType(types[next])
+    setOrderType(types[(types.indexOf(orderType) + 1) % types.length])
   }
 
-  // ── Filtered products ─────────────────────────────────────────────────────
-  const filteredProducts = selectedCategory
-    ? products.filter(p => p.category_id === selectedCategory)
-    : products
-
-  // ── Checkout (basic save to orders table) ─────────────────────────────────
   const handleAfrekenen = async () => {
     if (cart.length === 0) return
     await supabase.from('orders').insert({
@@ -136,19 +107,25 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     alert(`✅ Bestelling afgerekend! Totaal: €${total.toFixed(2)}`)
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div
       className="-m-4 md:-m-6 -mb-96 flex flex-col bg-[#e3e3e3] overflow-hidden"
       style={{ height: 'calc(100vh - 80px)' }}
     >
-      {/* ── Kassa header ── */}
-      <div className="bg-white border-b border-gray-200 flex items-center px-4 h-14 flex-shrink-0 shadow-sm">
-        <button onClick={() => setLeftOpen(o => !o)} className="p-2 hover:bg-gray-100 rounded-lg mr-3">
+      {/* ── Header ── */}
+      <div className="bg-white border-b border-gray-200 flex items-center px-4 h-14 flex-shrink-0 shadow-sm relative">
+
+        {/* Hamburger */}
+        <button
+          onClick={() => setNavOpen(o => !o)}
+          className="p-2 hover:bg-gray-100 rounded-lg mr-3 relative z-20"
+        >
           <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
+
+        {/* Kassa label */}
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-[#3C4D6B] rounded-lg flex items-center justify-center">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,107 +134,55 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           </div>
           <span className="font-bold text-gray-800 text-lg">Kassa</span>
         </div>
+
+        {/* Logo midden */}
         <div className="flex-1 flex justify-center">
           <span className="text-2xl font-black text-red-600 tracking-tight">Vysion</span>
           <span className="text-sm text-gray-400 self-end mb-0.5 ml-1">group</span>
         </div>
+
+        {/* Nav dropdown — opent ONDER de header */}
+        {navOpen && (
+          <>
+            {/* Overlay om te sluiten bij klik buiten */}
+            <div
+              className="fixed inset-0 z-10"
+              onClick={() => setNavOpen(false)}
+            />
+            <div className="absolute top-full left-0 z-20 w-64 bg-white border border-gray-200 rounded-b-2xl shadow-xl overflow-hidden">
+              <Link
+                href={`${baseUrl}/kassa`}
+                onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-4 bg-blue-50 border-b border-gray-100 font-bold text-[#3C4D6B]"
+              >
+                <span className="text-xl">🖥️</span> Kassa
+              </Link>
+              <Link
+                href={baseUrl}
+                onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors"
+              >
+                <span className="text-xl">🛒</span> Online Platform
+              </Link>
+              <Link
+                href={`${baseUrl}/reservaties`}
+                onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 font-semibold text-gray-700 transition-colors"
+              >
+                <span className="text-xl">📅</span> Reservaties
+              </Link>
+            </div>
+          </>
+        )}
       </div>
 
       {/* ── Hoofd layout ── */}
       <div className="flex-1 flex overflow-hidden">
 
-        {/* ── Links: categorieën / producten ── */}
-        {leftOpen && (
-          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-            {/* Sub-header */}
-            <div className="bg-white border-b border-gray-200 flex items-center gap-2 px-3 py-2 flex-shrink-0">
-              {selectedCategory && (
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium transition-colors"
-                >
-                  ← Terug
-                </button>
-              )}
-              {selectedCategory && (
-                <span className="font-semibold text-gray-700">
-                  {categories.find(c => c.id === selectedCategory)?.name}
-                </span>
-              )}
-            </div>
+        {/* Links: leeg grijs */}
+        <div className="flex-1 bg-[#e3e3e3]" />
 
-            {/* Grid */}
-            <div className="flex-1 overflow-y-auto p-3">
-              {!selectedCategory ? (
-                /* Categorieën */
-                categories.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                    <p className="text-lg">Nog geen categorieën</p>
-                    <p className="text-sm mt-1">Voeg categorieën toe via Online Platform</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {categories.map(cat => (
-                      <button
-                        key={cat.id}
-                        onClick={() => setSelectedCategory(cat.id!)}
-                        className="aspect-square rounded-2xl overflow-hidden relative flex flex-col shadow-[0_8px_24px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.45)] transition-shadow bg-[#3C4D6B]"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                        <div className="relative z-10 flex-1 flex flex-col justify-end items-start w-full p-4">
-                          <span className="font-bold text-xl text-white drop-shadow-lg">{cat.name}</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )
-              ) : (
-                /* Producten */
-                filteredProducts.length === 0 ? (
-                  <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                    <p className="text-lg">Geen producten in deze categorie</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {filteredProducts.map(product => {
-                      const cartItem = cart.find(i => i.product.id === product.id)
-                      return (
-                        <button
-                          key={product.id}
-                          onClick={() => addToCart(product)}
-                          className="rounded-2xl overflow-hidden bg-white shadow-[0_4px_16px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-shadow flex flex-col relative"
-                        >
-                          {/* Afbeelding */}
-                          <div className="aspect-square w-full bg-gray-100 relative">
-                            {product.image_url ? (
-                              <Image src={product.image_url} alt={product.name} fill className="object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-gray-300 bg-[#3C4D6B]/10">
-                                {product.name.charAt(0)}
-                              </div>
-                            )}
-                            {cartItem && (
-                              <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-[#3C4D6B] text-white flex items-center justify-center font-bold text-sm shadow-lg">
-                                {cartItem.quantity}
-                              </div>
-                            )}
-                          </div>
-                          {/* Info */}
-                          <div className="p-2 text-left">
-                            <p className="font-semibold text-sm truncate">{product.name}</p>
-                            <p className="text-[#3C4D6B] font-bold text-lg">€{product.price.toFixed(2)}</p>
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ── Rechts: numpad / cart paneel ── */}
+        {/* Rechts: numpad / cart */}
         <div className="w-80 sm:w-96 lg:w-[420px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0 h-full">
 
           {/* Tafel knop */}
@@ -292,7 +217,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           {/* Cart of Numpad */}
           <div className="flex-1 overflow-y-auto px-3 pt-2 flex flex-col">
             {cart.length === 0 ? (
-              /* Numpad */
               <div className="flex flex-col flex-1">
                 <div className="bg-[#e3e3e3] rounded-xl px-4 py-3 mb-3">
                   <input
@@ -329,19 +253,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 )}
               </div>
             ) : (
-              /* Cart items */
               <div className="space-y-2">
                 {cart.map(item => (
                   <div key={item.product.id} className="bg-gray-50 rounded-xl p-3 flex items-center gap-3 border border-gray-100">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0 relative">
-                      {item.product.image_url ? (
-                        <Image src={item.product.image_url} alt={item.product.name} fill className="object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-lg font-bold text-gray-400">
-                          {item.product.name.charAt(0)}
-                        </div>
-                      )}
-                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm truncate">{item.product.name}</p>
                       <p className="text-[#3C4D6B] font-bold">€{(item.product.price * item.quantity).toFixed(2)}</p>
@@ -373,8 +287,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               <span className="font-bold text-gray-700 text-lg">Totaal</span>
               <span className="font-bold text-[#3C4D6B] text-2xl">€{total.toFixed(2)}</span>
             </div>
-
-            {/* Actie knoppen rij */}
             <div className="grid grid-cols-3 gap-2">
               <button className="flex flex-col items-center gap-1 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-colors">
                 <span className="text-xl">💰</span>
@@ -393,8 +305,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 <span className="text-xs font-semibold">Verwijder</span>
               </button>
             </div>
-
-            {/* Afrekenen */}
             <button
               onClick={handleAfrekenen}
               disabled={cart.length === 0}
