@@ -615,66 +615,14 @@ function SidebarContent({
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2">
-        {menuItems.map((section, sectionIndex) => {
-          // Overzicht altijd zichtbaar bovenaan
-          if (section.categoryKey !== 'overview') return null
-
-          const isExpanded = isSectionExpanded(section.categoryKey)
-          const hasActive = hasActiveItemInSection(section)
-          const categoryName = t(`admin.categories.${section.categoryKey}`)
-
-          return (
-            <div key={section.categoryKey} className="mb-1">
-              <button
-                id={`menu-btn-${section.categoryKey}`}
-                onClick={() => !collapsed && toggleSection(section.categoryKey)}
-                className={`w-full flex items-center justify-between px-4 py-3 transition-all ${
-                  hasActive
-                    ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-500'
-                    : 'text-gray-700 hover:bg-gray-50 border-l-4 border-transparent'
-                } ${collapsed ? 'justify-center' : ''}`}
-                title={collapsed ? categoryName : undefined}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">{section.icon}</span>
-                  {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">{categoryName}</span>}
-                </div>
-                {!collapsed && (
-                  <svg className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                )}
-              </button>
-              {!collapsed && isExpanded && (
-                <FlyoutMenu
-                  section={section}
-                  categoryName={categoryName}
-                  sectionIndex={sectionIndex}
-                  baseUrl={baseUrl}
-                  tenant={tenant}
-                  isActive={isActive}
-                  onClose={() => {
-                    onClose?.()
-                    toggleSection(section.categoryKey)
-                  }}
-                  t={t}
-                  isPro={isPro}
-                  isTrial={isTrial}
-                  pendingReservations={pendingReservations}
-                />
-              )}
-            </div>
-          )
-        })}
-
-        {/* ── Online Platform knop ── */}
+        {/* ── Online Platform knop met ALLES erin ── */}
         <div className="mb-1">
           <button
             onClick={() => !collapsed && setOnlinePlatformOpen(prev => !prev)}
             className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 ${
               onlinePlatformOpen
                 ? 'bg-blue-600 text-white border-blue-700'
-                : menuItems.filter(s => s.categoryKey !== 'overview').some(s => hasActiveItemInSection(s))
+                : menuItems.some(s => hasActiveItemInSection(s))
                 ? 'bg-blue-50 text-blue-600 border-blue-500'
                 : 'text-gray-700 hover:bg-gray-50 border-transparent'
             } ${collapsed ? 'justify-center' : ''}`}
@@ -696,10 +644,10 @@ function SidebarContent({
             )}
           </button>
 
-          {/* Alle secties onder Online Platform */}
+          {/* Alle secties binnen Online Platform */}
           {!collapsed && onlinePlatformOpen && (
             <div className="pl-2 border-l-2 border-blue-200 ml-4">
-              {menuItems.filter(s => s.categoryKey !== 'overview').map((section, idx) => {
+              {menuItems.map((section) => {
                 const isExpanded = isSectionExpanded(section.categoryKey)
                 const hasActive = hasActiveItemInSection(section)
                 const sectionIsProOnly = (section as { proOnly?: boolean }).proOnly
