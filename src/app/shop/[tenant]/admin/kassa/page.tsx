@@ -150,7 +150,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#e3e3e3] overflow-hidden">
+    <div className="flex flex-col bg-[#e3e3e3] overflow-hidden" style={{ height: '100dvh' }}>
 
       {/* ── Volledige breedte header ── */}
       <div className="h-14 flex-shrink-0 bg-white border-b border-gray-200 flex items-center px-3 gap-3 relative z-30">
@@ -251,13 +251,13 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       </div>
 
       {/* ── Body: midden + rechts ── */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
 
         {/* Midden: lege ruimte (toekomst: categorieën/producten) */}
-        <div className="flex-1 bg-[#e3e3e3]" />
+        <div className="flex-1 bg-[#e3e3e3] min-h-0" />
 
         {/* ── Rechts: numpad / cart ── */}
-        <div className="w-80 sm:w-96 lg:w-[380px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0">
+        <div className="w-80 sm:w-96 lg:w-[380px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0 min-h-0 overflow-hidden">
 
         {/* Tafel knop */}
         {orderType === 'DINE_IN' && (
