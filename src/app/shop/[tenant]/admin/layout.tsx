@@ -619,8 +619,6 @@ function SidebarContent({
         <div className="mb-1">
           <Link
             href={`/kassa/${tenant}`}
-            target="_blank"
-            rel="noopener noreferrer"
             className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 border-transparent text-gray-700 hover:bg-gray-50 ${collapsed ? 'justify-center' : ''}`}
             title={collapsed ? 'Kassa' : undefined}
           >
