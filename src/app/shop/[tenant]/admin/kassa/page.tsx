@@ -31,6 +31,17 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [langOpen, setLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
 
+  // Blokkeer body scroll (iPad Safari fix)
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+      document.documentElement.style.overflow = ''
+    }
+  }, [])
+
   // Sound init
   useEffect(() => {
     setSoundsOn(getSoundsEnabled())
