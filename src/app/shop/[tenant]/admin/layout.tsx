@@ -617,7 +617,10 @@ function SidebarContent({
       <nav className="flex-1 overflow-y-auto py-2">
         {/* ── Kassa knop ── */}
         <div className="mb-1">
-          <button
+          <Link
+            href={`/kassa/${tenant}`}
+            target="_blank"
+            rel="noopener noreferrer"
             className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 border-transparent text-gray-700 hover:bg-gray-50 ${collapsed ? 'justify-center' : ''}`}
             title={collapsed ? 'Kassa' : undefined}
           >
@@ -625,7 +628,12 @@ function SidebarContent({
               <span className="text-xl">🖥️</span>
               {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">Kassa</span>}
             </div>
-          </button>
+            {!collapsed && (
+              <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            )}
+          </Link>
         </div>
 
         {/* ── Online Platform knop met ALLES erin ── */}
