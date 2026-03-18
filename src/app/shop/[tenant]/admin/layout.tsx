@@ -615,6 +615,19 @@ function SidebarContent({
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2">
+        {/* ── Kassa knop ── */}
+        <div className="mb-1">
+          <button
+            className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 border-transparent text-gray-700 hover:bg-gray-50 ${collapsed ? 'justify-center' : ''}`}
+            title={collapsed ? 'Kassa' : undefined}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">🖥️</span>
+              {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">Kassa</span>}
+            </div>
+          </button>
+        </div>
+
         {/* ── Online Platform knop met ALLES erin ── */}
         <div className="mb-1">
           <button
@@ -712,6 +725,19 @@ function SidebarContent({
               })}
             </div>
           )}
+        </div>
+
+        {/* ── Reservaties knop ── */}
+        <div className="mb-1">
+          <button
+            className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 border-transparent text-gray-700 hover:bg-gray-50 ${collapsed ? 'justify-center' : ''}`}
+            title={collapsed ? 'Reservaties' : undefined}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">📅</span>
+              {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">Reservaties</span>}
+            </div>
+          </button>
         </div>
       </nav>
 
