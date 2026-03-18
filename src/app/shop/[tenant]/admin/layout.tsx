@@ -269,33 +269,37 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         )}
       </AnimatePresence>
 
-      {/* Desktop Sidebar */}
-      <aside className={`hidden lg:block fixed left-0 top-0 h-full bg-white border-r shadow-sm z-40 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
-        <SidebarContent 
-          baseUrl={baseUrl} 
-          isActive={isActive} 
-          tenant={params.tenant}
-          tenantPlan={tenantPlan}
-          isTrial={isTrial}
-          collapsed={!sidebarOpen}
-          onToggle={() => setSidebarOpen(!sidebarOpen)}
-        />
-      </aside>
+      {/* Desktop Sidebar — verborgen op kassa pagina */}
+      {!pathname.includes('/kassa') && (
+        <aside className={`hidden lg:block fixed left-0 top-0 h-full bg-white border-r shadow-sm z-40 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
+          <SidebarContent 
+            baseUrl={baseUrl} 
+            isActive={isActive} 
+            tenant={params.tenant}
+            tenantPlan={tenantPlan}
+            isTrial={isTrial}
+            collapsed={!sidebarOpen}
+            onToggle={() => setSidebarOpen(!sidebarOpen)}
+          />
+        </aside>
+      )}
 
       {/* Top Bar with Language Selector and Display Link - Fixed top right */}
-      <div className="hidden lg:flex fixed top-4 right-8 z-50 items-center gap-3">
-        <Link
-          href={`/shop/${params.tenant}/display`}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg transition-colors font-medium shadow-lg"
-        >
-          🖥️ {t('admin.display')}
-        </Link>
-        <LanguageSelector />
-      </div>
+      {!pathname.includes('/kassa') && (
+        <div className="hidden lg:flex fixed top-4 right-8 z-50 items-center gap-3">
+          <Link
+            href={`/shop/${params.tenant}/display`}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg transition-colors font-medium shadow-lg"
+          >
+            🖥️ {t('admin.display')}
+          </Link>
+          <LanguageSelector />
+        </div>
+      )}
 
       {/* Main Content */}
-      <main className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} pt-16 lg:pt-20 overflow-x-hidden min-h-screen`}>
-        <div className="p-4 md:p-6 max-w-full pb-96">
+      <main className={`transition-all duration-300 ${pathname.includes('/kassa') ? 'lg:ml-0' : (sidebarOpen ? 'lg:ml-64' : 'lg:ml-20')} pt-16 lg:pt-20 overflow-x-hidden min-h-screen`}>
+        <div className={pathname.includes('/kassa') ? '' : 'p-4 md:p-6 max-w-full pb-96'}>
           {children}
         </div>
       </main>
