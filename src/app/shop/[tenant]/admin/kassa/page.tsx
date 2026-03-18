@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 export default function KassaAdminPage({ params }: { params: { tenant: string } }) {
   const [display, setDisplay] = useState('0.00')
+  const [leftOpen, setLeftOpen] = useState(true)
 
   const handleNumpad = (key: string) => {
     if (key === 'C') { setDisplay('0.00'); return }
@@ -19,7 +20,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
       {/* ── Header: hamburger + Kassa + Vysion ── */}
       <div className="bg-white border-b border-gray-200 flex items-center px-4 h-14 flex-shrink-0 shadow-sm">
-        <button className="p-2 hover:bg-gray-100 rounded-lg mr-3">
+        <button onClick={() => setLeftOpen(o => !o)} className="p-2 hover:bg-gray-100 rounded-lg mr-3">
           <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           </svg>
@@ -41,11 +42,11 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       {/* ── Hoofd layout ── */}
       <div className="flex-1 flex overflow-hidden">
 
-        {/* Links: leeg */}
-        <div className="flex-1 bg-[#e3e3e3]" />
+        {/* Links: inklapbaar */}
+        {leftOpen && <div className="flex-1 bg-[#e3e3e3]" />}
 
-        {/* Rechts: numpad paneel — breed en vol tot onder */}
-        <div className="w-[420px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0 h-full">
+        {/* Rechts: numpad paneel — vol tot onder */}
+        <div className="w-[380px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0 h-full overflow-y-auto">
 
           <button className="mx-3 mt-3 py-4 bg-[#2AAB8C] hover:bg-[#229A7E] text-white font-bold rounded-xl text-base transition-colors">
             Kies tafel...
@@ -59,7 +60,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             <span className="text-3xl font-bold text-gray-800">{display}</span>
           </div>
 
-          <div className="mx-3 mt-3 grid grid-cols-4 gap-2 flex-shrink-0">
+          <div className="mx-3 mt-3 grid grid-cols-4 gap-2 flex-1">
             <button onClick={() => handleNumpad('7')} className="py-5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 text-2xl hover:bg-gray-100 transition-colors">7</button>
             <button onClick={() => handleNumpad('8')} className="py-5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 text-2xl hover:bg-gray-100 transition-colors">8</button>
             <button onClick={() => handleNumpad('9')} className="py-5 bg-gray-50 border border-gray-200 rounded-xl font-bold text-gray-800 text-2xl hover:bg-gray-100 transition-colors">9</button>
