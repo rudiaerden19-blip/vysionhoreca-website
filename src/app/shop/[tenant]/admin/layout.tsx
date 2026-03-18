@@ -593,6 +593,7 @@ function SidebarContent({
         )}
         {onToggle && (
           <button
+            id="sidebar-toggle-btn"
             onClick={onToggle}
             className="p-2 hover:bg-gray-100 rounded-lg hidden lg:block"
           >

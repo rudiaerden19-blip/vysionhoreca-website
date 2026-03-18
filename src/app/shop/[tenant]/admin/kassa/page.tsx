@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { MenuProduct } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 
@@ -14,9 +13,10 @@ type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
 
 export default function KassaAdminPage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
-  const baseUrl = `/shop/${tenant}/admin`
-
-  const [navOpen, setNavOpen] = useState(false)
+  const toggleSidebar = () => {
+    const btn = document.getElementById('sidebar-toggle-btn') as HTMLButtonElement | null
+    btn?.click()
+  }
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
@@ -115,10 +115,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       {/* ── Header ── */}
       <div className="bg-white border-b border-gray-200 flex items-center px-4 h-14 flex-shrink-0 shadow-sm relative">
 
-        {/* Hamburger */}
+        {/* Hamburger — klapt admin sidebar in/uit */}
         <button
-          onClick={() => setNavOpen(o => !o)}
-          className="p-2 hover:bg-gray-100 rounded-lg mr-3 relative z-20"
+          onClick={toggleSidebar}
+          className="p-2 hover:bg-gray-100 rounded-lg mr-3"
         >
           <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -141,39 +141,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           <span className="text-sm text-gray-400 self-end mb-0.5 ml-1">group</span>
         </div>
 
-        {/* Nav dropdown — opent ONDER de header */}
-        {navOpen && (
-          <>
-            {/* Overlay om te sluiten bij klik buiten */}
-            <div
-              className="fixed inset-0 z-10"
-              onClick={() => setNavOpen(false)}
-            />
-            <div className="absolute top-full left-0 z-20 w-64 bg-white border border-gray-200 rounded-b-2xl shadow-xl overflow-hidden">
-              <Link
-                href={`${baseUrl}/kassa`}
-                onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 bg-blue-50 border-b border-gray-100 font-bold text-[#3C4D6B]"
-              >
-                <span className="text-xl">🖥️</span> Kassa
-              </Link>
-              <Link
-                href={baseUrl}
-                onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors"
-              >
-                <span className="text-xl">🛒</span> Online Platform
-              </Link>
-              <Link
-                href={`${baseUrl}/reservaties`}
-                onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 font-semibold text-gray-700 transition-colors"
-              >
-                <span className="text-xl">📅</span> Reservaties
-              </Link>
-            </div>
-          </>
-        )}
       </div>
 
       {/* ── Hoofd layout ── */}
