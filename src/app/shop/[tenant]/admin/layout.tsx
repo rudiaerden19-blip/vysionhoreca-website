@@ -212,6 +212,11 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     )
   }
 
+  // Kassa: geen layout wrapper, pagina beheert zichzelf volledig
+  if (pathname.includes('/kassa')) {
+    return <>{children}</>
+  }
+
   return (
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
       {/* Trial Banner */}
