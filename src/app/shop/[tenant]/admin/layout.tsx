@@ -298,8 +298,11 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       )}
 
       {/* Main Content */}
-      <main className={`transition-all duration-300 ${pathname.includes('/kassa') ? 'lg:ml-0' : (sidebarOpen ? 'lg:ml-64' : 'lg:ml-20')} ${pathname.includes('/kassa') ? 'pt-0' : 'pt-16 lg:pt-20'} overflow-x-hidden min-h-screen`}>
-        <div className={pathname.includes('/kassa') ? '' : 'p-4 md:p-6 max-w-full pb-96'}>
+      <main className={pathname.includes('/kassa')
+        ? 'h-screen overflow-hidden'
+        : `transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} pt-16 lg:pt-20 overflow-x-hidden min-h-screen`
+      }>
+        <div className={pathname.includes('/kassa') ? 'h-full' : 'p-4 md:p-6 max-w-full pb-96'}>
           {children}
         </div>
       </main>
