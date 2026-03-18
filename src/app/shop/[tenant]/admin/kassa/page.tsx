@@ -150,59 +150,99 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   return (
-    <div className="flex h-screen bg-[#e3e3e3] overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#e3e3e3] overflow-hidden">
 
-      {/* ── Links: hamburger kolom ── */}
-      <div className="flex flex-col bg-[#e3e3e3] w-16 flex-shrink-0 relative">
+      {/* ── Volledige breedte header ── */}
+      <div className="h-14 flex-shrink-0 bg-white border-b border-gray-200 flex items-center px-3 gap-3 relative z-30">
 
-        {/* Hamburger knop */}
-        <button
-          onClick={() => setNavOpen(o => !o)}
-          className="w-full h-16 flex items-center justify-center hover:bg-gray-300 transition-colors rounded-xl"
-        >
-          <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
+        {/* Links: hamburger + Kassa */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setNavOpen(o => !o)}
+            className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div className="w-8 h-8 bg-[#3C4D6B] rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <span className="font-bold text-gray-800 text-base">Kassa</span>
+        </div>
 
-        {/* Dropdown menu */}
+        {/* Midden: Vysion group */}
+        <div className="flex-1 flex justify-center items-end">
+          <span className="text-2xl font-black text-red-600 tracking-tight">Vysion</span>
+          <span className="text-sm text-gray-400 mb-0.5 ml-1">group</span>
+        </div>
+
+        {/* Rechts: online + geluid + taal */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700">
+            <div className={`w-2 h-2 rounded-full ${isOnline === null ? 'bg-gray-400 animate-pulse' : isOnline ? 'bg-green-500' : 'bg-red-500'}`} />
+            <span>{isOnline === null ? '...' : isOnline ? 'Online' : 'Offline'}</span>
+          </div>
+          <button
+            onClick={toggleSound}
+            className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors ${soundsOn ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}
+            title={soundsOn ? 'Geluid aan' : 'Geluid uit'}
+          >
+            {soundsOn ? '🔔' : '🔕'}
+          </button>
+          <div ref={langRef} className="relative">
+            <button
+              onClick={() => setLangOpen(o => !o)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+            >
+              <span className="text-base">{localeFlags[locale]}</span>
+              <span>{localeNames[locale]}</span>
+              <svg className={`w-3 h-3 text-gray-500 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {langOpen && (
+              <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 min-w-[160px] overflow-hidden">
+                {locales.map(lang => (
+                  <button
+                    key={lang}
+                    onClick={() => { setLocale(lang); setLangOpen(false) }}
+                    className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 transition-colors text-sm ${locale === lang ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}`}
+                  >
+                    <span>{localeFlags[lang]}</span>
+                    <span>{localeNames[lang]}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Hamburger dropdown */}
         {navOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setNavOpen(false)} />
-            <div className="absolute top-16 left-0 z-20 w-64 bg-white border border-gray-200 rounded-br-2xl shadow-xl overflow-hidden">
-              <Link
-                href={`${baseUrl}/kassa`}
-                onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 bg-blue-50 border-b border-gray-100 font-bold text-[#3C4D6B]"
-              >
+            <div className="absolute top-14 left-0 z-20 w-64 bg-white border border-gray-200 rounded-br-2xl shadow-xl overflow-hidden">
+              <Link href={`${baseUrl}/kassa`} onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-4 bg-blue-50 border-b border-gray-100 font-bold text-[#3C4D6B]">
                 <span className="text-xl">🖥️</span> Kassa
               </Link>
-              <Link
-                href={baseUrl}
-                onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors"
-              >
+              <Link href={baseUrl} onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">🛒</span> Online Platform
               </Link>
-              <Link
-                href={`${baseUrl}/reservaties`}
-                onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors"
-              >
+              <Link href={`${baseUrl}/reservaties`} onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">📅</span> Reservaties
               </Link>
-              <Link
-                href={`/shop/${tenant}`}
-                target="_blank"
-                onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors"
-              >
+              <Link href={`/shop/${tenant}`} target="_blank" onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">🔗</span> Bekijk je shop
               </Link>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-5 py-4 hover:bg-red-50 font-semibold text-red-600 transition-colors"
-              >
+              <button onClick={handleLogout}
+                className="w-full flex items-center gap-3 px-5 py-4 hover:bg-red-50 font-semibold text-red-600 transition-colors">
                 <span className="text-xl">🚪</span> Uitloggen
               </button>
             </div>
@@ -210,73 +250,14 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         )}
       </div>
 
-      {/* ── Midden: kassa header + lege ruimte ── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="bg-[#e3e3e3] flex items-center px-4 h-16 flex-shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[#3C4D6B] rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <span className="font-bold text-gray-800 text-lg">Kassa</span>
-          </div>
-          <div className="flex-1 flex justify-center">
-            <span className="text-2xl font-black text-red-600 tracking-tight">Vysion</span>
-            <span className="text-sm text-gray-400 self-end mb-0.5 ml-1">group</span>
-          </div>
-          {/* Rechts: online status + geluid + taal */}
-          <div className="flex items-center gap-2">
-            {/* Online status */}
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-sm font-medium text-gray-700">
-              <div className={`w-2 h-2 rounded-full ${isOnline === null ? 'bg-gray-400 animate-pulse' : isOnline ? 'bg-green-500' : 'bg-red-500'}`} />
-              <span>{isOnline === null ? '...' : isOnline ? 'Online' : 'Offline'}</span>
-            </div>
-            {/* Geluid toggle */}
-            <button
-              onClick={toggleSound}
-              className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors ${soundsOn ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-500'}`}
-              title={soundsOn ? 'Geluid aan' : 'Geluid uit'}
-            >
-              {soundsOn ? '🔔' : '🔕'}
-            </button>
-            {/* Taalknop */}
-            <div ref={langRef} className="relative">
-              <button
-                onClick={() => setLangOpen(o => !o)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                <span className="text-base">{localeFlags[locale]}</span>
-                <span>{localeNames[locale]}</span>
-                <svg className={`w-3 h-3 text-gray-500 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {langOpen && (
-                <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 min-w-[160px] overflow-hidden">
-                  {locales.map(lang => (
-                    <button
-                      key={lang}
-                      onClick={() => { setLocale(lang); setLangOpen(false) }}
-                      className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 transition-colors text-sm ${locale === lang ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}`}
-                    >
-                      <span>{localeFlags[lang]}</span>
-                      <span>{localeNames[lang]}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+      {/* ── Body: midden + rechts ── */}
+      <div className="flex flex-1 overflow-hidden">
 
-        {/* Lege ruimte */}
+        {/* Midden: lege ruimte (toekomst: categorieën/producten) */}
         <div className="flex-1 bg-[#e3e3e3]" />
-      </div>
 
-      {/* ── Rechts: numpad / cart ── */}
-      <div className="w-80 sm:w-96 lg:w-[420px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0 h-full">
+        {/* ── Rechts: numpad / cart ── */}
+        <div className="w-80 sm:w-96 lg:w-[380px] bg-white border-l border-gray-200 flex flex-col flex-shrink-0">
 
         {/* Tafel knop */}
         {orderType === 'DINE_IN' && (
@@ -405,6 +386,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           >
             💳 Afrekenen
           </button>
+        </div>
         </div>
       </div>
     </div>
