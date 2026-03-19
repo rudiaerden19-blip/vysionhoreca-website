@@ -383,6 +383,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
               }}
               onPointerDown={(e) => handlePointerDown(e, t.id)}
               onPointerUp={(e) => { e.stopPropagation(); handlePointerUp(e, t.id) }}
+              onClick={(e) => {
+                e.stopPropagation()
+                if (!dragMoved.current) {
+                  setSelected(prev => prev?.id === t.id ? null : t)
+                }
+              }}
             >
               <TableSVG
                 table={t}
