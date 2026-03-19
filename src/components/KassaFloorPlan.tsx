@@ -21,7 +21,6 @@ const STATUS_COLORS: Record<TableStatus, string> = {
   OCCUPIED: '#3b82f6',
   UNPAID: '#f59e0b',
 }
-
 const STATUS_LABELS: Record<TableStatus, string> = {
   FREE: 'Vrij',
   OCCUPIED: 'Bezet',
@@ -34,8 +33,193 @@ interface Props {
   onClose: () => void
 }
 
-function makeId() {
-  return Math.random().toString(36).slice(2, 10)
+function makeId() { return Math.random().toString(36).slice(2, 10) }
+
+function TableSVG({ table, isSelected, onClick }: {
+  table: KassaTable
+  isSelected: boolean
+  onClick: () => void
+}) {
+  const seats = table.seats
+  const color = STATUS_COLORS[table.status]
+
+  // Table dimensions
+  const tableSize = 90
+  const chairW = 26
+  const chairH = 22
+  const gap = 14 // distance from table edge to chair
+
+  // Generate chair positions
+  type Chair = { x: number; y: number; angle: number }
+  const chairs: Chair[] = []
+
+  if (table.shape === 'ROUND') {
+    const radius = tableSize / 2
+    const dist = radius + gap + chairH / 2
+    for (let i = 0; i < seats; i++) {
+      const angle = (i * 360) / seats - 90
+      const rad = (angle * Math.PI) / 180
+      chairs.push({ x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, angle })
+    }
+  } else if (table.shape === 'SQUARE') {
+    const half = tableSize / 2
+    const dist = half + gap + chairH / 2
+    const perSide = Math.ceil(seats / 4)
+    const sides = [
+      { angle: -90, axis: 'x' as const, fixed: -dist },
+      { angle: 0,   axis: 'y' as const, fixed: dist },
+      { angle: 90,  axis: 'x' as const, fixed: dist },
+      { angle: 180, axis: 'y' as const, fixed: -dist },
+    ]
+    let placed = 0
+    for (const side of sides) {
+      const count = Math.min(perSide, seats - placed)
+      for (let i = 0; i < count; i++) {
+        const offset = (i - (count - 1) / 2) * (chairW + 6)
+        chairs.push({
+          x: side.axis === 'x' ? offset : side.fixed,
+          y: side.axis === 'y' ? offset : side.fixed,
+          angle: side.angle,
+        })
+        placed++
+      }
+      if (placed >= seats) break
+    }
+  } else {
+    // RECTANGLE
+    const tw = tableSize * 1.7
+    const th = tableSize * 0.65
+    const perLong = Math.ceil(seats / 2)
+    const distTop = th / 2 + gap + chairH / 2
+    const distSide = tw / 2 + gap + chairH / 2
+    let placed = 0
+    // top
+    for (let i = 0; i < perLong && placed < seats; i++) {
+      const offset = (i - (perLong - 1) / 2) * (chairW + 6)
+      chairs.push({ x: offset, y: -distTop, angle: -90 })
+      placed++
+    }
+    // bottom
+    for (let i = 0; i < perLong && placed < seats; i++) {
+      const offset = (i - (perLong - 1) / 2) * (chairW + 6)
+      chairs.push({ x: offset, y: distTop, angle: 90 })
+      placed++
+    }
+    // sides if needed
+    if (placed < seats) {
+      chairs.push({ x: -distSide, y: 0, angle: 180 })
+      placed++
+    }
+    if (placed < seats) {
+      chairs.push({ x: distSide, y: 0, angle: 0 })
+    }
+  }
+
+  // SVG canvas size
+  const pad = 80
+  const tw = table.shape === 'RECTANGLE' ? tableSize * 1.7 : tableSize
+  const th = table.shape === 'RECTANGLE' ? tableSize * 0.65 : tableSize
+  const svgW = tw + pad * 2 + 40
+  const svgH = th + pad * 2 + 40
+  const cx = svgW / 2
+  const cy = svgH / 2
+
+  return (
+    <svg
+      width={svgW}
+      height={svgH}
+      onClick={onClick}
+      style={{ cursor: 'pointer', overflow: 'visible', display: 'block' }}
+    >
+      {/* Chairs */}
+      {chairs.map((c, i) => (
+        <g key={i} transform={`translate(${cx + c.x}, ${cy + c.y}) rotate(${c.angle})`}>
+          {/* Backrest */}
+          <rect
+            x={-chairW / 2 + 2}
+            y={-chairH / 2}
+            width={chairW - 4}
+            height={7}
+            rx={3}
+            fill="#8B4513"
+            stroke="#5D3A1A"
+            strokeWidth={1}
+          />
+          {/* Seat */}
+          <rect
+            x={-chairW / 2}
+            y={-chairH / 2 + 7}
+            width={chairW}
+            height={chairH - 7}
+            rx={3}
+            fill="#A0522D"
+            stroke="#5D3A1A"
+            strokeWidth={1}
+          />
+        </g>
+      ))}
+
+      {/* Table */}
+      {table.shape === 'ROUND' ? (
+        <ellipse
+          cx={cx} cy={cy}
+          rx={tableSize / 2} ry={tableSize / 2}
+          fill="url(#wood-round)"
+          stroke={isSelected ? color : '#5D3A1A'}
+          strokeWidth={isSelected ? 4 : 3}
+          filter="url(#shadow)"
+        />
+      ) : table.shape === 'RECTANGLE' ? (
+        <rect
+          x={cx - tw / 2} y={cy - th / 2}
+          width={tw} height={th}
+          rx={10}
+          fill="url(#wood-rect)"
+          stroke={isSelected ? color : '#5D3A1A'}
+          strokeWidth={isSelected ? 4 : 3}
+          filter="url(#shadow)"
+        />
+      ) : (
+        <rect
+          x={cx - tableSize / 2} y={cy - tableSize / 2}
+          width={tableSize} height={tableSize}
+          rx={10}
+          fill="url(#wood-rect)"
+          stroke={isSelected ? color : '#5D3A1A'}
+          strokeWidth={isSelected ? 4 : 3}
+          filter="url(#shadow)"
+        />
+      )}
+
+      {/* Table number */}
+      <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize={20} fontWeight="bold" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }}>
+        {table.number}
+      </text>
+      <text x={cx} y={cy + 14} textAnchor="middle" fill="rgba(255,255,255,0.75)" fontSize={12}>
+        {seats}p
+      </text>
+
+      {/* Status dot */}
+      <circle cx={cx + (table.shape === 'RECTANGLE' ? tw / 2 : tableSize / 2) - 4} cy={cy - (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + 4} r={8} fill={color} stroke="white" strokeWidth={2} />
+
+      {/* Defs */}
+      <defs>
+        <radialGradient id="wood-round" cx="35%" cy="35%">
+          <stop offset="0%" stopColor="#D2691E" />
+          <stop offset="50%" stopColor="#A0522D" />
+          <stop offset="100%" stopColor="#654321" />
+        </radialGradient>
+        <linearGradient id="wood-rect" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#D2691E" />
+          <stop offset="40%" stopColor="#A0522D" />
+          <stop offset="100%" stopColor="#654321" />
+        </linearGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.5" />
+        </filter>
+      </defs>
+    </svg>
+  )
 }
 
 export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props) {
@@ -46,7 +230,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
   const [addNumber, setAddNumber] = useState('')
   const [addSeats, setAddSeats] = useState(4)
   const [addShape, setAddShape] = useState<TableShape>('SQUARE')
-  const [dragging, setDragging] = useState<string | null>(null)
+  const [draggingId, setDraggingId] = useState<string | null>(null)
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     try {
@@ -67,8 +252,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
       number: addNumber.trim(),
       seats: addSeats,
       shape: addShape,
-      x: 20 + Math.random() * 50,
-      y: 20 + Math.random() * 50,
+      x: 15 + Math.random() * 60,
+      y: 15 + Math.random() * 60,
       rotation: 0,
       status: 'FREE',
     }
@@ -83,80 +268,42 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
     setSelected(null)
   }
 
-  const handleFloorClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (dragging) return
-    setSelected(null)
+  const rotate = (id: string, delta: number) => {
+    const updated = tables.map(t => t.id === id ? { ...t, rotation: (t.rotation + delta + 360) % 360 } : t)
+    save(updated)
+    const sel = updated.find(t => t.id === id)
+    if (sel) setSelected(sel)
   }
 
-  const handleDragStart = (id: string) => setDragging(id)
+  // Drag handlers
+  const handleMouseDown = (e: React.MouseEvent, id: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDraggingId(id)
+    setSelected(tables.find(t => t.id === id) || null)
+    const floor = (e.currentTarget.closest('.floor-plan') as HTMLElement)?.getBoundingClientRect()
+    if (!floor) return
+    const t = tables.find(t => t.id === id)!
+    setDragOffset({
+      x: e.clientX - floor.left - (t.x / 100) * floor.width,
+      y: e.clientY - floor.top - (t.y / 100) * floor.height,
+    })
+  }
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    if (!dragging) return
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!draggingId) return
     const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left) / rect.width) * 100
-    const y = ((e.clientY - rect.top) / rect.height) * 100
-    save(tables.map(t => t.id === dragging ? { ...t, x: Math.max(5, Math.min(92, x)), y: Math.max(5, Math.min(90, y)) } : t))
-    setDragging(null)
+    const x = ((e.clientX - rect.left - dragOffset.x) / rect.width) * 100
+    const y = ((e.clientY - rect.top - dragOffset.y) / rect.height) * 100
+    const updated = tables.map(t => t.id === draggingId ? { ...t, x: Math.max(5, Math.min(92, x)), y: Math.max(5, Math.min(92, y)) } : t)
+    setTables(updated)
   }
 
-  const renderTable = (t: KassaTable) => {
-    const size = 70
-    const color = STATUS_COLORS[t.status]
-    const isSelected = selected?.id === t.id
-
-    let shape: React.CSSProperties = {}
-    let w = size, h = size
-    if (t.shape === 'ROUND') {
-      shape = { borderRadius: '50%' }
-    } else if (t.shape === 'RECTANGLE') {
-      w = size * 1.6; h = size * 0.7
-      shape = { borderRadius: 8 }
-    } else {
-      shape = { borderRadius: 8 }
+  const handleMouseUp = () => {
+    if (draggingId) {
+      localStorage.setItem(storageKey, JSON.stringify(tables))
+      setDraggingId(null)
     }
-
-    return (
-      <div
-        key={t.id}
-        className="absolute cursor-pointer select-none"
-        style={{
-          left: `${t.x}%`,
-          top: `${t.y}%`,
-          transform: 'translate(-50%, -50%)',
-          zIndex: isSelected ? 10 : 1,
-        }}
-        draggable
-        onDragStart={() => handleDragStart(t.id)}
-        onClick={(e) => { e.stopPropagation(); setSelected(t) }}
-      >
-        <div
-          style={{
-            width: w,
-            height: h,
-            background: `linear-gradient(135deg, #D2691E 0%, #A0522D 40%, #8B4513 100%)`,
-            boxShadow: isSelected
-              ? `0 0 0 3px ${color}, 0 6px 20px rgba(0,0,0,0.5)`
-              : '0 4px 12px rgba(0,0,0,0.4)',
-            border: `3px solid ${isSelected ? color : '#5D3A1A'}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            position: 'relative',
-            transition: 'box-shadow 0.15s',
-            ...shape,
-          }}
-        >
-          <span className="text-white font-bold text-lg drop-shadow-lg">{t.number}</span>
-          <span className="text-white/70 text-xs">{t.seats}p</span>
-          {/* Status dot */}
-          <div
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full border-2 border-white shadow-lg"
-            style={{ backgroundColor: color }}
-          />
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -170,16 +317,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
           </span>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-semibold transition-colors"
-          >
+          <button onClick={() => setShowAddModal(true)}
+            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors">
             + Tafel
           </button>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-semibold transition-colors"
-          >
+          <button onClick={onClose}
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-semibold transition-colors">
             ✕ Sluiten
           </button>
         </div>
@@ -189,29 +332,48 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
       <div className="flex flex-1 overflow-hidden">
         {/* Floor plan */}
         <div
-          className="flex-1 relative overflow-hidden"
+          className="floor-plan flex-1 relative overflow-hidden select-none"
           style={{
             backgroundColor: '#4a4a4a',
             backgroundImage: `
-              linear-gradient(to right, rgba(200,200,200,0.3) 0px, rgba(200,200,200,0.3) 2px, transparent 2px),
-              linear-gradient(to bottom, rgba(200,200,200,0.3) 0px, rgba(200,200,200,0.3) 2px, transparent 2px)
+              linear-gradient(to right, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px),
+              linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
             `,
             backgroundSize: '100px 100px',
+            cursor: draggingId ? 'grabbing' : 'default',
           }}
-          onClick={handleFloorClick}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={handleDrop}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onClick={() => { if (!draggingId) setSelected(null) }}
         >
-          {tables.map(renderTable)}
+          {tables.map(t => (
+            <div
+              key={t.id}
+              className="absolute"
+              style={{
+                left: `${t.x}%`,
+                top: `${t.y}%`,
+                transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
+                zIndex: selected?.id === t.id ? 10 : 1,
+                cursor: 'grab',
+              }}
+              onMouseDown={(e) => handleMouseDown(e, t.id)}
+            >
+              <TableSVG
+                table={t}
+                isSelected={selected?.id === t.id}
+                onClick={() => setSelected(t)}
+              />
+            </div>
+          ))}
 
           {tables.length === 0 && (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-white/40">
               <span className="text-6xl mb-4">🪑</span>
               <p className="text-lg font-semibold">Nog geen tafels</p>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="mt-4 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors"
-              >
+              <button onClick={() => setShowAddModal(true)}
+                className="mt-4 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors">
                 + Voeg tafel toe
               </button>
             </div>
@@ -226,51 +388,54 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
               <button onClick={() => setSelected(null)} className="text-white/50 hover:text-white text-xl">✕</button>
             </div>
 
-            {/* Status */}
             <div className="p-4 border-b border-white/10">
-              <div
-                className="px-4 py-2 rounded-xl text-center font-bold text-white text-sm"
-                style={{ backgroundColor: STATUS_COLORS[selected.status] }}
-              >
+              <div className="px-4 py-2 rounded-xl text-center font-bold text-white text-sm"
+                style={{ backgroundColor: STATUS_COLORS[selected.status] }}>
                 {STATUS_LABELS[selected.status]}
               </div>
               <p className="text-white/50 text-xs text-center mt-2">{selected.seats} plaatsen</p>
             </div>
 
+            {/* Rotatie */}
+            <div className="p-4 border-b border-white/10">
+              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
+              <div className="flex gap-2">
+                <button onClick={() => rotate(selected.id, -45)}
+                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↺</button>
+                <button onClick={() => rotate(selected.id, 45)}
+                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↻</button>
+                <button onClick={() => rotate(selected.id, -selected.rotation)}
+                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors">Reset</button>
+              </div>
+            </div>
+
             {/* Status toggle */}
             <div className="p-4 border-b border-white/10 space-y-2">
-              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Status wijzigen</p>
+              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Status</p>
               {(['FREE', 'OCCUPIED', 'UNPAID'] as TableStatus[]).map(s => (
-                <button
-                  key={s}
+                <button key={s}
                   onClick={() => {
                     const updated = tables.map(t => t.id === selected.id ? { ...t, status: s } : t)
                     save(updated)
                     setSelected({ ...selected, status: s })
                   }}
-                  className={`w-full py-2 rounded-lg text-sm font-semibold transition-colors ${selected.status === s ? 'text-white' : 'text-white/50 bg-white/5 hover:bg-white/10'}`}
-                  style={selected.status === s ? { backgroundColor: STATUS_COLORS[s] } : {}}
-                >
+                  className="w-full py-2 rounded-lg text-sm font-semibold transition-colors"
+                  style={selected.status === s
+                    ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
+                    : { backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
                   {STATUS_LABELS[s]}
                 </button>
               ))}
             </div>
 
-            {/* Actions */}
             <div className="p-4 space-y-2 mt-auto">
               <button
-                onClick={() => {
-                  onSelectTable(selected.number)
-                  onClose()
-                }}
-                className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors flex items-center justify-center gap-2"
-              >
+                onClick={() => { onSelectTable(selected.number); onClose() }}
+                className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">
                 🛒 Nieuwe bestelling
               </button>
-              <button
-                onClick={() => deleteTable(selected.id)}
-                className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold transition-colors"
-              >
+              <button onClick={() => deleteTable(selected.id)}
+                className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold transition-colors">
                 🗑 Verwijder tafel
               </button>
             </div>
@@ -280,13 +445,13 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
 
       {/* Legend */}
       <div className="h-10 flex-shrink-0 bg-[#16213e] border-t border-white/10 flex items-center justify-center gap-6 text-sm text-white/60">
-        {Object.entries(STATUS_COLORS).map(([s, c]) => (
+        {(Object.entries(STATUS_COLORS) as [TableStatus, string][]).map(([s, c]) => (
           <div key={s} className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: c }} />
-            <span>{STATUS_LABELS[s as TableStatus]}</span>
+            <span>{STATUS_LABELS[s]}</span>
           </div>
         ))}
-        <span className="text-white/30 ml-4 text-xs">Sleep tafels om te verplaatsen</span>
+        <span className="text-white/30 ml-4 text-xs">Sleep om te verplaatsen • ↺↻ om te draaien</span>
       </div>
 
       {/* Add table modal */}
@@ -300,23 +465,17 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
             <div className="p-5 space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-1">Tafelnummer *</label>
-                <input
-                  autoFocus
-                  value={addNumber}
-                  onChange={e => setAddNumber(e.target.value)}
+                <input autoFocus value={addNumber} onChange={e => setAddNumber(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && addTable()}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-[#3C4D6B] outline-none text-xl font-bold text-center"
-                  placeholder="bv. 1, 2A, Toog"
-                />
+                  placeholder="bv. 1, 2A, Toog" />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-600 mb-2">Aantal plaatsen</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {[2, 4, 6, 8].map(n => (
-                    <button
-                      key={n}
-                      onClick={() => setAddSeats(n)}
-                      className={`py-2 rounded-xl font-bold transition-colors ${addSeats === n ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                    >
+                <div className="grid grid-cols-5 gap-2">
+                  {[2, 4, 6, 8, 10].map(n => (
+                    <button key={n} onClick={() => setAddSeats(n)}
+                      className={`py-2 rounded-xl font-bold transition-colors ${addSeats === n ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       {n}
                     </button>
                   ))}
@@ -326,11 +485,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
                 <label className="block text-sm font-semibold text-gray-600 mb-2">Vorm</label>
                 <div className="grid grid-cols-3 gap-2">
                   {([['SQUARE', '⬛ Vierkant'], ['ROUND', '⭕ Rond'], ['RECTANGLE', '▬ Rechthoek']] as const).map(([s, label]) => (
-                    <button
-                      key={s}
-                      onClick={() => setAddShape(s)}
-                      className={`py-2 rounded-xl text-xs font-bold transition-colors ${addShape === s ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                    >
+                    <button key={s} onClick={() => setAddShape(s)}
+                      className={`py-2 rounded-xl text-xs font-bold transition-colors ${addShape === s ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       {label}
                     </button>
                   ))}
@@ -339,7 +495,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
             </div>
             <div className="p-4 border-t flex gap-3">
               <button onClick={() => setShowAddModal(false)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700">Annuleer</button>
-              <button onClick={addTable} className="flex-2 flex-[2] py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">Toevoegen</button>
+              <button onClick={addTable} className="flex-[2] py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">Toevoegen</button>
             </div>
           </div>
         </div>
