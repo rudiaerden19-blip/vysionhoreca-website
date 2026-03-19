@@ -437,9 +437,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                         style={{ backgroundColor: '#3C4D6B' }}
                       >
                         {catImage && (
-                          <img src={catImage} alt={cat.name} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                          <img src={catImage} alt={cat.name} className="absolute inset-0 w-full h-full object-cover" />
                         )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                         <div className="absolute inset-0 flex flex-col items-center justify-end p-2">
                           {cat.icon && <span className="text-2xl mb-0.5">{cat.icon}</span>}
                           <span className="font-bold text-white text-xs text-center leading-tight drop-shadow">{cat.name}</span>
