@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct } from '@/lib/admin-api'
+import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct, getTenantSettings, TenantSettings } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled } from '@/lib/sounds'
@@ -50,6 +50,21 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [menuLoading, setMenuLoading] = useState(true)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
 
+  // Betaling
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  type PaymentMethodType = 'CASH' | 'CARD' | 'IDEAL' | 'BANCONTACT'
+  const [lastOrder, setLastOrder] = useState<{
+    orderNumber: number
+    items: CartItem[]
+    total: number
+    paymentMethod: PaymentMethodType
+    orderType: OrderType
+    tableNumber: string
+    createdAt: Date
+  } | null>(null)
+  const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
+
   // Opties modal
   const [optionsModal, setOptionsModal] = useState<{
     product: MenuProduct
@@ -84,6 +99,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   useEffect(() => {
     loadMenu()
+    getTenantSettings(tenant).then(s => setTenantInfo(s))
   }, [tenant])
 
   // Herlaad menu wanneer pagina weer focus krijgt (na terugkeren van producten/categorieen pagina)
@@ -244,20 +260,121 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     setOrderType(types[(types.indexOf(orderType) + 1) % types.length])
   }
 
-  const handleAfrekenen = async () => {
+  const completePayment = async (method: PaymentMethodType) => {
     if (cart.length === 0) return
+    const vatRate = tenantInfo?.btw_percentage ?? 6
+    const subtotal = total / (1 + vatRate / 100)
+    const tax = total - subtotal
+
+    // Ophalen huidig hoogste ordernummer voor tenant
+    const { data: lastOrderRow } = await supabase
+      .from('orders')
+      .select('order_number')
+      .eq('tenant_slug', tenant)
+      .order('order_number', { ascending: false })
+      .limit(1)
+      .single()
+    const orderNumber = (lastOrderRow?.order_number ?? 1000) + 1
+
     await supabase.from('orders').insert({
       tenant_slug: tenant,
+      order_number: orderNumber,
       status: 'completed',
+      payment_status: 'paid',
+      payment_method: method,
       order_type: orderType,
       table_number: tableNumber || null,
+      subtotal: Math.round(subtotal * 100) / 100,
+      tax: Math.round(tax * 100) / 100,
       total_amount: total,
-      items: cart.map(i => ({ product_id: i.product.id, name: i.product.name, price: i.product.price, quantity: i.quantity })),
+      items: cart.map(i => ({
+        product_id: i.product.id,
+        name: i.product.name,
+        price: i.product.price,
+        quantity: i.quantity,
+        choices: i.choices || [],
+      })),
       created_at: new Date().toISOString(),
+    })
+
+    setLastOrder({
+      orderNumber,
+      items: [...cart],
+      total,
+      paymentMethod: method,
+      orderType,
+      tableNumber,
+      createdAt: new Date(),
     })
     clearCart()
     setTableNumber('')
-    alert(`✅ Bestelling afgerekend! Totaal: €${total.toFixed(2)}`)
+    setShowPaymentModal(false)
+    setShowSuccessModal(true)
+  }
+
+  const printReceipt = (order: typeof lastOrder) => {
+    if (!order) return
+    const vatRate = tenantInfo?.btw_percentage ?? 6
+    const subtotal = order.total / (1 + vatRate / 100)
+    const tax = order.total - subtotal
+    const orderTypeLabel =
+      order.orderType === 'DINE_IN' ? '🍽️ Hier Opeten' :
+      order.orderType === 'TAKEAWAY' ? '📦 Afhalen' : '🚗 Bezorgen'
+    const payLabel =
+      order.paymentMethod === 'CASH' ? 'Contant' :
+      order.paymentMethod === 'CARD' ? 'PIN/Kaart' :
+      order.paymentMethod === 'IDEAL' ? 'iDEAL' : 'Bancontact'
+
+    const html = `<!DOCTYPE html><html><head><title>Bon #${order.orderNumber}</title><style>
+      * { margin:0;padding:0;box-sizing:border-box; }
+      body { font-family:'Courier New',monospace;font-size:12px;width:80mm;padding:10px; }
+      .center { text-align:center; }
+      .bold { font-weight:bold; }
+      .big { font-size:16px; }
+      .small { font-size:10px; }
+      .divider { border-top:1px dashed #000;margin:8px 0; }
+      .divider-solid { border-top:1px solid #000;margin:8px 0; }
+      .row { display:flex;justify-content:space-between;margin:2px 0; }
+      .total { font-size:18px;font-weight:bold;margin-top:8px; }
+      .order-type { font-size:20px;font-weight:bold;margin:10px 0;padding:8px;border:2px solid #000; }
+      @media print { body { width:auto; } }
+    </style></head><body>
+      <div class="center">
+        <div class="bold big">${tenantInfo?.business_name || 'Vysion Horeca'}</div>
+        ${tenantInfo?.address ? `<div class="small">${tenantInfo.address}</div>` : ''}
+        ${(tenantInfo?.postal_code || tenantInfo?.city) ? `<div class="small">${tenantInfo.postal_code ?? ''} ${tenantInfo.city ?? ''}</div>` : ''}
+        ${tenantInfo?.phone ? `<div class="small">Tel: ${tenantInfo.phone}</div>` : ''}
+      </div>
+      <div class="divider"></div>
+      <div class="center order-type">${orderTypeLabel}${order.tableNumber ? `<br/>TAFEL ${order.tableNumber}` : ''}</div>
+      <div class="row small">
+        <span>Bon #${order.orderNumber}</span>
+        <span>${order.createdAt.toLocaleString('nl-NL', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' })}</span>
+      </div>
+      <div class="divider-solid"></div>
+      ${order.items.map(i => {
+        const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+        const lineTotal = (i.product.price + choicesTotal) * i.quantity
+        return `<div class="row"><span>${i.quantity}x ${i.product.name}</span><span>€${lineTotal.toFixed(2)}</span></div>
+        ${(i.choices || []).map(c => `<div class="row small" style="margin-left:15px;color:#666;"><span>+ ${c.choiceName}</span><span>${c.price > 0 ? '€' + c.price.toFixed(2) : ''}</span></div>`).join('')}`
+      }).join('')}
+      <div class="divider-solid"></div>
+      <div class="row"><span>Subtotaal</span><span>€${subtotal.toFixed(2)}</span></div>
+      <div class="row"><span>BTW (${vatRate}%)</span><span>€${tax.toFixed(2)}</span></div>
+      <div class="row total"><span>TOTAAL</span><span>€${order.total.toFixed(2)}</span></div>
+      <div class="divider"></div>
+      <div class="center small">Betaald met: ${payLabel}</div>
+      <div class="divider"></div>
+      <div class="center small">
+        ${tenantInfo?.btw_number ? `BTW: ${tenantInfo.btw_number}<br/>` : ''}
+        Bedankt voor uw bezoek!
+        ${tenantInfo?.website ? `<br/>${tenantInfo.website}` : ''}
+      </div>
+      <script>window.onload=function(){window.print();}</script>
+    </body></html>`
+
+    const w = window.open('', '_blank', 'width=400,height=600')
+    if (w) { w.document.write(html); w.document.close() }
   }
 
   const handleLogout = () => {
@@ -654,7 +771,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             </button>
           </div>
           <button
-            onClick={handleAfrekenen}
+            onClick={() => { if (cart.length > 0) setShowPaymentModal(true) }}
             disabled={cart.length === 0}
             className="w-full py-5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
           >
@@ -722,6 +839,160 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           </div>
         </div>
       )}
+
+      {/* ── Betaalmodal ── */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h3 className="text-xl font-semibold">Betalen</h3>
+              <button onClick={() => setShowPaymentModal(false)} className="p-2 rounded-lg hover:bg-gray-100 text-2xl">✕</button>
+            </div>
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <p className="text-gray-500">Te betalen</p>
+                <p className="text-5xl font-bold text-[#3C4D6B]">€{total.toFixed(2)}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {([
+                  { method: 'CASH' as const, label: 'Contant', icon: '💵', color: '#10b981' },
+                  { method: 'CARD' as const, label: 'PIN/Kaart', icon: '💳', color: '#3b82f6' },
+                  { method: 'IDEAL' as const, label: 'iDEAL', icon: '📱', color: '#ec4899' },
+                  { method: 'BANCONTACT' as const, label: 'Bancontact', icon: '🏦', color: '#f59e0b' },
+                ] as const).map(pm => (
+                  <button
+                    key={pm.method}
+                    onClick={() => completePayment(pm.method)}
+                    className="flex flex-col items-center justify-center h-32 gap-3 rounded-xl border-2 bg-gray-50 hover:scale-[1.02] transition-transform font-semibold text-lg"
+                    style={{ borderColor: pm.color }}
+                  >
+                    <span className="text-4xl">{pm.icon}</span>
+                    <span style={{ color: pm.color }}>{pm.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Succes modal met kassabon ── */}
+      {showSuccessModal && lastOrder && (() => {
+        const vatRate = tenantInfo?.btw_percentage ?? 6
+        const subtotal = lastOrder.total / (1 + vatRate / 100)
+        const tax = lastOrder.total - subtotal
+        const orderTypeLabel =
+          lastOrder.orderType === 'DINE_IN' ? '🍽️ Hier Opeten' :
+          lastOrder.orderType === 'TAKEAWAY' ? '📦 Afhalen' : '🚗 Bezorgen'
+        const payLabel =
+          lastOrder.paymentMethod === 'CASH' ? 'Contant' :
+          lastOrder.paymentMethod === 'CARD' ? 'PIN/Kaart' :
+          lastOrder.paymentMethod === 'IDEAL' ? 'iDEAL' : 'Bancontact'
+        return (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white rounded-2xl overflow-hidden max-w-md w-full my-4 shadow-2xl">
+              {/* Header */}
+              <div className="p-4 bg-emerald-500 text-white text-center">
+                <div className="w-16 h-16 rounded-full bg-white/20 mx-auto mb-2 flex items-center justify-center text-4xl">✓</div>
+                <h3 className="text-xl font-bold">Betaling Geslaagd!</h3>
+                <p className="opacity-80">Bestelling #{lastOrder.orderNumber}</p>
+              </div>
+
+              {/* Kassabon — exact zelfde als referentie */}
+              <div className="p-4 max-h-[50vh] overflow-y-auto">
+                <div className="bg-white text-black p-4 rounded-lg max-w-[300px] mx-auto font-mono text-sm">
+                  {/* Header */}
+                  <div className="text-center mb-4">
+                    <h1 className="font-bold text-lg">{tenantInfo?.business_name || 'Vysion Horeca'}</h1>
+                    {tenantInfo?.address && <p className="text-xs">{tenantInfo.address}</p>}
+                    {(tenantInfo?.postal_code || tenantInfo?.city) && (
+                      <p className="text-xs">{tenantInfo?.postal_code} {tenantInfo?.city}</p>
+                    )}
+                    {tenantInfo?.phone && <p className="text-xs">Tel: {tenantInfo.phone}</p>}
+                  </div>
+                  <div className="border-t-2 border-dashed border-gray-400 my-3" />
+                  {/* Besteltype */}
+                  <div className="text-center mb-3">
+                    <p className="font-bold text-lg">{orderTypeLabel}</p>
+                    {lastOrder.tableNumber && <p className="font-bold">Tafel {lastOrder.tableNumber}</p>}
+                  </div>
+                  {/* Bon info */}
+                  <div className="text-xs mb-3">
+                    <div className="flex justify-between">
+                      <span>Bon #{lastOrder.orderNumber}</span>
+                      <span>{lastOrder.createdAt.toLocaleString('nl-NL', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' })}</span>
+                    </div>
+                  </div>
+                  <div className="border-t border-gray-300 my-2" />
+                  {/* Items */}
+                  <div className="space-y-2">
+                    {lastOrder.items.map((item, idx) => {
+                      const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+                      const lineTotal = (item.product.price + choicesTotal) * item.quantity
+                      return (
+                        <div key={idx}>
+                          <div className="flex justify-between">
+                            <div className="flex-1">
+                              <span className="font-medium">{item.quantity}x</span>{' '}
+                              <span>{item.product.name}</span>
+                            </div>
+                            <span>€{lineTotal.toFixed(2)}</span>
+                          </div>
+                          {(item.choices || []).length > 0 && (
+                            <div className="ml-4 text-xs text-gray-600">
+                              {(item.choices || []).map((c, ci) => (
+                                <div key={ci} className="flex justify-between">
+                                  <span>+ {c.choiceName}</span>
+                                  {c.price > 0 && <span>€{c.price.toFixed(2)}</span>}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="border-t border-gray-300 my-3" />
+                  {/* Totalen */}
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between"><span>Subtotaal</span><span>€{subtotal.toFixed(2)}</span></div>
+                    <div className="flex justify-between"><span>BTW ({vatRate}%)</span><span>€{tax.toFixed(2)}</span></div>
+                    <div className="flex justify-between font-bold text-lg border-t border-gray-400 pt-2 mt-2">
+                      <span>TOTAAL</span><span>€{lastOrder.total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                  {/* Betaalmethode */}
+                  <div className="text-center mt-3 text-xs">
+                    <p>Betaald met: {payLabel}</p>
+                  </div>
+                  <div className="border-t-2 border-dashed border-gray-400 my-3" />
+                  <div className="text-center text-xs">
+                    {tenantInfo?.btw_number && <p>BTW: {tenantInfo.btw_number}</p>}
+                    <p className="mt-2">Bedankt voor uw bezoek!</p>
+                    {tenantInfo?.website && <p className="mt-1">{tenantInfo.website}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Knoppen */}
+              <div className="p-4 border-t flex gap-3">
+                <button
+                  onClick={() => { printReceipt(lastOrder); setShowSuccessModal(false) }}
+                  className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700 flex items-center justify-center gap-2"
+                >
+                  🖨️ printReceipt
+                </button>
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold"
+                >
+                  Sluiten
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
