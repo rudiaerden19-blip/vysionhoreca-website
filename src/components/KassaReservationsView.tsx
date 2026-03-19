@@ -214,25 +214,6 @@ async function sendReservationEmail(data: {
   } catch { /* Stille fout */ }
 }
 
-// ---- SMS helper ----
-async function sendSMS(data: {
-  to: string
-  guestName: string
-  reservationDate: string
-  reservationTime: string
-  partySize: number
-  businessName: string
-  businessPhone?: string
-  type: 'confirmation' | 'reminder' | 'cancellation' | 'checkin'
-}) {
-  try {
-    await fetch('/api/reservation-sms', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    })
-  } catch { /* Stille fout */ }
-}
 
 // ============================================================
 // MAIN COMPONENT
@@ -439,19 +420,6 @@ export default function KassaReservationsView({
         businessEmail: businessInfo.email,
       })
     }
-    // z10 - SMS bij check-in
-    if (r.guest_phone) {
-      await sendSMS({
-        to: r.guest_phone,
-        guestName: r.guest_name,
-        reservationDate: r.reservation_date,
-        reservationTime: r.reservation_time,
-        partySize: r.party_size,
-        businessName: businessInfo.name,
-        businessPhone: businessInfo.phone,
-        type: 'checkin',
-      })
-    }
   }
 
   const handleNoShow = async (r: Reservation) => {
@@ -506,17 +474,6 @@ export default function KassaReservationsView({
         cancellationReason: 'Geannuleerd door personeel',
       })
     }
-    if (r.guest_phone) {
-      await sendSMS({
-        to: r.guest_phone,
-        guestName: r.guest_name,
-        reservationDate: r.reservation_date,
-        reservationTime: r.reservation_time,
-        partySize: r.party_size,
-        businessName: businessInfo.name,
-        type: 'cancellation',
-      })
-    }
   }
 
   const handleComplete = async (r: Reservation) => {
@@ -557,18 +514,6 @@ export default function KassaReservationsView({
         businessEmail: businessInfo.email,
       })
     }
-    if (r.guest_phone) {
-      await sendSMS({
-        to: r.guest_phone,
-        guestName: r.guest_name,
-        reservationDate: r.reservation_date,
-        reservationTime: r.reservation_time,
-        partySize: r.party_size,
-        businessName: businessInfo.name,
-        businessPhone: businessInfo.phone,
-        type: 'confirmation',
-      })
-    }
   }
 
   const handleConfirm = async (r: Reservation) => {
@@ -587,19 +532,6 @@ export default function KassaReservationsView({
         businessName: businessInfo.name,
         businessPhone: businessInfo.phone,
         businessEmail: businessInfo.email,
-      })
-    }
-    // z10 - SMS bevestiging
-    if (r.guest_phone) {
-      await sendSMS({
-        to: r.guest_phone,
-        guestName: r.guest_name,
-        reservationDate: r.reservation_date,
-        reservationTime: r.reservation_time,
-        partySize: r.party_size,
-        businessName: businessInfo.name,
-        businessPhone: businessInfo.phone,
-        type: 'confirmation',
       })
     }
   }
