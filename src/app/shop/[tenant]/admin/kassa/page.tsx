@@ -619,240 +619,152 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   return (
     <div className="flex flex-col bg-[#e3e3e3] overflow-hidden" style={{ height: '100dvh' }}>
 
-      {/* ── Volledige breedte header ── */}
-      <div className="h-14 flex-shrink-0 bg-white border-b border-gray-200 flex items-center px-3 gap-3 relative z-30">
+      {/* ── Blauwe navigatiebalk — volledige breedte ── */}
+      <div className="flex-shrink-0 bg-[#1e293b] flex items-center px-2 gap-0.5 relative z-30" style={{ height: 56 }}>
 
-        {/* Links: hamburger + Kassa */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setNavOpen(o => !o)}
-            className="w-12 h-12 flex items-center justify-center hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <svg className="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+        {/* Backdrop sluit alles */}
+        {flyoutOpen && <div className="fixed inset-0 z-10" onClick={() => setFlyoutOpen(null)} />}
+
+        {/* ── NAV ITEMS ── */}
+
+        {/* Kassa */}
+        <div className="relative z-20">
+          <button onClick={() => setFlyoutOpen(flyoutOpen === 'kassa' ? null : 'kassa')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'kassa' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-xl">🖥️</span>
+            <span className="font-semibold text-sm">Kassa</span>
+            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'kassa' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
-          <div className="w-8 h-8 bg-[#3C4D6B] rounded-lg flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <span className="font-bold text-gray-800 text-base">Kassa</span>
-        </div>
-
-        {/* Midden: Vysion group */}
-        <div className="flex-1 flex justify-center items-end">
-          <span className="text-2xl font-black text-red-600 tracking-tight">Vysion</span>
-          <span className="text-sm text-gray-400 mb-0.5 ml-1">group</span>
-        </div>
-
-        {/* Rechts: online + geluid + taal */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700">
-            <div className={`w-2 h-2 rounded-full ${isOnline === null ? 'bg-gray-400 animate-pulse' : isOnline ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span>{isOnline === null ? '...' : isOnline ? 'Online' : 'Offline'}</span>
-          </div>
-          <button
-            onClick={toggleSound}
-            className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors ${soundsOn ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}
-            title={soundsOn ? 'Geluid aan' : 'Geluid uit'}
-          >
-            {soundsOn ? '🔔' : '🔕'}
-          </button>
-          <div ref={langRef} className="relative">
-            <button
-              onClick={() => setLangOpen(o => !o)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
-            >
-              <span className="text-base">{localeFlags[locale]}</span>
-              <span>{localeNames[locale]}</span>
-              <svg className={`w-3 h-3 text-gray-500 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {langOpen && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 min-w-[160px] overflow-hidden">
-                {locales.map(lang => (
-                  <button
-                    key={lang}
-                    onClick={() => { setLocale(lang); setLangOpen(false) }}
-                    className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 transition-colors text-sm ${locale === lang ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}`}
-                  >
-                    <span>{localeFlags[lang]}</span>
-                    <span>{localeNames[lang]}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Hamburger menu — verticale rail + flyout */}
-        {navOpen && (
-          <>
-            {/* Backdrop */}
-            <div className="fixed inset-0 z-10" onClick={closeNav} />
-
-            {/* Verticale icon-rail */}
-            <div className="absolute top-14 left-0 z-30 bg-[#1e293b] flex flex-col py-2 shadow-2xl"
-              style={{ width: 100 }}>
-
-              {/* Kassa */}
-              <button
-                onClick={() => setFlyoutOpen(flyoutOpen === 'kassa' ? null : 'kassa')}
-                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'kassa' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-4xl">🖥️</span>
-                <span className="text-xs text-white font-bold leading-tight">Kassa</span>
-                {flyoutOpen === 'kassa' && (
-                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 260 }}>
-                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Kassa</div>
-                    <Link href={`${baseUrl}/kassa`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 border-b border-gray-100 font-semibold text-[#3C4D6B] text-base transition-colors">
-                      <span className="text-xl">🖥️</span> Ga naar kassa
-                    </Link>
-                    <Link href={`${baseUrl}/categorieen`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">📁</span> Categorieën
-                    </Link>
-                    <Link href={`${baseUrl}/producten`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">🍟</span> Producten
-                    </Link>
-                    <Link href={`${baseUrl}/opties`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">➕</span> Opties & Extra&apos;s
-                    </Link>
-                    <Link href={`${baseUrl}/allergenen`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">⚠️</span> Allergenen
-                    </Link>
-                  </div>
-                )}
-              </button>
-
-              {/* Online Platform */}
-              <button
-                onClick={() => setFlyoutOpen(flyoutOpen === 'online' ? null : 'online')}
-                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'online' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-4xl">🛒</span>
-                <span className="text-xs text-white font-bold leading-tight text-center">Online</span>
-                {flyoutOpen === 'online' && (
-                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 260 }}>
-                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Online Platform</div>
-                    <Link href={baseUrl} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">🛒</span> Online Platform
-                    </Link>
-                  </div>
-                )}
-              </button>
-
-              {/* Marketing */}
-              <button
-                onClick={() => setFlyoutOpen(flyoutOpen === 'marketing' ? null : 'marketing')}
-                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'marketing' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-4xl">📣</span>
-                <span className="text-xs text-white font-bold leading-tight">Marketing</span>
-                {flyoutOpen === 'marketing' && (
-                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 260 }}>
-                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Marketing</div>
-                    <Link href={`${baseUrl}/marketing`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">📣</span> Marketing
-                    </Link>
-                  </div>
-                )}
-              </button>
-
-              {/* Personeel */}
-              <button
-                onClick={() => setFlyoutOpen(flyoutOpen === 'personeel' ? null : 'personeel')}
-                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'personeel' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-4xl">👔</span>
-                <span className="text-xs text-white font-bold leading-tight">Personeel</span>
-                {flyoutOpen === 'personeel' && (
-                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 260 }}>
-                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Personeel</div>
-                    <Link href={`${baseUrl}/personeel`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">👔</span> Personeel
-                    </Link>
-                  </div>
-                )}
-              </button>
-
-              {/* Kostenberekening */}
-              <button
-                onClick={() => setFlyoutOpen(flyoutOpen === 'kosten' ? null : 'kosten')}
-                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'kosten' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-4xl">🧮</span>
-                <span className="text-xs text-white font-bold leading-tight text-center">Kosten</span>
-                {flyoutOpen === 'kosten' && (
-                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 260 }}>
-                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Kostenberekening</div>
-                    <Link href={`${baseUrl}/kosten/instellingen`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">🧮</span> Kostenberekening
-                    </Link>
-                  </div>
-                )}
-              </button>
-
-              {/* Bonnenprinter */}
-              <button
-                onClick={() => setFlyoutOpen(flyoutOpen === 'bonnen' ? null : 'bonnen')}
-                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'bonnen' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-4xl">🖨️</span>
-                <span className="text-xs text-white font-bold leading-tight text-center">Printer</span>
-                {flyoutOpen === 'bonnen' && (
-                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 260 }}>
-                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Bonnenprinter</div>
-                    <Link href={`${baseUrl}/bonnenprinter`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">🖨️</span> Bonnenprinter
-                    </Link>
-                  </div>
-                )}
-              </button>
-
-              {/* GKS Rapporten */}
-              <button
-                onClick={() => setFlyoutOpen(flyoutOpen === 'gks' ? null : 'gks')}
-                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'gks' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-4xl">🧾</span>
-                <span className="text-xs text-white font-bold leading-tight text-center">GKS</span>
-                {flyoutOpen === 'gks' && (
-                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 260 }}>
-                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">GKS Rapporten</div>
-                    <Link href={`${baseUrl}/z-rapport`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
-                      <span className="text-xl">🧾</span> GKS Rapporten
-                    </Link>
-                  </div>
-                )}
-              </button>
-
-              {/* Reservaties */}
-              <button
-                onClick={() => { closeNav(); setShowReservations(true) }}
-                className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 hover:bg-white/10 transition-colors">
-                <span className="text-4xl">📅</span>
-                <span className="text-xs text-white font-bold leading-tight">Reservaties</span>
-              </button>
-
-              {/* Bekijk shop */}
-              <Link href={`/shop/${tenant}`} target="_blank" onClick={closeNav}
-                className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 hover:bg-white/10 transition-colors">
-                <span className="text-4xl">🔗</span>
-                <span className="text-xs text-white font-bold leading-tight text-center">Shop</span>
-              </Link>
-
-              {/* Uitloggen */}
-              <button onClick={handleLogout}
-                className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 hover:bg-red-900/40 transition-colors mt-auto">
-                <span className="text-4xl">🚪</span>
-                <span className="text-xs text-red-400 font-bold leading-tight">Uitloggen</span>
-              </button>
-
+          {flyoutOpen === 'kassa' && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Kassa</div>
+              <Link href={`${baseUrl}/kassa`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-[#3C4D6B] text-sm transition-colors"><span className="text-lg">🖥️</span> Ga naar kassa</Link>
+              <Link href={`${baseUrl}/categorieen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📁</span> Categorieën</Link>
+              <Link href={`${baseUrl}/producten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🍟</span> Producten</Link>
+              <Link href={`${baseUrl}/opties`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">➕</span> Opties & Extra&apos;s</Link>
+              <Link href={`${baseUrl}/allergenen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚠️</span> Allergenen</Link>
             </div>
-          </>
-        )}
+          )}
+        </div>
+
+        {/* Online Platform */}
+        <div className="relative z-20">
+          <Link href={baseUrl}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <span className="text-xl">🛒</span>
+            <span className="font-semibold text-sm">Online</span>
+          </Link>
+        </div>
+
+        {/* Marketing */}
+        <div className="relative z-20">
+          <Link href={`${baseUrl}/marketing`}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <span className="text-xl">📣</span>
+            <span className="font-semibold text-sm">Marketing</span>
+          </Link>
+        </div>
+
+        {/* Personeel */}
+        <div className="relative z-20">
+          <Link href={`${baseUrl}/personeel`}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <span className="text-xl">👔</span>
+            <span className="font-semibold text-sm">Personeel</span>
+          </Link>
+        </div>
+
+        {/* Kostenberekening */}
+        <div className="relative z-20">
+          <Link href={`${baseUrl}/kosten/instellingen`}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <span className="text-xl">🧮</span>
+            <span className="font-semibold text-sm">Kosten</span>
+          </Link>
+        </div>
+
+        {/* Bonnenprinter */}
+        <div className="relative z-20">
+          <Link href={`${baseUrl}/bonnenprinter`}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <span className="text-xl">🖨️</span>
+            <span className="font-semibold text-sm">Printer</span>
+          </Link>
+        </div>
+
+        {/* GKS Rapporten */}
+        <div className="relative z-20">
+          <Link href={`${baseUrl}/z-rapport`}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <span className="text-xl">🧾</span>
+            <span className="font-semibold text-sm">GKS</span>
+          </Link>
+        </div>
+
+        {/* Reservaties */}
+        <div className="relative z-20">
+          <button onClick={() => { setFlyoutOpen(null); setShowReservations(true) }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <span className="text-xl">📅</span>
+            <span className="font-semibold text-sm">Reservaties</span>
+          </button>
+        </div>
+
+        {/* Shop */}
+        <div className="relative z-20">
+          <Link href={`/shop/${tenant}`} target="_blank"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <span className="text-xl">🔗</span>
+            <span className="font-semibold text-sm">Shop</span>
+          </Link>
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* ── RECHTS: online status + geluid + taal + uitloggen ── */}
+
+        {/* Online indicator */}
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-white/80">
+          <div className={`w-2 h-2 rounded-full ${isOnline === null ? 'bg-gray-400 animate-pulse' : isOnline ? 'bg-green-400' : 'bg-red-400'}`} />
+          <span className="text-xs">{isOnline === null ? '...' : isOnline ? 'Online' : 'Offline'}</span>
+        </div>
+
+        {/* Geluid */}
+        <button onClick={toggleSound}
+          className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors ${soundsOn ? 'bg-green-500/80 text-white' : 'bg-white/10 text-white/60'}`}
+          title={soundsOn ? 'Geluid aan' : 'Geluid uit'}>
+          {soundsOn ? '🔔' : '🔕'}
+        </button>
+
+        {/* Taal */}
+        <div ref={langRef} className="relative z-20">
+          <button onClick={() => setLangOpen(o => !o)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium text-white transition-colors">
+            <span className="text-base">{localeFlags[locale]}</span>
+            <span className="text-xs">{localeNames[locale]}</span>
+            <svg className={`w-3 h-3 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {langOpen && (
+            <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 min-w-[160px] overflow-hidden">
+              {locales.map(lang => (
+                <button key={lang} onClick={() => { setLocale(lang); setLangOpen(false) }}
+                  className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 transition-colors text-sm ${locale === lang ? 'bg-blue-50 text-blue-600 font-semibold' : 'text-gray-700'}`}>
+                  <span>{localeFlags[lang]}</span>
+                  <span>{localeNames[lang]}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Uitloggen */}
+        <button onClick={handleLogout}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600/80 hover:bg-red-600 rounded-lg text-white text-sm font-semibold transition-colors ml-1">
+          <span>🚪</span>
+          <span>Uitloggen</span>
+        </button>
+
       </div>
 
       {/* ── Body: midden + rechts ── */}
