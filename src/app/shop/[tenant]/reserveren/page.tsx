@@ -67,12 +67,24 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
   const [reservationId, setReservationId] = useState('')
 
   useEffect(() => {
-    // Laad tenant info
-    supabase.from('tenants').select('name,phone,email,logo_url,primary_color').eq('slug', tenant).single()
-      .then(({ data }) => { if (data) setTenantInfo(data) })
+    // Laad tenant info (basis: naam, telefoon, logo)
+    supabase.from('tenants').select('name,phone,email,logo_url').eq('slug', tenant).single()
+      .then(({ data }) => { if (data) setTenantInfo(prev => ({ ...prev, ...data })) })
 
-    // Laad instellingen uit localStorage (via API zou beter zijn maar dit werkt voor nu)
-    // Laad ook de reservatie settings als ze in Supabase staan
+    // Laad primaryColor uit tenant_settings (correcte bron)
+    supabase.from('tenant_settings').select('primary_color,business_name,logo_url').eq('tenant_slug', tenant).single()
+      .then(({ data }) => {
+        if (data) {
+          setTenantInfo(prev => ({
+            ...prev,
+            primary_color: data.primary_color || prev?.primary_color,
+            name: data.business_name || prev?.name || '',
+            logo_url: data.logo_url || prev?.logo_url,
+          }))
+        }
+      })
+
+    // Laad reservatie instellingen uit Supabase
     supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).single()
       .then(({ data }) => {
         if (data) setSettings({ ...DEFAULT_SETTINGS, ...data })
@@ -316,7 +328,9 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
                 value={formData.guest_name}
                 onChange={(e) => setFormData({ ...formData, guest_name: e.target.value })}
                 placeholder="Jan Janssen"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 outline-none bg-gray-50"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-gray-50 focus:border-2"
+                onFocus={e => e.target.style.borderColor = primaryColor}
+                onBlur={e => e.target.style.borderColor = ''}
               />
             </div>
 
@@ -331,7 +345,9 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
                   value={formData.guest_phone}
                   onChange={(e) => setFormData({ ...formData, guest_phone: e.target.value })}
                   placeholder="+32 ..."
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 outline-none bg-gray-50"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-gray-50"
+                  onFocus={e => e.target.style.borderColor = primaryColor}
+                  onBlur={e => e.target.style.borderColor = ''}
                 />
               </div>
               <div>
@@ -343,7 +359,9 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
                   value={formData.guest_email}
                   onChange={(e) => setFormData({ ...formData, guest_email: e.target.value })}
                   placeholder="jan@email.be"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 outline-none bg-gray-50"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-gray-50"
+                  onFocus={e => e.target.style.borderColor = primaryColor}
+                  onBlur={e => e.target.style.borderColor = ''}
                 />
               </div>
             </div>
@@ -359,7 +377,9 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
                 onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
                 min={getMinDate()}
                 max={getMaxDate()}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 outline-none bg-gray-50"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-gray-50"
+                onFocus={e => e.target.style.borderColor = primaryColor}
+                onBlur={e => e.target.style.borderColor = ''}
               />
             </div>
 
@@ -440,7 +460,9 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
                 onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
                 placeholder="Allergieën, kinderstoel, rolstoel, speciale wensen..."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-green-500 outline-none bg-gray-50 resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none bg-gray-50 resize-none"
+                onFocus={e => e.target.style.borderColor = primaryColor}
+                onBlur={e => e.target.style.borderColor = ''}
               />
             </div>
 
