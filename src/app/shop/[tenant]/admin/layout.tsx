@@ -14,7 +14,8 @@ interface AdminLayoutProps {
   params: { tenant: string }
 }
 
-const menuItems = [
+// Secties binnen "Online Platform"
+const onlinePlatformItems = [
   {
     categoryKey: 'overview',
     icon: '📊',
@@ -64,39 +65,11 @@ const menuItems = [
     ]
   },
   {
-    categoryKey: 'marketing',
-    icon: '📣',
-    items: [
-      { nameKey: 'emailMarketing', href: '/marketing', icon: '📧' },
-      { nameKey: 'qrCodes', href: '/qr-codes', icon: '📱' },
-      { nameKey: 'promotions', href: '/promoties', icon: '🎁' },
-      { nameKey: 'reviews', href: '/reviews', icon: '⭐' },
-    ]
-  },
-  {
     categoryKey: 'customers',
     icon: '👥',
     items: [
       { nameKey: 'customerList', href: '/klanten', icon: '👥' },
       { nameKey: 'rewards', href: '/klanten/beloningen', icon: '🎁' },
-    ]
-  },
-  {
-    categoryKey: 'staff',
-    icon: '👔',
-    items: [
-      { nameKey: 'employees', href: '/personeel', icon: '👥' },
-      { nameKey: 'timeTracking', href: '/uren', icon: '⏰' },
-      { nameKey: 'vacancies', href: '/vacatures', icon: '📢' },
-    ]
-  },
-  {
-    categoryKey: 'costCalculation',
-    icon: '🧮',
-    items: [
-      { nameKey: 'costSettings', href: '/kosten/instellingen', icon: '⚙️' },
-      { nameKey: 'ingredients', href: '/kosten/ingredienten', icon: '🥬' },
-      { nameKey: 'productCosts', href: '/kosten/producten', icon: '📊' },
     ]
   },
   {
@@ -124,14 +97,53 @@ const menuItems = [
       { nameKey: 'labelPrinter', href: '/labels', icon: '🏷️' },
     ]
   },
+]
+
+// Aparte topniveau-knoppen (buiten Online Platform)
+const separateMenuItems = [
+  {
+    categoryKey: 'marketing',
+    icon: '📣',
+    label: 'Marketing',
+    items: [
+      { nameKey: 'emailMarketing', href: '/marketing', icon: '📧' },
+      { nameKey: 'qrCodes', href: '/qr-codes', icon: '📱' },
+      { nameKey: 'promotions', href: '/promoties', icon: '🎁' },
+      { nameKey: 'reviews', href: '/reviews', icon: '⭐' },
+    ]
+  },
+  {
+    categoryKey: 'staff',
+    icon: '👔',
+    label: 'Personeel',
+    items: [
+      { nameKey: 'employees', href: '/personeel', icon: '👥' },
+      { nameKey: 'timeTracking', href: '/uren', icon: '⏰' },
+      { nameKey: 'vacancies', href: '/vacatures', icon: '📢' },
+    ]
+  },
+  {
+    categoryKey: 'costCalculation',
+    icon: '🧮',
+    label: 'Kostenberekening',
+    items: [
+      { nameKey: 'costSettings', href: '/kosten/instellingen', icon: '⚙️' },
+      { nameKey: 'ingredients', href: '/kosten/ingredienten', icon: '🥬' },
+      { nameKey: 'productCosts', href: '/kosten/producten', icon: '📊' },
+    ]
+  },
   {
     categoryKey: 'bonnenprinter',
     icon: '🖨️',
+    label: 'Bonnenprinter',
     items: [
       { nameKey: 'bonnenprinter', href: '/bonnenprinter', icon: '🖨️' },
     ]
   },
 ]
+
+// Gecombineerd voor gebruik in FlyoutMenu type checks
+const menuItems = [...onlinePlatformItems, ...separateMenuItems]
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
@@ -681,7 +693,7 @@ function SidebarContent({
           {/* Alle secties binnen Online Platform */}
           {!collapsed && onlinePlatformOpen && (
             <div className="pl-2 border-l-2 border-blue-200 ml-4">
-              {menuItems.map((section) => {
+              {onlinePlatformItems.map((section) => {
                 const isExpanded = isSectionExpanded(section.categoryKey)
                 const hasActive = hasActiveItemInSection(section)
                 const sectionIsProOnly = (section as { proOnly?: boolean }).proOnly
@@ -747,6 +759,56 @@ function SidebarContent({
             </div>
           )}
         </div>
+
+        {/* ── Aparte knoppen: Marketing / Personeel / Kostenberekening / Bonnenprinter ── */}
+        {separateMenuItems.map((section) => {
+          const isExpanded = isSectionExpanded(`top_${section.categoryKey}`)
+          const hasActive = section.items.some(item => isActive(item.href))
+          const globalIndex = menuItems.findIndex(s => s.categoryKey === section.categoryKey)
+          return (
+            <div key={section.categoryKey} className="mb-1">
+              <button
+                onClick={() => !collapsed && toggleSection(`top_${section.categoryKey}`)}
+                className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 ${
+                  isExpanded
+                    ? 'bg-blue-600 text-white border-blue-700'
+                    : hasActive
+                    ? 'bg-blue-50 text-blue-600 border-blue-500'
+                    : 'border-transparent text-gray-700 hover:bg-gray-50'
+                } ${collapsed ? 'justify-center' : ''}`}
+                title={collapsed ? section.label : undefined}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">{section.icon}</span>
+                  {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">{section.label}</span>}
+                </div>
+                {!collapsed && (
+                  <svg className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                )}
+              </button>
+              {!collapsed && isExpanded && (
+                <FlyoutMenu
+                  section={section}
+                  categoryName={section.label}
+                  sectionIndex={globalIndex}
+                  baseUrl={baseUrl}
+                  tenant={tenant}
+                  isActive={isActive}
+                  onClose={() => {
+                    onClose?.()
+                    toggleSection(`top_${section.categoryKey}`)
+                  }}
+                  t={t}
+                  isPro={isPro}
+                  isTrial={isTrial}
+                  pendingReservations={pendingReservations}
+                />
+              )}
+            </div>
+          )
+        })}
 
         {/* ── Reservaties knop ── */}
         <div className="mb-1">
