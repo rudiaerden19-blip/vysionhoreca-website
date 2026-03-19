@@ -433,7 +433,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                       <button
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat)}
-                        className="aspect-square relative rounded-xl overflow-hidden shadow-lg active:scale-95 transition-transform"
+                        className="aspect-square relative rounded-xl overflow-hidden active:scale-95 transition-transform"
+                        style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                         style={{ backgroundColor: '#3C4D6B' }}
                       >
                         {catImage && (
@@ -467,7 +468,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                         <button
                           key={product.id}
                           onClick={() => handleProductClick(product)}
-                          className="flex flex-col bg-white rounded-xl shadow-lg overflow-hidden active:scale-95 transition-transform relative"
+                          className="flex flex-col bg-white rounded-xl overflow-hidden active:scale-95 transition-transform relative"
+                          style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                         >
                           <div className="aspect-square w-full bg-gray-100 flex items-center justify-center overflow-hidden">
                             {product.image_url
