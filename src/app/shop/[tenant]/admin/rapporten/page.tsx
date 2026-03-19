@@ -112,12 +112,24 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   const loadData = useCallback(async () => {
     setLoading(true)
-    const [{ data: ordersData }, { data: zData }, info] = await Promise.all([
-      supabase.from('orders').select('id,order_number,status,payment_status,payment_method,order_type,total,subtotal,tax,discount_amount,created_at,customer_name,customer_email,items').eq('tenant_slug', tenant).neq('status','open').order('created_at', { ascending: false }).limit(3000),
+    const [{ data: ordersData, error: ordersError }, { data: zData }, info] = await Promise.all([
+      supabase.from('orders')
+        .select('id,order_number,status,payment_status,payment_method,order_type,total,subtotal,tax,discount_amount,created_at,customer_name,customer_email,items')
+        .eq('tenant_slug', tenant)
+        .order('created_at', { ascending: false })
+        .limit(3000),
       supabase.from('z_reports').select('*').eq('tenant_slug', tenant).order('report_date', { ascending: false }),
       getTenantSettings(tenant),
     ])
-    setOrders((ordersData||[]).map(o => ({ ...o, items: o.items||[], discount_amount: o.discount_amount||0 })))
+    if (ordersError) console.error('Rapporten orders error:', ordersError)
+    setOrders((ordersData||[]).map(o => ({
+      ...o,
+      items: o.items||[],
+      discount_amount: o.discount_amount||0,
+      tax: o.tax||0,
+      subtotal: o.subtotal||0,
+      total: o.total||0,
+    })))
     setZReports(zData||[])
     setTenantInfo(info as TenantInfo)
     setLoading(false)
@@ -126,7 +138,14 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   useEffect(() => { loadData() }, [loadData])
 
   // ── Order classification ──
-  const isValidOrder = (o: Order) => o.payment_status === 'paid' || ['completed','delivered'].includes(o.status)
+  // Kassa: status=completed (altijd betaald op de kassa)
+  // Online: payment_status=paid OR status in completed/delivered
+  // Uitgesloten: geannuleerd/afgewezen
+  const isValidOrder = (o: Order) =>
+    !['cancelled','rejected'].includes(o.status) && (
+      o.payment_status === 'paid' ||
+      ['completed','delivered'].includes(o.status)
+    )
   const isKassaOrder = (o: Order) => KASSA_TYPES.includes(o.order_type)
   const isOnlineOrder = (o: Order) => !KASSA_TYPES.includes(o.order_type)
 

@@ -535,11 +535,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     const orderPayload = {
       tenant_slug: tenant,
       order_number: orderNumber,
+      customer_name: tableNumber ? `Tafel ${tableNumber}` : 'Kassa',
       status: 'completed',
       payment_status: 'paid',
       payment_method: method,
       order_type: orderType,
-      table_number: tableNumber || null,
+      customer_notes: tableNumber ? `Tafel ${tableNumber}` : null,
       subtotal: Math.round(subtotal * 100) / 100,
       tax: Math.round(tax * 100) / 100,
       total: total,
@@ -563,8 +564,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         queue.push(orderPayload)
         localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
         alert(`⚠️ Geen internetverbinding. Order #${orderNumber} is lokaal opgeslagen en wordt automatisch verstuurd zodra je weer online bent.`)
+      } else {
+        console.error('Supabase order insert error:', error)
       }
-      // Bij andere fouten: order al lokaal verwerkt, bon wordt geprint — geen blokkerende melding
     }
 
     setLastOrder({ orderNumber, items: [...cart], total, paymentMethod: method, orderType, tableNumber, createdAt })
