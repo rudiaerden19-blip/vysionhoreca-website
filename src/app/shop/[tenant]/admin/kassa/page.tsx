@@ -35,7 +35,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   const [navOpen, setNavOpen] = useState(false)
   const [kassaOpen, setKassaOpen] = useState(false)
-  const closeNav = () => { setNavOpen(false); setKassaOpen(false) }
+  const [flyoutOpen, setFlyoutOpen] = useState<string | null>(null)
+  const closeNav = () => { setNavOpen(false); setKassaOpen(false); setFlyoutOpen(null) }
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
@@ -686,82 +687,169 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           </div>
         </div>
 
-        {/* Hamburger dropdown */}
+        {/* Hamburger menu — verticale rail + flyout */}
         {navOpen && (
           <>
+            {/* Backdrop */}
             <div className="fixed inset-0 z-10" onClick={closeNav} />
-            <div className="absolute top-14 left-0 z-20 w-64 bg-white border border-gray-200 rounded-br-2xl shadow-xl overflow-y-auto max-h-[80vh]">
-              {/* Kassa uitklapper */}
-              <button
-                onClick={() => setKassaOpen(o => !o)}
-                className="w-full flex items-center justify-between gap-3 px-5 py-3.5 bg-blue-50 border-b border-gray-100 font-bold text-[#3C4D6B]">
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">🖥️</span> Kassa
-                </div>
-                <span className="text-sm">{kassaOpen ? '▲' : '▼'}</span>
-              </button>
-              {kassaOpen && (
-                <>
-                  <Link href={`${baseUrl}/kassa`} onClick={closeNav}
-                    className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-[#3C4D6B] transition-colors bg-blue-50/40">
-                    <span className="text-lg">🖥️</span> Ga naar kassa
-                  </Link>
-                  <Link href={`${baseUrl}/categorieen`} onClick={closeNav}
-                    className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                    <span className="text-lg">📁</span> Categorieën
-                  </Link>
-                  <Link href={`${baseUrl}/producten`} onClick={closeNav}
-                    className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                    <span className="text-lg">🍟</span> Producten
-                  </Link>
-                  <Link href={`${baseUrl}/opties`} onClick={closeNav}
-                    className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                    <span className="text-lg">➕</span> Opties & Extra's
-                  </Link>
-                  <Link href={`${baseUrl}/allergenen`} onClick={closeNav}
-                    className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                    <span className="text-lg">⚠️</span> Allergenen
-                  </Link>
-                </>
-              )}
 
-              {/* Aparte knoppen */}
-              <Link href={baseUrl} onClick={closeNav}
-                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                <span className="text-xl">🛒</span> Online Platform
-              </Link>
-              <Link href={`${baseUrl}/marketing`} onClick={closeNav}
-                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                <span className="text-xl">📣</span> Marketing
-              </Link>
-              <Link href={`${baseUrl}/personeel`} onClick={closeNav}
-                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                <span className="text-xl">👔</span> Personeel
-              </Link>
-              <Link href={`${baseUrl}/kosten/instellingen`} onClick={closeNav}
-                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                <span className="text-xl">🧮</span> Kostenberekening
-              </Link>
-              <Link href={`${baseUrl}/bonnenprinter`} onClick={closeNav}
-                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                <span className="text-xl">🖨️</span> Bonnenprinter
-              </Link>
-              <Link href={`${baseUrl}/z-rapport`} onClick={closeNav}
-                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                <span className="text-xl">🧾</span> GKS Rapporten
-              </Link>
-              <button onClick={() => { closeNav(); setShowReservations(true) }}
-                className="w-full flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                <span className="text-xl">📅</span> Reservaties
+            {/* Verticale icon-rail */}
+            <div className="absolute top-14 left-0 z-30 bg-[#1e293b] flex flex-col py-2 shadow-2xl"
+              style={{ width: 72 }}>
+
+              {/* Kassa */}
+              <button
+                onClick={() => setFlyoutOpen(flyoutOpen === 'kassa' ? null : 'kassa')}
+                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'kassa' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-2xl">🖥️</span>
+                <span className="text-[10px] text-white font-semibold leading-tight">Kassa</span>
+                {flyoutOpen === 'kassa' && (
+                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                    style={{ width: 220 }}>
+                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Kassa</div>
+                    <Link href={`${baseUrl}/kassa`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-[#3C4D6B] text-sm transition-colors">
+                      <span>🖥️</span> Ga naar kassa
+                    </Link>
+                    <Link href={`${baseUrl}/categorieen`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>📁</span> Categorieën
+                    </Link>
+                    <Link href={`${baseUrl}/producten`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>🍟</span> Producten
+                    </Link>
+                    <Link href={`${baseUrl}/opties`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>➕</span> Opties & Extra&apos;s
+                    </Link>
+                    <Link href={`${baseUrl}/allergenen`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>⚠️</span> Allergenen
+                    </Link>
+                  </div>
+                )}
               </button>
+
+              {/* Online Platform */}
+              <button
+                onClick={() => setFlyoutOpen(flyoutOpen === 'online' ? null : 'online')}
+                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'online' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-2xl">🛒</span>
+                <span className="text-[10px] text-white font-semibold leading-tight text-center">Online</span>
+                {flyoutOpen === 'online' && (
+                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                    style={{ width: 220 }}>
+                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Online Platform</div>
+                    <Link href={baseUrl} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>🛒</span> Online Platform
+                    </Link>
+                  </div>
+                )}
+              </button>
+
+              {/* Marketing */}
+              <button
+                onClick={() => setFlyoutOpen(flyoutOpen === 'marketing' ? null : 'marketing')}
+                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'marketing' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-2xl">📣</span>
+                <span className="text-[10px] text-white font-semibold leading-tight">Marketing</span>
+                {flyoutOpen === 'marketing' && (
+                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                    style={{ width: 220 }}>
+                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Marketing</div>
+                    <Link href={`${baseUrl}/marketing`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>📣</span> Marketing
+                    </Link>
+                  </div>
+                )}
+              </button>
+
+              {/* Personeel */}
+              <button
+                onClick={() => setFlyoutOpen(flyoutOpen === 'personeel' ? null : 'personeel')}
+                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'personeel' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-2xl">👔</span>
+                <span className="text-[10px] text-white font-semibold leading-tight">Personeel</span>
+                {flyoutOpen === 'personeel' && (
+                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                    style={{ width: 220 }}>
+                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Personeel</div>
+                    <Link href={`${baseUrl}/personeel`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>👔</span> Personeel
+                    </Link>
+                  </div>
+                )}
+              </button>
+
+              {/* Kostenberekening */}
+              <button
+                onClick={() => setFlyoutOpen(flyoutOpen === 'kosten' ? null : 'kosten')}
+                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'kosten' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-2xl">🧮</span>
+                <span className="text-[10px] text-white font-semibold leading-tight text-center">Kosten</span>
+                {flyoutOpen === 'kosten' && (
+                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                    style={{ width: 220 }}>
+                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Kostenberekening</div>
+                    <Link href={`${baseUrl}/kosten/instellingen`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>🧮</span> Kostenberekening
+                    </Link>
+                  </div>
+                )}
+              </button>
+
+              {/* Bonnenprinter */}
+              <button
+                onClick={() => setFlyoutOpen(flyoutOpen === 'bonnen' ? null : 'bonnen')}
+                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'bonnen' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-2xl">🖨️</span>
+                <span className="text-[10px] text-white font-semibold leading-tight text-center">Printer</span>
+                {flyoutOpen === 'bonnen' && (
+                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                    style={{ width: 220 }}>
+                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Bonnenprinter</div>
+                    <Link href={`${baseUrl}/bonnenprinter`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>🖨️</span> Bonnenprinter
+                    </Link>
+                  </div>
+                )}
+              </button>
+
+              {/* GKS Rapporten */}
+              <button
+                onClick={() => setFlyoutOpen(flyoutOpen === 'gks' ? null : 'gks')}
+                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'gks' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-2xl">🧾</span>
+                <span className="text-[10px] text-white font-semibold leading-tight text-center">GKS</span>
+                {flyoutOpen === 'gks' && (
+                  <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
+                    style={{ width: 220 }}>
+                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">GKS Rapporten</div>
+                    <Link href={`${baseUrl}/z-rapport`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
+                      <span>🧾</span> GKS Rapporten
+                    </Link>
+                  </div>
+                )}
+              </button>
+
+              {/* Reservaties */}
+              <button
+                onClick={() => { closeNav(); setShowReservations(true) }}
+                className="flex flex-col items-center justify-center gap-1 py-3 px-1 hover:bg-white/10 transition-colors">
+                <span className="text-2xl">📅</span>
+                <span className="text-[10px] text-white font-semibold leading-tight">Reservaties</span>
+              </button>
+
+              {/* Bekijk shop */}
               <Link href={`/shop/${tenant}`} target="_blank" onClick={closeNav}
-                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
-                <span className="text-xl">🔗</span> Bekijk je shop
+                className="flex flex-col items-center justify-center gap-1 py-3 px-1 hover:bg-white/10 transition-colors">
+                <span className="text-2xl">🔗</span>
+                <span className="text-[10px] text-white font-semibold leading-tight text-center">Shop</span>
               </Link>
+
+              {/* Uitloggen */}
               <button onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-5 py-3 hover:bg-red-50 font-semibold text-red-600 transition-colors">
-                <span className="text-xl">🚪</span> Uitloggen
+                className="flex flex-col items-center justify-center gap-1 py-3 px-1 hover:bg-red-900/40 transition-colors mt-auto">
+                <span className="text-2xl">🚪</span>
+                <span className="text-[10px] text-red-400 font-semibold leading-tight">Uitloggen</span>
               </button>
+
             </div>
           </>
         )}
