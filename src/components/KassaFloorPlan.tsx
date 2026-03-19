@@ -38,7 +38,7 @@ function makeId() { return Math.random().toString(36).slice(2, 10) }
 function TableSVG({ table, isSelected, onClick }: {
   table: KassaTable
   isSelected: boolean
-  onClick: () => void
+  onClick: (e?: React.MouseEvent) => void
 }) {
   const seats = table.seats
   const color = STATUS_COLORS[table.status]
