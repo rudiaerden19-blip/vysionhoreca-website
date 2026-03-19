@@ -43,6 +43,8 @@ export interface DecorItem {
   x: number
   y: number
   rotation: number
+  stool1?: string
+  stool2?: string
 }
 
 function DecorSVG({ item, isSelected }: { item: DecorItem; isSelected: boolean }) {
@@ -84,7 +86,9 @@ function DecorSVG({ item, isSelected }: { item: DecorItem; isSelected: boolean }
   }
   // bar_segment: balk + 2 krukken aan de voorkant
   const bw = 140; const bh = 44
-  const stoolR = 14
+  const stoolR = 16
+  const s1 = item.stool1 || '?'
+  const s2 = item.stool2 || '?'
   return (
     <svg width={bw} height={bh + stoolR * 2 + 10} style={{ overflow: 'visible' }}>
       <defs>
@@ -107,9 +111,11 @@ function DecorSVG({ item, isSelected }: { item: DecorItem; isSelected: boolean }
       {/* Kruk 1 */}
       <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR} fill="#8B6914" stroke="#5a4010" strokeWidth={2} />
       <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR - 5} fill="#a07820" opacity={0.6} />
+      <text x={bw * 0.28} y={stoolR + 2 + 5} textAnchor="middle" fill="white" fontSize={11} fontWeight="bold">{s1}</text>
       {/* Kruk 2 */}
       <circle cx={bw * 0.72} cy={stoolR + 2} r={stoolR} fill="#8B6914" stroke="#5a4010" strokeWidth={2} />
       <circle cx={bw * 0.72} cy={stoolR + 2} r={stoolR - 5} fill="#a07820" opacity={0.6} />
+      <text x={bw * 0.72} y={stoolR + 2 + 5} textAnchor="middle" fill="white" fontSize={11} fontWeight="bold">{s2}</text>
     </svg>
   )
 }
@@ -312,6 +318,10 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
   const decorKey = `vysion_decor_${tenant}`
   const [decors, setDecors] = useState<DecorItem[]>([])
   const [selectedDecor, setSelectedDecor] = useState<DecorItem | null>(null)
+  const [showAddBarModal, setShowAddBarModal] = useState(false)
+  const [addStool1, setAddStool1] = useState('K1')
+  const [addStool2, setAddStool2] = useState('K2')
+  const [editStoolVals, setEditStoolVals] = useState({ s1: '', s2: '' })
 
   const draggingId = useRef<string | null>(null)
   const draggingType = useRef<'table' | 'decor'>('table')
@@ -346,6 +356,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
     load()
   }, [tenant, storageKey, decorKey])
 
+  useEffect(() => {
+    if (selectedDecor?.type === 'bar_segment') {
+      setEditStoolVals({ s1: selectedDecor.stool1 || '', s2: selectedDecor.stool2 || '' })
+    }
+  }, [selectedDecor])
+
   const save = (updated: KassaTable[]) => {
     setTables(updated)
     localStorage.setItem(storageKey, JSON.stringify(updated))
@@ -361,6 +377,35 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
   const addDecor = (type: DecorType) => {
     const d: DecorItem = { id: makeId(), type, x: 20 + Math.random() * 60, y: 20 + Math.random() * 60, rotation: 0 }
     saveDecor([...decors, d])
+  }
+
+  const openAddBarModal = () => {
+    const used = decors
+      .filter(d => d.type === 'bar_segment')
+      .flatMap(d => [d.stool1, d.stool2])
+      .filter(Boolean) as string[]
+    const kNums = used
+      .filter(s => /^K\d+$/.test(s))
+      .map(s => parseInt(s.slice(1)))
+      .sort((a, b) => a - b)
+    const next = kNums.length > 0 ? kNums[kNums.length - 1] + 1 : 1
+    setAddStool1(`K${next}`)
+    setAddStool2(`K${next + 1}`)
+    setShowAddBarModal(true)
+  }
+
+  const confirmAddBar = () => {
+    const d: DecorItem = {
+      id: makeId(),
+      type: 'bar_segment',
+      x: 20 + Math.random() * 60,
+      y: 20 + Math.random() * 60,
+      rotation: 0,
+      stool1: addStool1.trim() || 'K?',
+      stool2: addStool2.trim() || 'K?',
+    }
+    saveDecor([...decors, d])
+    setShowAddBarModal(false)
   }
 
   const deleteDecor = (id: string) => {
@@ -470,7 +515,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
             className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors">
             🪑 Tafel
           </button>
-          <button onClick={() => addDecor('bar_segment')}
+          <button onClick={openAddBarModal}
             className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-sm font-semibold transition-colors">
             🍺 Toogstuk
           </button>
@@ -574,11 +619,61 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
 
         {/* Decor Sidebar */}
         {selectedDecor && !selected && (
-          <div className="w-64 bg-[#16213e] border-l border-white/10 flex flex-col">
+          <div className="w-64 bg-[#16213e] border-l border-white/10 flex flex-col overflow-y-auto">
             <div className="p-4 border-b border-white/10 flex justify-between items-center">
               <h3 className="text-white font-bold text-lg">{selectedDecor.type === 'plant' ? '🌿 Plant' : '🍺 Toogstuk'}</h3>
               <button onClick={() => setSelectedDecor(null)} className="text-white/50 hover:text-white text-xl">✕</button>
             </div>
+
+            {/* Bar segment: kruk nummers + bestelling starten */}
+            {selectedDecor.type === 'bar_segment' && (
+              <>
+                <div className="p-4 border-b border-white/10 space-y-2">
+                  <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Kruk nummers</p>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-white/60 text-xs w-14">Kruk 1:</span>
+                    <input
+                      value={editStoolVals.s1}
+                      onChange={e => setEditStoolVals(prev => ({ ...prev, s1: e.target.value }))}
+                      className="flex-1 px-2 py-1.5 rounded-lg bg-white/10 text-white text-sm font-bold text-center outline-none border border-white/10 focus:border-blue-400"
+                    />
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-white/60 text-xs w-14">Kruk 2:</span>
+                    <input
+                      value={editStoolVals.s2}
+                      onChange={e => setEditStoolVals(prev => ({ ...prev, s2: e.target.value }))}
+                      className="flex-1 px-2 py-1.5 rounded-lg bg-white/10 text-white text-sm font-bold text-center outline-none border border-white/10 focus:border-blue-400"
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      const updated = decors.map(d => d.id === selectedDecor.id
+                        ? { ...d, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?' }
+                        : d)
+                      saveDecor(updated)
+                      setSelectedDecor({ ...selectedDecor, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?' })
+                    }}
+                    className="w-full py-1.5 rounded-lg bg-blue-500/30 text-blue-300 hover:bg-blue-500/50 text-sm font-semibold transition-colors">
+                    💾 Opslaan
+                  </button>
+                </div>
+                <div className="p-4 border-b border-white/10 space-y-2">
+                  <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Bestelling starten</p>
+                  <button
+                    onClick={() => { onSelectTable(selectedDecor.stool1 || 'K?'); onClose() }}
+                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-colors">
+                    🛒 Kruk {selectedDecor.stool1 || '?'}
+                  </button>
+                  <button
+                    onClick={() => { onSelectTable(selectedDecor.stool2 || 'K?'); onClose() }}
+                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-colors">
+                    🛒 Kruk {selectedDecor.stool2 || '?'}
+                  </button>
+                </div>
+              </>
+            )}
+
             <div className="p-4 border-b border-white/10">
               <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
               <div className="flex gap-2">
@@ -672,6 +767,48 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
         ))}
         <span className="text-white/30 ml-4 text-xs">Sleep om te verplaatsen • ↺↻ om te draaien</span>
       </div>
+
+      {/* Add bar segment modal */}
+      {showAddBarModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h3 className="font-bold text-lg">🍺 Toogstuk toevoegen</h3>
+              <button onClick={() => setShowAddBarModal(false)} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
+            </div>
+            <div className="p-5 space-y-4">
+              <p className="text-sm text-gray-500">Geef een nummer aan elke barkruk van dit toogstuk.</p>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">Kruk 1 nummer *</label>
+                  <input
+                    autoFocus
+                    value={addStool1}
+                    onChange={e => setAddStool1(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && confirmAddBar()}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center"
+                    placeholder="bv. K1"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">Kruk 2 nummer *</label>
+                  <input
+                    value={addStool2}
+                    onChange={e => setAddStool2(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && confirmAddBar()}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-amber-500 outline-none text-xl font-bold text-center"
+                    placeholder="bv. K2"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="p-4 border-t flex gap-3">
+              <button onClick={() => setShowAddBarModal(false)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700">Annuleer</button>
+              <button onClick={confirmAddBar} className="flex-[2] py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold transition-colors">Toevoegen</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add table modal */}
       {showAddModal && (

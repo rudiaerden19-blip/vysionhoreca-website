@@ -62,17 +62,45 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
   const [kassaTables, setKassaTables] = useState<{ id: string; number: string; seats: number; status: string }[]>([])
+  const [kassaStools, setKassaStools] = useState<{ stoolNumber: string; segmentId: string }[]>([])
   // Openstaande bestellingen per tafel: { "1": CartItem[], "2": CartItem[], ... }
   const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
 
   const tableOrdersKey = `vysion_table_orders_${tenant}`
 
-  // Laad tafels + openstaande bestellingen (localStorage + Supabase sync)
+  // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
   useEffect(() => {
     const raw = localStorage.getItem(`vysion_tables_${tenant}`)
     if (raw) {
       try { setKassaTables(JSON.parse(raw)) } catch { /* empty */ }
     }
+
+    // Barkrukken laden uit localStorage
+    const decorRaw = localStorage.getItem(`vysion_decor_${tenant}`)
+    if (decorRaw) {
+      try {
+        const decors = JSON.parse(decorRaw)
+        const stools = decors
+          .filter((d: { type: string }) => d.type === 'bar_segment')
+          .flatMap((d: { id: string; stool1?: string; stool2?: string }) => [
+            d.stool1 ? { stoolNumber: d.stool1, segmentId: d.id } : null,
+            d.stool2 ? { stoolNumber: d.stool2, segmentId: d.id } : null,
+          ].filter(Boolean))
+        setKassaStools(stools)
+      } catch { /* empty */ }
+    }
+    // Sync barkrukken vanuit Supabase
+    supabase.from('floor_plan_decor').select('data').eq('tenant_slug', tenant).single().then(({ data }) => {
+      if (data?.data) {
+        const stools = (data.data as { id: string; type: string; stool1?: string; stool2?: string }[])
+          .filter(d => d.type === 'bar_segment')
+          .flatMap(d => [
+            d.stool1 ? { stoolNumber: d.stool1, segmentId: d.id } : null,
+            d.stool2 ? { stoolNumber: d.stool2, segmentId: d.id } : null,
+          ].filter(Boolean)) as { stoolNumber: string; segmentId: string }[]
+        if (stools.length > 0) setKassaStools(stools)
+      }
+    })
     // Laad eerst uit localStorage (snel)
     const ordersRaw = localStorage.getItem(tableOrdersKey)
     if (ordersRaw) {
@@ -938,7 +966,11 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               onClick={() => setShowTablePicker(p => !p)}
               className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors"
             >
-              {tableNumber ? `🪑 Tafel ${tableNumber}` : 'Kies tafel...'}
+              {tableNumber
+                ? kassaStools.some(s => s.stoolNumber === tableNumber)
+                  ? `🍺 Kruk ${tableNumber}`
+                  : `🪑 Tafel ${tableNumber}`
+                : 'Kies tafel...'}
             </button>
 
             {/* Tafel picker popup */}
@@ -949,39 +981,76 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                   <div className="p-3 border-b bg-gray-50">
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Kies tafel</p>
                   </div>
-                  {kassaTables.length === 0 ? (
+                  {kassaTables.length === 0 && kassaStools.length === 0 ? (
                     <div className="p-4 text-center text-gray-400 text-sm">
                       Nog geen tafels aangemaakt
                     </div>
                   ) : (
-                    <div className="p-2 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-                      {kassaTables.map(t => (
-                        <button
-                          key={t.id}
-                          onClick={() => switchToTable(t.number)}
-                          className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 relative ${
-                            tableNumber === t.number
-                              ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
-                              : t.status === 'FREE'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
-                              : t.status === 'UNPAID'
-                              ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
-                              : 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
-                          }`}
-                        >
-                          <div className="text-lg">🪑</div>
-                          <div>{t.number}</div>
-                          <div className="text-[10px] opacity-70">
-                            {t.status === 'FREE' ? 'Vrij' : t.status === 'OCCUPIED' ? 'Bezet' : 'Onbetaald'}
+                    <>
+                      {kassaTables.length > 0 && (
+                        <div className="p-2 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                          {kassaTables.map(t => (
+                            <button
+                              key={t.id}
+                              onClick={() => switchToTable(t.number)}
+                              className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 relative ${
+                                tableNumber === t.number
+                                  ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
+                                  : t.status === 'FREE'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
+                                  : t.status === 'UNPAID'
+                                  ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
+                                  : 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
+                              }`}
+                            >
+                              <div className="text-lg">🪑</div>
+                              <div>{t.number}</div>
+                              <div className="text-[10px] opacity-70">
+                                {t.status === 'FREE' ? 'Vrij' : t.status === 'OCCUPIED' ? 'Bezet' : 'Onbetaald'}
+                              </div>
+                              {tableOrders[t.number] && tableOrders[t.number].length > 0 && (
+                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                                  {tableOrders[t.number].length}
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {kassaStools.length > 0 && (
+                        <>
+                          <div className="px-3 py-1.5 bg-amber-50 border-t border-amber-100 flex items-center gap-2">
+                            <span className="text-xs font-bold text-amber-700 uppercase tracking-wider">🍺 Barkrukken</span>
                           </div>
-                          {tableOrders[t.number] && tableOrders[t.number].length > 0 && (
-                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                              {tableOrders[t.number].length}
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
+                          <div className="p-2 grid grid-cols-3 gap-2 max-h-36 overflow-y-auto">
+                            {kassaStools.map(s => (
+                              <button
+                                key={s.segmentId + s.stoolNumber}
+                                onClick={() => switchToTable(s.stoolNumber)}
+                                className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 relative ${
+                                  tableNumber === s.stoolNumber
+                                    ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
+                                    : tableOrders[s.stoolNumber]?.length > 0
+                                    ? 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
+                                    : 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
+                                }`}
+                              >
+                                <div className="text-lg">🍺</div>
+                                <div>{s.stoolNumber}</div>
+                                <div className="text-[10px] opacity-70">
+                                  {tableOrders[s.stoolNumber]?.length > 0 ? 'Bezet' : 'Vrij'}
+                                </div>
+                                {tableOrders[s.stoolNumber]?.length > 0 && (
+                                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                                    {tableOrders[s.stoolNumber].length}
+                                  </span>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </>
                   )}
                   <div className="p-2 border-t bg-gray-50 flex gap-2">
                     {tableNumber && (
