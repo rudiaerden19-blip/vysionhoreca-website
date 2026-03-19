@@ -681,42 +681,48 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🔍', label: 'SEO', href: `${baseUrl}/seo` },
               ]},
             ]
+            const activeMod = modules.find(m => m.key === hamburgerSubOpen)
             return (
-              <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 z-30 overflow-y-auto" style={{ width: 260, maxHeight: '85vh' }}>
-                <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Menu</div>
-                {modules.map(mod => (
-                  <div key={mod.key} className="border-b border-gray-100 last:border-0">
-                    {mod.key === 'reservaties' ? (
-                      <button onClick={() => { setHamburgerOpen(false); setShowReservations(true) }}
-                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors">
-                        <span className="text-lg">{mod.icon}</span>
-                        <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
-                      </button>
-                    ) : (
-                      <>
+              <div className="absolute top-full left-0 mt-1 flex z-30">
+                {/* Eerste kolom: modules */}
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 240, maxHeight: '85vh' }}>
+                  <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Menu</div>
+                  {modules.map(mod => (
+                    <div key={mod.key} className="border-b border-gray-100 last:border-0">
+                      {mod.key === 'reservaties' ? (
+                        <button onClick={() => { setHamburgerOpen(false); setShowReservations(true) }}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors">
+                          <span className="text-lg">{mod.icon}</span>
+                          <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
+                        </button>
+                      ) : (
                         <button onClick={() => setHamburgerSubOpen(hamburgerSubOpen === mod.key ? null : mod.key)}
                           className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.key ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
                           <div className="flex items-center gap-3">
                             <span className="text-lg">{mod.icon}</span>
                             <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
                           </div>
-                          <svg className={`w-4 h-4 text-gray-400 transition-transform ${hamburgerSubOpen === mod.key ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                         </button>
-                        {hamburgerSubOpen === mod.key && (
-                          <div className="bg-gray-50/80 border-t border-gray-100">
-                            {mod.items.map(item => (
-                              <Link key={item.href} href={item.href} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
-                                className="flex items-center gap-3 px-6 py-2.5 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
-                                <span>{item.icon}</span>
-                                <span>{item.label}</span>
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )}
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {/* Tweede popup rechts: sub-items */}
+                {activeMod && (
+                  <div className="ml-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 220, maxHeight: '85vh' }}>
+                    <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl flex items-center gap-2">
+                      <span>{activeMod.icon}</span> {activeMod.label}
+                    </div>
+                    {activeMod.items.map(item => (
+                      <Link key={item.href} href={item.href} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
+                        <span>{item.icon}</span>
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             )
           })()}
@@ -735,7 +741,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         </Link>
 
         {/* Keukenscherm */}
-        <Link href={`/shop/${tenant}/keuken`} target="_blank"
+        <Link href={`/keuken`} target="_blank"
           className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
           <span className="text-lg">👨‍🍳</span>
           <span>Keukenscherm</span>
