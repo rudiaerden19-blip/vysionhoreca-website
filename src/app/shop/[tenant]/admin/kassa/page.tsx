@@ -746,8 +746,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           })()}
         </div>
 
-        {/* Spacer */}
-        <div className="flex-1" />
+        {/* Tenant naam */}
+        <div className="flex-1 flex items-center justify-center">
+          <span className="text-white font-bold text-lg tracking-wide uppercase">
+            {tenant.replace(/-/g, ' ')}
+          </span>
+        </div>
 
         {/* ── RECHTS ── */}
 
