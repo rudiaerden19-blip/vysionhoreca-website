@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
 import TrialBanner from '@/components/TrialBanner'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
@@ -149,47 +148,19 @@ const menuItems = [...onlinePlatformItems, ...separateMenuItems]
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
   const { t } = useLanguage()
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
-  const [tenantPlan, setTenantPlan] = useState<string>('starter')
-  const [isTrial, setIsTrial] = useState<boolean>(false)
   const [loading, setLoading] = useState(true)
   const baseUrl = `/shop/${params.tenant}/admin`
 
-  // Check of tenant bestaat en laad plan + trial status
+  // Check of tenant bestaat
   useEffect(() => {
     async function checkTenant() {
       const tenantData = await getTenantSettings(params.tenant)
       setTenantExists(tenantData !== null)
-
-      // Laad plan en trial status uit tenants tabel
-      const { data: tenantRow } = await supabase
-        .from('tenants')
-        .select('plan, subscription_status, trial_ends_at')
-        .eq('slug', params.tenant)
-        .single()
-
-      if (tenantRow?.plan) setTenantPlan(tenantRow.plan.toLowerCase())
-
-      // Tijdens proefperiode: alle Pro features zichtbaar
-      const status = (tenantRow?.subscription_status || '').toLowerCase()
-      const trialEndsAt = tenantRow?.trial_ends_at
-      const inTrial = status === 'trial' && trialEndsAt && new Date(trialEndsAt) > new Date()
-      setIsTrial(!!inTrial)
-
       setLoading(false)
     }
     checkTenant()
   }, [params.tenant])
-
-  const isActive = (href: string) => {
-    const fullPath = `${baseUrl}${href}`
-    if (href === '') {
-      return pathname === baseUrl || pathname === `${baseUrl}/`
-    }
-    return pathname.startsWith(fullPath)
-  }
 
   // Loading state
   if (loading) {
@@ -234,96 +205,44 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
       {/* Trial Banner */}
       <TrialBanner tenantSlug={params.tenant} />
-      
-      {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b z-50 flex items-center justify-between px-4">
-        <button
-          onClick={() => setMobileMenuOpen(true)}
-          className="p-2 hover:bg-gray-100 rounded-lg"
+
+      {/* ── Slanke blauwe topbalk (zelfde stijl als kassa) ── */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-[#1e293b] flex items-center px-3 gap-2" style={{ height: 56 }}>
+        {/* ← Terug naar Kassa */}
+        <Link
+          href={`${baseUrl}/kassa`}
+          className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-        </button>
-        <span className="font-bold text-gray-900">Admin Panel</span>
-        <Link 
-          href={`/shop/${params.tenant}`}
-          className="p-2 hover:bg-gray-100 rounded-lg text-blue-600"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
+          <span>Kassa</span>
         </Link>
-      </div>
 
-      {/* Mobile Sidebar Overlay */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setMobileMenuOpen(false)}
-            className="lg:hidden fixed inset-0 bg-black/50 z-50"
-          >
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              onClick={(e) => e.stopPropagation()}
-              className="absolute left-0 top-0 h-full w-72 bg-white shadow-xl overflow-y-auto"
-            >
-              <SidebarContent 
-                baseUrl={baseUrl} 
-                isActive={isActive} 
-                tenant={params.tenant}
-                tenantPlan={tenantPlan}
-                isTrial={isTrial}
-                onClose={() => setMobileMenuOpen(false)}
-              />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Tenant naam midden */}
+        <div className="flex-1 flex items-center justify-center">
+          <span className="text-red-400 font-medium text-base tracking-normal">
+            {params.tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+          </span>
+        </div>
 
-      {/* Desktop Sidebar — verborgen op kassa pagina */}
-      {!pathname.includes('/kassa') && (
-        <aside className={`hidden lg:block fixed left-0 top-0 h-full bg-white border-r shadow-sm z-40 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}>
-          <SidebarContent 
-            baseUrl={baseUrl} 
-            isActive={isActive} 
-            tenant={params.tenant}
-            tenantPlan={tenantPlan}
-            isTrial={isTrial}
-            collapsed={!sidebarOpen}
-            onToggle={() => setSidebarOpen(!sidebarOpen)}
-          />
-        </aside>
-      )}
-
-      {/* Top Bar with Language Selector and Display Link - Fixed top right */}
-      {!pathname.includes('/kassa') && (
-        <div className="hidden lg:flex fixed top-4 right-8 z-50 items-center gap-3">
+        {/* Rechts: taal + display knop */}
+        <div className="flex items-center gap-2">
           <Link
             href={`/shop/${params.tenant}/display`}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg transition-colors font-medium shadow-lg"
+            target="_blank"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
           >
-            🖥️ {t('admin.display')}
+            <span className="text-base">🖥️</span>
+            <span className="hidden sm:inline">Onlinescherm</span>
           </Link>
           <LanguageSelector />
         </div>
-      )}
+      </div>
 
-      {/* Main Content */}
-      <main
-        style={pathname.includes('/kassa') ? { height: '100dvh', overflow: 'hidden' } : undefined}
-        className={pathname.includes('/kassa')
-          ? ''
-          : `transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-20'} pt-16 lg:pt-20 overflow-x-hidden min-h-screen`
-        }
-      >
-        <div className={pathname.includes('/kassa') ? 'h-full' : 'p-4 md:p-6 max-w-full pb-96'}>
+      {/* Main Content — geen sidebar, volle breedte */}
+      <main className="pt-14 overflow-x-hidden min-h-screen">
+        <div className="p-4 md:p-6 max-w-full pb-24">
           {children}
         </div>
       </main>
