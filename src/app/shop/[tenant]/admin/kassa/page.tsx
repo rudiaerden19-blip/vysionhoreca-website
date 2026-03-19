@@ -741,7 +741,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         </Link>
 
         {/* Keukenscherm */}
-        <Link href={`/keuken`} target="_blank"
+        <Link href={`/keuken/${tenant}`} target="_blank"
           className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
           <span className="text-lg">👨‍🍳</span>
           <span>Keukenscherm</span>
