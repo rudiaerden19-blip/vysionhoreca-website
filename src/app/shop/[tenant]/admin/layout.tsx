@@ -6,144 +6,11 @@ import { usePathname } from 'next/navigation'
 import TrialBanner from '@/components/TrialBanner'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
-import { supabase } from '@/lib/supabase'
 
 interface AdminLayoutProps {
   children: React.ReactNode
   params: { tenant: string }
 }
-
-// Secties binnen "Online Platform"
-const onlinePlatformItems = [
-  {
-    categoryKey: 'overview',
-    icon: '📊',
-    items: [
-      { nameKey: 'dashboard', href: '', icon: '📊' },
-      { nameKey: 'shopDisplay', href: '/display', icon: '🖥️', fullscreen: true },
-      { nameKey: 'kitchenDisplay', href: '/keuken', icon: '👨‍🍳', fullscreen: true },
-      { nameKey: 'subscription', href: '/abonnement', icon: '💎' },
-      { nameKey: 'businessAnalysis', href: '/analyse', icon: '📊' },
-      { nameKey: 'sales', href: '/verkoop', icon: '💰' },
-      { nameKey: 'popularItems', href: '/populair', icon: '🔥' },
-    ]
-  },
-  {
-    categoryKey: 'settings',
-    icon: '⚙️',
-    items: [
-      { nameKey: 'onlineShopToggle', href: '/online-status', icon: '🔴' },
-      { nameKey: 'businessProfile', href: '/profiel', icon: '🏪' },
-      { nameKey: 'openingHours', href: '/openingstijden', icon: '🕐' },
-      { nameKey: 'deliveryPickup', href: '/levering', icon: '🚗' },
-      { nameKey: 'paymentMethods', href: '/betaling', icon: '💳' },
-      { nameKey: 'designColors', href: '/design', icon: '🎨' },
-      { nameKey: 'texts', href: '/teksten', icon: '✏️' },
-      { nameKey: 'ourTeam', href: '/team', icon: '👨‍🍳' },
-      { nameKey: 'giftCards', href: '/cadeaubonnen', icon: '🎁' },
-      { nameKey: 'seo', href: '/seo', icon: '🔍' },
-    ]
-  },
-  {
-    categoryKey: 'menu',
-    icon: '🍽️',
-    items: [
-      { nameKey: 'categories', href: '/categorieen', icon: '📁' },
-      { nameKey: 'products', href: '/producten', icon: '🍟' },
-      { nameKey: 'optionsExtras', href: '/opties', icon: '➕' },
-      { nameKey: 'allergens', href: '/allergenen', icon: '⚠️' },
-      { nameKey: 'photosMedia', href: '/media', icon: '📷' },
-    ]
-  },
-  {
-    categoryKey: 'whatsapp',
-    icon: '💬',
-    items: [
-      { nameKey: 'whatsappSettings', href: '/whatsapp', icon: '⚙️' },
-      { nameKey: 'whatsappQr', href: '/whatsapp#qr', icon: '📱' },
-    ]
-  },
-  {
-    categoryKey: 'customers',
-    icon: '👥',
-    items: [
-      { nameKey: 'customerList', href: '/klanten', icon: '👥' },
-      { nameKey: 'rewards', href: '/klanten/beloningen', icon: '🎁' },
-    ]
-  },
-  {
-    categoryKey: 'orders',
-    icon: '📦',
-    items: [
-      { nameKey: 'orderList', href: '/bestellingen', icon: '📦' },
-      { nameKey: 'reservations', href: '/reserveringen', icon: '📅' },
-    ]
-  },
-  {
-    categoryKey: 'groupOrders',
-    icon: '👥',
-    items: [
-      { nameKey: 'groupsList', href: '/groepen', icon: '🏢' },
-      { nameKey: 'groupSessions', href: '/groepen/sessies', icon: '📋' },
-      { nameKey: 'groupOrdersOverview', href: '/groepen/bestellingen', icon: '📦' },
-      { nameKey: 'labelPrinter', href: '/labels', icon: '🏷️' },
-    ]
-  },
-]
-
-// Aparte topniveau-knoppen (buiten Online Platform)
-const separateMenuItems = [
-  {
-    categoryKey: 'marketing',
-    icon: '📣',
-    label: 'Marketing',
-    items: [
-      { nameKey: 'emailMarketing', href: '/marketing', icon: '📧' },
-      { nameKey: 'qrCodes', href: '/qr-codes', icon: '📱' },
-      { nameKey: 'promotions', href: '/promoties', icon: '🎁' },
-      { nameKey: 'reviews', href: '/reviews', icon: '⭐' },
-    ]
-  },
-  {
-    categoryKey: 'staff',
-    icon: '👔',
-    label: 'Personeel',
-    items: [
-      { nameKey: 'employees', href: '/personeel', icon: '👥' },
-      { nameKey: 'timeTracking', href: '/uren', icon: '⏰' },
-      { nameKey: 'vacancies', href: '/vacatures', icon: '📢' },
-    ]
-  },
-  {
-    categoryKey: 'costCalculation',
-    icon: '🧮',
-    label: 'Kostenberekening',
-    items: [
-      { nameKey: 'costSettings', href: '/kosten/instellingen', icon: '⚙️' },
-      { nameKey: 'ingredients', href: '/kosten/ingredienten', icon: '🥬' },
-      { nameKey: 'productCosts', href: '/kosten/producten', icon: '📊' },
-    ]
-  },
-  {
-    categoryKey: 'bonnenprinter',
-    icon: '🖨️',
-    label: 'Bonnenprinter',
-    items: [
-      { nameKey: 'bonnenprinter', href: '/bonnenprinter', icon: '🖨️' },
-    ]
-  },
-  {
-    categoryKey: 'gksReports',
-    icon: '🧾',
-    label: 'GKS Rapporten',
-    items: [
-      { nameKey: 'zReport', href: '/z-rapport', icon: '📊' },
-    ]
-  },
-]
-
-// Gecombineerd voor gebruik in FlyoutMenu type checks
-const menuItems = [...onlinePlatformItems, ...separateMenuItems]
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
@@ -152,7 +19,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const [loading, setLoading] = useState(true)
   const baseUrl = `/shop/${params.tenant}/admin`
 
-  // Check of tenant bestaat
   useEffect(() => {
     async function checkTenant() {
       const tenantData = await getTenantSettings(params.tenant)
@@ -162,7 +28,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     checkTenant()
   }, [params.tenant])
 
-  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -174,24 +39,17 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     )
   }
 
-  // Tenant niet gevonden
   if (!tenantExists) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center"
-        >
+        <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
           <span className="text-6xl mb-6 block">🔍</span>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('shopPage.notFoundTitle') || 'Shop niet gevonden'}</h1>
-          <p className="text-gray-600 mb-6">
-            {t('shopPage.notFoundDescription') || 'Deze shop bestaat niet of is verwijderd.'}
-          </p>
-          <a href="https://www.vysionhoreca.com" className="text-blue-600 hover:text-blue-600 font-medium inline-block">
-            ← {t('shopPage.backToVysion') || 'Terug naar Vysion'}
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Shop niet gevonden</h1>
+          <p className="text-gray-600 mb-6">Deze shop bestaat niet of is verwijderd.</p>
+          <a href="https://www.vysionhoreca.com" className="text-blue-600 hover:text-blue-700 font-medium inline-block">
+            ← Terug naar Vysion
           </a>
-        </motion.div>
+        </div>
       </div>
     )
   }
@@ -203,7 +61,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   return (
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
-      {/* Trial Banner */}
       <TrialBanner tenantSlug={params.tenant} />
 
       {/* ── Slanke blauwe topbalk (zelfde stijl als kassa) ── */}
@@ -222,11 +79,11 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         {/* Tenant naam midden */}
         <div className="flex-1 flex items-center justify-center">
           <span className="text-red-400 font-medium text-base tracking-normal">
-            {params.tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            {params.tenant.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
           </span>
         </div>
 
-        {/* Rechts: taal + display knop */}
+        {/* Rechts: display knop + taal */}
         <div className="flex items-center gap-2">
           <Link
             href={`/shop/${params.tenant}/display`}
@@ -240,7 +97,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         </div>
       </div>
 
-      {/* Main Content — geen sidebar, volle breedte */}
+      {/* Hoofdinhoud — geen sidebar, volle breedte */}
       <main className="pt-14 overflow-x-hidden min-h-screen">
         <div className="p-4 md:p-6 max-w-full pb-24">
           {children}
@@ -250,7 +107,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   )
 }
 
-// Language Selector Component for top-right header
 function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -270,32 +126,22 @@ function LanguageSelector() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+        className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
       >
-        <span className="text-xl">{localeFlags[locale]}</span>
-        <span className="text-sm font-medium text-gray-700">{localeNames[locale]}</span>
-        <svg 
-          className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
+        <span className="text-base">{localeFlags[locale]}</span>
+        <span className="hidden sm:inline">{(localeNames[locale] || '').slice(0, 3).toUpperCase()}</span>
+        <svg className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      
+
       {isOpen && (
         <div className="absolute right-0 mt-2 bg-white rounded-xl shadow-xl border z-50 min-w-[180px] max-h-80 overflow-y-auto">
           {locales.map((langCode) => (
             <button
               key={langCode}
-              onClick={() => {
-                setLocale(langCode as typeof locale)
-                setIsOpen(false)
-              }}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${
-                locale === langCode ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
-              }`}
+              onClick={() => { setLocale(langCode as typeof locale); setIsOpen(false) }}
+              className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 transition-colors ${locale === langCode ? 'bg-blue-50 text-blue-600' : 'text-gray-700'}`}
             >
               <span className="text-lg">{localeFlags[langCode]}</span>
               <span className="text-sm">{localeNames[langCode]}</span>
@@ -308,467 +154,6 @@ function LanguageSelector() {
           ))}
         </div>
       )}
-    </div>
-  )
-}
-
-// Flyout Menu Component - renders with fixed positioning to escape overflow
-function FlyoutMenu({ 
-  section, 
-  categoryName, 
-  sectionIndex,
-  baseUrl, 
-  tenant, 
-  isActive, 
-  onClose,
-  t,
-  isPro = false,
-  isTrial = false,
-  pendingReservations = 0
-}: { 
-  section: typeof menuItems[0]
-  categoryName: string
-  sectionIndex: number
-  baseUrl: string
-  tenant: string
-  isActive: (href: string) => boolean
-  onClose: () => void
-  t: (key: string) => string
-  isPro?: boolean
-  isTrial?: boolean
-  pendingReservations?: number
-}) {
-  const menuRef = useRef<HTMLDivElement>(null)
-  const [position, setPosition] = useState({ top: 0, left: 0 })
-
-  useEffect(() => {
-    // Get the button position to align the flyout
-    const button = document.getElementById(`menu-btn-${section.categoryKey}`)
-    if (button) {
-      const rect = button.getBoundingClientRect()
-      setPosition({
-        top: rect.top,
-        left: rect.right + 8 // 8px gap from sidebar
-      })
-    }
-  }, [section.categoryKey])
-
-  // Close when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        const button = document.getElementById(`menu-btn-${section.categoryKey}`)
-        if (button && !button.contains(event.target as Node)) {
-          onClose()
-        }
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [onClose, section.categoryKey])
-
-  return (
-    <motion.div
-      ref={menuRef}
-      initial={{ opacity: 0, x: -10, scale: 0.95 }}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      exit={{ opacity: 0, x: -10, scale: 0.95 }}
-      transition={{ duration: 0.15 }}
-      style={{
-        position: 'fixed',
-        top: position.top,
-        left: position.left,
-        zIndex: 9999
-      }}
-      className="bg-white rounded-xl shadow-2xl border border-gray-200 py-2 min-w-[220px] max-h-[70vh] overflow-y-auto"
-    >
-      <div className="px-4 py-2 border-b border-gray-100 mb-1">
-        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{categoryName}</span>
-      </div>
-      <ul>
-        {section.items.map((item) => {
-          const itemIsProOnly = (item as { proOnly?: boolean }).proOnly
-          const isLocked = itemIsProOnly && !isPro
-
-          const getHref = () => {
-            if (isLocked) return `${baseUrl}/abonnement?upgrade=pro`
-            if ((item as { fullscreen?: boolean }).fullscreen) {
-              if (item.href === '/display') return `/shop/${tenant}/display`
-              if (item.href === '/keuken') return `/keuken/${tenant}`
-            }
-            return `${baseUrl}${item.href}`
-          }
-          
-          return (
-            <li key={item.href}>
-              <Link
-                href={getHref()}
-                onClick={onClose}
-                className={`flex items-center gap-3 px-4 py-2.5 transition-all ${
-                  isLocked
-                    ? 'text-gray-400 hover:bg-purple-50 hover:text-purple-600'
-                    : isActive(item.href)
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-700 hover:bg-blue-50 hover:text-blue-600'
-                }`}
-              >
-                <span className="text-lg">{item.icon}</span>
-                <span className="text-sm font-medium flex items-center gap-2 flex-1">
-                  {t(`admin.menu.${item.nameKey}`) !== `admin.menu.${item.nameKey}` 
-                    ? t(`admin.menu.${item.nameKey}`) 
-                    : item.nameKey === 'tablePlan' ? 'Tafelplan'
-                    : item.nameKey === 'onlineBooking' ? 'Online Boeking'
-                    : item.nameKey === 'guestCrm' ? 'Gasten CRM'
-                    : item.nameKey === 'noShow' ? 'No-show Bescherming'
-                    : item.nameKey}
-                  {(item as { fullscreen?: boolean }).fullscreen && <span className="text-xs opacity-60">↗</span>}
-                  {item.nameKey === 'reservations' && pendingReservations > 0 && (
-                    <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
-                      {pendingReservations}
-                    </span>
-                  )}
-                </span>
-                {itemIsProOnly && isTrial && (
-                  <span className="ml-auto text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">GRATIS</span>
-                )}
-                {isLocked && (
-                  <span className="ml-auto text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">PRO</span>
-                )}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
-    </motion.div>
-  )
-}
-
-function SidebarContent({ 
-  baseUrl, 
-  isActive, 
-  tenant,
-  tenantPlan = 'starter',
-  isTrial = false,
-  collapsed = false,
-  onClose,
-  onToggle 
-}: { 
-  baseUrl: string
-  isActive: (href: string) => boolean
-  tenant: string
-  tenantPlan?: string
-  isTrial?: boolean
-  collapsed?: boolean
-  onClose?: () => void
-  onToggle?: () => void
-}) {
-  const pathname = usePathname()
-  const [expandedSections, setExpandedSections] = useState<string[]>([])
-  const [onlinePlatformOpen, setOnlinePlatformOpen] = useState(false)
-  const [isLangOpen, setIsLangOpen] = useState(false)
-  const [pendingReservations, setPendingReservations] = useState(0)
-  const langRef = useRef<HTMLDivElement>(null)
-  const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
-  // Tijdens proefperiode: alles zichtbaar (15 dagen gratis alle features)
-  const isPro = tenantPlan === 'pro' || isTrial
-
-  // Load pending reservations count
-  useEffect(() => {
-    async function loadPendingCount() {
-      const { count } = await supabase
-        .from('reservations')
-        .select('*', { count: 'exact', head: true })
-        .eq('tenant_slug', tenant)
-        .eq('status', 'pending')
-      
-      setPendingReservations(count || 0)
-    }
-    loadPendingCount()
-    
-    // Poll every 30 seconds
-    const interval = setInterval(loadPendingCount, 30000)
-    return () => clearInterval(interval)
-  }, [tenant])
-
-  // Close language dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (langRef.current && !langRef.current.contains(event.target as Node)) {
-        setIsLangOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
-  // Don't auto-expand sections - only expand when user clicks
-
-  const toggleSection = (categoryKey: string) => {
-    // Only one section open at a time - clicking another closes the previous
-    setExpandedSections(prev => 
-      prev.includes(categoryKey) 
-        ? [] // Close if clicking same section
-        : [categoryKey] // Open only this one, close all others
-    )
-  }
-
-  const isSectionExpanded = (categoryKey: string) => expandedSections.includes(categoryKey)
-  
-  const hasActiveItemInSection = (section: typeof menuItems[0]) => {
-    return section.items.some((item) => isActive(item.href))
-  }
-
-  const handleLanguageSelect = (langCode: string) => {
-    setLocale(langCode as any)
-    setIsLangOpen(false)
-  }
-
-  return (
-    <div className="h-full flex flex-col">
-      {/* Header */}
-      <div className="p-4 border-b flex items-center justify-between">
-        {!collapsed && (
-          <div>
-            <h1 className="font-bold text-xl text-gray-900">Vysion</h1>
-            <p className="text-sm text-gray-500 truncate">{tenant}</p>
-          </div>
-        )}
-        {collapsed && (
-          <div className="w-full flex justify-center">
-            <span className="text-2xl">🍟</span>
-          </div>
-        )}
-        {onToggle && (
-          <button
-            id="sidebar-toggle-btn"
-            onClick={onToggle}
-            className="p-2 hover:bg-gray-100 rounded-lg hidden lg:block"
-          >
-            <svg className={`w-5 h-5 transition-transform ${collapsed ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
-          </button>
-        )}
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg lg:hidden"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        )}
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-2">
-        {/* ── Kassa knop ── */}
-        <div className="mb-1">
-          <Link
-            href={`${baseUrl}/kassa`}
-            className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 ${
-              pathname.startsWith(`${baseUrl}/kassa`)
-                ? 'bg-blue-50 text-blue-600 border-blue-500'
-                : 'border-transparent text-gray-700 hover:bg-gray-50'
-            } ${collapsed ? 'justify-center' : ''}`}
-            title={collapsed ? 'Kassa' : undefined}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-xl">🖥️</span>
-              {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">Kassa</span>}
-            </div>
-          </Link>
-        </div>
-
-        {/* ── Online Platform knop met ALLES erin ── */}
-        <div className="mb-1">
-          <button
-            onClick={() => !collapsed && setOnlinePlatformOpen(prev => !prev)}
-            className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 ${
-              onlinePlatformOpen
-                ? 'bg-blue-600 text-white border-blue-700'
-                : menuItems.some(s => hasActiveItemInSection(s))
-                ? 'bg-blue-50 text-blue-600 border-blue-500'
-                : 'text-gray-700 hover:bg-gray-50 border-transparent'
-            } ${collapsed ? 'justify-center' : ''}`}
-            title={collapsed ? 'Online Platform' : undefined}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-xl">🛒</span>
-              {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">Online Platform</span>}
-              {pendingReservations > 0 && !collapsed && (
-                <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center animate-pulse">
-                  {pendingReservations}
-                </span>
-              )}
-            </div>
-            {!collapsed && (
-              <svg className={`w-4 h-4 transition-transform duration-200 ${onlinePlatformOpen ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            )}
-          </button>
-
-          {/* Alle secties binnen Online Platform */}
-          {!collapsed && onlinePlatformOpen && (
-            <div className="pl-2 border-l-2 border-blue-200 ml-4">
-              {onlinePlatformItems.map((section) => {
-                const isExpanded = isSectionExpanded(section.categoryKey)
-                const hasActive = hasActiveItemInSection(section)
-                const sectionIsProOnly = (section as { proOnly?: boolean }).proOnly
-                const sectionLocked = sectionIsProOnly && !isPro
-                const categoryName = section.categoryKey === 'reservationsPro'
-                  ? 'Reserveringen Pro'
-                  : t(`admin.categories.${section.categoryKey}`)
-                const globalIndex = menuItems.findIndex(s => s.categoryKey === section.categoryKey)
-
-                return (
-                  <div key={section.categoryKey}>
-                    <button
-                      id={`menu-btn-${section.categoryKey}`}
-                      onClick={() => toggleSection(section.categoryKey)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 transition-all ${
-                        sectionLocked
-                          ? 'text-gray-400 hover:bg-purple-50'
-                          : hasActive
-                          ? 'bg-blue-50 text-blue-600 font-semibold'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">{section.icon}</span>
-                        <span className="text-xs font-semibold uppercase tracking-wide">{categoryName}</span>
-                        {section.categoryKey === 'orders' && pendingReservations > 0 && (
-                          <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center animate-pulse">
-                            {pendingReservations}
-                          </span>
-                        )}
-                        {sectionIsProOnly && isTrial && (
-                          <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">GRATIS</span>
-                        )}
-                        {sectionLocked && (
-                          <span className="text-xs font-bold bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">PRO</span>
-                        )}
-                      </div>
-                      <svg className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                    {isExpanded && (
-                      <FlyoutMenu
-                        section={section}
-                        categoryName={categoryName}
-                        sectionIndex={globalIndex}
-                        baseUrl={baseUrl}
-                        tenant={tenant}
-                        isActive={isActive}
-                        onClose={() => {
-                          onClose?.()
-                          toggleSection(section.categoryKey)
-                        }}
-                        t={t}
-                        isPro={isPro}
-                        isTrial={isTrial}
-                        pendingReservations={pendingReservations}
-                      />
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* ── Aparte knoppen: Marketing / Personeel / Kostenberekening / Bonnenprinter ── */}
-        {separateMenuItems.map((section) => {
-          const isExpanded = isSectionExpanded(`top_${section.categoryKey}`)
-          const hasActive = section.items.some(item => isActive(item.href))
-          const globalIndex = menuItems.findIndex(s => s.categoryKey === section.categoryKey)
-          return (
-            <div key={section.categoryKey} className="mb-1">
-              <button
-                onClick={() => !collapsed && toggleSection(`top_${section.categoryKey}`)}
-                className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 ${
-                  isExpanded
-                    ? 'bg-blue-600 text-white border-blue-700'
-                    : hasActive
-                    ? 'bg-blue-50 text-blue-600 border-blue-500'
-                    : 'border-transparent text-gray-700 hover:bg-gray-50'
-                } ${collapsed ? 'justify-center' : ''}`}
-                title={collapsed ? section.label : undefined}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-xl">{section.icon}</span>
-                  {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">{section.label}</span>}
-                </div>
-                {!collapsed && (
-                  <svg className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                )}
-              </button>
-              {!collapsed && isExpanded && (
-                <FlyoutMenu
-                  section={section}
-                  categoryName={section.label}
-                  sectionIndex={globalIndex}
-                  baseUrl={baseUrl}
-                  tenant={tenant}
-                  isActive={isActive}
-                  onClose={() => {
-                    onClose?.()
-                    toggleSection(`top_${section.categoryKey}`)
-                  }}
-                  t={t}
-                  isPro={isPro}
-                  isTrial={isTrial}
-                  pendingReservations={pendingReservations}
-                />
-              )}
-            </div>
-          )
-        })}
-
-        {/* ── Reservaties knop ── */}
-        <div className="mb-1">
-          <button
-            className={`w-full flex items-center justify-between px-4 py-3 transition-all border-l-4 border-transparent text-gray-700 hover:bg-gray-50 ${collapsed ? 'justify-center' : ''}`}
-            title={collapsed ? 'Reservaties' : undefined}
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-xl">📅</span>
-              {!collapsed && <span className="font-semibold text-sm uppercase tracking-wide">Reservaties</span>}
-            </div>
-          </button>
-        </div>
-      </nav>
-
-      {/* Footer */}
-      <div className="p-4 border-t space-y-2">
-        <Link
-          href={`/shop/${tenant}`}
-          target="_blank"
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors ${collapsed ? 'justify-center' : ''}`}
-        >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-          {!collapsed && <span className="font-medium text-gray-600">{t('admin.viewWebsite')}</span>}
-        </Link>
-        <button
-          onClick={() => {
-            localStorage.removeItem('vysion_tenant')
-            window.location.href = '/login'
-          }}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 transition-colors text-red-600 ${collapsed ? 'justify-center' : ''}`}
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          {!collapsed && <span className="font-medium">{t('admin.logout')}</span>}
-        </button>
-      </div>
     </div>
   )
 }
