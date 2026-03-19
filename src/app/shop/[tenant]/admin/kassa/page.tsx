@@ -224,7 +224,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         sort_order: 0,
         allergens: [],
       }
-      setCart(prev => [...prev, { product: custom, quantity: 1 }])
+      setCart(prev => [...prev, { product: custom, quantity: 1, cartKey: custom.id! }])
       setNumpadValue('')
     }
   }
