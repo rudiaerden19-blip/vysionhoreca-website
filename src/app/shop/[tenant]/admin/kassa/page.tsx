@@ -701,6 +701,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🏷️', label: 'Labels', href: `${baseUrl}/labels` },
               ]},
               { key: 'online', icon: '🛒', label: 'Online', items: [
+                { icon: '🟢', label: 'Online Aan/Uitzetten', href: `${baseUrl}/online-status` },
                 { icon: '📊', label: 'Dashboard', href: `${baseUrl}` },
                 { icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
                 { icon: '⚙️', label: 'Instellingen', href: `${baseUrl}/profiel` },
