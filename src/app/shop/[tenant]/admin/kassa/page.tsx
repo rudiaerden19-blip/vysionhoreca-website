@@ -693,6 +693,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🍟', label: 'Producten', href: `${baseUrl}/producten` },
                 { icon: '➕', label: "Opties & Extra's", href: `${baseUrl}/opties` },
                 { icon: '📦', label: 'Voorraad', href: `${baseUrl}/voorraad` },
+                { icon: '📊', label: 'Rapportages', href: `${baseUrl}/rapporten` },
                 { icon: '⚠️', label: 'Allergenen', href: `${baseUrl}/allergenen` },
                 { icon: '🖨️', label: 'Bonnenprinter', href: `${baseUrl}/bonnenprinter` },
                 { icon: '🏷️', label: 'Labels', href: `${baseUrl}/labels` },
