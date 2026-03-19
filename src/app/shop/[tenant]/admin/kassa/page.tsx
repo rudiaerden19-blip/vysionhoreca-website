@@ -733,6 +733,13 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
         {/* ── RECHTS ── */}
 
+        {/* Reserveringen */}
+        <button onClick={() => setShowReservations(true)}
+          className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
+          <span className="text-lg">📅</span>
+          <span>Reserveringen</span>
+        </button>
+
         {/* Onlinescherm */}
         <Link href={`/shop/${tenant}/display`} target="_blank"
           className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
@@ -759,7 +766,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           <button onClick={() => setLangOpen(o => !o)}
             className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl font-medium text-white transition-colors">
             <span className="text-2xl">{localeFlags[locale]}</span>
-            <span className="text-sm font-bold">{(localeNames[locale] || '').slice(0, 2).toUpperCase()}</span>
+            <span className="text-sm font-bold">{(localeNames[locale] || '').slice(0, 3).toUpperCase()}</span>
             <svg className={`w-4 h-4 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {langOpen && (
