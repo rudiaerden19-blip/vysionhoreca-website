@@ -434,8 +434,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat)}
                         className="aspect-square relative rounded-xl overflow-hidden active:scale-95 transition-transform"
-                        style={{ boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
-                        style={{ backgroundColor: '#3C4D6B' }}
+                        style={{ backgroundColor: '#3C4D6B', boxShadow: '0 8px 30px rgba(0,0,0,0.35)' }}
                       >
                         {catImage && (
                           <img src={catImage} alt={cat.name} className="absolute inset-0 w-full h-full object-cover" />
