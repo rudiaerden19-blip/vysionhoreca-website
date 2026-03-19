@@ -37,6 +37,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [kassaOpen, setKassaOpen] = useState(false)
   const [flyoutOpen, setFlyoutOpen] = useState<string | null>(null)
   const [onlineSubOpen, setOnlineSubOpen] = useState<string | null>(null)
+  const [personeelSubOpen, setPersoneelSubOpen] = useState<string | null>(null)
   const closeNav = () => { setNavOpen(false); setKassaOpen(false); setFlyoutOpen(null); setOnlineSubOpen(null) }
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
@@ -745,21 +746,60 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
         {/* Personeel */}
         <div className="relative z-20">
-          <button onClick={() => setFlyoutOpen(flyoutOpen === 'personeel' ? null : 'personeel')}
+          <button onClick={() => { setFlyoutOpen(flyoutOpen === 'personeel' ? null : 'personeel'); setPersoneelSubOpen(null) }}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'personeel' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">👔</span>
             <span className="font-bold text-sm">Personeel</span>
             <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'personeel' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
-          {flyoutOpen === 'personeel' && (
-            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
-              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Personeel</div>
-              <Link href={`${baseUrl}/personeel`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">👥</span> Medewerkers</Link>
-              <Link href={`${baseUrl}/team`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏢</span> Team</Link>
-              <Link href={`${baseUrl}/verlof`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏖️</span> Verlof</Link>
-              <Link href={`${baseUrl}/vacatures`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📋</span> Vacatures</Link>
-            </div>
-          )}
+          {flyoutOpen === 'personeel' && (() => {
+            const sections = [
+              { key: 'medewerkers', icon: '👥', label: 'Medewerkers', items: [
+                { icon: '👤', label: 'Medewerkers', href: '/personeel' },
+                { icon: '🏢', label: 'Team', href: '/team' },
+              ]},
+              { key: 'uren', icon: '⏱️', label: 'Urenregistratie', items: [
+                { icon: '📅', label: 'Uren overzicht', href: '/verlof' },
+                { icon: '🏖️', label: 'Verlof', href: '/verlof' },
+              ]},
+              { key: 'vacatures', icon: '📋', label: 'Vacatures', items: [
+                { icon: '📋', label: 'Vacatures', href: '/vacatures' },
+              ]},
+            ]
+            const activeSec = sections.find(s => s.key === personeelSubOpen)
+            return (
+              <div className="absolute top-full left-0 mt-1 flex z-30">
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 240, maxHeight: '82vh' }}>
+                  <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Personeel</div>
+                  {sections.map(sec => (
+                    <button key={sec.key}
+                      onClick={() => setPersoneelSubOpen(personeelSubOpen === sec.key ? null : sec.key)}
+                      className={`w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-0 transition-colors ${personeelSubOpen === sec.key ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg">{sec.icon}</span>
+                        <span className="font-semibold text-sm text-gray-700">{sec.label}</span>
+                      </div>
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                    </button>
+                  ))}
+                </div>
+                {activeSec && (
+                  <div className="ml-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 220, maxHeight: '82vh' }}>
+                    <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl flex items-center gap-2">
+                      <span>{activeSec.icon}</span> {activeSec.label}
+                    </div>
+                    {activeSec.items.map(item => (
+                      <Link key={item.href} href={`${baseUrl}${item.href}`} onClick={() => { setFlyoutOpen(null); setPersoneelSubOpen(null) }}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
+                        <span>{item.icon}</span>
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })()}
         </div>
 
         {/* Kostenberekening */}
