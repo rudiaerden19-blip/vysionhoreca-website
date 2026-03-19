@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { supabase } from '@/lib/supabase'
 
 export type TableShape = 'ROUND' | 'SQUARE' | 'RECTANGLE'
 export type TableStatus = 'FREE' | 'OCCUPIED' | 'UNPAID'
@@ -302,24 +303,41 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
   const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey)
-      if (raw) setTables(JSON.parse(raw))
-    } catch { /* empty */ }
-    try {
-      const raw = localStorage.getItem(decorKey)
-      if (raw) setDecors(JSON.parse(raw))
-    } catch { /* empty */ }
-  }, [storageKey, decorKey])
+    const load = async () => {
+      // Tafels laden
+      const { data: tData } = await supabase
+        .from('floor_plan_tables')
+        .select('data')
+        .eq('tenant_slug', tenant)
+        .single()
+      if (tData?.data) setTables(tData.data)
+      else {
+        try { const raw = localStorage.getItem(storageKey); if (raw) setTables(JSON.parse(raw)) } catch { /* empty */ }
+      }
+      // Decor laden
+      const { data: dData } = await supabase
+        .from('floor_plan_decor')
+        .select('data')
+        .eq('tenant_slug', tenant)
+        .single()
+      if (dData?.data) setDecors(dData.data)
+      else {
+        try { const raw = localStorage.getItem(decorKey); if (raw) setDecors(JSON.parse(raw)) } catch { /* empty */ }
+      }
+    }
+    load()
+  }, [tenant, storageKey, decorKey])
 
   const save = (updated: KassaTable[]) => {
     setTables(updated)
     localStorage.setItem(storageKey, JSON.stringify(updated))
+    supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
   }
 
   const saveDecor = (updated: DecorItem[]) => {
     setDecors(updated)
     localStorage.setItem(decorKey, JSON.stringify(updated))
+    supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
   }
 
   const addDecor = (type: DecorType) => {
@@ -407,8 +425,13 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (!draggingId.current) return
-    if (draggingType.current === 'table') localStorage.setItem(storageKey, JSON.stringify(tables))
-    else localStorage.setItem(decorKey, JSON.stringify(decors))
+    if (draggingType.current === 'table') {
+      localStorage.setItem(storageKey, JSON.stringify(tables))
+      supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: tables }, { onConflict: 'tenant_slug' })
+    } else {
+      localStorage.setItem(decorKey, JSON.stringify(decors))
+      supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: decors }, { onConflict: 'tenant_slug' })
+    }
     draggingId.current = null
     setIsDragging(false)
     setTimeout(() => { dragMoved.current = false }, 0)
