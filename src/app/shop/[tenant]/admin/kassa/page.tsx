@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct, getTenantSettings, TenantSettings } from '@/lib/admin-api'
 import KassaFloorPlan from '@/components/KassaFloorPlan'
+import KassaReservationsView from '@/components/KassaReservationsView'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled } from '@/lib/sounds'
@@ -51,6 +52,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [menuLoading, setMenuLoading] = useState(true)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
 
+  const [showReservations, setShowReservations] = useState(false)
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
   const [kassaTables, setKassaTables] = useState<{ id: string; number: string; status: string }[]>([])
@@ -748,10 +750,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">🧾</span> GKS Rapporten
               </Link>
-              <Link href={`${baseUrl}/reserveringen`} onClick={closeNav}
-                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
+              <button onClick={() => { closeNav(); setShowReservations(true) }}
+                className="w-full flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">📅</span> Reservaties
-              </Link>
+              </button>
               <Link href={`/shop/${tenant}`} target="_blank" onClick={closeNav}
                 className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">🔗</span> Bekijk je shop
@@ -1174,6 +1176,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           tenant={tenant}
           onSelectTable={(nr) => switchToTable(nr)}
           onClose={() => setShowFloorPlan(false)}
+        />
+      )}
+
+      {showReservations && (
+        <KassaReservationsView
+          tenant={tenant}
+          kassaTables={kassaTables}
+          onClose={() => setShowReservations(false)}
+          onStartOrder={(tableNr) => { switchToTable(tableNr); setShowReservations(false) }}
         />
       )}
 
