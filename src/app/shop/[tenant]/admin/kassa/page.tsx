@@ -54,14 +54,61 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
   const [kassaTables, setKassaTables] = useState<{ id: string; number: string; status: string }[]>([])
+  // Openstaande bestellingen per tafel: { "1": CartItem[], "2": CartItem[], ... }
+  const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
 
-  // Laad tafels uit localStorage
+  const tableOrdersKey = `vysion_table_orders_${tenant}`
+
+  // Laad tafels + openstaande bestellingen uit localStorage
   useEffect(() => {
     const raw = localStorage.getItem(`vysion_tables_${tenant}`)
     if (raw) {
       try { setKassaTables(JSON.parse(raw)) } catch { /* empty */ }
     }
-  }, [tenant, showTablePicker])
+    const ordersRaw = localStorage.getItem(tableOrdersKey)
+    if (ordersRaw) {
+      try { setTableOrders(JSON.parse(ordersRaw)) } catch { /* empty */ }
+    }
+  }, [tenant, showTablePicker, tableOrdersKey])
+
+  // Sla cart op voor huidige tafel
+  const saveCartToTable = (tblNr: string, items: CartItem[]) => {
+    const updated = { ...tableOrders, [tblNr]: items }
+    setTableOrders(updated)
+    localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
+    // Update tafel status naar OCCUPIED als er items zijn, FREE als leeg
+    const tablesRaw = localStorage.getItem(`vysion_tables_${tenant}`)
+    if (tablesRaw) {
+      try {
+        const tbls = JSON.parse(tablesRaw)
+        const updatedTbls = tbls.map((t: { number: string; status: string }) =>
+          t.number === tblNr ? { ...t, status: items.length > 0 ? 'OCCUPIED' : 'FREE' } : t
+        )
+        localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
+        setKassaTables(updatedTbls)
+      } catch { /* empty */ }
+    }
+  }
+
+  // Wissel naar andere tafel (sla huidige op, laad nieuwe)
+  const switchToTable = (newTableNr: string) => {
+    if (tableNumber && cart.length > 0) {
+      saveCartToTable(tableNumber, cart)
+    }
+    const existingOrder = tableOrders[newTableNr] || []
+    setCart(existingOrder)
+    setTableNumber(newTableNr)
+    setOrderType('DINE_IN')
+    setShowTablePicker(false)
+  }
+
+  // "Naar tafel" knop: sla bestelling op en leeg de kassa voor volgende tafel
+  const parkOrder = () => {
+    if (!tableNumber || cart.length === 0) return
+    saveCartToTable(tableNumber, cart)
+    setCart([])
+    setTableNumber('')
+  }
 
   // Betaling
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -322,6 +369,26 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       tableNumber,
       createdAt: new Date(),
     })
+
+    // Verwijder tafel bestelling na betaling + zet tafel terug op FREE
+    if (tableNumber) {
+      const updated = { ...tableOrders }
+      delete updated[tableNumber]
+      setTableOrders(updated)
+      localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
+      const tablesRaw = localStorage.getItem(`vysion_tables_${tenant}`)
+      if (tablesRaw) {
+        try {
+          const tbls = JSON.parse(tablesRaw)
+          const updatedTbls = tbls.map((t: { number: string; status: string }) =>
+            t.number === tableNumber ? { ...t, status: 'FREE' } : t
+          )
+          localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
+          setKassaTables(updatedTbls)
+        } catch { /* empty */ }
+      }
+    }
+
     clearCart()
     setTableNumber('')
     setShowPaymentModal(false)
@@ -687,12 +754,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                       {kassaTables.map(t => (
                         <button
                           key={t.id}
-                          onClick={() => {
-                            setTableNumber(t.number)
-                            setOrderType('DINE_IN')
-                            setShowTablePicker(false)
-                          }}
-                          className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 ${
+                          onClick={() => switchToTable(t.number)}
+                          className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 relative ${
                             tableNumber === t.number
                               ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
                               : t.status === 'FREE'
@@ -707,6 +770,11 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                           <div className="text-[10px] opacity-70">
                             {t.status === 'FREE' ? 'Vrij' : t.status === 'OCCUPIED' ? 'Bezet' : 'Onbetaald'}
                           </div>
+                          {tableOrders[t.number] && tableOrders[t.number].length > 0 && (
+                            <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                              {tableOrders[t.number].length}
+                            </span>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -844,6 +912,14 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               <span className="text-xs font-semibold">Verwijder</span>
             </button>
           </div>
+          {orderType === 'DINE_IN' && tableNumber && cart.length > 0 && (
+            <button
+              onClick={parkOrder}
+              className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors flex items-center justify-center gap-2"
+            >
+              🪑 Naar tafel {tableNumber}
+            </button>
+          )}
           <button
             onClick={() => { if (cart.length > 0) setShowPaymentModal(true) }}
             disabled={cart.length === 0}
@@ -918,7 +994,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       {showFloorPlan && (
         <KassaFloorPlan
           tenant={tenant}
-          onSelectTable={(nr) => { setTableNumber(nr); setOrderType('DINE_IN') }}
+          onSelectTable={(nr) => switchToTable(nr)}
           onClose={() => setShowFloorPlan(false)}
         />
       )}

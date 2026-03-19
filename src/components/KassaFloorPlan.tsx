@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export type TableShape = 'ROUND' | 'SQUARE' | 'RECTANGLE'
 export type TableStatus = 'FREE' | 'OCCUPIED' | 'UNPAID'
