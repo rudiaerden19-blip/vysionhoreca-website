@@ -690,6 +690,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           </button>
           {hamburgerOpen && (() => {
             const modules = [
+              { key: 'rapporten', icon: '📊', label: 'Rapporten', href: `${baseUrl}/rapporten`, items: [] },
               { key: 'kassa', icon: '🖥️', label: 'Kassa', items: [
                 { icon: '📁', label: 'Categorieën', href: `${baseUrl}/categorieen` },
                 { icon: '🍟', label: 'Producten', href: `${baseUrl}/producten` },
@@ -762,6 +763,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                           <span className="text-lg">{mod.icon}</span>
                           <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
                         </button>
+                      ) : 'href' in mod && mod.href ? (
+                        <Link href={mod.href} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors">
+                          <span className="text-lg">{mod.icon}</span>
+                          <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
+                        </Link>
                       ) : (
                         <button onClick={() => setHamburgerSubOpen(hamburgerSubOpen === mod.key ? null : mod.key)}
                           className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.key ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
