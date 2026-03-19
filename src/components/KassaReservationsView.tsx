@@ -34,7 +34,7 @@ import {
 import { supabase } from '@/lib/supabase'
 
 // ---- Types ----
-type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'NO_SHOW' | 'CANCELLED'
+type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'NO_SHOW' | 'CANCELLED' | 'WAITLIST'
 type ViewMode = 'today' | 'calendar' | 'list' | 'floorplan' | 'guests' | 'stats' | 'settings'
 
 interface Reservation {
@@ -56,6 +56,11 @@ interface Reservation {
   completed_at?: string
   total_spent: number
   created_at?: string
+  payment_status?: string
+  stripe_session_id?: string
+  stripe_payment_method_id?: string
+  deposit_amount?: number
+  waitlist_position?: number
 }
 
 interface KassaTable {
@@ -63,6 +68,14 @@ interface KassaTable {
   number: string
   seats: number
   status: string
+}
+
+interface Shift {
+  id: string
+  name: string
+  startTime: string
+  endTime: string
+  isActive: boolean
 }
 
 interface ReservationSettings {
@@ -79,6 +92,21 @@ interface ReservationSettings {
   kitchenCapacityEnabled: boolean
   kitchenMaxCoversPer15min: number
   closedDays: number[]
+  // z2 - Shifts
+  shifts: Shift[]
+  // z4 - Annuleringsbeleid
+  cancellationDeadlineHours: number
+  cancellationMessage: string
+  // z5 - Review
+  reviewLink: string
+  autoSendReview: boolean
+  // z8/z9 - Betaling
+  depositRequired: boolean
+  depositAmount: number
+  noShowProtection: boolean
+  noShowFee: number
+  // Booking widget URL label
+  bookingPageEnabled: boolean
 }
 
 interface GuestProfile {
@@ -111,6 +139,7 @@ const STATUS_CONFIG: Record<ReservationStatus, { label: string; color: string; b
   COMPLETED: { label: 'Afgerond', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.15)', icon: <CheckCircle2 size={14} /> },
   NO_SHOW: { label: 'No-show', color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.15)', icon: <UserX size={14} /> },
   CANCELLED: { label: 'Geannuleerd', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.15)', icon: <XCircle size={14} /> },
+  WAITLIST: { label: 'Wachtlijst', color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.15)', icon: <Clock size={14} /> },
 }
 
 // ---- Default settings ----
@@ -128,6 +157,19 @@ const DEFAULT_SETTINGS: ReservationSettings = {
   kitchenCapacityEnabled: false,
   kitchenMaxCoversPer15min: 20,
   closedDays: [],
+  shifts: [
+    { id: '1', name: 'Lunch', startTime: '12:00', endTime: '15:00', isActive: false },
+    { id: '2', name: 'Diner', startTime: '18:00', endTime: '23:00', isActive: false },
+  ],
+  cancellationDeadlineHours: 24,
+  cancellationMessage: 'Annulering is niet meer mogelijk, het afgesproken tijdstip is verstreken.',
+  reviewLink: '',
+  autoSendReview: false,
+  depositRequired: false,
+  depositAmount: 10,
+  noShowProtection: false,
+  noShowFee: 25,
+  bookingPageEnabled: true,
 }
 
 // ---- Toast simple ----
@@ -161,6 +203,7 @@ async function sendReservationEmail(data: {
   businessPhone?: string
   businessEmail?: string
   cancellationReason?: string
+  reviewLink?: string
 }) {
   try {
     await fetch('/api/send-reservation-email', {
@@ -168,9 +211,27 @@ async function sendReservationEmail(data: {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     })
-  } catch {
-    // Stille fout - email niet kritiek
-  }
+  } catch { /* Stille fout */ }
+}
+
+// ---- SMS helper ----
+async function sendSMS(data: {
+  to: string
+  guestName: string
+  reservationDate: string
+  reservationTime: string
+  partySize: number
+  businessName: string
+  businessPhone?: string
+  type: 'confirmation' | 'reminder' | 'cancellation' | 'checkin'
+}) {
+  try {
+    await fetch('/api/reservation-sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+  } catch { /* Stille fout */ }
 }
 
 // ============================================================
@@ -191,6 +252,9 @@ export default function KassaReservationsView({
   const [searchQuery, setSearchQuery] = useState('')
   const [showNewReservationModal, setShowNewReservationModal] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
+  const [selectedShift, setSelectedShift] = useState<string | null>(null)
+  const [guestProfilesDB, setGuestProfilesDB] = useState<GuestProfile[]>([])
+  const [cancelConfirm, setCancelConfirm] = useState<Reservation | null>(null)
   const [reservationSettings, setReservationSettings] = useState<ReservationSettings>(() => {
     if (typeof window === 'undefined') return DEFAULT_SETTINGS
     try {
@@ -222,7 +286,30 @@ export default function KassaReservationsView({
     setLoading(false)
   }
 
-  useEffect(() => { loadReservations() }, [tenant])
+  // Load guest profiles from Supabase (z6)
+  const loadGuestProfiles = async () => {
+    const { data } = await supabase
+      .from('guest_profiles')
+      .select('*')
+      .eq('tenant_slug', tenant)
+    if (data) {
+      setGuestProfilesDB(data.map(g => ({
+        id: g.id,
+        name: g.name,
+        phone: g.phone,
+        email: g.email,
+        isVip: g.is_vip,
+        isBlocked: g.is_blocked,
+        totalVisits: g.total_visits,
+        totalNoShows: g.total_no_shows,
+        totalSpent: g.total_spent,
+        lastVisit: g.last_visit,
+        notes: g.notes,
+      })))
+    }
+  }
+
+  useEffect(() => { loadReservations(); loadGuestProfiles() }, [tenant])
 
   // Save settings to localStorage
   const updateSettings = (updates: Partial<ReservationSettings>) => {
@@ -245,16 +332,26 @@ export default function KassaReservationsView({
     [reservations, today])
 
   const todayStats = useMemo(() => ({
-    total: todayReservations.length,
+    total: todayReservations.filter(r => r.status !== 'WAITLIST').length,
     confirmed: todayReservations.filter(r => r.status === 'CONFIRMED').length,
     checkedIn: todayReservations.filter(r => r.status === 'CHECKED_IN').length,
     completed: todayReservations.filter(r => r.status === 'COMPLETED').length,
     noShow: todayReservations.filter(r => r.status === 'NO_SHOW').length,
-    covers: todayReservations.reduce((s, r) => s + r.party_size, 0),
-  }), [todayReservations])
+    covers: todayReservations.filter(r => r.status !== 'WAITLIST').reduce((s, r) => s + r.party_size, 0),
+    waitlist: waitlistReservations.length,
+  }), [todayReservations, waitlistReservations])
 
   const filteredReservations = useMemo(() => {
-    const base = viewMode === 'today' ? todayReservations : upcomingReservations
+    let base = viewMode === 'today' ? todayReservations : upcomingReservations
+    // Filter wachtlijst uit normale weergave
+    base = base.filter(r => r.status !== 'WAITLIST')
+    // Filter op shift
+    if (selectedShift) {
+      const shift = reservationSettings.shifts?.find(s => s.id === selectedShift)
+      if (shift) {
+        base = base.filter(r => r.reservation_time >= shift.startTime && r.reservation_time <= shift.endTime)
+      }
+    }
     if (!searchQuery) return base
     const q = searchQuery.toLowerCase()
     return base.filter(r =>
@@ -262,14 +359,27 @@ export default function KassaReservationsView({
       r.guest_phone?.includes(q) ||
       r.guest_email?.toLowerCase().includes(q)
     )
-  }, [searchQuery, viewMode, todayReservations, upcomingReservations])
+  }, [searchQuery, viewMode, todayReservations, upcomingReservations, selectedShift, reservationSettings.shifts])
+
+  const waitlistReservations = useMemo(() =>
+    reservations.filter(r => r.status === 'WAITLIST' && r.reservation_date === today)
+      .sort((a, b) => (a.waitlist_position || 0) - (b.waitlist_position || 0)),
+    [reservations, today]
+  )
 
   // Guest profiles (derived)
+  // Combineer afgeleide profielen (reservaties) met Supabase VIP/blocked data
   const guestProfiles = useMemo<GuestProfile[]>(() => {
     const map = new Map<string, GuestProfile>()
     reservations.forEach(r => {
       const key = r.guest_phone || r.guest_email || r.guest_name
       if (!key) return
+      // Check of er Supabase profiel is voor VIP/blocked
+      const dbProfile = guestProfilesDB.find(g => 
+        (g.phone && g.phone === r.guest_phone) || 
+        (g.email && g.email === r.guest_email) ||
+        g.name === r.guest_name
+      )
       const existing = map.get(key)
       if (existing) {
         existing.totalVisits++
@@ -278,21 +388,22 @@ export default function KassaReservationsView({
         if (!existing.lastVisit || r.reservation_date > existing.lastVisit) existing.lastVisit = r.reservation_date
       } else {
         map.set(key, {
-          id: key,
+          id: dbProfile?.id || key,
           name: r.guest_name,
           phone: r.guest_phone,
           email: r.guest_email,
-          isVip: false,
-          isBlocked: false,
+          isVip: dbProfile?.isVip || false,
+          isBlocked: dbProfile?.isBlocked || false,
           totalVisits: 1,
           totalNoShows: r.status === 'NO_SHOW' ? 1 : 0,
           totalSpent: r.status === 'COMPLETED' ? (r.total_spent || 0) : 0,
           lastVisit: r.reservation_date,
+          notes: dbProfile?.notes,
         })
       }
     })
     return Array.from(map.values())
-  }, [reservations])
+  }, [reservations, guestProfilesDB])
 
   // Stats helpers
   const getNoShowRate = () => {
@@ -323,13 +434,23 @@ export default function KassaReservationsView({
         reservationTime: r.reservation_time,
         partySize: r.party_size,
         tableName: r.table_number,
-        notes: r.notes,
-        specialRequests: r.special_requests,
-        occasion: r.occasion,
         status: 'confirmed',
         businessName: businessInfo.name,
         businessPhone: businessInfo.phone,
         businessEmail: businessInfo.email,
+      })
+    }
+    // z10 - SMS bij check-in
+    if (r.guest_phone) {
+      await sendSMS({
+        to: r.guest_phone,
+        guestName: r.guest_name,
+        reservationDate: r.reservation_date,
+        reservationTime: r.reservation_time,
+        partySize: r.party_size,
+        businessName: businessInfo.name,
+        businessPhone: businessInfo.phone,
+        type: 'checkin',
       })
     }
   }
@@ -337,10 +458,40 @@ export default function KassaReservationsView({
   const handleNoShow = async (r: Reservation) => {
     await updateStatus(r.id, 'NO_SHOW')
     toast.error(`${r.guest_name} gemarkeerd als no-show`)
+    // z9 - No-show fee aanrekenen als bescherming actief
+    if (reservationSettings.noShowProtection && r.stripe_payment_method_id && r.guest_name) {
+      try {
+        await fetch('/api/reservation-card-auth', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            paymentMethodId: r.stripe_payment_method_id,
+            amount: reservationSettings.noShowFee || 25,
+            businessName: businessInfo.name,
+            guestName: r.guest_name,
+          }),
+        })
+        toast.success(`No-show kost €${reservationSettings.noShowFee} aangerekend`)
+      } catch { /* stille fout */ }
+    }
   }
 
   const handleCancel = async (r: Reservation) => {
+    // z4 - Check annuleringsbeleid deadline
+    if (reservationSettings.cancellationDeadlineHours > 0) {
+      const resDateTime = new Date(`${r.reservation_date}T${r.reservation_time}`)
+      const deadlineTime = new Date(resDateTime.getTime() - reservationSettings.cancellationDeadlineHours * 60 * 60 * 1000)
+      if (new Date() > deadlineTime && r.status !== 'WAITLIST') {
+        setCancelConfirm(r)
+        return
+      }
+    }
+    await doCancelReservation(r)
+  }
+
+  const doCancelReservation = async (r: Reservation) => {
     await updateStatus(r.id, 'CANCELLED')
+    setCancelConfirm(null)
     toast.success('Reservatie geannuleerd')
     if (r.guest_email) {
       await sendReservationEmail({
@@ -356,11 +507,69 @@ export default function KassaReservationsView({
         cancellationReason: 'Geannuleerd door personeel',
       })
     }
+    if (r.guest_phone) {
+      await sendSMS({
+        to: r.guest_phone,
+        guestName: r.guest_name,
+        reservationDate: r.reservation_date,
+        reservationTime: r.reservation_time,
+        partySize: r.party_size,
+        businessName: businessInfo.name,
+        type: 'cancellation',
+      })
+    }
   }
 
   const handleComplete = async (r: Reservation) => {
     await updateStatus(r.id, 'COMPLETED')
     toast.success('Reservatie afgerond')
+    // z5 - Review uitnodiging automatisch sturen
+    if (reservationSettings.autoSendReview && r.guest_email) {
+      await sendReservationEmail({
+        customerEmail: r.guest_email,
+        customerName: r.guest_name,
+        reservationDate: r.reservation_date,
+        reservationTime: r.reservation_time,
+        partySize: r.party_size,
+        status: 'review',
+        businessName: businessInfo.name,
+        businessPhone: businessInfo.phone,
+        businessEmail: businessInfo.email,
+        reviewLink: reservationSettings.reviewLink,
+      })
+    }
+  }
+
+  // z3 - Wachtlijst bevestigen
+  const handleConfirmFromWaitlist = async (r: Reservation) => {
+    await updateStatus(r.id, 'CONFIRMED')
+    toast.success(`${r.guest_name} bevestigd vanuit wachtlijst`)
+    if (r.guest_email) {
+      await sendReservationEmail({
+        customerEmail: r.guest_email,
+        customerName: r.guest_name,
+        customerPhone: r.guest_phone,
+        reservationDate: r.reservation_date,
+        reservationTime: r.reservation_time,
+        partySize: r.party_size,
+        status: 'confirmed',
+        businessName: businessInfo.name,
+        businessPhone: businessInfo.phone,
+        businessEmail: businessInfo.email,
+      })
+    }
+    if (r.guest_phone) {
+      await sendSMS({
+        to: r.guest_phone,
+        guestName: r.guest_name,
+        reservationDate: r.reservation_date,
+        reservationTime: r.reservation_time,
+        partySize: r.party_size,
+        businessName: businessInfo.name,
+        businessPhone: businessInfo.phone,
+        type: 'confirmation',
+      })
+    }
   }
 
   const handleConfirm = async (r: Reservation) => {
@@ -375,15 +584,56 @@ export default function KassaReservationsView({
         reservationTime: r.reservation_time,
         partySize: r.party_size,
         tableName: r.table_number,
-        notes: r.notes,
-        specialRequests: r.special_requests,
-        occasion: r.occasion,
         status: 'confirmed',
         businessName: businessInfo.name,
         businessPhone: businessInfo.phone,
         businessEmail: businessInfo.email,
       })
     }
+    // z10 - SMS bevestiging
+    if (r.guest_phone) {
+      await sendSMS({
+        to: r.guest_phone,
+        guestName: r.guest_name,
+        reservationDate: r.reservation_date,
+        reservationTime: r.reservation_time,
+        partySize: r.party_size,
+        businessName: businessInfo.name,
+        businessPhone: businessInfo.phone,
+        type: 'confirmation',
+      })
+    }
+  }
+
+  // z6 - VIP/geblokkeerd opslaan in Supabase
+  const handleToggleVip = async (guest: GuestProfile) => {
+    const newVip = !guest.isVip
+    await supabase.from('guest_profiles').upsert({
+      tenant_slug: tenant,
+      name: guest.name,
+      phone: guest.phone || null,
+      email: guest.email || null,
+      is_vip: newVip,
+      is_blocked: guest.isBlocked,
+      notes: guest.notes || '',
+    }, { onConflict: 'tenant_slug,phone' })
+    await loadGuestProfiles()
+    toast.success(newVip ? 'VIP status toegevoegd' : 'VIP status verwijderd')
+  }
+
+  const handleToggleBlocked = async (guest: GuestProfile) => {
+    const newBlocked = !guest.isBlocked
+    await supabase.from('guest_profiles').upsert({
+      tenant_slug: tenant,
+      name: guest.name,
+      phone: guest.phone || null,
+      email: guest.email || null,
+      is_vip: guest.isVip,
+      is_blocked: newBlocked,
+      notes: guest.notes || '',
+    }, { onConflict: 'tenant_slug,phone' })
+    await loadGuestProfiles()
+    toast.success(newBlocked ? 'Gast geblokkeerd' : 'Gast gedeblokkeerd')
   }
 
   const handleAssignTable = async (reservationId: string, tableNumber: string) => {
@@ -668,7 +918,34 @@ export default function KassaReservationsView({
             <p className="text-2xl font-bold">{todayStats.covers}</p>
             <p className="text-xs text-gray-400">Personen</p>
           </div>
+          {todayStats.waitlist > 0 && (
+            <div className="bg-purple-50 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-purple-500">{todayStats.waitlist}</p>
+              <p className="text-xs text-purple-400">Wachtlijst</p>
+            </div>
+          )}
         </div>
+
+        {/* Shift filter (z2) */}
+        {reservationSettings.shifts?.some(s => s.isActive) && viewMode === 'today' && (
+          <div className="flex items-center gap-2 mb-3">
+            <button
+              onClick={() => setSelectedShift(null)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${selectedShift === null ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-500 hover:text-gray-900'}`}
+            >
+              Alle shifts
+            </button>
+            {reservationSettings.shifts.filter(s => s.isActive).map(shift => (
+              <button
+                key={shift.id}
+                onClick={() => setSelectedShift(shift.id)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${selectedShift === shift.id ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-500 hover:text-gray-900'}`}
+              >
+                {shift.name} {shift.startTime}–{shift.endTime}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* View Toggle & Search */}
         <div className="flex items-center gap-3">
@@ -719,20 +996,53 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'today' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredReservations.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <CalendarDays size={48} className="mx-auto text-gray-300 mb-4" />
-                <p className="text-gray-400">Geen reservaties vandaag</p>
-                <button
-                  onClick={() => setShowNewReservationModal(true)}
-                  className="mt-4 px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition-colors"
-                >
-                  Eerste reservatie aanmaken
-                </button>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredReservations.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <CalendarDays size={48} className="mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-400">Geen reservaties vandaag</p>
+                  <button
+                    onClick={() => setShowNewReservationModal(true)}
+                    className="mt-4 px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition-colors"
+                  >
+                    Eerste reservatie aanmaken
+                  </button>
+                </div>
+              ) : (
+                filteredReservations.map(renderReservationCard)
+              )}
+            </div>
+
+            {/* z3 - Wachtlijst sectie */}
+            {waitlistReservations.length > 0 && (
+              <div>
+                <h3 className="font-bold text-purple-600 mb-3 flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-purple-500 inline-block" />
+                  Wachtlijst ({waitlistReservations.length})
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {waitlistReservations.map((r) => (
+                    <div key={r.id} className="bg-purple-50 border border-purple-200 rounded-xl p-4 cursor-pointer hover:border-purple-400 transition-colors" onClick={() => setSelectedReservation(r)}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <span className="text-sm font-bold text-purple-600">{r.reservation_time}</span>
+                          {r.waitlist_position && <span className="ml-2 text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full">#{r.waitlist_position}</span>}
+                        </div>
+                        <span className="flex items-center gap-1 text-sm text-purple-500"><Users size={14} />{r.party_size}</span>
+                      </div>
+                      <p className="font-semibold text-gray-900">{r.guest_name}</p>
+                      {r.guest_phone && <p className="text-sm text-gray-500">{r.guest_phone}</p>}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleConfirmFromWaitlist(r) }}
+                        className="mt-3 w-full py-2 rounded-lg bg-purple-500 text-white text-sm font-medium hover:bg-purple-600 transition-colors"
+                      >
+                        Bevestigen
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-            ) : (
-              filteredReservations.map(renderReservationCard)
             )}
           </div>
         )}
@@ -979,6 +1289,7 @@ export default function KassaReservationsView({
                       </div>
                       <div className="flex gap-2">
                         <button
+                          onClick={() => handleToggleVip(guest)}
                           className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1 ${
                             guest.isVip
                               ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30'
@@ -988,6 +1299,7 @@ export default function KassaReservationsView({
                           <Star size={14} /> VIP
                         </button>
                         <button
+                          onClick={() => handleToggleBlocked(guest)}
                           className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1 ${
                             guest.isBlocked
                               ? 'bg-red-500/20 text-red-400 border border-red-500/30'
@@ -1199,10 +1511,221 @@ export default function KassaReservationsView({
                   })}
                 </div>
               </div>
+
+              {/* z2 - Shifts beheer */}
+              <div className="border-t border-gray-100 pt-6">
+                <h4 className="font-bold mb-4">🍽️ Shifts Beheer</h4>
+                <p className="text-sm text-gray-400 mb-4">Definieer lunch en diner shifts om reservaties te filteren.</p>
+                <div className="space-y-3">
+                  {(reservationSettings.shifts || []).map((shift, idx) => (
+                    <div key={shift.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                      <button
+                        onClick={() => {
+                          const newShifts = [...(reservationSettings.shifts || [])]
+                          newShifts[idx] = { ...shift, isActive: !shift.isActive }
+                          updateSettings({ shifts: newShifts })
+                        }}
+                        className={`w-10 h-6 rounded-full transition-colors flex-shrink-0 ${shift.isActive ? 'bg-green-500' : 'bg-gray-300'}`}
+                      >
+                        <div className={`w-4 h-4 rounded-full bg-white transition-transform mx-auto ${shift.isActive ? 'translate-x-2' : '-translate-x-2'}`} />
+                      </button>
+                      <input
+                        type="text"
+                        value={shift.name}
+                        onChange={(e) => {
+                          const newShifts = [...(reservationSettings.shifts || [])]
+                          newShifts[idx] = { ...shift, name: e.target.value }
+                          updateSettings({ shifts: newShifts })
+                        }}
+                        className="flex-1 px-3 py-1.5 rounded-lg border border-gray-200 text-sm"
+                      />
+                      <input type="time" value={shift.startTime}
+                        onChange={(e) => {
+                          const newShifts = [...(reservationSettings.shifts || [])]
+                          newShifts[idx] = { ...shift, startTime: e.target.value }
+                          updateSettings({ shifts: newShifts })
+                        }}
+                        className="px-2 py-1.5 rounded-lg border border-gray-200 text-sm"
+                      />
+                      <span className="text-gray-400 text-sm">→</span>
+                      <input type="time" value={shift.endTime}
+                        onChange={(e) => {
+                          const newShifts = [...(reservationSettings.shifts || [])]
+                          newShifts[idx] = { ...shift, endTime: e.target.value }
+                          updateSettings({ shifts: newShifts })
+                        }}
+                        className="px-2 py-1.5 rounded-lg border border-gray-200 text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* z4 - Annuleringsbeleid */}
+              <div className="border-t border-gray-100 pt-6">
+                <h4 className="font-bold mb-4">❌ Annuleringsbeleid</h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="font-medium block mb-2">Annulering mogelijk tot (uren voor reservatie)</label>
+                    <p className="text-sm text-gray-400 mb-2">0 = altijd mogelijk, 24 = tot 24u van tevoren</p>
+                    <input type="number" min="0"
+                      value={reservationSettings.cancellationDeadlineHours}
+                      onChange={(e) => updateSettings({ cancellationDeadlineHours: parseInt(e.target.value) || 0 })}
+                      className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-medium block mb-2">Boodschap bij te late annulering</label>
+                    <textarea
+                      value={reservationSettings.cancellationMessage}
+                      onChange={(e) => updateSettings({ cancellationMessage: e.target.value })}
+                      rows={2}
+                      className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200 resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* z5 - Review uitnodiging */}
+              <div className="border-t border-gray-100 pt-6">
+                <h4 className="font-bold mb-4">⭐ Review Uitnodiging</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Automatisch review email sturen</p>
+                      <p className="text-sm text-gray-400">Bij afronden van reservatie</p>
+                    </div>
+                    <button
+                      onClick={() => updateSettings({ autoSendReview: !reservationSettings.autoSendReview })}
+                      className={`w-14 h-7 rounded-full transition-colors ${reservationSettings.autoSendReview ? 'bg-green-500' : 'bg-gray-300'}`}
+                    >
+                      <div className={`w-5 h-5 rounded-full bg-white transition-transform ${reservationSettings.autoSendReview ? 'translate-x-8' : 'translate-x-1'}`} />
+                    </button>
+                  </div>
+                  <div>
+                    <label className="font-medium block mb-2">Review link (Google Maps / TripAdvisor)</label>
+                    <input type="url"
+                      value={reservationSettings.reviewLink}
+                      onChange={(e) => updateSettings({ reviewLink: e.target.value })}
+                      placeholder="https://g.page/jouwzaak/review"
+                      className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* z8 - Borg/aanbetaling */}
+              <div className="border-t border-gray-100 pt-6">
+                <h4 className="font-bold mb-4">💳 Borg & Aanbetaling</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Borg vereisen bij online reservatie</p>
+                      <p className="text-sm text-gray-400">Klant betaalt borg via Stripe</p>
+                    </div>
+                    <button
+                      onClick={() => updateSettings({ depositRequired: !reservationSettings.depositRequired })}
+                      className={`w-14 h-7 rounded-full transition-colors ${reservationSettings.depositRequired ? 'bg-green-500' : 'bg-gray-300'}`}
+                    >
+                      <div className={`w-5 h-5 rounded-full bg-white transition-transform ${reservationSettings.depositRequired ? 'translate-x-8' : 'translate-x-1'}`} />
+                    </button>
+                  </div>
+                  {reservationSettings.depositRequired && (
+                    <div>
+                      <label className="font-medium block mb-2">Borgbedrag (€)</label>
+                      <input type="number" min="0" step="5"
+                        value={reservationSettings.depositAmount}
+                        onChange={(e) => updateSettings({ depositAmount: parseFloat(e.target.value) || 0 })}
+                        className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* z9 - No-show bescherming */}
+              <div className="border-t border-gray-100 pt-6">
+                <h4 className="font-bold mb-4">🛡️ No-show Bescherming</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Creditcard registreren bij reservatie</p>
+                      <p className="text-sm text-gray-400">Kaart wordt bewaard, pas belast bij no-show</p>
+                    </div>
+                    <button
+                      onClick={() => updateSettings({ noShowProtection: !reservationSettings.noShowProtection })}
+                      className={`w-14 h-7 rounded-full transition-colors ${reservationSettings.noShowProtection ? 'bg-green-500' : 'bg-gray-300'}`}
+                    >
+                      <div className={`w-5 h-5 rounded-full bg-white transition-transform ${reservationSettings.noShowProtection ? 'translate-x-8' : 'translate-x-1'}`} />
+                    </button>
+                  </div>
+                  {reservationSettings.noShowProtection && (
+                    <div>
+                      <label className="font-medium block mb-2">No-show kost (€)</label>
+                      <input type="number" min="0" step="5"
+                        value={reservationSettings.noShowFee}
+                        onChange={(e) => updateSettings({ noShowFee: parseFloat(e.target.value) || 25 })}
+                        className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* z7 - Online booking widget */}
+              <div className="border-t border-gray-100 pt-6">
+                <h4 className="font-bold mb-4">🌐 Online Booking Widget</h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Online reserveren inschakelen</p>
+                      <p className="text-sm text-gray-400">Klanten kunnen online reserveren</p>
+                    </div>
+                    <button
+                      onClick={() => updateSettings({ bookingPageEnabled: !reservationSettings.bookingPageEnabled })}
+                      className={`w-14 h-7 rounded-full transition-colors ${reservationSettings.bookingPageEnabled ? 'bg-green-500' : 'bg-gray-300'}`}
+                    >
+                      <div className={`w-5 h-5 rounded-full bg-white transition-transform ${reservationSettings.bookingPageEnabled ? 'translate-x-8' : 'translate-x-1'}`} />
+                    </button>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                    <p className="text-sm font-medium text-blue-700 mb-1">📎 Booking link voor klanten:</p>
+                    <p className="text-xs text-blue-600 font-mono break-all">
+                      {typeof window !== 'undefined' ? `${window.location.origin}/shop/${tenant}/reserveren` : `/shop/${tenant}/reserveren`}
+                    </p>
+                    <button
+                      onClick={() => {
+                        const url = `${window.location.origin}/shop/${tenant}/reserveren`
+                        navigator.clipboard?.writeText(url)
+                        toast.success('Link gekopieerd!')
+                      }}
+                      className="mt-2 px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      Kopieer link
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         )}
       </div>
+
+      {/* z4 - Annulering deadline modal */}
+      {cancelConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <h3 className="font-bold text-lg mb-2">⚠️ Annulering na deadline</h3>
+            <p className="text-gray-600 text-sm mb-4">{reservationSettings.cancellationMessage}</p>
+            <p className="text-gray-500 text-sm mb-6">Wilt u toch annuleren?</p>
+            <div className="flex gap-3">
+              <button onClick={() => setCancelConfirm(null)} className="flex-1 py-3 rounded-xl bg-gray-100 font-medium">Nee, terug</button>
+              <button onClick={() => doCancelReservation(cancelConfirm)} className="flex-1 py-3 rounded-xl bg-red-500 text-white font-medium">Ja, annuleren</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* New Reservation Modal */}
       {showNewReservationModal && (

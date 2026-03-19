@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       businessPhone,
       businessEmail,
       cancellationReason,
+      reviewLink,
     } = await request.json()
 
     if (!customerEmail || !customerName) {
@@ -63,6 +64,12 @@ export async function POST(request: NextRequest) {
       headerEmoji = '⏰'
       headerText = 'Herinnering Reservatie'
       bodyText = 'Dit is een herinnering voor uw reservatie morgen.'
+    } else if (status === 'review') {
+      subject = `⭐ Hoe was uw bezoek? - ${businessName}`
+      headerColor = '#f59e0b'
+      headerEmoji = '⭐'
+      headerText = 'Bedankt voor uw bezoek!'
+      bodyText = `We hopen dat u heeft genoten van uw bezoek bij ${businessName}. We stellen uw mening zeer op prijs!`
     } else {
       subject = `📅 Reservatie ontvangen - ${businessName}`
       headerColor = '#3C4D6B'
@@ -110,6 +117,15 @@ export async function POST(request: NextRequest) {
             ${businessPhone ? `<p style="margin: 5px 0; color: #666;">📞 ${businessPhone}</p>` : ''}
             ${businessEmail ? `<p style="margin: 5px 0; color: #666;">✉️ ${businessEmail}</p>` : ''}
           </div>
+
+          ${status === 'review' && reviewLink ? `
+          <div style="text-align: center; margin: 25px 0;">
+            <a href="${reviewLink}" style="display: inline-block; padding: 14px 32px; background: #f59e0b; color: white; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px;">
+              ⭐ Schrijf een recensie
+            </a>
+            <p style="color: #999; font-size: 13px; margin-top: 12px;">Uw mening helpt ons en andere gasten.</p>
+          </div>
+          ` : ''}
 
           ${status !== 'cancelled' ? `
           <p style="color: #666; font-size: 14px; margin-top: 20px;">
