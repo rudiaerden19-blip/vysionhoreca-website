@@ -218,8 +218,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       if (tenantData?.primary_color) {
         setPrimaryColor(tenantData.primary_color)
       }
-      if (tenantData?.name) {
-        setBusinessName(tenantData.name)
+      if (tenantData?.business_name) {
+        setBusinessName(tenantData.business_name)
       }
       if (tenantData?.image_display_mode) {
         setImageDisplayMode(tenantData.image_display_mode)
