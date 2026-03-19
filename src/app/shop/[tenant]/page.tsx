@@ -810,7 +810,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 className="text-white/50 font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm bg-white/10 flex items-center gap-1 cursor-not-allowed"
               >
                 <span>🚫</span>
-                <span className="hidden sm:inline">{t('shopPage.menu')}</span>
+                <span className="hidden sm:inline">Bestel</span>
               </span>
             ) : (
               <Link 
@@ -818,8 +818,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 style={{ backgroundColor: business.primary_color }}
                 className="text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:opacity-90 transition-opacity flex items-center gap-1"
               >
-                <span>🍟</span>
-                <span className="hidden sm:inline">{t('shopPage.menu')}</span>
+                <span>🛒</span>
+                <span className="hidden sm:inline">Bestel</span>
               </Link>
             )}
             
@@ -1007,8 +1007,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               className="mb-4"
             >
               {manualOffline?.is_offline ? (
-                <span className="inline-flex items-center gap-2 bg-orange-600/95 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
-                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                <span className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm border border-white/20">
+                  <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></span>
                   {manualOffline.offline_reason === 'volzet' ? t('shopOffline.bannerVolzet') :
                    manualOffline.offline_reason === 'panne' ? t('shopOffline.bannerPanne') :
                    manualOffline.offline_reason === 'vakantie' ? t('shopOffline.bannerVakantie') :
@@ -1016,18 +1016,18 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                    t('shopOffline.bannerSluiting')}
                 </span>
               ) : todayHours?.closed ? (
-                <span className="inline-flex items-center gap-2 bg-red-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
-                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                <span className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm border border-white/20">
+                  <span className="w-2 h-2 bg-red-400 rounded-full"></span>
                   {t('shopPage.closedToday')}
                 </span>
               ) : isCurrentlyOpen() ? (
-                <span className="inline-flex items-center gap-2 bg-green-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
-                  <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                <span className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm border border-white/20">
+                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                   {t('shopPage.openNow')} · {t('shopPage.closesAt')} {todayHours?.close?.slice(0, 5)}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-2 bg-orange-500/90 backdrop-blur-md text-white px-4 py-2 rounded-full font-medium">
-                  <span className="w-2 h-2 bg-white rounded-full"></span>
+                <span className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm border border-white/20">
+                  <span className="w-2 h-2 bg-orange-400 rounded-full"></span>
                   {t('shopPage.closedNow')} · {t('shopPage.opensAt')} {todayHours?.open?.slice(0, 5)}
                 </span>
               )}
@@ -1091,8 +1091,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   style={{ backgroundColor: business.primary_color }}
                   className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-white font-bold text-sm sm:text-base hover:opacity-90 transition-opacity shadow-lg"
                 >
-                  <span>🍟</span>
-                  <span>{t('shopPage.menu') || 'Bestel Nu'}</span>
+                  <span>🛒</span>
+                  <span>Bestel Nu</span>
                 </Link>
               )}
               {business.reservations_enabled && (
