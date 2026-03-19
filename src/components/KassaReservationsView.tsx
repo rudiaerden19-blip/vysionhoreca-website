@@ -31,7 +31,7 @@ import {
   X,
   UtensilsCrossed,
 } from 'lucide-react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabase'
 
 // ---- Types ----
 type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'NO_SHOW' | 'CANCELLED'
@@ -182,7 +182,6 @@ export default function KassaReservationsView({
   onClose,
   onStartOrder,
 }: KassaReservationsViewProps) {
-  const supabase = createClientComponentClient()
   const toast = useToast()
 
   const [reservations, setReservations] = useState<Reservation[]>([])
