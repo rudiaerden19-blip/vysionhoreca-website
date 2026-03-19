@@ -414,7 +414,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           )}
 
           {/* Grid */}
-          <div className="flex-1 overflow-y-auto p-2">
+          <div className="flex-1 overflow-y-auto p-4">
             {menuLoading ? (
               <div className="flex items-center justify-center h-full text-gray-400 text-lg">Laden...</div>
             ) : !selectedCategory ? (
@@ -426,7 +426,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                   <p className="text-sm mt-1">Voeg categorieën toe via het Online Platform</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-4 gap-4">
                   {categories.map(cat => {
                     const catImage = products.find(p => p.category_id === cat.id && p.image_url)?.image_url
                     return (
@@ -459,7 +459,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                     <p className="font-semibold">Geen producten in deze categorie</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-4 gap-4">
                     {filtered.map(product => {
                       const inCart = cart.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0)
                       const hasOpts = productsWithOptions.includes(product.id!)
