@@ -707,9 +707,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             ]
             const activeSec = sections.find(s => s.key === onlineSubOpen)
             return (
-              <div className="flex">
+              <div className="absolute top-full left-0 mt-1 flex z-30">
                 {/* Eerste kolom: secties */}
-                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 z-30 overflow-y-auto" style={{ width: 240, maxHeight: '82vh' }}>
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 240, maxHeight: '82vh' }}>
                   <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Online Platform</div>
                   {sections.map(sec => (
                     <button key={sec.key}
