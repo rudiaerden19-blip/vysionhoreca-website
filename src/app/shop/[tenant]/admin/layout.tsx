@@ -73,13 +73,6 @@ const onlinePlatformItems = [
     ]
   },
   {
-    categoryKey: 'gksReports',
-    icon: '🧾',
-    items: [
-      { nameKey: 'zReport', href: '/z-rapport', icon: '📊' },
-    ]
-  },
-  {
     categoryKey: 'orders',
     icon: '📦',
     items: [
@@ -138,6 +131,14 @@ const separateMenuItems = [
     label: 'Bonnenprinter',
     items: [
       { nameKey: 'bonnenprinter', href: '/bonnenprinter', icon: '🖨️' },
+    ]
+  },
+  {
+    categoryKey: 'gksReports',
+    icon: '🧾',
+    label: 'GKS Rapporten',
+    items: [
+      { nameKey: 'zReport', href: '/z-rapport', icon: '📊' },
     ]
   },
 ]
