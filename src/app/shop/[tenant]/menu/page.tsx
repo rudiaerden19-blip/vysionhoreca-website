@@ -46,6 +46,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
   const [productOptions, setProductOptions] = useState<ProductOption[]>([])
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
+  const [modalQuantity, setModalQuantity] = useState(1)
   const [loadingOptions, setLoadingOptions] = useState(false)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
   const [businessName, setBusinessName] = useState('')
@@ -361,13 +362,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       if (existing) {
         return prev.map(c => 
           c === existing
-            ? { ...c, quantity: c.quantity + 1 }
+            ? { ...c, quantity: c.quantity + modalQuantity }
             : c
         )
       }
       return [...prev, { 
         item: selectedItem, 
-        quantity: 1, 
+        quantity: modalQuantity, 
         selectedOptions: selectedOpts,
         totalPrice 
       }]
@@ -376,6 +377,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
     setSelectedItem(null)
     setProductOptions([])
     setSelectedChoices({})
+    setModalQuantity(1)
   }
 
   const removeFromCart = (index: number) => {
@@ -804,7 +806,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSelectedItem(null)}
+            onClick={() => { setSelectedItem(null); setModalQuantity(1) }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4"
           >
             <motion.div
@@ -834,7 +836,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   </div>
                 )}
                 <button
-                  onClick={() => setSelectedItem(null)}
+                  onClick={() => { setSelectedItem(null); setModalQuantity(1) }}
                   className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg"
                 >
                   <span className="text-2xl">×</span>
@@ -930,6 +932,24 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   </div>
                 )}
 
+                {/* Hoeveelheid kiezer */}
+                <div className={`flex items-center justify-between mb-4 p-4 rounded-2xl ${darkMode ? 'bg-[#2a2a2a]' : 'bg-gray-50'}`}>
+                  <span className={`font-semibold ${theme.text}`}>Aantal</span>
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={() => setModalQuantity(q => Math.max(1, q - 1))}
+                      className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-colors"
+                      style={{ borderColor: primaryColor, color: primaryColor }}
+                    >−</button>
+                    <span className={`text-2xl font-bold w-8 text-center ${theme.text}`}>{modalQuantity}</span>
+                    <button
+                      onClick={() => setModalQuantity(q => q + 1)}
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold text-white transition-colors"
+                      style={{ backgroundColor: primaryColor }}
+                    >+</button>
+                  </div>
+                </div>
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -939,8 +959,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   className="w-full disabled:bg-gray-300 text-white font-bold py-4 rounded-2xl transition-colors flex items-center justify-center gap-2 hover:opacity-90"
                 >
                   <span>🛒</span>
-                  <span>{t('menuPage.addToOrder')}</span>
-                  <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">€{calculateTotalPrice().toFixed(2)}</span>
+                  <span>{modalQuantity > 1 ? `${modalQuantity}x ` : ''}{t('menuPage.addToOrder')}</span>
+                  <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">€{(calculateTotalPrice() * modalQuantity).toFixed(2)}</span>
                 </motion.button>
               </div>
             </motion.div>
