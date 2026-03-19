@@ -59,39 +59,98 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   const tableOrdersKey = `vysion_table_orders_${tenant}`
 
-  // Laad tafels + openstaande bestellingen uit localStorage
+  // Laad tafels + openstaande bestellingen (localStorage + Supabase sync)
   useEffect(() => {
     const raw = localStorage.getItem(`vysion_tables_${tenant}`)
     if (raw) {
       try { setKassaTables(JSON.parse(raw)) } catch { /* empty */ }
     }
+    // Laad eerst uit localStorage (snel)
     const ordersRaw = localStorage.getItem(tableOrdersKey)
     if (ordersRaw) {
       try { setTableOrders(JSON.parse(ordersRaw)) } catch { /* empty */ }
     }
+    // Sync met Supabase open orders (cross-device)
+    supabase
+      .from('orders')
+      .select('table_number, items')
+      .eq('tenant_slug', tenant)
+      .eq('status', 'open')
+      .then(({ data }) => {
+        if (!data || data.length === 0) return
+        const fromSupabase: Record<string, CartItem[]> = {}
+        data.forEach(row => {
+          if (row.table_number && row.items) {
+            fromSupabase[row.table_number] = row.items as CartItem[]
+          }
+        })
+        // Merge: Supabase wint bij conflicten (meest recent)
+        setTableOrders(prev => {
+          const merged = { ...prev, ...fromSupabase }
+          localStorage.setItem(tableOrdersKey, JSON.stringify(merged))
+          return merged
+        })
+      })
   }, [tenant, showTablePicker, tableOrdersKey])
 
   // Sla cart op voor huidige tafel
+  const updateTableStatus = (tblNr: string, occupied: boolean) => {
+    const tablesRaw = localStorage.getItem(`vysion_tables_${tenant}`)
+    if (!tablesRaw) return
+    try {
+      const tbls = JSON.parse(tablesRaw)
+      const updatedTbls = tbls.map((t: { number: string; status: string }) =>
+        t.number === tblNr ? { ...t, status: occupied ? 'OCCUPIED' : 'FREE' } : t
+      )
+      localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
+      setKassaTables(updatedTbls)
+    } catch { /* empty */ }
+  }
+
   const saveCartToTable = (tblNr: string, items: CartItem[]) => {
     const updated = { ...tableOrders, [tblNr]: items }
     setTableOrders(updated)
     localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
-    // Update tafel status naar OCCUPIED als er items zijn, FREE als leeg
-    const tablesRaw = localStorage.getItem(`vysion_tables_${tenant}`)
-    if (tablesRaw) {
-      try {
-        const tbls = JSON.parse(tablesRaw)
-        const updatedTbls = tbls.map((t: { number: string; status: string }) =>
-          t.number === tblNr ? { ...t, status: items.length > 0 ? 'OCCUPIED' : 'FREE' } : t
-        )
-        localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
-        setKassaTables(updatedTbls)
-      } catch { /* empty */ }
-    }
+    updateTableStatus(tblNr, items.length > 0)
+    // Sync open bestelling naar Supabase voor cross-device toegang
+    supabase
+      .from('orders')
+      .delete()
+      .eq('tenant_slug', tenant)
+      .eq('table_number', tblNr)
+      .eq('status', 'open')
+      .then(() => {
+        if (items.length > 0) {
+          supabase.from('orders').insert({
+            tenant_slug: tenant,
+            order_number: 0,
+            status: 'open',
+            payment_status: 'pending',
+            order_type: 'DINE_IN',
+            table_number: tblNr,
+            subtotal: 0,
+            tax: 0,
+            total_amount: 0,
+            items: items as unknown as Record<string, unknown>[],
+            created_at: new Date().toISOString(),
+          })
+        }
+      })
   }
 
-  // Wissel naar andere tafel (sla huidige op, laad nieuwe)
+  // Bevestiging popup voor tafel wisselen
+  const [switchConfirm, setSwitchConfirm] = useState<string | null>(null)
+
   const switchToTable = (newTableNr: string) => {
+    if (tableNumber && cart.length > 0 && tableNumber !== newTableNr) {
+      // Vraag bevestiging voordat je wisselt
+      setSwitchConfirm(newTableNr)
+      return
+    }
+    doSwitchToTable(newTableNr)
+  }
+
+  const doSwitchToTable = (newTableNr: string) => {
     if (tableNumber && cart.length > 0) {
       saveCartToTable(tableNumber, cart)
     }
@@ -100,6 +159,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     setTableNumber(newTableNr)
     setOrderType('DINE_IN')
     setShowTablePicker(false)
+    setSwitchConfirm(null)
   }
 
   // "Naar tafel" knop: sla bestelling op en leeg de kassa voor volgende tafel
@@ -361,23 +421,65 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     setOrderType(types[(types.indexOf(orderType) + 1) % types.length])
   }
 
+  const offlineQueueKey = `vysion_offline_orders_${tenant}`
+
+  // Retry offline queue bij reconnect
+  useEffect(() => {
+    const retryQueue = async () => {
+      const raw = localStorage.getItem(offlineQueueKey)
+      if (!raw) return
+      try {
+        const queue: object[] = JSON.parse(raw)
+        if (queue.length === 0) return
+        const remaining: object[] = []
+        for (const order of queue) {
+          const { error } = await supabase.from('orders').insert(order)
+          if (error) remaining.push(order)
+        }
+        localStorage.setItem(offlineQueueKey, JSON.stringify(remaining))
+      } catch { /* empty */ }
+    }
+    window.addEventListener('online', retryQueue)
+    retryQueue() // ook bij pagina laden
+    return () => window.removeEventListener('online', retryQueue)
+  }, [tenant, offlineQueueKey])
+
+  const clearTableAfterPayment = (tblNr: string) => {
+    const updated = { ...tableOrders }
+    delete updated[tblNr]
+    setTableOrders(updated)
+    localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
+    updateTableStatus(tblNr, false)
+    // Verwijder open order uit Supabase
+    supabase
+      .from('orders')
+      .delete()
+      .eq('tenant_slug', tenant)
+      .eq('table_number', tblNr)
+      .eq('status', 'open')
+  }
+
   const completePayment = async (method: PaymentMethodType) => {
     if (cart.length === 0) return
     const vatRate = tenantInfo?.btw_percentage ?? 6
     const subtotal = total / (1 + vatRate / 100)
     const tax = total - subtotal
+    const createdAt = new Date()
 
-    // Ophalen huidig hoogste ordernummer voor tenant
-    const { data: lastOrderRow } = await supabase
-      .from('orders')
-      .select('order_number')
-      .eq('tenant_slug', tenant)
-      .order('order_number', { ascending: false })
-      .limit(1)
-      .single()
-    const orderNumber = (lastOrderRow?.order_number ?? 1000) + 1
+    // Lokaal ordernummer berekenen (werkt ook offline)
+    let orderNumber = Date.now() % 100000
+    try {
+      const { data: lastOrderRow } = await supabase
+        .from('orders')
+        .select('order_number')
+        .eq('tenant_slug', tenant)
+        .order('order_number', { ascending: false })
+        .limit(1)
+        .single()
+      orderNumber = (lastOrderRow?.order_number ?? 1000) + 1
+    } catch { /* offline: gebruik timestamp-gebaseerd nummer */ }
 
-    await supabase.from('orders').insert({
+    const orderPayload = {
       tenant_slug: tenant,
       order_number: orderNumber,
       status: 'completed',
@@ -395,37 +497,22 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         quantity: i.quantity,
         choices: i.choices || [],
       })),
-      created_at: new Date().toISOString(),
-    })
-
-    setLastOrder({
-      orderNumber,
-      items: [...cart],
-      total,
-      paymentMethod: method,
-      orderType,
-      tableNumber,
-      createdAt: new Date(),
-    })
-
-    // Verwijder tafel bestelling na betaling + zet tafel terug op FREE
-    if (tableNumber) {
-      const updated = { ...tableOrders }
-      delete updated[tableNumber]
-      setTableOrders(updated)
-      localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
-      const tablesRaw = localStorage.getItem(`vysion_tables_${tenant}`)
-      if (tablesRaw) {
-        try {
-          const tbls = JSON.parse(tablesRaw)
-          const updatedTbls = tbls.map((t: { number: string; status: string }) =>
-            t.number === tableNumber ? { ...t, status: 'FREE' } : t
-          )
-          localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
-          setKassaTables(updatedTbls)
-        } catch { /* empty */ }
-      }
+      created_at: createdAt.toISOString(),
     }
+
+    // Probeer Supabase, bij falen: sla op in offline queue
+    const { error } = await supabase.from('orders').insert(orderPayload)
+    if (error) {
+      const raw = localStorage.getItem(offlineQueueKey)
+      const queue = raw ? JSON.parse(raw) : []
+      queue.push(orderPayload)
+      localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
+      alert(`⚠️ Geen internetverbinding. Order #${orderNumber} is lokaal opgeslagen en wordt automatisch verstuurd zodra je weer online bent.`)
+    }
+
+    setLastOrder({ orderNumber, items: [...cart], total, paymentMethod: method, orderType, tableNumber, createdAt })
+
+    if (tableNumber) clearTableAfterPayment(tableNumber)
 
     clearCart()
     setTableNumber('')
@@ -491,11 +578,34 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         Bedankt voor uw bezoek!
         ${tenantInfo?.website ? `<br/>${tenantInfo.website}` : ''}
       </div>
-      <script>window.onload=function(){window.print();}</script>
     </body></html>`
 
-    const w = window.open('', '_blank', 'width=400,height=600')
-    if (w) { w.document.write(html); w.document.close() }
+    // iPad-safe print via blob URL + verborgen iframe
+    try {
+      const blob = new Blob([html], { type: 'text/html' })
+      const url = URL.createObjectURL(blob)
+      const iframe = document.createElement('iframe')
+      iframe.style.position = 'fixed'
+      iframe.style.top = '-9999px'
+      iframe.style.left = '-9999px'
+      iframe.style.width = '80mm'
+      iframe.style.height = '1px'
+      iframe.src = url
+      document.body.appendChild(iframe)
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow?.print()
+          setTimeout(() => {
+            document.body.removeChild(iframe)
+            URL.revokeObjectURL(url)
+          }, 1000)
+        }, 300)
+      }
+    } catch {
+      // Fallback: window.open voor browsers die blob niet ondersteunen
+      const w = window.open('', '_blank', 'width=400,height=600')
+      if (w) { w.document.write(html); w.document.close() }
+    }
   }
 
   const handleLogout = () => {
@@ -968,6 +1078,36 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         </div>
         </div>
       </div>
+
+      {/* ── Bevestiging: Tafel wisselen ── */}
+      {switchConfirm && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 flex flex-col gap-4">
+            <div className="text-center">
+              <div className="text-4xl mb-2">🪑</div>
+              <h2 className="font-bold text-xl text-gray-800">Tafel wisselen?</h2>
+              <p className="text-gray-500 mt-1 text-sm">
+                Je hebt nog items op tafel <strong>{tableNumber}</strong>.<br/>
+                Die bestelling wordt opgeslagen. Wil je verder naar tafel <strong>{switchConfirm}</strong>?
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setSwitchConfirm(null)}
+                className="flex-1 py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold hover:bg-gray-200 transition-colors"
+              >
+                Annuleer
+              </button>
+              <button
+                onClick={() => doSwitchToTable(switchConfirm)}
+                className="flex-1 py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#2D3A52] transition-colors"
+              >
+                Wissel naar {switchConfirm}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Opties Modal ── */}
       {optionsModal && (
