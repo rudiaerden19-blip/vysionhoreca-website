@@ -647,7 +647,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           )}
         </div>
 
-        {/* Online Platform */}
+        {/* Online Platform — mega menu */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'online' ? null : 'online')}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'online' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
@@ -656,12 +656,68 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'online' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'online' && (
-            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
-              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Online Platform</div>
-              <Link href={baseUrl} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🛒</span> Online Platform</Link>
-              <Link href={`${baseUrl}/promoties`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📣</span> Campagnes</Link>
-              <Link href={`${baseUrl}/cadeaubonnen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏷️</span> Kortingen</Link>
-              <Link href={`${baseUrl}/reviews`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⭐</span> Loyaliteitsprogramma</Link>
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 z-30 overflow-y-auto" style={{ width: 560, maxHeight: '80vh' }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0">Online Platform</div>
+              <div className="grid grid-cols-2 gap-0">
+
+                {/* Overzicht */}
+                <div className="border-b border-r border-gray-100">
+                  <div className="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2"><span>📊</span> Overzicht</div>
+                  <Link href={baseUrl} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>📊</span> Dashboard</Link>
+                  <Link href={`${baseUrl}/analyse`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>📈</span> Bedrijfsanalyse</Link>
+                  <Link href={`${baseUrl}/verkoop`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>💰</span> Verkoop</Link>
+                  <Link href={`${baseUrl}/populair`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🔥</span> Populaire items</Link>
+                  <Link href={`${baseUrl}/abonnement`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>💎</span> Abonnement</Link>
+                </div>
+
+                {/* Instellingen */}
+                <div className="border-b border-gray-100">
+                  <div className="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2"><span>⚙️</span> Instellingen</div>
+                  <Link href={`${baseUrl}/online-status`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🔴</span> Online Status</Link>
+                  <Link href={`${baseUrl}/profiel`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🏪</span> Bedrijfsprofiel</Link>
+                  <Link href={`${baseUrl}/openingstijden`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🕐</span> Openingstijden</Link>
+                  <Link href={`${baseUrl}/levering`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🚗</span> Levering & Afhaal</Link>
+                  <Link href={`${baseUrl}/betaling`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>💳</span> Betaalmethoden</Link>
+                  <Link href={`${baseUrl}/design`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🎨</span> Design & Kleuren</Link>
+                  <Link href={`${baseUrl}/seo`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🔍</span> SEO</Link>
+                </div>
+
+                {/* Menu */}
+                <div className="border-b border-r border-gray-100">
+                  <div className="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2"><span>🍽️</span> Menu</div>
+                  <Link href={`${baseUrl}/categorieen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>📁</span> Categorieën</Link>
+                  <Link href={`${baseUrl}/producten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🍟</span> Producten</Link>
+                  <Link href={`${baseUrl}/opties`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>➕</span> Opties & Extra&apos;s</Link>
+                  <Link href={`${baseUrl}/allergenen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>⚠️</span> Allergenen</Link>
+                  <Link href={`${baseUrl}/media`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>📷</span> Foto&apos;s & Media</Link>
+                </div>
+
+                {/* WhatsApp + Klanten */}
+                <div className="border-b border-gray-100">
+                  <div className="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2"><span>💬</span> WhatsApp</div>
+                  <Link href={`${baseUrl}/whatsapp`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>⚙️</span> Instellingen</Link>
+                  <div className="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2 border-t border-gray-100"><span>👥</span> Klanten</div>
+                  <Link href={`${baseUrl}/klanten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>👥</span> Klantenlijst</Link>
+                  <Link href={`${baseUrl}/klanten/beloningen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🎁</span> Beloningen</Link>
+                </div>
+
+                {/* Bestellingen */}
+                <div className="border-r border-gray-100">
+                  <div className="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2"><span>📦</span> Bestellingen</div>
+                  <Link href={`${baseUrl}/bestellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>📦</span> Bestellingenlijst</Link>
+                  <Link href={`${baseUrl}/reserveringen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>📅</span> Reserveringen</Link>
+                </div>
+
+                {/* Groepsbestellingen */}
+                <div>
+                  <div className="px-4 py-2 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2"><span>👥</span> Groepsbestellingen</div>
+                  <Link href={`${baseUrl}/groepen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🏢</span> Groepen</Link>
+                  <Link href={`${baseUrl}/groepen/sessies`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>📋</span> Sessies</Link>
+                  <Link href={`${baseUrl}/groepen/bestellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>📦</span> Overzicht</Link>
+                  <Link href={`${baseUrl}/labels`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-2 px-4 py-2.5 hover:bg-blue-50 text-sm text-gray-700 transition-colors"><span>🏷️</span> Labelprinter</Link>
+                </div>
+
+              </div>
             </div>
           )}
         </div>
