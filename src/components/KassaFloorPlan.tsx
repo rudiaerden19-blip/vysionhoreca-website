@@ -230,10 +230,11 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
   const [addNumber, setAddNumber] = useState('')
   const [addSeats, setAddSeats] = useState(4)
   const [addShape, setAddShape] = useState<TableShape>('SQUARE')
-  const [draggingId, setDraggingId] = useState<string | null>(null)
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
-  const [dragMoved, setDragMoved] = useState(false)
-  const [pointerStart, setPointerStart] = useState({ x: 0, y: 0 })
+  const draggingId = useRef<string | null>(null)
+  const dragOffset = useRef({ x: 0, y: 0 })
+  const dragMoved = useRef(false)
+  const pointerStart = useRef({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false) // alleen voor cursor styling
 
   useEffect(() => {
     try {
@@ -278,6 +279,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
   }
 
   // Pointer events — werkt op iPad (touch) én desktop (mouse)
+  // Refs worden gebruikt om stale closure problemen te vermijden
   const handlePointerDown = (e: React.PointerEvent, id: string) => {
     e.preventDefault()
     e.stopPropagation()
@@ -286,39 +288,44 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
     if (!floor) return
     const rect = floor.getBoundingClientRect()
     const t = tables.find(t => t.id === id)!
-    setDraggingId(id)
-    setDragMoved(false)
-    setPointerStart({ x: e.clientX, y: e.clientY })
-    setDragOffset({
+    draggingId.current = id
+    dragMoved.current = false
+    pointerStart.current = { x: e.clientX, y: e.clientY }
+    dragOffset.current = {
       x: e.clientX - rect.left - (t.x / 100) * rect.width,
       y: e.clientY - rect.top - (t.y / 100) * rect.height,
-    })
+    }
+    setIsDragging(true)
   }
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!draggingId) return
-    const dx = Math.abs(e.clientX - pointerStart.x)
-    const dy = Math.abs(e.clientY - pointerStart.y)
-    if (dx < 8 && dy < 8) return // kleine beweging = nog geen drag
-    setDragMoved(true)
+    if (!draggingId.current) return
+    const dx = Math.abs(e.clientX - pointerStart.current.x)
+    const dy = Math.abs(e.clientY - pointerStart.current.y)
+    if (dx < 8 && dy < 8) return
+    dragMoved.current = true
     const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left - dragOffset.x) / rect.width) * 100
-    const y = ((e.clientY - rect.top - dragOffset.y) / rect.height) * 100
-    setTables(prev => prev.map(t => t.id === draggingId
+    const x = ((e.clientX - rect.left - dragOffset.current.x) / rect.width) * 100
+    const y = ((e.clientY - rect.top - dragOffset.current.y) / rect.height) * 100
+    setTables(prev => prev.map(t => t.id === draggingId.current
       ? { ...t, x: Math.max(5, Math.min(92, x)), y: Math.max(5, Math.min(92, y)) }
       : t
     ))
   }
 
   const handlePointerUp = (e: React.PointerEvent, id?: string) => {
-    if (!draggingId) return
-    if (!dragMoved && id) {
+    if (!draggingId.current) return
+    if (!dragMoved.current && id) {
       // Tap zonder sleep → selecteer tafel
-      setSelected(tables.find(t => t.id === id) || null)
+      setSelected(prev => {
+        const t = tables.find(t => t.id === id) || null
+        return prev?.id === id ? null : t // toggle
+      })
     }
     localStorage.setItem(storageKey, JSON.stringify(tables))
-    setDraggingId(null)
-    setDragMoved(false)
+    draggingId.current = null
+    dragMoved.current = false
+    setIsDragging(false)
   }
 
   return (
@@ -355,12 +362,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
               linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
             `,
             backgroundSize: '100px 100px',
-            cursor: draggingId && dragMoved ? 'grabbing' : 'default',
+            cursor: isDragging ? 'grabbing' : 'default',
           touchAction: 'none',
           }}
           onPointerMove={handlePointerMove}
           onPointerUp={(e) => handlePointerUp(e)}
-          onClick={() => { if (!draggingId && !dragMoved) setSelected(null) }}
+          onClick={() => { if (!isDragging) setSelected(null) }}
         >
           {tables.map(t => (
             <div
@@ -371,7 +378,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
                 top: `${t.y}%`,
                 transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
                 zIndex: selected?.id === t.id ? 10 : 1,
-                cursor: draggingId === t.id && dragMoved ? 'grabbing' : 'grab',
+                cursor: isDragging ? 'grabbing' : 'grab',
                 touchAction: 'none',
               }}
               onPointerDown={(e) => handlePointerDown(e, t.id)}
@@ -380,7 +387,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
               <TableSVG
                 table={t}
                 isSelected={selected?.id === t.id}
-                onClick={() => { if (!dragMoved) setSelected(t) }}
+                onClick={() => { /* handled by onPointerUp */ }}
               />
             </div>
           ))}
