@@ -531,16 +531,21 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="px-4 py-3 flex items-center justify-between max-w-2xl mx-auto">
-          <Link 
-            href={`/shop/${params.tenant}/menu`} 
-            className="flex items-center gap-2 text-gray-600"
+          <Link
+            href={`/shop/${params.tenant}/menu`}
+            className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            <span>{t('checkoutPage.back')}</span>
+            <span className="text-sm font-medium hidden sm:inline">{t('checkoutPage.back')}</span>
           </Link>
-          <h1 className="font-bold text-lg text-gray-900">{t('checkoutPage.checkout')}</h1>
+          <div className="text-center">
+            <h1 className="font-bold text-base text-gray-900">{t('checkoutPage.checkout')}</h1>
+            {tenantSettings?.business_name && (
+              <p className="text-xs text-gray-400">{tenantSettings.business_name}</p>
+            )}
+          </div>
           <div className="w-16"></div>
         </div>
       </header>

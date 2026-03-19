@@ -221,37 +221,66 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
 
   if (step === 'success') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="text-center max-w-md bg-white rounded-2xl p-8 shadow-lg">
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 size={40} className="text-green-500" />
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: `${primaryColor}10` }}>
+        <div className="text-center max-w-md w-full bg-white rounded-3xl p-8 shadow-xl">
+          {/* Animated checkmark */}
+          <div className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl shadow-lg"
+            style={{ backgroundColor: primaryColor }}>
+            ✓
           </div>
-          <h2 className="text-2xl font-bold mb-3">Reservatie Ontvangen!</h2>
-          <p className="text-gray-500 mb-4">
-            Bedankt {formData.guest_name}! We hebben uw reservatie ontvangen voor <strong>{formData.reservation_date}</strong> om <strong>{formData.reservation_time}</strong>.
+          <h2 className="text-2xl font-bold mb-2">Reservatie Ontvangen!</h2>
+          <p className="text-gray-500 mb-6">
+            Bedankt <strong>{formData.guest_name}</strong>! Uw reservatie is aangevraagd.
           </p>
-          <p className="text-gray-400 text-sm mb-6">
-            {formData.guest_email ? `U ontvangt een bevestiging op ${formData.guest_email}.` : 'We nemen zo snel mogelijk contact op.'}
-          </p>
-          <div className="bg-gray-50 rounded-xl p-4 text-left space-y-2 mb-6">
-            <div className="flex items-center gap-2 text-sm">
-              <CalendarDays size={16} className="text-gray-400" />
-              <span>{new Date(formData.reservation_date).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+
+          {/* Overzicht kaart */}
+          <div className="rounded-2xl p-5 text-left space-y-3 mb-6" style={{ backgroundColor: `${primaryColor}15` }}>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm" style={{ backgroundColor: primaryColor }}>
+                <CalendarDays size={16} />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Datum</p>
+                <p className="font-semibold text-gray-800">{new Date(formData.reservation_date).toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Clock size={16} className="text-gray-400" />
-              <span>{formData.reservation_time}</span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm" style={{ backgroundColor: primaryColor }}>
+                <Clock size={16} />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Tijdstip</p>
+                <p className="font-semibold text-gray-800">{formData.reservation_time}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Users size={16} className="text-gray-400" />
-              <span>{formData.party_size} {formData.party_size === 1 ? 'persoon' : 'personen'}</span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm" style={{ backgroundColor: primaryColor }}>
+                <Users size={16} />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Personen</p>
+                <p className="font-semibold text-gray-800">{formData.party_size} {formData.party_size === 1 ? 'persoon' : 'personen'}</p>
+              </div>
             </div>
           </div>
-          {tenantInfo?.phone && (
-            <p className="text-gray-400 text-sm">
-              Vragen? Bel <a href={`tel:${tenantInfo.phone}`} className="text-green-500 font-medium">{tenantInfo.phone}</a>
+
+          {formData.guest_email && (
+            <p className="text-gray-400 text-sm mb-6">
+              📧 Een bevestiging wordt verstuurd naar <strong>{formData.guest_email}</strong>
             </p>
           )}
+
+          {tenantInfo?.phone && (
+            <a href={`tel:${tenantInfo.phone}`}
+              className="block w-full py-3 rounded-2xl font-semibold text-white mb-3 transition-opacity hover:opacity-90"
+              style={{ backgroundColor: primaryColor }}>
+              📞 {tenantInfo.phone}
+            </a>
+          )}
+          <a href={`/shop/${tenant}`}
+            className="block w-full py-3 rounded-2xl font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
+            ← Terug naar {tenantInfo?.name || 'de zaak'}
+          </a>
         </div>
       </div>
     )
@@ -260,14 +289,24 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="text-white py-8 px-4 text-center" style={{ backgroundColor: primaryColor }}>
-        <h1 className="text-2xl font-bold">{tenantInfo?.name || 'Reserveren'}</h1>
-        <p className="opacity-90 mt-1">Online tafel reserveren</p>
+      <div className="text-white px-4 pt-5 pb-10 relative" style={{ backgroundColor: primaryColor }}>
+        <a href={`/shop/${tenant}`} className="absolute top-4 left-4 flex items-center gap-1 text-white/80 hover:text-white text-sm font-medium transition-colors">
+          <ChevronLeft size={18} /> Terug
+        </a>
+        <div className="text-center">
+          {tenantInfo?.logo_url ? (
+            <img src={tenantInfo.logo_url} alt={tenantInfo.name} className="w-16 h-16 rounded-2xl object-cover mx-auto mb-3 shadow-lg border-2 border-white/30" />
+          ) : (
+            <div className="w-16 h-16 rounded-2xl bg-white/20 mx-auto mb-3 flex items-center justify-center text-3xl">📅</div>
+          )}
+          <h1 className="text-2xl font-bold">{tenantInfo?.name || 'Reserveren'}</h1>
+          <p className="opacity-80 mt-1 text-sm">Online tafel reserveren</p>
+        </div>
       </div>
 
       {/* Form */}
-      <div className="max-w-lg mx-auto p-4 -mt-4">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div className="max-w-lg mx-auto p-4 -mt-6">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-6 space-y-5">
             {/* Naam */}
             <div>
