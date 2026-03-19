@@ -309,6 +309,7 @@ export default function KassaReservationsView({
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadReservations(); loadGuestProfiles() }, [tenant])
 
   // Save settings to localStorage
@@ -331,6 +332,12 @@ export default function KassaReservationsView({
       .sort((a, b) => a.reservation_date.localeCompare(b.reservation_date) || a.reservation_time.localeCompare(b.reservation_time)),
     [reservations, today])
 
+  const waitlistReservations = useMemo(() =>
+    reservations.filter(r => r.status === 'WAITLIST' && r.reservation_date === today)
+      .sort((a, b) => (a.waitlist_position || 0) - (b.waitlist_position || 0)),
+    [reservations, today]
+  )
+
   const todayStats = useMemo(() => ({
     total: todayReservations.filter(r => r.status !== 'WAITLIST').length,
     confirmed: todayReservations.filter(r => r.status === 'CONFIRMED').length,
@@ -343,9 +350,7 @@ export default function KassaReservationsView({
 
   const filteredReservations = useMemo(() => {
     let base = viewMode === 'today' ? todayReservations : upcomingReservations
-    // Filter wachtlijst uit normale weergave
     base = base.filter(r => r.status !== 'WAITLIST')
-    // Filter op shift
     if (selectedShift) {
       const shift = reservationSettings.shifts?.find(s => s.id === selectedShift)
       if (shift) {
@@ -360,12 +365,6 @@ export default function KassaReservationsView({
       r.guest_email?.toLowerCase().includes(q)
     )
   }, [searchQuery, viewMode, todayReservations, upcomingReservations, selectedShift, reservationSettings.shifts])
-
-  const waitlistReservations = useMemo(() =>
-    reservations.filter(r => r.status === 'WAITLIST' && r.reservation_date === today)
-      .sort((a, b) => (a.waitlist_position || 0) - (b.waitlist_position || 0)),
-    [reservations, today]
-  )
 
   // Guest profiles (derived)
   // Combineer afgeleide profielen (reservaties) met Supabase VIP/blocked data
