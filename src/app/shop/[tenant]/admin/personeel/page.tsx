@@ -230,60 +230,58 @@ export default function PersoneelPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">👥 {t('personeelPage.title')}</h1>
-          <p className="text-gray-600">{t('personeelPage.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('personeelPage.title')}</h1>
+          <p className="text-gray-500">{t('personeelPage.subtitle')}</p>
         </div>
         <button
           onClick={openAddModal}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+          className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
         >
-          <span className="text-xl">+</span>
+          <span>+</span>
           <span>{t('personeelPage.addEmployee')}</span>
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-4 shadow-sm border">
-          <div className="text-3xl font-bold text-gray-800">{staff.filter(s => s.is_active).length}</div>
-          <div className="text-gray-600">{t('personeelPage.stats.activeEmployees')}</div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="text-3xl font-bold text-gray-900 mb-1">{staff.filter(s => s.is_active).length}</div>
+          <div className="text-sm text-gray-500">{t('personeelPage.stats.activeEmployees')}</div>
         </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm border">
-          <div className="text-3xl font-bold text-blue-600">{staff.filter(s => s.role === 'ADMIN').length}</div>
-          <div className="text-gray-600">{t('personeelPage.roles.admin')}</div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="text-3xl font-bold text-blue-600 mb-1">{staff.filter(s => s.role === 'ADMIN').length}</div>
+          <div className="text-sm text-gray-500">{t('personeelPage.roles.admin')}</div>
         </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm border">
-          <div className="text-3xl font-bold text-purple-600">{staff.filter(s => s.role === 'MANAGER').length}</div>
-          <div className="text-gray-600">{t('personeelPage.roles.manager')}</div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="text-3xl font-bold text-purple-600 mb-1">{staff.filter(s => s.role === 'MANAGER').length}</div>
+          <div className="text-sm text-gray-500">{t('personeelPage.roles.manager')}</div>
         </div>
-        <div className="bg-white rounded-xl p-4 shadow-sm border">
-          <div className="text-3xl font-bold text-green-600">{staff.filter(s => s.role === 'EMPLOYEE').length}</div>
-          <div className="text-gray-600">{t('personeelPage.roles.employees')}</div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="text-3xl font-bold text-green-600 mb-1">{staff.filter(s => s.role === 'EMPLOYEE').length}</div>
+          <div className="text-sm text-gray-500">{t('personeelPage.roles.employees')}</div>
         </div>
       </div>
 
       {/* Filter */}
-      <div className="flex items-center gap-4">
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={showInactive}
-            onChange={(e) => setShowInactive(e.target.checked)}
-            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <span className="text-gray-700">{t('personeelPage.showInactive')}</span>
-        </label>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setShowInactive(!showInactive)}
+          className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${showInactive ? 'bg-blue-600' : 'bg-gray-200'}`}
+        >
+          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${showInactive ? 'translate-x-5' : 'translate-x-0'}`} />
+        </button>
+        <span className="text-gray-700 text-sm font-medium">{t('personeelPage.showInactive')}</span>
       </div>
 
       {/* Staff List */}
       {filteredStaff.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 text-center shadow-sm border">
-          <div className="text-5xl mb-4">👥</div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">{t('personeelPage.noEmployees')}</h2>
-          <p className="text-gray-600 mb-6">{t('personeelPage.noEmployeesDesc')}</p>
+        <div className="bg-white rounded-2xl p-12 text-center shadow-sm">
+          <div className="text-6xl mb-4">👥</div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('personeelPage.noEmployees')}</h2>
+          <p className="text-gray-500 mb-6">{t('personeelPage.noEmployeesDesc')}</p>
           <button
             onClick={openAddModal}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
           >
             + {t('personeelPage.addFirstEmployee')}
           </button>
@@ -293,7 +291,7 @@ export default function PersoneelPage() {
           {filteredStaff.map((member) => (
             <div
               key={member.id}
-              className={`bg-white rounded-xl p-5 shadow-sm border transition ${
+              className={`bg-white rounded-2xl p-5 shadow-sm transition ${
                 !member.is_active ? 'opacity-50' : ''
               }`}
             >
@@ -318,14 +316,10 @@ export default function PersoneelPage() {
                 </div>
                 <button
                   onClick={() => toggleActive(member)}
-                  className={`p-2 rounded-lg transition ${
-                    member.is_active 
-                      ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                  }`}
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 flex-shrink-0 ${member.is_active ? 'bg-green-500' : 'bg-gray-300'}`}
                   title={member.is_active ? 'Actief' : 'Inactief'}
                 >
-                  {member.is_active ? '✓' : '○'}
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${member.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
 
@@ -360,22 +354,22 @@ export default function PersoneelPage() {
                 )}
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => openEditModal(member)}
-                  className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm"
+                  className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors text-sm font-medium"
                 >
                   ✏️ {t('adminPages.common.edit')}
                 </button>
                 <button
                   onClick={() => openContractModal(member)}
-                  className="flex-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition text-sm"
+                  className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-sm font-medium"
                 >
                   📋 {t('personeelPage.contract')}
                 </button>
                 <button
                   onClick={() => handleDelete(member)}
-                  className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition text-sm"
+                  className="px-3 py-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors text-sm"
                 >
                   🗑️
                 </button>
@@ -388,9 +382,9 @@ export default function PersoneelPage() {
       {/* Add/Edit Staff Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-xl">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
             <div className="p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">
+              <h2 className="text-xl font-bold text-gray-900">
                 {editingStaff ? `✏️ ${t('personeelPage.editEmployee')}` : `➕ ${t('personeelPage.newEmployee')}`}
               </h2>
             </div>
@@ -404,7 +398,7 @@ export default function PersoneelPage() {
                   type="text"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('personeelPage.form.namePlaceholder')}
                 />
               </div>
@@ -415,7 +409,7 @@ export default function PersoneelPage() {
                   type="email"
                   value={formData.email || ''}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('personeelPage.form.emailPlaceholder')}
                 />
               </div>
@@ -426,7 +420,7 @@ export default function PersoneelPage() {
                   type="tel"
                   value={formData.phone || ''}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('personeelPage.form.phonePlaceholder')}
                 />
               </div>
@@ -441,14 +435,14 @@ export default function PersoneelPage() {
                     type="text"
                     value={formData.pin || ''}
                     onChange={(e) => setFormData({ ...formData, pin: e.target.value.replace(/\D/g, '').slice(0, 4) })}
-                    className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-xl tracking-widest"
+                    className="flex-1 px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-xl tracking-widest"
                     placeholder={t('personeelPage.form.pinPlaceholder')}
                     maxLength={4}
                   />
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, pin: generatePin() })}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
                     title="Of genereer willekeurig"
                   >
                     🎲
@@ -461,7 +455,7 @@ export default function PersoneelPage() {
                 <select
                   value={formData.role || 'EMPLOYEE'}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as StaffRole })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {ROLES.map((role) => (
                     <option key={role.id} value={role.id}>{role.label}</option>
@@ -490,14 +484,14 @@ export default function PersoneelPage() {
             <div className="p-6 border-t flex gap-3 justify-end">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
               >
                 {t('adminPages.common.cancel')}
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
                 {saving ? `${t('adminPages.common.saving')}...` : editingStaff ? t('urenPage.update') : t('urenPage.add')}
               </button>
@@ -522,7 +516,7 @@ export default function PersoneelPage() {
                 <select
                   value={contractData.contract_type || ''}
                   onChange={(e) => setContractData({ ...contractData, contract_type: e.target.value as ContractType || undefined })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">{t('personeelPage.contractForm.select')}</option>
                   {LOCAL_CONTRACT_TYPES.map((type) => (
@@ -538,7 +532,7 @@ export default function PersoneelPage() {
                     type="number"
                     value={contractData.hours_per_week || ''}
                     onChange={(e) => setContractData({ ...contractData, hours_per_week: parseFloat(e.target.value) || undefined })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="38"
                     step="0.5"
                   />
@@ -549,7 +543,7 @@ export default function PersoneelPage() {
                     type="number"
                     value={contractData.hourly_rate || ''}
                     onChange={(e) => setContractData({ ...contractData, hourly_rate: parseFloat(e.target.value) || undefined })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="15.00"
                     step="0.01"
                   />
@@ -563,7 +557,7 @@ export default function PersoneelPage() {
                     type="date"
                     value={contractData.contract_start || ''}
                     onChange={(e) => setContractData({ ...contractData, contract_start: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -572,7 +566,7 @@ export default function PersoneelPage() {
                     type="date"
                     value={contractData.contract_end || ''}
                     onChange={(e) => setContractData({ ...contractData, contract_end: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -634,7 +628,7 @@ export default function PersoneelPage() {
                   value={contractData.contract_notes || ''}
                   onChange={(e) => setContractData({ ...contractData, contract_notes: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t('personeelPage.contractForm.notesPlaceholder')}
                 />
               </div>
@@ -653,14 +647,14 @@ export default function PersoneelPage() {
             <div className="p-6 border-t flex gap-3 justify-end">
               <button
                 onClick={() => setShowContractModal(false)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
               >
                 {t('adminPages.common.cancel')}
               </button>
               <button
                 onClick={handleSaveContract}
                 disabled={saving}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                className="px-6 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
                 {saving ? `${t('adminPages.common.saving')}...` : t('personeelPage.contractForm.saveContract')}
               </button>

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
+import { supabase } from '@/lib/supabase'
 
-const ALLERGEN_DATA = [
+const DEFAULT_ALLERGENS = [
   { id: 'gluten', icon: '🌾', enabled: true },
   { id: 'ei', icon: '🥚', enabled: true },
   { id: 'melk', icon: '🥛', enabled: true },
@@ -23,19 +24,45 @@ const ALLERGEN_DATA = [
 
 export default function AllergenenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
-  const [allergens, setAllergens] = useState(ALLERGEN_DATA)
+  const [allergens, setAllergens] = useState(DEFAULT_ALLERGENS)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    supabase
+      .from('tenant_settings')
+      .select('allergens_config')
+      .eq('tenant_slug', params.tenant)
+      .single()
+      .then(({ data }) => {
+        if (data?.allergens_config && Array.isArray(data.allergens_config)) {
+          setAllergens(
+            DEFAULT_ALLERGENS.map(def => ({
+              ...def,
+              enabled: (data.allergens_config as string[]).includes(def.id),
+            }))
+          )
+        }
+      })
+  }, [params.tenant])
 
   const toggleAllergen = (id: string) => {
-    setAllergens(prev => prev.map(a => 
+    setAllergens(prev => prev.map(a =>
       a.id === id ? { ...a, enabled: !a.enabled } : a
     ))
+    setSaved(false)
   }
 
   const handleSave = async () => {
     setSaving(true)
-    await new Promise(r => setTimeout(r, 1000))
+    const enabledIds = allergens.filter(a => a.enabled).map(a => a.id)
+    await supabase
+      .from('tenant_settings')
+      .update({ allergens_config: enabledIds })
+      .eq('tenant_slug', params.tenant)
     setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2500)
   }
 
   return (
@@ -50,9 +77,9 @@ export default function AllergenenPage({ params }: { params: { tenant: string } 
           whileTap={{ scale: 0.98 }}
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium flex items-center gap-2"
+          className={`px-6 py-3 text-white rounded-xl font-medium flex items-center gap-2 transition-colors ${saved ? 'bg-green-500' : 'bg-blue-600 hover:bg-blue-700'}`}
         >
-          {saving ? '⏳' : '💾'} {t('adminPages.common.save')}
+          {saving ? '⏳' : saved ? '✓' : '💾'} {saved ? t('adminPages.common.saved') : t('adminPages.common.save')}
         </motion.button>
       </div>
 

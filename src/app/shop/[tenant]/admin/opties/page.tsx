@@ -452,7 +452,7 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                   </h2>
                   <button
                     onClick={closeModal}
-                    className="p-2 hover:bg-gray-100 rounded-lg"
+                    className="p-2 hover:bg-gray-100 rounded-xl text-gray-400 hover:text-gray-600"
                   >
                     ✕
                   </button>
@@ -504,16 +504,14 @@ export default function OptiesPage({ params }: { params: { tenant: string } }) {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       {t('adminPages.opties.required')}?
                     </label>
-                    <div className="flex items-center gap-4 h-12">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.required}
-                          onChange={(e) => setFormData(prev => ({ ...prev, required: e.target.checked }))}
-                          className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span>{t('adminPages.opties.mustChoose')}</span>
-                      </label>
+                    <div
+                      onClick={() => setFormData(prev => ({ ...prev, required: !prev.required }))}
+                      className={`flex items-center justify-between h-12 px-4 rounded-xl cursor-pointer transition-colors ${formData.required ? 'bg-blue-50 border-2 border-blue-500' : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'}`}
+                    >
+                      <span className={`text-sm font-medium ${formData.required ? 'text-blue-700' : 'text-gray-600'}`}>{t('adminPages.opties.mustChoose')}</span>
+                      <button type="button" className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${formData.required ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                        <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${formData.required ? 'translate-x-5' : 'translate-x-0'}`} />
+                      </button>
                     </div>
                   </div>
                 </div>

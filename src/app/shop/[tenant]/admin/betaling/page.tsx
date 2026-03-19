@@ -134,16 +134,15 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         animate={{ opacity: 1, y: 0 }}
         className="bg-white rounded-2xl p-6 shadow-sm mb-6"
       >
-        <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <span>💳</span> {t('adminPages.betaling.methods')}
-        </h2>
-        <div className="space-y-3">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">💳 {t('adminPages.betaling.methods')}</p>
+        <div className="space-y-2">
           {paymentMethods.map((method) => (
-            <label 
+            <div
               key={method.id}
-              className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-colors ${
-                methods[method.id] 
-                  ? 'bg-blue-50 border-2 border-blue-500' 
+              onClick={() => setMethods(prev => ({ ...prev, [method.id]: !prev[method.id] }))}
+              className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${
+                methods[method.id]
+                  ? 'bg-blue-50 border-2 border-blue-500'
                   : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
               }`}
             >
@@ -151,16 +150,16 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
                 <span className="text-2xl">{method.icon}</span>
                 <div>
                   <p className="font-medium text-gray-900">{method.name}</p>
-                  <p className="text-sm text-gray-500">{method.description}</p>
+                  <p className="text-sm text-gray-400">{method.description}</p>
                 </div>
               </div>
-              <input
-                type="checkbox"
-                checked={methods[method.id] || false}
-                onChange={(e) => setMethods(prev => ({ ...prev, [method.id]: e.target.checked }))}
-                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-            </label>
+              <button
+                type="button"
+                className={`relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${methods[method.id] ? 'bg-blue-600' : 'bg-gray-300'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${methods[method.id] ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+            </div>
           ))}
         </div>
       </motion.div>
@@ -195,23 +194,26 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         </p>
       </motion.div>
 
-      {/* Online Payments Setup */}
+      {/* Online Payments Info */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="mt-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-6 text-white"
+        className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-5"
       >
-        <h3 className="font-semibold text-lg mb-2">💡 {t('adminPages.betaling.onlinePaymentsTitle')}</h3>
-        <p className="text-white/80 mb-4">
-          {t('adminPages.betaling.onlinePaymentsDesc')}
-        </p>
-        <a 
-          href="mailto:info@vysionhoreca.com?subject=Online%20Betalingen%20Activeren"
-          className="inline-block bg-white text-blue-600 font-medium px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors"
-        >
-          📧 Contact
-        </a>
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">💡</span>
+          <div className="flex-1">
+            <h3 className="font-semibold text-blue-900 mb-1">{t('adminPages.betaling.onlinePaymentsTitle')}</h3>
+            <p className="text-blue-700 text-sm mb-3">{t('adminPages.betaling.onlinePaymentsDesc')}</p>
+            <a
+              href="mailto:info@vysionhoreca.com?subject=Online%20Betalingen%20Activeren"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl text-sm transition-colors"
+            >
+              📧 Contact opnemen
+            </a>
+          </div>
+        </div>
       </motion.div>
     </div>
   )

@@ -259,48 +259,32 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
             <span>💳</span> {t('adminPages.betaling.methods')}
           </h2>
           
-          <div className="space-y-4">
-            <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
-              <input
-                type="checkbox"
-                checked={settings.payment_cash}
-                onChange={(e) => handleChange('payment_cash', e.target.checked)}
-                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-2xl">💵</span>
-              <div>
-                <p className="font-medium text-gray-900">{t('adminPages.betaling.cash')}</p>
-                <p className="text-sm text-gray-500">{t('adminPages.betaling.cashDesc')}</p>
-              </div>
-            </label>
-
-            <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
-              <input
-                type="checkbox"
-                checked={settings.payment_card}
-                onChange={(e) => handleChange('payment_card', e.target.checked)}
-                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-2xl">💳</span>
-              <div>
-                <p className="font-medium text-gray-900">{t('adminPages.betaling.bancontact')}</p>
-                <p className="text-sm text-gray-500">{t('adminPages.betaling.bancontactDesc')}</p>
-              </div>
-            </label>
-
-            <label className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors">
-              <input
-                type="checkbox"
-                checked={settings.payment_online}
-                onChange={(e) => handleChange('payment_online', e.target.checked)}
-                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-2xl">🌐</span>
-              <div>
-                <p className="font-medium text-gray-900">{t('adminPages.betaling.paypal')}</p>
-                <p className="text-sm text-gray-500">{t('adminPages.betaling.paypalDesc')}</p>
-              </div>
-            </label>
+          <div className="space-y-2">
+            {[
+              { key: 'payment_cash', icon: '💵', label: t('adminPages.betaling.cash'), desc: t('adminPages.betaling.cashDesc') },
+              { key: 'payment_card', icon: '💳', label: t('adminPages.betaling.bancontact'), desc: t('adminPages.betaling.bancontactDesc') },
+              { key: 'payment_online', icon: '🌐', label: 'Online betaling', desc: 'Betaling via link of QR-code' },
+            ].map(({ key, icon, label, desc }) => {
+              const val = !!(settings as any)[key]
+              return (
+                <div
+                  key={key}
+                  onClick={() => handleChange(key as any, !val)}
+                  className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${val ? 'bg-blue-50 border-2 border-blue-500' : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">{icon}</span>
+                    <div>
+                      <p className="font-medium text-gray-900">{label}</p>
+                      <p className="text-sm text-gray-400">{desc}</p>
+                    </div>
+                  </div>
+                  <button type="button" className={`relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${val ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${val ? 'translate-x-6' : 'translate-x-0'}`} />
+                  </button>
+                </div>
+              )
+            })}
           </div>
         </motion.div>
 
@@ -309,38 +293,34 @@ export default function LeveringPage({ params }: { params: { tenant: string } })
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 text-white"
+          className="bg-blue-50 border border-blue-200 rounded-2xl p-5"
         >
-          <h3 className="font-semibold text-lg mb-4">Preview</h3>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-white/10 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-2">
+          <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-3">📋 Overzicht instellingen</p>
+          <div className="grid md:grid-cols-3 gap-3">
+            <div className="bg-white rounded-xl p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
                 <span>🛍️</span>
-                <span className="font-medium">{t('adminPages.levering.pickup.title')}</span>
+                <span className="font-medium text-gray-900 text-sm">{t('adminPages.levering.pickup.title')}</span>
               </div>
-              <p className="text-white/80 text-sm">
-                {settings.pickup_enabled 
-                  ? `${settings.pickup_time_minutes} min` 
-                  : t('adminPages.common.disabled')}
+              <p className="text-gray-500 text-sm">
+                {settings.pickup_enabled ? `${settings.pickup_time_minutes} min` : t('adminPages.common.disabled')}
               </p>
             </div>
-            <div className="bg-white/10 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="bg-white rounded-xl p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
                 <span>🚗</span>
-                <span className="font-medium">{t('adminPages.levering.delivery.title')}</span>
+                <span className="font-medium text-gray-900 text-sm">{t('adminPages.levering.delivery.title')}</span>
               </div>
-              <p className="text-white/80 text-sm">
-                {settings.delivery_enabled 
-                  ? `€${settings.delivery_fee} · ${settings.delivery_radius_km}km · min €${settings.min_order_amount}` 
-                  : t('adminPages.common.disabled')}
+              <p className="text-gray-500 text-sm">
+                {settings.delivery_enabled ? `€${settings.delivery_fee} · ${settings.delivery_radius_km}km` : t('adminPages.common.disabled')}
               </p>
             </div>
-            <div className="bg-white/10 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="bg-white rounded-xl p-4 shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
                 <span>💳</span>
-                <span className="font-medium">{t('adminPages.betaling.methods')}</span>
+                <span className="font-medium text-gray-900 text-sm">{t('adminPages.betaling.methods')}</span>
               </div>
-              <p className="text-white/80 text-sm">
+              <p className="text-gray-500 text-sm">
                 {[
                   settings.payment_cash && t('adminPages.betaling.cash'),
                   settings.payment_card && t('adminPages.betaling.bancontact'),

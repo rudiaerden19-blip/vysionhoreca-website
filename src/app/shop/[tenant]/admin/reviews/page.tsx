@@ -216,14 +216,14 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                     </div>
                     <button
                       onClick={() => handleToggleVisible(review.id!, review.is_visible)}
-                      className={`p-2 rounded-lg transition-colors ${review.is_visible ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                      className={`p-2 rounded-xl transition-colors ${review.is_visible ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
                       title={review.is_visible ? t('reviewsPage.visibleTooltip') : t('reviewsPage.hiddenTooltip')}
                     >
                       {review.is_visible ? '👁️' : '🙈'}
                     </button>
                     <button
                       onClick={() => handleDelete(review.id!)}
-                      className="p-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+                      className="p-2 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
                       title={t('common.delete')}
                     >
                       🗑️
@@ -261,7 +261,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                         whileTap={{ scale: 0.98 }}
                         onClick={() => submitReply(review.id!)}
                         disabled={savingReply || !replyText.trim()}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-lg font-medium flex items-center gap-2"
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-xl font-medium flex items-center gap-2"
                       >
                         {savingReply ? (
                           <motion.div
@@ -276,7 +276,7 @@ export default function ReviewsPage({ params }: { params: { tenant: string } }) 
                       </motion.button>
                       <button
                         onClick={() => { setReplyingTo(null); setReplyText(''); }}
-                        className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg font-medium hover:bg-gray-200"
+                        className="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200"
                       >
                         {t('common.cancel')}
                       </button>
