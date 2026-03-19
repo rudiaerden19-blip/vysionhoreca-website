@@ -657,7 +657,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           {hamburgerOpen && (() => {
             const modules = [
               { key: 'kassa', icon: '🖥️', label: 'Kassa', items: [
-                { icon: '🖥️', label: 'Ga naar kassa', href: `${baseUrl}/kassa` },
                 { icon: '📁', label: 'Categorieën', href: `${baseUrl}/categorieen` },
                 { icon: '🍟', label: 'Producten', href: `${baseUrl}/producten` },
                 { icon: '➕', label: "Opties & Extra's", href: `${baseUrl}/opties` },
