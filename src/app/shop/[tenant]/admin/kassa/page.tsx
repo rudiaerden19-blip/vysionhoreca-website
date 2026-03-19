@@ -58,6 +58,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
 
   const [showReservations, setShowReservations] = useState(false)
+  const [pendingReservCount, setPendingReservCount] = useState(0)
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
   const [kassaTables, setKassaTables] = useState<{ id: string; number: string; seats: number; status: string }[]>([])
@@ -243,6 +244,23 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   useEffect(() => {
     setSoundsOn(getSoundsEnabled())
   }, [])
+
+  // Pending reservaties tellen + realtime update
+  useEffect(() => {
+    const fetchPending = async () => {
+      const { count } = await supabase
+        .from('reservations')
+        .select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenant)
+        .eq('status', 'pending')
+      setPendingReservCount(count ?? 0)
+    }
+    fetchPending()
+    const channel = supabase.channel('reservations-badge')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations', filter: `tenant_id=eq.${tenant}` }, fetchPending)
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [tenant])
 
   // Online status check
   useEffect(() => {
@@ -735,9 +753,14 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
         {/* Reserveringen */}
         <button onClick={() => setShowReservations(true)}
-          className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
+          className="relative flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
           <span className="text-lg">📅</span>
           <span>Reserveringen</span>
+          {pendingReservCount > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+              {pendingReservCount}
+            </span>
+          )}
         </button>
 
         {/* Onlinescherm */}
