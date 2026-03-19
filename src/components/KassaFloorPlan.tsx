@@ -313,19 +313,13 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
     ))
   }
 
-  const handlePointerUp = (e: React.PointerEvent, id?: string) => {
+  const handlePointerUp = (e: React.PointerEvent) => {
     if (!draggingId.current) return
-    if (!dragMoved.current && id) {
-      // Tap zonder sleep → selecteer tafel
-      setSelected(prev => {
-        const t = tables.find(t => t.id === id) || null
-        return prev?.id === id ? null : t // toggle
-      })
-    }
     localStorage.setItem(storageKey, JSON.stringify(tables))
     draggingId.current = null
-    dragMoved.current = false
     setIsDragging(false)
+    // dragMoved.current wordt gereset na de click event (setTimeout)
+    setTimeout(() => { dragMoved.current = false }, 0)
   }
 
   return (
@@ -366,7 +360,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
           touchAction: 'none',
           }}
           onPointerMove={handlePointerMove}
-          onPointerUp={(e) => handlePointerUp(e)}
+          onPointerUp={handlePointerUp}
           onClick={() => { if (!isDragging) setSelected(null) }}
         >
           {tables.map(t => (
@@ -382,7 +376,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
                 touchAction: 'none',
               }}
               onPointerDown={(e) => handlePointerDown(e, t.id)}
-              onPointerUp={(e) => { e.stopPropagation(); handlePointerUp(e, t.id) }}
+              onPointerUp={(e) => { e.stopPropagation(); handlePointerUp(e) }}
               onClick={(e) => {
                 e.stopPropagation()
                 if (!dragMoved.current) {
