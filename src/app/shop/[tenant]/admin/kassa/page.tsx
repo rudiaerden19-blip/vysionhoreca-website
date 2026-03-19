@@ -620,7 +620,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     <div className="flex flex-col bg-[#e3e3e3] overflow-hidden" style={{ height: '100dvh' }}>
 
       {/* ── Blauwe navigatiebalk — volledige breedte ── */}
-      <div className="flex-shrink-0 bg-[#1e293b] flex items-center px-2 gap-0.5 relative z-30" style={{ height: 56 }}>
+      <div className="flex-shrink-0 bg-[#1e293b] flex items-center px-3 gap-1 relative z-30" style={{ height: 68 }}>
 
         {/* Backdrop sluit alles */}
         {flyoutOpen && <div className="fixed inset-0 z-10" onClick={() => setFlyoutOpen(null)} />}
@@ -630,10 +630,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Kassa */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'kassa' ? null : 'kassa')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'kassa' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🖥️</span>
-            <span className="font-semibold text-sm">Kassa</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'kassa' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors ${flyoutOpen === 'kassa' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-2xl">🖥️</span>
+            <span className="font-bold text-base">Kassa</span>
+            <svg className={`w-4 h-4 transition-transform ${flyoutOpen === 'kassa' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'kassa' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
@@ -650,10 +650,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Online Platform */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'online' ? null : 'online')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'online' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🛒</span>
-            <span className="font-semibold text-sm">Online</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'online' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors ${flyoutOpen === 'online' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-2xl">🛒</span>
+            <span className="font-bold text-base">Online</span>
+            <svg className={`w-4 h-4 transition-transform ${flyoutOpen === 'online' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'online' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
@@ -668,10 +668,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Marketing */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'marketing' ? null : 'marketing')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'marketing' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">📣</span>
-            <span className="font-semibold text-sm">Marketing</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'marketing' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors ${flyoutOpen === 'marketing' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-2xl">📣</span>
+            <span className="font-bold text-base">Marketing</span>
+            <svg className={`w-4 h-4 transition-transform ${flyoutOpen === 'marketing' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'marketing' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
@@ -686,10 +686,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Personeel */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'personeel' ? null : 'personeel')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'personeel' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">👔</span>
-            <span className="font-semibold text-sm">Personeel</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'personeel' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors ${flyoutOpen === 'personeel' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-2xl">👔</span>
+            <span className="font-bold text-base">Personeel</span>
+            <svg className={`w-4 h-4 transition-transform ${flyoutOpen === 'personeel' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'personeel' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
@@ -704,10 +704,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Kostenberekening */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'kosten' ? null : 'kosten')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'kosten' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🧮</span>
-            <span className="font-semibold text-sm">Kosten</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'kosten' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors ${flyoutOpen === 'kosten' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-2xl">🧮</span>
+            <span className="font-bold text-base">Kosten</span>
+            <svg className={`w-4 h-4 transition-transform ${flyoutOpen === 'kosten' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'kosten' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
@@ -722,10 +722,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Bonnenprinter */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'bonnen' ? null : 'bonnen')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'bonnen' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🖨️</span>
-            <span className="font-semibold text-sm">Printer</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'bonnen' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors ${flyoutOpen === 'bonnen' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-2xl">🖨️</span>
+            <span className="font-bold text-base">Printer</span>
+            <svg className={`w-4 h-4 transition-transform ${flyoutOpen === 'bonnen' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'bonnen' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
@@ -739,10 +739,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* GKS Rapporten */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'gks' ? null : 'gks')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'gks' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🧾</span>
-            <span className="font-semibold text-sm">GKS</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'gks' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors ${flyoutOpen === 'gks' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-2xl">🧾</span>
+            <span className="font-bold text-base">GKS</span>
+            <svg className={`w-4 h-4 transition-transform ${flyoutOpen === 'gks' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'gks' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
@@ -756,10 +756,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Reservaties */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'reservaties' ? null : 'reservaties')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'reservaties' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">📅</span>
-            <span className="font-semibold text-sm">Reservaties</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'reservaties' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors ${flyoutOpen === 'reservaties' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-2xl">📅</span>
+            <span className="font-bold text-base">Reservaties</span>
+            <svg className={`w-4 h-4 transition-transform ${flyoutOpen === 'reservaties' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'reservaties' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
@@ -773,10 +773,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Shop */}
         <div className="relative z-20">
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'shop' ? null : 'shop')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'shop' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🔗</span>
-            <span className="font-semibold text-sm">Shop</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'shop' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition-colors ${flyoutOpen === 'shop' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <span className="text-2xl">🔗</span>
+            <span className="font-bold text-base">Shop</span>
+            <svg className={`w-4 h-4 transition-transform ${flyoutOpen === 'shop' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'shop' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
@@ -792,15 +792,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
         {/* ── RECHTS: online status + geluid + taal + uitloggen ── */}
 
-        {/* Online indicator */}
-        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium text-white/80">
-          <div className={`w-2 h-2 rounded-full ${isOnline === null ? 'bg-gray-400 animate-pulse' : isOnline ? 'bg-green-400' : 'bg-red-400'}`} />
-          <span className="text-xs">{isOnline === null ? '...' : isOnline ? 'Online' : 'Offline'}</span>
-        </div>
-
         {/* Geluid */}
         <button onClick={toggleSound}
-          className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-colors ${soundsOn ? 'bg-green-500/80 text-white' : 'bg-white/10 text-white/60'}`}
+          className={`w-11 h-11 rounded-xl flex items-center justify-center text-2xl transition-colors ${soundsOn ? 'bg-green-500/80 text-white' : 'bg-white/10 text-white/60'}`}
           title={soundsOn ? 'Geluid aan' : 'Geluid uit'}>
           {soundsOn ? '🔔' : '🔕'}
         </button>
@@ -808,10 +802,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Taal */}
         <div ref={langRef} className="relative z-20">
           <button onClick={() => setLangOpen(o => !o)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-medium text-white transition-colors">
-            <span className="text-base">{localeFlags[locale]}</span>
-            <span className="text-xs">{localeNames[locale]}</span>
-            <svg className={`w-3 h-3 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl font-medium text-white transition-colors">
+            <span className="text-2xl">{localeFlags[locale]}</span>
+            <span className="text-sm font-bold">{(localeNames[locale] || '').slice(0, 2).toUpperCase()}</span>
+            <svg className={`w-4 h-4 transition-transform ${langOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {langOpen && (
             <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 min-w-[160px] overflow-hidden">
@@ -828,8 +822,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
         {/* Uitloggen */}
         <button onClick={handleLogout}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600/80 hover:bg-red-600 rounded-lg text-white text-sm font-semibold transition-colors ml-1">
-          <span>🚪</span>
+          className="flex items-center gap-2 px-4 py-2 bg-red-600/80 hover:bg-red-600 rounded-xl text-white text-base font-bold transition-colors ml-1">
+          <span className="text-xl">🚪</span>
           <span>Uitloggen</span>
         </button>
 
