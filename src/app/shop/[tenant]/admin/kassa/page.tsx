@@ -742,12 +742,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🥬', label: 'Ingrediënten', href: `${baseUrl}/kosten/ingredienten` },
                 { icon: '📊', label: 'Product Kostprijs', href: `${baseUrl}/kosten/producten` },
               ]},
-              { key: 'gks', icon: '🧾', label: 'GKS', items: [
-                { icon: '🧾', label: 'Z-Rapporten', href: `${baseUrl}/z-rapport` },
-                { icon: '📊', label: 'Verkoop', href: `${baseUrl}/verkoop` },
-              ]},
               { key: 'rapporten', icon: '📊', label: 'Rapporten', items: [
                 { icon: '📊', label: 'Rapportages', href: `${baseUrl}/rapporten` },
+                { icon: '🧾', label: 'Z-Rapporten (GKS)', href: `${baseUrl}/z-rapport` },
               ]},
             ]
             const activeMod = modules.find(m => m.key === hamburgerSubOpen)
