@@ -48,19 +48,37 @@ export interface DecorItem {
 function DecorSVG({ item, isSelected }: { item: DecorItem; isSelected: boolean }) {
   if (item.type === 'plant') {
     return (
-      <svg width={60} height={60} style={{ overflow: 'visible' }}>
-        <circle cx={30} cy={30} r={28} fill="#2d6a2d" stroke={isSelected ? '#fff' : '#1a3d1a'} strokeWidth={isSelected ? 3 : 2} filter="url(#pshadow)" />
-        <circle cx={22} cy={22} r={12} fill="#3a8a3a" />
-        <circle cx={38} cy={20} r={10} fill="#4aaa4a" />
-        <circle cx={30} cy={35} r={11} fill="#3a8a3a" />
-        <circle cx={18} cy={34} r={9} fill="#2d6a2d" />
-        <circle cx={42} cy={32} r={9} fill="#2d6a2d" />
-        <rect x={27} y={42} width={6} height={10} rx={2} fill="#8B4513" />
+      <svg width={80} height={100} style={{ overflow: 'visible' }}>
         <defs>
-          <filter id="pshadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.4" />
+          <radialGradient id="pot-grad" cx="40%" cy="30%">
+            <stop offset="0%" stopColor="#c1440e" />
+            <stop offset="100%" stopColor="#7a2a08" />
+          </radialGradient>
+          <radialGradient id="leaf1" cx="40%" cy="40%">
+            <stop offset="0%" stopColor="#5dbf3f" />
+            <stop offset="100%" stopColor="#2d7a1a" />
+          </radialGradient>
+          <filter id="ps" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="5" floodOpacity="0.45" />
           </filter>
         </defs>
+        {/* Pot */}
+        <rect x={22} y={68} width={36} height={6} rx={3} fill="#8B3A0A" />
+        <path d="M18 74 L24 96 L56 96 L62 74 Z" fill="url(#pot-grad)" rx={4} />
+        <ellipse cx={40} cy={74} rx={22} ry={5} fill="#c1440e" opacity={0.8} />
+        <ellipse cx={40} cy={74} rx={18} ry={3.5} fill="#a03808" opacity={0.5} />
+        {/* Aarde */}
+        <ellipse cx={40} cy={68} rx={16} ry={4} fill="#3d1f00" />
+        {/* Bladeren groot */}
+        <ellipse cx={40} cy={38} rx={22} ry={24} fill="url(#leaf1)" filter="url(#ps)" />
+        <ellipse cx={24} cy={44} rx={14} ry={18} fill="#3a9a20" transform="rotate(-20,24,44)" />
+        <ellipse cx={56} cy={44} rx={14} ry={18} fill="#3a9a20" transform="rotate(20,56,44)" />
+        <ellipse cx={40} cy={22} rx={12} ry={16} fill="#5dbf3f" />
+        {/* Highlights */}
+        <ellipse cx={34} cy={30} rx={5} ry={8} fill="#80e050" opacity={0.4} transform="rotate(-15,34,30)" />
+        <ellipse cx={46} cy={28} rx={4} ry={7} fill="#80e050" opacity={0.3} transform="rotate(10,46,28)" />
+        {/* Geselecteerd kader */}
+        {isSelected && <ellipse cx={40} cy={38} rx={25} ry={27} fill="none" stroke="#60a5fa" strokeWidth={3} strokeDasharray="6 3" />}
       </svg>
     )
   }
