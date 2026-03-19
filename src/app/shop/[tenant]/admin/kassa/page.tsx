@@ -584,7 +584,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => updateQty(item.cartKey, item.quantity - 1)}
-                        className="w-9 h-9 rounded-lg bg-[#3C4D6B] text-white font-bold text-lg flex items-center justify-center hover:bg-[#2D3A52] transition-colors"
+                        className="w-9 h-9 rounded-lg bg-red-500 text-white font-bold text-lg flex items-center justify-center hover:bg-red-600 transition-colors"
                       >
                         {item.quantity === 1 ? '🗑' : '−'}
                       </button>
