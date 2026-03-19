@@ -659,8 +659,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
               <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Online Platform</div>
               <Link href={baseUrl} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🛒</span> Online Platform</Link>
-              <Link href={`${baseUrl}/menu`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📋</span> Menu beheer</Link>
-              <Link href={`${baseUrl}/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Instellingen</Link>
+              <Link href={`${baseUrl}/promoties`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📣</span> Campagnes</Link>
+              <Link href={`${baseUrl}/cadeaubonnen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏷️</span> Kortingen</Link>
+              <Link href={`${baseUrl}/reviews`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⭐</span> Loyaliteitsprogramma</Link>
             </div>
           )}
         </div>
@@ -676,9 +677,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           {flyoutOpen === 'marketing' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
               <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Marketing</div>
-              <Link href={`${baseUrl}/marketing`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📣</span> Campagnes</Link>
-              <Link href={`${baseUrl}/marketing/kortingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏷️</span> Kortingen</Link>
-              <Link href={`${baseUrl}/marketing/loyaliteit`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⭐</span> Loyaliteitsprogramma</Link>
+              <Link href={`${baseUrl}/marketing`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📣</span> Marketing</Link>
+              <Link href={`${baseUrl}/qr-codes`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🔲</span> QR Codes</Link>
+              <Link href={`${baseUrl}/whatsapp`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">💬</span> WhatsApp</Link>
             </div>
           )}
         </div>
@@ -695,8 +696,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
               <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Personeel</div>
               <Link href={`${baseUrl}/personeel`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">👥</span> Medewerkers</Link>
-              <Link href={`${baseUrl}/personeel/planning`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📅</span> Planning</Link>
-              <Link href={`${baseUrl}/personeel/verlof`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏖️</span> Verlof & Afwezigheid</Link>
+              <Link href={`${baseUrl}/team`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏢</span> Team</Link>
+              <Link href={`${baseUrl}/verlof`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏖️</span> Verlof</Link>
+              <Link href={`${baseUrl}/vacatures`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📋</span> Vacatures</Link>
             </div>
           )}
         </div>
@@ -712,9 +714,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           {flyoutOpen === 'kosten' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
               <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Kostenberekening</div>
-              <Link href={`${baseUrl}/kosten/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Instellingen</Link>
               <Link href={`${baseUrl}/kosten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📊</span> Overzicht</Link>
-              <Link href={`${baseUrl}/kosten/analyse`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📈</span> Analyse</Link>
+              <Link href={`${baseUrl}/kosten/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Instellingen</Link>
+              <Link href={`${baseUrl}/analyse`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📈</span> Analyse</Link>
             </div>
           )}
         </div>
@@ -730,8 +732,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           {flyoutOpen === 'bonnen' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
               <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Bonnenprinter</div>
-              <Link href={`${baseUrl}/bonnenprinter`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🖨️</span> Printerinstellingen</Link>
-              <Link href={`${baseUrl}/bonnenprinter/layout`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📄</span> Bon layout</Link>
+              <Link href={`${baseUrl}/bonnenprinter`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🖨️</span> Bonnenprinter</Link>
+              <Link href={`${baseUrl}/labels`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏷️</span> Labels</Link>
             </div>
           )}
         </div>
@@ -747,8 +749,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           {flyoutOpen === 'gks' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
               <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">GKS Rapporten</div>
-              <Link href={`${baseUrl}/z-rapport`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📋</span> Z-Rapporten</Link>
-              <Link href={`${baseUrl}/z-rapport/archief`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🗂️</span> Archief</Link>
+              <Link href={`${baseUrl}/z-rapport`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🧾</span> Z-Rapporten</Link>
+              <Link href={`${baseUrl}/verkoop`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📊</span> Verkoop</Link>
             </div>
           )}
         </div>
@@ -782,7 +784,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
               <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Mijn Shop</div>
               <Link href={`/shop/${tenant}`} target="_blank" onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🔗</span> Bekijk je shop</Link>
-              <Link href={`${baseUrl}/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Shop instellingen</Link>
+              <Link href={`${baseUrl}/design`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🎨</span> Design</Link>
+              <Link href={`${baseUrl}/seo`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🔍</span> SEO</Link>
             </div>
           )}
         </div>
