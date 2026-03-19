@@ -442,7 +442,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                         <div className="absolute inset-0 flex flex-col items-center justify-end p-2">
                           {cat.icon && <span className="text-2xl mb-0.5">{cat.icon}</span>}
-                          <span className="font-bold text-white text-xs text-center leading-tight drop-shadow">{cat.name}</span>
+                          <span className="font-bold text-white text-base text-center leading-tight drop-shadow-lg">{cat.name}</span>
                         </div>
                       </button>
                     )
