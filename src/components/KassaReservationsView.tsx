@@ -246,11 +246,20 @@ export default function KassaReservationsView({
   // Tenant info for emails
   const [businessInfo, setBusinessInfo] = useState({ name: '', phone: '', email: '' })
 
-  // Load tenant info
+  // Load tenant info + reservatie instellingen vanuit Supabase
   useEffect(() => {
     supabase.from('tenants').select('name,phone,email').eq('slug', tenant).single()
       .then(({ data }) => {
         if (data) setBusinessInfo({ name: data.name || '', phone: data.phone || '', email: data.email || '' })
+      })
+    // Laad reservatie instellingen vanuit Supabase (overschrijft localStorage)
+    supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).single()
+      .then(({ data }) => {
+        if (data) {
+          const loaded = { ...DEFAULT_SETTINGS, ...data }
+          setReservationSettings(loaded)
+          localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(loaded))
+        }
       })
   }, [tenant])
 
@@ -293,11 +302,15 @@ export default function KassaReservationsView({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadReservations(); loadGuestProfiles() }, [tenant])
 
-  // Save settings to localStorage
+  // Sla instellingen op in localStorage + Supabase (zodat publieke boekingspagina ze ook leest)
   const updateSettings = (updates: Partial<ReservationSettings>) => {
     const newSettings = { ...reservationSettings, ...updates }
     setReservationSettings(newSettings)
     localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(newSettings))
+    supabase.from('reservation_settings').upsert(
+      { tenant_slug: tenant, ...newSettings },
+      { onConflict: 'tenant_slug' }
+    ).then(() => {})
   }
 
   // ---- Derived data ----
