@@ -700,13 +700,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🏷️', label: 'Labels', href: `${baseUrl}/labels` },
               ]},
               { key: 'instellingen', icon: '⚙️', label: 'Instellingen', items: [
-                { icon: '🏠', label: 'Zaak Profiel', href: `${baseUrl}/profiel` },
                 { icon: '🕐', label: 'Openingstijden', href: `${baseUrl}/openingstijden` },
                 { icon: '🚚', label: 'Levering & Afhalen', href: `${baseUrl}/levering` },
                 { icon: '💳', label: 'Betaalmethodes', href: `${baseUrl}/betaling` },
-                { icon: '📝', label: 'Teksten & Info', href: `${baseUrl}/teksten` },
-                { icon: '🎨', label: 'Design', href: `${baseUrl}/design` },
-                { icon: '🔍', label: 'SEO', href: `${baseUrl}/seo` },
                 { icon: '📦', label: 'Abonnement', href: `${baseUrl}/abonnement` },
               ]},
               { key: 'online', icon: '🛒', label: 'Online', items: [
@@ -745,6 +741,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
                 { icon: '📊', label: 'Dashboard', href: `${baseUrl}` },
                 { icon: '🔥', label: 'Populaire items', href: `${baseUrl}/populair` },
+              ]},
+              { key: 'website', icon: '🌐', label: 'Website', items: [
+                { icon: '🏠', label: 'Zaak Profiel', href: `${baseUrl}/profiel` },
+                { icon: '🎨', label: 'Design', href: `${baseUrl}/design` },
+                { icon: '🔍', label: 'SEO', href: `${baseUrl}/seo` },
+                { icon: '📝', label: 'Teksten & Info', href: `${baseUrl}/teksten` },
               ]},
             ]
             const activeMod = modules.find(m => m.key === hamburgerSubOpen)
