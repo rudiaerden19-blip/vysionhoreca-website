@@ -3,14 +3,24 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MenuProduct, MenuCategory, getMenuCategories, getMenuProducts } from '@/lib/admin-api'
+import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled } from '@/lib/sounds'
 
+interface SelectedChoice {
+  optionId: string
+  optionName: string
+  choiceId: string
+  choiceName: string
+  price: number
+}
+
 interface CartItem {
   product: MenuProduct
   quantity: number
+  choices?: SelectedChoice[]
+  cartKey: string
 }
 
 type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
@@ -36,6 +46,14 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [products, setProducts] = useState<MenuProduct[]>([])
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory | null>(null)
   const [menuLoading, setMenuLoading] = useState(true)
+  const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
+
+  // Opties modal
+  const [optionsModal, setOptionsModal] = useState<{
+    product: MenuProduct
+    options: ProductOption[]
+    selected: SelectedChoice[]
+  } | null>(null)
 
   // Blokkeer body scroll (iPad Safari fix)
   useEffect(() => {
@@ -48,16 +66,18 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     }
   }, [])
 
-  // Laad categorieën en producten
+  // Laad categorieën, producten en welke producten opties hebben
   useEffect(() => {
     async function load() {
       setMenuLoading(true)
-      const [cats, prods] = await Promise.all([
+      const [cats, prods, withOpts] = await Promise.all([
         getMenuCategories(tenant),
         getMenuProducts(tenant),
+        getProductsWithOptions(tenant),
       ])
       setCategories(cats.filter(c => c.is_active))
       setProducts(prods.filter(p => p.is_active))
+      setProductsWithOptions(withOpts)
       setMenuLoading(false)
     }
     load()
@@ -101,21 +121,67 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   // ── Cart ─────────────────────────────────────────────────────────────────
-  const addToCart = (product: MenuProduct) => {
+  const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
+    const cartKey = choices.length > 0
+      ? `${product.id}-${choices.map(c => c.choiceId).sort().join('-')}`
+      : product.id!
     setCart(prev => {
-      const existing = prev.find(i => i.product.id === product.id)
-      if (existing) return prev.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
-      return [...prev, { product, quantity: 1 }]
+      const existing = prev.find(i => i.cartKey === cartKey)
+      if (existing) return prev.map(i => i.cartKey === cartKey ? { ...i, quantity: i.quantity + 1 } : i)
+      return [...prev, { product, quantity: 1, choices, cartKey }]
     })
   }
 
-  const updateQty = (productId: string, qty: number) => {
-    if (qty <= 0) setCart(prev => prev.filter(i => i.product.id !== productId))
-    else setCart(prev => prev.map(i => i.product.id === productId ? { ...i, quantity: qty } : i))
+  const handleProductClick = async (product: MenuProduct) => {
+    if (productsWithOptions.includes(product.id!)) {
+      const opts = await getOptionsForProduct(product.id!)
+      setOptionsModal({ product, options: opts, selected: [] })
+    } else {
+      addToCart(product)
+    }
+  }
+
+  const toggleChoice = (option: ProductOption, choice: ProductOptionChoice) => {
+    setOptionsModal(prev => {
+      if (!prev) return prev
+      const isSingle = option.type === 'single'
+      const alreadySelected = prev.selected.find(s => s.choiceId === choice.id)
+      let newSelected: SelectedChoice[]
+      if (alreadySelected) {
+        newSelected = prev.selected.filter(s => s.choiceId !== choice.id)
+      } else if (isSingle) {
+        newSelected = [...prev.selected.filter(s => s.optionId !== option.id!), {
+          optionId: option.id!, optionName: option.name,
+          choiceId: choice.id!, choiceName: choice.name, price: choice.price
+        }]
+      } else {
+        newSelected = [...prev.selected, {
+          optionId: option.id!, optionName: option.name,
+          choiceId: choice.id!, choiceName: choice.name, price: choice.price
+        }]
+      }
+      return { ...prev, selected: newSelected }
+    })
+  }
+
+  const confirmOptions = () => {
+    if (!optionsModal) return
+    const missing = optionsModal.options.filter(o => o.required && !optionsModal.selected.find(s => s.optionId === o.id))
+    if (missing.length > 0) { alert(`Kies een ${missing[0].name}`); return }
+    addToCart(optionsModal.product, optionsModal.selected)
+    setOptionsModal(null)
+  }
+
+  const updateQty = (cartKey: string, qty: number) => {
+    if (qty <= 0) setCart(prev => prev.filter(i => i.cartKey !== cartKey))
+    else setCart(prev => prev.map(i => i.cartKey === cartKey ? { ...i, quantity: qty } : i))
   }
 
   const clearCart = () => setCart([])
-  const total = cart.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
+  const total = cart.reduce((sum, i) => {
+    const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
+    return sum + (i.product.price + choicesTotal) * i.quantity
+  }, 0)
 
   // ── Numpad ────────────────────────────────────────────────────────────────
   const handleNumpad = (key: string) => {
@@ -313,11 +379,11 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           )}
 
           {/* Grid */}
-          <div className="flex-1 overflow-y-auto p-3">
+          <div className="flex-1 overflow-y-auto p-2">
             {menuLoading ? (
               <div className="flex items-center justify-center h-full text-gray-400 text-lg">Laden...</div>
             ) : !selectedCategory ? (
-              /* Categorieën grid */
+              /* Categorieën grid — 4 kolommen */
               categories.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                   <span className="text-5xl mb-3">📂</span>
@@ -325,21 +391,31 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                   <p className="text-sm mt-1">Voeg categorieën toe via het Online Platform</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-3 gap-3">
-                  {categories.map(cat => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat)}
-                      className="aspect-square flex flex-col items-center justify-center gap-2 bg-[#3C4D6B] hover:bg-[#2D3A52] text-white rounded-2xl shadow-md transition-colors p-4"
-                    >
-                      {cat.icon && <span className="text-4xl">{cat.icon}</span>}
-                      <span className="font-bold text-base text-center leading-tight">{cat.name}</span>
-                    </button>
-                  ))}
+                <div className="grid grid-cols-4 gap-2">
+                  {categories.map(cat => {
+                    const catImage = products.find(p => p.category_id === cat.id && p.image_url)?.image_url
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat)}
+                        className="aspect-square relative rounded-xl overflow-hidden shadow-md active:scale-95 transition-transform"
+                        style={{ backgroundColor: '#3C4D6B' }}
+                      >
+                        {catImage && (
+                          <img src={catImage} alt={cat.name} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        <div className="absolute inset-0 flex flex-col items-center justify-end p-2">
+                          {cat.icon && <span className="text-2xl mb-0.5">{cat.icon}</span>}
+                          <span className="font-bold text-white text-xs text-center leading-tight drop-shadow">{cat.name}</span>
+                        </div>
+                      </button>
+                    )
+                  })}
                 </div>
               )
             ) : (
-              /* Producten grid */
+              /* Producten grid — 4 kolommen */
               (() => {
                 const filtered = products.filter(p => p.category_id === selectedCategory.id)
                 return filtered.length === 0 ? (
@@ -348,33 +424,33 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                     <p className="font-semibold">Geen producten in deze categorie</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-4 gap-2">
                     {filtered.map(product => {
-                      const inCart = cart.find(i => i.product.id === product.id)
+                      const inCart = cart.filter(i => i.product.id === product.id).reduce((s, i) => s + i.quantity, 0)
+                      const hasOpts = productsWithOptions.includes(product.id!)
                       return (
                         <button
                           key={product.id}
-                          onClick={() => addToCart(product)}
-                          className="flex flex-col bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow relative"
+                          onClick={() => handleProductClick(product)}
+                          className="flex flex-col bg-white rounded-xl shadow overflow-hidden active:scale-95 transition-transform relative"
                         >
-                          {/* Afbeelding of placeholder */}
                           <div className="aspect-square w-full bg-gray-100 flex items-center justify-center overflow-hidden">
-                            {product.image_url ? (
-                              <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                            ) : (
-                              <span className="text-4xl text-gray-300">🍽️</span>
-                            )}
+                            {product.image_url
+                              ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+                              : <span className="text-3xl text-gray-300">🍽️</span>
+                            }
                           </div>
-                          {/* Badge */}
-                          {inCart && (
-                            <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-[#3C4D6B] text-white text-xs font-bold flex items-center justify-center shadow">
-                              {inCart.quantity}
+                          {inCart > 0 && (
+                            <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#3C4D6B] text-white text-xs font-bold flex items-center justify-center shadow">
+                              {inCart}
                             </div>
                           )}
-                          {/* Info */}
-                          <div className="p-2 text-left">
-                            <p className="font-semibold text-sm text-gray-800 truncate">{product.name}</p>
-                            <p className="text-[#3C4D6B] font-bold text-sm">€{product.price.toFixed(2)}</p>
+                          {hasOpts && (
+                            <div className="absolute bottom-8 right-1 text-xs bg-amber-400 text-white rounded px-1 font-bold">+</div>
+                          )}
+                          <div className="p-1.5 text-left">
+                            <p className="font-semibold text-xs text-gray-800 leading-tight line-clamp-2">{product.name}</p>
+                            <p className="text-[#3C4D6B] font-bold text-xs mt-0.5">€{product.price.toFixed(2)}</p>
                           </div>
                         </button>
                       )
@@ -458,29 +534,35 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             </div>
           ) : (
             <div className="space-y-2">
-              {cart.map(item => (
-                <div key={item.product.id} className="bg-gray-50 rounded-xl p-3 flex items-center gap-3 border border-gray-100">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate">{item.product.name}</p>
-                    <p className="text-[#3C4D6B] font-bold">€{(item.product.price * item.quantity).toFixed(2)}</p>
+              {cart.map(item => {
+                const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+                return (
+                  <div key={item.cartKey} className="bg-gray-50 rounded-xl p-3 flex items-center gap-3 border border-gray-100">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate">{item.product.name}</p>
+                      {item.choices && item.choices.length > 0 && (
+                        <p className="text-xs text-gray-400 truncate">{item.choices.map(c => c.choiceName).join(', ')}</p>
+                      )}
+                      <p className="text-[#3C4D6B] font-bold">€{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => updateQty(item.cartKey, item.quantity - 1)}
+                        className="w-9 h-9 rounded-lg bg-[#3C4D6B] text-white font-bold text-lg flex items-center justify-center hover:bg-[#2D3A52] transition-colors"
+                      >
+                        {item.quantity === 1 ? '🗑' : '−'}
+                      </button>
+                      <span className="w-6 text-center font-bold text-lg">{item.quantity}</span>
+                      <button
+                        onClick={() => updateQty(item.cartKey, item.quantity + 1)}
+                        className="w-9 h-9 rounded-lg bg-[#3C4D6B] text-white font-bold text-lg flex items-center justify-center hover:bg-[#2D3A52] transition-colors"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => updateQty(item.product.id!, item.quantity - 1)}
-                      className="w-9 h-9 rounded-lg bg-[#3C4D6B] text-white font-bold text-lg flex items-center justify-center hover:bg-[#2D3A52] transition-colors"
-                    >
-                      {item.quantity === 1 ? '🗑' : '−'}
-                    </button>
-                    <span className="w-6 text-center font-bold text-lg">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQty(item.product.id!, item.quantity + 1)}
-                      className="w-9 h-9 rounded-lg bg-[#3C4D6B] text-white font-bold text-lg flex items-center justify-center hover:bg-[#2D3A52] transition-colors"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -519,6 +601,65 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         </div>
         </div>
       </div>
+
+      {/* ── Opties Modal ── */}
+      {optionsModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center gap-3 p-4 border-b">
+              {optionsModal.product.image_url && (
+                <img src={optionsModal.product.image_url} alt={optionsModal.product.name} className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-lg truncate">{optionsModal.product.name}</p>
+                <p className="text-[#3C4D6B] font-bold">
+                  €{(optionsModal.product.price + optionsModal.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
+                </p>
+              </div>
+              <button onClick={() => setOptionsModal(null)} className="p-2 hover:bg-gray-100 rounded-xl">✕</button>
+            </div>
+
+            {/* Opties */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-5">
+              {optionsModal.options.map(option => (
+                <div key={option.id}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <p className="font-bold text-gray-800">{option.name}</p>
+                    {option.required && <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-semibold">Verplicht</span>}
+                    {option.type === 'multiple' && <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Meerdere</span>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(option.choices || []).map(choice => {
+                      const isSelected = optionsModal.selected.some(s => s.choiceId === choice.id)
+                      return (
+                        <button
+                          key={choice.id}
+                          onClick={() => toggleChoice(option, choice)}
+                          className={`flex items-center justify-between px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-colors ${
+                            isSelected ? 'border-[#3C4D6B] bg-[#3C4D6B] text-white' : 'border-gray-200 hover:border-[#3C4D6B] text-gray-700'
+                          }`}
+                        >
+                          <span>{choice.name}</span>
+                          {choice.price > 0 && <span className={isSelected ? 'text-white/80' : 'text-gray-400'}>+€{choice.price.toFixed(2)}</span>}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t flex gap-3">
+              <button onClick={() => setOptionsModal(null)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700">Annuleer</button>
+              <button onClick={confirmOptions} className="flex-[2] py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-lg">
+                + Toevoegen €{(optionsModal.product.price + optionsModal.selected.reduce((s, c) => s + c.price, 0)).toFixed(2)}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
