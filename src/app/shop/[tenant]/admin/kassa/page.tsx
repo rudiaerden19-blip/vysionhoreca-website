@@ -649,74 +649,142 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
         {/* Online Platform */}
         <div className="relative z-20">
-          <Link href={baseUrl}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+          <button onClick={() => setFlyoutOpen(flyoutOpen === 'online' ? null : 'online')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'online' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">🛒</span>
             <span className="font-semibold text-sm">Online</span>
-          </Link>
+            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'online' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {flyoutOpen === 'online' && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Online Platform</div>
+              <Link href={baseUrl} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🛒</span> Online Platform</Link>
+              <Link href={`${baseUrl}/menu`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📋</span> Menu beheer</Link>
+              <Link href={`${baseUrl}/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Instellingen</Link>
+            </div>
+          )}
         </div>
 
         {/* Marketing */}
         <div className="relative z-20">
-          <Link href={`${baseUrl}/marketing`}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+          <button onClick={() => setFlyoutOpen(flyoutOpen === 'marketing' ? null : 'marketing')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'marketing' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">📣</span>
             <span className="font-semibold text-sm">Marketing</span>
-          </Link>
+            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'marketing' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {flyoutOpen === 'marketing' && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Marketing</div>
+              <Link href={`${baseUrl}/marketing`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📣</span> Campagnes</Link>
+              <Link href={`${baseUrl}/marketing/kortingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏷️</span> Kortingen</Link>
+              <Link href={`${baseUrl}/marketing/loyaliteit`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⭐</span> Loyaliteitsprogramma</Link>
+            </div>
+          )}
         </div>
 
         {/* Personeel */}
         <div className="relative z-20">
-          <Link href={`${baseUrl}/personeel`}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+          <button onClick={() => setFlyoutOpen(flyoutOpen === 'personeel' ? null : 'personeel')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'personeel' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">👔</span>
             <span className="font-semibold text-sm">Personeel</span>
-          </Link>
+            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'personeel' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {flyoutOpen === 'personeel' && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Personeel</div>
+              <Link href={`${baseUrl}/personeel`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">👥</span> Medewerkers</Link>
+              <Link href={`${baseUrl}/personeel/planning`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📅</span> Planning</Link>
+              <Link href={`${baseUrl}/personeel/verlof`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏖️</span> Verlof & Afwezigheid</Link>
+            </div>
+          )}
         </div>
 
         {/* Kostenberekening */}
         <div className="relative z-20">
-          <Link href={`${baseUrl}/kosten/instellingen`}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+          <button onClick={() => setFlyoutOpen(flyoutOpen === 'kosten' ? null : 'kosten')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'kosten' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">🧮</span>
             <span className="font-semibold text-sm">Kosten</span>
-          </Link>
+            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'kosten' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {flyoutOpen === 'kosten' && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Kostenberekening</div>
+              <Link href={`${baseUrl}/kosten/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Instellingen</Link>
+              <Link href={`${baseUrl}/kosten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📊</span> Overzicht</Link>
+              <Link href={`${baseUrl}/kosten/analyse`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📈</span> Analyse</Link>
+            </div>
+          )}
         </div>
 
         {/* Bonnenprinter */}
         <div className="relative z-20">
-          <Link href={`${baseUrl}/bonnenprinter`}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+          <button onClick={() => setFlyoutOpen(flyoutOpen === 'bonnen' ? null : 'bonnen')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'bonnen' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">🖨️</span>
             <span className="font-semibold text-sm">Printer</span>
-          </Link>
+            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'bonnen' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {flyoutOpen === 'bonnen' && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Bonnenprinter</div>
+              <Link href={`${baseUrl}/bonnenprinter`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🖨️</span> Printerinstellingen</Link>
+              <Link href={`${baseUrl}/bonnenprinter/layout`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📄</span> Bon layout</Link>
+            </div>
+          )}
         </div>
 
         {/* GKS Rapporten */}
         <div className="relative z-20">
-          <Link href={`${baseUrl}/z-rapport`}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+          <button onClick={() => setFlyoutOpen(flyoutOpen === 'gks' ? null : 'gks')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'gks' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">🧾</span>
             <span className="font-semibold text-sm">GKS</span>
-          </Link>
+            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'gks' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {flyoutOpen === 'gks' && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">GKS Rapporten</div>
+              <Link href={`${baseUrl}/z-rapport`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📋</span> Z-Rapporten</Link>
+              <Link href={`${baseUrl}/z-rapport/archief`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🗂️</span> Archief</Link>
+            </div>
+          )}
         </div>
 
         {/* Reservaties */}
         <div className="relative z-20">
-          <button onClick={() => { setFlyoutOpen(null); setShowReservations(true) }}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+          <button onClick={() => setFlyoutOpen(flyoutOpen === 'reservaties' ? null : 'reservaties')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'reservaties' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">📅</span>
             <span className="font-semibold text-sm">Reservaties</span>
+            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'reservaties' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
+          {flyoutOpen === 'reservaties' && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Reservaties</div>
+              <button onClick={() => { setFlyoutOpen(null); setShowReservations(true) }} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📅</span> Reservaties beheren</button>
+              <button onClick={() => { setFlyoutOpen(null); setShowReservations(true) }} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Instellingen</button>
+            </div>
+          )}
         </div>
 
         {/* Shop */}
         <div className="relative z-20">
-          <Link href={`/shop/${tenant}`} target="_blank"
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+          <button onClick={() => setFlyoutOpen(flyoutOpen === 'shop' ? null : 'shop')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${flyoutOpen === 'shop' ? 'bg-blue-600 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">🔗</span>
             <span className="font-semibold text-sm">Shop</span>
-          </Link>
+            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'shop' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+          {flyoutOpen === 'shop' && (
+            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
+              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Mijn Shop</div>
+              <Link href={`/shop/${tenant}`} target="_blank" onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🔗</span> Bekijk je shop</Link>
+              <Link href={`${baseUrl}/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Shop instellingen</Link>
+            </div>
+          )}
         </div>
 
         {/* Spacer */}
