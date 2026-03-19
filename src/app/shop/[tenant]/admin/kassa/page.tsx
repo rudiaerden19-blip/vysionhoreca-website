@@ -761,8 +761,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🏢', label: 'Team', href: '/team' },
               ]},
               { key: 'uren', icon: '⏱️', label: 'Urenregistratie', items: [
-                { icon: '📅', label: 'Uren overzicht', href: '/verlof' },
-                { icon: '🏖️', label: 'Verlof', href: '/verlof' },
+                { icon: '⏱️', label: 'Urenregistratie', href: '/personeel' },
               ]},
               { key: 'vacatures', icon: '📋', label: 'Vacatures', items: [
                 { icon: '📋', label: 'Vacatures', href: '/vacatures' },
