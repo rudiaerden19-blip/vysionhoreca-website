@@ -54,6 +54,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   type PaymentMethodType = 'CASH' | 'CARD' | 'IDEAL' | 'BANCONTACT'
+  const [showSplitModal, setShowSplitModal] = useState(false)
+  const [splitCash, setSplitCash] = useState(0)
+  const [splitCard, setSplitCard] = useState(0)
   const [lastOrder, setLastOrder] = useState<{
     orderNumber: number
     items: CartItem[]
@@ -870,7 +873,88 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                     <span style={{ color: pm.color }}>{pm.label}</span>
                   </button>
                 ))}
+                {/* Gesplitst Betalen — volle breedte */}
+                <button
+                  onClick={() => { setSplitCash(0); setSplitCard(total); setShowSplitModal(true); setShowPaymentModal(false) }}
+                  className="col-span-2 flex flex-col items-center justify-center h-32 gap-3 rounded-xl border-2 bg-gray-50 hover:scale-[1.02] transition-transform font-semibold text-lg"
+                  style={{ borderColor: '#8b5cf6' }}
+                >
+                  <span className="text-4xl">👛</span>
+                  <span style={{ color: '#8b5cf6' }}>Gesplitst Betalen</span>
+                </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Gesplitst Betalen modal ── */}
+      {showSplitModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <span className="text-purple-500">👛</span> Gesplitst Betalen
+              </h3>
+              <button onClick={() => { setShowSplitModal(false); setShowPaymentModal(true) }} className="p-2 rounded-lg hover:bg-gray-100 text-2xl">✕</button>
+            </div>
+            <div className="p-6 space-y-5">
+              {/* Totaal */}
+              <div className="text-center p-4 bg-gray-50 rounded-xl">
+                <p className="text-gray-500">Totaal te betalen</p>
+                <p className="text-4xl font-bold text-[#3C4D6B]">€{total.toFixed(2)}</p>
+              </div>
+              {/* Contant */}
+              <div className="space-y-1">
+                <label className="flex items-center gap-2 text-gray-500 text-sm">💵 Contant bedrag</label>
+                <input
+                  type="number"
+                  value={splitCash || ''}
+                  onChange={(e) => { const v = parseFloat(e.target.value) || 0; setSplitCash(v); setSplitCard(Math.max(0, total - v)) }}
+                  className="w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 border-green-400 focus:border-green-500 outline-none"
+                  placeholder="0.00" step="0.01" min="0"
+                />
+              </div>
+              {/* Kaart */}
+              <div className="space-y-1">
+                <label className="flex items-center gap-2 text-gray-500 text-sm">💳 Kaart bedrag</label>
+                <input
+                  type="number"
+                  value={splitCard || ''}
+                  onChange={(e) => { const v = parseFloat(e.target.value) || 0; setSplitCard(v); setSplitCash(Math.max(0, total - v)) }}
+                  className="w-full px-4 py-4 text-2xl font-bold rounded-xl bg-white border-2 border-blue-400 focus:border-blue-500 outline-none"
+                  placeholder="0.00" step="0.01" min="0"
+                />
+              </div>
+              {/* Snelle knoppen */}
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: '50/50', cash: total / 2, card: total / 2 },
+                  { label: '100% 💵', cash: total, card: 0 },
+                  { label: '100% 💳', cash: 0, card: total },
+                ].map(opt => (
+                  <button key={opt.label} onClick={() => { setSplitCash(opt.cash); setSplitCard(opt.card) }}
+                    className="py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-sm font-semibold transition-colors">
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              {/* Resterende indicator */}
+              {Math.abs(total - splitCash - splitCard) > 0.01 && (
+                <div className={`p-3 rounded-xl text-center text-sm font-semibold ${(total - splitCash - splitCard) > 0 ? 'bg-red-100 text-red-600' : 'bg-yellow-100 text-yellow-700'}`}>
+                  {(total - splitCash - splitCard) > 0
+                    ? `Nog te betalen: €${(total - splitCash - splitCard).toFixed(2)}`
+                    : `Te veel: €${Math.abs(total - splitCash - splitCard).toFixed(2)}`}
+                </div>
+              )}
+              {/* Bevestigen */}
+              <button
+                onClick={() => { if (Math.abs(total - splitCash - splitCard) < 0.01) { completePayment('CASH'); setShowSplitModal(false) } }}
+                disabled={Math.abs(total - splitCash - splitCard) > 0.01}
+                className="w-full py-4 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                ✓ Betalen €{(splitCash + splitCard).toFixed(2)}
+              </button>
             </div>
           </div>
         </div>
