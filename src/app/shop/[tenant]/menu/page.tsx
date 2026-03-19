@@ -48,6 +48,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
   const [loadingOptions, setLoadingOptions] = useState(false)
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
+  const [businessName, setBusinessName] = useState('')
   const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover') // altijd cover als standaard
   const [upcomingClosings, setUpcomingClosings] = useState<ExceptionalClosing[]>([])
   const [darkMode, setDarkMode] = useState(false)
@@ -216,6 +217,9 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       // Set primary color, image display mode and dark mode from tenant settings
       if (tenantData?.primary_color) {
         setPrimaryColor(tenantData.primary_color)
+      }
+      if (tenantData?.name) {
+        setBusinessName(tenantData.name)
       }
       if (tenantData?.image_display_mode) {
         setImageDisplayMode(tenantData.image_display_mode)
@@ -417,9 +421,10 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
     return (
       <div
         onClick={() => selectProduct(item)}
-        className={`${theme.card} rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.28)] ${theme.cardHover} active:scale-[0.98] transition-all cursor-pointer group`}
+        className={`${theme.card} rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.22)] active:scale-[0.98] transition-all cursor-pointer group`}
       >
-        <div className={`relative h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
+        {/* Afbeelding met overlay badges */}
+        <div className={`relative h-44 sm:h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
           {item.image_url ? (
             <Image
               src={item.image_url}
@@ -428,44 +433,82 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               sizes="(max-width: 768px) 100vw, 50vw"
               quality={75}
               loading="lazy"
-              className={useContain ? 'object-contain p-2' : 'object-cover'}
+              className={`transition-transform duration-300 group-hover:scale-105 ${useContain ? 'object-contain p-2' : 'object-cover'}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-6xl">🍟</div>
           )}
+
+          {/* Gradient onderaan voor leesbaarheid */}
+          {!useContain && <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />}
+
+          {/* Top badges */}
           <div className="absolute top-3 left-3 flex gap-2">
             {item.is_popular && (
-              <span style={{ backgroundColor: primaryColor }} className="text-white text-xs font-bold px-2 py-1 rounded-full">
+              <span style={{ backgroundColor: primaryColor }} className="text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
                 🔥 POPULAIR
               </span>
             )}
+            {item.is_promo && item.promo_price != null && (
+              <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
+                PROMO
+              </span>
+            )}
           </div>
+
+          {/* Prijs badge rechts boven */}
+          <div className="absolute top-3 right-3">
+            {item.is_promo && item.promo_price != null ? (
+              <div className="flex flex-col items-end gap-1">
+                <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                  €{item.promo_price.toFixed(2)}
+                </span>
+                <span className="bg-black/50 text-white/70 text-xs font-medium px-2 py-0.5 rounded-full line-through">
+                  €{item.price.toFixed(2)}
+                </span>
+              </div>
+            ) : (
+              <span className="text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-md"
+                style={{ backgroundColor: primaryColor }}>
+                €{item.price.toFixed(2)}
+              </span>
+            )}
+          </div>
+
+          {/* Uitverkocht overlay */}
           {!item.is_available && (
             <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
               <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-full">{t('menuPage.soldOut')}</span>
             </div>
           )}
         </div>
-        <div className="p-4">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className={`font-bold text-lg ${theme.text}`}>{item.name}</h3>
-            <span style={darkMode ? {} : { color: primaryColor }} className={`text-xl font-bold ${darkMode ? 'text-white' : ''}`}>€{item.price.toFixed(2)}</span>
-          </div>
-          <p className={`${theme.textLight} text-sm mb-3 line-clamp-2`}>{item.description}</p>
+
+        {/* Kaartinhoud */}
+        <div className="p-3 sm:p-4">
+          <h3 className={`font-bold text-base sm:text-lg ${theme.text} mb-1 leading-snug`}>{item.name}</h3>
+          {item.description && (
+            <p className={`${theme.textLight} text-xs sm:text-sm mb-3 line-clamp-2 leading-relaxed`}>{item.description}</p>
+          )}
           {item.allergens.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-2">
+            <div className="flex flex-wrap gap-1 mb-2">
               {item.allergens.map(allergen => (
-                <span key={allergen} className={`text-xs px-2 py-1 rounded-full ${allergenIcons[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}>
-                  {allergenIcons[allergen.toLowerCase()]?.icon || '⚠️'} {allergenIcons[allergen.toLowerCase()]?.label || allergen}
+                <span key={allergen} className={`text-xs px-2 py-0.5 rounded-full ${allergenIcons[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}>
+                  {allergenIcons[allergen.toLowerCase()]?.icon || '⚠️'}
                 </span>
               ))}
             </div>
           )}
-          <div className={`mt-2 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all ${darkMode ? 'text-white' : ''}`} style={darkMode ? {} : { color: primaryColor }}>
-            {productsWithOptions.includes(item.id) ? (
-              <><span>⚙️</span><span>{t('menuPage.chooseOptions')}</span><span className="text-lg">→</span></>
+          {/* CTA knop */}
+          <div
+            className="mt-2 w-full py-2 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2 transition-opacity group-hover:opacity-90"
+            style={{ backgroundColor: item.is_available ? primaryColor : '#9ca3af' }}
+          >
+            {!item.is_available ? (
+              <span>{t('menuPage.soldOut')}</span>
+            ) : productsWithOptions.includes(item.id) ? (
+              <><span>⚙️</span><span>{t('menuPage.chooseOptions')}</span></>
             ) : (
-              <><span>🛒</span><span>{t('menuPage.clickToOrder')}</span><span className="text-lg">→</span></>
+              <><span>🛒</span><span>{t('menuPage.clickToOrder')}</span></>
             )}
           </div>
         </div>
@@ -527,18 +570,25 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         {/* Navigation Bar */}
         <div className={`border-b ${theme.border}`}>
           <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <Link href={`/shop/${params.tenant}`} className={`flex items-center gap-2 ${theme.textMuted} hover:opacity-70 transition-colors`}>
+            <Link href={`/shop/${params.tenant}`} className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              <span>{t('menuPage.back')}</span>
+              <span className="text-sm font-medium hidden sm:inline">{t('menuPage.back')}</span>
             </Link>
-            <h1 className={`font-bold text-xl ${theme.text}`}>{t('menuPage.menu')}</h1>
+            <div className="flex flex-col items-center">
+              <h1 className={`font-bold text-lg leading-tight ${theme.text}`}>
+                {businessName || t('menuPage.menu')}
+              </h1>
+              <span className={`text-xs ${theme.textLight}`}>{t('menuPage.menu')}</span>
+            </div>
             <Link 
               href={`/shop/${params.tenant}/account`}
-              className={`flex items-center gap-1 ${theme.textMuted} hover:opacity-70 transition-colors`}
+              className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}
             >
-              <span>👤</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+              </svg>
               <span className="text-sm font-medium hidden sm:inline">{t('menuPage.account')}</span>
             </Link>
           </div>
