@@ -281,7 +281,6 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
   // Pointer events — werkt op iPad (touch) én desktop (mouse)
   // Refs worden gebruikt om stale closure problemen te vermijden
   const handlePointerDown = (e: React.PointerEvent, id: string) => {
-    e.preventDefault()
     e.stopPropagation()
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
     const floor = document.querySelector('.floor-plan') as HTMLElement
@@ -376,13 +375,14 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
                 touchAction: 'none',
               }}
               onPointerDown={(e) => handlePointerDown(e, t.id)}
-              onPointerUp={(e) => { e.stopPropagation(); handlePointerUp(e) }}
-              onClick={(e) => {
+              onPointerUp={(e) => {
                 e.stopPropagation()
+                handlePointerUp(e)
                 if (!dragMoved.current) {
                   setSelected(prev => prev?.id === t.id ? null : t)
                 }
               }}
+              onClick={(e) => { e.stopPropagation() }}
             >
               <TableSVG
                 table={t}
