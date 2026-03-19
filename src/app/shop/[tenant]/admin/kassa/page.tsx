@@ -712,13 +712,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🎁', label: 'Beloningen', href: `${baseUrl}/klanten/beloningen` },
                 { icon: '🎫', label: 'Promoties', href: `${baseUrl}/promoties` },
                 { icon: '🎟️', label: 'Cadeaubonnen', href: `${baseUrl}/cadeaubonnen` },
-                { icon: '⭐', label: 'Reviews', href: `${baseUrl}/reviews` },
                 { icon: '🏢', label: 'Groepsbestellingen', href: `${baseUrl}/groepen` },
-                { icon: '📣', label: 'Marketing', href: `${baseUrl}/marketing` },
-                { icon: '📱', label: 'QR Codes', href: `${baseUrl}/qr-codes` },
                 { icon: '💬', label: 'WhatsApp', href: `${baseUrl}/whatsapp` },
-                { icon: '🖼️', label: 'Media', href: `${baseUrl}/media` },
-                { icon: '🔗', label: 'Bekijk je shop', href: `/shop/${tenant}` },
+                { icon: '🔗', label: 'Bekijk je Shop', href: `/shop/${tenant}` },
               ]},
               { key: 'reservaties', icon: '📅', label: 'Reservaties', items: [
                 { icon: '📅', label: 'Reserveringen', href: `${baseUrl}/reserveringen` },
@@ -745,6 +741,11 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🎨', label: 'Design', href: `${baseUrl}/design` },
                 { icon: '🔍', label: 'SEO', href: `${baseUrl}/seo` },
                 { icon: '📝', label: 'Teksten & Info', href: `${baseUrl}/teksten` },
+                { icon: '⭐', label: 'Reviews', href: `${baseUrl}/reviews` },
+                { icon: '📣', label: 'Marketing', href: `${baseUrl}/marketing` },
+                { icon: '📱', label: 'QR Codes', href: `${baseUrl}/qr-codes` },
+                { icon: '🖼️', label: 'Media', href: `${baseUrl}/media` },
+                { icon: '🔗', label: 'Bekijk je Website', href: `/shop/${tenant}` },
               ]},
             ]
             const activeMod = modules.find(m => m.key === hamburgerSubOpen)
