@@ -1059,7 +1059,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.6 }}
-              className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-8"
+              className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6"
             >
               {business.pickup_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
@@ -1075,6 +1075,34 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm max-w-full truncate">
                   <span className="shrink-0">📍</span> <span className="truncate">{business.address}{business.postal_code || business.city ? `, ${business.postal_code || ''} ${business.city || ''}`.trim() : ''}</span>
                 </span>
+              )}
+            </motion.div>
+
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.6 }}
+              className="flex flex-wrap gap-3 mt-6 sm:mt-8"
+            >
+              {!manualOffline?.is_offline && (
+                <Link
+                  href={`/shop/${params.tenant}/menu`}
+                  style={{ backgroundColor: business.primary_color }}
+                  className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl text-white font-bold text-sm sm:text-base hover:opacity-90 transition-opacity shadow-lg"
+                >
+                  <span>🍟</span>
+                  <span>{t('shopPage.menu') || 'Bestel Nu'}</span>
+                </Link>
+              )}
+              {business.reservations_enabled && (
+                <Link
+                  href={`/shop/${params.tenant}/reserveren`}
+                  className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-white/20 backdrop-blur-md text-white font-bold text-sm sm:text-base hover:bg-white/30 transition-colors border border-white/30"
+                >
+                  <span>📅</span>
+                  <span>{t('shopPage.reserveTable') || 'Reserveer'}</span>
+                </Link>
               )}
             </motion.div>
           </div>
@@ -1697,8 +1725,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     <div 
                       key={day}
                       className={`flex justify-between items-center py-3 border-b border-white/10 ${
-                        day === getDayName() ? 'text-orange-400 font-bold' : ''
+                        day === getDayName() ? 'font-bold' : ''
                       }`}
+                    style={day === getDayName() ? { color: business.primary_color } : {}}
                     >
                       <span className="capitalize">{translatedDay}</span>
                       <span>
