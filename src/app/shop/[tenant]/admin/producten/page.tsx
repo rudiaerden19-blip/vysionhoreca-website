@@ -618,79 +618,79 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                 </div>
               </div>
 
-              <div className="p-6 space-y-4">
-                {/* Product Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('adminPages.producten.name')} *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name || ''}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      const capitalized = val.charAt(0).toUpperCase() + val.slice(1)
-                      setFormData(prev => ({ ...prev, name: capitalized }))
-                    }}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder={t('adminPages.producten.namePlaceholder')}
-                  />
-                </div>
+              <div className="p-6 space-y-6">
 
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('adminPages.producten.description')}
-                  </label>
-                  <textarea
-                    value={formData.description || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                    placeholder={t('adminPages.producten.descriptionPlaceholder')}
-                  />
-                </div>
+                {/* ── SECTIE 1: Basis ── */}
+                <div className="space-y-4">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Basisinfo</p>
 
-                {/* Price & Category */}
-                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('adminPages.producten.price')} *
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      {t('adminPages.producten.name')} <span className="text-red-500">*</span>
                     </label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">€</span>
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={formData.price || ''}
-                        onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                        className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="0.00"
-                      />
+                    <input
+                      type="text"
+                      value={formData.name || ''}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        setFormData(prev => ({ ...prev, name: val.charAt(0).toUpperCase() + val.slice(1) }))
+                      }}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                      placeholder={t('adminPages.producten.namePlaceholder')}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      {t('adminPages.producten.description')}
+                    </label>
+                    <textarea
+                      value={formData.description || ''}
+                      onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                      rows={2}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      placeholder={t('adminPages.producten.descriptionPlaceholder')}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t('adminPages.producten.price')} <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">€</span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={formData.price || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
+                          className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base font-semibold"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {t('adminPages.producten.category')} <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={formData.category_id || ''}
+                        onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value || null }))}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="">{t('adminPages.producten.selectCategory')}</option>
+                        {categories.map(cat => (
+                          <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('adminPages.producten.category')} *
-                    </label>
-                    <select
-                      value={formData.category_id || ''}
-                      onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value || null }))}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">{t('adminPages.producten.selectCategory')}</option>
-                      {categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
-                      ))}
-                    </select>
-                  </div>
                 </div>
 
-                {/* Product Afbeelding */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('adminPages.producten.image')}
-                  </label>
+                {/* ── SECTIE 2: Foto ── */}
+                <div className="space-y-2 pt-2 border-t">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">📸 Foto</p>
                   <MediaPicker
                     tenantSlug={params.tenant}
                     value={formData.image_url || ''}
@@ -698,202 +698,122 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
                   />
                 </div>
 
-                {/* Koppel Opties */}
-                {availableOptions.length > 0 && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('adminPages.producten.linkOptions')}
-                    </label>
-                    <p className="text-sm text-gray-500 mb-3">
-                      {t('adminPages.producten.linkOptionsDesc')}
-                    </p>
-                    <div className="space-y-2">
-                      {availableOptions.map(option => (
-                        <label 
-                          key={option.id} 
-                          className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition-colors ${
-                            selectedOptionIds.includes(option.id!)
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:bg-gray-50'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedOptionIds.includes(option.id!)}
-                            onChange={() => toggleOptionSelection(option.id!)}
-                            className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <div className="flex-1">
-                            <span className="font-medium text-gray-900">{option.name}</span>
-                            <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                              option.type === 'single' 
-                                ? 'bg-blue-100 text-blue-700' 
-                                : 'bg-purple-100 text-purple-700'
-                            }`}>
-                              {option.type === 'single' ? t('adminPages.producten.singleChoice') : t('adminPages.producten.multipleChoice')}
-                            </span>
-                            {option.required && (
-                              <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">
-                                {t('adminPages.producten.required')}
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-sm text-gray-500">
-                            {option.choices?.length || 0} {t('adminPages.producten.choices')}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {/* ── SECTIE 3: Status toggles ── */}
+                <div className="space-y-3 pt-2 border-t">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">⚙️ Instellingen</p>
 
-                {/* Allergenen */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('adminPages.producten.allergens')}
-                  </label>
-                  <p className="text-sm text-gray-500 mb-3">
-                    {t('adminPages.producten.allergensDesc')}
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {ALLERGEN_IDS.map(allergen => {
-                      const isSelected = formData.allergens?.includes(allergen.id) || false
-                      const allergenName = t(`adminPages.allergenen.allergenNames.${allergen.id}`)
-                      return (
-                        <label
-                          key={allergen.id}
-                          className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
-                            isSelected
-                              ? 'bg-blue-50 border-2 border-blue-500'
-                              : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100'
-                          }`}
+                  {[
+                    { key: 'is_active', label: 'Beschikbaar', sub: 'Zichtbaar in menu & kassa', color: 'bg-green-500' },
+                    { key: 'is_popular', label: '🔥 Populair', sub: 'Wordt gemarkeerd als bestseller', color: 'bg-blue-500' },
+                    { key: 'is_promo', label: '🎁 Promotie', sub: 'Toon actieprijs', color: 'bg-orange-500' },
+                    { key: 'print_label', label: '🏷️ Print label', sub: 'Druk sticker af bij bestelling', color: 'bg-purple-500' },
+                  ].map(({ key, label, sub, color }) => {
+                    const val = !!(formData as any)[key]
+                    return (
+                      <div key={key} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                        <div>
+                          <p className="font-medium text-gray-800 text-sm">{label}</p>
+                          <p className="text-xs text-gray-400">{sub}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, [key]: !val }))}
+                          className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${val ? color : 'bg-gray-300'}`}
                         >
-                          <input
-                            type="checkbox"
-                            checked={isSelected}
-                            onChange={() => toggleAllergen(allergen.id)}
-                            className="sr-only"
-                          />
-                          <span className="text-lg">{allergen.icon}</span>
-                          <span className={`text-sm font-medium ${isSelected ? 'text-blue-700' : 'text-gray-600'}`}>
-                            {allergenName}
-                          </span>
-                        </label>
-                      )
-                    })}
-                  </div>
-                </div>
+                          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${val ? 'translate-x-6' : 'translate-x-0'}`} />
+                        </button>
+                      </div>
+                    )
+                  })}
 
-                {/* Status Opties */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('adminPages.producten.status')}
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl cursor-pointer hover:bg-gray-200">
-                      <input 
-                        type="checkbox" 
-                        checked={formData.is_active ?? true}
-                        onChange={(e) => setFormData(prev => ({ ...prev, is_active: e.target.checked }))}
-                        className="rounded" 
-                      />
-                      <span>{t('adminPages.producten.statusAvailable')}</span>
-                    </label>
-                    <label className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl cursor-pointer hover:bg-gray-200">
-                      <input 
-                        type="checkbox" 
-                        checked={formData.is_popular ?? false}
-                        onChange={(e) => setFormData(prev => ({ ...prev, is_popular: e.target.checked }))}
-                        className="rounded" 
-                      />
-                      <span>{t('adminPages.producten.statusPopular')}</span>
-                    </label>
-                    <label className="flex items-center gap-2 px-4 py-2 bg-green-100 rounded-xl cursor-pointer hover:bg-green-200">
-                      <input 
-                        type="checkbox" 
-                        checked={formData.is_promo ?? false}
-                        onChange={(e) => setFormData(prev => ({ ...prev, is_promo: e.target.checked }))}
-                        className="rounded" 
-                      />
-                      <span>{t('adminPages.producten.statusPromo')}</span>
-                    </label>
-                    <label className="flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-xl cursor-pointer hover:bg-purple-200">
-                      <input 
-                        type="checkbox" 
-                        checked={formData.print_label ?? false}
-                        onChange={(e) => setFormData(prev => ({ ...prev, print_label: e.target.checked }))}
-                        className="rounded" 
-                      />
-                      <span>🏷️ {t('adminPages.producten.printLabel')}</span>
-                    </label>
-                  </div>
-                  
-                  {/* Promo Price - alleen tonen als promotie aan staat */}
+                  {/* Promo prijs */}
                   {formData.is_promo && (
-                    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl">
-                      <label className="block text-sm font-medium text-green-800 mb-2">
-                        🎁 Actieprijs
-                      </label>
+                    <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                      <label className="block text-sm font-semibold text-orange-800 mb-2">Actieprijs</label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-green-600 font-bold">€</span>
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-orange-600 font-bold">€</span>
                         <input
                           type="number"
                           step="0.01"
                           min="0"
                           value={formData.promo_price || ''}
                           onChange={(e) => setFormData(prev => ({ ...prev, promo_price: parseFloat(e.target.value) || 0 }))}
-                          className="w-full pl-10 pr-4 py-3 border-2 border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent text-lg font-bold"
+                          className="w-full pl-10 pr-4 py-3 border-2 border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent text-lg font-bold"
                           placeholder="0.00"
                         />
                       </div>
-                      <p className="text-sm text-green-600 mt-2">
-                        Originele prijs: €{(formData.price || 0).toFixed(2)} → Actieprijs: €{(formData.promo_price || 0).toFixed(2)}
-                      </p>
+                      {(formData.promo_price || 0) > 0 && (
+                        <p className="text-sm text-orange-600 mt-2">
+                          €{(formData.price || 0).toFixed(2)} → <strong>€{(formData.promo_price || 0).toFixed(2)}</strong>
+                        </p>
+                      )}
                     </div>
                   )}
+                </div>
 
-                  {/* Afbeelding weergave */}
-                  <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-xl">
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                      🖼️ {t('adminPages.producten.imageDisplayMode')}
-                    </label>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, image_display_mode: null }))}
-                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          !formData.image_display_mode 
-                            ? 'bg-blue-600 text-white' 
-                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                        }`}
-                      >
-                        {t('adminPages.producten.imageDefault')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, image_display_mode: 'cover' }))}
-                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          formData.image_display_mode === 'cover' 
-                            ? 'bg-blue-600 text-white' 
-                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                        }`}
-                      >
-                        {t('adminPages.producten.imageCover')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, image_display_mode: 'contain' }))}
-                        className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          formData.image_display_mode === 'contain' 
-                            ? 'bg-blue-600 text-white' 
-                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-100'
-                        }`}
-                      >
-                        {t('adminPages.producten.imageContain')}
-                      </button>
+                {/* ── SECTIE 4: Opties ── */}
+                {availableOptions.length > 0 && (
+                  <div className="space-y-3 pt-2 border-t">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">🔧 Opties koppelen</p>
+                    <div className="space-y-2">
+                      {availableOptions.map(option => (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => toggleOptionSelection(option.id!)}
+                          className={`w-full flex items-center gap-3 p-3 border-2 rounded-xl text-left transition-all ${
+                            selectedOptionIds.includes(option.id!)
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                        >
+                          <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                            selectedOptionIds.includes(option.id!) ? 'border-blue-500 bg-blue-500' : 'border-gray-300'
+                          }`}>
+                            {selectedOptionIds.includes(option.id!) && <span className="text-white text-xs">✓</span>}
+                          </div>
+                          <div className="flex-1">
+                            <span className="font-medium text-gray-900">{option.name}</span>
+                            <div className="flex gap-1 mt-0.5">
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${option.type === 'single' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                                {option.type === 'single' ? 'Enkelvoudig' : 'Meervoudig'}
+                              </span>
+                              {option.required && <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">Verplicht</span>}
+                            </div>
+                          </div>
+                          <span className="text-sm text-gray-400">{option.choices?.length || 0} keuzes</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
+                )}
+
+                {/* ── SECTIE 5: Allergenen ── */}
+                <div className="space-y-3 pt-2 border-t">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider pt-2">⚠️ Allergenen</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {ALLERGEN_IDS.map(allergen => {
+                      const isSelected = formData.allergens?.includes(allergen.id) || false
+                      const allergenName = t(`adminPages.allergenen.allergenNames.${allergen.id}`)
+                      return (
+                        <button
+                          key={allergen.id}
+                          type="button"
+                          onClick={() => toggleAllergen(allergen.id)}
+                          className={`flex items-center gap-2 p-2.5 rounded-xl text-left transition-all border-2 ${
+                            isSelected ? 'border-blue-500 bg-blue-50' : 'border-transparent bg-gray-50 hover:bg-gray-100'
+                          }`}
+                        >
+                          <span className="text-xl">{allergen.icon}</span>
+                          <span className={`text-sm font-medium ${isSelected ? 'text-blue-700' : 'text-gray-600'}`}>
+                            {allergenName}
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
+
               </div>
 
               {/* Footer */}

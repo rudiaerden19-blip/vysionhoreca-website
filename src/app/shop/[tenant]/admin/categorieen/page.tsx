@@ -156,40 +156,44 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
       )}
 
       {/* Add New */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm mb-6 flex gap-4">
+      <div className="bg-white rounded-2xl p-4 shadow-sm mb-4 flex gap-3 items-center border border-dashed border-blue-200">
+        <span className="text-2xl">📂</span>
         <input
           type="text"
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
-          placeholder={t('adminPages.categorieen.newCategoryPlaceholder')}
-          className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Naam nieuwe categorie..."
+          className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
           onKeyDown={(e) => e.key === 'Enter' && addCategory()}
         />
         <button
           onClick={addCategory}
-          className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium"
+          disabled={!newCategory.trim()}
+          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-xl font-medium transition-colors whitespace-nowrap"
         >
-          {t('adminPages.categorieen.add')}
+          + Toevoegen
         </button>
       </div>
 
       {/* Categories List */}
       <motion.div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b bg-gray-50">
-          <p className="text-sm text-gray-500">{t('adminPages.categorieen.dragHint')}</p>
+        <div className="px-4 py-3 border-b bg-gray-50 flex items-center gap-2">
+          <span className="text-gray-400 text-sm">☰</span>
+          <p className="text-sm text-gray-500">Sleep om de volgorde aan te passen · klik op naam om te bewerken</p>
         </div>
         {categories.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <span className="text-4xl mb-4 block">📂</span>
-            <p>{t('adminPages.categorieen.noItems')}</p>
+          <div className="p-12 text-center">
+            <span className="text-5xl mb-4 block">📂</span>
+            <p className="text-gray-500 font-medium mb-1">Nog geen categorieën</p>
+            <p className="text-gray-400 text-sm">Voeg hierboven een eerste categorie toe</p>
           </div>
         ) : (
-          <Reorder.Group values={categories} onReorder={setCategories} className="divide-y">
+          <Reorder.Group values={categories} onReorder={setCategories} className="divide-y divide-gray-100">
             {categories.map((category) => (
-              <Reorder.Item key={category.id} value={category} className="p-4 bg-white hover:bg-gray-50 cursor-grab active:cursor-grabbing">
-                <div className="flex items-center gap-4">
-                  <span className="text-gray-400">⋮⋮</span>
-                  
+              <Reorder.Item key={category.id} value={category} className="bg-white hover:bg-gray-50 cursor-grab active:cursor-grabbing transition-colors">
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <span className="text-gray-300 text-lg select-none">⠿</span>
+
                   {editingId === category.id ? (
                     <input
                       type="text"
@@ -198,32 +202,35 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
                       onBlur={() => setEditingId(null)}
                       onKeyDown={(e) => e.key === 'Enter' && setEditingId(null)}
                       autoFocus
-                      className="flex-1 px-3 py-2 border border-blue-500 rounded-lg focus:outline-none"
+                      className="flex-1 px-3 py-1.5 border-2 border-blue-500 rounded-lg focus:outline-none text-base font-medium"
                     />
                   ) : (
-                    <span 
-                      className="flex-1 font-medium text-gray-900 cursor-pointer hover:text-blue-600"
+                    <span
+                      className="flex-1 font-medium text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
                       onClick={() => setEditingId(category.id!)}
+                      title="Klik om naam te bewerken"
                     >
                       {category.name}
                     </span>
                   )}
 
+                  {/* Zichtbaar toggle */}
                   <button
                     onClick={() => toggleVisible(category.id!)}
-                    className={`p-2 rounded-lg transition-colors ${
-                      category.is_active 
-                        ? 'bg-green-100 text-green-600' 
-                        : 'bg-gray-100 text-gray-400'
-                    }`}
-                    title={category.is_active ? t('adminPages.categorieen.visible') : t('adminPages.categorieen.hidden')}
+                    className={`relative w-10 h-5 rounded-full transition-colors flex-shrink-0 ${category.is_active ? 'bg-green-500' : 'bg-gray-200'}`}
+                    title={category.is_active ? 'Zichtbaar' : 'Verborgen'}
                   >
-                    {category.is_active ? '👁️' : '🙈'}
+                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${category.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
                   </button>
+
+                  <span className={`text-xs font-medium w-16 text-right ${category.is_active ? 'text-green-600' : 'text-gray-400'}`}>
+                    {category.is_active ? 'Zichtbaar' : 'Verborgen'}
+                  </span>
 
                   <button
                     onClick={() => handleDelete(category.id!)}
-                    className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
+                    className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Verwijderen"
                   >
                     🗑️
                   </button>
