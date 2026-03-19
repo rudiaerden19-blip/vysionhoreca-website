@@ -749,7 +749,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Tenant naam */}
         <div className="flex-1 flex items-center justify-center">
           <span className="text-red-700 font-medium text-xl tracking-normal">
-            {tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+            {tenantInfo?.business_name || tenant.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
           </span>
         </div>
 
