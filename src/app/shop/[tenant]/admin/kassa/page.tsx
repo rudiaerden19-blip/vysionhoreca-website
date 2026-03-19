@@ -1103,12 +1103,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                   className="w-full text-right text-3xl font-bold bg-transparent border-none outline-none text-black"
                 />
               </div>
-              <div className="grid grid-cols-4 gap-2 flex-1">
+              <div className="grid grid-cols-4 grid-rows-4 gap-2 flex-1">
                 {['7','8','9','+','4','5','6','-','1','2','3','×','C','0','.','='].map(key => (
                   <button
                     key={key}
                     onClick={() => handleNumpad(key)}
-                    className={`h-16 sm:h-20 rounded-xl font-bold text-2xl transition-colors active:scale-95 shadow-sm ${
+                    className={`rounded-xl font-bold text-2xl transition-colors active:scale-95 shadow-sm ${
                       key === 'C' ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                       : key === '=' ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                       : ['+','-','×'].includes(key) ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
