@@ -32,7 +32,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const { locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
 
   const [navOpen, setNavOpen] = useState(false)
-  const [kassaOpen, setKassaOpen] = useState(true)
+  const [kassaOpen, setKassaOpen] = useState(false)
+  const closeNav = () => { setNavOpen(false); setKassaOpen(false) }
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
@@ -338,7 +339,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {/* Hamburger dropdown */}
         {navOpen && (
           <>
-            <div className="fixed inset-0 z-10" onClick={() => setNavOpen(false)} />
+            <div className="fixed inset-0 z-10" onClick={closeNav} />
             <div className="absolute top-14 left-0 z-20 w-64 bg-white border border-gray-200 rounded-br-2xl shadow-xl overflow-y-auto max-h-[80vh]">
               {/* Kassa uitklapper */}
               <button
@@ -351,23 +352,23 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               </button>
               {kassaOpen && (
                 <>
-                  <Link href={`${baseUrl}/kassa`} onClick={() => setNavOpen(false)}
+                  <Link href={`${baseUrl}/kassa`} onClick={closeNav}
                     className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-[#3C4D6B] transition-colors bg-blue-50/40">
                     <span className="text-lg">🖥️</span> Ga naar kassa
                   </Link>
-                  <Link href={`${baseUrl}/categorieen`} onClick={() => setNavOpen(false)}
+                  <Link href={`${baseUrl}/categorieen`} onClick={closeNav}
                     className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                     <span className="text-lg">📁</span> Categorieën
                   </Link>
-                  <Link href={`${baseUrl}/producten`} onClick={() => setNavOpen(false)}
+                  <Link href={`${baseUrl}/producten`} onClick={closeNav}
                     className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                     <span className="text-lg">🍟</span> Producten
                   </Link>
-                  <Link href={`${baseUrl}/opties`} onClick={() => setNavOpen(false)}
+                  <Link href={`${baseUrl}/opties`} onClick={closeNav}
                     className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                     <span className="text-lg">➕</span> Opties & Extra's
                   </Link>
-                  <Link href={`${baseUrl}/allergenen`} onClick={() => setNavOpen(false)}
+                  <Link href={`${baseUrl}/allergenen`} onClick={closeNav}
                     className="flex items-center gap-3 pl-10 pr-5 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                     <span className="text-lg">⚠️</span> Allergenen
                   </Link>
@@ -378,15 +379,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               <div className="px-4 pt-3 pb-1">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Overige</p>
               </div>
-              <Link href={baseUrl} onClick={() => setNavOpen(false)}
+              <Link href={baseUrl} onClick={closeNav}
                 className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">🛒</span> Online Platform
               </Link>
-              <Link href={`${baseUrl}/reserveringen`} onClick={() => setNavOpen(false)}
+              <Link href={`${baseUrl}/reserveringen`} onClick={closeNav}
                 className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">📅</span> Reservaties
               </Link>
-              <Link href={`/shop/${tenant}`} target="_blank" onClick={() => setNavOpen(false)}
+              <Link href={`/shop/${tenant}`} target="_blank" onClick={closeNav}
                 className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">🔗</span> Bekijk je shop
               </Link>
