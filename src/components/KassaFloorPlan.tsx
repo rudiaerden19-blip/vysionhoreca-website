@@ -35,6 +35,66 @@ interface Props {
 
 function makeId() { return Math.random().toString(36).slice(2, 10) }
 
+export type DecorType = 'bar_segment' | 'plant'
+export interface DecorItem {
+  id: string
+  type: DecorType
+  x: number
+  y: number
+  rotation: number
+}
+
+function DecorSVG({ item, isSelected }: { item: DecorItem; isSelected: boolean }) {
+  if (item.type === 'plant') {
+    return (
+      <svg width={60} height={60} style={{ overflow: 'visible' }}>
+        <circle cx={30} cy={30} r={28} fill="#2d6a2d" stroke={isSelected ? '#fff' : '#1a3d1a'} strokeWidth={isSelected ? 3 : 2} filter="url(#pshadow)" />
+        <circle cx={22} cy={22} r={12} fill="#3a8a3a" />
+        <circle cx={38} cy={20} r={10} fill="#4aaa4a" />
+        <circle cx={30} cy={35} r={11} fill="#3a8a3a" />
+        <circle cx={18} cy={34} r={9} fill="#2d6a2d" />
+        <circle cx={42} cy={32} r={9} fill="#2d6a2d" />
+        <rect x={27} y={42} width={6} height={10} rx={2} fill="#8B4513" />
+        <defs>
+          <filter id="pshadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.4" />
+          </filter>
+        </defs>
+      </svg>
+    )
+  }
+  // bar_segment: balk + 2 krukken aan de voorkant
+  const bw = 140; const bh = 44
+  const stoolR = 14
+  return (
+    <svg width={bw} height={bh + stoolR * 2 + 10} style={{ overflow: 'visible' }}>
+      <defs>
+        <linearGradient id="bar-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#6b6b6b" />
+          <stop offset="40%" stopColor="#4a4a4a" />
+          <stop offset="100%" stopColor="#2a2a2a" />
+        </linearGradient>
+        <filter id="bshadow" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="3" stdDeviation="5" floodOpacity="0.5" />
+        </filter>
+      </defs>
+      {/* Bar balk */}
+      <rect x={0} y={stoolR * 2 + 6} width={bw} height={bh} rx={6}
+        fill="url(#bar-grad)" stroke={isSelected ? '#60a5fa' : '#222'} strokeWidth={isSelected ? 3 : 2} filter="url(#bshadow)" />
+      {/* Rand bovenop */}
+      <rect x={0} y={stoolR * 2 + 6} width={bw} height={8} rx={3} fill="#888" opacity={0.5} />
+      {/* Label */}
+      <text x={bw / 2} y={stoolR * 2 + 6 + bh / 2 + 5} textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize={11} fontWeight="bold">TOOG</text>
+      {/* Kruk 1 */}
+      <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR} fill="#8B6914" stroke="#5a4010" strokeWidth={2} />
+      <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR - 5} fill="#a07820" opacity={0.6} />
+      {/* Kruk 2 */}
+      <circle cx={bw * 0.72} cy={stoolR + 2} r={stoolR} fill="#8B6914" stroke="#5a4010" strokeWidth={2} />
+      <circle cx={bw * 0.72} cy={stoolR + 2} r={stoolR - 5} fill="#a07820" opacity={0.6} />
+    </svg>
+  )
+}
+
 function TableSVG({ table, isSelected, onClick }: {
   table: KassaTable
   isSelected: boolean
@@ -230,22 +290,53 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
   const [addNumber, setAddNumber] = useState('')
   const [addSeats, setAddSeats] = useState(4)
   const [addShape, setAddShape] = useState<TableShape>('SQUARE')
+  const decorKey = `vysion_decor_${tenant}`
+  const [decors, setDecors] = useState<DecorItem[]>([])
+  const [selectedDecor, setSelectedDecor] = useState<DecorItem | null>(null)
+
   const draggingId = useRef<string | null>(null)
+  const draggingType = useRef<'table' | 'decor'>('table')
   const dragOffset = useRef({ x: 0, y: 0 })
   const dragMoved = useRef(false)
   const pointerStart = useRef({ x: 0, y: 0 })
-  const [isDragging, setIsDragging] = useState(false) // alleen voor cursor styling
+  const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(storageKey)
       if (raw) setTables(JSON.parse(raw))
     } catch { /* empty */ }
-  }, [storageKey])
+    try {
+      const raw = localStorage.getItem(decorKey)
+      if (raw) setDecors(JSON.parse(raw))
+    } catch { /* empty */ }
+  }, [storageKey, decorKey])
 
   const save = (updated: KassaTable[]) => {
     setTables(updated)
     localStorage.setItem(storageKey, JSON.stringify(updated))
+  }
+
+  const saveDecor = (updated: DecorItem[]) => {
+    setDecors(updated)
+    localStorage.setItem(decorKey, JSON.stringify(updated))
+  }
+
+  const addDecor = (type: DecorType) => {
+    const d: DecorItem = { id: makeId(), type, x: 20 + Math.random() * 60, y: 20 + Math.random() * 60, rotation: 0 }
+    saveDecor([...decors, d])
+  }
+
+  const deleteDecor = (id: string) => {
+    saveDecor(decors.filter(d => d.id !== id))
+    setSelectedDecor(null)
+  }
+
+  const rotateDecor = (id: string, delta: number) => {
+    const updated = decors.map(d => d.id === id ? { ...d, rotation: (d.rotation + delta + 360) % 360 } : d)
+    saveDecor(updated)
+    const sel = updated.find(d => d.id === id)
+    if (sel) setSelectedDecor(sel)
   }
 
   const addTable = () => {
@@ -280,19 +371,20 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
 
   // Pointer events — werkt op iPad (touch) én desktop (mouse)
   // Refs worden gebruikt om stale closure problemen te vermijden
-  const handlePointerDown = (e: React.PointerEvent, id: string) => {
+  const handlePointerDown = (e: React.PointerEvent, id: string, type: 'table' | 'decor') => {
     e.stopPropagation()
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
     const floor = document.querySelector('.floor-plan') as HTMLElement
     if (!floor) return
     const rect = floor.getBoundingClientRect()
-    const t = tables.find(t => t.id === id)!
+    const item = type === 'table' ? tables.find(t => t.id === id)! : decors.find(d => d.id === id)!
     draggingId.current = id
+    draggingType.current = type
     dragMoved.current = false
     pointerStart.current = { x: e.clientX, y: e.clientY }
     dragOffset.current = {
-      x: e.clientX - rect.left - (t.x / 100) * rect.width,
-      y: e.clientY - rect.top - (t.y / 100) * rect.height,
+      x: e.clientX - rect.left - (item.x / 100) * rect.width,
+      y: e.clientY - rect.top - (item.y / 100) * rect.height,
     }
     setIsDragging(true)
   }
@@ -304,20 +396,21 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
     if (dx < 8 && dy < 8) return
     dragMoved.current = true
     const rect = e.currentTarget.getBoundingClientRect()
-    const x = ((e.clientX - rect.left - dragOffset.current.x) / rect.width) * 100
-    const y = ((e.clientY - rect.top - dragOffset.current.y) / rect.height) * 100
-    setTables(prev => prev.map(t => t.id === draggingId.current
-      ? { ...t, x: Math.max(5, Math.min(92, x)), y: Math.max(5, Math.min(92, y)) }
-      : t
-    ))
+    const x = Math.max(5, Math.min(92, ((e.clientX - rect.left - dragOffset.current.x) / rect.width) * 100))
+    const y = Math.max(5, Math.min(92, ((e.clientY - rect.top - dragOffset.current.y) / rect.height) * 100))
+    if (draggingType.current === 'table') {
+      setTables(prev => prev.map(t => t.id === draggingId.current ? { ...t, x, y } : t))
+    } else {
+      setDecors(prev => prev.map(d => d.id === draggingId.current ? { ...d, x, y } : d))
+    }
   }
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (!draggingId.current) return
-    localStorage.setItem(storageKey, JSON.stringify(tables))
+    if (draggingType.current === 'table') localStorage.setItem(storageKey, JSON.stringify(tables))
+    else localStorage.setItem(decorKey, JSON.stringify(decors))
     draggingId.current = null
     setIsDragging(false)
-    // dragMoved.current wordt gereset na de click event (setTimeout)
     setTimeout(() => { dragMoved.current = false }, 0)
   }
 
@@ -334,7 +427,15 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
         <div className="flex gap-2">
           <button onClick={() => setShowAddModal(true)}
             className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors">
-            + Tafel
+            🪑 Tafel
+          </button>
+          <button onClick={() => addDecor('bar_segment')}
+            className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-sm font-semibold transition-colors">
+            🍺 Toogstuk
+          </button>
+          <button onClick={() => addDecor('plant')}
+            className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg text-sm font-semibold transition-colors">
+            🌿 Plant
           </button>
           <button onClick={onClose}
             className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-semibold transition-colors">
@@ -360,8 +461,33 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
           }}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          onClick={() => { if (!isDragging) setSelected(null) }}
+          onClick={() => { if (!isDragging) { setSelected(null); setSelectedDecor(null) } }}
         >
+          {/* Decor items (achtergrond laag) */}
+          {decors.map(d => (
+            <div key={d.id} className="absolute"
+              style={{
+                left: `${d.x}%`, top: `${d.y}%`,
+                transform: `translate(-50%, -50%) rotate(${d.rotation}deg)`,
+                zIndex: selectedDecor?.id === d.id ? 9 : 0,
+                cursor: isDragging ? 'grabbing' : 'grab',
+                touchAction: 'none',
+              }}
+              onPointerDown={(e) => handlePointerDown(e, d.id, 'decor')}
+              onPointerUp={(e) => {
+                e.stopPropagation()
+                handlePointerUp(e)
+                if (!dragMoved.current) {
+                  setSelectedDecor(prev => prev?.id === d.id ? null : d)
+                  setSelected(null)
+                }
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} />
+            </div>
+          ))}
+
           {tables.map(t => (
             <div
               key={t.id}
@@ -374,12 +500,13 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
                 cursor: isDragging ? 'grabbing' : 'grab',
                 touchAction: 'none',
               }}
-              onPointerDown={(e) => handlePointerDown(e, t.id)}
+              onPointerDown={(e) => handlePointerDown(e, t.id, 'table')}
               onPointerUp={(e) => {
                 e.stopPropagation()
                 handlePointerUp(e)
                 if (!dragMoved.current) {
                   setSelected(prev => prev?.id === t.id ? null : t)
+                  setSelectedDecor(null)
                 }
               }}
               onClick={(e) => { e.stopPropagation() }}
@@ -404,7 +531,34 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
           )}
         </div>
 
-        {/* Sidebar */}
+        {/* Decor Sidebar */}
+        {selectedDecor && !selected && (
+          <div className="w-64 bg-[#16213e] border-l border-white/10 flex flex-col">
+            <div className="p-4 border-b border-white/10 flex justify-between items-center">
+              <h3 className="text-white font-bold text-lg">{selectedDecor.type === 'plant' ? '🌿 Plant' : '🍺 Toogstuk'}</h3>
+              <button onClick={() => setSelectedDecor(null)} className="text-white/50 hover:text-white text-xl">✕</button>
+            </div>
+            <div className="p-4 border-b border-white/10">
+              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
+              <div className="flex gap-2">
+                <button onClick={() => rotateDecor(selectedDecor.id, -45)}
+                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg">↺</button>
+                <button onClick={() => rotateDecor(selectedDecor.id, 45)}
+                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg">↻</button>
+                <button onClick={() => rotateDecor(selectedDecor.id, -selectedDecor.rotation)}
+                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold">Reset</button>
+              </div>
+            </div>
+            <div className="p-4 mt-auto">
+              <button onClick={() => deleteDecor(selectedDecor.id)}
+                className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold">
+                🗑 Verwijder
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Tafel Sidebar */}
         {selected && (
           <div className="w-72 bg-[#16213e] border-l border-white/10 flex flex-col">
             <div className="p-4 border-b border-white/10 flex justify-between items-center">
