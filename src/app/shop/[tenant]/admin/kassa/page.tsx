@@ -67,20 +67,28 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }, [])
 
   // Laad categorieën, producten en welke producten opties hebben
+  const loadMenu = async () => {
+    setMenuLoading(true)
+    const [cats, prods, withOpts] = await Promise.all([
+      getMenuCategories(tenant),
+      getMenuProducts(tenant),
+      getProductsWithOptions(tenant),
+    ])
+    setCategories(cats.filter(c => c.is_active))
+    setProducts(prods.filter(p => p.is_active))
+    setProductsWithOptions(withOpts)
+    setMenuLoading(false)
+  }
+
   useEffect(() => {
-    async function load() {
-      setMenuLoading(true)
-      const [cats, prods, withOpts] = await Promise.all([
-        getMenuCategories(tenant),
-        getMenuProducts(tenant),
-        getProductsWithOptions(tenant),
-      ])
-      setCategories(cats.filter(c => c.is_active))
-      setProducts(prods.filter(p => p.is_active))
-      setProductsWithOptions(withOpts)
-      setMenuLoading(false)
-    }
-    load()
+    loadMenu()
+  }, [tenant])
+
+  // Herlaad menu wanneer pagina weer focus krijgt (na terugkeren van producten/categorieen pagina)
+  useEffect(() => {
+    const onFocus = () => loadMenu()
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
   }, [tenant])
 
   // Sound init
@@ -330,25 +338,52 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {navOpen && (
           <>
             <div className="fixed inset-0 z-10" onClick={() => setNavOpen(false)} />
-            <div className="absolute top-14 left-0 z-20 w-64 bg-white border border-gray-200 rounded-br-2xl shadow-xl overflow-hidden">
+            <div className="absolute top-14 left-0 z-20 w-64 bg-white border border-gray-200 rounded-br-2xl shadow-xl overflow-y-auto max-h-[80vh]">
+              {/* Kassa */}
               <Link href={`${baseUrl}/kassa`} onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 bg-blue-50 border-b border-gray-100 font-bold text-[#3C4D6B]">
+                className="flex items-center gap-3 px-5 py-3.5 bg-blue-50 border-b border-gray-100 font-bold text-[#3C4D6B]">
                 <span className="text-xl">🖥️</span> Kassa
               </Link>
+
+              {/* Menu beheer */}
+              <div className="px-4 pt-3 pb-1">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Menu beheer</p>
+              </div>
+              <Link href={`${baseUrl}/categorieen`} onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
+                <span className="text-xl">📁</span> Categorieën
+              </Link>
+              <Link href={`${baseUrl}/producten`} onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
+                <span className="text-xl">🍟</span> Producten
+              </Link>
+              <Link href={`${baseUrl}/opties`} onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
+                <span className="text-xl">➕</span> Opties & Extra's
+              </Link>
+              <Link href={`${baseUrl}/allergenen`} onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
+                <span className="text-xl">⚠️</span> Allergenen
+              </Link>
+
+              {/* Overige */}
+              <div className="px-4 pt-3 pb-1">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Overige</p>
+              </div>
               <Link href={baseUrl} onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
+                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">🛒</span> Online Platform
               </Link>
-              <Link href={`${baseUrl}/reservaties`} onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
+              <Link href={`${baseUrl}/reserveringen`} onClick={() => setNavOpen(false)}
+                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">📅</span> Reservaties
               </Link>
               <Link href={`/shop/${tenant}`} target="_blank" onClick={() => setNavOpen(false)}
-                className="flex items-center gap-3 px-5 py-4 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
+                className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 border-b border-gray-100 font-semibold text-gray-700 transition-colors">
                 <span className="text-xl">🔗</span> Bekijk je shop
               </Link>
               <button onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-5 py-4 hover:bg-red-50 font-semibold text-red-600 transition-colors">
+                className="w-full flex items-center gap-3 px-5 py-3 hover:bg-red-50 font-semibold text-red-600 transition-colors">
                 <span className="text-xl">🚪</span> Uitloggen
               </button>
             </div>
