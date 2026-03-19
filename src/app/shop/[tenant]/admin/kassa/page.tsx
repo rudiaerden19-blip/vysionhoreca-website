@@ -52,6 +52,16 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
 
   const [showFloorPlan, setShowFloorPlan] = useState(false)
+  const [showTablePicker, setShowTablePicker] = useState(false)
+  const [kassaTables, setKassaTables] = useState<{ id: string; number: string; status: string }[]>([])
+
+  // Laad tafels uit localStorage
+  useEffect(() => {
+    const raw = localStorage.getItem(`vysion_tables_${tenant}`)
+    if (raw) {
+      try { setKassaTables(JSON.parse(raw)) } catch { /* empty */ }
+    }
+  }, [tenant, showTablePicker])
 
   // Betaling
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -652,13 +662,74 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
         {/* Tafel knop */}
         {orderType === 'DINE_IN' && (
-          <div className="px-3 pt-3">
+          <div className="px-3 pt-3 relative">
             <button
-              onClick={() => setShowFloorPlan(true)}
+              onClick={() => setShowTablePicker(p => !p)}
               className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors"
             >
               {tableNumber ? `🪑 Tafel ${tableNumber}` : 'Kies tafel...'}
             </button>
+
+            {/* Tafel picker popup */}
+            {showTablePicker && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowTablePicker(false)} />
+                <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+                  <div className="p-3 border-b bg-gray-50">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Kies tafel</p>
+                  </div>
+                  {kassaTables.length === 0 ? (
+                    <div className="p-4 text-center text-gray-400 text-sm">
+                      Nog geen tafels aangemaakt
+                    </div>
+                  ) : (
+                    <div className="p-2 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                      {kassaTables.map(t => (
+                        <button
+                          key={t.id}
+                          onClick={() => {
+                            setTableNumber(t.number)
+                            setOrderType('DINE_IN')
+                            setShowTablePicker(false)
+                          }}
+                          className={`py-3 rounded-xl font-bold text-sm transition-colors border-2 ${
+                            tableNumber === t.number
+                              ? 'bg-[#3C4D6B] text-white border-[#3C4D6B]'
+                              : t.status === 'FREE'
+                              ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
+                              : t.status === 'UNPAID'
+                              ? 'bg-amber-50 text-amber-700 border-amber-300 hover:bg-amber-100'
+                              : 'bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100'
+                          }`}
+                        >
+                          <div className="text-lg">🪑</div>
+                          <div>{t.number}</div>
+                          <div className="text-[10px] opacity-70">
+                            {t.status === 'FREE' ? 'Vrij' : t.status === 'OCCUPIED' ? 'Bezet' : 'Onbetaald'}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <div className="p-2 border-t bg-gray-50 flex gap-2">
+                    {tableNumber && (
+                      <button
+                        onClick={() => { setTableNumber(''); setShowTablePicker(false) }}
+                        className="flex-1 py-2 rounded-xl bg-red-50 text-red-600 font-semibold text-sm hover:bg-red-100 transition-colors"
+                      >
+                        ✕ Geen tafel
+                      </button>
+                    )}
+                    <button
+                      onClick={() => { setShowTablePicker(false); setShowFloorPlan(true) }}
+                      className="flex-1 py-2 rounded-xl bg-[#3C4D6B] text-white font-semibold text-sm hover:bg-[#2D3A52] transition-colors"
+                    >
+                      🗺️ Plattegrond
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 
