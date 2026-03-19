@@ -705,33 +705,39 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '⭐', label: 'Reviews', href: '/reviews' },
               ]},
             ]
+            const activeSec = sections.find(s => s.key === onlineSubOpen)
             return (
-              <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 z-30 overflow-y-auto" style={{ width: 280, maxHeight: '82vh' }}>
-                <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0">Online Platform</div>
-                {sections.map(sec => (
-                  <div key={sec.key} className="border-b border-gray-100 last:border-0">
-                    <button
+              <div className="flex">
+                {/* Eerste kolom: secties */}
+                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 z-30 overflow-y-auto" style={{ width: 240, maxHeight: '82vh' }}>
+                  <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Online Platform</div>
+                  {sections.map(sec => (
+                    <button key={sec.key}
                       onClick={() => setOnlineSubOpen(onlineSubOpen === sec.key ? null : sec.key)}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+                      className={`w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-0 transition-colors ${onlineSubOpen === sec.key ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
                       <div className="flex items-center gap-3">
                         <span className="text-lg">{sec.icon}</span>
-                        <span className="font-semibold text-sm text-gray-700 uppercase tracking-wide">{sec.label}</span>
+                        <span className="font-semibold text-sm text-gray-700">{sec.label}</span>
                       </div>
-                      <svg className={`w-4 h-4 text-gray-400 transition-transform ${onlineSubOpen === sec.key ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                      <svg className={`w-4 h-4 text-gray-400 transition-transform ${onlineSubOpen === sec.key ? 'text-blue-500' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                     </button>
-                    {onlineSubOpen === sec.key && (
-                      <div className="bg-blue-50/50 border-t border-gray-100">
-                        {sec.items.map(item => (
-                          <Link key={item.href} href={`${baseUrl}${item.href}`} onClick={() => { setFlyoutOpen(null); setOnlineSubOpen(null) }}
-                            className="flex items-center gap-3 px-6 py-2.5 hover:bg-blue-100 text-sm text-gray-700 transition-colors">
-                            <span>{item.icon}</span>
-                            <span>{item.label}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
+                  ))}
+                </div>
+                {/* Tweede popup: sub-items rechts naast eerste */}
+                {activeSec && (
+                  <div className="ml-2 bg-white rounded-2xl shadow-2xl border border-gray-100 z-30 overflow-y-auto" style={{ width: 220, maxHeight: '82vh' }}>
+                    <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl flex items-center gap-2">
+                      <span>{activeSec.icon}</span> {activeSec.label}
+                    </div>
+                    {activeSec.items.map(item => (
+                      <Link key={item.href} href={`${baseUrl}${item.href}`} onClick={() => { setFlyoutOpen(null); setOnlineSubOpen(null) }}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
+                        <span>{item.icon}</span>
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
             )
           })()}
