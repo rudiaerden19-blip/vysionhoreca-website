@@ -387,7 +387,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
               <TableSVG
                 table={t}
                 isSelected={selected?.id === t.id}
-                onClick={(e) => { e.stopPropagation() }}
+                onClick={(e) => { e?.stopPropagation() }}
               />
             </div>
           ))}
