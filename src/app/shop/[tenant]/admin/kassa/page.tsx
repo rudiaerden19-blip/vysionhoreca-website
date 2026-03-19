@@ -695,32 +695,32 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
             {/* Verticale icon-rail */}
             <div className="absolute top-14 left-0 z-30 bg-[#1e293b] flex flex-col py-2 shadow-2xl"
-              style={{ width: 72 }}>
+              style={{ width: 100 }}>
 
               {/* Kassa */}
               <button
                 onClick={() => setFlyoutOpen(flyoutOpen === 'kassa' ? null : 'kassa')}
-                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'kassa' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-2xl">🖥️</span>
-                <span className="text-[10px] text-white font-semibold leading-tight">Kassa</span>
+                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'kassa' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-4xl">🖥️</span>
+                <span className="text-xs text-white font-bold leading-tight">Kassa</span>
                 {flyoutOpen === 'kassa' && (
                   <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 220 }}>
-                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Kassa</div>
-                    <Link href={`${baseUrl}/kassa`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-[#3C4D6B] text-sm transition-colors">
-                      <span>🖥️</span> Ga naar kassa
+                    style={{ width: 260 }}>
+                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Kassa</div>
+                    <Link href={`${baseUrl}/kassa`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 border-b border-gray-100 font-semibold text-[#3C4D6B] text-base transition-colors">
+                      <span className="text-xl">🖥️</span> Ga naar kassa
                     </Link>
-                    <Link href={`${baseUrl}/categorieen`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>📁</span> Categorieën
+                    <Link href={`${baseUrl}/categorieen`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">📁</span> Categorieën
                     </Link>
-                    <Link href={`${baseUrl}/producten`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>🍟</span> Producten
+                    <Link href={`${baseUrl}/producten`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">🍟</span> Producten
                     </Link>
-                    <Link href={`${baseUrl}/opties`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>➕</span> Opties & Extra&apos;s
+                    <Link href={`${baseUrl}/opties`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">➕</span> Opties & Extra&apos;s
                     </Link>
-                    <Link href={`${baseUrl}/allergenen`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>⚠️</span> Allergenen
+                    <Link href={`${baseUrl}/allergenen`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">⚠️</span> Allergenen
                     </Link>
                   </div>
                 )}
@@ -729,15 +729,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               {/* Online Platform */}
               <button
                 onClick={() => setFlyoutOpen(flyoutOpen === 'online' ? null : 'online')}
-                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'online' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-2xl">🛒</span>
-                <span className="text-[10px] text-white font-semibold leading-tight text-center">Online</span>
+                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'online' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-4xl">🛒</span>
+                <span className="text-xs text-white font-bold leading-tight text-center">Online</span>
                 {flyoutOpen === 'online' && (
                   <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 220 }}>
-                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Online Platform</div>
-                    <Link href={baseUrl} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>🛒</span> Online Platform
+                    style={{ width: 260 }}>
+                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Online Platform</div>
+                    <Link href={baseUrl} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">🛒</span> Online Platform
                     </Link>
                   </div>
                 )}
@@ -746,15 +746,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               {/* Marketing */}
               <button
                 onClick={() => setFlyoutOpen(flyoutOpen === 'marketing' ? null : 'marketing')}
-                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'marketing' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-2xl">📣</span>
-                <span className="text-[10px] text-white font-semibold leading-tight">Marketing</span>
+                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'marketing' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-4xl">📣</span>
+                <span className="text-xs text-white font-bold leading-tight">Marketing</span>
                 {flyoutOpen === 'marketing' && (
                   <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 220 }}>
-                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Marketing</div>
-                    <Link href={`${baseUrl}/marketing`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>📣</span> Marketing
+                    style={{ width: 260 }}>
+                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Marketing</div>
+                    <Link href={`${baseUrl}/marketing`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">📣</span> Marketing
                     </Link>
                   </div>
                 )}
@@ -763,15 +763,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               {/* Personeel */}
               <button
                 onClick={() => setFlyoutOpen(flyoutOpen === 'personeel' ? null : 'personeel')}
-                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'personeel' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-2xl">👔</span>
-                <span className="text-[10px] text-white font-semibold leading-tight">Personeel</span>
+                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'personeel' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-4xl">👔</span>
+                <span className="text-xs text-white font-bold leading-tight">Personeel</span>
                 {flyoutOpen === 'personeel' && (
                   <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 220 }}>
-                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Personeel</div>
-                    <Link href={`${baseUrl}/personeel`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>👔</span> Personeel
+                    style={{ width: 260 }}>
+                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Personeel</div>
+                    <Link href={`${baseUrl}/personeel`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">👔</span> Personeel
                     </Link>
                   </div>
                 )}
@@ -780,15 +780,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               {/* Kostenberekening */}
               <button
                 onClick={() => setFlyoutOpen(flyoutOpen === 'kosten' ? null : 'kosten')}
-                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'kosten' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-2xl">🧮</span>
-                <span className="text-[10px] text-white font-semibold leading-tight text-center">Kosten</span>
+                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'kosten' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-4xl">🧮</span>
+                <span className="text-xs text-white font-bold leading-tight text-center">Kosten</span>
                 {flyoutOpen === 'kosten' && (
                   <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 220 }}>
-                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Kostenberekening</div>
-                    <Link href={`${baseUrl}/kosten/instellingen`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>🧮</span> Kostenberekening
+                    style={{ width: 260 }}>
+                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Kostenberekening</div>
+                    <Link href={`${baseUrl}/kosten/instellingen`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">🧮</span> Kostenberekening
                     </Link>
                   </div>
                 )}
@@ -797,15 +797,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               {/* Bonnenprinter */}
               <button
                 onClick={() => setFlyoutOpen(flyoutOpen === 'bonnen' ? null : 'bonnen')}
-                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'bonnen' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-2xl">🖨️</span>
-                <span className="text-[10px] text-white font-semibold leading-tight text-center">Printer</span>
+                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'bonnen' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-4xl">🖨️</span>
+                <span className="text-xs text-white font-bold leading-tight text-center">Printer</span>
                 {flyoutOpen === 'bonnen' && (
                   <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 220 }}>
-                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">Bonnenprinter</div>
-                    <Link href={`${baseUrl}/bonnenprinter`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>🖨️</span> Bonnenprinter
+                    style={{ width: 260 }}>
+                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">Bonnenprinter</div>
+                    <Link href={`${baseUrl}/bonnenprinter`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">🖨️</span> Bonnenprinter
                     </Link>
                   </div>
                 )}
@@ -814,15 +814,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               {/* GKS Rapporten */}
               <button
                 onClick={() => setFlyoutOpen(flyoutOpen === 'gks' ? null : 'gks')}
-                className={`relative flex flex-col items-center justify-center gap-1 py-3 px-1 transition-colors ${flyoutOpen === 'gks' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
-                <span className="text-2xl">🧾</span>
-                <span className="text-[10px] text-white font-semibold leading-tight text-center">GKS</span>
+                className={`relative flex flex-col items-center justify-center gap-1.5 py-4 px-2 transition-colors ${flyoutOpen === 'gks' ? 'bg-blue-600' : 'hover:bg-white/10'}`}>
+                <span className="text-4xl">🧾</span>
+                <span className="text-xs text-white font-bold leading-tight text-center">GKS</span>
                 {flyoutOpen === 'gks' && (
                   <div className="absolute left-full top-0 z-40 bg-white rounded-r-2xl shadow-2xl border border-gray-100 overflow-hidden"
-                    style={{ width: 220 }}>
-                    <div className="px-4 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider">GKS Rapporten</div>
-                    <Link href={`${baseUrl}/z-rapport`} onClick={closeNav} className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors">
-                      <span>🧾</span> GKS Rapporten
+                    style={{ width: 260 }}>
+                    <div className="px-5 py-3 bg-blue-600 text-white text-sm font-bold uppercase tracking-wider">GKS Rapporten</div>
+                    <Link href={`${baseUrl}/z-rapport`} onClick={closeNav} className="flex items-center gap-3 px-5 py-4 hover:bg-blue-50 font-semibold text-gray-700 text-base transition-colors">
+                      <span className="text-xl">🧾</span> GKS Rapporten
                     </Link>
                   </div>
                 )}
@@ -831,23 +831,23 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               {/* Reservaties */}
               <button
                 onClick={() => { closeNav(); setShowReservations(true) }}
-                className="flex flex-col items-center justify-center gap-1 py-3 px-1 hover:bg-white/10 transition-colors">
-                <span className="text-2xl">📅</span>
-                <span className="text-[10px] text-white font-semibold leading-tight">Reservaties</span>
+                className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 hover:bg-white/10 transition-colors">
+                <span className="text-4xl">📅</span>
+                <span className="text-xs text-white font-bold leading-tight">Reservaties</span>
               </button>
 
               {/* Bekijk shop */}
               <Link href={`/shop/${tenant}`} target="_blank" onClick={closeNav}
-                className="flex flex-col items-center justify-center gap-1 py-3 px-1 hover:bg-white/10 transition-colors">
-                <span className="text-2xl">🔗</span>
-                <span className="text-[10px] text-white font-semibold leading-tight text-center">Shop</span>
+                className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 hover:bg-white/10 transition-colors">
+                <span className="text-4xl">🔗</span>
+                <span className="text-xs text-white font-bold leading-tight text-center">Shop</span>
               </Link>
 
               {/* Uitloggen */}
               <button onClick={handleLogout}
-                className="flex flex-col items-center justify-center gap-1 py-3 px-1 hover:bg-red-900/40 transition-colors mt-auto">
-                <span className="text-2xl">🚪</span>
-                <span className="text-[10px] text-red-400 font-semibold leading-tight">Uitloggen</span>
+                className="flex flex-col items-center justify-center gap-1.5 py-4 px-2 hover:bg-red-900/40 transition-colors mt-auto">
+                <span className="text-4xl">🚪</span>
+                <span className="text-xs text-red-400 font-bold leading-tight">Uitloggen</span>
               </button>
 
             </div>
