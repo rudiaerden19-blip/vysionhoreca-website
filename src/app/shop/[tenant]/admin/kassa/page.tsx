@@ -644,7 +644,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               <Link href={`${baseUrl}/categorieen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📁</span> Categorieën</Link>
               <Link href={`${baseUrl}/producten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🍟</span> Producten</Link>
               <Link href={`${baseUrl}/opties`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">➕</span> Opties & Extra&apos;s</Link>
-              <Link href={`${baseUrl}/allergenen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚠️</span> Allergenen</Link>
+              <Link href={`${baseUrl}/allergenen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚠️</span> Allergenen</Link>
+              <Link href={`${baseUrl}/bonnenprinter`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🖨️</span> Bonnenprinter</Link>
+              <Link href={`${baseUrl}/labels`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏷️</span> Labels</Link>
             </div>
           )}
         </div>
@@ -816,23 +818,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               <Link href={`${baseUrl}/kosten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📊</span> Overzicht</Link>
               <Link href={`${baseUrl}/kosten/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Instellingen</Link>
               <Link href={`${baseUrl}/analyse`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📈</span> Analyse</Link>
-            </div>
-          )}
-        </div>
-
-        {/* Bonnenprinter */}
-        <div className="relative z-20">
-          <button onClick={() => setFlyoutOpen(flyoutOpen === 'bonnen' ? null : 'bonnen')}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'bonnen' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🖨️</span>
-            <span className="font-bold text-sm">Printer</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'bonnen' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {flyoutOpen === 'bonnen' && (
-            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
-              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Bonnenprinter</div>
-              <Link href={`${baseUrl}/bonnenprinter`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🖨️</span> Bonnenprinter</Link>
-              <Link href={`${baseUrl}/labels`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏷️</span> Labels</Link>
             </div>
           )}
         </div>
