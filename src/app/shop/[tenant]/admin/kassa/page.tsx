@@ -138,7 +138,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             table_number: tblNr,
             subtotal: 0,
             tax: 0,
-            total_amount: 0,
+            total: 0,
             items: items as unknown as Record<string, unknown>[],
             created_at: new Date().toISOString(),
           })
@@ -514,13 +514,13 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       table_number: tableNumber || null,
       subtotal: Math.round(subtotal * 100) / 100,
       tax: Math.round(tax * 100) / 100,
-      total_amount: total,
+      total: total,
       items: cart.map(i => ({
         product_id: i.product.id,
         name: i.product.name,
         price: i.product.price,
         quantity: i.quantity,
-        choices: i.choices || [],
+        options: i.choices || [],
       })),
       created_at: createdAt.toISOString(),
     }
