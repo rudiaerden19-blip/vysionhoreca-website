@@ -38,6 +38,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [flyoutOpen, setFlyoutOpen] = useState<string | null>(null)
   const [onlineSubOpen, setOnlineSubOpen] = useState<string | null>(null)
   const [personeelSubOpen, setPersoneelSubOpen] = useState<string | null>(null)
+  const [hamburgerOpen, setHamburgerOpen] = useState(false)
+  const [hamburgerSubOpen, setHamburgerSubOpen] = useState<string | null>(null)
   const closeNav = () => { setNavOpen(false); setKassaOpen(false); setFlyoutOpen(null); setOnlineSubOpen(null) }
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
@@ -622,261 +624,122 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     <div className="flex flex-col bg-[#e3e3e3] overflow-hidden" style={{ height: '100dvh' }}>
 
       {/* ── Blauwe navigatiebalk — volledige breedte ── */}
-      <div className="flex-shrink-0 bg-[#1e293b] flex items-center px-3 gap-1 relative z-30" style={{ height: 68 }}>
+      <div className="flex-shrink-0 bg-[#1e293b] flex items-center px-3 gap-2 relative z-30" style={{ height: 68 }}>
 
         {/* Backdrop sluit alles */}
-        {flyoutOpen && <div className="fixed inset-0 z-10" onClick={() => setFlyoutOpen(null)} />}
+        {(hamburgerOpen || flyoutOpen) && <div className="fixed inset-0 z-10" onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null); setFlyoutOpen(null) }} />}
 
-        {/* ── NAV ITEMS ── */}
-
-        {/* Kassa */}
+        {/* ── LINKS: Hamburger menu ── */}
         <div className="relative z-20">
-          <button onClick={() => setFlyoutOpen(flyoutOpen === 'kassa' ? null : 'kassa')}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'kassa' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🖥️</span>
-            <span className="font-bold text-sm">Kassa</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'kassa' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+          <button onClick={() => { setHamburgerOpen(!hamburgerOpen); setHamburgerSubOpen(null) }}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-colors ${hamburgerOpen ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            <span className="font-bold text-sm">Menu</span>
           </button>
-          {flyoutOpen === 'kassa' && (
-            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
-              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Kassa</div>
-              <Link href={`${baseUrl}/kassa`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-[#3C4D6B] text-sm transition-colors"><span className="text-lg">🖥️</span> Ga naar kassa</Link>
-              <Link href={`${baseUrl}/categorieen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📁</span> Categorieën</Link>
-              <Link href={`${baseUrl}/producten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🍟</span> Producten</Link>
-              <Link href={`${baseUrl}/opties`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">➕</span> Opties & Extra&apos;s</Link>
-              <Link href={`${baseUrl}/allergenen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚠️</span> Allergenen</Link>
-              <Link href={`${baseUrl}/bonnenprinter`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🖨️</span> Bonnenprinter</Link>
-              <Link href={`${baseUrl}/labels`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🏷️</span> Labels</Link>
-            </div>
-          )}
-        </div>
-
-        {/* Online Platform — accordion dropdown */}
-        <div className="relative z-20">
-          <button onClick={() => { setFlyoutOpen(flyoutOpen === 'online' ? null : 'online'); setOnlineSubOpen(null) }}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'online' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🛒</span>
-            <span className="font-bold text-sm">Online</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'online' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {flyoutOpen === 'online' && (() => {
-            const sections = [
-              { key: 'overzicht', icon: '📊', label: 'Overzicht', items: [
-                { icon: '📊', label: 'Dashboard', href: '' },
-                { icon: '📈', label: 'Bedrijfsanalyse', href: '/analyse' },
-                { icon: '💰', label: 'Verkoop', href: '/verkoop' },
-                { icon: '🔥', label: 'Populaire items', href: '/populair' },
-                { icon: '💎', label: 'Abonnement', href: '/abonnement' },
+          {hamburgerOpen && (() => {
+            const modules = [
+              { key: 'kassa', icon: '🖥️', label: 'Kassa', items: [
+                { icon: '🖥️', label: 'Ga naar kassa', href: `${baseUrl}/kassa` },
+                { icon: '📁', label: 'Categorieën', href: `${baseUrl}/categorieen` },
+                { icon: '🍟', label: 'Producten', href: `${baseUrl}/producten` },
+                { icon: '➕', label: "Opties & Extra's", href: `${baseUrl}/opties` },
+                { icon: '⚠️', label: 'Allergenen', href: `${baseUrl}/allergenen` },
+                { icon: '🖨️', label: 'Bonnenprinter', href: `${baseUrl}/bonnenprinter` },
+                { icon: '🏷️', label: 'Labels', href: `${baseUrl}/labels` },
               ]},
-              { key: 'instellingen', icon: '⚙️', label: 'Instellingen', items: [
-                { icon: '🔴', label: 'Online Status', href: '/online-status' },
-                { icon: '🏪', label: 'Bedrijfsprofiel', href: '/profiel' },
-                { icon: '🕐', label: 'Openingstijden', href: '/openingstijden' },
-                { icon: '🚗', label: 'Levering & Afhaal', href: '/levering' },
-                { icon: '💳', label: 'Betaalmethoden', href: '/betaling' },
-                { icon: '🎨', label: 'Design & Kleuren', href: '/design' },
-                { icon: '🔍', label: 'SEO', href: '/seo' },
+              { key: 'online', icon: '🛒', label: 'Online', items: [
+                { icon: '📊', label: 'Dashboard', href: `${baseUrl}` },
+                { icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
+                { icon: '⚙️', label: 'Instellingen', href: `${baseUrl}/profiel` },
+                { icon: '🍽️', label: 'Categorieën', href: `${baseUrl}/categorieen` },
+                { icon: '🍟', label: 'Producten', href: `${baseUrl}/producten` },
+                { icon: '💬', label: 'WhatsApp', href: `${baseUrl}/whatsapp` },
+                { icon: '👥', label: 'Klanten', href: `${baseUrl}/klanten` },
+                { icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
+                { icon: '🏢', label: 'Groepsbestellingen', href: `${baseUrl}/groepen` },
+                { icon: '📣', label: 'Marketing', href: `${baseUrl}/marketing` },
+                { icon: '📱', label: 'QR Codes', href: `${baseUrl}/qr-codes` },
               ]},
-              { key: 'menu', icon: '🍽️', label: 'Menu', items: [
-                { icon: '📁', label: 'Categorieën', href: '/categorieen' },
-                { icon: '🍟', label: 'Producten', href: '/producten' },
-                { icon: '➕', label: "Opties & Extra's", href: '/opties' },
-                { icon: '⚠️', label: 'Allergenen', href: '/allergenen' },
-                { icon: '📷', label: "Foto's & Media", href: '/media' },
+              { key: 'personeel', icon: '👔', label: 'Personeel', items: [
+                { icon: '👤', label: 'Medewerkers', href: `${baseUrl}/personeel` },
+                { icon: '⏱️', label: 'Urenregistratie', href: `${baseUrl}/uren` },
+                { icon: '📋', label: 'Vacatures', href: `${baseUrl}/vacatures` },
               ]},
-              { key: 'whatsapp', icon: '💬', label: 'WhatsApp', items: [
-                { icon: '⚙️', label: 'Instellingen', href: '/whatsapp' },
+              { key: 'kosten', icon: '🧮', label: 'Kostenberekening', items: [
+                { icon: '⚙️', label: 'Marge Instellingen', href: `${baseUrl}/kosten/instellingen` },
+                { icon: '🥬', label: 'Ingrediënten', href: `${baseUrl}/kosten/ingredienten` },
+                { icon: '📊', label: 'Product Kostprijs', href: `${baseUrl}/kosten/producten` },
               ]},
-              { key: 'klanten', icon: '👥', label: 'Klanten', items: [
-                { icon: '👥', label: 'Klantenlijst', href: '/klanten' },
-                { icon: '🎁', label: 'Beloningen', href: '/klanten/beloningen' },
+              { key: 'gks', icon: '🧾', label: 'GKS', items: [
+                { icon: '🧾', label: 'Z-Rapporten', href: `${baseUrl}/z-rapport` },
+                { icon: '📊', label: 'Verkoop', href: `${baseUrl}/verkoop` },
               ]},
-              { key: 'bestellingen', icon: '📦', label: 'Bestellingen', items: [
-                { icon: '📦', label: 'Bestellingenlijst', href: '/bestellingen' },
-                { icon: '📅', label: 'Reserveringen', href: '/reserveringen' },
-              ]},
-              { key: 'groepen', icon: '👥', label: 'Groepsbestellingen', items: [
-                { icon: '🏢', label: 'Groepen', href: '/groepen' },
-                { icon: '📋', label: 'Sessies', href: '/groepen/sessies' },
-                { icon: '📦', label: 'Overzicht', href: '/groepen/bestellingen' },
-                { icon: '🏷️', label: 'Labelprinter', href: '/labels' },
-              ]},
-              { key: 'marketing', icon: '📣', label: 'Marketing', items: [
-                { icon: '📧', label: 'Marketing', href: '/marketing' },
-                { icon: '📱', label: 'QR Codes', href: '/qr-codes' },
-                { icon: '🎁', label: 'Promoties', href: '/promoties' },
-                { icon: '⭐', label: 'Reviews', href: '/reviews' },
+              { key: 'reservaties', icon: '📅', label: 'Reservaties', items: [] },
+              { key: 'shop', icon: '🔗', label: 'Shop', items: [
+                { icon: '🔗', label: 'Bekijk je shop', href: `/shop/${tenant}` },
+                { icon: '🎨', label: 'Design', href: `${baseUrl}/design` },
+                { icon: '🔍', label: 'SEO', href: `${baseUrl}/seo` },
               ]},
             ]
-            const activeSec = sections.find(s => s.key === onlineSubOpen)
             return (
-              <div className="absolute top-full left-0 mt-1 flex z-30">
-                {/* Eerste kolom: secties */}
-                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 240, maxHeight: '82vh' }}>
-                  <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Online Platform</div>
-                  {sections.map(sec => (
-                    <button key={sec.key}
-                      onClick={() => setOnlineSubOpen(onlineSubOpen === sec.key ? null : sec.key)}
-                      className={`w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-0 transition-colors ${onlineSubOpen === sec.key ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">{sec.icon}</span>
-                        <span className="font-semibold text-sm text-gray-700">{sec.label}</span>
-                      </div>
-                      <svg className={`w-4 h-4 text-gray-400 transition-transform ${onlineSubOpen === sec.key ? 'text-blue-500' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                    </button>
-                  ))}
-                </div>
-                {/* Tweede popup: sub-items rechts naast eerste */}
-                {activeSec && (
-                  <div className="ml-2 bg-white rounded-2xl shadow-2xl border border-gray-100 z-30 overflow-y-auto" style={{ width: 220, maxHeight: '82vh' }}>
-                    <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl flex items-center gap-2">
-                      <span>{activeSec.icon}</span> {activeSec.label}
-                    </div>
-                    {activeSec.items.map(item => (
-                      <Link key={item.href} href={`${baseUrl}${item.href}`} onClick={() => { setFlyoutOpen(null); setOnlineSubOpen(null) }}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
-                        <span>{item.icon}</span>
-                        <span>{item.label}</span>
-                      </Link>
-                    ))}
+              <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 z-30 overflow-y-auto" style={{ width: 260, maxHeight: '85vh' }}>
+                <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Menu</div>
+                {modules.map(mod => (
+                  <div key={mod.key} className="border-b border-gray-100 last:border-0">
+                    {mod.key === 'reservaties' ? (
+                      <button onClick={() => { setHamburgerOpen(false); setShowReservations(true) }}
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors">
+                        <span className="text-lg">{mod.icon}</span>
+                        <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
+                      </button>
+                    ) : (
+                      <>
+                        <button onClick={() => setHamburgerSubOpen(hamburgerSubOpen === mod.key ? null : mod.key)}
+                          className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.key ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg">{mod.icon}</span>
+                            <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
+                          </div>
+                          <svg className={`w-4 h-4 text-gray-400 transition-transform ${hamburgerSubOpen === mod.key ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                        </button>
+                        {hamburgerSubOpen === mod.key && (
+                          <div className="bg-gray-50/80 border-t border-gray-100">
+                            {mod.items.map(item => (
+                              <Link key={item.href} href={item.href} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
+                                className="flex items-center gap-3 px-6 py-2.5 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
+                                <span>{item.icon}</span>
+                                <span>{item.label}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
-                )}
+                ))}
               </div>
             )
           })()}
-        </div>
-
-        {/* Personeel */}
-        <div className="relative z-20">
-          <button onClick={() => { setFlyoutOpen(flyoutOpen === 'personeel' ? null : 'personeel'); setPersoneelSubOpen(null) }}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'personeel' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">👔</span>
-            <span className="font-bold text-sm">Personeel</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'personeel' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {flyoutOpen === 'personeel' && (() => {
-            const sections = [
-              { key: 'medewerkers', icon: '👥', label: 'Medewerkers', items: [
-                { icon: '👤', label: 'Medewerkers', href: '/personeel' },
-                { icon: '🏢', label: 'Team', href: '/team' },
-              ]},
-              { key: 'uren', icon: '⏱️', label: 'Urenregistratie', items: [
-                { icon: '⏱️', label: 'Urenregistratie', href: '/uren' },
-              ]},
-              { key: 'vacatures', icon: '📋', label: 'Vacatures', items: [
-                { icon: '📋', label: 'Vacatures', href: '/vacatures' },
-              ]},
-            ]
-            const activeSec = sections.find(s => s.key === personeelSubOpen)
-            return (
-              <div className="absolute top-full left-0 mt-1 flex z-30">
-                <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 240, maxHeight: '82vh' }}>
-                  <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Personeel</div>
-                  {sections.map(sec => (
-                    <button key={sec.key}
-                      onClick={() => setPersoneelSubOpen(personeelSubOpen === sec.key ? null : sec.key)}
-                      className={`w-full flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-0 transition-colors ${personeelSubOpen === sec.key ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">{sec.icon}</span>
-                        <span className="font-semibold text-sm text-gray-700">{sec.label}</span>
-                      </div>
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                    </button>
-                  ))}
-                </div>
-                {activeSec && (
-                  <div className="ml-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 220, maxHeight: '82vh' }}>
-                    <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl flex items-center gap-2">
-                      <span>{activeSec.icon}</span> {activeSec.label}
-                    </div>
-                    {activeSec.items.map(item => (
-                      <Link key={item.href} href={`${baseUrl}${item.href}`} onClick={() => { setFlyoutOpen(null); setPersoneelSubOpen(null) }}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
-                        <span>{item.icon}</span>
-                        <span>{item.label}</span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })()}
-        </div>
-
-        {/* Kostenberekening */}
-        <div className="relative z-20">
-          <button onClick={() => setFlyoutOpen(flyoutOpen === 'kosten' ? null : 'kosten')}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'kosten' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🧮</span>
-            <span className="font-bold text-sm">Kostenberekening</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'kosten' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {flyoutOpen === 'kosten' && (
-            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
-              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Kostenberekening</div>
-              <Link href={`${baseUrl}/kosten/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Marge Instellingen</Link>
-              <Link href={`${baseUrl}/kosten/ingredienten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🥬</span> Ingrediënten</Link>
-              <Link href={`${baseUrl}/kosten/producten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📊</span> Product Kostprijs</Link>
-            </div>
-          )}
-        </div>
-
-        {/* GKS Rapporten */}
-        <div className="relative z-20">
-          <button onClick={() => setFlyoutOpen(flyoutOpen === 'gks' ? null : 'gks')}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'gks' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🧾</span>
-            <span className="font-bold text-sm">GKS</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'gks' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {flyoutOpen === 'gks' && (
-            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
-              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">GKS Rapporten</div>
-              <Link href={`${baseUrl}/z-rapport`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🧾</span> Z-Rapporten</Link>
-              <Link href={`${baseUrl}/verkoop`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📊</span> Verkoop</Link>
-            </div>
-          )}
-        </div>
-
-        {/* Reservaties */}
-        <div className="relative z-20">
-          <button onClick={() => setFlyoutOpen(flyoutOpen === 'reservaties' ? null : 'reservaties')}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'reservaties' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">📅</span>
-            <span className="font-bold text-sm">Reservaties</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'reservaties' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {flyoutOpen === 'reservaties' && (
-            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
-              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Reservaties</div>
-              <button onClick={() => { setFlyoutOpen(null); setShowReservations(true) }} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📅</span> Reservaties beheren</button>
-              <button onClick={() => { setFlyoutOpen(null); setShowReservations(true) }} className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Instellingen</button>
-            </div>
-          )}
-        </div>
-
-        {/* Shop */}
-        <div className="relative z-20">
-          <button onClick={() => setFlyoutOpen(flyoutOpen === 'shop' ? null : 'shop')}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'shop' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
-            <span className="text-xl">🔗</span>
-            <span className="font-bold text-sm">Shop</span>
-            <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'shop' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-          </button>
-          {flyoutOpen === 'shop' && (
-            <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
-              <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Mijn Shop</div>
-              <Link href={`/shop/${tenant}`} target="_blank" onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🔗</span> Bekijk je shop</Link>
-              <Link href={`${baseUrl}/design`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🎨</span> Design</Link>
-              <Link href={`${baseUrl}/seo`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🔍</span> SEO</Link>
-            </div>
-          )}
         </div>
 
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* ── RECHTS: online status + geluid + taal + uitloggen ── */}
+        {/* ── RECHTS ── */}
+
+        {/* Onlinescherm */}
+        <Link href={`/shop/${tenant}/display`} target="_blank"
+          className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
+          <span className="text-lg">🖥️</span>
+          <span>Onlinescherm</span>
+        </Link>
+
+        {/* Keukenscherm */}
+        <Link href={`/shop/${tenant}/keuken`} target="_blank"
+          className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
+          <span className="text-lg">👨‍🍳</span>
+          <span>Keukenscherm</span>
+        </Link>
 
         {/* Geluid */}
         <button onClick={toggleSound}
@@ -910,7 +773,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         <button onClick={handleLogout}
           className="flex items-center gap-1.5 px-3 py-2 bg-red-600/80 hover:bg-red-600 rounded-lg text-white text-sm font-bold transition-colors ml-1">
           <span className="text-lg">🚪</span>
-          <span>Uit</span>
+          <span>Uitloggen</span>
         </button>
 
       </div>
