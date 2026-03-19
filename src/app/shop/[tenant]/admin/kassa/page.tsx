@@ -931,20 +931,22 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                           <div className="aspect-square w-full bg-gray-100 flex items-center justify-center overflow-hidden">
                             {product.image_url
                               ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
-                              : <span className="text-3xl text-gray-300">🍽️</span>
+                              : <span className="text-4xl text-gray-300">🍽️</span>
                             }
                           </div>
+                          {/* In-cart badge */}
                           {inCart > 0 && (
-                            <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-[#3C4D6B] text-white text-xs font-bold flex items-center justify-center shadow">
+                            <div className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-emerald-500 text-white text-xs font-bold flex items-center justify-center shadow-md">
                               {inCart}
                             </div>
                           )}
+                          {/* Opties indicator */}
                           {hasOpts && (
-                            <div className="absolute bottom-8 right-1 text-xs bg-amber-400 text-white rounded px-1 font-bold">+</div>
+                            <div className="absolute top-1.5 left-1.5 bg-amber-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-md shadow">⚙️</div>
                           )}
                           <div className="p-2 text-left">
-                            <p className="font-semibold text-sm text-gray-800 leading-tight line-clamp-2">{product.name}</p>
-                            <p className="text-[#3C4D6B] font-bold text-sm mt-0.5">€{product.price.toFixed(2)}</p>
+                            <p className="font-bold text-sm text-gray-800 leading-tight line-clamp-2">{product.name}</p>
+                            <p className="text-emerald-600 font-bold text-base mt-0.5">€{product.price.toFixed(2)}</p>
                           </div>
                         </button>
                       )
@@ -1106,7 +1108,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                   <button
                     key={key}
                     onClick={() => handleNumpad(key)}
-                    className={`rounded-xl font-bold text-2xl transition-colors ${
+                    className={`aspect-square rounded-xl font-bold text-2xl transition-colors active:scale-95 shadow-sm ${
                       key === 'C' ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
                       : key === '=' ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                       : ['+','-','×'].includes(key) ? 'bg-[#3C4D6B] text-white hover:bg-[#2D3A52]'
@@ -1131,25 +1133,32 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               {cart.map(item => {
                 const choicesTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
                 return (
-                  <div key={item.cartKey} className="bg-gray-50 rounded-xl p-3 flex items-center gap-3 border border-gray-100">
+                  <div key={item.cartKey} className="bg-white rounded-xl p-2.5 flex items-center gap-2.5 border border-gray-100 shadow-sm">
+                    {/* Productfoto */}
+                    {item.product.image_url ? (
+                      <img src={item.product.image_url} alt={item.product.name}
+                        className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 text-xl">🍽️</div>
+                    )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm truncate">{item.product.name}</p>
+                      <p className="font-bold text-sm text-gray-800 truncate">{item.product.name}</p>
                       {item.choices && item.choices.length > 0 && (
                         <p className="text-xs text-gray-400 truncate">{item.choices.map(c => c.choiceName).join(', ')}</p>
                       )}
-                      <p className="text-[#3C4D6B] font-bold">€{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}</p>
+                      <p className="text-emerald-600 font-bold text-sm">€{((item.product.price + choicesTotal) * item.quantity).toFixed(2)}</p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => updateQty(item.cartKey, item.quantity - 1)}
-                        className="w-9 h-9 rounded-lg bg-red-500 text-white font-bold text-lg flex items-center justify-center hover:bg-red-600 transition-colors"
+                        className="w-8 h-8 rounded-lg bg-red-500 text-white font-bold text-base flex items-center justify-center hover:bg-red-600 transition-colors active:scale-95"
                       >
                         {item.quantity === 1 ? '🗑' : '−'}
                       </button>
-                      <span className="w-6 text-center font-bold text-lg">{item.quantity}</span>
+                      <span className="w-6 text-center font-bold text-base">{item.quantity}</span>
                       <button
                         onClick={() => updateQty(item.cartKey, item.quantity + 1)}
-                        className="w-9 h-9 rounded-lg bg-[#3C4D6B] text-white font-bold text-lg flex items-center justify-center hover:bg-[#2D3A52] transition-colors"
+                        className="w-8 h-8 rounded-lg bg-[#3C4D6B] text-white font-bold text-base flex items-center justify-center hover:bg-[#2D3A52] transition-colors active:scale-95"
                       >
                         +
                       </button>
