@@ -525,14 +525,18 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       created_at: createdAt.toISOString(),
     }
 
-    // Probeer Supabase, bij falen: sla op in offline queue
+    // Probeer Supabase, bij netwerkfout: sla op in offline queue
     const { error } = await supabase.from('orders').insert(orderPayload)
     if (error) {
-      const raw = localStorage.getItem(offlineQueueKey)
-      const queue = raw ? JSON.parse(raw) : []
-      queue.push(orderPayload)
-      localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
-      alert(`⚠️ Geen internetverbinding. Order #${orderNumber} is lokaal opgeslagen en wordt automatisch verstuurd zodra je weer online bent.`)
+      const isNetworkError = !navigator.onLine || error.message?.includes('fetch') || error.message?.includes('network')
+      if (isNetworkError) {
+        const raw = localStorage.getItem(offlineQueueKey)
+        const queue = raw ? JSON.parse(raw) : []
+        queue.push(orderPayload)
+        localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
+        alert(`⚠️ Geen internetverbinding. Order #${orderNumber} is lokaal opgeslagen en wordt automatisch verstuurd zodra je weer online bent.`)
+      }
+      // Bij andere fouten: order al lokaal verwerkt, bon wordt geprint — geen blokkerende melding
     }
 
     setLastOrder({ orderNumber, items: [...cart], total, paymentMethod: method, orderType, tableNumber, createdAt })
