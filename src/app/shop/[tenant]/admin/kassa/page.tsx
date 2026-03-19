@@ -711,8 +711,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               ]},
               { key: 'online', icon: '🛒', label: 'Online', items: [
                 { icon: '🟢', label: 'Online Aan/Uitzetten', href: `${baseUrl}/online-status` },
-                { icon: '📊', label: 'Dashboard', href: `${baseUrl}` },
-                { icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
                 { icon: '🍽️', label: 'Categorieën', href: `${baseUrl}/categorieen` },
                 { icon: '🍟', label: 'Producten', href: `${baseUrl}/producten` },
                 { icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
@@ -721,7 +719,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🎫', label: 'Promoties', href: `${baseUrl}/promoties` },
                 { icon: '🎟️', label: 'Cadeaubonnen', href: `${baseUrl}/cadeaubonnen` },
                 { icon: '⭐', label: 'Reviews', href: `${baseUrl}/reviews` },
-                { icon: '🔥', label: 'Populaire items', href: `${baseUrl}/populair` },
                 { icon: '🏢', label: 'Groepsbestellingen', href: `${baseUrl}/groepen` },
                 { icon: '📣', label: 'Marketing', href: `${baseUrl}/marketing` },
                 { icon: '📱', label: 'QR Codes', href: `${baseUrl}/qr-codes` },
@@ -745,6 +742,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               { key: 'rapporten', icon: '📊', label: 'Rapporten', items: [
                 { icon: '📊', label: 'Rapportages', href: `${baseUrl}/rapporten` },
                 { icon: '🧾', label: 'Z-Rapporten (GKS)', href: `${baseUrl}/z-rapport` },
+                { icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
+                { icon: '📊', label: 'Dashboard', href: `${baseUrl}` },
+                { icon: '🔥', label: 'Populaire items', href: `${baseUrl}/populair` },
               ]},
             ]
             const activeMod = modules.find(m => m.key === hamburgerSubOpen)
