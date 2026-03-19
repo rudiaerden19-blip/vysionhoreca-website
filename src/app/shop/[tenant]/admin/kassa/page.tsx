@@ -808,15 +808,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           <button onClick={() => setFlyoutOpen(flyoutOpen === 'kosten' ? null : 'kosten')}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${flyoutOpen === 'kosten' ? 'bg-blue-600 text-white' : 'text-white/90 hover:bg-white/10 hover:text-white'}`}>
             <span className="text-xl">🧮</span>
-            <span className="font-bold text-sm">Kosten</span>
+            <span className="font-bold text-sm">Kostenberekening</span>
             <svg className={`w-3.5 h-3.5 transition-transform ${flyoutOpen === 'kosten' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
           </button>
           {flyoutOpen === 'kosten' && (
             <div className="absolute top-full left-0 mt-1 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-30" style={{ width: 240 }}>
               <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider">Kostenberekening</div>
-              <Link href={`${baseUrl}/kosten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📊</span> Overzicht</Link>
-              <Link href={`${baseUrl}/kosten/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Instellingen</Link>
-              <Link href={`${baseUrl}/analyse`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📈</span> Analyse</Link>
+              <Link href={`${baseUrl}/kosten/instellingen`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">⚙️</span> Marge Instellingen</Link>
+              <Link href={`${baseUrl}/kosten/ingredienten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 border-b border-gray-100 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">🥬</span> Ingrediënten</Link>
+              <Link href={`${baseUrl}/kosten/producten`} onClick={() => setFlyoutOpen(null)} className="flex items-center gap-3 px-4 py-3.5 hover:bg-blue-50 font-semibold text-gray-700 text-sm transition-colors"><span className="text-lg">📊</span> Product Kostprijs</Link>
             </div>
           )}
         </div>
