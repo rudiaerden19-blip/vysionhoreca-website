@@ -55,7 +55,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [showReservations, setShowReservations] = useState(false)
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
-  const [kassaTables, setKassaTables] = useState<{ id: string; number: string; status: string }[]>([])
+  const [kassaTables, setKassaTables] = useState<{ id: string; number: string; seats: number; status: string }[]>([])
   // Openstaande bestellingen per tafel: { "1": CartItem[], "2": CartItem[], ... }
   const [tableOrders, setTableOrders] = useState<Record<string, CartItem[]>>({})
 
