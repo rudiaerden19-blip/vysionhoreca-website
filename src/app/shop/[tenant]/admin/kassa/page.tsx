@@ -442,7 +442,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                         <div className="absolute inset-0 flex flex-col items-center justify-end p-2">
                           {cat.icon && <span className="text-2xl mb-0.5">{cat.icon}</span>}
-                          <span className="font-bold text-white text-base text-center leading-tight drop-shadow-lg">{cat.name}</span>
+                          <span className="font-bold text-white text-xl text-center leading-tight drop-shadow-lg">{cat.name}</span>
                         </div>
                       </button>
                     )
@@ -483,9 +483,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                           {hasOpts && (
                             <div className="absolute bottom-8 right-1 text-xs bg-amber-400 text-white rounded px-1 font-bold">+</div>
                           )}
-                          <div className="p-1.5 text-left">
-                            <p className="font-semibold text-xs text-gray-800 leading-tight line-clamp-2">{product.name}</p>
-                            <p className="text-[#3C4D6B] font-bold text-xs mt-0.5">€{product.price.toFixed(2)}</p>
+                          <div className="p-2 text-left">
+                            <p className="font-semibold text-sm text-gray-800 leading-tight line-clamp-2">{product.name}</p>
+                            <p className="text-[#3C4D6B] font-bold text-sm mt-0.5">€{product.price.toFixed(2)}</p>
                           </div>
                         </button>
                       )
