@@ -707,8 +707,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               ]},
               { key: 'online', icon: '🛒', label: 'Online', items: [
                 { icon: '🟢', label: 'Online Aan/Uitzetten', href: `${baseUrl}/online-status` },
-                { icon: '🍽️', label: 'Categorieën', href: `${baseUrl}/categorieen` },
-                { icon: '🍟', label: 'Producten', href: `${baseUrl}/producten` },
                 { icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
                 { icon: '👥', label: 'Klanten', href: `${baseUrl}/klanten` },
                 { icon: '🎁', label: 'Beloningen', href: `${baseUrl}/klanten/beloningen` },
