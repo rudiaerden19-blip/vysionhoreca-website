@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct, getTenantSettings, TenantSettings } from '@/lib/admin-api'
+import KassaFloorPlan from '@/components/KassaFloorPlan'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled } from '@/lib/sounds'
@@ -49,6 +50,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [selectedCategory, setSelectedCategory] = useState<MenuCategory | null>(null)
   const [menuLoading, setMenuLoading] = useState(true)
   const [productsWithOptions, setProductsWithOptions] = useState<string[]>([])
+
+  const [showFloorPlan, setShowFloorPlan] = useState(false)
 
   // Betaling
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -651,10 +654,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         {orderType === 'DINE_IN' && (
           <div className="px-3 pt-3">
             <button
-              onClick={() => {
-                const nr = prompt('Tafelnummer:', tableNumber)
-                if (nr !== null) setTableNumber(nr)
-              }}
+              onClick={() => setShowFloorPlan(true)}
               className="w-full py-3 rounded-xl bg-[#3C4D6B] hover:bg-[#2D3A52] text-white font-bold text-base transition-colors"
             >
               {tableNumber ? `🪑 Tafel ${tableNumber}` : 'Kies tafel...'}
@@ -841,6 +841,15 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Plattegrond / Tafelkeuze ── */}
+      {showFloorPlan && (
+        <KassaFloorPlan
+          tenant={tenant}
+          onSelectTable={(nr) => { setTableNumber(nr); setOrderType('DINE_IN') }}
+          onClose={() => setShowFloorPlan(false)}
+        />
       )}
 
       {/* ── Betaalmodal ── */}
