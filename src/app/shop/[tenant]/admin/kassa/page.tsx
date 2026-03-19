@@ -210,14 +210,24 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   // ── Cart ─────────────────────────────────────────────────────────────────
+  const syncTableOrder = (updatedCart: CartItem[]) => {
+    if (!tableNumber) return
+    const newOrders = { ...tableOrders, [tableNumber]: updatedCart }
+    setTableOrders(newOrders)
+    localStorage.setItem(tableOrdersKey, JSON.stringify(newOrders))
+  }
+
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
     const cartKey = choices.length > 0
       ? `${product.id}-${choices.map(c => c.choiceId).sort().join('-')}`
       : product.id!
     setCart(prev => {
       const existing = prev.find(i => i.cartKey === cartKey)
-      if (existing) return prev.map(i => i.cartKey === cartKey ? { ...i, quantity: i.quantity + 1 } : i)
-      return [...prev, { product, quantity: 1, choices, cartKey }]
+      const updated = existing
+        ? prev.map(i => i.cartKey === cartKey ? { ...i, quantity: i.quantity + 1 } : i)
+        : [...prev, { product, quantity: 1, choices, cartKey }]
+      syncTableOrder(updated)
+      return updated
     })
   }
 
@@ -262,11 +272,39 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   const updateQty = (cartKey: string, qty: number) => {
-    if (qty <= 0) setCart(prev => prev.filter(i => i.cartKey !== cartKey))
-    else setCart(prev => prev.map(i => i.cartKey === cartKey ? { ...i, quantity: qty } : i))
+    setCart(prev => {
+      const updated = qty <= 0
+        ? prev.filter(i => i.cartKey !== cartKey)
+        : prev.map(i => i.cartKey === cartKey ? { ...i, quantity: qty } : i)
+      if (tableNumber) {
+        const newOrders = { ...tableOrders, [tableNumber]: updated }
+        setTableOrders(newOrders)
+        localStorage.setItem(tableOrdersKey, JSON.stringify(newOrders))
+        // Zet tafel op FREE als cart leeg is
+        const tablesRaw = localStorage.getItem(`vysion_tables_${tenant}`)
+        if (tablesRaw) {
+          try {
+            const tbls = JSON.parse(tablesRaw)
+            const updatedTbls = tbls.map((t: { number: string; status: string }) =>
+              t.number === tableNumber ? { ...t, status: updated.length > 0 ? 'OCCUPIED' : 'FREE' } : t
+            )
+            localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
+            setKassaTables(updatedTbls)
+          } catch { /* empty */ }
+        }
+      }
+      return updated
+    })
   }
 
-  const clearCart = () => setCart([])
+  const clearCart = () => {
+    setCart([])
+    if (tableNumber) {
+      const newOrders = { ...tableOrders, [tableNumber]: [] }
+      setTableOrders(newOrders)
+      localStorage.setItem(tableOrdersKey, JSON.stringify(newOrders))
+    }
+  }
   const total = cart.reduce((sum, i) => {
     const choicesTotal = (i.choices || []).reduce((s, c) => s + c.price, 0)
     return sum + (i.product.price + choicesTotal) * i.quantity
