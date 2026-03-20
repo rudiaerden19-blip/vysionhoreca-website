@@ -1,18 +1,36 @@
 {
   "name": "Vysion Kassa",
   "short_name": "Kassa",
-  "description": "Vysion Horeca Kassa",
+  "description": "Vysion Horeca POS – Kassa & Online bestellingen",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "landscape",
-  "background_color": "#e3e3e3",
-  "theme_color": "#3C4D6B",
+  "background_color": "#1a1a2e",
+  "theme_color": "#f97316",
+  "lang": "nl",
+  "categories": ["business", "food"],
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Kassa",
+      "short_name": "Kassa",
+      "description": "Open de kassa",
+      "url": "/",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any" }]
     }
   ]
 }

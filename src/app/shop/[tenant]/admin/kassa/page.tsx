@@ -368,23 +368,79 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     }
   }, [])
 
+  // ── PWA install prompt ────────────────────────────────────────────────────
+  const [installPrompt, setInstallPrompt] = useState<any>(null)
+  const [isInstalled, setIsInstalled] = useState(false)
+
+  useEffect(() => {
+    const handler = (e: any) => { e.preventDefault(); setInstallPrompt(e) }
+    window.addEventListener('beforeinstallprompt', handler)
+    if (window.matchMedia('(display-mode: standalone)').matches) setIsInstalled(true)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const handleInstallPWA = async () => {
+    if (!installPrompt) return
+    installPrompt.prompt()
+    const { outcome } = await installPrompt.userChoice
+    if (outcome === 'accepted') { setInstallPrompt(null); setIsInstalled(true) }
+  }
+
+  // ── Menu cache keys ────────────────────────────────────────────────────────
+  const CACHE_CATS = `vysion_menu_cats_${tenant}`
+  const CACHE_PRODS = `vysion_menu_prods_${tenant}`
+  const CACHE_OPTS = `vysion_menu_opts_${tenant}`
+  const CACHE_SETTINGS = `vysion_settings_${tenant}`
+
   // Laad categorieën, producten en welke producten opties hebben
+  // Offline: laad uit localStorage-cache; online: laad van Supabase en update cache
   const loadMenu = async () => {
     setMenuLoading(true)
-    const [cats, prods, withOpts] = await Promise.all([
-      getMenuCategories(tenant),
-      getMenuProducts(tenant),
-      getProductsWithOptions(tenant),
-    ])
-    setCategories(cats.filter(c => c.is_active))
-    setProducts(prods.filter(p => p.is_active))
-    setProductsWithOptions(withOpts)
+
+    // Laad meteen uit cache als beschikbaar (ook als online – snellere first render)
+    try {
+      const cachedCats = localStorage.getItem(CACHE_CATS)
+      const cachedProds = localStorage.getItem(CACHE_PRODS)
+      const cachedOpts = localStorage.getItem(CACHE_OPTS)
+      if (cachedCats && cachedProds && cachedOpts) {
+        setCategories(JSON.parse(cachedCats))
+        setProducts(JSON.parse(cachedProds))
+        setProductsWithOptions(JSON.parse(cachedOpts))
+        setMenuLoading(false)
+      }
+    } catch { /* geen geldige cache */ }
+
+    // Probeer van Supabase te laden (ook als we net uit cache laadden: refresh op achtergrond)
+    try {
+      const [cats, prods, withOpts] = await Promise.all([
+        getMenuCategories(tenant),
+        getMenuProducts(tenant),
+        getProductsWithOptions(tenant),
+      ])
+      const activeCats = cats.filter(c => c.is_active)
+      const activeProds = prods.filter(p => p.is_active)
+      setCategories(activeCats)
+      setProducts(activeProds)
+      setProductsWithOptions(withOpts)
+      // Cache opslaan voor offline gebruik
+      localStorage.setItem(CACHE_CATS, JSON.stringify(activeCats))
+      localStorage.setItem(CACHE_PRODS, JSON.stringify(activeProds))
+      localStorage.setItem(CACHE_OPTS, JSON.stringify(withOpts))
+    } catch {
+      // Netwerkfout – cache is al geladen hierboven, geen extra actie nodig
+    }
     setMenuLoading(false)
   }
 
   useEffect(() => {
     loadMenu()
-    getTenantSettings(tenant).then(s => setTenantInfo(s))
+    // TenantSettings: ook met cache
+    const cachedSettings = localStorage.getItem(CACHE_SETTINGS)
+    if (cachedSettings) { try { setTenantInfo(JSON.parse(cachedSettings)) } catch { /* ignore */ } }
+    getTenantSettings(tenant).then(s => {
+      setTenantInfo(s)
+      try { localStorage.setItem(CACHE_SETTINGS, JSON.stringify(s)) } catch { /* ignore */ }
+    }).catch(() => { /* offline: al geladen uit cache */ })
   }, [tenant])
 
   // Herlaad menu wanneer pagina weer focus krijgt (na terugkeren van producten/categorieen pagina)
@@ -416,9 +472,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     return () => { supabase.removeChannel(channel) }
   }, [tenant])
 
-  // Online status check
+  // Online status check – gecombineerd: navigator.onLine + server ping
   useEffect(() => {
     const check = async () => {
+      if (!navigator.onLine) { setIsOnline(false); return }
       try {
         const res = await fetch(`/api/shop/${tenant}/status`, { method: 'HEAD', cache: 'no-store' })
         setIsOnline(res.ok)
@@ -426,9 +483,17 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         setIsOnline(false)
       }
     }
+    const goOnline = () => { setIsOnline(true); check() }
+    const goOffline = () => setIsOnline(false)
+    window.addEventListener('online', goOnline)
+    window.addEventListener('offline', goOffline)
     check()
     const interval = setInterval(check, 30000)
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('online', goOnline)
+      window.removeEventListener('offline', goOffline)
+    }
   }, [tenant])
 
   // Close language dropdown on outside click
@@ -1025,6 +1090,23 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         </button>
 
       </div>
+
+      {/* ── Offline / PWA banner ── */}
+      {isOnline === false && (
+        <div className="flex-shrink-0 bg-red-600 text-white text-xs font-semibold flex items-center justify-center gap-2 py-1 px-4">
+          <span>📴</span>
+          <span>Offline – menu geladen uit cache. Bestellingen worden bewaard en verstuurd bij reconnect.</span>
+        </div>
+      )}
+      {installPrompt && !isInstalled && (
+        <div className="flex-shrink-0 bg-orange-500 text-white text-xs font-semibold flex items-center justify-between gap-2 py-1.5 px-4">
+          <span>📲 Installeer de Kassa als app voor volledig offline gebruik</span>
+          <div className="flex gap-2">
+            <button onClick={handleInstallPWA} className="bg-white text-orange-600 px-3 py-0.5 rounded-full text-xs font-bold hover:bg-orange-50">Installeer</button>
+            <button onClick={() => setInstallPrompt(null)} className="text-white/70 hover:text-white text-lg leading-none">×</button>
+          </div>
+        </div>
+      )}
 
       {/* ── Body: midden + rechts ── */}
       <div className="flex flex-1 overflow-hidden min-h-0">
