@@ -760,13 +760,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                   <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Menu</div>
                   {modules.map(mod => (
                     <div key={mod.key} className="border-b border-gray-100 last:border-0">
-                      {mod.key === 'reservaties' ? (
-                        <button onClick={() => { setHamburgerOpen(false); setShowReservations(true) }}
-                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors">
-                          <span className="text-lg">{mod.icon}</span>
-                          <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
-                        </button>
-                      ) : (
+                      {(
                         <button onClick={() => setHamburgerSubOpen(hamburgerSubOpen === mod.key ? null : mod.key)}
                           className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.key ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
                           <div className="flex items-center gap-3">
