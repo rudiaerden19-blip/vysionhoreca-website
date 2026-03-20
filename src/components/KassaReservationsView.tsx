@@ -576,8 +576,8 @@ export default function KassaReservationsView({
     // Bovenkant SVG steekt ~145px boven de wereldpositie uit → compenseer dat + 40px marge
     const svgHalfH = 145
     const svgHalfW = 145
-    setPanX(40 + svgHalfW - minX * floorZoom)
-    setPanY(40 + svgHalfH - minY * floorZoom)
+    setPanX(20 + svgHalfW - minX * floorZoom)
+    setPanY(20 + svgHalfH - minY * floorZoom)
     didCenterTables.current = true
   }, [floorPlanTablesDB, WORLD_W, WORLD_H, floorZoom])
 
