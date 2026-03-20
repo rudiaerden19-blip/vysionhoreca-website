@@ -868,39 +868,6 @@ export default function KassaReservationsView({
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-6 gap-3 mb-4">
-          <div className="bg-gray-100 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold">{todayStats.total}</p>
-            <p className="text-xs text-gray-400">Totaal</p>
-          </div>
-          <div className="bg-blue-50 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-blue-500">{todayStats.confirmed}</p>
-            <p className="text-xs text-blue-400">Bevestigd</p>
-          </div>
-          <div className="bg-emerald-50 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-emerald-500">{todayStats.checkedIn}</p>
-            <p className="text-xs text-emerald-400">Ingecheckt</p>
-          </div>
-          <div className="bg-gray-50 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-gray-400">{todayStats.completed}</p>
-            <p className="text-xs text-gray-400">Afgerond</p>
-          </div>
-          <div className="bg-red-50 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold text-red-400">{todayStats.noShow}</p>
-            <p className="text-xs text-red-400">No-show</p>
-          </div>
-          <div className="bg-[#3C4D6B]/10 rounded-xl p-3 text-center">
-            <p className="text-2xl font-bold">{todayStats.covers}</p>
-            <p className="text-xs text-gray-400">Personen</p>
-          </div>
-          {todayStats.waitlist > 0 && (
-            <div className="bg-purple-50 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-purple-500">{todayStats.waitlist}</p>
-              <p className="text-xs text-purple-400">Wachtlijst</p>
-            </div>
-          )}
-        </div>
 
         {/* Shift filter (z2) */}
         {reservationSettings.shifts?.some(s => s.isActive) && viewMode === 'today' && (
