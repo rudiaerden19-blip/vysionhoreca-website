@@ -941,11 +941,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                       <span>{activeMod.icon}</span> {activeMod.label}
                     </div>
                     {activeMod.items.map(item => (
-                      <Link key={item.href} href={item.href} target={'target' in item && item.target ? item.target : undefined} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
+                      <Link key={item.href} href={item.href} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
                         className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
                         <span>{item.icon}</span>
                         <span>{item.label}</span>
-                        {'target' in item && item.target && <span className="ml-auto text-gray-300 text-xs">↗</span>}
                       </Link>
                     ))}
                   </div>
