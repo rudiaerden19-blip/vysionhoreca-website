@@ -1875,20 +1875,22 @@ export default function KassaReservationsView({
           return (
             <div className="flex flex-col h-full -m-4" style={{ height: 'calc(100vh - 130px)' }}>
               {/* Toolbar */}
-              <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 flex-shrink-0">
+              <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-white border-b border-gray-200 flex-shrink-0 min-h-[52px]">
                 {/* Date nav */}
-                <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); setSelectedDate(d.toISOString().split('T')[0]) }}
-                  className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={16} /></button>
-                <span className="font-semibold text-sm min-w-28 text-center">{formatDate(selectedDate)}</span>
-                <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); setSelectedDate(d.toISOString().split('T')[0]) }}
-                  className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={16} /></button>
-                <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
-                  className="px-2 py-1.5 rounded-lg bg-gray-100 border border-gray-200 text-xs" />
+                <div className="flex items-center gap-1.5">
+                  <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                    className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center active:bg-gray-300"><ChevronLeft size={18} /></button>
+                  <span className="font-semibold text-sm min-w-[7rem] text-center">{formatDate(selectedDate)}</span>
+                  <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                    className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center active:bg-gray-300"><ChevronRight size={18} /></button>
+                  <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
+                    className="h-10 px-2 rounded-xl bg-gray-100 border border-gray-200 text-xs" />
+                </div>
 
                 <div className="flex-1" />
 
-                {/* Legend */}
-                <div className="hidden md:flex items-center gap-3 text-xs font-medium">
+                {/* Legend — alleen op grotere schermen */}
+                <div className="hidden lg:flex items-center gap-3 text-xs font-medium">
                   <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-green-400" /><span>Vrij</span></div>
                   <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-violet-400" /><span>Gereserveerd</span></div>
                   <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-blue-400" /><span>Bezet</span></div>
@@ -1898,24 +1900,18 @@ export default function KassaReservationsView({
                 <div className="flex-1" />
 
                 <button onClick={() => { setSelectedFloorTable(null); setShowAddFloorTable(true) }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors">
+                  className="flex items-center gap-2 h-10 px-4 rounded-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white text-sm font-semibold transition-colors whitespace-nowrap">
                   <Plus size={16} />
-                  Tafel toevoegen
+                  <span className="hidden sm:inline">Tafel toevoegen</span>
+                  <span className="sm:hidden">+ Tafel</span>
                 </button>
-                {selectedFloorTable && (
-                  <button onClick={() => deleteFloorTable(selectedFloorTable.id)}
-                    className="px-3 py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-500 text-sm font-semibold transition-colors">
-                    Verwijder
-                  </button>
-                )}
-
               </div>
 
               {/* Canvas + lijst + optional sidebar */}
-              <div className="flex flex-1 overflow-hidden">
+              <div className="flex flex-1 overflow-hidden relative">
 
                 {/* Lijst links */}
-                <div className="w-72 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+                <div className="w-52 md:w-60 lg:w-72 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
                   <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                     <span className="font-bold text-sm text-gray-800">Reservaties</span>
                     <span className="text-xs font-semibold text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">{floorRes.length}</span>
@@ -2038,12 +2034,12 @@ export default function KassaReservationsView({
                   </div>{/* einde geschaalde wrapper */}
                 </div>
 
-                {/* Sidebar — selected table detail */}
+                {/* Sidebar — selected table detail (overlay, werkt op desktop + iPad) */}
                 {selectedFloorTable && (() => {
                   const { label, color } = getFloorTableInfo(selectedFloorTable.number)
                   const allTableRes = floorRes.filter(r => r.table_number === selectedFloorTable.number).sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                   return (
-                    <div className="w-80 flex-shrink-0 flex flex-col overflow-hidden" style={{ backgroundColor: '#16213e', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div className="absolute right-0 top-0 bottom-0 flex flex-col overflow-hidden z-20 shadow-2xl" style={{ width: 'min(320px, 85vw)', backgroundColor: '#16213e', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
 
                       {/* Header */}
                       <div className="p-4 flex justify-between items-center" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', borderLeft: `4px solid ${color}` }}>
@@ -2080,41 +2076,41 @@ export default function KassaReservationsView({
                                 {r.guest_phone && <a href={`tel:${r.guest_phone}`} className="flex items-center gap-1 text-sm text-emerald-400 hover:text-emerald-300"><Phone size={12} />{r.guest_phone}</a>}
                                 {r.notes && <p className="text-xs text-white/30 italic">{r.notes}</p>}
 
-                                {/* Status knoppen */}
+                                {/* Status knoppen — min 44px hoogte voor touch */}
                                 <div className="grid grid-cols-2 gap-1.5 pt-1">
                                   {r.status === 'PENDING' && (
-                                    <button onClick={() => handleConfirm(r)} className="col-span-2 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
-                                      <CheckCircle2 size={13} /> Bevestigen
+                                    <button onClick={() => handleConfirm(r)} className="col-span-2 min-h-[44px] rounded-xl bg-blue-500 active:bg-blue-700 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
+                                      <CheckCircle2 size={14} /> Bevestigen
                                     </button>
                                   )}
                                   {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
-                                    <button onClick={() => handleCheckIn(r)} className="py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1">
-                                      <UserCheck size={13} /> Bezet
+                                    <button onClick={() => handleCheckIn(r)} className="min-h-[44px] rounded-xl bg-emerald-500 active:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+                                      <UserCheck size={14} /> Bezet
                                     </button>
                                   )}
                                   {r.status === 'CHECKED_IN' && (
-                                    <button onClick={() => handleStartOrder(r)} className="py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1">
-                                      <UtensilsCrossed size={13} /> Kassa
+                                    <button onClick={() => handleStartOrder(r)} className="min-h-[44px] rounded-xl bg-emerald-500 active:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+                                      <UtensilsCrossed size={14} /> Kassa
                                     </button>
                                   )}
                                   {r.status === 'CHECKED_IN' && (
-                                    <button onClick={() => handleComplete(r)} className="py-2 rounded-xl text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(99,102,241,0.4)' }}>
-                                      <CheckCircle2 size={13} /> Vrij
+                                    <button onClick={() => handleComplete(r)} className="min-h-[44px] rounded-xl text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(99,102,241,0.4)' }}>
+                                      <CheckCircle2 size={14} /> Vrij
                                     </button>
                                   )}
                                   {(r.status === 'CONFIRMED' || r.status === 'PENDING' || r.status === 'CHECKED_IN') && (
-                                    <button onClick={() => handleNoShow(r)} className="py-2 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.2)', color: '#f87171' }}>
-                                      <UserX size={13} /> No-show
+                                    <button onClick={() => handleNoShow(r)} className="min-h-[44px] rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.2)', color: '#f87171' }}>
+                                      <UserX size={14} /> No-show
                                     </button>
                                   )}
                                 </div>
 
                                 {/* Aanpassen + Verwijderen */}
                                 <div className="grid grid-cols-2 gap-1.5">
-                                  <button onClick={() => setSelectedReservation(r)} className="py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>
+                                  <button onClick={() => setSelectedReservation(r)} className="min-h-[44px] rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>
                                     ✏️ Aanpassen
                                   </button>
-                                  <button onClick={() => handleDeleteReservation(r.id)} className="py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.12)', color: '#f87171' }}>
+                                  <button onClick={() => handleDeleteReservation(r.id)} className="min-h-[44px] rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.12)', color: '#f87171' }}>
                                     🗑 Verwijderen
                                   </button>
                                 </div>
@@ -2131,22 +2127,22 @@ export default function KassaReservationsView({
                         <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
                         <div className="flex gap-2">
                           <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation - 45 + 360) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation - 45 + 360) % 360 } : null) }}
-                            className="flex-1 py-2 rounded-lg font-bold text-lg text-white transition-colors" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>↺</button>
+                            className="flex-1 min-h-[48px] rounded-xl font-bold text-xl text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>↺</button>
                           <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation + 45) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation + 45) % 360 } : null) }}
-                            className="flex-1 py-2 rounded-lg font-bold text-lg text-white transition-colors" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>↻</button>
+                            className="flex-1 min-h-[48px] rounded-xl font-bold text-xl text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>↻</button>
                           <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: 0 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: 0 } : null) }}
-                            className="flex-1 py-2 rounded-lg text-xs font-semibold text-white transition-colors" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>Reset</button>
+                            className="flex-1 min-h-[48px] rounded-xl text-xs font-semibold text-white transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>Reset</button>
                         </div>
                       </div>
 
                       {/* Acties */}
                       <div className="p-4 space-y-2">
                         <button onClick={() => { setShowNewReservationModal(true); setSelectedFloorTable(null) }}
-                          className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">
+                          className="w-full min-h-[52px] rounded-xl bg-emerald-500 active:bg-emerald-700 text-white font-bold transition-colors text-sm">
                           + Reservatie aanmaken
                         </button>
                         <button onClick={() => deleteFloorTable(selectedFloorTable.id)}
-                          className="w-full py-2 rounded-xl text-sm font-semibold transition-colors" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#f87171' }}>
+                          className="w-full min-h-[44px] rounded-xl text-sm font-semibold transition-colors active:opacity-70" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#f87171' }}>
                           🗑 Tafel verwijderen
                         </button>
                       </div>
