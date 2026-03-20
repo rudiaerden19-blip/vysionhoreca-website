@@ -942,20 +942,7 @@ export default function KassaReservationsView({
         {!loading && viewMode === 'today' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredReservations.length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  <CalendarDays size={48} className="mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-400">Geen reservaties vandaag</p>
-                  <button
-                    onClick={() => setShowNewReservationModal(true)}
-                    className="mt-4 px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition-colors"
-                  >
-                    Eerste reservatie aanmaken
-                  </button>
-                </div>
-              ) : (
-                filteredReservations.map(renderReservationCard)
-              )}
+              {filteredReservations.map(renderReservationCard)}
             </div>
 
             {/* z3 - Wachtlijst sectie */}
