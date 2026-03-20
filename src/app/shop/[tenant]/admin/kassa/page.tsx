@@ -252,6 +252,53 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       })
   }, [tenant, showTablePicker, tableOrdersKey])
 
+  // ── Realtime sync: tafelstatus tussen apparaten ───────────────────────────
+  useEffect(() => {
+    const tableChannel = supabase
+      .channel(`kassa_fpt_${tenant}`)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
+        ({ new: row }: any) => {
+          if (row?.data) {
+            setKassaTables(row.data)
+            localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(row.data))
+          }
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(tableChannel) }
+  }, [tenant])
+
+  // ── Realtime sync: open bestellingen per tafel tussen apparaten ───────────
+  useEffect(() => {
+    const ordersChannel = supabase
+      .channel(`kassa_open_orders_${tenant}`)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'orders', filter: `tenant_slug=eq.${tenant}` },
+        () => {
+          // Herlaad alle open orders bij elke wijziging (insert/update/delete)
+          supabase
+            .from('orders')
+            .select('table_number, items')
+            .eq('tenant_slug', tenant)
+            .eq('status', 'open')
+            .then(({ data }) => {
+              if (!data) return
+              const fromSupabase: Record<string, CartItem[]> = {}
+              data.forEach(row => {
+                if (row.table_number && row.items) {
+                  fromSupabase[row.table_number] = row.items as CartItem[]
+                }
+              })
+              setTableOrders(fromSupabase)
+              localStorage.setItem(tableOrdersKey, JSON.stringify(fromSupabase))
+            })
+        }
+      )
+      .subscribe()
+    return () => { supabase.removeChannel(ordersChannel) }
+  }, [tenant, tableOrdersKey])
+
   // Sla cart op voor huidige tafel
   const updateTableStatus = (tblNr: string, occupied: boolean) => {
     const tablesRaw = localStorage.getItem(`vysion_tables_${tenant}`)

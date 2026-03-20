@@ -349,6 +349,15 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const pointerStart = useRef({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
 
+  // ── Helpers: parse floor_plan_decor (oud: array, nieuw: {items, stool_statuses}) ──
+  const parseDecorData = (raw: unknown) => {
+    if (!raw) return { items: [] as DecorItem[], statuses: {} as Record<string, TableStatus> }
+    if (Array.isArray(raw)) return { items: raw as DecorItem[], statuses: {} }
+    const obj = raw as { items?: DecorItem[]; stool_statuses?: Record<string, TableStatus> }
+    return { items: obj.items || [], statuses: obj.stool_statuses || {} }
+  }
+
+  // ── Initieel laden vanuit Supabase ────────────────────────────────────────
   useEffect(() => {
     const load = async () => {
       // Tafels laden
@@ -357,25 +366,70 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         .select('data')
         .eq('tenant_slug', tenant)
         .single()
-      if (tData?.data) setTables(tData.data)
-      else {
+      if (tData?.data) {
+        setTables(tData.data)
+        localStorage.setItem(storageKey, JSON.stringify(tData.data))
+      } else {
         try { const raw = localStorage.getItem(storageKey); if (raw) setTables(JSON.parse(raw)) } catch { /* empty */ }
       }
-      // Decor laden
+      // Decor + krukstatussen laden
       const { data: dData } = await supabase
         .from('floor_plan_decor')
         .select('data')
         .eq('tenant_slug', tenant)
         .single()
-      if (dData?.data) setDecors(dData.data)
-      else {
+      if (dData?.data) {
+        const { items, statuses } = parseDecorData(dData.data)
+        setDecors(items)
+        setStoolStatuses(statuses)
+        localStorage.setItem(decorKey, JSON.stringify(items))
+        localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
+      } else {
         try { const raw = localStorage.getItem(decorKey); if (raw) setDecors(JSON.parse(raw)) } catch { /* empty */ }
+        try { const raw = localStorage.getItem(stoolStatusKey); if (raw) setStoolStatuses(JSON.parse(raw)) } catch { /* empty */ }
       }
-      // Kruk statussen laden
-      try { const raw = localStorage.getItem(`vysion_stool_status_${tenant}`); if (raw) setStoolStatuses(JSON.parse(raw)) } catch { /* empty */ }
     }
     load()
-  }, [tenant, storageKey, decorKey])
+  }, [tenant, storageKey, decorKey, stoolStatusKey])
+
+  // ── Realtime subscriptions: sync tussen apparaten ────────────────────────
+  useEffect(() => {
+    // Tafels: andere tablet verplaatst/voegt tafel toe → update hier
+    const tableChannel = supabase
+      .channel(`fpt_${tenant}`)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
+        ({ new: row }: any) => {
+          if (row?.data) {
+            setTables(row.data)
+            localStorage.setItem(storageKey, JSON.stringify(row.data))
+          }
+        }
+      )
+      .subscribe()
+
+    // Decor + krukstatussen: andere tablet wijzigt barkruk/status → update hier
+    const decorChannel = supabase
+      .channel(`fpd_${tenant}`)
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'floor_plan_decor', filter: `tenant_slug=eq.${tenant}` },
+        ({ new: row }: any) => {
+          if (row?.data) {
+            const { items, statuses } = parseDecorData(row.data)
+            setDecors(items)
+            setStoolStatuses(statuses)
+            localStorage.setItem(decorKey, JSON.stringify(items))
+            localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(tableChannel)
+      supabase.removeChannel(decorChannel)
+    }
+  }, [tenant, storageKey, decorKey, stoolStatusKey])
 
   useEffect(() => {
     if (selectedDecor?.type === 'bar_segment') {
@@ -389,15 +443,20 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
   }
 
-  const saveDecor = (updated: DecorItem[]) => {
+  // Sla decor + huidige krukstatussen samen op (één Supabase-rij, backward-compatible)
+  const saveDecor = (updated: DecorItem[], currentStoolStatuses?: Record<string, TableStatus>) => {
     setDecors(updated)
     localStorage.setItem(decorKey, JSON.stringify(updated))
-    supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
+    const payload = { items: updated, stool_statuses: currentStoolStatuses ?? stoolStatuses }
+    supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
   }
 
+  // Sla krukstatus op + sync naar Supabase zodat andere apparaten het zien
   const saveStoolStatus = (updated: Record<string, TableStatus>) => {
     setStoolStatuses(updated)
     localStorage.setItem(stoolStatusKey, JSON.stringify(updated))
+    const payload = { items: decors, stool_statuses: updated }
+    supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
   }
 
   // Effectieve stoel/tafel status:
@@ -536,8 +595,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       localStorage.setItem(storageKey, JSON.stringify(tables))
       supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: tables }, { onConflict: 'tenant_slug' })
     } else {
+      const payload = { items: decors, stool_statuses: stoolStatuses }
       localStorage.setItem(decorKey, JSON.stringify(decors))
-      supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: decors }, { onConflict: 'tenant_slug' })
+      supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
     }
     draggingId.current = null
     setIsDragging(false)
