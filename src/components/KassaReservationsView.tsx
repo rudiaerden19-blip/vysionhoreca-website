@@ -1148,10 +1148,17 @@ export default function KassaReservationsView({
 
               {floorPlanTablesDB.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
-                  <div className="text-center bg-white/70 rounded-2xl p-8 shadow-sm">
+                  <div className="text-center bg-white/80 rounded-2xl p-8 shadow-sm">
                     <LayoutGrid size={48} className="mx-auto text-gray-400 mb-3" />
-                    <p className="text-gray-600 font-semibold">Nog geen tafels aangemaakt</p>
-                    <p className="text-sm text-gray-400 mt-1">Maak tafels aan via Kassa → Plattegrond</p>
+                    <p className="text-gray-600 font-semibold mb-1">Nog geen tafels aangemaakt</p>
+                    <p className="text-sm text-gray-400 mb-4">Maak je plattegrond aan om tafels te zien</p>
+                    <button
+                      onClick={() => setViewMode('floorplan')}
+                      className="px-5 py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors flex items-center gap-2 mx-auto"
+                    >
+                      <Plus size={16} />
+                      Tafels aanmaken
+                    </button>
                   </div>
                 </div>
               ) : (
