@@ -1003,7 +1003,6 @@ export default function KassaReservationsView({
       party_size: data.party_size,
       reservation_date: data.reservation_date,
       reservation_time: data.reservation_time,
-      duration_minutes: data.duration_minutes,
       table_number: data.table_number,
       notes: data.notes,
       special_requests: data.special_requests,
