@@ -54,7 +54,7 @@ export interface DecorItem {
   stool2?: string
 }
 
-function DecorSVG({ item, isSelected }: { item: DecorItem; isSelected: boolean }) {
+function DecorSVG({ item, isSelected, orderedStools = new Set(), stoolStatuses = {}, getStoolStatus }: { item: DecorItem; isSelected: boolean; orderedStools?: Set<string>; stoolStatuses?: Record<string, TableStatus>; getStoolStatus?: (id: string) => TableStatus }) {
   if (item.type === 'plant') {
     return (
       <svg width={80} height={100} style={{ overflow: 'visible' }}>
@@ -96,6 +96,12 @@ function DecorSVG({ item, isSelected }: { item: DecorItem; isSelected: boolean }
   const stoolR = 16
   const s1 = item.stool1 || '?'
   const s2 = item.stool2 || '?'
+  const getColor = (stoolId: string) => {
+    const status = getStoolStatus ? getStoolStatus(stoolId) : (orderedStools.has(stoolId) ? 'OCCUPIED' : 'FREE')
+    return STATUS_COLORS[status]
+  }
+  const stool1Color = getColor(s1)
+  const stool2Color = getColor(s2)
   return (
     <svg width={bw} height={bh + stoolR * 2 + 10} style={{ overflow: 'visible' }}>
       <defs>
@@ -116,12 +122,12 @@ function DecorSVG({ item, isSelected }: { item: DecorItem; isSelected: boolean }
       {/* Label */}
       <text x={bw / 2} y={stoolR * 2 + 6 + bh / 2 + 5} textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize={11} fontWeight="bold">TOOG</text>
       {/* Kruk 1 */}
-      <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR} fill="#8B6914" stroke="#5a4010" strokeWidth={2} />
-      <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR - 5} fill="#a07820" opacity={0.6} />
+      <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR} fill={stool1Color} stroke="rgba(0,0,0,0.4)" strokeWidth={2} />
+      <circle cx={bw * 0.28} cy={stoolR + 2} r={stoolR - 5} fill="rgba(255,255,255,0.25)" />
       <text x={bw * 0.28} y={stoolR + 2 + 5} textAnchor="middle" fill="white" fontSize={11} fontWeight="bold">{s1}</text>
       {/* Kruk 2 */}
-      <circle cx={bw * 0.72} cy={stoolR + 2} r={stoolR} fill="#8B6914" stroke="#5a4010" strokeWidth={2} />
-      <circle cx={bw * 0.72} cy={stoolR + 2} r={stoolR - 5} fill="#a07820" opacity={0.6} />
+      <circle cx={bw * 0.72} cy={stoolR + 2} r={stoolR} fill={stool2Color} stroke="rgba(0,0,0,0.4)" strokeWidth={2} />
+      <circle cx={bw * 0.72} cy={stoolR + 2} r={stoolR - 5} fill="rgba(255,255,255,0.25)" />
       <text x={bw * 0.72} y={stoolR + 2 + 5} textAnchor="middle" fill="white" fontSize={11} fontWeight="bold">{s2}</text>
     </svg>
   )
@@ -329,6 +335,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const [addStool1, setAddStool1] = useState('K1')
   const [addStool2, setAddStool2] = useState('K2')
   const [editStoolVals, setEditStoolVals] = useState({ s1: '', s2: '' })
+  // Kruk statussen: { "K1": "FREE"|"OCCUPIED"|"UNPAID", ... }
+  const stoolStatusKey = `vysion_stool_status_${tenant}`
+  const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
   const draggingId = useRef<string | null>(null)
   const draggingType = useRef<'table' | 'decor'>('table')
@@ -359,6 +368,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       else {
         try { const raw = localStorage.getItem(decorKey); if (raw) setDecors(JSON.parse(raw)) } catch { /* empty */ }
       }
+      // Kruk statussen laden
+      try { const raw = localStorage.getItem(`vysion_stool_status_${tenant}`); if (raw) setStoolStatuses(JSON.parse(raw)) } catch { /* empty */ }
     }
     load()
   }, [tenant, storageKey, decorKey])
@@ -379,6 +390,17 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     setDecors(updated)
     localStorage.setItem(decorKey, JSON.stringify(updated))
     supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
+  }
+
+  const saveStoolStatus = (updated: Record<string, TableStatus>) => {
+    setStoolStatuses(updated)
+    localStorage.setItem(stoolStatusKey, JSON.stringify(updated))
+  }
+
+  // Effectieve stoel status: manueel override, anders auto van tableOrders
+  const getStoolStatus = (stoolId: string): TableStatus => {
+    if (stoolStatuses[stoolId]) return stoolStatuses[stoolId]
+    return (tableOrders[stoolId] || []).length > 0 ? 'OCCUPIED' : 'FREE'
   }
 
   const addDecor = (type: DecorType) => {
@@ -577,7 +599,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               }}
               onClick={(e) => e.stopPropagation()}
             >
-              <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} />
+              <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} orderedStools={new Set(Object.keys(tableOrders).filter(k => (tableOrders[k] || []).length > 0))} stoolStatuses={stoolStatuses} getStoolStatus={getStoolStatus} />
             </div>
           ))}
 
@@ -632,54 +654,120 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               <button onClick={() => setSelectedDecor(null)} className="text-white/50 hover:text-white text-xl">✕</button>
             </div>
 
-            {/* Bar segment: kruk nummers + bestelling starten */}
-            {selectedDecor.type === 'bar_segment' && (
-              <>
-                <div className="p-4 border-b border-white/10 space-y-2">
-                  <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Kruk nummers</p>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-white/60 text-xs w-14">Kruk 1:</span>
-                    <input
-                      value={editStoolVals.s1}
-                      onChange={e => setEditStoolVals(prev => ({ ...prev, s1: e.target.value }))}
-                      className="flex-1 px-2 py-1.5 rounded-lg bg-white/10 text-white text-sm font-bold text-center outline-none border border-white/10 focus:border-blue-400"
-                    />
+            {/* Bar segment: kruk nummers + bestellingen + bestelling starten */}
+            {selectedDecor.type === 'bar_segment' && (() => {
+              const s1 = selectedDecor.stool1 || 'K?'
+              const s2 = selectedDecor.stool2 || 'K?'
+              const items1 = tableOrders[s1] || []
+              const items2 = tableOrders[s2] || []
+              const total1 = items1.reduce((sum, item) => sum + (item.product.price + (item.choices||[]).reduce((s,c)=>s+c.price,0)) * item.quantity, 0)
+              const total2 = items2.reduce((sum, item) => sum + (item.product.price + (item.choices||[]).reduce((s,c)=>s+c.price,0)) * item.quantity, 0)
+
+              const StoolPanel = ({ stoolId, items, total }: { stoolId: string; items: SimpleCartItem[]; total: number }) => {
+                const status = getStoolStatus(stoolId)
+                return (
+                  <div className="mb-4 bg-white/5 rounded-xl overflow-hidden">
+                    {/* Kruk header met status kleur */}
+                    <div className="flex items-center justify-between px-3 py-2" style={{ backgroundColor: STATUS_COLORS[status] + '33', borderLeft: `4px solid ${STATUS_COLORS[status]}` }}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: STATUS_COLORS[status] }}>{stoolId}</div>
+                        <span className="text-white font-bold text-sm">Kruk {stoolId}</span>
+                      </div>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_COLORS[status] }}>{STATUS_LABELS[status]}</span>
+                    </div>
+                    {/* Bestellingen */}
+                    <div className="p-3">
+                      {items.length > 0 ? (
+                        <div className="space-y-1.5">
+                          {items.map((item, i) => {
+                            const choiceTotal = (item.choices||[]).reduce((s,c)=>s+c.price,0)
+                            return (
+                              <div key={i} className="flex justify-between items-start">
+                                <div className="flex-1 min-w-0">
+                                  <span className="text-white text-xs font-semibold">{item.quantity}× {item.product.name}</span>
+                                  {(item.choices||[]).map((c,ci) => (
+                                    <p key={ci} className="text-white/40 text-xs ml-2">+ {c.choiceName}</p>
+                                  ))}
+                                </div>
+                                <span className="text-amber-400 text-xs font-bold ml-2 shrink-0">€{((item.product.price+choiceTotal)*item.quantity).toFixed(2)}</span>
+                              </div>
+                            )
+                          })}
+                          <div className="flex justify-between pt-1 border-t border-white/10 mt-1">
+                            <span className="text-white/50 text-xs">Totaal</span>
+                            <span className="text-white text-xs font-bold">€{total.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-white/30 text-xs">Geen openstaande bestelling</p>
+                      )}
+                    </div>
+                    {/* Status knoppen */}
+                    <div className="px-3 pb-3 grid grid-cols-3 gap-1.5">
+                      {(['FREE', 'OCCUPIED', 'UNPAID'] as TableStatus[]).map(s => (
+                        <button key={s}
+                          onClick={() => saveStoolStatus({ ...stoolStatuses, [stoolId]: s })}
+                          className="py-1.5 rounded-lg text-xs font-semibold transition-all"
+                          style={status === s
+                            ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
+                            : { backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }
+                          }>
+                          {STATUS_LABELS[s]}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Bestelling knop */}
+                    <div className="px-3 pb-3">
+                      <button
+                        onClick={() => { onSelectTable(stoolId); onClose() }}
+                        className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-colors">
+                        🛒 {items.length > 0 ? `Toevoegen aan ${stoolId}` : `Nieuwe bestelling ${stoolId}`}
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-white/60 text-xs w-14">Kruk 2:</span>
-                    <input
-                      value={editStoolVals.s2}
-                      onChange={e => setEditStoolVals(prev => ({ ...prev, s2: e.target.value }))}
-                      className="flex-1 px-2 py-1.5 rounded-lg bg-white/10 text-white text-sm font-bold text-center outline-none border border-white/10 focus:border-blue-400"
-                    />
+                )
+              }
+
+              return (
+                <>
+                  <div className="p-4 border-b border-white/10 flex-1 overflow-y-auto">
+                    <p className="text-white/50 text-xs uppercase tracking-wider mb-3">Barkrukken</p>
+                    <StoolPanel stoolId={s1} items={items1} total={total1} />
+                    <StoolPanel stoolId={s2} items={items2} total={total2} />
                   </div>
-                  <button
-                    onClick={() => {
-                      const updated = decors.map(d => d.id === selectedDecor.id
-                        ? { ...d, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?' }
-                        : d)
-                      saveDecor(updated)
-                      setSelectedDecor({ ...selectedDecor, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?' })
-                    }}
-                    className="w-full py-1.5 rounded-lg bg-blue-500/30 text-blue-300 hover:bg-blue-500/50 text-sm font-semibold transition-colors">
-                    💾 Opslaan
-                  </button>
-                </div>
-                <div className="p-4 border-b border-white/10 space-y-2">
-                  <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Bestelling starten</p>
-                  <button
-                    onClick={() => { onSelectTable(selectedDecor.stool1 || 'K?'); onClose() }}
-                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-colors">
-                    🛒 Kruk {selectedDecor.stool1 || '?'}
-                  </button>
-                  <button
-                    onClick={() => { onSelectTable(selectedDecor.stool2 || 'K?'); onClose() }}
-                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-colors">
-                    🛒 Kruk {selectedDecor.stool2 || '?'}
-                  </button>
-                </div>
-              </>
-            )}
+                  <div className="p-4 border-b border-white/10 space-y-2">
+                    <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Kruk nummers bewerken</p>
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/60 text-xs w-14">Kruk 1:</span>
+                      <input
+                        value={editStoolVals.s1}
+                        onChange={e => setEditStoolVals(prev => ({ ...prev, s1: e.target.value }))}
+                        className="flex-1 px-2 py-1.5 rounded-lg bg-white/10 text-white text-sm font-bold text-center outline-none border border-white/10 focus:border-blue-400"
+                      />
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <span className="text-white/60 text-xs w-14">Kruk 2:</span>
+                      <input
+                        value={editStoolVals.s2}
+                        onChange={e => setEditStoolVals(prev => ({ ...prev, s2: e.target.value }))}
+                        className="flex-1 px-2 py-1.5 rounded-lg bg-white/10 text-white text-sm font-bold text-center outline-none border border-white/10 focus:border-blue-400"
+                      />
+                    </div>
+                    <button
+                      onClick={() => {
+                        const updated = decors.map(d => d.id === selectedDecor.id
+                          ? { ...d, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?' }
+                          : d)
+                        saveDecor(updated)
+                        setSelectedDecor({ ...selectedDecor, stool1: editStoolVals.s1 || 'K?', stool2: editStoolVals.s2 || 'K?' })
+                      }}
+                      className="w-full py-1.5 rounded-lg bg-blue-500/30 text-blue-300 hover:bg-blue-500/50 text-sm font-semibold transition-colors">
+                      💾 Opslaan
+                    </button>
+                  </div>
+                </>
+              )
+            })()}
 
             <div className="p-4 border-b border-white/10">
               <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
