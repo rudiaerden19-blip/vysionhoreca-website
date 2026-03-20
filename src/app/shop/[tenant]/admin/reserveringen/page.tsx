@@ -26,7 +26,7 @@ export default function ReserveringenPage({ params }: { params: { tenant: string
     <KassaReservationsView
       tenant={params.tenant}
       kassaTables={kassaTables}
-      onClose={() => router.push(`/shop/${params.tenant}/admin`)}
+      onClose={() => router.push(`/shop/${params.tenant}/admin/kassa`)}
       onStartOrder={(tableNr) => {
         router.push(`/shop/${params.tenant}/admin/kassa?tafel=${tableNr}`)
       }}
