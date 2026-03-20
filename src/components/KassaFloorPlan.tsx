@@ -664,7 +664,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
         {/* Decor Sidebar */}
         {selectedDecor && !selected && (
-          <div className="w-64 bg-[#16213e] border-l border-white/10 flex flex-col overflow-y-auto">
+          <div className="w-80 bg-[#16213e] border-l border-white/10 flex flex-col overflow-y-auto">
             <div className="p-4 border-b border-white/10 flex justify-between items-center">
               <h3 className="text-white font-bold text-lg">{selectedDecor.type === 'plant' ? '🌿 Plant' : '🍺 Toogstuk'}</h3>
               <button onClick={() => setSelectedDecor(null)} className="text-white/50 hover:text-white text-xl">✕</button>
@@ -719,20 +719,19 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                       )}
                     </div>
                     {/* Status knoppen */}
-                    <div className="px-3 pb-3 grid grid-cols-3 gap-1.5">
+                    <div className="px-3 pb-3 grid grid-cols-3 gap-2">
                       {(['FREE', 'OCCUPIED', 'UNPAID'] as TableStatus[]).map(s => {
                         const isActive = status === s
-                        // ONBETAALD knop oplichten als BEZET + items aanwezig
                         const warnUnpaid = s === 'UNPAID' && status === 'OCCUPIED' && items.length > 0
                         return (
                           <button key={s}
                             onClick={() => saveStoolStatus({ ...stoolStatuses, [stoolId]: s })}
-                            className="py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            className="py-2.5 rounded-xl text-sm font-bold transition-all"
                             style={isActive
                               ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
                               : warnUnpaid
-                              ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `1.5px solid ${STATUS_COLORS['UNPAID']}` }
-                              : { backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }
+                              ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}` }
+                              : { backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.5)' }
                             }>
                             {STATUS_LABELS[s]}{warnUnpaid ? ' ⚠️' : ''}
                           </button>
@@ -743,7 +742,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                     <div className="px-3 pb-3">
                       <button
                         onClick={() => { onSelectTable(stoolId); onClose() }}
-                        className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition-colors">
+                        className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-base transition-colors">
                         🛒 {items.length > 0 ? `Toevoegen aan ${stoolId}` : `Nieuwe bestelling ${stoolId}`}
                       </button>
                     </div>
