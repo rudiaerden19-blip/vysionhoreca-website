@@ -5,7 +5,7 @@
  * Exact gekopieerd van ReservationsView (vysion-horeca) + Supabase + email
  */
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import {
   CalendarDays,
   Users,
@@ -247,7 +247,19 @@ export default function KassaReservationsView({
   const [selectedShift, setSelectedShift] = useState<string | null>(null)
   const [guestProfilesDB, setGuestProfilesDB] = useState<GuestProfile[]>([])
   const [cancelConfirm, setCancelConfirm] = useState<Reservation | null>(null)
+  const [isPro, setIsPro] = useState(true)
   const [floorPlanTablesDB, setFloorPlanTablesDB] = useState<FloorPlanTable[]>([])
+  // Floor plan editor state
+  const [selectedFloorTable, setSelectedFloorTable] = useState<FloorPlanTable | null>(null)
+  const [showAddFloorTable, setShowAddFloorTable] = useState(false)
+  const [addFloorNumber, setAddFloorNumber] = useState('')
+  const [addFloorSeats, setAddFloorSeats] = useState(4)
+  const [addFloorShape, setAddFloorShape] = useState<'SQUARE' | 'ROUND' | 'RECTANGLE'>('SQUARE')
+  const [isDraggingFloor, setIsDraggingFloor] = useState(false)
+  const floorDraggingId = useRef<string | null>(null)
+  const floorDragOffset = useRef({ x: 0, y: 0 })
+  const floorDragMoved = useRef(false)
+  const floorPointerStart = useRef({ x: 0, y: 0 })
   const [timelineDate, setTimelineDate] = useState(new Date().toISOString().split('T')[0])
   const [floorPlanTime, setFloorPlanTime] = useState(() => {
     const now = new Date()
@@ -271,9 +283,15 @@ export default function KassaReservationsView({
 
   // Load tenant info + reservatie instellingen vanuit Supabase
   useEffect(() => {
-    supabase.from('tenants').select('name,phone,email').eq('slug', tenant).single()
+    supabase.from('tenants').select('name,phone,email,subscription_status,trial_ends_at,plan').eq('slug', tenant).single()
       .then(({ data }) => {
-        if (data) setBusinessInfo({ name: data.name || '', phone: data.phone || '', email: data.email || '' })
+        if (data) {
+          setBusinessInfo({ name: data.name || '', phone: data.phone || '', email: data.email || '' })
+          const status = data.subscription_status || 'trial'
+          const trialEnd = data.trial_ends_at ? new Date(data.trial_ends_at) : null
+          const isTrial = (status === 'trial' || status === 'TRIAL') && trialEnd && trialEnd > new Date()
+          setIsPro(data.plan === 'pro' || status === 'active' || !!isTrial)
+        }
       })
     // Laad reservatie instellingen vanuit Supabase (overschrijft localStorage)
     supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).single()
@@ -340,6 +358,74 @@ export default function KassaReservationsView({
       { tenant_slug: tenant, ...newSettings },
       { onConflict: 'tenant_slug' }
     ).then(() => {})
+  }
+
+  // ---- Floor plan editor helpers ----
+  const saveFloorPlan = async (updated: FloorPlanTable[]) => {
+    setFloorPlanTablesDB(updated)
+    await supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
+  }
+
+  const addFloorTable = async () => {
+    if (!addFloorNumber.trim()) return
+    const newTable: FloorPlanTable = {
+      id: Math.random().toString(36).slice(2, 10),
+      number: addFloorNumber.trim(),
+      seats: addFloorSeats,
+      shape: addFloorShape,
+      x: 15 + Math.random() * 60,
+      y: 15 + Math.random() * 60,
+      rotation: 0,
+      status: 'FREE',
+    }
+    await saveFloorPlan([...floorPlanTablesDB, newTable])
+    setAddFloorNumber('')
+    setAddFloorSeats(4)
+    setShowAddFloorTable(false)
+    toast.success(`Tafel ${newTable.number} toegevoegd`)
+  }
+
+  const deleteFloorTable = async (id: string) => {
+    await saveFloorPlan(floorPlanTablesDB.filter(t => t.id !== id))
+    setSelectedFloorTable(null)
+    toast.success('Tafel verwijderd')
+  }
+
+  const handleFloorPointerDown = (e: React.PointerEvent, id: string) => {
+    e.stopPropagation()
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    const canvas = document.querySelector('.res-floor-canvas') as HTMLElement
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const table = floorPlanTablesDB.find(t => t.id === id)!
+    floorDraggingId.current = id
+    floorDragMoved.current = false
+    floorPointerStart.current = { x: e.clientX, y: e.clientY }
+    floorDragOffset.current = {
+      x: e.clientX - rect.left - (table.x / 100) * rect.width,
+      y: e.clientY - rect.top - (table.y / 100) * rect.height,
+    }
+    setIsDraggingFloor(true)
+  }
+
+  const handleFloorPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!floorDraggingId.current) return
+    const dx = Math.abs(e.clientX - floorPointerStart.current.x)
+    const dy = Math.abs(e.clientY - floorPointerStart.current.y)
+    if (dx < 6 && dy < 6) return
+    floorDragMoved.current = true
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = Math.max(3, Math.min(95, ((e.clientX - rect.left - floorDragOffset.current.x) / rect.width) * 100))
+    const y = Math.max(3, Math.min(93, ((e.clientY - rect.top - floorDragOffset.current.y) / rect.height) * 100))
+    setFloorPlanTablesDB(prev => prev.map(t => t.id === floorDraggingId.current ? { ...t, x, y } : t))
+  }
+
+  const handleFloorPointerUp = async (e: React.PointerEvent) => {
+    if (!floorDraggingId.current) return
+    await supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: floorPlanTablesDB }, { onConflict: 'tenant_slug' })
+    floorDraggingId.current = null
+    setIsDraggingFloor(false)
+    setTimeout(() => { floorDragMoved.current = false }, 0)
   }
 
   // ---- Derived data ----
@@ -1458,128 +1544,320 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'floorplan' && (() => {
-          // Use real floor plan tables, fallback to kassa tables
-          const displayTables = floorPlanTablesDB.length > 0 ? floorPlanTablesDB : kassaTables.map(t => ({
-            ...t, shape: 'SQUARE' as const, x: 0, y: 0, rotation: 0,
-          }))
-
-          // Time slider: see occupancy at a specific time on selected date
-          const floorRes = reservations.filter(r =>
-            r.reservation_date === selectedDate &&
-            r.status !== 'CANCELLED' &&
-            r.status !== 'COMPLETED'
-          )
-
-          const getTableStatus = (tableNum: string) => {
-            const res = floorRes.find(r => r.table_number === tableNum)
-            if (!res) return { color: '#22c55e', label: 'Vrij', reservation: null }
-            if (res.status === 'CHECKED_IN') return { color: '#3b82f6', label: 'Bezet', reservation: res }
-            if (res.status === 'CONFIRMED') return { color: '#8b5cf6', label: 'Gereserveerd', reservation: res }
-            if (res.status === 'PENDING') return { color: '#f59e0b', label: 'In afwachting', reservation: res }
-            return { color: '#9ca3af', label: res.status, reservation: res }
-          }
-
-          const hasRealPositions = floorPlanTablesDB.length > 0
-
-          return (
-            <div>
-              {/* Date + Legend */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); setSelectedDate(d.toISOString().split('T')[0]) }}
-                      className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={16} /></button>
-                    <span className="font-semibold text-sm">{formatDate(selectedDate)}</span>
-                    <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); setSelectedDate(d.toISOString().split('T')[0]) }}
-                      className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={16} /></button>
+          // Pro gate
+          if (!isPro) {
+            return (
+              <div className="flex items-center justify-center h-96">
+                <div className="text-center max-w-md bg-white rounded-2xl p-10 shadow-lg border border-gray-200">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center mx-auto mb-5">
+                    <LayoutGrid size={32} className="text-white" />
                   </div>
-                </div>
-                <div className="flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500" /><span>Vrij</span></div>
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-purple-500" /><span>Gereserveerd</span></div>
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-blue-500" /><span>Bezet</span></div>
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-400" /><span>In afwachting</span></div>
+                  <h2 className="text-xl font-bold mb-2">Visueel Tafelplan</h2>
+                  <p className="text-gray-500 text-sm mb-6">
+                    Sleep tafels op de plattegrond, zie reservaties per tafel en beheer de bezetting visueel. Beschikbaar voor Pro klanten.
+                  </p>
+                  <a href={`/shop/${tenant}/admin/abonnement`}
+                    className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-600 text-white font-semibold hover:opacity-90 transition-opacity">
+                    Upgrade naar Pro
+                  </a>
                 </div>
               </div>
+            )
+          }
 
-              {displayTables.length === 0 ? (
-                <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                  <LayoutGrid size={48} className="mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-400 font-medium">Nog geen tafels aangemaakt</p>
-                  <p className="text-sm text-gray-400 mt-1">Maak tafels aan via de Kassa → Plattegrond</p>
+          // Reservation status per table for selected date
+          const floorRes = reservations.filter(r =>
+            r.reservation_date === selectedDate &&
+            r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
+          )
+          const getFloorTableInfo = (tableNum: string) => {
+            const res = floorRes.find(r => r.table_number === tableNum)
+            if (!res) return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res: null }
+            if (res.status === 'CHECKED_IN') return { color: '#60a5fa', borderColor: '#3b82f6', label: 'Bezet', res }
+            if (res.status === 'CONFIRMED') return { color: '#a78bfa', borderColor: '#8b5cf6', label: 'Gereserveerd', res }
+            if (res.status === 'PENDING') return { color: '#fbbf24', borderColor: '#f59e0b', label: 'Afwachting', res }
+            return { color: '#9ca3af', borderColor: '#6b7280', label: res.status, res }
+          }
+
+          return (
+            <div className="flex flex-col h-full -m-4" style={{ height: 'calc(100vh - 130px)' }}>
+              {/* Toolbar */}
+              <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 flex-shrink-0">
+                {/* Date nav */}
+                <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                  className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={16} /></button>
+                <span className="font-semibold text-sm min-w-28 text-center">{formatDate(selectedDate)}</span>
+                <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                  className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={16} /></button>
+                <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
+                  className="px-2 py-1.5 rounded-lg bg-gray-100 border border-gray-200 text-xs" />
+
+                <div className="flex-1" />
+
+                {/* Legend */}
+                <div className="hidden md:flex items-center gap-3 text-xs font-medium">
+                  <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-green-400" /><span>Vrij</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-violet-400" /><span>Gereserveerd</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-blue-400" /><span>Bezet</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-amber-400" /><span>Afwachting</span></div>
                 </div>
-              ) : hasRealPositions ? (
-                /* Real positioned floor plan */
-                <div className="bg-[#e8f0f7] rounded-2xl border border-gray-200 relative overflow-hidden"
-                  style={{ height: 580 }}>
-                  {/* Grid background */}
-                  <div className="absolute inset-0 opacity-30"
-                    style={{
-                      backgroundImage: 'linear-gradient(to right, #c5d5e4 1px, transparent 1px), linear-gradient(to bottom, #c5d5e4 1px, transparent 1px)',
-                      backgroundSize: '40px 40px',
-                    }} />
-                  {displayTables.map(table => {
-                    const { color, label, reservation } = getTableStatus(table.number)
-                    const tw = table.shape === 'RECTANGLE' ? 96 : table.shape === 'ROUND' ? 64 : 64
-                    const th = table.shape === 'RECTANGLE' ? 48 : 64
+
+                <div className="flex-1" />
+
+                <button onClick={() => { setSelectedFloorTable(null); setShowAddFloorTable(true) }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors">
+                  <Plus size={16} />
+                  Tafel toevoegen
+                </button>
+                {selectedFloorTable && (
+                  <button onClick={() => deleteFloorTable(selectedFloorTable.id)}
+                    className="px-3 py-2 rounded-xl bg-red-100 hover:bg-red-200 text-red-500 text-sm font-semibold transition-colors">
+                    Verwijder
+                  </button>
+                )}
+              </div>
+
+              {/* Canvas + optional sidebar */}
+              <div className="flex flex-1 overflow-hidden">
+                {/* Canvas */}
+                <div
+                  className="res-floor-canvas flex-1 relative overflow-hidden select-none"
+                  style={{
+                    backgroundColor: '#e3e3e3',
+                    backgroundImage: 'linear-gradient(to right, rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.07) 1px, transparent 1px)',
+                    backgroundSize: '40px 40px',
+                    cursor: isDraggingFloor ? 'grabbing' : 'default',
+                    touchAction: 'none',
+                  }}
+                  onPointerMove={handleFloorPointerMove}
+                  onPointerUp={handleFloorPointerUp}
+                  onClick={() => { if (!isDraggingFloor) setSelectedFloorTable(null) }}
+                >
+                  {floorPlanTablesDB.length === 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div className="text-center bg-white/80 rounded-2xl px-10 py-8 shadow-sm">
+                        <LayoutGrid size={48} className="mx-auto text-gray-400 mb-3" />
+                        <p className="text-gray-600 font-semibold mb-1">Nog geen tafels</p>
+                        <p className="text-sm text-gray-400">Klik op &ldquo;Tafel toevoegen&rdquo; om te starten</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {floorPlanTablesDB.map(table => {
+                    const { color, borderColor, res } = getFloorTableInfo(table.number)
+                    const isSelected = selectedFloorTable?.id === table.id
+                    const tw = table.shape === 'RECTANGLE' ? 100 : 72
+                    const th = table.shape === 'RECTANGLE' ? 52 : 72
+
                     return (
                       <div
                         key={table.id}
-                        onClick={() => reservation && setSelectedReservation(reservation)}
-                        className="absolute transition-all"
+                        className="absolute"
                         style={{
                           left: `${table.x}%`,
                           top: `${table.y}%`,
                           transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
-                          cursor: reservation ? 'pointer' : 'default',
-                          zIndex: reservation ? 2 : 1,
+                          zIndex: isSelected ? 10 : 1,
+                          cursor: isDraggingFloor ? 'grabbing' : 'grab',
+                          touchAction: 'none',
                         }}
+                        onPointerDown={e => handleFloorPointerDown(e, table.id)}
+                        onPointerUp={e => {
+                          e.stopPropagation()
+                          handleFloorPointerUp(e)
+                          if (!floorDragMoved.current) {
+                            setSelectedFloorTable(prev => prev?.id === table.id ? null : table)
+                            if (res) setSelectedReservation(res)
+                          }
+                        }}
+                        onClick={e => e.stopPropagation()}
                       >
                         <div
-                          className="flex flex-col items-center justify-center rounded-xl shadow-md border-2 relative"
+                          className="flex flex-col items-center justify-center relative transition-shadow"
                           style={{
                             width: tw, height: th,
-                            backgroundColor: color + 'dd',
-                            borderColor: color,
-                            borderRadius: table.shape === 'ROUND' ? '50%' : 12,
+                            backgroundColor: color,
+                            borderRadius: table.shape === 'ROUND' ? '50%' : 10,
+                            border: isSelected ? `3px solid #1d4ed8` : `2px solid ${borderColor}`,
+                            boxShadow: isSelected
+                              ? '0 0 0 4px rgba(29,78,216,0.2), 0 4px 16px rgba(0,0,0,0.2)'
+                              : '0 2px 8px rgba(0,0,0,0.18)',
                           }}
                         >
-                          <span className="text-white text-sm font-bold leading-none">{table.number}</span>
+                          <span className="text-white text-sm font-bold drop-shadow-sm leading-none">{table.number}</span>
                           <span className="text-white/80 text-[10px]">{table.seats}p</span>
-                          {reservation && (
-                            <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white shadow-md rounded-lg px-2 py-0.5 text-[10px] font-medium text-gray-700 border border-gray-200">
-                              {reservation.guest_name}
-                            </div>
-                          )}
                         </div>
+                        {res && (
+                          <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white shadow-md rounded-lg px-2 py-0.5 text-[10px] font-semibold text-gray-700 border border-gray-200 pointer-events-none z-20">
+                            {res.guest_name} {res.reservation_time}
+                          </div>
+                        )}
                       </div>
                     )
                   })}
                 </div>
-              ) : (
-                /* Fallback grid when no positions stored */
-                <div className="bg-[#e8f0f7] rounded-2xl border border-gray-200 p-6">
-                  <p className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4 inline-block">
-                    Stel tafels in via Kassa → Plattegrond om de echte layout te zien
-                  </p>
-                  <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-                    {displayTables.map(table => {
-                      const { color, label, reservation } = getTableStatus(table.number)
-                      return (
-                        <div key={table.id}
-                          onClick={() => reservation && setSelectedReservation(reservation)}
-                          className="aspect-square rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:opacity-90 transition-opacity relative shadow-sm"
-                          style={{ backgroundColor: color }}>
-                          <span className="text-white text-2xl font-bold">{table.number}</span>
-                          <span className="text-white/80 text-xs">{table.seats}p</span>
-                          {reservation && (
-                            <div className="absolute bottom-1 left-1 right-1 bg-black/30 rounded px-1 py-0.5 text-center">
-                              <span className="text-white text-[10px] truncate block">{reservation.guest_name}</span>
-                            </div>
-                          )}
+
+                {/* Sidebar — selected table detail */}
+                {selectedFloorTable && (() => {
+                  const { res, label, color } = getFloorTableInfo(selectedFloorTable.number)
+                  return (
+                    <div className="w-72 flex-shrink-0 bg-white border-l border-gray-200 flex flex-col overflow-y-auto">
+                      <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                        <div>
+                          <h3 className="font-bold text-lg">Tafel {selectedFloorTable.number}</h3>
+                          <p className="text-xs text-gray-400">{selectedFloorTable.seats} plaatsen • {selectedFloorTable.shape}</p>
                         </div>
-                      )
-                    })}
+                        <button onClick={() => setSelectedFloorTable(null)}
+                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
+                          <X size={18} />
+                        </button>
+                      </div>
+
+                      {/* Status badge */}
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-white text-sm font-medium" style={{ backgroundColor: color }}>
+                          <div className="w-2 h-2 rounded-full bg-white/70" />
+                          {label}
+                        </div>
+                      </div>
+
+                      {/* Reservation detail */}
+                      {res ? (
+                        <div className="p-4 space-y-3">
+                          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Reservatie</p>
+                          <div>
+                            <p className="font-bold text-gray-900">{res.guest_name}</p>
+                            <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
+                              <span className="flex items-center gap-1"><Clock size={13} />{res.reservation_time}</span>
+                              <span className="flex items-center gap-1"><Users size={13} />{res.party_size}p</span>
+                            </div>
+                            {res.guest_phone && (
+                              <a href={`tel:${res.guest_phone}`} className="flex items-center gap-1 text-sm text-blue-500 mt-1 hover:underline">
+                                <Phone size={13} />{res.guest_phone}
+                              </a>
+                            )}
+                            {res.notes && <p className="text-xs text-gray-400 mt-1 italic">{res.notes}</p>}
+                            {res.occasion && <p className="text-xs text-purple-500 mt-1">🎉 {res.occasion}</p>}
+                          </div>
+                          <div className="space-y-2 pt-2 border-t border-gray-100">
+                            {res.status === 'PENDING' && (
+                              <button onClick={() => { handleConfirm(res); setSelectedFloorTable(null) }}
+                                className="w-full py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+                                <CheckCircle2 size={16} /> Bevestigen
+                              </button>
+                            )}
+                            {res.status === 'CONFIRMED' && (
+                              <>
+                                <button onClick={() => { handleCheckIn(res); setSelectedFloorTable(null) }}
+                                  className="w-full py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
+                                  <UserCheck size={16} /> Check-in
+                                </button>
+                                <button onClick={() => { handleStartOrder(res); setSelectedFloorTable(null) }}
+                                  className="w-full py-2.5 rounded-xl bg-[#3C4D6B] text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                                  <UtensilsCrossed size={16} /> Naar Kassa
+                                </button>
+                              </>
+                            )}
+                            {res.status === 'CHECKED_IN' && (
+                              <button onClick={() => { handleStartOrder(res); setSelectedFloorTable(null) }}
+                                className="w-full py-2.5 rounded-xl bg-[#3C4D6B] text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                                <UtensilsCrossed size={16} /> Naar Kassa
+                              </button>
+                            )}
+                            {(res.status === 'CONFIRMED' || res.status === 'PENDING') && (
+                              <button onClick={() => { handleNoShow(res); setSelectedFloorTable(null) }}
+                                className="w-full py-2 rounded-xl bg-red-50 text-red-400 text-sm font-semibold hover:bg-red-100 transition-colors flex items-center justify-center gap-2">
+                                <UserX size={16} /> No-show
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-4">
+                          <p className="text-sm text-gray-400 text-center py-4">Geen reservatie voor {formatDate(selectedDate)}</p>
+                          <button onClick={() => {
+                            setShowNewReservationModal(true)
+                            setSelectedFloorTable(null)
+                          }}
+                            className="w-full py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2">
+                            <Plus size={16} /> Reservatie aanmaken
+                          </button>
+                          <button onClick={() => deleteFloorTable(selectedFloorTable.id)}
+                            className="w-full py-2 mt-2 rounded-xl bg-red-50 text-red-400 text-sm font-semibold hover:bg-red-100 transition-colors">
+                            Tafel verwijderen
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Rotate */}
+                      <div className="px-4 py-3 border-t border-gray-100 mt-auto">
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Draaien</p>
+                        <div className="flex gap-2">
+                          <button onClick={async () => {
+                            const updated = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation - 45 + 360) % 360 } : t)
+                            await saveFloorPlan(updated)
+                            setSelectedFloorTable(prev => prev ? { ...prev, rotation: (prev.rotation - 45 + 360) % 360 } : null)
+                          }} className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-lg">↺</button>
+                          <button onClick={async () => {
+                            const updated = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation + 45) % 360 } : t)
+                            await saveFloorPlan(updated)
+                            setSelectedFloorTable(prev => prev ? { ...prev, rotation: (prev.rotation + 45) % 360 } : null)
+                          }} className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-lg">↻</button>
+                          <button onClick={async () => {
+                            const updated = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: 0 } : t)
+                            await saveFloorPlan(updated)
+                            setSelectedFloorTable(prev => prev ? { ...prev, rotation: 0 } : null)
+                          }} className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold">Reset</button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
+
+              {/* Add table modal */}
+              {showAddFloorTable && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[70] p-4">
+                  <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
+                    <div className="p-5 border-b flex items-center justify-between">
+                      <h3 className="font-bold text-lg">Tafel toevoegen</h3>
+                      <button onClick={() => setShowAddFloorTable(false)} className="text-gray-400 hover:text-gray-700"><X size={20} /></button>
+                    </div>
+                    <div className="p-5 space-y-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-1">Tafelnummer *</label>
+                        <input autoFocus value={addFloorNumber} onChange={e => setAddFloorNumber(e.target.value)}
+                          onKeyDown={e => e.key === 'Enter' && addFloorTable()}
+                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-500 outline-none text-xl font-bold text-center"
+                          placeholder="bv. 1, 2A, Toog" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">Aantal plaatsen</label>
+                        <div className="grid grid-cols-5 gap-2">
+                          {[2, 4, 6, 8, 10].map(n => (
+                            <button key={n} onClick={() => setAddFloorSeats(n)}
+                              className={`py-2 rounded-xl font-bold transition-colors ${addFloorSeats === n ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                              {n}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-600 mb-2">Vorm</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          {([['SQUARE', '⬛ Vierkant'], ['ROUND', '⭕ Rond'], ['RECTANGLE', '▬ Rechthoek']] as const).map(([s, label]) => (
+                            <button key={s} onClick={() => setAddFloorShape(s)}
+                              className={`py-2 rounded-xl text-xs font-bold transition-colors ${addFloorShape === s ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 border-t flex gap-3">
+                      <button onClick={() => setShowAddFloorTable(false)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold">Annuleer</button>
+                      <button onClick={addFloorTable} className="flex-[2] py-3 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold transition-colors">Toevoegen</button>
+                    </div>
                   </div>
                 </div>
               )}
