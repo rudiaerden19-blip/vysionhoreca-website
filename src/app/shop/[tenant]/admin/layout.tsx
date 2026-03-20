@@ -87,7 +87,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         <div className="flex items-center gap-2">
           <Link
             href={`/shop/${params.tenant}/display`}
-            target="_blank"
+
             className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
           >
             <span className="text-base">🖥️</span>
