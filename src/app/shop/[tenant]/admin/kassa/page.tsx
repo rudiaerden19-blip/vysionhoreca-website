@@ -477,7 +477,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     const check = async () => {
       if (!navigator.onLine) { setIsOnline(false); return }
       try {
-        const res = await fetch(`/api/shop/${tenant}/status`, { method: 'HEAD', cache: 'no-store' })
+        const res = await fetch('/api/ping', { method: 'HEAD', cache: 'no-store' })
         setIsOnline(res.ok)
       } catch {
         setIsOnline(false)
