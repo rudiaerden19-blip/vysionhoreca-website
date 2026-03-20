@@ -145,10 +145,9 @@ interface KassaReservationsViewProps {
 // ---- Reservation Table SVG — identiek aan KassaFloorPlan stijl ----
 function ReservationTableSVG({ table, statusColor, isSelected, guestName, time }: {
   table: FloorPlanTable
-  statusColor: string   // kleur van reservatiestatus → rand van tafel
+  statusColor: string
   isSelected: boolean
-  guestName?: string
-  time?: string
+  guests?: { name: string; time: string }[]
 }) {
   const seats = table.seats
   const tableSize = 90
@@ -306,16 +305,29 @@ function ReservationTableSVG({ table, statusColor, isSelected, guestName, time }
         {seats}p
       </text>
 
-      {/* Gast label */}
-      {guestName && (
-        <>
-          <rect x={cx - 52} y={cy + th / 2 + 10} width={104} height={20} rx={10}
-            fill="white" style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.25))' }} />
-          <text x={cx} y={cy + th / 2 + 24} textAnchor="middle" fill="#111827" fontSize={10} fontWeight="700">
-            {guestName}{time ? ` · ${time}` : ''}
-          </text>
-        </>
-      )}
+      {/* Gast labels — naam + tijd, onder elkaar */}
+      {guests && guests.length > 0 && (() => {
+        const lineH = 22
+        const labelW = Math.max(120, tw * 0.9)
+        const totalH = guests.length * lineH + 10
+        const startY = cy + th / 2 + 14
+        return (
+          <>
+            <rect x={cx - labelW / 2} y={startY} width={labelW} height={totalH} rx={10}
+              fill="white" style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.22))' }} />
+            {guests.map((g, i) => (
+              <g key={i}>
+                <text x={cx - labelW / 2 + 10} y={startY + 17 + i * lineH} fill="#111827" fontSize={12} fontWeight="700">
+                  {g.name}
+                </text>
+                <text x={cx + labelW / 2 - 10} y={startY + 17 + i * lineH} textAnchor="end" fill="#6b7280" fontSize={11}>
+                  {g.time}
+                </text>
+              </g>
+            ))}
+          </>
+        )
+      })()}
     </svg>
   )
 }
@@ -1473,8 +1485,11 @@ export default function KassaReservationsView({
                           table={table}
                           statusColor={statusColor}
                           isSelected={isSelected}
-                          guestName={tableRes?.guest_name}
-                          time={tableRes?.reservation_time}
+                          guests={todayReservations
+                            .filter(r => r.table_number === table.number && r.status !== 'CANCELLED' && r.status !== 'COMPLETED')
+                            .sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
+                            .map(r => ({ name: r.guest_name, time: r.reservation_time }))
+                          }
                         />
                       </div>
                     )
@@ -2002,8 +2017,11 @@ export default function KassaReservationsView({
                             table={table}
                             statusColor={borderColor}
                             isSelected={isSelected}
-                            guestName={count > 0 ? guestLabel : undefined}
-                            time={res?.reservation_time}
+                            guests={floorRes
+                              .filter(r => r.table_number === table.number)
+                              .sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
+                              .map(r => ({ name: r.guest_name, time: r.reservation_time }))
+                            }
                           />
                         </div>
                       </div>
