@@ -8,7 +8,7 @@ import KassaFloorPlan from '@/components/KassaFloorPlan'
 import KassaReservationsView from '@/components/KassaReservationsView'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
-import { getSoundsEnabled, setSoundsEnabled } from '@/lib/sounds'
+import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio } from '@/lib/sounds'
 
 interface SelectedChoice {
   optionId: string
@@ -69,6 +69,17 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const tableOrdersKey = `vysion_table_orders_${tenant}`
 
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
+  // Audio initialiseren na eerste gebruikersinteractie
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      initAudio()
+      prewarmAudio()
+      document.removeEventListener('click', handleFirstInteraction)
+    }
+    document.addEventListener('click', handleFirstInteraction)
+    return () => document.removeEventListener('click', handleFirstInteraction)
+  }, [])
+
   useEffect(() => {
     const raw = localStorage.getItem(`vysion_tables_${tenant}`)
     if (raw) {
@@ -320,6 +331,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     const next = !soundsOn
     setSoundsOn(next)
     setSoundsEnabled(next)
+    playClick()
   }
 
   // ── Cart ─────────────────────────────────────────────────────────────────
@@ -331,6 +343,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   const addToCart = (product: MenuProduct, choices: SelectedChoice[] = []) => {
+    playAddToCart()
     const cartKey = choices.length > 0
       ? `${product.id}-${choices.map(c => c.choiceId).sort().join('-')}`
       : product.id!
@@ -379,12 +392,13 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const confirmOptions = () => {
     if (!optionsModal) return
     const missing = optionsModal.options.filter(o => o.required && !optionsModal.selected.find(s => s.optionId === o.id))
-    if (missing.length > 0) { alert(`Kies een ${missing[0].name}`); return }
+    if (missing.length > 0) { playClick(); alert(`Kies een ${missing[0].name}`); return }
     addToCart(optionsModal.product, optionsModal.selected)
     setOptionsModal(null)
   }
 
   const updateQty = (cartKey: string, qty: number) => {
+    if (qty <= 0) playRemove(); else playClick()
     setCart(prev => {
       const updated = qty <= 0
         ? prev.filter(i => i.cartKey !== cartKey)
@@ -411,6 +425,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   const clearCart = () => {
+    playRemove()
     setCart([])
     if (tableNumber) {
       const newOrders = { ...tableOrders, [tableNumber]: [] }
@@ -514,6 +529,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   const completePayment = async (method: PaymentMethodType) => {
     if (cart.length === 0) return
+    playCashRegister()
+    setTimeout(() => playSuccess(), 400)
     const vatRate = tenantInfo?.btw_percentage ?? 6
     const subtotal = total / (1 + vatRate / 100)
     const tax = total - subtotal
@@ -1220,7 +1237,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             </button>
           )}
           <button
-            onClick={() => { if (cart.length > 0) setShowPaymentModal(true) }}
+            onClick={() => { if (cart.length > 0) { playCheckout(); setShowPaymentModal(true) } }}
             disabled={cart.length === 0}
             className="w-full py-5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
           >
