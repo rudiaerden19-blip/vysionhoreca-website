@@ -243,15 +243,22 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
       onClick={onClick}
       style={{ cursor: 'pointer', overflow: 'visible', display: 'block' }}
     >
-      {/* Chairs — zelfde grijze stijl als toog */}
+      {/* Chairs — bovenaanzicht echte stoelen */}
       {chairs.map((c, i) => (
         <g key={i} transform={`translate(${cx + c.x}, ${cy + c.y}) rotate(${c.angle})`}>
-          {/* Rugsteun */}
-          <rect x={-chairW / 2 + 2} y={-chairH / 2} width={chairW - 4} height={7} rx={3} fill="#5a5a5a" stroke="#333" strokeWidth={1} />
-          {/* Zitting */}
-          <rect x={-chairW / 2} y={-chairH / 2 + 7} width={chairW} height={chairH - 7} rx={3} fill="#4a4a4a" stroke="#333" strokeWidth={1} />
-          {/* Glans */}
-          <rect x={-chairW / 2 + 3} y={-chairH / 2 + 8} width={chairW - 10} height={4} rx={2} fill="rgba(255,255,255,0.12)" />
+          {/* Schaduw */}
+          <rect x={-chairW / 2 + 1} y={-chairH / 2 + 2} width={chairW} height={chairH + 4} rx={5} fill="rgba(0,0,0,0.35)" />
+          {/* Rugsteun — dik en donker bovenaan */}
+          <rect x={-chairW / 2} y={-chairH / 2} width={chairW} height={9} rx={4} fill="#888" stroke="#555" strokeWidth={1} />
+          {/* Rugleuning highlight */}
+          <rect x={-chairW / 2 + 3} y={-chairH / 2 + 2} width={chairW - 6} height={3} rx={2} fill="rgba(255,255,255,0.3)" />
+          {/* Zitting — lichter, iets breder */}
+          <rect x={-chairW / 2} y={-chairH / 2 + 10} width={chairW} height={chairH - 8} rx={4} fill="#bbb" stroke="#888" strokeWidth={1} />
+          {/* Zitting glans */}
+          <rect x={-chairW / 2 + 4} y={-chairH / 2 + 12} width={chairW - 12} height={4} rx={2} fill="rgba(255,255,255,0.35)" />
+          {/* Pootjes (kleine hoekjes) */}
+          <rect x={-chairW / 2 - 1} y={-chairH / 2 + chairH - 2} width={5} height={4} rx={1} fill="#777" />
+          <rect x={chairW / 2 - 4} y={-chairH / 2 + chairH - 2} width={5} height={4} rx={1} fill="#777" />
         </g>
       ))}
 
