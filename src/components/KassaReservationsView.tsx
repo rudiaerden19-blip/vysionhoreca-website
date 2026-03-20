@@ -35,7 +35,7 @@ import { supabase } from '@/lib/supabase'
 
 // ---- Types ----
 type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'NO_SHOW' | 'CANCELLED' | 'WAITLIST'
-type ViewMode = 'today' | 'calendar' | 'list' | 'floorplan' | 'guests' | 'stats' | 'settings'
+type ViewMode = 'today' | 'calendar' | 'month' | 'list' | 'floorplan' | 'timeline' | 'guests' | 'stats' | 'settings'
 
 interface Reservation {
   id: string
@@ -121,6 +121,17 @@ interface GuestProfile {
   totalSpent: number
   lastVisit?: string
   notes?: string
+}
+
+interface FloorPlanTable {
+  id: string
+  number: string
+  seats: number
+  shape: 'ROUND' | 'SQUARE' | 'RECTANGLE'
+  x: number
+  y: number
+  rotation: number
+  status: string
 }
 
 // ---- Props ----
@@ -236,6 +247,18 @@ export default function KassaReservationsView({
   const [selectedShift, setSelectedShift] = useState<string | null>(null)
   const [guestProfilesDB, setGuestProfilesDB] = useState<GuestProfile[]>([])
   const [cancelConfirm, setCancelConfirm] = useState<Reservation | null>(null)
+  const [floorPlanTablesDB, setFloorPlanTablesDB] = useState<FloorPlanTable[]>([])
+  const [timelineDate, setTimelineDate] = useState(new Date().toISOString().split('T')[0])
+  const [floorPlanTime, setFloorPlanTime] = useState(() => {
+    const now = new Date()
+    const h = now.getHours().toString().padStart(2, '0')
+    const m = now.getMinutes() < 30 ? '00' : '30'
+    return `${h}:${m}`
+  })
+  const [monthDate, setMonthDate] = useState(() => {
+    const d = new Date()
+    return { year: d.getFullYear(), month: d.getMonth() }
+  })
   const [reservationSettings, setReservationSettings] = useState<ReservationSettings>(() => {
     if (typeof window === 'undefined') return DEFAULT_SETTINGS
     try {
@@ -301,6 +324,12 @@ export default function KassaReservationsView({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadReservations(); loadGuestProfiles() }, [tenant])
+
+  // Load floor plan tables from Supabase
+  useEffect(() => {
+    supabase.from('floor_plan_tables').select('data').eq('tenant_slug', tenant).single()
+      .then(({ data }) => { if (data?.data) setFloorPlanTablesDB(data.data as FloorPlanTable[]) })
+  }, [tenant])
 
   // Sla instellingen op in localStorage + Supabase (zodat publieke boekingspagina ze ook leest)
   const updateSettings = (updates: Partial<ReservationSettings>) => {
@@ -898,10 +927,11 @@ export default function KassaReservationsView({
         <div className="flex items-center gap-3">
           <div className="flex bg-gray-100 rounded-xl p-1 overflow-x-auto">
             {[
-              { id: 'today', label: 'Vandaag', icon: <Clock size={16} /> },
-              { id: 'calendar', label: 'Kalender', icon: <CalendarDays size={16} /> },
+              { id: 'today', label: 'Dag', icon: <Clock size={16} /> },
+              { id: 'timeline', label: 'Tijdlijn', icon: <LayoutGrid size={16} /> },
+              { id: 'month', label: 'Maand', icon: <CalendarDays size={16} /> },
               { id: 'list', label: 'Lijst', icon: <List size={16} /> },
-              { id: 'floorplan', label: 'Plattegrond', icon: <LayoutGrid size={16} /> },
+              { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} /> },
               { id: 'guests', label: 'Gasten', icon: <Users size={16} /> },
               { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} /> },
               { id: 'settings', label: 'Instellingen', icon: <Settings size={16} /> },
@@ -1045,6 +1075,262 @@ export default function KassaReservationsView({
           </div>
         )}
 
+        {!loading && viewMode === 'timeline' && (() => {
+          // Time slots from 10:00 to 23:00 in 30-min steps
+          const SLOT_W = 72 // px per 30-min slot
+          const ROW_H = 56
+          const LABEL_W = 80
+          const START_MIN = 10 * 60 // 10:00
+          const END_MIN = 23 * 60   // 23:00
+          const totalSlots = (END_MIN - START_MIN) / 30
+          const timeSlots: string[] = []
+          for (let m = START_MIN; m < END_MIN; m += 30) {
+            const h = Math.floor(m / 60).toString().padStart(2, '0')
+            const min = (m % 60).toString().padStart(2, '0')
+            timeSlots.push(`${h}:${min}`)
+          }
+
+          // Tables to show: floor plan tables first, then any table in reservations
+          const tableNumbers = floorPlanTablesDB.length > 0
+            ? floorPlanTablesDB.map(t => t.number)
+            : [...new Set(reservations.filter(r => r.table_number).map(r => r.table_number!))]
+          const sortedTables = tableNumbers.length > 0 ? tableNumbers : ['(geen tafel)']
+
+          // Filter reservations for this date
+          const dayRes = reservations.filter(r => r.reservation_date === timelineDate && r.status !== 'CANCELLED')
+
+          // Current time marker
+          const now = new Date()
+          const isToday = timelineDate === now.toISOString().split('T')[0]
+          const nowMin = now.getHours() * 60 + now.getMinutes()
+          const nowPx = isToday && nowMin >= START_MIN && nowMin <= END_MIN
+            ? LABEL_W + ((nowMin - START_MIN) / 30) * SLOT_W
+            : null
+
+          const statusColors: Record<string, string> = {
+            CONFIRMED: '#3b82f6',
+            CHECKED_IN: '#22c55e',
+            PENDING: '#f59e0b',
+            COMPLETED: '#9ca3af',
+            NO_SHOW: '#ef4444',
+            WAITLIST: '#8b5cf6',
+          }
+
+          return (
+            <div className="flex flex-col gap-0">
+              {/* Date nav */}
+              <div className="flex items-center gap-3 mb-4">
+                <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate() - 1); setTimelineDate(d.toISOString().split('T')[0]) }}
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={18} /></button>
+                <div className="flex items-center gap-2">
+                  <p className="font-bold text-lg">{formatDate(timelineDate)}</p>
+                  <input type="date" value={timelineDate} onChange={e => setTimelineDate(e.target.value)}
+                    className="px-2 py-1 rounded-lg bg-gray-100 border border-gray-200 text-sm" />
+                </div>
+                <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate() + 1); setTimelineDate(d.toISOString().split('T')[0]) }}
+                  className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={18} /></button>
+                <div className="ml-auto text-sm text-gray-400">
+                  {dayRes.length} reservaties • {dayRes.reduce((s, r) => s + r.party_size, 0)} personen
+                </div>
+              </div>
+
+              {/* Legend */}
+              <div className="flex items-center gap-4 mb-3 text-xs">
+                {Object.entries(STATUS_CONFIG).filter(([k]) => k !== 'CANCELLED').map(([key, cfg]) => (
+                  <div key={key} className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded" style={{ backgroundColor: statusColors[key] || '#ccc' }} />
+                    <span className="text-gray-500">{cfg.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Grid */}
+              <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
+                <div className="overflow-x-auto">
+                  <div style={{ minWidth: LABEL_W + totalSlots * SLOT_W + 40, position: 'relative' }}>
+                    {/* Time header */}
+                    <div className="flex border-b border-gray-200 bg-gray-50" style={{ height: 36 }}>
+                      <div style={{ width: LABEL_W, flexShrink: 0 }} className="border-r border-gray-200 flex items-center px-3">
+                        <span className="text-xs font-bold text-gray-400">Tafel</span>
+                      </div>
+                      {timeSlots.map((t, i) => (
+                        <div key={t} style={{ width: SLOT_W, flexShrink: 0 }}
+                          className="border-r border-gray-100 flex items-center justify-center">
+                          {i % 2 === 0 && <span className="text-xs font-medium text-gray-400">{t}</span>}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Table rows */}
+                    {sortedTables.map((tableNum, rowIdx) => {
+                      const tableRes = dayRes.filter(r => (r.table_number || '(geen tafel)') === tableNum)
+                      const fpTable = floorPlanTablesDB.find(t => t.number === tableNum)
+                      return (
+                        <div key={tableNum} className="flex relative"
+                          style={{ height: ROW_H, backgroundColor: rowIdx % 2 === 0 ? 'white' : '#f9fafb', borderBottom: '1px solid #f0f0f0' }}>
+                          {/* Table label */}
+                          <div style={{ width: LABEL_W, flexShrink: 0 }}
+                            className="border-r border-gray-200 flex flex-col items-center justify-center px-2">
+                            <span className="text-base font-bold text-gray-800">{tableNum}</span>
+                            {fpTable && <span className="text-xs text-gray-400">{fpTable.seats}p</span>}
+                          </div>
+                          {/* Slot grid lines */}
+                          <div className="flex absolute" style={{ left: LABEL_W, top: 0, bottom: 0 }}>
+                            {timeSlots.map((t, i) => (
+                              <div key={t} style={{ width: SLOT_W, flexShrink: 0, height: ROW_H }}
+                                className={`border-r ${i % 2 === 0 ? 'border-gray-100' : 'border-gray-50'}`} />
+                            ))}
+                          </div>
+                          {/* Reservation blocks */}
+                          {tableRes.map(r => {
+                            const [rh, rm] = r.reservation_time.split(':').map(Number)
+                            const startMin = rh * 60 + rm
+                            const dur = r.duration_minutes || 90
+                            const left = LABEL_W + ((startMin - START_MIN) / 30) * SLOT_W
+                            const width = (dur / 30) * SLOT_W - 4
+                            if (left < LABEL_W || startMin > END_MIN) return null
+                            const color = statusColors[r.status] || '#9ca3af'
+                            return (
+                              <div
+                                key={r.id}
+                                onClick={() => setSelectedReservation(r)}
+                                className="absolute top-2 bottom-2 rounded-lg cursor-pointer flex flex-col justify-center px-2 overflow-hidden hover:opacity-90 transition-opacity"
+                                style={{ left, width: Math.max(width, 40), backgroundColor: color + 'dd', borderLeft: `3px solid ${color}`, zIndex: 2 }}
+                              >
+                                <span className="text-white text-xs font-bold truncate">{r.guest_name}</span>
+                                <span className="text-white/80 text-xs truncate">{r.reservation_time} • {r.party_size}p</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )
+                    })}
+
+                    {/* Current time line */}
+                    {nowPx !== null && (
+                      <div className="absolute top-9 bottom-0 w-0.5 bg-red-500 z-10 pointer-events-none"
+                        style={{ left: nowPx }}>
+                        <div className="absolute -top-1 -left-1.5 w-3 h-3 rounded-full bg-red-500" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {dayRes.length === 0 && (
+                <div className="text-center py-12">
+                  <CalendarDays size={48} className="mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-400">Geen reservaties op {formatDate(timelineDate)}</p>
+                </div>
+              )}
+            </div>
+          )
+        })()}
+
+        {!loading && viewMode === 'month' && (() => {
+          const { year, month } = monthDate
+          const firstDay = new Date(year, month, 1)
+          const lastDay = new Date(year, month + 1, 0)
+          // Start on Monday
+          let startDow = firstDay.getDay() // 0=Sun, 1=Mon...
+          if (startDow === 0) startDow = 7
+          const paddingDays = startDow - 1
+
+          const days: (Date | null)[] = []
+          for (let i = 0; i < paddingDays; i++) days.push(null)
+          for (let d = 1; d <= lastDay.getDate(); d++) days.push(new Date(year, month, d))
+          while (days.length % 7 !== 0) days.push(null)
+
+          const activeShifts = (reservationSettings.shifts || []).filter(s => s.isActive)
+          const todayStr = new Date().toISOString().split('T')[0]
+
+          const getDateStr = (d: Date) => d.toISOString().split('T')[0]
+
+          const monthNames = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
+
+          return (
+            <div>
+              {/* Month nav */}
+              <div className="flex items-center justify-between mb-6">
+                <button onClick={() => setMonthDate(prev => {
+                  const d = new Date(prev.year, prev.month - 1, 1)
+                  return { year: d.getFullYear(), month: d.getMonth() }
+                })} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={20} /></button>
+                <h2 className="text-xl font-bold">{monthNames[month]} {year}</h2>
+                <button onClick={() => setMonthDate(prev => {
+                  const d = new Date(prev.year, prev.month + 1, 1)
+                  return { year: d.getFullYear(), month: d.getMonth() }
+                })} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={20} /></button>
+              </div>
+
+              {/* Shift filter tabs */}
+              {activeShifts.length > 0 && (
+                <div className="flex gap-2 mb-4">
+                  {activeShifts.map(s => (
+                    <div key={s.id} className="px-4 py-1.5 rounded-lg bg-[#3C4D6B] text-white text-sm font-medium">
+                      {s.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Day headers */}
+              <div className="grid grid-cols-7 mb-2">
+                {['Ma','Di','Wo','Do','Vr','Za','Zo'].map(d => (
+                  <div key={d} className="text-center text-xs font-bold text-gray-400 py-2">{d}</div>
+                ))}
+              </div>
+
+              {/* Calendar grid */}
+              <div className="grid grid-cols-7 gap-1">
+                {days.map((day, i) => {
+                  if (!day) return <div key={`empty-${i}`} className="h-24 rounded-xl" />
+                  const dateStr = getDateStr(day)
+                  const isToday = dateStr === todayStr
+                  const dayRes = reservations.filter(r => r.reservation_date === dateStr && r.status !== 'CANCELLED' && r.status !== 'NO_SHOW')
+                  const totalCovers = dayRes.reduce((s, r) => s + r.party_size, 0)
+
+                  return (
+                    <div
+                      key={dateStr}
+                      onClick={() => { setTimelineDate(dateStr); setViewMode('timeline') }}
+                      className={`min-h-24 rounded-xl p-2 cursor-pointer transition-all hover:border-[#3C4D6B] border-2 ${
+                        isToday ? 'bg-[#3C4D6B]/10 border-[#3C4D6B]' : 'bg-white border-gray-100 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className={`text-sm font-bold mb-1 ${isToday ? 'text-[#3C4D6B]' : 'text-gray-700'}`}>
+                        {day.getDate()}
+                      </div>
+                      {dayRes.length > 0 && (
+                        <div className="space-y-0.5">
+                          {activeShifts.length > 0 ? activeShifts.map(shift => {
+                            const shiftRes = dayRes.filter(r =>
+                              r.reservation_time >= shift.startTime && r.reservation_time <= shift.endTime
+                            )
+                            if (shiftRes.length === 0) return (
+                              <div key={shift.id} className="text-xs text-gray-300 truncate">{shift.name}</div>
+                            )
+                            const covers = shiftRes.reduce((s, r) => s + r.party_size, 0)
+                            return (
+                              <div key={shift.id} className="text-xs font-medium px-1.5 py-0.5 rounded-md bg-[#3C4D6B]/15 text-[#3C4D6B] truncate">
+                                {shift.name} <span className="font-bold">{covers}</span>
+                              </div>
+                            )
+                          }) : (
+                            <div className="text-xs font-bold px-1.5 py-0.5 rounded-md bg-green-100 text-green-700">
+                              {dayRes.length}× • {totalCovers}p
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })()}
+
         {!loading && viewMode === 'calendar' && (
           <CalendarView
             reservations={reservations}
@@ -1056,57 +1342,135 @@ export default function KassaReservationsView({
           />
         )}
 
-        {!loading && viewMode === 'floorplan' && (
-          <div>
-            {/* Legend */}
-            <div className="flex items-center gap-4 mb-4 text-sm">
-              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-emerald-500" /><span>Vrij</span></div>
-              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-purple-500" /><span>Gereserveerd</span></div>
-              <div className="flex items-center gap-2"><div className="w-4 h-4 rounded bg-blue-500" /><span>Bezet</span></div>
-            </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-6 min-h-[500px]">
-              {kassaTables.length === 0 ? (
-                <div className="text-center py-12">
+        {!loading && viewMode === 'floorplan' && (() => {
+          // Use real floor plan tables, fallback to kassa tables
+          const displayTables = floorPlanTablesDB.length > 0 ? floorPlanTablesDB : kassaTables.map(t => ({
+            ...t, shape: 'SQUARE' as const, x: 0, y: 0, rotation: 0,
+          }))
+
+          // Time slider: see occupancy at a specific time on selected date
+          const floorRes = reservations.filter(r =>
+            r.reservation_date === selectedDate &&
+            r.status !== 'CANCELLED' &&
+            r.status !== 'COMPLETED'
+          )
+
+          const getTableStatus = (tableNum: string) => {
+            const res = floorRes.find(r => r.table_number === tableNum)
+            if (!res) return { color: '#22c55e', label: 'Vrij', reservation: null }
+            if (res.status === 'CHECKED_IN') return { color: '#3b82f6', label: 'Bezet', reservation: res }
+            if (res.status === 'CONFIRMED') return { color: '#8b5cf6', label: 'Gereserveerd', reservation: res }
+            if (res.status === 'PENDING') return { color: '#f59e0b', label: 'In afwachting', reservation: res }
+            return { color: '#9ca3af', label: res.status, reservation: res }
+          }
+
+          const hasRealPositions = floorPlanTablesDB.length > 0
+
+          return (
+            <div>
+              {/* Date + Legend */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                      className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={16} /></button>
+                    <span className="font-semibold text-sm">{formatDate(selectedDate)}</span>
+                    <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                      className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={16} /></button>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500" /><span>Vrij</span></div>
+                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-purple-500" /><span>Gereserveerd</span></div>
+                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-blue-500" /><span>Bezet</span></div>
+                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-400" /><span>In afwachting</span></div>
+                </div>
+              </div>
+
+              {displayTables.length === 0 ? (
+                <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
                   <LayoutGrid size={48} className="mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-400">Nog geen tafels aangemaakt</p>
+                  <p className="text-gray-400 font-medium">Nog geen tafels aangemaakt</p>
                   <p className="text-sm text-gray-400 mt-1">Maak tafels aan via de Kassa → Plattegrond</p>
                 </div>
-              ) : (
-                <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-                  {kassaTables.map((table) => {
-                    const tableReservation = todayReservations.find(
-                      r => r.table_number === table.number && r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
-                    )
-                    const statusColor = table.status === 'FREE' ? 'bg-emerald-500'
-                      : table.status === 'RESERVED' ? 'bg-purple-500'
-                      : table.status === 'OCCUPIED' ? 'bg-blue-500'
-                      : 'bg-amber-500'
+              ) : hasRealPositions ? (
+                /* Real positioned floor plan */
+                <div className="bg-[#e8f0f7] rounded-2xl border border-gray-200 relative overflow-hidden"
+                  style={{ height: 580 }}>
+                  {/* Grid background */}
+                  <div className="absolute inset-0 opacity-30"
+                    style={{
+                      backgroundImage: 'linear-gradient(to right, #c5d5e4 1px, transparent 1px), linear-gradient(to bottom, #c5d5e4 1px, transparent 1px)',
+                      backgroundSize: '40px 40px',
+                    }} />
+                  {displayTables.map(table => {
+                    const { color, label, reservation } = getTableStatus(table.number)
+                    const tw = table.shape === 'RECTANGLE' ? 96 : table.shape === 'ROUND' ? 64 : 64
+                    const th = table.shape === 'RECTANGLE' ? 48 : 64
                     return (
                       <div
                         key={table.id}
-                        onClick={() => tableReservation && setSelectedReservation(tableReservation)}
-                        className={`aspect-square rounded-xl ${statusColor} p-3 flex flex-col items-center justify-center cursor-pointer hover:opacity-90 transition-opacity relative`}
+                        onClick={() => reservation && setSelectedReservation(reservation)}
+                        className="absolute transition-all"
+                        style={{
+                          left: `${table.x}%`,
+                          top: `${table.y}%`,
+                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
+                          cursor: reservation ? 'pointer' : 'default',
+                          zIndex: reservation ? 2 : 1,
+                        }}
                       >
-                        <span className="text-white text-2xl font-bold">{table.number}</span>
-                        <span className="text-white/80 text-xs">{table.seats} pers.</span>
-                        {tableReservation && (
-                          <div className="absolute -top-2 -right-2 bg-white rounded-full p-1 shadow">
-                            <CalendarDays size={14} className="text-purple-600" />
-                          </div>
-                        )}
-                        {tableReservation && (
-                          <div className="absolute bottom-1 left-1 right-1 bg-black/30 rounded px-1 py-0.5 text-center">
-                            <span className="text-white text-[10px] truncate block">{tableReservation.guest_name}</span>
-                          </div>
-                        )}
+                        <div
+                          className="flex flex-col items-center justify-center rounded-xl shadow-md border-2 relative"
+                          style={{
+                            width: tw, height: th,
+                            backgroundColor: color + 'dd',
+                            borderColor: color,
+                            borderRadius: table.shape === 'ROUND' ? '50%' : 12,
+                          }}
+                        >
+                          <span className="text-white text-sm font-bold leading-none">{table.number}</span>
+                          <span className="text-white/80 text-[10px]">{table.seats}p</span>
+                          {reservation && (
+                            <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white shadow-md rounded-lg px-2 py-0.5 text-[10px] font-medium text-gray-700 border border-gray-200">
+                              {reservation.guest_name}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )
                   })}
                 </div>
+              ) : (
+                /* Fallback grid when no positions stored */
+                <div className="bg-[#e8f0f7] rounded-2xl border border-gray-200 p-6">
+                  <p className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4 inline-block">
+                    Stel tafels in via Kassa → Plattegrond om de echte layout te zien
+                  </p>
+                  <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                    {displayTables.map(table => {
+                      const { color, label, reservation } = getTableStatus(table.number)
+                      return (
+                        <div key={table.id}
+                          onClick={() => reservation && setSelectedReservation(reservation)}
+                          className="aspect-square rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:opacity-90 transition-opacity relative shadow-sm"
+                          style={{ backgroundColor: color }}>
+                          <span className="text-white text-2xl font-bold">{table.number}</span>
+                          <span className="text-white/80 text-xs">{table.seats}p</span>
+                          {reservation && (
+                            <div className="absolute bottom-1 left-1 right-1 bg-black/30 rounded px-1 py-0.5 text-center">
+                              <span className="text-white text-[10px] truncate block">{reservation.guest_name}</span>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
               )}
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {!loading && viewMode === 'guests' && (
           <div className="space-y-6">
