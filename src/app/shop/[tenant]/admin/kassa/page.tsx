@@ -662,6 +662,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const offlineQueueKey = `vysion_offline_orders_${tenant}`
 
   // Retry offline queue bij reconnect
+  // Web Locks API zorgt dat bij meerdere open tabs slechts 1 tab de wachtrij verwerkt.
+  // De andere tab wacht, ziet daarna een lege wachtrij en doet niets.
   useEffect(() => {
     const retryQueue = async () => {
       const raw = localStorage.getItem(offlineQueueKey)
@@ -669,12 +671,29 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       try {
         const queue: object[] = JSON.parse(raw)
         if (queue.length === 0) return
-        const remaining: object[] = []
-        for (const order of queue) {
-          const { error } = await supabase.from('orders').insert(order)
-          if (error) remaining.push(order)
+
+        const processQueue = async () => {
+          // Lees wachtrij opnieuw binnen het slot (andere tab kan hem al leeg gemaakt hebben)
+          const freshRaw = localStorage.getItem(offlineQueueKey)
+          if (!freshRaw) return
+          const freshQueue: object[] = JSON.parse(freshRaw)
+          if (freshQueue.length === 0) return
+
+          const remaining: object[] = []
+          for (const order of freshQueue) {
+            const { error } = await supabase.from('orders').insert(order)
+            if (error) remaining.push(order)
+          }
+          localStorage.setItem(offlineQueueKey, JSON.stringify(remaining))
         }
-        localStorage.setItem(offlineQueueKey, JSON.stringify(remaining))
+
+        // Web Locks API beschikbaar (alle moderne browsers)
+        if ('locks' in navigator) {
+          await (navigator as any).locks.request(`vysion_queue_${tenant}`, processQueue)
+        } else {
+          // Fallback zonder locking (enkeltab-scenario of oudere browser)
+          await processQueue()
+        }
       } catch { /* empty */ }
     }
     window.addEventListener('online', retryQueue)
@@ -758,10 +777,21 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     if (error) {
       const isNetworkError = !navigator.onLine || error.message?.includes('fetch') || error.message?.includes('network')
       if (isNetworkError) {
-        const raw = localStorage.getItem(offlineQueueKey)
-        const queue = raw ? JSON.parse(raw) : []
-        queue.push(orderPayload)
-        localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
+        // Gebruik Web Locks om race conditions bij gelijktijdige tabs te voorkomen
+        const addToQueue = () => {
+          const raw = localStorage.getItem(offlineQueueKey)
+          const queue = raw ? JSON.parse(raw) : []
+          // Dubbele order voorkomen (zelfde order_number al in wachtrij?)
+          if (!queue.some((o: any) => o.order_number === orderPayload.order_number)) {
+            queue.push(orderPayload)
+            localStorage.setItem(offlineQueueKey, JSON.stringify(queue))
+          }
+        }
+        if ('locks' in navigator) {
+          await (navigator as any).locks.request(`vysion_queue_${tenant}`, async () => addToQueue())
+        } else {
+          addToQueue()
+        }
         alert(`⚠️ Geen internetverbinding. Order #${orderNumber} is lokaal opgeslagen en wordt automatisch verstuurd zodra je weer online bent.`)
       } else {
         console.error('Supabase order insert error:', error)
