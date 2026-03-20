@@ -1823,12 +1823,16 @@ export default function KassaReservationsView({
             r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
           )
           const getFloorTableInfo = (tableNum: string) => {
-            const res = floorRes.find(r => r.table_number === tableNum)
-            if (!res) return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res: null }
-            if (res.status === 'CHECKED_IN') return { color: '#60a5fa', borderColor: '#3b82f6', label: 'Bezet', res }
-            if (res.status === 'CONFIRMED') return { color: '#a78bfa', borderColor: '#8b5cf6', label: 'Gereserveerd', res }
-            if (res.status === 'PENDING') return { color: '#fbbf24', borderColor: '#f59e0b', label: 'Afwachting', res }
-            return { color: '#9ca3af', borderColor: '#6b7280', label: res.status, res }
+            const all = floorRes.filter(r => r.table_number === tableNum)
+            if (all.length === 0) return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res: null, count: 0 }
+            // Toon de eerstvolgende (gesorteerd op tijd)
+            const res = all.sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))[0]
+            const count = all.length
+            const guestLabel = count > 1 ? `${res.guest_name} +${count - 1}` : res.guest_name
+            if (res.status === 'CHECKED_IN') return { color: '#60a5fa', borderColor: '#3b82f6', label: 'Bezet', res, count, guestLabel }
+            if (res.status === 'CONFIRMED') return { color: '#a78bfa', borderColor: '#8b5cf6', label: 'Gereserveerd', res, count, guestLabel }
+            if (res.status === 'PENDING') return { color: '#fbbf24', borderColor: '#f59e0b', label: 'Afwachting', res, count, guestLabel }
+            return { color: '#9ca3af', borderColor: '#6b7280', label: res.status, res, count, guestLabel }
           }
 
           return (
@@ -1972,7 +1976,7 @@ export default function KassaReservationsView({
                   )}
 
                   {floorPlanTablesDB.map(table => {
-                    const { borderColor, res } = getFloorTableInfo(table.number)
+                    const { borderColor, res, count, guestLabel } = getFloorTableInfo(table.number)
                     const isSelected = selectedFloorTable?.id === table.id
 
                     return (
@@ -1989,13 +1993,12 @@ export default function KassaReservationsView({
                           touchAction: 'none',
                         }}
                       >
-                        {/* SVG pointer-events none zodat het parent div de touch/click vangt */}
                         <div style={{ pointerEvents: 'none' }}>
                           <ReservationTableSVG
                             table={table}
                             statusColor={borderColor}
                             isSelected={isSelected}
-                            guestName={res?.guest_name}
+                            guestName={count > 0 ? guestLabel : undefined}
                             time={res?.reservation_time}
                           />
                         </div>
@@ -2007,7 +2010,8 @@ export default function KassaReservationsView({
 
                 {/* Sidebar — selected table detail */}
                 {selectedFloorTable && (() => {
-                  const { res, label, color } = getFloorTableInfo(selectedFloorTable.number)
+                  const { res, label, color, count } = getFloorTableInfo(selectedFloorTable.number)
+                  const allTableRes = floorRes.filter(r => r.table_number === selectedFloorTable.number).sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                   return (
                     <div className="w-72 flex-shrink-0 bg-white border-l border-gray-200 flex flex-col overflow-y-auto">
                       <div className="p-4 border-b border-gray-100 flex items-center justify-between">
@@ -2029,56 +2033,56 @@ export default function KassaReservationsView({
                         </div>
                       </div>
 
-                      {/* Reservation detail */}
-                      {res ? (
-                        <div className="p-4 space-y-3">
-                          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Reservatie</p>
-                          <div>
-                            <p className="font-bold text-gray-900">{res.guest_name}</p>
-                            <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
-                              <span className="flex items-center gap-1"><Clock size={13} />{res.reservation_time}</span>
-                              <span className="flex items-center gap-1"><Users size={13} />{res.party_size}p</span>
+                      {/* Alle reservaties voor deze tafel */}
+                      {allTableRes.length > 0 ? (
+                        <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
+                          {allTableRes.map(r => (
+                            <div key={r.id} className="p-4 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <p className="font-bold text-gray-900">{r.guest_name}</p>
+                                <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                                  style={{ backgroundColor: STATUS_CONFIG[r.status]?.bgColor, color: STATUS_CONFIG[r.status]?.color }}>
+                                  {STATUS_CONFIG[r.status]?.label || r.status}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-3 text-sm text-gray-500">
+                                <span className="flex items-center gap-1"><Clock size={13} />{r.reservation_time}</span>
+                                <span className="flex items-center gap-1"><Users size={13} />{r.party_size}p</span>
+                              </div>
+                              {r.guest_phone && (
+                                <a href={`tel:${r.guest_phone}`} className="flex items-center gap-1 text-sm text-blue-500 hover:underline">
+                                  <Phone size={13} />{r.guest_phone}
+                                </a>
+                              )}
+                              {r.notes && <p className="text-xs text-gray-400 italic">{r.notes}</p>}
+                              <div className="flex flex-col gap-1.5 pt-1">
+                                {r.status === 'PENDING' && (
+                                  <button onClick={() => handleConfirm(r)}
+                                    className="w-full py-2 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+                                    <CheckCircle2 size={14} /> Bevestigen
+                                  </button>
+                                )}
+                                {r.status === 'CONFIRMED' && (
+                                  <button onClick={() => handleCheckIn(r)}
+                                    className="w-full py-2 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
+                                    <UserCheck size={14} /> Check-in
+                                  </button>
+                                )}
+                                {r.status === 'CHECKED_IN' && (
+                                  <button onClick={() => handleStartOrder(r)}
+                                    className="w-full py-2 rounded-xl bg-[#3C4D6B] text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                                    <UtensilsCrossed size={14} /> Naar Kassa
+                                  </button>
+                                )}
+                                {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
+                                  <button onClick={() => handleNoShow(r)}
+                                    className="w-full py-1.5 rounded-xl bg-red-50 text-red-400 text-sm font-semibold hover:bg-red-100 transition-colors flex items-center justify-center gap-2">
+                                    <UserX size={14} /> No-show
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                            {res.guest_phone && (
-                              <a href={`tel:${res.guest_phone}`} className="flex items-center gap-1 text-sm text-blue-500 mt-1 hover:underline">
-                                <Phone size={13} />{res.guest_phone}
-                              </a>
-                            )}
-                            {res.notes && <p className="text-xs text-gray-400 mt-1 italic">{res.notes}</p>}
-                            {res.occasion && <p className="text-xs text-purple-500 mt-1">🎉 {res.occasion}</p>}
-                          </div>
-                          <div className="space-y-2 pt-2 border-t border-gray-100">
-                            {res.status === 'PENDING' && (
-                              <button onClick={() => { handleConfirm(res); setSelectedFloorTable(null) }}
-                                className="w-full py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
-                                <CheckCircle2 size={16} /> Bevestigen
-                              </button>
-                            )}
-                            {res.status === 'CONFIRMED' && (
-                              <>
-                                <button onClick={() => { handleCheckIn(res); setSelectedFloorTable(null) }}
-                                  className="w-full py-2.5 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
-                                  <UserCheck size={16} /> Check-in
-                                </button>
-                                <button onClick={() => { handleStartOrder(res); setSelectedFloorTable(null) }}
-                                  className="w-full py-2.5 rounded-xl bg-[#3C4D6B] text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
-                                  <UtensilsCrossed size={16} /> Naar Kassa
-                                </button>
-                              </>
-                            )}
-                            {res.status === 'CHECKED_IN' && (
-                              <button onClick={() => { handleStartOrder(res); setSelectedFloorTable(null) }}
-                                className="w-full py-2.5 rounded-xl bg-[#3C4D6B] text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
-                                <UtensilsCrossed size={16} /> Naar Kassa
-                              </button>
-                            )}
-                            {(res.status === 'CONFIRMED' || res.status === 'PENDING') && (
-                              <button onClick={() => { handleNoShow(res); setSelectedFloorTable(null) }}
-                                className="w-full py-2 rounded-xl bg-red-50 text-red-400 text-sm font-semibold hover:bg-red-100 transition-colors flex items-center justify-center gap-2">
-                                <UserX size={16} /> No-show
-                              </button>
-                            )}
-                          </div>
+                          ))}
                         </div>
                       ) : (
                         <div className="p-4">
