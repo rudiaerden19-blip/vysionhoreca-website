@@ -1828,7 +1828,11 @@ export default function KassaReservationsView({
             // Toon de eerstvolgende (gesorteerd op tijd)
             const res = all.sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))[0]
             const count = all.length
-            const guestLabel = count > 1 ? `${res.guest_name} +${count - 1}` : res.guest_name
+            const guestLabel = count === 2
+              ? `${res.guest_name} · ${all[1].guest_name}`
+              : count > 2
+                ? `${res.guest_name} +${count - 1}`
+                : res.guest_name
             if (res.status === 'CHECKED_IN') return { color: '#60a5fa', borderColor: '#3b82f6', label: 'Bezet', res, count, guestLabel }
             if (res.status === 'CONFIRMED') return { color: '#a78bfa', borderColor: '#8b5cf6', label: 'Gereserveerd', res, count, guestLabel }
             if (res.status === 'PENDING') return { color: '#fbbf24', borderColor: '#f59e0b', label: 'Afwachting', res, count, guestLabel }
