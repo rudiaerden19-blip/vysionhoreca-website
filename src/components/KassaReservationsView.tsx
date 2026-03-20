@@ -450,9 +450,10 @@ export default function KassaReservationsView({
   const [addFloorSeats, setAddFloorSeats] = useState(4)
   const [addFloorShape, setAddFloorShape] = useState<'SQUARE' | 'ROUND' | 'RECTANGLE'>('SQUARE')
   const [isDraggingFloor, setIsDraggingFloor] = useState(false)
-  const [floorZoom, setFloorZoom] = useState(0.7)
+  const [floorZoom, setFloorZoom] = useState(1)
   const [panX, setPanX] = useState(0)
   const [panY, setPanY] = useState(0)
+  const didCenterTables = useRef(false)
   const floorDraggingId = useRef<string | null>(null)
   const floorDragOffset = useRef({ x: 0, y: 0 })
   const floorDragMoved = useRef(false)
@@ -464,7 +465,7 @@ export default function KassaReservationsView({
   const WORLD_H = 1600
   // Pinch-to-zoom
   const pinchStartDist = useRef<number | null>(null)
-  const pinchStartZoom = useRef(0.7)
+  const pinchStartZoom = useRef(1)
   const [timelineDate, setTimelineDate] = useState(new Date().toISOString().split('T')[0])
   const [floorPlanTime, setFloorPlanTime] = useState(() => {
     const now = new Date()
@@ -560,6 +561,23 @@ export default function KassaReservationsView({
     supabase.from('floor_plan_tables').select('data').eq('tenant_slug', tenant).single()
       .then(({ data }) => { if (data?.data) setFloorPlanTablesDB(data.data as FloorPlanTable[]) })
   }, [tenant])
+
+  // Centreer tafels in het beeld zodra ze laden
+  useEffect(() => {
+    if (floorPlanTablesDB.length === 0 || didCenterTables.current) return
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const minX = Math.min(...floorPlanTablesDB.map(t => (t.x / 100) * WORLD_W))
+    const maxX = Math.max(...floorPlanTablesDB.map(t => (t.x / 100) * WORLD_W))
+    const minY = Math.min(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
+    const maxY = Math.max(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
+    const cx = (minX + maxX) / 2
+    const cy = (minY + maxY) / 2
+    setPanX(rect.width / 2 - cx * floorZoom)
+    setPanY(rect.height / 2 - cy * floorZoom)
+    didCenterTables.current = true
+  }, [floorPlanTablesDB, WORLD_W, WORLD_H, floorZoom])
 
   // Sla instellingen op in localStorage + Supabase (zodat publieke boekingspagina ze ook leest)
   const updateSettings = (updates: Partial<ReservationSettings>) => {
@@ -1891,16 +1909,6 @@ export default function KassaReservationsView({
                   </button>
                 )}
 
-                {/* Zoom controls */}
-                <div className="flex items-center gap-1 ml-2 border-l border-gray-200 pl-3">
-                  <button onClick={() => setFloorZoom(z => Math.max(0.3, +(z - 0.1).toFixed(1)))}
-                    className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-lg flex items-center justify-center">−</button>
-                  <span className="text-xs font-semibold text-gray-500 w-10 text-center">{Math.round(floorZoom * 100)}%</span>
-                  <button onClick={() => setFloorZoom(z => Math.min(2, +(z + 0.1).toFixed(1)))}
-                    className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-lg flex items-center justify-center">+</button>
-                  <button onClick={() => setFloorZoom(0.7)}
-                    className="px-2 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-medium text-gray-500">Reset</button>
-                </div>
               </div>
 
               {/* Canvas + lijst + optional sidebar */}
