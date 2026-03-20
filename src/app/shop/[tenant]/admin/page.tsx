@@ -98,7 +98,9 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
       .eq('tenant_slug', params.tenant)
       .order('created_at', { ascending: false })
 
-    const orders = allOrders || []
+    // Sla geweigerde/geannuleerde orders uit voor omzetberekening
+    const INVALID_STATUSES = ['cancelled', 'rejected', 'CANCELLED', 'REJECTED']
+    const orders = (allOrders || []).filter(o => !INVALID_STATUSES.includes(o.status || ''))
 
     // Today's stats
     const todayOrders = orders.filter(o => new Date(o.created_at) >= today)

@@ -1674,24 +1674,25 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
     const { startUTC, endUTC } = getDateBoundsForBelgium(date)
     console.log(`autoUpdateZReport: Query van ${startUTC} tot ${endUTC}`)
     
-    // Haal alle completed orders op voor deze dag
+    // Haal alle betaalde orders op voor deze dag (betaald = kassa + geaccepteerde online)
     const { data: orders, error: ordersError } = await supabase
       .from('orders')
       .select('id, total, payment_method')
       .eq('tenant_slug', tenantSlug)
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
-      .eq('status', 'completed')
+      .eq('payment_status', 'paid')
+      .not('status', 'in', '("cancelled","rejected","CANCELLED","REJECTED")')
     
     if (ordersError) {
       console.error('autoUpdateZReport: Fout bij ophalen orders:', ordersError)
       return
     }
     
-    console.log(`autoUpdateZReport: ${orders?.length || 0} completed orders gevonden`)
+    console.log(`autoUpdateZReport: ${orders?.length || 0} betaalde orders gevonden`)
     
     if (!orders || orders.length === 0) {
-      console.log('autoUpdateZReport: Geen completed orders, skip update')
+      console.log('autoUpdateZReport: Geen betaalde orders, skip update')
       return
     }
     
@@ -1827,6 +1828,7 @@ export async function confirmOrder(id: string): Promise<boolean> {
     .from('orders')
     .update({ 
       status: 'confirmed',
+      payment_status: 'paid',
       confirmed_at: new Date().toISOString()
     })
     .eq('id', id)
@@ -1835,6 +1837,17 @@ export async function confirmOrder(id: string): Promise<boolean> {
     console.error('Error confirming order:', error)
     return false
   }
+
+  // Update z-rapport automatisch bij acceptatie
+  const { data: order } = await supabase
+    .from('orders')
+    .select('tenant_slug, created_at')
+    .eq('id', id)
+    .single()
+  if (order) {
+    await autoUpdateZReport(order.tenant_slug, new Date(order.created_at).toISOString().split('T')[0])
+  }
+
   return true
 }
 

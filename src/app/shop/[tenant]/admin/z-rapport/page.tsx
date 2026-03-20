@@ -119,8 +119,9 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
       .eq('tenant_slug', params.tenant)
       .gte('created_at', startUTC)
       .lte('created_at', endUTC)
-      // KRITIEK: Alleen 'completed' orders voor fiscale compliance
-      .eq('status', 'completed')
+      // Betaalde orders: kassa (completed+paid) + geaccepteerde online (confirmed+paid)
+      .eq('payment_status', 'paid')
+      .not('status', 'in', '("cancelled","rejected","CANCELLED","REJECTED")')
 
     if (orders) {
       let total = 0
