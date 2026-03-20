@@ -249,9 +249,9 @@ function ReservationTableSVG({ table, statusColor, isSelected, guestName, time }
         </filter>
       </defs>
 
-      {/* Stoelen — exact zoals KassaFloorPlan */}
+      {/* Stoelen — zitting gericht naar de tafel */}
       {chairs.map((c, i) => (
-        <g key={i} transform={`translate(${cx + c.x}, ${cy + c.y}) rotate(${c.angle})`}>
+        <g key={i} transform={`translate(${cx + c.x}, ${cy + c.y}) rotate(${c.angle + 90})`}>
           <rect x={-chairW / 2 + 1} y={-chairH / 2 + 2} width={chairW} height={chairH + 4} rx={5} fill="rgba(0,0,0,0.35)" />
           <rect x={-chairW / 2} y={-chairH / 2} width={chairW} height={9} rx={4} fill="#888" stroke="#555" strokeWidth={1} />
           <rect x={-chairW / 2 + 3} y={-chairH / 2 + 2} width={chairW - 6} height={3} rx={2} fill="rgba(255,255,255,0.3)" />
