@@ -41,34 +41,32 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [hamburgerOpen, setHamburgerOpen] = useState(false)
   const [hamburgerSubOpen, setHamburgerSubOpen] = useState<string | null>(null)
   const closeNav = () => { setNavOpen(false); setKassaOpen(false); setFlyoutOpen(null); setOnlineSubOpen(null) }
-  // ── Geluid activatie scherm (exact donor) ───────────────────────────────
-  // Elke sessie (browser open) moet de gebruiker 1x klikken om audio te activeren.
-  // Browser blokkeert audio zonder user gesture — dit scherm lost dat op.
-  const [soundActivated, setSoundActivated] = useState(false)
-  const [showSoundActivation, setShowSoundActivation] = useState(true)
+  // ── Geluid activatie scherm ──────────────────────────────────────────────
+  // Eén keer per sessie (sessionStorage). Navigeren binnen de kassa toont het NIET opnieuw.
+  // Bij nieuwe browsersessie (volgende ochtend) verschijnt het opnieuw.
+  const SESSION_KEY = 'vysion_kassa_audio_ok'
+  const [soundActivated, setSoundActivated] = useState(() =>
+    typeof window !== 'undefined' && sessionStorage.getItem(SESSION_KEY) === 'true'
+  )
+  const [showSoundActivation, setShowSoundActivation] = useState(() =>
+    typeof window === 'undefined' ? false : sessionStorage.getItem(SESSION_KEY) !== 'true'
+  )
 
   const activateSound = () => {
-    // AudioContext aanmaken + activeren TIJDENS user gesture (vereist door browser)
     try {
       const AC = window.AudioContext || (window as any).webkitAudioContext
       const ctx = new AC()
       if (ctx.state === 'suspended') ctx.resume()
     } catch { /* ignore */ }
-    // sounds.ts AudioContext ook activeren
     initAudio()
     prewarmAudio()
-    // Notificatie toestemming vragen
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission()
     }
+    sessionStorage.setItem(SESSION_KEY, 'true')
     setSoundActivated(true)
     setShowSoundActivation(false)
-    localStorage.setItem('vysion_sound_activated', 'true')
   }
-
-  // Toon activatiescherm elke sessie (browser vereist verse klik per sessie)
-  // Als vorige sessie al geactiveerd was, tonen we het nog steeds voor de zekerheid
-  // (donor doet hetzelfde: "Still show - browser requires fresh click each session")
 
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
@@ -84,6 +82,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const newOrderAlertRef = useRef<{id: string; orderNumber: number; total: number} | null>(null)
   const alarmIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const previousOrderIdsRef = useRef<string[]>([])
+  const dismissedOrderIdsRef = useRef<string[]>([]) // oranje scherm al getoond, niet opnieuw tonen
 
   // Gebruik playOrderNotification uit sounds.ts — zelfde geactiveerde AudioContext als alle andere knoppen
   const stopAlarm = useRef(() => {
@@ -1734,7 +1733,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         <div
           className="fixed inset-0 z-[200] bg-orange-500 flex flex-col items-center justify-center animate-pulse cursor-pointer"
           onClick={() => {
-            // Oranje scherm sluiten — alarm blijft spelen (exact donor)
+            // Voeg toe aan dismissed zodat polling dit order niet opnieuw toont
+            if (newOrderAlert) {
+              dismissedOrderIdsRef.current = [...dismissedOrderIdsRef.current, newOrderAlert.id]
+            }
             newOrderAlertRef.current = null
             setNewOrderAlert(null)
             // Open bestellingen in NIEUW TABBLAD zodat kassa+alarm open blijft

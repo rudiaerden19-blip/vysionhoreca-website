@@ -5,14 +5,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { getOrders, updateOrderStatus, confirmOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
-import { 
-  activateAudioForIOS,
-  prewarmAudio,
-  playOrderNotification,
-  isAudioActivatedThisSession,
-  markAudioActivated,
-  getSoundsEnabled
-} from '@/lib/sounds'
+import { getSoundsEnabled } from '@/lib/sounds'
 
 // Parse items from JSONB
 interface OrderItemJson {
@@ -87,16 +80,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
   const [kitchenMode, setKitchenMode] = useState(false)
-  const [soundEnabled, setSoundEnabled] = useState(true)
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [tenantSettings, setTenantSettings] = useState<TenantSettings | null>(null)
-  // Check if already activated this session - skip activation screen if so
-  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [rejectionNotes, setRejectionNotes] = useState('')
-  const [showNewOrderAlert, setShowNewOrderAlert] = useState(false)
-  const [alertDismissed, setAlertDismissed] = useState(false)
   
   const rejectionReasons = useMemo(() => [
     { value: 'too_busy', label: `🔥 ${t('ordersPage.rejection.reasons.tooBusy')}` },
@@ -108,45 +95,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   ], [t])
   
   // Refs
-  const audioIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const knownOrderIdsRef = useRef<Set<string>>(new Set())
   
-  // Track which orders are "new" and need attention
+  // Track which orders are "new" and need attention (alleen voor visuele indicators)
   const hasNewOrders = orders.some(o => o.status === 'new' || o.status === 'NEW')
-  
-  // Show orange alert when new orders arrive
-  useEffect(() => {
-    if (hasNewOrders && !alertDismissed) {
-      setShowNewOrderAlert(true)
-    }
-    if (!hasNewOrders) {
-      setShowNewOrderAlert(false)
-      setAlertDismissed(false) // Reset for next new order
-    }
-  }, [hasNewOrders, alertDismissed])
-  
-  const dismissAlert = () => {
-    setShowNewOrderAlert(false)
-    setAlertDismissed(true)
-    // Sound keeps playing until order is confirmed/rejected
-  }
-  
-  // Auto-initialize audio if already activated in this session
-  useEffect(() => {
-    setSoundEnabled(true)
-    setNotificationsEnabled(true)
-    
-    // Request notification permission on load
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission()
-    }
-    
-    // Prewarm audio system bij laden (nieuwe robuuste methode)
-    if (audioActivated) {
-      prewarmAudio()
-    }
-  }, [params.tenant, audioActivated])
 
   // Helper: parse items from JSONB or array
   const parseItems = (order: Order): OrderItemJson[] => {
@@ -162,39 +115,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     return order.items as OrderItemJson[]
   }
 
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (audioIntervalRef.current) {
-        clearInterval(audioIntervalRef.current)
-      }
-    }
-  }, [])
-
-  // Play repeating sound when there are new orders
-  // KRITIEK: Altijd proberen geluid te spelen - browser blokkeert automatisch als niet geactiveerd
-  useEffect(() => {
-    if (hasNewOrders) {
-      // Play immediately
-      playOrderNotification()
-      
-      // Repeat every 3 seconds
-      audioIntervalRef.current = setInterval(playOrderNotification, 3000)
-      
-    } else {
-      // Stop sound
-      if (audioIntervalRef.current) {
-        clearInterval(audioIntervalRef.current)
-        audioIntervalRef.current = null
-      }
-    }
-    
-    return () => {
-      if (audioIntervalRef.current) {
-        clearInterval(audioIntervalRef.current)
-      }
-    }
-  }, [hasNewOrders])
+  // Geluid en oranje scherm worden beheerd door kassa/page.tsx — NIET hier
 
   // Request notification permission
   useEffect(() => {
@@ -284,12 +205,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         // Update known IDs
         freshOrders.forEach(o => o.id && knownOrderIdsRef.current.add(o.id))
         
-        // If we found new orders, trigger alert!
-        if (newOrdersFound.length > 0) {
-          setAlertDismissed(false)
-          setShowNewOrderAlert(true)
-        }
-        
         // Update orders list
         setOrders(freshOrders)
         
@@ -311,22 +226,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant]) // Only restart polling when tenant changes
-
-  // Enable sound - uses shared audio system
-  const enableSound = () => {
-    setSoundEnabled(true)
-    activateAudioForIOS()
-    playOrderNotification()
-  }
-  
-  // Disable sound
-  const disableSound = () => {
-    setSoundEnabled(false)
-    if (audioIntervalRef.current) {
-      clearInterval(audioIntervalRef.current)
-      audioIntervalRef.current = null
-    }
-  }
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     setUpdatingId(orderId)
@@ -737,44 +636,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     )
   }
 
-  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - alleen EERSTE KEER per sessie
-  if (!audioActivated) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px] p-4">
-        <motion.button
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            // KRITIEK: Activeer audio TIJDENS user gesture (VEREIST voor iOS/Safari)
-            activateAudioForIOS()
-            prewarmAudio()
-            markAudioActivated()
-            setAudioActivated(true)
-            setSoundEnabled(true)
-            playOrderNotification()
-          }}
-          className="bg-blue-500 hover:bg-blue-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
-        >
-          <motion.div
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
-            className="text-7xl mb-6"
-          >
-            🔔
-          </motion.div>
-          <h1 className="text-2xl font-bold mb-4">Tik om geluid te activeren</h1>
-          <p className="text-lg opacity-80 mb-6">
-            Je ontvangt meldingen bij nieuwe bestellingen
-          </p>
-          <div className="bg-white/20 rounded-xl px-6 py-3 inline-block">
-            <span className="text-lg font-bold">▶️ START</span>
-          </div>
-        </motion.button>
-      </div>
-    )
-  }
 
   // Kitchen Mode - Fullscreen tablet view
   if (kitchenMode) {
@@ -796,10 +657,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           </div>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => soundEnabled ? disableSound() : enableSound()}
-              className={`p-4 rounded-xl text-2xl ${soundEnabled && getSoundsEnabled() ? 'bg-green-500' : 'bg-gray-600'}`}
+              className="p-4 rounded-xl text-2xl bg-green-500"
             >
-              {soundEnabled && getSoundsEnabled() ? '🔔' : '🔕'}
+              🔔
             </button>
             <button
               onClick={() => setKitchenMode(false)}
@@ -987,14 +847,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             🔔
           </button>
           
-          {/* Sound - altijd aan */}
-          <button
-            onClick={enableSound}
-            className="p-2 rounded-xl transition-colors bg-green-100 text-green-600"
-            title="Geluid (altijd aan)"
-          >
-            🔊
-          </button>
 
           {/* Archief */}
           <motion.button
@@ -1010,7 +862,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => { enableSound(); setKitchenMode(true); }}
+            onClick={() => setKitchenMode(true)}
             className="px-4 py-2 bg-gray-900 text-white rounded-xl font-medium flex items-center gap-2"
           >
             🍳 {t('ordersPage.kitchenMode')}
@@ -1598,54 +1450,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         )}
       </AnimatePresence>
 
-      {/* Fullscreen Orange Alert for New Orders */}
-      <AnimatePresence>
-        {showNewOrderAlert && hasNewOrders && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={dismissAlert}
-            className="fixed inset-0 z-[100] flex items-center justify-center cursor-pointer"
-            style={{ backgroundColor: 'rgba(249, 115, 22, 0.95)' }}
-          >
-            <motion.div
-              animate={{ 
-                scale: [1, 1.05, 1],
-                opacity: [1, 0.8, 1]
-              }}
-              transition={{ 
-                repeat: Infinity, 
-                duration: 0.8,
-                ease: "easeInOut"
-              }}
-              className="text-center text-white p-8"
-            >
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 0.5 }}
-                className="text-9xl mb-8"
-              >
-                🔔
-              </motion.div>
-              <h1 className="text-6xl md:text-8xl font-black mb-4">
-                {t('ordersPage.newOrderAlert.title')}
-              </h1>
-              <p className="text-2xl md:text-3xl opacity-90 mb-8">
-                {newCount} {newCount > 1 ? t('ordersPage.newOrdersPlural') : t('ordersPage.newOrders')} {newCount === 1 ? t('ordersPage.newOrderAlert.waitingApproval') : t('ordersPage.newOrderAlert.waitingApprovalPlural')}
-              </p>
-              <div className="bg-white/20 rounded-2xl px-8 py-4 inline-block">
-                <p className="text-xl font-medium">
-                  {t('ordersPage.newOrderAlert.tapToClose')}
-                </p>
-                <p className="text-lg opacity-75 mt-1">
-                  {t('ordersPage.newOrderAlert.soundStopsAfter')}
-                </p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
