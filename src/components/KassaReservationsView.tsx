@@ -434,10 +434,14 @@ export default function KassaReservationsView({
   const [addFloorSeats, setAddFloorSeats] = useState(4)
   const [addFloorShape, setAddFloorShape] = useState<'SQUARE' | 'ROUND' | 'RECTANGLE'>('SQUARE')
   const [isDraggingFloor, setIsDraggingFloor] = useState(false)
+  const [floorZoom, setFloorZoom] = useState(0.7)
   const floorDraggingId = useRef<string | null>(null)
   const floorDragOffset = useRef({ x: 0, y: 0 })
   const floorDragMoved = useRef(false)
   const floorPointerStart = useRef({ x: 0, y: 0 })
+  // Pinch-to-zoom
+  const pinchStartDist = useRef<number | null>(null)
+  const pinchStartZoom = useRef(0.7)
   const [timelineDate, setTimelineDate] = useState(new Date().toISOString().split('T')[0])
   const [floorPlanTime, setFloorPlanTime] = useState(() => {
     const now = new Date()
@@ -569,8 +573,36 @@ export default function KassaReservationsView({
     toast.success('Tafel verwijderd')
   }
 
+  // Wheel zoom (desktop)
+  const handleFloorWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setFloorZoom(z => Math.min(2, Math.max(0.3, z - e.deltaY * 0.001)))
+  }
+
+  // Pinch zoom (iPad) — track 2 pointers
+  const activePointers = useRef<Map<number, { x: number; y: number }>>(new Map())
+  const handleCanvasPinchMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (activePointers.current.size === 2) {
+      activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      const pts = Array.from(activePointers.current.values())
+      const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y)
+      if (pinchStartDist.current !== null) {
+        const ratio = dist / pinchStartDist.current
+        setFloorZoom(Math.min(2, Math.max(0.3, pinchStartZoom.current * ratio)))
+      }
+    }
+  }
+
   // Drag via canvas — werkt op desktop én iPad/touch
   const handleCanvasPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Track pointer voor pinch
+    activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (activePointers.current.size === 2) {
+      const pts = Array.from(activePointers.current.values())
+      pinchStartDist.current = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y)
+      pinchStartZoom.current = floorZoom
+      return // pinch, geen drag
+    }
     // Zoek het dichtste tafel-element
     const tableEl = (e.target as HTMLElement).closest('[data-table-id]') as HTMLElement | null
     if (!tableEl) {
@@ -585,9 +617,10 @@ export default function KassaReservationsView({
     floorDraggingId.current = id
     floorDragMoved.current = false
     floorPointerStart.current = { x: e.clientX, y: e.clientY }
+    // Offset corrigeren voor zoom: posities zijn % van de geschaalde canvas
     floorDragOffset.current = {
-      x: e.clientX - rect.left - (table.x / 100) * rect.width,
-      y: e.clientY - rect.top - (table.y / 100) * rect.height,
+      x: e.clientX - rect.left - (table.x / 100) * rect.width * floorZoom,
+      y: e.clientY - rect.top - (table.y / 100) * rect.height * floorZoom,
     }
     // Capture op de canvas zodat move/up ook buiten canvas werkt
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -595,6 +628,12 @@ export default function KassaReservationsView({
   }
 
   const handleFloorPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    activePointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    // Pinch zoom
+    if (activePointers.current.size === 2) {
+      handleCanvasPinchMove(e)
+      return
+    }
     if (!floorDraggingId.current) return
     e.preventDefault()
     const dx = Math.abs(e.clientX - floorPointerStart.current.x)
@@ -602,12 +641,17 @@ export default function KassaReservationsView({
     if (dx < 5 && dy < 5) return
     floorDragMoved.current = true
     const rect = e.currentTarget.getBoundingClientRect()
-    const x = Math.max(3, Math.min(95, ((e.clientX - rect.left - floorDragOffset.current.x) / rect.width) * 100))
-    const y = Math.max(3, Math.min(93, ((e.clientY - rect.top - floorDragOffset.current.y) / rect.height) * 100))
+    // Pas positie aan voor zoom: de tafel ligt op (x% * canvasW * zoom) in de geschaalde ruimte
+    const x = Math.max(3, Math.min(95, ((e.clientX - rect.left - floorDragOffset.current.x) / (rect.width * floorZoom)) * 100))
+    const y = Math.max(3, Math.min(93, ((e.clientY - rect.top - floorDragOffset.current.y) / (rect.height * floorZoom)) * 100))
     setFloorPlanTablesDB(prev => prev.map(t => t.id === floorDraggingId.current ? { ...t, x, y } : t))
   }
 
   const handleFloorPointerUp = async (e: React.PointerEvent<HTMLDivElement>) => {
+    activePointers.current.delete(e.pointerId)
+    if (activePointers.current.size < 2) {
+      pinchStartDist.current = null
+    }
     if (!floorDraggingId.current) return
     const id = floorDraggingId.current
     const wasTap = !floorDragMoved.current
@@ -617,11 +661,9 @@ export default function KassaReservationsView({
     floorDragMoved.current = false
 
     if (wasTap) {
-      // Selecteer tafel bij tap/klik
       const table = floorPlanTablesDB.find(t => t.id === id) || null
       setSelectedFloorTable(prev => prev?.id === id ? null : table)
     } else {
-      // Sla positie op na slepen
       await supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: floorPlanTablesDB }, { onConflict: 'tenant_slug' })
     }
   }
@@ -1781,6 +1823,17 @@ export default function KassaReservationsView({
                     Verwijder
                   </button>
                 )}
+
+                {/* Zoom controls */}
+                <div className="flex items-center gap-1 ml-2 border-l border-gray-200 pl-3">
+                  <button onClick={() => setFloorZoom(z => Math.max(0.3, +(z - 0.1).toFixed(1)))}
+                    className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-lg flex items-center justify-center">−</button>
+                  <span className="text-xs font-semibold text-gray-500 w-10 text-center">{Math.round(floorZoom * 100)}%</span>
+                  <button onClick={() => setFloorZoom(z => Math.min(2, +(z + 0.1).toFixed(1)))}
+                    className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-lg flex items-center justify-center">+</button>
+                  <button onClick={() => setFloorZoom(0.7)}
+                    className="px-2 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-medium text-gray-500">Reset</button>
+                </div>
               </div>
 
               {/* Canvas + lijst + optional sidebar */}
@@ -1840,8 +1893,8 @@ export default function KassaReservationsView({
                   className="res-floor-canvas flex-1 relative overflow-hidden select-none"
                   style={{
                     backgroundColor: '#e3e3e3',
-                    backgroundImage: 'linear-gradient(to right, rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.07) 1px, transparent 1px)',
-                    backgroundSize: '40px 40px',
+                    backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.07) 1px, transparent 1px)`,
+                    backgroundSize: `${40 * floorZoom}px ${40 * floorZoom}px`,
                     cursor: isDraggingFloor ? 'grabbing' : 'default',
                     touchAction: 'none',
                     userSelect: 'none',
@@ -1851,7 +1904,16 @@ export default function KassaReservationsView({
                   onPointerMove={handleFloorPointerMove}
                   onPointerUp={handleFloorPointerUp}
                   onPointerCancel={handleFloorPointerUp}
+                  onWheel={handleFloorWheel}
                 >
+                  {/* Geschaalde wrapper — alles schaalt mee met zoom */}
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    transform: `scale(${floorZoom})`,
+                    transformOrigin: 'top left',
+                    width: `${100 / floorZoom}%`,
+                    height: `${100 / floorZoom}%`,
+                  }}>
                   {floorPlanTablesDB.length === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div className="text-center bg-white/80 rounded-2xl px-10 py-8 shadow-sm">
@@ -1893,6 +1955,7 @@ export default function KassaReservationsView({
                       </div>
                     )
                   })}
+                  </div>{/* einde geschaalde wrapper */}
                 </div>
 
                 {/* Sidebar — selected table detail */}
