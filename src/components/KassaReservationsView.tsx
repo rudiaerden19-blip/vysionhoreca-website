@@ -1551,27 +1551,6 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'floorplan' && (() => {
-          // Pro gate
-          if (!isPro) {
-            return (
-              <div className="flex items-center justify-center h-96">
-                <div className="text-center max-w-md bg-white rounded-2xl p-10 shadow-lg border border-gray-200">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center mx-auto mb-5">
-                    <LayoutGrid size={32} className="text-white" />
-                  </div>
-                  <h2 className="text-xl font-bold mb-2">Visueel Tafelplan</h2>
-                  <p className="text-gray-500 text-sm mb-6">
-                    Sleep tafels op de plattegrond, zie reservaties per tafel en beheer de bezetting visueel. Beschikbaar voor Pro klanten.
-                  </p>
-                  <a href={`/shop/${tenant}/admin/abonnement`}
-                    className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-blue-600 text-white font-semibold hover:opacity-90 transition-opacity">
-                    Upgrade naar Pro
-                  </a>
-                </div>
-              </div>
-            )
-          }
-
           // Reservation status per table for selected date
           const floorRes = reservations.filter(r =>
             r.reservation_date === selectedDate &&
