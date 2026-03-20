@@ -8,7 +8,7 @@ import KassaFloorPlan from '@/components/KassaFloorPlan'
 import KassaReservationsView from '@/components/KassaReservationsView'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
-import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio } from '@/lib/sounds'
+import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio, playOrderNotification } from '@/lib/sounds'
 
 interface SelectedChoice {
   optionId: string
@@ -41,6 +41,35 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [hamburgerOpen, setHamburgerOpen] = useState(false)
   const [hamburgerSubOpen, setHamburgerSubOpen] = useState<string | null>(null)
   const closeNav = () => { setNavOpen(false); setKassaOpen(false); setFlyoutOpen(null); setOnlineSubOpen(null) }
+  // ── Geluid activatie scherm (exact donor) ───────────────────────────────
+  // Elke sessie (browser open) moet de gebruiker 1x klikken om audio te activeren.
+  // Browser blokkeert audio zonder user gesture — dit scherm lost dat op.
+  const [soundActivated, setSoundActivated] = useState(false)
+  const [showSoundActivation, setShowSoundActivation] = useState(true)
+
+  const activateSound = () => {
+    // AudioContext aanmaken + activeren TIJDENS user gesture (vereist door browser)
+    try {
+      const AC = window.AudioContext || (window as any).webkitAudioContext
+      const ctx = new AC()
+      if (ctx.state === 'suspended') ctx.resume()
+    } catch { /* ignore */ }
+    // sounds.ts AudioContext ook activeren
+    initAudio()
+    prewarmAudio()
+    // Notificatie toestemming vragen
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+    setSoundActivated(true)
+    setShowSoundActivation(false)
+    localStorage.setItem('vysion_sound_activated', 'true')
+  }
+
+  // Toon activatiescherm elke sessie (browser vereist verse klik per sessie)
+  // Als vorige sessie al geactiveerd was, tonen we het nog steeds voor de zekerheid
+  // (donor doet hetzelfde: "Still show - browser requires fresh click each session")
+
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
   const [tableNumber, setTableNumber] = useState('')
@@ -54,48 +83,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [newOrderAlert, setNewOrderAlert] = useState<{id: string; orderNumber: number; total: number} | null>(null)
   const newOrderAlertRef = useRef<{id: string; orderNumber: number; total: number} | null>(null)
   const alarmIntervalRef = useRef<NodeJS.Timeout | null>(null)
-  const audioCtxRef = useRef<AudioContext | null>(null)
   const previousOrderIdsRef = useRef<string[]>([])
 
-  const playHTMLAudioFallback = useRef(() => {
-    try {
-      const audio = new Audio('/notification.mp3')
-      audio.volume = 0.8
-      audio.play().catch(() => {
-        try {
-          if (audioCtxRef.current) {
-            const osc = audioCtxRef.current.createOscillator()
-            const gain = audioCtxRef.current.createGain()
-            osc.type = 'square'; osc.frequency.value = 880; gain.gain.value = 0.5
-            osc.connect(gain); gain.connect(audioCtxRef.current.destination)
-            osc.start(); osc.stop(audioCtxRef.current.currentTime + 0.3)
-          }
-        } catch { /* ignore */ }
-      })
-    } catch { /* ignore */ }
-  }).current
-
-  const playBeepOnly = useRef(() => {
-    playHTMLAudioFallback()
-    try {
-      if (!audioCtxRef.current) {
-        const AC = window.AudioContext || (window as any).webkitAudioContext
-        audioCtxRef.current = new AC()
-      }
-      const ctx = audioCtxRef.current
-      if (ctx.state === 'running') {
-        const osc = ctx.createOscillator(); const gain = ctx.createGain()
-        osc.type = 'square'; osc.frequency.value = 880; gain.gain.value = 0.3
-        osc.connect(gain); gain.connect(ctx.destination)
-        osc.start(ctx.currentTime)
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
-        osc.stop(ctx.currentTime + 0.3)
-      } else if (ctx.state === 'suspended') {
-        ctx.resume().catch(() => {})
-      }
-    } catch { /* ignore */ }
-  }).current
-
+  // Gebruik playOrderNotification uit sounds.ts — zelfde geactiveerde AudioContext als alle andere knoppen
   const stopAlarm = useRef(() => {
     if (alarmIntervalRef.current) {
       clearInterval(alarmIntervalRef.current)
@@ -105,25 +95,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   const startAlarm = useRef(() => {
     if (alarmIntervalRef.current) return
-    playBeepOnly()
-    let beepCount = 0
-    const alarmBeep = () => {
-      beepCount++
-      try {
-        playBeepOnly()
-        if (!alarmIntervalRef.current) {
-          alarmIntervalRef.current = setInterval(alarmBeep, 2000)
-        }
-      } catch {
-        try { playBeepOnly() } catch { /* ignore */ }
-      }
-    }
-    alarmIntervalRef.current = setInterval(alarmBeep, 2000)
-    setTimeout(() => {
-      if (!alarmIntervalRef.current) {
-        alarmIntervalRef.current = setInterval(alarmBeep, 2000)
-      }
-    }, 3000)
+    // Speel direct
+    playOrderNotification().catch(() => {})
+    // Herhaal elke 2 seconden
+    alarmIntervalRef.current = setInterval(() => {
+      playOrderNotification().catch(() => {})
+    }, 2000)
   }).current
 
   // Alarm blijft spelen zolang er nieuwe bestellingen zijn (exact donor: gebruik ref)
@@ -215,16 +192,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const tableOrdersKey = `vysion_table_orders_${tenant}`
 
   // Laad tafels + barkrukken + openstaande bestellingen (localStorage + Supabase sync)
-  // Audio initialiseren na eerste gebruikersinteractie
-  useEffect(() => {
-    const handleFirstInteraction = () => {
-      initAudio()
-      prewarmAudio()
-      document.removeEventListener('click', handleFirstInteraction)
-    }
-    document.addEventListener('click', handleFirstInteraction)
-    return () => document.removeEventListener('click', handleFirstInteraction)
-  }, [])
 
   useEffect(() => {
     const raw = localStorage.getItem(`vysion_tables_${tenant}`)
@@ -833,6 +800,33 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const handleLogout = () => {
     localStorage.removeItem('vysion_tenant')
     window.location.href = '/login'
+  }
+
+  // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
+  if (showSoundActivation && !soundActivated) {
+    return (
+      <div className="fixed inset-0 z-[200] bg-gradient-to-br from-[#2D3A52] to-[#5A7BA8] flex flex-col items-center justify-center p-8">
+        <div className="text-white text-center max-w-md">
+          <div className="text-8xl mb-8">🔔</div>
+          <h1 className="text-4xl font-bold mb-4">Activeer Geluid</h1>
+          <p className="text-xl text-white mb-8">
+            Klik op de knop om geluid en meldingen te activeren voor nieuwe bestellingen.
+            <br /><br />
+            <strong>Dit doe je maar 1 keer per dag.</strong>
+          </p>
+          <button
+            onClick={activateSound}
+            className="w-full py-6 bg-green-500 hover:bg-green-600 text-white text-2xl font-bold rounded-2xl shadow-2xl transform hover:scale-105 transition-all flex items-center justify-center gap-4"
+          >
+            <span className="text-4xl">🔊</span>
+            ACTIVEER GELUID
+          </button>
+          <p className="text-white/80 mt-6 text-sm">
+            💡 Zonder activatie kunnen nieuwe bestellingen geen alarm afspelen.
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
