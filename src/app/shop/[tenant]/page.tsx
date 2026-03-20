@@ -839,45 +839,24 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               </button>
             )}
             
-            {/* Menu */}
-            {manualOffline?.is_offline ? (
-              <span
-                className="text-white/50 font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm bg-white/10 flex items-center gap-1 cursor-not-allowed"
-              >
-                <span>🚫</span>
-                <span className="hidden sm:inline">Bestel</span>
-              </span>
-            ) : (
-              <Link 
-                href={`/shop/${params.tenant}/menu`}
-                style={{ backgroundColor: business.primary_color }}
-                className="text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:opacity-90 transition-opacity flex items-center gap-1"
-              >
-                <span>🛒</span>
-                <span className="hidden sm:inline">Bestel</span>
-              </Link>
-            )}
-            
             {/* Account */}
             <Link 
               href={`/shop/${params.tenant}/account`}
-              className="bg-white/20 backdrop-blur-md text-white font-medium px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:bg-white/30 transition-colors flex items-center gap-1"
+              className="bg-white/20 backdrop-blur-md text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-sm sm:text-base hover:bg-white/30 transition-colors flex items-center gap-1.5"
             >
               <span>👤</span>
               <span className="hidden sm:inline">{t('shopPage.account')}</span>
             </Link>
-            
-            {/* Admin knop verwijderd - eigenaar logt in via /login */}
 
-            {/* Language Switcher - fixed position rechts */}
+            {/* Language Switcher */}
             <div className="relative">
               <button
                 onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-                className="bg-white/20 backdrop-blur-md text-white font-medium px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm hover:bg-white/30 transition-colors flex items-center gap-1"
+                className="bg-white/20 backdrop-blur-md text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-sm sm:text-base hover:bg-white/30 transition-colors flex items-center gap-1.5"
                 title={t('languageSwitcher.selectLanguage')}
               >
-                <span>{localeFlags[locale]}</span>
-                <svg className="w-2.5 h-2.5 sm:w-3 sm:h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="text-base sm:text-lg">{localeFlags[locale]}</span>
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
