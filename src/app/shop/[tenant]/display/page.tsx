@@ -948,24 +948,24 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               )}
             </button>
 
-            {/* Links */}
+            {/* Navigatie knoppen */}
             <Link
-              href={`/shop/${params.tenant}/admin`}
-              className="px-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-sm font-bold"
+              href={`/shop/${params.tenant}/admin/kassa`}
+              className="px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-sm font-bold"
             >
-              ⚙️ Admin
+              🖥️ Kassa
             </Link>
             <Link
               href={`/keuken/${params.tenant}`}
-              className="px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-sm font-bold"
+              className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold"
             >
               👨‍🍳 {tx('kitchen')}
             </Link>
             <Link
               href={`/shop/${params.tenant}/admin`}
-              className="px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded-xl text-sm"
+              className="px-3 py-2 bg-orange-700 hover:bg-orange-600 rounded-xl text-sm font-bold"
             >
-              ✕
+              ⚙️ Admin
             </Link>
           </div>
         </div>

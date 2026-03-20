@@ -68,7 +68,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         {/* ← Terug naar Kassa */}
         <Link
           href={`${baseUrl}/kassa`}
-          className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
+          className="flex items-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-white text-sm font-bold transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

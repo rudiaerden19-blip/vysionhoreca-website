@@ -501,12 +501,18 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               🖨️ {printerStatus === 'online' ? 'Online' : printerStatus === 'offline' ? 'Offline' : 'Printer'}
             </button>
 
-            {/* Back to admin */}
+            {/* Navigatie knoppen */}
+            <Link
+              href={`/shop/${params.tenant}/admin/kassa`}
+              className="px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-sm font-bold"
+            >
+              🖥️ Kassa
+            </Link>
             <Link
               href={`/shop/${params.tenant}/admin`}
-              className="px-3 py-2 bg-white/20 hover:bg-white/30 rounded-xl text-sm"
+              className="px-3 py-2 bg-orange-700 hover:bg-orange-600 rounded-xl text-sm font-bold"
             >
-              ✕
+              ⚙️ Admin
             </Link>
           </div>
         </div>
