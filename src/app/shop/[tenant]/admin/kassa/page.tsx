@@ -1490,6 +1490,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           tenant={tenant}
           onSelectTable={(nr) => switchToTable(nr)}
           onClose={() => setShowFloorPlan(false)}
+          tableOrders={tableOrders}
         />
       )}
 

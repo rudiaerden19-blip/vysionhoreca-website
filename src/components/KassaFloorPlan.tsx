@@ -28,10 +28,17 @@ const STATUS_LABELS: Record<TableStatus, string> = {
   UNPAID: 'Onbetaald',
 }
 
+interface SimpleCartItem {
+  product: { name: string; price: number }
+  quantity: number
+  choices?: { choiceName: string; price: number }[]
+}
+
 interface Props {
   tenant: string
   onSelectTable: (tableNumber: string) => void
   onClose: () => void
+  tableOrders?: Record<string, SimpleCartItem[]>
 }
 
 function makeId() { return Math.random().toString(36).slice(2, 10) }
@@ -307,7 +314,7 @@ function TableSVG({ table, isSelected, onClick }: {
   )
 }
 
-export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props) {
+export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOrders = {} }: Props) {
   const storageKey = `vysion_tables_${tenant}`
   const [tables, setTables] = useState<KassaTable[]>([])
   const [selected, setSelected] = useState<KassaTable | null>(null)
@@ -695,66 +702,123 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose }: Props
         )}
 
         {/* Tafel Sidebar */}
-        {selected && (
-          <div className="w-72 bg-[#16213e] border-l border-white/10 flex flex-col">
-            <div className="p-4 border-b border-white/10 flex justify-between items-center">
-              <h3 className="text-white font-bold text-xl">Tafel {selected.number}</h3>
-              <button onClick={() => setSelected(null)} className="text-white/50 hover:text-white text-xl">✕</button>
-            </div>
+        {selected && (() => {
+          const items = tableOrders[selected.number] || []
+          const hasItems = items.length > 0
+          const totalPrice = items.reduce((sum, item) => {
+            const choiceTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+            return sum + (item.product.price + choiceTotal) * item.quantity
+          }, 0)
 
-            <div className="p-4 border-b border-white/10">
-              <div className="px-4 py-2 rounded-xl text-center font-bold text-white text-sm"
-                style={{ backgroundColor: STATUS_COLORS[selected.status] }}>
-                {STATUS_LABELS[selected.status]}
+          return (
+            <div className="w-80 bg-[#16213e] border-l border-white/10 flex flex-col">
+              {/* Header */}
+              <div className="p-4 border-b border-white/10 flex justify-between items-center">
+                <div>
+                  <h3 className="text-white font-bold text-xl">Tafel {selected.number}</h3>
+                  <p className="text-white/40 text-xs">{selected.seats} plaatsen</p>
+                </div>
+                <button onClick={() => setSelected(null)} className="text-white/50 hover:text-white text-xl">✕</button>
               </div>
-              <p className="text-white/50 text-xs text-center mt-2">{selected.seats} plaatsen</p>
-            </div>
 
-            {/* Rotatie */}
-            <div className="p-4 border-b border-white/10">
-              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
-              <div className="flex gap-2">
-                <button onClick={() => rotate(selected.id, -45)}
-                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↺</button>
-                <button onClick={() => rotate(selected.id, 45)}
-                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↻</button>
-                <button onClick={() => rotate(selected.id, -selected.rotation)}
-                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors">Reset</button>
+              {/* Bestellingen */}
+              <div className="flex-1 overflow-y-auto p-4 border-b border-white/10">
+                <p className="text-white/50 text-xs uppercase tracking-wider mb-3">Bestelling</p>
+                {hasItems ? (
+                  <div className="space-y-2">
+                    {items.map((item, i) => {
+                      const choiceTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
+                      const lineTotal = (item.product.price + choiceTotal) * item.quantity
+                      return (
+                        <div key={i} className="bg-white/5 rounded-xl p-3">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1 min-w-0">
+                              <span className="text-white font-semibold text-sm">
+                                {item.quantity}× {item.product.name}
+                              </span>
+                              {(item.choices || []).length > 0 && (
+                                <div className="mt-1 space-y-0.5">
+                                  {item.choices!.map((c, ci) => (
+                                    <p key={ci} className="text-white/40 text-xs">
+                                      + {c.choiceName}{c.price > 0 ? ` (€${c.price.toFixed(2)})` : ''}
+                                    </p>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-amber-400 font-bold text-sm ml-2 shrink-0">
+                              €{lineTotal.toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                    {/* Totaal */}
+                    <div className="flex justify-between items-center pt-2 border-t border-white/10 mt-2">
+                      <span className="text-white/60 text-sm font-semibold">Totaal</span>
+                      <span className="text-white font-bold text-lg">€{totalPrice.toFixed(2)}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-white/30 text-sm text-center py-6">Geen openstaande bestelling</p>
+                )}
               </div>
-            </div>
 
-            {/* Status toggle */}
-            <div className="p-4 border-b border-white/10 space-y-2">
-              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Status</p>
-              {(['FREE', 'OCCUPIED', 'UNPAID'] as TableStatus[]).map(s => (
-                <button key={s}
-                  onClick={() => {
-                    const updated = tables.map(t => t.id === selected.id ? { ...t, status: s } : t)
-                    save(updated)
-                    setSelected({ ...selected, status: s })
-                  }}
-                  className="w-full py-2 rounded-lg text-sm font-semibold transition-colors"
-                  style={selected.status === s
-                    ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
-                    : { backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)' }}>
-                  {STATUS_LABELS[s]}
+              {/* Rotatie */}
+              <div className="p-4 border-b border-white/10">
+                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
+                <div className="flex gap-2">
+                  <button onClick={() => rotate(selected.id, -45)}
+                    className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↺</button>
+                  <button onClick={() => rotate(selected.id, 45)}
+                    className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↻</button>
+                  <button onClick={() => rotate(selected.id, -selected.rotation)}
+                    className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors">Reset</button>
+                </div>
+              </div>
+
+              {/* Status toggle */}
+              <div className="p-4 border-b border-white/10 space-y-2">
+                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Status</p>
+                {(['FREE', 'OCCUPIED', 'UNPAID'] as TableStatus[]).map(s => {
+                  const isActive = selected.status === s
+                  // Onbetaald altijd oplichten als er items zijn
+                  const forceHighlight = s === 'UNPAID' && hasItems && !isActive
+                  return (
+                    <button key={s}
+                      onClick={() => {
+                        const updated = tables.map(t => t.id === selected.id ? { ...t, status: s } : t)
+                        save(updated)
+                        setSelected({ ...selected, status: s })
+                      }}
+                      className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
+                      style={
+                        isActive
+                          ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
+                          : forceHighlight
+                          ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}` }
+                          : { backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }
+                      }>
+                      {STATUS_LABELS[s]}{forceHighlight ? ' ⚠️' : ''}
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="p-4 space-y-2">
+                <button
+                  onClick={() => { onSelectTable(selected.number); onClose() }}
+                  className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">
+                  🛒 {hasItems ? 'Toevoegen aan bestelling' : 'Nieuwe bestelling'}
                 </button>
-              ))}
+                <button onClick={() => deleteTable(selected.id)}
+                  className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold transition-colors">
+                  🗑 Verwijder tafel
+                </button>
+              </div>
             </div>
-
-            <div className="p-4 space-y-2 mt-auto">
-              <button
-                onClick={() => { onSelectTable(selected.number); onClose() }}
-                className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">
-                🛒 Nieuwe bestelling
-              </button>
-              <button onClick={() => deleteTable(selected.id)}
-                className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold transition-colors">
-                🗑 Verwijder tafel
-              </button>
-            </div>
-          </div>
-        )}
+          )
+        })()}
       </div>
 
       {/* Legend */}
