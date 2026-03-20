@@ -1,12 +1,31 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import { useLanguage } from '@/i18n'
+
+function useCountdown(targetDate: Date) {
+  const calc = () => {
+    const diff = Math.max(0, targetDate.getTime() - Date.now())
+    return {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((diff / (1000 * 60)) % 60),
+      seconds: Math.floor((diff / 1000) % 60),
+    }
+  }
+  const [time, setTime] = useState(calc)
+  useEffect(() => {
+    const id = setInterval(() => setTime(calc()), 1000)
+    return () => clearInterval(id)
+  }, [])
+  return time
+}
 
 export default function PrijzenPage() {
   const { t, locale } = useLanguage()
   const [isYearly, setIsYearly] = useState(false)
+  const countdown = useCountdown(new Date('2026-05-01T00:00:00'))
   
   const starterMonthly = 59
   const proMonthly = 79
@@ -36,6 +55,34 @@ export default function PrijzenPage() {
       <section className="py-16 bg-gradient-to-b from-[#16213e] to-[#1a1a2e]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           
+          {/* ── Aanbieding countdown banner ── */}
+          <div className="mb-10 rounded-2xl overflow-hidden border border-red-500/30 bg-gradient-to-r from-red-950/60 to-orange-950/60 p-6 text-center">
+            <p className="text-red-300 font-semibold text-sm uppercase tracking-widest mb-1">⏳ Tijdelijke aanbieding</p>
+            <p className="text-white text-xl font-bold mb-5">Aanbieding loopt tot 1 mei 2026</p>
+            <div className="flex items-center justify-center gap-3 sm:gap-6">
+              {[
+                { value: countdown.days, label: 'Dagen' },
+                { value: countdown.hours, label: 'Uren' },
+                { value: countdown.minutes, label: 'Minuten' },
+                { value: countdown.seconds, label: 'Seconden' },
+              ].map(({ value, label }, i, arr) => (
+                <React.Fragment key={label}>
+                  <div className="flex flex-col items-center">
+                    <div className="bg-[#0f0f1a] border border-red-500/40 rounded-xl w-16 sm:w-20 h-16 sm:h-20 flex items-center justify-center">
+                      <span className="text-3xl sm:text-4xl font-black text-red-400 tabular-nums leading-none">
+                        {String(value).padStart(2, '0')}
+                      </span>
+                    </div>
+                    <span className="text-gray-400 text-xs mt-1.5 font-medium">{label}</span>
+                  </div>
+                  {i < arr.length - 1 && (
+                    <span className="text-red-400 text-2xl font-bold mb-5">:</span>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+
           {/* Toggle Maandelijks / Jaarlijks */}
           <div className="flex flex-col items-center mb-12">
             <div className="bg-[#0f0f1a] p-1 rounded-full inline-flex items-center">
@@ -83,12 +130,15 @@ export default function PrijzenPage() {
                   </div>
                   <h3 className="text-xl font-bold text-white">{t('pricing.starter.name')}</h3>
                 </div>
-                {/* Stuntprijs badge + doorgestreepte prijs */}
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="bg-red-500 text-white text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wide animate-pulse">
-                    🔥 Stuntprijs
+                {/* Tijdelijke aanbieding + doorgestreepte prijs */}
+                <div className="mb-3">
+                  <span className="bg-red-500 text-white text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wide">
+                    ⏳ Tijdelijke aanbieding
                   </span>
-                  <span className="text-gray-400 text-sm line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(99 * 0.9) : 99}/maand</span>
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl font-bold text-gray-400 line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(99 * 12 * 0.9) : 99}/maand</span>
+                  <span className="bg-green-500/20 text-green-400 text-sm font-bold px-2 py-0.5 rounded-lg">-40%</span>
                 </div>
                 <div className="flex items-baseline mb-6">
                   <span className="text-5xl font-bold text-yellow-400">€{starterPrice}</span>
@@ -134,12 +184,15 @@ export default function PrijzenPage() {
                   </div>
                   <h3 className="text-xl font-bold text-white">{t('pricing.pro.name')}</h3>
                 </div>
-                {/* Stuntprijs badge + doorgestreepte prijs */}
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="bg-red-500 text-white text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wide animate-pulse">
-                    🔥 Stuntprijs
+                {/* Tijdelijke aanbieding + doorgestreepte prijs */}
+                <div className="mb-3">
+                  <span className="bg-red-500 text-white text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wide">
+                    ⏳ Tijdelijke aanbieding
                   </span>
-                  <span className="text-gray-400 text-sm line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(129 * 0.9) : 129}/maand</span>
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl font-bold text-gray-400 line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(129 * 12 * 0.9) : 129}/maand</span>
+                  <span className="bg-green-500/20 text-green-400 text-sm font-bold px-2 py-0.5 rounded-lg">-39%</span>
                 </div>
                 <div className="flex items-baseline mb-6">
                   <span className="text-5xl font-bold text-purple-300">€{proPrice}</span>
