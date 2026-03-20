@@ -1807,7 +1807,7 @@ export default function KassaReservationsView({
                   </div>
                   <div className="p-3 border-t border-gray-100">
                     <button
-                      onClick={() => setShowNewReservation(true)}
+                      onClick={() => setShowNewReservationModal(true)}
                       className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors"
                     >
                       <Plus size={15} />
