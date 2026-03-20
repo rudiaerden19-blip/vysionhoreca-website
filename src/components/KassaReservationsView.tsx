@@ -142,6 +142,155 @@ interface KassaReservationsViewProps {
   onStartOrder: (tableNr: string) => void
 }
 
+// ---- Reservation Table SVG (met stoelen) ----
+function ReservationTableSVG({ table, color, borderColor, isSelected, guestName, time }: {
+  table: FloorPlanTable
+  color: string
+  borderColor: string
+  isSelected: boolean
+  guestName?: string
+  time?: string
+}) {
+  const seats = table.seats
+  const tableSize = 88
+  const chairW = 24
+  const chairH = 20
+  const gap = 12
+
+  type Chair = { x: number; y: number; angle: number }
+  const chairs: Chair[] = []
+
+  if (table.shape === 'ROUND') {
+    if (seats === 2) {
+      const dist = tableSize / 2 + gap + chairH / 2
+      chairs.push({ x: 0, y: -dist, angle: -90 })
+      chairs.push({ x: 0, y: dist, angle: 90 })
+    } else {
+      const dist = tableSize / 2 + gap + chairH / 2
+      for (let i = 0; i < seats; i++) {
+        const angle = (i * 360) / seats - 90
+        const rad = (angle * Math.PI) / 180
+        chairs.push({ x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, angle })
+      }
+    }
+  } else if (table.shape === 'SQUARE') {
+    const half = tableSize / 2
+    const dist = half + gap + chairH / 2
+    if (seats === 2) {
+      chairs.push({ x: 0, y: -dist, angle: -90 })
+      chairs.push({ x: 0, y: dist, angle: 90 })
+    } else {
+      const perSide = Math.ceil(seats / 4)
+      const sides = [
+        { angle: -90, axis: 'x' as const, fixed: -dist },
+        { angle: 0, axis: 'y' as const, fixed: dist },
+        { angle: 90, axis: 'x' as const, fixed: dist },
+        { angle: 180, axis: 'y' as const, fixed: -dist },
+      ]
+      let placed = 0
+      for (const side of sides) {
+        const count = Math.min(perSide, seats - placed)
+        for (let i = 0; i < count; i++) {
+          const offset = (i - (count - 1) / 2) * (chairW + 6)
+          chairs.push({
+            x: side.axis === 'x' ? offset : side.fixed,
+            y: side.axis === 'y' ? offset : side.fixed,
+            angle: side.angle,
+          })
+          placed++
+        }
+        if (placed >= seats) break
+      }
+    }
+  } else {
+    // RECTANGLE
+    const tw = tableSize * 1.7
+    const th = tableSize * 0.6
+    const perLong = Math.ceil(seats / 2)
+    const distTop = th / 2 + gap + chairH / 2
+    let placed = 0
+    for (let i = 0; i < perLong && placed < seats; i++) {
+      chairs.push({ x: (i - (perLong - 1) / 2) * (chairW + 6), y: -distTop, angle: -90 })
+      placed++
+    }
+    for (let i = 0; i < perLong && placed < seats; i++) {
+      chairs.push({ x: (i - (perLong - 1) / 2) * (chairW + 6), y: distTop, angle: 90 })
+      placed++
+    }
+  }
+
+  const pad = 72
+  const tw = table.shape === 'RECTANGLE' ? tableSize * 1.7 : tableSize
+  const th = table.shape === 'RECTANGLE' ? tableSize * 0.6 : tableSize
+  const svgW = tw + pad * 2
+  const svgH = th + pad * 2 + (guestName ? 24 : 0)
+  const cx = svgW / 2
+  const cy = (th + pad * 2) / 2
+
+  return (
+    <svg width={svgW} height={svgH} style={{ overflow: 'visible', display: 'block' }}>
+      <defs>
+        <filter id={`rshadow-${table.id}`} x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="3" stdDeviation="5" floodOpacity={isSelected ? 0.4 : 0.25} />
+        </filter>
+      </defs>
+
+      {/* Chairs */}
+      {chairs.map((c, i) => (
+        <g key={i} transform={`translate(${cx + c.x}, ${cy + c.y}) rotate(${c.angle})`}>
+          <rect x={-chairW / 2} y={-chairH / 2} width={chairW} height={8} rx={3} fill="#aaa" />
+          <rect x={-chairW / 2} y={-chairH / 2 + 9} width={chairW} height={chairH - 8} rx={3} fill="#ccc" />
+        </g>
+      ))}
+
+      {/* Table body */}
+      {table.shape === 'ROUND' ? (
+        <ellipse cx={cx} cy={cy} rx={tableSize / 2} ry={tableSize / 2}
+          fill={color} stroke={isSelected ? '#1d4ed8' : borderColor}
+          strokeWidth={isSelected ? 3 : 2}
+          filter={`url(#rshadow-${table.id})`} />
+      ) : table.shape === 'RECTANGLE' ? (
+        <rect x={cx - tw / 2} y={cy - th / 2} width={tw} height={th} rx={10}
+          fill={color} stroke={isSelected ? '#1d4ed8' : borderColor}
+          strokeWidth={isSelected ? 3 : 2}
+          filter={`url(#rshadow-${table.id})`} />
+      ) : (
+        <rect x={cx - tableSize / 2} y={cy - tableSize / 2} width={tableSize} height={tableSize} rx={10}
+          fill={color} stroke={isSelected ? '#1d4ed8' : borderColor}
+          strokeWidth={isSelected ? 3 : 2}
+          filter={`url(#rshadow-${table.id})`} />
+      )}
+
+      {/* Selection ring */}
+      {isSelected && (
+        table.shape === 'ROUND'
+          ? <ellipse cx={cx} cy={cy} rx={tableSize / 2 + 5} ry={tableSize / 2 + 5} fill="none" stroke="#1d4ed8" strokeWidth={2} strokeDasharray="5 3" opacity={0.6} />
+          : <rect x={cx - (tw) / 2 - 5} y={cy - th / 2 - 5} width={(tw) + 10} height={th + 10} rx={14} fill="none" stroke="#1d4ed8" strokeWidth={2} strokeDasharray="5 3" opacity={0.6} />
+      )}
+
+      {/* Table number */}
+      <text x={cx} y={cy - 5} textAnchor="middle" fill="white" fontSize={18} fontWeight="bold"
+        style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.5))' }}>
+        {table.number}
+      </text>
+      <text x={cx} y={cy + 13} textAnchor="middle" fill="rgba(255,255,255,0.8)" fontSize={11}>
+        {seats}p
+      </text>
+
+      {/* Guest name label */}
+      {guestName && (
+        <>
+          <rect x={cx - 50} y={cy + th / 2 + gap + 4} width={100} height={18} rx={9} fill="white"
+            style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.2))' }} />
+          <text x={cx} y={cy + th / 2 + gap + 16} textAnchor="middle" fill="#374151" fontSize={10} fontWeight="600">
+            {guestName}{time ? ` ${time}` : ''}
+          </text>
+        </>
+      )}
+    </svg>
+  )
+}
+
 // ---- Status config (exact kopie) ----
 const STATUS_CONFIG: Record<ReservationStatus, { label: string; color: string; bgColor: string; icon: React.ReactNode }> = {
   PENDING: { label: 'In afwachting', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.15)', icon: <Clock size={14} /> },
@@ -1169,18 +1318,16 @@ export default function KassaReservationsView({
                     )
                     const isSelected = selectedReservation?.table_number === table.number
                     let bgColor = '#4ade80'
-                    if (tableRes?.status === 'CHECKED_IN') bgColor = '#60a5fa'
-                    else if (tableRes?.status === 'CONFIRMED') bgColor = '#a78bfa'
-                    else if (tableRes?.status === 'PENDING') bgColor = '#fbbf24'
-
-                    const tw = table.shape === 'RECTANGLE' ? 100 : 70
-                    const th = table.shape === 'RECTANGLE' ? 50 : 70
+                    let borderColor = '#22c55e'
+                    if (tableRes?.status === 'CHECKED_IN') { bgColor = '#60a5fa'; borderColor = '#3b82f6' }
+                    else if (tableRes?.status === 'CONFIRMED') { bgColor = '#a78bfa'; borderColor = '#8b5cf6' }
+                    else if (tableRes?.status === 'PENDING') { bgColor = '#fbbf24'; borderColor = '#f59e0b' }
 
                     return (
                       <div
                         key={table.id}
                         onClick={() => tableRes ? setSelectedReservation(tableRes) : null}
-                        className="absolute transition-all"
+                        className="absolute"
                         style={{
                           left: `${table.x}%`,
                           top: `${table.y}%`,
@@ -1189,27 +1336,14 @@ export default function KassaReservationsView({
                           zIndex: isSelected ? 10 : 1,
                         }}
                       >
-                        <div
-                          className="flex flex-col items-center justify-center relative transition-all"
-                          style={{
-                            width: tw,
-                            height: th,
-                            backgroundColor: bgColor,
-                            borderRadius: table.shape === 'ROUND' ? '50%' : 10,
-                            border: isSelected ? '3px solid #1d4ed8' : '2px solid rgba(0,0,0,0.15)',
-                            boxShadow: isSelected
-                              ? '0 0 0 4px rgba(29,78,216,0.25), 0 4px 12px rgba(0,0,0,0.2)'
-                              : '0 2px 8px rgba(0,0,0,0.15)',
-                          }}
-                        >
-                          <span className="text-white text-sm font-bold drop-shadow">{table.number}</span>
-                          <span className="text-white/80 text-[10px]">{table.seats}p</span>
-                          {tableRes && (
-                            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white shadow-md rounded-lg px-2 py-0.5 text-[10px] font-semibold text-gray-700 border border-gray-200 pointer-events-none z-10">
-                              {tableRes.guest_name} • {tableRes.reservation_time}
-                            </div>
-                          )}
-                        </div>
+                        <ReservationTableSVG
+                          table={table}
+                          color={bgColor}
+                          borderColor={borderColor}
+                          isSelected={isSelected}
+                          guestName={tableRes?.guest_name}
+                          time={tableRes?.reservation_time}
+                        />
                       </div>
                     )
                   })}
@@ -1632,8 +1766,6 @@ export default function KassaReservationsView({
                   {floorPlanTablesDB.map(table => {
                     const { color, borderColor, res } = getFloorTableInfo(table.number)
                     const isSelected = selectedFloorTable?.id === table.id
-                    const tw = table.shape === 'RECTANGLE' ? 100 : 72
-                    const th = table.shape === 'RECTANGLE' ? 52 : 72
 
                     return (
                       <div
@@ -1658,26 +1790,14 @@ export default function KassaReservationsView({
                         }}
                         onClick={e => e.stopPropagation()}
                       >
-                        <div
-                          className="flex flex-col items-center justify-center relative transition-shadow"
-                          style={{
-                            width: tw, height: th,
-                            backgroundColor: color,
-                            borderRadius: table.shape === 'ROUND' ? '50%' : 10,
-                            border: isSelected ? `3px solid #1d4ed8` : `2px solid ${borderColor}`,
-                            boxShadow: isSelected
-                              ? '0 0 0 4px rgba(29,78,216,0.2), 0 4px 16px rgba(0,0,0,0.2)'
-                              : '0 2px 8px rgba(0,0,0,0.18)',
-                          }}
-                        >
-                          <span className="text-white text-sm font-bold drop-shadow-sm leading-none">{table.number}</span>
-                          <span className="text-white/80 text-[10px]">{table.seats}p</span>
-                        </div>
-                        {res && (
-                          <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white shadow-md rounded-lg px-2 py-0.5 text-[10px] font-semibold text-gray-700 border border-gray-200 pointer-events-none z-20">
-                            {res.guest_name} {res.reservation_time}
-                          </div>
-                        )}
+                        <ReservationTableSVG
+                          table={table}
+                          color={color}
+                          borderColor={borderColor}
+                          isSelected={isSelected}
+                          guestName={res?.guest_name}
+                          time={res?.reservation_time}
+                        />
                       </div>
                     )
                   })}
