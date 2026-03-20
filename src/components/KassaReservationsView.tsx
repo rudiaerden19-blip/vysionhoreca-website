@@ -1700,23 +1700,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
   const resByDate = (dateISO: string) =>
     reservations.filter(r => r.reservation_date === dateISO && r.status !== 'CANCELLED')
 
-  // ─── Helpers ───────────────────────────────────────────────
-  const timeToMinutes = (time: string) => {
-    const [h, m] = time.split(':').map(Number)
-    return h * 60 + m
-  }
-  const startMinutes = 10 * 60 // 10:00
-  const totalMinutes = 13 * 60 // 13 uur
-
-  // Positie in px berekenen vanuit tijd
-  const timeToTop = (time: string) => {
-    return ((timeToMinutes(time) - startMinutes) / totalMinutes) * (HOURS.length * HOUR_HEIGHT)
-  }
-  const durationToHeight = (minutes: number) => {
-    return (minutes / totalMinutes) * (HOURS.length * HOUR_HEIGHT)
-  }
-
-  // ─── WEEK VIEW (uur-per-uur grid) ──────────────────────────
+  // ─── WEEK VIEW: heatmap + tellers per uur ─────────────────
   const renderWeek = () => {
     const dow = (refDate.getDay() + 6) % 7
     const monday = new Date(refDate)
@@ -1728,9 +1712,21 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
     const nextWeek = () => { const d = new Date(monday); d.setDate(monday.getDate() + 7); onSelectDate(toISO(d)) }
     const weekLabel = `${weekDays[0].toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })} – ${weekDays[6].toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })}`
 
+    // Reservaties per (dag, uur) groeperen
+    const resByDayHour = (iso: string, hour: number) =>
+      reservations.filter(r => {
+        if (r.reservation_date !== iso || r.status === 'CANCELLED') return false
+        const h = parseInt(r.reservation_time?.split(':')[0] || '0', 10)
+        return h === hour
+      })
+
+    // Maximale count in de week (voor kleurintensiteit)
+    const maxCount = Math.max(1, ...HOURS.flatMap(h =>
+      weekDays.map(d => resByDayHour(toISO(d), h).length)
+    ))
+
     return (
       <div>
-        {/* Navigatie */}
         <div className="flex items-center justify-between mb-3">
           <button onClick={prevWeek} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={18} /></button>
           <span className="font-bold text-gray-800">{weekLabel}</span>
@@ -1738,85 +1734,93 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
-          <div style={{ minWidth: 600 }}>
-            {/* Dag-headers */}
-            <div className="grid border-b border-gray-200" style={{ gridTemplateColumns: '52px repeat(7, 1fr)' }}>
-              <div className="border-r border-gray-200" />
-              {weekDays.map((d, i) => {
-                const iso = toISO(d)
-                const isToday = iso === todayISO
-                const isSelected = iso === selectedDate
-                const cnt = resByDate(iso).length
-                return (
-                  <div
-                    key={iso}
-                    onClick={() => { onSelectDate(iso); setCalMode('day') }}
-                    className={`py-3 text-center cursor-pointer border-r border-gray-200 last:border-r-0 transition-colors ${isSelected ? 'bg-green-50' : isToday ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
-                  >
-                    <div className={`text-xs font-semibold uppercase tracking-wide ${isToday ? 'text-blue-500' : 'text-gray-400'}`}>{NL_DAYS_SHORT[i]}</div>
-                    <div className={`text-xl font-bold mt-0.5 w-8 h-8 rounded-full flex items-center justify-center mx-auto ${isToday ? 'bg-blue-500 text-white' : isSelected ? 'bg-green-500 text-white' : 'text-gray-800'}`}>{d.getDate()}</div>
-                    {cnt > 0 && <div className="text-[10px] text-green-600 font-bold mt-1">{cnt} res.</div>}
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* Uur-grid */}
-            <div className="relative" style={{ height: HOURS.length * HOUR_HEIGHT }}>
-              {/* Uur-lijnen + labels */}
-              {HOURS.map((h, idx) => (
-                <div key={h} className="absolute left-0 right-0 border-t border-gray-100 flex" style={{ top: idx * HOUR_HEIGHT }}>
-                  <div className="w-[52px] flex-shrink-0 text-[11px] text-gray-400 text-right pr-2 -mt-2 font-medium select-none">{h}:00</div>
-                  <div className="flex-1 border-l border-gray-200" />
-                </div>
-              ))}
-              {/* Half-uur stippellijn */}
-              {HOURS.map((h, idx) => (
-                <div key={`half-${h}`} className="absolute left-[52px] right-0 border-t border-dashed border-gray-100" style={{ top: idx * HOUR_HEIGHT + HOUR_HEIGHT / 2 }} />
-              ))}
-
-              {/* Kolommen per dag */}
-              <div className="absolute inset-0 left-[52px] grid" style={{ gridTemplateColumns: `repeat(7, 1fr)` }}>
+          <table className="w-full border-collapse" style={{ minWidth: 560 }}>
+            <thead>
+              <tr>
+                <th className="w-14 border-b border-r border-gray-200 bg-gray-50" />
                 {weekDays.map((d, i) => {
                   const iso = toISO(d)
                   const isToday = iso === todayISO
-                  const dayRes = resByDate(iso)
+                  const isSelected = iso === selectedDate
+                  const cnt = resByDate(iso).length
+                  const covers = resByDate(iso).reduce((s, r) => s + r.party_size, 0)
                   return (
-                    <div key={iso} className={`relative border-r border-gray-200 last:border-r-0 ${isToday ? 'bg-blue-50/30' : ''}`}>
-                      {dayRes.map(r => {
-                        const sc = STATUS_CONFIG[r.status]
-                        const top = timeToTop(r.reservation_time)
-                        const height = Math.max(durationToHeight(r.duration_minutes || 90), 28)
-                        return (
-                          <div
-                            key={r.id}
-                            onClick={() => onSelectReservation(r)}
-                            className="absolute left-0.5 right-0.5 rounded-md px-1.5 py-1 cursor-pointer hover:opacity-80 transition-opacity overflow-hidden shadow-sm border"
-                            style={{ top, height, backgroundColor: sc.bgColor, borderColor: sc.color + '60', color: sc.color }}
-                          >
-                            <div className="text-[10px] font-bold leading-tight truncate">{r.reservation_time} {r.guest_name}</div>
-                            <div className="text-[9px] opacity-80 leading-tight">{r.party_size}p{r.table_number ? ` · T${r.table_number}` : ''}</div>
-                          </div>
-                        )
-                      })}
-                    </div>
+                    <th key={iso}
+                      onClick={() => { onSelectDate(iso); setCalMode('day') }}
+                      className={`border-b border-r border-gray-200 last:border-r-0 py-2 px-1 text-center cursor-pointer transition-colors ${isSelected ? 'bg-green-50' : isToday ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                    >
+                      <div className={`text-[11px] font-bold uppercase tracking-wide mb-0.5 ${isToday ? 'text-blue-500' : 'text-gray-400'}`}>{NL_DAYS_SHORT[i]}</div>
+                      <div className={`text-lg font-bold w-8 h-8 rounded-full flex items-center justify-center mx-auto ${isToday ? 'bg-blue-500 text-white' : isSelected ? 'bg-green-500 text-white' : 'text-gray-800'}`}>{d.getDate()}</div>
+                      {cnt > 0
+                        ? <div className="text-[10px] text-green-700 font-semibold mt-0.5">{cnt}×&nbsp;·&nbsp;{covers}p</div>
+                        : <div className="text-[10px] text-gray-300 mt-0.5">–</div>
+                      }
+                    </th>
                   )
                 })}
-              </div>
-            </div>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              {HOURS.map(h => (
+                <tr key={h} className="border-t border-gray-100">
+                  <td className="text-[11px] text-gray-400 text-right pr-2 w-14 border-r border-gray-200 font-medium select-none py-0"
+                    style={{ height: 40 }}>{h}:00</td>
+                  {weekDays.map(d => {
+                    const iso = toISO(d)
+                    const cell = resByDayHour(iso, h)
+                    const cnt = cell.length
+                    const covers = cell.reduce((s, r) => s + r.party_size, 0)
+                    const intensity = cnt === 0 ? 0 : Math.max(0.12, cnt / maxCount)
+                    const isToday = iso === todayISO
+                    return (
+                      <td key={iso}
+                        onClick={() => { onSelectDate(iso); setCalMode('day') }}
+                        className={`border-r border-gray-100 last:border-r-0 text-center align-middle cursor-pointer transition-colors ${isToday ? 'bg-blue-50/40' : ''}`}
+                        style={{ height: 40 }}
+                      >
+                        {cnt > 0 && (
+                          <div
+                            className="mx-auto rounded-lg flex flex-col items-center justify-center text-white font-bold cursor-pointer transition-transform hover:scale-105"
+                            style={{
+                              backgroundColor: `rgba(22, 163, 74, ${intensity})`,
+                              border: `1px solid rgba(22,163,74,0.3)`,
+                              width: '90%', height: 32,
+                              color: intensity > 0.5 ? 'white' : '#166534',
+                            }}
+                          >
+                            <span className="text-[11px] leading-none font-bold">{cnt} res.</span>
+                            <span className="text-[9px] leading-none opacity-80">{covers} pers.</span>
+                          </div>
+                        )}
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+        <p className="text-xs text-gray-400 mt-2 text-center">Klik op een dag of cel om alle reservaties te zien</p>
       </div>
     )
   }
 
-  // ─── DAG VIEW (uur-per-uur) ────────────────────────────────
+  // ─── DAG VIEW: tijdsgegroepeerde lijst (onbeperkt schaalbaar) ────────────
   const renderDay = () => {
     const prevDay = () => { const d = new Date(refDate); d.setDate(refDate.getDate() - 1); onSelectDate(toISO(d)) }
     const nextDay = () => { const d = new Date(refDate); d.setDate(refDate.getDate() + 1); onSelectDate(toISO(d)) }
-    const dayRes = resByDate(selectedDate)
+    const dayRes = resByDate(selectedDate).sort((a, b) => (a.reservation_time || '').localeCompare(b.reservation_time || ''))
     const dayLabel = refDate.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
     const covers = dayRes.reduce((s, r) => s + r.party_size, 0)
+
+    // Groepeer op tijdstip
+    const groups: Record<string, Reservation[]> = {}
+    dayRes.forEach(r => {
+      const t = r.reservation_time || '00:00'
+      if (!groups[t]) groups[t] = []
+      groups[t].push(r)
+    })
+    const sortedTimes = Object.keys(groups).sort()
 
     return (
       <div>
@@ -1825,80 +1829,105 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
           <button onClick={prevDay} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={18} /></button>
           <div className="text-center">
             <div className="font-bold text-gray-800 capitalize">{dayLabel}</div>
-            {dayRes.length > 0 && <div className="text-sm text-gray-400">{dayRes.length} reservaties · {covers} personen</div>}
+            {dayRes.length > 0
+              ? <div className="text-sm text-gray-500">{dayRes.length} reservaties &nbsp;·&nbsp; {covers} personen</div>
+              : <div className="text-sm text-gray-400">Geen reservaties</div>
+            }
           </div>
           <button onClick={nextDay} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={18} /></button>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-          {/* Dag-header */}
-          <div className={`flex items-center justify-center py-3 border-b border-gray-200 ${selectedDate === todayISO ? 'bg-blue-50' : 'bg-gray-50'}`}>
-            <div className={`text-2xl font-bold w-12 h-12 rounded-full flex items-center justify-center ${selectedDate === todayISO ? 'bg-blue-500 text-white' : 'bg-white border border-gray-200 text-gray-800'}`}>
-              {refDate.getDate()}
-            </div>
+        {dayRes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 rounded-xl border border-gray-200 bg-white">
+            <CalendarDays size={44} className="text-gray-300 mb-3" />
+            <p className="text-gray-400 font-medium">Geen reservaties op deze dag</p>
+            <button onClick={onNewReservation} className="mt-4 px-5 py-2 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors">
+              + Reservatie aanmaken
+            </button>
           </div>
-
-          {/* Uur-grid */}
-          <div className="relative" style={{ height: HOURS.length * HOUR_HEIGHT }}>
-            {HOURS.map((h, idx) => (
-              <div key={h} className="absolute left-0 right-0 border-t border-gray-100 flex" style={{ top: idx * HOUR_HEIGHT }}>
-                <div className="w-14 flex-shrink-0 text-xs text-gray-400 text-right pr-3 -mt-2 font-medium select-none">{h}:00</div>
-                <div className="flex-1 border-l border-gray-200" />
-              </div>
-            ))}
-            {HOURS.map((_, idx) => (
-              <div key={`half-${idx}`} className="absolute left-14 right-0 border-t border-dashed border-gray-100" style={{ top: idx * HOUR_HEIGHT + HOUR_HEIGHT / 2 }} />
-            ))}
-
-            {/* Reservaties als blokken */}
-            <div className="absolute inset-0 left-14">
-              {dayRes.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-full">
-                  <CalendarDays size={40} className="text-gray-300 mb-3" />
-                  <p className="text-gray-400 font-medium text-sm">Geen reservaties</p>
-                  <button onClick={onNewReservation} className="mt-3 px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600">
-                    + Reservatie aanmaken
-                  </button>
-                </div>
-              )}
-              {dayRes.map(r => {
-                const sc = STATUS_CONFIG[r.status]
-                const top = timeToTop(r.reservation_time)
-                const height = Math.max(durationToHeight(r.duration_minutes || 90), 44)
-                return (
-                  <div
-                    key={r.id}
-                    onClick={() => onSelectReservation(r)}
-                    className="absolute left-2 right-4 rounded-xl px-3 py-2 cursor-pointer hover:opacity-90 transition-opacity shadow-sm border"
-                    style={{ top, height, backgroundColor: sc.bgColor, borderColor: sc.color + '60' }}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
-                        <div className="font-bold text-sm leading-tight" style={{ color: sc.color }}>{r.reservation_time}</div>
-                        <div className="font-semibold text-gray-800 text-sm truncate">{r.guest_name}</div>
-                        {height > 50 && r.guest_phone && (
-                          <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                            <Phone size={10} />{r.guest_phone}
-                          </div>
-                        )}
-                        {height > 70 && r.special_requests && (
-                          <div className="text-xs text-amber-600 mt-0.5 truncate">⚠️ {r.special_requests}</div>
-                        )}
-                      </div>
-                      <div className="flex-shrink-0 text-right">
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                          <Users size={12} /><span className="font-bold">{r.party_size}</span>
-                        </div>
-                        {r.table_number && <div className="text-[10px] bg-white/60 rounded px-1 mt-0.5 font-medium text-gray-600">T{r.table_number}</div>}
-                        {r.occasion && <div className="text-[10px] mt-0.5">🎉</div>}
-                      </div>
+        ) : (
+          <div className="space-y-4">
+            {sortedTimes.map(time => {
+              const group = groups[time]
+              const groupCovers = group.reduce((s, r) => s + r.party_size, 0)
+              return (
+                <div key={time} className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+                  {/* Tijdstip-header */}
+                  <div className="flex items-center gap-3 px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+                    <div className="text-lg font-black text-[#3C4D6B]">{time}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                        {group.length} {group.length === 1 ? 'reservatie' : 'reservaties'}
+                      </span>
+                      <span className="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                        {groupCovers} personen
+                      </span>
                     </div>
                   </div>
-                )
-              })}
-            </div>
+
+                  {/* Reservaties in deze tijdslot */}
+                  <div className="divide-y divide-gray-100">
+                    {group.map(r => {
+                      const sc = STATUS_CONFIG[r.status]
+                      return (
+                        <div
+                          key={r.id}
+                          onClick={() => onSelectReservation(r)}
+                          className="flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                        >
+                          {/* Status-streep */}
+                          <div className="w-1 self-stretch rounded-full flex-shrink-0 mt-0.5" style={{ backgroundColor: sc.color }} />
+
+                          {/* Hoofdinfo */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-gray-900 text-sm">{r.guest_name}</span>
+                              {r.occasion && <span className="text-sm">🎉</span>}
+                              {r.special_requests && <span className="text-amber-500 text-xs font-semibold">⚠️ Opmerking</span>}
+                            </div>
+                            <div className="flex items-center gap-3 mt-0.5 flex-wrap">
+                              {r.guest_phone && (
+                                <span className="text-xs text-gray-500 flex items-center gap-1">
+                                  <Phone size={10} />{r.guest_phone}
+                                </span>
+                              )}
+                              {r.special_requests && (
+                                <span className="text-xs text-amber-600 truncate max-w-[200px]">{r.special_requests}</span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Rechts: personen, tafel, status */}
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="text-center">
+                              <div className="flex items-center gap-1 text-gray-700">
+                                <Users size={13} />
+                                <span className="font-black text-base leading-none">{r.party_size}</span>
+                              </div>
+                              <div className="text-[10px] text-gray-400 leading-none">pers.</div>
+                            </div>
+                            {r.table_number && (
+                              <div className="bg-[#3C4D6B] text-white text-xs font-bold px-2 py-1 rounded-lg">
+                                T{r.table_number}
+                              </div>
+                            )}
+                            <div className="px-2 py-1 rounded-lg text-xs font-bold" style={{ backgroundColor: sc.bgColor, color: sc.color }}>
+                              {sc.label}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+
+            <button onClick={onNewReservation} className="w-full py-3 rounded-xl border-2 border-dashed border-green-300 text-green-600 text-sm font-semibold hover:bg-green-50 transition-colors">
+              + Nieuwe reservatie aanmaken
+            </button>
           </div>
-        </div>
+        )}
       </div>
     )
   }
