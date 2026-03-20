@@ -83,6 +83,13 @@ export default function PrijzenPage() {
                   </div>
                   <h3 className="text-xl font-bold text-white">{t('pricing.starter.name')}</h3>
                 </div>
+                {/* Stuntprijs badge + doorgestreepte prijs */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-red-500 text-white text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wide animate-pulse">
+                    🔥 Stuntprijs
+                  </span>
+                  <span className="text-gray-400 text-sm line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(99 * 0.9) : 99}/maand</span>
+                </div>
                 <div className="flex items-baseline mb-6">
                   <span className="text-5xl font-bold text-yellow-400">€{starterPrice}</span>
                   <span className="text-gray-400 ml-2">{isYearly ? '/jaar' : t('pricing.perMonth')}</span>
@@ -126,6 +133,13 @@ export default function PrijzenPage() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold text-white">{t('pricing.pro.name')}</h3>
+                </div>
+                {/* Stuntprijs badge + doorgestreepte prijs */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-red-500 text-white text-xs font-black px-2.5 py-1 rounded-full uppercase tracking-wide animate-pulse">
+                    🔥 Stuntprijs
+                  </span>
+                  <span className="text-gray-400 text-sm line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(129 * 0.9) : 129}/maand</span>
                 </div>
                 <div className="flex items-baseline mb-6">
                   <span className="text-5xl font-bold text-purple-300">€{proPrice}</span>
