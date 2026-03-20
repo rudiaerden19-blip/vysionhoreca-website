@@ -572,10 +572,9 @@ export default function KassaReservationsView({
     const maxX = Math.max(...floorPlanTablesDB.map(t => (t.x / 100) * WORLD_W))
     const minY = Math.min(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
     const maxY = Math.max(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
-    const cx = (minX + maxX) / 2
-    const cy = (minY + maxY) / 2
-    setPanX(rect.width / 2 - cx * floorZoom)
-    setPanY(rect.height / 2 - cy * floorZoom)
+    // Tafels linksboven starten met wat marge (niet gecentreerd)
+    setPanX(80 - minX * floorZoom)
+    setPanY(100 - minY * floorZoom)
     didCenterTables.current = true
   }, [floorPlanTablesDB, WORLD_W, WORLD_H, floorZoom])
 
