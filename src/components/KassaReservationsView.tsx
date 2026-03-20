@@ -2056,39 +2056,59 @@ export default function KassaReservationsView({
                           <div className="space-y-3">
                             {allTableRes.map(r => (
                               <div key={r.id} className="rounded-xl p-3 space-y-2" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                                {/* Naam + status */}
                                 <div className="flex items-center justify-between">
-                                  <p className="text-white font-bold">{r.guest_name}</p>
+                                  <p className="text-white font-bold text-base">{r.guest_name}</p>
                                   <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_CONFIG[r.status]?.color }}>
                                     {STATUS_CONFIG[r.status]?.label || r.status}
                                   </span>
                                 </div>
+                                {/* Details */}
                                 <div className="flex items-center gap-3 text-sm text-white/50">
                                   <span className="flex items-center gap-1"><Clock size={12} />{r.reservation_time}</span>
                                   <span className="flex items-center gap-1"><Users size={12} />{r.party_size}p</span>
+                                  {r.table_number && <span className="flex items-center gap-1"><MapPin size={12} />T{r.table_number}</span>}
                                 </div>
                                 {r.guest_phone && <a href={`tel:${r.guest_phone}`} className="flex items-center gap-1 text-sm text-emerald-400 hover:text-emerald-300"><Phone size={12} />{r.guest_phone}</a>}
                                 {r.notes && <p className="text-xs text-white/30 italic">{r.notes}</p>}
-                                <div className="flex flex-col gap-1.5 pt-1">
+
+                                {/* Status knoppen */}
+                                <div className="grid grid-cols-2 gap-1.5 pt-1">
                                   {r.status === 'PENDING' && (
-                                    <button onClick={() => handleConfirm(r)} className="w-full py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
-                                      <CheckCircle2 size={14} /> Bevestigen
-                                    </button>
-                                  )}
-                                  {r.status === 'CONFIRMED' && (
-                                    <button onClick={() => handleCheckIn(r)} className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
-                                      <UserCheck size={14} /> Check-in
-                                    </button>
-                                  )}
-                                  {r.status === 'CHECKED_IN' && (
-                                    <button onClick={() => handleStartOrder(r)} className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
-                                      <UtensilsCrossed size={14} /> Naar Kassa
+                                    <button onClick={() => handleConfirm(r)} className="col-span-2 py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1.5">
+                                      <CheckCircle2 size={13} /> Bevestigen
                                     </button>
                                   )}
                                   {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
-                                    <button onClick={() => handleNoShow(r)} className="w-full py-1.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#f87171' }}>
-                                      <UserX size={14} /> No-show
+                                    <button onClick={() => handleCheckIn(r)} className="py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+                                      <UserCheck size={13} /> Bezet
                                     </button>
                                   )}
+                                  {r.status === 'CHECKED_IN' && (
+                                    <button onClick={() => handleStartOrder(r)} className="py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1">
+                                      <UtensilsCrossed size={13} /> Kassa
+                                    </button>
+                                  )}
+                                  {r.status === 'CHECKED_IN' && (
+                                    <button onClick={() => handleComplete(r)} className="py-2 rounded-xl text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(99,102,241,0.4)' }}>
+                                      <CheckCircle2 size={13} /> Vrij
+                                    </button>
+                                  )}
+                                  {(r.status === 'CONFIRMED' || r.status === 'PENDING' || r.status === 'CHECKED_IN') && (
+                                    <button onClick={() => handleNoShow(r)} className="py-2 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.2)', color: '#f87171' }}>
+                                      <UserX size={13} /> No-show
+                                    </button>
+                                  )}
+                                </div>
+
+                                {/* Aanpassen + Verwijderen */}
+                                <div className="grid grid-cols-2 gap-1.5">
+                                  <button onClick={() => setSelectedReservation(r)} className="py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>
+                                    ✏️ Aanpassen
+                                  </button>
+                                  <button onClick={() => handleDeleteReservation(r.id)} className="py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.12)', color: '#f87171' }}>
+                                    🗑 Verwijderen
+                                  </button>
                                 </div>
                               </div>
                             ))}
