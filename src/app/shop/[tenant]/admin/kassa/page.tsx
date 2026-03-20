@@ -775,7 +775,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 </div>
                 {/* Tweede popup rechts: sub-items */}
                 {activeMod && (
-                  <div className="ml-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 220, maxHeight: '85vh' }}>
+                  <div className="ml-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto self-start" style={{ width: 220, maxHeight: '85vh' }}>
                     <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl flex items-center gap-2">
                       <span>{activeMod.icon}</span> {activeMod.label}
                     </div>
