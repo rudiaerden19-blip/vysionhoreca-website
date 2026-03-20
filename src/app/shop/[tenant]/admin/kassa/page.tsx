@@ -52,6 +52,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   // ── Nieuwe bestelling alarm (exact donor) ────────────────────────────────
   const [newOrderAlert, setNewOrderAlert] = useState<{id: string; orderNumber: number; total: number} | null>(null)
+  const newOrderAlertRef = useRef<{id: string; orderNumber: number; total: number} | null>(null)
   const alarmIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const previousOrderIdsRef = useRef<string[]>([])
@@ -125,12 +126,13 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     }, 3000)
   }).current
 
-  // Alarm blijft spelen zolang oranje scherm zichtbaar is
+  // Alarm blijft spelen zolang er nieuwe bestellingen zijn (exact donor: gebruik ref)
   useEffect(() => {
     if (newOrderAlert) {
       if (!alarmIntervalRef.current) startAlarm()
       const verifyInterval = setInterval(() => {
-        if (newOrderAlert && !alarmIntervalRef.current) startAlarm()
+        // Gebruik ref zodat we altijd de actuele waarde hebben (geen stale closure)
+        if (newOrderAlertRef.current && !alarmIntervalRef.current) startAlarm()
       }, 2000)
       return () => clearInterval(verifyInterval)
     }
@@ -141,7 +143,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   // Expose alarm functies globaal (zodat bestellingen pagina alarm kan stoppen)
   useEffect(() => {
-    ;(window as any).stopOrderAlarm = () => { stopAlarm(); setNewOrderAlert(null) }
+    ;(window as any).stopOrderAlarm = () => { stopAlarm(); newOrderAlertRef.current = null; setNewOrderAlert(null) }
     ;(window as any).startOrderAlarm = () => startAlarm()
     ;(window as any).isAlarmRunning = () => alarmIntervalRef.current !== null
   }, [stopAlarm, startAlarm])
@@ -173,12 +175,14 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 })
               }
             } catch { /* ignore */ }
-            setNewOrderAlert({ id: newOnes[0].id, orderNumber: newOnes[0].order_number, total: newOnes[0].total || 0 })
+            const alert = { id: newOnes[0].id, orderNumber: newOnes[0].order_number, total: newOnes[0].total || 0 }
+            newOrderAlertRef.current = alert
+            setNewOrderAlert(alert)
           }
           if (list.length > 0) {
             if (!alarmIntervalRef.current) startAlarm()
           } else {
-            if (alarmIntervalRef.current) { stopAlarm(); setNewOrderAlert(null) }
+            if (alarmIntervalRef.current) { stopAlarm(); newOrderAlertRef.current = null; setNewOrderAlert(null) }
           }
         } else {
           isFirstCheck = false
@@ -1736,14 +1740,11 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         <div
           className="fixed inset-0 z-[200] bg-orange-500 flex flex-col items-center justify-center animate-pulse cursor-pointer"
           onClick={() => {
-            // Oranje scherm sluiten maar alarm blijft spelen
+            // Oranje scherm sluiten — alarm blijft spelen (exact donor)
+            newOrderAlertRef.current = null
             setNewOrderAlert(null)
-            // Navigeer naar bestellingen
-            window.location.href = `/shop/${tenant}/admin/bestellingen`
-            // Verifieer alarm na klikken
-            if (typeof window !== 'undefined' && (window as any).startOrderAlarm) {
-              setTimeout(() => { (window as any).startOrderAlarm() }, 100)
-            }
+            // Open bestellingen in NIEUW TABBLAD zodat kassa+alarm open blijft
+            window.open(`/shop/${tenant}/admin/bestellingen`, '_blank')
           }}
         >
           <div className="text-white text-center px-8">
