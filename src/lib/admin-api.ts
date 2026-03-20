@@ -307,6 +307,12 @@ export async function saveOpeningHours(hours: OpeningHour[]): Promise<boolean> {
     console.error('Error saving opening hours:', error)
     return false
   }
+
+  // Invalideer cache zodat de webshop direct de nieuwe uren leest
+  if (hours.length > 0) {
+    cache.invalidate(cacheKey('opening_hours', hours[0].tenant_slug))
+  }
+
   return true
 }
 
@@ -422,8 +428,54 @@ message: `Gesloten - Weer open ${dayNames[nextDay]} om ${formatTimeShort(nextDay
     }
   }
   
-  // Check if we're after closing time
+  // Check if we're after shift 1 closing time
   if (currentTimeStr >= closeTime) {
+    // Check if there's a shift 2 today
+    if (todayHours.has_shift2 && todayHours.open_time_2 && todayHours.close_time_2) {
+      const openTime2 = todayHours.open_time_2
+      const closeTime2 = todayHours.close_time_2
+
+      // Between shift 1 and shift 2 (pauze)
+      if (currentTimeStr < openTime2) {
+        return {
+          isOpen: false,
+          canOrder: false,
+          message: `Pauze - We zijn weer open om ${formatTimeShort(openTime2)}`,
+          opensAt: formatTimeShort(openTime2)
+        }
+      }
+
+      // During shift 2
+      if (currentTimeStr >= openTime2 && currentTimeStr < closeTime2) {
+        // Calculate last order time for shift 2
+        let lastOrderTime2 = closeTime2
+        if (todayHours.last_order_time) {
+          if (todayHours.last_order_time === '15min') lastOrderTime2 = subtractMinutes(closeTime2, 15)
+          else if (todayHours.last_order_time === '30min') lastOrderTime2 = subtractMinutes(closeTime2, 30)
+          else if (todayHours.last_order_time === '45min') lastOrderTime2 = subtractMinutes(closeTime2, 45)
+          else if (todayHours.last_order_time === '60min') lastOrderTime2 = subtractMinutes(closeTime2, 60)
+          else if (todayHours.last_order_time.includes(':')) lastOrderTime2 = todayHours.last_order_time
+        }
+        if (currentTimeStr >= lastOrderTime2) {
+          return {
+            isOpen: true,
+            canOrder: false,
+            message: `Open tot ${formatTimeShort(closeTime2)}`,
+            orderCutoffMessage: `Bestellen is niet meer mogelijk voor vandaag.`,
+            closesAt: formatTimeShort(closeTime2)
+          }
+        }
+        return {
+          isOpen: true,
+          canOrder: true,
+          message: `Open tot ${formatTimeShort(closeTime2)}`,
+          closesAt: formatTimeShort(closeTime2)
+        }
+      }
+
+      // After shift 2: find next open day
+    }
+
     // Find next open day
     for (let i = 1; i <= 7; i++) {
       const nextDay = (dayOfWeek + i) % 7
@@ -442,7 +494,7 @@ message: `Gesloten - Weer open ${dayNames[nextDay]} om ${formatTimeShort(nextDay
     return { isOpen: false, canOrder: false, message: 'Momenteel gesloten' }
   }
   
-  // Check break time
+  // Check break time (legacy)
   if (todayHours.has_break && todayHours.break_start && todayHours.break_end) {
     if (currentTimeStr >= todayHours.break_start && currentTimeStr < todayHours.break_end) {
       return {
