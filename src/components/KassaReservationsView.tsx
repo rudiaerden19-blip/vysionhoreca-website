@@ -497,7 +497,7 @@ export default function KassaReservationsView({
       })
   }, [tenant])
 
-  // Load reservations from Supabase
+  // Load reservations — map DB columns (customer_name) naar interface (guest_name)
   const loadReservations = async () => {
     setLoading(true)
     const { data } = await supabase
@@ -506,7 +506,14 @@ export default function KassaReservationsView({
       .eq('tenant_slug', tenant)
       .order('reservation_date', { ascending: true })
       .order('reservation_time', { ascending: true })
-    if (data) setReservations(data as Reservation[])
+    if (data) setReservations(data.map((r: Record<string, unknown>) => ({
+      ...r,
+      guest_name: (r.guest_name || r.customer_name || '') as string,
+      guest_phone: (r.guest_phone || r.customer_phone || '') as string,
+      guest_email: (r.guest_email || r.customer_email || '') as string,
+      reservation_time: ((r.reservation_time as string) || '').substring(0, 5),
+      status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
+    })) as Reservation[])
     setLoading(false)
   }
 
@@ -791,7 +798,7 @@ export default function KassaReservationsView({
 
   // ---- CRUD actions ----
   const updateStatus = async (id: string, status: ReservationStatus, extra?: Partial<Reservation>) => {
-    const updates: Record<string, unknown> = { status, ...extra }
+    const updates: Record<string, unknown> = { status: status.toLowerCase(), ...extra }
     if (status === 'CHECKED_IN') updates.checked_in_at = new Date().toISOString()
     if (status === 'COMPLETED') updates.completed_at = new Date().toISOString()
     await supabase.from('reservations').update(updates).eq('id', id)
@@ -989,11 +996,23 @@ export default function KassaReservationsView({
   }
 
   const handleAddReservation = async (data: Omit<Reservation, 'id' | 'tenant_slug' | 'total_spent' | 'created_at'>) => {
-    const { data: inserted } = await supabase.from('reservations').insert([{
-      ...data,
+    const { data: inserted, error } = await supabase.from('reservations').insert([{
+      customer_name: data.guest_name,
+      customer_phone: data.guest_phone,
+      customer_email: data.guest_email,
+      party_size: data.party_size,
+      reservation_date: data.reservation_date,
+      reservation_time: data.reservation_time,
+      duration_minutes: data.duration_minutes,
+      table_number: data.table_number,
+      notes: data.notes,
+      special_requests: data.special_requests,
+      occasion: data.occasion,
+      status: 'confirmed',
       tenant_slug: tenant,
       total_spent: 0,
     }]).select().single()
+    if (error) { toast.error('Fout bij aanmaken: ' + error.message); return }
 
     await loadReservations()
     toast.success(`Reservatie voor ${data.guest_name} aangemaakt!`)
