@@ -418,7 +418,11 @@ export default function KassaReservationsView({
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>('floorplan')
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  // Lokale datum (niet UTC — in België 's avonds anders dan UTC)
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const d = new Date()
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  })
   const [searchQuery, setSearchQuery] = useState('')
   const [showNewReservationModal, setShowNewReservationModal] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
@@ -693,7 +697,7 @@ export default function KassaReservationsView({
   }
 
   // ---- Derived data ----
-  const today = new Date().toISOString().split('T')[0]
+  const today = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` })()
 
   const todayReservations = useMemo(() =>
     reservations.filter(r => r.reservation_date === today && r.status !== 'CANCELLED')
@@ -2685,7 +2689,12 @@ export default function KassaReservationsView({
         <NewReservationModal
           onClose={() => setShowNewReservationModal(false)}
           onSave={handleAddReservation}
-          tables={kassaTables}
+          tables={
+            // Gebruik floor plan tafels zodat nummers matchen; fallback op kassaTables
+            floorPlanTablesDB.length > 0
+              ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
+              : kassaTables
+          }
           defaultDurationMinutes={reservationSettings.defaultDurationMinutes}
           maxPartySize={reservationSettings.maxPartySize}
         />
@@ -2704,7 +2713,11 @@ export default function KassaReservationsView({
           onAssignTable={async (tableNumber) => { await handleAssignTable(selectedReservation.id, tableNumber); setSelectedReservation(null) }}
           onDelete={async () => { await handleDeleteReservation(selectedReservation.id); setSelectedReservation(null) }}
           onStartOrder={() => { handleStartOrder(selectedReservation); setSelectedReservation(null) }}
-          tables={kassaTables}
+          tables={
+            floorPlanTablesDB.length > 0
+              ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
+              : kassaTables
+          }
           guestProfile={guestProfiles.find(g => g.id === (selectedReservation.guest_phone || selectedReservation.guest_email || selectedReservation.guest_name))}
         />
       )}
