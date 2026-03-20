@@ -1043,53 +1043,14 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'calendar' && (
-          <div>
-            {/* Date selector */}
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <button
-                onClick={() => {
-                  const d = new Date(selectedDate)
-                  d.setDate(d.getDate() - 1)
-                  setSelectedDate(d.toISOString().split('T')[0])
-                }}
-                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <div className="text-center">
-                <p className="text-xl font-bold">{formatDate(selectedDate)}</p>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="mt-2 px-3 py-1 rounded-lg bg-gray-100 border border-gray-200 text-sm"
-                />
-              </div>
-              <button
-                onClick={() => {
-                  const d = new Date(selectedDate)
-                  d.setDate(d.getDate() + 1)
-                  setSelectedDate(d.toISOString().split('T')[0])
-                }}
-                className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {reservations.filter(r => r.reservation_date === selectedDate && r.status !== 'CANCELLED').length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  <CalendarDays size={48} className="mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-400">Geen reservaties op {formatDate(selectedDate)}</p>
-                </div>
-              ) : (
-                reservations
-                  .filter(r => r.reservation_date === selectedDate && r.status !== 'CANCELLED')
-                  .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
-                  .map(renderReservationCard)
-              )}
-            </div>
-          </div>
+          <CalendarView
+            reservations={reservations}
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+            onSelectReservation={setSelectedReservation}
+            onNewReservation={() => setShowNewReservationModal(true)}
+            renderReservationCard={renderReservationCard}
+          />
         )}
 
         {!loading && viewMode === 'floorplan' && (
@@ -1699,6 +1660,405 @@ export default function KassaReservationsView({
           guestProfile={guestProfiles.find(g => g.id === (selectedReservation.guest_phone || selectedReservation.guest_email || selectedReservation.guest_name))}
         />
       )}
+    </div>
+  )
+}
+
+// ============================================================
+// CALENDAR VIEW — maand / week / dag
+// ============================================================
+
+const NL_DAYS_SHORT = ['Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
+const NL_MONTHS_LONG = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
+
+interface CalendarViewProps {
+  reservations: Reservation[]
+  selectedDate: string
+  onSelectDate: (d: string) => void
+  onSelectReservation: (r: Reservation) => void
+  onNewReservation: () => void
+  renderReservationCard: (r: Reservation) => React.ReactNode
+}
+
+function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReservation, onNewReservation, renderReservationCard }: CalendarViewProps) {
+  const [calMode, setCalMode] = useState<'month' | 'week' | 'day'>('month')
+
+  // Huidige referentiedatum (geselecteerde dag)
+  const refDate = new Date(selectedDate + 'T12:00:00')
+  const refYear = refDate.getFullYear()
+  const refMonth = refDate.getMonth()
+
+  // Helpers
+  const toISO = (d: Date) => d.toISOString().split('T')[0]
+  const todayISO = toISO(new Date())
+
+  const resByDate = (dateISO: string) =>
+    reservations.filter(r => r.reservation_date === dateISO && r.status !== 'CANCELLED')
+
+  // ─── MAAND VIEW ────────────────────────────────────────────
+  const renderMonth = () => {
+    // Eerste dag van de maand, aanpassen zodat week begint op maandag
+    const firstDay = new Date(refYear, refMonth, 1)
+    const startDow = (firstDay.getDay() + 6) % 7 // 0=ma,6=zo
+    const daysInMonth = new Date(refYear, refMonth + 1, 0).getDate()
+
+    // Cellen: startDow lege + daysInMonth + aanvullen tot rij van 7
+    const totalCells = Math.ceil((startDow + daysInMonth) / 7) * 7
+    const cells: (number | null)[] = [
+      ...Array(startDow).fill(null),
+      ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+      ...Array(totalCells - startDow - daysInMonth).fill(null),
+    ]
+
+    const prevMonth = () => {
+      const d = new Date(refYear, refMonth - 1, 1)
+      onSelectDate(toISO(d))
+    }
+    const nextMonth = () => {
+      const d = new Date(refYear, refMonth + 1, 1)
+      onSelectDate(toISO(d))
+    }
+
+    return (
+      <div>
+        {/* Header navigatie */}
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={prevMonth} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={20} /></button>
+          <div className="text-center">
+            <p className="text-xl font-bold">{NL_MONTHS_LONG[refMonth]} {refYear}</p>
+          </div>
+          <button onClick={nextMonth} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={20} /></button>
+        </div>
+
+        {/* Dag-headers */}
+        <div className="grid grid-cols-7 mb-1">
+          {NL_DAYS_SHORT.map(d => (
+            <div key={d} className="text-center text-xs font-bold text-gray-400 py-2">{d}</div>
+          ))}
+        </div>
+
+        {/* Cellen */}
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((day, idx) => {
+            if (day === null) return <div key={`empty-${idx}`} />
+            const dateISO = toISO(new Date(refYear, refMonth, day))
+            const dayRes = resByDate(dateISO)
+            const isToday = dateISO === todayISO
+            const isSelected = dateISO === selectedDate
+            const pending = dayRes.filter(r => r.status === 'PENDING').length
+            const confirmed = dayRes.filter(r => r.status === 'CONFIRMED' || r.status === 'CHECKED_IN').length
+            const covers = dayRes.reduce((s, r) => s + r.party_size, 0)
+
+            return (
+              <div
+                key={dateISO}
+                onClick={() => { onSelectDate(dateISO); setCalMode('day') }}
+                className={`min-h-[80px] p-2 rounded-xl border cursor-pointer transition-all ${
+                  isSelected ? 'border-green-500 bg-green-50' :
+                  isToday ? 'border-blue-400 bg-blue-50' :
+                  dayRes.length > 0 ? 'border-gray-200 bg-white hover:border-green-300 hover:bg-green-50/40' :
+                  'border-gray-100 bg-gray-50 hover:bg-gray-100'
+                }`}
+              >
+                <div className={`text-sm font-bold mb-1 ${isToday ? 'text-blue-600' : isSelected ? 'text-green-600' : 'text-gray-700'}`}>
+                  {day}
+                </div>
+                {dayRes.length > 0 && (
+                  <div className="space-y-0.5">
+                    {confirmed > 0 && (
+                      <div className="text-[10px] bg-blue-100 text-blue-700 rounded px-1 py-0.5 font-medium truncate">
+                        ✓ {confirmed} bevestigd
+                      </div>
+                    )}
+                    {pending > 0 && (
+                      <div className="text-[10px] bg-amber-100 text-amber-700 rounded px-1 py-0.5 font-medium truncate">
+                        ⏳ {pending} wacht
+                      </div>
+                    )}
+                    {covers > 0 && (
+                      <div className="text-[10px] text-gray-400 font-medium">{covers} pers.</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+  // ─── WEEK VIEW ─────────────────────────────────────────────
+  const renderWeek = () => {
+    // Maandag van de week van geselecteerde datum
+    const dow = (refDate.getDay() + 6) % 7
+    const monday = new Date(refDate)
+    monday.setDate(refDate.getDate() - dow)
+
+    const weekDays = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday)
+      d.setDate(monday.getDate() + i)
+      return d
+    })
+
+    const hours = Array.from({ length: 13 }, (_, i) => i + 10) // 10:00–22:00
+
+    const prevWeek = () => {
+      const d = new Date(monday)
+      d.setDate(monday.getDate() - 7)
+      onSelectDate(toISO(d))
+    }
+    const nextWeek = () => {
+      const d = new Date(monday)
+      d.setDate(monday.getDate() + 7)
+      onSelectDate(toISO(d))
+    }
+
+    const weekStart = weekDays[0].toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })
+    const weekEnd = weekDays[6].toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })
+
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={prevWeek} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={20} /></button>
+          <p className="text-lg font-bold">{weekStart} – {weekEnd} {refYear}</p>
+          <button onClick={nextWeek} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={20} /></button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <div className="min-w-[700px]">
+            {/* Dag-headers */}
+            <div className="grid grid-cols-[60px_repeat(7,1fr)] mb-1 gap-1">
+              <div />
+              {weekDays.map((d, i) => {
+                const iso = toISO(d)
+                const isToday = iso === todayISO
+                const isSelected = iso === selectedDate
+                const cnt = resByDate(iso).length
+                return (
+                  <div
+                    key={iso}
+                    onClick={() => { onSelectDate(iso); setCalMode('day') }}
+                    className={`text-center py-2 rounded-lg cursor-pointer transition-colors ${
+                      isSelected ? 'bg-green-500 text-white' :
+                      isToday ? 'bg-blue-100 text-blue-700' :
+                      'bg-gray-100 hover:bg-gray-200'
+                    }`}
+                  >
+                    <div className="text-xs font-medium">{NL_DAYS_SHORT[i]}</div>
+                    <div className="text-lg font-bold">{d.getDate()}</div>
+                    {cnt > 0 && <div className="text-xs font-bold">{cnt}×</div>}
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Tijdsrijen */}
+            {hours.map(h => (
+              <div key={h} className="grid grid-cols-[60px_repeat(7,1fr)] gap-1 mb-1 min-h-[48px]">
+                <div className="text-xs text-gray-400 text-right pr-2 pt-1 font-medium">{h}:00</div>
+                {weekDays.map(d => {
+                  const iso = toISO(d)
+                  const slotRes = resByDate(iso).filter(r => {
+                    const rh = parseInt(r.reservation_time.split(':')[0])
+                    return rh === h
+                  })
+                  const isToday = iso === todayISO
+                  return (
+                    <div
+                      key={iso}
+                      className={`rounded-lg border min-h-[48px] p-1 ${isToday ? 'border-blue-200 bg-blue-50/30' : 'border-gray-100'}`}
+                    >
+                      {slotRes.map(r => {
+                        const sc = STATUS_CONFIG[r.status]
+                        return (
+                          <div
+                            key={r.id}
+                            onClick={() => onSelectReservation(r)}
+                            className="text-xs rounded px-1.5 py-1 mb-0.5 cursor-pointer font-medium truncate hover:opacity-80"
+                            style={{ backgroundColor: sc.bgColor, color: sc.color }}
+                          >
+                            {r.reservation_time} {r.guest_name} ({r.party_size}p)
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── DAG VIEW ──────────────────────────────────────────────
+  const renderDay = () => {
+    const prevDay = () => {
+      const d = new Date(refDate)
+      d.setDate(refDate.getDate() - 1)
+      onSelectDate(toISO(d))
+    }
+    const nextDay = () => {
+      const d = new Date(refDate)
+      d.setDate(refDate.getDate() + 1)
+      onSelectDate(toISO(d))
+    }
+
+    const dayRes = resByDate(selectedDate).sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
+    const hours = Array.from({ length: 13 }, (_, i) => i + 10)
+
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={prevDay} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={20} /></button>
+          <div className="text-center">
+            <p className="text-xl font-bold">
+              {refDate.toLocaleDateString('nl-BE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+            </p>
+            <p className="text-sm text-gray-400 mt-1">{dayRes.length} reservaties · {dayRes.reduce((s, r) => s + r.party_size, 0)} personen</p>
+          </div>
+          <button onClick={nextDay} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={20} /></button>
+        </div>
+
+        {dayRes.length === 0 ? (
+          <div className="text-center py-16">
+            <CalendarDays size={48} className="mx-auto text-gray-300 mb-4" />
+            <p className="text-gray-400 font-medium">Geen reservaties op deze dag</p>
+            <button
+              onClick={onNewReservation}
+              className="mt-4 px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600 transition-colors"
+            >
+              + Reservatie aanmaken
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-1">
+            {hours.map(h => {
+              const slotRes = dayRes.filter(r => parseInt(r.reservation_time.split(':')[0]) === h)
+              const halfSlotRes = dayRes.filter(r => {
+                const [rh, rm] = r.reservation_time.split(':').map(Number)
+                return rh === h && rm >= 30
+              })
+              // Toon slot alleen als er reservaties zijn
+              const fullRes = dayRes.filter(r => {
+                const [rh, rm] = r.reservation_time.split(':').map(Number)
+                return rh === h && rm < 30
+              })
+
+              if (fullRes.length === 0 && halfSlotRes.length === 0) {
+                return (
+                  <div key={h} className="grid grid-cols-[60px_1fr] gap-3 min-h-[40px] items-center">
+                    <div className="text-xs text-gray-300 text-right pr-2 font-medium">{h}:00</div>
+                    <div className="border-t border-gray-100 h-px" />
+                  </div>
+                )
+              }
+
+              return (
+                <div key={h}>
+                  {fullRes.length > 0 && (
+                    <div className="grid grid-cols-[60px_1fr] gap-3 mb-1">
+                      <div className="text-xs text-gray-500 text-right pr-2 pt-2 font-medium">{h}:00</div>
+                      <div className="space-y-2">
+                        {fullRes.map(r => {
+                          const sc = STATUS_CONFIG[r.status]
+                          return (
+                            <div
+                              key={r.id}
+                              onClick={() => onSelectReservation(r)}
+                              className="rounded-xl p-3 cursor-pointer hover:opacity-90 transition-opacity border"
+                              style={{ backgroundColor: sc.bgColor, borderColor: sc.color + '40' }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-sm" style={{ color: sc.color }}>{r.reservation_time}</span>
+                                  <span className="font-semibold text-gray-800">{r.guest_name}</span>
+                                  {r.occasion && <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">🎉 {r.occasion}</span>}
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                  <Users size={14} />
+                                  <span className="font-bold">{r.party_size}</span>
+                                  {r.table_number && <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">T{r.table_number}</span>}
+                                </div>
+                              </div>
+                              {r.guest_phone && <div className="text-xs text-gray-500 mt-1 flex items-center gap-1"><Phone size={11} />{r.guest_phone}</div>}
+                              {r.special_requests && <div className="text-xs text-amber-600 mt-1 truncate">⚠️ {r.special_requests}</div>}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {halfSlotRes.length > 0 && (
+                    <div className="grid grid-cols-[60px_1fr] gap-3 mb-1">
+                      <div className="text-xs text-gray-500 text-right pr-2 pt-2 font-medium">{h}:30</div>
+                      <div className="space-y-2">
+                        {halfSlotRes.map(r => {
+                          const sc = STATUS_CONFIG[r.status]
+                          return (
+                            <div
+                              key={r.id}
+                              onClick={() => onSelectReservation(r)}
+                              className="rounded-xl p-3 cursor-pointer hover:opacity-90 transition-opacity border"
+                              style={{ backgroundColor: sc.bgColor, borderColor: sc.color + '40' }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-sm" style={{ color: sc.color }}>{r.reservation_time}</span>
+                                  <span className="font-semibold text-gray-800">{r.guest_name}</span>
+                                  {r.occasion && <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full">🎉 {r.occasion}</span>}
+                                </div>
+                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                                  <Users size={14} />
+                                  <span className="font-bold">{r.party_size}</span>
+                                  {r.table_number && <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">T{r.table_number}</span>}
+                                </div>
+                              </div>
+                              {r.guest_phone && <div className="text-xs text-gray-500 mt-1 flex items-center gap-1"><Phone size={11} />{r.guest_phone}</div>}
+                              {r.special_requests && <div className="text-xs text-amber-600 mt-1 truncate">⚠️ {r.special_requests}</div>}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      {/* Sub-navigatie: Maand / Week / Dag */}
+      <div className="flex items-center gap-2 mb-5">
+        <div className="flex bg-gray-100 rounded-xl p-1">
+          {(['month', 'week', 'day'] as const).map(m => (
+            <button
+              key={m}
+              onClick={() => setCalMode(m)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${calMode === m ? 'bg-[#3C4D6B] text-white' : 'text-gray-500 hover:text-gray-900'}`}
+            >
+              {m === 'month' ? 'Maand' : m === 'week' ? 'Week' : 'Dag'}
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => { onSelectDate(new Date().toISOString().split('T')[0]); setCalMode('day') }}
+          className="px-3 py-2 rounded-xl bg-green-100 text-green-700 text-sm font-medium hover:bg-green-200 transition-colors"
+        >
+          Vandaag
+        </button>
+      </div>
+
+      {calMode === 'month' && renderMonth()}
+      {calMode === 'week' && renderWeek()}
+      {calMode === 'day' && renderDay()}
     </div>
   )
 }
