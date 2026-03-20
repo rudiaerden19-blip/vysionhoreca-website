@@ -569,13 +569,19 @@ export default function KassaReservationsView({
     toast.success('Tafel verwijderd')
   }
 
-  const handleFloorPointerDown = (e: React.PointerEvent, id: string) => {
-    e.stopPropagation()
-    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-    const canvas = document.querySelector('.res-floor-canvas') as HTMLElement
-    if (!canvas) return
-    const rect = canvas.getBoundingClientRect()
-    const table = floorPlanTablesDB.find(t => t.id === id)!
+  // Drag via canvas — werkt op desktop én iPad/touch
+  const handleCanvasPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // Zoek het dichtste tafel-element
+    const tableEl = (e.target as HTMLElement).closest('[data-table-id]') as HTMLElement | null
+    if (!tableEl) {
+      setSelectedFloorTable(null)
+      return
+    }
+    e.preventDefault()
+    const id = tableEl.getAttribute('data-table-id')!
+    const table = floorPlanTablesDB.find(t => t.id === id)
+    if (!table) return
+    const rect = e.currentTarget.getBoundingClientRect()
     floorDraggingId.current = id
     floorDragMoved.current = false
     floorPointerStart.current = { x: e.clientX, y: e.clientY }
@@ -583,14 +589,17 @@ export default function KassaReservationsView({
       x: e.clientX - rect.left - (table.x / 100) * rect.width,
       y: e.clientY - rect.top - (table.y / 100) * rect.height,
     }
+    // Capture op de canvas zodat move/up ook buiten canvas werkt
+    e.currentTarget.setPointerCapture(e.pointerId)
     setIsDraggingFloor(true)
   }
 
   const handleFloorPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!floorDraggingId.current) return
+    e.preventDefault()
     const dx = Math.abs(e.clientX - floorPointerStart.current.x)
     const dy = Math.abs(e.clientY - floorPointerStart.current.y)
-    if (dx < 6 && dy < 6) return
+    if (dx < 5 && dy < 5) return
     floorDragMoved.current = true
     const rect = e.currentTarget.getBoundingClientRect()
     const x = Math.max(3, Math.min(95, ((e.clientX - rect.left - floorDragOffset.current.x) / rect.width) * 100))
@@ -598,12 +607,23 @@ export default function KassaReservationsView({
     setFloorPlanTablesDB(prev => prev.map(t => t.id === floorDraggingId.current ? { ...t, x, y } : t))
   }
 
-  const handleFloorPointerUp = async (e: React.PointerEvent) => {
+  const handleFloorPointerUp = async (e: React.PointerEvent<HTMLDivElement>) => {
     if (!floorDraggingId.current) return
-    await supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: floorPlanTablesDB }, { onConflict: 'tenant_slug' })
+    const id = floorDraggingId.current
+    const wasTap = !floorDragMoved.current
+
     floorDraggingId.current = null
     setIsDraggingFloor(false)
-    setTimeout(() => { floorDragMoved.current = false }, 0)
+    floorDragMoved.current = false
+
+    if (wasTap) {
+      // Selecteer tafel bij tap/klik
+      const table = floorPlanTablesDB.find(t => t.id === id) || null
+      setSelectedFloorTable(prev => prev?.id === id ? null : table)
+    } else {
+      // Sla positie op na slepen
+      await supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: floorPlanTablesDB }, { onConflict: 'tenant_slug' })
+    }
   }
 
   // ---- Derived data ----
@@ -1825,10 +1845,13 @@ export default function KassaReservationsView({
                     backgroundSize: '40px 40px',
                     cursor: isDraggingFloor ? 'grabbing' : 'default',
                     touchAction: 'none',
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
                   }}
+                  onPointerDown={handleCanvasPointerDown}
                   onPointerMove={handleFloorPointerMove}
                   onPointerUp={handleFloorPointerUp}
-                  onClick={() => { if (!isDraggingFloor) setSelectedFloorTable(null) }}
+                  onPointerCancel={handleFloorPointerUp}
                 >
                   {floorPlanTablesDB.length === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -1841,12 +1864,13 @@ export default function KassaReservationsView({
                   )}
 
                   {floorPlanTablesDB.map(table => {
-                    const { color, borderColor, res } = getFloorTableInfo(table.number)
+                    const { borderColor, res } = getFloorTableInfo(table.number)
                     const isSelected = selectedFloorTable?.id === table.id
 
                     return (
                       <div
                         key={table.id}
+                        data-table-id={table.id}
                         className="absolute"
                         style={{
                           left: `${table.x}%`,
@@ -1856,24 +1880,17 @@ export default function KassaReservationsView({
                           cursor: isDraggingFloor ? 'grabbing' : 'grab',
                           touchAction: 'none',
                         }}
-                        onPointerDown={e => handleFloorPointerDown(e, table.id)}
-                        onPointerUp={e => {
-                          e.stopPropagation()
-                          handleFloorPointerUp(e)
-                          if (!floorDragMoved.current) {
-                            setSelectedFloorTable(prev => prev?.id === table.id ? null : table)
-                            if (res) setSelectedReservation(res)
-                          }
-                        }}
-                        onClick={e => e.stopPropagation()}
                       >
-                        <ReservationTableSVG
-                          table={table}
-                          statusColor={borderColor}
-                          isSelected={isSelected}
-                          guestName={res?.guest_name}
-                          time={res?.reservation_time}
-                        />
+                        {/* SVG pointer-events none zodat het parent div de touch/click vangt */}
+                        <div style={{ pointerEvents: 'none' }}>
+                          <ReservationTableSVG
+                            table={table}
+                            statusColor={borderColor}
+                            isSelected={isSelected}
+                            guestName={res?.guest_name}
+                            time={res?.reservation_time}
+                          />
+                        </div>
                       </div>
                     )
                   })}
