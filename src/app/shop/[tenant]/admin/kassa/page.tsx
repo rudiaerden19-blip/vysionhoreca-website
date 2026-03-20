@@ -863,8 +863,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               { key: 'online-bestellingen', icon: '📲', label: 'Online Bestellingen', items: [
                 { icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
                 { icon: '🏢', label: 'Groepsbestellingen', href: `${baseUrl}/groepen` },
-                { icon: '🖥️', label: 'Online Scherm', href: `/shop/${tenant}/display`, target: '_blank' },
-                { icon: '👨‍🍳', label: 'Keuken Scherm', href: `/keuken/${tenant}`, target: '_blank' },
+                { icon: '🖥️', label: 'Online Scherm', href: `/shop/${tenant}/display` },
+                { icon: '👨‍🍳', label: 'Keuken Scherm', href: `/keuken/${tenant}` },
               ]},
               { key: 'instellingen', icon: '⚙️', label: 'Instellingen', items: [
                 { icon: '🕐', label: 'Openingstijden', href: `${baseUrl}/openingstijden` },
@@ -977,14 +977,14 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         </button>
 
         {/* Onlinescherm */}
-        <Link href={`/shop/${tenant}/display`} target="_blank"
+        <Link href={`/shop/${tenant}/display`}
           className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
           <span className="text-lg">🖥️</span>
           <span>Onlinescherm</span>
         </Link>
 
         {/* Keukenscherm */}
-        <Link href={`/keuken/${tenant}`} target="_blank"
+        <Link href={`/keuken/${tenant}`}
           className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
           <span className="text-lg">👨‍🍳</span>
           <span>Keukenscherm</span>
