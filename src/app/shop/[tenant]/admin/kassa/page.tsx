@@ -630,6 +630,18 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     setTableOrders(updated)
     localStorage.setItem(tableOrdersKey, JSON.stringify(updated))
     updateTableStatus(tblNr, false)
+    // Stoel/kruk status resetten (K1, K2, ...) — auto-VRIJ via getStoolStatus maar ook localStorage cleanen
+    const stoolStatusKey = `vysion_stool_status_${tenant}`
+    try {
+      const raw = localStorage.getItem(stoolStatusKey)
+      if (raw) {
+        const statuses = JSON.parse(raw)
+        if (statuses[tblNr]) {
+          delete statuses[tblNr]
+          localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
+        }
+      }
+    } catch { /* empty */ }
     // Verwijder open order uit Supabase
     supabase
       .from('orders')

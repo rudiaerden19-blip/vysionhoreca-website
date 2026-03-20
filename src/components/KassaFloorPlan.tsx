@@ -397,10 +397,15 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     localStorage.setItem(stoolStatusKey, JSON.stringify(updated))
   }
 
-  // Effectieve stoel status: manueel override, anders auto van tableOrders
+  // Effectieve stoel status:
+  // - Geen items → altijd VRIJ (betaald = automatisch vrij)
+  // - Items aanwezig + manueel ONBETAALD → ONBETAALD
+  // - Items aanwezig, geen override → BEZET
   const getStoolStatus = (stoolId: string): TableStatus => {
-    if (stoolStatuses[stoolId]) return stoolStatuses[stoolId]
-    return (tableOrders[stoolId] || []).length > 0 ? 'OCCUPIED' : 'FREE'
+    const hasItems = (tableOrders[stoolId] || []).length > 0
+    if (!hasItems) return 'FREE'
+    if (stoolStatuses[stoolId] === 'UNPAID') return 'UNPAID'
+    return 'OCCUPIED'
   }
 
   const addDecor = (type: DecorType) => {
@@ -704,17 +709,24 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                     </div>
                     {/* Status knoppen */}
                     <div className="px-3 pb-3 grid grid-cols-3 gap-1.5">
-                      {(['FREE', 'OCCUPIED', 'UNPAID'] as TableStatus[]).map(s => (
-                        <button key={s}
-                          onClick={() => saveStoolStatus({ ...stoolStatuses, [stoolId]: s })}
-                          className="py-1.5 rounded-lg text-xs font-semibold transition-all"
-                          style={status === s
-                            ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
-                            : { backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }
-                          }>
-                          {STATUS_LABELS[s]}
-                        </button>
-                      ))}
+                      {(['FREE', 'OCCUPIED', 'UNPAID'] as TableStatus[]).map(s => {
+                        const isActive = status === s
+                        // ONBETAALD knop oplichten als BEZET + items aanwezig
+                        const warnUnpaid = s === 'UNPAID' && status === 'OCCUPIED' && items.length > 0
+                        return (
+                          <button key={s}
+                            onClick={() => saveStoolStatus({ ...stoolStatuses, [stoolId]: s })}
+                            className="py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            style={isActive
+                              ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
+                              : warnUnpaid
+                              ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `1.5px solid ${STATUS_COLORS['UNPAID']}` }
+                              : { backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }
+                            }>
+                            {STATUS_LABELS[s]}{warnUnpaid ? ' ⚠️' : ''}
+                          </button>
+                        )
+                      })}
                     </div>
                     {/* Bestelling knop */}
                     <div className="px-3 pb-3">
