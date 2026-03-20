@@ -142,20 +142,19 @@ interface KassaReservationsViewProps {
   onStartOrder: (tableNr: string) => void
 }
 
-// ---- Reservation Table SVG (met stoelen) ----
-function ReservationTableSVG({ table, color, borderColor, isSelected, guestName, time }: {
+// ---- Reservation Table SVG — identiek aan KassaFloorPlan stijl ----
+function ReservationTableSVG({ table, statusColor, isSelected, guestName, time }: {
   table: FloorPlanTable
-  color: string
-  borderColor: string
+  statusColor: string   // kleur van reservatiestatus → rand van tafel
   isSelected: boolean
   guestName?: string
   time?: string
 }) {
   const seats = table.seats
-  const tableSize = 88
-  const chairW = 24
-  const chairH = 20
-  const gap = 12
+  const tableSize = 90
+  const chairW = 26
+  const chairH = 22
+  const gap = 14
 
   type Chair = { x: number; y: number; angle: number }
   const chairs: Chair[] = []
@@ -183,8 +182,8 @@ function ReservationTableSVG({ table, color, borderColor, isSelected, guestName,
       const perSide = Math.ceil(seats / 4)
       const sides = [
         { angle: -90, axis: 'x' as const, fixed: -dist },
-        { angle: 0, axis: 'y' as const, fixed: dist },
-        { angle: 90, axis: 'x' as const, fixed: dist },
+        { angle: 0,   axis: 'y' as const, fixed: dist },
+        { angle: 90,  axis: 'x' as const, fixed: dist },
         { angle: 180, axis: 'y' as const, fixed: -dist },
       ]
       let placed = 0
@@ -204,10 +203,11 @@ function ReservationTableSVG({ table, color, borderColor, isSelected, guestName,
     }
   } else {
     // RECTANGLE
-    const tw = tableSize * 1.7
-    const th = tableSize * 0.6
+    const rectTw = tableSize * 1.7
+    const rectTh = tableSize * 0.65
     const perLong = Math.ceil(seats / 2)
-    const distTop = th / 2 + gap + chairH / 2
+    const distTop = rectTh / 2 + gap + chairH / 2
+    const distSide = rectTw / 2 + gap + chairH / 2
     let placed = 0
     for (let i = 0; i < perLong && placed < seats; i++) {
       chairs.push({ x: (i - (perLong - 1) / 2) * (chairW + 6), y: -distTop, angle: -90 })
@@ -217,73 +217,102 @@ function ReservationTableSVG({ table, color, borderColor, isSelected, guestName,
       chairs.push({ x: (i - (perLong - 1) / 2) * (chairW + 6), y: distTop, angle: 90 })
       placed++
     }
+    if (placed < seats) { chairs.push({ x: -distSide, y: 0, angle: 180 }); placed++ }
+    if (placed < seats) { chairs.push({ x: distSide, y: 0, angle: 0 }) }
   }
 
-  const pad = 72
+  const pad = 80
   const tw = table.shape === 'RECTANGLE' ? tableSize * 1.7 : tableSize
-  const th = table.shape === 'RECTANGLE' ? tableSize * 0.6 : tableSize
-  const svgW = tw + pad * 2
-  const svgH = th + pad * 2 + (guestName ? 24 : 0)
+  const th = table.shape === 'RECTANGLE' ? tableSize * 0.65 : tableSize
+  const svgW = tw + pad * 2 + 40
+  const svgH = th + pad * 2 + 40
   const cx = svgW / 2
-  const cy = (th + pad * 2) / 2
+  const cy = svgH / 2
+
+  const uid = table.id.replace(/[^a-z0-9]/gi, '')
 
   return (
     <svg width={svgW} height={svgH} style={{ overflow: 'visible', display: 'block' }}>
       <defs>
-        <filter id={`rshadow-${table.id}`} x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="3" stdDeviation="5" floodOpacity={isSelected ? 0.4 : 0.25} />
+        <linearGradient id={`tg-round-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#6b6b6b" />
+          <stop offset="40%" stopColor="#4a4a4a" />
+          <stop offset="100%" stopColor="#2a2a2a" />
+        </linearGradient>
+        <linearGradient id={`tg-rect-${uid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#6b6b6b" />
+          <stop offset="40%" stopColor="#4a4a4a" />
+          <stop offset="100%" stopColor="#2a2a2a" />
+        </linearGradient>
+        <filter id={`rshadow-${uid}`} x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="4" stdDeviation="7" floodOpacity="0.4" />
         </filter>
       </defs>
 
-      {/* Chairs */}
+      {/* Stoelen — exact zoals KassaFloorPlan */}
       {chairs.map((c, i) => (
         <g key={i} transform={`translate(${cx + c.x}, ${cy + c.y}) rotate(${c.angle})`}>
-          <rect x={-chairW / 2} y={-chairH / 2} width={chairW} height={8} rx={3} fill="#aaa" />
-          <rect x={-chairW / 2} y={-chairH / 2 + 9} width={chairW} height={chairH - 8} rx={3} fill="#ccc" />
+          <rect x={-chairW / 2 + 1} y={-chairH / 2 + 2} width={chairW} height={chairH + 4} rx={5} fill="rgba(0,0,0,0.35)" />
+          <rect x={-chairW / 2} y={-chairH / 2} width={chairW} height={9} rx={4} fill="#888" stroke="#555" strokeWidth={1} />
+          <rect x={-chairW / 2 + 3} y={-chairH / 2 + 2} width={chairW - 6} height={3} rx={2} fill="rgba(255,255,255,0.3)" />
+          <rect x={-chairW / 2} y={-chairH / 2 + 10} width={chairW} height={chairH - 8} rx={4} fill="#bbb" stroke="#888" strokeWidth={1} />
+          <rect x={-chairW / 2 + 4} y={-chairH / 2 + 12} width={chairW - 12} height={4} rx={2} fill="rgba(255,255,255,0.35)" />
+          <rect x={-chairW / 2 - 1} y={-chairH / 2 + chairH - 2} width={5} height={4} rx={1} fill="#777" />
+          <rect x={chairW / 2 - 4} y={-chairH / 2 + chairH - 2} width={5} height={4} rx={1} fill="#777" />
         </g>
       ))}
 
-      {/* Table body */}
+      {/* Tafel — donkergrijs gradient, statuskleur als rand */}
       {table.shape === 'ROUND' ? (
         <ellipse cx={cx} cy={cy} rx={tableSize / 2} ry={tableSize / 2}
-          fill={color} stroke={isSelected ? '#1d4ed8' : borderColor}
-          strokeWidth={isSelected ? 3 : 2}
-          filter={`url(#rshadow-${table.id})`} />
+          fill={`url(#tg-round-${uid})`}
+          stroke={statusColor}
+          strokeWidth={isSelected ? 5 : 4}
+          filter={`url(#rshadow-${uid})`} />
       ) : table.shape === 'RECTANGLE' ? (
         <rect x={cx - tw / 2} y={cy - th / 2} width={tw} height={th} rx={10}
-          fill={color} stroke={isSelected ? '#1d4ed8' : borderColor}
-          strokeWidth={isSelected ? 3 : 2}
-          filter={`url(#rshadow-${table.id})`} />
+          fill={`url(#tg-rect-${uid})`}
+          stroke={statusColor}
+          strokeWidth={isSelected ? 5 : 4}
+          filter={`url(#rshadow-${uid})`} />
       ) : (
         <rect x={cx - tableSize / 2} y={cy - tableSize / 2} width={tableSize} height={tableSize} rx={10}
-          fill={color} stroke={isSelected ? '#1d4ed8' : borderColor}
-          strokeWidth={isSelected ? 3 : 2}
-          filter={`url(#rshadow-${table.id})`} />
+          fill={`url(#tg-rect-${uid})`}
+          stroke={statusColor}
+          strokeWidth={isSelected ? 5 : 4}
+          filter={`url(#rshadow-${uid})`} />
       )}
 
-      {/* Selection ring */}
+      {/* Glans */}
+      {table.shape === 'ROUND'
+        ? <ellipse cx={cx - 12} cy={cy - 14} rx={16} ry={10} fill="rgba(255,255,255,0.08)" />
+        : <rect x={cx - tw / 2 + 8} y={cy - th / 2 + 6} width={tw * 0.35} height={th * 0.25} rx={4} fill="rgba(255,255,255,0.07)" />
+      }
+
+      {/* Selectie ring */}
       {isSelected && (
-        table.shape === 'ROUND'
-          ? <ellipse cx={cx} cy={cy} rx={tableSize / 2 + 5} ry={tableSize / 2 + 5} fill="none" stroke="#1d4ed8" strokeWidth={2} strokeDasharray="5 3" opacity={0.6} />
-          : <rect x={cx - (tw) / 2 - 5} y={cy - th / 2 - 5} width={(tw) + 10} height={th + 10} rx={14} fill="none" stroke="#1d4ed8" strokeWidth={2} strokeDasharray="5 3" opacity={0.6} />
+        <ellipse cx={cx} cy={cy}
+          rx={(table.shape === 'ROUND' ? tableSize / 2 : tw / 2) + 8}
+          ry={(table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + 8}
+          fill="none" stroke={statusColor} strokeWidth={2} strokeDasharray="6 3" opacity={0.7} />
       )}
 
-      {/* Table number */}
-      <text x={cx} y={cy - 5} textAnchor="middle" fill="white" fontSize={18} fontWeight="bold"
-        style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.5))' }}>
+      {/* Tafelnummer */}
+      <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize={20} fontWeight="bold"
+        style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }}>
         {table.number}
       </text>
-      <text x={cx} y={cy + 13} textAnchor="middle" fill="rgba(255,255,255,0.8)" fontSize={11}>
+      <text x={cx} y={cy + 14} textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize={12}>
         {seats}p
       </text>
 
-      {/* Guest name label */}
+      {/* Gast label */}
       {guestName && (
         <>
-          <rect x={cx - 50} y={cy + th / 2 + gap + 4} width={100} height={18} rx={9} fill="white"
-            style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.2))' }} />
-          <text x={cx} y={cy + th / 2 + gap + 16} textAnchor="middle" fill="#374151" fontSize={10} fontWeight="600">
-            {guestName}{time ? ` ${time}` : ''}
+          <rect x={cx - 52} y={cy + th / 2 + 10} width={104} height={20} rx={10}
+            fill="white" style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.25))' }} />
+          <text x={cx} y={cy + th / 2 + 24} textAnchor="middle" fill="#111827" fontSize={10} fontWeight="700">
+            {guestName}{time ? ` · ${time}` : ''}
           </text>
         </>
       )}
@@ -1317,11 +1346,10 @@ export default function KassaReservationsView({
                       r.table_number === table.number && r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
                     )
                     const isSelected = selectedReservation?.table_number === table.number
-                    let bgColor = '#4ade80'
-                    let borderColor = '#22c55e'
-                    if (tableRes?.status === 'CHECKED_IN') { bgColor = '#60a5fa'; borderColor = '#3b82f6' }
-                    else if (tableRes?.status === 'CONFIRMED') { bgColor = '#a78bfa'; borderColor = '#8b5cf6' }
-                    else if (tableRes?.status === 'PENDING') { bgColor = '#fbbf24'; borderColor = '#f59e0b' }
+                    let statusColor = '#4ade80'
+                    if (tableRes?.status === 'CHECKED_IN') statusColor = '#3b82f6'
+                    else if (tableRes?.status === 'CONFIRMED') statusColor = '#8b5cf6'
+                    else if (tableRes?.status === 'PENDING') statusColor = '#f59e0b'
 
                     return (
                       <div
@@ -1338,8 +1366,7 @@ export default function KassaReservationsView({
                       >
                         <ReservationTableSVG
                           table={table}
-                          color={bgColor}
-                          borderColor={borderColor}
+                          statusColor={statusColor}
                           isSelected={isSelected}
                           guestName={tableRes?.guest_name}
                           time={tableRes?.reservation_time}
@@ -1737,8 +1764,58 @@ export default function KassaReservationsView({
                 )}
               </div>
 
-              {/* Canvas + optional sidebar */}
+              {/* Canvas + lijst + optional sidebar */}
               <div className="flex flex-1 overflow-hidden">
+
+                {/* Lijst links */}
+                <div className="w-72 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                    <span className="font-bold text-sm text-gray-800">Reservaties</span>
+                    <span className="text-xs font-semibold text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">{floorRes.length}</span>
+                  </div>
+                  <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
+                    {floorRes.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-12 text-center px-6">
+                        <CalendarDays size={32} className="text-gray-300 mb-3" />
+                        <p className="text-sm text-gray-400 font-medium">Geen reservaties</p>
+                        <p className="text-xs text-gray-300 mt-1">voor {formatDate(selectedDate)}</p>
+                      </div>
+                    ) : (
+                      floorRes.map(r => {
+                        const statusDot: Record<string, string> = {
+                          CONFIRMED: 'bg-violet-400',
+                          CHECKED_IN: 'bg-blue-400',
+                          PENDING: 'bg-amber-400',
+                          CANCELLED: 'bg-gray-300',
+                        }
+                        const isActive = selectedReservation?.id === r.id
+                        return (
+                          <div
+                            key={r.id}
+                            onClick={() => setSelectedReservation(r)}
+                            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${isActive ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                          >
+                            <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${statusDot[r.status] ?? 'bg-gray-300'}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm text-gray-900 truncate">{r.guest_name}</p>
+                              <p className="text-xs text-gray-400">{r.reservation_time} · {r.party_size}p{r.table_number ? ` · T${r.table_number}` : ''}</p>
+                            </div>
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+                  <div className="p-3 border-t border-gray-100">
+                    <button
+                      onClick={() => setShowNewReservation(true)}
+                      className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-green-500 hover:bg-green-600 text-white text-sm font-semibold transition-colors"
+                    >
+                      <Plus size={15} />
+                      Nieuwe reservatie
+                    </button>
+                  </div>
+                </div>
+
                 {/* Canvas */}
                 <div
                   className="res-floor-canvas flex-1 relative overflow-hidden select-none"
@@ -1792,8 +1869,7 @@ export default function KassaReservationsView({
                       >
                         <ReservationTableSVG
                           table={table}
-                          color={color}
-                          borderColor={borderColor}
+                          statusColor={borderColor}
                           isSelected={isSelected}
                           guestName={res?.guest_name}
                           time={res?.reservation_time}
