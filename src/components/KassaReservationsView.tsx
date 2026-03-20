@@ -417,7 +417,7 @@ export default function KassaReservationsView({
 
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
-  const [viewMode, setViewMode] = useState<ViewMode>('today')
+  const [viewMode, setViewMode] = useState<ViewMode>('floorplan')
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [searchQuery, setSearchQuery] = useState('')
   const [showNewReservationModal, setShowNewReservationModal] = useState(false)
@@ -1178,11 +1178,10 @@ export default function KassaReservationsView({
         <div className="flex items-center gap-3">
           <div className="flex bg-gray-100 rounded-xl p-1 overflow-x-auto">
             {[
-              { id: 'today', label: 'Dag', icon: <Clock size={16} /> },
+              { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} /> },
               { id: 'timeline', label: 'Tijdlijn', icon: <LayoutGrid size={16} /> },
               { id: 'month', label: 'Maand', icon: <CalendarDays size={16} /> },
               { id: 'list', label: 'Lijst', icon: <List size={16} /> },
-              { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} /> },
               { id: 'guests', label: 'Gasten', icon: <Users size={16} /> },
               { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} /> },
               { id: 'settings', label: 'Instellingen', icon: <Settings size={16} /> },
