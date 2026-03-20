@@ -812,45 +812,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     )
   }
 
-  // VERPLICHT ACTIVATIESCHERM VOOR iPAD/iOS - alleen EERSTE KEER per sessie
-  if (!audioActivated) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <motion.button
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            // KRITIEK: Activeer audio TIJDENS user gesture (VEREIST voor iOS/Safari)
-            activateAudioForIOS()
-            prewarmAudio()
-            markAudioActivated()
-            setAudioActivated(true)
-            setSoundEnabled(true)
-            // Speel test geluid om te bevestigen dat het werkt
-            playOrderNotification()
-          }}
-          className="bg-orange-500 hover:bg-orange-600 text-white rounded-3xl p-12 text-center shadow-2xl max-w-lg"
-        >
-          <motion.div
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
-            className="text-8xl mb-6"
-          >
-            🔊
-          </motion.div>
-          <h1 className="text-3xl font-bold mb-4">Tik om te starten</h1>
-          <p className="text-xl opacity-80 mb-6">
-            Geluidsmeldingen worden geactiveerd
-          </p>
-          <div className="bg-white/20 rounded-xl px-6 py-3 inline-block">
-            <span className="text-lg font-bold">▶️ START DISPLAY</span>
-          </div>
-        </motion.button>
-      </div>
-    )
-  }
 
   return (
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-900 text-white">
