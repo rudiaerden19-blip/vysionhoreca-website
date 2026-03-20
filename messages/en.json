@@ -190,7 +190,7 @@
     "choosePro": "Choose Pro",
     "cancelAnytime": "Cancel anytime",
     "starter": {
-      "name": "Vysion Starter",
+      "name": "Vysion Pro",
       "features": {
         "1": "Online ordering platform",
         "2": "Fully customizable own website",
@@ -208,7 +208,7 @@
       }
     },
     "pro": {
-      "name": "Vysion Pro",
+      "name": "Vysion Premium",
       "allOfStarter": "Everything from Starter, plus:",
       "features": {
         "1": "SEO visibility",
@@ -2314,9 +2314,9 @@
       "daysLeft": "days left",
       "nextPayment": "Next payment",
       "perMonth": "/month",
-      "starter": "Vysion Starter",
+      "starter": "Vysion Premium",
       "starterDesc": "Everything you need",
-      "pro": "Vysion Pro",
+      "pro": "Vysion Premium",
       "proDesc": "Everything + extra features",
       "popular": "POPULAR",
       "buyStarter": "Buy Starter",

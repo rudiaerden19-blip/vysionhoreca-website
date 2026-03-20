@@ -16,8 +16,8 @@ const planPricesYearly: Record<string, number> = {
 }
 
 const planNames: Record<string, string> = {
-  starter: 'Vysion Starter',
-  pro: 'Vysion Pro',
+  starter: 'Vysion Pro',
+  pro: 'Vysion Premium',
 }
 
 export async function POST(request: NextRequest) {

@@ -190,7 +190,7 @@
     "choosePro": "Pro wählen",
     "cancelAnytime": "Monatlich kündbar",
     "starter": {
-      "name": "Vysion Starter",
+      "name": "Vysion Pro",
       "features": {
         "1": "Online-Bestellplattform",
         "2": "Vollständig anpassbare eigene Website",
@@ -208,7 +208,7 @@
       }
     },
     "pro": {
-      "name": "Vysion Pro",
+      "name": "Vysion Premium",
       "allOfStarter": "Alles von Starter, plus:",
       "features": {
         "1": "SEO-Sichtbarkeit",
@@ -1815,9 +1815,9 @@
       "daysLeft": "Tage übrig",
       "nextPayment": "Nächste Zahlung",
       "perMonth": "/Monat",
-      "starter": "Vysion Starter",
+      "starter": "Vysion Premium",
       "starterDesc": "Alles was Sie brauchen",
-      "pro": "Vysion Pro",
+      "pro": "Vysion Premium",
       "proDesc": "Alles + Zusatzfunktionen",
       "popular": "BELIEBT",
       "buyStarter": "Starter Kaufen",

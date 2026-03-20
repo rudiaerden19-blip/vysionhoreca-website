@@ -190,7 +190,7 @@
     "choosePro": "选择Pro",
     "cancelAnytime": "随时可取消",
     "starter": {
-      "name": "Vysion Starter",
+      "name": "Vysion Pro",
       "features": {
         "1": "在线订单平台",
         "2": "完全可定制的独立网站",
@@ -208,7 +208,7 @@
       }
     },
     "pro": {
-      "name": "Vysion Pro",
+      "name": "Vysion Premium",
       "allOfStarter": "Starter的所有功能，加上：",
       "features": {
         "1": "SEO可见性",
@@ -2309,9 +2309,9 @@
       "daysLeft": "天剩余",
       "nextPayment": "下次付款",
       "perMonth": "/月",
-      "starter": "Vysion Starter",
+      "starter": "Vysion Premium",
       "starterDesc": "您需要的一切",
-      "pro": "Vysion Pro",
+      "pro": "Vysion Premium",
       "proDesc": "一切 + 额外功能",
       "popular": "热门",
       "buyStarter": "购买 Starter",

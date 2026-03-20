@@ -190,7 +190,7 @@
     "choosePro": "Proを選択",
     "cancelAnytime": "月単位で解約可能",
     "starter": {
-      "name": "Vysion Starter",
+      "name": "Vysion Pro",
       "features": {
         "1": "オンライン注文プラットフォーム",
         "2": "完全カスタマイズ可能な独自ウェブサイト",
@@ -208,7 +208,7 @@
       }
     },
     "pro": {
-      "name": "Vysion Pro",
+      "name": "Vysion Premium",
       "allOfStarter": "Starterのすべて、さらに:",
       "features": {
         "1": "SEO可視性",
@@ -2309,9 +2309,9 @@
       "daysLeft": "日残り",
       "nextPayment": "次回支払い",
       "perMonth": "/月",
-      "starter": "Vysion Starter",
+      "starter": "Vysion Premium",
       "starterDesc": "必要なものすべて",
-      "pro": "Vysion Pro",
+      "pro": "Vysion Premium",
       "proDesc": "すべて + 追加機能",
       "popular": "人気",
       "buyStarter": "Starterを購入",

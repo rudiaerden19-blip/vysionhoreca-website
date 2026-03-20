@@ -190,7 +190,7 @@
     "choosePro": "اختر Pro",
     "cancelAnytime": "إلغاء شهري",
     "starter": {
-      "name": "Vysion Starter",
+      "name": "Vysion Pro",
       "features": {
         "1": "منصة طلبات أونلاين",
         "2": "موقع خاص قابل للتخصيص بالكامل",
@@ -208,7 +208,7 @@
       }
     },
     "pro": {
-      "name": "Vysion Pro",
+      "name": "Vysion Premium",
       "allOfStarter": "كل مميزات Starter، بالإضافة إلى:",
       "features": {
         "1": "ظهور في محركات البحث SEO",
@@ -2309,9 +2309,9 @@
       "daysLeft": "أيام متبقية",
       "nextPayment": "الدفعة التالية",
       "perMonth": "/شهر",
-      "starter": "Vysion Starter",
+      "starter": "Vysion Premium",
       "starterDesc": "كل ما تحتاجه",
-      "pro": "Vysion Pro",
+      "pro": "Vysion Premium",
       "proDesc": "كل شيء + ميزات إضافية",
       "popular": "شائع",
       "buyStarter": "شراء Starter",
