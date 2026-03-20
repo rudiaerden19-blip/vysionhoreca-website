@@ -821,17 +821,20 @@ export default function KassaReservationsView({
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={onClose}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-white text-sm font-bold transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Kassa
+            </button>
+            <button
               onClick={() => setShowNewReservationModal(true)}
               className="px-4 py-2 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors flex items-center gap-2"
             >
               <Plus size={20} />
               Nieuwe Reservatie
-            </button>
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors"
-            >
-              <X size={20} />
             </button>
           </div>
         </div>
