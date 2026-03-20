@@ -143,7 +143,7 @@ interface KassaReservationsViewProps {
 }
 
 // ---- Reservation Table SVG — identiek aan KassaFloorPlan stijl ----
-function ReservationTableSVG({ table, statusColor, isSelected, guestName, time }: {
+function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
   table: FloorPlanTable
   statusColor: string
   isSelected: boolean
