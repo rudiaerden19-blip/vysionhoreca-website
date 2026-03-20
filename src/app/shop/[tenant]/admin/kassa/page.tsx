@@ -50,6 +50,148 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   const [langOpen, setLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
 
+  // ── Nieuwe bestelling alarm (exact donor) ────────────────────────────────
+  const [newOrderAlert, setNewOrderAlert] = useState<{id: string; orderNumber: number; total: number} | null>(null)
+  const alarmIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+  const previousOrderIdsRef = useRef<string[]>([])
+
+  const playHTMLAudioFallback = useRef(() => {
+    try {
+      const audio = new Audio('/notification.mp3')
+      audio.volume = 0.8
+      audio.play().catch(() => {
+        try {
+          if (audioCtxRef.current) {
+            const osc = audioCtxRef.current.createOscillator()
+            const gain = audioCtxRef.current.createGain()
+            osc.type = 'square'; osc.frequency.value = 880; gain.gain.value = 0.5
+            osc.connect(gain); gain.connect(audioCtxRef.current.destination)
+            osc.start(); osc.stop(audioCtxRef.current.currentTime + 0.3)
+          }
+        } catch { /* ignore */ }
+      })
+    } catch { /* ignore */ }
+  }).current
+
+  const playBeepOnly = useRef(() => {
+    playHTMLAudioFallback()
+    try {
+      if (!audioCtxRef.current) {
+        const AC = window.AudioContext || (window as any).webkitAudioContext
+        audioCtxRef.current = new AC()
+      }
+      const ctx = audioCtxRef.current
+      if (ctx.state === 'running') {
+        const osc = ctx.createOscillator(); const gain = ctx.createGain()
+        osc.type = 'square'; osc.frequency.value = 880; gain.gain.value = 0.3
+        osc.connect(gain); gain.connect(ctx.destination)
+        osc.start(ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+        osc.stop(ctx.currentTime + 0.3)
+      } else if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {})
+      }
+    } catch { /* ignore */ }
+  }).current
+
+  const stopAlarm = useRef(() => {
+    if (alarmIntervalRef.current) {
+      clearInterval(alarmIntervalRef.current)
+      alarmIntervalRef.current = null
+    }
+  }).current
+
+  const startAlarm = useRef(() => {
+    if (alarmIntervalRef.current) return
+    playBeepOnly()
+    let beepCount = 0
+    const alarmBeep = () => {
+      beepCount++
+      try {
+        playBeepOnly()
+        if (!alarmIntervalRef.current) {
+          alarmIntervalRef.current = setInterval(alarmBeep, 2000)
+        }
+      } catch {
+        try { playBeepOnly() } catch { /* ignore */ }
+      }
+    }
+    alarmIntervalRef.current = setInterval(alarmBeep, 2000)
+    setTimeout(() => {
+      if (!alarmIntervalRef.current) {
+        alarmIntervalRef.current = setInterval(alarmBeep, 2000)
+      }
+    }, 3000)
+  }).current
+
+  // Alarm blijft spelen zolang oranje scherm zichtbaar is
+  useEffect(() => {
+    if (newOrderAlert) {
+      if (!alarmIntervalRef.current) startAlarm()
+      const verifyInterval = setInterval(() => {
+        if (newOrderAlert && !alarmIntervalRef.current) startAlarm()
+      }, 2000)
+      return () => clearInterval(verifyInterval)
+    }
+  }, [newOrderAlert, startAlarm])
+
+  // Cleanup alarm bij unmount
+  useEffect(() => { return () => { if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current) } }, [])
+
+  // Expose alarm functies globaal (zodat bestellingen pagina alarm kan stoppen)
+  useEffect(() => {
+    ;(window as any).stopOrderAlarm = () => { stopAlarm(); setNewOrderAlert(null) }
+    ;(window as any).startOrderAlarm = () => startAlarm()
+    ;(window as any).isAlarmRunning = () => alarmIntervalRef.current !== null
+  }, [stopAlarm, startAlarm])
+
+  // Poll elke 3 seconden voor nieuwe online bestellingen
+  useEffect(() => {
+    let isFirstCheck = true
+    const check = async () => {
+      try {
+        const { data: orders } = await supabase
+          .from('orders')
+          .select('id,order_number,total,status')
+          .eq('tenant_slug', tenant)
+          .eq('status', 'new')
+          .order('created_at', { ascending: false })
+          .limit(50)
+        const list = orders || []
+        const currentIds = list.map((o: any) => o.id)
+        const prevIds = previousOrderIdsRef.current
+        if (!isFirstCheck) {
+          const newOnes = list.filter((o: any) => !prevIds.includes(o.id))
+          if (newOnes.length > 0) {
+            startAlarm()
+            try {
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('🔔 NIEUWE BESTELLING!', {
+                  body: `Bestelling #${newOnes[0].order_number} is binnengekomen!`,
+                  icon: '/favicon.ico', requireInteraction: true, tag: 'new-order',
+                })
+              }
+            } catch { /* ignore */ }
+            setNewOrderAlert({ id: newOnes[0].id, orderNumber: newOnes[0].order_number, total: newOnes[0].total || 0 })
+          }
+          if (list.length > 0) {
+            if (!alarmIntervalRef.current) startAlarm()
+          } else {
+            if (alarmIntervalRef.current) { stopAlarm(); setNewOrderAlert(null) }
+          }
+        } else {
+          isFirstCheck = false
+          if (list.length > 0) startAlarm()
+        }
+        previousOrderIdsRef.current = currentIds
+      } catch { /* ignore */ }
+    }
+    check()
+    const interval = setInterval(check, 3000)
+    return () => clearInterval(interval)
+  }, [tenant, startAlarm, stopAlarm])
+
   // Menu
   const [categories, setCategories] = useState<MenuCategory[]>([])
   const [products, setProducts] = useState<MenuProduct[]>([])
@@ -1588,6 +1730,32 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           </div>
         )
       })()}
+
+      {/* ── ORANJE SCHERM: Nieuwe online bestelling (exact donor) ── */}
+      {newOrderAlert && (
+        <div
+          className="fixed inset-0 z-[200] bg-orange-500 flex flex-col items-center justify-center animate-pulse cursor-pointer"
+          onClick={() => {
+            // Oranje scherm sluiten maar alarm blijft spelen
+            setNewOrderAlert(null)
+            // Navigeer naar bestellingen
+            window.location.href = `/shop/${tenant}/admin/bestellingen`
+            // Verifieer alarm na klikken
+            if (typeof window !== 'undefined' && (window as any).startOrderAlarm) {
+              setTimeout(() => { (window as any).startOrderAlarm() }, 100)
+            }
+          }}
+        >
+          <div className="text-white text-center px-8">
+            <div className="text-6xl mb-4">🔔</div>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">NIEUWE BESTELLING!</h1>
+            <div className="text-3xl md:text-5xl font-bold mb-6">#{newOrderAlert.orderNumber}</div>
+            <div className="text-2xl md:text-4xl mb-8">€{newOrderAlert.total.toFixed(2)}</div>
+            <div className="text-xl opacity-80 mt-8">👆 Klik om te bekijken</div>
+            <p className="text-white/60 mt-4 text-sm">Geluid stopt na accepteren of weigeren</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

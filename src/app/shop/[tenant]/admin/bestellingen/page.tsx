@@ -384,6 +384,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const handleConfirmOrder = async (order: Order) => {
     if (!order.id) return
     setUpdatingId(order.id)
+    // Stop alarm exact zoals donor
+    if (typeof window !== 'undefined' && (window as any).stopOrderAlarm) {
+      (window as any).stopOrderAlarm()
+    }
     const success = await confirmOrder(order.id)
     if (success) {
       setOrders(prev => prev.map(o => 
@@ -474,6 +478,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const handleRejectOrder = async () => {
     if (!rejectingOrder?.id || !rejectionReason) return
     setUpdatingId(rejectingOrder.id)
+    // Stop alarm exact zoals donor
+    if (typeof window !== 'undefined' && (window as any).stopOrderAlarm) {
+      (window as any).stopOrderAlarm()
+    }
     
     try {
       // Use server-side API that handles both database update and WhatsApp
