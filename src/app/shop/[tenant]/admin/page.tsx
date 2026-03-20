@@ -98,17 +98,21 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
       .eq('tenant_slug', params.tenant)
       .order('created_at', { ascending: false })
 
-    // Sla geweigerde/geannuleerde orders uit voor omzetberekening
-    const INVALID_STATUSES = ['cancelled', 'rejected', 'CANCELLED', 'REJECTED']
-    const orders = (allOrders || []).filter(o => !INVALID_STATUSES.includes(o.status || ''))
+    const allOrdersList = allOrders || []
+
+    // Alleen betaalde orders voor omzetcijfers (geaccepteerd of kassaverkoop)
+    const paidOrders = allOrdersList.filter(o =>
+      o.payment_status === 'paid' &&
+      !['cancelled', 'rejected', 'CANCELLED', 'REJECTED'].includes(o.status || '')
+    )
 
     // Today's stats
-    const todayOrders = orders.filter(o => new Date(o.created_at) >= today)
+    const todayOrders = paidOrders.filter(o => new Date(o.created_at) >= today)
     const todayOrdersCount = todayOrders.length
     const todayRevenue = todayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
     // Yesterday's stats
-    const yesterdayOrders = orders.filter(o => {
+    const yesterdayOrders = paidOrders.filter(o => {
       const date = new Date(o.created_at)
       return date >= yesterday && date < today
     })
@@ -116,29 +120,29 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
     const yesterdayRevenue = yesterdayOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
     // Week stats
-    const weekOrders = orders.filter(o => new Date(o.created_at) >= weekAgo)
+    const weekOrders = paidOrders.filter(o => new Date(o.created_at) >= weekAgo)
     const weekOrdersCount = weekOrders.length
     const weekRevenue = weekOrders.reduce((sum, o) => sum + (o.total || 0), 0)
 
-    // Pending orders
-    const pendingOrders = orders.filter(o => 
-      o.status === 'pending' || o.status === 'confirmed' || o.status === 'preparing'
+    // Wachtende orders: nieuwe + in behandeling (niet betaald, niet geweigerd)
+    const pendingOrders = allOrdersList.filter(o =>
+      ['new', 'NEW', 'pending', 'confirmed', 'preparing'].includes(o.status || '')
     ).length
 
-    // Recent orders (last 5)
-    const recentOrdersData = orders.slice(0, 5).map(o => ({
+    // Recent orders (last 5, alle statussen voor weergave)
+    const recentOrdersData = allOrdersList.slice(0, 5).map(o => ({
       id: o.id,
       order_number: o.order_number || `#${o.id.slice(-4)}`,
       customer_name: o.customer_name || 'Onbekend',
       total: o.total || 0,
-      status: o.status || 'pending',
+      status: o.status || 'new',
       created_at: o.created_at,
       items: o.items || []
     }))
 
-    // Popular items from order_items
+    // Popular items — alleen van betaalde orders
     const itemCounts: Record<string, number> = {}
-    orders.forEach(order => {
+    paidOrders.forEach(order => {
       const items = order.items || []
       items.forEach((item: any) => {
         const name = item.product_name || item.name || 'Onbekend'

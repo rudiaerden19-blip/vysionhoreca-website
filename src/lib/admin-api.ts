@@ -1670,8 +1670,8 @@ async function autoUpdateZReport(tenantSlug: string, date: string): Promise<void
   console.log(`autoUpdateZReport: Start voor ${tenantSlug} op ${date}`)
   
   try {
-    // KRITIEK: Gebruik Belgium timezone voor correcte dag grenzen
-    const { startUTC, endUTC } = getDateBoundsForBelgium(date)
+    // KRITIEK: Gebruik fiscale dag grenzen (identiek aan z-rapport pagina, 36u venster)
+    const { startUTC, endUTC } = getZRapportDateBounds(date)
     console.log(`autoUpdateZReport: Query van ${startUTC} tot ${endUTC}`)
     
     // Haal alle betaalde orders op voor deze dag (betaald = kassa + geaccepteerde online)

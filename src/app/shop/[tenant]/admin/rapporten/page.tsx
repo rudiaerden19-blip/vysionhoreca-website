@@ -184,14 +184,16 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   }, [validOrders])
   const maxRevenue = Math.max(...last7Days.map(d=>d.revenue), 1)
 
-  // ── Betaalmethodes vandaag ──
+  // ── Betaalmethodes vandaag (case-insensitief: kassa=uppercase, online=lowercase) ──
   const paymentToday = useMemo(() => {
     const td = ordersInPeriod(validOrders, todayStart)
+    const pm = (o: Order) => (o.payment_method || '').toUpperCase()
     return {
-      CASH: td.filter(o=>o.payment_method==='CASH').reduce((s,o)=>s+o.total,0),
-      CARD: td.filter(o=>o.payment_method==='CARD').reduce((s,o)=>s+o.total,0),
-      IDEAL: td.filter(o=>o.payment_method==='IDEAL').reduce((s,o)=>s+o.total,0),
-      BANCONTACT: td.filter(o=>o.payment_method==='BANCONTACT').reduce((s,o)=>s+o.total,0),
+      CASH: td.filter(o=>pm(o)==='CASH'||pm(o)==='CONTANT').reduce((s,o)=>s+o.total,0),
+      CARD: td.filter(o=>pm(o)==='CARD'||pm(o)==='PIN'||pm(o)==='KAART').reduce((s,o)=>s+o.total,0),
+      IDEAL: td.filter(o=>pm(o)==='IDEAL').reduce((s,o)=>s+o.total,0),
+      BANCONTACT: td.filter(o=>pm(o)==='BANCONTACT').reduce((s,o)=>s+o.total,0),
+      ONLINE: td.filter(o=>pm(o)==='ONLINE').reduce((s,o)=>s+o.total,0),
     }
   }, [validOrders, todayStart])
 
@@ -257,8 +259,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
         const dayStart = startOfDay(day)
         const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate()+1)
         const dayOrders = validOrders.filter(o => { const t=new Date(o.created_at); return t>=dayStart && t<dayEnd })
-        const cash = dayOrders.filter(o=>o.payment_method==='CASH').reduce((s,o)=>s+o.total,0)
-        const card = dayOrders.filter(o=>o.payment_method!=='CASH').reduce((s,o)=>s+o.total,0)
+        const isCash = (o: Order) => (o.payment_method||'').toUpperCase() === 'CASH' || (o.payment_method||'').toUpperCase() === 'CONTANT'
+        const cash = dayOrders.filter(isCash).reduce((s,o)=>s+o.total,0)
+        const card = dayOrders.filter(o=>!isCash(o)).reduce((s,o)=>s+o.total,0)
         return { label:`${days-i} ${NL_MONTHS[m]}`, receipts:dayOrders.length, cash, card, total:cash+card }
       })
     } else {
@@ -267,8 +270,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
         const mStart = new Date(selectedYear, mIdx, 1)
         const mEnd = new Date(selectedYear, mIdx+1, 1)
         const mOrders = validOrders.filter(o => { const t=new Date(o.created_at); return t>=mStart && t<mEnd })
-        const cash = mOrders.filter(o=>o.payment_method==='CASH').reduce((s,o)=>s+o.total,0)
-        const card = mOrders.filter(o=>o.payment_method!=='CASH').reduce((s,o)=>s+o.total,0)
+        const isCash = (o: Order) => (o.payment_method||'').toUpperCase() === 'CASH' || (o.payment_method||'').toUpperCase() === 'CONTANT'
+        const cash = mOrders.filter(isCash).reduce((s,o)=>s+o.total,0)
+        const card = mOrders.filter(o=>!isCash(o)).reduce((s,o)=>s+o.total,0)
         return { label:`${NL_MONTHS[mIdx]} ${selectedYear}`, receipts:mOrders.length, cash, card, total:cash+card }
       })
     }
@@ -286,8 +290,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
 
   const xData = useMemo(() => {
     const total = xOrders.reduce((s,o)=>s+o.total,0)
-    const cash = xOrders.filter(o=>o.payment_method==='CASH').reduce((s,o)=>s+o.total,0)
-    const card = xOrders.filter(o=>o.payment_method!=='CASH').reduce((s,o)=>s+o.total,0)
+    const isCashOrder = (o: Order) => (o.payment_method||'').toUpperCase() === 'CASH' || (o.payment_method||'').toUpperCase() === 'CONTANT'
+    const cash = xOrders.filter(isCashOrder).reduce((s,o)=>s+o.total,0)
+    const card = xOrders.filter(o=>!isCashOrder(o)).reduce((s,o)=>s+o.total,0)
     const tax = xOrders.reduce((s,o)=>s+o.tax,0)
     const discounts = xOrders.reduce((s,o)=>s+(o.discount_amount||0),0)
     return { count:xOrders.length, total, cash, card, tax, discounts, expectedCash: openingCash+cash }
@@ -362,8 +367,9 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     const exp = validOrders.filter(o => new Date(o.created_at) >= from)
     const totalRev = exp.reduce((s,o)=>s+o.total,0)
     const totalTax = exp.reduce((s,o)=>s+o.tax,0)
-    const cash = exp.filter(o=>o.payment_method==='CASH').reduce((s,o)=>s+o.total,0)
-    const card = exp.filter(o=>o.payment_method!=='CASH').reduce((s,o)=>s+o.total,0)
+    const isCash = (o: Order) => (o.payment_method||'').toUpperCase() === 'CASH' || (o.payment_method||'').toUpperCase() === 'CONTANT'
+    const cash = exp.filter(isCash).reduce((s,o)=>s+o.total,0)
+    const card = exp.filter(o=>!isCash(o)).reduce((s,o)=>s+o.total,0)
     const vatRate = tenantInfo?.btw_percentage ?? 6
     const html = `<!DOCTYPE html><html><head><title>Rapport</title>
     <style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto}
@@ -586,6 +592,7 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
                     { key:'CARD',       label:'PIN/Kaart',  color:'#3b82f6', icon:'💳' },
                     { key:'IDEAL',      label:'iDEAL',      color:'#ec4899', icon:'📱' },
                     { key:'BANCONTACT', label:'Bancontact', color:'#f59e0b', icon:'🏦' },
+                    { key:'ONLINE',     label:'Online bet.', color:'#8b5cf6', icon:'🌐' },
                   ].map(m => {
                     const amount = paymentToday[m.key as keyof typeof paymentToday]||0
                     const pct = todayRevenue > 0 ? (amount/todayRevenue)*100 : 0
