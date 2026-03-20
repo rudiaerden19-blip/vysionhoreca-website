@@ -124,17 +124,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     }
   }, [])
 
-  const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission()
-      if (permission === 'granted') {
-        setNotificationsEnabled(true)
-      }
-    }
-  }
-
   const showNotification = useCallback((order: Order) => {
-    if (notificationsEnabled && 'Notification' in window && Notification.permission === 'granted') {
+    if ('Notification' in window && Notification.permission === 'granted') {
       new Notification('🍟 Nieuwe bestelling!', {
         body: `${order.customer_name} - €${order.total?.toFixed(2)}`,
         icon: '/icon-192.png',
@@ -142,7 +133,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         requireInteraction: true,
       })
     }
-  }, [notificationsEnabled])
+  }, [])
 
   // Load orders and tenant settings
   const loadOrders = useCallback(async () => {
@@ -838,14 +829,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Notification - altijd aan */}
-          <button
-            onClick={requestNotificationPermission}
-            className="p-2 rounded-xl transition-colors bg-green-100 text-green-600"
-            title="Browser notificaties (altijd aan)"
-          >
-            🔔
-          </button>
           
 
           {/* Archief */}
