@@ -133,13 +133,14 @@ function DecorSVG({ item, isSelected, orderedStools = new Set(), stoolStatuses =
   )
 }
 
-function TableSVG({ table, isSelected, onClick }: {
+function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
   table: KassaTable
   isSelected: boolean
   onClick: (e?: React.MouseEvent) => void
+  effectiveStatus?: TableStatus
 }) {
   const seats = table.seats
-  const color = STATUS_COLORS[table.status]
+  const color = STATUS_COLORS[effectiveStatus ?? table.status]
 
   // Table dimensions
   const tableSize = 90
@@ -397,7 +398,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     localStorage.setItem(stoolStatusKey, JSON.stringify(updated))
   }
 
-  // Effectieve stoel status:
+  // Effectieve stoel/tafel status:
   // - Geen items → altijd VRIJ (betaald = automatisch vrij)
   // - Items aanwezig + manueel ONBETAALD → ONBETAALD
   // - Items aanwezig, geen override → BEZET
@@ -405,6 +406,13 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     const hasItems = (tableOrders[stoolId] || []).length > 0
     if (!hasItems) return 'FREE'
     if (stoolStatuses[stoolId] === 'UNPAID') return 'UNPAID'
+    return 'OCCUPIED'
+  }
+
+  const getTableEffectiveStatus = (tableNumber: string, storedStatus: TableStatus): TableStatus => {
+    const hasItems = (tableOrders[tableNumber] || []).length > 0
+    if (!hasItems) return 'FREE'
+    if (storedStatus === 'UNPAID') return 'UNPAID'
     return 'OCCUPIED'
   }
 
@@ -635,6 +643,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 table={t}
                 isSelected={selected?.id === t.id}
                 onClick={(e) => { e?.stopPropagation() }}
+                effectiveStatus={getTableEffectiveStatus(t.number, t.status)}
               />
             </div>
           ))}
@@ -805,6 +814,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         {selected && (() => {
           const items = tableOrders[selected.number] || []
           const hasItems = items.length > 0
+          const effectiveStatus = getTableEffectiveStatus(selected.number, selected.status)
           const totalPrice = items.reduce((sum, item) => {
             const choiceTotal = (item.choices || []).reduce((s, c) => s + c.price, 0)
             return sum + (item.product.price + choiceTotal) * item.quantity
@@ -812,10 +822,13 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
           return (
             <div className="w-80 bg-[#16213e] border-l border-white/10 flex flex-col">
-              {/* Header */}
-              <div className="p-4 border-b border-white/10 flex justify-between items-center">
+              {/* Header met status kleur */}
+              <div className="p-4 border-b border-white/10 flex justify-between items-center" style={{ borderLeft: `4px solid ${STATUS_COLORS[effectiveStatus]}` }}>
                 <div>
-                  <h3 className="text-white font-bold text-xl">Tafel {selected.number}</h3>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <h3 className="text-white font-bold text-xl">Tafel {selected.number}</h3>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_COLORS[effectiveStatus] }}>{STATUS_LABELS[effectiveStatus]}</span>
+                  </div>
                   <p className="text-white/40 text-xs">{selected.seats} plaatsen</p>
                 </div>
                 <button onClick={() => setSelected(null)} className="text-white/50 hover:text-white text-xl">✕</button>
@@ -881,9 +894,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               <div className="p-4 border-b border-white/10 space-y-2">
                 <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Status</p>
                 {(['FREE', 'OCCUPIED', 'UNPAID'] as TableStatus[]).map(s => {
-                  const isActive = selected.status === s
-                  // Onbetaald altijd oplichten als er items zijn
-                  const forceHighlight = s === 'UNPAID' && hasItems && !isActive
+                  const isActive = effectiveStatus === s
+                  // ONBETAALD warning als BEZET met items
+                  const warnUnpaid = s === 'UNPAID' && effectiveStatus === 'OCCUPIED' && hasItems
                   return (
                     <button key={s}
                       onClick={() => {
@@ -895,11 +908,11 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                       style={
                         isActive
                           ? { backgroundColor: STATUS_COLORS[s], color: 'white' }
-                          : forceHighlight
+                          : warnUnpaid
                           ? { backgroundColor: STATUS_COLORS['UNPAID'] + '33', color: STATUS_COLORS['UNPAID'], border: `2px solid ${STATUS_COLORS['UNPAID']}` }
                           : { backgroundColor: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)' }
                       }>
-                      {STATUS_LABELS[s]}{forceHighlight ? ' ⚠️' : ''}
+                      {STATUS_LABELS[s]}{warnUnpaid ? ' ⚠️' : ''}
                     </button>
                   )
                 })}

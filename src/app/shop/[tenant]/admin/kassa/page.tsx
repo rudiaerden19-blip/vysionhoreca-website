@@ -258,11 +258,14 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     if (!tablesRaw) return
     try {
       const tbls = JSON.parse(tablesRaw)
+      const newStatus = occupied ? 'OCCUPIED' : 'FREE'
       const updatedTbls = tbls.map((t: { number: string; status: string }) =>
-        t.number === tblNr ? { ...t, status: occupied ? 'OCCUPIED' : 'FREE' } : t
+        t.number === tblNr ? { ...t, status: newStatus } : t
       )
       localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
       setKassaTables(updatedTbls)
+      // Sync naar Supabase zodat plattegrond ook up-to-date is
+      supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: updatedTbls }, { onConflict: 'tenant_slug' })
     } catch { /* empty */ }
   }
 
@@ -519,18 +522,8 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         const newOrders = { ...tableOrders, [tableNumber]: updated }
         setTableOrders(newOrders)
         localStorage.setItem(tableOrdersKey, JSON.stringify(newOrders))
-        // Zet tafel op FREE als cart leeg is
-        const tablesRaw = localStorage.getItem(`vysion_tables_${tenant}`)
-        if (tablesRaw) {
-          try {
-            const tbls = JSON.parse(tablesRaw)
-            const updatedTbls = tbls.map((t: { number: string; status: string }) =>
-              t.number === tableNumber ? { ...t, status: updated.length > 0 ? 'OCCUPIED' : 'FREE' } : t
-            )
-            localStorage.setItem(`vysion_tables_${tenant}`, JSON.stringify(updatedTbls))
-            setKassaTables(updatedTbls)
-          } catch { /* empty */ }
-        }
+        // Zet tafel status bij via centrale functie
+        updateTableStatus(tableNumber, updated.length > 0)
       }
       return updated
     })
