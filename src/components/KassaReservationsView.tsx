@@ -572,9 +572,12 @@ export default function KassaReservationsView({
     const maxX = Math.max(...floorPlanTablesDB.map(t => (t.x / 100) * WORLD_W))
     const minY = Math.min(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
     const maxY = Math.max(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
-    // Tafels linksboven starten met wat marge (niet gecentreerd)
-    setPanX(80 - minX * floorZoom)
-    setPanY(100 - minY * floorZoom)
+    // SVG is ±290px hoog, gecentreerd via translate(-50%,-50%).
+    // Bovenkant SVG steekt ~145px boven de wereldpositie uit → compenseer dat + 40px marge
+    const svgHalfH = 145
+    const svgHalfW = 145
+    setPanX(40 + svgHalfW - minX * floorZoom)
+    setPanY(40 + svgHalfH - minY * floorZoom)
     didCenterTables.current = true
   }, [floorPlanTablesDB, WORLD_W, WORLD_H, floorZoom])
 
