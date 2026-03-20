@@ -699,6 +699,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🖨️', label: 'Bonnenprinter', href: `${baseUrl}/bonnenprinter` },
                 { icon: '🏷️', label: 'Labels', href: `${baseUrl}/labels` },
               ]},
+              { key: 'online-bestellingen', icon: '📲', label: 'Online Bestellingen', items: [
+                { icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
+                { icon: '🏢', label: 'Groepsbestellingen', href: `${baseUrl}/groepen` },
+                { icon: '🖥️', label: 'Online Scherm', href: `/shop/${tenant}/display`, target: '_blank' },
+                { icon: '👨‍🍳', label: 'Keuken Scherm', href: `/keuken/${tenant}`, target: '_blank' },
+              ]},
               { key: 'instellingen', icon: '⚙️', label: 'Instellingen', items: [
                 { icon: '🕐', label: 'Openingstijden', href: `${baseUrl}/openingstijden` },
                 { icon: '🚚', label: 'Levering & Afhalen', href: `${baseUrl}/levering` },
@@ -707,12 +713,10 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               ]},
               { key: 'online', icon: '🛒', label: 'Online', items: [
                 { icon: '🟢', label: 'Online Aan/Uitzetten', href: `${baseUrl}/online-status` },
-                { icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
                 { icon: '👥', label: 'Klanten', href: `${baseUrl}/klanten` },
                 { icon: '🎁', label: 'Beloningen', href: `${baseUrl}/klanten/beloningen` },
                 { icon: '🎫', label: 'Promoties', href: `${baseUrl}/promoties` },
                 { icon: '🎟️', label: 'Cadeaubonnen', href: `${baseUrl}/cadeaubonnen` },
-                { icon: '🏢', label: 'Groepsbestellingen', href: `${baseUrl}/groepen` },
                 { icon: '💬', label: 'WhatsApp', href: `${baseUrl}/whatsapp` },
                 { icon: '🔗', label: 'Bekijk je Shop', href: `/shop/${tenant}` },
               ]},
@@ -782,10 +786,11 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                       <span>{activeMod.icon}</span> {activeMod.label}
                     </div>
                     {activeMod.items.map(item => (
-                      <Link key={item.href} href={item.href} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
+                      <Link key={item.href} href={item.href} target={'target' in item && item.target ? item.target : undefined} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
                         className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
                         <span>{item.icon}</span>
                         <span>{item.label}</span>
+                        {'target' in item && item.target && <span className="ml-auto text-gray-300 text-xs">↗</span>}
                       </Link>
                     ))}
                   </div>
