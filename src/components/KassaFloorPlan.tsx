@@ -153,36 +153,49 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
   const chairs: Chair[] = []
 
   if (table.shape === 'ROUND') {
-    const radius = tableSize / 2
-    const dist = radius + gap + chairH / 2
-    for (let i = 0; i < seats; i++) {
-      const angle = (i * 360) / seats - 90
-      const rad = (angle * Math.PI) / 180
-      chairs.push({ x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, angle })
+    // 2 stoelen: exact tegenover (top + bottom)
+    if (seats === 2) {
+      const dist = tableSize / 2 + gap + chairH / 2
+      chairs.push({ x: 0, y: -dist, angle: -90 })
+      chairs.push({ x: 0, y:  dist, angle:  90 })
+    } else {
+      const radius = tableSize / 2
+      const dist = radius + gap + chairH / 2
+      for (let i = 0; i < seats; i++) {
+        const angle = (i * 360) / seats - 90
+        const rad = (angle * Math.PI) / 180
+        chairs.push({ x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, angle })
+      }
     }
   } else if (table.shape === 'SQUARE') {
     const half = tableSize / 2
     const dist = half + gap + chairH / 2
-    const perSide = Math.ceil(seats / 4)
-    const sides = [
-      { angle: -90, axis: 'x' as const, fixed: -dist },
-      { angle: 0,   axis: 'y' as const, fixed: dist },
-      { angle: 90,  axis: 'x' as const, fixed: dist },
-      { angle: 180, axis: 'y' as const, fixed: -dist },
-    ]
-    let placed = 0
-    for (const side of sides) {
-      const count = Math.min(perSide, seats - placed)
-      for (let i = 0; i < count; i++) {
-        const offset = (i - (count - 1) / 2) * (chairW + 6)
-        chairs.push({
-          x: side.axis === 'x' ? offset : side.fixed,
-          y: side.axis === 'y' ? offset : side.fixed,
-          angle: side.angle,
-        })
-        placed++
+    // 2 stoelen: altijd tegenover mekaar (top + bottom)
+    if (seats === 2) {
+      chairs.push({ x: 0, y: -dist, angle: -90 })
+      chairs.push({ x: 0, y:  dist, angle:  90 })
+    } else {
+      const perSide = Math.ceil(seats / 4)
+      const sides = [
+        { angle: -90, axis: 'x' as const, fixed: -dist },
+        { angle: 0,   axis: 'y' as const, fixed: dist },
+        { angle: 90,  axis: 'x' as const, fixed: dist },
+        { angle: 180, axis: 'y' as const, fixed: -dist },
+      ]
+      let placed = 0
+      for (const side of sides) {
+        const count = Math.min(perSide, seats - placed)
+        for (let i = 0; i < count; i++) {
+          const offset = (i - (count - 1) / 2) * (chairW + 6)
+          chairs.push({
+            x: side.axis === 'x' ? offset : side.fixed,
+            y: side.axis === 'y' ? offset : side.fixed,
+            angle: side.angle,
+          })
+          placed++
+        }
+        if (placed >= seats) break
       }
-      if (placed >= seats) break
     }
   } else {
     // RECTANGLE
@@ -230,71 +243,53 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
       onClick={onClick}
       style={{ cursor: 'pointer', overflow: 'visible', display: 'block' }}
     >
-      {/* Chairs */}
+      {/* Chairs — zelfde grijze stijl als toog */}
       {chairs.map((c, i) => (
         <g key={i} transform={`translate(${cx + c.x}, ${cy + c.y}) rotate(${c.angle})`}>
-          {/* Backrest */}
-          <rect
-            x={-chairW / 2 + 2}
-            y={-chairH / 2}
-            width={chairW - 4}
-            height={7}
-            rx={3}
-            fill="#8B4513"
-            stroke="#5D3A1A"
-            strokeWidth={1}
-          />
-          {/* Seat */}
-          <rect
-            x={-chairW / 2}
-            y={-chairH / 2 + 7}
-            width={chairW}
-            height={chairH - 7}
-            rx={3}
-            fill="#A0522D"
-            stroke="#5D3A1A"
-            strokeWidth={1}
-          />
+          {/* Rugsteun */}
+          <rect x={-chairW / 2 + 2} y={-chairH / 2} width={chairW - 4} height={7} rx={3} fill="#5a5a5a" stroke="#333" strokeWidth={1} />
+          {/* Zitting */}
+          <rect x={-chairW / 2} y={-chairH / 2 + 7} width={chairW} height={chairH - 7} rx={3} fill="#4a4a4a" stroke="#333" strokeWidth={1} />
+          {/* Glans */}
+          <rect x={-chairW / 2 + 3} y={-chairH / 2 + 8} width={chairW - 10} height={4} rx={2} fill="rgba(255,255,255,0.12)" />
         </g>
       ))}
 
-      {/* Table */}
+      {/* Tafel — zelfde grijze stijl als toog */}
       {table.shape === 'ROUND' ? (
-        <ellipse
-          cx={cx} cy={cy}
-          rx={tableSize / 2} ry={tableSize / 2}
-          fill="url(#wood-round)"
-          stroke={isSelected ? color : '#5D3A1A'}
-          strokeWidth={isSelected ? 4 : 3}
+        <ellipse cx={cx} cy={cy} rx={tableSize / 2} ry={tableSize / 2}
+          fill="url(#table-grad-round)"
+          stroke={isSelected ? color : '#333'}
+          strokeWidth={isSelected ? 4 : 2}
           filter="url(#shadow)"
         />
       ) : table.shape === 'RECTANGLE' ? (
-        <rect
-          x={cx - tw / 2} y={cy - th / 2}
-          width={tw} height={th}
-          rx={10}
-          fill="url(#wood-rect)"
-          stroke={isSelected ? color : '#5D3A1A'}
-          strokeWidth={isSelected ? 4 : 3}
+        <rect x={cx - tw / 2} y={cy - th / 2} width={tw} height={th} rx={10}
+          fill="url(#table-grad-rect)"
+          stroke={isSelected ? color : '#333'}
+          strokeWidth={isSelected ? 4 : 2}
           filter="url(#shadow)"
         />
       ) : (
-        <rect
-          x={cx - tableSize / 2} y={cy - tableSize / 2}
-          width={tableSize} height={tableSize}
-          rx={10}
-          fill="url(#wood-rect)"
-          stroke={isSelected ? color : '#5D3A1A'}
-          strokeWidth={isSelected ? 4 : 3}
+        <rect x={cx - tableSize / 2} y={cy - tableSize / 2} width={tableSize} height={tableSize} rx={10}
+          fill="url(#table-grad-rect)"
+          stroke={isSelected ? color : '#333'}
+          strokeWidth={isSelected ? 4 : 2}
           filter="url(#shadow)"
         />
       )}
 
-      {/* Table number */}
+      {/* Glans op tafel */}
+      {table.shape === 'ROUND'
+        ? <ellipse cx={cx - 12} cy={cy - 14} rx={16} ry={10} fill="rgba(255,255,255,0.08)" />
+        : <rect x={cx - (tw / 2) + 8} y={cy - (th / 2) + 6} width={tw * 0.35} height={th * 0.25} rx={4} fill="rgba(255,255,255,0.07)" />
+      }
+
+      {/* Tafelnummer */}
       <text x={cx} y={cy - 6} textAnchor="middle" fill="white" fontSize={20} fontWeight="bold" style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.8))' }}>
         {table.number}
       </text>
-      <text x={cx} y={cy + 14} textAnchor="middle" fill="rgba(255,255,255,0.75)" fontSize={12}>
+      <text x={cx} y={cy + 14} textAnchor="middle" fill="rgba(255,255,255,0.6)" fontSize={12}>
         {seats}p
       </text>
 
@@ -303,15 +298,15 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
 
       {/* Defs */}
       <defs>
-        <radialGradient id="wood-round" cx="35%" cy="35%">
-          <stop offset="0%" stopColor="#D2691E" />
-          <stop offset="50%" stopColor="#A0522D" />
-          <stop offset="100%" stopColor="#654321" />
-        </radialGradient>
-        <linearGradient id="wood-rect" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#D2691E" />
-          <stop offset="40%" stopColor="#A0522D" />
-          <stop offset="100%" stopColor="#654321" />
+        <linearGradient id="table-grad-round" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#6b6b6b" />
+          <stop offset="40%" stopColor="#4a4a4a" />
+          <stop offset="100%" stopColor="#2a2a2a" />
+        </linearGradient>
+        <linearGradient id="table-grad-rect" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#6b6b6b" />
+          <stop offset="40%" stopColor="#4a4a4a" />
+          <stop offset="100%" stopColor="#2a2a2a" />
         </linearGradient>
         <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.5" />
