@@ -721,7 +721,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🔗', label: 'Bekijk je Shop', href: `/shop/${tenant}` },
               ]},
               { key: 'reservaties', icon: '📅', label: 'Reservaties', items: [
-                { icon: '📅', label: 'Reserveringen', href: `${baseUrl}/reserveringen` },
+                { icon: '📅', label: 'Restaurant Reservaties', href: `${baseUrl}/reserveringen` },
               ]},
               { key: 'personeel', icon: '👔', label: 'Personeel', items: [
                 { icon: '👤', label: 'Medewerkers', href: `${baseUrl}/personeel` },
