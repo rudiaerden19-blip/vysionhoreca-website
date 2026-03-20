@@ -932,7 +932,7 @@ export default function KassaReservationsView({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className={`flex-1 p-4 ${viewMode === 'today' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
@@ -940,41 +940,202 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'today' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredReservations.map(renderReservationCard)}
+          <div className="flex -m-4 h-full" style={{ height: 'calc(100vh - 130px)' }}>
+
+            {/* LEFT PANEL — reservatielijst */}
+            <div className="w-80 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 flex-shrink-0">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  {formatDate(today)} • {todayStats.covers} personen • {todayStats.total} reservaties
+                </p>
+              </div>
+              <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
+                {todayReservations.filter(r => r.status !== 'WAITLIST').length === 0 && (
+                  <div className="p-6 text-center text-gray-400 text-sm">Geen reservaties vandaag</div>
+                )}
+                {todayReservations.filter(r => r.status !== 'WAITLIST').map(r => {
+                  const status = STATUS_CONFIG[r.status]
+                  const isSelected = selectedReservation?.id === r.id
+                  const guest = guestProfiles.find(g => g.phone === r.guest_phone || g.email === r.guest_email)
+                  return (
+                    <div
+                      key={r.id}
+                      onClick={() => setSelectedReservation(r)}
+                      className={`px-3 py-2.5 cursor-pointer transition-colors hover:bg-gray-50 ${isSelected ? 'bg-blue-50 border-l-4 border-blue-500' : 'border-l-4 border-transparent'}`}
+                    >
+                      <div className="flex items-start gap-2.5">
+                        <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: status.color }} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-1 mb-0.5">
+                            <span className="text-sm font-bold text-gray-900">{r.reservation_time}</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0"
+                              style={{ backgroundColor: status.bgColor, color: status.color }}>
+                              {status.label}
+                            </span>
+                          </div>
+                          <p className="font-semibold text-gray-900 text-sm truncate">
+                            {r.guest_name}
+                            {guest?.isVip && <span className="ml-1 text-amber-400">★</span>}
+                          </p>
+                          <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
+                            <span className="flex items-center gap-0.5"><Users size={10} /> {r.party_size}p</span>
+                            {r.table_number && <span className="flex items-center gap-0.5"><MapPin size={10} /> T{r.table_number}</span>}
+                            {r.guest_phone && <span className="flex items-center gap-0.5"><Phone size={10} /></span>}
+                            {r.notes && <span className="flex items-center gap-0.5"><MessageSquare size={10} /></span>}
+                            {r.occasion && <span className="text-purple-400">🎉</span>}
+                          </div>
+                          {/* Quick actions */}
+                          {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
+                            <div className="flex gap-1 mt-1.5">
+                              {r.status === 'PENDING' && (
+                                <button onClick={e => { e.stopPropagation(); handleConfirm(r) }}
+                                  className="text-[10px] px-2 py-1 rounded-md bg-blue-500 text-white font-medium hover:bg-blue-600 transition-colors">
+                                  Bevestigen
+                                </button>
+                              )}
+                              {r.status === 'CONFIRMED' && (
+                                <button onClick={e => { e.stopPropagation(); handleCheckIn(r) }}
+                                  className="text-[10px] px-2 py-1 rounded-md bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors">
+                                  Check-in
+                                </button>
+                              )}
+                              <button onClick={e => { e.stopPropagation(); handleNoShow(r) }}
+                                className="text-[10px] px-2 py-1 rounded-md bg-red-100 text-red-500 font-medium hover:bg-red-200 transition-colors">
+                                No-show
+                              </button>
+                            </div>
+                          )}
+                          {r.status === 'CHECKED_IN' && (
+                            <div className="flex gap-1 mt-1.5">
+                              <button onClick={e => { e.stopPropagation(); handleStartOrder(r) }}
+                                className="text-[10px] px-2 py-1 rounded-md bg-[#3C4D6B] text-white font-medium hover:bg-[#4a5d7b] transition-colors">
+                                Naar Kassa
+                              </button>
+                              <button onClick={e => { e.stopPropagation(); handleComplete(r) }}
+                                className="text-[10px] px-2 py-1 rounded-md bg-gray-100 text-gray-500 font-medium hover:bg-gray-200 transition-colors">
+                                Afronden
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {/* Wachtlijst */}
+                {waitlistReservations.length > 0 && (
+                  <div>
+                    <div className="px-3 py-2 bg-purple-50 border-y border-purple-100">
+                      <p className="text-xs font-bold text-purple-600">WACHTLIJST ({waitlistReservations.length})</p>
+                    </div>
+                    {waitlistReservations.map(r => (
+                      <div key={r.id} onClick={() => setSelectedReservation(r)}
+                        className="px-3 py-2.5 border-l-4 border-purple-400 cursor-pointer hover:bg-purple-50 transition-colors">
+                        <div className="flex items-center justify-between mb-0.5">
+                          <span className="text-sm font-bold">{r.reservation_time}</span>
+                          {r.waitlist_position && <span className="text-xs bg-purple-100 text-purple-600 px-1.5 py-0.5 rounded-full">#{r.waitlist_position}</span>}
+                        </div>
+                        <p className="font-semibold text-sm text-gray-900 truncate">{r.guest_name}</p>
+                        <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
+                          <span>{r.party_size}p</span>
+                        </div>
+                        <button onClick={e => { e.stopPropagation(); handleConfirmFromWaitlist(r) }}
+                          className="mt-1.5 text-[10px] px-2 py-1 rounded-md bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors">
+                          Bevestigen
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* z3 - Wachtlijst sectie */}
-            {waitlistReservations.length > 0 && (
-              <div>
-                <h3 className="font-bold text-purple-600 mb-3 flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-purple-500 inline-block" />
-                  Wachtlijst ({waitlistReservations.length})
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {waitlistReservations.map((r) => (
-                    <div key={r.id} className="bg-purple-50 border border-purple-200 rounded-xl p-4 cursor-pointer hover:border-purple-400 transition-colors" onClick={() => setSelectedReservation(r)}>
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <span className="text-sm font-bold text-purple-600">{r.reservation_time}</span>
-                          {r.waitlist_position && <span className="ml-2 text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full">#{r.waitlist_position}</span>}
-                        </div>
-                        <span className="flex items-center gap-1 text-sm text-purple-500"><Users size={14} />{r.party_size}</span>
-                      </div>
-                      <p className="font-semibold text-gray-900">{r.guest_name}</p>
-                      {r.guest_phone && <p className="text-sm text-gray-500">{r.guest_phone}</p>}
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleConfirmFromWaitlist(r) }}
-                        className="mt-3 w-full py-2 rounded-lg bg-purple-500 text-white text-sm font-medium hover:bg-purple-600 transition-colors"
-                      >
-                        Bevestigen
-                      </button>
-                    </div>
-                  ))}
+            {/* RIGHT PANEL — tafelplan */}
+            <div className="flex-1 relative overflow-hidden" style={{ backgroundColor: '#e3e3e3' }}>
+              {/* Grid achtergrond */}
+              <div className="absolute inset-0 opacity-20 pointer-events-none"
+                style={{
+                  backgroundImage: 'linear-gradient(to right, #999 1px, transparent 1px), linear-gradient(to bottom, #999 1px, transparent 1px)',
+                  backgroundSize: '40px 40px',
+                }} />
+
+              {floorPlanTablesDB.length === 0 ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center bg-white/70 rounded-2xl p-8 shadow-sm">
+                    <LayoutGrid size={48} className="mx-auto text-gray-400 mb-3" />
+                    <p className="text-gray-600 font-semibold">Nog geen tafels aangemaakt</p>
+                    <p className="text-sm text-gray-400 mt-1">Maak tafels aan via Kassa → Plattegrond</p>
+                  </div>
                 </div>
-              </div>
-            )}
+              ) : (
+                <>
+                  {floorPlanTablesDB.map(table => {
+                    const tableRes = todayReservations.find(r =>
+                      r.table_number === table.number && r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
+                    )
+                    const isSelected = selectedReservation?.table_number === table.number
+                    let bgColor = '#4ade80'
+                    if (tableRes?.status === 'CHECKED_IN') bgColor = '#60a5fa'
+                    else if (tableRes?.status === 'CONFIRMED') bgColor = '#a78bfa'
+                    else if (tableRes?.status === 'PENDING') bgColor = '#fbbf24'
+
+                    const tw = table.shape === 'RECTANGLE' ? 100 : 70
+                    const th = table.shape === 'RECTANGLE' ? 50 : 70
+
+                    return (
+                      <div
+                        key={table.id}
+                        onClick={() => tableRes ? setSelectedReservation(tableRes) : null}
+                        className="absolute transition-all"
+                        style={{
+                          left: `${table.x}%`,
+                          top: `${table.y}%`,
+                          transform: `translate(-50%, -50%) rotate(${table.rotation}deg)`,
+                          cursor: tableRes ? 'pointer' : 'default',
+                          zIndex: isSelected ? 10 : 1,
+                        }}
+                      >
+                        <div
+                          className="flex flex-col items-center justify-center relative transition-all"
+                          style={{
+                            width: tw,
+                            height: th,
+                            backgroundColor: bgColor,
+                            borderRadius: table.shape === 'ROUND' ? '50%' : 10,
+                            border: isSelected ? '3px solid #1d4ed8' : '2px solid rgba(0,0,0,0.15)',
+                            boxShadow: isSelected
+                              ? '0 0 0 4px rgba(29,78,216,0.25), 0 4px 12px rgba(0,0,0,0.2)'
+                              : '0 2px 8px rgba(0,0,0,0.15)',
+                          }}
+                        >
+                          <span className="text-white text-sm font-bold drop-shadow">{table.number}</span>
+                          <span className="text-white/80 text-[10px]">{table.seats}p</span>
+                          {tableRes && (
+                            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-white shadow-md rounded-lg px-2 py-0.5 text-[10px] font-semibold text-gray-700 border border-gray-200 pointer-events-none z-10">
+                              {tableRes.guest_name} • {tableRes.reservation_time}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+
+                  {/* Legenda */}
+                  <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-xl px-4 py-2.5 flex items-center gap-4 shadow-md text-xs font-medium">
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-green-400" /><span>Vrij</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-violet-400" /><span>Gereserveerd</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-400" /><span>Bezet</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-400" /><span>Afwachting</span></div>
+                  </div>
+
+                  {/* Datum badge */}
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur rounded-xl px-3 py-1.5 shadow text-xs font-bold text-gray-600">
+                    {formatDate(today)}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         )}
 
