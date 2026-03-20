@@ -2032,117 +2032,95 @@ export default function KassaReservationsView({
 
                 {/* Sidebar — selected table detail */}
                 {selectedFloorTable && (() => {
-                  const { res, label, color, count } = getFloorTableInfo(selectedFloorTable.number)
+                  const { label, color } = getFloorTableInfo(selectedFloorTable.number)
                   const allTableRes = floorRes.filter(r => r.table_number === selectedFloorTable.number).sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                   return (
-                    <div className="w-72 flex-shrink-0 bg-white border-l border-gray-200 flex flex-col overflow-y-auto">
-                      <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+                    <div className="w-80 flex-shrink-0 flex flex-col overflow-hidden" style={{ backgroundColor: '#16213e', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+
+                      {/* Header */}
+                      <div className="p-4 flex justify-between items-center" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', borderLeft: `4px solid ${color}` }}>
                         <div>
-                          <h3 className="font-bold text-lg">Tafel {selectedFloorTable.number}</h3>
-                          <p className="text-xs text-gray-400">{selectedFloorTable.seats} plaatsen • {selectedFloorTable.shape}</p>
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <h3 className="text-white font-bold text-xl">Tafel {selectedFloorTable.number}</h3>
+                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: color }}>{label}</span>
+                          </div>
+                          <p className="text-white/40 text-xs">{selectedFloorTable.seats} plaatsen</p>
                         </div>
-                        <button onClick={() => setSelectedFloorTable(null)}
-                          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400">
-                          <X size={18} />
-                        </button>
+                        <button onClick={() => setSelectedFloorTable(null)} className="text-white/50 hover:text-white text-xl">✕</button>
                       </div>
 
-                      {/* Status badge */}
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-white text-sm font-medium" style={{ backgroundColor: color }}>
-                          <div className="w-2 h-2 rounded-full bg-white/70" />
-                          {label}
-                        </div>
+                      {/* Reservaties */}
+                      <div className="flex-1 overflow-y-auto p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        <p className="text-white/50 text-xs uppercase tracking-wider mb-3">Reservaties</p>
+                        {allTableRes.length > 0 ? (
+                          <div className="space-y-3">
+                            {allTableRes.map(r => (
+                              <div key={r.id} className="rounded-xl p-3 space-y-2" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                                <div className="flex items-center justify-between">
+                                  <p className="text-white font-bold">{r.guest_name}</p>
+                                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_CONFIG[r.status]?.color }}>
+                                    {STATUS_CONFIG[r.status]?.label || r.status}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-3 text-sm text-white/50">
+                                  <span className="flex items-center gap-1"><Clock size={12} />{r.reservation_time}</span>
+                                  <span className="flex items-center gap-1"><Users size={12} />{r.party_size}p</span>
+                                </div>
+                                {r.guest_phone && <a href={`tel:${r.guest_phone}`} className="flex items-center gap-1 text-sm text-emerald-400 hover:text-emerald-300"><Phone size={12} />{r.guest_phone}</a>}
+                                {r.notes && <p className="text-xs text-white/30 italic">{r.notes}</p>}
+                                <div className="flex flex-col gap-1.5 pt-1">
+                                  {r.status === 'PENDING' && (
+                                    <button onClick={() => handleConfirm(r)} className="w-full py-2 rounded-xl bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                                      <CheckCircle2 size={14} /> Bevestigen
+                                    </button>
+                                  )}
+                                  {r.status === 'CONFIRMED' && (
+                                    <button onClick={() => handleCheckIn(r)} className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                                      <UserCheck size={14} /> Check-in
+                                    </button>
+                                  )}
+                                  {r.status === 'CHECKED_IN' && (
+                                    <button onClick={() => handleStartOrder(r)} className="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                                      <UtensilsCrossed size={14} /> Naar Kassa
+                                    </button>
+                                  )}
+                                  {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
+                                    <button onClick={() => handleNoShow(r)} className="w-full py-1.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-2" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#f87171' }}>
+                                      <UserX size={14} /> No-show
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-white/30 text-sm text-center py-6">Geen reservatie voor {formatDate(selectedDate)}</p>
+                        )}
                       </div>
 
-                      {/* Alle reservaties voor deze tafel */}
-                      {allTableRes.length > 0 ? (
-                        <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
-                          {allTableRes.map(r => (
-                            <div key={r.id} className="p-4 space-y-2">
-                              <div className="flex items-center justify-between">
-                                <p className="font-bold text-gray-900">{r.guest_name}</p>
-                                <span className="text-xs px-2 py-0.5 rounded-full font-medium"
-                                  style={{ backgroundColor: STATUS_CONFIG[r.status]?.bgColor, color: STATUS_CONFIG[r.status]?.color }}>
-                                  {STATUS_CONFIG[r.status]?.label || r.status}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-3 text-sm text-gray-500">
-                                <span className="flex items-center gap-1"><Clock size={13} />{r.reservation_time}</span>
-                                <span className="flex items-center gap-1"><Users size={13} />{r.party_size}p</span>
-                              </div>
-                              {r.guest_phone && (
-                                <a href={`tel:${r.guest_phone}`} className="flex items-center gap-1 text-sm text-blue-500 hover:underline">
-                                  <Phone size={13} />{r.guest_phone}
-                                </a>
-                              )}
-                              {r.notes && <p className="text-xs text-gray-400 italic">{r.notes}</p>}
-                              <div className="flex flex-col gap-1.5 pt-1">
-                                {r.status === 'PENDING' && (
-                                  <button onClick={() => handleConfirm(r)}
-                                    className="w-full py-2 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
-                                    <CheckCircle2 size={14} /> Bevestigen
-                                  </button>
-                                )}
-                                {r.status === 'CONFIRMED' && (
-                                  <button onClick={() => handleCheckIn(r)}
-                                    className="w-full py-2 rounded-xl bg-emerald-500 text-white text-sm font-semibold hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2">
-                                    <UserCheck size={14} /> Check-in
-                                  </button>
-                                )}
-                                {r.status === 'CHECKED_IN' && (
-                                  <button onClick={() => handleStartOrder(r)}
-                                    className="w-full py-2 rounded-xl bg-[#3C4D6B] text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2">
-                                    <UtensilsCrossed size={14} /> Naar Kassa
-                                  </button>
-                                )}
-                                {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
-                                  <button onClick={() => handleNoShow(r)}
-                                    className="w-full py-1.5 rounded-xl bg-red-50 text-red-400 text-sm font-semibold hover:bg-red-100 transition-colors flex items-center justify-center gap-2">
-                                    <UserX size={14} /> No-show
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="p-4">
-                          <p className="text-sm text-gray-400 text-center py-4">Geen reservatie voor {formatDate(selectedDate)}</p>
-                          <button onClick={() => {
-                            setShowNewReservationModal(true)
-                            setSelectedFloorTable(null)
-                          }}
-                            className="w-full py-2.5 rounded-xl bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2">
-                            <Plus size={16} /> Reservatie aanmaken
-                          </button>
-                          <button onClick={() => deleteFloorTable(selectedFloorTable.id)}
-                            className="w-full py-2 mt-2 rounded-xl bg-red-50 text-red-400 text-sm font-semibold hover:bg-red-100 transition-colors">
-                            Tafel verwijderen
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Rotate */}
-                      <div className="px-4 py-3 border-t border-gray-100 mt-auto">
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Draaien</p>
+                      {/* Draaien */}
+                      <div className="p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                        <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
                         <div className="flex gap-2">
-                          <button onClick={async () => {
-                            const updated = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation - 45 + 360) % 360 } : t)
-                            await saveFloorPlan(updated)
-                            setSelectedFloorTable(prev => prev ? { ...prev, rotation: (prev.rotation - 45 + 360) % 360 } : null)
-                          }} className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-lg">↺</button>
-                          <button onClick={async () => {
-                            const updated = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation + 45) % 360 } : t)
-                            await saveFloorPlan(updated)
-                            setSelectedFloorTable(prev => prev ? { ...prev, rotation: (prev.rotation + 45) % 360 } : null)
-                          }} className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 font-bold text-lg">↻</button>
-                          <button onClick={async () => {
-                            const updated = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: 0 } : t)
-                            await saveFloorPlan(updated)
-                            setSelectedFloorTable(prev => prev ? { ...prev, rotation: 0 } : null)
-                          }} className="flex-1 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-semibold">Reset</button>
+                          <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation - 45 + 360) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation - 45 + 360) % 360 } : null) }}
+                            className="flex-1 py-2 rounded-lg font-bold text-lg text-white transition-colors" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>↺</button>
+                          <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation + 45) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation + 45) % 360 } : null) }}
+                            className="flex-1 py-2 rounded-lg font-bold text-lg text-white transition-colors" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>↻</button>
+                          <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: 0 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: 0 } : null) }}
+                            className="flex-1 py-2 rounded-lg text-xs font-semibold text-white transition-colors" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>Reset</button>
                         </div>
+                      </div>
+
+                      {/* Acties */}
+                      <div className="p-4 space-y-2">
+                        <button onClick={() => { setShowNewReservationModal(true); setSelectedFloorTable(null) }}
+                          className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">
+                          + Reservatie aanmaken
+                        </button>
+                        <button onClick={() => deleteFloorTable(selectedFloorTable.id)}
+                          className="w-full py-2 rounded-xl text-sm font-semibold transition-colors" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#f87171' }}>
+                          🗑 Tafel verwijderen
+                        </button>
                       </div>
                     </div>
                   )
