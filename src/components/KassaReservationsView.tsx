@@ -609,7 +609,14 @@ export default function KassaReservationsView({
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { loadReservations(); loadGuestProfiles() }, [tenant])
+  useEffect(() => {
+    loadReservations()
+    loadGuestProfiles()
+    // Auto-refresh elke 30 seconden — zorgt dat iPad altijd actuele data toont
+    const interval = setInterval(() => { loadReservations() }, 30_000)
+    return () => clearInterval(interval)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tenant])
 
   // Load floor plan tables from Supabase
   useEffect(() => {
@@ -1158,13 +1165,18 @@ export default function KassaReservationsView({
   const handleAddReservation = async (data: Omit<Reservation, 'id' | 'tenant_slug' | 'total_spent' | 'created_at'>) => {
     const { data: inserted, error } = await supabase.from('reservations').insert([{
       customer_name: data.guest_name,
+      guest_name: data.guest_name,
       customer_phone: data.guest_phone || null,
+      guest_phone: data.guest_phone || null,
       customer_email: data.guest_email || null,
+      guest_email: data.guest_email || null,
       party_size: data.party_size,
       reservation_date: data.reservation_date,
       reservation_time: data.reservation_time,
+      duration_minutes: data.duration_minutes || 90,
       table_number: data.table_number || null,
       notes: data.notes || null,
+      occasion: data.occasion || null,
       ...(data.special_requests ? { special_requests: data.special_requests } : {}),
       status: 'confirmed',
       tenant_slug: tenant,
@@ -3460,7 +3472,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     party_size: 2,
     reservation_date: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` })(),
     reservation_time: '19:00',
-    duration_minutes: defaultDurationMinutes,
+    duration_minutes: defaultDurationMinutes || 90,
     table_number: '',
     notes: '',
     special_requests: '',
@@ -3492,7 +3504,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
   // Zoek automatisch een vrije tafel voor de gegeven datum/tijd/groep
   const autoAssignTable = (): string => {
     const startMin = parseInt(formData.reservation_time.split(':')[0]) * 60 + parseInt(formData.reservation_time.split(':')[1])
-    const endMin = startMin + formData.duration_minutes
+    const endMin = startMin + (formData.duration_minutes || 90)
     // Reservaties die overlappen op dezelfde dag
     const busyTables = new Set(
       reservations
@@ -3550,7 +3562,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
   // Bereken welke tafels bezet zijn op het gekozen tijdstip
   const getTableStatus = (tableNum: string | number): { bezet: boolean; door?: string; tot?: string } => {
     const startMin = parseInt(formData.reservation_time.split(':')[0]) * 60 + parseInt(formData.reservation_time.split(':')[1])
-    const endMin = startMin + formData.duration_minutes
+    const endMin = startMin + (formData.duration_minutes || 90)
     const conflict = reservations.find(r =>
       r.reservation_date === formData.reservation_date &&
       r.status !== 'CANCELLED' &&
