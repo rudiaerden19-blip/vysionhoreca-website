@@ -1165,11 +1165,8 @@ export default function KassaReservationsView({
   const handleAddReservation = async (data: Omit<Reservation, 'id' | 'tenant_slug' | 'total_spent' | 'created_at'>) => {
     const { data: inserted, error } = await supabase.from('reservations').insert([{
       customer_name: data.guest_name,
-      guest_name: data.guest_name,
       customer_phone: data.guest_phone || null,
-      guest_phone: data.guest_phone || null,
       customer_email: data.guest_email || null,
-      guest_email: data.guest_email || null,
       party_size: data.party_size,
       reservation_date: data.reservation_date,
       reservation_time: data.reservation_time,
