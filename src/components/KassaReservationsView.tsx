@@ -1825,11 +1825,12 @@ export default function KassaReservationsView({
           const totalSlots = (END_MIN - START_MIN) / 30
           const SLOT_W = 0 // niet gebruikt — slots vullen beschikbare breedte
           const timeSlots: string[] = []
-          for (let m = START_MIN; m <= END_MIN; m += 30) {
+          for (let m = START_MIN; m < END_MIN; m += 30) {
             const h = Math.floor(m / 60).toString().padStart(2, '0')
             const min = (m % 60).toString().padStart(2, '0')
             timeSlots.push(`${h}:${min}`)
           }
+          // totalSlots = 24 (10:00-21:30), range = 720min → perfecte uitlijning
 
           // Tables to show: floor plan tables first, then any table in reservations
           const tableNumbers = floorPlanTablesDB.length > 0
@@ -1893,12 +1894,14 @@ export default function KassaReservationsView({
                   <div style={{ width: LABEL_W, flexShrink: 0 }} className="border-r border-orange-400 flex items-center px-3">
                     <span className="text-base font-bold text-white">Tafel</span>
                   </div>
-                  <div className="flex flex-1">
+                  <div className="flex flex-1 relative">
                     {timeSlots.map((t, i) => (
                       <div key={t} className="flex-1 border-r border-orange-400 flex items-center justify-center">
                         {i % 2 === 0 && <span className="text-base font-bold text-white">{t}</span>}
                       </div>
                     ))}
+                    {/* 22:00 eindlabel — vast rechts */}
+                    <span className="absolute right-1 top-1/2 -translate-y-1/2 text-base font-bold text-white">22:00</span>
                   </div>
                 </div>
 
@@ -1933,13 +1936,17 @@ export default function KassaReservationsView({
                           if (startMin >= END_MIN || startMin + dur <= START_MIN) return null
                           const leftPct = Math.max(0, (startMin - START_MIN) / totalRange * 100)
                           const widthPct = Math.min(dur / totalRange * 100, 100 - leftPct)
+                          const endMin = startMin + dur
+                          const endH = Math.floor(endMin / 60).toString().padStart(2, '0')
+                          const endM = (endMin % 60).toString().padStart(2, '0')
+                          const endTime = `${endH}:${endM}`
                           return (
                             <div key={r.id}
                               onClick={() => setSelectedReservation(r)}
-                              className="absolute top-2 bottom-2 rounded-lg cursor-pointer flex flex-col justify-center px-2 overflow-hidden hover:opacity-90 transition-opacity"
+                              className="absolute top-1 bottom-1 rounded-lg cursor-pointer flex flex-col justify-center px-2 overflow-hidden hover:opacity-90 transition-opacity"
                               style={{ left: `${leftPct}%`, width: `calc(${widthPct}% - 4px)`, backgroundColor: '#1e3a8a', borderLeft: '3px solid #1e2f6e', zIndex: 2 }}>
                               <span className="text-white text-sm font-bold truncate">{r.guest_name}</span>
-                              <span className="text-white/80 text-sm truncate">{r.reservation_time} • {r.party_size}p</span>
+                              <span className="text-white/80 text-xs truncate">{r.reservation_time} → {endTime} · {r.party_size}p</span>
                             </div>
                           )
                         })}
