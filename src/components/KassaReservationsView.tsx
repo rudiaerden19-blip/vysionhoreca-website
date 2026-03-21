@@ -3225,6 +3225,7 @@ export default function KassaReservationsView({
           defaultDurationMinutes={reservationSettings.defaultDurationMinutes}
           maxPartySize={reservationSettings.maxPartySize}
           reservations={reservations}
+          shifts={reservationSettings.shifts || []}
         />
       )}
 
@@ -3622,9 +3623,10 @@ interface NewReservationModalProps {
   defaultDurationMinutes: number
   maxPartySize: number
   reservations: Reservation[]
+  shifts: Shift[]
 }
 
-function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize, reservations }: NewReservationModalProps) {
+function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize, reservations, shifts }: NewReservationModalProps) {
   const [formData, setFormData] = useState({
     guest_first_name: '',
     guest_last_name: '',
@@ -3654,6 +3656,12 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     if (!formData.guest_email.trim()) newErrors.guest_email = 'Email is verplicht'
     if (!formData.reservation_date) newErrors.reservation_date = 'Datum is verplicht'
     if (!formData.reservation_time) newErrors.reservation_time = 'Tijd is verplicht'
+    // Blokkeer als buiten openingstijden
+    const activeShiftsV = shifts.filter(s => s.isActive)
+    if (formData.reservation_time && activeShiftsV.length > 0) {
+      const inShift = activeShiftsV.some(s => formData.reservation_time >= s.startTime && formData.reservation_time <= s.endTime)
+      if (!inShift) newErrors.reservation_time = 'Buiten openingsuren — kies een andere tijd'
+    }
     if (formData.party_size < 1) newErrors.party_size = 'Min. 1 persoon'
     if (!formData.duration_minutes || formData.duration_minutes < 1) newErrors.duration_minutes = 'Duur is verplicht'
     if (!formData.occasion || formData.occasion === '') newErrors.occasion = 'Gelegenheid is verplicht'
@@ -3713,10 +3721,16 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
   }
 
   const timeSlots: string[] = []
-  for (let h = 11; h <= 22; h++) {
+  for (let h = 10; h <= 23; h++) {
     timeSlots.push(`${h.toString().padStart(2, '0')}:00`)
-    timeSlots.push(`${h.toString().padStart(2, '0')}:30`)
+    if (h < 23) timeSlots.push(`${h.toString().padStart(2, '0')}:30`)
   }
+
+  // Controleer of gekozen tijd binnen openingstijden (actieve shifts) valt
+  const activeShifts = shifts.filter(s => s.isActive)
+  const isOutsideHours = formData.reservation_time && activeShifts.length > 0
+    ? !activeShifts.some(s => formData.reservation_time >= s.startTime && formData.reservation_time <= s.endTime)
+    : false
 
   const availableTables = tables.filter(t => t.seats >= formData.party_size)
 
@@ -3813,11 +3827,25 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
               <label className="block text-sm font-medium mb-1">Tijd {req()}</label>
               <select value={formData.reservation_time}
                 onChange={(e) => setFormData({ ...formData, reservation_time: e.target.value })}
-                className={inputCls('reservation_time')}>
+                className={`${inputCls('reservation_time')} ${isOutsideHours ? 'border-red-500 bg-red-50' : ''}`}>
                 {timeSlots.map((time) => (
                   <option key={time} value={time}>{time}</option>
                 ))}
               </select>
+              {isOutsideHours && (
+                <div className="mt-2 flex items-start gap-2 px-3 py-2 bg-red-50 border border-red-300 rounded-lg">
+                  <span className="text-red-500 text-lg leading-none mt-0.5">⚠️</span>
+                  <p className="text-red-600 text-sm font-semibold">
+                    U boekt buiten de openingsuren. Maak een andere keuze.
+                    {activeShifts.length > 0 && (
+                      <span className="block text-xs font-normal mt-0.5 text-red-500">
+                        Openingsuren: {activeShifts.map(s => `${s.name} ${s.startTime}–${s.endTime}`).join(', ')}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
+              {errors.reservation_time && <p className="text-red-500 text-xs mt-1">{errors.reservation_time}</p>}
             </div>
           </div>
 
