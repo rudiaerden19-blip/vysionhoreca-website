@@ -556,6 +556,8 @@ export default function KassaReservationsView({
       guest_email: (r.guest_email || r.customer_email || '') as string,
       reservation_time: ((r.reservation_time as string) || '').substring(0, 5),
       status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
+      // Altijd string zodat vergelijking met table.number nooit faalt
+      table_number: r.table_number != null ? String(r.table_number) : undefined,
     })) as Reservation[])
     setLoading(false)
   }
@@ -1582,9 +1584,9 @@ export default function KassaReservationsView({
                 <>
                   {floorPlanTablesDB.map(table => {
                     const tableRes = todayReservations.find(r =>
-                      r.table_number === table.number && r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
+                      String(r.table_number) === String(table.number) && r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
                     )
-                    const isSelected = selectedReservation?.table_number === table.number
+                    const isSelected = String(selectedReservation?.table_number) === String(table.number)
                     let statusColor = '#4ade80'
                     if (tableRes?.status === 'CHECKED_IN') statusColor = '#3b82f6'
                     else if (tableRes?.status === 'CONFIRMED') statusColor = '#8b5cf6'
@@ -1608,7 +1610,7 @@ export default function KassaReservationsView({
                           statusColor={statusColor}
                           isSelected={isSelected}
                           guests={todayReservations
-                            .filter(r => r.table_number === table.number && r.status !== 'CANCELLED' && r.status !== 'COMPLETED')
+                            .filter(r => String(r.table_number) === String(table.number) && r.status !== 'CANCELLED' && r.status !== 'COMPLETED')
                             .sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                             .map(r => ({ name: r.guest_name, time: r.reservation_time }))
                           }
@@ -2027,7 +2029,7 @@ export default function KassaReservationsView({
             r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
           )
           const getFloorTableInfo = (tableNum: string) => {
-            const all = floorRes.filter(r => r.table_number === tableNum)
+            const all = floorRes.filter(r => String(r.table_number) === String(tableNum))
             if (all.length === 0) return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res: null, count: 0 }
             // Toon de eerstvolgende (gesorteerd op tijd)
             const res = all.sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))[0]
@@ -2222,7 +2224,7 @@ export default function KassaReservationsView({
                             statusColor={borderColor}
                             isSelected={isSelected}
                             guests={floorRes
-                              .filter(r => r.table_number === table.number)
+                              .filter(r => String(r.table_number) === String(table.number))
                               .sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                               .map(r => ({ name: r.guest_name, time: r.reservation_time }))
                             }
@@ -2237,7 +2239,7 @@ export default function KassaReservationsView({
                 {/* Sidebar — selected table detail (overlay, werkt op desktop + iPad) */}
                 {selectedFloorTable && (() => {
                   const { label, color } = getFloorTableInfo(selectedFloorTable.number)
-                  const allTableRes = floorRes.filter(r => r.table_number === selectedFloorTable.number).sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
+                  const allTableRes = floorRes.filter(r => String(r.table_number) === String(selectedFloorTable.number)).sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                   return (
                     <div className="absolute right-0 top-0 bottom-0 flex flex-col overflow-hidden z-20 shadow-2xl" style={{ width: 'min(320px, 85vw)', backgroundColor: '#16213e', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
 
