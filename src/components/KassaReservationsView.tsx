@@ -640,7 +640,7 @@ export default function KassaReservationsView({
   const [timelineDate, setTimelineDate] = useState(new Date().toISOString().split('T')[0])
   const [timelineNow, setTimelineNow] = useState(new Date())
   const [calMonth, setCalMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }))
-  const [timeShift, setTimeShift] = useState<'dag'|'avond'>('dag')
+  const [timeShift, setTimeShift] = useState<'dag'|'avond'>(() => new Date().getHours() >= 17 ? 'avond' : 'dag')
   const [calOpen, setCalOpen] = useState(true)
   const [showSearchPopup, setShowSearchPopup] = useState(false)
   const [searchPopupQuery, setSearchPopupQuery] = useState('')
