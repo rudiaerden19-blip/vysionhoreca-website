@@ -689,7 +689,7 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
         const timeW = 38  // vaste breedte voor tijdkolom
         const nameW = labelW - timeW - 20  // resterende breedte voor naam
         const totalH = guests.length * lineH + 10
-        const startY = cy + th / 2 + 14
+        const startY = cy + (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + gap + chairH + 10
         return (
           <>
             <defs>
