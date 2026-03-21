@@ -1380,6 +1380,9 @@ export default function KassaReservationsView({
     addReservationInProgress.current = true
     try {
     const { data: inserted, error } = await supabase.from('reservations').insert([{
+      guest_name: data.guest_name,
+      guest_phone: data.guest_phone || null,
+      guest_email: data.guest_email || null,
       customer_name: data.guest_name,
       customer_phone: data.guest_phone || null,
       customer_email: data.guest_email || null,
