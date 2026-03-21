@@ -1828,7 +1828,7 @@ export default function KassaReservationsView({
 
         {!loading && viewMode === 'timeline' && (() => {
           // Time slots from 10:00 to 22:00 — geen horizontaal scrollen
-          const ROW_H = 80
+          const ROW_H = 60
           const LABEL_W = 90
           const START_MIN = timeShift === 'dag' ? 10 * 60 : 17 * 60  // dag=10:00, avond=17:00
           const END_MIN   = timeShift === 'dag' ? 16 * 60 : 23 * 60  // dag=16:00, avond=23:00
@@ -1970,16 +1970,16 @@ export default function KassaReservationsView({
                               return (
                                 <div key={r.id} onClick={() => setSelectedReservation(r)}
                                   className="absolute cursor-pointer flex items-center hover:brightness-110 transition-all"
-                                  style={{ left:`${leftPct}%`, width:`calc(${widthPct}% - 2px)`, top:'50%', transform:'translateY(-50%)', height:'28px', zIndex:2 }}>
+                                  style={{ left:`${leftPct}%`, width:`calc(${widthPct}% - 2px)`, top:'6px', bottom:'6px', height:'auto', zIndex:2 }}>
                                   <div className="flex items-center h-full w-full"
                                     style={{
                                       backgroundColor: BLOCK_COLOR,
-                                      clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%)',
+                                      clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)',
                                     }}>
-                                    <div className="flex-shrink-0 w-5 h-5 ml-1.5 rounded-full bg-white/30 flex items-center justify-center">
-                                      <span className="text-white text-[10px] font-black leading-none">{r.table_number||'?'}</span>
+                                    <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
+                                      <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
                                     </div>
-                                    <span className="text-white text-xs font-semibold ml-1.5 truncate pr-3">{r.guest_name}</span>
+                                    <span className="text-white text-base font-bold ml-2 truncate pr-5">{r.guest_name}</span>
                                   </div>
                                 </div>
                               )
