@@ -2192,10 +2192,10 @@ export default function KassaReservationsView({
                       <div className="p-4 flex justify-between items-center" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', borderLeft: `4px solid ${color}` }}>
                         <div>
                           <div className="flex items-center gap-2 mb-0.5">
-                            <h3 className="text-white font-bold text-xl">Tafel {selectedFloorTable.number}</h3>
-                            <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: color }}>{label}</span>
+                            <h3 className="text-white font-bold text-3xl">Tafel {selectedFloorTable.number}</h3>
+                            <span className="text-base font-bold px-3 py-1 rounded-full text-white" style={{ backgroundColor: color }}>{label}</span>
                           </div>
-                          <p className="text-white/40 text-xs">{selectedFloorTable.seats} plaatsen</p>
+                          <p className="text-white/60 text-base font-medium">{selectedFloorTable.seats} plaatsen</p>
                         </div>
                         <button onClick={() => setSelectedFloorTable(null)} className="text-white/50 hover:text-white text-xl">✕</button>
                       </div>
