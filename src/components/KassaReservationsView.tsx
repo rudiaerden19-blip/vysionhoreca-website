@@ -814,6 +814,7 @@ export default function KassaReservationsView({
         const newJson = JSON.stringify(mapped.map(sig))
         return prevJson === newJson ? prev : mapped
       })
+      loadGuestProfiles()
     }, 60_000)
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1396,6 +1397,7 @@ export default function KassaReservationsView({
     if (error) { toast.error('Fout bij aanmaken: ' + error.message); return }
 
     await loadReservations()
+    await loadGuestProfiles()
     toast.success(`Reservatie voor ${data.guest_name} aangemaakt!`)
     setShowNewReservationModal(false)
 
@@ -1660,7 +1662,7 @@ export default function KassaReservationsView({
             ].map((view) => (
               <button
                 key={view.id}
-                onClick={() => setViewMode(view.id as ViewMode)}
+                onClick={() => { setViewMode(view.id as ViewMode); setShowResCalendar(false) }}
                 className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap min-w-[44px] ${
                   viewMode === view.id
                     ? 'bg-[#3C4D6B] text-white'
