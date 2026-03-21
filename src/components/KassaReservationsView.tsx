@@ -33,6 +33,9 @@ import {
   Send,
   Lock,
   LockOpen,
+  Eye,
+  EyeOff,
+  Calendar,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { getAuthHeaders } from '@/lib/auth-headers'
@@ -1907,6 +1910,18 @@ export default function KassaReservationsView({
                       Avond
                     </button>
                   </div>
+                  {/* Kalender toon/verberg knop */}
+                  <button
+                    onClick={() => setCalOpen(o => !o)}
+                    title={calOpen ? 'Kalender verbergen' : 'Kalender tonen'}
+                    className={`ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-bold text-sm transition-colors
+                      ${calOpen
+                        ? 'bg-orange-500 border-orange-500 text-white hover:bg-orange-600'
+                        : 'bg-gray-200 border-gray-300 text-gray-400 hover:bg-gray-300'
+                      }`}>
+                    <Calendar size={16}/>
+                    {calOpen ? <Eye size={16}/> : <EyeOff size={16}/>}
+                  </button>
                   <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
                 </div>
 
