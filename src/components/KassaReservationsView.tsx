@@ -149,6 +149,227 @@ interface KassaReservationsViewProps {
   onStartOrder: (tableNr: string) => void
 }
 
+// ---- Rapporten View ----
+function RapportenView({ reservations, guestProfiles }: { reservations: Reservation[], guestProfiles: GuestProfile[] }) {
+  const now = new Date()
+  const [rMonth, setRMonth] = useState(now.getMonth())
+  const [rYear, setRYear] = useState(now.getFullYear())
+
+  const MONTHS = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
+
+  // Filter reserveringen op geselecteerde maand
+  const from = `${rYear}-${String(rMonth+1).padStart(2,'0')}-01`
+  const to = `${rYear}-${String(rMonth+1).padStart(2,'0')}-${String(new Date(rYear, rMonth+1, 0).getDate()).padStart(2,'0')}`
+  const filtered = reservations.filter(r => r.reservation_date >= from && r.reservation_date <= to)
+  const active = filtered.filter(r => r.status !== 'CANCELLED')
+  const total = active.length
+  const cancelled = filtered.filter(r => r.status === 'CANCELLED').length
+  const noShows = filtered.filter(r => r.status === 'NO_SHOW').length
+  const avgGroup = total > 0 ? (active.reduce((s, r) => s + r.party_size, 0) / total) : 0
+
+  // Terugkerende gasten = gasten met >1 reservering ooit
+  const returningPct = guestProfiles.length > 0
+    ? Math.round((guestProfiles.filter(g => g.totalVisits > 1).length / guestProfiles.length) * 100)
+    : 0
+  const cancelPct = filtered.length > 0 ? Math.round((cancelled / filtered.length) * 100) : 0
+  const noShowPct = total > 0 ? Math.round((noShows / total) * 100) : 0
+
+  // Bouw dagseries op voor grafieken
+  const daysInMonth = new Date(rYear, rMonth+1, 0).getDate()
+  const dayLabels = Array.from({length: daysInMonth}, (_, i) => {
+    const d = new Date(rYear, rMonth, i+1)
+    return `${['Zo','Ma','Di','Wo','Do','Vr','Za'][d.getDay()]} ${i+1}`
+  })
+  const guestsByDay = Array.from({length: daysInMonth}, (_, i) => {
+    const d = `${rYear}-${String(rMonth+1).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`
+    return active.filter(r => r.reservation_date === d).reduce((s, r) => s + r.party_size, 0)
+  })
+  const resByDay = Array.from({length: daysInMonth}, (_, i) => {
+    const d = `${rYear}-${String(rMonth+1).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`
+    return active.filter(r => r.reservation_date === d).length
+  })
+
+  const maxGuests = Math.max(...guestsByDay, 1)
+  const maxRes = Math.max(...resByDay, 1)
+
+  const totalGuests = guestsByDay.reduce((s, v) => s + v, 0)
+  const totalRes = resByDay.reduce((s, v) => s + v, 0)
+
+  // SVG area chart
+  const AreaChart = ({ data, max, color }: { data: number[], max: number, color: string }) => {
+    const W = 1000, H = 140, PAD = 8
+    const pts = data.map((v, i) => {
+      const x = PAD + (i / (data.length - 1 || 1)) * (W - PAD*2)
+      const y = H - PAD - ((v / max) * (H - PAD*2))
+      return `${x},${y}`
+    })
+    const linePath = `M ${pts.join(' L ')}`
+    const areaPath = `M ${PAD},${H-PAD} L ${pts.join(' L ')} L ${W-PAD},${H-PAD} Z`
+    return (
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{height: 150}}>
+        <defs>
+          <linearGradient id={`grad-${color}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.25"/>
+            <stop offset="100%" stopColor={color} stopOpacity="0.02"/>
+          </linearGradient>
+        </defs>
+        {/* Grid lijnen */}
+        {[0.25,0.5,0.75,1].map(f => (
+          <line key={f} x1={PAD} y1={H-PAD-(f*(H-PAD*2))} x2={W-PAD} y2={H-PAD-(f*(H-PAD*2))}
+            stroke="#e5e7eb" strokeWidth="1"/>
+        ))}
+        {/* Area */}
+        <path d={areaPath} fill={`url(#grad-${color})`}/>
+        {/* Lijn */}
+        <path d={linePath} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round"/>
+        {/* Punten */}
+        {pts.map((pt, i) => data[i] > 0 && (
+          <circle key={i} cx={Number(pt.split(',')[0])} cy={Number(pt.split(',')[1])} r="3.5" fill={color}/>
+        ))}
+      </svg>
+    )
+  }
+
+  // X-as labels (elke ~5 dagen)
+  const xLabels = dayLabels.filter((_, i) => i % Math.ceil(daysInMonth / 10) === 0 || i === daysInMonth - 1)
+  const xIdxs = Array.from({length: daysInMonth}, (_,i) => i).filter((i) => i % Math.ceil(daysInMonth / 10) === 0 || i === daysInMonth - 1)
+
+  // Status verdeling
+  const statusData = [
+    { label: 'Bevestigd', status: 'CONFIRMED', color: '#3b82f6' },
+    { label: 'Ingecheckt', status: 'CHECKED_IN', color: '#22c55e' },
+    { label: 'Afgerond', status: 'COMPLETED', color: '#6b7280' },
+    { label: 'No-show', status: 'NO_SHOW', color: '#ef4444' },
+    { label: 'Geannuleerd', status: 'CANCELLED', color: '#d1d5db' },
+  ]
+
+  return (
+    <div className="space-y-5 pb-8">
+      {/* Filter balk */}
+      <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-wrap items-center gap-4">
+        <div>
+          <label className="text-xs text-gray-500 block mb-1">Datumbereik</label>
+          <div className="flex items-center gap-2">
+            <select value={rMonth} onChange={e => setRMonth(Number(e.target.value))}
+              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white outline-none focus:border-orange-400">
+              {MONTHS.map((m, i) => <option key={i} value={i}>{m}</option>)}
+            </select>
+            <select value={rYear} onChange={e => setRYear(Number(e.target.value))}
+              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white outline-none focus:border-orange-400">
+              {[2024,2025,2026,2027].map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="h-8 w-px bg-gray-200 hidden sm:block"/>
+        <div className="text-sm text-gray-500">
+          <span className="font-semibold text-gray-800">{total}</span> reservaties &nbsp;·&nbsp;
+          <span className="font-semibold text-gray-800">{totalGuests}</span> gasten in {MONTHS[rMonth]} {rYear}
+        </div>
+      </div>
+
+      {/* KPI kaarten */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: 'Terugkerende gasten', value: `${returningPct}%`, sub: 'van alle gasten', color: 'text-gray-800' },
+          { label: 'Annuleringen', value: `${cancelPct}%`, sub: `${cancelled} geannuleerd`, color: cancelPct > 20 ? 'text-red-500' : 'text-gray-800' },
+          { label: 'No-shows', value: `${noShowPct}%`, sub: `${noShows} no-show`, color: noShowPct > 10 ? 'text-red-500' : 'text-gray-800' },
+          { label: 'Gem. groepsgrootte', value: avgGroup > 0 ? avgGroup.toFixed(1) : '—', sub: 'personen per reservatie', color: 'text-gray-800' },
+        ].map(({ label, value, sub, color }) => (
+          <div key={label} className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{label}</p>
+            <p className={`text-3xl font-bold mb-1 ${color}`}>{value}</p>
+            <p className="text-xs text-gray-400">{sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Gasten per dag */}
+      <div className="bg-white border border-gray-200 rounded-xl p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h4 className="font-bold text-gray-800">Gasten per dag</h4>
+            <p className="text-xs text-gray-400 mt-0.5">{MONTHS[rMonth]} {rYear}</p>
+          </div>
+          <span className="text-sm font-semibold text-gray-500">Totaal: {totalGuests}</span>
+        </div>
+        <AreaChart data={guestsByDay} max={maxGuests} color="#f97316"/>
+        {/* X-as labels */}
+        <div className="flex justify-between mt-1 px-2">
+          {xIdxs.map(i => (
+            <span key={i} className="text-xs text-gray-400">{dayLabels[i]}</span>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 mt-3">
+          <div className="w-3 h-3 rounded-full bg-orange-400"/>
+          <span className="text-xs text-gray-500">Handmatig / kassa</span>
+        </div>
+      </div>
+
+      {/* Reserveringen per dag */}
+      <div className="bg-white border border-gray-200 rounded-xl p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h4 className="font-bold text-gray-800">Reserveringen per dag</h4>
+            <p className="text-xs text-gray-400 mt-0.5">{MONTHS[rMonth]} {rYear}</p>
+          </div>
+          <span className="text-sm font-semibold text-gray-500">Totaal: {totalRes}</span>
+        </div>
+        <AreaChart data={resByDay} max={maxRes} color="#3b82f6"/>
+        <div className="flex justify-between mt-1 px-2">
+          {xIdxs.map(i => (
+            <span key={i} className="text-xs text-gray-400">{dayLabels[i]}</span>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 mt-3">
+          <div className="w-3 h-3 rounded-full bg-blue-400"/>
+          <span className="text-xs text-gray-500">Handmatig / kassa</span>
+        </div>
+      </div>
+
+      {/* Status verdeling + Top gasten */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <h4 className="font-bold text-gray-800 mb-4">Status verdeling</h4>
+          <div className="space-y-3">
+            {statusData.map(({ label, status, color }) => {
+              const count = filtered.filter(r => r.status === status).length
+              const pct = filtered.length > 0 ? (count / filtered.length) * 100 : 0
+              return (
+                <div key={status} className="flex items-center gap-3">
+                  <span className="w-24 text-sm text-gray-600 shrink-0">{label}</span>
+                  <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full transition-all" style={{width:`${pct}%`, backgroundColor: color}}/>
+                  </div>
+                  <span className="w-8 text-right text-sm font-semibold text-gray-700">{count}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-5">
+          <h4 className="font-bold text-gray-800 mb-4">Top 5 meest terugkerende gasten</h4>
+          <div className="space-y-3">
+            {[...guestProfiles].sort((a,b) => b.totalVisits - a.totalVisits).slice(0,5).map((g, i) => (
+              <div key={g.id} className="flex items-center gap-3">
+                <span className="w-6 h-6 rounded-full bg-orange-50 border border-orange-200 flex items-center justify-center text-xs font-bold text-orange-600 shrink-0">{i+1}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm text-gray-800 truncate">{g.name}</p>
+                  <div className="h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
+                    <div className="h-full bg-orange-400 rounded-full" style={{width:`${Math.min(100,(g.totalVisits/([...guestProfiles].sort((a,b)=>b.totalVisits-a.totalVisits)[0]?.totalVisits||1))*100)}%`}}/>
+                  </div>
+                </div>
+                <span className="text-sm font-semibold text-gray-600 shrink-0">{g.totalVisits}x</span>
+              </div>
+            ))}
+            {guestProfiles.length === 0 && <p className="text-gray-400 text-sm text-center py-4">Nog geen gastdata</p>}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ---- Contacts / Gasten tabel view — exact zoals screenshot 2 ----
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
 
@@ -2946,77 +3167,7 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'stats' && (
-          <div className="space-y-6">
-            <h3 className="text-lg font-bold">📊 Reservatie Rapporten</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <p className="text-sm text-gray-400 mb-1">No-show Rate</p>
-                <p className="text-3xl font-bold text-red-400">{getNoShowRate()}%</p>
-                <p className="text-xs text-gray-400 mt-1">Totaal van alle reservaties</p>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <p className="text-sm text-gray-400 mb-1">Covers Vandaag</p>
-                <p className="text-3xl font-bold text-green-500">{getTodayCovers()}</p>
-                <p className="text-xs text-gray-400 mt-1">Aantal gasten verwacht</p>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <p className="text-sm text-gray-400 mb-1">Totaal Reservaties</p>
-                <p className="text-3xl font-bold">{reservations.length}</p>
-                <p className="text-xs text-gray-400 mt-1">Alle tijd</p>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <p className="text-sm text-gray-400 mb-1">Omzet</p>
-                <p className="text-3xl font-bold text-green-500">
-                  €{reservations.filter(r => r.status === 'COMPLETED').reduce((s, r) => s + (r.total_spent || 0), 0).toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-400 mt-1">Afgeronde reservaties</p>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h4 className="font-bold mb-4">Status Overzicht</h4>
-              <div className="space-y-3">
-                {[
-                  { status: 'CONFIRMED', label: 'Bevestigd', color: '#3b82f6' },
-                  { status: 'CHECKED_IN', label: 'Ingecheckt', color: '#22c55e' },
-                  { status: 'COMPLETED', label: 'Afgerond', color: '#6b7280' },
-                  { status: 'NO_SHOW', label: 'No-show', color: '#ef4444' },
-                  { status: 'CANCELLED', label: 'Geannuleerd', color: '#9ca3af' },
-                ].map(({ status, label, color }) => {
-                  const count = reservations.filter(r => r.status === status).length
-                  const percentage = reservations.length > 0 ? (count / reservations.length) * 100 : 0
-                  return (
-                    <div key={status} className="flex items-center gap-3">
-                      <span className="w-24 text-sm">{label}</span>
-                      <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all" style={{ width: `${percentage}%`, backgroundColor: color }} />
-                      </div>
-                      <span className="w-12 text-right text-sm font-medium">{count}</span>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h4 className="font-bold mb-4">🏆 Top 5 Gasten (Omzet)</h4>
-              <div className="space-y-3">
-                {guestProfiles.sort((a, b) => b.totalSpent - a.totalSpent).slice(0, 5).map((guest, index) => (
-                  <div key={guest.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                    <div className="flex items-center gap-3">
-                      <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold">{index + 1}</span>
-                      <div>
-                        <p className="font-medium">{guest.name}</p>
-                        <p className="text-xs text-gray-400">{guest.totalVisits} bezoeken</p>
-                      </div>
-                    </div>
-                    <span className="font-bold text-green-500">€{guest.totalSpent.toFixed(2)}</span>
-                  </div>
-                ))}
-                {guestProfiles.length === 0 && <p className="text-gray-400 text-center py-4">Nog geen gastdata</p>}
-              </div>
-            </div>
-          </div>
+          <RapportenView reservations={reservations} guestProfiles={guestProfiles} />
         )}
 
         {!loading && viewMode === 'settings' && (
