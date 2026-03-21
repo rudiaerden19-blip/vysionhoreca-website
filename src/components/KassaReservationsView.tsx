@@ -313,18 +313,29 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
       {guests && guests.length > 0 && (() => {
         const lineH = 22
         const labelW = Math.max(120, tw * 0.9)
+        const timeW = 38  // vaste breedte voor tijdkolom
+        const nameW = labelW - timeW - 20  // resterende breedte voor naam
         const totalH = guests.length * lineH + 10
         const startY = cy + th / 2 + 14
         return (
           <>
+            <defs>
+              <clipPath id={`nameClip-${table.id}`}>
+                <rect x={cx - labelW / 2 + 8} y={startY} width={nameW} height={totalH} />
+              </clipPath>
+            </defs>
             <rect x={cx - labelW / 2} y={startY} width={labelW} height={totalH} rx={10}
               fill="white" style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.22))' }} />
             {guests.map((g, i) => (
               <g key={i}>
-                <text x={cx - labelW / 2 + 10} y={startY + 17 + i * lineH} fill="#111827" fontSize={12} fontWeight="700">
+                <text
+                  x={cx - labelW / 2 + 8} y={startY + 17 + i * lineH}
+                  fill="#111827" fontSize={12} fontWeight="700"
+                  clipPath={`url(#nameClip-${table.id})`}
+                >
                   {g.name}
                 </text>
-                <text x={cx + labelW / 2 - 10} y={startY + 17 + i * lineH} textAnchor="end" fill="#6b7280" fontSize={11}>
+                <text x={cx + labelW / 2 - 6} y={startY + 17 + i * lineH} textAnchor="end" fill="#6b7280" fontSize={11}>
                   {g.time}
                 </text>
               </g>
@@ -3511,6 +3522,12 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     const assignedTable = rest.table_number || autoAssignTable()
     if (!assignedTable) {
       alert('Geen vrije tafel beschikbaar voor dit tijdstip en deze groepsgrootte.')
+      return
+    }
+    // Dubbele boeking check — ook bij manuele tafelselectie
+    const conflict = getTableStatus(assignedTable)
+    if (conflict.bezet) {
+      alert(`Tafel ${assignedTable} is al bezet op dit tijdstip (${conflict.door}, t/m ${conflict.tot}). Kies een andere tafel.`)
       return
     }
     onSave({
