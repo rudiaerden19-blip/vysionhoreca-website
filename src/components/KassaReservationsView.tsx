@@ -1296,10 +1296,10 @@ export default function KassaReservationsView({
         <div className="flex items-center gap-3">
           <div className="flex bg-gray-100 rounded-xl p-1 overflow-x-auto">
             {[
-              { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} /> },
+              { id: 'floorplan', label: 'Reservaties', icon: <MapPin size={16} /> },
+              { id: 'list', label: 'Lijst', icon: <List size={16} /> },
               { id: 'timeline', label: 'Tijdlijn', icon: <LayoutGrid size={16} /> },
               { id: 'month', label: 'Maand', icon: <CalendarDays size={16} /> },
-              { id: 'list', label: 'Lijst', icon: <List size={16} /> },
               { id: 'guests', label: 'Gasten', icon: <Users size={16} /> },
               { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} /> },
               { id: 'settings', label: 'Instellingen', icon: <Settings size={16} /> },
