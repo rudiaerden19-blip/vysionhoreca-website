@@ -31,6 +31,8 @@ import {
   X,
   UtensilsCrossed,
   Send,
+  Lock,
+  LockOpen,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { getAuthHeaders } from '@/lib/auth-headers'
@@ -452,6 +454,9 @@ export default function KassaReservationsView({
   const [addFloorSeats, setAddFloorSeats] = useState(4)
   const [addFloorShape, setAddFloorShape] = useState<'SQUARE' | 'ROUND' | 'RECTANGLE'>('SQUARE')
   const [isDraggingFloor, setIsDraggingFloor] = useState(false)
+  const [tablesLocked, setTablesLocked] = useState(() => {
+    try { return localStorage.getItem('floor_tables_locked') === 'true' } catch { return false }
+  })
   const [floorZoom, setFloorZoom] = useState(1)
   const [panX, setPanX] = useState(0)
   const [panY, setPanY] = useState(0)
@@ -735,6 +740,7 @@ export default function KassaReservationsView({
       return
     }
     if (!floorDraggingId.current) return
+    if (tablesLocked) return  // vergrendeld — geen verschuiven
     const dx = Math.abs(e.clientX - floorPointerStart.current.x)
     const dy = Math.abs(e.clientY - floorPointerStart.current.y)
     if (dx < 4 && dy < 4) return
@@ -2049,6 +2055,24 @@ export default function KassaReservationsView({
                 </div>
 
                 <div className="flex-1" />
+
+                {/* Vergrendel-knop */}
+                <button
+                  onClick={() => {
+                    const next = !tablesLocked
+                    setTablesLocked(next)
+                    try { localStorage.setItem('floor_tables_locked', String(next)) } catch {}
+                  }}
+                  className={`flex items-center gap-2 h-11 px-4 rounded-xl text-sm font-bold transition-colors whitespace-nowrap shadow-sm ${
+                    tablesLocked
+                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                  }`}
+                  title={tablesLocked ? 'Tafels vergrendeld — klik om te ontgrendelen' : 'Tafels ontgrendeld — klik om te vergrendelen'}
+                >
+                  {tablesLocked ? <Lock size={18} /> : <LockOpen size={18} />}
+                  <span className="hidden sm:inline">{tablesLocked ? 'Vergrendeld' : 'Vergrendelen'}</span>
+                </button>
 
                 <button onClick={() => { setSelectedFloorTable(null); setShowAddFloorTable(true) }}
                   className="flex items-center gap-2 h-11 px-5 rounded-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white text-sm font-bold transition-colors whitespace-nowrap shadow-sm">
