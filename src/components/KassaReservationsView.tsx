@@ -975,22 +975,8 @@ export default function KassaReservationsView({
 
   const handleCheckIn = async (r: Reservation) => {
     await updateStatus(r.id, 'CHECKED_IN')
-    toast.success(`${r.guest_name} ingecheckt!`)
-    if (r.guest_email) {
-      await sendReservationEmail({
-        customerEmail: r.guest_email,
-        customerName: r.guest_name,
-        customerPhone: r.guest_phone,
-        reservationDate: r.reservation_date,
-        reservationTime: r.reservation_time,
-        partySize: r.party_size,
-        tableName: r.table_number,
-        status: 'confirmed',
-        businessName: businessInfo.name,
-        businessPhone: businessInfo.phone,
-        businessEmail: businessInfo.email,
-      })
-    }
+    toast.success(`${r.guest_name} aan tafel!`)
+    // Geen mail sturen bij aan tafel zetten — enkel interne statuswijziging
   }
 
   const handleUndoNoShow = async (r: Reservation) => {
@@ -1066,80 +1052,26 @@ export default function KassaReservationsView({
     await updateStatus(r.id, 'CANCELLED')
     setCancelConfirm(null)
     toast.success('Reservatie geannuleerd')
-    if (r.guest_email) {
-      await sendReservationEmail({
-        customerEmail: r.guest_email,
-        customerName: r.guest_name,
-        reservationDate: r.reservation_date,
-        reservationTime: r.reservation_time,
-        partySize: r.party_size,
-        status: 'cancelled',
-        businessName: businessInfo.name,
-        businessPhone: businessInfo.phone,
-        businessEmail: businessInfo.email,
-        cancellationReason: 'Geannuleerd door personeel',
-      })
-    }
+    // Geen mail bij annulatie — enkel interne statuswijziging
   }
 
   const handleComplete = async (r: Reservation) => {
     await updateStatus(r.id, 'COMPLETED')
-    toast.success('Reservatie afgerond')
-    // z5 - Review uitnodiging automatisch sturen
-    if (reservationSettings.autoSendReview && r.guest_email) {
-      await sendReservationEmail({
-        customerEmail: r.guest_email,
-        customerName: r.guest_name,
-        reservationDate: r.reservation_date,
-        reservationTime: r.reservation_time,
-        partySize: r.party_size,
-        status: 'review',
-        businessName: businessInfo.name,
-        businessPhone: businessInfo.phone,
-        businessEmail: businessInfo.email,
-        reviewLink: reservationSettings.reviewLink,
-      })
-    }
+    toast.success(`${r.guest_name} vertrokken`)
+    // Geen automatische mail bij vertrekken — enkel interne statuswijziging
   }
 
   // z3 - Wachtlijst bevestigen
   const handleConfirmFromWaitlist = async (r: Reservation) => {
     await updateStatus(r.id, 'CONFIRMED')
     toast.success(`${r.guest_name} bevestigd vanuit wachtlijst`)
-    if (r.guest_email) {
-      await sendReservationEmail({
-        customerEmail: r.guest_email,
-        customerName: r.guest_name,
-        customerPhone: r.guest_phone,
-        reservationDate: r.reservation_date,
-        reservationTime: r.reservation_time,
-        partySize: r.party_size,
-        status: 'confirmed',
-        businessName: businessInfo.name,
-        businessPhone: businessInfo.phone,
-        businessEmail: businessInfo.email,
-      })
-    }
+    // Geen mail — enkel statuswijziging
   }
 
   const handleConfirm = async (r: Reservation) => {
     await updateStatus(r.id, 'CONFIRMED')
     toast.success('Reservatie bevestigd')
-    if (r.guest_email) {
-      await sendReservationEmail({
-        customerEmail: r.guest_email,
-        customerName: r.guest_name,
-        customerPhone: r.guest_phone,
-        reservationDate: r.reservation_date,
-        reservationTime: r.reservation_time,
-        partySize: r.party_size,
-        tableName: r.table_number,
-        status: 'confirmed',
-        businessName: businessInfo.name,
-        businessPhone: businessInfo.phone,
-        businessEmail: businessInfo.email,
-      })
-    }
+    // Geen mail — bevestigingsmail wordt enkel gestuurd bij nieuwe reservatie
   }
 
   // z6 - VIP/geblokkeerd opslaan in Supabase
