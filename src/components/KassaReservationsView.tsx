@@ -1564,8 +1564,6 @@ export default function KassaReservationsView({
               { id: 'floorplan', label: 'Reservaties', icon: <MapPin size={16} /> },
               { id: 'list', label: 'Gasten', icon: <List size={16} /> },
               { id: 'timeline', label: 'Tijdlijn', icon: <LayoutGrid size={16} /> },
-              { id: 'month', label: 'Maand', icon: <CalendarDays size={16} /> },
-              { id: 'guests', label: 'Contacten', icon: <Users size={16} /> },
               { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} /> },
               { id: 'settings', label: 'Instellingen', icon: <Settings size={16} /> },
             ].map((view) => (
@@ -2221,109 +2219,6 @@ export default function KassaReservationsView({
           )
         })()}
 
-        {!loading && viewMode === 'month' && (() => {
-          const { year, month } = monthDate
-          const firstDay = new Date(year, month, 1)
-          const lastDay = new Date(year, month + 1, 0)
-          // Start on Monday
-          let startDow = firstDay.getDay() // 0=Sun, 1=Mon...
-          if (startDow === 0) startDow = 7
-          const paddingDays = startDow - 1
-
-          const days: (Date | null)[] = []
-          for (let i = 0; i < paddingDays; i++) days.push(null)
-          for (let d = 1; d <= lastDay.getDate(); d++) days.push(new Date(year, month, d))
-          while (days.length % 7 !== 0) days.push(null)
-
-          const activeShifts = (reservationSettings.shifts || []).filter(s => s.isActive)
-          const todayStr = new Date().toISOString().split('T')[0]
-
-          const getDateStr = (d: Date) => d.toISOString().split('T')[0]
-
-          const monthNames = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
-
-          return (
-            <div>
-              {/* Month nav */}
-              <div className="flex items-center justify-between mb-6">
-                <button onClick={() => setMonthDate(prev => {
-                  const d = new Date(prev.year, prev.month - 1, 1)
-                  return { year: d.getFullYear(), month: d.getMonth() }
-                })} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={20} /></button>
-                <h2 className="text-xl font-bold">{monthNames[month]} {year}</h2>
-                <button onClick={() => setMonthDate(prev => {
-                  const d = new Date(prev.year, prev.month + 1, 1)
-                  return { year: d.getFullYear(), month: d.getMonth() }
-                })} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={20} /></button>
-              </div>
-
-              {/* Shift filter tabs */}
-              {activeShifts.length > 0 && (
-                <div className="flex gap-2 mb-4">
-                  {activeShifts.map(s => (
-                    <div key={s.id} className="px-4 py-1.5 rounded-lg bg-[#3C4D6B] text-white text-sm font-medium">
-                      {s.name}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Day headers */}
-              <div className="grid grid-cols-7 mb-2">
-                {['Ma','Di','Wo','Do','Vr','Za','Zo'].map(d => (
-                  <div key={d} className="text-center text-xs font-bold text-gray-400 py-2">{d}</div>
-                ))}
-              </div>
-
-              {/* Calendar grid */}
-              <div className="grid grid-cols-7 gap-1">
-                {days.map((day, i) => {
-                  if (!day) return <div key={`empty-${i}`} className="h-24 rounded-xl" />
-                  const dateStr = getDateStr(day)
-                  const isToday = dateStr === todayStr
-                  const dayRes = reservations.filter(r => r.reservation_date === dateStr && r.status !== 'CANCELLED' && r.status !== 'NO_SHOW')
-                  const totalCovers = dayRes.reduce((s, r) => s + r.party_size, 0)
-
-                  return (
-                    <div
-                      key={dateStr}
-                      onClick={() => { setTimelineDate(dateStr); setViewMode('timeline') }}
-                      className={`min-h-24 rounded-xl p-2 cursor-pointer transition-all hover:border-[#3C4D6B] border-2 ${
-                        isToday ? 'bg-[#3C4D6B]/10 border-[#3C4D6B]' : 'bg-white border-gray-100 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className={`text-sm font-bold mb-1 ${isToday ? 'text-[#3C4D6B]' : 'text-gray-700'}`}>
-                        {day.getDate()}
-                      </div>
-                      {dayRes.length > 0 && (
-                        <div className="space-y-0.5">
-                          {activeShifts.length > 0 ? activeShifts.map(shift => {
-                            const shiftRes = dayRes.filter(r =>
-                              r.reservation_time >= shift.startTime && r.reservation_time <= shift.endTime
-                            )
-                            if (shiftRes.length === 0) return (
-                              <div key={shift.id} className="text-xs text-gray-300 truncate">{shift.name}</div>
-                            )
-                            const covers = shiftRes.reduce((s, r) => s + r.party_size, 0)
-                            return (
-                              <div key={shift.id} className="text-xs font-medium px-1.5 py-0.5 rounded-md bg-[#3C4D6B]/15 text-[#3C4D6B] truncate">
-                                {shift.name} <span className="font-bold">{covers}</span>
-                              </div>
-                            )
-                          }) : (
-                            <div className="text-xs font-bold px-1.5 py-0.5 rounded-md bg-green-100 text-green-700">
-                              {dayRes.length}× • {totalCovers}p
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })()}
 
         {!loading && viewMode === 'calendar' && (
           <CalendarView
@@ -2757,14 +2652,6 @@ export default function KassaReservationsView({
           )
         })()}
 
-        {!loading && viewMode === 'guests' && (
-          <ContactsView
-            guestProfiles={guestProfiles}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            onToggleBlocked={handleToggleBlocked}
-          />
-        )}
 
         {!loading && viewMode === 'stats' && (
           <div className="space-y-6">
