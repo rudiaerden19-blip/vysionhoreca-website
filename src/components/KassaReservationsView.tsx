@@ -1576,18 +1576,17 @@ export default function KassaReservationsView({
 
         {!loading && viewMode === 'list' && (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            {/* grid: datum(72) tijd(52) gast(1fr) email(1fr) pers(36) tafel(42) status(90) acties(86) push(38) */}
-            <div className="grid gap-2 px-3 py-2 border-b border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-wide"
-              style={{ gridTemplateColumns: '72px 52px 1fr 1fr 36px 42px 90px 86px 38px' }}>
+            <div className="grid gap-3 px-4 py-3 border-b border-gray-200 bg-gray-50 text-sm font-semibold text-gray-500 uppercase tracking-wide"
+              style={{ gridTemplateColumns: '90px 70px 1fr 170px 50px 55px 120px 130px 60px' }}>
               <span>Datum</span>
               <span>Tijd</span>
               <span>Gast</span>
               <span>Email</span>
-              <span>Ps</span>
-              <span>Tfl</span>
+              <span>Ps.</span>
+              <span>Tafel</span>
               <span>Status</span>
-              <span>Acties</span>
-              <span></span>
+              <span>No-show</span>
+              <span>Push</span>
             </div>
             {filteredReservations.length === 0 && (
               <div className="py-16 text-center text-gray-400 text-base">Geen reservaties</div>
@@ -1597,62 +1596,53 @@ export default function KassaReservationsView({
               return (
                 <div
                   key={r.id}
-                  className="grid gap-2 px-3 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
-                  style={{ gridTemplateColumns: '72px 52px 1fr 1fr 36px 42px 90px 86px 38px' }}
+                  className="grid gap-3 px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
+                  style={{ gridTemplateColumns: '90px 70px 1fr 170px 50px 55px 120px 130px 60px' }}
                   onClick={() => setSelectedReservation(r)}
                 >
-                  <p className="text-sm font-medium text-gray-700 truncate">
+                  <p className="text-sm font-semibold text-gray-700">
                     {new Date(r.reservation_date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                   </p>
-                  <p className="text-sm font-bold text-gray-900">{r.reservation_time}</p>
+                  <p className="text-base font-bold text-gray-900">{r.reservation_time}</p>
                   <div className="min-w-0">
-                    <p className="font-semibold text-sm text-gray-900 truncate">{r.guest_name}</p>
-                    {r.guest_phone && <p className="text-xs text-gray-400 truncate">{r.guest_phone}</p>}
+                    <p className="font-semibold text-base text-gray-900 truncate">{r.guest_name}</p>
+                    {r.guest_phone && <p className="text-sm text-gray-500 truncate">{r.guest_phone}</p>}
                   </div>
-                  <p className="text-xs text-gray-500 truncate min-w-0">{r.guest_email || '—'}</p>
-                  <span className="text-sm font-semibold text-gray-700">{r.party_size}</span>
-                  <span className="text-sm font-semibold text-gray-700">{r.table_number || '-'}</span>
+                  <p className="text-sm text-gray-500 truncate min-w-0">{r.guest_email || '—'}</p>
+                  <span className="text-base font-semibold text-gray-700">{r.party_size}</span>
+                  <span className="text-base font-semibold text-gray-700">{r.table_number || '-'}</span>
                   <span
-                    className="px-2 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 w-fit"
+                    className="px-3 py-1.5 rounded-full text-sm font-semibold inline-flex items-center gap-1.5 w-fit"
                     style={{ backgroundColor: status.bgColor, color: status.color }}
                   >
                     {status.icon}
                     {status.label}
                   </span>
-                  <div className="flex gap-1 items-center" onClick={e => e.stopPropagation()}>
-                    {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
-                      <button
-                        onClick={() => handleCheckIn(r)}
-                        className="p-1.5 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 flex-shrink-0"
-                        title="Bezet"
-                      >
-                        <UserCheck size={14} />
-                      </button>
-                    )}
+                  <div onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => r.status === 'NO_SHOW' ? handleUndoNoShow(r) : handleNoShow(r)}
-                      className="px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 flex-shrink-0 transition-colors"
+                      className="px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors w-full"
                       style={r.status === 'NO_SHOW'
                         ? { backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }
                         : { backgroundColor: '#f3f4f6', color: '#9ca3af' }
                       }
-                      title={r.status === 'NO_SHOW' ? 'Klik om ongedaan te maken' : 'Klik om no-show te zetten'}
                     >
-                      <UserX size={13} />
+                      <UserX size={15} />
+                      No-show
                     </button>
                   </div>
                   <div onClick={e => e.stopPropagation()}>
                     {r.guest_email ? (
                       <button
                         onClick={() => { setPushTarget(r); setPushSubject(''); setPushMessage('') }}
-                        className="p-1.5 rounded-lg flex items-center justify-center"
+                        className="p-2.5 rounded-xl flex items-center justify-center"
                         style={{ backgroundColor: 'rgba(59,130,246,0.1)', color: '#2563eb' }}
                         title={`Push naar ${r.guest_email}`}
                       >
-                        <Send size={14} />
+                        <Send size={16} />
                       </button>
                     ) : (
-                      <span className="text-xs text-gray-200">—</span>
+                      <span className="text-sm text-gray-300">—</span>
                     )}
                   </div>
                 </div>
