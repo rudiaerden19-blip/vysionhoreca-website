@@ -1935,108 +1935,98 @@ export default function KassaReservationsView({
                   <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
                 </div>
 
-                {/* Grid — horizontaal scrollen voor extra vakken na eindtijd */}
+                {/* Grid — één scroll container voor beide richtingen */}
                 <div className="border border-gray-200 rounded-xl overflow-hidden bg-white flex flex-col flex-1">
-                  {/* Wrapper voor horizontaal scrollen */}
-                  <div className="overflow-x-auto flex flex-col flex-1">
-                    {/* Minimumbreedte zodat slots een vaste breedte hebben */}
-                    <div style={{ minWidth: (timeSlots.length + extraSlots.length) * 80 + LABEL_W }} className="flex flex-col flex-1">
+                  <div className="overflow-auto flex-1">
+                    {/* Vaste minimumbreedte — alles binnenin scrollt mee */}
+                    <div style={{ minWidth: (timeSlots.length + extraSlots.length) * 80 + LABEL_W }}>
 
-                  {/* Oranje header */}
-                  <div className="flex flex-shrink-0" style={{ height:48, backgroundColor:'#F97316', position:'sticky', top:0, zIndex:10 }}>
-                    <div style={{ width:LABEL_W, flexShrink:0 }} className="border-r border-orange-400 flex items-center justify-center sticky left-0 z-20 bg-orange-500">
-                      <span className="text-sm font-bold text-white">Tafel</span>
-                    </div>
-                    <div className="flex flex-1 relative">
-                      {/* Normale slots — oranje */}
-                      {timeSlots.map((t,i) => (
-                        <div key={t} style={{ flex:'0 0 80px' }} className="border-r border-orange-400 flex items-center justify-center">
-                          {i%2===0 && <span className="text-sm font-bold text-white">{t}</span>}
+                      {/* Oranje header — sticky bovenaan de scroll container */}
+                      <div className="flex sticky top-0 z-10" style={{ height:48, backgroundColor:'#F97316' }}>
+                        <div style={{ width:LABEL_W, flexShrink:0 }} className="border-r border-orange-400 flex items-center justify-center sticky left-0 z-20 bg-orange-500">
+                          <span className="text-sm font-bold text-white">Tafel</span>
                         </div>
-                      ))}
-                      {/* Extra slots — iets donkerder oranje als overgang */}
-                      {extraSlots.map((t,i) => (
-                        <div key={`ex-${t}`} style={{ flex:'0 0 80px' }} className="border-r border-orange-300 flex items-center justify-center bg-orange-400/70">
-                          {i%2===0 && <span className="text-sm font-bold text-white/80">{t}</span>}
+                        <div className="flex relative" style={{ width:(timeSlots.length+extraSlots.length)*80 }}>
+                          {timeSlots.map((t,i) => (
+                            <div key={t} style={{ width:80, flexShrink:0 }} className="border-r border-orange-400 flex items-center justify-center">
+                              {i%2===0 && <span className="text-sm font-bold text-white">{t}</span>}
+                            </div>
+                          ))}
+                          {extraSlots.map((t,i) => (
+                            <div key={`ex-${t}`} style={{ width:80, flexShrink:0 }} className="border-r border-orange-300 flex items-center justify-center bg-orange-400/70">
+                              {i%2===0 && <span className="text-sm font-bold text-white/80">{t}</span>}
+                            </div>
+                          ))}
+                          {redLinePct !== null && (
+                            <div className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20 pointer-events-none" style={{ left:`${redLinePct}%` }} />
+                          )}
                         </div>
-                      ))}
-                      {/* Rode lijn in header */}
-                      {redLinePct !== null && (
-                        <div className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20" style={{ left:`${redLinePct}%` }} />
+                      </div>
+
+                      {/* Rijen */}
+                      {sortedTables.map((tableNum, rowIdx) => {
+                        const tableRes = dayRes.filter(r => (r.table_number||'(geen tafel)') === tableNum)
+                        const fpTable = floorPlanTablesDB.find(t => t.number === tableNum)
+                        const slotW = (timeSlots.length + extraSlots.length) * 80
+                        return (
+                          <div key={tableNum} className="flex relative"
+                            style={{ height:ROW_H, backgroundColor:rowIdx%2===0?'white':'#f9fafb', borderBottom:'1px solid #e5e7eb' }}>
+                            <div style={{ width:LABEL_W, flexShrink:0 }}
+                              className="border-r border-gray-200 flex flex-col items-center justify-center px-2 bg-white sticky left-0 z-10">
+                              <span className="text-base font-bold text-gray-800">{tableNum}</span>
+                              {fpTable && <span className="text-xs text-gray-400">{fpTable.seats}p</span>}
+                            </div>
+                            {/* Content area — vaste breedte zodat % positionering klopt */}
+                            <div style={{ width:slotW, position:'relative', flexShrink:0 }}>
+                              {/* Grid lijnen */}
+                              <div className="flex h-full absolute inset-0">
+                                {timeSlots.map((t,i) => (
+                                  <div key={t} style={{ width:80, flexShrink:0 }} className={`h-full border-r ${i%2===0?'border-gray-300':'border-gray-100'}`} />
+                                ))}
+                                {extraSlots.map((t) => (
+                                  <div key={`ex-${t}`} style={{ width:80, flexShrink:0 }} className="h-full border-r border-gray-200 bg-gray-100/60" />
+                                ))}
+                              </div>
+                              {/* Rode lijn */}
+                              {redLinePct !== null && (
+                                <div className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10 pointer-events-none" style={{ left:`${redLinePct}%` }}>
+                                  {rowIdx === 0 && <div className="absolute -top-1 -left-1.5 w-3 h-3 rounded-full bg-red-500" />}
+                                </div>
+                              )}
+                              {/* Reservatieblokken */}
+                              {tableRes.map((r) => {
+                                const [rh,rm] = r.reservation_time.split(':').map(Number)
+                                const startMin = rh*60+rm
+                                const dur = r.duration_minutes||90
+                                if (startMin >= EXTRA_MIN || startMin+dur <= START_MIN) return null
+                                const leftPx = Math.max(0,(startMin-START_MIN)/totalRange*slotW)
+                                const widthPx = Math.min(dur/totalRange*slotW, slotW-leftPx) - 2
+                                return (
+                                  <div key={r.id} onClick={() => setSelectedReservation(r)}
+                                    className="absolute cursor-pointer flex items-center hover:brightness-110 transition-all"
+                                    style={{ left:leftPx, width:widthPx, top:6, bottom:6, height:'auto', zIndex:2 }}>
+                                    <div className="flex items-center h-full w-full"
+                                      style={{ backgroundColor: startMin >= END_MIN ? '#6B7280' : BLOCK_COLOR, clipPath:'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)' }}>
+                                      <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
+                                        <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
+                                      </div>
+                                      <span className="text-white text-base font-bold ml-2 truncate pr-5">{r.guest_name}</span>
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )
+                      })}
+                      {dayRes.length===0 && (
+                        <div className="flex flex-col items-center justify-center py-16 text-gray-300">
+                          <CalendarDays size={40} className="mb-3"/>
+                          <p className="text-base">Geen reservaties op {formatDate(timelineDate)}</p>
+                        </div>
                       )}
                     </div>
                   </div>
-
-                  {/* Rijen */}
-                  <div className="overflow-y-auto flex-1 relative">
-                    {sortedTables.map((tableNum, rowIdx) => {
-                      const tableRes = dayRes.filter(r => (r.table_number||'(geen tafel)') === tableNum)
-                      const fpTable = floorPlanTablesDB.find(t => t.number === tableNum)
-                      return (
-                        <div key={tableNum} className="flex relative"
-                          style={{ height:ROW_H, backgroundColor:rowIdx%2===0?'white':'#f9fafb', borderBottom:'1px solid #e5e7eb' }}>
-                          <div style={{ width:LABEL_W, flexShrink:0 }}
-                            className="border-r border-gray-200 flex flex-col items-center justify-center px-2 bg-white sticky left-0 z-10">
-                            <span className="text-base font-bold text-gray-800">{tableNum}</span>
-                            {fpTable && <span className="text-xs text-gray-400">{fpTable.seats}p</span>}
-                          </div>
-                          <div className="flex-1 relative">
-                            {/* Grid lijnen — normale slots */}
-                            <div className="flex h-full absolute inset-0">
-                              {timeSlots.map((t,i) => (
-                                <div key={t} style={{ flex:'0 0 80px' }} className={`h-full border-r ${i%2===0?'border-gray-300':'border-gray-100'}`} />
-                              ))}
-                              {/* Extra grijze slots */}
-                              {extraSlots.map((t) => (
-                                <div key={`ex-${t}`} style={{ flex:'0 0 80px' }} className="h-full border-r border-gray-200 bg-gray-100/60" />
-                              ))}
-                            </div>
-                            {/* Rode lijn */}
-                            {redLinePct !== null && (
-                              <div className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10 pointer-events-none" style={{ left:`${redLinePct}%` }}>
-                                {rowIdx === 0 && (
-                                  <div className="absolute -top-1 -left-1.5 w-3 h-3 rounded-full bg-red-500" />
-                                )}
-                              </div>
-                            )}
-                            {/* Reservatieblokken — dunne pijlvorm, één kleur */}
-                            {tableRes.map((r) => {
-                              const [rh,rm] = r.reservation_time.split(':').map(Number)
-                              const startMin = rh*60+rm
-                              const dur = r.duration_minutes||90
-                              if (startMin>=END_MIN || startMin+dur<=START_MIN) return null
-                              const leftPct = Math.max(0,(startMin-START_MIN)/totalRange*100)
-                              const widthPct = Math.min(dur/totalRange*100, 100-leftPct)
-                              return (
-                                <div key={r.id} onClick={() => setSelectedReservation(r)}
-                                  className="absolute cursor-pointer flex items-center hover:brightness-110 transition-all"
-                                  style={{ left:`${leftPct}%`, width:`calc(${widthPct}% - 2px)`, top:'6px', bottom:'6px', height:'auto', zIndex:2 }}>
-                                  <div className="flex items-center h-full w-full"
-                                    style={{
-                                      backgroundColor: BLOCK_COLOR,
-                                      clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)',
-                                    }}>
-                                    <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
-                                      <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
-                                    </div>
-                                    <span className="text-white text-base font-bold ml-2 truncate pr-5">{r.guest_name}</span>
-                                  </div>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </div>
-                      )
-                    })}
-                    {dayRes.length===0 && (
-                      <div className="flex flex-col items-center justify-center py-16 text-gray-300">
-                        <CalendarDays size={40} className="mb-3"/>
-                        <p className="text-base">Geen reservaties op {formatDate(timelineDate)}</p>
-                      </div>
-                    )}
-                  </div>
-                    </div>{/* einde minWidth wrapper */}
-                  </div>{/* einde overflow-x-auto */}
                 </div>
               </div>
 
