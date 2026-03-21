@@ -2015,33 +2015,44 @@ export default function KassaReservationsView({
           return (
             <div className="flex flex-col h-full -m-4" style={{ height: 'calc(100vh - 130px)' }}>
               {/* Toolbar */}
-              <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-white border-b border-gray-200 flex-shrink-0 min-h-[52px]">
-                {/* Date nav */}
-                <div className="flex items-center gap-1.5">
-                  <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); setSelectedDate(d.toISOString().split('T')[0]) }}
-                    className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center active:bg-gray-300"><ChevronLeft size={18} /></button>
-                  <span className="font-semibold text-sm min-w-[7rem] text-center">{formatDate(selectedDate)}</span>
-                  <button onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); setSelectedDate(d.toISOString().split('T')[0]) }}
-                    className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center active:bg-gray-300"><ChevronRight size={18} /></button>
-                  <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
-                    className="h-10 px-2 rounded-xl bg-gray-100 border border-gray-200 text-xs" />
+              <div className="flex flex-wrap items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 flex-shrink-0">
+
+                {/* Datum kiezer — groot en opvallend */}
+                <div className="flex items-center gap-2 bg-orange-500 rounded-2xl px-3 py-2 shadow-md">
+                  <button
+                    onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                    className="w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 active:bg-white/40 flex items-center justify-center transition-colors">
+                    <ChevronLeft size={22} className="text-white" />
+                  </button>
+                  <div className="flex flex-col items-center">
+                    <span className="font-bold text-xl text-white min-w-[8rem] text-center leading-tight">
+                      {formatDate(selectedDate)}
+                    </span>
+                    <input type="date" value={selectedDate} onChange={e => setSelectedDate(e.target.value)}
+                      className="mt-0.5 text-xs font-semibold text-white/90 bg-white/20 border border-white/30 rounded-lg px-2 py-0.5 text-center cursor-pointer outline-none" />
+                  </div>
+                  <button
+                    onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                    className="w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 active:bg-white/40 flex items-center justify-center transition-colors">
+                    <ChevronRight size={22} className="text-white" />
+                  </button>
                 </div>
 
                 <div className="flex-1" />
 
-                {/* Legend — alleen op grotere schermen */}
-                <div className="hidden lg:flex items-center gap-3 text-xs font-medium">
-                  <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-green-400" /><span>Vrij</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-violet-400" /><span>Gereserveerd</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-blue-400" /><span>Bezet</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-sm bg-amber-400" /><span>Afwachting</span></div>
+                {/* Legend */}
+                <div className="hidden lg:flex items-center gap-4 text-sm font-medium text-gray-600">
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-green-400" /><span>Vrij</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-violet-400" /><span>Gereserveerd</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-blue-400" /><span>Bezet</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-amber-400" /><span>Afwachting</span></div>
                 </div>
 
                 <div className="flex-1" />
 
                 <button onClick={() => { setSelectedFloorTable(null); setShowAddFloorTable(true) }}
-                  className="flex items-center gap-2 h-10 px-4 rounded-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white text-sm font-semibold transition-colors whitespace-nowrap">
-                  <Plus size={16} />
+                  className="flex items-center gap-2 h-11 px-5 rounded-xl bg-green-500 hover:bg-green-600 active:bg-green-700 text-white text-sm font-bold transition-colors whitespace-nowrap shadow-sm">
+                  <Plus size={18} />
                   <span className="hidden sm:inline">Tafel toevoegen</span>
                   <span className="sm:hidden">+ Tafel</span>
                 </button>
