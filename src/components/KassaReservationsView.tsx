@@ -1578,8 +1578,8 @@ export default function KassaReservationsView({
         {!loading && viewMode === 'list' && (() => {
           const COLS = 'repeat(9, 1fr)'
           return (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="grid gap-2 px-4 py-4 text-base font-bold text-white uppercase tracking-wide sticky top-0 z-10"
+          <div className="bg-white rounded-xl border border-gray-200">
+            <div className="grid gap-2 px-4 py-4 text-base font-bold text-white uppercase tracking-wide rounded-t-xl sticky top-0 z-10"
               style={{ gridTemplateColumns: COLS, backgroundColor: '#F97316' }}>
               <span>Datum</span><span>Tijd</span><span>Gast</span><span>Email</span>
               <span>Personen</span><span>Tafel</span><span>Status</span><span>No-show</span><span>Push</span>
