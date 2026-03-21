@@ -42,7 +42,7 @@ import { getAuthHeaders } from '@/lib/auth-headers'
 
 // ---- Types ----
 type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'NO_SHOW' | 'CANCELLED' | 'WAITLIST'
-type ViewMode = 'today' | 'calendar' | 'month' | 'list' | 'floorplan' | 'timeline' | 'guests' | 'stats' | 'settings'
+type ViewMode = 'today' | 'calendar' | 'month' | 'list' | 'floorplan' | 'timeline' | 'guests' | 'stats' | 'settings' | 'reservations'
 
 interface Reservation {
   id: string
@@ -646,6 +646,7 @@ export default function KassaReservationsView({
   const [searchPopupQuery, setSearchPopupQuery] = useState('')
   const [searchPopupTab, setSearchPopupTab] = useState<'dag'|'alle'>('dag')
   const [editReservation, setEditReservation] = useState<Reservation | null>(null)
+  const [resListDate, setResListDate] = useState(() => new Date().toISOString().split('T')[0])
   const [floorPlanTime, setFloorPlanTime] = useState(() => {
     const now = new Date()
     const h = now.getHours().toString().padStart(2, '0')
@@ -1567,6 +1568,7 @@ export default function KassaReservationsView({
             {[
               { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} /> },
               { id: 'timeline', label: 'Tafels', icon: <LayoutGrid size={16} /> },
+              { id: 'reservations', label: 'Reserveringen', icon: <List size={16} /> },
               { id: 'guests', label: 'Contacten', icon: <Users size={16} /> },
               { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} /> },
               { id: 'settings', label: 'Instellingen', icon: <Settings size={16} /> },
@@ -2526,6 +2528,107 @@ export default function KassaReservationsView({
                       )
                     })}
                   </div>
+                )}
+              </div>
+            </div>
+          )
+        })()}
+
+        {!loading && viewMode === 'reservations' && (() => {
+          const resDate = resListDate
+          const setResDate = setResListDate
+          const dayRes = reservations
+            .filter(r => r.reservation_date === resDate && r.status !== 'CANCELLED')
+            .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
+
+          const statusLabel: Record<string, { label: string; cls: string }> = {
+            CONFIRMED:  { label: 'Bevestigd',   cls: 'bg-blue-100 text-blue-700' },
+            CHECKED_IN: { label: 'Aan tafel',   cls: 'bg-green-100 text-green-700' },
+            NO_SHOW:    { label: 'No-show',     cls: 'bg-red-100 text-red-600' },
+            COMPLETED:  { label: 'Afgerond',    cls: 'bg-gray-100 text-gray-500' },
+            PENDING:    { label: 'Verwacht',    cls: 'bg-orange-100 text-orange-600' },
+            WAITLIST:   { label: 'Wachtlijst',  cls: 'bg-purple-100 text-purple-600' },
+          }
+
+          return (
+            <div className="flex flex-col h-full -m-4 bg-white">
+              {/* Datum kiezer */}
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 flex-shrink-0">
+                <button onClick={() => { const d = new Date(resDate); d.setDate(d.getDate()-1); setResDate(d.toISOString().split('T')[0]) }}
+                  className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+                  <ChevronLeft size={18}/>
+                </button>
+                <div className="flex items-center gap-2 bg-orange-500 rounded-xl px-4 py-2">
+                  <span className="font-bold text-white text-base">{formatDate(resDate)}</span>
+                  <input type="date" value={resDate} onChange={e => setResDate(e.target.value)}
+                    className="text-xs text-white/90 bg-white/20 border border-white/30 rounded-lg px-2 py-0.5 outline-none cursor-pointer"/>
+                </div>
+                <button onClick={() => { const d = new Date(resDate); d.setDate(d.getDate()+1); setResDate(d.toISOString().split('T')[0]) }}
+                  className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+                  <ChevronRight size={18}/>
+                </button>
+                <span className="ml-2 text-sm text-gray-400 font-medium">{dayRes.length} reservering{dayRes.length !== 1 ? 'en' : ''} · {dayRes.reduce((s,r) => s+r.party_size,0)} personen</span>
+                <button onClick={() => setResDate(new Date().toISOString().split('T')[0])}
+                  className="ml-auto text-xs px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 font-medium">Vandaag</button>
+              </div>
+
+              {/* Lijst */}
+              <div className="flex-1 overflow-auto">
+                {dayRes.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                    <List size={40} className="text-gray-300"/>
+                    <p className="font-medium">Geen reserveringen voor {formatDate(resDate)}</p>
+                  </div>
+                ) : (
+                  <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: '#f9fafb', borderBottom: '2px solid #e5e7eb' }}>
+                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tijd</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Naam</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Personen</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tafel</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Status</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Opmerkingen</th>
+                        <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dayRes.map((r, idx) => {
+                        const st = statusLabel[r.status] || { label: r.status, cls: 'bg-gray-100 text-gray-500' }
+                        return (
+                          <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb' }}
+                            className={`transition-colors hover:bg-orange-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}`}>
+                            <td className="px-5 py-4 font-bold text-gray-800 text-base" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.reservation_time}
+                            </td>
+                            <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.guest_name}
+                              {r.guest_phone && <div className="text-xs text-gray-400 font-normal mt-0.5">{r.guest_phone}</div>}
+                              {r.guest_email && <div className="text-xs text-gray-400 font-normal">{r.guest_email}</div>}
+                            </td>
+                            <td className="px-5 py-4 text-gray-700 text-center font-bold text-lg" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.party_size}
+                            </td>
+                            <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
+                            </td>
+                            <td className="px-5 py-4" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${st.cls}`}>{st.label}</span>
+                            </td>
+                            <td className="px-5 py-4 text-gray-500 text-xs max-w-xs" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.special_requests || r.notes || <span className="text-gray-300">—</span>}
+                            </td>
+                            <td className="px-5 py-4 text-right">
+                              <button onClick={() => setEditReservation(r)}
+                                className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white text-sm font-semibold transition-colors">
+                                ✏️ Bewerken
+                              </button>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
                 )}
               </div>
             </div>
