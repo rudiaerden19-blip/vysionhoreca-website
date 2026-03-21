@@ -1885,8 +1885,17 @@ export default function KassaReservationsView({
             WAITLIST: '#8b5cf6',
           }
 
-          // Één vaste kleur voor alle reservatieblokken
-          const BLOCK_COLOR = '#3B5BDB'
+          // Kleur per status
+          const statusBlockColor = (status: string, inExtraZone: boolean) => {
+            if (inExtraZone) return '#6B7280'
+            switch(status) {
+              case 'CHECKED_IN':  return '#16a34a'  // groen — aan tafel
+              case 'NO_SHOW':     return '#dc2626'  // rood
+              case 'COMPLETED':   return '#6B7280'  // grijs — vertrokken
+              case 'CONFIRMED':   return '#3B5BDB'  // blauw
+              default:            return '#3B5BDB'  // blauw (PENDING etc.)
+            }
+          }
 
           // Rode lijn positie
           const nowMin2 = timelineNow.getHours() * 60 + timelineNow.getMinutes()
@@ -1944,6 +1953,21 @@ export default function KassaReservationsView({
                     <span>Zoek reserv.</span>
                   </button>
                   <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
+                </div>
+
+                {/* Legenda statuskleuren */}
+                <div className="flex items-center gap-4 mb-2 px-1">
+                  {[
+                    { color:'#3B5BDB', label:'Verwacht/Bevestigd' },
+                    { color:'#16a34a', label:'Aan tafel' },
+                    { color:'#dc2626', label:'No-show' },
+                    { color:'#6B7280', label:'Vertrokken' },
+                  ].map(s => (
+                    <div key={s.label} className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }}/>
+                      <span className="text-xs text-gray-500">{s.label}</span>
+                    </div>
+                  ))}
                 </div>
 
                 {/* Grid — één scroll container voor beide richtingen */}
@@ -2017,7 +2041,7 @@ export default function KassaReservationsView({
                                     className="absolute cursor-pointer flex items-center hover:brightness-110 transition-all"
                                     style={{ left:leftPx, width:widthPx, top:6, bottom:6, height:'auto', zIndex:2 }}>
                                     <div className="flex items-center h-full w-full"
-                                      style={{ backgroundColor: startMin >= END_MIN ? '#6B7280' : BLOCK_COLOR, clipPath:'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)' }}>
+                                      style={{ backgroundColor: statusBlockColor(r.status, startMin >= END_MIN), clipPath:'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)' }}>
                                       <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
                                         <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
                                       </div>
