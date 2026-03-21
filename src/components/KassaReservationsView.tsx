@@ -2598,6 +2598,7 @@ export default function KassaReservationsView({
                     setResCalYear(t.getFullYear())
                     setResCalMonth(t.getMonth())
                     setResListDate(today)
+                    setShowResCalendar(false)
                   }} className="ml-4 px-4 py-1 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold">
                     Vandaag
                   </button>
@@ -2618,7 +2619,7 @@ export default function KassaReservationsView({
                           const isToday = dateStr === today
                           const hasDot = daysWithRes.has(dateStr)
                           return (
-                            <button key={i} onClick={() => setResListDate(dateStr)}
+                            <button key={i} onClick={() => { setResListDate(dateStr); setShowResCalendar(false) }}
                               className={`w-8 h-8 mx-auto rounded-full text-sm font-medium flex flex-col items-center justify-center transition-colors relative
                                 ${isSelected ? 'bg-orange-500 text-white' : isToday ? 'border-2 border-orange-400 text-orange-600' : 'text-gray-700 hover:bg-orange-50'}`}>
                               {day}
