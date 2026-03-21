@@ -3267,6 +3267,7 @@ export default function KassaReservationsView({
           onAssignTable={async (tableNumber) => { await handleAssignTable(selectedReservation.id, tableNumber); setSelectedReservation(null) }}
           onDelete={async () => { await handleDeleteReservation(selectedReservation.id); setSelectedReservation(null) }}
           onStartOrder={() => { handleStartOrder(selectedReservation); setSelectedReservation(null) }}
+          onEdit={() => { setEditReservation(selectedReservation); setSelectedReservation(null) }}
           tables={
             floorPlanTablesDB.length > 0
               ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
@@ -4349,6 +4350,7 @@ interface ReservationDetailModalProps {
   onAssignTable: (tableNumber: string) => void
   onDelete: () => void
   onStartOrder: () => void
+  onEdit: () => void
   tables: KassaTable[]
   guestProfile?: GuestProfile
 }
@@ -4364,6 +4366,7 @@ function ReservationDetailModal({
   onAssignTable,
   onDelete,
   onStartOrder,
+  onEdit,
   tables,
   guestProfile,
 }: ReservationDetailModalProps) {
@@ -4495,61 +4498,58 @@ function ReservationDetailModal({
             </button>
           )}
 
-          {reservation.status === 'CONFIRMED' && (
-            <>
-              <button
-                onClick={onStartOrder}
-                className="w-full py-3 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-600 transition-colors flex items-center justify-center gap-2"
-              >
-                <UtensilsCrossed size={18} />
-                Start Order → Kassa
-              </button>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={onCheckIn}
-                  className="py-3 rounded-xl bg-emerald-500/20 text-emerald-600 font-medium hover:bg-emerald-500/30 transition-colors flex items-center justify-center gap-2"
-                >
-                  <UserCheck size={18} />
-                  Check-in
-                </button>
-                <button
-                  onClick={onNoShow}
-                  className="py-3 rounded-xl bg-red-500/20 text-red-400 font-medium hover:bg-red-500/30 transition-colors flex items-center justify-center gap-2"
-                >
-                  <UserX size={18} />
-                  No-show
-                </button>
-              </div>
-            </>
-          )}
+          {/* === ACTIE KNOPPEN — altijd zichtbaar === */}
+          {/* Kassa knop */}
+          <button
+            onClick={onStartOrder}
+            className="w-full py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#4A5D7B] transition-colors flex items-center justify-center gap-2"
+          >
+            <UtensilsCrossed size={18} />
+            Naar Kassa
+          </button>
 
-          {reservation.status === 'CHECKED_IN' && (
-            <>
-              <button
-                onClick={onStartOrder}
-                className="w-full py-3 rounded-xl bg-[#3C4D6B] text-white font-medium hover:bg-[#4A5D7B] transition-colors flex items-center justify-center gap-2"
-              >
-                <UtensilsCrossed size={18} />
-                Naar Kassa
-              </button>
-              <button
-                onClick={onComplete}
-                className="w-full py-3 rounded-xl bg-gray-100 text-gray-600 font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-              >
-                <CheckCircle2 size={18} />
-                Afronden
-              </button>
-            </>
-          )}
-
-          {(reservation.status === 'PENDING' || reservation.status === 'CONFIRMED') && (
+          {/* Status knoppen — 3 in een rij */}
+          <div className="grid grid-cols-3 gap-2">
             <button
-              onClick={onCancel}
-              className="w-full py-3 rounded-xl bg-gray-100 text-gray-400 font-medium hover:text-red-400 transition-colors"
+              onClick={onCheckIn}
+              className={`py-3 rounded-xl font-bold text-sm flex flex-col items-center justify-center gap-1 transition-colors border-2
+                ${reservation.status === 'CHECKED_IN'
+                  ? 'bg-green-500 border-green-500 text-white'
+                  : 'bg-green-50 border-green-200 text-green-700 hover:bg-green-100'}`}
             >
-              Annuleren
+              <UserCheck size={20} />
+              Aan tafel
             </button>
-          )}
+            <button
+              onClick={onNoShow}
+              className={`py-3 rounded-xl font-bold text-sm flex flex-col items-center justify-center gap-1 transition-colors border-2
+                ${reservation.status === 'NO_SHOW'
+                  ? 'bg-red-500 border-red-500 text-white'
+                  : 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100'}`}
+            >
+              <UserX size={20} />
+              No-show
+            </button>
+            <button
+              onClick={onComplete}
+              className={`py-3 rounded-xl font-bold text-sm flex flex-col items-center justify-center gap-1 transition-colors border-2
+                ${reservation.status === 'COMPLETED'
+                  ? 'bg-gray-500 border-gray-500 text-white'
+                  : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'}`}
+            >
+              <CheckCircle2 size={20} />
+              Vertrokken
+            </button>
+          </div>
+
+          {/* Bewerken / Verplaatsen */}
+          <button
+            onClick={onEdit}
+            className="w-full py-3 rounded-xl bg-orange-50 border-2 border-orange-200 text-orange-700 font-bold hover:bg-orange-100 transition-colors flex items-center justify-center gap-2"
+          >
+            <Settings size={18} />
+            Bewerken / Verplaatsen
+          </button>
 
           <div className="flex gap-2">
             <button
