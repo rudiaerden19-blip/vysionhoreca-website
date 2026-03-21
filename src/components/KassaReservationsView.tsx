@@ -1565,8 +1565,8 @@ export default function KassaReservationsView({
         <div className="flex items-center gap-3 w-full">
           <div className="flex bg-gray-100 rounded-xl p-1 w-full">
             {[
-              { id: 'floorplan', label: 'Reservaties', icon: <MapPin size={16} /> },
-              { id: 'timeline', label: 'Tijdlijn', icon: <LayoutGrid size={16} /> },
+              { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} /> },
+              { id: 'timeline', label: 'Tafels', icon: <LayoutGrid size={16} /> },
               { id: 'guests', label: 'Contacten', icon: <Users size={16} /> },
               { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} /> },
               { id: 'settings', label: 'Instellingen', icon: <Settings size={16} /> },
