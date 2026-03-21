@@ -1598,7 +1598,7 @@ export default function KassaReservationsView({
                         <UserX size={16} />
                         No-show ✓
                       </button>
-                    ) : (r.status === 'CONFIRMED' || r.status === 'PENDING' || r.status === 'CHECKED_IN') ? (
+                    ) : (
                       <button
                         onClick={() => handleNoShow(r)}
                         className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-1.5"
@@ -1608,7 +1608,7 @@ export default function KassaReservationsView({
                         <UserX size={16} />
                         No-show
                       </button>
-                    ) : null}
+                    )}
                   </div>
                 </div>
               )
