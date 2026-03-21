@@ -1576,13 +1576,13 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'list' && (() => {
-          const COLS = '80px 65px 1fr 1fr 45px 50px 115px 115px 50px'
+          const COLS = 'repeat(9, 1fr)'
           return (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="grid gap-2 px-3 py-3 border-b border-gray-200 bg-gray-50 text-sm font-bold text-gray-500 uppercase tracking-wide"
+            <div className="grid gap-2 px-4 py-3 border-b border-gray-200 bg-gray-50 text-base font-bold text-gray-500 uppercase tracking-wide"
               style={{ gridTemplateColumns: COLS }}>
               <span>Datum</span><span>Tijd</span><span>Gast</span><span>Email</span>
-              <span>Ps</span><span>Tfl</span><span>Status</span><span>No-show</span><span></span>
+              <span>Ps</span><span>Tfl</span><span>Status</span><span>No-show</span><span>Push</span>
             </div>
             {filteredReservations.length === 0 && (
               <div className="py-12 text-center text-gray-400 text-base">Geen reservaties</div>
@@ -1593,25 +1593,18 @@ export default function KassaReservationsView({
                 <div key={r.id} className="grid gap-2 px-3 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
                   style={{ gridTemplateColumns: COLS }}
                   onClick={() => setSelectedReservation(r)}>
-                  {/* Datum */}
-                  <p className="text-base font-semibold text-gray-700 truncate">
+                  <p className="text-lg font-semibold text-gray-700 truncate">
                     {new Date(r.reservation_date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                   </p>
-                  {/* Tijd */}
-                  <p className="text-base font-bold text-gray-900">{r.reservation_time}</p>
-                  {/* Gast */}
+                  <p className="text-lg font-bold text-gray-900">{r.reservation_time}</p>
                   <div className="min-w-0">
-                    <p className="font-bold text-base text-gray-900 truncate">{r.guest_name}</p>
-                    {r.guest_phone && <p className="text-sm text-gray-400 truncate">{r.guest_phone}</p>}
+                    <p className="font-bold text-lg text-gray-900 truncate">{r.guest_name}</p>
+                    {r.guest_phone && <p className="text-base text-gray-400 truncate">{r.guest_phone}</p>}
                   </div>
-                  {/* Email */}
-                  <p className="text-sm text-gray-600 truncate min-w-0">{r.guest_email || '—'}</p>
-                  {/* Personen */}
-                  <span className="text-base font-bold text-gray-700">{r.party_size}</span>
-                  {/* Tafel */}
-                  <span className="text-base font-bold text-gray-700">{r.table_number || '-'}</span>
-                  {/* Status */}
-                  <span className="px-2 py-1 rounded-full text-sm font-bold inline-flex items-center gap-1 w-fit"
+                  <p className="text-base text-gray-600 truncate min-w-0">{r.guest_email || '—'}</p>
+                  <span className="text-lg font-bold text-gray-700">{r.party_size}</span>
+                  <span className="text-lg font-bold text-gray-700">{r.table_number || '-'}</span>
+                  <span className="px-2 py-1.5 rounded-full text-base font-bold inline-flex items-center gap-1 w-fit"
                     style={{ backgroundColor: status.bgColor, color: status.color }}>
                     {status.icon}{status.label}
                   </span>
@@ -1623,7 +1616,7 @@ export default function KassaReservationsView({
                         next.has(r.id) ? next.delete(r.id) : next.add(r.id)
                         return next
                       })}
-                      className="px-2 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1 transition-colors w-full justify-center"
+                      className="px-2 py-2 rounded-lg text-base font-bold flex items-center gap-1.5 transition-colors w-full justify-center"
                       style={noShowMarked.has(r.id)
                         ? { backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }
                         : { backgroundColor: '#f3f4f6', color: '#9ca3af' }}>
