@@ -1596,7 +1596,10 @@ export default function KassaReservationsView({
                   className="grid grid-cols-[90px_1fr_80px_70px_150px_180px_100px] gap-3 px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
                   onClick={() => setSelectedReservation(r)}
                 >
-                  <span className="font-bold text-base">{r.reservation_time}</span>
+                  <div>
+                    <p className="font-bold text-base">{r.reservation_time}</p>
+                    <p className="text-xs text-gray-400">{new Date(r.reservation_date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}</p>
+                  </div>
                   <div className="min-w-0">
                     <p className="font-semibold text-base text-gray-900 truncate">{r.guest_name}</p>
                     {r.guest_phone && <p className="text-sm text-gray-500 truncate">{r.guest_phone}</p>}
