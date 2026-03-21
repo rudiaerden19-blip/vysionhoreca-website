@@ -543,22 +543,34 @@ export default function KassaReservationsView({
   // Load reservations — map DB columns (customer_name) naar interface (guest_name)
   const loadReservations = async () => {
     setLoading(true)
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('reservations')
       .select('*')
       .eq('tenant_slug', tenant)
       .order('reservation_date', { ascending: true })
       .order('reservation_time', { ascending: true })
-    if (data) setReservations(data.map((r: Record<string, unknown>) => ({
-      ...r,
-      guest_name: (r.guest_name || r.customer_name || '') as string,
-      guest_phone: (r.guest_phone || r.customer_phone || '') as string,
-      guest_email: (r.guest_email || r.customer_email || '') as string,
-      reservation_time: ((r.reservation_time as string) || '').substring(0, 5),
-      status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
-      // Altijd string zodat vergelijking met table.number nooit faalt
-      table_number: r.table_number != null ? String(r.table_number) : undefined,
-    })) as Reservation[])
+    if (error) {
+      console.error('[loadReservations] Supabase error:', error)
+      toast.error('Fout bij laden reservaties: ' + error.message)
+    }
+    if (data) {
+      const mapped = data.map((r: Record<string, unknown>) => ({
+        ...r,
+        guest_name: (r.guest_name || r.customer_name || '') as string,
+        guest_phone: (r.guest_phone || r.customer_phone || '') as string,
+        guest_email: (r.guest_email || r.customer_email || '') as string,
+        // reservation_date altijd als string (DATE type geeft YYYY-MM-DD)
+        reservation_date: r.reservation_date ? String(r.reservation_date).slice(0, 10) : '',
+        reservation_time: ((r.reservation_time as string) || '').substring(0, 5),
+        status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
+        // Altijd string zodat vergelijking met table.number nooit faalt
+        table_number: r.table_number != null ? String(r.table_number) : undefined,
+      })) as Reservation[]
+      console.log('[loadReservations] Geladen:', mapped.length, 'reservaties. Datums:', [...new Set(mapped.map(r => r.reservation_date))].join(', ') || '(geen)')
+      setReservations(mapped)
+    } else if (!error) {
+      console.warn('[loadReservations] data is null maar geen error — RLS probleem?', { tenant })
+    }
     setLoading(false)
   }
 
@@ -2124,6 +2136,15 @@ export default function KassaReservationsView({
                         <CalendarDays size={32} className="text-gray-300 mb-3" />
                         <p className="text-base text-gray-400 font-medium">Geen reservaties</p>
                         <p className="text-sm text-gray-300 mt-1">voor {formatDate(selectedDate)}</p>
+                        {reservations.length > 0 && (
+                          <p className="text-xs text-gray-300 mt-3 leading-relaxed">
+                            {reservations.length} reservatie{reservations.length !== 1 ? 's' : ''} geladen<br />
+                            datums: {[...new Set(reservations.map(r => r.reservation_date))].join(', ')}
+                          </p>
+                        )}
+                        {reservations.length === 0 && !loading && (
+                          <p className="text-xs text-red-300 mt-3">Geen data van server ontvangen</p>
+                        )}
                       </div>
                     ) : (
                       floorRes.map(r => {
