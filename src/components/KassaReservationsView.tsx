@@ -2753,11 +2753,6 @@ export default function KassaReservationsView({
                   </div>
                 )}
 
-                {/* Totalen */}
-                <span className="text-sm text-gray-400 hidden sm:block">
-                  {filteredRes.length} reservering{filteredRes.length !== 1 ? 'en' : ''} · {totalPersons} pers.
-                </span>
-
                 {/* Filter knoppen: Dag / Week / Maand / Jaar */}
                 <div className="flex bg-gray-100 rounded-xl p-0.5 gap-0.5">
                   {(['dag','week','maand','jaar'] as const).map(f => (
@@ -2792,6 +2787,48 @@ export default function KassaReservationsView({
                     className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"/>
                 </div>
               )}
+
+              {/* Samenvatting vak */}
+              <div className="flex items-stretch gap-0 border-b border-gray-200 flex-shrink-0 bg-gray-50 divide-x divide-gray-200">
+                <div className="flex flex-col items-center justify-center px-8 py-3">
+                  <span className="text-2xl font-black text-gray-800">{filteredRes.length}</span>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
+                    Reservering{filteredRes.length !== 1 ? 'en' : ''}
+                  </span>
+                </div>
+                <div className="flex flex-col items-center justify-center px-8 py-3">
+                  <span className="text-2xl font-black text-orange-500">{totalPersons}</span>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">Personen</span>
+                </div>
+                {resViewFilter !== 'dag' && (
+                  <div className="flex flex-col items-center justify-center px-8 py-3">
+                    <span className="text-2xl font-black text-gray-800">
+                      {grouped.length}
+                    </span>
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">
+                      {resViewFilter === 'week' ? 'Dagen' : resViewFilter === 'maand' ? 'Dagen' : 'Maanden'}
+                    </span>
+                  </div>
+                )}
+                {resViewFilter !== 'dag' && filteredRes.length > 0 && (
+                  <div className="flex flex-col items-center justify-center px-8 py-3">
+                    <span className="text-2xl font-black text-gray-800">
+                      {Math.round(totalPersons / filteredRes.length * 10) / 10}
+                    </span>
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-0.5">Gem. groep</span>
+                  </div>
+                )}
+                <div className="flex-1"/>
+                <div className="flex flex-col items-center justify-center px-6 py-3">
+                  <span className="text-xs font-bold text-orange-500 uppercase tracking-wider">
+                    {resViewFilter === 'dag' && formatDate(resDate)}
+                    {resViewFilter === 'week' && `${from} – ${to}`}
+                    {resViewFilter === 'maand' && `${MONTHS_NL[resFilterMonth].charAt(0).toUpperCase() + MONTHS_NL[resFilterMonth].slice(1)} ${resFilterYear}`}
+                    {resViewFilter === 'jaar' && `Jaar ${resFilterYear}`}
+                  </span>
+                  <span className="text-[10px] text-gray-400 uppercase tracking-wider mt-0.5">Periode</span>
+                </div>
+              </div>
 
               {/* Body: lijst + kalender sidebar */}
               <div className="relative flex flex-1 overflow-hidden" onClick={() => showMonthPicker && setShowMonthPicker(false)}>
