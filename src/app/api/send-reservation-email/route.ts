@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer'
 
 export async function POST(request: NextRequest) {
   try {
+    const body = await request.json()
     const {
       customerEmail,
       customerName,
@@ -20,10 +21,27 @@ export async function POST(request: NextRequest) {
       businessEmail,
       cancellationReason,
       reviewLink,
-    } = await request.json()
+    } = body
+
+    // 🔍 Logging: toon altijd wie de email triggert
+    console.log('[send-reservation-email] Aangeroepen:', {
+      status,
+      customerEmail,
+      customerName,
+      referer: request.headers.get('referer'),
+      origin: request.headers.get('origin'),
+      userAgent: request.headers.get('user-agent')?.slice(0, 80),
+    })
 
     if (!customerEmail || !customerName) {
       return NextResponse.json({ error: 'Email en naam zijn verplicht' }, { status: 400 })
+    }
+
+    // ✅ Enkel toegestane statussen — blokkeer alles anders
+    const allowed = ['confirmed', 'pending', 'cancelled', 'reminder', 'review']
+    if (!allowed.includes(status)) {
+      console.warn('[send-reservation-email] GEBLOKKEERD: ongeldige status:', status)
+      return NextResponse.json({ error: 'Ongeldige status — email niet verstuurd' }, { status: 400 })
     }
 
     const transporter = nodemailer.createTransport({

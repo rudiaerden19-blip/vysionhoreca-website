@@ -623,6 +623,7 @@ export default function KassaReservationsView({
   // Pinch-to-zoom
   const pinchStartDist = useRef<number | null>(null)
   const pinchStartZoom = useRef(1)
+  const addReservationInProgress = useRef(false)  // guard tegen dubbele submit
   const [timelineDate, setTimelineDate] = useState(new Date().toISOString().split('T')[0])
   const [timelineNow, setTimelineNow] = useState(new Date())
   const [calMonth, setCalMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }))
@@ -1272,6 +1273,10 @@ export default function KassaReservationsView({
   }
 
   const handleAddReservation = async (data: Omit<Reservation, 'id' | 'tenant_slug' | 'total_spent' | 'created_at'>) => {
+    // Voorkom dubbele submit
+    if (addReservationInProgress.current) return
+    addReservationInProgress.current = true
+    try {
     const { data: inserted, error } = await supabase.from('reservations').insert([{
       customer_name: data.guest_name,
       customer_phone: data.guest_phone || null,
@@ -1295,7 +1300,7 @@ export default function KassaReservationsView({
     toast.success(`Reservatie voor ${data.guest_name} aangemaakt!`)
     setShowNewReservationModal(false)
 
-    // Email sturen
+    // Enkel bevestigingsmail voor NIEUWE reservatie
     if (data.guest_email && inserted) {
       await sendReservationEmail({
         customerEmail: data.guest_email,
@@ -1308,11 +1313,14 @@ export default function KassaReservationsView({
         notes: data.notes,
         specialRequests: data.special_requests,
         occasion: data.occasion,
-        status: data.status === 'CONFIRMED' ? 'confirmed' : 'pending',
+        status: 'confirmed',
         businessName: businessInfo.name,
         businessPhone: businessInfo.phone,
         businessEmail: businessInfo.email,
       })
+    }
+    } finally {
+      addReservationInProgress.current = false
     }
   }
 
