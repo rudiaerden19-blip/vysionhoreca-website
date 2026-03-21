@@ -611,38 +611,48 @@ export default function KassaReservationsView({
     didCenterTables.current = true
   }, [floorPlanTablesDB, WORLD_W, WORLD_H, floorZoom])
 
-  // Sla instellingen op in localStorage + Supabase (zodat publieke boekingspagina ze ook leest)
+  // Bouw de volledige Supabase payload van huidige instellingen
+  const buildSettingsPayload = (s: ReservationSettings) => ({
+    tenant_slug: tenant,
+    is_enabled: s.isEnabled,
+    accept_online: s.acceptOnline,
+    max_party_size: s.maxPartySize,
+    default_duration_minutes: s.defaultDurationMinutes,
+    slot_duration_minutes: s.slotDurationMinutes,
+    min_advance_hours: s.minAdvanceHours,
+    max_advance_days: s.maxAdvanceDays,
+    shifts: JSON.stringify(s.shifts || []),
+    closed_days: JSON.stringify(s.closedDays || []),
+    deposit_required: s.depositRequired,
+    deposit_amount: s.depositAmount,
+    no_show_protection: s.noShowProtection,
+    cancellation_deadline_hours: s.cancellationDeadlineHours,
+    cancellation_message: s.cancellationMessage,
+    auto_send_review: s.autoSendReview,
+    review_link: s.reviewLink,
+    booking_page_enabled: s.bookingPageEnabled,
+  })
+
+  // Auto-save bij elke toggle/wijziging (localStorage direct, Supabase async)
   const updateSettings = (updates: Partial<ReservationSettings>) => {
     const newSettings = { ...reservationSettings, ...updates }
     setReservationSettings(newSettings)
-    // localStorage altijd eerst — werkt ook zonder database
     localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(newSettings))
-    // Supabase als extra backup — sla alleen basis velden op die zeker bestaan
-    const safeSettings = {
-      tenant_slug: tenant,
-      is_enabled: newSettings.isEnabled,
-      accept_online: newSettings.acceptOnline,
-      max_party_size: newSettings.maxPartySize,
-      default_duration_minutes: newSettings.defaultDurationMinutes,
-      slot_duration_minutes: newSettings.slotDurationMinutes,
-      min_advance_hours: newSettings.minAdvanceHours,
-      max_advance_days: newSettings.maxAdvanceDays,
-      shifts: JSON.stringify(newSettings.shifts || []),
-      closed_days: JSON.stringify(newSettings.closedDays || []),
-      deposit_required: newSettings.depositRequired,
-      deposit_amount: newSettings.depositAmount,
-      no_show_protection: newSettings.noShowProtection,
+    // Stil opslaan naar Supabase (geen toast — dat doet de expliciete Opslaan knop)
+    supabase.from('reservation_settings').upsert(buildSettingsPayload(newSettings), { onConflict: 'tenant_slug' })
+      .then(({ error }) => { if (error) console.warn('Auto-save fout:', error.message) })
+  }
+
+  // Expliciet opslaan met toast feedback
+  const saveSettingsToSupabase = async () => {
+    localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(reservationSettings))
+    const { error } = await supabase.from('reservation_settings')
+      .upsert(buildSettingsPayload(reservationSettings), { onConflict: 'tenant_slug' })
+    if (error) {
+      toast.error('Opslaan mislukt: ' + error.message)
+    } else {
+      toast.success('✅ Instellingen opgeslagen!')
     }
-    supabase.from('reservation_settings').upsert(safeSettings, { onConflict: 'tenant_slug' })
-      .then(({ error }) => {
-        if (error) {
-          // Kolom bestaat mogelijk niet → probeer zonder deposit velden
-          console.warn('Settings save fout:', error.message)
-          const { deposit_required, deposit_amount, no_show_protection, ...basicSettings } = safeSettings
-          supabase.from('reservation_settings').upsert(basicSettings, { onConflict: 'tenant_slug' })
-            .then(({ error: e2 }) => { if (e2) console.warn('Settings fallback save fout:', e2.message) })
-        }
-      })
   }
 
   // ---- Floor plan editor helpers ----
@@ -2588,35 +2598,7 @@ export default function KassaReservationsView({
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">Reservatie Instellingen</h3>
               <button
-                onClick={async () => {
-                  const s = reservationSettings
-                  const payload = {
-                    tenant_slug: tenant,
-                    is_enabled: s.isEnabled,
-                    accept_online: s.acceptOnline,
-                    max_party_size: s.maxPartySize,
-                    default_duration_minutes: s.defaultDurationMinutes,
-                    slot_duration_minutes: s.slotDurationMinutes,
-                    min_advance_hours: s.minAdvanceHours,
-                    max_advance_days: s.maxAdvanceDays,
-                    shifts: JSON.stringify(s.shifts || []),
-                    closed_days: JSON.stringify(s.closedDays || []),
-                    deposit_required: s.depositRequired,
-                    deposit_amount: s.depositAmount,
-                    no_show_protection: s.noShowProtection,
-                    cancellation_deadline_hours: s.cancellationDeadlineHours,
-                    cancellation_message: s.cancellationMessage,
-                    auto_send_review: s.autoSendReview,
-                    review_link: s.reviewLink,
-                  }
-                  localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(s))
-                  const { error } = await supabase.from('reservation_settings').upsert(payload, { onConflict: 'tenant_slug' })
-                  if (error) {
-                    toast.error('Opslaan mislukt: ' + error.message)
-                  } else {
-                    toast.success('✅ Instellingen opgeslagen!')
-                  }
-                }}
+                onClick={saveSettingsToSupabase}
                 className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow transition-colors"
               >
                 💾 Opslaan
@@ -2969,35 +2951,7 @@ export default function KassaReservationsView({
 
             {/* Opslaan knop onderaan */}
             <button
-              onClick={async () => {
-                const s = reservationSettings
-                const payload = {
-                  tenant_slug: tenant,
-                  is_enabled: s.isEnabled,
-                  accept_online: s.acceptOnline,
-                  max_party_size: s.maxPartySize,
-                  default_duration_minutes: s.defaultDurationMinutes,
-                  slot_duration_minutes: s.slotDurationMinutes,
-                  min_advance_hours: s.minAdvanceHours,
-                  max_advance_days: s.maxAdvanceDays,
-                  shifts: JSON.stringify(s.shifts || []),
-                  closed_days: JSON.stringify(s.closedDays || []),
-                  deposit_required: s.depositRequired,
-                  deposit_amount: s.depositAmount,
-                  no_show_protection: s.noShowProtection,
-                  cancellation_deadline_hours: s.cancellationDeadlineHours,
-                  cancellation_message: s.cancellationMessage,
-                  auto_send_review: s.autoSendReview,
-                  review_link: s.reviewLink,
-                }
-                localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(s))
-                const { error } = await supabase.from('reservation_settings').upsert(payload, { onConflict: 'tenant_slug' })
-                if (error) {
-                  toast.error('Opslaan mislukt: ' + error.message)
-                } else {
-                  toast.success('✅ Instellingen opgeslagen!')
-                }
-              }}
+              onClick={saveSettingsToSupabase}
               className="w-full mt-4 py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg rounded-xl shadow-md transition-colors"
             >
               💾 Instellingen Opslaan
