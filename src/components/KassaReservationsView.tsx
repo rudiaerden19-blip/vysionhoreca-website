@@ -206,97 +206,90 @@ function ContactsView({
     : null
 
   return (
-    <div className="flex flex-col h-full -m-4" style={{ background: '#1a1a2e' }}>
+    <div className="flex flex-col h-full -m-4 bg-gray-50">
       {/* Zoekbalk */}
-      <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="px-4 py-3 flex-shrink-0 bg-white border-b border-gray-200">
         <div className="relative">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"/>
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
           <input type="text" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setPage(0) }}
             placeholder="Zoek op naam, email of telefoon..."
-            className="w-full pl-9 pr-4 py-2 rounded-lg text-sm outline-none"
-            style={{ background: 'rgba(255,255,255,0.06)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.1)' }}/>
+            className="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:border-gray-400 text-gray-700"/>
         </div>
       </div>
 
       {/* Tabel */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto bg-white">
         <table className="w-full text-sm border-collapse">
           <thead>
-            <tr style={{ background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+            <tr className="bg-gray-100 border-b border-gray-200">
               <th className="w-10 px-4 py-3 text-left">
-                <input type="checkbox" checked={allPageSelected} onChange={toggleAll}
-                  className="w-4 h-4 cursor-pointer" style={{ accentColor: '#3b82f6' }}/>
+                <input type="checkbox" checked={allPageSelected} onChange={toggleAll} className="w-4 h-4 cursor-pointer"/>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-300 hover:text-white"
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
                 onClick={() => toggleSort('name')}>
                 Naam <SortArrow col="name"/>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Bedrijf</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-300">E-mail</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-300">Telefoon</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-300 hover:text-white"
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">Bedrijf</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">E-mail</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Telefoon</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
                 onClick={() => toggleSort('lastVisit')}>
                 Laatste bezoek <SortArrow col="lastVisit"/>
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-300 hover:text-white"
+              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
                 onClick={() => toggleSort('visits')}>
                 Bezoeken <SortArrow col="visits"/>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-300">No-show</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">No-show</th>
             </tr>
           </thead>
           <tbody>
             {paginated.length === 0 && (
               <tr>
-                <td colSpan={8} className="text-center py-16 text-gray-500">
+                <td colSpan={8} className="text-center py-16 text-gray-400">
                   {searchQuery ? 'Geen resultaten gevonden' : 'Nog geen contacten — reservaties worden automatisch toegevoegd'}
                 </td>
               </tr>
             )}
-            {paginated.map((guest: GuestProfile) => {
+            {paginated.map((guest: GuestProfile, idx: number) => {
               const isSelected = selectedGuests.has(guest.id)
               const isNoShow = guest.totalNoShows > 0
               return (
                 <tr key={guest.id}
-                  style={{
-                    borderBottom: '1px solid rgba(255,255,255,0.05)',
-                    background: isSelected ? 'rgba(59,130,246,0.12)' : 'transparent',
-                  }}
-                  className="hover:bg-white/5 transition-colors">
+                  className={`border-b border-gray-100 transition-colors ${isSelected ? 'bg-blue-50' : idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'} hover:bg-blue-50/50`}>
                   <td className="px-4 py-3">
-                    <input type="checkbox" checked={isSelected} onChange={() => toggleOne(guest.id)}
-                      className="w-4 h-4 cursor-pointer" style={{ accentColor: '#3b82f6' }}/>
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleOne(guest.id)} className="w-4 h-4 cursor-pointer"/>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5 font-semibold text-white">
+                    <div className="flex items-center gap-1.5 font-semibold text-gray-800">
                       {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0"/>}
                       {guest.isBlocked && <Ban size={12} className="text-red-400 flex-shrink-0"/>}
                       {guest.name}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">—</td>
-                  <td className="px-4 py-3 text-gray-300">
+                  <td className="px-4 py-3 text-gray-300">—</td>
+                  <td className="px-4 py-3 text-gray-600">
                     {guest.email
-                      ? <a href={`mailto:${guest.email}`} className="hover:text-blue-400 transition-colors">{guest.email}</a>
-                      : <span className="text-gray-600">—</span>}
+                      ? <a href={`mailto:${guest.email}`} className="hover:underline hover:text-blue-600">{guest.email}</a>
+                      : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-300">
+                  <td className="px-4 py-3 text-gray-600">
                     {guest.phone
-                      ? <a href={`tel:${guest.phone}`} className="hover:text-blue-400 transition-colors">{guest.phone}</a>
-                      : <span className="text-gray-600">—</span>}
+                      ? <a href={`tel:${guest.phone}`} className="hover:underline hover:text-blue-600">{guest.phone}</a>
+                      : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-400 text-sm">
+                  <td className="px-4 py-3 text-gray-500 text-sm">
                     {guest.lastVisit
                       ? new Date(guest.lastVisit+'T12:00').toLocaleDateString('nl-BE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
                       : '—'}
                   </td>
-                  <td className="px-4 py-3 text-white font-bold text-right">{guest.totalVisits}</td>
+                  <td className="px-4 py-3 text-gray-800 font-bold text-right">{guest.totalVisits}</td>
                   <td className="px-4 py-3">
                     <button onClick={() => onToggleBlocked(guest)}
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-colors ${
                         guest.isBlocked ? 'bg-red-500 text-white'
-                        : isNoShow ? 'bg-red-900/40 text-red-400 border border-red-800'
-                        : 'text-gray-600'
+                        : isNoShow ? 'bg-red-100 text-red-600 border border-red-200'
+                        : 'text-gray-300'
                       }`}>
                       {guest.isBlocked ? <><UserX size={11}/> Geblokkeerd</>
                         : isNoShow ? <><UserX size={11}/> {guest.totalNoShows}×</>
@@ -310,21 +303,19 @@ function ContactsView({
         </table>
       </div>
 
-      {/* Footer met paginering — exact zoals screenshot 2 */}
-      <div className="flex-shrink-0 flex items-center justify-end gap-4 px-4 py-3 text-sm text-gray-400"
-        style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      {/* Footer paginering */}
+      <div className="flex-shrink-0 flex items-center justify-end gap-4 px-4 py-3 text-sm text-gray-500 bg-white border-t border-gray-200">
         <span>Rijen per pagina:</span>
         <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(0) }}
-          className="rounded px-2 py-1 text-sm outline-none cursor-pointer"
-          style={{ background: 'rgba(255,255,255,0.08)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.15)' }}>
+          className="rounded-lg px-2 py-1 text-sm outline-none cursor-pointer bg-gray-100 border border-gray-200 text-gray-700">
           {PAGE_SIZE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
         <span>{from}-{to} van {filtered.length}</span>
         <div className="flex gap-1">
           <button onClick={() => setPage(p => Math.max(0, p-1))} disabled={page === 0}
-            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-white/10 transition-colors text-gray-300">&lt;</button>
+            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 transition-colors">&lt;</button>
           <button onClick={() => setPage(p => Math.min(totalPages-1, p+1))} disabled={page >= totalPages-1}
-            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-white/10 transition-colors text-gray-300">&gt;</button>
+            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 transition-colors">&gt;</button>
         </div>
       </div>
     </div>
