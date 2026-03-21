@@ -30,8 +30,10 @@ import {
   Ban,
   X,
   UtensilsCrossed,
+  Send,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { getAuthHeaders } from '@/lib/auth-headers'
 
 // ---- Types ----
 type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'NO_SHOW' | 'CANCELLED' | 'WAITLIST'
@@ -486,6 +488,10 @@ export default function KassaReservationsView({
   })
   // Tenant info for emails
   const [businessInfo, setBusinessInfo] = useState({ name: '', phone: '', email: '' })
+  const [pushTarget, setPushTarget] = useState<Reservation | null>(null)
+  const [pushSubject, setPushSubject] = useState('')
+  const [pushMessage, setPushMessage] = useState('')
+  const [pushSending, setPushSending] = useState(false)
 
   // Load tenant info + reservatie instellingen vanuit Supabase
   useEffect(() => {
@@ -860,6 +866,36 @@ export default function KassaReservationsView({
   const handleUndoNoShow = async (r: Reservation) => {
     await updateStatus(r.id, 'CONFIRMED')
     toast.success(`${r.guest_name} teruggezet naar Bevestigd`)
+  }
+
+  const handleSendPush = async () => {
+    if (!pushTarget?.guest_email) { toast.error('Deze klant heeft geen emailadres'); return }
+    if (!pushSubject.trim() || !pushMessage.trim()) { toast.error('Vul onderwerp en bericht in'); return }
+    setPushSending(true)
+    try {
+      const res = await fetch('/api/marketing/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({
+          tenantSlug: tenant,
+          recipients: [{ email: pushTarget.guest_email, name: pushTarget.guest_name }],
+          subject: pushSubject,
+          message: pushMessage,
+          businessName: businessInfo.name,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success(`Email verstuurd naar ${pushTarget.guest_name}`)
+        setPushTarget(null); setPushSubject(''); setPushMessage('')
+      } else {
+        toast.error(data.error || 'Versturen mislukt')
+      }
+    } catch {
+      toast.error('Netwerk fout, probeer opnieuw')
+    } finally {
+      setPushSending(false)
+    }
   }
 
   const handleNoShow = async (r: Reservation) => {
@@ -1540,13 +1576,14 @@ export default function KassaReservationsView({
 
         {!loading && viewMode === 'list' && (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="grid grid-cols-[90px_1fr_80px_70px_150px_180px] gap-3 px-4 py-4 border-b border-gray-200 bg-gray-50 text-sm font-semibold text-gray-500 uppercase tracking-wide">
+            <div className="grid grid-cols-[90px_1fr_80px_70px_150px_180px_100px] gap-3 px-4 py-4 border-b border-gray-200 bg-gray-50 text-sm font-semibold text-gray-500 uppercase tracking-wide">
               <span>Tijd</span>
               <span>Gast</span>
               <span>Pers.</span>
               <span>Tafel</span>
               <span>Status</span>
               <span>Acties</span>
+              <span>Push</span>
             </div>
             {filteredReservations.length === 0 && (
               <div className="py-16 text-center text-gray-400 text-base">Geen reservaties</div>
@@ -1556,7 +1593,7 @@ export default function KassaReservationsView({
               return (
                 <div
                   key={r.id}
-                  className="grid grid-cols-[90px_1fr_80px_70px_150px_180px] gap-3 px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
+                  className="grid grid-cols-[90px_1fr_80px_70px_150px_180px_100px] gap-3 px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
                   onClick={() => setSelectedReservation(r)}
                 >
                   <span className="font-bold text-base">{r.reservation_time}</span>
@@ -1588,31 +1625,91 @@ export default function KassaReservationsView({
                         Bezet
                       </button>
                     )}
-                    {r.status === 'NO_SHOW' ? (
+                    <span
+                      className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-1.5 select-none"
+                      style={r.status === 'NO_SHOW'
+                        ? { backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }
+                        : { backgroundColor: '#f3f4f6', color: '#9ca3af' }
+                      }
+                    >
+                      <UserX size={16} />
+                      No-show
+                    </span>
+                  </div>
+                  {/* Push knop */}
+                  <div onClick={e => e.stopPropagation()}>
+                    {r.guest_email ? (
                       <button
-                        onClick={() => handleUndoNoShow(r)}
-                        className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-1.5"
-                        style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626', border: '2px solid #dc2626' }}
-                        title="Ongedaan maken"
+                        onClick={() => { setPushTarget(r); setPushSubject(''); setPushMessage('') }}
+                        className="px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5"
+                        style={{ backgroundColor: 'rgba(59,130,246,0.1)', color: '#2563eb' }}
+                        title={`Stuur email naar ${r.guest_email}`}
                       >
-                        <UserX size={16} />
-                        No-show ✓
+                        <Send size={15} />
+                        Push
                       </button>
                     ) : (
-                      <button
-                        onClick={() => handleNoShow(r)}
-                        className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-1.5"
-                        style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#dc2626' }}
-                        title="No-show"
-                      >
-                        <UserX size={16} />
-                        No-show
-                      </button>
+                      <span className="text-xs text-gray-300 italic">geen email</span>
                     )}
                   </div>
                 </div>
               )
             })}
+          </div>
+        )}
+
+        {/* Push email modal */}
+        {pushTarget && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[80] p-4">
+            <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900">Email sturen</h3>
+                  <p className="text-sm text-gray-400">{pushTarget.guest_name} · {pushTarget.guest_email}</p>
+                </div>
+                <button onClick={() => setPushTarget(null)} className="text-gray-400 hover:text-gray-700"><X size={22} /></button>
+              </div>
+              {/* Body */}
+              <div className="px-6 py-5 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">Onderwerp</label>
+                  <input
+                    autoFocus
+                    value={pushSubject}
+                    onChange={e => setPushSubject(e.target.value)}
+                    placeholder="bv. Speciale aanbieding voor u!"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 outline-none text-base"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-600 mb-1">Bericht / Promotie</label>
+                  <textarea
+                    value={pushMessage}
+                    onChange={e => setPushMessage(e.target.value)}
+                    placeholder={`Beste ${pushTarget.guest_name},\n\nBedankt voor uw bezoek! Als waardering bieden wij u...`}
+                    rows={6}
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 outline-none text-base resize-none"
+                  />
+                </div>
+              </div>
+              {/* Footer */}
+              <div className="px-6 py-4 border-t border-gray-100 flex gap-3">
+                <button
+                  onClick={() => setPushTarget(null)}
+                  className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-semibold text-sm hover:bg-gray-50"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={handleSendPush}
+                  disabled={pushSending || !pushSubject.trim() || !pushMessage.trim()}
+                  className="flex-1 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-bold text-sm flex items-center justify-center gap-2"
+                >
+                  {pushSending ? 'Versturen...' : <><Send size={16} /> Verstuur email</>}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
