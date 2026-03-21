@@ -1535,7 +1535,7 @@ export default function KassaReservationsView({
 
         {!loading && viewMode === 'list' && (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="grid grid-cols-[70px_1fr_64px_52px_120px_140px] gap-2 px-3 py-3 border-b border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-wide">
+            <div className="grid grid-cols-[90px_1fr_80px_70px_150px_180px] gap-3 px-4 py-4 border-b border-gray-200 bg-gray-50 text-sm font-semibold text-gray-500 uppercase tracking-wide">
               <span>Tijd</span>
               <span>Gast</span>
               <span>Pers.</span>
@@ -1544,52 +1544,53 @@ export default function KassaReservationsView({
               <span>Acties</span>
             </div>
             {filteredReservations.length === 0 && (
-              <div className="py-12 text-center text-gray-400 text-sm">Geen reservaties</div>
+              <div className="py-16 text-center text-gray-400 text-base">Geen reservaties</div>
             )}
             {filteredReservations.map((r) => {
               const status = STATUS_CONFIG[r.status]
               return (
                 <div
                   key={r.id}
-                  className="grid grid-cols-[70px_1fr_64px_52px_120px_140px] gap-2 px-3 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
+                  className="grid grid-cols-[90px_1fr_80px_70px_150px_180px] gap-3 px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
                   onClick={() => setSelectedReservation(r)}
                 >
-                  <span className="font-bold text-sm">{r.reservation_time}</span>
+                  <span className="font-bold text-base">{r.reservation_time}</span>
                   <div className="min-w-0">
-                    <p className="font-semibold text-sm text-gray-900 truncate">{r.guest_name}</p>
-                    {r.guest_phone && <p className="text-xs text-gray-400 truncate">{r.guest_phone}</p>}
-                    {r.guest_email && <p className="text-xs text-gray-400 truncate">{r.guest_email}</p>}
+                    <p className="font-semibold text-base text-gray-900 truncate">{r.guest_name}</p>
+                    {r.guest_phone && <p className="text-sm text-gray-500 truncate">{r.guest_phone}</p>}
+                    {r.guest_email && <p className="text-sm text-gray-400 truncate">{r.guest_email}</p>}
                   </div>
-                  <div className="flex items-center gap-1 text-sm">
-                    <Users size={13} className="text-gray-400 flex-shrink-0" />
-                    <span>{r.party_size}</span>
+                  <div className="flex items-center gap-1.5 text-base">
+                    <Users size={15} className="text-gray-400 flex-shrink-0" />
+                    <span className="font-medium">{r.party_size}</span>
                   </div>
-                  <span className="text-sm font-medium">{r.table_number || '-'}</span>
+                  <span className="text-base font-semibold">{r.table_number || '-'}</span>
                   <span
-                    className="px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 w-fit"
+                    className="px-3 py-1.5 rounded-full text-sm font-semibold inline-flex items-center gap-1.5 w-fit"
                     style={{ backgroundColor: status.bgColor, color: status.color }}
                   >
                     {status.icon}
                     {status.label}
                   </span>
-                  <div className="flex gap-1" onClick={e => e.stopPropagation()}>
+                  <div className="flex gap-2" onClick={e => e.stopPropagation()}>
                     {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
                       <button
                         onClick={() => handleCheckIn(r)}
-                        className="p-1.5 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 flex-shrink-0"
+                        className="px-3 py-2 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 flex-shrink-0 flex items-center gap-1.5 text-sm font-semibold"
                         title="Bezet"
                       >
-                        <UserCheck size={15} />
+                        <UserCheck size={16} />
+                        Bezet
                       </button>
                     )}
                     {(r.status === 'CONFIRMED' || r.status === 'PENDING' || r.status === 'CHECKED_IN') && (
                       <button
                         onClick={() => handleNoShow(r)}
-                        className="px-2 py-1.5 rounded-lg text-xs font-semibold flex-shrink-0 flex items-center gap-1"
+                        className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-1.5"
                         style={{ backgroundColor: 'rgba(239,68,68,0.1)', color: '#dc2626' }}
                         title="No-show"
                       >
-                        <UserX size={13} />
+                        <UserX size={16} />
                         No-show
                       </button>
                     )}
