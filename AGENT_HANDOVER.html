@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Vysion Horeca — Agent Handover</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {  background-color: #f8f8f8; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ef2929; } /* Alert */
+    code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #204a87; } /* Attribute */
+    code span.bn { color: #0000cf; } /* BaseN */
+    code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4e9a06; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #8f5902; font-style: italic; } /* Comment */
+    code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+    code span.dt { color: #204a87; } /* DataType */
+    code span.dv { color: #0000cf; } /* DecVal */
+    code span.er { color: #a40000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #0000cf; } /* Float */
+    code span.fu { color: #204a87; font-weight: bold; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+    code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+    code span.ot { color: #8f5902; } /* Other */
+    code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+    code span.sc { color: #ce5c00; font-weight: bold; } /* SpecialChar */
+    code span.ss { color: #4e9a06; } /* SpecialString */
+    code span.st { color: #4e9a06; } /* String */
+    code span.va { color: #000000; } /* Variable */
+    code span.vs { color: #4e9a06; } /* VerbatimString */
+    code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Vysion Horeca — Agent Handover</h1>
+</header>
+<h1 id="agent-handover-document">AGENT HANDOVER DOCUMENT</h1>
+<h2
+id="vysion-horeca-platform-volledige-technische-briefing-voor-nieuwe-ai-agent">Vysion
+Horeca Platform — Volledige technische briefing voor nieuwe
+AI-agent</h2>
+<blockquote>
+<p><strong>⚠️ KRITIEKE REGEL VOOR ELKE AGENT:</strong> Bouw NOOIT iets
+zonder eerst te overleggen met de gebruiker. Lees dit document volledig
+vóór je één regel code aanraakt. Eerdere agents hebben fouten gemaakt
+door te snel te handelen. Deze codebase heeft 500+ actieve tenants — een
+fout treft iedereen.</p>
+</blockquote>
+<hr />
+<h2 id="project-identiteit">1. PROJECT IDENTITEIT</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Eigenschap</th>
+<th>Waarde</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Projectnaam</strong></td>
+<td>Vysion Horeca Platform</td>
+</tr>
+<tr>
+<td><strong>Repository</strong></td>
+<td><code>vysionhoreca-website</code></td>
+</tr>
+<tr>
+<td><strong>Framework</strong></td>
+<td>Next.js 14 (App Router)</td>
+</tr>
+<tr>
+<td><strong>Taal</strong></td>
+<td>TypeScript (strict)</td>
+</tr>
+<tr>
+<td><strong>Database</strong></td>
+<td>Supabase (PostgreSQL + RLS)</td>
+</tr>
+<tr>
+<td><strong>Styling</strong></td>
+<td>Tailwind CSS</td>
+</tr>
+<tr>
+<td><strong>Hosting/Deploy</strong></td>
+<td>Vercel</td>
+</tr>
+<tr>
+<td><strong>Git remote</strong></td>
+<td><code>https://github.com/rudiaerden19-blip/vysionhoreca-website</code></td>
+</tr>
+<tr>
+<td><strong>Hoofdbranch</strong></td>
+<td><code>main</code></td>
+</tr>
+<tr>
+<td><strong>Deploy trigger</strong></td>
+<td>Elke push naar <code>main</code> → automatisch Vercel deploy</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="hoe-committen-en-deployen">2. HOE COMMITTEN EN DEPLOYEN</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Altijd eerst builden om type errors te vangen</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Daarna committen</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add <span class="at">-A</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Beschrijvende commit message&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># → Vercel deploy start automatisch binnen 30 seconden</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># → Productie URL: https://vysionhoreca-website.vercel.app (of custom domain)</span></span></code></pre></div>
+<p><strong>⚠️ Nooit pushen zonder <code>npm run build</code> te laten
+slagen. Type errors blokkeren de Vercel deploy.</strong></p>
+<hr />
+<h2 id="architectuur-overzicht">3. ARCHITECTUUR OVERZICHT</h2>
+<pre><code>vysionhoreca-website/
+├── src/
+│   ├── app/                    ← Next.js App Router pages + API routes
+│   │   ├── api/                ← ~50 API routes
+│   │   ├── shop/[tenant]/      ← Tenant-specifieke shop + admin
+│   │   │   └── admin/          ← 40+ admin pagina&#39;s per tenant
+│   │   ├── kassa/[tenant]/     ← POS kassa systeem
+│   │   ├── keuken/[tenant]/    ← Keukenweergave
+│   │   ├── superadmin/         ← Platform-beheer
+│   │   └── login/              ← Auth pagina&#39;s
+│   ├── components/             ← Gedeelde React componenten
+│   │   ├── KassaReservationsView.tsx   ← HOOFD COMPONENT (4800+ regels)
+│   │   └── KassaFloorPlan.tsx          ← Vloerplan component
+│   ├── lib/                    ← Utilities, Supabase client, auth
+│   └── i18n/                   ← Internationalisatie
+├── AGENT_HANDOVER.md           ← Dit document
+└── public/                     ← Statische bestanden</code></pre>
+<hr />
+<h2 id="multi-tenant-architectuur-absoluut-verplicht">4. MULTI-TENANT
+ARCHITECTUUR — ABSOLUUT VERPLICHT</h2>
+<p>Dit platform bedient <strong>500+ restaurants</strong> (tenants).
+Elke tenant heeft zijn eigen data, instellingen en gebruikers.</p>
+<h3 id="hoe-werkt-de-tenant-identificatie">4.1 Hoe werkt de tenant
+identificatie?</h3>
+<p><strong>Via URL parameter:</strong></p>
+<pre><code>/shop/frituurrudi/admin/reserveringen
+        ↑ dit is de tenant_slug</code></pre>
+<p><strong>Via subdomein (middleware rewrite):</strong></p>
+<pre><code>frituurrudi.ordervysion.com → intern: /shop/frituurrudi/</code></pre>
+<p><strong>Via localStorage (frontend auth):</strong></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="er">localStorage</span><span class="ot">[</span><span class="st">&quot;vysion_tenant&quot;</span><span class="ot">]</span> <span class="er">=</span> <span class="fu">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tenant_slug&quot;</span><span class="fu">:</span> <span class="st">&quot;frituurrudi&quot;</span><span class="fu">,</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;email&quot;</span><span class="fu">:</span> <span class="st">&quot;rudi@zaak.be&quot;</span><span class="fu">,</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;business_id&quot;</span><span class="fu">:</span> <span class="st">&quot;uuid-hier&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><strong>Via request headers (API routes):</strong></p>
+<pre><code>x-business-id: &lt;uuid&gt;
+x-auth-email: eigenaar@zaak.be
+x-tenant-slug: frituurrudi</code></pre>
+<h3 id="verplichte-checklist-bij-elke-database-aanroep">4.2 VERPLICHTE
+checklist bij elke database-aanroep</h3>
+<p><strong>❌ VERBODEN — Zonder tenant filter:</strong></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>supabase<span class="op">.</span><span class="fu">from</span>(<span class="st">&#39;reservations&#39;</span>)<span class="op">.</span><span class="fu">select</span>(<span class="st">&#39;*&#39;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>supabase<span class="op">.</span><span class="fu">from</span>(<span class="st">&#39;floor_plan_tables&#39;</span>)<span class="op">.</span><span class="fu">insert</span>({ name<span class="op">:</span> <span class="st">&#39;Tafel 1&#39;</span> })</span></code></pre></div>
+<p><strong>✅ VERPLICHT — Altijd filteren:</strong></p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>supabase<span class="op">.</span><span class="fu">from</span>(<span class="st">&#39;reservations&#39;</span>)<span class="op">.</span><span class="fu">select</span>(<span class="st">&#39;*&#39;</span>)<span class="op">.</span><span class="fu">eq</span>(<span class="st">&#39;tenant_slug&#39;</span><span class="op">,</span> tenant)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>supabase<span class="op">.</span><span class="fu">from</span>(<span class="st">&#39;floor_plan_tables&#39;</span>)<span class="op">.</span><span class="fu">insert</span>({ tenant_slug<span class="op">:</span> tenant<span class="op">,</span> name<span class="op">:</span> <span class="st">&#39;Tafel 1&#39;</span> })</span></code></pre></div>
+<h3 id="plan-trial-logica">4.3 Plan &amp; Trial logica</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Hoe Pro-toegang bepalen:</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> status <span class="op">=</span> data<span class="op">.</span><span class="at">subscription_status</span>  <span class="co">// &#39;trial&#39; | &#39;active&#39; | &#39;inactive&#39;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> trialEnd <span class="op">=</span> data<span class="op">.</span><span class="at">trial_ends_at</span> <span class="op">?</span> <span class="kw">new</span> <span class="bu">Date</span>(data<span class="op">.</span><span class="at">trial_ends_at</span>) <span class="op">:</span> <span class="dt">null</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> isTrial <span class="op">=</span> (status <span class="op">===</span> <span class="st">&#39;trial&#39;</span>) <span class="op">&amp;&amp;</span> trialEnd <span class="op">&amp;&amp;</span> trialEnd <span class="op">&gt;</span> <span class="kw">new</span> <span class="bu">Date</span>()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> isPro <span class="op">=</span> data<span class="op">.</span><span class="at">plan</span> <span class="op">===</span> <span class="st">&#39;pro&#39;</span> <span class="op">||</span> status <span class="op">===</span> <span class="st">&#39;active&#39;</span> <span class="op">||</span> isTrial</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">// ⚠️ isPro start als FALSE — niet TRUE</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">// Starter-tenants mogen geen Pro-features zien</span></span></code></pre></div>
+<hr />
+<h2 id="hoofd-component-kassareservationsview.tsx">5. HOOFD COMPONENT:
+KassaReservationsView.tsx</h2>
+<p><strong>Locatie:</strong>
+<code>src/components/KassaReservationsView.tsx</code><br />
+<strong>Grootte:</strong> ~4900 regels, 250KB<br />
+<strong>Props:</strong> <code>tenant: string</code> (de tenant slug)</p>
+<p>Dit is het kloppende hart van het systeem. Het bevat 6 tabs:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tab ID</th>
+<th>Label</th>
+<th>Functie</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reservations</code></td>
+<td>Reserveringen</td>
+<td>Lijst van alle reserveringen met filters</td>
+</tr>
+<tr>
+<td><code>floorplan</code></td>
+<td>Plattegrond</td>
+<td>Drag &amp; drop vloerplan met live bezetting</td>
+</tr>
+<tr>
+<td><code>timeline</code></td>
+<td>Tafels</td>
+<td>Tijdlijn per tafel (dag/avond)</td>
+</tr>
+<tr>
+<td><code>guests</code></td>
+<td>Contacten</td>
+<td>Gastendatabase</td>
+</tr>
+<tr>
+<td><code>stats</code></td>
+<td>Rapporten</td>
+<td>Statistieken en grafieken</td>
+</tr>
+<tr>
+<td><code>settings</code></td>
+<td>Instellingen</td>
+<td>Reservatie-instellingen</td>
+</tr>
+</tbody>
+</table>
+<h3 id="state-architectuur-selectie-van-de-50-states">5.1 State
+architectuur (selectie van de 50+ states)</h3>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Kerndata</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [reservations<span class="op">,</span> setReservations] <span class="op">=</span> <span class="fu">useState</span><span class="op">&lt;</span>Reservation[]<span class="op">&gt;</span>([])</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [reservationSettings<span class="op">,</span> setReservationSettings] <span class="op">=</span> <span class="fu">useState</span><span class="op">&lt;</span>ReservationSettings<span class="op">&gt;</span>(DEFAULT_SETTINGS)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [floorPlanTablesDB<span class="op">,</span> setFloorPlanTablesDB] <span class="op">=</span> <span class="fu">useState</span><span class="op">&lt;</span>FloorPlanTable[]<span class="op">&gt;</span>([])</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [guestProfilesDB<span class="op">,</span> setGuestProfilesDB] <span class="op">=</span> <span class="fu">useState</span><span class="op">&lt;</span>GuestProfile[]<span class="op">&gt;</span>([])</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co">// UI staat</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [viewMode<span class="op">,</span> setViewMode] <span class="op">=</span> <span class="fu">useState</span><span class="op">&lt;</span>ViewMode<span class="op">&gt;</span>(<span class="st">&#39;reservations&#39;</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [editReservation<span class="op">,</span> setEditReservation] <span class="op">=</span> <span class="fu">useState</span><span class="op">&lt;</span>Reservation <span class="op">|</span> <span class="dt">null</span><span class="op">&gt;</span>(<span class="kw">null</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [loading<span class="op">,</span> setLoading] <span class="op">=</span> <span class="fu">useState</span>(<span class="kw">true</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">// Reserveringen-view filters</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [resListDate<span class="op">,</span> setResListDate] <span class="op">=</span> <span class="fu">useState</span>(<span class="op">...</span>)         <span class="co">// geselecteerde dag</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [resViewFilter<span class="op">,</span> setResViewFilter] <span class="op">=</span> <span class="fu">useState</span><span class="op">&lt;</span><span class="st">&#39;dag&#39;</span><span class="op">|</span><span class="st">&#39;week&#39;</span><span class="op">|</span><span class="st">&#39;maand&#39;</span><span class="op">|</span><span class="st">&#39;jaar&#39;</span><span class="op">&gt;</span>(<span class="st">&#39;dag&#39;</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [resFilterMonth<span class="op">,</span> setResFilterMonth] <span class="op">=</span> <span class="fu">useState</span>(<span class="op">...</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [resFilterYear<span class="op">,</span> setResFilterYear] <span class="op">=</span> <span class="fu">useState</span>(<span class="op">...</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [resSearch<span class="op">,</span> setResSearch] <span class="op">=</span> <span class="fu">useState</span>(<span class="st">&#39;&#39;</span>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [showResCalendar<span class="op">,</span> setShowResCalendar] <span class="op">=</span> <span class="fu">useState</span>(<span class="kw">false</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [resCalYear<span class="op">,</span> setResCalYear] <span class="op">=</span> <span class="fu">useState</span>(<span class="op">...</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="co">// Vloerplan</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [tablesLocked<span class="op">,</span> setTablesLocked] <span class="op">=</span> <span class="fu">useState</span>(<span class="op">...</span>)     <span class="co">// localStorage: floor_tables_locked_{tenant}</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [floorZoom<span class="op">,</span> setFloorZoom] <span class="op">=</span> <span class="fu">useState</span>(<span class="dv">1</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [panX<span class="op">,</span> setPanX] <span class="op">=</span> <span class="fu">useState</span>(<span class="dv">0</span>)</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [panY<span class="op">,</span> setPanY] <span class="op">=</span> <span class="fu">useState</span>(<span class="dv">0</span>)</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="co">// Tijdlijn</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [timeShift<span class="op">,</span> setTimeShift] <span class="op">=</span> <span class="fu">useState</span>(<span class="op">...</span>)           <span class="co">// &#39;dag&#39; of &#39;avond&#39; — auto op basis van uur</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> [timelineNow<span class="op">,</span> setTimelineNow] <span class="op">=</span> <span class="fu">useState</span>(<span class="kw">new</span> <span class="bu">Date</span>())</span></code></pre></div>
+<h3 id="usememo-optimalisaties-geoptimaliseerd">5.2 useMemo
+optimalisaties (geoptimaliseerd)</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Niet aanraken zonder reden — deze zijn geoptimaliseerd</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> todayReservations <span class="op">=</span> <span class="fu">useMemo</span>(<span class="op">...</span>)        <span class="co">// Vandaag&#39;s reserveringen</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> upcomingReservations <span class="op">=</span> <span class="fu">useMemo</span>(<span class="op">...</span>)     <span class="co">// Komende reserveringen</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> waitlistReservations <span class="op">=</span> <span class="fu">useMemo</span>(<span class="op">...</span>)     <span class="co">// Wachtlijst</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> todayStats <span class="op">=</span> <span class="fu">useMemo</span>(<span class="op">...</span>)              <span class="co">// Statistieken vandaag</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> filteredReservations <span class="op">=</span> <span class="fu">useMemo</span>(<span class="op">...</span>)    <span class="co">// Gefilterd op zoek + shift</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> guestProfiles <span class="op">=</span> <span class="fu">useMemo</span>(<span class="op">...</span>)           <span class="co">// Gastprofielen berekend uit reserveringen</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> daysWithRes <span class="op">=</span> <span class="fu">useMemo</span>(<span class="op">...</span>)             <span class="co">// Set van datums met reserveringen (kalender dots)</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> resViewFiltered <span class="op">=</span> <span class="fu">useMemo</span>(<span class="op">...</span>)         <span class="co">// Reserveringen view: gefilterd + gegroepeerd</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> resCalMonths <span class="op">=</span> <span class="fu">useMemo</span>(<span class="op">...</span>)            <span class="co">// 12 kalendermaanden (sidebar)</span></span></code></pre></div>
+<h3 id="auto-refresh">5.3 Auto-refresh</h3>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Elke 60 seconden — vergelijkt data vóór re-render</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="pp">setInterval</span>(<span class="kw">async</span> () <span class="kw">=&gt;</span> {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> { data } <span class="op">=</span> <span class="cf">await</span> supabase<span class="op">.</span><span class="fu">from</span>(<span class="st">&#39;reservations&#39;</span>)<span class="op">...</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setReservations</span>(prev <span class="kw">=&gt;</span> {</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> sig <span class="op">=</span> (r) <span class="kw">=&gt;</span> [r<span class="op">.</span><span class="at">id</span><span class="op">,</span> r<span class="op">.</span><span class="at">status</span><span class="op">,</span> r<span class="op">.</span><span class="at">table_number</span><span class="op">,</span> <span class="op">...</span>]<span class="op">.</span><span class="fu">join</span>(<span class="st">&#39;|&#39;</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(prev<span class="op">.</span><span class="fu">map</span>(sig)) <span class="op">===</span> <span class="bu">JSON</span><span class="op">.</span><span class="fu">stringify</span>(data<span class="op">.</span><span class="fu">map</span>(sig)) <span class="op">?</span> prev <span class="op">:</span> data</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>}<span class="op">,</span> <span class="dv">60_000</span>)</span></code></pre></div>
+<h3 id="crud-functies">5.4 CRUD functies</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loadReservations</span>(silent<span class="op">?</span>)      <span class="co">// Herlaad alle reserveringen</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">loadGuestProfiles</span>()            <span class="co">// Herlaad gastprofielen</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">updateStatus</span>(id<span class="op">,</span> status)       <span class="co">// Statuswijziging reservering</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">handleAddReservation</span>(data)     <span class="co">// Nieuwe reservering aanmaken</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">handleDeleteReservation</span>(id)    <span class="co">// Reservering verwijderen</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">handleAssignTable</span>(id<span class="op">,</span> table)   <span class="co">// Tafel toewijzen</span></span></code></pre></div>
+<hr />
+<h2 id="reserveringen-systeem-volledige-flow">6. RESERVERINGEN SYSTEEM —
+VOLLEDIGE FLOW</h2>
+<h3 id="reservering-aanmaken-intern-via-kassa">6.1 Reservering aanmaken
+(intern via kassa)</h3>
+<pre><code>Gebruiker klikt &quot;+ Reservering&quot;
+→ Popup opent (AddReservationModal)
+→ Formulier: naam, telefoon, email, datum, tijd, personen, tafel, opmerkingen
+→ Overlap-check: controleert of tafel al bezet is op dat tijdstip (+buffer minuten)
+→ handleAddReservation():
+   1. addReservationInProgress.current = true  ← Voorkomt dubbele submit
+   2. INSERT in reservations (met tenant_slug)
+   3. UPSERT in guest_profiles (herkenning vaste klant)
+   4. Stuur bevestigingsmail via /api/send-reservation-email (ALLEEN als guest_email aanwezig)
+   5. loadReservations()
+   6. addReservationInProgress.current = false</code></pre>
+<h3 id="reservering-aanmaken-online-via-klant">6.2 Reservering aanmaken
+(online via klant)</h3>
+<pre><code>Klant op /shop/[tenant]/reserveren
+→ Selecteert datum, tijd, personen
+→ Vult naam + contactgegevens in
+→ POST naar API (admin-api.ts: createReservation)
+→ Cron job /api/cron/reservation-reminders stuurt herinnering 24u van tevoren</code></pre>
+<h3 id="email-flow-kritiek">6.3 Email flow — KRITIEK</h3>
+<p><strong>❌ VERBODEN:</strong> Emails sturen bij statuswijzigingen
+(bezet, vertrokken, afgerond, etc.)</p>
+<p><strong>✅ TOEGESTAAN:</strong> Emails ALLEEN bij: -
+<code>confirmed</code> — Reserveringsbevestiging - <code>pending</code>
+— Reservering in behandeling - <code>cancelled</code> — Annulering -
+<code>reminder</code> — Herinnering (via cron) - <code>review</code> —
+Review verzoek na bezoek</p>
+<p><strong>Whitelist in
+<code>/api/send-reservation-email/route.ts</code>:</strong></p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> allowed <span class="op">=</span> [<span class="st">&#39;confirmed&#39;</span><span class="op">,</span> <span class="st">&#39;pending&#39;</span><span class="op">,</span> <span class="st">&#39;cancelled&#39;</span><span class="op">,</span> <span class="st">&#39;reminder&#39;</span><span class="op">,</span> <span class="st">&#39;review&#39;</span>]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="op">!</span>allowed<span class="op">.</span><span class="fu">includes</span>(status)) {</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> NextResponse<span class="op">.</span><span class="fu">json</span>({ error<span class="op">:</span> <span class="st">&#39;Ongeldige status — email niet verstuurd&#39;</span> }<span class="op">,</span> { status<span class="op">:</span> <span class="dv">400</span> })</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="reservering-statussen">6.4 Reservering statussen</h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> ReservationStatus <span class="op">=</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;PENDING&#39;</span>      <span class="co">// Wacht op bevestiging</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;CONFIRMED&#39;</span>    <span class="co">// Bevestigd</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;CHECKED_IN&#39;</span>   <span class="co">// Aan tafel gezet</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;COMPLETED&#39;</span>    <span class="co">// Afgerond (tafel wordt GROEN op vloerplan)</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;NO_SHOW&#39;</span>      <span class="co">// Niet komen opdagen</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;CANCELLED&#39;</span>    <span class="co">// Geannuleerd</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="op">|</span> <span class="st">&#39;WAITLIST&#39;</span>     <span class="co">// Op wachtlijst</span></span></code></pre></div>
+<hr />
+<h2 id="vloerplan-systeem">7. VLOERPLAN SYSTEEM</h2>
+<h3 id="data-structuur">7.1 Data structuur</h3>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">interface</span> FloorPlanTable {</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  id<span class="op">:</span> <span class="dt">string</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  number<span class="op">:</span> <span class="dt">number</span>        <span class="co">// Tafelnummer</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  seats<span class="op">:</span> <span class="dt">number</span>         <span class="co">// Aantal zitplaatsen</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  shape<span class="op">:</span> <span class="st">&#39;SQUARE&#39;</span> <span class="op">|</span> <span class="st">&#39;ROUND&#39;</span> <span class="op">|</span> <span class="st">&#39;RECTANGLE&#39;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  x<span class="op">:</span> <span class="dt">number</span>             <span class="co">// Positie in % van canvas breedte</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  y<span class="op">:</span> <span class="dt">number</span>             <span class="co">// Positie in % van canvas hoogte</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p>Opgeslagen als JSON in <code>floor_plan_tables.data</code> kolom:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>floor_plan_tables (</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  tenant_slug TEXT <span class="kw">NOT</span> <span class="kw">NULL</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="kw">data</span> JSONB               ← <span class="dt">Array</span> van FloorPlanTable objecten</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<h3 id="tafels-vergrendelen">7.2 Tafels vergrendelen</h3>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">// localStorage key is TENANT-SPECIFIEK</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="vs">`floor_tables_locked_</span><span class="sc">${</span>tenant<span class="sc">}</span><span class="vs">`</span>)  <span class="co">// ✅</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">// NOOIT:</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>localStorage<span class="op">.</span><span class="fu">getItem</span>(<span class="st">&#39;floor_tables_locked&#39;</span>)             <span class="co">// ❌ — deelt state tussen tenants</span></span></code></pre></div>
+<h3 id="tafelkleur-op-basis-van-bezetting">7.3 Tafelkleur op basis van
+bezetting</h3>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">// COMPLETED → Groen (tafel is vrij)</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">// CHECKED_IN → Rood (tafel bezet)</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">// CONFIRMED/PENDING → Oranje (verwacht)</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">// Geen actieve reservering → Groen</span></span></code></pre></div>
+<hr />
+<h2 id="tijdlijn-tafels-tab">8. TIJDLIJN (TAFELS TAB)</h2>
+<ul>
+<li>Horizontale tijdas met tijdsloten</li>
+<li>Elke rij = één tafel</li>
+<li>Reserveringsblokken klikbaar (opens edit popup)</li>
+<li>Automatische selectie:
+<ul>
+<li>Vóór 17:00 → <strong>Dag</strong> (10:00–16:00)</li>
+<li>Na 17:00 → <strong>Avond</strong> (17:00–23:00)</li>
+</ul></li>
+<li>Rode verticale lijn = huidige tijd (beweegt elke minuut)</li>
+</ul>
+<hr />
+<h2 id="contacten-tab-guestprofielen">9. CONTACTEN TAB
+(guestprofielen)</h2>
+<ul>
+<li>Berekend vanuit alle reserveringen via <code>useMemo</code></li>
+<li>Kolommen: Naam, E-mail, Telefoon, Laatste bezoek, Bezoeken,
+No-show</li>
+<li>No-show badge: <strong>puur visueel toggle</strong> — rood =
+no-show, grijs = geen. <strong>Geen backend functie.</strong></li>
+<li>Zoeken op naam</li>
+<li>Paginering: rijen per pagina instelbaar</li>
+<li>Nieuwe klanten verschijnen automatisch bij eerste reservering</li>
+</ul>
+<hr />
+<h2 id="reserveringen-tab-filters">10. RESERVERINGEN TAB — FILTERS</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Filter</th>
+<th>Gedrag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dag</strong></td>
+<td>Toont reserveringen van geselecteerde dag</td>
+</tr>
+<tr>
+<td><strong>Week</strong></td>
+<td>Toont ma–zo van week rond geselecteerde dag, pijltjes = ±1 week</td>
+</tr>
+<tr>
+<td><strong>Maand</strong></td>
+<td>Maandpicker popup (Jan–Dec grid) + jaarselectie, toont volledige
+maand</td>
+</tr>
+<tr>
+<td><strong>Jaar</strong></td>
+<td>Toont volledig jaar, pijltjes = ±1 jaar</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Samenvatting-vak</strong> toont per filter: - Aantal
+reserveringen (groot, vetgedrukt) - Aantal personen (oranje) - Actieve
+dagen / gemiddelde groepsgrootte (week/maand/jaar) - Periode label</p>
+<p><strong>Kalender sidebar:</strong> - Alle 12 maanden van geselecteerd
+jaar - Scrollbaar van Jan tot Dec - Oranje stip = dag heeft
+reserveringen - Klik op dag → lijst toont die dag + filter = ‘dag’ +
+kalender sluit</p>
+<hr />
+<h2 id="api-routes-kritieke-regels">11. API ROUTES — KRITIEKE
+REGELS</h2>
+<h3 id="email-api">11.1 Email API</h3>
+<p><strong>Route:</strong>
+<code>POST /api/send-reservation-email</code></p>
+<p>Verplichte body velden:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode json"><code class="sourceCode json"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;customerEmail&quot;</span><span class="fu">:</span> <span class="st">&quot;klant@email.com&quot;</span><span class="fu">,</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;customerName&quot;</span><span class="fu">:</span> <span class="st">&quot;Jan Peeters&quot;</span><span class="fu">,</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;status&quot;</span><span class="fu">:</span> <span class="st">&quot;confirmed&quot;</span><span class="fu">,</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;reservationDate&quot;</span><span class="fu">:</span> <span class="st">&quot;2026-03-21&quot;</span><span class="fu">,</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;reservationTime&quot;</span><span class="fu">:</span> <span class="st">&quot;19:00&quot;</span><span class="fu">,</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;partySize&quot;</span><span class="fu">:</span> <span class="dv">4</span><span class="fu">,</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;tenantSlug&quot;</span><span class="fu">:</span> <span class="st">&quot;frituurrudi&quot;</span><span class="fu">,</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&quot;businessName&quot;</span><span class="fu">:</span> <span class="st">&quot;Frituur Rudi&quot;</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<h3 id="whatsapp-api">11.2 WhatsApp API</h3>
+<p><strong>Route:</strong>
+<code>POST /api/whatsapp/send-confirmation</code></p>
+<p>Haalt WhatsApp instellingen op per tenant uit
+<code>whatsapp_settings</code> tabel.</p>
+<h3 id="cron-jobs-vercel">11.3 Cron jobs (Vercel)</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Route</th>
+<th>Frequentie</th>
+<th>Doel</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/api/cron/reservation-reminders</code></td>
+<td>Dagelijks</td>
+<td>Herinneringen 24u voor reservering</td>
+</tr>
+<tr>
+<td><code>/api/cron/subscription-reminders</code></td>
+<td>Dagelijks</td>
+<td>Abonnementsherinneringen</td>
+</tr>
+<tr>
+<td><code>/api/cron/archive-z-reports</code></td>
+<td>Wekelijks</td>
+<td>Z-rapporten archiveren</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="supabase-tabellen-selectie">12. SUPABASE TABELLEN
+(SELECTIE)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Tabel</th>
+<th>Primaire sleutel</th>
+<th>Tenant filter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tenants</code></td>
+<td><code>id</code> (uuid)</td>
+<td><code>slug = tenant</code></td>
+</tr>
+<tr>
+<td><code>reservations</code></td>
+<td><code>id</code> (uuid)</td>
+<td><code>tenant_slug</code></td>
+</tr>
+<tr>
+<td><code>reservation_settings</code></td>
+<td><code>tenant_slug</code></td>
+<td><code>tenant_slug</code></td>
+</tr>
+<tr>
+<td><code>guest_profiles</code></td>
+<td><code>id</code> (uuid)</td>
+<td><code>tenant_slug</code></td>
+</tr>
+<tr>
+<td><code>floor_plan_tables</code></td>
+<td><code>tenant_slug</code></td>
+<td><code>tenant_slug</code> (1 rij per tenant)</td>
+</tr>
+<tr>
+<td><code>orders</code></td>
+<td><code>id</code> (uuid)</td>
+<td><code>tenant_slug</code></td>
+</tr>
+<tr>
+<td><code>menu_products</code></td>
+<td><code>id</code> (uuid)</td>
+<td><code>tenant_slug</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="authenticatie-flow">13. AUTHENTICATIE FLOW</h2>
+<pre><code>1. Eigenaar logt in via POST /api/auth/login
+2. Server checkt business_profiles (email + bcrypt wachtwoord)
+3. Response: { tenant: { tenant_slug, business_id, email } }
+4. Frontend slaat op in localStorage[&quot;vysion_tenant&quot;]
+5. Elke API call stuurt headers mee:
+   - x-business-id
+   - x-auth-email
+   - x-tenant-slug
+6. Server verifieert via verifyTenantAccess() in lib/verify-tenant-access.ts</code></pre>
+<hr />
+<h2 id="optimalisaties-die-gedaan-zijn">14. OPTIMALISATIES DIE GEDAAN
+ZIJN</h2>
+<h3 id="performance">14.1 Performance</h3>
+<ul>
+<li><strong><code>useMemo</code></strong> op alle zware berekeningen in
+KassaReservationsView:
+<ul>
+<li><code>todayReservations</code>, <code>upcomingReservations</code>,
+<code>waitlistReservations</code></li>
+<li><code>filteredReservations</code>, <code>guestProfiles</code>,
+<code>todayStats</code></li>
+<li><code>daysWithRes</code>, <code>resViewFiltered</code>,
+<code>resCalMonths</code></li>
+</ul></li>
+<li><strong>Auto-refresh</strong> vergelijkt data via signature hash →
+geen onnodige re-renders</li>
+<li><strong><code>addReservationInProgress</code> ref</strong> →
+voorkomt dubbele reserveringen bij dubbele klik</li>
+</ul>
+<h3 id="bug-fixes">14.2 Bug fixes</h3>
+<ul>
+<li><code>isPro</code> start als <code>false</code> (niet
+<code>true</code>) → starter-tenants zien geen Pro-features tijdens
+load</li>
+<li><code>localStorage</code> keys zijn tenant-specifiek:
+<code>floor_tables_locked_{tenant}</code></li>
+<li>UTC datum bug → lokale datum gebruikt
+(<code>new Date().getFullYear()...</code>) ipv
+<code>toISOString()</code></li>
+<li><code>JSON.parse</code> altijd in try/catch (corrupted localStorage
+breekt app niet meer)</li>
+<li>Alle Supabase <code>.then()</code> chains omgezet naar
+<code>async/await</code> met try/catch</li>
+<li>Email API heeft server-side whitelist → enkel toegestane statussen
+sturen mail</li>
+<li><code>handleAddReservation</code> heeft guard via
+<code>useRef</code> → geen dubbele submits</li>
+</ul>
+<h3 id="multi-tenant-correcties">14.3 Multi-tenant correcties</h3>
+<ul>
+<li>Alle Supabase queries gefilterd op <code>tenant_slug</code>
+(geauditeerd)</li>
+<li><code>floor_tables_locked</code> localStorage key is nu
+<code>floor_tables_locked_{tenant}</code></li>
+<li><code>reservation_settings</code> localStorage key was al
+tenant-specifiek</li>
+</ul>
+<hr />
+<h2 id="responsive-design">15. RESPONSIVE DESIGN</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Scherm</th>
+<th>Gedrag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Desktop (1280px+)</strong></td>
+<td>Volledige layout, alle labels zichtbaar</td>
+</tr>
+<tr>
+<td><strong>iPad (768px–1024px)</strong></td>
+<td>Tab labels verborgen → alleen iconen</td>
+</tr>
+<tr>
+<td><strong>Mobiel (&lt;768px)</strong></td>
+<td>Kalender opent als fullscreen overlay met × sluitknop</td>
+</tr>
+</tbody>
+</table>
+<p>Tab-balk: <code>overflow-x-auto</code> → scrolt horizontaal als te
+smal.</p>
+<hr />
+<h2 id="verboden-acties-voor-nieuwe-agents">16. VERBODEN ACTIES VOOR
+NIEUWE AGENTS</h2>
+<p><strong>❌ ABSOLUUT VERBODEN:</strong> 1. Iets bouwen of wijzigen
+zonder eerst te vragen 2. Queries zonder <code>tenant_slug</code> filter
+3. <code>isPro</code> starten als <code>true</code> 4.
+<code>localStorage</code> keys zonder tenant prefix 5. Emails sturen bij
+statuswijzigingen (alleen
+<code>confirmed/pending/cancelled/reminder/review</code>) 6.
+<code>useMemo</code> of <code>useEffect</code> hooks conditioneel
+aanroepen 7. Pushen zonder <code>npm run build</code> te laten slagen 8.
+Force push naar <code>main</code> 9. Grote blokken code verwijderen
+zonder git backup 10. IIFEs in render met zware berekeningen (gebruik
+<code>useMemo</code> bovenaan component)</p>
+<p><strong>⚠️ ALTIJD OVERLEGGEN VOOR:</strong> - Nieuwe database
+tabellen of kolommen - Wijzigingen aan de auth flow - Wijzigingen aan
+email-logica - Toevoegen van nieuwe API routes - Refactoring van
+KassaReservationsView.tsx (enorm bestand) - Wijzigingen die alle tenants
+beïnvloeden - Cron job aanpassingen</p>
+<hr />
+<h2 id="omgevingsvariabelen">17. OMGEVINGSVARIABELEN</h2>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Supabase</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_SUPABASE_URL</span><span class="op">=</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_SUPABASE_ANON_KEY</span><span class="op">=</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="va">SUPABASE_SERVICE_ROLE_KEY</span><span class="op">=</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Sentry (error monitoring)</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="va">NEXT_PUBLIC_SENTRY_DSN</span><span class="op">=</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="va">SENTRY_AUTH_TOKEN</span><span class="op">=</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># WhatsApp</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="va">WHATSAPP_VERIFY_TOKEN</span><span class="op">=</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Legacy auth</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="va">PASSWORD_LEGACY_SALT</span><span class="op">=</span></span></code></pre></div>
+<hr />
+<h2 id="git-workflow">18. GIT WORKFLOW</h2>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Normale feature</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> add <span class="at">-A</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">&quot;Korte beschrijving van wijziging&quot;</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Controleer altijd eerst</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> run build   <span class="co"># Moet slagen</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> status      <span class="co"># Controleer wat je commit</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Nooit</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> push <span class="at">--force</span>               <span class="co"># ❌</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">--amend</span> <span class="er">(</span><span class="ex">na</span> push<span class="kw">)</span>   <span class="co"># ❌</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> reset <span class="at">--hard</span> HEAD~1        <span class="co"># ❌ zonder overleg</span></span></code></pre></div>
+<hr />
+<h2 id="debugging-tips">19. DEBUGGING TIPS</h2>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode typescript"><code class="sourceCode typescript"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">// Email debugging: logs in /api/send-reservation-email</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">&#39;[send-reservation-email] Aangeroepen:&#39;</span><span class="op">,</span> {</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  status<span class="op">,</span> customerEmail<span class="op">,</span> customerName<span class="op">,</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  referer<span class="op">,</span> origin<span class="op">,</span> userAgent</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co">// Reserveringen laden</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="fu">loadReservations</span>()         <span class="co">// Met loading spinner</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="fu">loadReservations</span>(<span class="kw">true</span>)     <span class="co">// Silent (achtergrond, geen spinner)</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co">// Tenant check in component</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> tenant <span class="op">=</span> props<span class="op">.</span><span class="at">tenant</span>  <span class="co">// Altijd via props, nooit hardcoded</span></span></code></pre></div>
+<hr />
+<h2 id="contactinfo-context">20. CONTACTINFO &amp; CONTEXT</h2>
+<ul>
+<li><strong>Eigenaar:</strong> Rudi Aerden</li>
+<li><strong>Taal in code:</strong> Nederlands (labels, comments,
+variabelenamen)</li>
+<li><strong>Taal communicatie:</strong> Nederlands</li>
+<li><strong>Doel:</strong> Beter dan Zenchef/Resengo bouwen — moderne,
+snelle horeca-software</li>
+<li><strong>Stijl:</strong> Oranje als hoofdkleur
+(<code>orange-500</code>), donkerblauw (<code>#3C4D6B</code>) voor
+actieve tabs</li>
+<li><strong>Tone:</strong> Directief, geen overbodige uitleg, toon
+resultaten</li>
+</ul>
+<hr />
+<p><em>Document aangemaakt op 21 maart 2026 — KassaReservationsView
+versie na audit &amp; optimalisatie</em></p>
+</body>
+</html>

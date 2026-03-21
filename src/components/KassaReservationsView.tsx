@@ -1389,8 +1389,6 @@ export default function KassaReservationsView({
       table_number: data.table_number || null,
       notes: data.notes || null,
       special_requests: data.special_requests || '',
-      occasion: data.occasion || null,
-      payment_status: data.payment_status || 'pending',
       status: 'confirmed',
       tenant_slug: tenant,
       total_spent: 0,
