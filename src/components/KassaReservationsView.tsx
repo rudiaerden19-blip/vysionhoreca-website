@@ -857,6 +857,11 @@ export default function KassaReservationsView({
     }
   }
 
+  const handleUndoNoShow = async (r: Reservation) => {
+    await updateStatus(r.id, 'CONFIRMED')
+    toast.success(`${r.guest_name} teruggezet naar Bevestigd`)
+  }
+
   const handleNoShow = async (r: Reservation) => {
     await updateStatus(r.id, 'NO_SHOW')
     toast.error(`${r.guest_name} gemarkeerd als no-show`)
@@ -1583,7 +1588,17 @@ export default function KassaReservationsView({
                         Bezet
                       </button>
                     )}
-                    {(r.status === 'CONFIRMED' || r.status === 'PENDING' || r.status === 'CHECKED_IN') && (
+                    {r.status === 'NO_SHOW' ? (
+                      <button
+                        onClick={() => handleUndoNoShow(r)}
+                        className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-1.5"
+                        style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626', border: '2px solid #dc2626' }}
+                        title="Ongedaan maken"
+                      >
+                        <UserX size={16} />
+                        No-show ✓
+                      </button>
+                    ) : (r.status === 'CONFIRMED' || r.status === 'PENDING' || r.status === 'CHECKED_IN') ? (
                       <button
                         onClick={() => handleNoShow(r)}
                         className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-1.5"
@@ -1593,7 +1608,7 @@ export default function KassaReservationsView({
                         <UserX size={16} />
                         No-show
                       </button>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               )
