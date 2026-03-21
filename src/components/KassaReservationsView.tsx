@@ -1169,7 +1169,6 @@ export default function KassaReservationsView({
       duration_minutes: data.duration_minutes || 90,
       table_number: data.table_number || null,
       notes: data.notes || null,
-      occasion: data.occasion || null,
       ...(data.special_requests ? { special_requests: data.special_requests } : {}),
       status: 'confirmed',
       tenant_slug: tenant,
