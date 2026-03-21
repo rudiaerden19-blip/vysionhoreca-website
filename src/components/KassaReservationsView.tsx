@@ -652,6 +652,10 @@ export default function KassaReservationsView({
   const [resCalMonth, setResCalMonth] = useState(() => new Date().getMonth())
   const [resSearch, setResSearch] = useState('')
   const [showResSearch, setShowResSearch] = useState(false)
+  const [resViewFilter, setResViewFilter] = useState<'dag' | 'week' | 'maand' | 'jaar'>('dag')
+  const [resFilterMonth, setResFilterMonth] = useState(() => new Date().getMonth())
+  const [resFilterYear, setResFilterYear] = useState(() => new Date().getFullYear())
+  const [showMonthPicker, setShowMonthPicker] = useState(false)
   const [floorPlanTime, setFloorPlanTime] = useState(() => {
     const now = new Date()
     const h = now.getHours().toString().padStart(2, '0')
@@ -2555,21 +2559,73 @@ export default function KassaReservationsView({
 
         {!loading && viewMode === 'reservations' && (() => {
           const resDate = resListDate
-          // Gebruik lokale datum (niet UTC) om tijdzone-bugs na middernacht te vermijden
           const _tn = new Date()
           const today = `${_tn.getFullYear()}-${String(_tn.getMonth()+1).padStart(2,'0')}-${String(_tn.getDate()).padStart(2,'0')}`
 
-          const q = resSearch.trim().toLowerCase()
-          const dayRes = reservations
-            .filter(r => r.reservation_date === resDate && r.status !== 'CANCELLED')
-            .filter(r => !q || r.guest_name?.toLowerCase().includes(q) || r.guest_phone?.includes(q) || r.guest_email?.toLowerCase().includes(q))
-            .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
-
-          const daysWithRes = new Set(reservations.filter(r => r.status !== 'CANCELLED').map(r => r.reservation_date))
-          const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
+          const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','december']
+          const MONTHS_SHORT = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec']
+          const DAYS_FULL_NL = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag']
           const DAYS_NL = ['Ma','Di','Wo','Do','Vr','Za','Zo']
 
-          // Bouw kalendermaanden op (3 maanden: vorige, huidige, volgende)
+          // --- Datumbereik berekenen op basis van filter ---
+          const getDateRange = (): { from: string; to: string; label: string } => {
+            if (resViewFilter === 'dag') {
+              return { from: resDate, to: resDate, label: formatDate(resDate) }
+            }
+            if (resViewFilter === 'week') {
+              const d = new Date(resDate + 'T12:00:00')
+              const dow = d.getDay() === 0 ? 6 : d.getDay() - 1
+              const mon = new Date(d); mon.setDate(d.getDate() - dow)
+              const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
+              const fmt = (dt: Date) => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+              return { from: fmt(mon), to: fmt(sun), label: `Week van ${fmt(mon)}` }
+            }
+            if (resViewFilter === 'maand') {
+              const y = resFilterYear, m = resFilterMonth
+              const from = `${y}-${String(m+1).padStart(2,'0')}-01`
+              const to = `${y}-${String(m+1).padStart(2,'0')}-${String(new Date(y, m+1, 0).getDate()).padStart(2,'0')}`
+              return { from, to, label: `${MONTHS_NL[m].charAt(0).toUpperCase() + MONTHS_NL[m].slice(1)} ${y}` }
+            }
+            // jaar
+            return { from: `${resFilterYear}-01-01`, to: `${resFilterYear}-12-31`, label: `Jaar ${resFilterYear}` }
+          }
+
+          const { from, to } = getDateRange()
+          const q = resSearch.trim().toLowerCase()
+
+          const filteredRes = reservations
+            .filter(r => r.status !== 'CANCELLED' && r.reservation_date >= from && r.reservation_date <= to)
+            .filter(r => !q || r.guest_name?.toLowerCase().includes(q) || r.guest_phone?.includes(q) || r.guest_email?.toLowerCase().includes(q))
+            .sort((a, b) => a.reservation_date.localeCompare(b.reservation_date) || a.reservation_time.localeCompare(b.reservation_time))
+
+          // Groepeer per datum voor week/maand/jaar weergave
+          const grouped: { date: string; rows: typeof filteredRes }[] = []
+          if (resViewFilter === 'dag') {
+            grouped.push({ date: resDate, rows: filteredRes })
+          } else {
+            const map = new Map<string, typeof filteredRes>()
+            filteredRes.forEach(r => {
+              if (!map.has(r.reservation_date)) map.set(r.reservation_date, [])
+              map.get(r.reservation_date)!.push(r)
+            })
+            map.forEach((rows, date) => grouped.push({ date, rows }))
+          }
+
+          const totalPersons = filteredRes.reduce((s, r) => s + r.party_size, 0)
+
+          // Datum header label voor groepen
+          const dateHeader = (ds: string) => {
+            if (resViewFilter === 'dag') return null
+            const d = new Date(ds + 'T12:00:00')
+            const dayName = DAYS_FULL_NL[d.getDay()]
+            const day = d.getDate()
+            const month = MONTHS_SHORT[d.getMonth()]
+            return `${dayName} ${day} ${month}`
+          }
+
+          const daysWithRes = new Set(reservations.filter(r => r.status !== 'CANCELLED').map(r => r.reservation_date))
+
+          // Kalender sidebar maanden
           const calMonths: { y: number; m: number; cells: (number|null)[] }[] = []
           for (let mOff = -1; mOff <= 1; mOff++) {
             let y = resCalYear, m = resCalMonth + mOff
@@ -2584,22 +2640,136 @@ export default function KassaReservationsView({
             calMonths.push({ y, m, cells })
           }
 
+          const reservationRow = (r: typeof filteredRes[0], idx: number) => (
+            <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb' }}
+              className={`transition-colors hover:bg-orange-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}`}>
+              <td className="px-5 py-4 font-bold text-gray-800 text-base" style={{ borderRight: '1px solid #e5e7eb' }}>{r.reservation_time}</td>
+              <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
+              </td>
+              <td className="px-5 py-4 text-center font-bold text-gray-800 text-lg" style={{ borderRight: '1px solid #e5e7eb' }}>{r.party_size}</td>
+              <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>{r.guest_name}</td>
+              <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                {r.guest_phone ? <a href={`tel:${r.guest_phone}`} className="hover:underline">{r.guest_phone}</a> : <span className="text-gray-300">—</span>}
+              </td>
+              <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                {r.guest_email ? <a href={`mailto:${r.guest_email}`} className="hover:underline">{r.guest_email}</a> : <span className="text-gray-300">—</span>}
+              </td>
+              <td className="px-5 py-4 text-right">
+                <button onClick={() => setEditReservation(r)}
+                  className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white text-sm font-semibold transition-colors">
+                  ✏️ Bewerken
+                </button>
+              </td>
+            </tr>
+          )
+
           return (
             <div className="flex flex-col h-full -m-4 bg-white">
-              {/* Toolbar */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 flex-shrink-0">
-                <button onClick={() => { const d = new Date(resDate); d.setDate(d.getDate()-1); setResListDate(d.toISOString().split('T')[0]) }}
-                  className="w-9 h-9 rounded-xl bg-orange-500 hover:bg-orange-600 flex items-center justify-center text-white">
-                  <ChevronLeft size={18}/>
-                </button>
-                <span className="font-bold text-gray-800 text-sm min-w-[110px] text-center">{formatDate(resDate)}</span>
-                <button onClick={() => { const d = new Date(resDate); d.setDate(d.getDate()+1); setResListDate(d.toISOString().split('T')[0]) }}
-                  className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
-                  <ChevronRight size={18}/>
-                </button>
+              {/* Toolbar rij 1: datum nav + filter knoppen + acties */}
+              <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-b border-gray-200 flex-shrink-0">
+
+                {/* Dag navigatie — alleen zichtbaar in dag-modus */}
+                {resViewFilter === 'dag' && (
+                  <>
+                    <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()-1); setResListDate(d.toISOString().split('T')[0]) }}
+                      className="w-9 h-9 rounded-xl bg-orange-500 hover:bg-orange-600 flex items-center justify-center text-white flex-shrink-0">
+                      <ChevronLeft size={18}/>
+                    </button>
+                    <span className="font-bold text-gray-800 text-sm min-w-[100px] text-center">{formatDate(resDate)}</span>
+                    <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()+1); setResListDate(d.toISOString().split('T')[0]) }}
+                      className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
+                      <ChevronRight size={18}/>
+                    </button>
+                  </>
+                )}
+
+                {/* Week navigatie */}
+                {resViewFilter === 'week' && (
+                  <>
+                    <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()-7); setResListDate(d.toISOString().split('T')[0]) }}
+                      className="w-9 h-9 rounded-xl bg-orange-500 hover:bg-orange-600 flex items-center justify-center text-white flex-shrink-0">
+                      <ChevronLeft size={18}/>
+                    </button>
+                    <span className="font-bold text-gray-800 text-sm min-w-[140px] text-center">{from} – {to}</span>
+                    <button onClick={() => { const d = new Date(resDate + 'T12:00:00'); d.setDate(d.getDate()+7); setResListDate(d.toISOString().split('T')[0]) }}
+                      className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 flex-shrink-0">
+                      <ChevronRight size={18}/>
+                    </button>
+                  </>
+                )}
+
+                {/* Maand selector */}
+                {resViewFilter === 'maand' && (
+                  <div className="relative">
+                    <button onClick={() => setShowMonthPicker(v => !v)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm">
+                      <Calendar size={15}/>
+                      {MONTHS_SHORT[resFilterMonth]} {resFilterYear}
+                      <ChevronRight size={13} className={`transition-transform ${showMonthPicker ? 'rotate-90' : ''}`}/>
+                    </button>
+                    {showMonthPicker && (
+                      <div className="absolute top-12 left-0 z-50 bg-white border border-gray-200 rounded-2xl shadow-2xl p-4 w-72">
+                        {/* Jaar in picker */}
+                        <div className="flex items-center justify-between mb-3">
+                          <button onClick={() => setResFilterYear(y => y - 1)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600">
+                            <ChevronLeft size={15}/>
+                          </button>
+                          <span className="font-bold text-gray-800">{resFilterYear}</span>
+                          <button onClick={() => setResFilterYear(y => y + 1)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600">
+                            <ChevronRight size={15}/>
+                          </button>
+                        </div>
+                        {/* 12 maanden grid */}
+                        <div className="grid grid-cols-3 gap-2">
+                          {MONTHS_SHORT.map((mn, mi) => (
+                            <button key={mi}
+                              onClick={() => { setResFilterMonth(mi); setShowMonthPicker(false) }}
+                              className={`py-2 rounded-xl text-sm font-semibold transition-colors
+                                ${resFilterMonth === mi ? 'bg-orange-500 text-white' : 'bg-gray-100 hover:bg-orange-100 text-gray-700'}`}>
+                              {mn}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Jaar selector */}
+                {resViewFilter === 'jaar' && (
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setResFilterYear(y => y - 1)}
+                      className="w-9 h-9 rounded-xl bg-orange-500 hover:bg-orange-600 flex items-center justify-center text-white">
+                      <ChevronLeft size={18}/>
+                    </button>
+                    <span className="font-bold text-gray-800 text-base px-2">{resFilterYear}</span>
+                    <button onClick={() => setResFilterYear(y => y + 1)}
+                      className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
+                      <ChevronRight size={18}/>
+                    </button>
+                  </div>
+                )}
+
+                {/* Totalen */}
                 <span className="text-sm text-gray-400 hidden sm:block">
-                  {dayRes.length} reservering{dayRes.length !== 1 ? 'en' : ''} · {dayRes.reduce((s,r) => s+r.party_size, 0)} pers.
+                  {filteredRes.length} reservering{filteredRes.length !== 1 ? 'en' : ''} · {totalPersons} pers.
                 </span>
+
+                {/* Filter knoppen: Dag / Week / Maand / Jaar */}
+                <div className="flex bg-gray-100 rounded-xl p-0.5 gap-0.5">
+                  {(['dag','week','maand','jaar'] as const).map(f => (
+                    <button key={f}
+                      onClick={() => { setResViewFilter(f); setShowMonthPicker(false); if (f === 'maand') { setResFilterMonth(new Date().getMonth()); setResFilterYear(new Date().getFullYear()) } if (f === 'jaar') setResFilterYear(new Date().getFullYear()) }}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold capitalize transition-colors
+                        ${resViewFilter === f ? 'bg-orange-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-800'}`}>
+                      {f.charAt(0).toUpperCase() + f.slice(1)}
+                    </button>
+                  ))}
+                </div>
+
                 <div className="ml-auto flex gap-2">
                   <button onClick={() => { setShowResCalendar(v => !v); setShowResSearch(false) }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors
@@ -2624,13 +2794,13 @@ export default function KassaReservationsView({
               )}
 
               {/* Body: lijst + kalender sidebar */}
-              <div className="relative flex flex-1 overflow-hidden">
+              <div className="relative flex flex-1 overflow-hidden" onClick={() => showMonthPicker && setShowMonthPicker(false)}>
                 {/* Lijst */}
                 <div className="flex-1 overflow-auto">
-                  {dayRes.length === 0 ? (
+                  {filteredRes.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2 py-16">
                       <List size={40} className="text-gray-300"/>
-                      <p className="font-medium">{q ? `Geen resultaten voor "${resSearch}"` : `Geen reserveringen voor ${formatDate(resDate)}`}</p>
+                      <p className="font-medium">{q ? `Geen resultaten voor "${resSearch}"` : `Geen reserveringen gevonden`}</p>
                     </div>
                   ) : (
                     <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
@@ -2646,38 +2816,27 @@ export default function KassaReservationsView({
                         </tr>
                       </thead>
                       <tbody>
-                        {dayRes.map((r, idx) => (
-                          <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb' }}
-                            className={`transition-colors hover:bg-orange-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}`}>
-                            <td className="px-5 py-4 font-bold text-gray-800 text-base" style={{ borderRight: '1px solid #e5e7eb' }}>{r.reservation_time}</td>
-                            <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
-                              {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
-                            </td>
-                            <td className="px-5 py-4 text-center font-bold text-gray-800 text-lg" style={{ borderRight: '1px solid #e5e7eb' }}>{r.party_size}</td>
-                            <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>{r.guest_name}</td>
-                            <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
-                              {r.guest_phone ? <a href={`tel:${r.guest_phone}`} className="hover:underline">{r.guest_phone}</a> : <span className="text-gray-300">—</span>}
-                            </td>
-                            <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
-                              {r.guest_email ? <a href={`mailto:${r.guest_email}`} className="hover:underline">{r.guest_email}</a> : <span className="text-gray-300">—</span>}
-                            </td>
-                            <td className="px-5 py-4 text-right">
-                              <button onClick={() => setEditReservation(r)}
-                                className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white text-sm font-semibold transition-colors">
-                                ✏️ Bewerken
-                              </button>
-                            </td>
-                          </tr>
+                        {grouped.map(({ date, rows }) => (
+                          <>
+                            {dateHeader(date) && (
+                              <tr key={`hdr-${date}`}>
+                                <td colSpan={7} className="px-5 py-2 bg-orange-50 border-b border-orange-100">
+                                  <span className="text-xs font-bold text-orange-600 uppercase tracking-wider">{dateHeader(date)}</span>
+                                  <span className="ml-2 text-xs text-orange-400">{rows.length} reserv. · {rows.reduce((s,r) => s+r.party_size,0)} pers.</span>
+                                </td>
+                              </tr>
+                            )}
+                            {rows.map((r, idx) => reservationRow(r, idx))}
+                          </>
                         ))}
                       </tbody>
                     </table>
                   )}
                 </div>
 
-                {/* Kalender sidebar — op grote schermen rechts naast lijst, op klein scherm als overlay */}
+                {/* Kalender sidebar */}
                 {showResCalendar && (
                   <div className="absolute inset-0 z-20 bg-white overflow-y-auto md:relative md:inset-auto md:z-auto md:w-[270px] md:flex-shrink-0 md:border-l md:border-gray-200">
-                    {/* Jaar nav */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                       <button onClick={() => setResCalYear(y => y - 1)}
                         className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500">
@@ -2697,11 +2856,10 @@ export default function KassaReservationsView({
                         <X size={14}/>
                       </button>
                     </div>
-                    {/* Maanden */}
                     <div className="px-3 py-2 space-y-4">
                       {calMonths.map(({ y, m, cells }) => (
                         <div key={`${y}-${m}`}>
-                          <div className="text-xs font-bold text-gray-700 mb-1 px-1">{MONTHS_NL[m]}</div>
+                          <div className="text-xs font-bold text-gray-700 mb-1 px-1">{MONTHS_NL[m].charAt(0).toUpperCase() + MONTHS_NL[m].slice(1)}</div>
                           <div className="grid grid-cols-7 text-center mb-1">
                             {DAYS_NL.map(d => <div key={d} className="text-[10px] text-gray-400 font-semibold py-0.5">{d}</div>)}
                           </div>
@@ -2714,7 +2872,7 @@ export default function KassaReservationsView({
                               const hasDot = daysWithRes.has(ds)
                               return (
                                 <button key={i}
-                                  onClick={() => { setResListDate(ds); setShowResCalendar(false) }}
+                                  onClick={() => { setResListDate(ds); setResViewFilter('dag'); setShowResCalendar(false) }}
                                   className={`w-7 h-7 mx-auto rounded-full text-xs font-medium flex items-center justify-center transition-colors relative
                                     ${isSel ? 'bg-orange-500 text-white' : isTod ? 'border border-orange-400 text-orange-600 font-bold' : 'text-gray-700 hover:bg-orange-50'}`}>
                                   {day}
