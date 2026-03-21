@@ -621,8 +621,9 @@ export default function KassaReservationsView({
     slot_duration_minutes: s.slotDurationMinutes,
     min_advance_hours: s.minAdvanceHours,
     max_advance_days: s.maxAdvanceDays,
-    shifts: JSON.stringify(s.shifts || []),
-    closed_days: JSON.stringify(s.closedDays || []),
+    // Stuur als object/array — Supabase serialiseert zelf naar JSONB of text[]
+    shifts: s.shifts || [],
+    closed_days: s.closedDays || [],
     deposit_required: s.depositRequired,
     deposit_amount: s.depositAmount,
     no_show_protection: s.noShowProtection,
