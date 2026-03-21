@@ -1404,7 +1404,7 @@ export default function KassaReservationsView({
       </div>
 
       {/* Content */}
-      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'list' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
+      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'list' || viewMode === 'timeline' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
@@ -1732,8 +1732,8 @@ export default function KassaReservationsView({
 
         {!loading && viewMode === 'timeline' && (() => {
           // Time slots from 10:00 to 22:00 — geen horizontaal scrollen
-          const ROW_H = 56
-          const LABEL_W = 72
+          const ROW_H = 80
+          const LABEL_W = 90
           const START_MIN = 10 * 60 // 10:00
           const END_MIN = 22 * 60   // 22:00
           const totalSlots = (END_MIN - START_MIN) / 30
@@ -1773,15 +1773,15 @@ export default function KassaReservationsView({
           }
 
           return (
-            <div className="flex flex-col gap-0">
+            <div className="flex flex-col gap-0 flex-1 overflow-hidden">
               {/* Date nav */}
               <div className="flex items-center gap-3 mb-4">
                 <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate() - 1); setTimelineDate(d.toISOString().split('T')[0]) }}
                   className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={18} /></button>
                 <div className="flex items-center gap-2">
-                  <p className="font-bold text-lg">{formatDate(timelineDate)}</p>
+                  <p className="font-bold text-2xl">{formatDate(timelineDate)}</p>
                   <input type="date" value={timelineDate} onChange={e => setTimelineDate(e.target.value)}
-                    className="px-2 py-1 rounded-lg bg-gray-100 border border-gray-200 text-sm" />
+                    className="px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-base" />
                 </div>
                 <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate() + 1); setTimelineDate(d.toISOString().split('T')[0]) }}
                   className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={18} /></button>
@@ -1791,51 +1791,52 @@ export default function KassaReservationsView({
               </div>
 
               {/* Legend */}
-              <div className="flex items-center gap-4 mb-3 text-xs">
+              <div className="flex items-center gap-5 mb-3 text-sm">
                 {Object.entries(STATUS_CONFIG).filter(([k]) => k !== 'CANCELLED').map(([key, cfg]) => (
-                  <div key={key} className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded" style={{ backgroundColor: statusColors[key] || '#ccc' }} />
-                    <span className="text-gray-500">{cfg.label}</span>
+                  <div key={key} className="flex items-center gap-1.5">
+                    <div className="w-4 h-4 rounded" style={{ backgroundColor: statusColors[key] || '#ccc' }} />
+                    <span className="text-gray-600 font-medium">{cfg.label}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Grid — vult volledige breedte, geen horizontale scroll */}
-              <div className="border border-gray-200 rounded-xl overflow-hidden bg-white w-full">
-                {/* Time header */}
-                <div className="flex border-b border-gray-200 bg-gray-50" style={{ height: 36 }}>
-                  <div style={{ width: LABEL_W, flexShrink: 0 }} className="border-r border-gray-200 flex items-center px-2">
-                    <span className="text-xs font-bold text-gray-400">Tafel</span>
+              {/* Grid — oranje sticky header + verticale scroll */}
+              <div className="border border-gray-200 rounded-xl overflow-hidden bg-white w-full flex flex-col" style={{ maxHeight: 'calc(100vh - 280px)' }}>
+                {/* Oranje sticky header */}
+                <div className="flex flex-shrink-0" style={{ height: 56, backgroundColor: '#F97316', position: 'sticky', top: 0, zIndex: 10 }}>
+                  <div style={{ width: LABEL_W, flexShrink: 0 }} className="border-r border-orange-400 flex items-center px-3">
+                    <span className="text-base font-bold text-white">Tafel</span>
                   </div>
                   <div className="flex flex-1">
                     {timeSlots.map((t, i) => (
-                      <div key={t} className="flex-1 border-r border-gray-100 flex items-center justify-center">
-                        {i % 2 === 0 && <span className="text-xs font-medium text-gray-400">{t}</span>}
+                      <div key={t} className="flex-1 border-r border-orange-400 flex items-center justify-center">
+                        {i % 2 === 0 && <span className="text-base font-bold text-white">{t}</span>}
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Table rows */}
+                {/* Scrollbare rijen */}
+                <div className="overflow-y-auto flex-1">
                 {sortedTables.map((tableNum, rowIdx) => {
                   const tableRes = dayRes.filter(r => (r.table_number || '(geen tafel)') === tableNum)
                   const fpTable = floorPlanTablesDB.find(t => t.number === tableNum)
                   const totalRange = END_MIN - START_MIN
                   return (
                     <div key={tableNum} className="flex relative"
-                      style={{ height: ROW_H, backgroundColor: rowIdx % 2 === 0 ? 'white' : '#f9fafb', borderBottom: '1px solid #f0f0f0' }}>
+                      style={{ height: ROW_H, backgroundColor: rowIdx % 2 === 0 ? 'white' : '#fef9f6', borderBottom: '1px solid #e5e7eb' }}>
                       {/* Label */}
                       <div style={{ width: LABEL_W, flexShrink: 0 }}
-                        className="border-r border-gray-200 flex flex-col items-center justify-center px-2">
-                        <span className="text-base font-bold text-gray-800">{tableNum}</span>
-                        {fpTable && <span className="text-xs text-gray-400">{fpTable.seats}p</span>}
+                        className="border-r border-gray-300 flex flex-col items-center justify-center px-2">
+                        <span className="text-lg font-bold text-gray-800">{tableNum}</span>
+                        {fpTable && <span className="text-sm text-gray-400">{fpTable.seats}p</span>}
                       </div>
                       {/* Grid + reservaties — neemt resterende breedte */}
                       <div className="flex-1 relative">
-                        {/* Slot grid lijnen */}
+                        {/* Slot grid lijnen — donkerder */}
                         <div className="flex h-full">
                           {timeSlots.map((t, i) => (
-                            <div key={t} className={`flex-1 h-full border-r ${i % 2 === 0 ? 'border-gray-100' : 'border-gray-50'}`} />
+                            <div key={t} className={`flex-1 h-full border-r ${i % 2 === 0 ? 'border-gray-300' : 'border-gray-200'}`} />
                           ))}
                         </div>
                         {/* Reservaties — positie in % van beschikbare breedte */}
@@ -1846,14 +1847,13 @@ export default function KassaReservationsView({
                           if (startMin >= END_MIN || startMin + dur <= START_MIN) return null
                           const leftPct = Math.max(0, (startMin - START_MIN) / totalRange * 100)
                           const widthPct = Math.min(dur / totalRange * 100, 100 - leftPct)
-                          const color = statusColors[r.status] || '#9ca3af'
                           return (
                             <div key={r.id}
                               onClick={() => setSelectedReservation(r)}
                               className="absolute top-2 bottom-2 rounded-lg cursor-pointer flex flex-col justify-center px-2 overflow-hidden hover:opacity-90 transition-opacity"
-                              style={{ left: `${leftPct}%`, width: `calc(${widthPct}% - 4px)`, backgroundColor: color + 'dd', borderLeft: `3px solid ${color}`, zIndex: 2 }}>
-                              <span className="text-white text-xs font-bold truncate">{r.guest_name}</span>
-                              <span className="text-white/80 text-xs truncate">{r.reservation_time} • {r.party_size}p</span>
+                              style={{ left: `${leftPct}%`, width: `calc(${widthPct}% - 4px)`, backgroundColor: '#F97316', borderLeft: '3px solid #ea6a00', zIndex: 2 }}>
+                              <span className="text-white text-sm font-bold truncate">{r.guest_name}</span>
+                              <span className="text-white/80 text-sm truncate">{r.reservation_time} • {r.party_size}p</span>
                             </div>
                           )
                         })}
@@ -1861,6 +1861,7 @@ export default function KassaReservationsView({
                     </div>
                   )
                 })}
+                </div>{/* einde scrollbare rijen */}
               </div>
 
               {dayRes.length === 0 && (
