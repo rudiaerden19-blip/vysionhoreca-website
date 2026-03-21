@@ -1574,82 +1574,75 @@ export default function KassaReservationsView({
           </div>
         )}
 
-        {!loading && viewMode === 'list' && (
+        {!loading && viewMode === 'list' && (() => {
+          const COLS = '74px 58px 1fr 1fr 32px 38px 92px 98px 42px'
+          return (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="grid gap-3 px-4 py-3 border-b border-gray-200 bg-gray-50 text-sm font-semibold text-gray-500 uppercase tracking-wide"
-              style={{ gridTemplateColumns: '90px 70px 1fr 170px 50px 55px 120px 130px 60px' }}>
-              <span>Datum</span>
-              <span>Tijd</span>
-              <span>Gast</span>
-              <span>Email</span>
-              <span>Ps.</span>
-              <span>Tafel</span>
-              <span>Status</span>
-              <span>No-show</span>
-              <span>Push</span>
+            <div className="grid gap-2 px-3 py-2 border-b border-gray-200 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wide"
+              style={{ gridTemplateColumns: COLS }}>
+              <span>Datum</span><span>Tijd</span><span>Gast</span><span>Email</span>
+              <span>Ps</span><span>Tfl</span><span>Status</span><span>No-show</span><span></span>
             </div>
             {filteredReservations.length === 0 && (
-              <div className="py-16 text-center text-gray-400 text-base">Geen reservaties</div>
+              <div className="py-12 text-center text-gray-400 text-base">Geen reservaties</div>
             )}
             {filteredReservations.map((r) => {
               const status = STATUS_CONFIG[r.status]
               return (
-                <div
-                  key={r.id}
-                  className="grid gap-3 px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
-                  style={{ gridTemplateColumns: '90px 70px 1fr 170px 50px 55px 120px 130px 60px' }}
-                  onClick={() => setSelectedReservation(r)}
-                >
-                  <p className="text-sm font-semibold text-gray-700">
+                <div key={r.id} className="grid gap-2 px-3 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
+                  style={{ gridTemplateColumns: COLS }}
+                  onClick={() => setSelectedReservation(r)}>
+                  {/* Datum */}
+                  <p className="text-sm font-semibold text-gray-700 truncate">
                     {new Date(r.reservation_date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                   </p>
-                  <p className="text-base font-bold text-gray-900">{r.reservation_time}</p>
+                  {/* Tijd */}
+                  <p className="text-sm font-bold text-gray-900">{r.reservation_time}</p>
+                  {/* Gast */}
                   <div className="min-w-0">
-                    <p className="font-semibold text-base text-gray-900 truncate">{r.guest_name}</p>
-                    {r.guest_phone && <p className="text-sm text-gray-500 truncate">{r.guest_phone}</p>}
+                    <p className="font-bold text-sm text-gray-900 truncate">{r.guest_name}</p>
+                    {r.guest_phone && <p className="text-xs text-gray-400 truncate">{r.guest_phone}</p>}
                   </div>
-                  <p className="text-sm text-gray-500 truncate min-w-0">{r.guest_email || '—'}</p>
-                  <span className="text-base font-semibold text-gray-700">{r.party_size}</span>
-                  <span className="text-base font-semibold text-gray-700">{r.table_number || '-'}</span>
-                  <span
-                    className="px-3 py-1.5 rounded-full text-sm font-semibold inline-flex items-center gap-1.5 w-fit"
-                    style={{ backgroundColor: status.bgColor, color: status.color }}
-                  >
-                    {status.icon}
-                    {status.label}
+                  {/* Email */}
+                  <p className="text-xs text-gray-500 truncate min-w-0">{r.guest_email || '—'}</p>
+                  {/* Personen */}
+                  <span className="text-sm font-bold text-gray-700">{r.party_size}</span>
+                  {/* Tafel */}
+                  <span className="text-sm font-bold text-gray-700">{r.table_number || '-'}</span>
+                  {/* Status */}
+                  <span className="px-2 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1 w-fit"
+                    style={{ backgroundColor: status.bgColor, color: status.color }}>
+                    {status.icon}{status.label}
                   </span>
+                  {/* No-show toggle */}
                   <div onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => r.status === 'NO_SHOW' ? handleUndoNoShow(r) : handleNoShow(r)}
-                      className="px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors w-full"
+                      className="px-2 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors w-full justify-center"
                       style={r.status === 'NO_SHOW'
                         ? { backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }
-                        : { backgroundColor: '#f3f4f6', color: '#9ca3af' }
-                      }
-                    >
-                      <UserX size={15} />
-                      No-show
+                        : { backgroundColor: '#f3f4f6', color: '#9ca3af' }}>
+                      <UserX size={13} />No-show
                     </button>
                   </div>
+                  {/* Push */}
                   <div onClick={e => e.stopPropagation()}>
                     {r.guest_email ? (
                       <button
                         onClick={() => { setPushTarget(r); setPushSubject(''); setPushMessage('') }}
-                        className="p-2.5 rounded-xl flex items-center justify-center"
+                        className="p-2 rounded-lg flex items-center justify-center w-full"
                         style={{ backgroundColor: 'rgba(59,130,246,0.1)', color: '#2563eb' }}
-                        title={`Push naar ${r.guest_email}`}
-                      >
-                        <Send size={16} />
+                        title="Push email">
+                        <Send size={14} />
                       </button>
-                    ) : (
-                      <span className="text-sm text-gray-300">—</span>
-                    )}
+                    ) : <span className="text-xs text-gray-200 text-center block">—</span>}
                   </div>
                 </div>
               )
             })}
           </div>
-        )}
+          )
+        })()}
 
         {/* Push email modal */}
         {pushTarget && (
