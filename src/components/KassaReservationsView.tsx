@@ -460,7 +460,7 @@ export default function KassaReservationsView({
   const [floorZoom, setFloorZoom] = useState(1)
   const [panX, setPanX] = useState(0)
   const [panY, setPanY] = useState(0)
-  const didCenterTables = useRef(false)
+
   const floorDraggingId = useRef<string | null>(null)
   const floorDragOffset = useRef({ x: 0, y: 0 })
   const floorDragMoved = useRef(false)
@@ -606,24 +606,26 @@ export default function KassaReservationsView({
       .then(({ data }) => { if (data?.data) setFloorPlanTablesDB(data.data as FloorPlanTable[]) })
   }, [tenant])
 
-  // Centreer tafels in het beeld zodra ze laden
+  // Centreer tafels zodra de plattegrond-tab actief wordt (canvas is dan zichtbaar)
   useEffect(() => {
-    if (floorPlanTablesDB.length === 0 || didCenterTables.current) return
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const rect = canvas.getBoundingClientRect()
-    const minX = Math.min(...floorPlanTablesDB.map(t => (t.x / 100) * WORLD_W))
-    const maxX = Math.max(...floorPlanTablesDB.map(t => (t.x / 100) * WORLD_W))
-    const minY = Math.min(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
-    const maxY = Math.max(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
-    // SVG is ±290px hoog, gecentreerd via translate(-50%,-50%).
-    // Bovenkant SVG steekt ~145px boven de wereldpositie uit → compenseer dat + 40px marge
-    const svgHalfH = 145
-    const svgHalfW = 145
-    setPanX(20 + svgHalfW - minX * floorZoom)
-    setPanY(20 + svgHalfH - minY * floorZoom)
-    didCenterTables.current = true
-  }, [floorPlanTablesDB, WORLD_W, WORLD_H, floorZoom])
+    if (viewMode !== 'floorplan') return
+    if (floorPlanTablesDB.length === 0) return
+    // Geef React één frame om de canvas te renderen
+    const timer = setTimeout(() => {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      const minX = Math.min(...floorPlanTablesDB.map(t => (t.x / 100) * WORLD_W))
+      const minY = Math.min(...floorPlanTablesDB.map(t => (t.y / 100) * WORLD_H))
+      // SVG-groep steekt ~145px uit rondom het middelpunt (stoelen + tafel)
+      const svgHalfH = 145
+      const svgHalfW = 145
+      // Zet pan zodat de meest linkse/bovenste tafel 40px van de rand staat
+      setPanX(40 + svgHalfW - minX * floorZoom)
+      setPanY(40 + svgHalfH - minY * floorZoom)
+    }, 50)
+    return () => clearTimeout(timer)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, floorPlanTablesDB])
 
   // Bouw de volledige Supabase payload van huidige instellingen
   const buildSettingsPayload = (s: ReservationSettings) => ({
