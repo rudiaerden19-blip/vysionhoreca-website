@@ -637,7 +637,7 @@ export default function KassaReservationsView({
   const pinchStartDist = useRef<number | null>(null)
   const pinchStartZoom = useRef(1)
   const addReservationInProgress = useRef(false)  // guard tegen dubbele submit
-  const [timelineDate, setTimelineDate] = useState(new Date().toISOString().split('T')[0])
+  const [timelineDate, setTimelineDate] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` })
   const [timelineNow, setTimelineNow] = useState(new Date())
   const [calMonth, setCalMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }))
   const [timeShift, setTimeShift] = useState<'dag'|'avond'>(() => new Date().getHours() >= 17 ? 'avond' : 'dag')
@@ -646,7 +646,7 @@ export default function KassaReservationsView({
   const [searchPopupQuery, setSearchPopupQuery] = useState('')
   const [searchPopupTab, setSearchPopupTab] = useState<'dag'|'alle'>('dag')
   const [editReservation, setEditReservation] = useState<Reservation | null>(null)
-  const [resListDate, setResListDate] = useState(() => new Date().toISOString().split('T')[0])
+  const [resListDate, setResListDate] = useState(() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}` })
   const [showResCalendar, setShowResCalendar] = useState(false)
   const [resCalYear, setResCalYear] = useState(() => new Date().getFullYear())
   const [resCalMonth, setResCalMonth] = useState(() => new Date().getMonth())
@@ -1942,7 +1942,7 @@ export default function KassaReservationsView({
                 {/* Datum kiezer — groot en opvallend */}
                 <div className="flex items-center gap-2 bg-orange-500 rounded-2xl px-3 py-2 shadow-md">
                   <button
-                    onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                    onClick={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() - 1); setSelectedDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
                     className="w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 active:bg-white/40 flex items-center justify-center transition-colors">
                     <ChevronLeft size={22} className="text-white" />
                   </button>
@@ -1954,7 +1954,7 @@ export default function KassaReservationsView({
                       className="mt-0.5 text-xs font-semibold text-white/90 bg-white/20 border border-white/30 rounded-lg px-2 py-0.5 text-center cursor-pointer outline-none" />
                   </div>
                   <button
-                    onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); setSelectedDate(d.toISOString().split('T')[0]) }}
+                    onClick={() => { const d = new Date(selectedDate + 'T12:00:00'); d.setDate(d.getDate() + 1); setSelectedDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
                     className="w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 active:bg-white/40 flex items-center justify-center transition-colors">
                     <ChevronRight size={22} className="text-white" />
                   </button>
@@ -2365,7 +2365,7 @@ export default function KassaReservationsView({
 
           // Current time marker
           const now = new Date()
-          const isToday = timelineDate === now.toISOString().split('T')[0]
+          const isToday = timelineDate === `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`
           const nowMin = now.getHours() * 60 + now.getMinutes()
           // nowPct = positie van huidige tijd als percentage van de tijdband (excl. label)
           const nowPct = isToday && nowMin >= START_MIN && nowMin <= END_MIN
@@ -2413,10 +2413,10 @@ export default function KassaReservationsView({
               <div className="flex flex-col flex-1 overflow-hidden min-w-0">
                 {/* Date nav */}
                 <div className="flex items-center gap-2 mb-3">
-                  <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate()-1); setTimelineDate(d.toISOString().split('T')[0]) }}
+                  <button onClick={() => { const d = new Date(timelineDate + 'T12:00:00'); d.setDate(d.getDate()-1); setTimelineDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
                     className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={16}/></button>
                   <span className="font-bold text-xl">{formatDate(timelineDate)}</span>
-                  <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate()+1); setTimelineDate(d.toISOString().split('T')[0]) }}
+                  <button onClick={() => { const d = new Date(timelineDate + 'T12:00:00'); d.setDate(d.getDate()+1); setTimelineDate(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`) }}
                     className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={16}/></button>
                   {/* Dag / Avond toggle */}
                   <div className="flex rounded-lg overflow-hidden border border-gray-200 ml-2">
