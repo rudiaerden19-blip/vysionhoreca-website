@@ -487,6 +487,7 @@ export default function KassaReservationsView({
   const [timelineDate, setTimelineDate] = useState(new Date().toISOString().split('T')[0])
   const [timelineNow, setTimelineNow] = useState(new Date())
   const [calMonth, setCalMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }))
+  const [timeShift, setTimeShift] = useState<'dag'|'avond'>('dag')
   const [floorPlanTime, setFloorPlanTime] = useState(() => {
     const now = new Date()
     const h = now.getHours().toString().padStart(2, '0')
@@ -1828,17 +1829,15 @@ export default function KassaReservationsView({
           // Time slots from 10:00 to 22:00 — geen horizontaal scrollen
           const ROW_H = 80
           const LABEL_W = 90
-          const START_MIN = 10 * 60 // 10:00
-          const END_MIN = 22 * 60   // 22:00
+          const START_MIN = timeShift === 'dag' ? 10 * 60 : 17 * 60  // dag=10:00, avond=17:00
+          const END_MIN   = timeShift === 'dag' ? 16 * 60 : 23 * 60  // dag=16:00, avond=23:00
           const totalSlots = (END_MIN - START_MIN) / 30
-          const SLOT_W = 0 // niet gebruikt — slots vullen beschikbare breedte
           const timeSlots: string[] = []
           for (let m = START_MIN; m < END_MIN; m += 30) {
             const h = Math.floor(m / 60).toString().padStart(2, '0')
             const min = (m % 60).toString().padStart(2, '0')
             timeSlots.push(`${h}:${min}`)
           }
-          // totalSlots = 24 (10:00-21:30), range = 720min → perfecte uitlijning
 
           // Tables to show: floor plan tables first, then any table in reservations
           const tableNumbers = floorPlanTablesDB.length > 0
@@ -1867,8 +1866,8 @@ export default function KassaReservationsView({
             WAITLIST: '#8b5cf6',
           }
 
-          // Kleuren per reservatie — elke reservatie krijgt eigen kleur op basis van positie in daglijst
-          const BLOCK_COLORS = ['#2563eb','#16a34a','#9333ea','#ea580c','#0891b2','#be185d','#d97706','#0f766e','#7c3aed','#dc2626']
+          // Één vaste kleur voor alle reservatieblokken
+          const BLOCK_COLOR = '#3B5BDB'
           const totalRange = END_MIN - START_MIN
 
           // Rode lijn positie
@@ -1893,10 +1892,21 @@ export default function KassaReservationsView({
                 <div className="flex items-center gap-2 mb-3">
                   <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate()-1); setTimelineDate(d.toISOString().split('T')[0]) }}
                     className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={16}/></button>
-                  <span className="font-bold text-xl flex-1">{formatDate(timelineDate)}</span>
+                  <span className="font-bold text-xl">{formatDate(timelineDate)}</span>
                   <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate()+1); setTimelineDate(d.toISOString().split('T')[0]) }}
                     className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={16}/></button>
-                  <span className="text-sm text-gray-400">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
+                  {/* Dag / Avond toggle */}
+                  <div className="flex rounded-lg overflow-hidden border border-gray-200 ml-2">
+                    <button onClick={() => setTimeShift('dag')}
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-orange-500 text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      Dag
+                    </button>
+                    <button onClick={() => setTimeShift('avond')}
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors border-l border-gray-200 ${timeShift==='avond'?'bg-orange-500 text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      Avond
+                    </button>
+                  </div>
+                  <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
                 </div>
 
                 {/* Grid */}
@@ -1912,7 +1922,7 @@ export default function KassaReservationsView({
                           {i%2===0 && <span className="text-sm font-bold text-white">{t}</span>}
                         </div>
                       ))}
-                      <span className="absolute right-1 top-1/2 -translate-y-1/2 text-sm font-bold text-white">22:00</span>
+                      <span className="absolute right-1 top-1/2 -translate-y-1/2 text-sm font-bold text-white">{String(END_MIN/60).padStart(2,'0')}:00</span>
                       {/* Rode lijn in header */}
                       {redLinePct !== null && (
                         <div className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20" style={{ left:`${redLinePct}%` }} />
@@ -1948,7 +1958,7 @@ export default function KassaReservationsView({
                                 )}
                               </div>
                             )}
-                            {/* Reservatieblokken — pijlvorm zoals professionele kalender */}
+                            {/* Reservatieblokken — dunne pijlvorm, één kleur */}
                             {tableRes.map((r) => {
                               const [rh,rm] = r.reservation_time.split(':').map(Number)
                               const startMin = rh*60+rm
@@ -1956,24 +1966,19 @@ export default function KassaReservationsView({
                               if (startMin>=END_MIN || startMin+dur<=START_MIN) return null
                               const leftPct = Math.max(0,(startMin-START_MIN)/totalRange*100)
                               const widthPct = Math.min(dur/totalRange*100, 100-leftPct)
-                              const color = BLOCK_COLORS[(dayRes.indexOf(r))%BLOCK_COLORS.length]
-                              const arrowSize = 14
                               return (
                                 <div key={r.id} onClick={() => setSelectedReservation(r)}
-                                  className="absolute top-2.5 bottom-2.5 cursor-pointer flex items-center hover:brightness-110 transition-all"
-                                  style={{ left:`${leftPct}%`, width:`calc(${widthPct}% - 2px)`, zIndex:2 }}>
-                                  {/* Pijlvorm via clip-path */}
-                                  <div className="flex items-center h-full w-full relative"
+                                  className="absolute cursor-pointer flex items-center hover:brightness-110 transition-all"
+                                  style={{ left:`${leftPct}%`, width:`calc(${widthPct}% - 2px)`, top:'50%', transform:'translateY(-50%)', height:'28px', zIndex:2 }}>
+                                  <div className="flex items-center h-full w-full"
                                     style={{
-                                      backgroundColor: color,
-                                      clipPath: `polygon(0 0, calc(100% - ${arrowSize}px) 0, 100% 50%, calc(100% - ${arrowSize}px) 100%, 0 100%)`,
+                                      backgroundColor: BLOCK_COLOR,
+                                      clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%)',
                                     }}>
-                                    {/* Tafelnummer badge */}
-                                    <div className="flex-shrink-0 w-7 h-7 ml-2 rounded-full bg-white/25 flex items-center justify-center">
-                                      <span className="text-white text-xs font-black">{r.table_number||'?'}</span>
+                                    <div className="flex-shrink-0 w-5 h-5 ml-1.5 rounded-full bg-white/30 flex items-center justify-center">
+                                      <span className="text-white text-[10px] font-black leading-none">{r.table_number||'?'}</span>
                                     </div>
-                                    {/* Naam */}
-                                    <span className="text-white text-sm font-bold ml-2 truncate pr-4">{r.guest_name}</span>
+                                    <span className="text-white text-xs font-semibold ml-1.5 truncate pr-3">{r.guest_name}</span>
                                   </div>
                                 </div>
                               )
