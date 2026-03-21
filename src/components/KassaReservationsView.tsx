@@ -2585,7 +2585,44 @@ export default function KassaReservationsView({
 
         {!loading && viewMode === 'settings' && (
           <div className="max-w-2xl overflow-y-auto h-full pb-8">
-            <h3 className="text-lg font-bold mb-4">Reservatie Instellingen</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">Reservatie Instellingen</h3>
+              <button
+                onClick={async () => {
+                  const s = reservationSettings
+                  const payload = {
+                    tenant_slug: tenant,
+                    is_enabled: s.isEnabled,
+                    accept_online: s.acceptOnline,
+                    max_party_size: s.maxPartySize,
+                    default_duration_minutes: s.defaultDurationMinutes,
+                    slot_duration_minutes: s.slotDurationMinutes,
+                    min_advance_hours: s.minAdvanceHours,
+                    max_advance_days: s.maxAdvanceDays,
+                    shifts: JSON.stringify(s.shifts || []),
+                    closed_days: JSON.stringify(s.closedDays || []),
+                    deposit_required: s.depositRequired,
+                    deposit_amount: s.depositAmount,
+                    no_show_protection: s.noShowProtection,
+                    cancellation_deadline_hours: s.cancellationDeadlineHours,
+                    cancellation_message: s.cancellationMessage,
+                    auto_send_review: s.autoSendReview,
+                    review_link: s.reviewLink,
+                  }
+                  localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(s))
+                  const { error } = await supabase.from('reservation_settings').upsert(payload, { onConflict: 'tenant_slug' })
+                  if (error) {
+                    toast.error('Opslaan mislukt: ' + error.message)
+                  } else {
+                    toast.success('✅ Instellingen opgeslagen!')
+                  }
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl shadow transition-colors"
+              >
+                💾 Opslaan
+              </button>
+            </div>
+            <h3 className="text-lg font-bold mb-4 hidden">Reservatie Instellingen</h3>
             <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
               {/* Enable toggle */}
               <div className="flex items-center justify-between">
@@ -2929,6 +2966,42 @@ export default function KassaReservationsView({
               </div>
 
             </div>
+
+            {/* Opslaan knop onderaan */}
+            <button
+              onClick={async () => {
+                const s = reservationSettings
+                const payload = {
+                  tenant_slug: tenant,
+                  is_enabled: s.isEnabled,
+                  accept_online: s.acceptOnline,
+                  max_party_size: s.maxPartySize,
+                  default_duration_minutes: s.defaultDurationMinutes,
+                  slot_duration_minutes: s.slotDurationMinutes,
+                  min_advance_hours: s.minAdvanceHours,
+                  max_advance_days: s.maxAdvanceDays,
+                  shifts: JSON.stringify(s.shifts || []),
+                  closed_days: JSON.stringify(s.closedDays || []),
+                  deposit_required: s.depositRequired,
+                  deposit_amount: s.depositAmount,
+                  no_show_protection: s.noShowProtection,
+                  cancellation_deadline_hours: s.cancellationDeadlineHours,
+                  cancellation_message: s.cancellationMessage,
+                  auto_send_review: s.autoSendReview,
+                  review_link: s.reviewLink,
+                }
+                localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(s))
+                const { error } = await supabase.from('reservation_settings').upsert(payload, { onConflict: 'tenant_slug' })
+                if (error) {
+                  toast.error('Opslaan mislukt: ' + error.message)
+                } else {
+                  toast.success('✅ Instellingen opgeslagen!')
+                }
+              }}
+              className="w-full mt-4 py-4 bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg rounded-xl shadow-md transition-colors"
+            >
+              💾 Instellingen Opslaan
+            </button>
           </div>
         )}
       </div>
