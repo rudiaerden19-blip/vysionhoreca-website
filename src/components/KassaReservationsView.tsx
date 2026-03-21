@@ -1620,13 +1620,15 @@ export default function KassaReservationsView({
               </svg>
               Kassa
             </button>
-            <button
-              onClick={() => setShowNewReservationModal(true)}
-              className="px-4 py-2 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors flex items-center gap-2"
-            >
-              <Plus size={20} />
-              Nieuwe Reservatie
-            </button>
+            {viewMode !== 'guests' && viewMode !== 'settings' && (
+              <button
+                onClick={() => setShowNewReservationModal(true)}
+                className="px-4 py-2 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors flex items-center gap-2"
+              >
+                <Plus size={20} />
+                Nieuwe Reservatie
+              </button>
+            )}
           </div>
         </div>
 
