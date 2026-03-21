@@ -1079,6 +1079,7 @@ export default function KassaReservationsView({
       reservation_time: data.reservation_time,
       table_number: data.table_number || null,
       notes: data.notes || null,
+      special_requests: data.special_requests || null,
       status: 'confirmed',
       tenant_slug: tenant,
       total_spent: 0,
@@ -2190,6 +2191,9 @@ export default function KassaReservationsView({
                                 </div>
                                 {r.guest_phone && <a href={`tel:${r.guest_phone}`} className="flex items-center gap-1 text-base text-emerald-600 hover:text-emerald-700"><Phone size={14} />{r.guest_phone}</a>}
                                 {r.notes && <p className="text-sm text-gray-500 italic">{r.notes}</p>}
+                                {r.special_requests && (
+                                  <p className="text-sm font-semibold" style={{ color: '#f59e0b' }}>⚠️ {r.special_requests}</p>
+                                )}
 
                                 {/* Status knoppen — min 44px hoogte voor touch */}
                                 <div className="grid grid-cols-2 gap-1.5 pt-1">
@@ -3627,13 +3631,11 @@ function ReservationDetailModal({
             </div>
           )}
 
-          {/* Special Requests */}
-          {reservation.special_requests && (
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
-              <p className="text-xs text-amber-500 mb-1">Speciale wensen</p>
-              <p className="text-sm">{reservation.special_requests}</p>
-            </div>
-          )}
+          {/* Special Requests — altijd zichtbaar */}
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
+            <p className="text-xs text-amber-500 font-semibold mb-1">⚠️ Speciale wensen gast</p>
+            <p className="text-sm text-amber-900">{reservation.special_requests || '—'}</p>
+          </div>
 
           {/* Occasion */}
           {reservation.occasion && (
