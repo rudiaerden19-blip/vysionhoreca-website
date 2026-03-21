@@ -1913,14 +1913,14 @@ export default function KassaReservationsView({
                   {/* Kalender toon/verberg knop */}
                   <button
                     onClick={() => setCalOpen(o => !o)}
-                    title={calOpen ? 'Kalender verbergen' : 'Kalender tonen'}
-                    className={`ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border font-bold text-sm transition-colors
+                    className={`ml-2 flex items-center gap-2 px-5 py-1.5 rounded-lg border-2 font-bold text-sm transition-colors
                       ${calOpen
                         ? 'bg-orange-500 border-orange-500 text-white hover:bg-orange-600'
-                        : 'bg-gray-200 border-gray-300 text-gray-400 hover:bg-gray-300'
+                        : 'bg-gray-200 border-gray-300 text-gray-500 hover:bg-gray-300'
                       }`}>
-                    <Calendar size={16}/>
-                    {calOpen ? <Eye size={16}/> : <EyeOff size={16}/>}
+                    <Calendar size={20}/>
+                    <span>Kalender</span>
+                    {calOpen ? <Eye size={22}/> : <EyeOff size={22}/>}
                   </button>
                   <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
                 </div>
