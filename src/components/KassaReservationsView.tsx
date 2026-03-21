@@ -3527,6 +3527,28 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
   }
 
   const availableTables = tables.filter(t => t.seats >= formData.party_size)
+
+  // Bereken welke tafels bezet zijn op het gekozen tijdstip
+  const getTableStatus = (tableNum: string | number): { bezet: boolean; door?: string; tot?: string } => {
+    const startMin = parseInt(formData.reservation_time.split(':')[0]) * 60 + parseInt(formData.reservation_time.split(':')[1])
+    const endMin = startMin + formData.duration_minutes
+    const conflict = reservations.find(r =>
+      r.reservation_date === formData.reservation_date &&
+      r.status !== 'CANCELLED' &&
+      String(r.table_number) === String(tableNum) &&
+      (() => {
+        const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
+        const rEnd = rStart + (r.duration_minutes || 90)
+        return startMin < rEnd && endMin > rStart
+      })()
+    )
+    if (!conflict) return { bezet: false }
+    const rStart = parseInt(conflict.reservation_time.split(':')[0]) * 60 + parseInt(conflict.reservation_time.split(':')[1])
+    const rEnd = rStart + (conflict.duration_minutes || 90)
+    const fmt = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
+    return { bezet: true, door: conflict.guest_name, tot: fmt(rEnd) }
+  }
+
   const inputCls = (field: string) =>
     `w-full px-4 py-3 rounded-xl bg-gray-100 border ${errors[field] ? 'border-red-500' : 'border-gray-200'} focus:border-green-500 outline-none`
 
@@ -3643,17 +3665,52 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
           {/* Tafel */}
           <div>
             <label className="block text-sm font-medium mb-1">Tafel {req()}</label>
-            <select value={formData.table_number}
-              onChange={(e) => setFormData({ ...formData, table_number: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none">
-              <option value="">Automatisch toewijzen</option>
-              {availableTables.map((table) => (
-                <option key={table.id} value={table.number}>
-                  Tafel {table.number} ({table.seats} pers.)
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-gray-400 mt-1">Laat leeg om automatisch een vrije tafel te kiezen</p>
+            <div className="grid grid-cols-2 gap-2">
+              {/* Automatisch toewijzen knop */}
+              <button
+                type="button"
+                onClick={() => setFormData({ ...formData, table_number: '' })}
+                className={`col-span-2 px-4 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
+                  formData.table_number === ''
+                    ? 'border-green-500 bg-green-50 text-green-700'
+                    : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'
+                }`}
+              >
+                ✨ Automatisch toewijzen (vrije tafel)
+              </button>
+              {/* Tafels met bezet/vrij status */}
+              {tables.filter(t => t.seats >= formData.party_size).map((table) => {
+                const status = getTableStatus(table.number)
+                const isSelected = String(formData.table_number) === String(table.number)
+                return (
+                  <button
+                    key={table.id}
+                    type="button"
+                    disabled={status.bezet}
+                    onClick={() => !status.bezet && setFormData({ ...formData, table_number: String(table.number) })}
+                    className={`px-3 py-2.5 rounded-xl text-sm border-2 transition-colors text-left ${
+                      status.bezet
+                        ? 'border-red-200 bg-red-50 text-red-400 cursor-not-allowed opacity-75'
+                        : isSelected
+                          ? 'border-green-500 bg-green-50 text-green-700'
+                          : 'border-gray-200 bg-gray-50 text-gray-700 hover:border-green-300 hover:bg-green-50 cursor-pointer'
+                    }`}
+                  >
+                    <div className="font-bold">Tafel {table.number}</div>
+                    <div className="text-xs mt-0.5">
+                      {table.seats} pers. &nbsp;·&nbsp;
+                      {status.bezet
+                        ? <span className="text-red-500 font-semibold">Bezet t/m {status.tot}</span>
+                        : <span className="text-green-600 font-semibold">Vrij</span>
+                      }
+                    </div>
+                    {status.bezet && status.door && (
+                      <div className="text-xs text-red-400 truncate">{status.door}</div>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           {/* Gelegenheid */}
