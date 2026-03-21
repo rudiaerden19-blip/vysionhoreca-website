@@ -1575,17 +1575,19 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'list' && (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
-            <div className="grid grid-cols-[85px_70px_1fr_160px_55px_55px_120px_170px_85px] gap-2 px-3 py-3 border-b border-gray-200 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide min-w-[900px]">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            {/* grid: datum(72) tijd(52) gast(1fr) email(1fr) pers(36) tafel(42) status(90) acties(86) push(38) */}
+            <div className="grid gap-2 px-3 py-2 border-b border-gray-200 bg-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-wide"
+              style={{ gridTemplateColumns: '72px 52px 1fr 1fr 36px 42px 90px 86px 38px' }}>
               <span>Datum</span>
               <span>Tijd</span>
               <span>Gast</span>
               <span>Email</span>
-              <span>Pers.</span>
-              <span>Tafel</span>
+              <span>Ps</span>
+              <span>Tfl</span>
               <span>Status</span>
               <span>Acties</span>
-              <span>Push</span>
+              <span></span>
             </div>
             {filteredReservations.length === 0 && (
               <div className="py-16 text-center text-gray-400 text-base">Geen reservaties</div>
@@ -1595,66 +1597,62 @@ export default function KassaReservationsView({
               return (
                 <div
                   key={r.id}
-                  className="grid grid-cols-[85px_70px_1fr_160px_55px_55px_120px_170px_85px] gap-2 px-3 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center min-w-[900px]"
+                  className="grid gap-2 px-3 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
+                  style={{ gridTemplateColumns: '72px 52px 1fr 1fr 36px 42px 90px 86px 38px' }}
                   onClick={() => setSelectedReservation(r)}
                 >
-                  <p className="text-sm font-semibold text-gray-700">
+                  <p className="text-sm font-medium text-gray-700 truncate">
                     {new Date(r.reservation_date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                   </p>
-                  <p className="font-bold text-base">{r.reservation_time}</p>
+                  <p className="text-sm font-bold text-gray-900">{r.reservation_time}</p>
                   <div className="min-w-0">
-                    <p className="font-semibold text-base text-gray-900 truncate">{r.guest_name}</p>
-                    {r.guest_phone && <p className="text-sm text-gray-500 truncate">{r.guest_phone}</p>}
+                    <p className="font-semibold text-sm text-gray-900 truncate">{r.guest_name}</p>
+                    {r.guest_phone && <p className="text-xs text-gray-400 truncate">{r.guest_phone}</p>}
                   </div>
-                  <p className="text-sm text-gray-500 truncate">{r.guest_email || <span className="text-gray-300 italic">geen email</span>}</p>
-                  <div className="flex items-center gap-1 text-base">
-                    <Users size={14} className="text-gray-400 flex-shrink-0" />
-                    <span className="font-medium">{r.party_size}</span>
-                  </div>
-                  <span className="text-base font-semibold">{r.table_number || '-'}</span>
+                  <p className="text-xs text-gray-500 truncate min-w-0">{r.guest_email || '—'}</p>
+                  <span className="text-sm font-semibold text-gray-700">{r.party_size}</span>
+                  <span className="text-sm font-semibold text-gray-700">{r.table_number || '-'}</span>
                   <span
-                    className="px-3 py-1.5 rounded-full text-sm font-semibold inline-flex items-center gap-1.5 w-fit"
+                    className="px-2 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 w-fit"
                     style={{ backgroundColor: status.bgColor, color: status.color }}
                   >
                     {status.icon}
                     {status.label}
                   </span>
-                  <div className="flex gap-2" onClick={e => e.stopPropagation()}>
+                  <div className="flex gap-1 items-center" onClick={e => e.stopPropagation()}>
                     {(r.status === 'CONFIRMED' || r.status === 'PENDING') && (
                       <button
                         onClick={() => handleCheckIn(r)}
-                        className="px-3 py-2 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 flex-shrink-0 flex items-center gap-1.5 text-sm font-semibold"
+                        className="p-1.5 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 flex-shrink-0"
                         title="Bezet"
                       >
-                        <UserCheck size={16} />
-                        Bezet
+                        <UserCheck size={14} />
                       </button>
                     )}
-                    <span
-                      className="px-3 py-2 rounded-xl text-sm font-semibold flex-shrink-0 flex items-center gap-1.5 select-none"
+                    <button
+                      onClick={() => r.status === 'NO_SHOW' ? handleUndoNoShow(r) : handleNoShow(r)}
+                      className="px-2 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 flex-shrink-0 transition-colors"
                       style={r.status === 'NO_SHOW'
                         ? { backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }
                         : { backgroundColor: '#f3f4f6', color: '#9ca3af' }
                       }
+                      title={r.status === 'NO_SHOW' ? 'Klik om ongedaan te maken' : 'Klik om no-show te zetten'}
                     >
-                      <UserX size={16} />
-                      No-show
-                    </span>
+                      <UserX size={13} />
+                    </button>
                   </div>
-                  {/* Push knop */}
                   <div onClick={e => e.stopPropagation()}>
                     {r.guest_email ? (
                       <button
                         onClick={() => { setPushTarget(r); setPushSubject(''); setPushMessage('') }}
-                        className="px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5"
+                        className="p-1.5 rounded-lg flex items-center justify-center"
                         style={{ backgroundColor: 'rgba(59,130,246,0.1)', color: '#2563eb' }}
-                        title={`Stuur email naar ${r.guest_email}`}
+                        title={`Push naar ${r.guest_email}`}
                       >
-                        <Send size={15} />
-                        Push
+                        <Send size={14} />
                       </button>
                     ) : (
-                      <span className="text-xs text-gray-300 italic">geen email</span>
+                      <span className="text-xs text-gray-200">—</span>
                     )}
                   </div>
                 </div>
