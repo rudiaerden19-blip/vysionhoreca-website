@@ -1825,7 +1825,7 @@ export default function KassaReservationsView({
           const totalSlots = (END_MIN - START_MIN) / 30
           const SLOT_W = 0 // niet gebruikt — slots vullen beschikbare breedte
           const timeSlots: string[] = []
-          for (let m = START_MIN; m < END_MIN; m += 30) {
+          for (let m = START_MIN; m <= END_MIN; m += 30) {
             const h = Math.floor(m / 60).toString().padStart(2, '0')
             const min = (m % 60).toString().padStart(2, '0')
             timeSlots.push(`${h}:${min}`)
