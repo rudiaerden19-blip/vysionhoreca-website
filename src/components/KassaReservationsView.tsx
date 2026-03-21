@@ -1078,9 +1078,10 @@ export default function KassaReservationsView({
   }
 
   const handleDeleteReservation = async (id: string) => {
+    await supabase.from('reservations').update({ status: 'CANCELLED' }).eq('id', id)
     await supabase.from('reservations').delete().eq('id', id)
     await loadReservations()
-    toast.success('Reservatie verwijderd')
+    toast.success('Reservatie geannuleerd en verwijderd')
   }
 
   const handleStartOrder = async (r: Reservation) => {
@@ -2261,7 +2262,7 @@ export default function KassaReservationsView({
                                     ✏️ Aanpassen
                                   </button>
                                   <button onClick={() => handleDeleteReservation(r.id)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }}>
-                                    🗑 Verwijderen
+                                    🗑 Annulatie
                                   </button>
                                 </div>
                               </div>
@@ -3751,7 +3752,7 @@ function ReservationDetailModal({
               onClick={onDelete}
               className="flex-1 py-3 rounded-xl bg-red-50 text-red-400 font-medium hover:bg-red-100 transition-colors text-sm"
             >
-              Verwijderen
+              Annulatie
             </button>
             <button
               onClick={onClose}
