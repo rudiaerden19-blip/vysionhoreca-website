@@ -3699,7 +3699,6 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
               <select value={formData.duration_minutes}
                 onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })}
                 className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none">
-                <option value={30}>30 min</option>
                 <option value={60}>1 uur</option>
                 <option value={90}>1,5 uur</option>
                 <option value={120}>2 uur</option>
