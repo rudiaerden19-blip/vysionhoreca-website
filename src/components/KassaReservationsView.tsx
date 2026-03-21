@@ -492,6 +492,10 @@ export default function KassaReservationsView({
   const [calMonth, setCalMonth] = useState(() => ({ year: new Date().getFullYear(), month: new Date().getMonth() }))
   const [timeShift, setTimeShift] = useState<'dag'|'avond'>('dag')
   const [calOpen, setCalOpen] = useState(true)
+  const [showSearchPopup, setShowSearchPopup] = useState(false)
+  const [searchPopupQuery, setSearchPopupQuery] = useState('')
+  const [searchPopupTab, setSearchPopupTab] = useState<'dag'|'alle'>('dag')
+  const [editReservation, setEditReservation] = useState<Reservation | null>(null)
   const [floorPlanTime, setFloorPlanTime] = useState(() => {
     const now = new Date()
     const h = now.getHours().toString().padStart(2, '0')
@@ -1932,6 +1936,13 @@ export default function KassaReservationsView({
                     <span>Kalender</span>
                     {calOpen ? <Eye size={22}/> : <EyeOff size={22}/>}
                   </button>
+                  {/* Zoek knop */}
+                  <button
+                    onClick={() => setShowSearchPopup(true)}
+                    className="ml-2 flex items-center gap-2 px-5 py-1.5 rounded-lg border-2 font-bold text-sm bg-gray-700 border-gray-700 text-white hover:bg-gray-800 transition-colors">
+                    <Search size={20}/>
+                    <span>Zoek reserv.</span>
+                  </button>
                   <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
                 </div>
 
@@ -3240,6 +3251,309 @@ export default function KassaReservationsView({
           guestProfile={guestProfiles.find(g => g.id === (selectedReservation.guest_phone || selectedReservation.guest_email || selectedReservation.guest_name))}
         />
       )}
+
+      {/* ======== ZOEK POPUP ======== */}
+      {showSearchPopup && (() => {
+        const q = searchPopupQuery.toLowerCase().trim()
+        const todayISO = new Date().toISOString().split('T')[0]
+        const base = searchPopupTab === 'dag'
+          ? reservations.filter(r => r.reservation_date === timelineDate && r.status !== 'CANCELLED')
+          : reservations.filter(r => r.reservation_date >= todayISO && r.status !== 'CANCELLED')
+        const results = q
+          ? base.filter(r =>
+              r.guest_name?.toLowerCase().includes(q) ||
+              r.guest_email?.toLowerCase().includes(q) ||
+              r.guest_phone?.toLowerCase().includes(q) ||
+              String(r.table_number).includes(q)
+            )
+          : base.slice(0, 30)
+
+        // Groepeer per datum
+        const grouped: Record<string, Reservation[]> = {}
+        results.forEach(r => {
+          if (!grouped[r.reservation_date]) grouped[r.reservation_date] = []
+          grouped[r.reservation_date].push(r)
+        })
+        const sortedDates = Object.keys(grouped).sort()
+
+        return (
+          <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4"
+            style={{ background: 'rgba(0,0,0,0.4)' }}
+            onClick={() => setShowSearchPopup(false)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col overflow-hidden"
+              style={{ maxHeight: '75vh' }}
+              onClick={e => e.stopPropagation()}>
+              {/* Zoekbalk */}
+              <div className="px-4 pt-4 pb-3 border-b border-gray-100">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Zoeken</p>
+                <div className="flex items-center gap-3 bg-gray-100 rounded-xl px-4 py-2">
+                  <Search size={20} className="text-gray-400 flex-shrink-0"/>
+                  <input autoFocus type="text" value={searchPopupQuery}
+                    onChange={e => setSearchPopupQuery(e.target.value)}
+                    placeholder="Naam, telefoon, email, tafel..."
+                    className="flex-1 bg-transparent outline-none text-base text-gray-800 placeholder-gray-400"/>
+                  {searchPopupQuery && (
+                    <button onClick={() => setSearchPopupQuery('')} className="text-gray-400 hover:text-gray-600">
+                      <X size={16}/>
+                    </button>
+                  )}
+                </div>
+              </div>
+              {/* Tabs */}
+              <div className="flex border-b border-gray-100">
+                <button onClick={() => setSearchPopupTab('dag')}
+                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='dag'?'text-blue-600 border-b-2 border-blue-600':'text-gray-400 hover:text-gray-600'}`}>
+                  DEZE DAG
+                </button>
+                <button onClick={() => setSearchPopupTab('alle')}
+                  className={`flex-1 py-3 text-sm font-bold tracking-wide transition-colors ${searchPopupTab==='alle'?'text-blue-600 border-b-2 border-blue-600':'text-gray-400 hover:text-gray-600'}`}>
+                  ALLE DAGEN
+                </button>
+              </div>
+              {/* Resultaten */}
+              <div className="overflow-y-auto flex-1">
+                {sortedDates.length === 0 && (
+                  <div className="py-12 text-center text-gray-400 text-sm">Geen reservaties gevonden</div>
+                )}
+                {sortedDates.map(date => (
+                  <div key={date}>
+                    <p className="px-4 py-2 text-sm font-black text-gray-700 bg-gray-50 border-b border-gray-100">
+                      {new Date(date+'T12:00').toLocaleDateString('nl-BE',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+                    </p>
+                    {grouped[date].sort((a,b)=>a.reservation_time.localeCompare(b.reservation_time)).map(r => (
+                      <button key={r.id} onClick={() => { setEditReservation(r); setShowSearchPopup(false) }}
+                        className="w-full px-4 py-3 border-b border-gray-50 hover:bg-blue-50 transition-colors text-left flex items-center gap-4">
+                        <div className="flex-shrink-0 text-center">
+                          <p className="text-base font-black text-gray-800">{r.reservation_time}</p>
+                          <p className="text-xs text-gray-400">{r.party_size}p.</p>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-gray-800 truncate">{r.guest_name}</p>
+                          <p className="text-xs text-gray-400">{r.guest_phone || r.guest_email || ''}</p>
+                        </div>
+                        <div className="flex-shrink-0 text-right">
+                          <p className="text-xs text-gray-500">Tafel {r.table_number || '?'}</p>
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                            r.status==='CONFIRMED'?'bg-green-100 text-green-700':
+                            r.status==='PENDING'?'bg-yellow-100 text-yellow-700':
+                            r.status==='CHECKED_IN'?'bg-blue-100 text-blue-700':
+                            'bg-gray-100 text-gray-500'}`}>
+                            {r.status==='CONFIRMED'?'Bevestigd':r.status==='PENDING'?'Verwacht':r.status==='CHECKED_IN'?'Aanwezig':'Onbekend'}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* ======== EDIT RESERVATIE MODAL ======== */}
+      {editReservation && (
+        <EditReservationModal
+          reservation={editReservation}
+          tables={floorPlanTablesDB.length > 0
+            ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
+            : kassaTables}
+          onClose={() => setEditReservation(null)}
+          onSave={async (updated) => {
+            const { error } = await supabase.from('reservations').update({
+              reservation_date: updated.reservation_date,
+              reservation_time: updated.reservation_time,
+              party_size: updated.party_size,
+              duration_minutes: updated.duration_minutes,
+              table_number: updated.table_number,
+              status: updated.status,
+              special_requests: updated.special_requests,
+            }).eq('id', updated.id)
+            if (!error) { await loadReservations(); setEditReservation(null) }
+          }}
+          onCancel={async () => {
+            const { error } = await supabase.from('reservations').update({ status: 'CANCELLED' }).eq('id', editReservation.id)
+            if (!error) { await loadReservations(); setEditReservation(null) }
+          }}
+        />
+      )}
+    </div>
+  )
+}
+
+// ============================================================
+// EDIT RESERVATIE MODAL
+// ============================================================
+interface EditReservationModalProps {
+  reservation: Reservation
+  tables: KassaTable[]
+  onClose: () => void
+  onSave: (updated: Reservation) => Promise<void>
+  onCancel: () => Promise<void>
+}
+
+function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }: EditReservationModalProps) {
+  const [form, setForm] = useState({
+    reservation_date: reservation.reservation_date,
+    reservation_time: reservation.reservation_time,
+    party_size: reservation.party_size,
+    duration_minutes: reservation.duration_minutes || 90,
+    table_number: String(reservation.table_number || ''),
+    special_requests: reservation.special_requests || '',
+    status: reservation.status,
+  })
+  const [saving, setSaving] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const [confirmCancel, setConfirmCancel] = useState(false)
+
+  const timeSlots: string[] = []
+  for (let h = 10; h <= 23; h++) {
+    timeSlots.push(`${String(h).padStart(2,'0')}:00`)
+    if (h < 23) timeSlots.push(`${String(h).padStart(2,'0')}:30`)
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    await onSave({ ...reservation, ...form, table_number: form.table_number || reservation.table_number })
+    setSaving(false)
+  }
+
+  const handleCancel = async () => {
+    setCancelling(true)
+    await onCancel()
+    setCancelling(false)
+  }
+
+  const inputCls = 'w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-blue-500 outline-none text-base'
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background:'rgba(0,0,0,0.5)' }}
+      onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden"
+        style={{ maxHeight:'90vh' }}
+        onClick={e => e.stopPropagation()}>
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <div>
+            <h2 className="text-lg font-black text-gray-800">Reservatie bewerken</h2>
+            <p className="text-sm text-gray-500">{reservation.guest_name} · {reservation.reservation_date} {reservation.reservation_time}</p>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-lg"><X size={20}/></button>
+        </div>
+
+        {/* Body */}
+        <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-4">
+          {/* Datum & Tijd */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-bold text-gray-600 mb-1">Datum</label>
+              <input type="date" value={form.reservation_date}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={e => setForm({...form, reservation_date: e.target.value})}
+                className={inputCls}/>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-600 mb-1">Tijd</label>
+              <select value={form.reservation_time}
+                onChange={e => setForm({...form, reservation_time: e.target.value})}
+                className={inputCls}>
+                {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* Personen & Duur */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-bold text-gray-600 mb-1">Personen</label>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 border border-gray-200">
+                <button type="button" onClick={() => setForm({...form, party_size: Math.max(1, form.party_size-1)})}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-xl font-bold">-</button>
+                <span className="flex-1 text-center text-2xl font-bold">{form.party_size}</span>
+                <button type="button" onClick={() => setForm({...form, party_size: form.party_size+1})}
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-xl font-bold">+</button>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-600 mb-1">Duur</label>
+              <select value={form.duration_minutes}
+                onChange={e => setForm({...form, duration_minutes: parseInt(e.target.value)})}
+                className={inputCls}>
+                <option value={60}>1 uur</option>
+                <option value={90}>1,5 uur</option>
+                <option value={120}>2 uur</option>
+                <option value={150}>2,5 uur</option>
+                <option value={180}>3 uur</option>
+                <option value={240}>4 uur</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Tafel */}
+          <div>
+            <label className="block text-sm font-bold text-gray-600 mb-1">Tafel</label>
+            <select value={form.table_number}
+              onChange={e => setForm({...form, table_number: e.target.value})}
+              className={inputCls}>
+              <option value="">— Automatisch —</option>
+              {tables.map(t => (
+                <option key={t.id} value={String(t.number)}>Tafel {t.number} ({t.seats} plaatsen)</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm font-bold text-gray-600 mb-1">Status</label>
+            <select value={form.status}
+              onChange={e => setForm({...form, status: e.target.value as Reservation['status']})}
+              className={inputCls}>
+              <option value="PENDING">Verwacht</option>
+              <option value="CONFIRMED">Bevestigd</option>
+              <option value="CHECKED_IN">Aanwezig</option>
+              <option value="COMPLETED">Afgerond</option>
+            </select>
+          </div>
+
+          {/* Opmerkingen */}
+          <div>
+            <label className="block text-sm font-bold text-gray-600 mb-1">Opmerkingen / Speciale wensen</label>
+            <textarea value={form.special_requests}
+              onChange={e => setForm({...form, special_requests: e.target.value})}
+              rows={3} placeholder="Bijv. allergieën, verjaardagstaart, rolstoel..."
+              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-blue-500 outline-none text-base resize-none"/>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-100 flex gap-3">
+          {/* Annuleren */}
+          {!confirmCancel ? (
+            <button onClick={() => setConfirmCancel(true)}
+              className="px-4 py-3 rounded-xl border-2 border-red-300 text-red-600 font-bold text-sm hover:bg-red-50 transition-colors">
+              Annuleer reservatie
+            </button>
+          ) : (
+            <div className="flex gap-2 flex-1">
+              <button onClick={handleCancel} disabled={cancelling}
+                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold text-sm hover:bg-red-600 disabled:opacity-50">
+                {cancelling ? 'Bezig...' : '✓ Ja, annuleer'}
+              </button>
+              <button onClick={() => setConfirmCancel(false)}
+                className="flex-1 py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-bold text-sm">
+                Terug
+              </button>
+            </div>
+          )}
+          {!confirmCancel && (
+            <button onClick={handleSave} disabled={saving}
+              className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 disabled:opacity-50 transition-colors">
+              {saving ? 'Opslaan...' : 'Wijzigingen opslaan'}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
