@@ -506,13 +506,28 @@ export default function KassaReservationsView({
           setIsPro(data.plan === 'pro' || status === 'active' || !!isTrial)
         }
       })
-    // Laad reservatie instellingen vanuit Supabase (overschrijft localStorage)
+    // Laad instellingen: localStorage is primair, Supabase vult aan
     supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).single()
       .then(({ data }) => {
         if (data) {
-          const loaded = { ...DEFAULT_SETTINGS, ...data }
-          setReservationSettings(loaded)
-          localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(loaded))
+          // Zet Supabase snake_case terug naar camelCase
+          const fromDB: Partial<ReservationSettings> = {
+            isEnabled: data.is_enabled ?? data.isEnabled,
+            acceptOnline: data.accept_online ?? data.acceptOnline,
+            maxPartySize: data.max_party_size ?? data.maxPartySize,
+            defaultDurationMinutes: data.default_duration_minutes ?? data.defaultDurationMinutes,
+            slotDurationMinutes: data.slot_duration_minutes ?? data.slotDurationMinutes,
+            minAdvanceHours: data.min_advance_hours ?? data.minAdvanceHours,
+            maxAdvanceDays: data.max_advance_days ?? data.maxAdvanceDays,
+            shifts: typeof data.shifts === 'string' ? JSON.parse(data.shifts) : (data.shifts ?? undefined),
+            closedDays: typeof data.closed_days === 'string' ? JSON.parse(data.closed_days) : (data.closed_days ?? undefined),
+          }
+          // Merge: localStorage > Supabase > defaults
+          const localRaw = localStorage.getItem(`reservationSettings_${tenant}`)
+          const localData = localRaw ? JSON.parse(localRaw) : {}
+          const merged = { ...DEFAULT_SETTINGS, ...fromDB, ...localData }
+          setReservationSettings(merged)
+          localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(merged))
         }
       })
   }, [tenant])
@@ -592,11 +607,23 @@ export default function KassaReservationsView({
   const updateSettings = (updates: Partial<ReservationSettings>) => {
     const newSettings = { ...reservationSettings, ...updates }
     setReservationSettings(newSettings)
+    // localStorage altijd eerst — werkt ook zonder database
     localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(newSettings))
-    supabase.from('reservation_settings').upsert(
-      { tenant_slug: tenant, ...newSettings },
-      { onConflict: 'tenant_slug' }
-    ).then(() => {})
+    // Supabase als extra backup — sla alleen basis velden op die zeker bestaan
+    const safeSettings = {
+      tenant_slug: tenant,
+      is_enabled: newSettings.isEnabled,
+      accept_online: newSettings.acceptOnline,
+      max_party_size: newSettings.maxPartySize,
+      default_duration_minutes: newSettings.defaultDurationMinutes,
+      slot_duration_minutes: newSettings.slotDurationMinutes,
+      min_advance_hours: newSettings.minAdvanceHours,
+      max_advance_days: newSettings.maxAdvanceDays,
+      shifts: JSON.stringify(newSettings.shifts || []),
+      closed_days: JSON.stringify(newSettings.closedDays || []),
+    }
+    supabase.from('reservation_settings').upsert(safeSettings, { onConflict: 'tenant_slug' })
+      .then(({ error }) => { if (error) console.warn('Settings Supabase save:', error.message) })
   }
 
   // ---- Floor plan editor helpers ----
@@ -1376,7 +1403,7 @@ export default function KassaReservationsView({
       </div>
 
       {/* Content */}
-      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'list' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
+      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'list' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
@@ -2515,7 +2542,7 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'settings' && (
-          <div className="max-w-2xl">
+          <div className="max-w-2xl overflow-y-auto h-full pb-8">
             <h3 className="text-lg font-bold mb-4">Reservatie Instellingen</h3>
             <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
               {/* Enable toggle */}
