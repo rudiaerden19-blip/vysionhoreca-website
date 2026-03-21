@@ -114,6 +114,8 @@ interface ReservationSettings {
   noShowFee: number
   // Booking widget URL label
   bookingPageEnabled: boolean
+  // Bevestigingsmodus: automatisch of handmatig
+  autoConfirm: boolean
 }
 
 interface GuestProfile {
@@ -759,6 +761,7 @@ const DEFAULT_SETTINGS: ReservationSettings = {
   noShowProtection: false,
   noShowFee: 25,
   bookingPageEnabled: true,
+  autoConfirm: false,
 }
 
 // ---- Toast simple ----
@@ -939,6 +942,7 @@ export default function KassaReservationsView({
             depositRequired: data.deposit_required ?? data.depositRequired,
             depositAmount: data.deposit_amount ?? data.depositAmount,
             noShowProtection: data.no_show_protection ?? data.noShowProtection,
+            autoConfirm: data.auto_confirm ?? data.autoConfirm ?? false,
           }
           let localData: Record<string, unknown> = {}
           try {
@@ -1102,6 +1106,7 @@ export default function KassaReservationsView({
     auto_send_review: s.autoSendReview,
     review_link: s.reviewLink,
     booking_page_enabled: s.bookingPageEnabled,
+    auto_confirm: s.autoConfirm,
   })
 
   // Auto-save bij elke toggle/wijziging (localStorage direct, Supabase async)
@@ -1535,7 +1540,30 @@ export default function KassaReservationsView({
   const handleConfirm = async (r: Reservation) => {
     await updateStatus(r.id, 'CONFIRMED')
     toast.success('Reservatie bevestigd')
-    // Geen mail — bevestigingsmail wordt enkel gestuurd bij nieuwe reservatie
+    // Stuur bevestigingsmail als de klant een e-mail heeft (handmatige goedkeuring)
+    if (r.guest_email) {
+      try {
+        await fetch('/api/send-reservation-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerEmail: r.guest_email,
+            customerName: r.guest_name,
+            customerPhone: r.guest_phone,
+            reservationDate: r.reservation_date,
+            reservationTime: r.reservation_time,
+            partySize: r.party_size,
+            tableName: r.table_number,
+            notes: r.notes,
+            specialRequests: r.special_requests,
+            status: 'confirmed',
+            businessName: businessInfo.name,
+            businessPhone: businessInfo.phone,
+            businessEmail: businessInfo.email,
+          }),
+        })
+      } catch (e) { console.warn('Bevestigingsmail mislukt:', e) }
+    }
   }
 
   // z6 - VIP/geblokkeerd opslaan in Supabase
@@ -1945,27 +1973,35 @@ export default function KassaReservationsView({
         {/* View Toggle & Search */}
         <div className="flex flex-col gap-2 w-full lg:flex-row lg:items-center lg:gap-3">
           <div className="flex bg-gray-100 rounded-xl p-1 w-full overflow-x-auto">
-            {[
-              { id: 'reservations', label: 'Reserveringen', icon: <List size={16} /> },
-              { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} /> },
-              { id: 'timeline', label: 'Tafels', icon: <LayoutGrid size={16} /> },
-              { id: 'guests', label: 'Contacten', icon: <Users size={16} /> },
-              { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} /> },
-              { id: 'settings', label: 'Instellingen', icon: <Settings size={16} /> },
-            ].map((view) => (
-              <button
-                key={view.id}
-                onClick={() => { setViewMode(view.id as ViewMode); setShowResCalendar(false) }}
-                className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap min-w-[44px] ${
-                  viewMode === view.id
-                    ? 'bg-[#3C4D6B] text-white'
-                    : 'text-gray-400 hover:text-gray-900'
-                }`}
-              >
-                {view.icon}
-                <span className="hidden md:inline">{view.label}</span>
-              </button>
-            ))}
+            {(() => {
+              const pendingCount = reservations.filter(r => r.status === 'PENDING').length
+              return [
+                { id: 'reservations', label: 'Reserveringen', icon: <List size={16} />, badge: pendingCount },
+                { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} />, badge: 0 },
+                { id: 'timeline', label: 'Tafels', icon: <LayoutGrid size={16} />, badge: 0 },
+                { id: 'guests', label: 'Contacten', icon: <Users size={16} />, badge: 0 },
+                { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} />, badge: 0 },
+                { id: 'settings', label: 'Instellingen', icon: <Settings size={16} />, badge: 0 },
+              ].map((view) => (
+                <button
+                  key={view.id}
+                  onClick={() => { setViewMode(view.id as ViewMode); setShowResCalendar(false) }}
+                  className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap min-w-[44px] relative ${
+                    viewMode === view.id
+                      ? 'bg-[#3C4D6B] text-white'
+                      : 'text-gray-400 hover:text-gray-900'
+                  }`}
+                >
+                  {view.icon}
+                  <span className="hidden md:inline">{view.label}</span>
+                  {view.badge > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-amber-500 text-white text-xs font-bold flex items-center justify-center">
+                      {view.badge}
+                    </span>
+                  )}
+                </button>
+              ))
+            })()}
           </div>
 
           {viewMode !== 'timeline' && viewMode !== 'reservations' && (
@@ -3125,6 +3161,43 @@ export default function KassaReservationsView({
                 </div>
               </div>
 
+              {/* Goedkeuren banner — PENDING reservaties */}
+              {(() => {
+                const pending = reservations.filter(r => r.status === 'PENDING')
+                if (pending.length === 0) return null
+                return (
+                  <div className="flex-shrink-0 bg-amber-50 border-b-2 border-amber-200 px-4 py-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-amber-600 font-bold text-sm">⏳ {pending.length} reservatie{pending.length > 1 ? 's' : ''} wacht op goedkeuring</span>
+                    </div>
+                    <div className="space-y-2">
+                      {pending.slice(0, 3).map(r => (
+                        <div key={r.id} className="flex items-center justify-between bg-white rounded-xl px-4 py-2.5 border border-amber-200 shadow-sm">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0"/>
+                            <div className="min-w-0">
+                              <p className="font-semibold text-sm text-gray-800 truncate">{r.guest_name}</p>
+                              <p className="text-xs text-gray-500">{r.reservation_date} · {r.reservation_time} · {r.party_size}p</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 shrink-0 ml-3">
+                            <button onClick={() => updateStatus(r.id, 'CANCELLED')}
+                              className="px-3 py-1.5 rounded-lg bg-red-100 text-red-600 text-xs font-bold hover:bg-red-200 transition-colors">
+                              Weigeren
+                            </button>
+                            <button onClick={() => handleConfirm(r)}
+                              className="px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-bold hover:bg-green-600 transition-colors">
+                              ✓ Goedkeuren
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {pending.length > 3 && <p className="text-xs text-amber-600 text-center">+{pending.length - 3} meer...</p>}
+                    </div>
+                  </div>
+                )
+              })()}
+
               {/* Body: lijst + kalender sidebar */}
               <div className="relative flex flex-1 overflow-hidden" onClick={() => showMonthPicker && setShowMonthPicker(false)}>
                 {/* Lijst */}
@@ -3313,6 +3386,34 @@ export default function KassaReservationsView({
                   <div className={`w-5 h-5 rounded-full bg-white transition-transform ${reservationSettings.acceptOnline ? 'translate-x-8' : 'translate-x-1'}`} />
                 </button>
               </div>
+
+              {/* Bevestigingsmodus */}
+              {reservationSettings.acceptOnline && (
+                <div>
+                  <p className="font-medium mb-1">Bevestigingsmodus online reservaties</p>
+                  <p className="text-sm text-gray-400 mb-3">Hoe worden online reservaties verwerkt?</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => updateSettings({ autoConfirm: false })}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${!reservationSettings.autoConfirm ? 'border-orange-500 bg-orange-50' : 'border-gray-200 hover:border-gray-300'}`}
+                    >
+                      <div className="text-2xl mb-2">✋</div>
+                      <p className={`font-bold text-sm ${!reservationSettings.autoConfirm ? 'text-orange-700' : 'text-gray-700'}`}>Handmatig</p>
+                      <p className="text-xs text-gray-500 mt-1">Klant krijgt mail "in afwachting". Jij keurt goed in de kassa → klant krijgt bevestigingsmail.</p>
+                      {!reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-orange-600 bg-orange-100 px-2 py-0.5 rounded-full">Actief</span>}
+                    </button>
+                    <button
+                      onClick={() => updateSettings({ autoConfirm: true })}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${reservationSettings.autoConfirm ? 'border-green-500 bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
+                    >
+                      <div className="text-2xl mb-2">⚡</div>
+                      <p className={`font-bold text-sm ${reservationSettings.autoConfirm ? 'text-green-700' : 'text-gray-700'}`}>Automatisch</p>
+                      <p className="text-xs text-gray-500 mt-1">Klant reserveert → direct bevestigd → klant krijgt meteen bevestigingsmail.</p>
+                      {reservationSettings.autoConfirm && <span className="mt-2 inline-block text-xs font-bold text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Actief</span>}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Max party size */}
               <div>

@@ -29,6 +29,7 @@ interface BookingSettings {
   depositAmount: number
   noShowProtection: boolean
   shifts: { id: string; name: string; startTime: string; endTime: string; isActive: boolean }[]
+  autoConfirm: boolean
 }
 
 const DEFAULT_SETTINGS: BookingSettings = {
@@ -43,6 +44,7 @@ const DEFAULT_SETTINGS: BookingSettings = {
   depositAmount: 0,
   noShowProtection: false,
   shifts: [],
+  autoConfirm: false,
 }
 
 export default function ReserverenPage({ params }: { params: { tenant: string } }) {
@@ -87,7 +89,11 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
     // Laad reservatie instellingen uit Supabase
     supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).single()
       .then(({ data }) => {
-        if (data) setSettings({ ...DEFAULT_SETTINGS, ...data })
+        if (data) setSettings({
+          ...DEFAULT_SETTINGS,
+          ...data,
+          autoConfirm: data.auto_confirm ?? data.autoConfirm ?? false,
+        })
       })
   }, [tenant])
 
@@ -139,11 +145,15 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
     setLoading(true)
 
     try {
+      const reservationStatus = settings.autoConfirm ? 'CONFIRMED' : 'PENDING'
       const { data, error: insertError } = await supabase.from('reservations').insert([{
         tenant_slug: tenant,
         guest_name: formData.guest_name,
         guest_phone: formData.guest_phone || null,
         guest_email: formData.guest_email || null,
+        customer_name: formData.guest_name,
+        customer_phone: formData.guest_phone || null,
+        customer_email: formData.guest_email || null,
         party_size: formData.party_size,
         reservation_date: formData.reservation_date,
         reservation_time: formData.reservation_time,
@@ -151,14 +161,14 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
         notes: formData.notes || null,
         special_requests: formData.special_requests || null,
         occasion: formData.occasion || null,
-        status: 'PENDING',
+        status: reservationStatus,
         total_spent: 0,
         payment_status: 'unpaid',
       }]).select().single()
 
       if (insertError) throw insertError
 
-      // Stuur bevestigingsmail
+      // Stuur mail: bij autoConfirm → "bevestigd", anders → "in afwachting"
       if (formData.guest_email) {
         await fetch('/api/send-reservation-email', {
           method: 'POST',
@@ -173,7 +183,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
             notes: formData.notes,
             specialRequests: formData.special_requests,
             occasion: formData.occasion,
-            status: 'pending',
+            status: settings.autoConfirm ? 'confirmed' : 'pending',
             businessName: tenantInfo?.name || tenant,
             businessPhone: tenantInfo?.phone,
             businessEmail: tenantInfo?.email,
@@ -240,9 +250,14 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
             style={{ backgroundColor: primaryColor }}>
             ✓
           </div>
-          <h2 className="text-2xl font-bold mb-2">Reservatie Ontvangen!</h2>
+          <h2 className="text-2xl font-bold mb-2">
+            {settings.autoConfirm ? 'Reservatie Bevestigd! 🎉' : 'Reservatie Ontvangen!'}
+          </h2>
           <p className="text-gray-500 mb-6">
-            Bedankt <strong>{formData.guest_name}</strong>! Uw reservatie is aangevraagd.
+            {settings.autoConfirm
+              ? <>Bedankt <strong>{formData.guest_name}</strong>! Uw tafel is gereserveerd. Tot ziens!</>
+              : <>Bedankt <strong>{formData.guest_name}</strong>! Uw reservatie is aangevraagd. U ontvangt een bevestiging zodra wij uw reservatie goedkeuren.</>
+            }
           </p>
 
           {/* Overzicht kaart */}
@@ -278,7 +293,10 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
 
           {formData.guest_email && (
             <p className="text-gray-400 text-sm mb-6">
-              📧 Een bevestiging wordt verstuurd naar <strong>{formData.guest_email}</strong>
+              📧 {settings.autoConfirm
+                ? <>Een bevestiging is verstuurd naar <strong>{formData.guest_email}</strong></>
+                : <>U ontvangt een bevestigingsmail op <strong>{formData.guest_email}</strong> zodra uw reservatie goedgekeurd is.</>
+              }
             </p>
           )}
 
