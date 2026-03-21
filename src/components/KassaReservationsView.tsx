@@ -608,8 +608,32 @@ export default function KassaReservationsView({
   useEffect(() => {
     loadReservations()
     loadGuestProfiles()
-    // Auto-refresh elke 60 seconden — stille achtergrond refresh, geen flikkering
-    const interval = setInterval(() => { loadReservations(true) }, 60_000)
+    // Auto-refresh elke 60 seconden — alleen data updaten als het veranderd is
+    const interval = setInterval(async () => {
+      const { data } = await supabase
+        .from('reservations')
+        .select('*')
+        .eq('tenant_slug', tenant)
+        .order('reservation_date', { ascending: true })
+        .order('reservation_time', { ascending: true })
+      if (!data) return
+      const mapped = data.map((r: Record<string, unknown>) => ({
+        ...r,
+        guest_name: (r.guest_name || r.customer_name || '') as string,
+        guest_phone: (r.guest_phone || r.customer_phone || '') as string,
+        guest_email: (r.guest_email || r.customer_email || '') as string,
+        reservation_date: r.reservation_date ? String(r.reservation_date).slice(0, 10) : '',
+        reservation_time: ((r.reservation_time as string) || '').substring(0, 5),
+        status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
+        table_number: r.table_number != null ? String(r.table_number) : undefined,
+      })) as Reservation[]
+      // Alleen re-renderen als data echt veranderd is
+      setReservations(prev => {
+        const prevJson = JSON.stringify(prev.map(r => r.id + r.status + r.table_number))
+        const newJson = JSON.stringify(mapped.map(r => r.id + r.status + r.table_number))
+        return prevJson === newJson ? prev : mapped
+      })
+    }, 60_000)
     return () => clearInterval(interval)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenant])
@@ -2180,7 +2204,7 @@ export default function KassaReservationsView({
                             <div className="mt-4">
                               <p className="text-xs text-red-400 font-medium">Geen data geladen</p>
                               <button
-                                onClick={loadReservations}
+                                onClick={() => loadReservations()}
                                 className="mt-2 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg px-3 py-1.5 font-semibold transition-colors"
                               >
                                 Opnieuw laden
