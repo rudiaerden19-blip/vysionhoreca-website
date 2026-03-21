@@ -181,6 +181,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   const [showReservations, setShowReservations] = useState(false)
   const [pendingReservCount, setPendingReservCount] = useState(0)
+  const [newReservNotif, setNewReservNotif] = useState(false)
   const [showFloorPlan, setShowFloorPlan] = useState(false)
   const [showTablePicker, setShowTablePicker] = useState(false)
   const [kassaTables, setKassaTables] = useState<{ id: string; number: string; seats: number; status: string }[]>([])
@@ -502,19 +503,29 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     setSoundsOn(getSoundsEnabled())
   }, [])
 
-  // Pending reservaties tellen + realtime update
+  // Pending reservaties tellen + realtime update + notificatie bij nieuwe
+  const prevPendingRef = useRef(0)
   useEffect(() => {
-    const fetchPending = async () => {
+    const fetchPending = async (showNotif = false) => {
       const { count } = await supabase
         .from('reservations')
         .select('*', { count: 'exact', head: true })
-        .eq('tenant_id', tenant)
-        .eq('status', 'pending')
-      setPendingReservCount(count ?? 0)
+        .eq('tenant_slug', tenant)
+        .eq('status', 'PENDING')
+      const n = count ?? 0
+      setPendingReservCount(n)
+      // Toon melding als er een nieuwe binnenkomt
+      if (showNotif && n > prevPendingRef.current) {
+        try { playOrderNotification() } catch {}
+        setNewReservNotif(true)
+        setTimeout(() => setNewReservNotif(false), 8000)
+      }
+      prevPendingRef.current = n
     }
-    fetchPending()
-    const channel = supabase.channel('reservations-badge')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'reservations', filter: `tenant_id=eq.${tenant}` }, fetchPending)
+    fetchPending(false)
+    const channel = supabase.channel('reservations-badge-v2')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'reservations' }, () => fetchPending(true))
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'reservations' }, () => fetchPending(false))
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [tenant])
@@ -1655,6 +1666,24 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           onClose={() => setShowFloorPlan(false)}
           tableOrders={tableOrders}
         />
+      )}
+
+      {/* Nieuwe reservatie notificatie banner */}
+      {newReservNotif && !showReservations && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 bg-amber-500 text-white px-6 py-4 rounded-2xl shadow-2xl cursor-pointer animate-bounce"
+          onClick={() => { setShowReservations(true); setNewReservNotif(false) }}
+        >
+          <span className="text-2xl">📅</span>
+          <div>
+            <p className="font-bold text-base">Nieuwe reservatie aangevraagd!</p>
+            <p className="text-sm opacity-90">Klik om te bekijken en goed te keuren</p>
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); setNewReservNotif(false) }}
+            className="ml-2 text-white/70 hover:text-white text-xl font-bold"
+          >×</button>
+        </div>
       )}
 
       {showReservations && (
