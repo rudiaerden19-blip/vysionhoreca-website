@@ -2584,31 +2584,29 @@ export default function KassaReservationsView({
                     <thead>
                       <tr style={{ background: '#f9fafb', borderBottom: '2px solid #e5e7eb' }}>
                         <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tijd</th>
-                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Naam</th>
-                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Personen</th>
                         <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tafel</th>
+                        <th className="px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500">Personen</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Naam</th>
                         <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Telefoon</th>
                         <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">E-mail</th>
                         <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500"></th>
                       </tr>
                     </thead>
                     <tbody>
-                      {dayRes.map((r, idx) => {
-                        const st = statusLabel[r.status] || { label: r.status, cls: 'bg-gray-100 text-gray-500' }
-                        return (
+                      {dayRes.map((r, idx) => (
                           <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb' }}
                             className={`transition-colors hover:bg-orange-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}`}>
                             <td className="px-5 py-4 font-bold text-gray-800 text-base" style={{ borderRight: '1px solid #e5e7eb' }}>
                               {r.reservation_time}
                             </td>
-                            <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>
-                              {r.guest_name}
-                            </td>
-                            <td className="px-5 py-4 text-gray-700 text-center font-bold text-lg" style={{ borderRight: '1px solid #e5e7eb' }}>
-                              {r.party_size}
-                            </td>
                             <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
                               {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
+                            </td>
+                            <td className="px-5 py-4 text-center font-bold text-gray-800 text-lg" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.party_size}
+                            </td>
+                            <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.guest_name}
                             </td>
                             <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
                               {r.guest_phone
@@ -2627,8 +2625,7 @@ export default function KassaReservationsView({
                               </button>
                             </td>
                           </tr>
-                        )
-                      })}
+                      ))}
                     </tbody>
                   </table>
                 )}
