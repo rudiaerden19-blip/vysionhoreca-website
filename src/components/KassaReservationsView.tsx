@@ -1376,7 +1376,7 @@ export default function KassaReservationsView({
       </div>
 
       {/* Content */}
-      <div className={`flex-1 p-4 ${viewMode === 'today' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'list' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`}>
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
@@ -1579,12 +1579,15 @@ export default function KassaReservationsView({
         {!loading && viewMode === 'list' && (() => {
           const COLS = 'repeat(9, 1fr)'
           return (
-          <div className="bg-white rounded-xl border border-gray-200">
-            <div className="grid gap-2 px-4 py-4 text-base font-bold text-white uppercase tracking-wide rounded-t-xl sticky top-0 z-10"
+          <div className="bg-white rounded-xl border border-gray-200 flex flex-col flex-1 overflow-hidden">
+            {/* Oranje header — altijd zichtbaar, nooit scrollend */}
+            <div className="grid gap-2 px-4 py-4 text-base font-bold text-white uppercase tracking-wide rounded-t-xl flex-shrink-0"
               style={{ gridTemplateColumns: COLS, backgroundColor: '#F97316' }}>
               <span>Datum</span><span>Tijd</span><span>Gast</span><span>Email</span>
               <span>Personen</span><span>Tafel</span><span>Status</span><span>No-show</span><span>Push</span>
             </div>
+            {/* Rijen — scrollen */}
+            <div className="overflow-y-auto flex-1">
             {filteredReservations.length === 0 && (
               <div className="py-12 text-center text-gray-400 text-base">Geen reservaties</div>
             )}
@@ -1639,8 +1642,9 @@ export default function KassaReservationsView({
                 </div>
               )
             })}
+            </div>{/* einde scrollbare rijen */}
           </div>
-          )
+        )
         })()}
 
         {/* Push email modal */}
