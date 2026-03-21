@@ -2038,7 +2038,7 @@ export default function KassaReservationsView({
           // Reservation status per table for selected date
           const floorRes = reservations.filter(r =>
             r.reservation_date === selectedDate &&
-            r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
+            r.status !== 'CANCELLED'
           )
           const getFloorTableInfo = (tableNum: string) => {
             const all = floorRes.filter(r => String(r.table_number) === String(tableNum))
@@ -2131,22 +2131,48 @@ export default function KassaReservationsView({
                     <span className="text-sm font-semibold text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">{floorRes.length}</span>
                   </div>
                   <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
-                    {floorRes.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-12 text-center px-6">
-                        <CalendarDays size={32} className="text-gray-300 mb-3" />
-                        <p className="text-base text-gray-400 font-medium">Geen reservaties</p>
-                        <p className="text-sm text-gray-300 mt-1">voor {formatDate(selectedDate)}</p>
-                        {reservations.length > 0 && (
-                          <p className="text-xs text-gray-300 mt-3 leading-relaxed">
-                            {reservations.length} reservatie{reservations.length !== 1 ? 's' : ''} geladen<br />
-                            datums: {[...new Set(reservations.map(r => r.reservation_date))].join(', ')}
-                          </p>
-                        )}
-                        {reservations.length === 0 && !loading && (
-                          <p className="text-xs text-red-300 mt-3">Geen data van server ontvangen</p>
-                        )}
-                      </div>
-                    ) : (
+                    {floorRes.length === 0 ? (() => {
+                      const allDates = [...new Set(
+                        reservations
+                          .filter(r => r.status !== 'CANCELLED')
+                          .map(r => r.reservation_date)
+                          .filter(Boolean)
+                      )].sort()
+                      return (
+                        <div className="flex flex-col items-center justify-center py-10 text-center px-6">
+                          <CalendarDays size={32} className="text-gray-300 mb-3" />
+                          <p className="text-base text-gray-400 font-medium">Geen reservaties</p>
+                          <p className="text-sm text-gray-300 mt-1">voor {formatDate(selectedDate)}</p>
+                          {allDates.length > 0 && (
+                            <div className="mt-4 w-full">
+                              <p className="text-xs text-gray-400 mb-2">Reservaties gevonden op:</p>
+                              <div className="flex flex-col gap-1">
+                                {allDates.map(d => (
+                                  <button
+                                    key={d}
+                                    onClick={() => setSelectedDate(d)}
+                                    className="text-xs bg-orange-100 text-orange-700 hover:bg-orange-200 rounded-lg px-3 py-1.5 font-semibold transition-colors"
+                                  >
+                                    {formatDate(d)} ({reservations.filter(r => r.reservation_date === d && r.status !== 'CANCELLED').length}×)
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {reservations.length === 0 && !loading && (
+                            <div className="mt-4">
+                              <p className="text-xs text-red-400 font-medium">Geen data geladen</p>
+                              <button
+                                onClick={loadReservations}
+                                className="mt-2 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg px-3 py-1.5 font-semibold transition-colors"
+                              >
+                                Opnieuw laden
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })() : (
                       floorRes.map(r => {
                         const statusDot: Record<string, string> = {
                           CONFIRMED: 'bg-violet-400',
