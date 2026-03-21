@@ -2237,6 +2237,301 @@ export default function KassaReservationsView({
         })()}
 
 
+        {!loading && viewMode === 'timeline' && (() => {
+          // Time slots from 10:00 to 22:00 — geen horizontaal scrollen
+          const ROW_H = 60
+          const LABEL_W = 90
+          const START_MIN  = timeShift === 'dag' ? 10 * 60 : 17 * 60  // dag=10:00, avond=17:00
+          const END_MIN    = timeShift === 'dag' ? 16 * 60 : 23 * 60  // dag=16:00, avond=23:00
+          const EXTRA_MIN  = END_MIN + 2 * 60  // 2 uur extra grijze vakken na END_MIN
+          const totalSlots = (END_MIN - START_MIN) / 30
+          const timeSlots: string[] = []
+          for (let m = START_MIN; m < END_MIN; m += 30) {
+            const h = Math.floor(m / 60).toString().padStart(2, '0')
+            const min = (m % 60).toString().padStart(2, '0')
+            timeSlots.push(`${h}:${min}`)
+          }
+          // Extra grijze slots na einde tijdband (zichtbaar via horizontaal scrollen)
+          const extraSlots: string[] = []
+          for (let m = END_MIN; m < EXTRA_MIN; m += 30) {
+            const hh = Math.floor(m / 60) % 24
+            const mm = m % 60
+            extraSlots.push(`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`)
+          }
+          const totalRange = EXTRA_MIN - START_MIN  // blokken berekend over totale range incl. extra
+
+          // Tables to show: floor plan tables first, then any table in reservations
+          const tableNumbers = floorPlanTablesDB.length > 0
+            ? floorPlanTablesDB.map(t => t.number)
+            : [...new Set(reservations.filter(r => r.table_number).map(r => r.table_number!))]
+          const sortedTables = tableNumbers.length > 0 ? tableNumbers : ['(geen tafel)']
+
+          // Filter reservations for this date
+          const dayRes = reservations.filter(r => r.reservation_date === timelineDate && r.status !== 'CANCELLED')
+
+          // Current time marker
+          const now = new Date()
+          const isToday = timelineDate === now.toISOString().split('T')[0]
+          const nowMin = now.getHours() * 60 + now.getMinutes()
+          // nowPct = positie van huidige tijd als percentage van de tijdband (excl. label)
+          const nowPct = isToday && nowMin >= START_MIN && nowMin <= END_MIN
+            ? ((nowMin - START_MIN) / (END_MIN - START_MIN)) * 100
+            : null
+
+          const statusColors: Record<string, string> = {
+            CONFIRMED: '#3b82f6',
+            CHECKED_IN: '#22c55e',
+            PENDING: '#f59e0b',
+            COMPLETED: '#9ca3af',
+            NO_SHOW: '#ef4444',
+            WAITLIST: '#8b5cf6',
+          }
+
+          // Kleur per status
+          const statusBlockColor = (status: string, inExtraZone: boolean) => {
+            if (inExtraZone) return '#6B7280'
+            switch(status) {
+              case 'CHECKED_IN':  return '#16a34a'  // groen — aan tafel
+              case 'NO_SHOW':     return '#dc2626'  // rood
+              case 'COMPLETED':   return '#6B7280'  // grijs — vertrokken
+              case 'CONFIRMED':   return '#3B5BDB'  // blauw
+              default:            return '#3B5BDB'  // blauw (PENDING etc.)
+            }
+          }
+
+          // Rode lijn positie
+          const nowMin2 = timelineNow.getHours() * 60 + timelineNow.getMinutes()
+          const isToday2 = timelineDate === `${timelineNow.getFullYear()}-${String(timelineNow.getMonth()+1).padStart(2,'0')}-${String(timelineNow.getDate()).padStart(2,'0')}`
+          const redLinePct = isToday2 && nowMin2 >= START_MIN && nowMin2 <= EXTRA_MIN
+            ? ((nowMin2 - START_MIN) / totalRange * 100)
+            : null
+
+          // Mini kalender helpers
+          const calFirstDay = new Date(calMonth.year, calMonth.month, 1)
+          let calDow = calFirstDay.getDay(); if (calDow === 0) calDow = 7
+          const calDaysInMonth = new Date(calMonth.year, calMonth.month + 1, 0).getDate()
+          const calPad = calDow - 1
+          const todayStr = `${timelineNow.getFullYear()}-${String(timelineNow.getMonth()+1).padStart(2,'0')}-${String(timelineNow.getDate()).padStart(2,'0')}`
+
+          return (
+            <div className="flex gap-3 flex-1 overflow-hidden min-w-0">
+              {/* === TIJDLIJN LINKS — groeit/krimpt mee met kalender === */}
+              <div className="flex flex-col flex-1 overflow-hidden min-w-0">
+                {/* Date nav */}
+                <div className="flex items-center gap-2 mb-3">
+                  <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate()-1); setTimelineDate(d.toISOString().split('T')[0]) }}
+                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronLeft size={16}/></button>
+                  <span className="font-bold text-xl">{formatDate(timelineDate)}</span>
+                  <button onClick={() => { const d = new Date(timelineDate); d.setDate(d.getDate()+1); setTimelineDate(d.toISOString().split('T')[0]) }}
+                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"><ChevronRight size={16}/></button>
+                  {/* Dag / Avond toggle */}
+                  <div className="flex rounded-lg overflow-hidden border border-gray-200 ml-2">
+                    <button onClick={() => setTimeShift('dag')}
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors ${timeShift==='dag'?'bg-orange-500 text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      Dag
+                    </button>
+                    <button onClick={() => setTimeShift('avond')}
+                      className={`px-4 py-1.5 text-sm font-bold transition-colors border-l border-gray-200 ${timeShift==='avond'?'bg-orange-500 text-white':'bg-white text-gray-500 hover:bg-gray-50'}`}>
+                      Avond
+                    </button>
+                  </div>
+                  {/* Kalender toon/verberg knop */}
+                  <button
+                    onClick={() => setCalOpen(o => !o)}
+                    className={`ml-2 flex items-center gap-2 px-5 py-1.5 rounded-lg border-2 font-bold text-sm transition-colors
+                      ${calOpen
+                        ? 'bg-orange-500 border-orange-500 text-white hover:bg-orange-600'
+                        : 'bg-gray-200 border-gray-300 text-gray-500 hover:bg-gray-300'
+                      }`}>
+                    <Calendar size={20}/>
+                    <span>Kalender</span>
+                    {calOpen ? <Eye size={22}/> : <EyeOff size={22}/>}
+                  </button>
+                  {/* Zoek knop */}
+                  <button
+                    onClick={() => setShowSearchPopup(true)}
+                    className="ml-2 flex items-center gap-2 px-5 py-1.5 rounded-lg border-2 font-bold text-sm bg-gray-700 border-gray-700 text-white hover:bg-gray-800 transition-colors">
+                    <Search size={20}/>
+                    <span>Zoek reserv.</span>
+                  </button>
+                  <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
+                </div>
+
+                {/* Legenda statuskleuren */}
+                <div className="flex items-center gap-4 mb-2 px-1">
+                  {[
+                    { color:'#3B5BDB', label:'Verwacht/Bevestigd' },
+                    { color:'#16a34a', label:'Aan tafel' },
+                    { color:'#dc2626', label:'No-show' },
+                    { color:'#6B7280', label:'Vertrokken' },
+                  ].map(s => (
+                    <div key={s.label} className="flex items-center gap-1.5">
+                      <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }}/>
+                      <span className="text-xs text-gray-500">{s.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Grid — één scroll container voor beide richtingen */}
+                <div className="border border-gray-200 rounded-xl overflow-hidden bg-white flex flex-col flex-1">
+                  <div className="overflow-auto flex-1">
+                    {/* Vaste minimumbreedte — alles binnenin scrollt mee */}
+                    <div style={{ minWidth: (timeSlots.length + extraSlots.length) * 80 + LABEL_W }}>
+
+                      {/* Oranje header — sticky bovenaan de scroll container */}
+                      <div className="flex sticky top-0 z-10" style={{ height:48, backgroundColor:'#F97316' }}>
+                        <div style={{ width:LABEL_W, flexShrink:0 }} className="border-r border-orange-400 flex items-center justify-center sticky left-0 z-20 bg-orange-500">
+                          <span className="text-sm font-bold text-white">Tafel</span>
+                        </div>
+                        <div className="flex relative" style={{ width:(timeSlots.length+extraSlots.length)*80 }}>
+                          {timeSlots.map((t,i) => (
+                            <div key={t} style={{ width:80, flexShrink:0 }} className="border-r border-orange-400 flex items-center justify-center">
+                              {i%2===0 && <span className="text-sm font-bold text-white">{t}</span>}
+                            </div>
+                          ))}
+                          {extraSlots.map((t,i) => (
+                            <div key={`ex-${t}`} style={{ width:80, flexShrink:0 }} className="border-r border-orange-300 flex items-center justify-center bg-orange-400/70">
+                              {i%2===0 && <span className="text-sm font-bold text-white/80">{t}</span>}
+                            </div>
+                          ))}
+                          {redLinePct !== null && (
+                            <div className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20 pointer-events-none" style={{ left:`${redLinePct}%` }} />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Rijen */}
+                      {sortedTables.map((tableNum, rowIdx) => {
+                        const tableRes = dayRes.filter(r => (r.table_number||'(geen tafel)') === tableNum)
+                        const fpTable = floorPlanTablesDB.find(t => t.number === tableNum)
+                        const slotW = (timeSlots.length + extraSlots.length) * 80
+                        return (
+                          <div key={tableNum} className="flex relative"
+                            style={{ height:ROW_H, backgroundColor:rowIdx%2===0?'white':'#f9fafb', borderBottom:'1px solid #e5e7eb' }}>
+                            <div style={{ width:LABEL_W, flexShrink:0 }}
+                              className="border-r border-gray-200 flex flex-col items-center justify-center px-2 bg-white sticky left-0 z-10">
+                              <span className="text-base font-bold text-gray-800">{tableNum}</span>
+                              {fpTable && <span className="text-xs text-gray-400">{fpTable.seats}p</span>}
+                            </div>
+                            {/* Content area — vaste breedte zodat % positionering klopt */}
+                            <div style={{ width:slotW, position:'relative', flexShrink:0 }}>
+                              {/* Grid lijnen */}
+                              <div className="flex h-full absolute inset-0">
+                                {timeSlots.map((t,i) => (
+                                  <div key={t} style={{ width:80, flexShrink:0 }} className={`h-full border-r ${i%2===0?'border-gray-300':'border-gray-100'}`} />
+                                ))}
+                                {extraSlots.map((t) => (
+                                  <div key={`ex-${t}`} style={{ width:80, flexShrink:0 }} className="h-full border-r border-gray-200 bg-gray-100/60" />
+                                ))}
+                              </div>
+                              {/* Rode lijn */}
+                              {redLinePct !== null && (
+                                <div className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10 pointer-events-none" style={{ left:`${redLinePct}%` }}>
+                                  {rowIdx === 0 && <div className="absolute -top-1 -left-1.5 w-3 h-3 rounded-full bg-red-500" />}
+                                </div>
+                              )}
+                              {/* Reservatieblokken */}
+                              {tableRes.map((r) => {
+                                const [rh,rm] = r.reservation_time.split(':').map(Number)
+                                const startMin = rh*60+rm
+                                const dur = r.duration_minutes||90
+                                if (startMin >= EXTRA_MIN || startMin+dur <= START_MIN) return null
+                                const leftPx = Math.max(0,(startMin-START_MIN)/totalRange*slotW)
+                                const widthPx = Math.min(dur/totalRange*slotW, slotW-leftPx) - 2
+                                return (
+                                  <div key={r.id} onClick={() => setSelectedReservation(r)}
+                                    className="absolute cursor-pointer flex items-center hover:brightness-110 transition-all"
+                                    style={{ left:leftPx, width:widthPx, top:6, bottom:6, height:'auto', zIndex:2 }}>
+                                    <div className="flex items-center h-full w-full"
+                                      style={{ backgroundColor: statusBlockColor(r.status, startMin >= END_MIN), clipPath:'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)' }}>
+                                      <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
+                                        <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
+                                      </div>
+                                      <span className="text-white text-base font-bold ml-2 truncate pr-5">{r.guest_name}</span>
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )
+                      })}
+                      {dayRes.length===0 && (
+                        <div className="flex flex-col items-center justify-center py-16 text-gray-300">
+                          <CalendarDays size={40} className="mb-3"/>
+                          <p className="text-base">Geen reservaties op {formatDate(timelineDate)}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* === KALENDER RECHTS — inklapbaar, groot === */}
+              <div className={`flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col transition-[width] duration-300 ease-in-out ${calOpen ? 'w-72' : 'w-12'}`}>
+                {/* Header: inklapknop + jaar + vandaag */}
+                <div className="flex items-center gap-2 px-3 py-3 border-b border-gray-100 flex-shrink-0 bg-orange-500">
+                  <button onClick={() => setCalOpen(o=>!o)}
+                    className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white flex-shrink-0">
+                    {calOpen ? <ChevronRight size={18}/> : <ChevronLeft size={18}/>}
+                  </button>
+                  {calOpen && (<>
+                    <button onClick={() => setCalMonth(m=>({year:m.year-1,month:m.month}))}
+                      className="p-1.5 hover:bg-white/20 rounded-lg text-white"><ChevronLeft size={18}/></button>
+                    <span className="flex-1 text-center text-lg font-black text-white">{calMonth.year}</span>
+                    <button onClick={() => setCalMonth(m=>({year:m.year+1,month:m.month}))}
+                      className="p-1.5 hover:bg-white/20 rounded-lg text-white"><ChevronRight size={18}/></button>
+                    <button onClick={() => { setTimelineDate(todayStr); setCalMonth({year:timelineNow.getFullYear(),month:timelineNow.getMonth()}) }}
+                      className="px-3 py-1 rounded-lg bg-white text-orange-500 text-sm font-black hover:bg-orange-50">
+                      Vandaag
+                    </button>
+                  </>)}
+                </div>
+                {/* Alle 12 maanden scrollbaar — alleen zichtbaar als open */}
+                {calOpen && (
+                  <div className="overflow-y-auto flex-1">
+                    {Array.from({length:12}).map((_,mi) => {
+                      const mYear = calMonth.year
+                      const mMonth = mi
+                      const mFirst = new Date(mYear, mMonth, 1)
+                      let mDow = mFirst.getDay(); if(mDow===0) mDow=7
+                      const mDays = new Date(mYear, mMonth+1, 0).getDate()
+                      const mPad = mDow - 1
+                      const mName = mFirst.toLocaleDateString('nl-BE',{month:'long'})
+                      return (
+                        <div key={mMonth} className="px-3 pt-4 pb-3 border-b border-gray-50 last:border-0">
+                          <p className="text-sm font-black text-gray-600 uppercase tracking-wide mb-2 capitalize">{mName}</p>
+                          <div className="grid grid-cols-7 gap-0.5">
+                            {['Ma','Di','Wo','Do','Vr','Za','Zo'].map((d,i)=>(
+                              <div key={i} className="text-center text-xs text-gray-400 font-bold pb-1">{d}</div>
+                            ))}
+                            {Array.from({length:mPad}).map((_,i)=><div key={`p${i}`}/>)}
+                            {Array.from({length:mDays}).map((_,di)=>{
+                              const day = di+1
+                              const dStr = `${mYear}-${String(mMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
+                              const isSel = dStr===timelineDate
+                              const isTod = dStr===todayStr
+                              const hasRes = reservations.some(r=>r.reservation_date===dStr&&r.status!=='CANCELLED')
+                              return (
+                                <button key={day} onClick={()=>{ setTimelineDate(dStr); setCalMonth({year:mYear,month:mMonth}) }}
+                                  className={`relative aspect-square flex items-center justify-center text-sm font-bold rounded-full transition-colors
+                                    ${isSel?'bg-orange-500 text-white':isTod?'bg-orange-100 text-orange-600':'hover:bg-gray-100 text-gray-700'}`}>
+                                  {day}
+                                  {hasRes&&!isSel&&<span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-500"/>}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })()}
+
         {!loading && viewMode === 'guests' && (
           <ContactsView
             guestProfiles={guestProfiles}
