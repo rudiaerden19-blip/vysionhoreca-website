@@ -1079,7 +1079,7 @@ export default function KassaReservationsView({
       reservation_time: data.reservation_time,
       table_number: data.table_number || null,
       notes: data.notes || null,
-      special_requests: data.special_requests || null,
+      ...(data.special_requests ? { special_requests: data.special_requests } : {}),
       status: 'confirmed',
       tenant_slug: tenant,
       total_spent: 0,
