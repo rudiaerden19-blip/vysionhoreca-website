@@ -149,6 +149,142 @@ interface KassaReservationsViewProps {
   onStartOrder: (tableNr: string) => void
 }
 
+// ---- Contacts / Gasten tabel view ----
+function ContactsView({
+  guestProfiles,
+  searchQuery,
+  setSearchQuery,
+  onToggleBlocked,
+}: {
+  guestProfiles: GuestProfile[]
+  searchQuery: string
+  setSearchQuery: (q: string) => void
+  onToggleBlocked: (guest: GuestProfile) => void
+}) {
+  const [guestSort, setGuestSort] = useState<'visits'|'name'|'lastVisit'>('visits')
+  const [guestSortDir, setGuestSortDir] = useState<'asc'|'desc'>('desc')
+  const [selectedGuests, setSelectedGuests] = useState<Set<string>>(new Set())
+
+  const toggleSort = (col: typeof guestSort) => {
+    if (guestSort === col) setGuestSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    else { setGuestSort(col); setGuestSortDir('desc') }
+  }
+
+  const filtered = guestProfiles
+    .filter(g => {
+      if (!searchQuery) return true
+      const q = searchQuery.toLowerCase()
+      return g.name.toLowerCase().includes(q) || g.phone?.includes(q) || g.email?.toLowerCase().includes(q)
+    })
+    .sort((a, b) => {
+      let cmp = 0
+      if (guestSort === 'visits') cmp = a.totalVisits - b.totalVisits
+      else if (guestSort === 'name') cmp = a.name.localeCompare(b.name)
+      else if (guestSort === 'lastVisit') cmp = (a.lastVisit||'').localeCompare(b.lastVisit||'')
+      return guestSortDir === 'desc' ? -cmp : cmp
+    })
+
+  const allSelected = filtered.length > 0 && filtered.every(g => selectedGuests.has(g.id))
+  const toggleAll = () => setSelectedGuests(allSelected ? new Set() : new Set(filtered.map(g => g.id)))
+  const toggleOne = (id: string) => setSelectedGuests(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
+
+  const SortIcon = ({ col }: { col: typeof guestSort }) => (
+    <span className={`ml-1 text-xs ${guestSort===col?'opacity-100':'opacity-30'}`}>
+      {guestSort===col && guestSortDir==='asc' ? '↑' : '↓'}
+    </span>
+  )
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden -m-4">
+      <div className="px-4 py-3 flex-shrink-0">
+        <div className="relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
+          <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+            placeholder="Zoek op naam, email of telefoon..."
+            className="w-full pl-9 pr-4 py-2 rounded-xl bg-white border border-gray-200 text-sm outline-none focus:border-gray-400"/>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="bg-gray-900 text-white sticky top-0 z-10">
+              <th className="w-10 px-4 py-3 text-left">
+                <input type="checkbox" checked={allSelected} onChange={toggleAll} className="w-4 h-4 rounded cursor-pointer"/>
+              </th>
+              <th className="px-4 py-3 text-left font-bold cursor-pointer select-none" onClick={() => toggleSort('name')}>
+                Naam <SortIcon col="name"/>
+              </th>
+              <th className="px-4 py-3 text-left font-bold text-gray-400">Bedrijf</th>
+              <th className="px-4 py-3 text-left font-bold">E-mail</th>
+              <th className="px-4 py-3 text-left font-bold">Telefoon</th>
+              <th className="px-4 py-3 text-left font-bold cursor-pointer select-none" onClick={() => toggleSort('lastVisit')}>
+                Laatste bezoek <SortIcon col="lastVisit"/>
+              </th>
+              <th className="px-4 py-3 text-left font-bold cursor-pointer select-none text-right" onClick={() => toggleSort('visits')}>
+                Bezoeken <SortIcon col="visits"/>
+              </th>
+              <th className="px-4 py-3 text-left font-bold">No-show</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.length === 0 && (
+              <tr><td colSpan={8} className="text-center py-16 text-gray-400">Geen contacten gevonden</td></tr>
+            )}
+            {filtered.map((guest: GuestProfile, idx: number) => {
+              const isSelected = selectedGuests.has(guest.id)
+              const isNoShow = guest.totalNoShows > 0
+              return (
+                <tr key={guest.id}
+                  className={`border-b border-gray-100 transition-colors ${isSelected?'bg-blue-50':idx%2===0?'bg-white':'bg-gray-50/50'} hover:bg-blue-50/40`}>
+                  <td className="px-4 py-3">
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleOne(guest.id)} className="w-4 h-4 rounded cursor-pointer"/>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1.5 font-semibold text-gray-800">
+                      {guest.isVip && <Star size={13} className="text-amber-400 fill-amber-400 flex-shrink-0"/>}
+                      {guest.isBlocked && <Ban size={13} className="text-red-400 flex-shrink-0"/>}
+                      {guest.name}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-gray-400">—</td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {guest.email ? <a href={`mailto:${guest.email}`} className="hover:underline">{guest.email}</a> : <span className="text-gray-300">—</span>}
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {guest.phone ? <a href={`tel:${guest.phone}`} className="hover:underline">{guest.phone}</a> : <span className="text-gray-300">—</span>}
+                  </td>
+                  <td className="px-4 py-3 text-gray-500">
+                    {guest.lastVisit
+                      ? new Date(guest.lastVisit+'T12:00').toLocaleDateString('nl-BE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
+                      : '—'}
+                  </td>
+                  <td className="px-4 py-3 font-bold text-gray-700 text-right">{guest.totalVisits}</td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => onToggleBlocked(guest)}
+                      title={isNoShow ? `${guest.totalNoShows} no-show(s)` : 'Geen no-shows'}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-colors ${
+                        guest.isBlocked
+                          ? 'bg-red-500 text-white'
+                          : isNoShow
+                            ? 'bg-red-100 text-red-600 border border-red-200'
+                            : 'bg-gray-100 text-gray-400'
+                      }`}>
+                      <UserX size={12}/>
+                      {guest.isBlocked ? 'Geblokkeerd' : isNoShow ? `${guest.totalNoShows}×` : '—'}
+                    </button>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
 // ---- Reservation Table SVG — identiek aan KassaFloorPlan stijl ----
 function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
   table: FloorPlanTable
@@ -1412,7 +1548,7 @@ export default function KassaReservationsView({
               { id: 'list', label: 'Lijst', icon: <List size={16} /> },
               { id: 'timeline', label: 'Tijdlijn', icon: <LayoutGrid size={16} /> },
               { id: 'month', label: 'Maand', icon: <CalendarDays size={16} /> },
-              { id: 'guests', label: 'Gasten', icon: <Users size={16} /> },
+              { id: 'guests', label: 'Contacten', icon: <Users size={16} /> },
               { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} /> },
               { id: 'settings', label: 'Instellingen', icon: <Settings size={16} /> },
             ].map((view) => (
@@ -1597,7 +1733,7 @@ export default function KassaReservationsView({
                       String(r.table_number) === String(table.number) && r.status !== 'CANCELLED' && r.status !== 'COMPLETED'
                     )
                     const isSelected = String(selectedReservation?.table_number) === String(table.number)
-                    let statusColor = '#4ade80'
+                    let statusColor = '#22c55e'
                     if (tableRes?.status === 'CHECKED_IN') statusColor = '#3b82f6'
                     else if (tableRes?.status === 'CONFIRMED') statusColor = '#8b5cf6'
                     else if (tableRes?.status === 'PENDING') statusColor = '#f59e0b'
@@ -1620,7 +1756,7 @@ export default function KassaReservationsView({
                           statusColor={statusColor}
                           isSelected={isSelected}
                           guests={todayReservations
-                            .filter(r => String(r.table_number) === String(table.number) && r.status !== 'CANCELLED' && r.status !== 'COMPLETED')
+                            .filter(r => String(r.table_number) === String(table.number) && r.status !== 'CANCELLED' && r.status !== 'COMPLETED' && r.status !== 'NO_SHOW')
                             .sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                             .map(r => ({ name: r.guest_name, time: r.reservation_time }))
                           }
@@ -2191,19 +2327,21 @@ export default function KassaReservationsView({
           )
           const getFloorTableInfo = (tableNum: string) => {
             const all = floorRes.filter(r => String(r.table_number) === String(tableNum))
-            if (all.length === 0) return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res: null, count: 0 }
-            // Toon de eerstvolgende (gesorteerd op tijd)
-            const res = all.sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))[0]
-            const count = all.length
+            // Geen reservaties of enkel afgeronde → vrij (groen)
+            const active = all.filter(r => r.status !== 'COMPLETED')
+            if (active.length === 0) return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res: null, count: 0, guestLabel: '' }
+            // Toon de eerstvolgende actieve reservatie
+            const res = active.sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))[0]
+            const count = active.length
             const guestLabel = count === 2
-              ? `${res.guest_name} · ${all[1].guest_name}`
+              ? `${res.guest_name} · ${active[1].guest_name}`
               : count > 2
                 ? `${res.guest_name} +${count - 1}`
                 : res.guest_name
             if (res.status === 'CHECKED_IN') return { color: '#60a5fa', borderColor: '#3b82f6', label: 'Bezet', res, count, guestLabel }
             if (res.status === 'CONFIRMED') return { color: '#a78bfa', borderColor: '#8b5cf6', label: 'Gereserveerd', res, count, guestLabel }
             if (res.status === 'PENDING') return { color: '#fbbf24', borderColor: '#f59e0b', label: 'Afwachting', res, count, guestLabel }
-            return { color: '#9ca3af', borderColor: '#6b7280', label: res.status, res, count, guestLabel }
+            return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res, count, guestLabel }
           }
 
           return (
@@ -2603,119 +2741,12 @@ export default function KassaReservationsView({
         })()}
 
         {!loading && viewMode === 'guests' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <p className="text-sm text-gray-400">Totaal Gasten</p>
-                <p className="text-2xl font-bold">{guestProfiles.length}</p>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <p className="text-sm text-gray-400">VIP Gasten</p>
-                <p className="text-2xl font-bold text-amber-500">{guestProfiles.filter(g => g.isVip).length}</p>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <p className="text-sm text-gray-400">Geblokkeerd</p>
-                <p className="text-2xl font-bold text-red-400">{guestProfiles.filter(g => g.isBlocked).length}</p>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <p className="text-sm text-gray-400">Totaal Omzet</p>
-                <p className="text-2xl font-bold text-green-500">€{guestProfiles.reduce((s, g) => s + g.totalSpent, 0).toFixed(2)}</p>
-              </div>
-            </div>
-
-            <div className="relative">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Zoek gast op naam, telefoon of email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-gray-200"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {guestProfiles.length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  <Users size={48} className="mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-400">Nog geen gastprofielen</p>
-                  <p className="text-sm text-gray-400 mt-1">Profielen worden automatisch aangemaakt bij reservaties</p>
-                </div>
-              ) : (
-                guestProfiles
-                  .filter(g => {
-                    if (!searchQuery) return true
-                    const q = searchQuery.toLowerCase()
-                    return g.name.toLowerCase().includes(q) ||
-                      g.phone?.toLowerCase().includes(q) ||
-                      g.email?.toLowerCase().includes(q)
-                  })
-                  .sort((a, b) => b.totalSpent - a.totalSpent)
-                  .map((guest) => (
-                    <div key={guest.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 transition-colors">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold">{guest.name}</h3>
-                            {guest.isVip && <Star size={16} className="text-amber-400 fill-amber-400" />}
-                            {guest.isBlocked && <Ban size={16} className="text-red-400" />}
-                          </div>
-                          {guest.phone && (
-                            <a href={`tel:${guest.phone}`} className="text-sm text-gray-400 hover:underline flex items-center gap-1">
-                              <Phone size={12} /> {guest.phone}
-                            </a>
-                          )}
-                          {guest.email && (
-                            <a href={`mailto:${guest.email}`} className="text-sm text-gray-400 hover:underline flex items-center gap-1">
-                              <Mail size={12} /> {guest.email}
-                            </a>
-                          )}
-                        </div>
-                        <div className="text-right text-sm">
-                          <p className="font-bold text-lg">{guest.totalVisits}</p>
-                          <p className="text-gray-400 text-xs">bezoeken</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm mb-3 py-2 border-t border-b border-gray-100">
-                        <span className="text-green-500 font-medium">€{guest.totalSpent.toFixed(2)} besteed</span>
-                        {guest.totalNoShows > 0 && (
-                          <span className="text-red-400 flex items-center gap-1">
-                            <AlertCircle size={12} /> {guest.totalNoShows} no-shows
-                          </span>
-                        )}
-                        {guest.lastVisit && (
-                          <span className="text-gray-400">
-                            Laatst: {new Date(guest.lastVisit).toLocaleDateString('nl-BE')}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleToggleVip(guest)}
-                          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1 ${
-                            guest.isVip
-                              ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30'
-                              : 'bg-gray-100 border border-gray-200 hover:bg-gray-50'
-                          }`}
-                        >
-                          <Star size={14} /> VIP
-                        </button>
-                        <button
-                          onClick={() => handleToggleBlocked(guest)}
-                          className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-1 ${
-                            guest.isBlocked
-                              ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                              : 'bg-gray-100 border border-gray-200 hover:bg-gray-50'
-                          }`}
-                        >
-                          <Ban size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ))
-              )}
-            </div>
-          </div>
+          <ContactsView
+            guestProfiles={guestProfiles}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onToggleBlocked={handleToggleBlocked}
+          />
         )}
 
         {!loading && viewMode === 'stats' && (
