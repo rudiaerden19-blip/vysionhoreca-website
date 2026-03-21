@@ -1463,8 +1463,8 @@ export default function KassaReservationsView({
         )}
 
         {/* View Toggle & Search */}
-        <div className="flex items-center gap-3">
-          <div className="flex bg-gray-100 rounded-xl p-1 overflow-x-auto">
+        <div className="flex items-center gap-3 w-full">
+          <div className="flex bg-gray-100 rounded-xl p-1 w-full">
             {[
               { id: 'floorplan', label: 'Reservaties', icon: <MapPin size={16} /> },
               { id: 'list', label: 'Lijst', icon: <List size={16} /> },
@@ -1477,7 +1477,7 @@ export default function KassaReservationsView({
               <button
                 key={view.id}
                 onClick={() => setViewMode(view.id as ViewMode)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap ${
+                className={`flex-1 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap ${
                   viewMode === view.id
                     ? 'bg-[#3C4D6B] text-white'
                     : 'text-gray-400 hover:text-gray-900'
@@ -1489,16 +1489,18 @@ export default function KassaReservationsView({
             ))}
           </div>
 
-          <div className="flex-1 relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Zoek op naam, telefoon of email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 border border-gray-200 focus:border-[#3C4D6B] outline-none"
-            />
-          </div>
+          {viewMode !== 'timeline' && (
+            <div className="flex-shrink-0 w-72 relative">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Zoek op naam, telefoon of email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 rounded-xl bg-gray-100 border border-gray-200 focus:border-[#3C4D6B] outline-none"
+              />
+            </div>
+          )}
         </div>
       </div>
 
