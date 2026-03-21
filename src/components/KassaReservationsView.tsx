@@ -825,6 +825,8 @@ export default function KassaReservationsView({
   })
   const [searchQuery, setSearchQuery] = useState('')
   const [showNewReservationModal, setShowNewReservationModal] = useState(false)
+  const [showWalkInModal, setShowWalkInModal] = useState(false)
+  const [showWaitlistModal, setShowWaitlistModal] = useState(false)
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
   const [selectedShift, setSelectedShift] = useState<string | null>(null)
   const [guestProfilesDB, setGuestProfilesDB] = useState<GuestProfile[]>([])
@@ -1595,6 +1597,55 @@ export default function KassaReservationsView({
     }
   }
 
+  // Walk-in: direct inchecken zonder reservatie
+  const handleWalkIn = async (name: string, partySize: number, tableNumber: string) => {
+    const now = new Date()
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`
+    const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`
+    const { error } = await supabase.from('reservations').insert([{
+      guest_name: name,
+      customer_name: name,
+      party_size: partySize,
+      reservation_date: dateStr,
+      reservation_time: timeStr,
+      duration_minutes: 90,
+      table_number: tableNumber || null,
+      status: 'checked_in',
+      tenant_slug: tenant,
+      total_spent: 0,
+      notes: 'Walk-in',
+    }])
+    if (error) { toast.error('Walk-in mislukt: ' + error.message); return }
+    await loadReservations()
+    await loadGuestProfiles()
+    setShowWalkInModal(false)
+    toast.success(`Walk-in ${name} ingecheckt op tafel ${tableNumber}!`)
+  }
+
+  // Wachtlijst: toevoegen met WAITLIST status + automatische positie
+  const handleAddToWaitlist = async (name: string, phone: string, partySize: number, date: string, time: string) => {
+    const pos = reservations.filter(r => r.status === 'WAITLIST' && r.reservation_date === date).length + 1
+    const { error } = await supabase.from('reservations').insert([{
+      guest_name: name,
+      guest_phone: phone || null,
+      customer_name: name,
+      customer_phone: phone || null,
+      party_size: partySize,
+      reservation_date: date,
+      reservation_time: time,
+      duration_minutes: 90,
+      status: 'waitlist',
+      waitlist_position: pos,
+      tenant_slug: tenant,
+      total_spent: 0,
+    }])
+    if (error) { toast.error('Wachtlijst mislukt: ' + error.message); return }
+    await loadReservations()
+    await loadGuestProfiles()
+    setShowWaitlistModal(false)
+    toast.success(`${name} toegevoegd aan wachtlijst (#${pos})`)
+  }
+
   const handleAddReservation = async (data: Omit<Reservation, 'id' | 'tenant_slug' | 'total_spent' | 'created_at'>) => {
     // Voorkom dubbele submit
     if (addReservationInProgress.current) return
@@ -1842,13 +1893,29 @@ export default function KassaReservationsView({
               Kassa
             </button>
             {viewMode !== 'guests' && viewMode !== 'settings' && (
-              <button
-                onClick={() => setShowNewReservationModal(true)}
-                className="px-4 py-2 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors flex items-center gap-2"
-              >
-                <Plus size={20} />
-                Nieuwe Reservatie
-              </button>
+              <>
+                <button
+                  onClick={() => setShowWalkInModal(true)}
+                  className="px-4 py-2 rounded-xl bg-gray-700 text-white font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"
+                >
+                  <UserCheck size={18} />
+                  Walk-in
+                </button>
+                <button
+                  onClick={() => setShowWaitlistModal(true)}
+                  className="px-4 py-2 rounded-xl bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors flex items-center gap-2"
+                >
+                  <Clock size={18} />
+                  Wachtlijst
+                </button>
+                <button
+                  onClick={() => setShowNewReservationModal(true)}
+                  className="px-4 py-2 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors flex items-center gap-2"
+                >
+                  <Plus size={20} />
+                  Nieuwe Reservatie
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -3099,6 +3166,42 @@ export default function KassaReservationsView({
                   )}
                 </div>
 
+                {/* Wachtlijst sectie — alleen bij dag-filter */}
+                {(() => {
+                  const wl = reservations.filter(r => r.status === 'WAITLIST' && r.reservation_date === resListDate)
+                    .sort((a, b) => (a.waitlist_position || 0) - (b.waitlist_position || 0))
+                  if (resViewFilter !== 'dag' || wl.length === 0) return null
+                  return (
+                    <div className="flex-shrink-0 border-t-2 border-purple-200 bg-purple-50">
+                      <div className="px-5 py-2 flex items-center gap-2">
+                        <Clock size={14} className="text-purple-600"/>
+                        <span className="text-xs font-bold text-purple-700 uppercase tracking-wider">Wachtlijst</span>
+                        <span className="text-xs text-purple-500">{wl.length} wachtend · {wl.reduce((s,r)=>s+r.party_size,0)} pers.</span>
+                      </div>
+                      <table className="w-full text-sm" style={{borderCollapse:'collapse'}}>
+                        <tbody>
+                          {wl.map((r, idx) => (
+                            <tr key={r.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-purple-50/50'} style={{borderBottom:'1px solid #e9d5ff'}}>
+                              <td className="px-5 py-3 font-medium text-purple-700">#{r.waitlist_position || idx+1}</td>
+                              <td className="px-5 py-3">{r.reservation_time}</td>
+                              <td className="px-5 py-3 text-center font-bold">{r.party_size}</td>
+                              <td className="px-5 py-3 font-semibold">{r.guest_name}</td>
+                              <td className="px-5 py-3 text-gray-500">{r.guest_phone}</td>
+                              <td className="px-5 py-3 text-gray-500">{r.guest_email}</td>
+                              <td className="px-5 py-3 text-right">
+                                <button onClick={() => updateStatus(r.id, 'CONFIRMED')}
+                                  className="px-3 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white text-xs font-bold transition-colors">
+                                  Bevestigen
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )
+                })()}
+
                 {/* Kalender sidebar */}
                 {showResCalendar && (
                   <div className="absolute inset-0 z-20 bg-white overflow-y-auto md:relative md:inset-auto md:z-auto md:w-[270px] md:flex-shrink-0 md:border-l md:border-gray-200">
@@ -3568,6 +3671,26 @@ export default function KassaReservationsView({
           reservations={reservations}
           shifts={reservationSettings.shifts || []}
           bufferMinutes={reservationSettings.bufferMinutes || 0}
+        />
+      )}
+
+      {/* Walk-in Modal */}
+      {showWalkInModal && (
+        <WalkInModal
+          onClose={() => setShowWalkInModal(false)}
+          onSave={handleWalkIn}
+          tables={floorPlanTablesDB.length > 0
+            ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
+            : kassaTables}
+          reservations={reservations}
+        />
+      )}
+
+      {/* Wachtlijst Modal */}
+      {showWaitlistModal && (
+        <WaitlistModal
+          onClose={() => setShowWaitlistModal(false)}
+          onSave={handleAddToWaitlist}
         />
       )}
 
@@ -4340,6 +4463,198 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
 // ============================================================
 // NEW RESERVATION MODAL (exact kopie)
 // ============================================================
+
+// ---- Walk-in Modal ----
+function WalkInModal({ onClose, onSave, tables, reservations }: {
+  onClose: () => void
+  onSave: (name: string, partySize: number, tableNumber: string) => Promise<void>
+  tables: KassaTable[]
+  reservations: Reservation[]
+}) {
+  const [name, setName] = useState('')
+  const [partySize, setPartySize] = useState(2)
+  const [tableNumber, setTableNumber] = useState('')
+  const [saving, setSaving] = useState(false)
+
+  const now = new Date()
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`
+  const nowMin = now.getHours() * 60 + now.getMinutes()
+
+  // Bepaal welke tafels nu bezet zijn
+  const busyNow = new Set(
+    reservations.filter(r =>
+      r.reservation_date === todayStr &&
+      r.status !== 'CANCELLED' && r.status !== 'COMPLETED' &&
+      r.table_number
+    ).filter(r => {
+      const [h, m] = r.reservation_time.split(':').map(Number)
+      const start = h * 60 + m
+      const end = start + (r.duration_minutes || 90)
+      return nowMin >= start && nowMin < end
+    }).map(r => String(r.table_number))
+  )
+
+  const freeTables = tables.filter(t => !busyNow.has(String(t.number)))
+
+  const handleSubmit = async () => {
+    if (!name.trim()) { alert('Vul een naam in'); return }
+    if (!tableNumber) { alert('Kies een tafel'); return }
+    setSaving(true)
+    await onSave(name.trim(), partySize, tableNumber)
+    setSaving(false)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gray-800 flex items-center justify-center">
+              <UserCheck size={18} className="text-white"/>
+            </div>
+            <div>
+              <h2 className="font-bold text-lg">Walk-in</h2>
+              <p className="text-xs text-gray-400">Direct inchecken — geen reservatie nodig</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 transition-colors">
+            <X size={20}/>
+          </button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Naam gast <span className="text-red-500">*</span></label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Voornaam achternaam"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-gray-700 outline-none text-sm"/>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Aantal personen</label>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setPartySize(p => Math.max(1, p-1))}
+                className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center font-bold text-lg hover:bg-gray-50">−</button>
+              <span className="text-xl font-bold w-8 text-center">{partySize}</span>
+              <button onClick={() => setPartySize(p => p+1)}
+                className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center font-bold text-lg hover:bg-gray-50">+</button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Tafel <span className="text-red-500">*</span></label>
+            <div className="grid grid-cols-5 gap-2">
+              {freeTables.length === 0 && <p className="col-span-5 text-sm text-gray-400 py-2">Alle tafels bezet op dit moment</p>}
+              {freeTables.map(t => (
+                <button key={t.number} onClick={() => setTableNumber(String(t.number))}
+                  className={`py-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                    tableNumber === String(t.number)
+                      ? 'border-gray-800 bg-gray-800 text-white'
+                      : 'border-gray-200 hover:border-gray-400'
+                  }`}>
+                  {t.number}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-3 p-5 pt-0">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium transition-colors">
+            Annuleren
+          </button>
+          <button onClick={handleSubmit} disabled={saving}
+            className="flex-1 py-2.5 rounded-xl bg-gray-800 text-white font-bold hover:bg-gray-900 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
+            {saving ? <span className="animate-spin">⟳</span> : <UserCheck size={18}/>}
+            Inchecken
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ---- Wachtlijst Modal ----
+function WaitlistModal({ onClose, onSave }: {
+  onClose: () => void
+  onSave: (name: string, phone: string, partySize: number, date: string, time: string) => Promise<void>
+}) {
+  const now = new Date()
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [partySize, setPartySize] = useState(2)
+  const [date, setDate] = useState(todayStr)
+  const [time, setTime] = useState(`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`)
+  const [saving, setSaving] = useState(false)
+
+  const handleSubmit = async () => {
+    if (!name.trim()) { alert('Vul een naam in'); return }
+    setSaving(true)
+    await onSave(name.trim(), phone.trim(), partySize, date, time)
+    setSaving(false)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-purple-500 flex items-center justify-center">
+              <Clock size={18} className="text-white"/>
+            </div>
+            <div>
+              <h2 className="font-bold text-lg">Wachtlijst</h2>
+              <p className="text-xs text-gray-400">Toevoegen aan de wachtlijst</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-700 transition-colors">
+            <X size={20}/>
+          </button>
+        </div>
+        <div className="p-5 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Naam <span className="text-red-500">*</span></label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Naam gast"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Telefoon</label>
+            <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="0471 234 567"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Aantal personen</label>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setPartySize(p => Math.max(1, p-1))}
+                className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center font-bold text-lg hover:bg-gray-50">−</button>
+              <span className="text-xl font-bold w-8 text-center">{partySize}</span>
+              <button onClick={() => setPartySize(p => p+1)}
+                className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center font-bold text-lg hover:bg-gray-50">+</button>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Datum</label>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Tijdstip</label>
+              <input type="time" value={time} onChange={e => setTime(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-purple-400 outline-none text-sm"/>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-3 p-5 pt-0">
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium transition-colors">
+            Annuleren
+          </button>
+          <button onClick={handleSubmit} disabled={saving}
+            className="flex-1 py-2.5 rounded-xl bg-purple-500 text-white font-bold hover:bg-purple-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
+            {saving ? <span className="animate-spin">⟳</span> : <Clock size={18}/>}
+            Op wachtlijst
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 interface NewReservationModalProps {
   onClose: () => void
