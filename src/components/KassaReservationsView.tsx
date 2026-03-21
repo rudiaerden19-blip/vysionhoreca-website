@@ -1835,8 +1835,9 @@ export default function KassaReservationsView({
           // Time slots from 10:00 to 22:00 — geen horizontaal scrollen
           const ROW_H = 60
           const LABEL_W = 90
-          const START_MIN = timeShift === 'dag' ? 10 * 60 : 17 * 60  // dag=10:00, avond=17:00
-          const END_MIN   = timeShift === 'dag' ? 16 * 60 : 23 * 60  // dag=16:00, avond=23:00
+          const START_MIN  = timeShift === 'dag' ? 10 * 60 : 17 * 60  // dag=10:00, avond=17:00
+          const END_MIN    = timeShift === 'dag' ? 16 * 60 : 23 * 60  // dag=16:00, avond=23:00
+          const EXTRA_MIN  = END_MIN + 2 * 60  // 2 uur extra grijze vakken na END_MIN
           const totalSlots = (END_MIN - START_MIN) / 30
           const timeSlots: string[] = []
           for (let m = START_MIN; m < END_MIN; m += 30) {
@@ -1844,6 +1845,14 @@ export default function KassaReservationsView({
             const min = (m % 60).toString().padStart(2, '0')
             timeSlots.push(`${h}:${min}`)
           }
+          // Extra grijze slots na einde tijdband (zichtbaar via horizontaal scrollen)
+          const extraSlots: string[] = []
+          for (let m = END_MIN; m < EXTRA_MIN; m += 30) {
+            const hh = Math.floor(m / 60) % 24
+            const mm = m % 60
+            extraSlots.push(`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`)
+          }
+          const totalRange = EXTRA_MIN - START_MIN  // blokken berekend over totale range incl. extra
 
           // Tables to show: floor plan tables first, then any table in reservations
           const tableNumbers = floorPlanTablesDB.length > 0
@@ -1874,12 +1883,11 @@ export default function KassaReservationsView({
 
           // Één vaste kleur voor alle reservatieblokken
           const BLOCK_COLOR = '#3B5BDB'
-          const totalRange = END_MIN - START_MIN
 
           // Rode lijn positie
           const nowMin2 = timelineNow.getHours() * 60 + timelineNow.getMinutes()
           const isToday2 = timelineDate === `${timelineNow.getFullYear()}-${String(timelineNow.getMonth()+1).padStart(2,'0')}-${String(timelineNow.getDate()).padStart(2,'0')}`
-          const redLinePct = isToday2 && nowMin2 >= START_MIN && nowMin2 <= END_MIN
+          const redLinePct = isToday2 && nowMin2 >= START_MIN && nowMin2 <= EXTRA_MIN
             ? ((nowMin2 - START_MIN) / totalRange * 100)
             : null
 
@@ -1927,20 +1935,31 @@ export default function KassaReservationsView({
                   <span className="text-sm text-gray-400 ml-auto">{dayRes.length} res. · {dayRes.reduce((s,r)=>s+r.party_size,0)}p</span>
                 </div>
 
-                {/* Grid */}
+                {/* Grid — horizontaal scrollen voor extra vakken na eindtijd */}
                 <div className="border border-gray-200 rounded-xl overflow-hidden bg-white flex flex-col flex-1">
+                  {/* Wrapper voor horizontaal scrollen */}
+                  <div className="overflow-x-auto flex flex-col flex-1">
+                    {/* Minimumbreedte zodat slots een vaste breedte hebben */}
+                    <div style={{ minWidth: (timeSlots.length + extraSlots.length) * 80 + LABEL_W }} className="flex flex-col flex-1">
+
                   {/* Oranje header */}
                   <div className="flex flex-shrink-0" style={{ height:48, backgroundColor:'#F97316', position:'sticky', top:0, zIndex:10 }}>
-                    <div style={{ width:LABEL_W, flexShrink:0 }} className="border-r border-orange-400 flex items-center justify-center">
+                    <div style={{ width:LABEL_W, flexShrink:0 }} className="border-r border-orange-400 flex items-center justify-center sticky left-0 z-20 bg-orange-500">
                       <span className="text-sm font-bold text-white">Tafel</span>
                     </div>
                     <div className="flex flex-1 relative">
+                      {/* Normale slots — oranje */}
                       {timeSlots.map((t,i) => (
-                        <div key={t} className="flex-1 border-r border-orange-400 flex items-center justify-center">
+                        <div key={t} style={{ flex:'0 0 80px' }} className="border-r border-orange-400 flex items-center justify-center">
                           {i%2===0 && <span className="text-sm font-bold text-white">{t}</span>}
                         </div>
                       ))}
-                      <span className="absolute right-1 top-1/2 -translate-y-1/2 text-sm font-bold text-white">{String(END_MIN/60).padStart(2,'0')}:00</span>
+                      {/* Extra slots — iets donkerder oranje als overgang */}
+                      {extraSlots.map((t,i) => (
+                        <div key={`ex-${t}`} style={{ flex:'0 0 80px' }} className="border-r border-orange-300 flex items-center justify-center bg-orange-400/70">
+                          {i%2===0 && <span className="text-sm font-bold text-white/80">{t}</span>}
+                        </div>
+                      ))}
                       {/* Rode lijn in header */}
                       {redLinePct !== null && (
                         <div className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20" style={{ left:`${redLinePct}%` }} />
@@ -1962,10 +1981,14 @@ export default function KassaReservationsView({
                             {fpTable && <span className="text-xs text-gray-400">{fpTable.seats}p</span>}
                           </div>
                           <div className="flex-1 relative">
-                            {/* Grid lijnen */}
+                            {/* Grid lijnen — normale slots */}
                             <div className="flex h-full absolute inset-0">
                               {timeSlots.map((t,i) => (
-                                <div key={t} className={`flex-1 h-full border-r ${i%2===0?'border-gray-300':'border-gray-100'}`} />
+                                <div key={t} style={{ flex:'0 0 80px' }} className={`h-full border-r ${i%2===0?'border-gray-300':'border-gray-100'}`} />
+                              ))}
+                              {/* Extra grijze slots */}
+                              {extraSlots.map((t) => (
+                                <div key={`ex-${t}`} style={{ flex:'0 0 80px' }} className="h-full border-r border-gray-200 bg-gray-100/60" />
                               ))}
                             </div>
                             {/* Rode lijn */}
@@ -2012,6 +2035,8 @@ export default function KassaReservationsView({
                       </div>
                     )}
                   </div>
+                    </div>{/* einde minWidth wrapper */}
+                  </div>{/* einde overflow-x-auto */}
                 </div>
               </div>
 
