@@ -1139,6 +1139,70 @@ export default function KassaReservationsView({
   }
   const getTodayCovers = () => todayReservations.reduce((s, r) => s + r.party_size, 0)
 
+  // ---- Reserveringen-view: geoptimaliseerde berekeningen (useMemo) ----
+  const daysWithRes = useMemo(
+    () => new Set(reservations.filter(r => r.status !== 'CANCELLED').map(r => r.reservation_date)),
+    [reservations]
+  )
+
+  const resViewFiltered = useMemo(() => {
+    const _tn = new Date()
+    const todayStr = `${_tn.getFullYear()}-${String(_tn.getMonth()+1).padStart(2,'0')}-${String(_tn.getDate()).padStart(2,'0')}`
+
+    let from: string, to: string
+    if (resViewFilter === 'dag') {
+      from = resListDate; to = resListDate
+    } else if (resViewFilter === 'week') {
+      const d = new Date(resListDate + 'T12:00:00')
+      const dow = d.getDay() === 0 ? 6 : d.getDay() - 1
+      const mon = new Date(d); mon.setDate(d.getDate() - dow)
+      const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
+      const fmt = (dt: Date) => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+      from = fmt(mon); to = fmt(sun)
+    } else if (resViewFilter === 'maand') {
+      from = `${resFilterYear}-${String(resFilterMonth+1).padStart(2,'0')}-01`
+      to = `${resFilterYear}-${String(resFilterMonth+1).padStart(2,'0')}-${String(new Date(resFilterYear, resFilterMonth+1, 0).getDate()).padStart(2,'0')}`
+    } else {
+      from = `${resFilterYear}-01-01`; to = `${resFilterYear}-12-31`
+    }
+
+    const q = resSearch.trim().toLowerCase()
+    const rows = reservations
+      .filter(r => r.status !== 'CANCELLED' && r.reservation_date >= from && r.reservation_date <= to)
+      .filter(r => !q || r.guest_name?.toLowerCase().includes(q) || r.guest_phone?.includes(q) || r.guest_email?.toLowerCase().includes(q))
+      .sort((a, b) => a.reservation_date.localeCompare(b.reservation_date) || a.reservation_time.localeCompare(b.reservation_time))
+
+    // Groepeer per datum
+    const grouped: { date: string; rows: typeof rows }[] = []
+    if (resViewFilter === 'dag') {
+      grouped.push({ date: resListDate, rows })
+    } else {
+      const map = new Map<string, typeof rows>()
+      rows.forEach(r => {
+        if (!map.has(r.reservation_date)) map.set(r.reservation_date, [])
+        map.get(r.reservation_date)!.push(r)
+      })
+      map.forEach((r, date) => grouped.push({ date, rows: r }))
+    }
+
+    return { rows, grouped, from, to, today: todayStr }
+  }, [reservations, resViewFilter, resListDate, resFilterYear, resFilterMonth, resSearch])
+
+  // 12 kalendermaanden voor sidebar (alleen herbouwen als jaar wijzigt)
+  const resCalMonths = useMemo(() => {
+    const months: { y: number; m: number; cells: (number|null)[] }[] = []
+    for (let m = 0; m <= 11; m++) {
+      let dow = new Date(resCalYear, m, 1).getDay() - 1
+      if (dow < 0) dow = 6
+      const dim = new Date(resCalYear, m + 1, 0).getDate()
+      const cells: (number|null)[] = Array(dow).fill(null)
+      for (let d = 1; d <= dim; d++) cells.push(d)
+      while (cells.length % 7 !== 0) cells.push(null)
+      months.push({ y: resCalYear, m, cells })
+    }
+    return months
+  }, [resCalYear])
+
   // ---- CRUD actions ----
   const updateStatus = async (id: string, status: ReservationStatus, extra?: Partial<Reservation>) => {
     const updates: Record<string, unknown> = { status: status.toLowerCase(), ...extra }
@@ -2558,87 +2622,25 @@ export default function KassaReservationsView({
         })()}
 
         {!loading && viewMode === 'reservations' && (() => {
-          const resDate = resListDate
-          const _tn = new Date()
-          const today = `${_tn.getFullYear()}-${String(_tn.getMonth()+1).padStart(2,'0')}-${String(_tn.getDate()).padStart(2,'0')}`
+          // Alle zware berekeningen komen uit useMemo — worden enkel herberekend als afhankelijkheden wijzigen
+          const { rows: filteredRes, grouped, from, to, today } = resViewFiltered
+          const totalPersons = filteredRes.reduce((s, r) => s + r.party_size, 0)
 
-          const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','december']
+          const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
           const MONTHS_SHORT = ['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec']
           const DAYS_FULL_NL = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag']
           const DAYS_NL = ['Ma','Di','Wo','Do','Vr','Za','Zo']
 
-          // --- Datumbereik berekenen op basis van filter ---
-          const getDateRange = (): { from: string; to: string; label: string } => {
-            if (resViewFilter === 'dag') {
-              return { from: resDate, to: resDate, label: formatDate(resDate) }
-            }
-            if (resViewFilter === 'week') {
-              const d = new Date(resDate + 'T12:00:00')
-              const dow = d.getDay() === 0 ? 6 : d.getDay() - 1
-              const mon = new Date(d); mon.setDate(d.getDate() - dow)
-              const sun = new Date(mon); sun.setDate(mon.getDate() + 6)
-              const fmt = (dt: Date) => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
-              return { from: fmt(mon), to: fmt(sun), label: `Week van ${fmt(mon)}` }
-            }
-            if (resViewFilter === 'maand') {
-              const y = resFilterYear, m = resFilterMonth
-              const from = `${y}-${String(m+1).padStart(2,'0')}-01`
-              const to = `${y}-${String(m+1).padStart(2,'0')}-${String(new Date(y, m+1, 0).getDate()).padStart(2,'0')}`
-              return { from, to, label: `${MONTHS_NL[m].charAt(0).toUpperCase() + MONTHS_NL[m].slice(1)} ${y}` }
-            }
-            // jaar
-            return { from: `${resFilterYear}-01-01`, to: `${resFilterYear}-12-31`, label: `Jaar ${resFilterYear}` }
-          }
-
-          const { from, to } = getDateRange()
-          const q = resSearch.trim().toLowerCase()
-
-          const filteredRes = reservations
-            .filter(r => r.status !== 'CANCELLED' && r.reservation_date >= from && r.reservation_date <= to)
-            .filter(r => !q || r.guest_name?.toLowerCase().includes(q) || r.guest_phone?.includes(q) || r.guest_email?.toLowerCase().includes(q))
-            .sort((a, b) => a.reservation_date.localeCompare(b.reservation_date) || a.reservation_time.localeCompare(b.reservation_time))
-
-          // Groepeer per datum voor week/maand/jaar weergave
-          const grouped: { date: string; rows: typeof filteredRes }[] = []
-          if (resViewFilter === 'dag') {
-            grouped.push({ date: resDate, rows: filteredRes })
-          } else {
-            const map = new Map<string, typeof filteredRes>()
-            filteredRes.forEach(r => {
-              if (!map.has(r.reservation_date)) map.set(r.reservation_date, [])
-              map.get(r.reservation_date)!.push(r)
-            })
-            map.forEach((rows, date) => grouped.push({ date, rows }))
-          }
-
-          const totalPersons = filteredRes.reduce((s, r) => s + r.party_size, 0)
-
-          // Datum header label voor groepen
           const dateHeader = (ds: string) => {
             if (resViewFilter === 'dag') return null
             const d = new Date(ds + 'T12:00:00')
-            const dayName = DAYS_FULL_NL[d.getDay()]
-            const day = d.getDate()
-            const month = MONTHS_SHORT[d.getMonth()]
-            return `${dayName} ${day} ${month}`
+            return `${DAYS_FULL_NL[d.getDay()]} ${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`
           }
 
-          const daysWithRes = new Set(reservations.filter(r => r.status !== 'CANCELLED').map(r => r.reservation_date))
-
-          // Kalender sidebar maanden
-          const calMonths: { y: number; m: number; cells: (number|null)[] }[] = []
-          for (let mOff = -1; mOff <= 1; mOff++) {
-            let y = resCalYear, m = resCalMonth + mOff
-            if (m < 0) { m = 11; y-- }
-            if (m > 11) { m = 0; y++ }
-            let dow = new Date(y, m, 1).getDay() - 1
-            if (dow < 0) dow = 6
-            const dim = new Date(y, m + 1, 0).getDate()
-            const cells: (number|null)[] = Array(dow).fill(null)
-            for (let d = 1; d <= dim; d++) cells.push(d)
-            while (cells.length % 7 !== 0) cells.push(null)
-            calMonths.push({ y, m, cells })
-          }
+          const resDate = resListDate
+          const q = resSearch.trim().toLowerCase()
+          // Gebruik gecachte kalendermaanden en dagset uit useMemo
+          const calMonths = resCalMonths
 
           const reservationRow = (r: typeof filteredRes[0], idx: number) => (
             <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb' }}
