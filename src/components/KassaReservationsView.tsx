@@ -626,6 +626,9 @@ export default function KassaReservationsView({
       max_advance_days: newSettings.maxAdvanceDays,
       shifts: JSON.stringify(newSettings.shifts || []),
       closed_days: JSON.stringify(newSettings.closedDays || []),
+      deposit_required: newSettings.depositRequired,
+      deposit_amount: newSettings.depositAmount,
+      no_show_protection: newSettings.noShowProtection,
     }
     supabase.from('reservation_settings').upsert(safeSettings, { onConflict: 'tenant_slug' })
       .then(({ error }) => { if (error) console.warn('Settings Supabase save:', error.message) })
