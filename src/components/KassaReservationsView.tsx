@@ -488,6 +488,7 @@ export default function KassaReservationsView({
   })
   // Tenant info for emails
   const [businessInfo, setBusinessInfo] = useState({ name: '', phone: '', email: '' })
+  const [noShowMarked, setNoShowMarked] = useState<Set<string>>(new Set())
   const [pushTarget, setPushTarget] = useState<Reservation | null>(null)
   const [pushSubject, setPushSubject] = useState('')
   const [pushMessage, setPushMessage] = useState('')
@@ -1614,12 +1615,16 @@ export default function KassaReservationsView({
                     style={{ backgroundColor: status.bgColor, color: status.color }}>
                     {status.icon}{status.label}
                   </span>
-                  {/* No-show toggle */}
+                  {/* No-show toggle — puur visueel, raakt status NIET aan */}
                   <div onClick={e => e.stopPropagation()}>
                     <button
-                      onClick={() => r.status === 'NO_SHOW' ? handleUndoNoShow(r) : handleNoShow(r)}
+                      onClick={() => setNoShowMarked(prev => {
+                        const next = new Set(prev)
+                        next.has(r.id) ? next.delete(r.id) : next.add(r.id)
+                        return next
+                      })}
                       className="px-2 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors w-full justify-center"
-                      style={r.status === 'NO_SHOW'
+                      style={noShowMarked.has(r.id)
                         ? { backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }
                         : { backgroundColor: '#f3f4f6', color: '#9ca3af' }}>
                       <UserX size={13} />No-show
