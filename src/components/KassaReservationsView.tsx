@@ -1948,23 +1948,33 @@ export default function KassaReservationsView({
                                 )}
                               </div>
                             )}
-                            {/* Reservatieblokken */}
-                            {tableRes.map((r, ri) => {
+                            {/* Reservatieblokken — pijlvorm zoals professionele kalender */}
+                            {tableRes.map((r) => {
                               const [rh,rm] = r.reservation_time.split(':').map(Number)
                               const startMin = rh*60+rm
                               const dur = r.duration_minutes||90
                               if (startMin>=END_MIN || startMin+dur<=START_MIN) return null
                               const leftPct = Math.max(0,(startMin-START_MIN)/totalRange*100)
                               const widthPct = Math.min(dur/totalRange*100, 100-leftPct)
-                              const endMin = startMin+dur
-                              const endTime = `${String(Math.floor(endMin/60)).padStart(2,'0')}:${String(endMin%60).padStart(2,'0')}`
                               const color = BLOCK_COLORS[(dayRes.indexOf(r))%BLOCK_COLORS.length]
+                              const arrowSize = 14
                               return (
                                 <div key={r.id} onClick={() => setSelectedReservation(r)}
-                                  className="absolute top-2 bottom-2 rounded-lg cursor-pointer flex flex-col justify-center px-2 overflow-hidden hover:brightness-110 transition-all"
-                                  style={{ left:`${leftPct}%`, width:`calc(${widthPct}% - 4px)`, backgroundColor:color, borderLeft:`3px solid rgba(0,0,0,0.2)`, zIndex:2 }}>
-                                  <span className="text-white text-sm font-bold truncate">{r.guest_name}</span>
-                                  <span className="text-white/80 text-xs truncate">{r.reservation_time} → {endTime} · {r.party_size}p</span>
+                                  className="absolute top-2.5 bottom-2.5 cursor-pointer flex items-center hover:brightness-110 transition-all"
+                                  style={{ left:`${leftPct}%`, width:`calc(${widthPct}% - 2px)`, zIndex:2 }}>
+                                  {/* Pijlvorm via clip-path */}
+                                  <div className="flex items-center h-full w-full relative"
+                                    style={{
+                                      backgroundColor: color,
+                                      clipPath: `polygon(0 0, calc(100% - ${arrowSize}px) 0, 100% 50%, calc(100% - ${arrowSize}px) 100%, 0 100%)`,
+                                    }}>
+                                    {/* Tafelnummer badge */}
+                                    <div className="flex-shrink-0 w-7 h-7 ml-2 rounded-full bg-white/25 flex items-center justify-center">
+                                      <span className="text-white text-xs font-black">{r.table_number||'?'}</span>
+                                    </div>
+                                    {/* Naam */}
+                                    <span className="text-white text-sm font-bold ml-2 truncate pr-4">{r.guest_name}</span>
+                                  </div>
                                 </div>
                               )
                             })}
@@ -1982,42 +1992,55 @@ export default function KassaReservationsView({
                 </div>
               </div>
 
-              {/* === KALENDER RECHTS === */}
-              <div className="w-52 flex-shrink-0 bg-white border border-gray-200 rounded-xl p-3 overflow-y-auto flex flex-col gap-4">
-                {/* Vandaag knop */}
-                <button onClick={() => { setTimelineDate(todayStr); setCalMonth({year:timelineNow.getFullYear(),month:timelineNow.getMonth()}) }}
-                  className="w-full py-1.5 rounded-lg bg-orange-500 text-white text-sm font-bold hover:bg-orange-600 transition-colors">
-                  Vandaag
-                </button>
-                {/* Maand navigatie */}
-                <div className="flex items-center justify-between">
-                  <button onClick={() => setCalMonth(m => { const d=new Date(m.year,m.month-1,1); return {year:d.getFullYear(),month:d.getMonth()} })}
+              {/* === KALENDER RECHTS — heel jaar scrollbaar === */}
+              <div className="w-52 flex-shrink-0 bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col">
+                {/* Jaar navigatie + vandaag */}
+                <div className="flex items-center gap-1 px-2 py-2 border-b border-gray-100 flex-shrink-0">
+                  <button onClick={() => setCalMonth(m=>({year:m.year-1,month:m.month}))}
                     className="p-1 hover:bg-gray-100 rounded"><ChevronLeft size={14}/></button>
-                  <span className="text-sm font-bold text-gray-700 capitalize">
-                    {new Date(calMonth.year,calMonth.month,1).toLocaleDateString('nl-BE',{month:'long',year:'numeric'})}
-                  </span>
-                  <button onClick={() => setCalMonth(m => { const d=new Date(m.year,m.month+1,1); return {year:d.getFullYear(),month:d.getMonth()} })}
+                  <span className="flex-1 text-center text-sm font-bold text-gray-700">{calMonth.year}</span>
+                  <button onClick={() => setCalMonth(m=>({year:m.year+1,month:m.month}))}
                     className="p-1 hover:bg-gray-100 rounded"><ChevronRight size={14}/></button>
+                  <button onClick={() => { setTimelineDate(todayStr); setCalMonth({year:timelineNow.getFullYear(),month:timelineNow.getMonth()}) }}
+                    className="px-2 py-0.5 rounded bg-orange-500 text-white text-xs font-bold hover:bg-orange-600">
+                    Vandaag
+                  </button>
                 </div>
-                {/* Dag labels */}
-                <div className="grid grid-cols-7 gap-0">
-                  {['M','D','W','D','V','Z','Z'].map((d,i) => (
-                    <div key={i} className="text-center text-xs font-semibold text-gray-400 py-1">{d}</div>
-                  ))}
-                  {Array.from({length:calPad}).map((_,i) => <div key={`pad-${i}`}/>)}
-                  {Array.from({length:calDaysInMonth}).map((_,i) => {
-                    const day = i+1
-                    const dateStr = `${calMonth.year}-${String(calMonth.month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
-                    const isSelected = dateStr === timelineDate
-                    const isToday3 = dateStr === todayStr
-                    const hasRes = reservations.some(r => r.reservation_date===dateStr && r.status!=='CANCELLED')
+                {/* Alle 12 maanden scrollbaar */}
+                <div className="overflow-y-auto flex-1">
+                  {Array.from({length:12}).map((_,mi) => {
+                    const mYear = calMonth.year
+                    const mMonth = mi
+                    const mFirst = new Date(mYear, mMonth, 1)
+                    let mDow = mFirst.getDay(); if(mDow===0) mDow=7
+                    const mDays = new Date(mYear, mMonth+1, 0).getDate()
+                    const mPad = mDow - 1
+                    const mName = mFirst.toLocaleDateString('nl-BE',{month:'long'})
                     return (
-                      <button key={day} onClick={() => setTimelineDate(dateStr)}
-                        className={`relative aspect-square flex items-center justify-center text-xs font-semibold rounded-full transition-colors
-                          ${isSelected?'bg-orange-500 text-white':isToday3?'bg-orange-100 text-orange-700':'hover:bg-gray-100 text-gray-700'}`}>
-                        {day}
-                        {hasRes && !isSelected && <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-400"/>}
-                      </button>
+                      <div key={mMonth} className="px-2 pt-3 pb-2">
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 capitalize">{mName}</p>
+                        <div className="grid grid-cols-7">
+                          {['M','D','W','D','V','Z','Z'].map((d,i)=>(
+                            <div key={i} className="text-center text-[10px] text-gray-300 font-semibold pb-0.5">{d}</div>
+                          ))}
+                          {Array.from({length:mPad}).map((_,i)=><div key={`p${i}`}/>)}
+                          {Array.from({length:mDays}).map((_,di)=>{
+                            const day = di+1
+                            const dStr = `${mYear}-${String(mMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
+                            const isSel = dStr===timelineDate
+                            const isTod = dStr===todayStr
+                            const hasRes = reservations.some(r=>r.reservation_date===dStr&&r.status!=='CANCELLED')
+                            return (
+                              <button key={day} onClick={()=>{ setTimelineDate(dStr); setCalMonth({year:mYear,month:mMonth}) }}
+                                className={`relative aspect-square flex items-center justify-center text-[11px] font-semibold rounded-full transition-colors
+                                  ${isSel?'bg-orange-500 text-white':isTod?'bg-orange-100 text-orange-700':'hover:bg-gray-100 text-gray-700'}`}>
+                                {day}
+                                {hasRes&&!isSel&&<span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-400"/>}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
                     )
                   })}
                 </div>
