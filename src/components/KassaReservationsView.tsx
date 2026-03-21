@@ -1286,8 +1286,8 @@ export default function KassaReservationsView({
               <CalendarDays size={24} className="text-green-500" />
             </div>
             <div>
-              <h1 className="text-xl font-bold">Reservaties</h1>
-              <p className="text-sm text-gray-400">
+              <h1 className="text-2xl font-bold">Reservaties</h1>
+              <p className="text-base text-gray-400">
                 {formatDate(selectedDate)} • {todayStats.covers} personen verwacht
               </p>
             </div>
@@ -1579,10 +1579,10 @@ export default function KassaReservationsView({
           const COLS = 'repeat(9, 1fr)'
           return (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="grid gap-2 px-4 py-3 border-b border-gray-200 bg-gray-50 text-base font-bold text-gray-500 uppercase tracking-wide"
-              style={{ gridTemplateColumns: COLS }}>
+            <div className="grid gap-2 px-4 py-4 text-base font-bold text-white uppercase tracking-wide sticky top-0 z-10"
+              style={{ gridTemplateColumns: COLS, backgroundColor: '#F97316' }}>
               <span>Datum</span><span>Tijd</span><span>Gast</span><span>Email</span>
-              <span>Ps</span><span>Tfl</span><span>Status</span><span>No-show</span><span>Push</span>
+              <span>Personen</span><span>Tafel</span><span>Status</span><span>No-show</span><span>Push</span>
             </div>
             {filteredReservations.length === 0 && (
               <div className="py-12 text-center text-gray-400 text-base">Geen reservaties</div>
