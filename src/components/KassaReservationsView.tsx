@@ -3284,7 +3284,8 @@ interface NewReservationModalProps {
 
 function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize }: NewReservationModalProps) {
   const [formData, setFormData] = useState({
-    guest_name: '',
+    guest_first_name: '',
+    guest_last_name: '',
     guest_phone: '',
     guest_email: '',
     party_size: 2,
@@ -3294,13 +3295,20 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     table_number: '',
     notes: '',
     special_requests: '',
-    occasion: '',
+    occasion: 'Geen',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  const req = () => (
+    <span className="text-red-500 font-bold ml-0.5">*</span>
+  )
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
-    if (!formData.guest_name.trim()) newErrors.guest_name = 'Naam is verplicht'
+    if (!formData.guest_first_name.trim()) newErrors.guest_first_name = 'Voornaam is verplicht'
+    if (!formData.guest_last_name.trim()) newErrors.guest_last_name = 'Achternaam is verplicht'
+    if (!formData.guest_phone.trim()) newErrors.guest_phone = 'Telefoon is verplicht'
+    if (!formData.guest_email.trim()) newErrors.guest_email = 'Email is verplicht'
     if (!formData.reservation_date) newErrors.reservation_date = 'Datum is verplicht'
     if (!formData.reservation_time) newErrors.reservation_time = 'Tijd is verplicht'
     if (formData.party_size < 1) newErrors.party_size = 'Min. 1 persoon'
@@ -3310,7 +3318,8 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
 
   const handleSubmit = () => {
     if (!validateForm()) return
-    onSave({ ...formData, status: 'CONFIRMED' })
+    const { guest_first_name, guest_last_name, ...rest } = formData
+    onSave({ ...rest, guest_name: `${guest_first_name} ${guest_last_name}`.trim(), status: 'CONFIRMED' })
   }
 
   const timeSlots: string[] = []
@@ -3320,6 +3329,8 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
   }
 
   const availableTables = tables.filter(t => t.seats >= formData.party_size)
+  const inputCls = (field: string) =>
+    `w-full px-4 py-3 rounded-xl bg-gray-100 border ${errors[field] ? 'border-red-500' : 'border-gray-200'} focus:border-green-500 outline-none`
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
@@ -3339,62 +3350,58 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
 
         {/* Form */}
         <div className="p-6 space-y-4">
-          {/* Naam */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Naam gast *</label>
-            <input
-              type="text"
-              value={formData.guest_name}
-              onChange={(e) => setFormData({ ...formData, guest_name: e.target.value })}
-              placeholder="Jan Janssen"
-              className={`w-full px-4 py-3 rounded-xl bg-gray-100 border ${errors.guest_name ? 'border-red-500' : 'border-gray-200'} focus:border-green-500 outline-none`}
-            />
-            {errors.guest_name && <p className="text-red-500 text-xs mt-1">{errors.guest_name}</p>}
+
+          {/* Voornaam & Achternaam */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Voornaam {req()}</label>
+              <input type="text" value={formData.guest_first_name}
+                onChange={(e) => setFormData({ ...formData, guest_first_name: e.target.value })}
+                placeholder="Jan" className={inputCls('guest_first_name')} />
+              {errors.guest_first_name && <p className="text-red-500 text-xs mt-1">{errors.guest_first_name}</p>}
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Achternaam {req()}</label>
+              <input type="text" value={formData.guest_last_name}
+                onChange={(e) => setFormData({ ...formData, guest_last_name: e.target.value })}
+                placeholder="Janssen" className={inputCls('guest_last_name')} />
+              {errors.guest_last_name && <p className="text-red-500 text-xs mt-1">{errors.guest_last_name}</p>}
+            </div>
           </div>
 
           {/* Telefoon & Email */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Telefoon</label>
-              <input
-                type="tel"
-                value={formData.guest_phone}
+              <label className="block text-sm font-medium mb-1">Telefoon {req()}</label>
+              <input type="tel" value={formData.guest_phone}
                 onChange={(e) => setFormData({ ...formData, guest_phone: e.target.value })}
-                placeholder="+32 ..."
-                className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none"
-              />
+                placeholder="+32 ..." className={inputCls('guest_phone')} />
+              {errors.guest_phone && <p className="text-red-500 text-xs mt-1">{errors.guest_phone}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
-              <input
-                type="email"
-                value={formData.guest_email}
+              <label className="block text-sm font-medium mb-1">Email {req()}</label>
+              <input type="email" value={formData.guest_email}
                 onChange={(e) => setFormData({ ...formData, guest_email: e.target.value })}
-                placeholder="jan@email.be"
-                className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none"
-              />
+                placeholder="jan@email.be" className={inputCls('guest_email')} />
+              {errors.guest_email && <p className="text-red-500 text-xs mt-1">{errors.guest_email}</p>}
             </div>
           </div>
 
           {/* Datum & Tijd */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Datum *</label>
-              <input
-                type="date"
-                value={formData.reservation_date}
+              <label className="block text-sm font-medium mb-1">Datum {req()}</label>
+              <input type="date" value={formData.reservation_date}
                 onChange={(e) => setFormData({ ...formData, reservation_date: e.target.value })}
                 min={new Date().toISOString().split('T')[0]}
-                className={`w-full px-4 py-3 rounded-xl bg-gray-100 border ${errors.reservation_date ? 'border-red-500' : 'border-gray-200'} focus:border-green-500 outline-none`}
-              />
+                className={inputCls('reservation_date')} />
+              {errors.reservation_date && <p className="text-red-500 text-xs mt-1">{errors.reservation_date}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Tijd *</label>
-              <select
-                value={formData.reservation_time}
+              <label className="block text-sm font-medium mb-1">Tijd {req()}</label>
+              <select value={formData.reservation_time}
                 onChange={(e) => setFormData({ ...formData, reservation_time: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none"
-              >
+                className={inputCls('reservation_time')}>
                 {timeSlots.map((time) => (
                   <option key={time} value={time}>{time}</option>
                 ))}
@@ -3405,31 +3412,26 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
           {/* Personen & Duur */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Aantal personen *</label>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
+              <label className="block text-sm font-medium mb-1">Aantal personen {req()}</label>
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-100 border ${errors.party_size ? 'border-red-500' : 'border-gray-200'}`}>
+                <button type="button"
                   onClick={() => setFormData({ ...formData, party_size: Math.max(1, formData.party_size - 1) })}
-                  className="w-12 h-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-bold hover:bg-gray-50"
-                >-</button>
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-xl font-bold hover:bg-gray-50">-</button>
                 <div className="flex-1 text-center">
                   <span className="text-2xl font-bold">{formData.party_size}</span>
                   <span className="text-sm text-gray-400 ml-1">pers.</span>
                 </div>
-                <button
-                  type="button"
+                <button type="button"
                   onClick={() => setFormData({ ...formData, party_size: Math.min(maxPartySize || 20, formData.party_size + 1) })}
-                  className="w-12 h-12 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-bold hover:bg-gray-50"
-                >+</button>
+                  className="w-10 h-10 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-xl font-bold hover:bg-gray-50">+</button>
               </div>
+              {errors.party_size && <p className="text-red-500 text-xs mt-1">{errors.party_size}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Duur</label>
-              <select
-                value={formData.duration_minutes}
+              <label className="block text-sm font-medium mb-1">Duur {req()}</label>
+              <select value={formData.duration_minutes}
                 onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })}
-                className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none"
-              >
+                className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none">
                 <option value={60}>1 uur</option>
                 <option value={90}>1,5 uur</option>
                 <option value={120}>2 uur</option>
@@ -3441,12 +3443,10 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
 
           {/* Tafel */}
           <div>
-            <label className="block text-sm font-medium mb-1">Tafel (optioneel)</label>
-            <select
-              value={formData.table_number}
+            <label className="block text-sm font-medium mb-1">Tafel {req()}</label>
+            <select value={formData.table_number}
               onChange={(e) => setFormData({ ...formData, table_number: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none"
-            >
+              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none">
               <option value="">Automatisch toewijzen</option>
               {availableTables.map((table) => (
                 <option key={table.id} value={table.number}>
@@ -3458,62 +3458,45 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
 
           {/* Gelegenheid */}
           <div>
-            <label className="block text-sm font-medium mb-1">Gelegenheid</label>
+            <label className="block text-sm font-medium mb-1">Gelegenheid {req()}</label>
             <div className="flex flex-wrap gap-2">
-              {['', 'Verjaardag', 'Jubileum', 'Zakelijk', 'Romantisch', 'Feest'].map((occ) => (
-                <button
-                  key={occ}
-                  type="button"
+              {['Geen', 'Verjaardag', 'Jubileum', 'Zakelijk', 'Romantisch', 'Feest'].map((occ) => (
+                <button key={occ} type="button"
                   onClick={() => setFormData({ ...formData, occasion: occ })}
                   className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                    formData.occasion === occ
-                      ? 'bg-green-500 text-white'
-                      : 'bg-gray-100 text-gray-400 hover:text-gray-900'
-                  }`}
-                >
-                  {occ || 'Geen'}
-                </button>
+                    formData.occasion === occ ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}>{occ}</button>
               ))}
             </div>
           </div>
 
-          {/* Opmerkingen */}
+          {/* Opmerkingen — niet verplicht */}
           <div>
             <label className="block text-sm font-medium mb-1">Opmerkingen</label>
-            <textarea
-              value={formData.notes}
+            <textarea value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Interne opmerkingen..."
-              rows={2}
-              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none resize-none"
-            />
+              placeholder="Interne opmerkingen..." rows={2}
+              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none resize-none" />
           </div>
 
-          {/* Speciale wensen */}
+          {/* Speciale wensen — niet verplicht */}
           <div>
             <label className="block text-sm font-medium mb-1">Speciale wensen gast</label>
-            <textarea
-              value={formData.special_requests}
+            <textarea value={formData.special_requests}
               onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
-              placeholder="Allergieën, kinderstoel, rolstoel..."
-              rows={2}
-              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none resize-none"
-            />
+              placeholder="Allergieën, kinderstoel, rolstoel..." rows={2}
+              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none resize-none" />
           </div>
         </div>
 
         {/* Footer */}
         <div className="sticky bottom-0 bg-white p-6 pt-4 border-t border-gray-200 flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl bg-gray-100 font-medium hover:bg-gray-200 transition-colors"
-          >
+          <button onClick={onClose}
+            className="flex-1 py-3 rounded-xl bg-gray-100 font-medium hover:bg-gray-200 transition-colors">
             Annuleren
           </button>
-          <button
-            onClick={handleSubmit}
-            className="flex-1 py-3 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors"
-          >
+          <button onClick={handleSubmit}
+            className="flex-1 py-3 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors">
             Reservatie Aanmaken
           </button>
         </div>
