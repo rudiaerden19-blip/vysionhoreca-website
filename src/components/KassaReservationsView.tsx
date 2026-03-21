@@ -3331,6 +3331,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     notes: '',
     special_requests: '',
     occasion: 'Geen',
+    deposit_paid: false,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -3353,8 +3354,13 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
 
   const handleSubmit = () => {
     if (!validateForm()) return
-    const { guest_first_name, guest_last_name, ...rest } = formData
-    onSave({ ...rest, guest_name: `${guest_first_name} ${guest_last_name}`.trim(), status: 'CONFIRMED' })
+    const { guest_first_name, guest_last_name, deposit_paid, ...rest } = formData
+    onSave({
+      ...rest,
+      guest_name: `${guest_first_name} ${guest_last_name}`.trim(),
+      status: 'CONFIRMED',
+      payment_status: deposit_paid ? 'deposit_paid' : 'pending',
+    })
   }
 
   const timeSlots: string[] = []
@@ -3503,6 +3509,28 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
                   }`}>{occ}</button>
               ))}
             </div>
+          </div>
+
+          {/* Voorschot betaald */}
+          <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200">
+            <div>
+              <p className="text-sm font-semibold text-gray-800">Voorschot betaald</p>
+              <p className="text-xs text-gray-400 mt-0.5">Heeft de gast een voorschot betaald?</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFormData(f => ({ ...f, deposit_paid: !f.deposit_paid }))}
+              className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-200 focus:outline-none ${
+                formData.deposit_paid ? 'bg-green-500' : 'bg-gray-300'
+              }`}
+            >
+              <span className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-md transition-transform duration-200 ${
+                formData.deposit_paid ? 'translate-x-7' : 'translate-x-1'
+              }`} />
+            </button>
+            <span className={`ml-3 text-sm font-bold min-w-[2.5rem] ${formData.deposit_paid ? 'text-green-600' : 'text-gray-400'}`}>
+              {formData.deposit_paid ? 'Ja' : 'Nee'}
+            </span>
           </div>
 
           {/* Opmerkingen — niet verplicht */}
