@@ -223,6 +223,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [reservationError, setReservationError] = useState('')
   const [availableTimes, setAvailableTimes] = useState<string[]>([])
   const [selectedDayClosed, setSelectedDayClosed] = useState(false)
+  const [depositSettings, setDepositSettings] = useState<{ required: boolean; amount: number }>({ required: false, amount: 0 })
 
   // Generate time slots based on opening hours for selected date
   const generateTimeSlots = (date: string, openingHours: Record<string, { open?: string; close?: string; closed?: boolean; hasBreak?: boolean; breakStart?: string; breakEnd?: string }>) => {
@@ -324,44 +325,74 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     
     const fullName = `${capitalizeWords(reservationForm.firstName)} ${capitalizeWords(reservationForm.lastName)}`
     
-    const success = await createReservation({
+    // Direct insert zodat we het ID krijgen voor Stripe
+    const { data: resData, error: resError } = await supabase.from('reservations').insert([{
       tenant_slug: params.tenant,
-      customer_name: fullName,
-      customer_phone: reservationForm.phone,
-      customer_email: reservationForm.email.toLowerCase(),
+      guest_name: fullName,
+      guest_phone: reservationForm.phone,
+      guest_email: reservationForm.email.toLowerCase(),
+      party_size: parseInt(reservationForm.partySize),
       reservation_date: reservationForm.date,
       reservation_time: reservationForm.time,
-      party_size: parseInt(reservationForm.partySize),
       notes: capitalizeWords(reservationForm.notes),
-    })
-    
-    if (success) {
-      // Send confirmation email to customer
+      status: 'PENDING',
+      total_spent: 0,
+      payment_status: depositSettings.required && depositSettings.amount > 0 ? 'pending' : 'unpaid',
+    }]).select().single()
+
+    if (resError || !resData) {
+      setReservationError(t('shopPage.reservationError'))
+      setReservationSubmitting(false)
+      return
+    }
+
+    // Stuur bevestigingsmail
+    try {
+      await fetch('/api/send-reservation-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'pending',
+          customerEmail: reservationForm.email.toLowerCase(),
+          customerName: fullName,
+          customerPhone: reservationForm.phone,
+          reservationDate: reservationForm.date,
+          reservationTime: reservationForm.time,
+          partySize: parseInt(reservationForm.partySize),
+          tenantSlug: params.tenant,
+          businessName: business?.name,
+        }),
+      })
+    } catch (emailError) {
+      console.error('Failed to send reservation email:', emailError)
+    }
+
+    // Als voorschot vereist → redirect naar Stripe
+    if (depositSettings.required && depositSettings.amount > 0) {
       try {
-        await fetch('/api/send-reservation-email', {
+        const res = await fetch('/api/reservation-deposit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            status: 'pending',
-            customerEmail: reservationForm.email.toLowerCase(),
-            customerName: fullName,
-            customerPhone: reservationForm.phone,
+            reservationId: resData.id,
+            tenantSlug: params.tenant,
+            guestName: fullName,
+            guestEmail: reservationForm.email.toLowerCase(),
+            depositAmount: depositSettings.amount,
             reservationDate: reservationForm.date,
             reservationTime: reservationForm.time,
-            partySize: parseInt(reservationForm.partySize),
-            tenantSlug: params.tenant,
-            businessName: business?.name,
+            businessName: business?.name || params.tenant,
           }),
         })
-      } catch (emailError) {
-        console.error('Failed to send reservation email:', emailError)
+        const { url } = await res.json()
+        if (url) { window.location.href = url; return }
+      } catch (stripeError) {
+        console.error('Stripe redirect failed:', stripeError)
       }
-      
-      setReservationSuccess(true)
-      setReservationForm({ firstName: '', lastName: '', phone: '', email: '', date: '', time: '', partySize: '', notes: '' })
-    } else {
-      setReservationError(t('shopPage.reservationError'))
     }
+
+    setReservationSuccess(true)
+    setReservationForm({ firstName: '', lastName: '', phone: '', email: '', date: '', time: '', partySize: '', notes: '' })
     setReservationSubmitting(false)
   }
 
@@ -370,6 +401,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Laad voorschot instellingen
+  useEffect(() => {
+    supabase.from('reservation_settings').select('deposit_required,deposit_amount').eq('tenant_slug', params.tenant).single()
+      .then(({ data }) => {
+        if (data) setDepositSettings({ required: !!data.deposit_required, amount: data.deposit_amount || 0 })
+      })
+  }, [params.tenant])
 
   // Fetch manual offline status
   useEffect(() => {
@@ -1428,6 +1467,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   </div>
                 </div>
 
+                {/* Voorschot banner */}
+                {depositSettings.required && depositSettings.amount > 0 && (
+                  <div className="mt-6 bg-amber-50 border border-amber-300 rounded-xl p-4 flex items-start gap-3">
+                    <span className="text-2xl">💳</span>
+                    <div>
+                      <p className="font-bold text-amber-800">Voorschot vereist: €{depositSettings.amount}</p>
+                      <p className="text-amber-700 text-sm mt-0.5">Na het invullen wordt u doorgestuurd naar de beveiligde betaalpagina (Stripe). Uw reservatie wordt bevestigd na betaling.</p>
+                    </div>
+                  </div>
+                )}
+
                 {reservationError && (
                   <p className="text-red-500 text-center mt-4">{reservationError}</p>
                 )}
@@ -1436,10 +1486,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   onClick={handleReservationSubmit}
                   disabled={reservationSubmitting}
                   style={{ backgroundColor: business.primary_color }}
-                  className="w-full mt-8 text-white font-bold text-lg py-4 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                  className="w-full mt-6 text-white font-bold text-lg py-4 rounded-xl transition-all flex items-center justify-center gap-2 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                 >
                   {reservationSubmitting ? (
                     <span>{t('shopPage.pleaseWait')}</span>
+                  ) : depositSettings.required && depositSettings.amount > 0 ? (
+                    <>
+                      <span>💳</span>
+                      <span>Reserveren &amp; Betalen €{depositSettings.amount}</span>
+                    </>
                   ) : (
                     <>
                       <span>🍽️</span>
