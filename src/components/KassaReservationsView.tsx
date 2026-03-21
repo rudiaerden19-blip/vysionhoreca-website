@@ -3469,6 +3469,9 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     if (!formData.reservation_date) newErrors.reservation_date = 'Datum is verplicht'
     if (!formData.reservation_time) newErrors.reservation_time = 'Tijd is verplicht'
     if (formData.party_size < 1) newErrors.party_size = 'Min. 1 persoon'
+    if (!formData.duration_minutes || formData.duration_minutes < 1) newErrors.duration_minutes = 'Duur is verplicht'
+    if (!formData.table_number) newErrors.table_number = 'Kies een tafel'
+    if (!formData.occasion || formData.occasion === '') newErrors.occasion = 'Gelegenheid is verplicht'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -3600,6 +3603,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
                 <option value={150}>2,5 uur</option>
                 <option value={180}>3 uur</option>
               </select>
+              {errors.duration_minutes && <p className="text-red-500 text-xs mt-1">{errors.duration_minutes}</p>}
             </div>
           </div>
 
@@ -3608,14 +3612,15 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
             <label className="block text-sm font-medium mb-1">Tafel {req()}</label>
             <select value={formData.table_number}
               onChange={(e) => setFormData({ ...formData, table_number: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none">
-              <option value="">Automatisch toewijzen</option>
+              className={`w-full px-4 py-3 rounded-xl bg-gray-100 border focus:border-green-500 outline-none ${errors.table_number ? 'border-red-400' : 'border-gray-200'}`}>
+              <option value="">— Kies een tafel —</option>
               {availableTables.map((table) => (
                 <option key={table.id} value={table.number}>
                   Tafel {table.number} ({table.seats} pers.)
                 </option>
               ))}
             </select>
+            {errors.table_number && <p className="text-red-500 text-xs mt-1">{errors.table_number}</p>}
           </div>
 
           {/* Gelegenheid */}
@@ -3624,12 +3629,13 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
             <div className="flex flex-wrap gap-2">
               {['Geen', 'Verjaardag', 'Jubileum', 'Zakelijk', 'Romantisch', 'Feest'].map((occ) => (
                 <button key={occ} type="button"
-                  onClick={() => setFormData({ ...formData, occasion: occ })}
+                  onClick={() => { setFormData({ ...formData, occasion: occ }); setErrors(e => ({ ...e, occasion: '' })) }}
                   className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                     formData.occasion === occ ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}>{occ}</button>
               ))}
             </div>
+            {errors.occasion && <p className="text-red-500 text-xs mt-1">{errors.occasion}</p>}
           </div>
 
           {/* Voorschot betaald */}
