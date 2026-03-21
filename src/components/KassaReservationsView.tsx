@@ -1731,13 +1731,13 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'timeline' && (() => {
-          // Time slots from 10:00 to 23:00 in 30-min steps
-          const SLOT_W = 72 // px per 30-min slot
+          // Time slots from 10:00 to 22:00 — geen horizontaal scrollen
           const ROW_H = 56
-          const LABEL_W = 80
+          const LABEL_W = 72
           const START_MIN = 10 * 60 // 10:00
-          const END_MIN = 23 * 60   // 23:00
+          const END_MIN = 22 * 60   // 22:00
           const totalSlots = (END_MIN - START_MIN) / 30
+          const SLOT_W = 0 // niet gebruikt — slots vullen beschikbare breedte
           const timeSlots: string[] = []
           for (let m = START_MIN; m < END_MIN; m += 30) {
             const h = Math.floor(m / 60).toString().padStart(2, '0')
@@ -1758,8 +1758,9 @@ export default function KassaReservationsView({
           const now = new Date()
           const isToday = timelineDate === now.toISOString().split('T')[0]
           const nowMin = now.getHours() * 60 + now.getMinutes()
-          const nowPx = isToday && nowMin >= START_MIN && nowMin <= END_MIN
-            ? LABEL_W + ((nowMin - START_MIN) / 30) * SLOT_W
+          // nowPct = positie van huidige tijd als percentage van de tijdband (excl. label)
+          const nowPct = isToday && nowMin >= START_MIN && nowMin <= END_MIN
+            ? ((nowMin - START_MIN) / (END_MIN - START_MIN)) * 100
             : null
 
           const statusColors: Record<string, string> = {
@@ -1799,77 +1800,67 @@ export default function KassaReservationsView({
                 ))}
               </div>
 
-              {/* Grid */}
-              <div className="border border-gray-200 rounded-xl overflow-hidden bg-white">
-                <div className="overflow-x-auto">
-                  <div style={{ minWidth: LABEL_W + totalSlots * SLOT_W + 40, position: 'relative' }}>
-                    {/* Time header */}
-                    <div className="flex border-b border-gray-200 bg-gray-50" style={{ height: 36 }}>
-                      <div style={{ width: LABEL_W, flexShrink: 0 }} className="border-r border-gray-200 flex items-center px-3">
-                        <span className="text-xs font-bold text-gray-400">Tafel</span>
+              {/* Grid — vult volledige breedte, geen horizontale scroll */}
+              <div className="border border-gray-200 rounded-xl overflow-hidden bg-white w-full">
+                {/* Time header */}
+                <div className="flex border-b border-gray-200 bg-gray-50" style={{ height: 36 }}>
+                  <div style={{ width: LABEL_W, flexShrink: 0 }} className="border-r border-gray-200 flex items-center px-2">
+                    <span className="text-xs font-bold text-gray-400">Tafel</span>
+                  </div>
+                  <div className="flex flex-1">
+                    {timeSlots.map((t, i) => (
+                      <div key={t} className="flex-1 border-r border-gray-100 flex items-center justify-center">
+                        {i % 2 === 0 && <span className="text-xs font-medium text-gray-400">{t}</span>}
                       </div>
-                      {timeSlots.map((t, i) => (
-                        <div key={t} style={{ width: SLOT_W, flexShrink: 0 }}
-                          className="border-r border-gray-100 flex items-center justify-center">
-                          {i % 2 === 0 && <span className="text-xs font-medium text-gray-400">{t}</span>}
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Table rows */}
-                    {sortedTables.map((tableNum, rowIdx) => {
-                      const tableRes = dayRes.filter(r => (r.table_number || '(geen tafel)') === tableNum)
-                      const fpTable = floorPlanTablesDB.find(t => t.number === tableNum)
-                      return (
-                        <div key={tableNum} className="flex relative"
-                          style={{ height: ROW_H, backgroundColor: rowIdx % 2 === 0 ? 'white' : '#f9fafb', borderBottom: '1px solid #f0f0f0' }}>
-                          {/* Table label */}
-                          <div style={{ width: LABEL_W, flexShrink: 0 }}
-                            className="border-r border-gray-200 flex flex-col items-center justify-center px-2">
-                            <span className="text-base font-bold text-gray-800">{tableNum}</span>
-                            {fpTable && <span className="text-xs text-gray-400">{fpTable.seats}p</span>}
-                          </div>
-                          {/* Slot grid lines */}
-                          <div className="flex absolute" style={{ left: LABEL_W, top: 0, bottom: 0 }}>
-                            {timeSlots.map((t, i) => (
-                              <div key={t} style={{ width: SLOT_W, flexShrink: 0, height: ROW_H }}
-                                className={`border-r ${i % 2 === 0 ? 'border-gray-100' : 'border-gray-50'}`} />
-                            ))}
-                          </div>
-                          {/* Reservation blocks */}
-                          {tableRes.map(r => {
-                            const [rh, rm] = r.reservation_time.split(':').map(Number)
-                            const startMin = rh * 60 + rm
-                            const dur = r.duration_minutes || 90
-                            const left = LABEL_W + ((startMin - START_MIN) / 30) * SLOT_W
-                            const width = (dur / 30) * SLOT_W - 4
-                            if (left < LABEL_W || startMin > END_MIN) return null
-                            const color = statusColors[r.status] || '#9ca3af'
-                            return (
-                              <div
-                                key={r.id}
-                                onClick={() => setSelectedReservation(r)}
-                                className="absolute top-2 bottom-2 rounded-lg cursor-pointer flex flex-col justify-center px-2 overflow-hidden hover:opacity-90 transition-opacity"
-                                style={{ left, width: Math.max(width, 40), backgroundColor: color + 'dd', borderLeft: `3px solid ${color}`, zIndex: 2 }}
-                              >
-                                <span className="text-white text-xs font-bold truncate">{r.guest_name}</span>
-                                <span className="text-white/80 text-xs truncate">{r.reservation_time} • {r.party_size}p</span>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      )
-                    })}
-
-                    {/* Current time line */}
-                    {nowPx !== null && (
-                      <div className="absolute top-9 bottom-0 w-0.5 bg-red-500 z-10 pointer-events-none"
-                        style={{ left: nowPx }}>
-                        <div className="absolute -top-1 -left-1.5 w-3 h-3 rounded-full bg-red-500" />
-                      </div>
-                    )}
+                    ))}
                   </div>
                 </div>
+
+                {/* Table rows */}
+                {sortedTables.map((tableNum, rowIdx) => {
+                  const tableRes = dayRes.filter(r => (r.table_number || '(geen tafel)') === tableNum)
+                  const fpTable = floorPlanTablesDB.find(t => t.number === tableNum)
+                  const totalRange = END_MIN - START_MIN
+                  return (
+                    <div key={tableNum} className="flex relative"
+                      style={{ height: ROW_H, backgroundColor: rowIdx % 2 === 0 ? 'white' : '#f9fafb', borderBottom: '1px solid #f0f0f0' }}>
+                      {/* Label */}
+                      <div style={{ width: LABEL_W, flexShrink: 0 }}
+                        className="border-r border-gray-200 flex flex-col items-center justify-center px-2">
+                        <span className="text-base font-bold text-gray-800">{tableNum}</span>
+                        {fpTable && <span className="text-xs text-gray-400">{fpTable.seats}p</span>}
+                      </div>
+                      {/* Grid + reservaties — neemt resterende breedte */}
+                      <div className="flex-1 relative">
+                        {/* Slot grid lijnen */}
+                        <div className="flex h-full">
+                          {timeSlots.map((t, i) => (
+                            <div key={t} className={`flex-1 h-full border-r ${i % 2 === 0 ? 'border-gray-100' : 'border-gray-50'}`} />
+                          ))}
+                        </div>
+                        {/* Reservaties — positie in % van beschikbare breedte */}
+                        {tableRes.map(r => {
+                          const [rh, rm] = r.reservation_time.split(':').map(Number)
+                          const startMin = rh * 60 + rm
+                          const dur = r.duration_minutes || 90
+                          if (startMin >= END_MIN || startMin + dur <= START_MIN) return null
+                          const leftPct = Math.max(0, (startMin - START_MIN) / totalRange * 100)
+                          const widthPct = Math.min(dur / totalRange * 100, 100 - leftPct)
+                          const color = statusColors[r.status] || '#9ca3af'
+                          return (
+                            <div key={r.id}
+                              onClick={() => setSelectedReservation(r)}
+                              className="absolute top-2 bottom-2 rounded-lg cursor-pointer flex flex-col justify-center px-2 overflow-hidden hover:opacity-90 transition-opacity"
+                              style={{ left: `${leftPct}%`, width: `calc(${widthPct}% - 4px)`, backgroundColor: color + 'dd', borderLeft: `3px solid ${color}`, zIndex: 2 }}>
+                              <span className="text-white text-xs font-bold truncate">{r.guest_name}</span>
+                              <span className="text-white/80 text-xs truncate">{r.reservation_time} • {r.party_size}p</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
 
               {dayRes.length === 0 && (
