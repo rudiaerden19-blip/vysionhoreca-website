@@ -156,18 +156,17 @@ function ContactsView({
   guestProfiles,
   searchQuery,
   setSearchQuery,
-  onToggleBlocked,
 }: {
   guestProfiles: GuestProfile[]
   searchQuery: string
   setSearchQuery: (q: string) => void
-  onToggleBlocked: (guest: GuestProfile) => void
 }) {
   const [guestSort, setGuestSort] = useState<'visits'|'name'|'lastVisit'>('visits')
   const [guestSortDir, setGuestSortDir] = useState<'asc'|'desc'>('desc')
   const [selectedGuests, setSelectedGuests] = useState<Set<string>>(new Set())
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(25)
+  const [noShowRed, setNoShowRed] = useState<Set<string>>(new Set())
 
   const toggleSort = (col: typeof guestSort) => {
     if (guestSort === col) setGuestSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -240,7 +239,7 @@ function ContactsView({
               </td></tr>
             )}
             {paginated.map((guest: GuestProfile) => {
-              const isNoShow = guest.totalNoShows > 0
+              const isRed = noShowRed.has(guest.id)
               return (
                 <tr key={guest.id} style={{ borderBottom: '1px solid #e5e7eb' }}
                   className="hover:bg-gray-50 transition-colors">
@@ -261,12 +260,17 @@ function ContactsView({
                   </td>
                   <td className="px-5 py-3 font-bold text-gray-800 text-right" style={{ borderRight: '1px solid #e5e7eb' }}>{guest.totalVisits}</td>
                   <td className="px-5 py-3">
-                    {/* Enkel visueel — rood = no-show gehad, grijs = geen */}
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                      isNoShow ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400'
-                    }`}>
-                      {isNoShow ? `No-show` : 'No-show'}
-                    </span>
+                    <button
+                      onClick={() => setNoShowRed(prev => {
+                        const s = new Set(prev)
+                        s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id)
+                        return s
+                      })}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
+                        isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400'
+                      }`}>
+                      No-show
+                    </button>
                   </td>
                 </tr>
               )
@@ -1562,8 +1566,8 @@ export default function KassaReservationsView({
           <div className="flex bg-gray-100 rounded-xl p-1 w-full">
             {[
               { id: 'floorplan', label: 'Reservaties', icon: <MapPin size={16} /> },
-              { id: 'list', label: 'Gasten', icon: <List size={16} /> },
               { id: 'timeline', label: 'Tijdlijn', icon: <LayoutGrid size={16} /> },
+              { id: 'guests', label: 'Contacten', icon: <Users size={16} /> },
               { id: 'stats', label: 'Rapporten', icon: <AlertCircle size={16} /> },
               { id: 'settings', label: 'Instellingen', icon: <Settings size={16} /> },
             ].map((view) => (
@@ -2652,6 +2656,14 @@ export default function KassaReservationsView({
           )
         })()}
 
+
+        {!loading && viewMode === 'guests' && (
+          <ContactsView
+            guestProfiles={guestProfiles}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+          />
+        )}
 
         {!loading && viewMode === 'stats' && (
           <div className="space-y-6">
