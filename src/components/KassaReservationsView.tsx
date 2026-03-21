@@ -2587,8 +2587,8 @@ export default function KassaReservationsView({
                         <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Naam</th>
                         <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Personen</th>
                         <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tafel</th>
-                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Status</th>
-                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Opmerkingen</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Telefoon</th>
+                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">E-mail</th>
                         <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500"></th>
                       </tr>
                     </thead>
@@ -2603,8 +2603,6 @@ export default function KassaReservationsView({
                             </td>
                             <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>
                               {r.guest_name}
-                              {r.guest_phone && <div className="text-xs text-gray-400 font-normal mt-0.5">{r.guest_phone}</div>}
-                              {r.guest_email && <div className="text-xs text-gray-400 font-normal">{r.guest_email}</div>}
                             </td>
                             <td className="px-5 py-4 text-gray-700 text-center font-bold text-lg" style={{ borderRight: '1px solid #e5e7eb' }}>
                               {r.party_size}
@@ -2612,11 +2610,15 @@ export default function KassaReservationsView({
                             <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
                               {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
                             </td>
-                            <td className="px-5 py-4" style={{ borderRight: '1px solid #e5e7eb' }}>
-                              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${st.cls}`}>{st.label}</span>
+                            <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.guest_phone
+                                ? <a href={`tel:${r.guest_phone}`} className="hover:underline">{r.guest_phone}</a>
+                                : <span className="text-gray-300">—</span>}
                             </td>
-                            <td className="px-5 py-4 text-gray-500 text-xs max-w-xs" style={{ borderRight: '1px solid #e5e7eb' }}>
-                              {r.special_requests || r.notes || <span className="text-gray-300">—</span>}
+                            <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.guest_email
+                                ? <a href={`mailto:${r.guest_email}`} className="hover:underline">{r.guest_email}</a>
+                                : <span className="text-gray-300">—</span>}
                             </td>
                             <td className="px-5 py-4 text-right">
                               <button onClick={() => setEditReservation(r)}
