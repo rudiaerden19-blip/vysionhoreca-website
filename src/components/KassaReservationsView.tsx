@@ -219,18 +219,18 @@ function ContactsView({
 
       {/* Tabel */}
       <div className="flex-1 overflow-auto">
-        <table className="w-full text-sm border-collapse">
+        <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
           <thead>
-            <tr className="border-b-2 border-gray-200 bg-white">
-              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-600 hover:text-gray-900"
+            <tr style={{ borderBottom: '2px solid #e5e7eb', background: '#f9fafb' }}>
+              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
                 onClick={() => toggleSort('name')}>Naam <SortArrow col="name"/></th>
-              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">E-mail</th>
-              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Telefoon</th>
-              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-600 hover:text-gray-900"
+              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">E-mail</th>
+              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Telefoon</th>
+              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
                 onClick={() => toggleSort('lastVisit')}>Laatste bezoek <SortArrow col="lastVisit"/></th>
-              <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-600 hover:text-gray-900"
+              <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
                 onClick={() => toggleSort('visits')}>Aantal <SortArrow col="visits"/></th>
-              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">No-show</th>
+              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">No-show</th>
             </tr>
           </thead>
           <tbody>
@@ -239,40 +239,34 @@ function ContactsView({
                 {searchQuery ? 'Geen resultaten' : 'Nog geen gasten — worden automatisch toegevoegd bij reservaties'}
               </td></tr>
             )}
-            {paginated.map((guest: GuestProfile, idx: number) => {
+            {paginated.map((guest: GuestProfile) => {
               const isNoShow = guest.totalNoShows > 0
               return (
-                <tr key={guest.id}
-                  className={`border-b border-gray-100 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-orange-50/30`}>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5 font-semibold text-gray-800">
-                      {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0"/>}
-                      {guest.name}
-                    </div>
-                    {guest.phone && <div className="text-xs text-gray-400 mt-0.5">{guest.phone}</div>}
+                <tr key={guest.id} style={{ borderBottom: '1px solid #e5e7eb' }}
+                  className="hover:bg-gray-50 transition-colors">
+                  <td className="px-5 py-3 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>
+                    {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 inline mr-1"/>}
+                    {guest.name}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-5 py-3 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
                     {guest.email ? <a href={`mailto:${guest.email}`} className="hover:underline">{guest.email}</a> : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-5 py-3 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
                     {guest.phone ? <a href={`tel:${guest.phone}`} className="hover:underline">{guest.phone}</a> : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-500">
+                  <td className="px-5 py-3 text-gray-500" style={{ borderRight: '1px solid #e5e7eb' }}>
                     {guest.lastVisit
                       ? new Date(guest.lastVisit+'T12:00').toLocaleDateString('nl-BE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
                       : '—'}
                   </td>
-                  <td className="px-4 py-3 font-bold text-gray-800 text-right">{guest.totalVisits}</td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => onToggleBlocked(guest)}
-                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
-                        guest.isBlocked ? 'bg-red-500 text-white'
-                        : isNoShow ? 'bg-red-100 text-red-600 border border-red-200'
-                        : 'bg-gray-100 text-gray-400'
-                      }`}>
-                      <UserX size={11}/>
-                      {guest.isBlocked ? 'Geblokkeerd' : isNoShow ? `${guest.totalNoShows}×` : 'Geen'}
-                    </button>
+                  <td className="px-5 py-3 font-bold text-gray-800 text-right" style={{ borderRight: '1px solid #e5e7eb' }}>{guest.totalVisits}</td>
+                  <td className="px-5 py-3">
+                    {/* Enkel visueel — rood = no-show gehad, grijs = geen */}
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                      isNoShow ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400'
+                    }`}>
+                      {isNoShow ? `No-show` : 'No-show'}
+                    </span>
                   </td>
                 </tr>
               )
