@@ -3470,17 +3470,50 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     if (!formData.reservation_time) newErrors.reservation_time = 'Tijd is verplicht'
     if (formData.party_size < 1) newErrors.party_size = 'Min. 1 persoon'
     if (!formData.duration_minutes || formData.duration_minutes < 1) newErrors.duration_minutes = 'Duur is verplicht'
-    if (!formData.table_number) newErrors.table_number = 'Kies een tafel'
     if (!formData.occasion || formData.occasion === '') newErrors.occasion = 'Gelegenheid is verplicht'
+    // Tafel: '' = automatisch toewijzen → altijd geldig
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
+  }
+
+  // Zoek automatisch een vrije tafel voor de gegeven datum/tijd/groep
+  const autoAssignTable = (): string => {
+    const startMin = parseInt(formData.reservation_time.split(':')[0]) * 60 + parseInt(formData.reservation_time.split(':')[1])
+    const endMin = startMin + formData.duration_minutes
+    // Reservaties die overlappen op dezelfde dag
+    const busyTables = new Set(
+      reservations
+        .filter(r =>
+          r.reservation_date === formData.reservation_date &&
+          r.status !== 'CANCELLED' &&
+          r.table_number
+        )
+        .filter(r => {
+          const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
+          const rEnd = rStart + (r.duration_minutes || 90)
+          return startMin < rEnd && endMin > rStart
+        })
+        .map(r => String(r.table_number))
+    )
+    // Kies eerste beschikbare tafel met genoeg plaatsen
+    const candidate = tables
+      .filter(t => t.seats >= formData.party_size && !busyTables.has(String(t.number)))
+      .sort((a, b) => a.seats - b.seats)[0]
+    return candidate ? String(candidate.number) : ''
   }
 
   const handleSubmit = () => {
     if (!validateForm()) return
     const { guest_first_name, guest_last_name, deposit_paid, ...rest } = formData
+    // Automatisch toewijzen: zoek vrije tafel als niets geselecteerd
+    const assignedTable = rest.table_number || autoAssignTable()
+    if (!assignedTable) {
+      toast.error('Geen vrije tafel beschikbaar voor dit tijdstip')
+      return
+    }
     onSave({
       ...rest,
+      table_number: assignedTable,
       guest_name: `${guest_first_name} ${guest_last_name}`.trim(),
       status: 'CONFIRMED',
       payment_status: deposit_paid ? 'deposit_paid' : 'pending',
@@ -3612,15 +3645,15 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
             <label className="block text-sm font-medium mb-1">Tafel {req()}</label>
             <select value={formData.table_number}
               onChange={(e) => setFormData({ ...formData, table_number: e.target.value })}
-              className={`w-full px-4 py-3 rounded-xl bg-gray-100 border focus:border-green-500 outline-none ${errors.table_number ? 'border-red-400' : 'border-gray-200'}`}>
-              <option value="">— Kies een tafel —</option>
+              className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-green-500 outline-none">
+              <option value="">Automatisch toewijzen</option>
               {availableTables.map((table) => (
                 <option key={table.id} value={table.number}>
                   Tafel {table.number} ({table.seats} pers.)
                 </option>
               ))}
             </select>
-            {errors.table_number && <p className="text-red-500 text-xs mt-1">{errors.table_number}</p>}
+            <p className="text-xs text-gray-400 mt-1">Laat leeg om automatisch een vrije tafel te kiezen</p>
           </div>
 
           {/* Gelegenheid */}
