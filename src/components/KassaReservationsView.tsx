@@ -2795,28 +2795,56 @@ export default function KassaReservationsView({
 
               {/* z8 - Borg/aanbetaling */}
               <div className="border-t border-gray-100 pt-6">
-                <h4 className="font-bold mb-4">💳 Borg & Aanbetaling</h4>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
+                <h4 className="font-bold mb-4">💳 Voorschot bij online reservatie</h4>
+                <div className="space-y-5">
+
+                  {/* Aan/uit toggle */}
+                  <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200">
                     <div>
-                      <p className="font-medium">Borg vereisen bij online reservatie</p>
-                      <p className="text-sm text-gray-400">Klant betaalt borg via Stripe</p>
+                      <p className="font-semibold text-gray-800">Voorschot verplichten</p>
+                      <p className="text-sm text-gray-400">Klant betaalt voorschot via Stripe vóór de reservatie bevestigd wordt</p>
                     </div>
                     <button
                       onClick={() => updateSettings({ depositRequired: !reservationSettings.depositRequired })}
-                      className={`w-14 h-7 rounded-full transition-colors ${reservationSettings.depositRequired ? 'bg-green-500' : 'bg-gray-300'}`}
+                      className={`relative w-16 h-8 rounded-full transition-colors flex-shrink-0 ml-4 ${reservationSettings.depositRequired ? 'bg-green-500' : 'bg-gray-300'}`}
                     >
-                      <div className={`w-5 h-5 rounded-full bg-white transition-transform ${reservationSettings.depositRequired ? 'translate-x-8' : 'translate-x-1'}`} />
+                      <div className={`absolute top-1 w-6 h-6 rounded-full bg-white shadow transition-transform ${reservationSettings.depositRequired ? 'translate-x-9' : 'translate-x-1'}`} />
                     </button>
                   </div>
+
+                  {/* Bedrag kiezen — alleen zichtbaar als aan */}
                   {reservationSettings.depositRequired && (
-                    <div>
-                      <label className="font-medium block mb-2">Borgbedrag (€)</label>
-                      <input type="number" min="0" step="5"
-                        value={reservationSettings.depositAmount}
-                        onChange={(e) => updateSettings({ depositAmount: parseFloat(e.target.value) || 0 })}
-                        className="w-full px-4 py-2 rounded-lg bg-gray-100 border border-gray-200"
-                      />
+                    <div className="p-4 rounded-xl bg-orange-50 border border-orange-200">
+                      <p className="font-semibold text-gray-800 mb-3">Kies het voorschotbedrag</p>
+                      <div className="grid grid-cols-5 gap-2">
+                        {[25, 50, 75, 100, 150].map(amount => (
+                          <button
+                            key={amount}
+                            onClick={() => updateSettings({ depositAmount: amount })}
+                            className={`py-3 rounded-xl font-bold text-sm transition-colors ${
+                              reservationSettings.depositAmount === amount
+                                ? 'bg-orange-500 text-white shadow-md'
+                                : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300 hover:text-orange-600'
+                            }`}
+                          >
+                            €{amount}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-3 flex items-center gap-2">
+                        <span className="text-sm text-gray-500">Of vrij bedrag:</span>
+                        <div className="flex items-center gap-1 bg-white border border-gray-200 rounded-lg px-3 py-1.5">
+                          <span className="text-gray-500 font-medium">€</span>
+                          <input type="number" min="1" step="5"
+                            value={reservationSettings.depositAmount}
+                            onChange={(e) => updateSettings({ depositAmount: parseFloat(e.target.value) || 0 })}
+                            className="w-16 outline-none text-sm font-bold text-gray-800"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-orange-700 mt-3 bg-orange-100 rounded-lg px-3 py-2">
+                        ✅ Klant wordt na invullen doorgestuurd naar <strong>Stripe betaalpagina</strong> voor €{reservationSettings.depositAmount}. Na betaling wordt de reservatie bevestigd.
+                      </p>
                     </div>
                   )}
                 </div>

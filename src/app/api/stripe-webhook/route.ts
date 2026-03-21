@@ -91,11 +91,23 @@ export async function POST(request: NextRequest) {
       const session = event.data.object as Stripe.Checkout.Session
       
       const giftCardId = session.metadata?.gift_card_id
-      const tenantSlug = session.metadata?.tenant_slug
+      const reservationId = session.metadata?.reservationId
+      const tenantSlug = session.metadata?.tenant_slug || session.metadata?.tenantSlug
       const recipientEmail = session.metadata?.recipient_email
 
+      // ── Reservatie voorschot ──────────────────────────────────────
+      if (reservationId) {
+        await supabase.from('reservations').update({
+          payment_status: 'deposit_paid',
+          status: 'CONFIRMED',
+          stripe_session_id: session.id,
+        }).eq('id', reservationId)
+
+        logger.info('Reservation deposit paid', { requestId, reservationId })
+      }
+
+      // ── Cadeaubon ────────────────────────────────────────────────
       if (giftCardId && tenantSlug) {
-        // Update gift card status to paid
         const { data: giftCard } = await supabase
           .from('gift_cards')
           .update({ 
@@ -107,22 +119,15 @@ export async function POST(request: NextRequest) {
           .single()
 
         if (giftCard) {
-          // Get tenant info for email
           const { data: tenant } = await supabase
             .from('tenant_settings')
             .select('business_name, email, logo_url, primary_color')
             .eq('tenant_slug', tenantSlug)
             .single()
 
-          // Send email to recipient
           if (tenant && recipientEmail) {
             await sendGiftCardEmail(giftCard, tenant, recipientEmail)
-            
-            // Mark as sent
-            await supabase
-              .from('gift_cards')
-              .update({ is_sent: true })
-              .eq('id', giftCardId)
+            await supabase.from('gift_cards').update({ is_sent: true }).eq('id', giftCardId)
           }
         }
       }
