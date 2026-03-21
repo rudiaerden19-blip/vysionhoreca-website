@@ -1575,10 +1575,12 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'list' && (
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="grid grid-cols-[90px_1fr_80px_70px_150px_180px_100px] gap-3 px-4 py-4 border-b border-gray-200 bg-gray-50 text-sm font-semibold text-gray-500 uppercase tracking-wide">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+            <div className="grid grid-cols-[85px_70px_1fr_160px_55px_55px_120px_170px_85px] gap-2 px-3 py-3 border-b border-gray-200 bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wide min-w-[900px]">
+              <span>Datum</span>
               <span>Tijd</span>
               <span>Gast</span>
+              <span>Email</span>
               <span>Pers.</span>
               <span>Tafel</span>
               <span>Status</span>
@@ -1593,20 +1595,20 @@ export default function KassaReservationsView({
               return (
                 <div
                   key={r.id}
-                  className="grid grid-cols-[90px_1fr_80px_70px_150px_180px_100px] gap-3 px-4 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center"
+                  className="grid grid-cols-[85px_70px_1fr_160px_55px_55px_120px_170px_85px] gap-2 px-3 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer items-center min-w-[900px]"
                   onClick={() => setSelectedReservation(r)}
                 >
-                  <div>
-                    <p className="font-bold text-base">{r.reservation_time}</p>
-                    <p className="text-xs text-gray-400">{new Date(r.reservation_date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}</p>
-                  </div>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {new Date(r.reservation_date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
+                  </p>
+                  <p className="font-bold text-base">{r.reservation_time}</p>
                   <div className="min-w-0">
                     <p className="font-semibold text-base text-gray-900 truncate">{r.guest_name}</p>
                     {r.guest_phone && <p className="text-sm text-gray-500 truncate">{r.guest_phone}</p>}
-                    {r.guest_email && <p className="text-sm text-gray-400 truncate">{r.guest_email}</p>}
                   </div>
-                  <div className="flex items-center gap-1.5 text-base">
-                    <Users size={15} className="text-gray-400 flex-shrink-0" />
+                  <p className="text-sm text-gray-500 truncate">{r.guest_email || <span className="text-gray-300 italic">geen email</span>}</p>
+                  <div className="flex items-center gap-1 text-base">
+                    <Users size={14} className="text-gray-400 flex-shrink-0" />
                     <span className="font-medium">{r.party_size}</span>
                   </div>
                   <span className="text-base font-semibold">{r.table_number || '-'}</span>
