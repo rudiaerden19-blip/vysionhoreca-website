@@ -206,94 +206,72 @@ function ContactsView({
     : null
 
   return (
-    <div className="flex flex-col h-full -m-4 bg-gray-50">
+    <div className="flex flex-col h-full -m-4 bg-white">
       {/* Zoekbalk */}
-      <div className="px-4 py-3 flex-shrink-0 bg-white border-b border-gray-200">
-        <div className="relative">
+      <div className="px-4 py-3 flex-shrink-0 border-b border-gray-200">
+        <div className="relative max-w-sm">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
           <input type="text" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setPage(0) }}
             placeholder="Zoek op naam, email of telefoon..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:border-gray-400 text-gray-700"/>
+            className="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:border-gray-400"/>
         </div>
       </div>
 
       {/* Tabel */}
-      <div className="flex-1 overflow-auto bg-white">
+      <div className="flex-1 overflow-auto">
         <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="bg-gray-100 border-b border-gray-200">
-              <th className="w-10 px-4 py-3 text-left">
-                <input type="checkbox" checked={allPageSelected} onChange={toggleAll} className="w-4 h-4 cursor-pointer"/>
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
-                onClick={() => toggleSort('name')}>
-                Naam <SortArrow col="name"/>
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-400">Bedrijf</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">E-mail</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Telefoon</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
-                onClick={() => toggleSort('lastVisit')}>
-                Laatste bezoek <SortArrow col="lastVisit"/>
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
-                onClick={() => toggleSort('visits')}>
-                Bezoeken <SortArrow col="visits"/>
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">No-show</th>
+            <tr className="border-b-2 border-gray-200 bg-white">
+              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-600 hover:text-gray-900"
+                onClick={() => toggleSort('name')}>Naam <SortArrow col="name"/></th>
+              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">E-mail</th>
+              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Telefoon</th>
+              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-600 hover:text-gray-900"
+                onClick={() => toggleSort('lastVisit')}>Laatste bezoek <SortArrow col="lastVisit"/></th>
+              <th className="px-4 py-3 text-right text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-600 hover:text-gray-900"
+                onClick={() => toggleSort('visits')}>Aantal <SortArrow col="visits"/></th>
+              <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-600">No-show</th>
             </tr>
           </thead>
           <tbody>
             {paginated.length === 0 && (
-              <tr>
-                <td colSpan={8} className="text-center py-16 text-gray-400">
-                  {searchQuery ? 'Geen resultaten gevonden' : 'Nog geen contacten — reservaties worden automatisch toegevoegd'}
-                </td>
-              </tr>
+              <tr><td colSpan={6} className="text-center py-16 text-gray-400">
+                {searchQuery ? 'Geen resultaten' : 'Nog geen gasten — worden automatisch toegevoegd bij reservaties'}
+              </td></tr>
             )}
             {paginated.map((guest: GuestProfile, idx: number) => {
-              const isSelected = selectedGuests.has(guest.id)
               const isNoShow = guest.totalNoShows > 0
               return (
                 <tr key={guest.id}
-                  className={`border-b border-gray-100 transition-colors ${isSelected ? 'bg-blue-50' : idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'} hover:bg-blue-50/50`}>
-                  <td className="px-4 py-3">
-                    <input type="checkbox" checked={isSelected} onChange={() => toggleOne(guest.id)} className="w-4 h-4 cursor-pointer"/>
-                  </td>
+                  className={`border-b border-gray-100 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-orange-50/30`}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1.5 font-semibold text-gray-800">
                       {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0"/>}
-                      {guest.isBlocked && <Ban size={12} className="text-red-400 flex-shrink-0"/>}
                       {guest.name}
                     </div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-300">—</td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {guest.email
-                      ? <a href={`mailto:${guest.email}`} className="hover:underline hover:text-blue-600">{guest.email}</a>
-                      : <span className="text-gray-300">—</span>}
+                    {guest.phone && <div className="text-xs text-gray-400 mt-0.5">{guest.phone}</div>}
                   </td>
                   <td className="px-4 py-3 text-gray-600">
-                    {guest.phone
-                      ? <a href={`tel:${guest.phone}`} className="hover:underline hover:text-blue-600">{guest.phone}</a>
-                      : <span className="text-gray-300">—</span>}
+                    {guest.email ? <a href={`mailto:${guest.email}`} className="hover:underline">{guest.email}</a> : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-500 text-sm">
+                  <td className="px-4 py-3 text-gray-600">
+                    {guest.phone ? <a href={`tel:${guest.phone}`} className="hover:underline">{guest.phone}</a> : <span className="text-gray-300">—</span>}
+                  </td>
+                  <td className="px-4 py-3 text-gray-500">
                     {guest.lastVisit
                       ? new Date(guest.lastVisit+'T12:00').toLocaleDateString('nl-BE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
                       : '—'}
                   </td>
-                  <td className="px-4 py-3 text-gray-800 font-bold text-right">{guest.totalVisits}</td>
+                  <td className="px-4 py-3 font-bold text-gray-800 text-right">{guest.totalVisits}</td>
                   <td className="px-4 py-3">
                     <button onClick={() => onToggleBlocked(guest)}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-colors ${
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
                         guest.isBlocked ? 'bg-red-500 text-white'
                         : isNoShow ? 'bg-red-100 text-red-600 border border-red-200'
-                        : 'text-gray-300'
+                        : 'bg-gray-100 text-gray-400'
                       }`}>
-                      {guest.isBlocked ? <><UserX size={11}/> Geblokkeerd</>
-                        : isNoShow ? <><UserX size={11}/> {guest.totalNoShows}×</>
-                        : '—'}
+                      <UserX size={11}/>
+                      {guest.isBlocked ? 'Geblokkeerd' : isNoShow ? `${guest.totalNoShows}×` : 'Geen'}
                     </button>
                   </td>
                 </tr>
@@ -303,19 +281,19 @@ function ContactsView({
         </table>
       </div>
 
-      {/* Footer paginering */}
-      <div className="flex-shrink-0 flex items-center justify-end gap-4 px-4 py-3 text-sm text-gray-500 bg-white border-t border-gray-200">
+      {/* Paginering */}
+      <div className="flex-shrink-0 flex items-center justify-end gap-4 px-4 py-3 text-sm text-gray-500 border-t border-gray-200">
         <span>Rijen per pagina:</span>
         <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(0) }}
-          className="rounded-lg px-2 py-1 text-sm outline-none cursor-pointer bg-gray-100 border border-gray-200 text-gray-700">
+          className="rounded px-2 py-1 text-sm bg-gray-100 border border-gray-200 outline-none cursor-pointer">
           {PAGE_SIZE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <span>{from}-{to} van {filtered.length}</span>
+        <span>{from}–{to} van {filtered.length}</span>
         <div className="flex gap-1">
           <button onClick={() => setPage(p => Math.max(0, p-1))} disabled={page === 0}
-            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 transition-colors">&lt;</button>
+            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-gray-100">&lt;</button>
           <button onClick={() => setPage(p => Math.min(totalPages-1, p+1))} disabled={page >= totalPages-1}
-            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 transition-colors">&gt;</button>
+            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-gray-100">&gt;</button>
         </div>
       </div>
     </div>
