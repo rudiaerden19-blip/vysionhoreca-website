@@ -608,7 +608,7 @@ export default function KassaReservationsView({
   const [selectedShift, setSelectedShift] = useState<string | null>(null)
   const [guestProfilesDB, setGuestProfilesDB] = useState<GuestProfile[]>([])
   const [cancelConfirm, setCancelConfirm] = useState<Reservation | null>(null)
-  const [isPro, setIsPro] = useState(true)
+  const [isPro, setIsPro] = useState(false)
   const [floorPlanTablesDB, setFloorPlanTablesDB] = useState<FloorPlanTable[]>([])
   // Floor plan editor state
   const [selectedFloorTable, setSelectedFloorTable] = useState<FloorPlanTable | null>(null)
@@ -618,7 +618,7 @@ export default function KassaReservationsView({
   const [addFloorShape, setAddFloorShape] = useState<'SQUARE' | 'ROUND' | 'RECTANGLE'>('SQUARE')
   const [isDraggingFloor, setIsDraggingFloor] = useState(false)
   const [tablesLocked, setTablesLocked] = useState(() => {
-    try { return localStorage.getItem('floor_tables_locked') === 'true' } catch { return false }
+    try { return localStorage.getItem(`floor_tables_locked_${tenant}`) === 'true' } catch { return false }
   })
   const [floorZoom, setFloorZoom] = useState(1)
   const [panX, setPanX] = useState(0)
@@ -679,8 +679,9 @@ export default function KassaReservationsView({
 
   // Load tenant info + reservatie instellingen vanuit Supabase
   useEffect(() => {
-    supabase.from('tenants').select('name,phone,email,subscription_status,trial_ends_at,plan').eq('slug', tenant).single()
-      .then(({ data }) => {
+    const loadTenantData = async () => {
+      try {
+        const { data } = await supabase.from('tenants').select('name,phone,email,subscription_status,trial_ends_at,plan').eq('slug', tenant).single()
         if (data) {
           setBusinessInfo({ name: data.name || '', phone: data.phone || '', email: data.email || '' })
           const status = data.subscription_status || 'trial'
@@ -688,12 +689,16 @@ export default function KassaReservationsView({
           const isTrial = (status === 'trial' || status === 'TRIAL') && trialEnd && trialEnd > new Date()
           setIsPro(data.plan === 'pro' || status === 'active' || !!isTrial)
         }
-      })
-    // Laad instellingen: localStorage is primair, Supabase vult aan
-    supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).single()
-      .then(({ data }) => {
+      } catch (err) { console.error('[tenants] load error:', err) }
+
+      // Laad instellingen: localStorage is primair, Supabase vult aan
+      try {
+        const { data } = await supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).single()
         if (data) {
-          // Zet Supabase snake_case terug naar camelCase
+          const safeParseJSON = (val: unknown, fallback: unknown) => {
+            if (typeof val !== 'string') return val ?? fallback
+            try { return JSON.parse(val) } catch { return fallback }
+          }
           const fromDB: Partial<ReservationSettings> = {
             isEnabled: data.is_enabled ?? data.isEnabled,
             acceptOnline: data.accept_online ?? data.acceptOnline,
@@ -702,20 +707,24 @@ export default function KassaReservationsView({
             slotDurationMinutes: data.slot_duration_minutes ?? data.slotDurationMinutes,
             minAdvanceHours: data.min_advance_hours ?? data.minAdvanceHours,
             maxAdvanceDays: data.max_advance_days ?? data.maxAdvanceDays,
-            shifts: typeof data.shifts === 'string' ? JSON.parse(data.shifts) : (data.shifts ?? undefined),
-            closedDays: typeof data.closed_days === 'string' ? JSON.parse(data.closed_days) : (data.closed_days ?? undefined),
+            shifts: safeParseJSON(data.shifts, undefined),
+            closedDays: safeParseJSON(data.closed_days, undefined),
             depositRequired: data.deposit_required ?? data.depositRequired,
             depositAmount: data.deposit_amount ?? data.depositAmount,
             noShowProtection: data.no_show_protection ?? data.noShowProtection,
           }
-          // Merge: localStorage > Supabase > defaults
-          const localRaw = localStorage.getItem(`reservationSettings_${tenant}`)
-          const localData = localRaw ? JSON.parse(localRaw) : {}
+          let localData: Record<string, unknown> = {}
+          try {
+            const localRaw = localStorage.getItem(`reservationSettings_${tenant}`)
+            localData = localRaw ? JSON.parse(localRaw) : {}
+          } catch { localData = {} }
           const merged = { ...DEFAULT_SETTINGS, ...fromDB, ...localData }
           setReservationSettings(merged)
-          localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(merged))
+          try { localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(merged)) } catch {}
         }
-      })
+      } catch (err) { console.error('[reservation_settings] load error:', err) }
+    }
+    loadTenantData()
   }, [tenant])
 
   // Load reservations — map DB columns (customer_name) naar interface (guest_name)
@@ -814,8 +823,13 @@ export default function KassaReservationsView({
 
   // Load floor plan tables from Supabase
   useEffect(() => {
-    supabase.from('floor_plan_tables').select('data').eq('tenant_slug', tenant).single()
-      .then(({ data }) => { if (data?.data) setFloorPlanTablesDB(data.data as FloorPlanTable[]) })
+    const loadFloorTables = async () => {
+      try {
+        const { data } = await supabase.from('floor_plan_tables').select('data').eq('tenant_slug', tenant).single()
+        if (data?.data) setFloorPlanTablesDB(data.data as FloorPlanTable[])
+      } catch (err) { console.error('[floor_plan_tables] load error:', err) }
+    }
+    loadFloorTables()
   }, [tenant])
 
   // Centreer tafels zodra de plattegrond-tab actief wordt (canvas is dan zichtbaar)
@@ -1568,8 +1582,8 @@ export default function KassaReservationsView({
         )}
 
         {/* View Toggle & Search */}
-        <div className="flex items-center gap-3 w-full">
-          <div className="flex bg-gray-100 rounded-xl p-1 w-full">
+        <div className="flex flex-col gap-2 w-full lg:flex-row lg:items-center lg:gap-3">
+          <div className="flex bg-gray-100 rounded-xl p-1 w-full overflow-x-auto">
             {[
               { id: 'reservations', label: 'Reserveringen', icon: <List size={16} /> },
               { id: 'floorplan', label: 'Plattegrond', icon: <MapPin size={16} /> },
@@ -1581,20 +1595,20 @@ export default function KassaReservationsView({
               <button
                 key={view.id}
                 onClick={() => setViewMode(view.id as ViewMode)}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap ${
+                className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap min-w-[44px] ${
                   viewMode === view.id
                     ? 'bg-[#3C4D6B] text-white'
                     : 'text-gray-400 hover:text-gray-900'
                 }`}
               >
                 {view.icon}
-                {view.label}
+                <span className="hidden md:inline">{view.label}</span>
               </button>
             ))}
           </div>
 
-          {viewMode !== 'timeline' && (
-            <div className="flex-shrink-0 w-72 relative">
+          {viewMode !== 'timeline' && viewMode !== 'reservations' && (
+            <div className="flex-shrink-0 lg:w-72 relative">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
@@ -1609,7 +1623,7 @@ export default function KassaReservationsView({
       </div>
 
       {/* Content */}
-      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'timeline' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
+      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
@@ -1890,7 +1904,7 @@ export default function KassaReservationsView({
                   onClick={() => {
                     const next = !tablesLocked
                     setTablesLocked(next)
-                    try { localStorage.setItem('floor_tables_locked', String(next)) } catch {}
+                    try { localStorage.setItem(`floor_tables_locked_${tenant}`, String(next)) } catch {}
                   }}
                   className={`flex items-center gap-2 h-11 px-4 rounded-xl text-sm font-bold transition-colors whitespace-nowrap shadow-sm ${
                     tablesLocked
@@ -2541,7 +2555,9 @@ export default function KassaReservationsView({
 
         {!loading && viewMode === 'reservations' && (() => {
           const resDate = resListDate
-          const today = new Date().toISOString().split('T')[0]
+          // Gebruik lokale datum (niet UTC) om tijdzone-bugs na middernacht te vermijden
+          const _tn = new Date()
+          const today = `${_tn.getFullYear()}-${String(_tn.getMonth()+1).padStart(2,'0')}-${String(_tn.getDate()).padStart(2,'0')}`
 
           const q = resSearch.trim().toLowerCase()
           const dayRes = reservations
@@ -2608,7 +2624,7 @@ export default function KassaReservationsView({
               )}
 
               {/* Body: lijst + kalender sidebar */}
-              <div className="flex flex-1 overflow-hidden">
+              <div className="relative flex flex-1 overflow-hidden">
                 {/* Lijst */}
                 <div className="flex-1 overflow-auto">
                   {dayRes.length === 0 ? (
@@ -2658,9 +2674,9 @@ export default function KassaReservationsView({
                   )}
                 </div>
 
-                {/* Kalender sidebar */}
+                {/* Kalender sidebar — op grote schermen rechts naast lijst, op klein scherm als overlay */}
                 {showResCalendar && (
-                  <div className="w-[270px] flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto">
+                  <div className="absolute inset-0 z-20 bg-white overflow-y-auto md:relative md:inset-auto md:z-auto md:w-[270px] md:flex-shrink-0 md:border-l md:border-gray-200">
                     {/* Jaar nav */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                       <button onClick={() => setResCalYear(y => y - 1)}
@@ -2675,6 +2691,10 @@ export default function KassaReservationsView({
                       <button onClick={() => { setResListDate(today); setShowResCalendar(false) }}
                         className="ml-2 px-3 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold">
                         Vandaag
+                      </button>
+                      <button onClick={() => setShowResCalendar(false)}
+                        className="ml-1 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-400 md:hidden">
+                        <X size={14}/>
                       </button>
                     </div>
                     {/* Maanden */}
