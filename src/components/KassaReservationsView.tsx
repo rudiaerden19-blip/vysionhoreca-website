@@ -638,10 +638,11 @@ export default function KassaReservationsView({
         status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
         table_number: r.table_number != null ? String(r.table_number) : undefined,
       })) as Reservation[]
-      // Alleen re-renderen als data echt veranderd is
+      // Alleen re-renderen als data echt veranderd is — vergelijk alle relevante velden
       setReservations(prev => {
-        const prevJson = JSON.stringify(prev.map(r => r.id + r.status + r.table_number))
-        const newJson = JSON.stringify(mapped.map(r => r.id + r.status + r.table_number))
+        const sig = (r: Reservation) => [r.id, r.status, r.table_number, r.guest_name, r.reservation_date, r.reservation_time, r.duration_minutes, r.special_requests].join('|')
+        const prevJson = JSON.stringify(prev.map(sig))
+        const newJson = JSON.stringify(mapped.map(sig))
         return prevJson === newJson ? prev : mapped
       })
     }, 60_000)
@@ -969,7 +970,8 @@ export default function KassaReservationsView({
     const updates: Record<string, unknown> = { status: status.toLowerCase(), ...extra }
     if (status === 'CHECKED_IN') updates.checked_in_at = new Date().toISOString()
     if (status === 'COMPLETED') updates.completed_at = new Date().toISOString()
-    await supabase.from('reservations').update(updates).eq('id', id)
+    const { error } = await supabase.from('reservations').update(updates).eq('id', id).eq('tenant_slug', tenant)
+    if (error) { toast.error('Status kon niet worden bijgewerkt: ' + error.message); return }
     await loadReservations()
   }
 
@@ -1106,16 +1108,18 @@ export default function KassaReservationsView({
   }
 
   const handleAssignTable = async (reservationId: string, tableNumber: string) => {
-    await supabase.from('reservations').update({ table_number: tableNumber }).eq('id', reservationId)
+    const { error } = await supabase.from('reservations').update({ table_number: tableNumber })
+      .eq('id', reservationId).eq('tenant_slug', tenant)
+    if (error) { toast.error('Tafel toewijzen mislukt: ' + error.message); return }
     await loadReservations()
     toast.success('Tafel toegewezen')
   }
 
   const handleDeleteReservation = async (id: string) => {
-    await supabase.from('reservations').update({ status: 'CANCELLED' }).eq('id', id)
-    await supabase.from('reservations').delete().eq('id', id)
+    const { error } = await supabase.from('reservations').delete().eq('id', id).eq('tenant_slug', tenant)
+    if (error) { toast.error('Verwijderen mislukt: ' + error.message); return }
     await loadReservations()
-    toast.success('Reservatie geannuleerd en verwijderd')
+    toast.success('Reservatie verwijderd')
   }
 
   const handleStartOrder = async (r: Reservation) => {
@@ -1142,7 +1146,9 @@ export default function KassaReservationsView({
       duration_minutes: data.duration_minutes || 90,
       table_number: data.table_number || null,
       notes: data.notes || null,
-      ...(data.special_requests ? { special_requests: data.special_requests } : {}),
+      special_requests: data.special_requests || '',
+      occasion: data.occasion || null,
+      payment_status: data.payment_status || 'pending',
       status: 'confirmed',
       tenant_slug: tenant,
       total_spent: 0,
@@ -3183,6 +3189,7 @@ export default function KassaReservationsView({
           maxPartySize={reservationSettings.maxPartySize}
           reservations={reservations}
           shifts={reservationSettings.shifts || []}
+          bufferMinutes={reservationSettings.bufferMinutes || 0}
         />
       )}
 
@@ -3315,22 +3322,35 @@ export default function KassaReservationsView({
           tables={floorPlanTablesDB.length > 0
             ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
             : kassaTables}
+          reservations={reservations}
+          shifts={reservationSettings.shifts || []}
+          bufferMinutes={reservationSettings.bufferMinutes || 0}
           onClose={() => setEditReservation(null)}
           onSave={async (updated) => {
             const { error } = await supabase.from('reservations').update({
+              customer_name: updated.guest_name,
+              customer_phone: updated.guest_phone || null,
+              customer_email: updated.guest_email || null,
               reservation_date: updated.reservation_date,
               reservation_time: updated.reservation_time,
               party_size: updated.party_size,
               duration_minutes: updated.duration_minutes,
-              table_number: updated.table_number,
-              status: updated.status,
-              special_requests: updated.special_requests,
-            }).eq('id', updated.id)
-            if (!error) { await loadReservations(); setEditReservation(null) }
+              table_number: updated.table_number || null,
+              status: updated.status?.toLowerCase(),
+              special_requests: updated.special_requests || '',
+            }).eq('id', updated.id).eq('tenant_slug', tenant)
+            if (error) { toast.error('Opslaan mislukt: ' + error.message); return }
+            await loadReservations()
+            setEditReservation(null)
+            toast.success('Reservatie opgeslagen')
           }}
           onCancel={async () => {
-            const { error } = await supabase.from('reservations').update({ status: 'CANCELLED' }).eq('id', editReservation.id)
-            if (!error) { await loadReservations(); setEditReservation(null) }
+            const { error } = await supabase.from('reservations')
+              .update({ status: 'cancelled' }).eq('id', editReservation.id).eq('tenant_slug', tenant)
+            if (error) { toast.error('Annuleren mislukt: ' + error.message); return }
+            await loadReservations()
+            setEditReservation(null)
+            toast.success('Reservatie geannuleerd')
           }}
         />
       )}
@@ -3344,13 +3364,19 @@ export default function KassaReservationsView({
 interface EditReservationModalProps {
   reservation: Reservation
   tables: KassaTable[]
+  reservations: Reservation[]
+  shifts: Shift[]
+  bufferMinutes: number
   onClose: () => void
   onSave: (updated: Reservation) => Promise<void>
   onCancel: () => Promise<void>
 }
 
-function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }: EditReservationModalProps) {
+function EditReservationModal({ reservation, tables, reservations, shifts, bufferMinutes, onClose, onSave, onCancel }: EditReservationModalProps) {
   const [form, setForm] = useState({
+    guest_name: reservation.guest_name || '',
+    guest_phone: reservation.guest_phone || '',
+    guest_email: reservation.guest_email || '',
     reservation_date: reservation.reservation_date,
     reservation_time: reservation.reservation_time,
     party_size: reservation.party_size,
@@ -3362,6 +3388,7 @@ function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }
   const [saving, setSaving] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [confirmCancel, setConfirmCancel] = useState(false)
+  const [validationError, setValidationError] = useState('')
 
   const timeSlots: string[] = []
   for (let h = 10; h <= 23; h++) {
@@ -3369,7 +3396,33 @@ function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }
     if (h < 23) timeSlots.push(`${String(h).padStart(2,'0')}:30`)
   }
 
+  // Shift-validatie
+  const activeShifts = shifts.filter(s => s.isActive)
+  const isOutsideShifts = activeShifts.length > 0
+    ? !activeShifts.some(s => form.reservation_time >= s.startTime && form.reservation_time <= s.endTime)
+    : false
+
+  // Overlap-check (excl. eigen reservatie, incl. buffer)
+  const hasConflict = (() => {
+    if (!form.table_number || !form.reservation_date || !form.reservation_time) return false
+    const startMin = parseInt(form.reservation_time.split(':')[0]) * 60 + parseInt(form.reservation_time.split(':')[1])
+    const endMin = startMin + (form.duration_minutes || 90) + (bufferMinutes || 0)
+    return reservations.some(r => {
+      if (r.id === reservation.id) return false
+      if (r.status === 'CANCELLED') return false
+      if (String(r.table_number) !== form.table_number) return false
+      if (r.reservation_date !== form.reservation_date) return false
+      const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
+      const rEnd = rStart + (r.duration_minutes || 90)
+      return startMin < rEnd && endMin > rStart
+    })
+  })()
+
   const handleSave = async () => {
+    setValidationError('')
+    if (!form.guest_name.trim()) { setValidationError('Naam is verplicht'); return }
+    if (isOutsideShifts) { setValidationError(`Gekozen tijd valt buiten de openingstijden (${activeShifts.map(s=>`${s.name} ${s.startTime}–${s.endTime}`).join(', ')})`); return }
+    if (hasConflict) { setValidationError('Tafel is al bezet op dit tijdstip — kies een andere tafel of tijd'); return }
     setSaving(true)
     await onSave({ ...reservation, ...form, table_number: form.table_number || reservation.table_number })
     setSaving(false)
@@ -3387,11 +3440,11 @@ function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4" style={{ background:'rgba(0,0,0,0.5)' }}
       onClick={onClose}>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col overflow-hidden"
-        style={{ maxHeight:'90vh' }}
+        style={{ maxHeight:'92vh' }}
         onClick={e => e.stopPropagation()}>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50 flex-shrink-0">
           <div>
             <h2 className="text-lg font-black text-gray-800">Reservatie bewerken</h2>
             <p className="text-sm text-gray-500">{reservation.guest_name} · {reservation.reservation_date} {reservation.reservation_time}</p>
@@ -3401,12 +3454,36 @@ function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }
 
         {/* Body */}
         <div className="overflow-y-auto flex-1 px-6 py-5 flex flex-col gap-4">
+
+          {/* Naam */}
+          <div>
+            <label className="block text-sm font-bold text-gray-600 mb-1">Naam gast <span className="text-red-500">*</span></label>
+            <input type="text" value={form.guest_name}
+              onChange={e => setForm({...form, guest_name: e.target.value})}
+              className={inputCls} placeholder="Voor- en achternaam"/>
+          </div>
+
+          {/* Telefoon & Email */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-bold text-gray-600 mb-1">Telefoon</label>
+              <input type="tel" value={form.guest_phone}
+                onChange={e => setForm({...form, guest_phone: e.target.value})}
+                className={inputCls} placeholder="0472..."/>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-600 mb-1">Email</label>
+              <input type="email" value={form.guest_email}
+                onChange={e => setForm({...form, guest_email: e.target.value})}
+                className={inputCls} placeholder="naam@mail.com"/>
+            </div>
+          </div>
+
           {/* Datum & Tijd */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-sm font-bold text-gray-600 mb-1">Datum</label>
               <input type="date" value={form.reservation_date}
-                min={new Date().toISOString().split('T')[0]}
                 onChange={e => setForm({...form, reservation_date: e.target.value})}
                 className={inputCls}/>
             </div>
@@ -3414,9 +3491,10 @@ function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }
               <label className="block text-sm font-bold text-gray-600 mb-1">Tijd</label>
               <select value={form.reservation_time}
                 onChange={e => setForm({...form, reservation_time: e.target.value})}
-                className={inputCls}>
+                className={`${inputCls} ${isOutsideShifts ? 'border-red-400 bg-red-50' : ''}`}>
                 {timeSlots.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
+              {isOutsideShifts && <p className="text-red-500 text-xs mt-1">⚠️ Buiten openingstijden</p>}
             </div>
           </div>
 
@@ -3452,12 +3530,13 @@ function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }
             <label className="block text-sm font-bold text-gray-600 mb-1">Tafel</label>
             <select value={form.table_number}
               onChange={e => setForm({...form, table_number: e.target.value})}
-              className={inputCls}>
-              <option value="">— Automatisch —</option>
+              className={`${inputCls} ${hasConflict ? 'border-red-400 bg-red-50' : ''}`}>
+              <option value="">— Geen voorkeur —</option>
               {tables.map(t => (
                 <option key={t.id} value={String(t.number)}>Tafel {t.number} ({t.seats} plaatsen)</option>
               ))}
             </select>
+            {hasConflict && <p className="text-red-500 text-xs mt-1">⚠️ Tafel al bezet op dit tijdstip</p>}
           </div>
 
           {/* Status */}
@@ -3468,8 +3547,9 @@ function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }
               className={inputCls}>
               <option value="PENDING">Verwacht</option>
               <option value="CONFIRMED">Bevestigd</option>
-              <option value="CHECKED_IN">Aanwezig</option>
-              <option value="COMPLETED">Afgerond</option>
+              <option value="CHECKED_IN">Aan tafel</option>
+              <option value="COMPLETED">Vertrokken</option>
+              <option value="NO_SHOW">No-show</option>
             </select>
           </div>
 
@@ -3481,15 +3561,21 @@ function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }
               rows={3} placeholder="Bijv. allergieën, verjaardagstaart, rolstoel..."
               className="w-full px-4 py-3 rounded-xl bg-gray-100 border border-gray-200 focus:border-blue-500 outline-none text-base resize-none"/>
           </div>
+
+          {/* Validatiefout */}
+          {validationError && (
+            <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm font-semibold">
+              ⚠️ {validationError}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 flex gap-3">
-          {/* Annuleren */}
+        <div className="px-6 py-4 border-t border-gray-100 flex gap-3 flex-shrink-0">
           {!confirmCancel ? (
             <button onClick={() => setConfirmCancel(true)}
               className="px-4 py-3 rounded-xl border-2 border-red-300 text-red-600 font-bold text-sm hover:bg-red-50 transition-colors">
-              Annuleer reservatie
+              Annuleer
             </button>
           ) : (
             <div className="flex gap-2 flex-1">
@@ -3504,8 +3590,8 @@ function EditReservationModal({ reservation, tables, onClose, onSave, onCancel }
             </div>
           )}
           {!confirmCancel && (
-            <button onClick={handleSave} disabled={saving}
-              className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 disabled:opacity-50 transition-colors">
+            <button onClick={handleSave} disabled={saving || isOutsideShifts || hasConflict}
+              className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 disabled:opacity-40 transition-colors">
               {saving ? 'Opslaan...' : 'Wijzigingen opslaan'}
             </button>
           )}
@@ -3885,9 +3971,10 @@ interface NewReservationModalProps {
   maxPartySize: number
   reservations: Reservation[]
   shifts: Shift[]
+  bufferMinutes: number
 }
 
-function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize, reservations, shifts }: NewReservationModalProps) {
+function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize, reservations, shifts, bufferMinutes }: NewReservationModalProps) {
   const [formData, setFormData] = useState({
     guest_first_name: '',
     guest_last_name: '',
@@ -3934,8 +4021,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
   // Zoek automatisch een vrije tafel voor de gegeven datum/tijd/groep
   const autoAssignTable = (): string => {
     const startMin = parseInt(formData.reservation_time.split(':')[0]) * 60 + parseInt(formData.reservation_time.split(':')[1])
-    const endMin = startMin + (formData.duration_minutes || 90)
-    // Reservaties die overlappen op dezelfde dag
+    const endMin = startMin + (formData.duration_minutes || 90) + (bufferMinutes || 0)
     const busyTables = new Set(
       reservations
         .filter(r =>
@@ -3998,7 +4084,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
   // Bereken welke tafels bezet zijn op het gekozen tijdstip
   const getTableStatus = (tableNum: string | number): { bezet: boolean; door?: string; tot?: string } => {
     const startMin = parseInt(formData.reservation_time.split(':')[0]) * 60 + parseInt(formData.reservation_time.split(':')[1])
-    const endMin = startMin + (formData.duration_minutes || 90)
+    const endMin = startMin + (formData.duration_minutes || 90) + (bufferMinutes || 0)
     const conflict = reservations.find(r =>
       r.reservation_date === formData.reservation_date &&
       r.status !== 'CANCELLED' &&
