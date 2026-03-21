@@ -2541,12 +2541,7 @@ export default function KassaReservationsView({
 
         {!loading && viewMode === 'reservations' && (() => {
           const resDate = resListDate
-          const setResDate = (d: string) => {
-            setResListDate(d)
-            const dt = new Date(d)
-            setResCalYear(dt.getFullYear())
-            setResCalMonth(dt.getMonth())
-          }
+          const today = new Date().toISOString().split('T')[0]
 
           const q = resSearch.trim().toLowerCase()
           const dayRes = reservations
@@ -2554,124 +2549,50 @@ export default function KassaReservationsView({
             .filter(r => !q || r.guest_name?.toLowerCase().includes(q) || r.guest_phone?.includes(q) || r.guest_email?.toLowerCase().includes(q))
             .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
 
-          // Dagen met reserveringen (voor dots in kalender)
           const daysWithRes = new Set(reservations.filter(r => r.status !== 'CANCELLED').map(r => r.reservation_date))
-
-          // Kalender helpers
           const MONTHS_NL = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
           const DAYS_NL = ['Ma','Di','Wo','Do','Vr','Za','Zo']
-          const today = new Date().toISOString().split('T')[0]
 
-          const renderCalendar = () => {
-            // Groepeer per maand: toon huidige, vorige en volgende
-            const months = []
-            for (let mOff = -1; mOff <= 1; mOff++) {
-              let y = resCalYear, m = resCalMonth + mOff
-              if (m < 0) { m = 11; y -= 1 }
-              if (m > 11) { m = 0; y += 1 }
-              const firstDay = new Date(y, m, 1)
-              // Ma=0...Zo=6
-              let startDow = firstDay.getDay() - 1
-              if (startDow < 0) startDow = 6
-              const daysInMonth = new Date(y, m + 1, 0).getDate()
-              const cells: (number | null)[] = Array(startDow).fill(null)
-              for (let d = 1; d <= daysInMonth; d++) cells.push(d)
-              while (cells.length % 7 !== 0) cells.push(null)
-              months.push({ y, m, cells })
-            }
-
-            return (
-              <div className="border-b border-gray-200 bg-white px-4 pb-3 flex-shrink-0">
-                {/* Jaar navigatie */}
-                <div className="flex items-center justify-between py-2">
-                  <button onClick={() => setResCalYear(y => y - 1)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600">
-                    <ChevronLeft size={16}/>
-                  </button>
-                  <span className="font-bold text-gray-800 text-base">{resCalYear}</span>
-                  <button onClick={() => setResCalYear(y => y + 1)}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-600">
-                    <ChevronRight size={16}/>
-                  </button>
-                  <button onClick={() => {
-                    const t = new Date()
-                    setResCalYear(t.getFullYear())
-                    setResCalMonth(t.getMonth())
-                    setResListDate(today)
-                    setShowResCalendar(false)
-                  }} className="ml-4 px-4 py-1 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold">
-                    Vandaag
-                  </button>
-                </div>
-                {/* Maanden */}
-                <div className="space-y-4">
-                  {months.map(({ y, m, cells }) => (
-                    <div key={`${y}-${m}`}>
-                      <div className="text-sm font-bold text-gray-700 mb-1">{MONTHS_NL[m]}</div>
-                      <div className="grid grid-cols-7 text-center text-xs text-gray-400 font-semibold mb-1">
-                        {DAYS_NL.map(d => <div key={d}>{d}</div>)}
-                      </div>
-                      <div className="grid grid-cols-7 text-center gap-y-1">
-                        {cells.map((day, i) => {
-                          if (!day) return <div key={i}/>
-                          const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
-                          const isSelected = dateStr === resDate
-                          const isToday = dateStr === today
-                          const hasDot = daysWithRes.has(dateStr)
-                          return (
-                            <button key={i} onClick={() => { setResListDate(dateStr); setShowResCalendar(false) }}
-                              className={`w-8 h-8 mx-auto rounded-full text-sm font-medium flex flex-col items-center justify-center transition-colors relative
-                                ${isSelected ? 'bg-orange-500 text-white' : isToday ? 'border-2 border-orange-400 text-orange-600' : 'text-gray-700 hover:bg-orange-50'}`}>
-                              {day}
-                              {hasDot && !isSelected && (
-                                <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-400"/>
-                              )}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
+          // Bouw kalendermaanden op (3 maanden: vorige, huidige, volgende)
+          const calMonths: { y: number; m: number; cells: (number|null)[] }[] = []
+          for (let mOff = -1; mOff <= 1; mOff++) {
+            let y = resCalYear, m = resCalMonth + mOff
+            if (m < 0) { m = 11; y-- }
+            if (m > 11) { m = 0; y++ }
+            let dow = new Date(y, m, 1).getDay() - 1
+            if (dow < 0) dow = 6
+            const dim = new Date(y, m + 1, 0).getDate()
+            const cells: (number|null)[] = Array(dow).fill(null)
+            for (let d = 1; d <= dim; d++) cells.push(d)
+            while (cells.length % 7 !== 0) cells.push(null)
+            calMonths.push({ y, m, cells })
           }
 
           return (
             <div className="flex flex-col h-full -m-4 bg-white">
               {/* Toolbar */}
               <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 flex-shrink-0">
-                {/* Datum prev/next */}
-                <button onClick={() => { const d = new Date(resDate); d.setDate(d.getDate()-1); setResDate(d.toISOString().split('T')[0]) }}
+                <button onClick={() => { const d = new Date(resDate); d.setDate(d.getDate()-1); setResListDate(d.toISOString().split('T')[0]) }}
                   className="w-9 h-9 rounded-xl bg-orange-500 hover:bg-orange-600 flex items-center justify-center text-white">
                   <ChevronLeft size={18}/>
                 </button>
-                <button onClick={() => { const d = new Date(resDate); d.setDate(d.getDate()+1); setResDate(d.toISOString().split('T')[0]) }}
+                <span className="font-bold text-gray-800 text-sm min-w-[110px] text-center">{formatDate(resDate)}</span>
+                <button onClick={() => { const d = new Date(resDate); d.setDate(d.getDate()+1); setResListDate(d.toISOString().split('T')[0]) }}
                   className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600">
                   <ChevronRight size={18}/>
                 </button>
-
-                {/* Geselecteerde datum */}
-                <div className="flex items-center gap-1.5 bg-orange-500 rounded-xl px-3 py-1.5 cursor-pointer" onClick={() => setShowResCalendar(v => !v)}>
-                  <span className="font-bold text-white text-sm">{formatDate(resDate)}</span>
-                </div>
-
-                <span className="text-sm text-gray-400 font-medium hidden sm:block">
-                  {dayRes.length} reservering{dayRes.length !== 1 ? 'en' : ''} · {dayRes.reduce((s,r) => s+r.party_size,0)} pers.
+                <span className="text-sm text-gray-400 hidden sm:block">
+                  {dayRes.length} reservering{dayRes.length !== 1 ? 'en' : ''} · {dayRes.reduce((s,r) => s+r.party_size, 0)} pers.
                 </span>
-
-                <div className="ml-auto flex items-center gap-2">
-                  {/* Kalender toggle */}
+                <div className="ml-auto flex gap-2">
                   <button onClick={() => { setShowResCalendar(v => !v); setShowResSearch(false) }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors
-                      ${showResCalendar ? 'bg-orange-500 text-white' : 'bg-orange-500 text-white hover:bg-orange-600'}`}>
-                    <span>📅</span> Kalender
-                    <span className="opacity-80">{showResCalendar ? '🙈' : '👁'}</span>
+                      ${showResCalendar ? 'bg-orange-600 text-white ring-2 ring-orange-300' : 'bg-orange-500 hover:bg-orange-600 text-white'}`}>
+                    <Calendar size={15}/> Kalender {showResCalendar ? <Eye size={13}/> : <EyeOff size={13}/>}
                   </button>
-                  {/* Zoek toggle */}
                   <button onClick={() => { setShowResSearch(v => !v); if (showResSearch) setResSearch('') }}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-colors
-                      ${showResSearch ? 'bg-gray-700 text-white' : 'bg-gray-800 text-white hover:bg-gray-700'}`}>
+                      ${showResSearch ? 'bg-gray-700 text-white ring-2 ring-gray-400' : 'bg-gray-800 hover:bg-gray-700 text-white'}`}>
                     <Search size={15}/> Zoek reserv.
                   </button>
                 </div>
@@ -2679,77 +2600,115 @@ export default function KassaReservationsView({
 
               {/* Zoekbalk */}
               {showResSearch && (
-                <div className="px-4 py-2 border-b border-gray-200 flex-shrink-0">
-                  <input
-                    autoFocus
-                    type="text"
-                    placeholder="Zoek op naam, telefoon of e-mail…"
-                    value={resSearch}
-                    onChange={e => setResSearch(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"
-                  />
+                <div className="px-4 py-2 border-b border-gray-200 flex-shrink-0 bg-gray-50">
+                  <input autoFocus type="text" placeholder="Zoek op naam, telefoon of e-mail…"
+                    value={resSearch} onChange={e => setResSearch(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-xl text-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100"/>
                 </div>
               )}
 
-              {/* Kalender */}
-              {showResCalendar && renderCalendar()}
-
-              {/* Lijst */}
-              <div className="flex-1 overflow-auto">
-                {dayRes.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
-                    <List size={40} className="text-gray-300"/>
-                    <p className="font-medium">{q ? `Geen resultaten voor "${resSearch}"` : `Geen reserveringen voor ${formatDate(resDate)}`}</p>
-                  </div>
-                ) : (
-                  <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
-                    <thead>
-                      <tr style={{ background: '#f9fafb', borderBottom: '2px solid #e5e7eb' }}>
-                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tijd</th>
-                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tafel</th>
-                        <th className="px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500">Personen</th>
-                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Naam</th>
-                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Telefoon</th>
-                        <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">E-mail</th>
-                        <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {dayRes.map((r, idx) => (
-                        <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb' }}
-                          className={`transition-colors hover:bg-orange-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}`}>
-                          <td className="px-5 py-4 font-bold text-gray-800 text-base" style={{ borderRight: '1px solid #e5e7eb' }}>
-                            {r.reservation_time}
-                          </td>
-                          <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
-                            {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
-                          </td>
-                          <td className="px-5 py-4 text-center font-bold text-gray-800 text-lg" style={{ borderRight: '1px solid #e5e7eb' }}>
-                            {r.party_size}
-                          </td>
-                          <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>
-                            {r.guest_name}
-                          </td>
-                          <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
-                            {r.guest_phone
-                              ? <a href={`tel:${r.guest_phone}`} className="hover:underline">{r.guest_phone}</a>
-                              : <span className="text-gray-300">—</span>}
-                          </td>
-                          <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
-                            {r.guest_email
-                              ? <a href={`mailto:${r.guest_email}`} className="hover:underline">{r.guest_email}</a>
-                              : <span className="text-gray-300">—</span>}
-                          </td>
-                          <td className="px-5 py-4 text-right">
-                            <button onClick={() => setEditReservation(r)}
-                              className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white text-sm font-semibold transition-colors">
-                              ✏️ Bewerken
-                            </button>
-                          </td>
+              {/* Body: lijst + kalender sidebar */}
+              <div className="flex flex-1 overflow-hidden">
+                {/* Lijst */}
+                <div className="flex-1 overflow-auto">
+                  {dayRes.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2 py-16">
+                      <List size={40} className="text-gray-300"/>
+                      <p className="font-medium">{q ? `Geen resultaten voor "${resSearch}"` : `Geen reserveringen voor ${formatDate(resDate)}`}</p>
+                    </div>
+                  ) : (
+                    <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
+                      <thead>
+                        <tr style={{ background: '#f9fafb', borderBottom: '2px solid #e5e7eb' }}>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tijd</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Tafel</th>
+                          <th className="px-5 py-3 text-center text-xs font-bold uppercase tracking-wider text-gray-500">Personen</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Naam</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Telefoon</th>
+                          <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">E-mail</th>
+                          <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider text-gray-500"></th>
                         </tr>
+                      </thead>
+                      <tbody>
+                        {dayRes.map((r, idx) => (
+                          <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb' }}
+                            className={`transition-colors hover:bg-orange-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}`}>
+                            <td className="px-5 py-4 font-bold text-gray-800 text-base" style={{ borderRight: '1px solid #e5e7eb' }}>{r.reservation_time}</td>
+                            <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
+                            </td>
+                            <td className="px-5 py-4 text-center font-bold text-gray-800 text-lg" style={{ borderRight: '1px solid #e5e7eb' }}>{r.party_size}</td>
+                            <td className="px-5 py-4 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>{r.guest_name}</td>
+                            <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.guest_phone ? <a href={`tel:${r.guest_phone}`} className="hover:underline">{r.guest_phone}</a> : <span className="text-gray-300">—</span>}
+                            </td>
+                            <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                              {r.guest_email ? <a href={`mailto:${r.guest_email}`} className="hover:underline">{r.guest_email}</a> : <span className="text-gray-300">—</span>}
+                            </td>
+                            <td className="px-5 py-4 text-right">
+                              <button onClick={() => setEditReservation(r)}
+                                className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white text-sm font-semibold transition-colors">
+                                ✏️ Bewerken
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+
+                {/* Kalender sidebar */}
+                {showResCalendar && (
+                  <div className="w-[270px] flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto">
+                    {/* Jaar nav */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                      <button onClick={() => setResCalYear(y => y - 1)}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500">
+                        <ChevronLeft size={14}/>
+                      </button>
+                      <span className="font-bold text-gray-800 text-sm">{resCalYear}</span>
+                      <button onClick={() => setResCalYear(y => y + 1)}
+                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500">
+                        <ChevronRight size={14}/>
+                      </button>
+                      <button onClick={() => { setResListDate(today); setShowResCalendar(false) }}
+                        className="ml-2 px-3 py-1 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold">
+                        Vandaag
+                      </button>
+                    </div>
+                    {/* Maanden */}
+                    <div className="px-3 py-2 space-y-4">
+                      {calMonths.map(({ y, m, cells }) => (
+                        <div key={`${y}-${m}`}>
+                          <div className="text-xs font-bold text-gray-700 mb-1 px-1">{MONTHS_NL[m]}</div>
+                          <div className="grid grid-cols-7 text-center mb-1">
+                            {DAYS_NL.map(d => <div key={d} className="text-[10px] text-gray-400 font-semibold py-0.5">{d}</div>)}
+                          </div>
+                          <div className="grid grid-cols-7 text-center gap-y-0.5">
+                            {cells.map((day, i) => {
+                              if (!day) return <div key={i}/>
+                              const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
+                              const isSel = ds === resDate
+                              const isTod = ds === today
+                              const hasDot = daysWithRes.has(ds)
+                              return (
+                                <button key={i}
+                                  onClick={() => { setResListDate(ds); setShowResCalendar(false) }}
+                                  className={`w-7 h-7 mx-auto rounded-full text-xs font-medium flex items-center justify-center transition-colors relative
+                                    ${isSel ? 'bg-orange-500 text-white' : isTod ? 'border border-orange-400 text-orange-600 font-bold' : 'text-gray-700 hover:bg-orange-50'}`}>
+                                  {day}
+                                  {hasDot && !isSel && (
+                                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-400"/>
+                                  )}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
                       ))}
-                    </tbody>
-                  </table>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
