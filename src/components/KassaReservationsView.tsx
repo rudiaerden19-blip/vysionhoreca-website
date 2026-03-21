@@ -1576,7 +1576,7 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'list' && (() => {
-          const COLS = '80px 65px 160px 160px 45px 50px 110px 110px 50px'
+          const COLS = '80px 65px 1fr 1fr 45px 50px 115px 115px 50px'
           return (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="grid gap-2 px-3 py-3 border-b border-gray-200 bg-gray-50 text-sm font-bold text-gray-500 uppercase tracking-wide"
