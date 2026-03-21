@@ -1851,7 +1851,7 @@ export default function KassaReservationsView({
                             <div key={r.id}
                               onClick={() => setSelectedReservation(r)}
                               className="absolute top-2 bottom-2 rounded-lg cursor-pointer flex flex-col justify-center px-2 overflow-hidden hover:opacity-90 transition-opacity"
-                              style={{ left: `${leftPct}%`, width: `calc(${widthPct}% - 4px)`, backgroundColor: '#3b82f6', borderLeft: '3px solid #1d4ed8', zIndex: 2 }}>
+                              style={{ left: `${leftPct}%`, width: `calc(${widthPct}% - 4px)`, backgroundColor: '#1e3a8a', borderLeft: '3px solid #1e2f6e', zIndex: 2 }}>
                               <span className="text-white text-sm font-bold truncate">{r.guest_name}</span>
                               <span className="text-white/80 text-sm truncate">{r.reservation_time} • {r.party_size}p</span>
                             </div>
