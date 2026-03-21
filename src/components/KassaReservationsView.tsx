@@ -1576,10 +1576,10 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'list' && (() => {
-          const COLS = '74px 58px 1fr 1fr 32px 38px 92px 98px 42px'
+          const COLS = '80px 65px 160px 160px 45px 50px 110px 110px 50px'
           return (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="grid gap-2 px-3 py-2 border-b border-gray-200 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wide"
+            <div className="grid gap-2 px-3 py-3 border-b border-gray-200 bg-gray-50 text-sm font-bold text-gray-500 uppercase tracking-wide"
               style={{ gridTemplateColumns: COLS }}>
               <span>Datum</span><span>Tijd</span><span>Gast</span><span>Email</span>
               <span>Ps</span><span>Tfl</span><span>Status</span><span>No-show</span><span></span>
@@ -1594,24 +1594,24 @@ export default function KassaReservationsView({
                   style={{ gridTemplateColumns: COLS }}
                   onClick={() => setSelectedReservation(r)}>
                   {/* Datum */}
-                  <p className="text-sm font-semibold text-gray-700 truncate">
+                  <p className="text-base font-semibold text-gray-700 truncate">
                     {new Date(r.reservation_date).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' })}
                   </p>
                   {/* Tijd */}
-                  <p className="text-sm font-bold text-gray-900">{r.reservation_time}</p>
+                  <p className="text-base font-bold text-gray-900">{r.reservation_time}</p>
                   {/* Gast */}
                   <div className="min-w-0">
-                    <p className="font-bold text-sm text-gray-900 truncate">{r.guest_name}</p>
-                    {r.guest_phone && <p className="text-xs text-gray-400 truncate">{r.guest_phone}</p>}
+                    <p className="font-bold text-base text-gray-900 truncate">{r.guest_name}</p>
+                    {r.guest_phone && <p className="text-sm text-gray-400 truncate">{r.guest_phone}</p>}
                   </div>
                   {/* Email */}
-                  <p className="text-xs text-gray-500 truncate min-w-0">{r.guest_email || '—'}</p>
+                  <p className="text-sm text-gray-600 truncate min-w-0">{r.guest_email || '—'}</p>
                   {/* Personen */}
-                  <span className="text-sm font-bold text-gray-700">{r.party_size}</span>
+                  <span className="text-base font-bold text-gray-700">{r.party_size}</span>
                   {/* Tafel */}
-                  <span className="text-sm font-bold text-gray-700">{r.table_number || '-'}</span>
+                  <span className="text-base font-bold text-gray-700">{r.table_number || '-'}</span>
                   {/* Status */}
-                  <span className="px-2 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1 w-fit"
+                  <span className="px-2 py-1 rounded-full text-sm font-bold inline-flex items-center gap-1 w-fit"
                     style={{ backgroundColor: status.bgColor, color: status.color }}>
                     {status.icon}{status.label}
                   </span>
@@ -1623,7 +1623,7 @@ export default function KassaReservationsView({
                         next.has(r.id) ? next.delete(r.id) : next.add(r.id)
                         return next
                       })}
-                      className="px-2 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors w-full justify-center"
+                      className="px-2 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1 transition-colors w-full justify-center"
                       style={noShowMarked.has(r.id)
                         ? { backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }
                         : { backgroundColor: '#f3f4f6', color: '#9ca3af' }}>
