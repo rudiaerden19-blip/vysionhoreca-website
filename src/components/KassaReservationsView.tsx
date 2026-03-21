@@ -149,7 +149,9 @@ interface KassaReservationsViewProps {
   onStartOrder: (tableNr: string) => void
 }
 
-// ---- Contacts / Gasten tabel view ----
+// ---- Contacts / Gasten tabel view — exact zoals screenshot 2 ----
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
+
 function ContactsView({
   guestProfiles,
   searchQuery,
@@ -164,10 +166,13 @@ function ContactsView({
   const [guestSort, setGuestSort] = useState<'visits'|'name'|'lastVisit'>('visits')
   const [guestSortDir, setGuestSortDir] = useState<'asc'|'desc'>('desc')
   const [selectedGuests, setSelectedGuests] = useState<Set<string>>(new Set())
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(25)
 
   const toggleSort = (col: typeof guestSort) => {
     if (guestSort === col) setGuestSortDir(d => d === 'asc' ? 'desc' : 'asc')
     else { setGuestSort(col); setGuestSortDir('desc') }
+    setPage(0)
   }
 
   const filtered = guestProfiles
@@ -184,95 +189,118 @@ function ContactsView({
       return guestSortDir === 'desc' ? -cmp : cmp
     })
 
-  const allSelected = filtered.length > 0 && filtered.every(g => selectedGuests.has(g.id))
-  const toggleAll = () => setSelectedGuests(allSelected ? new Set() : new Set(filtered.map(g => g.id)))
+  const totalPages = Math.ceil(filtered.length / pageSize)
+  const paginated = filtered.slice(page * pageSize, page * pageSize + pageSize)
+  const from = filtered.length === 0 ? 0 : page * pageSize + 1
+  const to = Math.min(page * pageSize + pageSize, filtered.length)
+
+  const allPageSelected = paginated.length > 0 && paginated.every(g => selectedGuests.has(g.id))
+  const toggleAll = () => setSelectedGuests(allPageSelected
+    ? new Set([...selectedGuests].filter(id => !paginated.find(g => g.id === id)))
+    : new Set([...selectedGuests, ...paginated.map(g => g.id)])
+  )
   const toggleOne = (id: string) => setSelectedGuests(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
 
-  const SortIcon = ({ col }: { col: typeof guestSort }) => (
-    <span className={`ml-1 text-xs ${guestSort===col?'opacity-100':'opacity-30'}`}>
-      {guestSort===col && guestSortDir==='asc' ? '↑' : '↓'}
-    </span>
-  )
+  const SortArrow = ({ col }: { col: typeof guestSort }) => guestSort === col
+    ? <span className="ml-1">{guestSortDir === 'asc' ? '↑' : '↓'}</span>
+    : null
 
   return (
-    <div className="flex flex-col h-full overflow-hidden -m-4">
-      <div className="px-4 py-3 flex-shrink-0">
+    <div className="flex flex-col h-full -m-4" style={{ background: '#1a1a2e' }}>
+      {/* Zoekbalk */}
+      <div className="px-4 py-3 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="relative">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
-          <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"/>
+          <input type="text" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setPage(0) }}
             placeholder="Zoek op naam, email of telefoon..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-white border border-gray-200 text-sm outline-none focus:border-gray-400"/>
+            className="w-full pl-9 pr-4 py-2 rounded-lg text-sm outline-none"
+            style={{ background: 'rgba(255,255,255,0.06)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.1)' }}/>
         </div>
       </div>
 
+      {/* Tabel */}
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm border-collapse">
           <thead>
-            <tr className="bg-gray-900 text-white sticky top-0 z-10">
+            <tr style={{ background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
               <th className="w-10 px-4 py-3 text-left">
-                <input type="checkbox" checked={allSelected} onChange={toggleAll} className="w-4 h-4 rounded cursor-pointer"/>
+                <input type="checkbox" checked={allPageSelected} onChange={toggleAll}
+                  className="w-4 h-4 cursor-pointer" style={{ accentColor: '#3b82f6' }}/>
               </th>
-              <th className="px-4 py-3 text-left font-bold cursor-pointer select-none" onClick={() => toggleSort('name')}>
-                Naam <SortIcon col="name"/>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-300 hover:text-white"
+                onClick={() => toggleSort('name')}>
+                Naam <SortArrow col="name"/>
               </th>
-              <th className="px-4 py-3 text-left font-bold text-gray-400">Bedrijf</th>
-              <th className="px-4 py-3 text-left font-bold">E-mail</th>
-              <th className="px-4 py-3 text-left font-bold">Telefoon</th>
-              <th className="px-4 py-3 text-left font-bold cursor-pointer select-none" onClick={() => toggleSort('lastVisit')}>
-                Laatste bezoek <SortIcon col="lastVisit"/>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Bedrijf</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-300">E-mail</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-300">Telefoon</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-300 hover:text-white"
+                onClick={() => toggleSort('lastVisit')}>
+                Laatste bezoek <SortArrow col="lastVisit"/>
               </th>
-              <th className="px-4 py-3 text-left font-bold cursor-pointer select-none text-right" onClick={() => toggleSort('visits')}>
-                Bezoeken <SortIcon col="visits"/>
+              <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider cursor-pointer select-none text-gray-300 hover:text-white"
+                onClick={() => toggleSort('visits')}>
+                Bezoeken <SortArrow col="visits"/>
               </th>
-              <th className="px-4 py-3 text-left font-bold">No-show</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-300">No-show</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 && (
-              <tr><td colSpan={8} className="text-center py-16 text-gray-400">Geen contacten gevonden</td></tr>
+            {paginated.length === 0 && (
+              <tr>
+                <td colSpan={8} className="text-center py-16 text-gray-500">
+                  {searchQuery ? 'Geen resultaten gevonden' : 'Nog geen contacten — reservaties worden automatisch toegevoegd'}
+                </td>
+              </tr>
             )}
-            {filtered.map((guest: GuestProfile, idx: number) => {
+            {paginated.map((guest: GuestProfile) => {
               const isSelected = selectedGuests.has(guest.id)
               const isNoShow = guest.totalNoShows > 0
               return (
                 <tr key={guest.id}
-                  className={`border-b border-gray-100 transition-colors ${isSelected?'bg-blue-50':idx%2===0?'bg-white':'bg-gray-50/50'} hover:bg-blue-50/40`}>
+                  style={{
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    background: isSelected ? 'rgba(59,130,246,0.12)' : 'transparent',
+                  }}
+                  className="hover:bg-white/5 transition-colors">
                   <td className="px-4 py-3">
-                    <input type="checkbox" checked={isSelected} onChange={() => toggleOne(guest.id)} className="w-4 h-4 rounded cursor-pointer"/>
+                    <input type="checkbox" checked={isSelected} onChange={() => toggleOne(guest.id)}
+                      className="w-4 h-4 cursor-pointer" style={{ accentColor: '#3b82f6' }}/>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5 font-semibold text-gray-800">
-                      {guest.isVip && <Star size={13} className="text-amber-400 fill-amber-400 flex-shrink-0"/>}
-                      {guest.isBlocked && <Ban size={13} className="text-red-400 flex-shrink-0"/>}
+                    <div className="flex items-center gap-1.5 font-semibold text-white">
+                      {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0"/>}
+                      {guest.isBlocked && <Ban size={12} className="text-red-400 flex-shrink-0"/>}
                       {guest.name}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-400">—</td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {guest.email ? <a href={`mailto:${guest.email}`} className="hover:underline">{guest.email}</a> : <span className="text-gray-300">—</span>}
+                  <td className="px-4 py-3 text-gray-600">—</td>
+                  <td className="px-4 py-3 text-gray-300">
+                    {guest.email
+                      ? <a href={`mailto:${guest.email}`} className="hover:text-blue-400 transition-colors">{guest.email}</a>
+                      : <span className="text-gray-600">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {guest.phone ? <a href={`tel:${guest.phone}`} className="hover:underline">{guest.phone}</a> : <span className="text-gray-300">—</span>}
+                  <td className="px-4 py-3 text-gray-300">
+                    {guest.phone
+                      ? <a href={`tel:${guest.phone}`} className="hover:text-blue-400 transition-colors">{guest.phone}</a>
+                      : <span className="text-gray-600">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-gray-500">
+                  <td className="px-4 py-3 text-gray-400 text-sm">
                     {guest.lastVisit
                       ? new Date(guest.lastVisit+'T12:00').toLocaleDateString('nl-BE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
                       : '—'}
                   </td>
-                  <td className="px-4 py-3 font-bold text-gray-700 text-right">{guest.totalVisits}</td>
+                  <td className="px-4 py-3 text-white font-bold text-right">{guest.totalVisits}</td>
                   <td className="px-4 py-3">
-                    <button
-                      onClick={() => onToggleBlocked(guest)}
-                      title={isNoShow ? `${guest.totalNoShows} no-show(s)` : 'Geen no-shows'}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-colors ${
-                        guest.isBlocked
-                          ? 'bg-red-500 text-white'
-                          : isNoShow
-                            ? 'bg-red-100 text-red-600 border border-red-200'
-                            : 'bg-gray-100 text-gray-400'
+                    <button onClick={() => onToggleBlocked(guest)}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold transition-colors ${
+                        guest.isBlocked ? 'bg-red-500 text-white'
+                        : isNoShow ? 'bg-red-900/40 text-red-400 border border-red-800'
+                        : 'text-gray-600'
                       }`}>
-                      <UserX size={12}/>
-                      {guest.isBlocked ? 'Geblokkeerd' : isNoShow ? `${guest.totalNoShows}×` : '—'}
+                      {guest.isBlocked ? <><UserX size={11}/> Geblokkeerd</>
+                        : isNoShow ? <><UserX size={11}/> {guest.totalNoShows}×</>
+                        : '—'}
                     </button>
                   </td>
                 </tr>
@@ -280,6 +308,24 @@ function ContactsView({
             })}
           </tbody>
         </table>
+      </div>
+
+      {/* Footer met paginering — exact zoals screenshot 2 */}
+      <div className="flex-shrink-0 flex items-center justify-end gap-4 px-4 py-3 text-sm text-gray-400"
+        style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+        <span>Rijen per pagina:</span>
+        <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(0) }}
+          className="rounded px-2 py-1 text-sm outline-none cursor-pointer"
+          style={{ background: 'rgba(255,255,255,0.08)', color: '#e2e8f0', border: '1px solid rgba(255,255,255,0.15)' }}>
+          {PAGE_SIZE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+        <span>{from}-{to} van {filtered.length}</span>
+        <div className="flex gap-1">
+          <button onClick={() => setPage(p => Math.max(0, p-1))} disabled={page === 0}
+            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-white/10 transition-colors text-gray-300">&lt;</button>
+          <button onClick={() => setPage(p => Math.min(totalPages-1, p+1))} disabled={page >= totalPages-1}
+            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-white/10 transition-colors text-gray-300">&gt;</button>
+        </div>
       </div>
     </div>
   )
@@ -1553,7 +1599,7 @@ export default function KassaReservationsView({
           <div className="flex bg-gray-100 rounded-xl p-1 w-full">
             {[
               { id: 'floorplan', label: 'Reservaties', icon: <MapPin size={16} /> },
-              { id: 'list', label: 'Lijst', icon: <List size={16} /> },
+              { id: 'list', label: 'Gasten', icon: <List size={16} /> },
               { id: 'timeline', label: 'Tijdlijn', icon: <LayoutGrid size={16} /> },
               { id: 'month', label: 'Maand', icon: <CalendarDays size={16} /> },
               { id: 'guests', label: 'Contacten', icon: <Users size={16} /> },
