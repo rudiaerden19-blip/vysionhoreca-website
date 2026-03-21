@@ -2061,22 +2061,22 @@ export default function KassaReservationsView({
                         {allTableRes.length > 0 ? (
                           <div className="space-y-3">
                             {allTableRes.map(r => (
-                              <div key={r.id} className="rounded-xl p-3 space-y-2" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
+                              <div key={r.id} className="rounded-xl p-3 space-y-2" style={{ backgroundColor: '#e3e3e3' }}>
                                 {/* Naam + status */}
                                 <div className="flex items-center justify-between">
-                                  <p className="text-white font-bold text-lg">{r.guest_name}</p>
+                                  <p className="text-gray-900 font-bold text-lg">{r.guest_name}</p>
                                   <span className="text-sm font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_CONFIG[r.status]?.color }}>
                                     {STATUS_CONFIG[r.status]?.label || r.status}
                                   </span>
                                 </div>
                                 {/* Details */}
-                                <div className="flex items-center gap-3 text-base text-white/50">
+                                <div className="flex items-center gap-3 text-base text-gray-600">
                                   <span className="flex items-center gap-1"><Clock size={14} />{r.reservation_time}</span>
                                   <span className="flex items-center gap-1"><Users size={14} />{r.party_size}p</span>
                                   {r.table_number && <span className="flex items-center gap-1"><MapPin size={14} />T{r.table_number}</span>}
                                 </div>
-                                {r.guest_phone && <a href={`tel:${r.guest_phone}`} className="flex items-center gap-1 text-base text-emerald-400 hover:text-emerald-300"><Phone size={14} />{r.guest_phone}</a>}
-                                {r.notes && <p className="text-sm text-white/30 italic">{r.notes}</p>}
+                                {r.guest_phone && <a href={`tel:${r.guest_phone}`} className="flex items-center gap-1 text-base text-emerald-600 hover:text-emerald-700"><Phone size={14} />{r.guest_phone}</a>}
+                                {r.notes && <p className="text-sm text-gray-500 italic">{r.notes}</p>}
 
                                 {/* Status knoppen — min 44px hoogte voor touch */}
                                 <div className="grid grid-cols-2 gap-1.5 pt-1">
@@ -2096,12 +2096,12 @@ export default function KassaReservationsView({
                                     </button>
                                   )}
                                   {r.status === 'CHECKED_IN' && (
-                                    <button onClick={() => handleComplete(r)} className="min-h-[44px] rounded-xl text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(99,102,241,0.4)' }}>
+                                    <button onClick={() => handleComplete(r)} className="min-h-[44px] rounded-xl text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(99,102,241,0.8)' }}>
                                       <CheckCircle2 size={15} /> Vrij
                                     </button>
                                   )}
                                   {(r.status === 'CONFIRMED' || r.status === 'PENDING' || r.status === 'CHECKED_IN') && (
-                                    <button onClick={() => handleNoShow(r)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.2)', color: '#f87171' }}>
+                                    <button onClick={() => handleNoShow(r)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }}>
                                       <UserX size={15} /> No-show
                                     </button>
                                   )}
@@ -2109,10 +2109,10 @@ export default function KassaReservationsView({
 
                                 {/* Aanpassen + Verwijderen */}
                                 <div className="grid grid-cols-2 gap-1.5">
-                                  <button onClick={() => setSelectedReservation(r)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }}>
+                                  <button onClick={() => setSelectedReservation(r)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(0,0,0,0.08)', color: '#374151' }}>
                                     ✏️ Aanpassen
                                   </button>
-                                  <button onClick={() => handleDeleteReservation(r.id)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.12)', color: '#f87171' }}>
+                                  <button onClick={() => handleDeleteReservation(r.id)} className="min-h-[44px] rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1" style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#dc2626' }}>
                                     🗑 Verwijderen
                                   </button>
                                 </div>
