@@ -402,11 +402,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Laad voorschot instellingen
+  // Laad voorschot instellingen — lees alle velden, check snake_case én camelCase
   useEffect(() => {
-    supabase.from('reservation_settings').select('deposit_required,deposit_amount').eq('tenant_slug', params.tenant).single()
+    supabase.from('reservation_settings').select('*').eq('tenant_slug', params.tenant).single()
       .then(({ data }) => {
-        if (data) setDepositSettings({ required: !!data.deposit_required, amount: data.deposit_amount || 0 })
+        if (data) {
+          const required = !!(data.deposit_required ?? data.depositRequired ?? false)
+          const amount = Number(data.deposit_amount ?? data.depositAmount ?? 0)
+          setDepositSettings({ required, amount })
+        }
       })
   }, [params.tenant])
 

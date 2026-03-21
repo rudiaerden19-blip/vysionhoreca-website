@@ -526,6 +526,9 @@ export default function KassaReservationsView({
             maxAdvanceDays: data.max_advance_days ?? data.maxAdvanceDays,
             shifts: typeof data.shifts === 'string' ? JSON.parse(data.shifts) : (data.shifts ?? undefined),
             closedDays: typeof data.closed_days === 'string' ? JSON.parse(data.closed_days) : (data.closed_days ?? undefined),
+            depositRequired: data.deposit_required ?? data.depositRequired,
+            depositAmount: data.deposit_amount ?? data.depositAmount,
+            noShowProtection: data.no_show_protection ?? data.noShowProtection,
           }
           // Merge: localStorage > Supabase > defaults
           const localRaw = localStorage.getItem(`reservationSettings_${tenant}`)
@@ -631,7 +634,15 @@ export default function KassaReservationsView({
       no_show_protection: newSettings.noShowProtection,
     }
     supabase.from('reservation_settings').upsert(safeSettings, { onConflict: 'tenant_slug' })
-      .then(({ error }) => { if (error) console.warn('Settings Supabase save:', error.message) })
+      .then(({ error }) => {
+        if (error) {
+          // Kolom bestaat mogelijk niet → probeer zonder deposit velden
+          console.warn('Settings save fout:', error.message)
+          const { deposit_required, deposit_amount, no_show_protection, ...basicSettings } = safeSettings
+          supabase.from('reservation_settings').upsert(basicSettings, { onConflict: 'tenant_slug' })
+            .then(({ error: e2 }) => { if (e2) console.warn('Settings fallback save fout:', e2.message) })
+        }
+      })
   }
 
   // ---- Floor plan editor helpers ----
