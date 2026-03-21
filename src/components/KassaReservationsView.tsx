@@ -3040,6 +3040,7 @@ export default function KassaReservationsView({
           }
           defaultDurationMinutes={reservationSettings.defaultDurationMinutes}
           maxPartySize={reservationSettings.maxPartySize}
+          reservations={reservations}
         />
       )}
 
@@ -3436,9 +3437,10 @@ interface NewReservationModalProps {
   tables: KassaTable[]
   defaultDurationMinutes: number
   maxPartySize: number
+  reservations: Reservation[]
 }
 
-function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize }: NewReservationModalProps) {
+function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize, reservations }: NewReservationModalProps) {
   const [formData, setFormData] = useState({
     guest_first_name: '',
     guest_last_name: '',
@@ -3508,7 +3510,7 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     // Automatisch toewijzen: zoek vrije tafel als niets geselecteerd
     const assignedTable = rest.table_number || autoAssignTable()
     if (!assignedTable) {
-      toast.error('Geen vrije tafel beschikbaar voor dit tijdstip')
+      alert('Geen vrije tafel beschikbaar voor dit tijdstip en deze groepsgrootte.')
       return
     }
     onSave({
