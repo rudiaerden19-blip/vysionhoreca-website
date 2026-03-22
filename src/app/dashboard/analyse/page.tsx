@@ -25,8 +25,7 @@ export default function AnalysePage() {
       if (!tenant?.tenant_slug) return
       
       const [ordersRes, costsRes] = await Promise.all([
-        supabase.from('orders').select('*').eq('tenant_slug', tenant.tenant_slug)
-          .not('status', 'in', '("rejected","cancelled","new","REJECTED","CANCELLED","NEW")'),
+        supabase.from('orders').select('*').eq('tenant_slug', tenant.tenant_slug),
         supabase.from('fixed_costs').select('*').eq('business_id', tenant.business_id),
       ])
 
@@ -57,10 +56,9 @@ export default function AnalysePage() {
     paymentMethods[method] = (paymentMethods[method] || 0) + (Number(order.total) || 0)
   })
 
-  // Group by order type (kassa = DINE_IN/TAKEAWAY/DELIVERY uppercase, online = pickup/delivery lowercase)
-  const KASSA_TYPES = ['DINE_IN', 'TAKEAWAY', 'DELIVERY']
-  const onlineRevenue = orders.filter(o => !KASSA_TYPES.includes(o.order_type)).reduce((sum, o) => sum + (Number(o.total) || 0), 0)
-  const kassaRevenue = orders.filter(o => KASSA_TYPES.includes(o.order_type)).reduce((sum, o) => sum + (Number(o.total) || 0), 0)
+  // Group by order type
+  const onlineRevenue = orders.filter(o => o.is_online).reduce((sum, o) => sum + (Number(o.total) || 0), 0)
+  const kassaRevenue = orders.filter(o => !o.is_online).reduce((sum, o) => sum + (Number(o.total) || 0), 0)
 
   // Top hours
   const ordersByHour: Record<number, number> = {}
