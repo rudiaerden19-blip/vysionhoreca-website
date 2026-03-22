@@ -1015,35 +1015,34 @@ export default function KassaReservationsView({
   useEffect(() => {
     loadReservations()
     loadGuestProfiles()
-    // Auto-refresh elke 60 seconden — alleen data updaten als het veranderd is
-    const interval = setInterval(async () => {
-      const { data } = await supabase
-        .from('reservations')
-        .select('*')
-        .eq('tenant_slug', tenant)
-        .order('reservation_date', { ascending: true })
-        .order('reservation_time', { ascending: true })
-      if (!data) return
-      const mapped = data.map((r: Record<string, unknown>) => ({
-        ...r,
-        guest_name: (r.guest_name || r.customer_name || '') as string,
-        guest_phone: (r.guest_phone || r.customer_phone || '') as string,
-        guest_email: (r.guest_email || r.customer_email || '') as string,
-        reservation_date: r.reservation_date ? String(r.reservation_date).slice(0, 10) : '',
-        reservation_time: ((r.reservation_time as string) || '').substring(0, 5),
-        status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
-        table_number: r.table_number != null ? String(r.table_number) : undefined,
-      })) as Reservation[]
-      // Alleen re-renderen als data echt veranderd is — vergelijk alle relevante velden
-      setReservations(prev => {
-        const sig = (r: Reservation) => [r.id, r.status, r.table_number, r.guest_name, r.reservation_date, r.reservation_time, r.duration_minutes, r.special_requests].join('|')
-        const prevJson = JSON.stringify(prev.map(sig))
-        const newJson = JSON.stringify(mapped.map(sig))
-        return prevJson === newJson ? prev : mapped
-      })
+
+    // Real-time: directe update bij elke INSERT of UPDATE op reservations
+    const channel = supabase
+      .channel(`kassa-reservations-${tenant}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'reservations',
+        filter: `tenant_slug=eq.${tenant}`,
+      }, () => { loadReservations(true); loadGuestProfiles() })
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'reservations',
+        filter: `tenant_slug=eq.${tenant}`,
+      }, () => { loadReservations(true); loadGuestProfiles() })
+      .subscribe()
+
+    // Fallback polling elke 30 seconden (als real-time tijdelijk wegvalt)
+    const interval = setInterval(() => {
+      loadReservations(true)
       loadGuestProfiles()
-    }, 60_000)
-    return () => clearInterval(interval)
+    }, 30_000)
+
+    return () => {
+      supabase.removeChannel(channel)
+      clearInterval(interval)
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenant])
 
@@ -1579,7 +1578,8 @@ export default function KassaReservationsView({
     toast.success(`${r.guest_name} goedgekeurd${assignedTable && !r.table_number ? ` — Tafel ${assignedTable} toegewezen` : ''}`)
 
     // Stuur bevestigingsmail — haal businessInfo opnieuw op als leeg
-    const emailTo = r.guest_email
+    // guest_email kan '' zijn na mapping — haal ook raw DB waarde op als fallback
+    const emailTo = r.guest_email || ''
     if (emailTo) {
       try {
         let bName = businessInfo.name
