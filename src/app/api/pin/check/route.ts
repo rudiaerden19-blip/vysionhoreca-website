@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     .from('tenant_settings')
     .select('owner_pin_hash')
     .eq('tenant_slug', tenant)
-    .single()
+    .maybeSingle()
 
   return NextResponse.json({ hasPin: !!data?.owner_pin_hash })
 }

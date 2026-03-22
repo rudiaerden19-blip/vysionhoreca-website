@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     .from('tenant_settings')
     .select('owner_pin_hash')
     .eq('tenant_slug', tenant)
-    .single()
+    .maybeSingle()
 
   if (!data?.owner_pin_hash) return NextResponse.json({ valid: false })
 

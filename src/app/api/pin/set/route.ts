@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     .from('tenant_settings')
     .select('owner_pin_hash')
     .eq('tenant_slug', tenant)
-    .single()
+    .maybeSingle()
 
   const hasExistingPin = !!settings?.owner_pin_hash
 
@@ -43,8 +43,7 @@ export async function POST(request: NextRequest) {
   const hash = await bcrypt.hash(String(pin), 10)
   const { error } = await supabase
     .from('tenant_settings')
-    .update({ owner_pin_hash: hash })
-    .eq('tenant_slug', tenant)
+    .upsert({ tenant_slug: tenant, owner_pin_hash: hash }, { onConflict: 'tenant_slug' })
 
   if (error) return NextResponse.json({ error: 'Opslaan mislukt' }, { status: 500 })
   return NextResponse.json({ success: true })
