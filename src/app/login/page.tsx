@@ -80,10 +80,13 @@ export default function LoginPage() {
         (window.location.hostname.includes('localhost') || 
          window.location.hostname.includes('127.0.0.1'))
       
+      // Wis welkom-sessie zodat welkomstscherm altijd verschijnt na login
+      try { sessionStorage.removeItem(`vysion_welcomed_${tenant.tenant_slug}`) } catch { /* ignore */ }
+
       if (isLocalhost) {
-        router.push(`/shop/${tenant.tenant_slug}/admin`)
+        router.push(`/shop/${tenant.tenant_slug}/welkom`)
       } else {
-        window.location.href = `https://${tenant.tenant_slug}.ordervysion.com/admin`
+        window.location.href = `https://${tenant.tenant_slug}.ordervysion.com/welkom`
       }
       
     } catch (err) {

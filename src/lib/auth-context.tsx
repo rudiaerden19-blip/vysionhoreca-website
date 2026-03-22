@@ -144,6 +144,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (supabase) {
       await supabase.auth.signOut()
     }
+    // Wis welkom-sessie zodat welkomstscherm opnieuw verschijnt na inloggen
+    try {
+      Object.keys(sessionStorage)
+        .filter(k => k.startsWith('vysion_welcomed_'))
+        .forEach(k => sessionStorage.removeItem(k))
+    } catch { /* ignore */ }
     setUser(null)
     setSession(null)
     setTenant(null)

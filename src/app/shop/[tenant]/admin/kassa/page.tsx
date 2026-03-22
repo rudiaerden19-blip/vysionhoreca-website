@@ -956,6 +956,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   const handleLogout = () => {
     localStorage.removeItem('vysion_tenant')
+    try { sessionStorage.removeItem(`vysion_welcomed_${tenant}`) } catch { /* ignore */ }
     window.location.href = '/login'
   }
 
