@@ -2973,7 +2973,8 @@ export default function KassaReservationsView({
 
           const reservationRow = (r: typeof filteredRes[0], idx: number) => (
             <tr key={r.id} style={{ borderBottom: '1px solid #e5e7eb' }}
-              className={`transition-colors hover:bg-orange-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}`}>
+              onClick={() => setEditReservation(r)}
+              className={`cursor-pointer transition-colors hover:bg-orange-50/30 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}`}>
               <td className="px-5 py-4 font-bold text-gray-800 text-base" style={{ borderRight: '1px solid #e5e7eb' }}>{r.reservation_time}</td>
               <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
                 {r.table_number ? <span className="font-semibold">Tafel {r.table_number}</span> : <span className="text-gray-300">—</span>}
@@ -2986,7 +2987,7 @@ export default function KassaReservationsView({
               <td className="px-5 py-4 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
                 {r.guest_email ? <a href={`mailto:${r.guest_email}`} className="hover:underline">{r.guest_email}</a> : <span className="text-gray-300">—</span>}
               </td>
-              <td className="px-5 py-4 text-right">
+              <td className="px-5 py-4 text-right" onClick={e => e.stopPropagation()}>
                 <button onClick={() => setEditReservation(r)}
                   className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white text-sm font-semibold transition-colors">
                   ✏️ Bewerken
