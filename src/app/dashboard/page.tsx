@@ -74,20 +74,24 @@ export default function DashboardPage() {
 
       if (customersError) throw customersError
 
-      // Calculate stats
-      const today = new Date().toISOString().split('T')[0]
-      const todayOrders = orders?.filter((o: any) => o.created_at?.startsWith(today)) || []
-      const onlineOrders = orders?.filter((o: any) => o.is_online) || []
-      const pendingOrders = orders?.filter((o: any) => o.status === 'pending' || o.status === 'preparing') || []
+      // Calculate stats — alleen bevestigde/betaalde orders tellen mee in omzet
+      const EXCLUDED = ['rejected', 'cancelled', 'new']
+      const validOrders = orders?.filter((o: any) => !EXCLUDED.includes((o.status || '').toLowerCase())) || []
+      const KASSA_TYPES = ['DINE_IN', 'TAKEAWAY', 'DELIVERY']
 
-      const totalRevenue = orders?.reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0) || 0
+      const today = new Date().toISOString().split('T')[0]
+      const todayOrders = validOrders.filter((o: any) => o.created_at?.startsWith(today))
+      const onlineOrders = validOrders.filter((o: any) => !KASSA_TYPES.includes(o.order_type))
+      const pendingOrders = orders?.filter((o: any) => o.status === 'new' || o.status === 'preparing') || []
+
+      const totalRevenue = validOrders.reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0)
       const todayRevenue = todayOrders.reduce((sum: number, o: any) => sum + (Number(o.total) || 0), 0)
 
       setStats({
-        totalOrders: orders?.length || 0,
+        totalOrders: validOrders.length,
         totalRevenue,
         totalCustomers: customers?.length || 0,
-        averageOrderValue: orders?.length ? totalRevenue / orders.length : 0,
+        averageOrderValue: validOrders.length ? totalRevenue / validOrders.length : 0,
         todayOrders: todayOrders.length,
         todayRevenue,
         onlineOrders: onlineOrders.length,
