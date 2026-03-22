@@ -1541,9 +1541,10 @@ export default function KassaReservationsView({
     // Auto-wijs een vrije tafel toe als er nog geen tafel is
     let assignedTable = r.table_number
     if (!assignedTable) {
-      const allTables = floorPlanTablesDB.length > 0
-        ? floorPlanTablesDB.filter(t => t.seats >= r.party_size).map(t => String(t.number))
-        : kassaTables.filter(t => t.seats >= r.party_size).map(t => String(t.number))
+      const allTables = (floorPlanTablesDB.length > 0
+        ? [...floorPlanTablesDB].filter(t => t.seats >= r.party_size).sort((a, b) => a.seats - b.seats)
+        : [...kassaTables].filter(t => t.seats >= r.party_size).sort((a, b) => a.seats - b.seats)
+      ).map(t => String(t.number))
 
       const buffer = reservationSettings.bufferMinutes || 0
       const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
@@ -1573,6 +1574,7 @@ export default function KassaReservationsView({
     const { error } = await supabase.from('reservations').update(updates).eq('id', r.id).eq('tenant_slug', tenant)
     if (error) { toast.error('Goedkeuren mislukt: ' + error.message); return }
     await loadReservations()
+    await loadGuestProfiles()
 
     toast.success(`${r.guest_name} goedgekeurd${assignedTable && !r.table_number ? ` — Tafel ${assignedTable} toegewezen` : ''}`)
 
@@ -1624,6 +1626,7 @@ export default function KassaReservationsView({
       .update({ status: 'cancelled' }).eq('id', r.id).eq('tenant_slug', tenant)
     if (error) { toast.error('Weigeren mislukt: ' + error.message); return }
     await loadReservations()
+    await loadGuestProfiles()
     toast.success(`${r.guest_name} geweigerd`)
 
     // Stuur weigeringsmail
