@@ -1942,8 +1942,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
             }
             newOrderAlertRef.current = null
             setNewOrderAlert(null)
-            // Open bestellingen in NIEUW TABBLAD zodat kassa+alarm open blijft
-            window.open(`/shop/${tenant}/admin/bestellingen`, '_blank')
+            router.push(`/shop/${tenant}/admin/bestellingen`)
           }}
         >
           <div className="text-white text-center px-8">
