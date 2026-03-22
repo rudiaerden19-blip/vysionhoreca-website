@@ -998,14 +998,12 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         >
           {tx('completed')} ({completedOrders.length})
         </button>
-        {activeOrders.length > 0 && (
-          <button
-            onClick={handleCompleteAll}
-            className="ml-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
-          >
-            ✓ Alles afronden
-          </button>
-        )}
+        <button
+          onClick={handleCompleteAll}
+          className="ml-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
+        >
+          ✓ Alles afronden
+        </button>
       </div>
 
       {/* Orders Grid */}
