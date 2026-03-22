@@ -1557,7 +1557,8 @@ export default function KassaReservationsView({
         )
         .filter(res => {
           const sMin = parseInt(res.reservation_time.split(':')[0]) * 60 + parseInt(res.reservation_time.split(':')[1])
-          const eMin = sMin + (res.duration_minutes || 90)
+          // Buffer ook op bestaande reserveringen — symmetrische check
+          const eMin = sMin + (res.duration_minutes || 90) + buffer
           return rStart < eMin && rEnd > sMin
         })
         .map(res => String(res.table_number))
@@ -4911,12 +4912,13 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
         )
         .filter(r => {
           const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
-          const rEnd = rStart + (r.duration_minutes || 90)
+          // Buffer ook toepassen op bestaande reserveringen voor symmetrische overlap-check
+          const rEnd = rStart + (r.duration_minutes || 90) + (bufferMinutes || 0)
           return startMin < rEnd && endMin > rStart
         })
         .map(r => String(r.table_number))
     )
-    // Kies eerste beschikbare tafel met genoeg plaatsen
+    // Kies kleinste tafel die groot genoeg is (seats >= party_size)
     const candidate = tables
       .filter(t => t.seats >= formData.party_size && !busyTables.has(String(t.number)))
       .sort((a, b) => a.seats - b.seats)[0]

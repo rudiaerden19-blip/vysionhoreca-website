@@ -54,6 +54,7 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
   const [step, setStep] = useState<'form' | 'success'>('form')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [emailWarning, setEmailWarning] = useState('')
 
   const [formData, setFormData] = useState({
     guest_name: '',
@@ -162,14 +163,38 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
         special_requests: formData.special_requests || null,
         status: reservationStatus,
         total_spent: 0,
-        payment_status: 'unpaid',
       }]).select().single()
 
       if (insertError) throw insertError
 
+      // Gastprofiel aanmaken of updaten — zodat klant direct zichtbaar is in contacten
+      if (formData.guest_phone || formData.guest_email) {
+        try {
+          const conflictCol = formData.guest_phone ? 'tenant_slug,phone' : 'tenant_slug,email'
+          await supabase.from('guest_profiles').upsert({
+            tenant_slug: tenant,
+            name: formData.guest_name,
+            phone: formData.guest_phone || null,
+            email: formData.guest_email || null,
+            total_visits: 1,
+            last_visit: formData.reservation_date,
+          }, { onConflict: conflictCol, ignoreDuplicates: false })
+        } catch (profileErr) {
+          console.warn('[reserveren] guest_profiles upsert mislukt:', profileErr)
+        }
+      }
+
       // Stuur mail: bij autoConfirm → "bevestigd", anders → "in afwachting"
       if (formData.guest_email) {
         try {
+          // Haal tenant info opnieuw op als nog niet geladen
+          let bName = tenantInfo?.name || ''
+          let bPhone = tenantInfo?.phone || ''
+          let bEmail = tenantInfo?.email || ''
+          if (!bName) {
+            const { data: td } = await supabase.from('tenants').select('name,phone,email').eq('slug', tenant).single()
+            if (td) { bName = td.name || tenant; bPhone = td.phone || ''; bEmail = td.email || '' }
+          }
           const mailRes = await fetch('/api/send-reservation-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -183,18 +208,19 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
               notes: formData.notes,
               specialRequests: formData.special_requests,
               status: settings.autoConfirm ? 'confirmed' : 'pending',
-              businessName: tenantInfo?.name || tenant,
-              businessPhone: tenantInfo?.phone,
-              businessEmail: tenantInfo?.email,
+              businessName: bName || tenant,
+              businessPhone: bPhone,
+              businessEmail: bEmail,
             }),
           })
           if (!mailRes.ok) {
             const err = await mailRes.json().catch(() => ({}))
             console.error('[reserveren] Email fout:', err)
-            setError(`Reservatie gemaakt maar mail mislukt: ${err.error || mailRes.statusText}`)
+            setEmailWarning('Uw reservatie is aangemaakt, maar de bevestigingsmail kon niet worden verstuurd. Neem contact op met de zaak als u geen mail ontvangt.')
           }
         } catch (mailErr) {
           console.error('[reserveren] Email netwerk fout:', mailErr)
+          setEmailWarning('Uw reservatie is aangemaakt, maar de bevestigingsmail kon niet worden verstuurd. Neem contact op met de zaak als u geen mail ontvangt.')
         }
       }
 
@@ -298,13 +324,19 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
             </div>
           </div>
 
-          {formData.guest_email && (
+          {formData.guest_email && !emailWarning && (
             <p className="text-gray-400 text-sm mb-6">
               📧 {settings.autoConfirm
                 ? <>Een bevestiging is verstuurd naar <strong>{formData.guest_email}</strong></>
                 : <>U ontvangt een bevestigingsmail op <strong>{formData.guest_email}</strong> zodra uw reservatie goedgekeurd is.</>
               }
             </p>
+          )}
+
+          {emailWarning && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-left">
+              <p className="text-amber-700 text-sm">{emailWarning}</p>
+            </div>
           )}
 
           {tenantInfo?.phone && (
