@@ -2357,7 +2357,7 @@ export default function KassaReservationsView({
           }
 
           return (
-            <div className="flex flex-col h-full -m-4" style={{ height: 'calc(100vh - 130px)' }}>
+            <div className="flex flex-col h-full -m-4" style={{ height: 'calc(100vh - 170px)' }}>
               {/* Toolbar */}
               <div className="flex flex-wrap items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 flex-shrink-0">
 
