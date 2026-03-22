@@ -825,7 +825,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
         name: i.product.name,
         price: i.product.price,
         quantity: i.quantity,
-        options: i.choices || [],
+        options: (i.choices || []).map((c: any) => ({ name: c.choiceName || c.name || '', price: c.price || 0 })),
       })),
       created_at: createdAt.toISOString(),
     }
