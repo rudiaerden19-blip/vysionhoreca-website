@@ -868,6 +868,8 @@ export default function KassaReservationsView({
   const floorPointerStart = useRef({ x: 0, y: 0 })
   const isPanning = useRef(false)
   const panStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 })
+  const panLockedTableId = useRef<string | null>(null) // tafel-id als panning gestart op tafel in locked mode
+  const panMoved = useRef(false) // heeft de pan bewogen (vs. tap)
   const canvasRef = useRef<HTMLDivElement>(null)
   const WORLD_W = 2400
   const WORLD_H = 1600
@@ -1207,21 +1209,21 @@ export default function KassaReservationsView({
       pinchStartZoom.current = floorZoom
       return
     }
+    e.preventDefault()
     const tableEl = (e.target as HTMLElement).closest('[data-table-id]') as HTMLElement | null
-    if (!tableEl) {
-      // Pan achtergrond
-      e.preventDefault()
+    // Vergrendeld of geen tafel → altijd canvas pannen
+    if (!tableEl || tablesLocked) {
       isPanning.current = true
+      panMoved.current = false
+      panLockedTableId.current = tablesLocked && tableEl ? tableEl.getAttribute('data-table-id') : null
       panStart.current = { x: e.clientX, y: e.clientY, panX, panY }
       canvasRef.current!.setPointerCapture(e.pointerId)
       return
     }
-    // Tafel slepen
-    e.preventDefault()
+    // Ontgrendeld + op tafel → tafel slepen
     const id = tableEl.getAttribute('data-table-id')!
     const table = floorPlanTablesDB.find(t => t.id === id)
     if (!table) return
-    // Mouse → world coordinaten
     const canvas = canvasRef.current!
     const rect = canvas.getBoundingClientRect()
     const mouseWorldX = (e.clientX - rect.left - panX) / floorZoom
@@ -1241,9 +1243,9 @@ export default function KassaReservationsView({
     if (activePointers.current.size >= 2) { handleCanvasPinchMove(e); return }
 
     if (isPanning.current) {
-      // Pan achtergrond
       const dx = e.clientX - panStart.current.x
       const dy = e.clientY - panStart.current.y
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) panMoved.current = true
       setPanX(panStart.current.panX + dx)
       setPanY(panStart.current.panY + dy)
       return
@@ -1269,7 +1271,18 @@ export default function KassaReservationsView({
   const handleFloorPointerUp = async (e: React.PointerEvent<HTMLDivElement>) => {
     activePointers.current.delete(e.pointerId)
     if (activePointers.current.size < 2) pinchStartDist.current = null
-    if (isPanning.current) { isPanning.current = false; return }
+    if (isPanning.current) {
+      isPanning.current = false
+      // Tap op tafel in vergrendelde modus → open tafelsidebar
+      if (!panMoved.current && panLockedTableId.current) {
+        const id = panLockedTableId.current
+        const table = floorPlanTablesDB.find(t => t.id === id) || null
+        setSelectedFloorTable(prev => prev?.id === id ? null : table)
+      }
+      panMoved.current = false
+      panLockedTableId.current = null
+      return
+    }
     if (!floorDraggingId.current) return
     const id = floorDraggingId.current
     const wasTap = !floorDragMoved.current
