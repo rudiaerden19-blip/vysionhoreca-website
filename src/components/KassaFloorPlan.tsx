@@ -758,8 +758,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             touchAction: 'none',
           }}
           onPointerDown={(e) => {
-            // Alleen slepen op lege achtergrond (niet op tafels/decor)
-            if (e.target !== floorRef.current && !(e.target as HTMLElement).classList.contains('floor-plan')) return
+            // Tafels/decor gebruiken stopPropagation, dus hier komen alleen events van lege vloer
             ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
             draggingId.current = '__canvas__'
             draggingType.current = 'canvas'
