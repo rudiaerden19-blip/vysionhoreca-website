@@ -12,12 +12,9 @@ type State = 'loading' | 'no-pin' | 'locked' | 'unlocked' | 'forgot'
 export default function PinGate({ tenant, children }: Props) {
   const SESSION_KEY = `vysion_pin_unlocked_${tenant}`
   const [state, setState] = useState<State>('loading')
-  const [showLockConfirm, setShowLockConfirm] = useState(false)
-
   const lock = () => {
     sessionStorage.removeItem(SESSION_KEY)
     setState('locked')
-    setShowLockConfirm(false)
     setPin('')
     setError('')
   }
@@ -106,34 +103,14 @@ export default function PinGate({ tenant, children }: Props) {
 
   if (state === 'unlocked') return (
     <>
-      {/* Vergrendelknop — onder de header, niet overlappend */}
+      {/* Vergrendelknop — direct vergrendelen, geen popup */}
       <div className="fixed top-20 right-4 z-50">
-        {showLockConfirm ? (
-          <div className="bg-white rounded-2xl shadow-xl p-4 flex flex-col items-center gap-3 border border-gray-200 min-w-[180px]">
-            <p className="text-sm font-semibold text-gray-700 text-center">Module vergrendelen?</p>
-            <div className="flex gap-2 w-full">
-              <button
-                onClick={lock}
-                className="flex-1 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-bold transition-colors"
-              >
-                Vergrendel
-              </button>
-              <button
-                onClick={() => setShowLockConfirm(false)}
-                className="flex-1 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold transition-colors"
-              >
-                Annuleer
-              </button>
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={() => setShowLockConfirm(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white shadow-md border border-gray-200 text-gray-600 hover:text-red-600 hover:border-red-300 text-sm font-semibold transition-colors"
-          >
-            <span>🔒</span> Vergrendel
-          </button>
-        )}
+        <button
+          onClick={lock}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white shadow-md text-sm font-semibold transition-colors"
+        >
+          🔒 Vergrendel
+        </button>
       </div>
       {children}
     </>
