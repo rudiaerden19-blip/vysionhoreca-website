@@ -32,6 +32,8 @@ interface Order {
   items: any[]
   customer_notes?: string
   created_at: string
+  scheduled_date?: string
+  scheduled_time?: string
   rejection_reason?: string
   rejection_notes?: string
 }
@@ -602,6 +604,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
           
           <div class="order-number">#${order.order_number}</div>
           <div class="order-type">${order.order_type === 'delivery' ? '🚗 LEVERING' : '🛍️ AFHALEN'}</div>
+          ${(order.scheduled_date || order.scheduled_time) ? `
+          <div style="margin: 8px 0; padding: 6px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; text-align: center; font-weight: bold; font-size: 13px;">
+            📅 ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
+          </div>` : ''}
           
           <div class="order-info">
             <strong>${order.customer_name}</strong><br>
@@ -682,6 +688,10 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             <div style="font-size: 14px; font-weight: bold;">KEUKEN BON</div>
             <div class="order-number">#${order.order_number}</div>
             <div class="order-type">${order.order_type === 'delivery' ? '🚗 LEVERING' : '🛍️ AFHALEN'}</div>
+            ${(order.scheduled_date || order.scheduled_time) ? `
+            <div style="margin: 6px 0; padding: 5px; background: #000; color: #fff; font-size: 16px; font-weight: bold;">
+              📅 ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
+            </div>` : ''}
             <div class="time">
               ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
             </div>
@@ -1047,6 +1057,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
                   {/* Order Content */}
                   <div className="p-3 bg-gray-800">
+                    {(order.scheduled_date || order.scheduled_time) && (
+                      <div className="mb-2 px-2 py-1 bg-yellow-500 text-black rounded font-bold text-sm text-center">
+                        📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
+                      </div>
+                    )}
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-bold truncate">{order.customer_name}</span>
                       <span className="text-gray-400 text-xs shrink-0 ml-2">{getTimeSince(order.created_at)}</span>

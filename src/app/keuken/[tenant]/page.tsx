@@ -25,6 +25,8 @@ interface Order {
   items: any[]
   customer_notes?: string
   created_at: string
+  scheduled_date?: string
+  scheduled_time?: string
 }
 
 interface BusinessSettings {
@@ -378,6 +380,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">*** KEUKEN BON ***</div>
             <div class="order-number">#${order.order_number}</div>
             <div class="order-type">${order.order_type === 'delivery' ? '🚗 BEZORGEN' : '🛍️ AFHALEN'}</div>
+            ${(order.scheduled_date || order.scheduled_time) ? `
+            <div style="margin: 6px 0; padding: 6px; background: #000; color: #fff; font-size: 16px; font-weight: bold; border-radius: 4px;">
+              📅 LEVEREN OP: ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
+            </div>` : ''}
             <div style="font-size: 14px; margin-top: 5px;">
               ${new Date(order.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}
             </div>
@@ -578,6 +584,13 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 }`}>
                   {order.order_type === 'delivery' ? `🚗 ${tx('delivery')}` : `🛍️ ${tx('pickup')}`}
                 </div>
+
+                {/* Geplande datum/tijd */}
+                {(order.scheduled_date || order.scheduled_time) && (
+                  <div className="px-4 py-2 bg-yellow-400 text-black text-center font-black text-base">
+                    📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
+                  </div>
+                )}
 
                 {/* Items List */}
                 <div className="p-4">
