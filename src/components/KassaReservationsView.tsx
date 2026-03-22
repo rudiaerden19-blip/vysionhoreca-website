@@ -1538,9 +1538,45 @@ export default function KassaReservationsView({
   }
 
   const handleConfirm = async (r: Reservation) => {
-    await updateStatus(r.id, 'CONFIRMED')
-    toast.success('Reservatie bevestigd')
-    // Stuur bevestigingsmail als de klant een e-mail heeft (handmatige goedkeuring)
+    // Auto-wijs een vrije tafel toe als er nog geen tafel is
+    let assignedTable = r.table_number
+    if (!assignedTable) {
+      const allTables = floorPlanTablesDB.length > 0
+        ? floorPlanTablesDB.map(t => String(t.number))
+        : kassaTables.map(t => String(t.number))
+
+      const buffer = reservationSettings.bufferMinutes || 0
+      const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
+      const rEnd = rStart + (r.duration_minutes || 90) + buffer
+
+      const occupied = reservations
+        .filter(res =>
+          res.id !== r.id &&
+          res.status !== 'CANCELLED' &&
+          res.status !== 'WAITLIST' &&
+          res.reservation_date === r.reservation_date &&
+          res.table_number
+        )
+        .filter(res => {
+          const sMin = parseInt(res.reservation_time.split(':')[0]) * 60 + parseInt(res.reservation_time.split(':')[1])
+          const eMin = sMin + (res.duration_minutes || 90)
+          return rStart < eMin && rEnd > sMin
+        })
+        .map(res => String(res.table_number))
+
+      assignedTable = allTables.find(t => !occupied.includes(t)) || undefined
+    }
+
+    // Sla status + eventueel tafelnummer op
+    const updates: Record<string, unknown> = { status: 'confirmed' }
+    if (assignedTable && !r.table_number) updates.table_number = assignedTable
+    const { error } = await supabase.from('reservations').update(updates).eq('id', r.id).eq('tenant_slug', tenant)
+    if (error) { toast.error('Goedkeuren mislukt: ' + error.message); return }
+    await loadReservations()
+
+    toast.success(`${r.guest_name} goedgekeurd${assignedTable && !r.table_number ? ` — Tafel ${assignedTable} toegewezen` : ''}`)
+
+    // Stuur bevestigingsmail
     if (r.guest_email) {
       try {
         await fetch('/api/send-reservation-email', {
@@ -1553,7 +1589,7 @@ export default function KassaReservationsView({
             reservationDate: r.reservation_date,
             reservationTime: r.reservation_time,
             partySize: r.party_size,
-            tableName: r.table_number,
+            tableName: assignedTable || r.table_number,
             notes: r.notes,
             specialRequests: r.special_requests,
             status: 'confirmed',
@@ -1563,6 +1599,37 @@ export default function KassaReservationsView({
           }),
         })
       } catch (e) { console.warn('Bevestigingsmail mislukt:', e) }
+    }
+  }
+
+  const handleReject = async (r: Reservation) => {
+    const { error } = await supabase.from('reservations')
+      .update({ status: 'cancelled' }).eq('id', r.id).eq('tenant_slug', tenant)
+    if (error) { toast.error('Weigeren mislukt: ' + error.message); return }
+    await loadReservations()
+    toast.success(`${r.guest_name} geweigerd`)
+
+    // Stuur weigeringsmail
+    if (r.guest_email) {
+      try {
+        await fetch('/api/send-reservation-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerEmail: r.guest_email,
+            customerName: r.guest_name,
+            customerPhone: r.guest_phone,
+            reservationDate: r.reservation_date,
+            reservationTime: r.reservation_time,
+            partySize: r.party_size,
+            status: 'cancelled',
+            cancellationReason: 'Uw reservatieverzoek kon helaas niet worden goedgekeurd. Neem contact op voor meer informatie.',
+            businessName: businessInfo.name,
+            businessPhone: businessInfo.phone,
+            businessEmail: businessInfo.email,
+          }),
+        })
+      } catch (e) { console.warn('Weigeringsmail mislukt:', e) }
     }
   }
 
@@ -3182,7 +3249,7 @@ export default function KassaReservationsView({
                             </div>
                           </div>
                           <div className="flex gap-2 shrink-0 ml-3">
-                            <button onClick={() => updateStatus(r.id, 'CANCELLED')}
+                            <button onClick={() => handleReject(r)}
                               className="px-3 py-1.5 rounded-lg bg-red-100 text-red-600 text-xs font-bold hover:bg-red-200 transition-colors">
                               Weigeren
                             </button>
