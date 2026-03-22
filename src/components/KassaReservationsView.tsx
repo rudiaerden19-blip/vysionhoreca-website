@@ -455,7 +455,7 @@ function ContactsView({
 
           {/* Header */}
           <div className="grid items-center px-4 py-3 bg-gray-50 border-b border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-500"
-            style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(100px,1.5fr) minmax(80px,1fr) 60px 80px' }}>
+            style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(120px,1.5fr) minmax(100px,1fr) 70px 90px', columnGap: '16px' }}>
             <div onClick={() => changeSort('name')} className="cursor-pointer select-none hover:text-gray-900 flex items-center gap-1">
               Naam {guestSort === 'name' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
             </div>
@@ -479,7 +479,7 @@ function ContactsView({
               return (
                 <div key={guest.id}
                   className="grid items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-                  style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(100px,1.5fr) minmax(80px,1fr) 60px 80px' }}
+                  style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(120px,1.5fr) minmax(100px,1fr) 70px 90px', columnGap: '16px' }}
                 >
                   {/* Naam */}
                   <div className="font-semibold text-gray-900 flex items-center gap-1.5 min-w-0 pr-2">
