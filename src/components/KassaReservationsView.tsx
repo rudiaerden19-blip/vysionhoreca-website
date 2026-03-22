@@ -454,17 +454,17 @@ function ContactsView({
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
 
           {/* Header */}
-          <div className="grid items-center px-4 py-3 bg-gray-50 border-b border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-500"
-            style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(120px,1.5fr) minmax(100px,1fr) 70px 90px', columnGap: '16px' }}>
-            <div onClick={() => changeSort('name')} className="cursor-pointer select-none hover:text-gray-900 flex items-center gap-1">
+          <div className="grid items-center px-4 py-3 text-xs font-bold uppercase tracking-wider text-white"
+            style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(120px,1.5fr) minmax(100px,1fr) 100px 90px', columnGap: '16px', backgroundColor: '#f97316' }}>
+            <div onClick={() => changeSort('name')} className="cursor-pointer select-none hover:opacity-80 flex items-center gap-1">
               Naam {guestSort === 'name' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
             </div>
             <div>Telefoon</div>
-            <div onClick={() => changeSort('lastVisit')} className="cursor-pointer select-none hover:text-gray-900 hidden md:flex items-center gap-1">
+            <div onClick={() => changeSort('lastVisit')} className="cursor-pointer select-none hover:opacity-80 hidden md:flex items-center gap-1">
               Laatste bezoek {guestSort === 'lastVisit' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
             </div>
-            <div onClick={() => changeSort('visits')} className="cursor-pointer select-none hover:text-gray-900 text-right flex items-center justify-end gap-1">
-              Aantal {guestSort === 'visits' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
+            <div onClick={() => changeSort('visits')} className="cursor-pointer select-none hover:opacity-80 flex items-center gap-1">
+              Aantal bezoeken {guestSort === 'visits' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
             </div>
             <div>No-show</div>
           </div>
@@ -479,7 +479,7 @@ function ContactsView({
               return (
                 <div key={guest.id}
                   className="grid items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-                  style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(120px,1.5fr) minmax(100px,1fr) 70px 90px', columnGap: '16px' }}
+                  style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(120px,1.5fr) minmax(100px,1fr) 100px 90px', columnGap: '16px' }}
                 >
                   {/* Naam */}
                   <div className="font-semibold text-gray-900 flex items-center gap-1.5 min-w-0 pr-2">
