@@ -450,6 +450,13 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     }
   }, [selectedDecor])
 
+  // Veiligheidsnet voor iPad: sla posities altijd op na elke drag
+  useEffect(() => {
+    if (tables.length > 0 && !isDragging) {
+      localStorage.setItem(storageKey, JSON.stringify(tables))
+    }
+  }, [tables, isDragging, storageKey])
+
   // Auto-pan: bereken een verschuiving zodat alle tafels gecentreerd in het scherm vallen
   useEffect(() => {
     if (tables.length === 0 || !floorRef.current) return
