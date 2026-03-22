@@ -1158,6 +1158,17 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
               {/* Content */}
               <div className="p-6">
+                {/* Geplande datum/tijd */}
+                {(selectedOrder.scheduled_date || selectedOrder.scheduled_time) && (
+                  <div className="bg-yellow-400 text-black rounded-2xl p-4 mb-4 text-center">
+                    <p className="text-sm font-semibold">📅 Gewenst tijdstip</p>
+                    <p className="text-2xl font-black">
+                      {selectedOrder.scheduled_date ? new Date(selectedOrder.scheduled_date).toLocaleDateString('nl-BE', { weekday: 'long', day: '2-digit', month: 'long' }) : ''}
+                      {selectedOrder.scheduled_time ? ` om ${selectedOrder.scheduled_time}` : ''}
+                    </p>
+                  </div>
+                )}
+
                 {/* Customer Info */}
                 <div className="bg-gray-700/50 rounded-2xl p-4 mb-4">
                   <div className="grid grid-cols-2 gap-4">
