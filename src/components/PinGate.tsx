@@ -106,8 +106,8 @@ export default function PinGate({ tenant, children }: Props) {
 
   if (state === 'unlocked') return (
     <>
-      {/* Vergrendelknop — altijd zichtbaar rechtsboven */}
-      <div className="fixed top-4 right-4 z-50">
+      {/* Vergrendelknop — onder de header, niet overlappend */}
+      <div className="fixed top-20 right-4 z-50">
         {showLockConfirm ? (
           <div className="bg-white rounded-2xl shadow-xl p-4 flex flex-col items-center gap-3 border border-gray-200 min-w-[180px]">
             <p className="text-sm font-semibold text-gray-700 text-center">Module vergrendelen?</p>
