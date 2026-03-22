@@ -2524,8 +2524,8 @@ export default function KassaReservationsView({
                 {/* Oranje toggle knop om lijst in/uit te klappen */}
                 <button
                   onClick={() => setResListCollapsed(c => !c)}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-6 h-14 rounded-r-xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white shadow-lg transition-all"
-                  style={{ left: resListCollapsed ? 0 : undefined }}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center rounded-r-2xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white shadow-xl transition-all"
+                  style={{ width: 44, height: 80, fontSize: 22, left: resListCollapsed ? 0 : undefined }}
                   title={resListCollapsed ? 'Lijst tonen' : 'Lijst verbergen'}
                 >
                   {resListCollapsed ? '▶' : '◀'}
