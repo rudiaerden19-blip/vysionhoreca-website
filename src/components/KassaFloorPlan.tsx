@@ -323,6 +323,11 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
   )
 }
 
+// Grootte van het virtuele canvas waarop tafels geplaatst worden (in pixels)
+// Tafels slaan posities op als % (0-100), hier schalen we dat naar px
+const CANVAS_W = 3000
+const CANVAS_H = 2000
+
 export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOrders = {} }: Props) {
   const storageKey = `vysion_tables_${tenant}`
   const [tables, setTables] = useState<KassaTable[]>([])
@@ -343,6 +348,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
   const [isLocked, setIsLocked] = useState(true)
+  const floorRef = useRef<HTMLDivElement>(null)
 
   const draggingId = useRef<string | null>(null)
   const draggingType = useRef<'table' | 'decor'>('table')
@@ -438,6 +444,24 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       setEditStoolVals({ s1: selectedDecor.stool1 || '', s2: selectedDecor.stool2 || '' })
     }
   }, [selectedDecor])
+
+  // Auto-scroll: centreer de tafels in het viewport zodra ze geladen zijn
+  useEffect(() => {
+    if (tables.length === 0 || !floorRef.current) return
+    const all = [...tables, ...decors]
+    const minX = Math.min(...all.map(i => (i.x / 100) * CANVAS_W))
+    const minY = Math.min(...all.map(i => (i.y / 100) * CANVAS_H))
+    const maxX = Math.max(...all.map(i => (i.x / 100) * CANVAS_W))
+    const maxY = Math.max(...all.map(i => (i.y / 100) * CANVAS_H))
+    const centerX = (minX + maxX) / 2
+    const centerY = (minY + maxY) / 2
+    const vw = floorRef.current.clientWidth
+    const vh = floorRef.current.clientHeight
+    floorRef.current.scrollLeft = Math.max(0, centerX - vw / 2)
+    floorRef.current.scrollTop = Math.max(0, centerY - vh / 2)
+  // Alleen uitvoeren als tafels voor het eerst geladen worden
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tables.length])
 
   const save = (updated: KassaTable[]) => {
     setTables(updated)
@@ -556,12 +580,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   }
 
   // Pointer events — werkt op iPad (touch) én desktop (mouse)
-  // Refs worden gebruikt om stale closure problemen te vermijden
+  // Posities worden opgeslagen als % (0-100) van CANVAS_W/CANVAS_H
   const handlePointerDown = (e: React.PointerEvent, id: string, type: 'table' | 'decor') => {
     e.stopPropagation()
     if (isLocked) return
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-    const floor = document.querySelector('.floor-plan') as HTMLElement
+    const floor = floorRef.current
     if (!floor) return
     const rect = floor.getBoundingClientRect()
     const item = type === 'table' ? tables.find(t => t.id === id)! : decors.find(d => d.id === id)!
@@ -569,9 +593,10 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     draggingType.current = type
     dragMoved.current = false
     pointerStart.current = { x: e.clientX, y: e.clientY }
+    // Offset = muispositie binnen canvas (inclusief scroll) minus tafel canvas-positie
     dragOffset.current = {
-      x: e.clientX - rect.left - (item.x / 100) * rect.width,
-      y: e.clientY - rect.top - (item.y / 100) * rect.height,
+      x: e.clientX - rect.left + floor.scrollLeft - (item.x / 100) * CANVAS_W,
+      y: e.clientY - rect.top + floor.scrollTop - (item.y / 100) * CANVAS_H,
     }
     setIsDragging(true)
   }
@@ -582,9 +607,13 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     const dy = Math.abs(e.clientY - pointerStart.current.y)
     if (dx < 8 && dy < 8) return
     dragMoved.current = true
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = Math.max(5, Math.min(92, ((e.clientX - rect.left - dragOffset.current.x) / rect.width) * 100))
-    const y = Math.max(5, Math.min(92, ((e.clientY - rect.top - dragOffset.current.y) / rect.height) * 100))
+    const floor = e.currentTarget
+    const rect = floor.getBoundingClientRect()
+    // Bereken canvas-positie in px (met scroll), converteer naar %
+    const canvasX = e.clientX - rect.left + floor.scrollLeft - dragOffset.current.x
+    const canvasY = e.clientY - rect.top + floor.scrollTop - dragOffset.current.y
+    const x = Math.max(1, Math.min(99, (canvasX / CANVAS_W) * 100))
+    const y = Math.max(1, Math.min(99, (canvasY / CANVAS_H) * 100))
     if (draggingType.current === 'table') {
       setTables(prev => prev.map(t => t.id === draggingId.current ? { ...t, x, y } : t))
     } else {
@@ -662,28 +691,38 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
       {/* Floor + Sidebar */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Floor plan */}
+        {/* Floor plan — scrollbaar groot canvas zodat tafels altijd zichtbaar zijn */}
         <div
-          className="floor-plan flex-1 relative overflow-hidden select-none"
+          ref={floorRef}
+          className="floor-plan flex-1 overflow-auto select-none"
           style={{
             backgroundColor: '#4a4a4a',
-            backgroundImage: `
-              linear-gradient(to right, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px),
-              linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
-            `,
-            backgroundSize: '100px 100px',
             cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
-          touchAction: 'none',
+            touchAction: isLocked ? 'auto' : 'none',
           }}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onClick={() => { if (!isDragging) { setSelected(null); setSelectedDecor(null) } }}
         >
+          {/* Groot virtueel canvas — tafels worden gepositioneerd in pixels */}
+          <div
+            className="relative"
+            style={{
+              width: CANVAS_W,
+              height: CANVAS_H,
+              backgroundImage: `
+                linear-gradient(to right, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px),
+                linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
+              `,
+              backgroundSize: '100px 100px',
+            }}
+          >
           {/* Decor items (achtergrond laag) */}
           {decors.map(d => (
             <div key={d.id} className="absolute"
               style={{
-                left: `${d.x}%`, top: `${d.y}%`,
+                left: `${(d.x / 100) * CANVAS_W}px`,
+                top: `${(d.y / 100) * CANVAS_H}px`,
                 transform: `translate(-50%, -50%) rotate(${d.rotation}deg)`,
                 zIndex: selectedDecor?.id === d.id ? 9 : 0,
                 cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
@@ -709,8 +748,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               key={t.id}
               className="absolute"
               style={{
-                left: `${t.x}%`,
-                top: `${t.y}%`,
+                left: `${(t.x / 100) * CANVAS_W}px`,
+                top: `${(t.y / 100) * CANVAS_H}px`,
                 transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
                 zIndex: selected?.id === t.id ? 10 : 1,
                 cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
@@ -746,6 +785,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               </button>
             </div>
           )}
+          </div>{/* einde virtueel canvas */}
         </div>
 
         {/* Decor Sidebar */}
