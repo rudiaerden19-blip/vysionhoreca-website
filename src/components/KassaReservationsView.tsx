@@ -384,14 +384,14 @@ function ContactsView({
   searchQuery: string
   setSearchQuery: (q: string) => void
 }) {
-  const [guestSort, setGuestSort] = useState<'visits'|'name'|'lastVisit'>('visits')
-  const [guestSortDir, setGuestSortDir] = useState<'asc'|'desc'>('desc')
-  const [selectedGuests, setSelectedGuests] = useState<Set<string>>(new Set())
+  // Standaard: meest recent bovenaan — nieuwe klanten zijn altijd zichtbaar
+  const [guestSort, setGuestSort] = useState<'lastVisit' | 'name' | 'visits'>('lastVisit')
+  const [guestSortDir, setGuestSortDir] = useState<'asc' | 'desc'>('desc')
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(25)
   const [noShowRed, setNoShowRed] = useState<Set<string>>(new Set())
 
-  const toggleSort = (col: typeof guestSort) => {
+  const changeSort = (col: typeof guestSort) => {
     if (guestSort === col) setGuestSortDir(d => d === 'asc' ? 'desc' : 'asc')
     else { setGuestSort(col); setGuestSortDir('desc') }
     setPage(0)
@@ -407,7 +407,7 @@ function ContactsView({
       let cmp = 0
       if (guestSort === 'visits') cmp = a.totalVisits - b.totalVisits
       else if (guestSort === 'name') cmp = a.name.localeCompare(b.name)
-      else if (guestSort === 'lastVisit') cmp = (a.lastVisit||'').localeCompare(b.lastVisit||'')
+      else cmp = (a.lastVisit || '').localeCompare(b.lastVisit || '')
       return guestSortDir === 'desc' ? -cmp : cmp
     })
 
@@ -416,107 +416,119 @@ function ContactsView({
   const from = filtered.length === 0 ? 0 : page * pageSize + 1
   const to = Math.min(page * pageSize + pageSize, filtered.length)
 
-  const allPageSelected = paginated.length > 0 && paginated.every(g => selectedGuests.has(g.id))
-  const toggleAll = () => setSelectedGuests(allPageSelected
-    ? new Set([...selectedGuests].filter(id => !paginated.find(g => g.id === id)))
-    : new Set([...selectedGuests, ...paginated.map(g => g.id)])
+  const SortBtn = ({ col, label }: { col: typeof guestSort; label: string }) => (
+    <button
+      onClick={() => changeSort(col)}
+      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
+        guestSort === col ? 'bg-[#3C4D6B] text-white' : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+      }`}
+    >
+      {label}{guestSort === col ? (guestSortDir === 'desc' ? ' ↓' : ' ↑') : ''}
+    </button>
   )
-  const toggleOne = (id: string) => setSelectedGuests(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
-
-  const SortArrow = ({ col }: { col: typeof guestSort }) => guestSort === col
-    ? <span className="ml-1">{guestSortDir === 'asc' ? '↑' : '↓'}</span>
-    : null
 
   return (
-    <div className="flex flex-col h-full -m-4 bg-white">
-      {/* Zoekbalk */}
-      <div className="px-4 py-3 flex-shrink-0 border-b border-gray-200">
-        <div className="relative max-w-sm">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
-          <input type="text" value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setPage(0) }}
+    <div className="space-y-3">
+      {/* Zoekbalk + sorteerknoppen */}
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+        <div className="relative w-full sm:max-w-sm">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={e => { setSearchQuery(e.target.value); setPage(0) }}
             placeholder="Zoek op naam, email of telefoon..."
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm outline-none focus:border-gray-400"/>
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm outline-none focus:border-[#3C4D6B]"
+          />
+        </div>
+        <div className="flex gap-2 flex-wrap">
+          <SortBtn col="lastVisit" label="Meest recent" />
+          <SortBtn col="visits" label="Meest bezocht" />
+          <SortBtn col="name" label="Naam A–Z" />
         </div>
       </div>
 
-      {/* Tabel */}
-      <div className="flex-1 overflow-auto">
-        <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ borderBottom: '2px solid #e5e7eb', background: '#f9fafb' }}>
-              <th className="px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
-                onClick={() => toggleSort('name')}>Naam <SortArrow col="name"/></th>
-              <th className="hidden lg:table-cell px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">E-mail</th>
-              <th className="px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Telefoon</th>
-              <th className="hidden lg:table-cell px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
-                onClick={() => toggleSort('lastVisit')}>Laatste bezoek <SortArrow col="lastVisit"/></th>
-              <th className="px-3 lg:px-5 py-3 text-right text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
-                onClick={() => toggleSort('visits')}>Aantal <SortArrow col="visits"/></th>
-              <th className="px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">No-show</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginated.length === 0 && (
-              <tr><td colSpan={6} className="text-center py-16 text-gray-400">
-                {searchQuery ? 'Geen resultaten' : 'Nog geen gasten — worden automatisch toegevoegd bij reservaties'}
-              </td></tr>
-            )}
-            {paginated.map((guest: GuestProfile) => {
-              const isRed = noShowRed.has(guest.id)
-              return (
-                <tr key={guest.id} style={{ borderBottom: '1px solid #e5e7eb' }}
-                  className="hover:bg-gray-50 transition-colors">
-                  <td className="px-3 lg:px-5 py-3 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>
-                    {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 inline mr-1"/>}
-                    {guest.name}
-                  </td>
-                  <td className="hidden lg:table-cell px-3 lg:px-5 py-3 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
-                    {guest.email ? <a href={`mailto:${guest.email}`} className="hover:underline">{guest.email}</a> : <span className="text-gray-300">—</span>}
-                  </td>
-                  <td className="px-3 lg:px-5 py-3 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
-                    {guest.phone ? <a href={`tel:${guest.phone}`} className="hover:underline">{guest.phone}</a> : <span className="text-gray-300">—</span>}
-                  </td>
-                  <td className="hidden lg:table-cell px-3 lg:px-5 py-3 text-gray-500" style={{ borderRight: '1px solid #e5e7eb' }}>
-                    {guest.lastVisit
-                      ? new Date(guest.lastVisit+'T12:00').toLocaleDateString('nl-BE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
-                      : '—'}
-                  </td>
-                  <td className="px-3 lg:px-5 py-3 font-bold text-gray-800 text-right" style={{ borderRight: '1px solid #e5e7eb' }}>{guest.totalVisits}</td>
-                  <td className="px-3 lg:px-5 py-3">
-                    <button
-                      onClick={() => setNoShowRed(prev => {
-                        const s = new Set(prev)
-                        s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id)
-                        return s
-                      })}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
-                        isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400'
-                      }`}>
-                      No-show
-                    </button>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
+      <p className="text-sm text-gray-400">{filtered.length} contacten</p>
 
-      {/* Paginering */}
-      <div className="flex-shrink-0 flex items-center justify-end gap-4 px-4 py-3 text-sm text-gray-500 border-t border-gray-200">
-        <span>Rijen per pagina:</span>
-        <select value={pageSize} onChange={e => { setPageSize(Number(e.target.value)); setPage(0) }}
-          className="rounded px-2 py-1 text-sm bg-gray-100 border border-gray-200 outline-none cursor-pointer">
-          {PAGE_SIZE_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <span>{from}–{to} van {filtered.length}</span>
-        <div className="flex gap-1">
-          <button onClick={() => setPage(p => Math.max(0, p-1))} disabled={page === 0}
-            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-gray-100">&lt;</button>
-          <button onClick={() => setPage(p => Math.min(totalPages-1, p+1))} disabled={page >= totalPages-1}
-            className="w-7 h-7 rounded flex items-center justify-center disabled:opacity-30 hover:bg-gray-100">&gt;</button>
+      {/* Lege staat */}
+      {paginated.length === 0 && (
+        <div className="text-center py-16 text-gray-400 bg-white rounded-2xl border border-gray-100">
+          {searchQuery ? 'Geen resultaten voor deze zoekopdracht' : 'Nog geen gasten — ze verschijnen automatisch na de eerste reservatie'}
         </div>
-      </div>
+      )}
+
+      {/* Contactenlijst */}
+      {paginated.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
+          {paginated.map((guest: GuestProfile) => {
+            const isRed = noShowRed.has(guest.id)
+            const lastVisitFmt = guest.lastVisit
+              ? new Date(guest.lastVisit + 'T12:00').toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
+              : null
+            return (
+              <div key={guest.id} className="px-4 py-3 hover:bg-gray-50 transition-colors">
+                {/* Rij: naam links, details rechts */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    {/* Naam + badge */}
+                    <div className="flex items-center gap-2 mb-0.5">
+                      {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0" />}
+                      <span className="font-semibold text-gray-900 truncate">{guest.name}</span>
+                      <span className="text-xs text-gray-400 flex-shrink-0">{guest.totalVisits}×</span>
+                    </div>
+                    {/* Contact info */}
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-gray-500">
+                      {guest.phone && (
+                        <a href={`tel:${guest.phone}`} className="hover:text-[#3C4D6B] hover:underline">{guest.phone}</a>
+                      )}
+                      {guest.email && (
+                        <a href={`mailto:${guest.email}`} className="hover:text-[#3C4D6B] hover:underline truncate max-w-[220px]">{guest.email}</a>
+                      )}
+                      {lastVisitFmt && (
+                        <span className="text-gray-400">{lastVisitFmt}</span>
+                      )}
+                    </div>
+                  </div>
+                  {/* No-show knop */}
+                  <button
+                    onClick={() => setNoShowRed(prev => {
+                      const s = new Set(prev)
+                      s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id)
+                      return s
+                    })}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                      isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                    }`}
+                  >
+                    No-show
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Paginering — alleen zichtbaar als nodig */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between bg-white rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-500">
+          <span>{from}–{to} van {filtered.length}</span>
+          <div className="flex items-center gap-2">
+            <select
+              value={pageSize}
+              onChange={e => { setPageSize(Number(e.target.value)); setPage(0) }}
+              className="rounded-lg px-2 py-1 text-sm bg-gray-100 border border-gray-200 outline-none cursor-pointer"
+            >
+              {PAGE_SIZE_OPTIONS.map(s => <option key={s} value={s}>{s} per pagina</option>)}
+            </select>
+            <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
+              className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 font-bold">‹</button>
+            <span className="font-medium">{page + 1} / {totalPages}</span>
+            <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
+              className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 font-bold">›</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -2106,7 +2118,7 @@ export default function KassaReservationsView({
       </div>
 
       {/* Content */}
-      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' || viewMode === 'guests' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
+      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
