@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   tenant: string
@@ -12,11 +13,11 @@ type State = 'loading' | 'no-pin' | 'locked' | 'unlocked' | 'forgot'
 export default function PinGate({ tenant, children }: Props) {
   const SESSION_KEY = `vysion_pin_unlocked_${tenant}`
   const [state, setState] = useState<State>('loading')
+  const router = useRouter()
+
   const lock = () => {
     sessionStorage.removeItem(SESSION_KEY)
-    setState('locked')
-    setPin('')
-    setError('')
+    router.push(`/shop/${tenant}/admin/kassa`)
   }
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
