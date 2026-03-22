@@ -44,12 +44,12 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   // ── Geluid activatie scherm ──────────────────────────────────────────────
   // Eén keer per sessie (sessionStorage). Navigeren binnen de kassa toont het NIET opnieuw.
   // Bij nieuwe browsersessie (volgende ochtend) verschijnt het opnieuw.
-  const SESSION_KEY = 'vysion_kassa_audio_ok'
+  const SESSION_KEY = `vysion_kassa_audio_ok_${tenant}`
   const [soundActivated, setSoundActivated] = useState(() =>
-    typeof window !== 'undefined' && sessionStorage.getItem(SESSION_KEY) === 'true'
+    typeof window !== 'undefined' && sessionStorage.getItem(`vysion_kassa_audio_ok_${tenant}`) === 'true'
   )
   const [showSoundActivation, setShowSoundActivation] = useState(() =>
-    typeof window === 'undefined' ? false : sessionStorage.getItem(SESSION_KEY) !== 'true'
+    typeof window === 'undefined' ? false : sessionStorage.getItem(`vysion_kassa_audio_ok_${tenant}`) !== 'true'
   )
 
   const activateSound = () => {
