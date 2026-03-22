@@ -343,16 +343,23 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
   const [isLocked, setIsLocked] = useState(true)
-  // Pan offset: verschuift het hele canvas zodat tafels altijd zichtbaar zijn na laden
-  const [panX, setPanX] = useState(0)
-  const [panY, setPanY] = useState(0)
+  // Pan offset: verschuift het hele canvas — opgeslagen per tenant in localStorage
+  const panKey = `vysion_floor_pan_${tenant}`
+  const [panX, setPanX] = useState(() => {
+    try { const s = localStorage.getItem(`vysion_floor_pan_${tenant}`); return s ? JSON.parse(s).x : 0 } catch { return 0 }
+  })
+  const [panY, setPanY] = useState(() => {
+    try { const s = localStorage.getItem(`vysion_floor_pan_${tenant}`); return s ? JSON.parse(s).y : 0 } catch { return 0 }
+  })
+  const autoCenteredRef = useRef(false) // Alleen eerste keer auto-centeren
   const floorRef = useRef<HTMLDivElement>(null)
 
   const draggingId = useRef<string | null>(null)
-  const draggingType = useRef<'table' | 'decor'>('table')
+  const draggingType = useRef<'table' | 'decor' | 'canvas'>('table')
   const dragOffset = useRef({ x: 0, y: 0 })
   const dragMoved = useRef(false)
   const pointerStart = useRef({ x: 0, y: 0 })
+  const panStart = useRef({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
 
   // ── Helpers: parse floor_plan_decor (oud: array, nieuw: {items, stool_statuses}) ──
@@ -457,19 +464,27 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     }
   }, [tables, isDragging, storageKey])
 
-  // Auto-pan: bereken een verschuiving zodat alle tafels gecentreerd in het scherm vallen
+  // Auto-pan: alleen bij allereerste load als er geen opgeslagen pan is
   useEffect(() => {
-    if (tables.length === 0 || !floorRef.current) return
+    if (tables.length === 0 || !floorRef.current || autoCenteredRef.current) return
+    // Als er al een opgeslagen pan is, niet auto-centeren
+    try {
+      const saved = localStorage.getItem(panKey)
+      if (saved) { autoCenteredRef.current = true; return }
+    } catch { /* ignore */ }
+    autoCenteredRef.current = true
     const all = [...tables, ...decors]
     const xs = all.map(i => i.x)
     const ys = all.map(i => i.y)
-    const centerXpct = (Math.min(...xs) + Math.max(...xs)) / 2  // % (0-100)
+    const centerXpct = (Math.min(...xs) + Math.max(...xs)) / 2
     const centerYpct = (Math.min(...ys) + Math.max(...ys)) / 2
     const vw = floorRef.current.clientWidth
     const vh = floorRef.current.clientHeight
-    // Pan zodat het midden van alle tafels op het midden van het scherm valt
-    setPanX(vw / 2 - (centerXpct / 100) * vw)
-    setPanY(vh / 2 - (centerYpct / 100) * vh)
+    const newPanX = vw / 2 - (centerXpct / 100) * vw
+    const newPanY = vh / 2 - (centerYpct / 100) * vh
+    setPanX(newPanX)
+    setPanY(newPanY)
+    try { localStorage.setItem(panKey, JSON.stringify({ x: newPanX, y: newPanY })) } catch { /* ignore */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tables.length])
 
@@ -617,6 +632,17 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     const dy = Math.abs(e.clientY - pointerStart.current.y)
     if (dx < 8 && dy < 8) return
     dragMoved.current = true
+
+    // Canvas panning: slepen op lege achtergrond
+    if (draggingType.current === 'canvas') {
+      const newX = panStart.current.x + (e.clientX - pointerStart.current.x)
+      const newY = panStart.current.y + (e.clientY - pointerStart.current.y)
+      setPanX(newX)
+      setPanY(newY)
+      try { localStorage.setItem(panKey, JSON.stringify({ x: newX, y: newY })) } catch { /* ignore */ }
+      return
+    }
+
     const floor = floorRef.current
     if (!floor) return
     const rect = floor.getBoundingClientRect()
@@ -632,6 +658,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (!draggingId.current) return
+    if (draggingType.current === 'canvas') {
+      draggingId.current = null
+      setIsDragging(false)
+      setTimeout(() => { dragMoved.current = false }, 0)
+      return
+    }
     // Gebruik functionele update zodat we altijd de NIEUWSTE posities opslaan,
     // niet de stale closure-waarde van vóór het slepen.
     if (draggingType.current === 'table') {
@@ -715,9 +747,20 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
             touchAction: 'none',
           }}
+          onPointerDown={(e) => {
+            // Alleen slepen op lege achtergrond (niet op tafels/decor)
+            if (e.target !== floorRef.current && !(e.target as HTMLElement).classList.contains('floor-plan')) return
+            ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+            draggingId.current = '__canvas__'
+            draggingType.current = 'canvas'
+            dragMoved.current = false
+            pointerStart.current = { x: e.clientX, y: e.clientY }
+            panStart.current = { x: panX, y: panY }
+            setIsDragging(true)
+          }}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          onClick={() => { if (!isDragging) { setSelected(null); setSelectedDecor(null) } }}
+          onClick={() => { if (!dragMoved.current) { setSelected(null); setSelectedDecor(null) } }}
         >
           {/* Inner canvas: posities zijn % van de container, pan verschuift het geheel */}
           <div style={{ position: 'absolute', inset: 0, transform: `translate(${panX}px, ${panY}px)` }}>
