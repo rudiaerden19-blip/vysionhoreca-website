@@ -860,6 +860,7 @@ export default function KassaReservationsView({
   const [floorZoom, setFloorZoom] = useState(1)
   const [panX, setPanX] = useState(0)
   const [panY, setPanY] = useState(0)
+  const [resListCollapsed, setResListCollapsed] = useState(false)
 
   const floorDraggingId = useRef<string | null>(null)
   const floorDragOffset = useRef({ x: 0, y: 0 })
@@ -2423,10 +2424,10 @@ export default function KassaReservationsView({
               {/* Canvas + lijst + optional sidebar */}
               <div className="flex flex-1 overflow-hidden relative">
 
-                {/* Lijst links */}
-                <div className="w-52 md:w-60 lg:w-72 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden">
+                {/* Lijst links — inklapbaar */}
+                <div className={`flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-all duration-300 relative ${resListCollapsed ? 'w-0' : 'w-52 md:w-60 lg:w-72'}`}>
                   <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                    <span className="font-bold text-base text-gray-800">Reservaties</span>
+                    <span className="font-bold text-base text-gray-800 whitespace-nowrap">Reservaties</span>
                     <span className="text-sm font-semibold text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">{floorRes.length}</span>
                   </div>
                   <div className="flex-1 overflow-y-auto divide-y divide-gray-50">
@@ -2507,6 +2508,16 @@ export default function KassaReservationsView({
                   </div>
                 </div>
 
+                {/* Oranje toggle knop om lijst in/uit te klappen */}
+                <button
+                  onClick={() => setResListCollapsed(c => !c)}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-6 h-14 rounded-r-xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white shadow-lg transition-all"
+                  style={{ left: resListCollapsed ? 0 : undefined }}
+                  title={resListCollapsed ? 'Lijst tonen' : 'Lijst verbergen'}
+                >
+                  {resListCollapsed ? '▶' : '◀'}
+                </button>
+
                 {/* Canvas */}
                 <div
                   className="res-floor-canvas flex-1 relative overflow-hidden select-none"
@@ -2580,6 +2591,47 @@ export default function KassaReservationsView({
                     )
                   })}
                   </div>{/* einde geschaalde wrapper */}
+
+                  {/* Kompaspad linksonder — hint + knoppen voor canvas panning */}
+                  <div
+                    className="absolute bottom-4 left-4 z-20 select-none"
+                    onPointerDown={e => e.stopPropagation()}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <div className="grid grid-cols-3 gap-1">
+                      <div />
+                      <button
+                        onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
+                        onClick={e => { e.stopPropagation(); setPanY((p: number) => p + 80) }}
+                        className="w-10 h-10 rounded-xl text-white flex items-center justify-center text-lg font-bold border border-white/30 transition-colors"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+                      >▲</button>
+                      <div />
+                      <button
+                        onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
+                        onClick={e => { e.stopPropagation(); setPanX((p: number) => p + 80) }}
+                        className="w-10 h-10 rounded-xl text-white flex items-center justify-center text-lg font-bold border border-white/30 transition-colors"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+                      >◀</button>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 14 }}>✛</span>
+                      </div>
+                      <button
+                        onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
+                        onClick={e => { e.stopPropagation(); setPanX((p: number) => p - 80) }}
+                        className="w-10 h-10 rounded-xl text-white flex items-center justify-center text-lg font-bold border border-white/30 transition-colors"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+                      >▶</button>
+                      <div />
+                      <button
+                        onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
+                        onClick={e => { e.stopPropagation(); setPanY((p: number) => p - 80) }}
+                        className="w-10 h-10 rounded-xl text-white flex items-center justify-center text-lg font-bold border border-white/30 transition-colors"
+                        style={{ backgroundColor: 'rgba(0,0,0,0.45)' }}
+                      >▼</button>
+                      <div />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Sidebar — selected table detail (overlay, werkt op desktop + iPad) */}
