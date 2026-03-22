@@ -184,6 +184,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           .select('*')
           .eq('tenant_slug', params.tenant)
           .eq('status', 'confirmed')
+          .in('order_type', ['pickup', 'delivery'])
           .order('created_at', { ascending: true })
           .limit(50)
 
@@ -243,12 +244,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         return
       }
 
-      // Only fetch confirmed orders (ready to be made)
+      // Alleen online bevestigde orders tonen (pickup/delivery — kleine letters)
+      // Kassa-orders (DINE_IN, TAKEAWAY, DELIVERY — hoofdletters) worden uitgesloten
       const { data } = await supabase
         .from('orders')
         .select('*')
         .eq('tenant_slug', params.tenant)
         .eq('status', 'confirmed')
+        .in('order_type', ['pickup', 'delivery'])
         .order('created_at', { ascending: true }) // Oldest first (FIFO)
         .limit(50)
 

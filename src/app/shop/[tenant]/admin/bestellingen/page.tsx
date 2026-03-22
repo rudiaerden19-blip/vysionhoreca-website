@@ -695,7 +695,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   <div className="text-right">
                     <p className="text-2xl font-bold">€{order.total?.toFixed(2)}</p>
                     <p className="text-lg">
-                      {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? `🛍️ ${t('ordersPage.orderType.pickup')}` : `🚗 ${t('ordersPage.orderType.delivery')}`}
+                      {order.order_type === 'DINE_IN' ? '🍽️ Kassa - Ter plaatse' : order.order_type === 'TAKEAWAY' ? '📦 Kassa - Afhalen' : order.order_type === 'DELIVERY' ? '🚗 Kassa - Levering' : order.order_type === 'pickup' || order.order_type === 'PICKUP' ? `🛍️ ${t('ordersPage.orderType.pickup')}` : `🚗 ${t('ordersPage.orderType.delivery')}`}
                     </p>
                   </div>
                 </div>
@@ -1016,8 +1016,17 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 }`}
               >
                 {/* AFHALEN / LEVERING — groot en centraal */}
-                <div className={`w-full text-center py-2 mb-3 rounded-xl font-black text-xl tracking-wide ${order.order_type === 'pickup' || order.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                  {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ AFHALEN' : '🚗 LEVERING'}
+                <div className={`w-full text-center py-2 mb-3 rounded-xl font-black text-xl tracking-wide ${
+                  order.order_type === 'pickup' || order.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' :
+                  order.order_type === 'DINE_IN' ? 'bg-gray-100 text-gray-700' :
+                  order.order_type === 'TAKEAWAY' ? 'bg-amber-100 text-amber-700' :
+                  'bg-purple-100 text-purple-700'
+                }`}>
+                  {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ AFHALEN' :
+                   order.order_type === 'DINE_IN' ? '🍽️ KASSA - TER PLAATSE' :
+                   order.order_type === 'TAKEAWAY' ? '📦 KASSA - AFHALEN' :
+                   order.order_type === 'DELIVERY' ? '🚗 KASSA - LEVERING' :
+                   '🚗 LEVERING'}
                 </div>
 
                 <div className="flex items-start justify-between mb-4">
