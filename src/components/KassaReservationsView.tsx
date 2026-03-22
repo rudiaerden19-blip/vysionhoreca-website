@@ -2069,7 +2069,7 @@ export default function KassaReservationsView({
 
         {/* View Toggle & Search */}
         <div className="flex flex-col gap-2 w-full lg:flex-row lg:items-center lg:gap-3">
-          <div className="flex bg-gray-100 rounded-xl p-1 w-full overflow-x-auto">
+          <div className="flex rounded-xl p-1 w-full overflow-x-auto" style={{ backgroundColor: '#fed7aa' }}>
             {(() => {
               const pendingCount = reservations.filter(r => r.status === 'PENDING').length
               return [
@@ -2086,8 +2086,9 @@ export default function KassaReservationsView({
                   className={`flex-1 py-2 px-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap min-w-[44px] relative ${
                     viewMode === view.id
                       ? 'bg-[#3C4D6B] text-white'
-                      : 'text-gray-400 hover:text-gray-900'
+                      : 'text-white hover:opacity-80'
                   }`}
+                  style={viewMode !== view.id ? { backgroundColor: '#f97316' } : {}}
                 >
                   {view.icon}
                   <span className="hidden md:inline">{view.label}</span>
