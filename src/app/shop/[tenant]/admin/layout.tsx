@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import TrialBanner from '@/components/TrialBanner'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
@@ -83,16 +83,16 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           </span>
         </div>
 
-        {/* Rechts: display knop + taal */}
+        {/* Rechts: display knop + vergrendel + taal */}
         <div className="flex items-center gap-2">
           <Link
             href={`/shop/${params.tenant}/display`}
-
             className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
           >
             <span className="text-base">🖥️</span>
             <span className="hidden sm:inline">Onlinescherm</span>
           </Link>
+          <LockButton tenant={params.tenant} />
           <LanguageSelector />
         </div>
       </div>
@@ -104,6 +104,22 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
         </div>
       </main>
     </div>
+  )
+}
+
+function LockButton({ tenant }: { tenant: string }) {
+  const router = useRouter()
+  const handleLock = () => {
+    sessionStorage.removeItem(`vysion_pin_unlocked_${tenant}`)
+    router.push(`/shop/${tenant}/admin/kassa`)
+  }
+  return (
+    <button
+      onClick={handleLock}
+      className="flex items-center gap-1.5 px-3 py-2 bg-red-500 hover:bg-red-600 rounded-xl text-white text-sm font-bold transition-colors"
+    >
+      🔒 <span className="hidden sm:inline">Vergrendel</span>
+    </button>
   )
 }
 
