@@ -464,6 +464,11 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     setSelectedOrder(null)
   }
 
+  async function handleCompleteAll() {
+    await Promise.all(activeOrders.map(o => updateOrderStatus(o.id, 'completed')))
+    loadData()
+  }
+
   async function handleReady(order: Order) {
     await updateOrderStatus(order.id, 'ready')
     setSelectedOrder(null)
@@ -972,7 +977,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </header>
 
       {/* Tabs */}
-      <div className="bg-gray-800/50 px-4 py-2 flex gap-2">
+      <div className="bg-gray-800/50 px-4 py-2 flex gap-2 items-center">
         <button
           onClick={() => setActiveTab('active')}
           className={`px-4 py-2 rounded-lg font-bold transition-colors ${
@@ -993,6 +998,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         >
           {tx('completed')} ({completedOrders.length})
         </button>
+        {activeOrders.length > 0 && (
+          <button
+            onClick={handleCompleteAll}
+            className="ml-auto px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
+          >
+            ✓ Alles afronden
+          </button>
+        )}
       </div>
 
       {/* Orders Grid */}

@@ -275,6 +275,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     playOrderNotification()
   }
 
+  async function handleAllReady() {
+    await Promise.all(orders.map(o => updateOrderStatus(o.id, 'ready')))
+    setOrders([])
+  }
+
   async function handleReady(order: Order) {
     await updateOrderStatus(order.id, 'ready')
     
@@ -470,6 +475,16 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             <div className="px-4 py-2 bg-white/20 rounded-xl font-bold">
               📋 {orders.length} {tx('toMake')}
             </div>
+
+            {/* Alles klaar */}
+            {orders.length > 0 && (
+              <button
+                onClick={handleAllReady}
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-xl font-bold text-white transition-colors"
+              >
+                ✓ Alles klaar
+              </button>
+            )}
 
             {/* New order indicator */}
             {newOrderIds.size > 0 && (
