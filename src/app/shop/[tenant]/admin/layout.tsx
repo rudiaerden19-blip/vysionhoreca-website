@@ -12,12 +12,18 @@ interface AdminLayoutProps {
   params: { tenant: string }
 }
 
+const LOCK_PAGES = ['categorieen', 'producten', 'rapporten', 'z-rapport', 'analyse']
+
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
   const baseUrl = `/shop/${params.tenant}/admin`
+
+  const showLockButton =
+    pathname === `/shop/${params.tenant}/admin` ||
+    LOCK_PAGES.some(p => pathname.includes(`/admin/${p}`))
 
   useEffect(() => {
     async function checkTenant() {
@@ -92,7 +98,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             <span className="text-base">🖥️</span>
             <span className="hidden sm:inline">Onlinescherm</span>
           </Link>
-          <LockButton tenant={params.tenant} />
+          {showLockButton && <LockButton tenant={params.tenant} />}
           <LanguageSelector />
         </div>
       </div>
