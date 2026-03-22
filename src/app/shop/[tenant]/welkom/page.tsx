@@ -19,7 +19,13 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
   const handleEnter = () => {
     // Markeer als gezien in deze sessie (verdwijnt als browser/tab gesloten wordt)
     try { sessionStorage.setItem(`vysion_welcomed_${params.tenant}`, 'true') } catch { /* ignore */ }
-    router.push(`/shop/${params.tenant}/admin/kassa`)
+    const isLocalhost = typeof window !== 'undefined' &&
+      (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1'))
+    if (isLocalhost) {
+      router.push(`/shop/${params.tenant}/admin/kassa`)
+    } else {
+      window.location.href = `https://${params.tenant}.ordervysion.com/admin/kassa`
+    }
   }
 
   return (
