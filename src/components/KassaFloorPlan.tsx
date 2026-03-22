@@ -366,33 +366,40 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   // ── Initieel laden vanuit Supabase ────────────────────────────────────────
   useEffect(() => {
     const load = async () => {
-      // Tafels laden
-      const { data: tData } = await supabase
-        .from('floor_plan_tables')
-        .select('data')
-        .eq('tenant_slug', tenant)
-        .single()
-      if (tData?.data) {
-        setTables(tData.data)
-        localStorage.setItem(storageKey, JSON.stringify(tData.data))
+      // Tafels: localStorage eerst (instant), Supabase alleen als localStorage leeg is
+      const localTables = (() => { try { const r = localStorage.getItem(storageKey); return r ? JSON.parse(r) : null } catch { return null } })()
+      if (localTables) {
+        setTables(localTables)
       } else {
-        try { const raw = localStorage.getItem(storageKey); if (raw) setTables(JSON.parse(raw)) } catch { /* empty */ }
+        const { data: tData } = await supabase
+          .from('floor_plan_tables')
+          .select('data')
+          .eq('tenant_slug', tenant)
+          .single()
+        if (tData?.data) {
+          setTables(tData.data)
+          localStorage.setItem(storageKey, JSON.stringify(tData.data))
+        }
       }
-      // Decor + krukstatussen laden
-      const { data: dData } = await supabase
-        .from('floor_plan_decor')
-        .select('data')
-        .eq('tenant_slug', tenant)
-        .single()
-      if (dData?.data) {
-        const { items, statuses } = parseDecorData(dData.data)
-        setDecors(items)
-        setStoolStatuses(statuses)
-        localStorage.setItem(decorKey, JSON.stringify(items))
-        localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
+      // Decor: zelfde logica
+      const localDecor = (() => { try { const r = localStorage.getItem(decorKey); return r ? JSON.parse(r) : null } catch { return null } })()
+      const localStoolStatus = (() => { try { const r = localStorage.getItem(stoolStatusKey); return r ? JSON.parse(r) : null } catch { return null } })()
+      if (localDecor) {
+        setDecors(localDecor)
+        if (localStoolStatus) setStoolStatuses(localStoolStatus)
       } else {
-        try { const raw = localStorage.getItem(decorKey); if (raw) setDecors(JSON.parse(raw)) } catch { /* empty */ }
-        try { const raw = localStorage.getItem(stoolStatusKey); if (raw) setStoolStatuses(JSON.parse(raw)) } catch { /* empty */ }
+        const { data: dData } = await supabase
+          .from('floor_plan_decor')
+          .select('data')
+          .eq('tenant_slug', tenant)
+          .single()
+        if (dData?.data) {
+          const { items, statuses } = parseDecorData(dData.data)
+          setDecors(items)
+          setStoolStatuses(statuses)
+          localStorage.setItem(decorKey, JSON.stringify(items))
+          localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
+        }
       }
     }
     load()
