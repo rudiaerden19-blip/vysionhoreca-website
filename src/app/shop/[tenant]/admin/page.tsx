@@ -36,13 +36,12 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   const router = useRouter()
   const [businessName, setBusinessName] = useState<string>('')
 
-  // Welkomstpagina: toon elke ochtend (1× per dag) bij het openen
+  // Welkomstpagina: toon bij elke nieuwe sessie (tab/browser openen)
   useEffect(() => {
     try {
-      const today = new Date().toISOString().slice(0, 10)
       const key = `vysion_welcomed_${params.tenant}`
-      const lastSeen = localStorage.getItem(key)
-      if (lastSeen !== today) {
+      const seen = sessionStorage.getItem(key)
+      if (!seen) {
         router.replace(`/shop/${params.tenant}/welkom`)
       }
     } catch { /* ignore */ }

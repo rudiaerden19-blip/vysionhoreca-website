@@ -17,9 +17,8 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
   }, [])
 
   const handleEnter = () => {
-    // Markeer als gezien vandaag
-    const today = new Date().toISOString().slice(0, 10)
-    try { localStorage.setItem(`vysion_welcomed_${params.tenant}`, today) } catch { /* ignore */ }
+    // Markeer als gezien in deze sessie (verdwijnt als browser/tab gesloten wordt)
+    try { sessionStorage.setItem(`vysion_welcomed_${params.tenant}`, 'true') } catch { /* ignore */ }
     router.push(`/shop/${params.tenant}/admin/kassa`)
   }
 
