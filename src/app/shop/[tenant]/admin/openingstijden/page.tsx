@@ -7,6 +7,7 @@ import {
   getExceptionalClosings, saveExceptionalClosing, deleteExceptionalClosing, ExceptionalClosing,
 } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
+import PinGate from '@/components/PinGate'
 
 // ── Belgische feestdagen ──────────────────────────────────────────
 
@@ -272,7 +273,8 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
   }
 
   return (
-    <div className="max-w-4xl mx-auto pb-24">
+      <PinGate tenant={params.tenant}>
+      <div className="max-w-4xl mx-auto pb-24">
       {/* Floating Save Button - Fixed Bottom Right */}
       <motion.button
         whileHover={{ scale: 1.05 }}
@@ -708,5 +710,6 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
         </div>
       </motion.div>
     </div>
+      </PinGate>
   )
 }

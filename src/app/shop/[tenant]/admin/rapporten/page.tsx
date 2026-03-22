@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings } from '@/lib/admin-api'
+import PinGate from '@/components/PinGate'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface Order {
@@ -500,7 +501,8 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   ]
 
   return (
-    <div className="max-w-6xl mx-auto">
+      <PinGate tenant={tenant}>
+      <div className="max-w-6xl mx-auto">
       {/* ── Header ── */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Rapportages</h1>
@@ -1112,5 +1114,6 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
         <p className="text-xs text-gray-300">Vysion Horeca @ 2026</p>
       </div>
     </div>
+      </PinGate>
   )
 }

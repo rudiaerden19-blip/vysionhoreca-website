@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
 import { supabase } from '@/lib/supabase'
+import PinGate from '@/components/PinGate'
 
 export default function BetalingPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -106,7 +107,8 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
   }
 
   return (
-    <div className="max-w-3xl mx-auto pb-24">
+      <PinGate tenant={params.tenant}>
+      <div className="max-w-3xl mx-auto pb-24">
       {/* Floating Save Button */}
       <motion.button
         whileHover={{ scale: 1.05 }}
@@ -216,5 +218,6 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         </div>
       </motion.div>
     </div>
+      </PinGate>
   )
 }

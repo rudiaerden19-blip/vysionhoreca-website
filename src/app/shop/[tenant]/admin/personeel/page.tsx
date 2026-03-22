@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
+import PinGate from '@/components/PinGate'
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
@@ -226,7 +227,8 @@ export default function PersoneelPage() {
   }
 
   return (
-    <div className="space-y-6">
+      <PinGate tenant={tenant}>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -663,5 +665,6 @@ export default function PersoneelPage() {
         </div>
       )}
     </div>
+      </PinGate>
   )
 }

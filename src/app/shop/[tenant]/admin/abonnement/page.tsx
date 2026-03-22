@@ -6,6 +6,7 @@ import { useParams, useSearchParams } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { motion, AnimatePresence } from 'framer-motion'
+import PinGate from '@/components/PinGate'
 
 interface Subscription {
   id: string
@@ -700,6 +701,7 @@ export default function AbonnementPage() {
   }
 
   return (
+    <PinGate tenant={tenantSlug}>
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Header */}
       <div>
@@ -1181,5 +1183,6 @@ export default function AbonnementPage() {
         </div>
       </div>
     </div>
+    </PinGate>
   )
 }

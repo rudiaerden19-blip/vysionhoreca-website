@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { getTenantSettings, getZRapportDateBounds, getBelgiumDateString } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
+import PinGate from '@/components/PinGate'
 
 // SHA-256 hash voor integriteitsverificatie (GKS compliance)
 async function generateReportHash(data: {
@@ -589,7 +590,8 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+      <PinGate tenant={params.tenant}>
+      <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8 print:hidden">
         <div>
@@ -1137,5 +1139,6 @@ export default function ZRapportPage({ params }: { params: { tenant: string } })
         )}
       </AnimatePresence>
     </div>
+      </PinGate>
   )
 }

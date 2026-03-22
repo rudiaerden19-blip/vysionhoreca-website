@@ -33,6 +33,7 @@ import {
 } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
 import { useLanguage } from '@/i18n'
+import PinGate from '@/components/PinGate'
 
 const ALLERGEN_IDS = [
   { id: 'gluten', icon: '🌾' },
@@ -469,7 +470,8 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+      <PinGate tenant={params.tenant}>
+      <div className="max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
@@ -848,5 +850,6 @@ export default function ProductenPage({ params }: { params: { tenant: string } }
         )}
       </AnimatePresence>
     </div>
+      </PinGate>
   )
 }

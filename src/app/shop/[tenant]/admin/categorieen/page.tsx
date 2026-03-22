@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, Reorder } from 'framer-motion'
 import { getMenuCategories, saveMenuCategory, deleteMenuCategory, MenuCategory } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
+import PinGate from '@/components/PinGate'
 
 export default function CategorieenPage({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
@@ -108,6 +109,7 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
   }
 
   return (
+    <PinGate tenant={params.tenant}>
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -241,5 +243,6 @@ export default function CategorieenPage({ params }: { params: { tenant: string }
         )}
       </motion.div>
     </div>
+    </PinGate>
   )
 }

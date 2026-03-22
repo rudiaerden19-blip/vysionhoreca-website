@@ -1012,6 +1012,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '⚠️', label: 'Allergenen', href: `${baseUrl}/allergenen` },
                 { icon: '🖨️', label: 'Bonnenprinter', href: `${baseUrl}/bonnenprinter` },
                 { icon: '🏷️', label: 'Labels', href: `${baseUrl}/labels` },
+                { icon: '🔐', label: 'Pincode', href: `${baseUrl}/pincode` },
               ]},
               { key: 'online-bestellingen', icon: '📲', label: 'Online Bestellingen', items: [
                 { icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
