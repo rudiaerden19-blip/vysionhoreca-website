@@ -19,7 +19,7 @@ interface Order {
   order_number: string
   customer_name: string
   customer_phone?: string
-  order_type: 'pickup' | 'delivery'
+  order_type: string
   status: string
   total: number
   items: any[]
@@ -184,7 +184,6 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           .select('*')
           .eq('tenant_slug', params.tenant)
           .eq('status', 'confirmed')
-          .in('order_type', ['pickup', 'delivery'])
           .order('created_at', { ascending: true })
           .limit(50)
 
@@ -244,15 +243,13 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         return
       }
 
-      // Alleen online bevestigde orders tonen (pickup/delivery — kleine letters)
-      // Kassa-orders (DINE_IN, TAKEAWAY, DELIVERY — hoofdletters) worden uitgesloten
+      // Alle bevestigde orders — exact zoals donor frituur nolim
       const { data } = await supabase
         .from('orders')
         .select('*')
         .eq('tenant_slug', params.tenant)
         .eq('status', 'confirmed')
-        .in('order_type', ['pickup', 'delivery'])
-        .order('created_at', { ascending: true }) // Oldest first (FIFO)
+        .order('created_at', { ascending: true })
         .limit(50)
 
       if (data) {
@@ -382,7 +379,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           <div class="header">
             <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">*** KEUKEN BON ***</div>
             <div class="order-number">#${order.order_number}</div>
-            <div class="order-type">${order.order_type === 'delivery' ? '🚗 BEZORGEN' : '🛍️ AFHALEN'}</div>
+            <div class="order-type">${order.order_type === 'delivery' || order.order_type === 'DELIVERY' ? '🚗 BEZORGEN' : order.order_type === 'DINE_IN' ? '🍽️ TER PLAATSE' : order.order_type === 'TAKEAWAY' ? '📦 AFHALEN' : '🛍️ AFHALEN'}</div>
             ${(order.scheduled_date || order.scheduled_time) ? `
             <div style="margin: 6px 0; padding: 6px; background: #000; color: #fff; font-size: 16px; font-weight: bold; border-radius: 4px;">
               📅 LEVEREN OP: ${order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}${order.scheduled_time ? ' om ' + order.scheduled_time : ''}
@@ -585,7 +582,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     ? 'bg-purple-600' 
                     : 'bg-green-600'
                 }`}>
-                  {order.order_type === 'delivery' ? `🚗 ${tx('delivery')}` : `🛍️ ${tx('pickup')}`}
+                  {order.order_type === 'delivery' || order.order_type === 'DELIVERY' ? `🚗 ${tx('delivery')}` : order.order_type === 'DINE_IN' ? '🍽️ Ter plaatse' : order.order_type === 'TAKEAWAY' ? '📦 Afhalen' : `🛍️ ${tx('pickup')}`}
                 </div>
 
                 {/* Geplande datum/tijd */}
@@ -677,7 +674,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                       <span className={`px-3 py-1 rounded-lg font-bold ${
                         selectedOrder.order_type === 'delivery' ? 'bg-purple-500' : 'bg-green-500'
                       }`}>
-                        {selectedOrder.order_type === 'delivery' ? `🚗 ${tx('delivery')}` : `🛍️ ${tx('pickup')}`}
+                        {selectedOrder.order_type === 'delivery' || selectedOrder.order_type === 'DELIVERY' ? `🚗 ${tx('delivery')}` : selectedOrder.order_type === 'DINE_IN' ? '🍽️ Ter plaatse' : selectedOrder.order_type === 'TAKEAWAY' ? '📦 Afhalen' : `🛍️ ${tx('pickup')}`}
                       </span>
                       <span className={`font-mono font-bold text-lg ${getTimeColor(selectedOrder.created_at)}`}>
                         ⏱️ {getTimeSince(selectedOrder.created_at)}
