@@ -342,6 +342,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const stoolStatusKey = `vysion_stool_status_${tenant}`
   const [stoolStatuses, setStoolStatuses] = useState<Record<string, TableStatus>>({})
 
+  const [isLocked, setIsLocked] = useState(true)
+
   const draggingId = useRef<string | null>(null)
   const draggingType = useRef<'table' | 'decor'>('table')
   const dragOffset = useRef({ x: 0, y: 0 })
@@ -557,6 +559,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   // Refs worden gebruikt om stale closure problemen te vermijden
   const handlePointerDown = (e: React.PointerEvent, id: string, type: 'table' | 'decor') => {
     e.stopPropagation()
+    if (isLocked) return
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
     const floor = document.querySelector('.floor-plan') as HTMLElement
     if (!floor) return
@@ -614,18 +617,33 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             {tables.filter(t => t.status === 'FREE').length}/{tables.length} vrij
           </span>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors">
-            🪑 Tafel
-          </button>
-          <button onClick={openAddBarModal}
-            className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-sm font-semibold transition-colors">
-            🍺 Toogstuk
-          </button>
-          <button onClick={() => addDecor('plant')}
-            className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg text-sm font-semibold transition-colors">
-            🌿 Plant
+        <div className="flex gap-2 items-center">
+          {!isLocked && (
+            <>
+              <button onClick={() => setShowAddModal(true)}
+                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-semibold transition-colors">
+                🪑 Tafel
+              </button>
+              <button onClick={openAddBarModal}
+                className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white rounded-lg text-sm font-semibold transition-colors">
+                🍺 Toogstuk
+              </button>
+              <button onClick={() => addDecor('plant')}
+                className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg text-sm font-semibold transition-colors">
+                🌿 Plant
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => setIsLocked(prev => !prev)}
+            title={isLocked ? 'Ontgrendelen om tafels te verplaatsen' : 'Vergrendelen'}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 ${
+              isLocked
+                ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                : 'bg-yellow-400 hover:bg-yellow-500 text-gray-900'
+            }`}
+          >
+            {isLocked ? '🔒 Vergrendeld' : '🔓 Bewerken'}
           </button>
           <button onClick={onClose}
             className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-semibold transition-colors">
@@ -646,7 +664,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               linear-gradient(to bottom, rgba(200,200,200,0.25) 0px, rgba(200,200,200,0.25) 2px, transparent 2px)
             `,
             backgroundSize: '100px 100px',
-            cursor: isDragging ? 'grabbing' : 'default',
+            cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
           touchAction: 'none',
           }}
           onPointerMove={handlePointerMove}
@@ -660,7 +678,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 left: `${d.x}%`, top: `${d.y}%`,
                 transform: `translate(-50%, -50%) rotate(${d.rotation}deg)`,
                 zIndex: selectedDecor?.id === d.id ? 9 : 0,
-                cursor: isDragging ? 'grabbing' : 'grab',
+                cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
                 touchAction: 'none',
               }}
               onPointerDown={(e) => handlePointerDown(e, d.id, 'decor')}
@@ -687,7 +705,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 top: `${t.y}%`,
                 transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
                 zIndex: selected?.id === t.id ? 10 : 1,
-                cursor: isDragging ? 'grabbing' : 'grab',
+                cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
                 touchAction: 'none',
               }}
               onPointerDown={(e) => handlePointerDown(e, t.id, 'table')}
@@ -851,23 +869,27 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
               )
             })()}
 
-            <div className="p-4 border-b border-white/10">
-              <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
-              <div className="flex gap-2">
-                <button onClick={() => rotateDecor(selectedDecor.id, -45)}
-                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg">↺</button>
-                <button onClick={() => rotateDecor(selectedDecor.id, 45)}
-                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg">↻</button>
-                <button onClick={() => rotateDecor(selectedDecor.id, -selectedDecor.rotation)}
-                  className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold">Reset</button>
-              </div>
-            </div>
-            <div className="p-4 mt-auto">
-              <button onClick={() => deleteDecor(selectedDecor.id)}
-                className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold">
-                🗑 Verwijder
-              </button>
-            </div>
+            {!isLocked && (
+              <>
+                <div className="p-4 border-b border-white/10">
+                  <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
+                  <div className="flex gap-2">
+                    <button onClick={() => rotateDecor(selectedDecor.id, -45)}
+                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg">↺</button>
+                    <button onClick={() => rotateDecor(selectedDecor.id, 45)}
+                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg">↻</button>
+                    <button onClick={() => rotateDecor(selectedDecor.id, -selectedDecor.rotation)}
+                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold">Reset</button>
+                  </div>
+                </div>
+                <div className="p-4 mt-auto">
+                  <button onClick={() => deleteDecor(selectedDecor.id)}
+                    className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold">
+                    🗑 Verwijder
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -938,18 +960,20 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 )}
               </div>
 
-              {/* Rotatie */}
-              <div className="p-4 border-b border-white/10">
-                <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
-                <div className="flex gap-2">
-                  <button onClick={() => rotate(selected.id, -45)}
-                    className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↺</button>
-                  <button onClick={() => rotate(selected.id, 45)}
-                    className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↻</button>
-                  <button onClick={() => rotate(selected.id, -selected.rotation)}
-                    className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors">Reset</button>
+              {/* Rotatie — alleen in bewerkmodus */}
+              {!isLocked && (
+                <div className="p-4 border-b border-white/10">
+                  <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
+                  <div className="flex gap-2">
+                    <button onClick={() => rotate(selected.id, -45)}
+                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↺</button>
+                    <button onClick={() => rotate(selected.id, 45)}
+                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-lg transition-colors">↻</button>
+                    <button onClick={() => rotate(selected.id, -selected.rotation)}
+                      className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-semibold transition-colors">Reset</button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Status toggle */}
               <div className="p-4 border-b border-white/10 space-y-2">
@@ -985,10 +1009,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                   className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">
                   🛒 {hasItems ? 'Toevoegen aan bestelling' : 'Nieuwe bestelling'}
                 </button>
-                <button onClick={() => deleteTable(selected.id)}
-                  className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold transition-colors">
-                  🗑 Verwijder tafel
-                </button>
+                {!isLocked && (
+                  <button onClick={() => deleteTable(selected.id)}
+                    className="w-full py-2 rounded-xl bg-red-500/20 text-red-400 hover:bg-red-500/30 text-sm font-semibold transition-colors">
+                    🗑 Verwijder tafel
+                  </button>
+                )}
               </div>
             </div>
           )
@@ -1003,7 +1029,10 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             <span>{STATUS_LABELS[s]}</span>
           </div>
         ))}
-        <span className="text-white/30 ml-4 text-xs">Sleep om te verplaatsen • ↺↻ om te draaien</span>
+        {isLocked
+          ? <span className="text-orange-400/70 ml-4 text-xs">🔒 Vergrendeld — klik op &quot;Bewerken&quot; om tafels te verplaatsen</span>
+          : <span className="text-yellow-400/70 ml-4 text-xs">🔓 Bewerkmodus — sleep om te verplaatsen • ↺↻ om te draaien</span>
+        }
       </div>
 
       {/* Add bar segment modal */}
