@@ -444,15 +444,15 @@ function ContactsView({
         <table className="w-full text-sm" style={{ borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #e5e7eb', background: '#f9fafb' }}>
-              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
+              <th className="px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
                 onClick={() => toggleSort('name')}>Naam <SortArrow col="name"/></th>
-              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">E-mail</th>
-              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Telefoon</th>
-              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
+              <th className="hidden lg:table-cell px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">E-mail</th>
+              <th className="px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">Telefoon</th>
+              <th className="hidden lg:table-cell px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
                 onClick={() => toggleSort('lastVisit')}>Laatste bezoek <SortArrow col="lastVisit"/></th>
-              <th className="px-5 py-3 text-right text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
+              <th className="px-3 lg:px-5 py-3 text-right text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900"
                 onClick={() => toggleSort('visits')}>Aantal <SortArrow col="visits"/></th>
-              <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">No-show</th>
+              <th className="px-3 lg:px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-gray-500">No-show</th>
             </tr>
           </thead>
           <tbody>
@@ -466,23 +466,23 @@ function ContactsView({
               return (
                 <tr key={guest.id} style={{ borderBottom: '1px solid #e5e7eb' }}
                   className="hover:bg-gray-50 transition-colors">
-                  <td className="px-5 py-3 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>
+                  <td className="px-3 lg:px-5 py-3 font-semibold text-gray-800" style={{ borderRight: '1px solid #e5e7eb' }}>
                     {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 inline mr-1"/>}
                     {guest.name}
                   </td>
-                  <td className="px-5 py-3 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                  <td className="hidden lg:table-cell px-3 lg:px-5 py-3 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
                     {guest.email ? <a href={`mailto:${guest.email}`} className="hover:underline">{guest.email}</a> : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-5 py-3 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
+                  <td className="px-3 lg:px-5 py-3 text-gray-600" style={{ borderRight: '1px solid #e5e7eb' }}>
                     {guest.phone ? <a href={`tel:${guest.phone}`} className="hover:underline">{guest.phone}</a> : <span className="text-gray-300">—</span>}
                   </td>
-                  <td className="px-5 py-3 text-gray-500" style={{ borderRight: '1px solid #e5e7eb' }}>
+                  <td className="hidden lg:table-cell px-3 lg:px-5 py-3 text-gray-500" style={{ borderRight: '1px solid #e5e7eb' }}>
                     {guest.lastVisit
                       ? new Date(guest.lastVisit+'T12:00').toLocaleDateString('nl-BE',{weekday:'short',day:'numeric',month:'short',year:'numeric'})
                       : '—'}
                   </td>
-                  <td className="px-5 py-3 font-bold text-gray-800 text-right" style={{ borderRight: '1px solid #e5e7eb' }}>{guest.totalVisits}</td>
-                  <td className="px-5 py-3">
+                  <td className="px-3 lg:px-5 py-3 font-bold text-gray-800 text-right" style={{ borderRight: '1px solid #e5e7eb' }}>{guest.totalVisits}</td>
+                  <td className="px-3 lg:px-5 py-3">
                     <button
                       onClick={() => setNoShowRed(prev => {
                         const s = new Set(prev)
@@ -2106,7 +2106,7 @@ export default function KassaReservationsView({
       </div>
 
       {/* Content */}
-      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
+      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' || viewMode === 'guests' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
