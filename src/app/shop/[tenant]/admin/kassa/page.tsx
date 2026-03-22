@@ -956,7 +956,11 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   const handleLogout = () => {
     localStorage.removeItem('vysion_tenant')
-    try { sessionStorage.removeItem(`vysion_welcomed_${tenant}`) } catch { /* ignore */ }
+    try {
+      sessionStorage.removeItem(`vysion_welcomed_${tenant}`)
+      sessionStorage.removeItem(`vysion_kassa_audio_ok_${tenant}`)
+      sessionStorage.removeItem(`vysion_audio_activated_${tenant}`)
+    } catch { /* ignore */ }
     window.location.href = '/login'
   }
 

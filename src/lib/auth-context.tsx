@@ -144,10 +144,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (supabase) {
       await supabase.auth.signOut()
     }
-    // Wis welkom-sessie zodat welkomstscherm opnieuw verschijnt na inloggen
+    // Wis sessie-keys zodat welkomst + audio scherm opnieuw verschijnen na inloggen
     try {
       Object.keys(sessionStorage)
-        .filter(k => k.startsWith('vysion_welcomed_'))
+        .filter(k =>
+          k.startsWith('vysion_welcomed_') ||
+          k.startsWith('vysion_kassa_audio_ok_') ||
+          k.startsWith('vysion_audio_activated_')
+        )
         .forEach(k => sessionStorage.removeItem(k))
     } catch { /* ignore */ }
     setUser(null)

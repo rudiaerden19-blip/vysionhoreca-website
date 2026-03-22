@@ -17,8 +17,13 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
   }, [])
 
   const handleEnter = () => {
-    // Markeer als gezien in deze sessie (verdwijnt als browser/tab gesloten wordt)
-    try { sessionStorage.setItem(`vysion_welcomed_${params.tenant}`, 'true') } catch { /* ignore */ }
+    try {
+      // Markeer welkom als gezien in deze sessie
+      sessionStorage.setItem(`vysion_welcomed_${params.tenant}`, 'true')
+      // Wis audio-activatie zodat geluidsscherm opnieuw verschijnt in kassa
+      sessionStorage.removeItem(`vysion_kassa_audio_ok_${params.tenant}`)
+      sessionStorage.removeItem(`vysion_audio_activated_${params.tenant}`)
+    } catch { /* ignore */ }
     const isLocalhost = typeof window !== 'undefined' &&
       (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1'))
     if (isLocalhost) {
