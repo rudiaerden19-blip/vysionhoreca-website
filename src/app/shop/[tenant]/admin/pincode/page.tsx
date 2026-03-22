@@ -7,6 +7,7 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
   const SESSION_KEY = `vysion_pin_unlocked_${tenant}`
 
   const [hasPin, setHasPin] = useState<boolean | null>(null)
+  const [justSaved, setJustSaved] = useState(false)
   const [step, setStep] = useState<'check' | 'set' | 'change-current' | 'change-new'>('check')
   const [pin1, setPin1] = useState('')
   const [pin2, setPin2] = useState('')
@@ -35,8 +36,8 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
       sessionStorage.setItem(SESSION_KEY, 'true')
       setSuccess(hasPin ? 'PIN succesvol gewijzigd!' : 'PIN succesvol ingesteld!')
       setHasPin(true)
+      setJustSaved(true)
       setPin1(''); setPin2(''); setCurrentPin('')
-      setStep('change-current')
     } else {
       setError(data.error || 'Er ging iets mis')
     }
@@ -74,11 +75,20 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
           </p>
         </div>
 
-        {success && (
-          <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 text-green-700 text-sm text-center font-semibold">
-            ✓ {success}
+        {justSaved ? (
+          <div className="text-center">
+            <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-6 text-green-700 font-semibold">
+              ✓ {success}
+            </div>
+            <button
+              onClick={() => setJustSaved(false)}
+              className="px-6 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold transition-colors"
+            >
+              PIN wijzigen
+            </button>
           </div>
-        )}
+        ) : (
+        <>
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4 text-red-700 text-sm text-center">
             {error}
@@ -138,6 +148,8 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
           <p className="font-semibold mb-1">Beschermde modules:</p>
           <p>Categorieën · Producten · Openingstijden · Abonnement · Betaalmethodes · Personeel · Rapporten · Z-rapport</p>
         </div>
+        </>
+        )}
       </div>
     </div>
   )
