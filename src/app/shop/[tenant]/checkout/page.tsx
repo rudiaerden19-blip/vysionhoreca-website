@@ -374,6 +374,32 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
         setEarnedPoints(points)
       }
       
+      // Voor online betalingen (bancontact/kaart): doorsturen naar Stripe
+      const isOnlinePayment = paymentMethod !== 'cash'
+      if (isOnlinePayment) {
+        try {
+          const stripeRes = await fetch('/api/stripe/create-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: order.id,
+              tenantSlug: params.tenant,
+              successUrl: `${window.location.origin}/shop/${params.tenant}?payment=success&order=${order.order_number}`,
+              cancelUrl: `${window.location.origin}/shop/${params.tenant}/checkout?payment=cancelled`,
+            }),
+          })
+          const stripeData = await stripeRes.json()
+          if (stripeData.url) {
+            localStorage.removeItem(`cart_${params.tenant}`)
+            window.location.href = stripeData.url
+            return
+          }
+          // Als Stripe niet geconfigureerd is, gewoon doorgaan als cash
+        } catch {
+          // Stripe niet beschikbaar, doorgaan zonder
+        }
+      }
+
       // IMPORTANT: Set success state FIRST before anything else
       setOrderNumber(order.order_number)
       setOrderSuccess(true)

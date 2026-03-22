@@ -92,8 +92,23 @@ export async function POST(request: NextRequest) {
       
       const giftCardId = session.metadata?.gift_card_id
       const reservationId = session.metadata?.reservationId
+      const orderId = session.metadata?.order_id
       const tenantSlug = session.metadata?.tenant_slug || session.metadata?.tenantSlug
       const recipientEmail = session.metadata?.recipient_email
+
+      // ── Order betaling ────────────────────────────────────────────
+      if (orderId && tenantSlug) {
+        await supabase
+          .from('orders')
+          .update({
+            payment_status: 'paid',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', orderId)
+          .eq('tenant_slug', tenantSlug)
+
+        logger.info('Order payment completed via Stripe', { requestId, orderId, tenantSlug })
+      }
 
       // ── Reservatie voorschot ──────────────────────────────────────
       if (reservationId) {

@@ -20,6 +20,12 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [stripeSecretKey, setStripeSecretKey] = useState('')
+  const [stripePublicKey, setStripePublicKey] = useState('')
+  const [stripeWebhookSecret, setStripeWebhookSecret] = useState('')
+  const [savingStripe, setSavingStripe] = useState(false)
+  const [savedStripe, setSavedStripe] = useState(false)
+  const [showStripeKeys, setShowStripeKeys] = useState(false)
 
   useEffect(() => {
     loadSettings()
@@ -29,7 +35,7 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
   async function loadSettings() {
     const { data } = await supabase
       .from('tenant_settings')
-      .select('payment_methods, btw_percentage')
+      .select('payment_methods, btw_percentage, stripe_public_key, stripe_secret_key, stripe_webhook_secret')
       .eq('tenant_slug', params.tenant)
       .single()
 
@@ -38,6 +44,10 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
       if (data.btw_percentage) {
         setVatRate(data.btw_percentage)
       }
+
+      if (data.stripe_public_key) setStripePublicKey(data.stripe_public_key)
+      if (data.stripe_secret_key) setStripeSecretKey(data.stripe_secret_key)
+      if (data.stripe_webhook_secret) setStripeWebhookSecret(data.stripe_webhook_secret)
 
       // Load payment methods
       if (data.payment_methods && Array.isArray(data.payment_methods)) {
@@ -87,6 +97,23 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
     }
 
     setSaving(false)
+  }
+
+  const handleSaveStripe = async () => {
+    setSavingStripe(true)
+    const { error } = await supabase
+      .from('tenant_settings')
+      .update({
+        stripe_public_key: stripePublicKey || null,
+        stripe_secret_key: stripeSecretKey || null,
+        stripe_webhook_secret: stripeWebhookSecret || null,
+      })
+      .eq('tenant_slug', params.tenant)
+    if (!error) {
+      setSavedStripe(true)
+      setTimeout(() => setSavedStripe(false), 2000)
+    }
+    setSavingStripe(false)
   }
 
   const paymentMethods = [
@@ -196,26 +223,76 @@ export default function BetalingPage({ params }: { params: { tenant: string } })
         </p>
       </motion.div>
 
-      {/* Online Payments Info */}
+      {/* Stripe Online Betalingen */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="mt-6 bg-blue-50 border border-blue-200 rounded-2xl p-5"
+        className="mt-6 bg-white rounded-2xl shadow-sm overflow-hidden"
       >
-        <div className="flex items-start gap-3">
-          <span className="text-2xl">💡</span>
-          <div className="flex-1">
-            <h3 className="font-semibold text-blue-900 mb-1">{t('adminPages.betaling.onlinePaymentsTitle')}</h3>
-            <p className="text-blue-700 text-sm mb-3">{t('adminPages.betaling.onlinePaymentsDesc')}</p>
-            <a
-              href="mailto:info@vysionhoreca.com?subject=Online%20Betalingen%20Activeren"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-xl text-sm transition-colors"
-            >
-              📧 Contact opnemen
-            </a>
+        <button
+          onClick={() => setShowStripeKeys(v => !v)}
+          className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚡</span>
+            <div className="text-left">
+              <p className="font-semibold text-gray-900">Stripe — Online betalingen</p>
+              <p className="text-sm text-gray-500">{stripeSecretKey ? '✅ Geconfigureerd' : 'Voer je Stripe keys in om online betalingen te activeren'}</p>
+            </div>
           </div>
-        </div>
+          <span className="text-gray-400">{showStripeKeys ? '▲' : '▼'}</span>
+        </button>
+
+        {showStripeKeys && (
+          <div className="px-6 pb-6 space-y-4 border-t border-gray-100">
+            <p className="text-sm text-gray-500 pt-4">
+              Maak een account op <a href="https://stripe.com" target="_blank" className="text-blue-600 underline">stripe.com</a> en kopieer je keys hieronder. Bancontact en kaartebetalingen worden automatisch verwerkt.
+            </p>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Publishable Key <span className="text-gray-400">(pk_live_...)</span></label>
+              <input
+                type="text"
+                value={stripePublicKey}
+                onChange={e => setStripePublicKey(e.target.value)}
+                placeholder="pk_live_..."
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Secret Key <span className="text-gray-400">(sk_live_...)</span></label>
+              <input
+                type="password"
+                value={stripeSecretKey}
+                onChange={e => setStripeSecretKey(e.target.value)}
+                placeholder="sk_live_..."
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Webhook Secret <span className="text-gray-400">(whsec_...)</span></label>
+              <input
+                type="password"
+                value={stripeWebhookSecret}
+                onChange={e => setStripeWebhookSecret(e.target.value)}
+                placeholder="whsec_..."
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-xs text-gray-400 mt-1">Webhook URL: <span className="font-mono">https://jouwdomein.com/api/stripe-webhook</span></p>
+            </div>
+
+            <button
+              onClick={handleSaveStripe}
+              disabled={savingStripe}
+              className={`w-full py-3 rounded-xl font-semibold transition-colors ${savedStripe ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+            >
+              {savingStripe ? '⏳ Opslaan...' : savedStripe ? '✓ Opgeslagen' : '💾 Stripe keys opslaan'}
+            </button>
+          </div>
+        )}
       </motion.div>
     </div>
       </PinGate>

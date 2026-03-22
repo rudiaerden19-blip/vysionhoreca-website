@@ -159,6 +159,7 @@ export interface TenantSettings {
   // Stripe & Cadeaubonnen
   stripe_secret_key?: string
   stripe_public_key?: string
+  stripe_webhook_secret?: string
   gift_cards_enabled?: boolean
   // Promoties aan/uit in shop
   promotions_enabled?: boolean
@@ -189,8 +190,9 @@ export async function getTenantSettings(tenantSlug: string): Promise<TenantSetti
       
       // SECURITY: Remove sensitive fields before returning to prevent exposure
       if (data) {
-        const fullData = data as TenantSettings & { stripe_secret_key?: string }
+        const fullData = data as TenantSettings & { stripe_secret_key?: string; stripe_webhook_secret?: string }
         delete fullData.stripe_secret_key
+        delete fullData.stripe_webhook_secret
         return fullData as TenantSettings
       }
       return data
@@ -1828,9 +1830,8 @@ export async function confirmOrder(id: string): Promise<boolean> {
   
   const { error } = await supabase
     .from('orders')
-    .update({ 
+    .update({
       status: 'confirmed',
-      payment_status: 'paid',
       confirmed_at: new Date().toISOString()
     })
     .eq('id', id)
