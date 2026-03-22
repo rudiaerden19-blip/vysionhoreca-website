@@ -594,13 +594,21 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if (!draggingId.current) return
+    // Gebruik functionele update zodat we altijd de NIEUWSTE posities opslaan,
+    // niet de stale closure-waarde van vóór het slepen.
     if (draggingType.current === 'table') {
-      localStorage.setItem(storageKey, JSON.stringify(tables))
-      supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: tables }, { onConflict: 'tenant_slug' })
+      setTables(latest => {
+        localStorage.setItem(storageKey, JSON.stringify(latest))
+        supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: latest }, { onConflict: 'tenant_slug' })
+        return latest
+      })
     } else {
-      const payload = { items: decors, stool_statuses: stoolStatuses }
-      localStorage.setItem(decorKey, JSON.stringify(decors))
-      supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
+      setDecors(latestDecors => {
+        const payload = { items: latestDecors, stool_statuses: stoolStatuses }
+        localStorage.setItem(decorKey, JSON.stringify(latestDecors))
+        supabase.from('floor_plan_decor').upsert({ tenant_slug: tenant, data: payload }, { onConflict: 'tenant_slug' })
+        return latestDecors
+      })
     }
     draggingId.current = null
     setIsDragging(false)
