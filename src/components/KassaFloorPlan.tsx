@@ -608,7 +608,17 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   // Posities zijn % (0-100) van de container. Pan verschuift het canvas visueel.
   const handlePointerDown = (e: React.PointerEvent, id: string, type: 'table' | 'decor') => {
     e.stopPropagation()
-    if (isLocked) return
+    if (isLocked) {
+      // Vergrendeld: sleep overal (ook op tafels) om canvas te pannen
+      ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+      draggingId.current = '__canvas__'
+      draggingType.current = 'canvas'
+      dragMoved.current = false
+      pointerStart.current = { x: e.clientX, y: e.clientY }
+      panStart.current = { x: panX, y: panY }
+      setIsDragging(true)
+      return
+    }
     ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
     const floor = floorRef.current
     if (!floor) return
@@ -744,7 +754,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             `,
             backgroundSize: '100px 100px',
             backgroundPosition: `${panX}px ${panY}px`,
-            cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
+            cursor: isDragging ? 'grabbing' : 'grab',
             touchAction: 'none',
           }}
           onPointerDown={(e) => {
@@ -773,7 +783,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 top: `${d.y}%`,
                 transform: `translate(-50%, -50%) rotate(${d.rotation}deg)`,
                 zIndex: selectedDecor?.id === d.id ? 9 : 0,
-                cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
+                cursor: isDragging ? 'grabbing' : 'grab',
                 touchAction: 'none',
               }}
               onPointerDown={(e) => handlePointerDown(e, d.id, 'decor')}
@@ -800,7 +810,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 top: `${t.y}%`,
                 transform: `translate(-50%, -50%) rotate(${t.rotation}deg)`,
                 zIndex: selected?.id === t.id ? 10 : 1,
-                cursor: isLocked ? 'default' : isDragging ? 'grabbing' : 'grab',
+                cursor: isDragging ? 'grabbing' : 'grab',
                 touchAction: 'none',
               }}
               onPointerDown={(e) => handlePointerDown(e, t.id, 'table')}
