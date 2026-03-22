@@ -416,36 +416,28 @@ function ContactsView({
   const from = filtered.length === 0 ? 0 : page * pageSize + 1
   const to = Math.min(page * pageSize + pageSize, filtered.length)
 
-  const SortBtn = ({ col, label }: { col: typeof guestSort; label: string }) => (
-    <button
+  const SortTh = ({ col, label, right }: { col: typeof guestSort; label: string; right?: boolean }) => (
+    <div
       onClick={() => changeSort(col)}
-      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap ${
-        guestSort === col ? 'bg-[#3C4D6B] text-white' : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
-      }`}
+      className={`text-xs font-bold uppercase tracking-wider cursor-pointer select-none text-gray-500 hover:text-gray-900 flex items-center gap-1 ${right ? 'justify-end' : ''}`}
     >
-      {label}{guestSort === col ? (guestSortDir === 'desc' ? ' ↓' : ' ↑') : ''}
-    </button>
+      {label}
+      {guestSort === col && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
+    </div>
   )
 
   return (
     <div className="space-y-3">
-      {/* Zoekbalk + sorteerknoppen */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-        <div className="relative w-full sm:max-w-sm">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => { setSearchQuery(e.target.value); setPage(0) }}
-            placeholder="Zoek op naam, email of telefoon..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm outline-none focus:border-[#3C4D6B]"
-          />
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <SortBtn col="lastVisit" label="Meest recent" />
-          <SortBtn col="visits" label="Meest bezocht" />
-          <SortBtn col="name" label="Naam A–Z" />
-        </div>
+      {/* Zoekbalk */}
+      <div className="relative max-w-sm">
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={e => { setSearchQuery(e.target.value); setPage(0) }}
+          placeholder="Zoek op naam, email of telefoon..."
+          className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm outline-none focus:border-[#3C4D6B]"
+        />
       </div>
 
       <p className="text-sm text-gray-400">{filtered.length} contacten</p>
@@ -457,78 +449,106 @@ function ContactsView({
         </div>
       )}
 
-      {/* Contactenlijst */}
+      {/* Kolommentabel via CSS grid — geen HTML table → geen overflow problemen */}
       {paginated.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
-          {paginated.map((guest: GuestProfile) => {
-            const isRed = noShowRed.has(guest.id)
-            const lastVisitFmt = guest.lastVisit
-              ? new Date(guest.lastVisit + 'T12:00').toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
-              : null
-            return (
-              <div key={guest.id} className="px-4 py-3 hover:bg-gray-50 transition-colors">
-                {/* Rij: naam links, details rechts */}
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    {/* Naam + badge */}
-                    <div className="flex items-center gap-2 mb-0.5">
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+
+          {/* Header — desktop: 5 kolommen, iPad: 3 kolommen */}
+          <div className="hidden md:grid md:grid-cols-[2fr_1.4fr_1fr_80px_90px] lg:grid-cols-[2fr_2fr_1.4fr_1fr_80px_90px] gap-0 px-5 py-3 bg-gray-50 border-b border-gray-200">
+            <SortTh col="name" label="Naam" />
+            <div className="hidden lg:block"><SortTh col="lastVisit" label="E-mail" /></div>
+            <SortTh col="lastVisit" label="Telefoon" />
+            <SortTh col="lastVisit" label="Laatste bezoek" />
+            <SortTh col="visits" label="Aantal" right />
+            <div className="text-xs font-bold uppercase tracking-wider text-gray-500">No-show</div>
+          </div>
+          {/* Header — mobiel */}
+          <div className="md:hidden grid grid-cols-[1fr_auto] gap-0 px-4 py-2.5 bg-gray-50 border-b border-gray-200">
+            <SortTh col="name" label="Naam" />
+            <SortTh col="visits" label="Bezoeken" right />
+          </div>
+
+          {/* Rijen */}
+          <div className="divide-y divide-gray-100">
+            {paginated.map((guest: GuestProfile) => {
+              const isRed = noShowRed.has(guest.id)
+              const lastVisitFmt = guest.lastVisit
+                ? new Date(guest.lastVisit + 'T12:00').toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
+                : '—'
+              return (
+                <div key={guest.id} className="hover:bg-gray-50 transition-colors">
+                  {/* Desktop rij */}
+                  <div className="hidden md:grid md:grid-cols-[2fr_1.4fr_1fr_80px_90px] lg:grid-cols-[2fr_2fr_1.4fr_1fr_80px_90px] gap-0 px-5 py-3 items-center">
+                    <div className="font-semibold text-gray-900 flex items-center gap-1.5 min-w-0">
                       {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0" />}
-                      <span className="font-semibold text-gray-900 truncate">{guest.name}</span>
-                      <span className="text-xs text-gray-400 flex-shrink-0">{guest.totalVisits}×</span>
+                      <span className="truncate">{guest.name}</span>
                     </div>
-                    {/* Contact info */}
-                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-gray-500">
-                      {guest.phone && (
-                        <a href={`tel:${guest.phone}`} className="hover:text-[#3C4D6B] hover:underline">{guest.phone}</a>
-                      )}
-                      {guest.email && (
-                        <a href={`mailto:${guest.email}`} className="hover:text-[#3C4D6B] hover:underline truncate max-w-[220px]">{guest.email}</a>
-                      )}
-                      {lastVisitFmt && (
-                        <span className="text-gray-400">{lastVisitFmt}</span>
-                      )}
+                    <div className="hidden lg:block text-gray-500 text-sm truncate pr-2">
+                      {guest.email
+                        ? <a href={`mailto:${guest.email}`} className="hover:underline hover:text-[#3C4D6B]">{guest.email}</a>
+                        : <span className="text-gray-300">—</span>}
+                    </div>
+                    <div className="text-gray-600 text-sm">
+                      {guest.phone
+                        ? <a href={`tel:${guest.phone}`} className="hover:underline hover:text-[#3C4D6B]">{guest.phone}</a>
+                        : <span className="text-gray-300">—</span>}
+                    </div>
+                    <div className="text-gray-500 text-sm">{lastVisitFmt}</div>
+                    <div className="font-bold text-gray-800 text-right pr-4">{guest.totalVisits}</div>
+                    <button
+                      onClick={() => setNoShowRed(prev => { const s = new Set(prev); s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id); return s })}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors w-fit ${isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                    >
+                      No-show
+                    </button>
+                  </div>
+                  {/* Mobiel/iPad rij */}
+                  <div className="md:hidden px-4 py-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 mb-0.5">
+                          {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0" />}
+                          <span className="font-semibold text-gray-900 truncate">{guest.name}</span>
+                          <span className="text-xs text-gray-400 flex-shrink-0">{guest.totalVisits}×</span>
+                        </div>
+                        <div className="flex flex-wrap gap-x-3 text-sm text-gray-500">
+                          {guest.phone && <a href={`tel:${guest.phone}`} className="hover:underline">{guest.phone}</a>}
+                          <span className="text-gray-400">{lastVisitFmt}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setNoShowRed(prev => { const s = new Set(prev); s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id); return s })}
+                        className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold ${isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400'}`}
+                      >
+                        No-show
+                      </button>
                     </div>
                   </div>
-                  {/* No-show knop */}
-                  <button
-                    onClick={() => setNoShowRed(prev => {
-                      const s = new Set(prev)
-                      s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id)
-                      return s
-                    })}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                      isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
-                    }`}
-                  >
-                    No-show
-                  </button>
                 </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {/* Paginering — alleen zichtbaar als nodig */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between bg-white rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-500">
-          <span>{from}–{to} van {filtered.length}</span>
-          <div className="flex items-center gap-2">
-            <select
-              value={pageSize}
-              onChange={e => { setPageSize(Number(e.target.value)); setPage(0) }}
-              className="rounded-lg px-2 py-1 text-sm bg-gray-100 border border-gray-200 outline-none cursor-pointer"
-            >
-              {PAGE_SIZE_OPTIONS.map(s => <option key={s} value={s}>{s} per pagina</option>)}
-            </select>
-            <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 font-bold">‹</button>
-            <span className="font-medium">{page + 1} / {totalPages}</span>
-            <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
-              className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 font-bold">›</button>
+              )
+            })}
           </div>
         </div>
       )}
+
+      {/* Paginering */}
+      <div className="flex items-center justify-between bg-white rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-500">
+        <span>{from}–{to} van {filtered.length}</span>
+        <div className="flex items-center gap-2">
+          <select
+            value={pageSize}
+            onChange={e => { setPageSize(Number(e.target.value)); setPage(0) }}
+            className="rounded-lg px-2 py-1 text-sm bg-gray-100 border border-gray-200 outline-none cursor-pointer"
+          >
+            {PAGE_SIZE_OPTIONS.map(s => <option key={s} value={s}>{s} per pagina</option>)}
+          </select>
+          <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
+            className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 font-bold">‹</button>
+          <span className="font-medium">{page + 1} / {totalPages}</span>
+          <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
+            className="w-8 h-8 rounded-lg flex items-center justify-center disabled:opacity-30 hover:bg-gray-100 font-bold">›</button>
+        </div>
+      </div>
     </div>
   )
 }
