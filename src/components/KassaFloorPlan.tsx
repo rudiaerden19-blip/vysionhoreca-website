@@ -843,6 +843,46 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             </div>
           )}
           </div>{/* einde inner canvas */}
+
+          {/* Pan hint: pijltjes linksonder */}
+          <div
+            className="absolute bottom-4 left-4 z-20 select-none"
+            onPointerDown={e => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="grid grid-cols-3 gap-1" style={{ gridTemplateRows: 'repeat(3, 1fr)' }}>
+              {/* Rij 1: lege cel, omhoog, lege cel */}
+              <div />
+              <button
+                onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
+                onClick={e => { e.stopPropagation(); const s = 80; setPanY((p: number) => { const n = p + s; try { localStorage.setItem(panKey, JSON.stringify({ x: panX, y: n })) } catch { /* ignore */ } return n }) }}
+                className="w-10 h-10 rounded-xl bg-black/50 hover:bg-black/70 active:bg-black/90 text-white flex items-center justify-center text-lg font-bold transition-colors border border-white/20"
+              >▲</button>
+              <div />
+              {/* Rij 2: links, midden (kompas), rechts */}
+              <button
+                onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
+                onClick={e => { e.stopPropagation(); const s = 80; setPanX((p: number) => { const n = p + s; try { localStorage.setItem(panKey, JSON.stringify({ x: n, y: panY })) } catch { /* ignore */ } return n }) }}
+                className="w-10 h-10 rounded-xl bg-black/50 hover:bg-black/70 active:bg-black/90 text-white flex items-center justify-center text-lg font-bold transition-colors border border-white/20"
+              >◀</button>
+              <div className="w-10 h-10 rounded-xl bg-black/30 border border-white/10 flex items-center justify-center">
+                <span className="text-white/40 text-xs">✛</span>
+              </div>
+              <button
+                onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
+                onClick={e => { e.stopPropagation(); const s = 80; setPanX((p: number) => { const n = p - s; try { localStorage.setItem(panKey, JSON.stringify({ x: n, y: panY })) } catch { /* ignore */ } return n }) }}
+                className="w-10 h-10 rounded-xl bg-black/50 hover:bg-black/70 active:bg-black/90 text-white flex items-center justify-center text-lg font-bold transition-colors border border-white/20"
+              >▶</button>
+              {/* Rij 3: lege cel, omlaag, lege cel */}
+              <div />
+              <button
+                onPointerDown={e => { e.stopPropagation(); e.preventDefault() }}
+                onClick={e => { e.stopPropagation(); const s = 80; setPanY((p: number) => { const n = p - s; try { localStorage.setItem(panKey, JSON.stringify({ x: panX, y: n })) } catch { /* ignore */ } return n }) }}
+                className="w-10 h-10 rounded-xl bg-black/50 hover:bg-black/70 active:bg-black/90 text-white flex items-center justify-center text-lg font-bold transition-colors border border-white/20"
+              >▼</button>
+              <div />
+            </div>
+          </div>
         </div>
 
         {/* Decor Sidebar */}
