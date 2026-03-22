@@ -453,19 +453,20 @@ function ContactsView({
       {paginated.length > 0 && (
         <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
 
-          {/* Header — desktop: 5 kolommen, iPad: 3 kolommen */}
-          <div className="hidden md:grid md:grid-cols-[2fr_1.4fr_1fr_80px_90px] lg:grid-cols-[2fr_2fr_1.4fr_1fr_80px_90px] gap-0 px-5 py-3 bg-gray-50 border-b border-gray-200">
-            <SortTh col="name" label="Naam" />
-            <div className="hidden lg:block"><SortTh col="lastVisit" label="E-mail" /></div>
-            <SortTh col="lastVisit" label="Telefoon" />
-            <SortTh col="lastVisit" label="Laatste bezoek" />
-            <SortTh col="visits" label="Aantal" right />
-            <div className="text-xs font-bold uppercase tracking-wider text-gray-500">No-show</div>
-          </div>
-          {/* Header — mobiel */}
-          <div className="md:hidden grid grid-cols-[1fr_auto] gap-0 px-4 py-2.5 bg-gray-50 border-b border-gray-200">
-            <SortTh col="name" label="Naam" />
-            <SortTh col="visits" label="Bezoeken" right />
+          {/* Header */}
+          <div className="grid items-center px-4 py-3 bg-gray-50 border-b border-gray-200 text-xs font-bold uppercase tracking-wider text-gray-500"
+            style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(100px,1.5fr) minmax(80px,1fr) 60px 80px' }}>
+            <div onClick={() => changeSort('name')} className="cursor-pointer select-none hover:text-gray-900 flex items-center gap-1">
+              Naam {guestSort === 'name' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
+            </div>
+            <div>Telefoon</div>
+            <div onClick={() => changeSort('lastVisit')} className="cursor-pointer select-none hover:text-gray-900 hidden md:flex items-center gap-1">
+              Laatste bezoek {guestSort === 'lastVisit' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
+            </div>
+            <div onClick={() => changeSort('visits')} className="cursor-pointer select-none hover:text-gray-900 text-right flex items-center justify-end gap-1">
+              Aantal {guestSort === 'visits' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
+            </div>
+            <div>No-show</div>
           </div>
 
           {/* Rijen */}
@@ -476,54 +477,32 @@ function ContactsView({
                 ? new Date(guest.lastVisit + 'T12:00').toLocaleDateString('nl-BE', { day: 'numeric', month: 'short', year: 'numeric' })
                 : '—'
               return (
-                <div key={guest.id} className="hover:bg-gray-50 transition-colors">
-                  {/* Desktop rij */}
-                  <div className="hidden md:grid md:grid-cols-[2fr_1.4fr_1fr_80px_90px] lg:grid-cols-[2fr_2fr_1.4fr_1fr_80px_90px] gap-0 px-5 py-3 items-center">
-                    <div className="font-semibold text-gray-900 flex items-center gap-1.5 min-w-0">
-                      {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0" />}
-                      <span className="truncate">{guest.name}</span>
-                    </div>
-                    <div className="hidden lg:block text-gray-500 text-sm truncate pr-2">
-                      {guest.email
-                        ? <a href={`mailto:${guest.email}`} className="hover:underline hover:text-[#3C4D6B]">{guest.email}</a>
-                        : <span className="text-gray-300">—</span>}
-                    </div>
-                    <div className="text-gray-600 text-sm">
-                      {guest.phone
-                        ? <a href={`tel:${guest.phone}`} className="hover:underline hover:text-[#3C4D6B]">{guest.phone}</a>
-                        : <span className="text-gray-300">—</span>}
-                    </div>
-                    <div className="text-gray-500 text-sm">{lastVisitFmt}</div>
-                    <div className="font-bold text-gray-800 text-right pr-4">{guest.totalVisits}</div>
-                    <button
-                      onClick={() => setNoShowRed(prev => { const s = new Set(prev); s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id); return s })}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors w-fit ${isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
-                    >
-                      No-show
-                    </button>
+                <div key={guest.id}
+                  className="grid items-center px-4 py-3 hover:bg-gray-50 transition-colors"
+                  style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(100px,1.5fr) minmax(80px,1fr) 60px 80px' }}
+                >
+                  {/* Naam */}
+                  <div className="font-semibold text-gray-900 flex items-center gap-1.5 min-w-0 pr-2">
+                    {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0" />}
+                    <span className="truncate">{guest.name}</span>
                   </div>
-                  {/* Mobiel/iPad rij */}
-                  <div className="md:hidden px-4 py-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0" />}
-                          <span className="font-semibold text-gray-900 truncate">{guest.name}</span>
-                          <span className="text-xs text-gray-400 flex-shrink-0">{guest.totalVisits}×</span>
-                        </div>
-                        <div className="flex flex-wrap gap-x-3 text-sm text-gray-500">
-                          {guest.phone && <a href={`tel:${guest.phone}`} className="hover:underline">{guest.phone}</a>}
-                          <span className="text-gray-400">{lastVisitFmt}</span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => setNoShowRed(prev => { const s = new Set(prev); s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id); return s })}
-                        className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold ${isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400'}`}
-                      >
-                        No-show
-                      </button>
-                    </div>
+                  {/* Telefoon */}
+                  <div className="text-gray-600 text-sm pr-2">
+                    {guest.phone
+                      ? <a href={`tel:${guest.phone}`} className="hover:underline hover:text-[#3C4D6B]">{guest.phone}</a>
+                      : <span className="text-gray-300">—</span>}
                   </div>
+                  {/* Laatste bezoek */}
+                  <div className="text-gray-500 text-sm hidden md:block pr-2">{lastVisitFmt}</div>
+                  {/* Aantal */}
+                  <div className="font-bold text-gray-800 text-right pr-4">{guest.totalVisits}</div>
+                  {/* No-show */}
+                  <button
+                    onClick={() => setNoShowRed(prev => { const s = new Set(prev); s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id); return s })}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors w-fit ${isRed ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                  >
+                    No-show
+                  </button>
                 </div>
               )
             })}
