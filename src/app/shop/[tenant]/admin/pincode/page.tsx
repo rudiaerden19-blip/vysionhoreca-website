@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 
 export default function PincodePage({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
-  const SESSION_KEY = `vysion_pin_unlocked_${tenant}`
 
   const [hasPin, setHasPin] = useState<boolean | null>(null)
   const [justSaved, setJustSaved] = useState(false)
@@ -33,7 +32,6 @@ export default function PincodePage({ params }: { params: { tenant: string } }) 
     const data = await res.json()
     setSaving(false)
     if (data.success) {
-      sessionStorage.setItem(SESSION_KEY, 'true')
       setSuccess(hasPin ? 'PIN succesvol gewijzigd!' : 'PIN succesvol ingesteld!')
       setHasPin(true)
       setJustSaved(true)
