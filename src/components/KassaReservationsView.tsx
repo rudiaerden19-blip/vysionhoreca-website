@@ -1542,8 +1542,8 @@ export default function KassaReservationsView({
     let assignedTable = r.table_number
     if (!assignedTable) {
       const allTables = floorPlanTablesDB.length > 0
-        ? floorPlanTablesDB.map(t => String(t.number))
-        : kassaTables.map(t => String(t.number))
+        ? floorPlanTablesDB.filter(t => t.seats >= r.party_size).map(t => String(t.number))
+        : kassaTables.filter(t => t.seats >= r.party_size).map(t => String(t.number))
 
       const buffer = reservationSettings.bufferMinutes || 0
       const rStart = parseInt(r.reservation_time.split(':')[0]) * 60 + parseInt(r.reservation_time.split(':')[1])
@@ -1576,14 +1576,22 @@ export default function KassaReservationsView({
 
     toast.success(`${r.guest_name} goedgekeurd${assignedTable && !r.table_number ? ` — Tafel ${assignedTable} toegewezen` : ''}`)
 
-    // Stuur bevestigingsmail
-    if (r.guest_email) {
+    // Stuur bevestigingsmail — haal businessInfo opnieuw op als leeg
+    const emailTo = r.guest_email
+    if (emailTo) {
       try {
-        await fetch('/api/send-reservation-email', {
+        let bName = businessInfo.name
+        let bPhone = businessInfo.phone
+        let bEmail = businessInfo.email
+        if (!bName) {
+          const { data: td } = await supabase.from('tenants').select('name,phone,email').eq('slug', tenant).single()
+          if (td) { bName = td.name || ''; bPhone = td.phone || ''; bEmail = td.email || '' }
+        }
+        const res = await fetch('/api/send-reservation-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            customerEmail: r.guest_email,
+            customerEmail: emailTo,
             customerName: r.guest_name,
             customerPhone: r.guest_phone,
             reservationDate: r.reservation_date,
@@ -1593,12 +1601,21 @@ export default function KassaReservationsView({
             notes: r.notes,
             specialRequests: r.special_requests,
             status: 'confirmed',
-            businessName: businessInfo.name,
-            businessPhone: businessInfo.phone,
-            businessEmail: businessInfo.email,
+            businessName: bName,
+            businessPhone: bPhone,
+            businessEmail: bEmail,
           }),
         })
-      } catch (e) { console.warn('Bevestigingsmail mislukt:', e) }
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}))
+          toast.error('Mail mislukt: ' + (err.error || res.statusText))
+        } else {
+          toast.success('Bevestigingsmail verstuurd naar ' + emailTo)
+        }
+      } catch (e) {
+        toast.error('Mail kon niet verstuurd worden')
+        console.error('Bevestigingsmail error:', e)
+      }
     }
   }
 
@@ -3234,15 +3251,15 @@ export default function KassaReservationsView({
                 const pending = reservations.filter(r => r.status === 'PENDING')
                 if (pending.length === 0) return null
                 return (
-                  <div className="flex-shrink-0 bg-amber-50 border-b-2 border-amber-200 px-4 py-3">
+                  <div className="flex-shrink-0 bg-red-600 border-b-4 border-red-800 px-4 py-3 animate-pulse">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-amber-600 font-bold text-sm">⏳ {pending.length} reservatie{pending.length > 1 ? 's' : ''} wacht op goedkeuring</span>
+                      <span className="text-white font-black text-sm tracking-wide">🔴 {pending.length} NIEUWE RESERVATIE{pending.length > 1 ? 'S' : ''} — WACHT OP GOEDKEURING</span>
                     </div>
                     <div className="space-y-2">
                       {pending.slice(0, 3).map(r => (
-                        <div key={r.id} className="flex items-center justify-between bg-white rounded-xl px-4 py-2.5 border border-amber-200 shadow-sm">
+                        <div key={r.id} className="flex items-center justify-between bg-white rounded-xl px-4 py-2.5 border-2 border-red-300 shadow-md">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-2 h-2 rounded-full bg-amber-400 shrink-0"/>
+                            <div className="w-3 h-3 rounded-full bg-red-500 shrink-0 animate-ping"/>
                             <div className="min-w-0">
                               <p className="font-semibold text-sm text-gray-800 truncate">{r.guest_name}</p>
                               <p className="text-xs text-gray-500">{r.reservation_date} · {r.reservation_time} · {r.party_size}p</p>
