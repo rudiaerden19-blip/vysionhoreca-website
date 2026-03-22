@@ -1015,15 +1015,17 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                   status === 'new' ? 'ring-2 ring-red-500 animate-pulse' : ''
                 }`}
               >
+                {/* AFHALEN / LEVERING — groot en centraal */}
+                <div className={`w-full text-center py-2 mb-3 rounded-xl font-black text-xl tracking-wide ${order.order_type === 'pickup' || order.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                  {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? '🛍️ AFHALEN' : '🚗 LEVERING'}
+                </div>
+
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-3 flex-wrap">
                       <span className="text-xl font-bold text-gray-900">#{order.order_number || order.id?.slice(0, 8)}</span>
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${config.bg} ${config.text}`}>
                         {config.label}
-                      </span>
-                      <span className={`px-2 py-1 rounded text-xs font-medium ${order.order_type === 'pickup' || order.order_type === 'PICKUP' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                        {order.order_type === 'pickup' || order.order_type === 'PICKUP' ? `🛍️ ${t('ordersPage.orderType.pickup')}` : `🚗 ${t('ordersPage.orderType.delivery')}`}
                       </span>
                       {/* Payment Status Badge */}
                       {order.payment_status && (
