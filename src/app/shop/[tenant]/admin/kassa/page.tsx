@@ -1005,6 +1005,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           {hamburgerOpen && (() => {
             const modules = [
               { key: 'kassa', icon: '🖥️', label: 'Kassa', items: [
+                { icon: '🔐', label: 'Pincode', href: `${baseUrl}/pincode` },
                 { icon: '📁', label: 'Categorieën', href: `${baseUrl}/categorieen` },
                 { icon: '🍟', label: 'Producten', href: `${baseUrl}/producten` },
                 { icon: '➕', label: "Opties & Extra's", href: `${baseUrl}/opties` },
@@ -1012,7 +1013,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '⚠️', label: 'Allergenen', href: `${baseUrl}/allergenen` },
                 { icon: '🖨️', label: 'Bonnenprinter', href: `${baseUrl}/bonnenprinter` },
                 { icon: '🏷️', label: 'Labels', href: `${baseUrl}/labels` },
-                { icon: '🔐', label: 'Pincode', href: `${baseUrl}/pincode` },
               ]},
               { key: 'online-bestellingen', icon: '📲', label: 'Online Bestellingen', items: [
                 { icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
