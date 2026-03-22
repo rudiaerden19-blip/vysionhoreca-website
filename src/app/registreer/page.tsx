@@ -145,11 +145,11 @@ export default function RegisterPage() {
       setTenantSlug(data.tenant.tenant_slug)
       setSuccess(true)
       
-      // Redirect directly to admin
+      // Redirect naar welkomstpagina bij eerste registratie
       if (window.location.hostname === 'localhost') {
-        router.push(`/shop/${data.tenant.tenant_slug}/admin`)
+        router.push(`/shop/${data.tenant.tenant_slug}/welkom`)
       } else {
-        window.location.href = `https://${data.tenant.tenant_slug}.ordervysion.com/admin`
+        window.location.href = `https://${data.tenant.tenant_slug}.ordervysion.com/welkom`
       }
       
     } catch (err) {
@@ -163,9 +163,9 @@ export default function RegisterPage() {
       (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1'))
     
     if (isLocalhost) {
-      router.push(`/shop/${tenantSlug}/admin`)
+      router.push(`/shop/${tenantSlug}/welkom`)
     } else {
-      window.location.href = `https://${tenantSlug}.ordervysion.com/admin`
+      window.location.href = `https://${tenantSlug}.ordervysion.com/welkom`
     }
   }
 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
@@ -32,7 +33,20 @@ interface RecentOrder {
 
 export default function AdminDashboard({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
+  const router = useRouter()
   const [businessName, setBusinessName] = useState<string>('')
+
+  // Welkomstpagina: toon elke ochtend (1× per dag) bij het openen
+  useEffect(() => {
+    try {
+      const today = new Date().toISOString().slice(0, 10)
+      const key = `vysion_welcomed_${params.tenant}`
+      const lastSeen = localStorage.getItem(key)
+      if (lastSeen !== today) {
+        router.replace(`/shop/${params.tenant}/welkom`)
+      }
+    } catch { /* ignore */ }
+  }, [params.tenant, router])
   const [stats, setStats] = useState<DashboardStats>({
     todayOrders: 0,
     todayRevenue: 0,
