@@ -1041,6 +1041,11 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       )}
                     </div>
                     <p className="text-gray-500 mt-1">{formatTime(order.created_at)}</p>
+                    {((order as any).scheduled_date || (order as any).scheduled_time) && (
+                      <p className="mt-1 text-sm font-semibold text-orange-600 bg-orange-50 px-2 py-1 rounded-lg inline-block">
+                        📅 {(order as any).scheduled_date ? new Date((order as any).scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}{(order as any).scheduled_time ? ` om ${(order as any).scheduled_time}` : ''}
+                      </p>
+                    )}
                   </div>
                   <p className="text-2xl font-bold text-blue-600">€{order.total?.toFixed(2) || '0.00'}</p>
                 </div>
@@ -1231,6 +1236,19 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     </span>
                   )}
                 </div>
+
+                {/* Geplande datum/tijd — PROMINENT tonen als aanwezig */}
+                {((selectedOrder as any).scheduled_date || (selectedOrder as any).scheduled_time) && (
+                  <div className="bg-orange-50 border-2 border-orange-300 rounded-xl p-4">
+                    <p className="text-sm text-orange-600 font-semibold mb-1">📅 Gewenst tijdstip</p>
+                    <p className="text-2xl font-black text-orange-700">
+                      {(selectedOrder as any).scheduled_date
+                        ? new Date((selectedOrder as any).scheduled_date).toLocaleDateString('nl-BE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+                        : ''}
+                      {(selectedOrder as any).scheduled_time ? ` om ${(selectedOrder as any).scheduled_time}` : ''}
+                    </p>
+                  </div>
+                )}
 
                 {/* Customer Info */}
                 <div className="bg-blue-50 rounded-xl p-5">

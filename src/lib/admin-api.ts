@@ -1519,6 +1519,8 @@ export interface Order {
   payment_status?: string
   requested_date?: string
   requested_time?: string
+  scheduled_date?: string
+  scheduled_time?: string
   estimated_ready_time?: string
   completed_at?: string
   confirmed_at?: string
