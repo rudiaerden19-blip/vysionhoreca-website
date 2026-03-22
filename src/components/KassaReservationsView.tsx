@@ -1023,13 +1023,11 @@ export default function KassaReservationsView({
         event: 'INSERT',
         schema: 'public',
         table: 'reservations',
-        filter: `tenant_slug=eq.${tenant}`,
       }, () => { loadReservations(true); loadGuestProfiles() })
       .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'reservations',
-        filter: `tenant_slug=eq.${tenant}`,
       }, () => { loadReservations(true); loadGuestProfiles() })
       .subscribe()
 

@@ -169,24 +169,33 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
 
       // Stuur mail: bij autoConfirm → "bevestigd", anders → "in afwachting"
       if (formData.guest_email) {
-        await fetch('/api/send-reservation-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            customerEmail: formData.guest_email,
-            customerName: formData.guest_name,
-            customerPhone: formData.guest_phone,
-            reservationDate: formData.reservation_date,
-            reservationTime: formData.reservation_time,
-            partySize: formData.party_size,
-            notes: formData.notes,
-            specialRequests: formData.special_requests,
-            status: settings.autoConfirm ? 'confirmed' : 'pending',
-            businessName: tenantInfo?.name || tenant,
-            businessPhone: tenantInfo?.phone,
-            businessEmail: tenantInfo?.email,
-          }),
-        })
+        try {
+          const mailRes = await fetch('/api/send-reservation-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              customerEmail: formData.guest_email,
+              customerName: formData.guest_name,
+              customerPhone: formData.guest_phone,
+              reservationDate: formData.reservation_date,
+              reservationTime: formData.reservation_time,
+              partySize: formData.party_size,
+              notes: formData.notes,
+              specialRequests: formData.special_requests,
+              status: settings.autoConfirm ? 'confirmed' : 'pending',
+              businessName: tenantInfo?.name || tenant,
+              businessPhone: tenantInfo?.phone,
+              businessEmail: tenantInfo?.email,
+            }),
+          })
+          if (!mailRes.ok) {
+            const err = await mailRes.json().catch(() => ({}))
+            console.error('[reserveren] Email fout:', err)
+            setError(`Reservatie gemaakt maar mail mislukt: ${err.error || mailRes.statusText}`)
+          }
+        } catch (mailErr) {
+          console.error('[reserveren] Email netwerk fout:', mailErr)
+        }
       }
 
       // Als borg vereist, redirect naar Stripe
