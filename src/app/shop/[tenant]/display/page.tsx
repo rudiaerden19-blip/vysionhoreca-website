@@ -91,7 +91,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   const [currentTime, setCurrentTime] = useState(new Date())
   const [soundEnabled, setSoundEnabled] = useState(true)
   // Check if already activated this session - skip activation screen if so
-  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession())
+  const [audioActivated, setAudioActivated] = useState(() => isAudioActivatedThisSession(params.tenant))
   const [newOrderIds, setNewOrderIds] = useState<Set<string>>(new Set())
   const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active')
   const [printerIP, setPrinterIP] = useState<string | null>(null)

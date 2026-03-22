@@ -16,34 +16,35 @@ let heartbeatInterval: NodeJS.Timeout | null = null;
 let audioContextResumePromise: Promise<void> | null = null;
 let heartbeatRefCount = 0; // Track hoeveel tenants heartbeat nodig hebben
 
-// Session storage key voor activatie tracking
-const AUDIO_SESSION_KEY = 'vysion_audio_session_activated';
-
-// Check if sounds are enabled (read from localStorage for performance)
-export const getSoundsEnabled = (): boolean => {
+// Check if sounds are enabled (tenant-specifiek)
+export const getSoundsEnabled = (tenant?: string): boolean => {
   if (typeof window === 'undefined') return true;
-  const saved = localStorage.getItem('vysion_sounds_enabled');
+  const key = tenant ? `vysion_sounds_enabled_${tenant}` : 'vysion_sounds_enabled';
+  const saved = localStorage.getItem(key);
   return saved !== 'false';
 };
 
-// Check of audio al geactiveerd is deze sessie (voor activatiescherm)
-export const isAudioActivatedThisSession = (): boolean => {
+// Check of audio al geactiveerd is deze sessie (tenant-specifiek)
+export const isAudioActivatedThisSession = (tenant?: string): boolean => {
   if (typeof window === 'undefined') return false;
-  return sessionStorage.getItem(AUDIO_SESSION_KEY) === 'true';
+  const key = tenant ? `vysion_audio_activated_${tenant}` : 'vysion_audio_session_activated';
+  return sessionStorage.getItem(key) === 'true';
 };
 
-// Markeer audio als geactiveerd deze sessie
-export const markAudioActivated = (): void => {
+// Markeer audio als geactiveerd deze sessie (tenant-specifiek)
+export const markAudioActivated = (tenant?: string): void => {
   if (typeof window !== 'undefined') {
-    sessionStorage.setItem(AUDIO_SESSION_KEY, 'true');
+    const key = tenant ? `vysion_audio_activated_${tenant}` : 'vysion_audio_session_activated';
+    sessionStorage.setItem(key, 'true');
   }
 };
 
-// Set sounds enabled state
-export const setSoundsEnabled = (enabled: boolean) => {
+// Set sounds enabled state (tenant-specifiek)
+export const setSoundsEnabled = (enabled: boolean, tenant?: string) => {
   soundsEnabled = enabled;
   if (typeof window !== 'undefined') {
-    localStorage.setItem('vysion_sounds_enabled', String(enabled));
+    const key = tenant ? `vysion_sounds_enabled_${tenant}` : 'vysion_sounds_enabled';
+    localStorage.setItem(key, String(enabled));
   }
   if (enabled) {
     startHeartbeat();
