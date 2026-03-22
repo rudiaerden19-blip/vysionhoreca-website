@@ -50,17 +50,18 @@ export default function DashboardPage() {
 
   async function fetchDashboardData() {
     const businessId = getBusinessId()
-    if (!businessId || !supabase) {
+    const tenantSlug = (() => { try { const s = localStorage.getItem('vysion_tenant'); return s ? JSON.parse(s).tenant_slug : null } catch { return null } })()
+    if (!tenantSlug || !supabase) {
       setLoading(false)
       return
     }
 
     try {
-      // Fetch orders filtered by business_id
+      // Fetch orders filtered by tenant_slug
       const { data: orders, error: ordersError } = await supabase
         .from('orders')
         .select('*')
-        .eq('business_id', businessId)
+        .eq('tenant_slug', tenantSlug)
         .order('created_at', { ascending: false })
 
       if (ordersError) throw ordersError

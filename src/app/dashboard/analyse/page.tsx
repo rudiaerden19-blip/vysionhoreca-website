@@ -22,10 +22,10 @@ export default function AnalysePage() {
       const stored = localStorage.getItem('vysion_tenant')
       if (!stored) return
       const tenant = JSON.parse(stored)
-      if (!tenant?.business_id) return
+      if (!tenant?.tenant_slug) return
       
       const [ordersRes, costsRes] = await Promise.all([
-        supabase.from('orders').select('*').eq('business_id', tenant.business_id),
+        supabase.from('orders').select('*').eq('tenant_slug', tenant.tenant_slug),
         supabase.from('fixed_costs').select('*').eq('business_id', tenant.business_id),
       ])
 

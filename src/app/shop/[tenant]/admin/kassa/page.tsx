@@ -812,7 +812,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       tenant_slug: tenant,
       order_number: orderNumber,
       customer_name: tableNumber ? `Tafel ${tableNumber}` : 'Kassa',
-      status: 'completed',
+      status: 'confirmed',
       payment_status: 'paid',
       payment_method: method,
       order_type: orderType,
