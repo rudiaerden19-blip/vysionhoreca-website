@@ -1535,6 +1535,14 @@ export interface Order {
   items?: OrderItem[] | { name: string; quantity: number; price: number }[]
 }
 
+/** Webshop (checkout): pickup/delivery lowercase. Kassa gebruikt DINE_IN / TAKEAWAY / DELIVERY (hoofdletters). */
+export function isWebshopOrder(order: Pick<Order, 'order_type'>): boolean {
+  const t = (order.order_type || '').toString()
+  if (t === 'DINE_IN' || t === 'TAKEAWAY' || t === 'DELIVERY') return false
+  const lower = t.toLowerCase()
+  return lower === 'pickup' || lower === 'delivery'
+}
+
 export async function getOrders(tenantSlug: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Order[]> {
   let query = supabase
     .from('orders')
@@ -1851,6 +1859,56 @@ export async function confirmOrder(id: string): Promise<boolean> {
     await autoUpdateZReport(order.tenant_slug, new Date(order.created_at).toISOString().split('T')[0])
   }
 
+  return true
+}
+
+/**
+ * Webshop: één stap na goedkeuren — completed + betaald (pending→paid) zodat Z-rapport/dashboard met betaalde omzet klopt.
+ * Geen tussenstappen bereiding/klaar.
+ */
+export async function confirmAndCompleteOnlineOrder(id: string): Promise<boolean> {
+  if (!supabase) return false
+
+  const { data: order, error: fetchError } = await supabase
+    .from('orders')
+    .select('tenant_slug, created_at, payment_status, payment_method, order_type, status')
+    .eq('id', id)
+    .single()
+
+  if (fetchError || !order) {
+    console.error('confirmAndCompleteOnlineOrder: order niet gevonden', fetchError)
+    return false
+  }
+
+  if (!isWebshopOrder(order)) {
+    console.warn('confirmAndCompleteOnlineOrder: geen webshop-order')
+    return false
+  }
+
+  const st = (order.status || '').toLowerCase()
+  if (st === 'rejected' || st === 'cancelled' || st === 'completed') {
+    return false
+  }
+
+  const updates: Record<string, unknown> = {
+    status: 'completed',
+    confirmed_at: new Date().toISOString(),
+    completed_at: new Date().toISOString(),
+  }
+
+  const ps = (order.payment_status || '').toLowerCase()
+  if (ps === 'pending') {
+    updates.payment_status = 'paid'
+  }
+
+  const { error } = await supabase.from('orders').update(updates).eq('id', id)
+
+  if (error) {
+    console.error('confirmAndCompleteOnlineOrder:', error)
+    return false
+  }
+
+  await autoUpdateZReport(order.tenant_slug, new Date(order.created_at).toISOString().split('T')[0])
   return true
 }
 

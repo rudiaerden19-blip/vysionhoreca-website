@@ -3,7 +3,7 @@
 import { useLanguage } from '@/i18n'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getOrders, updateOrderStatus, confirmOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints } from '@/lib/admin-api'
+import { getOrders, updateOrderStatus, confirmOrder, confirmAndCompleteOnlineOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints, isWebshopOrder } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { getSoundsEnabled } from '@/lib/sounds'
 
@@ -229,8 +229,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       
       // WhatsApp status updates only for confirmed/rejected (handled in their own functions)
       
-      // Send email when order is ready for pickup
-      if (newStatus === 'ready' && order?.customer_email) {
+      // E-mail "klaar voor afhalen" — niet voor webshop (die gaat in één stap naar completed zonder tussenmail)
+      if (newStatus === 'ready' && order?.customer_email && order && !isWebshopOrder(order)) {
         try {
           await fetch('/api/send-order-status', {
             method: 'POST',
@@ -270,18 +270,43 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setUpdatingId(null)
   }
   
+  /** Oude webshop-flow: nog in confirmed/preparing/ready → één tap om te voltooien (geen extra mails hier). */
+  const handleFinalizeWebshop = async (order: Order) => {
+    if (!order.id) return
+    setUpdatingId(order.id)
+    const success = await confirmAndCompleteOnlineOrder(order.id)
+    if (success) {
+      const now = new Date().toISOString()
+      setOrders(prev => prev.map(o =>
+        o.id === order.id ? { ...o, status: 'completed', completed_at: now, payment_status: 'paid' } : o
+      ))
+    }
+    setUpdatingId(null)
+  }
+
   // Handle confirm order (goedkeuren)
   const handleConfirmOrder = async (order: Order) => {
     if (!order.id) return
+    const web = isWebshopOrder(order)
     setUpdatingId(order.id)
     // Stop alarm exact zoals donor
     if (typeof window !== 'undefined' && (window as any).stopOrderAlarm) {
       (window as any).stopOrderAlarm()
     }
-    const success = await confirmOrder(order.id)
+    const success = web
+      ? await confirmAndCompleteOnlineOrder(order.id)
+      : await confirmOrder(order.id)
     if (success) {
-      setOrders(prev => prev.map(o => 
-        o.id === order.id ? { ...o, status: 'confirmed', confirmed_at: new Date().toISOString() } : o
+      const now = new Date().toISOString()
+      setOrders(prev => prev.map(o =>
+        o.id === order.id
+          ? {
+              ...o,
+              status: web ? 'completed' : 'confirmed',
+              confirmed_at: now,
+              ...(web ? { completed_at: now, payment_status: 'paid' } : {}),
+            }
+          : o
       ))
       
       // Send WhatsApp confirmation to customer
@@ -761,7 +786,18 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       </motion.button>
                     </>
                   )}
-                  {status === 'confirmed' && (
+                  {/* Webshop: oude orders nog niet afgerond → één knop (geen bereiding/klaar-stappen) */}
+                  {isWebshopOrder(order) && !['new', 'completed', 'cancelled', 'rejected'].includes(status) && (
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleFinalizeWebshop(order)}
+                      disabled={updatingId === order.id}
+                      className="col-span-2 p-4 bg-gray-700 hover:bg-gray-800 text-white rounded-xl text-xl font-bold"
+                    >
+                      ✔️ {t('ordersPage.actions.complete').toUpperCase()}
+                    </motion.button>
+                  )}
+                  {!isWebshopOrder(order) && status === 'confirmed' && (
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleUpdateStatus(order.id!, 'preparing')}
@@ -771,7 +807,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       👨‍🍳 {t('ordersPage.actions.startPreparation').toUpperCase()}
                     </motion.button>
                   )}
-                  {status === 'preparing' && (
+                  {!isWebshopOrder(order) && status === 'preparing' && (
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleUpdateStatus(order.id!, 'ready')}
@@ -781,7 +817,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       ✅ {t('ordersPage.actions.ready').toUpperCase()}
                     </motion.button>
                   )}
-                  {status === 'ready' && (
+                  {!isWebshopOrder(order) && status === 'ready' && (
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => handleUpdateStatus(order.id!, 'completed')}
@@ -1138,7 +1174,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       </motion.button>
                     </>
                   )}
-                  {status.toLowerCase() !== 'new' && !['completed', 'cancelled'].includes(status.toLowerCase()) && config.next && (
+                  {/* Kassa / niet-webshop: bereiding → klaar → afronden */}
+                  {!isWebshopOrder(order) && status.toLowerCase() !== 'new' && !['completed', 'cancelled'].includes(status.toLowerCase()) && config.next && (
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -1159,6 +1196,18 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                           {status.toLowerCase() === 'ready' && `✔️ ${t('ordersPage.actions.complete')}`}
                         </>
                       )}
+                    </motion.button>
+                  )}
+                  {/* Webshop: alleen afhandelen als oude flow nog open stond */}
+                  {isWebshopOrder(order) && !['new', 'completed', 'cancelled', 'rejected'].includes(status.toLowerCase()) && (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleFinalizeWebshop(order)}
+                      disabled={updatingId === order.id}
+                      className="flex-1 min-w-[200px] bg-gray-700 hover:bg-gray-800 disabled:bg-gray-400 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+                    >
+                      ✔️ {t('ordersPage.actions.complete')}
                     </motion.button>
                   )}
                   <button 
