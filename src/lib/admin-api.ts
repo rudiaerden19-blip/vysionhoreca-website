@@ -1535,12 +1535,15 @@ export interface Order {
   items?: OrderItem[] | { name: string; quantity: number; price: number }[]
 }
 
-/** Webshop (checkout): pickup/delivery lowercase. Kassa gebruikt DINE_IN / TAKEAWAY / DELIVERY (hoofdletters). */
-export function isWebshopOrder(order: Pick<Order, 'order_type'>): boolean {
+/** Alleen deze drie komen uit de fysieke kassa-POS. Alles anders (pickup, delivery, leeg, …) = webshop/online. */
+export function isKassaPosOrder(order: Pick<Order, 'order_type'>): boolean {
   const t = (order.order_type || '').toString()
-  if (t === 'DINE_IN' || t === 'TAKEAWAY' || t === 'DELIVERY') return false
-  const lower = t.toLowerCase()
-  return lower === 'pickup' || lower === 'delivery'
+  return t === 'DINE_IN' || t === 'TAKEAWAY' || t === 'DELIVERY'
+}
+
+/** Webshop of online kanaal — niet de kassa-POS. */
+export function isWebshopOrder(order: Pick<Order, 'order_type'>): boolean {
+  return !isKassaPosOrder(order)
 }
 
 export async function getOrders(tenantSlug: string, status?: string, dateFrom?: string, dateTo?: string): Promise<Order[]> {

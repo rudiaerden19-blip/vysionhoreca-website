@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings, updateOrderStatus, TenantSettings } from '@/lib/admin-api'
+import { getTenantSettings, updateOrderStatus, TenantSettings, confirmAndCompleteOnlineOrder, isWebshopOrder } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { 
@@ -21,7 +21,7 @@ interface Order {
   customer_phone?: string
   customer_email?: string
   delivery_address?: string
-  order_type: 'pickup' | 'delivery'
+  order_type: string
   status: string
   total: number
   subtotal?: number
@@ -433,7 +433,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   async function handleApprove(order: Order) {
-    await updateOrderStatus(order.id, 'confirmed')
+    const web = isWebshopOrder(order)
+    if (web) {
+      const ok = await confirmAndCompleteOnlineOrder(order.id)
+      if (!ok) return
+    } else {
+      await updateOrderStatus(order.id, 'confirmed')
+    }
     await sendOrderStatusEmail(order, 'confirmed')
     setNewOrderIds(prev => {
       const next = new Set(prev)
@@ -462,12 +468,21 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   }
 
   async function handleComplete(order: Order) {
-    await updateOrderStatus(order.id, 'completed')
+    if (isWebshopOrder(order)) {
+      await confirmAndCompleteOnlineOrder(order.id)
+    } else {
+      await updateOrderStatus(order.id, 'completed')
+    }
     setSelectedOrder(null)
+    loadData()
   }
 
   async function handleCompleteAll() {
-    await Promise.all(activeOrders.map(o => updateOrderStatus(o.id, 'completed')))
+    await Promise.all(
+      activeOrders.map(async (o) =>
+        isWebshopOrder(o) ? confirmAndCompleteOnlineOrder(o.id) : updateOrderStatus(o.id, 'completed')
+      )
+    )
     loadData()
   }
 
@@ -1293,7 +1308,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   </button>
                 </div>
 
-                {/* Action Buttons */}
+                {/* Action Buttons — webshop: geen ketting bevestigd → klaar → afronden; één stap na goedkeuren */}
                 <div className="grid grid-cols-2 gap-4">
                   {selectedOrder.status.toLowerCase() === 'new' && (
                     <>
@@ -1315,7 +1330,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                       </motion.button>
                     </>
                   )}
-                  {selectedOrder.status.toLowerCase() === 'confirmed' && (
+                  {!isWebshopOrder(selectedOrder) && selectedOrder.status.toLowerCase() === 'confirmed' && (
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -1325,7 +1340,18 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                       ✓ {tx('markReady')}
                     </motion.button>
                   )}
-                  {selectedOrder.status.toLowerCase() === 'ready' && (
+                  {isWebshopOrder(selectedOrder) &&
+                    ['confirmed', 'preparing', 'ready'].includes(selectedOrder.status.toLowerCase()) && (
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleComplete(selectedOrder)}
+                        className="col-span-2 py-6 bg-gray-600 hover:bg-gray-500 rounded-2xl font-bold text-2xl"
+                      >
+                        ✔️ {tx('markCompleted')}
+                      </motion.button>
+                    )}
+                  {!isWebshopOrder(selectedOrder) && selectedOrder.status.toLowerCase() === 'ready' && (
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}

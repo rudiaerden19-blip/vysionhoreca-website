@@ -270,16 +270,25 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setUpdatingId(null)
   }
   
-  /** Oude webshop-flow: nog in confirmed/preparing/ready → één tap om te voltooien (geen extra mails hier). */
-  const handleFinalizeWebshop = async (order: Order) => {
+  /** Geen bereiding/klaar-stappen: webshop → confirmAndComplete; kassa-POS → direct completed. */
+  const handleMarkOrderComplete = async (order: Order) => {
     if (!order.id) return
     setUpdatingId(order.id)
-    const success = await confirmAndCompleteOnlineOrder(order.id)
-    if (success) {
-      const now = new Date().toISOString()
-      setOrders(prev => prev.map(o =>
-        o.id === order.id ? { ...o, status: 'completed', completed_at: now, payment_status: 'paid' } : o
-      ))
+    if (isWebshopOrder(order)) {
+      const success = await confirmAndCompleteOnlineOrder(order.id)
+      if (success) {
+        const now = new Date().toISOString()
+        setOrders(prev => prev.map(o =>
+          o.id === order.id ? { ...o, status: 'completed', completed_at: now, payment_status: 'paid' } : o
+        ))
+      }
+    } else {
+      const success = await updateOrderStatus(order.id, 'completed')
+      if (success) {
+        setOrders(prev => prev.map(o =>
+          o.id === order.id ? { ...o, status: 'completed', completed_at: new Date().toISOString() } : o
+        ))
+      }
     }
     setUpdatingId(null)
   }
@@ -629,12 +638,12 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
   const filteredOrders = orders.filter(o => {
     const status = o.status?.toLowerCase()
-    if (filter === 'active') return !['completed', 'cancelled'].includes(status)
+    if (filter === 'active') return !['completed', 'cancelled', 'rejected'].includes(status)
     if (filter === 'completed') return status === 'completed'
     return true
   })
 
-  const activeCount = orders.filter(o => !['completed', 'cancelled'].includes(o.status?.toLowerCase())).length
+  const activeCount = orders.filter(o => !['completed', 'cancelled', 'rejected'].includes(o.status?.toLowerCase())).length
   const newCount = orders.filter(o => o.status === 'new' || o.status === 'NEW').length
 
   if (loading) {
@@ -766,7 +775,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
                 {/* Action Buttons */}
                 <div className="grid grid-cols-2 gap-3">
-                  {status === 'new' && (
+                  {status.toLowerCase() === 'new' && (
                     <>
                       <motion.button
                         whileTap={{ scale: 0.95 }}
@@ -786,43 +795,12 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       </motion.button>
                     </>
                   )}
-                  {/* Webshop: oude orders nog niet afgerond → één knop (geen bereiding/klaar-stappen) */}
-                  {isWebshopOrder(order) && !['new', 'completed', 'cancelled', 'rejected'].includes(status) && (
+                  {!['new', 'completed', 'cancelled', 'rejected'].includes(status.toLowerCase()) && (
                     <motion.button
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => handleFinalizeWebshop(order)}
+                      onClick={() => handleMarkOrderComplete(order)}
                       disabled={updatingId === order.id}
                       className="col-span-2 p-4 bg-gray-700 hover:bg-gray-800 text-white rounded-xl text-xl font-bold"
-                    >
-                      ✔️ {t('ordersPage.actions.complete').toUpperCase()}
-                    </motion.button>
-                  )}
-                  {!isWebshopOrder(order) && status === 'confirmed' && (
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleUpdateStatus(order.id!, 'preparing')}
-                      disabled={updatingId === order.id}
-                      className="col-span-2 p-4 bg-blue-700 hover:bg-blue-800 text-white rounded-xl text-xl font-bold"
-                    >
-                      👨‍🍳 {t('ordersPage.actions.startPreparation').toUpperCase()}
-                    </motion.button>
-                  )}
-                  {!isWebshopOrder(order) && status === 'preparing' && (
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleUpdateStatus(order.id!, 'ready')}
-                      disabled={updatingId === order.id}
-                      className="col-span-2 p-4 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xl font-bold"
-                    >
-                      ✅ {t('ordersPage.actions.ready').toUpperCase()}
-                    </motion.button>
-                  )}
-                  {!isWebshopOrder(order) && status === 'ready' && (
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => handleUpdateStatus(order.id!, 'completed')}
-                      disabled={updatingId === order.id}
-                      className="col-span-2 p-4 bg-gray-600 hover:bg-gray-700 text-white rounded-xl text-xl font-bold"
                     >
                       ✔️ {t('ordersPage.actions.complete').toUpperCase()}
                     </motion.button>
@@ -1174,14 +1152,13 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       </motion.button>
                     </>
                   )}
-                  {/* Kassa / niet-webshop: bereiding → klaar → afronden */}
-                  {!isWebshopOrder(order) && status.toLowerCase() !== 'new' && !['completed', 'cancelled'].includes(status.toLowerCase()) && config.next && (
+                  {!['new', 'completed', 'cancelled', 'rejected'].includes(status.toLowerCase()) && (
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={() => handleUpdateStatus(order.id!, config.next!)}
+                      onClick={() => handleMarkOrderComplete(order)}
                       disabled={updatingId === order.id}
-                      className="flex-1 min-w-[200px] bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+                      className="flex-1 min-w-[200px] bg-gray-700 hover:bg-gray-800 disabled:bg-gray-400 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
                     >
                       {updatingId === order.id ? (
                         <motion.div
@@ -1191,23 +1168,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                         />
                       ) : (
                         <>
-                          {status.toLowerCase() === 'confirmed' && `👨‍🍳 ${t('ordersPage.actions.startPreparation')}`}
-                          {status.toLowerCase() === 'preparing' && `✅ ${t('ordersPage.actions.ready')}`}
-                          {status.toLowerCase() === 'ready' && `✔️ ${t('ordersPage.actions.complete')}`}
+                          ✔️ {t('ordersPage.actions.complete')}
                         </>
                       )}
-                    </motion.button>
-                  )}
-                  {/* Webshop: alleen afhandelen als oude flow nog open stond */}
-                  {isWebshopOrder(order) && !['new', 'completed', 'cancelled', 'rejected'].includes(status.toLowerCase()) && (
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleFinalizeWebshop(order)}
-                      disabled={updatingId === order.id}
-                      className="flex-1 min-w-[200px] bg-gray-700 hover:bg-gray-800 disabled:bg-gray-400 text-white font-medium py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
-                    >
-                      ✔️ {t('ordersPage.actions.complete')}
                     </motion.button>
                   )}
                   <button 
