@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
+import PinGate from '@/components/PinGate'
 
 interface DashboardStats {
   todayOrders: number
@@ -245,6 +246,7 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   }
 
   return (
+    <PinGate tenant={params.tenant}>
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
@@ -434,5 +436,6 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         </div>
       </motion.div>
     </div>
+    </PinGate>
   )
 }
