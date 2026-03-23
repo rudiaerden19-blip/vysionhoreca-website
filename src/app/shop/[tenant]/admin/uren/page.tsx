@@ -95,7 +95,7 @@ export default function UrenPage() {
     clock_out: '',
     break_minutes: undefined,
     worked_hours: 0,
-    absence_hours: 8,
+    absence_hours: undefined,
     notes: '',
   })
   const [emailForm, setEmailForm] = useState({
@@ -212,7 +212,7 @@ export default function UrenPage() {
         clock_out: existingEntry.clock_out || '',
         break_minutes: existingEntry.break_minutes ?? undefined,
         worked_hours: existingEntry.worked_hours || 0,
-        absence_hours: existingEntry.absence_hours || 8,
+        absence_hours: existingEntry.absence_hours ?? undefined,
         notes: existingEntry.notes || '',
       })
     } else {
@@ -223,7 +223,7 @@ export default function UrenPage() {
         clock_out: '17:00',
         break_minutes: undefined,
         worked_hours: 8,
-        absence_hours: 8,
+        absence_hours: undefined,
         notes: '',
       })
     }
@@ -1183,8 +1183,9 @@ Met vriendelijke groeten`,
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('urenPage.hours')}</label>
                   <input
                     type="number"
-                    value={entryForm.absence_hours || 8}
-                    onChange={(e) => setEntryForm({ ...entryForm, absence_hours: parseFloat(e.target.value) || 0 })}
+                    value={entryForm.absence_hours ?? ''}
+                    placeholder="bv. 8"
+                    onChange={(e) => setEntryForm({ ...entryForm, absence_hours: e.target.value === '' ? undefined : parseFloat(e.target.value) })}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     step="0.5"
                     min="0"
