@@ -57,8 +57,9 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [loggedInCustomerId, setLoggedInCustomerId] = useState<string | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
   const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>(['cash'])
-  const [scheduledDate, setScheduledDate] = useState<string>('') // Selected pickup date
-  const [scheduledTime, setScheduledTime] = useState<string>('') // Selected pickup time
+  const [scheduledDate, setScheduledDate] = useState<string>('') // YYYY-MM-DD
+  const [scheduledDateDisplay, setScheduledDateDisplay] = useState<string>('') // DD/MM/YYYY
+  const [scheduledTime, setScheduledTime] = useState<string>('') // HH:MM
   const [whatsappPhone, setWhatsappPhone] = useState<string | null>(null) // Phone from WhatsApp link
   const [businessWhatsApp, setBusinessWhatsApp] = useState<string>('') // Business WhatsApp number
   const [radiusConfirmed] = useState(true)
@@ -634,30 +635,47 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               <h2 className="text-lg font-bold text-gray-900 mb-4">📅 {t('checkoutPage.whenPickup')}</h2>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                {/* Date picker */}
+                {/* Date input — DD/MM/YYYY tekstveld */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.date')}</label>
                   <input
-                    type="date"
-                    value={scheduledDate}
-                    onChange={(e) => setScheduledDate(e.target.value)}
-                    min={shopStatus?.canOrder 
-                      ? new Date().toISOString().split('T')[0] 
-                      : new Date(Date.now() + 86400000).toISOString().split('T')[0]
-                    }
-                    max={new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="DD/MM/JJJJ"
+                    maxLength={10}
+                    value={scheduledDateDisplay}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, '').slice(0, 8)
+                      let display = digits
+                      if (digits.length > 4) display = digits.slice(0,2) + '/' + digits.slice(2,4) + '/' + digits.slice(4)
+                      else if (digits.length > 2) display = digits.slice(0,2) + '/' + digits.slice(2)
+                      setScheduledDateDisplay(display)
+                      if (digits.length === 8) {
+                        const iso = `${digits.slice(4,8)}-${digits.slice(2,4)}-${digits.slice(0,2)}`
+                        setScheduledDate(iso)
+                      } else {
+                        setScheduledDate('')
+                      }
+                    }}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all text-center text-lg tracking-widest"
                   />
                 </div>
 
-                {/* Time picker */}
+                {/* Time input — HH:MM tekstveld */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.time')}</label>
                   <input
-                    type="time"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="00:00"
+                    maxLength={5}
                     value={scheduledTime}
-                    onChange={(e) => setScheduledTime(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, '').slice(0, 4)
+                      const formatted = digits.length > 2 ? digits.slice(0,2) + ':' + digits.slice(2) : digits
+                      setScheduledTime(formatted)
+                    }}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all text-center text-lg tracking-widest"
                   />
                 </div>
               </div>
