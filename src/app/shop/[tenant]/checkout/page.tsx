@@ -635,29 +635,19 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               <h2 className="text-lg font-bold text-gray-900 mb-4">📅 {t('checkoutPage.whenPickup')}</h2>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                {/* Date input — DD/MM/YYYY tekstveld */}
+                {/* Date picker — kalender */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('checkoutPage.date')}</label>
                   <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="DD/MM/JJJJ"
-                    maxLength={10}
-                    value={scheduledDateDisplay}
-                    onChange={(e) => {
-                      const digits = e.target.value.replace(/\D/g, '').slice(0, 8)
-                      let display = digits
-                      if (digits.length > 4) display = digits.slice(0,2) + '/' + digits.slice(2,4) + '/' + digits.slice(4)
-                      else if (digits.length > 2) display = digits.slice(0,2) + '/' + digits.slice(2)
-                      setScheduledDateDisplay(display)
-                      if (digits.length === 8) {
-                        const iso = `${digits.slice(4,8)}-${digits.slice(2,4)}-${digits.slice(0,2)}`
-                        setScheduledDate(iso)
-                      } else {
-                        setScheduledDate('')
-                      }
-                    }}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all text-center text-lg tracking-widest"
+                    type="date"
+                    value={scheduledDate}
+                    onChange={(e) => { setScheduledDate(e.target.value); setScheduledDateDisplay(e.target.value) }}
+                    min={shopStatus?.canOrder
+                      ? new Date().toISOString().split('T')[0]
+                      : new Date(Date.now() + 86400000).toISOString().split('T')[0]
+                    }
+                    max={new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                   />
                 </div>
 
