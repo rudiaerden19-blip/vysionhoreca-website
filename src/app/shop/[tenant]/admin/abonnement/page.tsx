@@ -765,14 +765,22 @@ export default function AbonnementPage() {
                 <h3 className="font-bold text-purple-900 mt-2 mb-1">Upgrade naar Premium</h3>
                 <p className="text-purple-700 text-sm mb-4">Alle features voor €99/maand</p>
                 <button
-                  onClick={() => {
-                    setBillingYearly(false)
-                    document.getElementById('pro-plan-card')?.scrollIntoView({ behavior: 'smooth' })
-                  }}
-                  className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-3 px-6 rounded-xl font-bold text-sm transition-colors"
+                  onClick={() => handleSubscribe('pro', 'monthly')}
+                  disabled={processing !== null}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-3 px-6 rounded-xl font-bold text-sm transition-colors disabled:opacity-50"
                 >
-                  🛒 Upgrade naar Premium
+                  {processing === 'pro' ? '⏳ Laden...' : '🛒 Upgrade naar Premium'}
                 </button>
+              </div>
+            </div>
+          )}
+          {/* Huidig plan is Premium */}
+          {(currentPlan === 'pro' || currentPlan === 'PRO') && (isActive || isTrial) && (
+            <div className="flex-shrink-0">
+              <div className="bg-gradient-to-br from-purple-100 to-pink-100 border border-purple-300 rounded-2xl p-5 text-center max-w-xs">
+                <span className="text-3xl">✨</span>
+                <h3 className="font-bold text-purple-900 mt-2 mb-1">Vysion Premium</h3>
+                <p className="text-green-700 font-semibold text-sm">✅ Uw huidig plan is Premium</p>
               </div>
             </div>
           )}
