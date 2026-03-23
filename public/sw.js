@@ -1,8 +1,9 @@
 // Vysion Kassa – Service Worker
-// Zorgt voor offline werking van de kassa app
+// Zorgt voor offline werking van de kassa app + cache van productafbeeldingen (externe URL's)
 
 const CACHE = 'vysion-kassa-v3'
 const STATIC_CACHE = 'vysion-static-v3'
+const IMAGE_CACHE = 'vysion-images-v1'
 
 // Bij installatie: skip waiting zodat de nieuwe SW meteen actief wordt
 self.addEventListener('install', () => self.skipWaiting())
@@ -13,12 +14,53 @@ self.addEventListener('activate', event => {
     caches.keys()
       .then(keys => Promise.all(
         keys
-          .filter(k => k !== CACHE && k !== STATIC_CACHE)
+          .filter(k => k !== CACHE && k !== STATIC_CACHE && k !== IMAGE_CACHE)
           .map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   )
 })
+
+function isSupabaseHost(hostname) {
+  return hostname.includes('supabase.co') || hostname.includes('supabase.in')
+}
+
+/** Supabase REST/Auth/etc.: niet via SW — alleen Storage-objecten cachen we als afbeelding. */
+function isSupabaseNonStorageRequest(url) {
+  return isSupabaseHost(url.hostname) && !url.pathname.includes('/storage/v1/')
+}
+
+function isCacheableProductImageUrl(url) {
+  if (url.pathname.includes('/storage/v1/')) return true
+  if (/\.(jpg|jpeg|png|gif|webp|avif)(\?|$)/i.test(url.pathname)) return true
+  return false
+}
+
+function shouldStoreImageResponse(url, request, response) {
+  if (!response.ok) return false
+  if (isCacheableProductImageUrl(url)) return true
+  if (request.destination === 'image') return true
+  const ct = (response.headers.get('content-type') || '').toLowerCase()
+  if (ct.startsWith('image/')) return true
+  return false
+}
+
+/** Externe GET: cache-first in IMAGE_CACHE; alleen afbeeldingen wegschrijven. */
+function cacheFirstExternalImage(request, url) {
+  return caches.open(IMAGE_CACHE).then(cache =>
+    cache.match(request).then(cached => {
+      if (cached) return cached
+      return fetch(request)
+        .then(response => {
+          if (shouldStoreImageResponse(url, request, response)) {
+            cache.put(request, response.clone())
+          }
+          return response
+        })
+        .catch(() => cache.match(request))
+    })
+  )
+}
 
 self.addEventListener('fetch', event => {
   const { request } = event
@@ -27,14 +69,17 @@ self.addEventListener('fetch', event => {
   // Alleen GET-verzoeken via http(s)
   if (request.method !== 'GET' || !url.protocol.startsWith('http')) return
 
-  // Supabase API-calls: altijd live (nooit cachen)
-  if (url.hostname.includes('supabase.co') || url.hostname.includes('supabase.in')) return
+  // Supabase API / auth: altijd live, niet cachen
+  if (isSupabaseNonStorageRequest(url)) return
+
+  // Externe hosts: cache-first voor afbeeldingen (Supabase Storage, CDN, prefetch, …)
+  if (url.hostname !== self.location.hostname) {
+    event.respondWith(cacheFirstExternalImage(request, url))
+    return
+  }
 
   // Eigen API-routes: altijd live
   if (url.pathname.startsWith('/api/')) return
-
-  // Externe domeinen (Sentry, Stripe, Google): altijd live
-  if (url.hostname !== self.location.hostname) return
 
   // Next.js statische assets (hash in naam): cache-first – nooit verlopen
   if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/_next/image')) {

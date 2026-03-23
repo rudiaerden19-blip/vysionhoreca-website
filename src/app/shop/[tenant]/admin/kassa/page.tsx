@@ -9,6 +9,7 @@ import KassaReservationsView from '@/components/KassaReservationsView'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio, playOrderNotification } from '@/lib/sounds'
+import { prefetchProductImageUrls } from '@/lib/offline-product-images'
 
 interface SelectedChoice {
   optionId: string
@@ -490,6 +491,18 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       try { localStorage.setItem(CACHE_SETTINGS, JSON.stringify(s)) } catch { /* ignore */ }
     }).catch(() => { /* offline: al geladen uit cache */ })
   }, [tenant])
+
+  // Zorg dat product- en logo-afbeeldingen in de SW image-cache zitten (offline zichtbaar)
+  useEffect(() => {
+    if (products.length === 0) return
+    if (typeof navigator !== 'undefined' && !navigator.onLine) return
+    const urls: string[] = []
+    for (const p of products) {
+      if (p.image_url) urls.push(p.image_url)
+    }
+    if (tenantInfo?.logo_url) urls.push(tenantInfo.logo_url)
+    prefetchProductImageUrls(urls).catch(() => {})
+  }, [products, tenantInfo?.logo_url])
 
   // Herlaad menu wanneer pagina weer focus krijgt (na terugkeren van producten/categorieen pagina)
   useEffect(() => {
