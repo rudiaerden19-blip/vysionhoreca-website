@@ -9,6 +9,27 @@ import {
 import { useLanguage } from '@/i18n'
 import PinGate from '@/components/PinGate'
 
+// ── Tijdinvoer helper ─────────────────────────────────────────────
+function formatTimeInput(raw: string): string {
+  const digits = raw.replace(/\D/g, '').slice(0, 4)
+  if (digits.length <= 2) return digits
+  return digits.slice(0, 2) + ':' + digits.slice(2)
+}
+
+function TimeInput({ value, onChange, className }: { value: string; onChange: (v: string) => void; className?: string }) {
+  return (
+    <input
+      type="text"
+      inputMode="numeric"
+      value={value}
+      placeholder="00:00"
+      maxLength={5}
+      onChange={(e) => onChange(formatTimeInput(e.target.value))}
+      className={className ?? 'px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center w-20'}
+    />
+  )
+}
+
 // ── Belgische feestdagen ──────────────────────────────────────────
 
 function easterDate(year: number): Date {
@@ -367,18 +388,14 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                   <div className="flex items-center gap-4 flex-1 flex-wrap">
                     {/* Shift 1 */}
                     <div className="flex items-center gap-2">
-                      <input
-                        type="time"
+                      <TimeInput
                         value={daySchedule.open_time}
-                        onChange={(e) => updateDay(index, 'open_time', e.target.value)}
-                        className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        onChange={(v) => updateDay(index, 'open_time', v)}
                       />
                       <span className="text-gray-400">-</span>
-                      <input
-                        type="time"
+                      <TimeInput
                         value={daySchedule.close_time}
-                        onChange={(e) => updateDay(index, 'close_time', e.target.value)}
-                        className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        onChange={(v) => updateDay(index, 'close_time', v)}
                       />
                     </div>
 
@@ -423,18 +440,14 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                   className="mt-4 ml-[156px] flex items-center gap-2"
                 >
                   <span className="text-sm text-gray-500">{t('adminPages.openingstijden.shift2')}:</span>
-                  <input
-                    type="time"
+                  <TimeInput
                     value={daySchedule.open_time_2 || '17:00'}
-                    onChange={(e) => updateDay(index, 'open_time_2', e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    onChange={(v) => updateDay(index, 'open_time_2', v)}
                   />
                   <span className="text-gray-400">-</span>
-                  <input
-                    type="time"
+                  <TimeInput
                     value={daySchedule.close_time_2 || '21:00'}
-                    onChange={(e) => updateDay(index, 'close_time_2', e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    onChange={(v) => updateDay(index, 'close_time_2', v)}
                   />
                 </motion.div>
               )}
@@ -460,11 +473,9 @@ export default function OpeningstijdenPage({ params }: { params: { tenant: strin
                     <option value="custom">{t('adminPages.openingstijden.customTime')}</option>
                   </select>
                   {daySchedule.last_order_time && !['15min', '30min', '45min', '60min', ''].includes(daySchedule.last_order_time) && (
-                    <input
-                      type="time"
+                    <TimeInput
                       value={daySchedule.last_order_time}
-                      onChange={(e) => updateDay(index, 'last_order_time', e.target.value)}
-                      className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                      onChange={(v) => updateDay(index, 'last_order_time', v)}
                     />
                   )}
                 </motion.div>
