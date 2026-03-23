@@ -69,7 +69,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const paymentStatusConfig = useMemo(() => getPaymentStatusConfig(t), [t])
   const paymentMethodLabels = useMemo(() => getPaymentMethodLabels(t), [t])
   
-  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all')
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('active')
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [archiveMode, setArchiveMode] = useState(false)
