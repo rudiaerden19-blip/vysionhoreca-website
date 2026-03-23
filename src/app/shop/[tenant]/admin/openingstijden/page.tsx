@@ -24,6 +24,7 @@ function TimeInput({ value, onChange, className }: { value: string; onChange: (v
       value={value}
       placeholder="00:00"
       maxLength={5}
+      onFocus={(e) => e.target.select()}
       onChange={(e) => onChange(formatTimeInput(e.target.value))}
       className={className ?? 'px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center w-20'}
     />
