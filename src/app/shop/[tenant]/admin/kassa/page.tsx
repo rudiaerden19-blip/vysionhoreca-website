@@ -1071,6 +1071,9 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🖼️', label: 'Media', href: `${baseUrl}/media` },
                 { icon: '🔗', label: 'Bekijk je Website', href: `/shop/${tenant}` },
               ]},
+              { key: 'account', icon: '👤', label: 'Account', items: [
+                { icon: '📋', label: 'Mijn Account', href: `${baseUrl}/abonnement` },
+              ]},
             ]
             const activeMod = modules.find(m => m.key === hamburgerSubOpen)
             return (

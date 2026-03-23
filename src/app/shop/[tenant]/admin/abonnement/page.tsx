@@ -41,6 +41,17 @@ interface Tenant {
   trial_ends_at: string | null
 }
 
+interface TenantInfo {
+  business_name: string | null
+  email: string | null
+  phone: string | null
+  address: string | null
+  postal_code: string | null
+  city: string | null
+  vat_number: string | null
+  country: string | null
+}
+
 // Keep legacy translations as fallback - will be removed after migration
 const legacyTranslations: Record<string, Record<string, string>> = {
   nl: {
@@ -501,6 +512,7 @@ export default function AbonnementPage() {
   
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [tenant, setTenant] = useState<Tenant | null>(null)
+  const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null)
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
@@ -579,6 +591,13 @@ export default function AbonnementPage() {
       .eq('slug', tenantSlug)
       .single()
     setTenant(tenantData)
+
+    const { data: settingsData } = await supabase
+      .from('tenant_settings')
+      .select('business_name, email, phone, address, postal_code, city, vat_number, country')
+      .eq('tenant_slug', tenantSlug)
+      .maybeSingle()
+    setTenantInfo(settingsData)
 
     const { data: invoiceData } = await supabase
       .from('invoices')
@@ -707,6 +726,57 @@ export default function AbonnementPage() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
         <p className="text-gray-600 mt-2">{t('subtitle')}</p>
+      </div>
+
+      {/* Zaakgegevens + Upgrade knop */}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+          <div className="flex-1">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">🏢 Zaakgegevens</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+              {tenantInfo?.business_name && (
+                <div><span className="text-gray-500">Naam</span><p className="font-semibold text-gray-900">{tenantInfo.business_name}</p></div>
+              )}
+              {tenantInfo?.email && (
+                <div><span className="text-gray-500">E-mail</span><p className="font-semibold text-gray-900">{tenantInfo.email}</p></div>
+              )}
+              {tenantInfo?.phone && (
+                <div><span className="text-gray-500">Telefoon</span><p className="font-semibold text-gray-900">{tenantInfo.phone}</p></div>
+              )}
+              {tenantInfo?.vat_number && (
+                <div><span className="text-gray-500">BTW-nummer</span><p className="font-semibold text-gray-900">{tenantInfo.vat_number}</p></div>
+              )}
+              {tenantInfo?.address && (
+                <div><span className="text-gray-500">Adres</span><p className="font-semibold text-gray-900">{tenantInfo.address}</p></div>
+              )}
+              {(tenantInfo?.postal_code || tenantInfo?.city) && (
+                <div><span className="text-gray-500">Gemeente</span><p className="font-semibold text-gray-900">{[tenantInfo.postal_code, tenantInfo.city].filter(Boolean).join(' ')}</p></div>
+              )}
+              {tenantInfo?.country && (
+                <div><span className="text-gray-500">Land</span><p className="font-semibold text-gray-900">{tenantInfo.country}</p></div>
+              )}
+            </div>
+          </div>
+          {/* Upgrade knop voor starter plan */}
+          {(currentPlan === 'starter' || currentPlan === 'STARTER') && (
+            <div className="flex-shrink-0">
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-5 text-center max-w-xs">
+                <span className="text-3xl">✨</span>
+                <h3 className="font-bold text-purple-900 mt-2 mb-1">Upgrade naar Premium</h3>
+                <p className="text-purple-700 text-sm mb-4">Alle features voor €99/maand</p>
+                <button
+                  onClick={() => {
+                    setBillingYearly(false)
+                    document.getElementById('pro-plan-card')?.scrollIntoView({ behavior: 'smooth' })
+                  }}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white py-3 px-6 rounded-xl font-bold text-sm transition-colors"
+                >
+                  🛒 Upgrade naar Premium
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Upgrade Banner - wordt getoond wanneer tenant een Pro feature probeert te openen */}
