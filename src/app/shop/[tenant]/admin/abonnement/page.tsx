@@ -7,6 +7,7 @@ import { useLanguage } from '@/i18n'
 import { getAuthHeaders } from '@/lib/auth-headers'
 import { motion, AnimatePresence } from 'framer-motion'
 import PinGate from '@/components/PinGate'
+import { getTenantSettings, TenantSettings } from '@/lib/admin-api'
 
 interface Subscription {
   id: string
@@ -41,16 +42,6 @@ interface Tenant {
   trial_ends_at: string | null
 }
 
-interface TenantInfo {
-  business_name: string | null
-  email: string | null
-  phone: string | null
-  address: string | null
-  postal_code: string | null
-  city: string | null
-  vat_number: string | null
-  country: string | null
-}
 
 // Keep legacy translations as fallback - will be removed after migration
 const legacyTranslations: Record<string, Record<string, string>> = {
@@ -512,7 +503,7 @@ export default function AbonnementPage() {
   
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [tenant, setTenant] = useState<Tenant | null>(null)
-  const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null)
+  const [tenantInfo, setTenantInfo] = useState<TenantSettings | null>(null)
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState<string | null>(null)
@@ -592,11 +583,7 @@ export default function AbonnementPage() {
       .single()
     setTenant(tenantData)
 
-    const { data: settingsData } = await supabase
-      .from('tenant_settings')
-      .select('business_name, email, phone, address, postal_code, city, vat_number, country')
-      .eq('tenant_slug', tenantSlug)
-      .maybeSingle()
+    const settingsData = await getTenantSettings(tenantSlug)
     setTenantInfo(settingsData)
 
     const { data: invoiceData } = await supabase
@@ -743,8 +730,8 @@ export default function AbonnementPage() {
               {tenantInfo?.phone && (
                 <div><span className="text-gray-500">Telefoon</span><p className="font-semibold text-gray-900">{tenantInfo.phone}</p></div>
               )}
-              {tenantInfo?.vat_number && (
-                <div><span className="text-gray-500">BTW-nummer</span><p className="font-semibold text-gray-900">{tenantInfo.vat_number}</p></div>
+              {tenantInfo?.btw_number && (
+                <div><span className="text-gray-500">BTW-nummer</span><p className="font-semibold text-gray-900">{tenantInfo.btw_number}</p></div>
               )}
               {tenantInfo?.address && (
                 <div><span className="text-gray-500">Adres</span><p className="font-semibold text-gray-900">{tenantInfo.address}</p></div>
