@@ -1019,7 +1019,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '🖨️', label: 'Bonnenprinter', href: `${baseUrl}/bonnenprinter` },
                 { icon: '🏷️', label: 'Labels', href: `${baseUrl}/labels` },
               ]},
-              { key: 'online-bestellingen', icon: '📲', label: 'Online Bestellingen', items: [
+              { key: 'online-bestellingen', icon: '📲', label: 'Bestellingen', items: [
                 { icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
                 { icon: '🏢', label: 'Groepsbestellingen', href: `${baseUrl}/groepen` },
                 { icon: '🖥️', label: 'Online Scherm', href: `/shop/${tenant}/display` },
