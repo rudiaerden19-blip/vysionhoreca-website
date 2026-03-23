@@ -669,7 +669,7 @@ export default function AbonnementPage() {
     })
   }
 
-  const currentPlan = subscription?.plan || tenant?.plan || 'starter'
+  const currentPlan = (status === 'trial' || status === 'TRIAL') ? 'pro' : (subscription?.plan || tenant?.plan || 'starter')
   const isActive = status === 'active' || status === 'ACTIVE'
   const isTrial = status === 'trial' || status === 'TRIAL'
   const isExpired = status === 'expired' || status === 'EXPIRED'
@@ -725,7 +725,7 @@ export default function AbonnementPage() {
               <div className="flex-1">
                 <h3 className="text-lg font-bold text-purple-900">Dit is een Pro functie</h3>
                 <p className="text-purple-700 mt-1">
-                  Het volledige reserveringssysteem met tafelplan, online boeking door klanten, no-show bescherming en gaste CRM is beschikbaar in <strong>Vysion Premium (€79/maand)</strong>.
+                  Het volledige reserveringssysteem met tafelplan, online boeking door klanten, no-show bescherming en gaste CRM is beschikbaar in <strong>Vysion Premium (€99/maand)</strong>.
                 </p>
                 <div className="flex gap-3 mt-4">
                   <button
@@ -883,7 +883,7 @@ export default function AbonnementPage() {
             </div>
           </div>
           <div className="text-3xl font-bold text-gray-900">
-            €{currentPlan === 'pro' || currentPlan === 'PRO' ? '69' : '59'}
+            €{currentPlan === 'pro' || currentPlan === 'PRO' ? '99' : '59'}
             <span className="text-base font-normal text-gray-500">{t('perMonth')}</span>
           </div>
         </div>
@@ -1038,13 +1038,13 @@ export default function AbonnementPage() {
           <div className="mb-6">
             {billingYearly ? (
               <>
-                <span className="text-4xl font-bold text-purple-300">€{Math.round(79 * 12 * 0.9)}</span>
+                <span className="text-4xl font-bold text-purple-300">€{Math.round(99 * 12 * 0.9)}</span>
                 <span className="text-gray-300 ml-2">/jaar</span>
-                <p className="text-purple-200 text-sm mt-1">= €{Math.round(79 * 0.9)}/maand</p>
+                <p className="text-purple-200 text-sm mt-1">= €{Math.round(99 * 0.9)}/maand</p>
               </>
             ) : (
               <>
-                <span className="text-4xl font-bold text-purple-300">€79</span>
+                <span className="text-4xl font-bold text-purple-300">€99</span>
                 <span className="text-gray-300 ml-2">{t('perMonth')}</span>
               </>
             )}

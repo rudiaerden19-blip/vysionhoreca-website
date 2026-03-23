@@ -6,13 +6,13 @@ import { logger } from '@/lib/logger'
 // Plan pricing in cents (monthly)
 const planPrices: Record<string, number> = {
   starter: 5900,  // €59/maand
-  pro: 7900,      // €79/maand
+  pro: 9900,      // €99/maand
 }
 
 // Plan pricing in cents (yearly = monthly * 12 * 0.9)
 const planPricesYearly: Record<string, number> = {
-  starter: 63660, // €636.60/jaar (€59 * 12 * 0.9)
-  pro: 85320,     // €853.20/jaar (€79 * 12 * 0.9)
+  starter: 63660,  // €636.60/jaar (€59 * 12 * 0.9)
+  pro: 106920,     // €1069.20/jaar (€99 * 12 * 0.9)
 }
 
 const planNames: Record<string, string> = {
