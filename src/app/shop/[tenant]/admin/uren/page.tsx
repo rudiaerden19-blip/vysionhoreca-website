@@ -2,9 +2,8 @@
 
 import { useLanguage } from '@/i18n'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'next/navigation'
-import dynamic from 'next/dynamic'
 import { 
   getActiveStaff,
   getTimesheetEntries,
@@ -67,7 +66,8 @@ const formatHours = (hours: number | undefined | null): string => {
 export default function UrenPage() {
   const { t } = useLanguage()
   const params = useParams()
-  const tenant = params.tenant as string
+  const rawTenant = params?.tenant
+  const tenant = (Array.isArray(rawTenant) ? rawTenant[0] : rawTenant) ?? ''
   
   const MONTHS = getMonths(t)
   const DAYS = getDays(t)
@@ -107,48 +107,58 @@ export default function UrenPage() {
   
   const printRef = useRef<HTMLDivElement>(null)
   const pdfRef = useRef<HTMLDivElement>(null)
+  /** Altijd laatste medewerker voor handlers (voorkomt stille mis-clicks vóór state-sync). */
+  const selectedStaffRef = useRef<Staff | null>(null)
+  selectedStaffRef.current = selectedStaff
+
+  const loadData = useCallback(async () => {
+    const staff = selectedStaffRef.current
+    if (!tenant || !staff?.id) return
+    setLoading(true)
+    try {
+      const [entriesData, timesheetData] = await Promise.all([
+        getTimesheetEntries(tenant, staff.id, selectedYear, selectedMonth),
+        getMonthlyTimesheet(tenant, staff.id, selectedYear, selectedMonth),
+      ])
+      setEntries(entriesData)
+      setMonthlyTimesheet(timesheetData)
+    } finally {
+      setLoading(false)
+    }
+  }, [tenant, selectedYear, selectedMonth])
 
   useEffect(() => {
+    if (!tenant) return
     loadStaff()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenant])
 
   useEffect(() => {
-    if (selectedStaff) {
-      loadData()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedStaff, selectedYear, selectedMonth])
+    if (!tenant || !selectedStaff?.id) return
+    loadData()
+  }, [tenant, selectedStaff?.id, selectedYear, selectedMonth, loadData])
 
   async function loadStaff() {
+    if (!tenant) {
+      setLoading(false)
+      return
+    }
     setLoading(true)
-    
-    // Load staff and business info in parallel
+
     const [staffData, tenantData] = await Promise.all([
       getActiveStaff(tenant),
-      getTenantSettings(tenant)
+      getTenantSettings(tenant),
     ])
-    
+
     setStaff(staffData)
     setBusinessInfo(tenantData)
-    
+
     if (staffData.length > 0) {
       setSelectedStaff(staffData[0])
+      /* loading blijft true tot loadData (effect) klaar is — niet hier al false zetten */
+    } else {
+      setLoading(false)
     }
-    setLoading(false)
-  }
-
-  async function loadData() {
-    if (!selectedStaff?.id) return
-    
-    setLoading(true)
-    const [entriesData, timesheetData] = await Promise.all([
-      getTimesheetEntries(tenant, selectedStaff.id, selectedYear, selectedMonth),
-      getMonthlyTimesheet(tenant, selectedStaff.id, selectedYear, selectedMonth)
-    ])
-    setEntries(entriesData)
-    setMonthlyTimesheet(timesheetData)
-    setLoading(false)
   }
 
   function getCalendarDays(): { date: Date; inMonth: boolean }[] {
@@ -274,27 +284,30 @@ export default function UrenPage() {
   }
 
   async function handleApproveAll() {
-    if (!selectedStaff?.id) return
+    const staff = selectedStaffRef.current
+    if (!staff?.id || !tenant) return
     if (!confirm(t('urenPage.confirmApproveAll'))) return
     
-    const success = await approveTimesheetEntries(tenant, selectedStaff.id, selectedYear, selectedMonth, selectedStaff.id)
+    const success = await approveTimesheetEntries(tenant, staff.id, selectedYear, selectedMonth, staff.id)
     if (success) {
       loadData()
     }
   }
 
   async function handleCloseMonth() {
-    if (!selectedStaff?.id) return
+    const staff = selectedStaffRef.current
+    if (!staff?.id || !tenant) return
     if (!confirm(t('urenPage.confirmCloseMonth'))) return
     
-    const success = await closeMonthlyTimesheet(tenant, selectedStaff.id, selectedYear, selectedMonth, selectedStaff.id)
+    const success = await closeMonthlyTimesheet(tenant, staff.id, selectedYear, selectedMonth, staff.id)
     if (success) {
       loadData()
     }
   }
 
   async function handleReopenMonth() {
-    if (!selectedStaff?.id || !reopenReason.trim()) {
+    const staff = selectedStaffRef.current
+    if (!staff?.id || !tenant || !reopenReason.trim()) {
       alert(t('urenPage.reopenReasonRequired'))
       return
     }
@@ -302,10 +315,10 @@ export default function UrenPage() {
     setSaving(true)
     const success = await reopenMonthlyTimesheet(
       tenant, 
-      selectedStaff.id, 
+      staff.id, 
       selectedYear, 
       selectedMonth, 
-      selectedStaff.id,
+      staff.id,
       reopenReason.trim()
     )
     setSaving(false)
@@ -537,7 +550,8 @@ Met vriendelijke groeten`,
   const totalOther = entries.filter(e => !['WORKED', 'SICK', 'VACATION'].includes(e.absence_type)).reduce((sum, e) => sum + (e.absence_hours || e.worked_hours || 0), 0)
   const totalHours = totalWorked + totalSick + totalVacation + totalOther
   const approvedCount = entries.filter(e => e.is_approved).length
-  
+  const isMonthClosed = monthlyTimesheet?.is_closed === true
+
   // Kilometers berekening: aantal gewerkte dagen * woon-werk afstand * 2 (heen en terug)
   const workedDaysCount = entries.filter(e => e.absence_type === 'WORKED').length
   const commuteDistanceKm = selectedStaff?.commute_distance_km || 0
@@ -650,14 +664,16 @@ Met vriendelijke groeten`,
         <div className="flex-1" />
 
         <button
+          type="button"
           onClick={handleApproveAll}
-          disabled={monthlyTimesheet?.is_closed}
+          disabled={isMonthClosed}
           className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
         >
           ✓ {t('urenPage.approveAll')}
         </button>
-        {monthlyTimesheet?.is_closed ? (
+        {isMonthClosed ? (
           <button
+            type="button"
             onClick={() => setShowReopenModal(true)}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
@@ -665,6 +681,7 @@ Met vriendelijke groeten`,
           </button>
         ) : (
           <button
+            type="button"
             onClick={handleCloseMonth}
             className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
           >
@@ -808,7 +825,7 @@ Met vriendelijke groeten`,
       )}
 
       {/* Status badges */}
-      {monthlyTimesheet?.is_closed && (
+      {isMonthClosed && (
         <div className="bg-purple-100 border border-purple-300 rounded-lg p-3 flex items-center justify-between">
           <span className="text-purple-700">
             🔒 {t('urenPage.print.monthClosed')} {new Date(monthlyTimesheet.closed_at!).toLocaleDateString()}
@@ -843,12 +860,12 @@ Met vriendelijke groeten`,
             return (
               <div
                 key={idx}
-                onClick={() => inMonth && !monthlyTimesheet?.is_closed && openEntryModal(date)}
+                onClick={() => inMonth && !isMonthClosed && openEntryModal(date)}
                 className={`min-h-[80px] md:min-h-[100px] p-2 border-b border-r relative ${
                   !inMonth ? 'bg-gray-50 text-gray-300' :
                   isWeekend ? 'bg-gray-50' :
                   ''
-                } ${inMonth && !monthlyTimesheet?.is_closed ? 'cursor-pointer hover:bg-blue-50' : ''} print:min-h-[60px]`}
+                } ${inMonth && !isMonthClosed ? 'cursor-pointer hover:bg-blue-50' : ''} print:min-h-[60px]`}
               >
                 <div className={`text-sm font-medium mb-1 ${
                   isToday ? 'bg-blue-600 text-white w-7 h-7 rounded-full flex items-center justify-center' : ''
