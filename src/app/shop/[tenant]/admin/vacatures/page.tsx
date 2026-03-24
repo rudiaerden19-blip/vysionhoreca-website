@@ -75,6 +75,42 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
     setSaving(false)
   }
 
+  const renderSaveButton = () => (
+    <motion.button
+      type="button"
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={handleSave}
+      disabled={saving}
+      className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
+        saved
+          ? 'bg-green-500 text-white'
+          : 'bg-blue-600 hover:bg-blue-700 text-white'
+      }`}
+    >
+      {saving ? (
+        <>
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+          />
+          <span>{t('adminPages.common.saving')}</span>
+        </>
+      ) : saved ? (
+        <>
+          <span>✓</span>
+          <span>{t('adminPages.common.saved')}</span>
+        </>
+      ) : (
+        <>
+          <span>💾</span>
+          <span>{t('adminPages.common.save')}</span>
+        </>
+      )}
+    </motion.button>
+  )
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -98,38 +134,7 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
           <h1 className="text-2xl font-bold text-gray-900">{t('vacaturesPage.title')}</h1>
           <p className="text-gray-500">{t('vacaturesPage.subtitle')}</p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleSave}
-          disabled={saving}
-          className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 ${
-            saved 
-              ? 'bg-green-500 text-white' 
-              : 'bg-blue-600 hover:bg-blue-700 text-white'
-          }`}
-        >
-          {saving ? (
-            <>
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-              />
-              <span>{t('adminPages.common.saving')}</span>
-            </>
-          ) : saved ? (
-            <>
-              <span>✓</span>
-              <span>{t('adminPages.common.saved')}</span>
-            </>
-          ) : (
-            <>
-              <span>💾</span>
-              <span>{t('adminPages.common.save')}</span>
-            </>
-          )}
-        </motion.button>
+        {renderSaveButton()}
       </div>
 
       {/* Error Message */}
@@ -227,6 +232,10 @@ export default function VacaturesPage({ params }: { params: { tenant: string } }
               </div>
             </motion.div>
           )}
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-gray-100 flex justify-end">
+          {renderSaveButton()}
         </div>
       </motion.div>
 
