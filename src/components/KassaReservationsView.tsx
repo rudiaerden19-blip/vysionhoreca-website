@@ -36,6 +36,7 @@ import {
   Eye,
   EyeOff,
   Calendar,
+  GripVertical,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { getAuthHeaders } from '@/lib/auth-headers'
@@ -921,6 +922,18 @@ export default function KassaReservationsView({
   const [pushMessage, setPushMessage] = useState('')
   const [pushSending, setPushSending] = useState(false)
 
+  /** Tijdlijn: rechts slepen om duur (duration_minutes) te wijzigen */
+  const timelineDurDragRef = useRef<{
+    id: string
+    startX: number
+    startDur: number
+    maxDur: number
+    slotW: number
+    totalRange: number
+    lastDur: number
+  } | null>(null)
+  const [timelineDurPreview, setTimelineDurPreview] = useState<{ id: string; dur: number } | null>(null)
+
   // Load tenant info + reservatie instellingen vanuit Supabase
   useEffect(() => {
     const loadTenantData = async () => {
@@ -1000,6 +1013,102 @@ export default function KassaReservationsView({
       setReservations(mapped)
     }
     if (!silent) setLoading(false)
+  }
+
+  const formatTimelineDurLabel = (minutes: number) => {
+    const h = Math.floor(minutes / 60)
+    const m = minutes % 60
+    if (h === 0) return `${m} min`
+    if (m === 0) return `${h} u`
+    return `${h}u${String(m).padStart(2, '0')}`
+  }
+
+  /** Max. duur (min): einde grid óf vóór volgende reservatie opzelfde tafel (met buffer). */
+  const computeTimelineMaxDurationMinutes = (
+    r: Reservation,
+    sameTableSameDay: Reservation[],
+    buffer: number,
+    EXTRA_MIN: number,
+  ): number => {
+    const [rh, rm] = r.reservation_time.split(':').map(Number)
+    const startMin = rh * 60 + rm
+    const gridMax = Math.max(30, EXTRA_MIN - startMin)
+    let nextStart: number | null = null
+    for (const o of sameTableSameDay) {
+      if (o.id === r.id) continue
+      if (o.status === 'CANCELLED') continue
+      const [h, m] = o.reservation_time.split(':').map(Number)
+      const sm = h * 60 + m
+      if (sm > startMin && (nextStart === null || sm < nextStart)) nextStart = sm
+    }
+    if (nextStart === null) return gridMax
+    const cap = nextStart - startMin - buffer
+    const snapped = Math.floor(Math.max(0, cap) / 15) * 15
+    return Math.max(30, Math.min(gridMax, snapped))
+  }
+
+  const beginTimelineDurationResize = (
+    e: React.PointerEvent,
+    r: Reservation,
+    slotW: number,
+    totalRange: number,
+    maxDur: number,
+  ) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    e.stopPropagation()
+    e.preventDefault()
+    const startDur = r.duration_minutes || 90
+    const minDur = 30
+    const cap = Math.max(minDur, maxDur)
+
+    timelineDurDragRef.current = {
+      id: r.id,
+      startX: e.clientX,
+      startDur,
+      maxDur: cap,
+      slotW,
+      totalRange,
+      lastDur: startDur,
+    }
+    setTimelineDurPreview({ id: r.id, dur: startDur })
+
+    const onMove = (ev: PointerEvent) => {
+      const d = timelineDurDragRef.current
+      if (!d) return
+      const dx = ev.clientX - d.startX
+      const deltaMin = (dx / d.slotW) * d.totalRange
+      let next = Math.round((d.startDur + deltaMin) / 15) * 15
+      next = Math.max(minDur, Math.min(d.maxDur, next))
+      d.lastDur = next
+      setTimelineDurPreview({ id: d.id, dur: next })
+    }
+
+    const onUp = async () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onUp)
+      const d = timelineDurDragRef.current
+      timelineDurDragRef.current = null
+      setTimelineDurPreview(null)
+      if (!d) return
+      const finalDur = d.lastDur
+      if (finalDur === d.startDur) return
+      const { error } = await supabase
+        .from('reservations')
+        .update({ duration_minutes: finalDur })
+        .eq('id', d.id)
+        .eq('tenant_slug', tenant)
+      if (error) {
+        toast.error('Duur kon niet worden opgeslagen: ' + error.message)
+      } else {
+        toast.success(`Duur: ${formatTimelineDurLabel(finalDur)}`)
+      }
+      await loadReservations(true)
+    }
+
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onUp)
   }
 
   // Load guest profiles from Supabase (z6)
@@ -3015,20 +3124,42 @@ export default function KassaReservationsView({
                               {tableRes.map((r) => {
                                 const [rh,rm] = r.reservation_time.split(':').map(Number)
                                 const startMin = rh*60+rm
-                                const dur = r.duration_minutes||90
+                                const dur = timelineDurPreview?.id === r.id ? timelineDurPreview.dur : (r.duration_minutes || 90)
                                 if (startMin >= EXTRA_MIN || startMin+dur <= START_MIN) return null
                                 const leftPx = Math.max(0,(startMin-START_MIN)/totalRange*slotW)
                                 const widthPx = Math.min(dur/totalRange*slotW, slotW-leftPx) - 2
+                                const bufferMin = reservationSettings.bufferMinutes || 0
+                                const maxDurCap = computeTimelineMaxDurationMinutes(r, tableRes, bufferMin, EXTRA_MIN)
                                 return (
-                                  <div key={r.id} onClick={() => setSelectedReservation(r)}
-                                    className="absolute cursor-pointer flex items-center hover:brightness-110 transition-all"
-                                    style={{ left:leftPx, width:widthPx, top:6, bottom:6, height:'auto', zIndex:2 }}>
-                                    <div className="flex items-center h-full w-full"
-                                      style={{ backgroundColor: statusBlockColor(r.status, startMin >= END_MIN), clipPath:'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)' }}>
+                                  <div
+                                    key={r.id}
+                                    className="absolute group"
+                                    style={{ left:leftPx, width:Math.max(widthPx, 48), top:6, bottom:6, height:'auto', zIndex:2 }}
+                                  >
+                                    <div
+                                      role="button"
+                                      tabIndex={0}
+                                      onClick={() => setSelectedReservation(r)}
+                                      onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setSelectedReservation(r) } }}
+                                      className="absolute inset-0 cursor-pointer flex items-center hover:brightness-110 transition-all pr-7 sm:pr-8"
+                                      style={{ backgroundColor: statusBlockColor(r.status, startMin >= END_MIN), clipPath:'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)' }}
+                                    >
                                       <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
                                         <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
                                       </div>
-                                      <span className="text-white text-base font-bold ml-2 truncate pr-5">{r.guest_name}</span>
+                                      <div className="min-w-0 flex-1 flex flex-col justify-center ml-2 pr-1">
+                                        <span className="text-white text-base font-bold truncate leading-tight">{r.guest_name}</span>
+                                        <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(dur)}</span>
+                                      </div>
+                                    </div>
+                                    <div
+                                      title="Sleep links/rechts: duur korter of langer (stopt vóór volgende reservatie)"
+                                      className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-10 cursor-ew-resize flex items-center justify-center hover:bg-black/20 active:bg-black/30 rounded-r-md border-l border-white/40 touch-none select-none"
+                                      style={{ touchAction: 'none' }}
+                                      onPointerDown={(e) => beginTimelineDurationResize(e, r, slotW, totalRange, maxDurCap)}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <GripVertical className="w-4 h-5 text-white pointer-events-none drop-shadow-sm" aria-hidden />
                                     </div>
                                   </div>
                                 )
