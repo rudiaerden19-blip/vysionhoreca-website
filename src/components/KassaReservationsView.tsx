@@ -5,7 +5,7 @@
  * Exact gekopieerd van ReservationsView (vysion-horeca) + Supabase + email
  */
 
-import { useState, useMemo, useEffect, useRef } from 'react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import {
   CalendarDays,
   Users,
@@ -872,6 +872,17 @@ export default function KassaReservationsView({
   const panLockedTableId = useRef<string | null>(null) // tafel-id als panning gestart op tafel in locked mode
   const panMoved = useRef(false) // heeft de pan bewogen (vs. tap)
   const canvasRef = useRef<HTMLDivElement>(null)
+  /** Horizontaal scrollende tijdlijn — nodig voor correcte resize (pixels ↔ minuten) */
+  const timelineGridScrollRef = useRef<HTMLDivElement>(null)
+  /** Zelfde als LABEL_W in de tijdlijn-UI (kolom “Tafel”) */
+  const TIMELINE_LABEL_W = 90
+  /** X-positie in het raster (0 = START_MIN), rekening houdend met horizontaal scrollen */
+  const timelinePointerToGridX = useCallback((clientX: number) => {
+    const el = timelineGridScrollRef.current
+    if (!el) return 0
+    const rect = el.getBoundingClientRect()
+    return clientX - rect.left + el.scrollLeft - TIMELINE_LABEL_W
+  }, [])
   const WORLD_W = 2400
   const WORLD_H = 1600
   // Pinch-to-zoom
@@ -925,7 +936,7 @@ export default function KassaReservationsView({
   /** Tijdlijn: rechts slepen om duur (duration_minutes) te wijzigen */
   const timelineDurDragRef = useRef<{
     id: string
-    startX: number
+    startGridX: number
     startDur: number
     maxDur: number
     slotW: number
@@ -1000,16 +1011,25 @@ export default function KassaReservationsView({
       if (!silent) toast.error('Fout bij laden reservaties: ' + error.message)
     }
     if (data) {
-      const mapped = data.map((r: Record<string, unknown>) => ({
-        ...r,
-        guest_name: (r.guest_name || r.customer_name || '') as string,
-        guest_phone: (r.guest_phone || r.customer_phone || '') as string,
-        guest_email: (r.guest_email || r.customer_email || '') as string,
-        reservation_date: r.reservation_date ? String(r.reservation_date).slice(0, 10) : '',
-        reservation_time: ((r.reservation_time as string) || '').substring(0, 5),
-        status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
-        table_number: r.table_number != null ? String(r.table_number) : undefined,
-      })) as Reservation[]
+      const mapped = data.map((r: Record<string, unknown>) => {
+        const rawDur = r.duration_minutes ?? (r as { durationMinutes?: unknown }).durationMinutes
+        let duration_minutes = 90
+        if (rawDur != null && rawDur !== '') {
+          const n = typeof rawDur === 'number' ? rawDur : parseInt(String(rawDur), 10)
+          if (Number.isFinite(n) && n > 0) duration_minutes = n
+        }
+        return {
+          ...r,
+          duration_minutes,
+          guest_name: (r.guest_name || r.customer_name || '') as string,
+          guest_phone: (r.guest_phone || r.customer_phone || '') as string,
+          guest_email: (r.guest_email || r.customer_email || '') as string,
+          reservation_date: r.reservation_date ? String(r.reservation_date).slice(0, 10) : '',
+          reservation_time: ((r.reservation_time as string) || '').substring(0, 5),
+          status: ((r.status as string) || '').toUpperCase() as ReservationStatus,
+          table_number: r.table_number != null ? String(r.table_number) : undefined,
+        }
+      }) as Reservation[]
       setReservations(mapped)
     }
     if (!silent) setLoading(false)
@@ -1057,13 +1077,16 @@ export default function KassaReservationsView({
     if (e.pointerType === 'mouse' && e.button !== 0) return
     e.stopPropagation()
     e.preventDefault()
-    const startDur = r.duration_minutes || 90
+    const startDur = (() => {
+      const n = Number(r.duration_minutes)
+      return Number.isFinite(n) && n > 0 ? n : 90
+    })()
     const minDur = 30
     const cap = Math.max(minDur, maxDur)
 
     timelineDurDragRef.current = {
       id: r.id,
-      startX: e.clientX,
+      startGridX: timelinePointerToGridX(e.clientX),
       startDur,
       maxDur: cap,
       slotW,
@@ -1075,8 +1098,8 @@ export default function KassaReservationsView({
     const onMove = (ev: PointerEvent) => {
       const d = timelineDurDragRef.current
       if (!d) return
-      const dx = ev.clientX - d.startX
-      const deltaMin = (dx / d.slotW) * d.totalRange
+      const deltaPx = timelinePointerToGridX(ev.clientX) - d.startGridX
+      const deltaMin = (deltaPx / d.slotW) * d.totalRange
       let next = Math.round((d.startDur + deltaMin) / 15) * 15
       next = Math.max(minDur, Math.min(d.maxDur, next))
       d.lastDur = next
@@ -3092,7 +3115,7 @@ export default function KassaReservationsView({
 
                 {/* Grid — één scroll container voor beide richtingen */}
                 <div className="border border-gray-200 rounded-xl overflow-hidden bg-white flex flex-col flex-1">
-                  <div className="overflow-auto flex-1">
+                  <div className="overflow-auto flex-1" ref={timelineGridScrollRef}>
                     {/* Vaste minimumbreedte — alles binnenin scrollt mee */}
                     <div style={{ minWidth: (timeSlots.length + extraSlots.length) * 80 + LABEL_W }}>
 
@@ -3152,7 +3175,11 @@ export default function KassaReservationsView({
                               {tableRes.map((r) => {
                                 const [rh,rm] = r.reservation_time.split(':').map(Number)
                                 const startMin = rh*60+rm
-                                const dur = timelineDurPreview?.id === r.id ? timelineDurPreview.dur : (r.duration_minutes || 90)
+                                const baseDur = (() => {
+                                  const n = Number(r.duration_minutes)
+                                  return Number.isFinite(n) && n > 0 ? n : 90
+                                })()
+                                const dur = timelineDurPreview?.id === r.id ? timelineDurPreview.dur : baseDur
                                 if (startMin >= EXTRA_MIN || startMin+dur <= START_MIN) return null
                                 const leftPx = Math.max(0,(startMin-START_MIN)/totalRange*slotW)
                                 const widthPx = Math.min(dur/totalRange*slotW, slotW-leftPx) - 2
