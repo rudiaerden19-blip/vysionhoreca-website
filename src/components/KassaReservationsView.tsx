@@ -2241,7 +2241,14 @@ export default function KassaReservationsView({
       </div>
 
       {/* Content */}
-      <div className={`flex-1 p-4 ${viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' ? 'overflow-hidden flex flex-col' : 'overflow-y-auto'}`} key={viewMode}>
+      <div
+        className={`flex-1 min-h-0 p-4 ${
+          viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' || viewMode === 'floorplan'
+            ? 'overflow-hidden flex flex-col'
+            : 'overflow-y-auto'
+        }`}
+        key={viewMode}
+      >
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" />
@@ -2480,7 +2487,7 @@ export default function KassaReservationsView({
           }
 
           return (
-            <div className="flex flex-col h-full -m-4" style={{ height: 'calc(100vh - 170px)' }}>
+            <div className="flex flex-col flex-1 min-h-0 -m-4">
               {/* Toolbar */}
               <div className="flex flex-wrap items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 flex-shrink-0">
 
@@ -2544,7 +2551,7 @@ export default function KassaReservationsView({
               </div>
 
               {/* Canvas + lijst + optional sidebar */}
-              <div className="flex flex-1 overflow-hidden relative">
+              <div className="flex flex-1 min-h-0 overflow-hidden relative">
 
                 {/* Lijst links — inklapbaar */}
                 <div className={`flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-all duration-300 relative ${resListCollapsed ? 'w-0' : 'w-52 md:w-60 lg:w-72'}`}>
@@ -2642,7 +2649,7 @@ export default function KassaReservationsView({
 
                 {/* Canvas */}
                 <div
-                  className="res-floor-canvas flex-1 relative overflow-hidden select-none"
+                  className="res-floor-canvas flex-1 min-h-0 relative overflow-hidden select-none"
                   ref={canvasRef}
                   style={{
                     backgroundColor: '#e3e3e3',
@@ -2756,15 +2763,15 @@ export default function KassaReservationsView({
                   </div>
                 </div>
 
-                {/* Sidebar — selected table detail (overlay, werkt op desktop + iPad) */}
+                {/* Sidebar — selected table detail (volle hoogte van canvas-rij; blauw tot onderaan op iPad) */}
                 {selectedFloorTable && (() => {
                   const { label, color } = getFloorTableInfo(selectedFloorTable.number)
                   const allTableRes = floorRes.filter(r => String(r.table_number) === String(selectedFloorTable.number)).sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                   return (
-                    <div className="absolute right-0 top-0 bottom-0 flex flex-col overflow-hidden z-20 shadow-2xl" style={{ width: 'min(320px, 85vw)', backgroundColor: '#16213e', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+                    <div className="absolute right-0 top-0 bottom-0 flex h-full min-h-0 w-[min(320px,85vw)] flex-col overflow-hidden z-20 shadow-2xl bg-[#16213e] border-l border-white/10">
 
                       {/* Header */}
-                      <div className="p-4 flex justify-between items-center" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', borderLeft: `4px solid ${color}` }}>
+                      <div className="p-4 flex justify-between items-center flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', borderLeft: `4px solid ${color}` }}>
                         <div>
                           <div className="flex items-center gap-2 mb-0.5">
                             <h3 className="text-white font-bold text-3xl">Tafel {selectedFloorTable.number}</h3>
@@ -2776,7 +2783,7 @@ export default function KassaReservationsView({
                       </div>
 
                       {/* Reservaties */}
-                      <div className="flex-1 overflow-y-auto p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div className="flex-1 min-h-0 overflow-y-auto p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                         <p className="text-white/50 text-sm uppercase tracking-wider mb-3">Reservaties</p>
                         {allTableRes.length > 0 ? (
                           <div className="space-y-3">
@@ -2848,7 +2855,7 @@ export default function KassaReservationsView({
                       </div>
 
                       {/* Draaien */}
-                      <div className="p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div className="p-4 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                         <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
                         <div className="flex gap-2">
                           <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation - 45 + 360) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation - 45 + 360) % 360 } : null) }}
@@ -2861,7 +2868,7 @@ export default function KassaReservationsView({
                       </div>
 
                       {/* Acties */}
-                      <div className="p-4 space-y-2">
+                      <div className="p-4 space-y-2 flex-shrink-0 mt-auto">
                         <button onClick={() => { setShowNewReservationModal(true); setSelectedFloorTable(null) }}
                           className="w-full min-h-[52px] rounded-xl bg-emerald-500 active:bg-emerald-700 text-white font-bold transition-colors text-sm">
                           + Reservatie aanmaken
