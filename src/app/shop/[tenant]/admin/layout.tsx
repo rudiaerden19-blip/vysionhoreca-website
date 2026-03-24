@@ -35,6 +35,25 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     checkTenant()
   }, [params.tenant])
 
+  /**
+   * Welkom-splash (/welkom) wordt getoond vanuit admin/page als `vysion_welcomed_*` ontbreekt.
+   * Wie eerst een subpagina opent (b.v. Rapporten) had die flag niet → bij later bezoek aan
+   * /admin springt de app "ineens" naar het ENTER-scherm. Zet de flag hier als we al op een
+   * admin-subroute zitten (niet alleen dashboard-root).
+   */
+  useEffect(() => {
+    try {
+      const key = `vysion_welcomed_${params.tenant}`
+      if (sessionStorage.getItem(key)) return
+      if (pathname.includes('/kassa')) return
+      const root = `/shop/${params.tenant}/admin`
+      const isDashboardRoot = pathname === root || pathname === `${root}/`
+      if (!isDashboardRoot) {
+        sessionStorage.setItem(key, 'true')
+      }
+    } catch { /* ignore */ }
+  }, [params.tenant, pathname])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
