@@ -964,6 +964,20 @@ export default function KassaReservationsView({
   } | null>(null)
   const [timelineDurPreview, setTimelineDurPreview] = useState<{ id: string; dur: number } | null>(null)
 
+  /** Tijdlijn: links slepen = starttijd (duur blijft gelijk) */
+  const timelineStartDragRef = useRef<{
+    id: string
+    startGridX: number
+    startMin: number
+    duration: number
+    slotW: number
+    totalRange: number
+    minStart: number
+    maxStart: number
+    lastStartMin: number
+  } | null>(null)
+  const [timelineStartPreview, setTimelineStartPreview] = useState<{ id: string; startMin: number } | null>(null)
+
   // Load tenant info + reservatie instellingen vanuit Supabase
   useEffect(() => {
     const loadTenantData = async () => {
@@ -1080,6 +1094,120 @@ export default function KassaReservationsView({
     const cap = nextStart - startMin - buffer
     const snapped = Math.floor(Math.max(0, cap) / 15) * 15
     return Math.max(30, Math.min(gridMax, snapped))
+  }
+
+  /** Min/max start (minuten vanaf middernacht) voor slepen linkerkant: zelfde tafel, buffer, raster. */
+  const computeTimelineStartBounds = useCallback(
+    (
+      r: Reservation,
+      sortedSameTable: Reservation[],
+      buffer: number,
+      START_MIN: number,
+      EXTRA_MIN: number,
+    ) => {
+      const defDur = reservationSettings.defaultDurationMinutes
+      const [rh, rm] = r.reservation_time.split(':').map(Number)
+      const startMin = rh * 60 + rm
+      const dur = parseDurationMinutesFromRaw(r.duration_minutes, defDur)
+      const sorted = [...sortedSameTable]
+        .filter(x => x.status !== 'CANCELLED')
+        .sort((a, b) => {
+          const [ah, am] = a.reservation_time.split(':').map(Number)
+          const [bh, bm] = b.reservation_time.split(':').map(Number)
+          return ah * 60 + am - (bh * 60 + bm)
+        })
+      const idx = sorted.findIndex(x => x.id === r.id)
+      let minStart = START_MIN
+      if (idx > 0) {
+        const prev = sorted[idx - 1]
+        const [ph, pm] = prev.reservation_time.split(':').map(Number)
+        const prevEnd =
+          ph * 60 + pm + parseDurationMinutesFromRaw(prev.duration_minutes, defDur)
+        minStart = Math.max(minStart, prevEnd + buffer)
+      }
+      let maxStart = EXTRA_MIN - dur
+      if (idx >= 0 && idx < sorted.length - 1) {
+        const next = sorted[idx + 1]
+        const [nh, nm] = next.reservation_time.split(':').map(Number)
+        const nextStart = nh * 60 + nm
+        maxStart = Math.min(maxStart, nextStart - buffer - dur)
+      }
+      minStart = Math.ceil(minStart / 15) * 15
+      maxStart = Math.floor(maxStart / 15) * 15
+      if (maxStart < minStart) maxStart = minStart
+      return { minStart, maxStart }
+    },
+    [reservationSettings.defaultDurationMinutes],
+  )
+
+  const beginTimelineStartResize = (
+    e: React.PointerEvent,
+    r: Reservation,
+    slotW: number,
+    totalRange: number,
+    minStart: number,
+    maxStart: number,
+  ) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return
+    e.stopPropagation()
+    e.preventDefault()
+    const [rh, rm] = r.reservation_time.split(':').map(Number)
+    const startMin = rh * 60 + rm
+    const dur = parseDurationMinutesFromRaw(r.duration_minutes, reservationSettings.defaultDurationMinutes)
+
+    timelineStartDragRef.current = {
+      id: r.id,
+      startGridX: timelinePointerToGridX(e.clientX),
+      startMin,
+      duration: dur,
+      slotW,
+      totalRange,
+      minStart,
+      maxStart,
+      lastStartMin: startMin,
+    }
+    setTimelineStartPreview({ id: r.id, startMin })
+
+    const onMove = (ev: PointerEvent) => {
+      const d = timelineStartDragRef.current
+      if (!d) return
+      const deltaPx = timelinePointerToGridX(ev.clientX) - d.startGridX
+      const deltaMin = (deltaPx / d.slotW) * d.totalRange
+      let next = Math.round((d.startMin + deltaMin) / 15) * 15
+      next = Math.max(d.minStart, Math.min(d.maxStart, next))
+      d.lastStartMin = next
+      setTimelineStartPreview({ id: d.id, startMin: next })
+    }
+
+    const onUp = async () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onUp)
+      const d = timelineStartDragRef.current
+      timelineStartDragRef.current = null
+      setTimelineStartPreview(null)
+      if (!d) return
+      const finalStart = d.lastStartMin
+      if (finalStart === d.startMin) return
+      const hh = Math.floor(finalStart / 60) % 24
+      const mi = finalStart % 60
+      const timeStr = `${String(hh).padStart(2, '0')}:${String(mi).padStart(2, '0')}`
+      const { error } = await supabase
+        .from('reservations')
+        .update({ reservation_time: timeStr })
+        .eq('id', d.id)
+        .eq('tenant_slug', tenant)
+      if (error) {
+        toast.error('Starttijd kon niet worden opgeslagen: ' + error.message)
+      } else {
+        toast.success(`Starttijd: ${timeStr}`)
+      }
+      await loadReservations(true)
+    }
+
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onUp)
   }
 
   const beginTimelineDurationResize = (
@@ -3156,6 +3284,13 @@ export default function KassaReservationsView({
                       {/* Rijen */}
                       {sortedTables.map((tableNum, rowIdx) => {
                         const tableRes = dayRes.filter(r => (r.table_number||'(geen tafel)') === tableNum)
+                        const sortedTableRes = [...tableRes]
+                          .filter(x => x.status !== 'CANCELLED')
+                          .sort((a, b) => {
+                            const [ah, am] = a.reservation_time.split(':').map(Number)
+                            const [bh, bm] = b.reservation_time.split(':').map(Number)
+                            return ah * 60 + am - (bh * 60 + bm)
+                          })
                         const fpTable = floorPlanTablesDB.find(t => t.number === tableNum)
                         const slotW = (timeSlots.length + extraSlots.length) * 80
                         return (
@@ -3186,7 +3321,9 @@ export default function KassaReservationsView({
                               {/* Reservatieblokken */}
                               {tableRes.map((r) => {
                                 const [rh,rm] = r.reservation_time.split(':').map(Number)
-                                const startMin = rh*60+rm
+                                const dbStartMin = rh*60+rm
+                                const startMin =
+                                  timelineStartPreview?.id === r.id ? timelineStartPreview.startMin : dbStartMin
                                 const baseDur = parseDurationMinutesFromRaw(
                                   r.duration_minutes,
                                   reservationSettings.defaultDurationMinutes,
@@ -3199,9 +3336,12 @@ export default function KassaReservationsView({
                                 const leftPx = Math.max(0, ((startMin - START_MIN) / MINUTES_PER_COL) * PX_PER_COL)
                                 const naturalW = (durMin / MINUTES_PER_COL) * PX_PER_COL
                                 const barOuterW = Math.min(naturalW, slotW - leftPx)
-                                const widthPx = Math.max(barOuterW - 2, 48)
+                                /* Volledige berekende breedte — géén padding op deze container (dat kortte de balk ~30px in) */
+                                const widthPx = Math.max(barOuterW, 48)
                                 const bufferMin = reservationSettings.bufferMinutes || 0
                                 const maxDurCap = computeTimelineMaxDurationMinutes(r, tableRes, bufferMin, EXTRA_MIN)
+                                const { minStart: minStartBound, maxStart: maxStartBound } =
+                                  computeTimelineStartBounds(r, sortedTableRes, bufferMin, START_MIN, EXTRA_MIN)
                                 const barColor = statusBlockColor(r.status, startMin >= END_MIN)
                                 return (
                                   <div
@@ -3214,13 +3354,13 @@ export default function KassaReservationsView({
                                       tabIndex={0}
                                       onClick={() => setSelectedReservation(r)}
                                       onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setSelectedReservation(r) } }}
-                                      className="absolute inset-0 cursor-pointer flex items-stretch pr-7 sm:pr-8 hover:brightness-110 transition-all"
+                                      className="absolute inset-0 flex items-stretch cursor-pointer hover:brightness-110 transition-all"
                                     >
                                       <div
-                                        className="flex-1 min-w-0 flex items-center rounded-l-md overflow-hidden"
+                                        className="flex-1 min-w-0 flex items-center rounded-l-md overflow-hidden pl-7 pr-1"
                                         style={{ backgroundColor: barColor }}
                                       >
-                                        <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
+                                        <div className="flex-shrink-0 w-8 h-8 ml-1 rounded-full bg-white/30 flex items-center justify-center">
                                           <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
                                         </div>
                                         <div className="min-w-0 flex-1 flex flex-col justify-center ml-2 pr-1">
@@ -3228,7 +3368,7 @@ export default function KassaReservationsView({
                                           <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(durMin)}</span>
                                         </div>
                                       </div>
-                                      {/* Rechter einde: puntige pijl (geen afgeronde hoek) */}
+                                      {/* Rechter einde: puntige pijl — telt mee in widthPx, geen extra korting op duur */}
                                       <div
                                         className="flex-shrink-0 self-stretch w-3.5"
                                         style={{
@@ -3239,8 +3379,17 @@ export default function KassaReservationsView({
                                       />
                                     </div>
                                     <div
+                                      title="Sleep links: starttijd (duur blijft gelijk)"
+                                      className="absolute left-0 top-0 bottom-0 w-7 sm:w-8 z-20 cursor-ew-resize flex items-center justify-center hover:bg-black/25 active:bg-black/35 rounded-l-md border-r border-white/40 touch-none select-none bg-black/10"
+                                      style={{ touchAction: 'none' }}
+                                      onPointerDown={(e) => beginTimelineStartResize(e, r, slotW, totalRange, minStartBound, maxStartBound)}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <GripVertical className="w-4 h-5 text-white pointer-events-none drop-shadow-sm" aria-hidden />
+                                    </div>
+                                    <div
                                       title="Sleep rechts: duur aanpassen (stopt vóór volgende reservatie)"
-                                      className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-10 cursor-ew-resize flex items-center justify-center hover:bg-black/20 active:bg-black/30 border-l border-white/40 touch-none select-none"
+                                      className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-20 cursor-ew-resize flex items-center justify-center hover:bg-black/25 active:bg-black/35 border-l border-white/40 touch-none select-none bg-black/10"
                                       style={{ touchAction: 'none' }}
                                       onPointerDown={(e) => beginTimelineDurationResize(e, r, slotW, totalRange, maxDurCap)}
                                       onClick={(e) => e.stopPropagation()}
