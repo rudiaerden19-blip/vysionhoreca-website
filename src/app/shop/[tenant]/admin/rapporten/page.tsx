@@ -70,6 +70,20 @@ function daysInMonth(y: number, m: number) { return new Date(y, m+1, 0).getDate(
 function fmt(n: number) { return `€${n.toFixed(2)}` }
 function fmtDate(s: string) { const d = new Date(s); return `${d.getDate()} ${NL_MONTHS[d.getMonth()]}` }
 
+/** JSONB kan als object of als string binnenkomen — anders crasht .forEach op populaire producten. */
+function parseOrderItems(raw: unknown): Order['items'] {
+  if (Array.isArray(raw)) return raw as Order['items']
+  if (typeof raw === 'string') {
+    try {
+      const p = JSON.parse(raw)
+      return Array.isArray(p) ? (p as Order['items']) : []
+    } catch {
+      return []
+    }
+  }
+  return []
+}
+
 function getPeriodStart(period: ExportPeriod): Date {
   const now = new Date()
   if (period === 'day') return startOfDay(now)
@@ -125,11 +139,11 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
     if (ordersError) console.error('Rapporten orders error:', ordersError)
     setOrders((ordersData||[]).map(o => ({
       ...o,
-      items: o.items||[],
-      discount_amount: o.discount_amount||0,
-      tax: o.tax||0,
-      subtotal: o.subtotal||0,
-      total: o.total||0,
+      items: parseOrderItems(o.items),
+      discount_amount: Number(o.discount_amount) || 0,
+      tax: Number(o.tax) || 0,
+      subtotal: Number(o.subtotal) || 0,
+      total: Number(o.total) || 0,
     })))
     setZReports(zData||[])
     setTenantInfo(info as TenantInfo)
