@@ -14,13 +14,12 @@ import { useEffect } from 'react'
 export function GlobalAutoCapitalize() {
   useEffect(() => {
     function handleInput(event: Event) {
-      const target = event.target as HTMLInputElement | HTMLTextAreaElement
-      
-      // Skip als het geen input/textarea is
-      if (!target || (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA')) {
-        return
-      }
-      
+      const raw = event.target
+      // Alleen echte DOM-elementen hebben getAttribute (geen Text, Document, Window, …)
+      if (raw == null || !(raw instanceof Element)) return
+      if (!(raw instanceof HTMLInputElement) && !(raw instanceof HTMLTextAreaElement)) return
+      const target = raw
+
       // Skip bepaalde input types
       const inputType = target.getAttribute('type')?.toLowerCase()
       if (inputType === 'email' || inputType === 'password' || inputType === 'url' || inputType === 'number' || inputType === 'checkbox' || inputType === 'radio' || inputType === 'range' || inputType === 'color' || inputType === 'file' || inputType === 'hidden') {
