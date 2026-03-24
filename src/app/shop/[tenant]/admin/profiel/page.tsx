@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { getTenantSettings, saveTenantSettings, TenantSettings } from '@/lib/admin-api'
 import MediaPicker from '@/components/MediaPicker'
@@ -218,6 +219,12 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.profiel.title')}</h1>
           <p className="text-gray-500">{t('adminPages.profiel.subtitle')}</p>
+          <Link
+            href={`/shop/${params.tenant}/admin/team`}
+            className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+          >
+            → {t('websiteTeam.title')}
+          </Link>
         </div>
       </div>
 

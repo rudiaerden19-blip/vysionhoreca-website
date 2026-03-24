@@ -1075,6 +1075,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               ]},
               { key: 'website', icon: '🌐', label: 'Website', items: [
                 { icon: '🏠', label: 'Zaak Profiel', href: `${baseUrl}/profiel` },
+                { icon: '👥', label: 'Ons team', href: `${baseUrl}/team` },
                 { icon: '🎨', label: 'Design', href: `${baseUrl}/design` },
                 { icon: '🔍', label: 'SEO', href: `${baseUrl}/seo` },
                 { icon: '📝', label: 'Teksten & Info', href: `${baseUrl}/teksten` },
