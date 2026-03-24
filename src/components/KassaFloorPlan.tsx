@@ -369,6 +369,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   })
   const autoCenteredRef = useRef(false) // Alleen eerste keer auto-centeren
   const floorRef = useRef<HTMLDivElement>(null)
+  /** iPad/Safari: altijd releasePointerCapture na drag, anders blijven tikken “vast”. */
+  const pointerCaptureRef = useRef<{ pointerId: number; element: HTMLElement } | null>(null)
 
   const draggingId = useRef<string | null>(null)
   const draggingType = useRef<'table' | 'decor' | 'canvas'>('table')
@@ -377,6 +379,26 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   const pointerStart = useRef({ x: 0, y: 0 })
   const panStart = useRef({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
+
+  const releaseCapturedPointer = (e: React.PointerEvent) => {
+    const cap = pointerCaptureRef.current
+    if (!cap || cap.pointerId !== e.pointerId) return
+    try {
+      cap.element.releasePointerCapture(e.pointerId)
+    } catch {
+      /* ignore */
+    }
+    pointerCaptureRef.current = null
+  }
+
+  const takePointerCapture = (el: HTMLElement, pointerId: number) => {
+    try {
+      el.setPointerCapture(pointerId)
+      pointerCaptureRef.current = { pointerId, element: el }
+    } catch {
+      /* ignore */
+    }
+  }
 
   // ── Helpers: parse floor_plan_decor (oud: array, nieuw: {items, stool_statuses}) ──
   const parseDecorData = (raw: unknown) => {
@@ -631,11 +653,11 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       rotation: 0,
       status: 'FREE',
     }
-    save([...tables, t])
-    setSelected(t)
+    setShowAddModal(false)
     setAddNumber('')
     setAddSeats(4)
-    setShowAddModal(false)
+    save([...tables, t])
+    setSelected(t)
   }
 
   const deleteTable = (id: string) => {
@@ -654,9 +676,10 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   // Posities zijn % (0-100) van de container. Pan verschuift het canvas visueel.
   const handlePointerDown = (e: React.PointerEvent, id: string, type: 'table' | 'decor') => {
     e.stopPropagation()
+    if (showAddModal || showAddBarModal) return
     if (isLocked) {
       // Vergrendeld: sleep overal (ook op tafels) om canvas te pannen
-      ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+      takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
       draggingId.current = '__canvas__'
       draggingType.current = 'canvas'
       dragMoved.current = false
@@ -665,7 +688,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       setIsDragging(true)
       return
     }
-    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
     const floor = floorRef.current
     if (!floor) return
     const rect = floor.getBoundingClientRect()
@@ -683,6 +706,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   }
 
   const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (showAddModal || showAddBarModal) return
     if (!draggingId.current) return
     const dx = Math.abs(e.clientX - pointerStart.current.x)
     const dy = Math.abs(e.clientY - pointerStart.current.y)
@@ -713,6 +737,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
   }
 
   const handlePointerUp = (e: React.PointerEvent) => {
+    releaseCapturedPointer(e)
     if (!draggingId.current) return
     if (draggingType.current === 'canvas') {
       draggingId.current = null
@@ -741,8 +766,19 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     setTimeout(() => { dragMoved.current = false }, 0)
   }
 
+  const handlePointerCancel = (e: React.PointerEvent) => {
+    releaseCapturedPointer(e)
+    draggingId.current = null
+    setIsDragging(false)
+    setTimeout(() => { dragMoved.current = false }, 0)
+  }
+
+  const modalOpen = showAddModal || showAddBarModal
+
   return (
     <div className="fixed inset-0 bg-[#1a1a2e] z-50 flex flex-col">
+      {/* Bij open modal: geen pointer-events naar vloer/header (iPad raakte vast na capture) */}
+      <div className={`flex min-h-0 flex-1 flex-col ${modalOpen ? 'pointer-events-none' : ''}`}>
       {/* Header */}
       <div className="h-14 flex-shrink-0 bg-[#16213e] border-b border-white/10 flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
@@ -804,8 +840,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
             touchAction: 'none',
           }}
           onPointerDown={(e) => {
+            if (showAddModal || showAddBarModal) return
             // Tafels/decor gebruiken stopPropagation, dus hier komen alleen events van lege vloer
-            ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+            takePointerCapture(e.currentTarget as HTMLElement, e.pointerId)
             draggingId.current = '__canvas__'
             draggingType.current = 'canvas'
             dragMoved.current = false
@@ -815,6 +852,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
           }}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerCancel}
           onClick={() => { if (!dragMoved.current) { setSelected(null); setSelectedDecor(null) } }}
         >
           {/* Inner canvas: posities zijn % van de container, pan verschuift het geheel */}
@@ -840,6 +878,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                   setSelected(null)
                 }
               }}
+              onPointerCancel={(e) => { e.stopPropagation(); handlePointerCancel(e) }}
               onClick={(e) => e.stopPropagation()}
             >
               <DecorSVG item={d} isSelected={selectedDecor?.id === d.id} orderedStools={new Set(Object.keys(tableOrders).filter(k => (tableOrders[k] || []).length > 0))} stoolStatuses={stoolStatuses} getStoolStatus={getStoolStatus} />
@@ -867,6 +906,7 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                   setSelectedDecor(null)
                 }
               }}
+              onPointerCancel={(e) => { e.stopPropagation(); handlePointerCancel(e) }}
               onClick={(e) => { e.stopPropagation() }}
             >
               <TableSVG
@@ -1225,14 +1265,15 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
           : <span className="text-yellow-400/70 ml-4 text-xs">🔓 Bewerkmodus — sleep om te verplaatsen • ↺↻ om te draaien</span>
         }
       </div>
+      </div>
 
       {/* Add bar segment modal */}
       {showAddBarModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 touch-manipulation">
+          <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true">
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="font-bold text-lg">🍺 Toogstuk toevoegen</h3>
-              <button onClick={() => setShowAddBarModal(false)} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
+              <button type="button" onClick={() => setShowAddBarModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700">✕</button>
             </div>
             <div className="p-5 space-y-4">
               <p className="text-sm text-gray-500">Geef een nummer aan elke barkruk van dit toogstuk.</p>
@@ -1260,9 +1301,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 </div>
               </div>
             </div>
-            <div className="p-4 border-t flex gap-3">
-              <button onClick={() => setShowAddBarModal(false)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700">Annuleer</button>
-              <button onClick={confirmAddBar} className="flex-[2] py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold transition-colors">Toevoegen</button>
+            <div className="flex gap-3 border-t p-4">
+              <button type="button" onClick={() => setShowAddBarModal(false)} className="min-h-[44px] flex-1 touch-manipulation rounded-xl bg-gray-100 py-3 font-semibold text-gray-700">Annuleer</button>
+              <button type="button" onClick={confirmAddBar} className="min-h-[44px] flex-[2] touch-manipulation rounded-xl bg-amber-600 py-3 font-bold text-white transition-colors hover:bg-amber-700">Toevoegen</button>
             </div>
           </div>
         </div>
@@ -1270,11 +1311,11 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
       {/* Add table modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 touch-manipulation">
+          <div className="pointer-events-auto w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl" role="dialog" aria-modal="true">
             <div className="p-4 border-b flex justify-between items-center">
               <h3 className="font-bold text-lg">Tafel toevoegen</h3>
-              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
+              <button type="button" onClick={() => setShowAddModal(false)} className="min-h-[44px] min-w-[44px] touch-manipulation text-2xl text-gray-400 hover:text-gray-700">✕</button>
             </div>
             <div className="p-5 space-y-4">
               <div>
@@ -1288,8 +1329,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 <label className="block text-sm font-semibold text-gray-600 mb-2">Aantal plaatsen</label>
                 <div className="grid grid-cols-5 gap-2">
                   {[2, 4, 6, 8, 10].map(n => (
-                    <button key={n} onClick={() => setAddSeats(n)}
-                      className={`py-2 rounded-xl font-bold transition-colors ${addSeats === n ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                    <button key={n} type="button" onClick={() => setAddSeats(n)}
+                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 font-bold transition-colors ${addSeats === n ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       {n}
                     </button>
                   ))}
@@ -1299,17 +1340,17 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
                 <label className="block text-sm font-semibold text-gray-600 mb-2">Vorm</label>
                 <div className="grid grid-cols-3 gap-2">
                   {([['SQUARE', '⬛ Vierkant'], ['ROUND', '⭕ Rond'], ['RECTANGLE', '▬ Rechthoek']] as const).map(([s, label]) => (
-                    <button key={s} onClick={() => setAddShape(s)}
-                      className={`py-2 rounded-xl text-xs font-bold transition-colors ${addShape === s ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+                    <button key={s} type="button" onClick={() => setAddShape(s)}
+                      className={`min-h-[44px] touch-manipulation rounded-xl py-2 text-xs font-bold transition-colors ${addShape === s ? 'bg-[#3C4D6B] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
                       {label}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
-            <div className="p-4 border-t flex gap-3">
-              <button onClick={() => setShowAddModal(false)} className="flex-1 py-3 rounded-xl bg-gray-100 font-semibold text-gray-700">Annuleer</button>
-              <button onClick={addTable} className="flex-[2] py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition-colors">Toevoegen</button>
+            <div className="flex gap-3 border-t p-4">
+              <button type="button" onClick={() => setShowAddModal(false)} className="min-h-[44px] flex-1 touch-manipulation rounded-xl bg-gray-100 py-3 font-semibold text-gray-700">Annuleer</button>
+              <button type="button" onClick={addTable} className="min-h-[44px] flex-[2] touch-manipulation rounded-xl bg-emerald-500 py-3 font-bold text-white transition-colors hover:bg-emerald-600">Toevoegen</button>
             </div>
           </div>
         </div>
