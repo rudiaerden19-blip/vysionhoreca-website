@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
-import { getTenantSettings, updateOrderStatus, TenantSettings, confirmAndCompleteOnlineOrder, isWebshopOrder } from '@/lib/admin-api'
+import { getTenantSettings, updateOrderStatus, TenantSettings, approveWebshopOrder, completeWebshopOrder, isWebshopOrder } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
 import { 
@@ -435,7 +435,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   async function handleApprove(order: Order) {
     const web = isWebshopOrder(order)
     if (web) {
-      const ok = await confirmAndCompleteOnlineOrder(order.id)
+      const ok = await approveWebshopOrder(order.id)
       if (!ok) return
     } else {
       await updateOrderStatus(order.id, 'confirmed')
@@ -469,7 +469,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   async function handleComplete(order: Order) {
     if (isWebshopOrder(order)) {
-      await confirmAndCompleteOnlineOrder(order.id)
+      await completeWebshopOrder(order.id)
     } else {
       await updateOrderStatus(order.id, 'completed')
     }
@@ -480,7 +480,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
   async function handleCompleteAll() {
     await Promise.all(
       activeOrders.map(async (o) =>
-        isWebshopOrder(o) ? confirmAndCompleteOnlineOrder(o.id) : updateOrderStatus(o.id, 'completed')
+        isWebshopOrder(o) ? completeWebshopOrder(o.id) : updateOrderStatus(o.id, 'completed')
       )
     )
     loadData()

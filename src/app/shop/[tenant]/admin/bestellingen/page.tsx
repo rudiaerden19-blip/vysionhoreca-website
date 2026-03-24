@@ -3,7 +3,7 @@
 import { useLanguage } from '@/i18n'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getOrders, updateOrderStatus, confirmOrder, confirmAndCompleteOnlineOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints, isWebshopOrder } from '@/lib/admin-api'
+import { getOrders, updateOrderStatus, confirmOrder, approveWebshopOrder, completeWebshopOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints, isWebshopOrder } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { getSoundsEnabled } from '@/lib/sounds'
 
@@ -270,16 +270,16 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     setUpdatingId(null)
   }
   
-  /** Geen bereiding/klaar-stappen: webshop → confirmAndComplete; kassa-POS → direct completed. */
+  /** Webshop: Afronden → completed. Kassa-POS → direct completed. */
   const handleMarkOrderComplete = async (order: Order) => {
     if (!order.id) return
     setUpdatingId(order.id)
     if (isWebshopOrder(order)) {
-      const success = await confirmAndCompleteOnlineOrder(order.id)
+      const success = await completeWebshopOrder(order.id)
       if (success) {
         const now = new Date().toISOString()
         setOrders(prev => prev.map(o =>
-          o.id === order.id ? { ...o, status: 'completed', completed_at: now, payment_status: 'paid' } : o
+          o.id === order.id ? { ...o, status: 'completed', completed_at: now, payment_status: (o.payment_status || '').toLowerCase() === 'pending' ? 'paid' : o.payment_status } : o
         ))
       }
     } else {
@@ -303,7 +303,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       (window as any).stopOrderAlarm()
     }
     const success = web
-      ? await confirmAndCompleteOnlineOrder(order.id)
+      ? await approveWebshopOrder(order.id)
       : await confirmOrder(order.id)
     if (success) {
       const now = new Date().toISOString()
@@ -311,9 +311,9 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         o.id === order.id
           ? {
               ...o,
-              status: web ? 'completed' : 'confirmed',
+              status: 'confirmed',
               confirmed_at: now,
-              ...(web ? { completed_at: now, payment_status: 'paid' } : {}),
+              ...(web && (o.payment_status || '').toLowerCase() === 'pending' ? { payment_status: 'paid' as const } : {}),
             }
           : o
       ))

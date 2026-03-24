@@ -1871,25 +1871,73 @@ export async function confirmOrder(id: string): Promise<boolean> {
 }
 
 /**
- * Webshop: één stap na goedkeuren — completed + betaald (pending→paid) zodat Z-rapport/dashboard met betaalde omzet klopt.
- * Geen tussenstappen bereiding/klaar.
+ * Webshop: goedkeuren → confirmed + betaald (pending→paid) + Z-rapport.
+ * Keuken/onlinescherm tonen orders op status `confirmed` tot iemand afrondt met completeWebshopOrder.
  */
-export async function confirmAndCompleteOnlineOrder(id: string): Promise<boolean> {
+export async function approveWebshopOrder(id: string): Promise<boolean> {
   if (!supabase) return false
 
   const { data: order, error: fetchError } = await supabase
     .from('orders')
-    .select('tenant_slug, created_at, payment_status, payment_method, order_type, status')
+    .select('tenant_slug, created_at, payment_status, order_type, status')
     .eq('id', id)
     .single()
 
   if (fetchError || !order) {
-    console.error('confirmAndCompleteOnlineOrder: order niet gevonden', fetchError)
+    console.error('approveWebshopOrder: order niet gevonden', fetchError)
     return false
   }
 
   if (!isWebshopOrder(order)) {
-    console.warn('confirmAndCompleteOnlineOrder: geen webshop-order')
+    console.warn('approveWebshopOrder: geen webshop-order')
+    return false
+  }
+
+  const st = (order.status || '').toLowerCase()
+  if (st === 'rejected' || st === 'cancelled' || st === 'completed') {
+    return false
+  }
+
+  const updates: Record<string, unknown> = {
+    status: 'confirmed',
+    confirmed_at: new Date().toISOString(),
+  }
+
+  const ps = (order.payment_status || '').toLowerCase()
+  if (ps === 'pending') {
+    updates.payment_status = 'paid'
+  }
+
+  const { error } = await supabase.from('orders').update(updates).eq('id', id)
+
+  if (error) {
+    console.error('approveWebshopOrder:', error)
+    return false
+  }
+
+  await autoUpdateZReport(order.tenant_slug, new Date(order.created_at).toISOString().split('T')[0])
+  return true
+}
+
+/**
+ * Webshop: definitief afgerond (na keuken / Afronden-knop).
+ */
+export async function completeWebshopOrder(id: string): Promise<boolean> {
+  if (!supabase) return false
+
+  const { data: order, error: fetchError } = await supabase
+    .from('orders')
+    .select('tenant_slug, created_at, payment_status, order_type, status')
+    .eq('id', id)
+    .single()
+
+  if (fetchError || !order) {
+    console.error('completeWebshopOrder: order niet gevonden', fetchError)
+    return false
+  }
+
+  if (!isWebshopOrder(order)) {
+    console.warn('completeWebshopOrder: geen webshop-order')
     return false
   }
 
@@ -1900,7 +1948,6 @@ export async function confirmAndCompleteOnlineOrder(id: string): Promise<boolean
 
   const updates: Record<string, unknown> = {
     status: 'completed',
-    confirmed_at: new Date().toISOString(),
     completed_at: new Date().toISOString(),
   }
 
@@ -1912,7 +1959,7 @@ export async function confirmAndCompleteOnlineOrder(id: string): Promise<boolean
   const { error } = await supabase.from('orders').update(updates).eq('id', id)
 
   if (error) {
-    console.error('confirmAndCompleteOnlineOrder:', error)
+    console.error('completeWebshopOrder:', error)
     return false
   }
 

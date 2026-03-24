@@ -183,7 +183,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
           .from('orders')
           .select('*')
           .eq('tenant_slug', params.tenant)
-          .eq('status', 'confirmed')
+          .in('status', ['confirmed', 'preparing'])
           .order('created_at', { ascending: true })
           .limit(50)
 
@@ -248,7 +248,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         .from('orders')
         .select('*')
         .eq('tenant_slug', params.tenant)
-        .eq('status', 'confirmed')
+        .in('status', ['confirmed', 'preparing'])
         .order('created_at', { ascending: true })
         .limit(50)
 
