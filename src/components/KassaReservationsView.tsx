@@ -3103,6 +3103,56 @@ export default function KassaReservationsView({
                       <div />
                     </div>
                   </div>
+
+                  {/* Datum kiezer rechtsonder — alleen bij “alleen vloer” (toolbar verborgen) */}
+                  {floorOnlyMode && (
+                    <div
+                      className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] right-[max(1rem,env(safe-area-inset-right))] z-[35] select-none"
+                      onPointerDown={e => e.stopPropagation()}
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <div className="flex items-center gap-2 rounded-2xl bg-orange-500 px-2 py-2 shadow-xl sm:px-3 sm:py-2.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const d = new Date(selectedDate + 'T12:00:00')
+                            d.setDate(d.getDate() - 1)
+                            setSelectedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+                          }}
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/20 transition-colors hover:bg-white/30 active:bg-white/40"
+                          title="Vorige dag"
+                          aria-label="Vorige dag"
+                        >
+                          <ChevronLeft size={22} className="text-white" />
+                        </button>
+                        <div className="flex min-w-0 flex-col items-center px-1">
+                          <span className="max-w-[10rem] truncate text-center text-base font-bold leading-tight text-white sm:max-w-none sm:text-lg">
+                            {formatDate(selectedDate)}
+                          </span>
+                          <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={e => setSelectedDate(e.target.value)}
+                            className="mt-0.5 max-w-full cursor-pointer rounded-lg border border-white/30 bg-white/20 px-2 py-0.5 text-center text-xs font-semibold text-white/95 outline-none"
+                            aria-label="Kies datum"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const d = new Date(selectedDate + 'T12:00:00')
+                            d.setDate(d.getDate() + 1)
+                            setSelectedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+                          }}
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/20 transition-colors hover:bg-white/30 active:bg-white/40"
+                          title="Volgende dag"
+                          aria-label="Volgende dag"
+                        >
+                          <ChevronRight size={22} className="text-white" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Sidebar — fixed: volledige schermhoogte, ook over toolbar (Wachtlijst, Vergrendelen, …) */}
