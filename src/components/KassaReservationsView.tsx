@@ -5554,24 +5554,28 @@ function ReservationDetailModal({
   const [showTableSelect, setShowTableSelect] = useState(false)
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md relative">
-        {/* Header */}
-        <div className="relative p-6 pb-4 border-b border-gray-200">
-          {/* Absoluut rechtsboven: blijft zichtbaar op iPad/landscape (geen flex-squeeze) */}
+    <div
+      className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/50 px-3 py-3 sm:p-4 sm:py-6 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      {/* Iets smaller + max-h: op iPad valt een gecentreerde hoge modal uit beeld; kruis blijft nu bovenaan zichtbaar */}
+      <div
+        className="relative mb-4 flex min-h-0 w-full max-h-[min(78dvh,620px)] max-w-[min(100%,22rem)] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:max-w-md"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header — sticky bovenin kaart; witte achtergrond zodat X niet verdwijnt */}
+        <div className="relative shrink-0 border-b border-gray-200 bg-white p-4 pb-3 sm:p-5 sm:pb-4">
           <button
             type="button"
             onClick={onClose}
-            className="absolute z-20 flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-800 shadow-sm hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
-            style={{
-              top: 'max(0.75rem, env(safe-area-inset-top, 0px))',
-              right: 'max(0.75rem, env(safe-area-inset-right, 0px))',
-            }}
+            className="absolute right-2 top-2 z-[60] flex h-9 w-9 items-center justify-center rounded-lg border-2 border-gray-300 bg-white text-gray-900 shadow-md hover:bg-gray-50 active:bg-gray-100 touch-manipulation sm:h-10 sm:w-10"
             aria-label="Sluiten"
           >
-            <X size={22} className="pointer-events-none shrink-0" strokeWidth={2.25} />
+            <X size={22} className="pointer-events-none shrink-0" strokeWidth={2.5} />
           </button>
-          <div className="min-w-0 pr-14">
+          <div className="min-w-0 pr-12">
             <span
               className="px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center gap-1"
               style={{ backgroundColor: status.bgColor, color: status.color }}
@@ -5579,12 +5583,13 @@ function ReservationDetailModal({
               {status.icon}
               {status.label}
             </span>
-            <h2 className="text-xl font-bold mt-2 break-words">{reservation.guest_name}</h2>
+            <h2 className="text-lg font-bold mt-0.5 break-words sm:text-xl">{reservation.guest_name}</h2>
           </div>
         </div>
 
-        {/* Details */}
-        <div className="p-6 space-y-4">
+        {/* Details — scrollbaar middenstuk */}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:p-5 sm:py-4">
+        <div className="space-y-3 sm:space-y-4">
           {/* Datum & Tijd */}
           <div className="flex items-center gap-4 p-4 bg-gray-100 rounded-xl">
             <div className="p-3 rounded-xl bg-green-100">
@@ -5673,9 +5678,10 @@ function ReservationDetailModal({
             </div>
           )}
         </div>
+        </div>
 
-        {/* Actions */}
-        <div className="p-6 pt-0 space-y-2">
+        {/* Actions — vast onderaan kaart (niet mee scrollen) */}
+        <div className="shrink-0 space-y-2 border-t border-gray-100 bg-white p-4 pt-3 sm:p-5 sm:pt-4">
           {reservation.status === 'PENDING' && (
             <button
               onClick={onConfirm}
