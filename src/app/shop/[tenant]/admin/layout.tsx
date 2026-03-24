@@ -12,7 +12,8 @@ interface AdminLayoutProps {
   params: { tenant: string }
 }
 
-const LOCK_PAGES = ['categorieen', 'producten', 'rapporten', 'z-rapport', 'analyse']
+// Geen Vergrendel-knop op rapportage-pagina's (Rapportages, Z-rapport) — wel op o.a. producten/categorieën/analyse
+const LOCK_PAGES = ['categorieen', 'producten', 'analyse']
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
