@@ -6,6 +6,7 @@ import nodemailer from 'nodemailer'
 import { registerRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
+import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
 
 // Secure password hashing with bcrypt
 async function hashPassword(password: string): Promise<string> {
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await hashPassword(password)
     const trialEndsAt = new Date()
-    trialEndsAt.setDate(trialEndsAt.getDate() + 14)
+    trialEndsAt.setDate(trialEndsAt.getDate() + 15)
 
     // ========================================
     // 1. CREATE TENANT (main table)
@@ -195,6 +196,8 @@ export async function POST(request: NextRequest) {
       logger.warn('Error creating tenant_settings', { requestId, error: settingsError.message, tenantSlug })
       // Don't fail - this is secondary
     }
+
+    await ensureDeliverySettingsForTenant(supabase, tenantSlug)
 
     // ========================================
     // 4. CREATE SUBSCRIPTION
@@ -300,7 +303,7 @@ async function sendVerificationEmail(email: string, name: string, token: string)
         <h2 style="color: #333;">Welkom ${name}!</h2>
         
         <p style="color: #555; line-height: 1.6;">
-          Bedankt voor je registratie bij Vysion Horeca! Je proefperiode van 14 dagen is gestart.
+          Bedankt voor je registratie bij Vysion Horeca! Je proefperiode van 15 dagen is gestart.
         </p>
         
         <p style="color: #555; line-height: 1.6;">
@@ -340,7 +343,7 @@ async function sendVerificationEmail(email: string, name: string, token: string)
     text: `
 Welkom ${name}!
 
-Bedankt voor je registratie bij Vysion Horeca! Je proefperiode van 14 dagen is gestart.
+Bedankt voor je registratie bij Vysion Horeca! Je proefperiode van 15 dagen is gestart.
 
 Klik op deze link om je emailadres te bevestigen:
 ${verifyUrl}

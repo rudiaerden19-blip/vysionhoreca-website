@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import { cache, CACHE_TTL, cacheKey } from './cache'
+import { buildDefaultDeliverySettingsRow } from '@/lib/tenant-defaults'
 import bcrypt from 'bcryptjs'
 
 // =====================================================
@@ -751,7 +752,7 @@ export interface DeliverySettings {
   payment_online: boolean
 }
 
-export async function getDeliverySettings(tenantSlug: string): Promise<DeliverySettings | null> {
+export async function getDeliverySettings(tenantSlug: string): Promise<DeliverySettings> {
   return cache.getOrFetch(
     cacheKey('delivery_settings', tenantSlug),
     async () => {
@@ -759,13 +760,16 @@ export async function getDeliverySettings(tenantSlug: string): Promise<DeliveryS
         .from('delivery_settings')
         .select('*')
         .eq('tenant_slug', tenantSlug)
-        .single()
-      
+        .maybeSingle()
+
       if (error) {
         console.error('Error fetching delivery settings:', error)
-        return null
+        return buildDefaultDeliverySettingsRow(tenantSlug)
       }
-      return data
+      if (!data) {
+        return buildDefaultDeliverySettingsRow(tenantSlug)
+      }
+      return data as DeliverySettings
     },
     CACHE_TTL.DELIVERY_SETTINGS
   )
@@ -775,11 +779,12 @@ export async function saveDeliverySettings(settings: DeliverySettings): Promise<
   const { error } = await supabase
     .from('delivery_settings')
     .upsert(settings, { onConflict: 'tenant_slug' })
-  
+
   if (error) {
     console.error('Error saving delivery settings:', error)
     return false
   }
+  cache.invalidate(cacheKey('delivery_settings', settings.tenant_slug))
   return true
 }
 
