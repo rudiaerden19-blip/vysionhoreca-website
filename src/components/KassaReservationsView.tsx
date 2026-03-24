@@ -71,6 +71,25 @@ interface Reservation {
   waitlist_position?: number
 }
 
+/**
+ * Duur uit Supabase/Excel: integer minuten, of decimale uren (1,5 / 1.5 = 90 min).
+ * Geen parseInt op "1.5" — dat werd 1 minuut en een te korte balk.
+ */
+function parseDurationMinutesFromRaw(raw: unknown, fallback: number): number {
+  if (raw == null || raw === '') return fallback
+  if (typeof raw === 'number') {
+    if (!Number.isFinite(raw) || raw <= 0) return fallback
+    if (raw < 24 && raw % 1 !== 0) return Math.round(raw * 60)
+    return Math.round(raw)
+  }
+  const s = String(raw).trim().replace(',', '.')
+  if (!s) return fallback
+  const n = parseFloat(s)
+  if (!Number.isFinite(n) || n <= 0) return fallback
+  if (n < 24 && n % 1 !== 0) return Math.round(n * 60)
+  return Math.round(n)
+}
+
 interface KassaTable {
   id: string
   number: string
@@ -1013,11 +1032,7 @@ export default function KassaReservationsView({
     if (data) {
       const mapped = data.map((r: Record<string, unknown>) => {
         const rawDur = r.duration_minutes ?? (r as { durationMinutes?: unknown }).durationMinutes
-        let duration_minutes = 90
-        if (rawDur != null && rawDur !== '') {
-          const n = typeof rawDur === 'number' ? rawDur : parseInt(String(rawDur), 10)
-          if (Number.isFinite(n) && n > 0) duration_minutes = n
-        }
+        const duration_minutes = parseDurationMinutesFromRaw(rawDur, 90)
         return {
           ...r,
           duration_minutes,
@@ -1077,10 +1092,7 @@ export default function KassaReservationsView({
     if (e.pointerType === 'mouse' && e.button !== 0) return
     e.stopPropagation()
     e.preventDefault()
-    const startDur = (() => {
-      const n = Number(r.duration_minutes)
-      return Number.isFinite(n) && n > 0 ? n : 90
-    })()
+    const startDur = parseDurationMinutesFromRaw(r.duration_minutes, 90)
     const minDur = 30
     const cap = Math.max(minDur, maxDur)
 
@@ -2999,7 +3011,8 @@ export default function KassaReservationsView({
             const mm = m % 60
             extraSlots.push(`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`)
           }
-          const totalRange = EXTRA_MIN - START_MIN  // blokken berekend over totale range incl. extra
+          // Minuten over het getekende raster = aantal kolommen × 30 min (bron van waarheid voor pixels)
+          const totalRange = (timeSlots.length + extraSlots.length) * 30
 
           // Tables to show: floor plan tables first, then any table in reservations
           const tableNumbers = floorPlanTablesDB.length > 0
@@ -3175,14 +3188,18 @@ export default function KassaReservationsView({
                               {tableRes.map((r) => {
                                 const [rh,rm] = r.reservation_time.split(':').map(Number)
                                 const startMin = rh*60+rm
-                                const baseDur = (() => {
-                                  const n = Number(r.duration_minutes)
-                                  return Number.isFinite(n) && n > 0 ? n : 90
-                                })()
-                                const dur = timelineDurPreview?.id === r.id ? timelineDurPreview.dur : baseDur
-                                if (startMin >= EXTRA_MIN || startMin+dur <= START_MIN) return null
-                                const leftPx = Math.max(0,(startMin-START_MIN)/totalRange*slotW)
-                                const widthPx = Math.min(dur/totalRange*slotW, slotW-leftPx) - 2
+                                const baseDur = parseDurationMinutesFromRaw(
+                                  r.duration_minutes,
+                                  reservationSettings.defaultDurationMinutes,
+                                )
+                                const durRaw = timelineDurPreview?.id === r.id ? timelineDurPreview.dur : baseDur
+                                const durMin = Math.max(15, Math.round(Number(durRaw)) || baseDur)
+                                if (startMin >= EXTRA_MIN || startMin+durMin <= START_MIN) return null
+                                const MINUTES_PER_COL = 30
+                                const PX_PER_COL = 80
+                                const leftPx = Math.max(0, ((startMin - START_MIN) / MINUTES_PER_COL) * PX_PER_COL)
+                                const naturalW = (durMin / MINUTES_PER_COL) * PX_PER_COL
+                                const widthPx = Math.min(naturalW, slotW - leftPx) - 2
                                 const bufferMin = reservationSettings.bufferMinutes || 0
                                 const maxDurCap = computeTimelineMaxDurationMinutes(r, tableRes, bufferMin, EXTRA_MIN)
                                 return (
@@ -3204,7 +3221,7 @@ export default function KassaReservationsView({
                                       </div>
                                       <div className="min-w-0 flex-1 flex flex-col justify-center ml-2 pr-1">
                                         <span className="text-white text-base font-bold truncate leading-tight">{r.guest_name}</span>
-                                        <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(dur)}</span>
+                                        <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(durMin)}</span>
                                       </div>
                                     </div>
                                     <div
