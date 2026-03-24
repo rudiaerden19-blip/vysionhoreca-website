@@ -33,6 +33,33 @@ interface CartItem {
   notes?: string  // For voice order modifications like "zonder tomaat"
 }
 
+/** Vandaag YYYY-MM-DD in Europe/Brussels (zelfde kalenderdag als zaak) */
+function todayYMDBrussels(): string {
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
+}
+
+function closingPeriodEnd(c: ExceptionalClosing): string {
+  if (c.date_end && c.date_end >= c.date) return c.date_end
+  return c.date
+}
+
+/** Toon in banner: vanaf nu instelbaar tot de laatste sluitingsdag voorbij is */
+function filterActiveClosingAnnouncements(closings: ExceptionalClosing[], todayStr: string): ExceptionalClosing[] {
+  return (closings || [])
+    .filter(c => closingPeriodEnd(c) >= todayStr)
+    .sort((a, b) => a.date.localeCompare(b.date))
+}
+
+function formatClosingDateNL(ymd: string): string {
+  const [y, m, d] = ymd.split('-').map(Number)
+  if (!y || !m || !d) return ymd
+  return new Date(y, m - 1, d).toLocaleDateString('nl-BE', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
 export default function MenuPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
@@ -195,15 +222,8 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         getExceptionalClosings(params.tenant),
       ])
 
-      // Filter komende sluitingen (vanaf morgen, binnen 30 dagen)
-      const todayStr = new Date().toISOString().split('T')[0]
-      const in30Days = new Date(); in30Days.setDate(in30Days.getDate() + 30)
-      const in30DaysStr = in30Days.toISOString().split('T')[0]
-      const upcoming = (closingsData || []).filter(c => {
-        const startDate = c.date_end ? c.date_end : c.date
-        return startDate >= todayStr && c.date <= in30DaysStr
-      }).sort((a, b) => a.date.localeCompare(b.date))
-      setUpcomingClosings(upcoming)
+      const todayStr = todayYMDBrussels()
+      setUpcomingClosings(filterActiveClosingAnnouncements(closingsData || [], todayStr))
       
       setProductsWithOptions(optionProducts)
       setPromotions(promotionsData)
@@ -596,6 +616,35 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           </div>
         </div>
 
+        {/* Sluitings- / vakantieaankondiging — direct zichtbaar in header tot de periode voorbij is */}
+        {upcomingClosings.length > 0 && (
+          <div className={`border-b ${theme.border}`}>
+            <div className="max-w-4xl mx-auto px-3 sm:px-4 py-2 space-y-1.5">
+              {upcomingClosings.map((closing) => {
+                const isPeriod = !!(closing.date_end && closing.date_end !== closing.date)
+                const fromLabel = formatClosingDateNL(closing.date)
+                const toLabel = closing.date_end ? formatClosingDateNL(closing.date_end) : fromLabel
+                const line = isPeriod
+                  ? `Gesloten van ${fromLabel} tot en met ${toLabel}`
+                  : `Gesloten op ${fromLabel}`
+                return (
+                  <div
+                    key={`${closing.date}-${closing.date_end || 'single'}`}
+                    className="flex items-start gap-2 px-3 py-2 rounded-lg text-xs sm:text-sm font-medium"
+                    style={{ backgroundColor: primaryColor + '28', borderLeft: `4px solid ${primaryColor}` }}
+                  >
+                    <span className="text-base shrink-0 leading-none">📢</span>
+                    <span className={`${theme.text} leading-snug`}>
+                      <strong>{line}</strong>
+                      {closing.reason ? ` — ${closing.reason}` : ''}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Categories Bar */}
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -644,29 +693,6 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
 
       {/* Menu Items - Continuous scroll met section headers */}
       <div ref={menuContentRef} className="max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-8 pb-28 sm:pb-32 space-y-8">
-        
-        {/* Aankondiging uitzonderlijke sluitingen */}
-        {upcomingClosings.length > 0 && (
-          <div className="mb-4 space-y-2">
-            {upcomingClosings.map((closing, i) => {
-              const dateFrom = new Date(closing.date)
-              const dateTo = closing.date_end ? new Date(closing.date_end) : null
-              const formatDate = (d: Date) => d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'long' })
-              const dateLabel = dateTo && closing.date_end !== closing.date
-                ? `${formatDate(dateFrom)} → ${formatDate(dateTo)}`
-                : formatDate(dateFrom)
-              return (
-                <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium" style={{ backgroundColor: primaryColor + '20', borderLeft: `4px solid ${primaryColor}` }}>
-                  <span className="text-lg">📢</span>
-                  <span className={theme.text}>
-                    <strong>Gesloten op {dateLabel}</strong>
-                    {closing.reason ? ` — ${closing.reason}` : ''}
-                  </span>
-                </div>
-              )
-            })}
-          </div>
-        )}
 
         {/* Promoties sectie */}
         {promotionsEnabled && promotions.length > 0 && (
