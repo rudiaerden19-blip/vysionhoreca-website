@@ -3202,14 +3202,18 @@ export default function KassaReservationsView({
                                 const PX_PER_COL = 80
                                 const leftPx = Math.max(0, ((startMin - START_MIN) / MINUTES_PER_COL) * PX_PER_COL)
                                 const naturalW = (durMin / MINUTES_PER_COL) * PX_PER_COL
-                                const widthPx = Math.min(naturalW, slotW - leftPx) - 2
+                                const barOuterW = Math.min(naturalW, slotW - leftPx)
+                                const widthPx = Math.max(barOuterW - 2, 48)
+                                /** Label uit echte balkbreedte (kolommen), niet alleen DB — voorkomt bv. "2 u" bij 3 kolommen / 1u30 */
+                                const slotsDrawn = Math.max(1, Math.round(barOuterW / PX_PER_COL))
+                                const minutesForLabel = Math.max(15, slotsDrawn * MINUTES_PER_COL)
                                 const bufferMin = reservationSettings.bufferMinutes || 0
                                 const maxDurCap = computeTimelineMaxDurationMinutes(r, tableRes, bufferMin, EXTRA_MIN)
                                 return (
                                   <div
                                     key={r.id}
                                     className="absolute group"
-                                    style={{ left:leftPx, width:Math.max(widthPx, 48), top:6, bottom:6, height:'auto', zIndex:2 }}
+                                    style={{ left:leftPx, width: widthPx, top:6, bottom:6, height:'auto', zIndex:2 }}
                                   >
                                     <div
                                       role="button"
@@ -3227,7 +3231,7 @@ export default function KassaReservationsView({
                                       </div>
                                       <div className="min-w-0 flex-1 flex flex-col justify-center ml-2 pr-1">
                                         <span className="text-white text-base font-bold truncate leading-tight">{r.guest_name}</span>
-                                        <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(durMin)}</span>
+                                        <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(minutesForLabel)}</span>
                                       </div>
                                     </div>
                                     <div
