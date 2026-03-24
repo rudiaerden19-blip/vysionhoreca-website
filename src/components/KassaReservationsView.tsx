@@ -37,6 +37,8 @@ import {
   EyeOff,
   Calendar,
   GripVertical,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { getAuthHeaders } from '@/lib/auth-headers'
@@ -136,6 +138,8 @@ interface ReservationSettings {
   bookingPageEnabled: boolean
   // Bevestigingsmodus: automatisch of handmatig
   autoConfirm: boolean
+  /** Kassa plattegrond: alleen vloer (header/tabs/lijst verborgen) — opgeslagen in Supabase */
+  floorplanFloorOnly: boolean
 }
 
 interface GuestProfile {
@@ -793,6 +797,7 @@ const DEFAULT_SETTINGS: ReservationSettings = {
   noShowFee: 25,
   bookingPageEnabled: true,
   autoConfirm: false,
+  floorplanFloorOnly: false,
 }
 
 // ---- Toast simple ----
@@ -1014,6 +1019,9 @@ export default function KassaReservationsView({
             depositAmount: data.deposit_amount ?? data.depositAmount,
             noShowProtection: data.no_show_protection ?? data.noShowProtection,
             autoConfirm: data.auto_confirm ?? data.autoConfirm ?? false,
+            floorplanFloorOnly: Boolean(
+              (data as { floorplan_floor_only?: boolean }).floorplan_floor_only,
+            ),
           }
           let localData: Record<string, unknown> = {}
           try {
@@ -1394,6 +1402,7 @@ export default function KassaReservationsView({
     review_link: s.reviewLink,
     booking_page_enabled: s.bookingPageEnabled,
     auto_confirm: s.autoConfirm,
+    floorplan_floor_only: s.floorplanFloorOnly,
   })
 
   // Auto-save bij elke toggle/wijziging (localStorage direct, Supabase async)
@@ -1416,6 +1425,11 @@ export default function KassaReservationsView({
     } else {
       toast.success('✅ Instellingen opgeslagen!')
     }
+  }
+
+  const floorOnlyMode = viewMode === 'floorplan' && reservationSettings.floorplanFloorOnly
+  const toggleFloorOnlyMode = () => {
+    updateSettings({ floorplanFloorOnly: !reservationSettings.floorplanFloorOnly })
   }
 
   // ---- Floor plan editor helpers ----
@@ -2285,8 +2299,12 @@ export default function KassaReservationsView({
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex-shrink-0 border-b border-gray-200 bg-white p-3 sm:p-4">
+      {/* Header — verborgen in plattegrond “alleen vloer” */}
+      <div
+        className={`flex-shrink-0 border-b border-gray-200 bg-white p-3 sm:p-4 ${
+          viewMode === 'floorplan' && floorOnlyMode ? 'hidden' : ''
+        }`}
+      >
         <div className="mb-3 flex flex-col gap-3 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <div className="flex-shrink-0 rounded-xl bg-green-100 p-2">
@@ -2412,7 +2430,9 @@ export default function KassaReservationsView({
 
       {/* Content */}
       <div
-        className={`flex-1 min-h-0 p-2 sm:p-4 ${
+        className={`flex-1 min-h-0 ${
+          viewMode === 'floorplan' && floorOnlyMode ? 'p-0' : 'p-2 sm:p-4'
+        } ${
           viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' || viewMode === 'floorplan'
             ? 'flex flex-col overflow-hidden'
             : 'overflow-y-auto'
@@ -2656,9 +2676,12 @@ export default function KassaReservationsView({
             return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res, count, guestLabel }
           }
 
+          const effectiveResListCollapsed = floorOnlyMode || resListCollapsed
+
           return (
-            <div className="flex flex-col flex-1 min-h-0 -m-4">
+            <div className={`flex flex-col flex-1 min-h-0 ${floorOnlyMode ? '' : '-m-4'}`}>
               {/* Toolbar */}
+              {!floorOnlyMode && (
               <div className="flex flex-shrink-0 flex-wrap items-center gap-2 bg-white px-2 py-2 sm:gap-3 sm:px-4 sm:py-3 border-b border-gray-200">
 
                 {/* Datum kiezer — groot en opvallend */}
@@ -2694,6 +2717,18 @@ export default function KassaReservationsView({
 
                 <div className="flex-1" />
 
+                <button
+                  type="button"
+                  onClick={toggleFloorOnlyMode}
+                  className="flex min-h-[44px] items-center gap-2 rounded-xl border-2 border-[#3C4D6B] bg-white px-3 py-2 text-sm font-bold text-[#3C4D6B] shadow-sm transition-colors hover:bg-gray-50"
+                  title="Verberg menu en toon alleen de vloer"
+                  aria-label="Alleen vloer — verberg balken"
+                >
+                  <Maximize2 size={18} className="shrink-0" />
+                  <span className="sm:hidden">Vloer</span>
+                  <span className="hidden sm:inline">Alleen vloer</span>
+                </button>
+
                 {/* Vergrendel-knop */}
                 <button
                   onClick={() => {
@@ -2719,12 +2754,13 @@ export default function KassaReservationsView({
                   <span className="sm:hidden">+ Tafel</span>
                 </button>
               </div>
+              )}
 
               {/* Canvas + lijst + optional sidebar */}
               <div className="flex flex-1 min-h-0 overflow-hidden relative">
 
                 {/* Lijst links — inklapbaar */}
-                <div className={`flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-all duration-300 relative ${resListCollapsed ? 'w-0' : 'w-52 md:w-60 lg:w-72'}`}>
+                <div className={`flex-shrink-0 bg-white border-r border-gray-200 flex flex-col overflow-hidden transition-all duration-300 relative ${effectiveResListCollapsed ? 'w-0' : 'w-52 md:w-60 lg:w-72'}`}>
                   <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
                     <span className="font-bold text-base text-gray-800 whitespace-nowrap">Reservaties</span>
                     <span className="text-sm font-semibold text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">{floorRes.length}</span>
@@ -2807,7 +2843,8 @@ export default function KassaReservationsView({
                   </div>
                 </div>
 
-                {/* Oranje toggle knop om lijst in/uit te klappen */}
+                {/* Oranje toggle knop om lijst in/uit te klappen — verborgen in “alleen vloer” */}
+                {!floorOnlyMode && (
                 <button
                   onClick={() => setResListCollapsed(c => !c)}
                   className="absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center rounded-r-2xl bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white shadow-xl transition-all"
@@ -2816,6 +2853,7 @@ export default function KassaReservationsView({
                 >
                   {resListCollapsed ? '▶' : '◀'}
                 </button>
+                )}
 
                 {/* Canvas */}
                 <div
@@ -2838,6 +2876,18 @@ export default function KassaReservationsView({
                   onPointerCancel={handleFloorPointerUp}
                   onWheel={handleFloorWheel}
                 >
+                  {floorOnlyMode && (
+                    <button
+                      type="button"
+                      onClick={e => { e.stopPropagation(); toggleFloorOnlyMode() }}
+                      onPointerDown={e => e.stopPropagation()}
+                      className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[35] flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-xl bg-orange-500 px-4 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-orange-600 active:bg-orange-700"
+                      title="Toon menu, tabs en werkbalk"
+                    >
+                      <Minimize2 size={20} className="shrink-0" />
+                      <span className="hidden sm:inline">Panelen tonen</span>
+                    </button>
+                  )}
                   {/* Wereld — beweegt via pan+zoom transform, tafels staan vast */}
                   <div style={{
                     position: 'absolute',

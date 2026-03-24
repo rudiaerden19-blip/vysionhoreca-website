@@ -62,7 +62,8 @@ ALTER TABLE reservation_settings
   ADD COLUMN IF NOT EXISTS deposit_amount NUMERIC DEFAULT 0,
   ADD COLUMN IF NOT EXISTS no_show_protection BOOLEAN DEFAULT false,
   ADD COLUMN IF NOT EXISTS no_show_fee NUMERIC DEFAULT 0,
-  ADD COLUMN IF NOT EXISTS booking_page_enabled BOOLEAN DEFAULT true;
+  ADD COLUMN IF NOT EXISTS booking_page_enabled BOOLEAN DEFAULT true,
+  ADD COLUMN IF NOT EXISTS floorplan_floor_only BOOLEAN NOT NULL DEFAULT false;
 
 -- Index
 CREATE INDEX IF NOT EXISTS idx_reservation_settings_tenant ON reservation_settings(tenant_slug);
