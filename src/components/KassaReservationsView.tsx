@@ -5540,21 +5540,29 @@ function ReservationDetailModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
       <div className="bg-white rounded-2xl w-full max-w-md relative">
         {/* Header */}
-        <div className="p-6 pb-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <span
-                className="px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center gap-1"
-                style={{ backgroundColor: status.bgColor, color: status.color }}
-              >
-                {status.icon}
-                {status.label}
-              </span>
-              <h2 className="text-xl font-bold mt-2">{reservation.guest_name}</h2>
-            </div>
-            <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100">
-              <X size={20} />
-            </button>
+        <div className="relative p-6 pb-4 border-b border-gray-200">
+          {/* Absoluut rechtsboven: blijft zichtbaar op iPad/landscape (geen flex-squeeze) */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute z-20 flex h-11 w-11 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-800 shadow-sm hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
+            style={{
+              top: 'max(0.75rem, env(safe-area-inset-top, 0px))',
+              right: 'max(0.75rem, env(safe-area-inset-right, 0px))',
+            }}
+            aria-label="Sluiten"
+          >
+            <X size={22} className="pointer-events-none shrink-0" strokeWidth={2.25} />
+          </button>
+          <div className="min-w-0 pr-14">
+            <span
+              className="px-2 py-0.5 rounded-full text-xs font-medium inline-flex items-center gap-1"
+              style={{ backgroundColor: status.bgColor, color: status.color }}
+            >
+              {status.icon}
+              {status.label}
+            </span>
+            <h2 className="text-xl font-bold mt-2 break-words">{reservation.guest_name}</h2>
           </div>
         </div>
 
