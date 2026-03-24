@@ -1064,11 +1064,11 @@ export default function KassaReservationsView({
     if (!silent) setLoading(false)
   }
 
+  /** Altijd zelfde formaat als 1u30 / 2u00 (geen "2 u" met spatie). */
   const formatTimelineDurLabel = (minutes: number) => {
     const h = Math.floor(minutes / 60)
     const m = minutes % 60
     if (h === 0) return `${m} min`
-    if (m === 0) return `${h} u`
     return `${h}u${String(m).padStart(2, '0')}`
   }
 
@@ -3338,6 +3338,11 @@ export default function KassaReservationsView({
                                 const barOuterW = Math.min(naturalW, slotW - leftPx)
                                 /* Volledige berekende breedte — géén padding op deze container (dat kortte de balk ~30px in) */
                                 const widthPx = Math.max(barOuterW, 48)
+                                /* Label = wat je ziet: bij afsnijden aan rasterrand moet tekst overeenkomen met balklengte, niet met DB-duur */
+                                const visualDurMinutes = Math.max(
+                                  15,
+                                  Math.round((barOuterW / PX_PER_COL) * MINUTES_PER_COL / 15) * 15,
+                                )
                                 const bufferMin = reservationSettings.bufferMinutes || 0
                                 const maxDurCap = computeTimelineMaxDurationMinutes(r, tableRes, bufferMin, EXTRA_MIN)
                                 const { minStart: minStartBound, maxStart: maxStartBound } =
@@ -3365,7 +3370,7 @@ export default function KassaReservationsView({
                                         </div>
                                         <div className="min-w-0 flex-1 flex flex-col justify-center ml-2 pr-1">
                                           <span className="text-white text-base font-bold truncate leading-tight">{r.guest_name}</span>
-                                          <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(durMin)}</span>
+                                          <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(visualDurMinutes)}</span>
                                         </div>
                                       </div>
                                       {/* Rechter einde: puntige pijl — telt mee in widthPx, geen extra korting op duur */}
