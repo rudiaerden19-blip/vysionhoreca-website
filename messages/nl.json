@@ -2178,7 +2178,7 @@
       "subtitle": "Beheer keuzes die klanten kunnen maken",
       "addOption": "Nieuwe optie",
       "editOption": "Optie bewerken",
-      "optionName": "Vul betaald of gratis optie in voor iedere tenant",
+      "optionName": "Vul gratis optie of betaalde optie in hier",
       "optionNamePlaceholder": "Bijv. Formaat, Saus, Extra toppings",
       "choices": "Keuzes",
       "choiceNamePlaceholder": "Naam (bijv. Klein, Medium, Groot)",
