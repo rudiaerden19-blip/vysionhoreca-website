@@ -4,7 +4,21 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { getTenantSettings, getDeliverySettings, TenantSettings, DeliverySettings, addLoyaltyPoints, getCustomer, getShopStatus, ShopStatus } from '@/lib/admin-api'
+import {
+  getTenantSettings,
+  getDeliverySettings,
+  TenantSettings,
+  DeliverySettings,
+  addLoyaltyPoints,
+  getCustomer,
+  getShopStatus,
+  ShopStatus,
+  getExceptionalClosings,
+  ExceptionalClosing,
+  getBelgiumDateString,
+  addDaysToBelgiumYMD,
+  isDateInExceptionalClosing,
+} from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 
@@ -56,6 +70,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const [earnedPoints, setEarnedPoints] = useState(0)
   const [loggedInCustomerId, setLoggedInCustomerId] = useState<string | null>(null)
   const [shopStatus, setShopStatus] = useState<ShopStatus | null>(null)
+  const [exceptionalClosings, setExceptionalClosings] = useState<ExceptionalClosing[]>([])
   const [enabledPaymentMethods, setEnabledPaymentMethods] = useState<string[]>(['cash'])
   const [scheduledDate, setScheduledDate] = useState<string>('') // YYYY-MM-DD
   const [scheduledDateDisplay, setScheduledDateDisplay] = useState<string>('') // DD/MM/YYYY
@@ -104,11 +119,22 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 
+  function firstAvailableScheduledDate(status: ShopStatus | null, closings: ExceptionalClosing[]): string {
+    const todayB = getBelgiumDateString()
+    const startOffset = status?.canOrder ? 0 : 1
+    for (let i = startOffset; i < 120; i++) {
+      const candidate = addDaysToBelgiumYMD(todayB, i)
+      if (!isDateInExceptionalClosing(candidate, closings)) return candidate
+    }
+    return addDaysToBelgiumYMD(todayB, startOffset)
+  }
+
   async function loadData() {
-    const [tenant, delivery, status] = await Promise.all([
+    const [tenant, delivery, status, closings] = await Promise.all([
       getTenantSettings(params.tenant),
       getDeliverySettings(params.tenant),
       getShopStatus(params.tenant),
+      getExceptionalClosings(params.tenant),
     ])
     
     // Check of tenant bestaat - redirect naar niet gevonden als tenant null is
@@ -120,15 +146,10 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     setTenantSettings(tenant)
     setDeliverySettings(delivery)
     setShopStatus(status)
-    
-    // Set default scheduled date based on whether today is available
-    const today = new Date().toISOString().split('T')[0]
-    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
-    if (status && status.canOrder) {
-      setScheduledDate(today)  // Today is available
-    } else {
-      setScheduledDate(tomorrow)  // Today not available, default to tomorrow
-    }
+    setExceptionalClosings(closings || [])
+
+    // Eerste beschikbare dag (Brussels) die niet in een uitzonderlijke sluiting valt
+    setScheduledDate(firstAvailableScheduledDate(status, closings || []))
     
     // Load enabled payment methods
     if (tenant?.payment_methods && Array.isArray(tenant.payment_methods) && tenant.payment_methods.length > 0) {
@@ -212,6 +233,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     if (orderType === 'delivery' && (!customerInfo.address || !customerInfo.postal_code || !customerInfo.city)) return false
     if (cart.length === 0) return false
     if (!scheduledDate) return false
+    if (isDateInExceptionalClosing(scheduledDate, exceptionalClosings)) return false
     // Blokkeer als minimale bestelling niet bereikt bij bezorging
     if (orderType === 'delivery' && deliverySettings?.min_order_amount && subtotal < deliverySettings.min_order_amount) return false
     // Radius bevestiging verplicht bij bezorging
@@ -222,6 +244,8 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
   const getSubmitError = () => {
     if (cart.length === 0) return t('checkoutPage.cartEmpty')
     if (!scheduledDate) return t('checkoutPage.selectDateRequired')
+    if (isDateInExceptionalClosing(scheduledDate, exceptionalClosings))
+      return t('checkoutPage.dateInClosingPeriod')
     if (!customerInfo.name) return t('checkoutPage.fillName')
     if (!customerInfo.phone) return t('checkoutPage.fillPhone')
     if (orderType === 'delivery') {
@@ -284,6 +308,10 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
 
   const handleSubmit = async () => {
     if (!canSubmit()) return
+    if (scheduledDate && isDateInExceptionalClosing(scheduledDate, exceptionalClosings)) {
+      alert(t('checkoutPage.dateInClosingPeriod'))
+      return
+    }
     setSubmitting(true)
     
     try {
@@ -548,8 +576,9 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
     )
   }
 
-  // Shop is closed - user can still order but must select a future date
-  const isShopClosed = shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder)
+  const todayBrussels = getBelgiumDateString()
+  const minDatePicker = shopStatus?.canOrder ? todayBrussels : addDaysToBelgiumYMD(todayBrussels, 1)
+  const maxDatePicker = addDaysToBelgiumYMD(todayBrussels, 30)
 
   return (
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
@@ -642,11 +671,8 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                     type="date"
                     value={scheduledDate}
                     onChange={(e) => { setScheduledDate(e.target.value); setScheduledDateDisplay(e.target.value) }}
-                    min={shopStatus?.canOrder
-                      ? new Date().toISOString().split('T')[0]
-                      : new Date(Date.now() + 86400000).toISOString().split('T')[0]
-                    }
-                    max={new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]}
+                    min={minDatePicker}
+                    max={maxDatePicker}
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:border-transparent transition-all"
                   />
                 </div>
@@ -674,6 +700,11 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
               {shopStatus && !shopStatus.canOrder && (
                 <div className="mt-4 p-3 bg-orange-50 border border-orange-200 rounded-xl text-orange-800 text-sm">
                   ⚠️ {t('checkoutPage.todayNotAvailable')}
+                </div>
+              )}
+              {scheduledDate && isDateInExceptionalClosing(scheduledDate, exceptionalClosings) && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm font-medium">
+                  ⛔ {t('checkoutPage.dateInClosingPeriod')}
                 </div>
               )}
             </motion.div>

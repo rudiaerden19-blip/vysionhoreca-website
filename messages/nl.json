@@ -3630,6 +3630,7 @@
     "tomorrow": "Morgen",
     "orderScheduledFor": "Uw bestelling is gepland voor",
     "selectDateRequired": "Kies eerst een datum voor uw bestelling",
+    "dateInClosingPeriod": "Deze datum valt in een sluitingsperiode. Kies een andere dag.",
     "whenPickup": "Wanneer afhalen?",
     "date": "Datum",
     "time": "Tijd",

@@ -3622,6 +3622,7 @@
     "tomorrow": "Tomorrow",
     "orderScheduledFor": "Your order is scheduled for",
     "selectDateRequired": "Please select a date for your order first",
+    "dateInClosingPeriod": "This date falls within a closing period. Please pick another day.",
     "whenPickup": "When to pick up?",
     "date": "Date",
     "time": "Time",

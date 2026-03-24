@@ -80,6 +80,22 @@ export function getBelgiumDateString(date: Date = new Date()): string {
   return date.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
 }
 
+/** Voeg dagen toe aan een YYYY-MM-DD (kalender in Europe/Brussels). */
+export function addDaysToBelgiumYMD(ymd: string, days: number): string {
+  const [y, m, d] = ymd.split('-').map(Number)
+  const dt = new Date(Date.UTC(y, m - 1, d + days))
+  return dt.toLocaleDateString('sv-SE', { timeZone: 'Europe/Brussels' })
+}
+
+/** Of een kalenderdag binnen een uitzonderlijke sluiting valt (inclusief periode date … date_end). */
+export function isDateInExceptionalClosing(dateStr: string, closings: ExceptionalClosing[]): boolean {
+  if (!dateStr || !closings?.length) return false
+  return closings.some((c) => {
+    const end = c.date_end && c.date_end >= c.date ? c.date_end : c.date
+    return dateStr >= c.date && dateStr <= end
+  })
+}
+
 /**
  * Fiscale dag grenzen voor Z-Rapport (GKS compliant)
  * Een fiscale dag loopt van 00:00 tot 12:00 de VOLGENDE dag.
@@ -343,8 +359,8 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
     getExceptionalClosings(tenantSlug),
   ])
 
-  // Check uitzonderlijke sluitingsdagen (feestdagen + eigen keuze)
-  const todayStr = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+  // Check uitzonderlijke sluitingsdagen (feestdagen + eigen keuze) — kalenderdag = Europe/Brussels
+  const todayStr = getBelgiumDateString()
   const exceptionalToday = exceptionalClosings.find(c => {
     if (c.date === todayStr) return true
     if (c.date_end) return todayStr >= c.date && todayStr <= c.date_end
@@ -359,9 +375,7 @@ export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
     const dayNames = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag']
     for (let i = 1; i <= 14; i++) {
       const nextDay = (dayOfWeek + i) % 7
-      const nextDate = new Date(now)
-      nextDate.setDate(now.getDate() + i)
-      const nextDateStr = nextDate.toISOString().split('T')[0]
+      const nextDateStr = addDaysToBelgiumYMD(todayStr, i)
       const isExceptional = exceptionalClosings.some(c => {
         if (c.date === nextDateStr) return true
         if (c.date_end) return nextDateStr >= c.date && nextDateStr <= c.date_end
