@@ -1,0 +1,24 @@
+---
+description: Deploy- en testworkflow via Vercel sandbox (preview), niet alleen production
+alwaysApply: true
+---
+
+# Sandbox (Vercel preview)
+
+Zie ook `TESTRAPORT.md`: omgeving = **sandbox via Vercel** na GitHub push.
+
+## Verplicht gedrag na wijzigingen die live moeten
+
+1. **Commit** met duidelijke boodschap.
+2. **Push naar GitHub** (`origin/main` of feature branch met PR).
+3. **Sandbox = preview**: controleer dat Vercel een **Preview Deployment** bouwt (PR-branch of push). Gebruik de **preview-URL** om te testen vóór je productie als enige bron van waarheid beschouwt.
+4. Gebruik waar mogelijk **`npx vercel`** (of gekoppelde CLI) voor een expliciete preview-deploy als de gebruiker dat vraagt of als push alleen niet genoeg is — vereist netwerk en eventueel login.
+
+## Niet doen
+
+- Alleen “naar main pushen” als klaar zonder te verwijzen naar preview/sandbox wanneer deploy/test het onderwerp is.
+- Production URL als enige test gebruiken als het team preview gebruikt.
+
+## GitHub
+
+- Push blijft de trigger voor Vercel; **GitHub + Vercel preview** samen = sandbox-workflow.
