@@ -2108,34 +2108,36 @@ export default function KassaReservationsView({
 
   // ---- Main render ----
   return (
-    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+    <div className="fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-white h-[100dvh] max-h-[100dvh]">
       {/* Toast */}
       {toast.msg && (
-        <div className={`fixed top-4 right-4 z-[60] px-4 py-3 rounded-xl text-white font-medium shadow-lg transition-all ${toast.msg.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+        <div
+          className={`fixed left-3 right-3 top-[max(0.5rem,env(safe-area-inset-top))] z-[60] mx-auto max-w-lg rounded-xl px-4 py-3 text-center text-sm text-white shadow-lg transition-all sm:left-auto sm:right-4 sm:top-4 sm:mx-0 sm:text-left sm:text-base ${toast.msg.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}
+        >
           {toast.msg.text}
         </div>
       )}
 
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-green-100">
-              <CalendarDays size={24} className="text-green-500" />
+      <div className="flex-shrink-0 border-b border-gray-200 bg-white p-3 sm:p-4">
+        <div className="mb-3 flex flex-col gap-3 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <div className="flex-shrink-0 rounded-xl bg-green-100 p-2">
+              <CalendarDays size={22} className="text-green-500 sm:h-6 sm:w-6" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold">Reservaties</h1>
-              <p className="text-base text-gray-400">
+            <div className="min-w-0">
+              <h1 className="truncate text-xl font-bold sm:text-2xl">Reservaties</h1>
+              <p className="text-sm text-gray-400 sm:text-base">
                 {formatDate(selectedDate)} • {todayStats.covers} personen verwacht
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
             <button
               onClick={onClose}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-orange-500 hover:bg-orange-400 text-white text-sm font-bold transition-colors"
+              className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400 sm:gap-2"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Kassa
@@ -2144,24 +2146,25 @@ export default function KassaReservationsView({
               <>
                 <button
                   onClick={() => setShowWalkInModal(true)}
-                  className="px-4 py-2 rounded-xl bg-gray-700 text-white font-medium hover:bg-gray-800 transition-colors flex items-center gap-2"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-gray-700 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 sm:gap-2 sm:px-4"
                 >
-                  <UserCheck size={18} />
-                  Walk-in
+                  <UserCheck size={18} className="shrink-0" />
+                  <span className="hidden sm:inline">Walk-in</span>
                 </button>
                 <button
                   onClick={() => setShowWaitlistModal(true)}
-                  className="px-4 py-2 rounded-xl bg-purple-500 text-white font-medium hover:bg-purple-600 transition-colors flex items-center gap-2"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-purple-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-purple-600 sm:gap-2 sm:px-4"
                 >
-                  <Clock size={18} />
-                  Wachtlijst
+                  <Clock size={18} className="shrink-0" />
+                  <span className="hidden sm:inline">Wachtlijst</span>
                 </button>
                 <button
                   onClick={() => setShowNewReservationModal(true)}
-                  className="px-4 py-2 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors flex items-center gap-2"
+                  className="flex min-h-[44px] shrink-0 items-center gap-1.5 rounded-xl bg-green-500 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-600 sm:gap-2 sm:px-4"
                 >
-                  <Plus size={20} />
-                  Nieuwe Reservatie
+                  <Plus size={20} className="shrink-0" />
+                  <span className="inline md:hidden">Nieuw</span>
+                  <span className="hidden md:inline">Nieuwe Reservatie</span>
                 </button>
               </>
             )}
@@ -2242,9 +2245,9 @@ export default function KassaReservationsView({
 
       {/* Content */}
       <div
-        className={`flex-1 min-h-0 p-4 ${
+        className={`flex-1 min-h-0 p-2 sm:p-4 ${
           viewMode === 'today' || viewMode === 'timeline' || viewMode === 'reservations' || viewMode === 'floorplan'
-            ? 'overflow-hidden flex flex-col'
+            ? 'flex flex-col overflow-hidden'
             : 'overflow-y-auto'
         }`}
         key={viewMode}
@@ -2489,7 +2492,7 @@ export default function KassaReservationsView({
           return (
             <div className="flex flex-col flex-1 min-h-0 -m-4">
               {/* Toolbar */}
-              <div className="flex flex-wrap items-center gap-3 px-4 py-3 bg-white border-b border-gray-200 flex-shrink-0">
+              <div className="flex flex-shrink-0 flex-wrap items-center gap-2 bg-white px-2 py-2 sm:gap-3 sm:px-4 sm:py-3 border-b border-gray-200">
 
                 {/* Datum kiezer — groot en opvallend */}
                 <div className="flex items-center gap-2 bg-orange-500 rounded-2xl px-3 py-2 shadow-md">
@@ -2769,7 +2772,7 @@ export default function KassaReservationsView({
                   const allTableRes = floorRes.filter(r => String(r.table_number) === String(selectedFloorTable.number)).sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                   return (
                     <div
-                      className="fixed right-0 top-0 z-[55] flex min-h-0 w-[min(320px,85vw)] flex-col overflow-hidden shadow-2xl bg-[#16213e] border-l border-white/10"
+                      className="fixed right-0 top-0 z-[55] flex min-h-0 w-[min(380px,95vw)] sm:w-[min(320px,85vw)] flex-col overflow-hidden border-l border-white/10 bg-[#16213e] shadow-2xl"
                       style={{
                         height: '100dvh',
                         maxHeight: '100dvh',
@@ -2779,19 +2782,29 @@ export default function KassaReservationsView({
                     >
 
                       {/* Header */}
-                      <div className="p-4 flex justify-between items-center flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', borderLeft: `4px solid ${color}` }}>
-                        <div>
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <h3 className="text-white font-bold text-3xl">Tafel {selectedFloorTable.number}</h3>
-                            <span className="text-base font-bold px-3 py-1 rounded-full text-white" style={{ backgroundColor: color }}>{label}</span>
+                      <div
+                        className="flex flex-shrink-0 items-start justify-between gap-2 p-3 sm:p-4"
+                        style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', borderLeft: `4px solid ${color}` }}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-0.5 flex flex-wrap items-center gap-2">
+                            <h3 className="text-2xl font-bold text-white sm:text-3xl">Tafel {selectedFloorTable.number}</h3>
+                            <span className="shrink-0 rounded-full px-2.5 py-1 text-sm font-bold text-white sm:px-3 sm:text-base" style={{ backgroundColor: color }}>{label}</span>
                           </div>
-                          <p className="text-white/60 text-base font-medium">{selectedFloorTable.seats} plaatsen</p>
+                          <p className="text-sm font-medium text-white/60 sm:text-base">{selectedFloorTable.seats} plaatsen</p>
                         </div>
-                        <button onClick={() => setSelectedFloorTable(null)} className="text-white/50 hover:text-white text-xl">✕</button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFloorTable(null)}
+                          className="min-h-[44px] min-w-[44px] shrink-0 text-2xl text-white/50 hover:text-white"
+                          aria-label="Sluiten"
+                        >
+                          ✕
+                        </button>
                       </div>
 
                       {/* Reservaties */}
-                      <div className="flex-1 min-h-0 overflow-y-auto p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                         <p className="text-white/50 text-sm uppercase tracking-wider mb-3">Reservaties</p>
                         {allTableRes.length > 0 ? (
                           <div className="space-y-3">
@@ -2863,7 +2876,7 @@ export default function KassaReservationsView({
                       </div>
 
                       {/* Draaien */}
-                      <div className="p-4 flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                      <div className="flex-shrink-0 p-3 sm:p-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                         <p className="text-white/50 text-xs uppercase tracking-wider mb-2">Draaien</p>
                         <div className="flex gap-2">
                           <button onClick={async () => { const u = floorPlanTablesDB.map(t => t.id === selectedFloorTable.id ? { ...t, rotation: (t.rotation - 45 + 360) % 360 } : t); await saveFloorPlan(u); setSelectedFloorTable(p => p ? { ...p, rotation: (p.rotation - 45 + 360) % 360 } : null) }}
@@ -2876,7 +2889,7 @@ export default function KassaReservationsView({
                       </div>
 
                       {/* Acties */}
-                      <div className="p-4 space-y-2 flex-shrink-0 mt-auto">
+                      <div className="mt-auto flex-shrink-0 space-y-2 p-3 sm:p-4">
                         <button onClick={() => { setShowNewReservationModal(true); setSelectedFloorTable(null) }}
                           className="w-full min-h-[52px] rounded-xl bg-emerald-500 active:bg-emerald-700 text-white font-bold transition-colors text-sm">
                           + Reservatie aanmaken
