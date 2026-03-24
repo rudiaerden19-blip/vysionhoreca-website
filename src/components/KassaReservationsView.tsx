@@ -3204,9 +3204,9 @@ export default function KassaReservationsView({
                                 const naturalW = (durMin / MINUTES_PER_COL) * PX_PER_COL
                                 const barOuterW = Math.min(naturalW, slotW - leftPx)
                                 const widthPx = Math.max(barOuterW - 2, 48)
-                                /** Label uit echte balkbreedte (kolommen), niet alleen DB — voorkomt bv. "2 u" bij 3 kolommen / 1u30 */
-                                const slotsDrawn = Math.max(1, Math.round(barOuterW / PX_PER_COL))
-                                const minutesForLabel = Math.max(15, slotsDrawn * MINUTES_PER_COL)
+                                /** Minuten uit pixelbreedte (geen aantal kolommen afronden: 4,5×80 werd 5 kol → "2u30" bij 2 uur) */
+                                const minutesFromWidth = (barOuterW / PX_PER_COL) * MINUTES_PER_COL
+                                const minutesForLabel = Math.max(15, Math.round(minutesFromWidth / 15) * 15)
                                 const bufferMin = reservationSettings.bufferMinutes || 0
                                 const maxDurCap = computeTimelineMaxDurationMinutes(r, tableRes, bufferMin, EXTRA_MIN)
                                 return (
