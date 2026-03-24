@@ -2763,12 +2763,20 @@ export default function KassaReservationsView({
                   </div>
                 </div>
 
-                {/* Sidebar — selected table detail (volle hoogte van canvas-rij; blauw tot onderaan op iPad) */}
+                {/* Sidebar — fixed: volledige schermhoogte, ook over toolbar (Wachtlijst, Vergrendelen, …) */}
                 {selectedFloorTable && (() => {
                   const { label, color } = getFloorTableInfo(selectedFloorTable.number)
                   const allTableRes = floorRes.filter(r => String(r.table_number) === String(selectedFloorTable.number)).sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                   return (
-                    <div className="absolute right-0 top-0 bottom-0 flex h-full min-h-0 w-[min(320px,85vw)] flex-col overflow-hidden z-20 shadow-2xl bg-[#16213e] border-l border-white/10">
+                    <div
+                      className="fixed right-0 top-0 z-[55] flex min-h-0 w-[min(320px,85vw)] flex-col overflow-hidden shadow-2xl bg-[#16213e] border-l border-white/10"
+                      style={{
+                        height: '100dvh',
+                        maxHeight: '100dvh',
+                        paddingTop: 'env(safe-area-inset-top, 0px)',
+                        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+                      }}
+                    >
 
                       {/* Header */}
                       <div className="p-4 flex justify-between items-center flex-shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', borderLeft: `4px solid ${color}` }}>
