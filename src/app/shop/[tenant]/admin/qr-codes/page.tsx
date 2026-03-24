@@ -84,33 +84,51 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
     setSaving(false)
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (e: React.MouseEvent, id: string | undefined) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!id) {
+      alert('QR-code kon niet worden herkend. Vernieuw de pagina en probeer opnieuw.')
+      return
+    }
     if (!confirm(t('marketingQr.confirmDelete'))) return
-    
+
     const success = await deleteQrCode(id)
     if (success) {
       setQrCodes(prev => prev.filter(qr => qr.id !== id))
+    } else {
+      alert('Verwijderen mislukt. Controleer je verbinding of probeer later opnieuw.')
     }
   }
 
-  const downloadQr = async (qr: QrCode) => {
+  /** Print-dialog direct na klik (geen async fetch — anders blokkeert de browser popups). */
+  const printQr = (qr: QrCode) => {
     const imageUrl = getQrImageUrl(qr.target_url, 400)
-    
-    try {
-      const response = await fetch(imageUrl)
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `qr-${qr.name.toLowerCase().replace(/\s+/g, '-')}.png`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      window.URL.revokeObjectURL(url)
-    } catch {
-      // Fallback: open in new tab
-      window.open(imageUrl, '_blank')
+    const w = window.open('', '_blank')
+    if (!w) {
+      alert('Pop-up geblokkeerd. Sta pop-ups toe voor deze site om af te drukken.')
+      return
     }
+    const esc = (s: string) =>
+      s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!))
+    w.document.write(
+      `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${esc(qr.name)}</title></head>` +
+        `<body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#fff">` +
+        `<img src="${imageUrl}" alt="" style="max-width:100%;max-height:100vh;object-fit:contain"/>` +
+        `</body></html>`
+    )
+    w.document.close()
+    const img = w.document.body.querySelector('img')
+    const runPrint = () => {
+      try {
+        w.focus()
+        w.print()
+      } catch {
+        /* ignore */
+      }
+    }
+    if (img?.complete) runPrint()
+    else img?.addEventListener('load', runPrint, { once: true })
   }
 
   const openCreateModal = (type: string) => {
@@ -205,9 +223,8 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
         ) : (
           <div className="divide-y">
             {qrCodes.map((qr) => (
-              <motion.div 
-                key={qr.id} 
-                layout
+              <div
+                key={qr.id}
                 className="p-4 flex items-center gap-4 hover:bg-gray-50"
               >
                 {/* QR Preview */}
@@ -235,28 +252,29 @@ export default function QrCodesPage({ params }: { params: { tenant: string } }) 
                   <p className="text-sm text-gray-500">{t('marketingQr.scans')}</p>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <motion.button 
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => downloadQr(qr)}
-                    className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg" 
-                    title="Download"
+                {/* Actions — geen motion layout op parent (verstoort klikken); gewone buttons */}
+                <div className="flex gap-2 shrink-0 relative z-10">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      printQr(qr)
+                    }}
+                    className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg"
+                    title="Afdrukken"
                   >
-                    📥
-                  </motion.button>
-                  <motion.button 
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => handleDelete(qr.id!)}
-                    className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg" 
+                    🖨️
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDelete(e, qr.id)}
+                    className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg"
                     title="Verwijderen"
                   >
                     🗑️
-                  </motion.button>
+                  </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         )}
