@@ -3139,13 +3139,13 @@ export default function KassaReservationsView({
                         </div>
                         <div className="flex relative" style={{ width:(timeSlots.length+extraSlots.length)*80 }}>
                           {timeSlots.map((t,i) => (
-                            <div key={t} style={{ width:80, flexShrink:0 }} className="border-r border-orange-400 flex items-center justify-center">
-                              {i%2===0 && <span className="text-sm font-bold text-white">{t}</span>}
+                            <div key={`${t}-${i}`} style={{ width:80, flexShrink:0 }} className="border-r border-orange-400 flex items-center justify-center px-0.5">
+                              <span className="text-[11px] font-bold leading-tight text-white sm:text-xs md:text-sm">{t}</span>
                             </div>
                           ))}
                           {extraSlots.map((t,i) => (
-                            <div key={`ex-${t}`} style={{ width:80, flexShrink:0 }} className="border-r border-orange-300 flex items-center justify-center bg-orange-400/70">
-                              {i%2===0 && <span className="text-sm font-bold text-white/80">{t}</span>}
+                            <div key={`ex-${t}-${i}`} style={{ width:80, flexShrink:0 }} className="border-r border-orange-300 flex items-center justify-center bg-orange-400/70 px-0.5">
+                              <span className="text-[11px] font-bold leading-tight text-white/90 sm:text-xs md:text-sm">{t}</span>
                             </div>
                           ))}
                           {redLinePct !== null && (
