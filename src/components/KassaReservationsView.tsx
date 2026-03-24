@@ -800,6 +800,67 @@ const DEFAULT_SETTINGS: ReservationSettings = {
   floorplanFloorOnly: false,
 }
 
+/** Robuuste conversie Supabase → UI (numeriek uit string, ontbrekende kolommen) */
+function numFromDb(v: unknown, fallback: number): number {
+  if (typeof v === 'number' && Number.isFinite(v)) return v
+  if (typeof v === 'string' && v.trim() !== '') {
+    const n = Number(v)
+    if (Number.isFinite(n)) return n
+  }
+  return fallback
+}
+
+function boolFromDb(v: unknown, fallback: boolean): boolean {
+  if (typeof v === 'boolean') return v
+  if (v === 't' || v === 'true' || v === 1) return true
+  if (v === 'f' || v === 'false' || v === 0) return false
+  return fallback
+}
+
+function mapReservationSettingsFromDb(data: Record<string, unknown>): Partial<ReservationSettings> {
+  const safeParseJSON = (val: unknown, fallback: unknown) => {
+    if (val == null) return fallback
+    if (typeof val !== 'string') return val ?? fallback
+    try { return JSON.parse(val) } catch { return fallback }
+  }
+  const closedRaw = safeParseJSON(data.closed_days, DEFAULT_SETTINGS.closedDays)
+  const closedDays = Array.isArray(closedRaw)
+    ? closedRaw.map((x) => (typeof x === 'number' ? x : Number(x))).filter((x) => Number.isFinite(x))
+    : DEFAULT_SETTINGS.closedDays
+  const shiftsRaw = safeParseJSON(data.shifts, DEFAULT_SETTINGS.shifts)
+  const shifts = Array.isArray(shiftsRaw) ? (shiftsRaw as Shift[]) : DEFAULT_SETTINGS.shifts
+
+  return {
+    isEnabled: boolFromDb(data.is_enabled, DEFAULT_SETTINGS.isEnabled),
+    acceptOnline: boolFromDb(data.accept_online, DEFAULT_SETTINGS.acceptOnline),
+    maxPartySize: numFromDb(data.max_party_size, DEFAULT_SETTINGS.maxPartySize),
+    defaultDurationMinutes: numFromDb(data.default_duration_minutes, DEFAULT_SETTINGS.defaultDurationMinutes),
+    bufferMinutes: numFromDb(data.buffer_minutes, DEFAULT_SETTINGS.bufferMinutes),
+    slotDurationMinutes: numFromDb(data.slot_duration_minutes, DEFAULT_SETTINGS.slotDurationMinutes),
+    maxReservationsPerSlot: numFromDb(data.max_reservations_per_slot, DEFAULT_SETTINGS.maxReservationsPerSlot),
+    maxCoversPerSlot: numFromDb(data.max_covers_per_slot, DEFAULT_SETTINGS.maxCoversPerSlot),
+    minAdvanceHours: numFromDb(data.min_advance_hours, DEFAULT_SETTINGS.minAdvanceHours),
+    maxAdvanceDays: numFromDb(data.max_advance_days, DEFAULT_SETTINGS.maxAdvanceDays),
+    kitchenCapacityEnabled: boolFromDb(data.kitchen_capacity_enabled, DEFAULT_SETTINGS.kitchenCapacityEnabled),
+    kitchenMaxCoversPer15min: numFromDb(data.kitchen_max_covers_per_15min, DEFAULT_SETTINGS.kitchenMaxCoversPer15min),
+    closedDays,
+    shifts,
+    cancellationDeadlineHours: numFromDb(data.cancellation_deadline_hours, DEFAULT_SETTINGS.cancellationDeadlineHours),
+    cancellationMessage: typeof data.cancellation_message === 'string'
+      ? data.cancellation_message
+      : DEFAULT_SETTINGS.cancellationMessage,
+    reviewLink: typeof data.review_link === 'string' ? data.review_link : DEFAULT_SETTINGS.reviewLink,
+    autoSendReview: boolFromDb(data.auto_send_review, DEFAULT_SETTINGS.autoSendReview),
+    depositRequired: boolFromDb(data.deposit_required, DEFAULT_SETTINGS.depositRequired),
+    depositAmount: numFromDb(data.deposit_amount, DEFAULT_SETTINGS.depositAmount),
+    noShowProtection: boolFromDb(data.no_show_protection, DEFAULT_SETTINGS.noShowProtection),
+    noShowFee: numFromDb(data.no_show_fee, DEFAULT_SETTINGS.noShowFee),
+    bookingPageEnabled: boolFromDb(data.booking_page_enabled, DEFAULT_SETTINGS.bookingPageEnabled),
+    autoConfirm: boolFromDb(data.auto_confirm, DEFAULT_SETTINGS.autoConfirm),
+    floorplanFloorOnly: boolFromDb(data.floorplan_floor_only, DEFAULT_SETTINGS.floorplanFloorOnly),
+  }
+}
+
 // ---- Toast simple ----
 function useToast() {
   const [msg, setMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
@@ -997,42 +1058,34 @@ export default function KassaReservationsView({
         }
       } catch (err) { console.error('[tenants] load error:', err) }
 
-      // Laad instellingen: localStorage is primair, Supabase vult aan
+      // Laad instellingen: Supabase is bron van waarheid; localStorage alleen voor offline/cache overlay
       try {
-        const { data } = await supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).single()
-        if (data) {
-          const safeParseJSON = (val: unknown, fallback: unknown) => {
-            if (typeof val !== 'string') return val ?? fallback
-            try { return JSON.parse(val) } catch { return fallback }
-          }
-          const fromDB: Partial<ReservationSettings> = {
-            isEnabled: data.is_enabled ?? data.isEnabled,
-            acceptOnline: data.accept_online ?? data.acceptOnline,
-            maxPartySize: data.max_party_size ?? data.maxPartySize,
-            defaultDurationMinutes: data.default_duration_minutes ?? data.defaultDurationMinutes,
-            slotDurationMinutes: data.slot_duration_minutes ?? data.slotDurationMinutes,
-            minAdvanceHours: data.min_advance_hours ?? data.minAdvanceHours,
-            maxAdvanceDays: data.max_advance_days ?? data.maxAdvanceDays,
-            shifts: safeParseJSON(data.shifts, undefined),
-            closedDays: safeParseJSON(data.closed_days, undefined),
-            depositRequired: data.deposit_required ?? data.depositRequired,
-            depositAmount: data.deposit_amount ?? data.depositAmount,
-            noShowProtection: data.no_show_protection ?? data.noShowProtection,
-            autoConfirm: data.auto_confirm ?? data.autoConfirm ?? false,
-            floorplanFloorOnly: Boolean(
-              (data as { floorplan_floor_only?: boolean }).floorplan_floor_only,
-            ),
-          }
-          let localData: Record<string, unknown> = {}
-          try {
-            const localRaw = localStorage.getItem(`reservationSettings_${tenant}`)
-            localData = localRaw ? JSON.parse(localRaw) : {}
-          } catch { localData = {} }
+        const { data, error: rsErr } = await supabase
+          .from('reservation_settings')
+          .select('*')
+          .eq('tenant_slug', tenant)
+          .maybeSingle()
+        if (rsErr) {
+          console.error('[reservation_settings] load error:', rsErr.message)
+        }
+        let localData: Record<string, unknown> = {}
+        try {
+          const localRaw = localStorage.getItem(`reservationSettings_${tenant}`)
+          localData = localRaw ? JSON.parse(localRaw) : {}
+        } catch { localData = {} }
+
+        if (data && typeof data === 'object') {
+          const fromDB = mapReservationSettingsFromDb(data as Record<string, unknown>)
           const merged = { ...DEFAULT_SETTINGS, ...fromDB, ...localData }
           setReservationSettings(merged)
           try { localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(merged)) } catch {}
+        } else {
+          const merged = { ...DEFAULT_SETTINGS, ...localData }
+          setReservationSettings(merged)
         }
-      } catch (err) { console.error('[reservation_settings] load error:', err) }
+      } catch (err) {
+        console.error('[reservation_settings] load error:', err)
+      }
     }
     loadTenantData()
   }, [tenant])
@@ -1351,12 +1404,25 @@ export default function KassaReservationsView({
   // Load floor plan tables from Supabase
   useEffect(() => {
     const loadFloorTables = async () => {
-      try {
-        const { data } = await supabase.from('floor_plan_tables').select('data').eq('tenant_slug', tenant).single()
-        if (data?.data) setFloorPlanTablesDB(data.data as FloorPlanTable[])
-      } catch (err) { console.error('[floor_plan_tables] load error:', err) }
+      const { data, error } = await supabase
+        .from('floor_plan_tables')
+        .select('data')
+        .eq('tenant_slug', tenant)
+        .maybeSingle()
+      if (error) {
+        console.error('[floor_plan_tables] load error:', error.message)
+        setFloorPlanTablesDB([])
+        return
+      }
+      if (data?.data != null) {
+        const raw = data.data as unknown
+        const arr = Array.isArray(raw) ? raw : []
+        setFloorPlanTablesDB(arr as FloorPlanTable[])
+      } else {
+        setFloorPlanTablesDB([])
+      }
     }
-    loadFloorTables()
+    void loadFloorTables()
   }, [tenant])
 
   // Centreer tafels zodra de plattegrond-tab actief wordt (canvas is dan zichtbaar)
@@ -1387,15 +1453,20 @@ export default function KassaReservationsView({
     accept_online: s.acceptOnline,
     max_party_size: s.maxPartySize,
     default_duration_minutes: s.defaultDurationMinutes,
+    buffer_minutes: s.bufferMinutes,
     slot_duration_minutes: s.slotDurationMinutes,
+    max_reservations_per_slot: s.maxReservationsPerSlot,
+    max_covers_per_slot: s.maxCoversPerSlot,
     min_advance_hours: s.minAdvanceHours,
     max_advance_days: s.maxAdvanceDays,
-    // Stuur als object/array — Supabase serialiseert zelf naar JSONB of text[]
+    kitchen_capacity_enabled: s.kitchenCapacityEnabled,
+    kitchen_max_covers_per_15min: s.kitchenMaxCoversPer15min,
     shifts: s.shifts || [],
     closed_days: s.closedDays || [],
     deposit_required: s.depositRequired,
     deposit_amount: s.depositAmount,
     no_show_protection: s.noShowProtection,
+    no_show_fee: s.noShowFee,
     cancellation_deadline_hours: s.cancellationDeadlineHours,
     cancellation_message: s.cancellationMessage,
     auto_send_review: s.autoSendReview,
@@ -1412,7 +1483,9 @@ export default function KassaReservationsView({
     localStorage.setItem(`reservationSettings_${tenant}`, JSON.stringify(newSettings))
     // Stil opslaan naar Supabase (geen toast — dat doet de expliciete Opslaan knop)
     supabase.from('reservation_settings').upsert(buildSettingsPayload(newSettings), { onConflict: 'tenant_slug' })
-      .then(({ error }) => { if (error) console.warn('Auto-save fout:', error.message) })
+      .then(({ error }) => {
+        if (error) console.error('[reservation_settings] upsert:', error.message, error)
+      })
   }
 
   // Expliciet opslaan met toast feedback
@@ -1435,7 +1508,20 @@ export default function KassaReservationsView({
   // ---- Floor plan editor helpers ----
   const saveFloorPlan = async (updated: FloorPlanTable[]) => {
     setFloorPlanTablesDB(updated)
-    await supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
+    const { error } = await supabase
+      .from('floor_plan_tables')
+      .upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
+    if (error) {
+      console.error('[floor_plan_tables] upsert:', error.message)
+      toast.error('Plattegrond opslaan mislukt: ' + error.message)
+      const { data: row } = await supabase
+        .from('floor_plan_tables')
+        .select('data')
+        .eq('tenant_slug', tenant)
+        .maybeSingle()
+      const raw = row?.data
+      setFloorPlanTablesDB(Array.isArray(raw) ? (raw as FloorPlanTable[]) : [])
+    }
   }
 
   const addFloorTable = async () => {
@@ -1583,7 +1669,7 @@ export default function KassaReservationsView({
       const table = floorPlanTablesDB.find(t => t.id === id) || null
       setSelectedFloorTable(prev => prev?.id === id ? null : table)
     } else {
-      await supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: floorPlanTablesDB }, { onConflict: 'tenant_slug' })
+      await saveFloorPlan(floorPlanTablesDB)
     }
   }
 
@@ -2877,16 +2963,52 @@ export default function KassaReservationsView({
                   onWheel={handleFloorWheel}
                 >
                   {floorOnlyMode && (
-                    <button
-                      type="button"
-                      onClick={e => { e.stopPropagation(); toggleFloorOnlyMode() }}
+                    <div
+                      className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[35] flex max-w-[calc(100vw-1.5rem)] flex-row flex-wrap items-center justify-end gap-2"
                       onPointerDown={e => e.stopPropagation()}
-                      className="absolute right-3 top-[max(0.75rem,env(safe-area-inset-top))] z-[35] flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-xl bg-orange-500 px-4 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-orange-600 active:bg-orange-700"
-                      title="Toon menu, tabs en werkbalk"
                     >
-                      <Minimize2 size={20} className="shrink-0" />
-                      <span className="hidden sm:inline">Panelen tonen</span>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.stopPropagation()
+                          const next = !tablesLocked
+                          setTablesLocked(next)
+                          try { localStorage.setItem(`floor_tables_locked_${tenant}`, String(next)) } catch {}
+                        }}
+                        className={`flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold shadow-lg transition-colors sm:px-4 ${
+                          tablesLocked
+                            ? 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700'
+                            : 'bg-gray-200 text-gray-800 hover:bg-gray-300 active:bg-gray-400'
+                        }`}
+                        title={tablesLocked ? 'Tafels vergrendeld — tik om te ontgrendelen' : 'Tafels ontgrendeld — tik om te vergrendelen'}
+                      >
+                        {tablesLocked ? <Lock size={18} className="shrink-0" /> : <LockOpen size={18} className="shrink-0" />}
+                        <span className="hidden sm:inline">{tablesLocked ? 'Vergrendeld' : 'Vergrendelen'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={e => {
+                          e.stopPropagation()
+                          setSelectedFloorTable(null)
+                          setShowAddFloorTable(true)
+                        }}
+                        className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-green-500 px-3 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-green-600 active:bg-green-700 sm:px-5"
+                        title="Nieuwe tafel op de plattegrond"
+                      >
+                        <Plus size={18} className="shrink-0" />
+                        <span className="hidden sm:inline">Tafel toevoegen</span>
+                        <span className="sm:hidden">+ Tafel</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={e => { e.stopPropagation(); toggleFloorOnlyMode() }}
+                        className="flex min-h-[44px] shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white shadow-lg transition-colors hover:bg-orange-600 active:bg-orange-700 sm:px-4"
+                        title="Toon menu, tabs en werkbalk"
+                      >
+                        <Minimize2 size={20} className="shrink-0" />
+                        <span className="hidden sm:inline">Panelen tonen</span>
+                      </button>
+                    </div>
                   )}
                   {/* Wereld — beweegt via pan+zoom transform, tafels staan vast */}
                   <div style={{

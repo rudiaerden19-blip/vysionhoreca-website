@@ -87,13 +87,28 @@ export default function ReserverenPage({ params }: { params: { tenant: string } 
         }
       })
 
-    // Laad reservatie instellingen uit Supabase
-    supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).single()
-      .then(({ data }) => {
-        if (data) setSettings({
+    // Laad reservatie instellingen uit Supabase (geen harde fout bij ontbrekende rij)
+    supabase.from('reservation_settings').select('*').eq('tenant_slug', tenant).maybeSingle()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('[reserveren] reservation_settings:', error.message)
+          return
+        }
+        if (!data) return
+        setSettings({
           ...DEFAULT_SETTINGS,
-          ...data,
-          autoConfirm: data.auto_confirm ?? data.autoConfirm ?? false,
+          isEnabled: data.is_enabled ?? DEFAULT_SETTINGS.isEnabled,
+          maxPartySize: data.max_party_size ?? DEFAULT_SETTINGS.maxPartySize,
+          defaultDurationMinutes: data.default_duration_minutes ?? DEFAULT_SETTINGS.defaultDurationMinutes,
+          minAdvanceHours: data.min_advance_hours ?? DEFAULT_SETTINGS.minAdvanceHours,
+          maxAdvanceDays: data.max_advance_days ?? DEFAULT_SETTINGS.maxAdvanceDays,
+          slotDurationMinutes: data.slot_duration_minutes ?? DEFAULT_SETTINGS.slotDurationMinutes,
+          closedDays: Array.isArray(data.closed_days) ? data.closed_days : (typeof data.closed_days === 'string' ? (() => { try { return JSON.parse(data.closed_days) } catch { return [] } })() : []),
+          depositRequired: data.deposit_required ?? DEFAULT_SETTINGS.depositRequired,
+          depositAmount: Number(data.deposit_amount) || DEFAULT_SETTINGS.depositAmount,
+          noShowProtection: data.no_show_protection ?? DEFAULT_SETTINGS.noShowProtection,
+          shifts: Array.isArray(data.shifts) ? data.shifts : (typeof data.shifts === 'string' ? (() => { try { return JSON.parse(data.shifts) } catch { return [] } })() : []),
+          autoConfirm: data.auto_confirm ?? false,
         })
       })
   }, [tenant])

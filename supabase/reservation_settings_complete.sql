@@ -63,7 +63,12 @@ ALTER TABLE reservation_settings
   ADD COLUMN IF NOT EXISTS no_show_protection BOOLEAN DEFAULT false,
   ADD COLUMN IF NOT EXISTS no_show_fee NUMERIC DEFAULT 0,
   ADD COLUMN IF NOT EXISTS booking_page_enabled BOOLEAN DEFAULT true,
-  ADD COLUMN IF NOT EXISTS floorplan_floor_only BOOLEAN NOT NULL DEFAULT false;
+  ADD COLUMN IF NOT EXISTS floorplan_floor_only BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS buffer_minutes INTEGER NOT NULL DEFAULT 15,
+  ADD COLUMN IF NOT EXISTS max_reservations_per_slot INTEGER NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS max_covers_per_slot INTEGER NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS kitchen_capacity_enabled BOOLEAN NOT NULL DEFAULT false,
+  ADD COLUMN IF NOT EXISTS kitchen_max_covers_per_15min INTEGER NOT NULL DEFAULT 20;
 
 -- Index
 CREATE INDEX IF NOT EXISTS idx_reservation_settings_tenant ON reservation_settings(tenant_slug);
