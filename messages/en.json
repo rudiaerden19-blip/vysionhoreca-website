@@ -2782,7 +2782,8 @@
     "memberUpdated": "Team member updated",
     "memberDeleted": "Team member removed",
     "tip": "Tip",
-    "tipText": "Team members are automatically shown on your website in the \"Our Team\" section between top sellers and opening hours."
+    "tipText": "Team members are automatically shown on your website in the \"Our Team\" section between top sellers and opening hours.",
+    "mijnTeamButton": "My team"
   },
   "vacaturesPage": {
     "title": "Vacancies",

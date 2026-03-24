@@ -2128,7 +2128,8 @@
     "memberUpdated": "Membre mis à jour",
     "memberDeleted": "Membre supprimé",
     "tip": "Conseil",
-    "tipText": "Les membres de l'équipe sont automatiquement affichés sur votre site dans la section \"Notre Équipe\" entre les meilleures ventes et les horaires d'ouverture."
+    "tipText": "Les membres de l'équipe sont automatiquement affichés sur votre site dans la section \"Notre Équipe\" entre les meilleures ventes et les horaires d'ouverture.",
+    "mijnTeamButton": "Mon équipe"
   },
   "vacaturesPage": {
     "title": "Offres d'emploi",

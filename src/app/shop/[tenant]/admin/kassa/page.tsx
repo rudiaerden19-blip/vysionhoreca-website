@@ -1075,7 +1075,6 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
               ]},
               { key: 'website', icon: '🌐', label: 'Website', items: [
                 { icon: '🏠', label: 'Zaak Profiel', href: `${baseUrl}/profiel` },
-                { icon: '👥', label: 'Ons team', href: `${baseUrl}/team` },
                 { icon: '🎨', label: 'Design', href: `${baseUrl}/design` },
                 { icon: '🔍', label: 'SEO', href: `${baseUrl}/seo` },
                 { icon: '📝', label: 'Teksten & Info', href: `${baseUrl}/teksten` },
@@ -1083,6 +1082,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
                 { icon: '📣', label: 'Marketing', href: `${baseUrl}/marketing` },
                 { icon: '📱', label: 'QR Codes', href: `${baseUrl}/qr-codes` },
                 { icon: '🖼️', label: 'Media', href: `${baseUrl}/media` },
+                { icon: '👥', label: 'Mijn team', href: `${baseUrl}/team` },
                 { icon: '🔗', label: 'Bekijk je Website', href: `/shop/${tenant}` },
               ]},
               { key: 'account', icon: '👤', label: 'Account', items: [

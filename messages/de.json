@@ -2128,7 +2128,8 @@
     "memberUpdated": "Teammitglied aktualisiert",
     "memberDeleted": "Teammitglied entfernt",
     "tip": "Tipp",
-    "tipText": "Teammitglieder werden automatisch auf Ihrer Website im Bereich \"Unser Team\" zwischen Bestsellern und Öffnungszeiten angezeigt."
+    "tipText": "Teammitglieder werden automatisch auf Ihrer Website im Bereich \"Unser Team\" zwischen Bestsellern und Öffnungszeiten angezeigt.",
+    "mijnTeamButton": "Mein Team"
   },
   "vacaturesPage": {
     "title": "Stellenangebote",

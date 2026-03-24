@@ -2622,7 +2622,8 @@
     "memberUpdated": "成员已更新",
     "memberDeleted": "成员已移除",
     "tip": "提示",
-    "tipText": "团队成员会自动显示在网站的\"我们的团队\"部分，位于畅销品和营业时间之间。"
+    "tipText": "团队成员会自动显示在网站的\"我们的团队\"部分，位于畅销品和营业时间之间。",
+    "mijnTeamButton": "我的团队"
   },
   "vacaturesPage": {
     "title": "招聘信息",

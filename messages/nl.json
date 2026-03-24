@@ -2785,7 +2785,8 @@
     "memberUpdated": "Teamlid bijgewerkt",
     "memberDeleted": "Teamlid verwijderd",
     "tip": "Tip",
-    "tipText": "Teamleden worden automatisch getoond op je website in de \"Ons Team\" sectie tussen de topverkopers en openingsuren."
+    "tipText": "Teamleden worden automatisch getoond op je website in de \"Ons Team\" sectie tussen de topverkopers en openingsuren.",
+    "mijnTeamButton": "Mijn team"
   },
   "vacaturesPage": {
     "title": "Vacatures",

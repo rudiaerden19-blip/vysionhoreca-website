@@ -2622,7 +2622,8 @@
     "memberUpdated": "Membro aggiornato",
     "memberDeleted": "Membro rimosso",
     "tip": "Suggerimento",
-    "tipText": "I membri del team vengono automaticamente mostrati sul tuo sito nella sezione \"Il Nostro Team\" tra i più venduti e gli orari di apertura."
+    "tipText": "I membri del team vengono automaticamente mostrati sul tuo sito nella sezione \"Il Nostro Team\" tra i più venduti e gli orari di apertura.",
+    "mijnTeamButton": "La mia squadra"
   },
   "vacaturesPage": {
     "title": "Offerte di lavoro",

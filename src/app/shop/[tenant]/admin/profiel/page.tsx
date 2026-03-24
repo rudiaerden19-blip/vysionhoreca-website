@@ -215,17 +215,18 @@ export default function ProfielPage({ params }: { params: { tenant: string } }) 
       </motion.button>
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t('adminPages.profiel.title')}</h1>
           <p className="text-gray-500">{t('adminPages.profiel.subtitle')}</p>
-          <Link
-            href={`/shop/${params.tenant}/admin/team`}
-            className="text-sm text-blue-600 hover:underline mt-2 inline-block"
-          >
-            → {t('websiteTeam.title')}
-          </Link>
         </div>
+        <Link
+          href={`/shop/${params.tenant}/admin/team`}
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium text-white bg-blue-600 hover:bg-blue-700 shadow-sm shrink-0"
+        >
+          <span>👥</span>
+          {t('websiteTeam.mijnTeamButton')}
+        </Link>
       </div>
 
       {/* Error Message */}

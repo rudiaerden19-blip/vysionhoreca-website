@@ -2622,7 +2622,8 @@
     "memberUpdated": "Miembro actualizado",
     "memberDeleted": "Miembro eliminado",
     "tip": "Consejo",
-    "tipText": "Los miembros del equipo se muestran automáticamente en tu sitio web en la sección \"Nuestro Equipo\" entre los más vendidos y los horarios."
+    "tipText": "Los miembros del equipo se muestran automáticamente en tu sitio web en la sección \"Nuestro Equipo\" entre los más vendidos y los horarios.",
+    "mijnTeamButton": "Mi equipo"
   },
   "vacaturesPage": {
     "title": "Vacantes",
