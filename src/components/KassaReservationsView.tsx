@@ -2997,22 +2997,18 @@ export default function KassaReservationsView({
           const START_MIN  = timeShift === 'dag' ? 10 * 60 : 17 * 60  // dag=10:00, avond=17:00
           const END_MIN    = timeShift === 'dag' ? 16 * 60 : 23 * 60  // dag=16:00, avond=23:00
           const EXTRA_MIN  = END_MIN + 2 * 60  // 2 uur extra grijze vakken na END_MIN
-          /** Label per kolom = eindtijd van dat 30-min-blok (pijl eindigt bij het getoonde tijdstip, niet bij start) */
-          const formatSlotEndLabel = (startMinOfSlot: number) => {
-            const end = startMinOfSlot + 30
-            const m = ((end % (24 * 60)) + 24 * 60) % (24 * 60)
-            const h = Math.floor(m / 60)
-            const mm = m % 60
-            return `${String(h).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
-          }
+          /** Starttijd per kolom (niet eindtijd): de linkerrand van de cel met "12:30" is 12:30 — anders staat "12:30" op [12:00–12:30) en klopt het visueel niet. */
           const timeSlots: string[] = []
           for (let m = START_MIN; m < END_MIN; m += 30) {
-            timeSlots.push(formatSlotEndLabel(m))
+            const h = Math.floor(m / 60).toString().padStart(2, '0')
+            const min = (m % 60).toString().padStart(2, '0')
+            timeSlots.push(`${h}:${min}`)
           }
-          // Extra grijze slots na einde tijdband (zichtbaar via horizontaal scrollen)
           const extraSlots: string[] = []
           for (let m = END_MIN; m < EXTRA_MIN; m += 30) {
-            extraSlots.push(formatSlotEndLabel(m))
+            const hh = Math.floor(m / 60) % 24
+            const mm = m % 60
+            extraSlots.push(`${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`)
           }
           // Minuten over het getekende raster = aantal kolommen × 30 min (bron van waarheid voor pixels)
           const totalRange = (timeSlots.length + extraSlots.length) * 30
