@@ -244,25 +244,37 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
 
   // Verwijder één foto direct
   const deleteSingleMedia = async (e: React.MouseEvent, item: MediaItem) => {
-    e.stopPropagation() // Voorkom selectie
-    
+    e.preventDefault()
+    e.stopPropagation()
+
     if (!confirm('Weet je zeker dat je deze foto wilt verwijderen?')) return
 
     try {
       // Verwijder uit storage
       const urlParts = item.url.split('/media/')
       if (urlParts[1]) {
-        await supabase.storage.from('media').remove([urlParts[1]])
+        const { error: storageErr } = await supabase.storage.from('media').remove([urlParts[1]])
+        if (storageErr) console.warn('Storage remove:', storageErr)
       }
-      // Verwijder uit database
-      await supabase.from('tenant_media').delete().eq('id', item.id)
-      
-      // Herlaad
+      const { error: dbError } = await supabase.from('tenant_media').delete().eq('id', item.id)
+      if (dbError) {
+        console.error('DB delete:', dbError)
+        alert(`Verwijderen mislukt: ${dbError.message}`)
+        return
+      }
+
+      setSelectedItems(prev => prev.filter(id => id !== item.id))
       await loadMedia()
     } catch (error) {
       console.error('Delete error:', error)
       alert('Fout bij verwijderen')
     }
+  }
+
+  const handleListRowClick = (e: React.MouseEvent, itemId: string) => {
+    const el = e.target as HTMLElement
+    if (el.closest('button') || el.closest('input[type="checkbox"]') || el.closest('label')) return
+    toggleSelect(itemId)
   }
 
   const deleteSelected = async () => {
@@ -283,10 +295,11 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
     await loadMedia()
   }
 
-  const formatSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + ' B'
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+  const formatSize = (bytes: number | null | undefined) => {
+    const b = bytes ?? 0
+    if (b < 1024) return b + ' B'
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB'
+    return (b / (1024 * 1024)).toFixed(1) + ' MB'
   }
 
   const formatDate = (date: string) => {
@@ -584,6 +597,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               />
               {/* DELETE KNOP - altijd zichtbaar rechtsboven */}
               <button
+                type="button"
                 onClick={(e) => deleteSingleMedia(e, item)}
                 className="absolute top-2 right-2 w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-xl border-2 border-white z-20"
                 title="Verwijderen"
@@ -616,7 +630,7 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
           {filteredMedia.map((item) => (
             <div 
               key={item.id}
-              onClick={() => toggleSelect(item.id)}
+              onClick={(e) => handleListRowClick(e, item.id)}
               className={`flex items-center gap-4 p-4 border-b hover:bg-gray-50 cursor-pointer ${
                 selectedItems.includes(item.id) ? 'bg-blue-50' : ''
               }`}
@@ -625,7 +639,8 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
                 type="checkbox"
                 checked={selectedItems.includes(item.id)}
                 onChange={() => toggleSelect(item.id)}
-                className="w-5 h-5 rounded border-gray-300 text-blue-600"
+                onClick={(e) => e.stopPropagation()}
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 shrink-0 relative z-10"
               />
               <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                 <img
@@ -646,8 +661,9 @@ export default function MediaPage({ params }: { params: { tenant: string } }) {
               <p className="text-sm text-gray-400">{formatDate(item.created_at)}</p>
               {/* DELETE KNOP in list view */}
               <button
+                type="button"
                 onClick={(e) => deleteSingleMedia(e, item)}
-                className="w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-lg flex-shrink-0"
+                className="w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-lg flex-shrink-0 relative z-10"
                 title="Verwijderen"
               >
                 <span className="text-lg">🗑️</span>
