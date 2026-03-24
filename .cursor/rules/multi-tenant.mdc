@@ -53,3 +53,20 @@ const isPro = tenantPlan === 'pro' || isTrial
 1. Voeg `proOnly: true` toe aan menu item in `layout.tsx`
 2. Controleer of bestaande tenants hun trial/plan correct hebben
 3. Test met een starter-tenant én een pro-tenant
+
+## Nieuwe tenants — geen “alleen hoofdtenant”-bugs
+- **Defaults voor data**: ontbrekende rijen per tenant horen in code, niet alleen in oude SQL-seeds voor één demo (`demo-frituur`). Nieuwe defaults: `src/lib/tenant-defaults.ts` + aanroep bij **registratie** (`/api/auth/register`) en **superadmin nieuwe tenant**.
+- **API/helpers**: als een scherm `.single()` op een tabel gebruikt die leeg kan zijn voor een nieuwe tenant, gebruik `maybeSingle()` + **fallback defaults** in `admin-api.ts` (zoals `getDeliverySettings`), of zorg dat bootstrap altijd een rij zet.
+- **Backfill**: voor bestaande productie-DB’s: eenmalig SQL in `supabase/` documenteren; nieuwe tenants hoeven dat niet handmatig.
+
+## Orderstatus / webshop — alle schermen dezelfde lifecycle
+Bij **wijziging** van welke status een actie zet (goedkeuren, keuken, afronden, Z-rapport), expliciet nalopen:
+| Scherm | Bestand (indicatief) |
+|--------|----------------------|
+| Admin bestellingen | `admin/bestellingen/page.tsx` |
+| Onlinescherm | `display/page.tsx` |
+| Keukenscherm | `keuken/[tenant]/page.tsx` |
+| Backend | `admin-api.ts` (`approveWebshopOrder`, `completeWebshopOrder`, `confirmOrder`, …) |
+
+- Filters op `orders.status` (b.v. alleen `confirmed`) moeten **logisch** zijn bij de gekozen flow; test met een **lege nieuwe tenant** (geen oude data).
+- **Nooit** hardcoded tenant slug; gedrag altijd via `tenant_slug` / route `params.tenant`.
