@@ -3200,9 +3200,6 @@ export default function KassaReservationsView({
                                 const naturalW = (durMin / MINUTES_PER_COL) * PX_PER_COL
                                 const barOuterW = Math.min(naturalW, slotW - leftPx)
                                 const widthPx = Math.max(barOuterW - 2, 48)
-                                /** Minuten uit pixelbreedte (geen aantal kolommen afronden: 4,5×80 werd 5 kol → "2u30" bij 2 uur) */
-                                const minutesFromWidth = (barOuterW / PX_PER_COL) * MINUTES_PER_COL
-                                const minutesForLabel = Math.max(15, Math.round(minutesFromWidth / 15) * 15)
                                 const bufferMin = reservationSettings.bufferMinutes || 0
                                 const maxDurCap = computeTimelineMaxDurationMinutes(r, tableRes, bufferMin, EXTRA_MIN)
                                 return (
@@ -3216,10 +3213,9 @@ export default function KassaReservationsView({
                                       tabIndex={0}
                                       onClick={() => setSelectedReservation(r)}
                                       onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setSelectedReservation(r) } }}
-                                      className="absolute inset-0 cursor-pointer flex items-center hover:brightness-110 transition-all pr-7 sm:pr-8"
+                                      className="absolute inset-0 cursor-pointer flex items-center rounded-md hover:brightness-110 transition-all pr-7 sm:pr-8"
                                       style={{
                                         backgroundColor: statusBlockColor(r.status, startMin >= END_MIN),
-                                        clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)',
                                       }}
                                     >
                                       <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
@@ -3227,7 +3223,7 @@ export default function KassaReservationsView({
                                       </div>
                                       <div className="min-w-0 flex-1 flex flex-col justify-center ml-2 pr-1">
                                         <span className="text-white text-base font-bold truncate leading-tight">{r.guest_name}</span>
-                                        <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(minutesForLabel)}</span>
+                                        <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(durMin)}</span>
                                       </div>
                                     </div>
                                     <div
