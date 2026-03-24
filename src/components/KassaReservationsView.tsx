@@ -2997,19 +2997,22 @@ export default function KassaReservationsView({
           const START_MIN  = timeShift === 'dag' ? 10 * 60 : 17 * 60  // dag=10:00, avond=17:00
           const END_MIN    = timeShift === 'dag' ? 16 * 60 : 23 * 60  // dag=16:00, avond=23:00
           const EXTRA_MIN  = END_MIN + 2 * 60  // 2 uur extra grijze vakken na END_MIN
-          const totalSlots = (END_MIN - START_MIN) / 30
+          /** Label per kolom = eindtijd van dat 30-min-blok (pijl eindigt bij het getoonde tijdstip, niet bij start) */
+          const formatSlotEndLabel = (startMinOfSlot: number) => {
+            const end = startMinOfSlot + 30
+            const m = ((end % (24 * 60)) + 24 * 60) % (24 * 60)
+            const h = Math.floor(m / 60)
+            const mm = m % 60
+            return `${String(h).padStart(2, '0')}:${String(mm).padStart(2, '0')}`
+          }
           const timeSlots: string[] = []
           for (let m = START_MIN; m < END_MIN; m += 30) {
-            const h = Math.floor(m / 60).toString().padStart(2, '0')
-            const min = (m % 60).toString().padStart(2, '0')
-            timeSlots.push(`${h}:${min}`)
+            timeSlots.push(formatSlotEndLabel(m))
           }
           // Extra grijze slots na einde tijdband (zichtbaar via horizontaal scrollen)
           const extraSlots: string[] = []
           for (let m = END_MIN; m < EXTRA_MIN; m += 30) {
-            const hh = Math.floor(m / 60) % 24
-            const mm = m % 60
-            extraSlots.push(`${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}`)
+            extraSlots.push(formatSlotEndLabel(m))
           }
           // Minuten over het getekende raster = aantal kolommen × 30 min (bron van waarheid voor pixels)
           const totalRange = (timeSlots.length + extraSlots.length) * 30
@@ -3205,17 +3208,19 @@ export default function KassaReservationsView({
                                 return (
                                   <div
                                     key={r.id}
-                                    className="absolute group overflow-hidden rounded-lg"
+                                    className="absolute group"
                                     style={{ left:leftPx, width:Math.max(widthPx, 48), top:6, bottom:6, height:'auto', zIndex:2 }}
                                   >
-                                    {/* Geen clip-path pijl: die deed de vulling vroeg stoppen en was misleidend t.o.v. de echte eindtijd */}
                                     <div
                                       role="button"
                                       tabIndex={0}
                                       onClick={() => setSelectedReservation(r)}
                                       onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setSelectedReservation(r) } }}
                                       className="absolute inset-0 cursor-pointer flex items-center hover:brightness-110 transition-all pr-7 sm:pr-8"
-                                      style={{ backgroundColor: statusBlockColor(r.status, startMin >= END_MIN) }}
+                                      style={{
+                                        backgroundColor: statusBlockColor(r.status, startMin >= END_MIN),
+                                        clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)',
+                                      }}
                                     >
                                       <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
                                         <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
@@ -3227,7 +3232,7 @@ export default function KassaReservationsView({
                                     </div>
                                     <div
                                       title="Sleep rechts: duur aanpassen (stopt vóór volgende reservatie)"
-                                      className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-10 cursor-ew-resize flex items-center justify-center rounded-r-lg border-l border-white/40 bg-black/10 hover:bg-black/25 active:bg-black/35 touch-none select-none"
+                                      className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-10 cursor-ew-resize flex items-center justify-center hover:bg-black/20 active:bg-black/30 rounded-r-md border-l border-white/40 touch-none select-none"
                                       style={{ touchAction: 'none' }}
                                       onPointerDown={(e) => beginTimelineDurationResize(e, r, slotW, totalRange, maxDurCap)}
                                       onClick={(e) => e.stopPropagation()}
