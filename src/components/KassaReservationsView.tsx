@@ -3202,6 +3202,7 @@ export default function KassaReservationsView({
                                 const widthPx = Math.max(barOuterW - 2, 48)
                                 const bufferMin = reservationSettings.bufferMinutes || 0
                                 const maxDurCap = computeTimelineMaxDurationMinutes(r, tableRes, bufferMin, EXTRA_MIN)
+                                const barColor = statusBlockColor(r.status, startMin >= END_MIN)
                                 return (
                                   <div
                                     key={r.id}
@@ -3213,22 +3214,33 @@ export default function KassaReservationsView({
                                       tabIndex={0}
                                       onClick={() => setSelectedReservation(r)}
                                       onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setSelectedReservation(r) } }}
-                                      className="absolute inset-0 cursor-pointer flex items-center rounded-md hover:brightness-110 transition-all pr-7 sm:pr-8"
-                                      style={{
-                                        backgroundColor: statusBlockColor(r.status, startMin >= END_MIN),
-                                      }}
+                                      className="absolute inset-0 cursor-pointer flex items-stretch pr-7 sm:pr-8 hover:brightness-110 transition-all"
                                     >
-                                      <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
-                                        <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
+                                      <div
+                                        className="flex-1 min-w-0 flex items-center rounded-l-md overflow-hidden"
+                                        style={{ backgroundColor: barColor }}
+                                      >
+                                        <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
+                                          <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
+                                        </div>
+                                        <div className="min-w-0 flex-1 flex flex-col justify-center ml-2 pr-1">
+                                          <span className="text-white text-base font-bold truncate leading-tight">{r.guest_name}</span>
+                                          <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(durMin)}</span>
+                                        </div>
                                       </div>
-                                      <div className="min-w-0 flex-1 flex flex-col justify-center ml-2 pr-1">
-                                        <span className="text-white text-base font-bold truncate leading-tight">{r.guest_name}</span>
-                                        <span className="text-white/85 text-[10px] font-semibold leading-tight">{formatTimelineDurLabel(durMin)}</span>
-                                      </div>
+                                      {/* Rechter einde: puntige pijl (geen afgeronde hoek) */}
+                                      <div
+                                        className="flex-shrink-0 self-stretch w-3.5"
+                                        style={{
+                                          backgroundColor: barColor,
+                                          clipPath: 'polygon(0 0, 100% 50%, 0 100%)',
+                                        }}
+                                        aria-hidden
+                                      />
                                     </div>
                                     <div
                                       title="Sleep rechts: duur aanpassen (stopt vóór volgende reservatie)"
-                                      className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-10 cursor-ew-resize flex items-center justify-center hover:bg-black/20 active:bg-black/30 rounded-r-md border-l border-white/40 touch-none select-none"
+                                      className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-10 cursor-ew-resize flex items-center justify-center hover:bg-black/20 active:bg-black/30 border-l border-white/40 touch-none select-none"
                                       style={{ touchAction: 'none' }}
                                       onPointerDown={(e) => beginTimelineDurationResize(e, r, slotW, totalRange, maxDurCap)}
                                       onClick={(e) => e.stopPropagation()}
