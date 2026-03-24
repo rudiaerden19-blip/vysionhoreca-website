@@ -43,6 +43,22 @@ interface Props {
 
 function makeId() { return Math.random().toString(36).slice(2, 10) }
 
+/** Posities zijn % van het canvas (ongeveer 1–99). Corrupte waarden buiten 0–100 worden geneutraliseerd. */
+function clampPct(v: unknown, fallback = 50): number {
+  const n = typeof v === 'number' ? v : parseFloat(String(v))
+  if (!Number.isFinite(n)) return fallback
+  if (n >= 0 && n <= 100) return Math.max(1, Math.min(99, n))
+  return fallback
+}
+
+function sanitizeTables(list: KassaTable[]): KassaTable[] {
+  return list.map(t => ({ ...t, x: clampPct(t.x), y: clampPct(t.y) }))
+}
+
+function sanitizeDecors(list: DecorItem[]): DecorItem[] {
+  return list.map(d => ({ ...d, x: clampPct(d.x), y: clampPct(d.y) }))
+}
+
 export type DecorType = 'bar_segment' | 'plant'
 export interface DecorItem {
   id: string
@@ -376,7 +392,12 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       // Tafels: localStorage eerst (instant), Supabase alleen als localStorage leeg is
       const localTables = (() => { try { const r = localStorage.getItem(storageKey); return r ? JSON.parse(r) : null } catch { return null } })()
       if (localTables) {
-        setTables(localTables)
+        const fixed = sanitizeTables(localTables as KassaTable[])
+        setTables(fixed)
+        if (JSON.stringify(fixed) !== JSON.stringify(localTables)) {
+          localStorage.setItem(storageKey, JSON.stringify(fixed))
+          void supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: fixed }, { onConflict: 'tenant_slug' })
+        }
       } else {
         const { data: tData } = await supabase
           .from('floor_plan_tables')
@@ -384,15 +405,24 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
           .eq('tenant_slug', tenant)
           .single()
         if (tData?.data) {
-          setTables(tData.data)
-          localStorage.setItem(storageKey, JSON.stringify(tData.data))
+          const raw = tData.data as KassaTable[]
+          const fixed = sanitizeTables(raw)
+          setTables(fixed)
+          localStorage.setItem(storageKey, JSON.stringify(fixed))
+          if (JSON.stringify(fixed) !== JSON.stringify(raw)) {
+            void supabase.from('floor_plan_tables').upsert({ tenant_slug: tenant, data: fixed }, { onConflict: 'tenant_slug' })
+          }
         }
       }
       // Decor: zelfde logica
       const localDecor = (() => { try { const r = localStorage.getItem(decorKey); return r ? JSON.parse(r) : null } catch { return null } })()
       const localStoolStatus = (() => { try { const r = localStorage.getItem(stoolStatusKey); return r ? JSON.parse(r) : null } catch { return null } })()
       if (localDecor) {
-        setDecors(localDecor)
+        const fixedD = sanitizeDecors(localDecor as DecorItem[])
+        setDecors(fixedD)
+        if (JSON.stringify(fixedD) !== JSON.stringify(localDecor)) {
+          localStorage.setItem(decorKey, JSON.stringify(fixedD))
+        }
         if (localStoolStatus) setStoolStatuses(localStoolStatus)
       } else {
         const { data: dData } = await supabase
@@ -402,9 +432,10 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
           .single()
         if (dData?.data) {
           const { items, statuses } = parseDecorData(dData.data)
-          setDecors(items)
+          const fixedItems = sanitizeDecors(items)
+          setDecors(fixedItems)
           setStoolStatuses(statuses)
-          localStorage.setItem(decorKey, JSON.stringify(items))
+          localStorage.setItem(decorKey, JSON.stringify(fixedItems))
           localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
         }
       }
@@ -421,8 +452,9 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         { event: '*', schema: 'public', table: 'floor_plan_tables', filter: `tenant_slug=eq.${tenant}` },
         ({ new: row }: any) => {
           if (row?.data) {
-            setTables(row.data)
-            localStorage.setItem(storageKey, JSON.stringify(row.data))
+            const fixed = sanitizeTables(row.data as KassaTable[])
+            setTables(fixed)
+            localStorage.setItem(storageKey, JSON.stringify(fixed))
           }
         }
       )
@@ -436,9 +468,10 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
         ({ new: row }: any) => {
           if (row?.data) {
             const { items, statuses } = parseDecorData(row.data)
-            setDecors(items)
+            const fixedItems = sanitizeDecors(items)
+            setDecors(fixedItems)
             setStoolStatuses(statuses)
-            localStorage.setItem(decorKey, JSON.stringify(items))
+            localStorage.setItem(decorKey, JSON.stringify(fixedItems))
             localStorage.setItem(stoolStatusKey, JSON.stringify(statuses))
           }
         }
@@ -474,8 +507,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
     } catch { /* ignore */ }
     autoCenteredRef.current = true
     const all = [...tables, ...decors]
-    const xs = all.map(i => i.x)
-    const ys = all.map(i => i.y)
+    const xs = all.map(i => clampPct(i.x))
+    const ys = all.map(i => clampPct(i.y))
     const centerXpct = (Math.min(...xs) + Math.max(...xs)) / 2
     const centerYpct = (Math.min(...ys) + Math.max(...ys)) / 2
     const vw = floorRef.current.clientWidth
@@ -576,17 +609,30 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
 
   const addTable = () => {
     if (!addNumber.trim()) return
+    // Plaats in het midden van het huidige zicht (pan), niet ergens op vaste random % — anders staat de tafel “ver weg”
+    let x = 25 + Math.random() * 50
+    let y = 25 + Math.random() * 50
+    const el = floorRef.current
+    if (el && el.clientWidth > 0 && el.clientHeight > 0) {
+      const vw = el.clientWidth
+      const vh = el.clientHeight
+      const cx = ((vw / 2 - panX) / vw) * 100
+      const cy = ((vh / 2 - panY) / vh) * 100
+      x = clampPct(cx + (Math.random() - 0.5) * 10)
+      y = clampPct(cy + (Math.random() - 0.5) * 10)
+    }
     const t: KassaTable = {
       id: makeId(),
       number: addNumber.trim(),
       seats: addSeats,
       shape: addShape,
-      x: 15 + Math.random() * 60,
-      y: 15 + Math.random() * 60,
+      x,
+      y,
       rotation: 0,
       status: 'FREE',
     }
     save([...tables, t])
+    setSelected(t)
     setAddNumber('')
     setAddSeats(4)
     setShowAddModal(false)
