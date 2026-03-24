@@ -3205,16 +3205,17 @@ export default function KassaReservationsView({
                                 return (
                                   <div
                                     key={r.id}
-                                    className="absolute group"
+                                    className="absolute group overflow-hidden rounded-lg"
                                     style={{ left:leftPx, width:Math.max(widthPx, 48), top:6, bottom:6, height:'auto', zIndex:2 }}
                                   >
+                                    {/* Geen clip-path pijl: die deed de vulling vroeg stoppen en was misleidend t.o.v. de echte eindtijd */}
                                     <div
                                       role="button"
                                       tabIndex={0}
                                       onClick={() => setSelectedReservation(r)}
                                       onKeyDown={(ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); setSelectedReservation(r) } }}
                                       className="absolute inset-0 cursor-pointer flex items-center hover:brightness-110 transition-all pr-7 sm:pr-8"
-                                      style={{ backgroundColor: statusBlockColor(r.status, startMin >= END_MIN), clipPath:'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)' }}
+                                      style={{ backgroundColor: statusBlockColor(r.status, startMin >= END_MIN) }}
                                     >
                                       <div className="flex-shrink-0 w-8 h-8 ml-2 rounded-full bg-white/30 flex items-center justify-center">
                                         <span className="text-white text-sm font-black leading-none">{r.table_number||'?'}</span>
@@ -3225,8 +3226,8 @@ export default function KassaReservationsView({
                                       </div>
                                     </div>
                                     <div
-                                      title="Sleep links/rechts: duur korter of langer (stopt vóór volgende reservatie)"
-                                      className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-10 cursor-ew-resize flex items-center justify-center hover:bg-black/20 active:bg-black/30 rounded-r-md border-l border-white/40 touch-none select-none"
+                                      title="Sleep rechts: duur aanpassen (stopt vóór volgende reservatie)"
+                                      className="absolute right-0 top-0 bottom-0 w-7 sm:w-8 z-10 cursor-ew-resize flex items-center justify-center rounded-r-lg border-l border-white/40 bg-black/10 hover:bg-black/25 active:bg-black/35 touch-none select-none"
                                       style={{ touchAction: 'none' }}
                                       onPointerDown={(e) => beginTimelineDurationResize(e, r, slotW, totalRange, maxDurCap)}
                                       onClick={(e) => e.stopPropagation()}
