@@ -1,24 +1,31 @@
 ---
-description: Deploy- en testworkflow via Vercel sandbox (preview), niet alleen production
+description: Altijd commit + push na bouwen; Vercel sandbox/preview via GitHub
 alwaysApply: true
 ---
 
-# Sandbox (Vercel preview)
+# Commit, deploy en sandbox (Vercel)
 
 Zie ook `TESTRAPORT.md`: omgeving = **sandbox via Vercel** na GitHub push.
 
-## Verplicht gedrag na wijzigingen die live moeten
+## Altijd — na elke bouwtaak met code-/configwijzigingen
 
-1. **Commit** met duidelijke boodschap.
-2. **Push naar GitHub** (`origin/main` of feature branch met PR).
-3. **Sandbox = preview**: controleer dat Vercel een **Preview Deployment** bouwt (PR-branch of push). Gebruik de **preview-URL** om te testen vóór je productie als enige bron van waarheid beschouwt.
-4. Gebruik waar mogelijk **`npx vercel`** (of gekoppelde CLI) voor een expliciete preview-deploy als de gebruiker dat vraagt of als push alleen niet genoeg is — vereist netwerk en eventueel login.
+Einde van de taak (tenzij de gebruiker expliciet zegt *niet* te committen/pushen):
+
+1. **`git status`** — alle relevante bestanden meenemen.
+2. **`git commit`** — duidelijke boodschap (wat + waarom).
+3. **`git push origin`** (huidige branch, meestal `main`).
+
+**Deploy:** push naar GitHub triggert **Vercel** (production en/of preview). Dat is de standaard-deploy; geen “alleen lokaal klaar” zonder push als er wijzigingen zijn.
+
+**Uitzonderingen:** geen commit bij puur uitleg/lezen zonder bestandswijzigingen; geen lege commits.
+
+## Sandbox = preview
+
+- Controleer in Vercel dat een deployment **loopt of klaar** is na de push.
+- Gebruik de **preview-URL** (PR-branch of push) om te testen waar dat past.
+- **`npx vercel`** alleen als extra nodig (geen gekoppelde repo, of gebruiker vraagt expliciet om CLI-deploy).
 
 ## Niet doen
 
-- Alleen “naar main pushen” als klaar zonder te verwijzen naar preview/sandbox wanneer deploy/test het onderwerp is.
-- Production URL als enige test gebruiken als het team preview gebruikt.
-
-## GitHub
-
-- Push blijft de trigger voor Vercel; **GitHub + Vercel preview** samen = sandbox-workflow.
+- Bouwwerk afronden zonder commit + push terwijl er uncommitted wijzigingen zijn (tenzij gebruiker het verbiedt).
+- Alleen productie-URL als test gebruiken als het team preview gebruikt — preview/sandbox waar mogelijk.
