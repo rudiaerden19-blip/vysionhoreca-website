@@ -1122,7 +1122,13 @@ function IndustrySection() {
       ],
     },
     accounting: { images: ['/images/cost-calculator-1.png'] },
-    payroll: { images: ['/images/industry-payroll.png'] },
+    payroll: {
+      images: [
+        '/images/loonadministratie-1.png',
+        '/images/loonadministratie-2.png',
+        '/images/loonadministratie-3.png',
+      ],
+    },
     whatsapp: { images: [
       '/images/whatsapp-1.png',
       '/images/whatsapp-2.png',
