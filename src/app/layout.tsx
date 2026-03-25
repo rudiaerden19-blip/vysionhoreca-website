@@ -19,10 +19,62 @@ export const viewport: Viewport = {
   maximumScale: 1,
 }
 
+const siteUrl = 'https://vysionhoreca.com'
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#organization`,
+      name: 'Vysion Horeca',
+      url: siteUrl,
+      logo: `${siteUrl}/favicon.svg`,
+      description:
+        'Alles-in-één horecasoftware: kassa (POS), reserveringsplatform, online bestelplatform, keukenscherm, kostencalculator, urenregistratie en bedrijfsanalyse voor België en Nederland.',
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}/#website`,
+      url: siteUrl,
+      name: 'Vysion Horeca',
+      publisher: { '@id': `${siteUrl}/#organization` },
+      inLanguage: 'nl-BE',
+    },
+  ],
+}
+
 export const metadata: Metadata = {
-  title: 'Vysion Horeca | Alles-in-1: Bestelplatform, Gratis Website, Kostencalculator, Personeel & Bedrijfsanalyse',
-  description: 'Vysion Horeca: Het complete alles-in-1 platform voor horeca. Bestelplatform, gratis website, kostencalculator, personeelsbeheer en bedrijfsanalyse. Probeer 14 dagen gratis.',
-  keywords: 'kassa, horeca, restaurant, frituur, POS, betaalterminal, online bestellen, kostencalculator, personeel, bedrijfsanalyse, België',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default:
+      'Vysion Horeca | Horeca kassa, reserveringsplatform & online bestelplatform',
+    template: '%s | Vysion Horeca',
+  },
+  description:
+    'Alles-in-één voor horeca en frituur: touchscreen kassa (POS), reserveringsplatform met plattegrond, online bestelplatform, keukenscherm, WhatsApp-bestellen, kostencalculator, urenregistratie, loonadministratie en bedrijfsanalyse. Bancontact, iDEAL, 14 dagen gratis proefperiode. België & Nederland.',
+  keywords: [
+    'horeca kassa',
+    'kassasysteem horeca',
+    'POS horeca',
+    'touchscreen kassa',
+    'reserveringsplatform',
+    'online reserveren restaurant',
+    'tafels reserveren',
+    'online bestelplatform',
+    'online bestellen horeca',
+    'bestelsysteem restaurant',
+    'keukenscherm',
+    'kitchen display',
+    'WhatsApp bestellen',
+    'kostencalculator horeca',
+    'urenregistratie',
+    'loonadministratie horeca',
+    'bedrijfsanalyse horeca',
+    'horeca software België',
+    'frituur software',
+    'restaurant software',
+  ],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -34,10 +86,27 @@ export const metadata: Metadata = {
     apple: '/favicon.svg',
   },
   openGraph: {
-    title: 'Vysion Horeca | Alles-in-1: Bestelplatform, Gratis Website, Kostencalculator, Personeel & Bedrijfsanalyse',
-    description: 'Het complete alles-in-1 platform voor horeca. Bestelplatform, gratis website, kostencalculator, personeel & bedrijfsanalyse.',
+    title:
+      'Vysion Horeca | Kassa, reserveringsplatform, online bestellen & meer',
+    description:
+      'Complete horecasoftware: kassa, reserveringen, online bestellen, keukenscherm, kosten, uren en analyse. Probeer gratis.',
     type: 'website',
     locale: 'nl_BE',
+    url: siteUrl,
+    siteName: 'Vysion Horeca',
+    images: [{ url: '/images/online-order-platform-1.png' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title:
+      'Vysion Horeca | Kassa, reserveringsplatform & online bestelplatform',
+    description:
+      'Horeca kassa, reserveringen, online bestellen, keukenscherm en analyses — één platform.',
+    images: ['/images/online-order-platform-1.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 }
 
@@ -49,6 +118,12 @@ export default function RootLayout({
   return (
     <html lang="nl" className={inter.variable}>
       <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
+        />
         <LanguageProvider>
           <PWARegister />
           <GlobalAutoCapitalize />

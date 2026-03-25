@@ -8,4 +8,3 @@ Sitemap: https://vysionhoreca.com/sitemap.xml
 # Disallow admin and private areas
 Disallow: /api/
 Disallow: /login
-Disallow: /registreer
