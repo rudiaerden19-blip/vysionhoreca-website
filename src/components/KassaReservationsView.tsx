@@ -92,6 +92,25 @@ function parseDurationMinutesFromRaw(raw: unknown, fallback: number): number {
   return Math.round(n)
 }
 
+/** Plattegrond-label: start- en eindtijd obv reservatieduur (per reservatie of default zaak). */
+function formatFloorPlanTimeRange(reservationTime: string, durationMinutes: number): string {
+  const raw = (reservationTime || '12:00').trim().slice(0, 8)
+  const m = raw.match(/^(\d{1,2}):(\d{2})/)
+  if (!m) return raw.slice(0, 5)
+  const h = parseInt(m[1], 10)
+  const min = parseInt(m[2], 10)
+  if (!Number.isFinite(h) || !Number.isFinite(min)) return raw.slice(0, 5)
+  const dur = Math.max(15, Math.round(durationMinutes || 90))
+  const startTotal = h * 60 + min
+  const endTotal = startTotal + dur
+  const dayMin = ((endTotal % (24 * 60)) + (24 * 60)) % (24 * 60)
+  const endH = Math.floor(dayMin / 60)
+  const endM = dayMin % 60
+  const startStr = `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`
+  const endStr = `${endH}u${String(endM).padStart(2, '0')}`
+  return `${startStr} tot ${endStr}`
+}
+
 interface KassaTable {
   id: string
   number: string
@@ -838,8 +857,8 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
       {/* Gast labels — naam + tijd, onder elkaar */}
       {guests && guests.length > 0 && (() => {
         const lineH = 22
-        const labelW = Math.max(120, tw * 0.9)
-        const timeW = 38  // vaste breedte voor tijdkolom
+        const labelW = Math.max(168, tw * 1.15)
+        const timeW = 132  // "12:00 tot 13u30"
         const nameW = labelW - timeW - 20  // resterende breedte voor naam
         const totalH = guests.length * lineH + 10
         const startY = cy + (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + gap + chairH + 10
@@ -861,7 +880,7 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
                 >
                   {g.name}
                 </text>
-                <text x={cx + labelW / 2 - 6} y={startY + 17 + i * lineH} textAnchor="end" fill="#6b7280" fontSize={11}>
+                <text x={cx + labelW / 2 - 6} y={startY + 17 + i * lineH} textAnchor="end" fill="#6b7280" fontSize={10}>
                   {g.time}
                 </text>
               </g>
@@ -2893,7 +2912,13 @@ export default function KassaReservationsView({
                           guests={todayReservations
                             .filter(r => String(r.table_number) === String(table.number) && r.status !== 'CANCELLED' && r.status !== 'COMPLETED' && r.status !== 'NO_SHOW')
                             .sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
-                            .map(r => ({ name: r.guest_name, time: r.reservation_time }))
+                            .map(r => ({
+                              name: r.guest_name,
+                              time: formatFloorPlanTimeRange(
+                                r.reservation_time,
+                                r.duration_minutes || reservationSettings.defaultDurationMinutes,
+                              ),
+                            }))
                           }
                         />
                       </div>
@@ -3248,7 +3273,13 @@ export default function KassaReservationsView({
                             guests={floorRes
                               .filter(r => String(r.table_number) === String(table.number))
                               .sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
-                              .map(r => ({ name: r.guest_name, time: r.reservation_time }))
+                              .map(r => ({
+                                name: r.guest_name,
+                                time: formatFloorPlanTimeRange(
+                                  r.reservation_time,
+                                  r.duration_minutes || reservationSettings.defaultDurationMinutes,
+                                ),
+                              }))
                             }
                           />
                         </div>
