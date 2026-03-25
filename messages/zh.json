@@ -81,8 +81,8 @@
       "description": "随时选择与调整餐桌。在任意位置添加餐桌：一楼、楼上、露台等。按您想要的节奏，又快又简单。"
     },
     "payments": {
-      "title": "支付",
-      "description": "集成支付终端。Bancontact、Visa、Mastercard、Mollie、Stripe - 全部在一个系统中。"
+      "title": "餐桌",
+      "description": "随时调整餐桌设置。预订时间变长？可按桌即时更新——灵活省心。"
     },
     "invoicing": {
       "title": "发票 & Peppol",

@@ -81,8 +81,8 @@
       "description": "いつでも好きなようにテーブルを選んで変更。1階、上階、テラスなど、必要な場所にテーブルを追加。希望どおりに素早く簡単に。"
     },
     "payments": {
-      "title": "決済",
-      "description": "統合決済端末。Bancontact、Visa、Mastercard、Mollie、Stripe - すべて1つのシステムで。"
+      "title": "テーブル",
+      "description": "テーブル設定をその場で変更。予約が長引く場合も、テーブル単位ですぐ反映 — 柔軟で手間いらず。"
     },
     "invoicing": {
       "title": "請求書 & Peppol",

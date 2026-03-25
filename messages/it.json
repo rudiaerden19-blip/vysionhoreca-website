@@ -81,8 +81,8 @@
       "description": "Scegli e modifica un tavolo quando vuoi. Aggiungi tavoli dove vuoi: pian terreno, piano superiore, terrazza e altro. Veloce e semplice come desideri."
     },
     "payments": {
-      "title": "Pagamenti",
-      "description": "Terminale di pagamento integrato. Bancontact, Visa, Mastercard, Mollie, Stripe - tutto in un sistema."
+      "title": "Tavoli",
+      "description": "Modifica i tavoli al volo. La prenotazione si allunga? Aggiornala subito per tavolo — flessibile e senza complicazioni."
     },
     "invoicing": {
       "title": "Fatturazione & Peppol",

@@ -82,8 +82,8 @@
       "description": "Choose and edit any table whenever you like. Add tables wherever you need—ground floor, upstairs, terrace and more. As quick and simple as you want it."
     },
     "payments": {
-      "title": "Payments",
-      "description": "Integrated payment terminal. Bancontact, Visa, Mastercard, Mollie, Stripe - all in one system."
+      "title": "Tables",
+      "description": "Adjust your tables on the fly. If a reservation runs longer, update it right there per table—flexible and hassle-free."
     },
     "invoicing": {
       "title": "Cost Calculator",

@@ -81,8 +81,8 @@
       "description": "Elige y cambia una mesa cuando quieras. Añade mesas donde quieras: planta baja, piso superior, terraza, etc. Tan rápido y sencillo como tú quieras."
     },
     "payments": {
-      "title": "Pagos",
-      "description": "Terminal de pago integrado. Bancontact, Visa, Mastercard, Mollie, Stripe - todo en un sistema."
+      "title": "Mesas",
+      "description": "Ajusta tus mesas al momento. ¿La reserva se alarga? Actualízala al instante por mesa: flexible y sin complicaciones."
     },
     "invoicing": {
       "title": "Facturación & Peppol",

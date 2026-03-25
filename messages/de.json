@@ -81,8 +81,8 @@
       "description": "Wählen und ändern Sie Tische wann und wie Sie möchten. Fügen Sie Tische hinzu, wo Sie möchten: Erdgeschoss, Obergeschoss, Terrasse usw. So schnell und einfach, wie Sie es wollen."
     },
     "payments": {
-      "title": "Zahlungen",
-      "description": "Integriertes Zahlungsterminal. Bancontact, Visa, Mastercard, Mollie, Stripe - alles in einem System."
+      "title": "Tische",
+      "description": "Passen Sie Tische live an. Dauert eine Reservierung länger, passen Sie das sofort pro Tisch an — flexibel und unkompliziert."
     },
     "invoicing": {
       "title": "Rechnungsstellung & Peppol",

@@ -81,8 +81,8 @@
       "description": "Choisissez et modifiez une table quand vous voulez. Ajoutez des tables où vous voulez : rez-de-chaussée, étage, terrasse, etc. Aussi rapide et simple que vous le souhaitez."
     },
     "payments": {
-      "title": "Paiements",
-      "description": "Terminal de paiement intégré. Bancontact, Visa, Mastercard, Mollie, Stripe - tout en un système."
+      "title": "Tables",
+      "description": "Ajustez vos tables en direct. Une réservation se prolonge ? Modifiez-la immédiatement table par table — simple et souple."
     },
     "invoicing": {
       "title": "Facturation & Peppol",

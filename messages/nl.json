@@ -82,8 +82,8 @@
       "description": "Kies en wijzig een tafel hoe en wanneer je wilt. Voeg tafels toe waar je wilt: gelijkvloers, verdieping, terras enz. Zo snel en eenvoudig als jij het wilt."
     },
     "payments": {
-      "title": "Betalingen",
-      "description": "Geïntegreerde betaalterminal. Bancontact, Visa, Mastercard, Mollie, Stripe - alles in één systeem."
+      "title": "Tafels",
+      "description": "Pas je tafels live aan. Duurt een reservering langer, dan stel je dat direct per tafel bij — flexibel en zonder gedoe."
     },
     "invoicing": {
       "title": "Kostencalculator",
