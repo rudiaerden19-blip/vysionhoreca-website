@@ -256,6 +256,11 @@
       "title": "Procesamiento rápido, clientes satisfechos.",
       "description": "Procesa pedidos rápidamente durante horas punta. Sin más colas. Todo perfectamente integrado en la caja. Todo en tiempo real a la cocina."
     },
+    "reservations": {
+      "tab": "Plataforma de reservas",
+      "title": "Reservas, plano y planificación en un solo lugar.",
+      "description": "Gestiona reservas, plano, línea de tiempo de mesas, contactos, informes y ajustes desde el TPV. Reservas online, depósitos, inasistencias, franjas horarias y cancelaciones — todo a mano."
+    },
     "analytics": {
       "tab": "Análisis empresarial",
       "title": "Análisis empresarial en tiempo real.",
@@ -277,7 +282,9 @@
       "tab": "Pedir por WhatsApp",
       "title": "Pedir por WhatsApp.",
       "description": "Deja que tus clientes pidan por WhatsApp, elijan productos y paguen - todo en WhatsApp. Sin App Store. Resultados probados: 20% más de ingresos y pedidos más rápidos."
-    }
+    },
+    "prevImage": "Anterior",
+    "nextImage": "Siguiente"
   },
   "costCalculator": {
     "title": "Por fin está aquí",

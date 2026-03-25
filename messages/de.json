@@ -256,6 +256,11 @@
       "title": "Schnelle Abwicklung, zufriedene Kunden.",
       "description": "Verarbeiten Sie Bestellungen blitzschnell während der Stoßzeiten. Keine Warteschlangen mehr. Alles perfekt in die Kasse integriert. Alles in Echtzeit in die Küche."
     },
+    "reservations": {
+      "tab": "Reservierungsplattform",
+      "title": "Reservierungen, Raumplan und Planung an einem Ort.",
+      "description": "Verwalten Sie Reservierungen, Grundriss, Tisch-Zeitleiste, Kontakte, Berichte und Einstellungen direkt an der Kasse. Online-Reservierungen, Anzahlungen, No-Shows, Zeitfenster und Stornierungen — alles griffbereit."
+    },
     "analytics": {
       "tab": "Geschäftsanalyse",
       "title": "Echtzeit-Geschäftsanalyse.",
@@ -277,7 +282,9 @@
       "tab": "WhatsApp Bestellen",
       "title": "Bestellen über WhatsApp.",
       "description": "Lassen Sie Ihre Kunden über WhatsApp bestellen, Produkte wählen und bezahlen - alles in WhatsApp. Kein App Store nötig. Bewährte Ergebnisse: 20% mehr Umsatz und schnellere Bestellungen."
-    }
+    },
+    "prevImage": "Zurück",
+    "nextImage": "Weiter"
   },
   "costCalculator": {
     "title": "Endlich ist er da",

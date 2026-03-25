@@ -256,6 +256,11 @@
       "title": "Elaborazione rapida, clienti soddisfatti.",
       "description": "Elabora ordini rapidamente durante le ore di punta. Niente più code. Tutto perfettamente integrato nella cassa. Tutto in tempo reale in cucina."
     },
+    "reservations": {
+      "tab": "Piattaforma prenotazioni",
+      "title": "Prenotazioni, planimetria e planning in un unico posto.",
+      "description": "Gestisci prenotazioni, planimetria, timeline tavoli, contatti, report e impostazioni dal POS. Prenotazioni online, caparre, no-show, fasce orarie e cancellazioni — tutto a portata di mano."
+    },
     "analytics": {
       "tab": "Analisi aziendale",
       "title": "Analisi aziendale in tempo reale.",
@@ -277,7 +282,9 @@
       "tab": "Ordina via WhatsApp",
       "title": "Ordina via WhatsApp.",
       "description": "Lascia che i tuoi clienti ordinino via WhatsApp, scelgano prodotti e paghino - tutto in WhatsApp. Nessun App Store necessario. Risultati provati: 20% in più di fatturato e ordini più veloci."
-    }
+    },
+    "prevImage": "Precedente",
+    "nextImage": "Successivo"
   },
   "costCalculator": {
     "title": "Finalmente è arrivato",

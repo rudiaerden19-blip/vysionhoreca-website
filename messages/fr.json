@@ -256,6 +256,11 @@
       "title": "Traitement rapide, clients satisfaits.",
       "description": "Traitez les commandes ultra-rapidement pendant les heures de pointe. Plus de files d'attente. Tout parfaitement intégré dans la caisse. Tout en temps réel vers la cuisine."
     },
+    "reservations": {
+      "tab": "Plateforme de réservation",
+      "title": "Réservations, plan de salle et planning réunis.",
+      "description": "Gérez réservations, plan de salle, chronologie des tables, contacts, rapports et paramètres depuis votre caisse. Réservations en ligne, acomptes, no-shows, créneaux et annulations — tout sous la main."
+    },
     "analytics": {
       "tab": "Analyse commerciale",
       "title": "Analyse commerciale en temps réel.",
@@ -277,7 +282,9 @@
       "tab": "Commander via WhatsApp",
       "title": "Commander via WhatsApp.",
       "description": "Laissez vos clients commander via WhatsApp, choisir des produits et payer - tout dans WhatsApp. Pas besoin d'App Store. Résultats prouvés: 20% de chiffre d'affaires en plus et commandes plus rapides."
-    }
+    },
+    "prevImage": "Précédent",
+    "nextImage": "Suivant"
   },
   "costCalculator": {
     "title": "Enfin, il est là",

@@ -256,6 +256,11 @@
       "title": "快速处理，满意客户。",
       "description": "高峰期快速处理订单。不再排队。完美集成到收银机。实时发送到厨房。"
     },
+    "reservations": {
+      "tab": "预订平台",
+      "title": "预订、平面图与排期一站式管理。",
+      "description": "在收银端管理预订、平面图、桌位时间轴、联系人、报表与设置。在线预订、押金、爽约、时段与取消——触手可及。"
+    },
     "analytics": {
       "tab": "业务分析",
       "title": "实时业务分析。",
@@ -277,7 +282,9 @@
       "tab": "WhatsApp订购",
       "title": "通过WhatsApp订购。",
       "description": "让您的客户通过WhatsApp订购、选择产品并付款 - 一切都在WhatsApp中完成。无需App Store。验证结果：收入增加20%，订单更快。"
-    }
+    },
+    "prevImage": "上一张",
+    "nextImage": "下一张"
   },
   "costCalculator": {
     "title": "终于来了",

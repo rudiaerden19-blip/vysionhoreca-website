@@ -1084,6 +1084,16 @@ function IndustrySection() {
   
   const industries: Record<string, { images: string[] }> = {
     ordering: { images: ['/images/industry-ordering.png'] },
+    reservations: {
+      images: [
+        '/images/reservation-platform-1.png',
+        '/images/reservation-platform-2.png',
+        '/images/reservation-platform-3.png',
+        '/images/reservation-platform-4.png',
+        '/images/reservation-platform-5.png',
+        '/images/reservation-platform-6.png',
+      ],
+    },
     analytics: { images: ['/images/industry-analytics.png'] },
     accounting: { images: ['/images/cost-calculator-1.png'] },
     payroll: { images: ['/images/industry-payroll.png'] },
@@ -1115,6 +1125,23 @@ function IndustrySection() {
     setLightboxIndex(lightboxIndex === current.images.length - 1 ? 0 : lightboxIndex + 1)
   }
 
+  const goInlinePrev = () => {
+    const idx = lightboxIndex === 0 ? current.images.length - 1 : lightboxIndex - 1
+    setLightboxIndex(idx)
+    setShowLightbox(true)
+  }
+
+  const goInlineNext = () => {
+    const idx = lightboxIndex === current.images.length - 1 ? 0 : lightboxIndex + 1
+    setLightboxIndex(idx)
+    setShowLightbox(true)
+  }
+
+  useEffect(() => {
+    setShowLightbox(false)
+    setLightboxIndex(0)
+  }, [activeTab])
+
   return (
     <section className="py-24 bg-[#e3e3e3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1125,7 +1152,7 @@ function IndustrySection() {
         
         {/* Tabs */}
         <div className="flex flex-wrap gap-3 sm:gap-6 lg:gap-8 mb-12 justify-center lg:justify-start">
-          {['ordering', 'analytics', 'accounting', 'payroll', 'whatsapp'].map((tab) => (
+          {['ordering', 'reservations', 'analytics', 'accounting', 'payroll', 'whatsapp'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -1158,20 +1185,45 @@ function IndustrySection() {
           </div>
 
           {/* Right content - Images */}
-          <div className="relative text-center flex flex-col items-center justify-center">
+          <div className="relative text-center flex flex-col items-center justify-center w-full">
             {hasMultipleImages ? (
-              /* Multiple thumbnails grid for WhatsApp */
-              <div className="grid grid-cols-3 gap-3 w-full max-w-[500px]">
-                {current.images.map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={`${activeTab} ${idx + 1}`}
-                    className="w-full h-32 sm:h-40 object-cover rounded-xl shadow-lg cursor-pointer hover:scale-105 transition-transform border-2 border-gray-100"
-                    loading="lazy"
-                    onClick={() => openLightbox(idx)}
-                  />
-                ))}
+              <div className="relative w-full max-w-[520px]">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full">
+                  {current.images.map((img, idx) => (
+                    <img
+                      key={idx}
+                      src={img}
+                      alt={`${t(`industry.${activeTab}.tab`)} ${idx + 1}`}
+                      className="w-full h-28 sm:h-36 object-cover object-top rounded-xl shadow-lg cursor-pointer hover:scale-[1.02] transition-transform border-2 border-gray-100"
+                      loading="lazy"
+                      onClick={() => openLightbox(idx)}
+                    />
+                  ))}
+                </div>
+                <div className="flex items-center justify-center gap-4 mt-4">
+                  <button
+                    type="button"
+                    onClick={goInlinePrev}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-semibold shadow hover:bg-gray-50 transition-colors"
+                    aria-label={t('industry.prevImage')}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    {t('industry.prevImage')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={goInlineNext}
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-semibold shadow hover:bg-gray-50 transition-colors"
+                    aria-label={t('industry.nextImage')}
+                  >
+                    {t('industry.nextImage')}
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             ) : (
               /* Single image for other tabs */

@@ -256,6 +256,11 @@
       "title": "Fast handling, happy customers.",
       "description": "Process orders lightning fast during peak hours. No more queues. Everything perfectly integrated in the POS. Everything in real-time to the kitchen."
     },
+    "reservations": {
+      "tab": "Reservation platform",
+      "title": "Reservations, floor plan and scheduling in one place.",
+      "description": "Manage reservations, floor plan, table timeline, contacts, reports and reservation settings directly from your POS. Online bookings, deposits, no-shows, time slots and cancellations—all at your fingertips."
+    },
     "analytics": {
       "tab": "Business analytics",
       "title": "Real-time business analytics.",
@@ -277,7 +282,9 @@
       "description": "Let your customers order via WhatsApp, choose products and checkout - all in WhatsApp. No App Store needed. Proven results: 20% more revenue and faster orders."
     },
     "tryFree": "Try free",
-    "clickToEnlarge": "Click to enlarge"
+    "clickToEnlarge": "Click to enlarge",
+    "prevImage": "Previous",
+    "nextImage": "Next"
   },
   "costCalculator": {
     "title": "Finally, it's here",

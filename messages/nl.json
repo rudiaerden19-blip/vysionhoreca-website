@@ -257,6 +257,11 @@
       "title": "Snelle afhandeling, tevreden klanten.",
       "description": "Bestellingen razendsnel verwerken tijdens piekuren. Geen wachtrijen meer. Alles perfect geïntegreerd in de kassa. Alles in realtime naar de keuken."
     },
+    "reservations": {
+      "tab": "Reserveringsplatform",
+      "title": "Reserveringen, plattegrond en planning in één.",
+      "description": "Beheer reserveringen, plattegrond, tafeltijdlijn, contacten, rapportage en reservatie-instellingen rechtstreeks vanuit je kassa. Online reserveren, voorschotten, no-shows, tijdsloten en annuleringen: alles binnen handbereik."
+    },
     "analytics": {
       "tab": "Bedrijfsanalyse",
       "title": "Realtime bedrijfsanalyse.",
@@ -278,7 +283,9 @@
       "description": "Laat je klanten via WhatsApp bestellen, producten kiezen en afrekenen - alles in WhatsApp. Geen App Store nodig. Bewezen resultaat: 20% meer omzet en snellere bestellingen."
     },
     "tryFree": "Gratis testen",
-    "clickToEnlarge": "Klik om te vergroten"
+    "clickToEnlarge": "Klik om te vergroten",
+    "prevImage": "Vorige",
+    "nextImage": "Volgende"
   },
   "costCalculator": {
     "title": "Eindelijk, hij is er",
