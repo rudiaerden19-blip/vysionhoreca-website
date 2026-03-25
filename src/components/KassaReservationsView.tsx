@@ -403,10 +403,16 @@ function ContactsView({
   guestProfiles,
   searchQuery,
   setSearchQuery,
+  onPromoMailClick,
+  onBulkPromoMailClick,
+  promoSelectionReset = 0,
 }: {
   guestProfiles: GuestProfile[]
   searchQuery: string
   setSearchQuery: (q: string) => void
+  onPromoMailClick: (guest: GuestProfile) => void
+  onBulkPromoMailClick: (guests: GuestProfile[]) => void
+  promoSelectionReset?: number
 }) {
   // Standaard: meest recent bovenaan — nieuwe klanten zijn altijd zichtbaar
   const [guestSort, setGuestSort] = useState<'lastVisit' | 'name' | 'visits'>('lastVisit')
@@ -414,6 +420,12 @@ function ContactsView({
   const [page, setPage] = useState(0)
   const [pageSize, setPageSize] = useState(25)
   const [noShowRed, setNoShowRed] = useState<Set<string>>(new Set())
+  const [selectedGuestIds, setSelectedGuestIds] = useState<Set<string>>(new Set())
+  const headerSelectRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    setSelectedGuestIds(new Set())
+  }, [promoSelectionReset])
 
   const changeSort = (col: typeof guestSort) => {
     if (guestSort === col) setGuestSortDir(d => d === 'asc' ? 'desc' : 'asc')
@@ -439,6 +451,37 @@ function ContactsView({
   const paginated = filtered.slice(page * pageSize, page * pageSize + pageSize)
   const from = filtered.length === 0 ? 0 : page * pageSize + 1
   const to = Math.min(page * pageSize + pageSize, filtered.length)
+
+  const pageIds = paginated.map(g => g.id)
+  const allPageSelected = pageIds.length > 0 && pageIds.every(id => selectedGuestIds.has(id))
+  const somePageSelected = pageIds.some(id => selectedGuestIds.has(id))
+  const selectedWithEmail = filtered.filter(g => selectedGuestIds.has(g.id) && g.email?.trim())
+  const selectedTotal = selectedGuestIds.size
+
+  useEffect(() => {
+    const el = headerSelectRef.current
+    if (el) el.indeterminate = somePageSelected && !allPageSelected
+  }, [somePageSelected, allPageSelected])
+
+  const toggleSelectPage = () => {
+    setSelectedGuestIds(prev => {
+      const next = new Set(prev)
+      if (allPageSelected) pageIds.forEach(id => next.delete(id))
+      else pageIds.forEach(id => next.add(id))
+      return next
+    })
+  }
+
+  const toggleSelectRow = (id: string) => {
+    setSelectedGuestIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const GRID_COLS = '44px minmax(100px,1.6fr) minmax(100px,1.2fr) minmax(140px,2fr) minmax(88px,1fr) 72px 88px'
 
   const SortTh = ({ col, label, right }: { col: typeof guestSort; label: string; right?: boolean }) => (
     <div
@@ -466,6 +509,33 @@ function ContactsView({
 
       <p className="text-sm text-gray-400">{filtered.length} contacten</p>
 
+      {selectedTotal > 0 && (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm">
+          <span className="font-semibold text-gray-800">
+            {selectedTotal} geselecteerd
+            {selectedWithEmail.length !== selectedTotal && (
+              <span className="font-normal text-gray-500"> ({selectedWithEmail.length} met e-mail)</span>
+            )}
+          </span>
+          <button
+            type="button"
+            disabled={selectedWithEmail.length === 0}
+            onClick={() => onBulkPromoMailClick(selectedWithEmail)}
+            className="flex min-h-[44px] items-center gap-2 rounded-xl bg-orange-500 px-4 py-2 font-bold text-white shadow-sm transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Send size={16} />
+            Promotie e-mail{selectedWithEmail.length > 0 ? ` (${selectedWithEmail.length})` : ''}
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelectedGuestIds(new Set())}
+            className="min-h-[44px] rounded-lg px-3 text-sm font-medium text-gray-600 underline decoration-gray-300 hover:text-gray-900"
+          >
+            Selectie wissen
+          </button>
+        </div>
+      )}
+
       {/* Lege staat */}
       {paginated.length === 0 && (
         <div className="text-center py-16 text-gray-400 bg-white rounded-2xl border border-gray-100">
@@ -479,16 +549,28 @@ function ContactsView({
 
           {/* Header */}
           <div className="grid items-center px-4 py-3 text-xs font-bold uppercase tracking-wider text-white"
-            style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(120px,1.5fr) minmax(100px,1fr) 100px 90px', columnGap: '16px', backgroundColor: '#f97316' }}>
+            style={{ gridTemplateColumns: GRID_COLS, columnGap: '12px', backgroundColor: '#f97316' }}>
+            <div className="flex justify-center" onClick={e => e.stopPropagation()}>
+              <input
+                ref={headerSelectRef}
+                type="checkbox"
+                checked={allPageSelected}
+                onChange={toggleSelectPage}
+                className="h-5 w-5 cursor-pointer rounded border-white/50 text-orange-600 focus:ring-2 focus:ring-white/80"
+                title="Selecteer alle contacten op deze pagina"
+                aria-label="Selecteer alle contacten op deze pagina"
+              />
+            </div>
             <div onClick={() => changeSort('name')} className="cursor-pointer select-none hover:opacity-80 flex items-center gap-1">
               Naam {guestSort === 'name' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
             </div>
             <div>Telefoon</div>
+            <div>E-mail</div>
             <div onClick={() => changeSort('lastVisit')} className="cursor-pointer select-none hover:opacity-80 hidden md:flex items-center gap-1">
               Laatste bezoek {guestSort === 'lastVisit' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
             </div>
             <div onClick={() => changeSort('visits')} className="cursor-pointer select-none hover:opacity-80 flex items-center gap-1">
-              Aantal bezoeken {guestSort === 'visits' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
+              Bezoeken {guestSort === 'visits' && <span>{guestSortDir === 'desc' ? '↓' : '↑'}</span>}
             </div>
             <div>No-show</div>
           </div>
@@ -503,8 +585,17 @@ function ContactsView({
               return (
                 <div key={guest.id}
                   className="grid items-center px-4 py-3 hover:bg-gray-50 transition-colors"
-                  style={{ gridTemplateColumns: 'minmax(120px,2fr) minmax(120px,1.5fr) minmax(100px,1fr) 100px 90px', columnGap: '16px' }}
+                  style={{ gridTemplateColumns: GRID_COLS, columnGap: '12px' }}
                 >
+                  <div className="flex justify-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedGuestIds.has(guest.id)}
+                      onChange={() => toggleSelectRow(guest.id)}
+                      className="h-5 w-5 cursor-pointer rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      aria-label={`Selecteer ${guest.name}`}
+                    />
+                  </div>
                   {/* Naam */}
                   <div className="font-semibold text-gray-900 flex items-center gap-1.5 min-w-0 pr-2">
                     {guest.isVip && <Star size={12} className="text-amber-400 fill-amber-400 flex-shrink-0" />}
@@ -516,10 +607,35 @@ function ContactsView({
                       ? <a href={`tel:${guest.phone}`} className="hover:underline hover:text-[#3C4D6B]">{guest.phone}</a>
                       : <span className="text-gray-300">—</span>}
                   </div>
+                  {/* E-mail + promotie (vliegtuigje) */}
+                  <div className="flex min-w-0 items-center gap-1.5 pr-1">
+                    {guest.email ? (
+                      <>
+                        <a
+                          href={`mailto:${guest.email}`}
+                          className="min-w-0 truncate text-sm text-[#3C4D6B] hover:underline"
+                          title={guest.email}
+                        >
+                          {guest.email}
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => onPromoMailClick(guest)}
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500 text-white shadow-sm transition-colors hover:bg-orange-600 active:bg-orange-700"
+                          title="Promotie-e-mail versturen"
+                          aria-label={`Promotie-e-mail naar ${guest.name}`}
+                        >
+                          <Send size={16} className="shrink-0" strokeWidth={2.25} />
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-sm text-gray-300">—</span>
+                    )}
+                  </div>
                   {/* Laatste bezoek */}
                   <div className="text-gray-500 text-sm hidden md:block pr-2">{lastVisitFmt}</div>
                   {/* Aantal */}
-                  <div className="font-bold text-gray-800 text-right pr-4">{guest.totalVisits}</div>
+                  <div className="font-bold text-gray-800 text-right pr-2">{guest.totalVisits}</div>
                   {/* No-show */}
                   <button
                     onClick={() => setNoShowRed(prev => { const s = new Set(prev); s.has(guest.id) ? s.delete(guest.id) : s.add(guest.id); return s })}
@@ -1017,6 +1133,12 @@ export default function KassaReservationsView({
   const [pushSubject, setPushSubject] = useState('')
   const [pushMessage, setPushMessage] = useState('')
   const [pushSending, setPushSending] = useState(false)
+  /** Contacten-tab: promotie-mail naar één of meerdere gasten */
+  const [contactPromoRecipients, setContactPromoRecipients] = useState<GuestProfile[]>([])
+  const [contactPromoSubject, setContactPromoSubject] = useState('')
+  const [contactPromoMessage, setContactPromoMessage] = useState('')
+  const [contactPromoSending, setContactPromoSending] = useState(false)
+  const [contactPromoSelectionReset, setContactPromoSelectionReset] = useState(0)
 
   /** Tijdlijn: rechts slepen om duur (duration_minutes) te wijzigen */
   const timelineDurDragRef = useRef<{
@@ -1878,6 +2000,78 @@ export default function KassaReservationsView({
       toast.error('Netwerk fout, probeer opnieuw')
     } finally {
       setPushSending(false)
+    }
+  }
+
+  const openContactPromoModal = (g: GuestProfile) => {
+    if (!g.email?.trim()) {
+      toast.error('Deze contactpersoon heeft geen e-mailadres')
+      return
+    }
+    setContactPromoRecipients([g])
+    setContactPromoSubject(businessInfo.name ? `Nieuws van ${businessInfo.name}` : 'Een woordje van ons')
+    setContactPromoMessage(`Beste ${g.name},\n\n`)
+  }
+
+  const openContactPromoModalMany = (guests: GuestProfile[]) => {
+    const seen = new Set<string>()
+    const withEmail = guests.filter(g => {
+      if (!g.email?.trim() || seen.has(g.id)) return false
+      seen.add(g.id)
+      return true
+    })
+    if (withEmail.length === 0) {
+      toast.error('Geen geselecteerde contacten met e-mailadres')
+      return
+    }
+    setContactPromoRecipients(withEmail)
+    setContactPromoSubject(businessInfo.name ? `Nieuws van ${businessInfo.name}` : 'Een woordje van ons')
+    setContactPromoMessage('Beste klant,\n\n')
+  }
+
+  const handleSendContactPromo = async () => {
+    const recipients = contactPromoRecipients
+      .map(g => ({ email: (g.email || '').trim(), name: g.name }))
+      .filter(r => r.email.length > 0)
+    if (recipients.length === 0) {
+      toast.error('Geen geldige e-mailadressen')
+      return
+    }
+    if (!contactPromoSubject.trim() || !contactPromoMessage.trim()) {
+      toast.error('Vul onderwerp en bericht in')
+      return
+    }
+    setContactPromoSending(true)
+    try {
+      const res = await fetch('/api/marketing/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        body: JSON.stringify({
+          tenantSlug: tenant,
+          recipients,
+          subject: contactPromoSubject.trim(),
+          message: contactPromoMessage.trim(),
+          businessName: businessInfo.name,
+        }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success(
+          recipients.length === 1
+            ? `Promotie e-mail verstuurd naar ${recipients[0].name}`
+            : `Promotie e-mail verstuurd naar ${recipients.length} ontvangers`,
+        )
+        setContactPromoRecipients([])
+        setContactPromoSubject('')
+        setContactPromoMessage('')
+        setContactPromoSelectionReset(n => n + 1)
+      } else {
+        toast.error(data.error || 'Versturen mislukt')
+      }
+    } catch {
+      toast.error('Netwerkfout, probeer opnieuw')
+    } finally {
+      setContactPromoSending(false)
     }
   }
 
@@ -4100,6 +4294,9 @@ export default function KassaReservationsView({
             guestProfiles={guestProfiles}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
+            onPromoMailClick={openContactPromoModal}
+            onBulkPromoMailClick={openContactPromoModalMany}
+            promoSelectionReset={contactPromoSelectionReset}
           />
         )}
 
@@ -4501,6 +4698,89 @@ export default function KassaReservationsView({
           </div>
         )}
       </div>
+
+      {/* Promotie-e-mail vanuit contacten */}
+      {contactPromoRecipients.length > 0 && (
+        <div className="fixed inset-0 z-[72] flex items-center justify-center bg-black/50 p-4 pointer-events-auto" onClick={() => !contactPromoSending && setContactPromoRecipients([])}>
+          <div
+            className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-lg font-bold text-gray-900">Promotie-e-mail</h3>
+                {contactPromoRecipients.length === 1 ? (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Naar <span className="font-medium text-gray-800">{contactPromoRecipients[0].name}</span>
+                    {' · '}
+                    <span className="break-all">{contactPromoRecipients[0].email}</span>
+                  </p>
+                ) : (
+                  <div className="mt-1 text-sm text-gray-500">
+                    <p className="font-medium text-gray-700">{contactPromoRecipients.length} ontvangers</p>
+                    <ul className="mt-1 max-h-28 overflow-y-auto rounded-lg border border-gray-100 bg-gray-50 px-2 py-1 text-xs">
+                      {contactPromoRecipients.map(g => (
+                        <li key={g.id} className="truncate py-0.5">
+                          <span className="font-medium text-gray-800">{g.name}</span>
+                          {' '}
+                          <span className="break-all text-gray-500">{g.email}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                disabled={contactPromoSending}
+                onClick={() => setContactPromoRecipients([])}
+                className="min-h-[44px] min-w-[44px] rounded-xl text-2xl text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                aria-label="Sluiten"
+              >
+                ×
+              </button>
+            </div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Onderwerp</label>
+            <input
+              type="text"
+              value={contactPromoSubject}
+              onChange={e => setContactPromoSubject(e.target.value)}
+              className="mb-4 w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-[#3C4D6B]"
+              disabled={contactPromoSending}
+            />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Bericht</label>
+            <textarea
+              value={contactPromoMessage}
+              onChange={e => setContactPromoMessage(e.target.value)}
+              rows={6}
+              className="mb-4 w-full resize-y rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none focus:border-[#3C4D6B]"
+              disabled={contactPromoSending}
+            />
+            <p className="mb-4 text-xs text-gray-400">
+              Wordt verstuurd via je e-mailinstellingen (zoals bij Marketing). “Beste klant” in het bericht wordt automatisch vervangen door de voornaam van de ontvanger.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                disabled={contactPromoSending}
+                onClick={() => setContactPromoRecipients([])}
+                className="min-h-[44px] flex-1 rounded-xl bg-gray-100 px-4 font-semibold text-gray-700 hover:bg-gray-200"
+              >
+                Annuleren
+              </button>
+              <button
+                type="button"
+                disabled={contactPromoSending}
+                onClick={() => void handleSendContactPromo()}
+                className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 font-bold text-white hover:bg-orange-600 disabled:opacity-50"
+              >
+                <Send size={18} />
+                {contactPromoSending ? 'Versturen…' : contactPromoRecipients.length > 1 ? `Versturen (${contactPromoRecipients.length})` : 'Versturen'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* z4 - Annulering deadline modal */}
       {cancelConfirm && (
