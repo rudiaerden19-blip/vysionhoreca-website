@@ -1765,6 +1765,7 @@ export default function HomePage() {
       <HeroSection />
       <OneDayOnlineSection />
       <FeaturesSection />
+      <IndustrySection />
       <StatsSection />
       <OrderAppSection />
       <LiveDemoSection />
@@ -1772,7 +1773,6 @@ export default function HomePage() {
       <PricingSection />
       <ButWaitSection />
       <ComparisonSection />
-      <IndustrySection />
       <CostCalculatorSection />
       <TestimonialSection />
       <CTASection />
