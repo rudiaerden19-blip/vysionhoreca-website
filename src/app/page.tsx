@@ -256,32 +256,32 @@ function FeaturesSection() {
   ]
 
   return (
-    <section id="functies" className="py-24 bg-[#e3e3e3]">
+    <section id="functies" className="py-20 sm:py-24 bg-[#e3e3e3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 sm:mb-5 tracking-tight">
             {t('features.title')}
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-2">
             {t('features.subtitle')}
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {features.map((feature, index) => (
             <div 
               key={index}
-              className="bg-white rounded-2xl p-8 shadow-[0_4px_15px_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.3)] transition-shadow duration-300"
+              className="bg-white rounded-2xl p-6 sm:p-8 md:p-9 shadow-[0_4px_15px_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(255,255,255,0.3)] transition-shadow duration-300"
             >
-              <div className="w-14 h-14 bg-accent rounded-xl flex items-center justify-center text-white mb-6">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 bg-accent rounded-xl flex items-center justify-center text-white mb-5 sm:mb-6 shrink-0">
+                <svg className="w-8 h-8 sm:w-9 sm:h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {feature.icon}
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 leading-snug">
                 {t(`features.${feature.key}.title`)}
               </h3>
-              <p className="text-gray-600">
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
                 {t(`features.${feature.key}.description`)}
               </p>
             </div>
