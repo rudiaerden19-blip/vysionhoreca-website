@@ -1083,7 +1083,15 @@ function IndustrySection() {
   const { t, locale } = useLanguage()
   
   const industries: Record<string, { images: string[] }> = {
-    ordering: { images: ['/images/industry-ordering.png'] },
+    ordering: {
+      images: [
+        '/images/online-order-platform-1.png',
+        '/images/online-order-platform-2.png',
+        '/images/online-order-platform-3.png',
+        '/images/online-order-platform-4.png',
+        '/images/online-order-platform-5.png',
+      ],
+    },
     reservations: {
       images: [
         '/images/reservation-platform-1.png',
