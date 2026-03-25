@@ -571,7 +571,7 @@ function PricingSection() {
   
   // Jaarlijks = 10% korting
   const starterMonthly = 59
-  const proMonthly = 79
+  const proMonthly = 99
   const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
   const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
   const periodLabel = isYearly ? '/jaar' : '/maand'
@@ -720,7 +720,7 @@ function PricingSection() {
               </div>
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-2xl font-bold text-gray-400 line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(129 * 12 * 0.9) : 129}/maand</span>
-                <span className="bg-green-500/20 text-green-400 text-sm font-bold px-2 py-0.5 rounded-lg">-39%</span>
+                <span className="bg-green-500/20 text-green-400 text-sm font-bold px-2 py-0.5 rounded-lg">-23%</span>
               </div>
               <div className="flex items-baseline mb-6">
                 <span className="text-5xl font-bold text-purple-300">€{proPrice}</span>
@@ -1032,7 +1032,7 @@ function ComparisonSection() {
                 <th className="px-6 py-5 text-left font-semibold">{t('comparison.feature')}</th>
                 <th className="px-6 py-5 text-center">
                   <div className="text-accent font-bold text-lg">Vysion Horeca</div>
-                  <div className="text-sm text-gray-300">€59 - €79/maand</div>
+                  <div className="text-sm text-gray-300">€59 - €99/maand</div>
                 </th>
                 <th className="px-6 py-5 text-center">
                   <div className="font-semibold">Lightspeed</div>

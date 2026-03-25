@@ -28,7 +28,7 @@ export default function PrijzenPage() {
   const countdown = useCountdown(new Date('2026-05-01T00:00:00'))
   
   const starterMonthly = 59
-  const proMonthly = 79
+  const proMonthly = 99
   const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
   const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
 
@@ -169,7 +169,7 @@ export default function PrijzenPage() {
               </div>
             </div>
 
-            {/* Vysion Pro - €79 - POPULAR */}
+            {/* Vysion Premium - €99 - POPULAR */}
             <div className="bg-gradient-to-b from-[#4a3f6e] to-[#2d2654] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl relative">
               {/* Popular badge */}
               <div className="absolute top-4 right-4 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
@@ -192,7 +192,7 @@ export default function PrijzenPage() {
                 </div>
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-2xl font-bold text-gray-400 line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(129 * 12 * 0.9) : 129}/maand</span>
-                  <span className="bg-green-500/20 text-green-400 text-sm font-bold px-2 py-0.5 rounded-lg">-39%</span>
+                  <span className="bg-green-500/20 text-green-400 text-sm font-bold px-2 py-0.5 rounded-lg">-23%</span>
                 </div>
                 <div className="flex items-baseline mb-6">
                   <span className="text-5xl font-bold text-purple-300">€{proPrice}</span>
