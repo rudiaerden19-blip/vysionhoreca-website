@@ -261,6 +261,11 @@
       "title": "Reservations, floor plan and scheduling in one place.",
       "description": "Manage reservations, floor plan, table timeline, contacts, reports and reservation settings directly from your POS. Online bookings, deposits, no-shows, time slots and cancellations—all at your fingertips."
     },
+    "kassa": {
+      "tab": "POS",
+      "title": "Fast, intuitive touchscreen checkout.",
+      "description": "Sell with categories, options and add-ons, dine-in or takeaway, multiple payment methods (cash, card, iDEAL, Bancontact, split payment) and clear receipts. After payment, orders flow straight to kitchen and display—one connected workflow."
+    },
     "analytics": {
       "tab": "Business analytics",
       "title": "Real-time business analytics.",

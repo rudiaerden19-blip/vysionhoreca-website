@@ -262,6 +262,11 @@
       "title": "Reserveringen, plattegrond en planning in één.",
       "description": "Beheer reserveringen, plattegrond, tafeltijdlijn, contacten, rapportage en reservatie-instellingen rechtstreeks vanuit je kassa. Online reserveren, voorschotten, no-shows, tijdsloten en annuleringen: alles binnen handbereik."
     },
+    "kassa": {
+      "tab": "Kassa",
+      "title": "Snelle, overzichtelijke touchscreen-kassa.",
+      "description": "Verkoop met categorieën, productopties en extras, tafel/afhaal, meerdere betaalwijzen (contant, kaart, iDEAL, Bancontact, gesplitst betalen) en duidelijke bonnen. Na betaling stroomt de bestelling meteen door naar keuken en scherm — één doorlopende flow."
+    },
     "analytics": {
       "tab": "Bedrijfsanalyse",
       "title": "Realtime bedrijfsanalyse.",

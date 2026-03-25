@@ -261,6 +261,11 @@
       "title": "Reservierungen, Raumplan und Planung an einem Ort.",
       "description": "Verwalten Sie Reservierungen, Grundriss, Tisch-Zeitleiste, Kontakte, Berichte und Einstellungen direkt an der Kasse. Online-Reservierungen, Anzahlungen, No-Shows, Zeitfenster und Stornierungen — alles griffbereit."
     },
+    "kassa": {
+      "tab": "Kasse",
+      "title": "Schnelle, übersichtliche Touchscreen-Kasse.",
+      "description": "Verkaufen mit Kategorien, Optionen und Extras, Tisch oder Mitnahme, mehrere Zahlungsarten (Bar, Karte, iDEAL, Bancontact, geteilte Zahlung) und klare Belege. Nach der Zahlung fließt die Bestellung direkt zu Küche und Display — ein durchgängiger Ablauf."
+    },
     "analytics": {
       "tab": "Geschäftsanalyse",
       "title": "Echtzeit-Geschäftsanalyse.",

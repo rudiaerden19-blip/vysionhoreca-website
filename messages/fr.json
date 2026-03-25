@@ -261,6 +261,11 @@
       "title": "Réservations, plan de salle et planning réunis.",
       "description": "Gérez réservations, plan de salle, chronologie des tables, contacts, rapports et paramètres depuis votre caisse. Réservations en ligne, acomptes, no-shows, créneaux et annulations — tout sous la main."
     },
+    "kassa": {
+      "tab": "Caisse",
+      "title": "Encaissement tactile rapide et clair.",
+      "description": "Vendez avec catégories, options et suppléments, sur place ou à emporter, plusieurs moyens de paiement (espèces, carte, iDEAL, Bancontact, paiement partagé) et tickets lisibles. Après paiement, la commande part directement vers cuisine et écran — un flux unique."
+    },
     "analytics": {
       "tab": "Analyse commerciale",
       "title": "Analyse commerciale en temps réel.",

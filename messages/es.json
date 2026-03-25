@@ -261,6 +261,11 @@
       "title": "Reservas, plano y planificación en un solo lugar.",
       "description": "Gestiona reservas, plano, línea de tiempo de mesas, contactos, informes y ajustes desde el TPV. Reservas online, depósitos, inasistencias, franjas horarias y cancelaciones — todo a mano."
     },
+    "kassa": {
+      "tab": "TPV",
+      "title": "Cobro táctil rápido y claro.",
+      "description": "Vende con categorías, opciones y extras, en mesa o para llevar, varios métodos de pago (efectivo, tarjeta, iDEAL, Bancontact, pago dividido) y tickets claros. Tras el pago, el pedido sigue a cocina y pantalla — un flujo unificado."
+    },
     "analytics": {
       "tab": "Análisis empresarial",
       "title": "Análisis empresarial en tiempo real.",

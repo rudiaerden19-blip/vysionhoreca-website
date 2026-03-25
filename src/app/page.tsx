@@ -1094,6 +1094,16 @@ function IndustrySection() {
         '/images/reservation-platform-6.png',
       ],
     },
+    kassa: {
+      images: [
+        '/images/kassa-platform-1.png',
+        '/images/kassa-platform-2.png',
+        '/images/kassa-platform-3.png',
+        '/images/kassa-platform-4.png',
+        '/images/kassa-platform-5.png',
+        '/images/kassa-platform-6.png',
+      ],
+    },
     analytics: { images: ['/images/industry-analytics.png'] },
     accounting: { images: ['/images/cost-calculator-1.png'] },
     payroll: { images: ['/images/industry-payroll.png'] },
@@ -1152,7 +1162,7 @@ function IndustrySection() {
         
         {/* Tabs */}
         <div className="flex flex-wrap gap-3 sm:gap-6 lg:gap-8 mb-12 justify-center lg:justify-start">
-          {['ordering', 'reservations', 'analytics', 'accounting', 'payroll', 'whatsapp'].map((tab) => (
+          {['ordering', 'reservations', 'kassa', 'analytics', 'accounting', 'payroll', 'whatsapp'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

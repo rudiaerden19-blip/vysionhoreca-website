@@ -261,6 +261,11 @@
       "title": "Prenotazioni, planimetria e planning in un unico posto.",
       "description": "Gestisci prenotazioni, planimetria, timeline tavoli, contatti, report e impostazioni dal POS. Prenotazioni online, caparre, no-show, fasce orarie e cancellazioni — tutto a portata di mano."
     },
+    "kassa": {
+      "tab": "Cassa",
+      "title": "Cassa touchscreen veloce e chiara.",
+      "description": "Vendi con categorie, opzioni ed extra, al tavolo o asporto, più metodi di pagamento (contanti, carta, iDEAL, Bancontact, pagamento diviso) e scontrini chiari. Dopo il pagamento l'ordine va dritto in cucina e al display — un flusso unico."
+    },
     "analytics": {
       "tab": "Analisi aziendale",
       "title": "Analisi aziendale in tempo reale.",
