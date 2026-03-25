@@ -111,6 +111,48 @@ function formatFloorPlanTimeRange(reservationTime: string, durationMinutes: numb
   return `${startStr} tot ${endStr}`
 }
 
+/**
+ * Paarse (CONFIRMED) rand: volledig na aanvang tot het laatste deel van het slot; daarna lineair naar 0.
+ * Lange slots (≥ dit aantal uren): alleen de laatste `STATUS_RING_FADE_LAST_HOURS` vervagen.
+ * Kortere slots: laatste helft van de duur, minimaal 15 min (zodat aan het begin nog steeds “vol” is).
+ * Alleen op de echte kalenderdag van vandaag (lokale tijd). Wijzig STATUS_RING_FADE_LAST_HOURS naar 1 voor 1 uur.
+ */
+const STATUS_RING_FADE_LAST_HOURS = 1.5
+
+function computeConfirmedStatusRingOpacity(
+  reservationDate: string,
+  reservationTime: string,
+  durationMinutes: number,
+): number {
+  const d = new Date()
+  const todayLocal = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  if (reservationDate !== todayLocal) return 1
+
+  const raw = (reservationTime || '12:00').trim().slice(0, 8)
+  const m = raw.match(/^(\d{1,2}):(\d{2})/)
+  if (!m) return 1
+  const h = parseInt(m[1], 10)
+  const min = parseInt(m[2], 10)
+  if (!Number.isFinite(h) || !Number.isFinite(min)) return 1
+  const start = new Date(`${reservationDate}T${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}:00`)
+  if (Number.isNaN(start.getTime())) return 1
+  const dur = Math.max(15, Math.round(durationMinutes || 90))
+  const startMs = start.getTime()
+  const endMs = startMs + dur * 60 * 1000
+  const slotMs = endMs - startMs
+  const nowMs = Date.now()
+  if (nowMs <= startMs) return 1
+  if (nowMs >= endMs) return 0
+  const fadeCap = STATUS_RING_FADE_LAST_HOURS * 60 * 60 * 1000
+  const fadeMs =
+    slotMs >= fadeCap
+      ? fadeCap
+      : Math.max(15 * 60 * 1000, Math.floor(slotMs / 2))
+  const toEnd = endMs - nowMs
+  if (toEnd >= fadeMs) return 1
+  return Math.max(0, toEnd / fadeMs)
+}
+
 interface KassaTable {
   id: string
   number: string
@@ -692,12 +734,15 @@ function ContactsView({
 }
 
 // ---- Reservation Table SVG — identiek aan KassaFloorPlan stijl ----
-function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
+function ReservationTableSVG({ table, statusColor, isSelected, guests, statusRingOpacity = 1 }: {
   table: FloorPlanTable
   statusColor: string
   isSelected: boolean
   guests?: { name: string; time: string }[]
+  /** 0–1: paarse reserveringsrand verdwijnt richting eind van het slot (alleen CONFIRMED callers). */
+  statusRingOpacity?: number
 }) {
+  const ringOp = Math.min(1, Math.max(0, statusRingOpacity))
   const seats = table.seats
   const tableSize = 90
   const chairW = 26
@@ -810,23 +855,80 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
         </g>
       ))}
 
+      {/* Statusrand — zacht naar buiten (blur-halo); binnenrand blijft scherp */}
+      {(() => {
+        const haloBlur = 8
+        const haloStroke = 11
+        const haloOpacity = 0.42 * ringOp
+        const expand = 5
+        const haloStyle = { filter: `blur(${haloBlur}px)` as const }
+        if (table.shape === 'ROUND') {
+          return (
+            <ellipse
+              cx={cx}
+              cy={cy}
+              rx={tableSize / 2 + expand}
+              ry={tableSize / 2 + expand}
+              fill="none"
+              stroke={statusColor}
+              strokeWidth={haloStroke}
+              opacity={haloOpacity}
+              style={haloStyle}
+            />
+          )
+        }
+        if (table.shape === 'RECTANGLE') {
+          return (
+            <rect
+              x={cx - tw / 2 - expand}
+              y={cy - th / 2 - expand}
+              width={tw + expand * 2}
+              height={th + expand * 2}
+              rx={12}
+              fill="none"
+              stroke={statusColor}
+              strokeWidth={haloStroke}
+              opacity={haloOpacity}
+              style={haloStyle}
+            />
+          )
+        }
+        return (
+          <rect
+            x={cx - tableSize / 2 - expand}
+            y={cy - tableSize / 2 - expand}
+            width={tableSize + expand * 2}
+            height={tableSize + expand * 2}
+            rx={12}
+            fill="none"
+            stroke={statusColor}
+            strokeWidth={haloStroke}
+            opacity={haloOpacity}
+            style={haloStyle}
+          />
+        )
+      })()}
+
       {/* Tafel — donkergrijs gradient, statuskleur als rand */}
       {table.shape === 'ROUND' ? (
         <ellipse cx={cx} cy={cy} rx={tableSize / 2} ry={tableSize / 2}
           fill={`url(#tg-round-${uid})`}
           stroke={statusColor}
+          strokeOpacity={ringOp}
           strokeWidth={isSelected ? 5 : 4}
           filter={`url(#rshadow-${uid})`} />
       ) : table.shape === 'RECTANGLE' ? (
         <rect x={cx - tw / 2} y={cy - th / 2} width={tw} height={th} rx={10}
           fill={`url(#tg-rect-${uid})`}
           stroke={statusColor}
+          strokeOpacity={ringOp}
           strokeWidth={isSelected ? 5 : 4}
           filter={`url(#rshadow-${uid})`} />
       ) : (
         <rect x={cx - tableSize / 2} y={cy - tableSize / 2} width={tableSize} height={tableSize} rx={10}
           fill={`url(#tg-rect-${uid})`}
           stroke={statusColor}
+          strokeOpacity={ringOp}
           strokeWidth={isSelected ? 5 : 4}
           filter={`url(#rshadow-${uid})`} />
       )}
@@ -842,7 +944,7 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
         <ellipse cx={cx} cy={cy}
           rx={(table.shape === 'ROUND' ? tableSize / 2 : tw / 2) + 8}
           ry={(table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + 8}
-          fill="none" stroke={statusColor} strokeWidth={2} strokeDasharray="6 3" opacity={0.7} />
+          fill="none" stroke={statusColor} strokeWidth={2} strokeDasharray="6 3" opacity={0.7 * ringOp} />
       )}
 
       {/* Tafelnummer */}
@@ -854,19 +956,23 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
         {seats}p
       </text>
 
-      {/* Gast labels — naam + tijd, onder elkaar */}
+      {/* Gast labels — per rij: volledige naam (voor + achternaam op één regel) + tijd rechts */}
       {guests && guests.length > 0 && (() => {
         const lineH = 22
-        const labelW = Math.max(168, tw * 1.15)
-        const timeW = 132  // "12:00 tot 13u30"
-        const nameW = labelW - timeW - 20  // resterende breedte voor naam
+        const padL = 10
+        const padR = 8
+        const gapNameTime = 8
+        const timeW = 118 // "12:30 tot 14u00"
+        const labelW = Math.max(300, Math.round(tw * 1.45))
+        const nameW = Math.max(120, labelW - padL - padR - gapNameTime - timeW)
         const totalH = guests.length * lineH + 10
         const startY = cy + (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + gap + chairH + 10
+        const oneLineName = (n: string) => n.replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim()
         return (
           <>
             <defs>
               <clipPath id={`nameClip-${table.id}`}>
-                <rect x={cx - labelW / 2 + 8} y={startY} width={nameW} height={totalH} />
+                <rect x={cx - labelW / 2 + padL} y={startY} width={nameW} height={totalH} />
               </clipPath>
             </defs>
             <rect x={cx - labelW / 2} y={startY} width={labelW} height={totalH} rx={10}
@@ -874,13 +980,13 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests }: {
             {guests.map((g, i) => (
               <g key={i}>
                 <text
-                  x={cx - labelW / 2 + 8} y={startY + 17 + i * lineH}
+                  x={cx - labelW / 2 + padL} y={startY + 17 + i * lineH}
                   fill="#111827" fontSize={12} fontWeight="700"
                   clipPath={`url(#nameClip-${table.id})`}
                 >
-                  {g.name}
+                  {oneLineName(g.name)}
                 </text>
-                <text x={cx + labelW / 2 - 6} y={startY + 17 + i * lineH} textAnchor="end" fill="#6b7280" fontSize={10}>
+                <text x={cx + labelW / 2 - padR} y={startY + 17 + i * lineH} textAnchor="end" fill="#6b7280" fontSize={10}>
                   {g.time}
                 </text>
               </g>
@@ -1134,6 +1240,12 @@ export default function KassaReservationsView({
     const m = now.getMinutes() < 30 ? '00' : '30'
     return `${h}:${m}`
   })
+  /** Triggert re-renders zodat de paarse rand richting slot-einde live minder wordt. */
+  const [, setStatusRingClockBump] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setStatusRingClockBump(n => n + 1), 30_000)
+    return () => clearInterval(id)
+  }, [])
   const [monthDate, setMonthDate] = useState(() => {
     const d = new Date()
     return { year: d.getFullYear(), month: d.getMonth() }
@@ -2892,6 +3004,15 @@ export default function KassaReservationsView({
                     else if (tableRes?.status === 'CONFIRMED') statusColor = '#8b5cf6'
                     else if (tableRes?.status === 'PENDING') statusColor = '#f59e0b'
 
+                    const statusRingOpacity =
+                      tableRes?.status === 'CONFIRMED'
+                        ? computeConfirmedStatusRingOpacity(
+                            tableRes.reservation_date,
+                            tableRes.reservation_time,
+                            parseDurationMinutesFromRaw(tableRes.duration_minutes, reservationSettings.defaultDurationMinutes),
+                          )
+                        : 1
+
                     return (
                       <div
                         key={table.id}
@@ -2909,6 +3030,7 @@ export default function KassaReservationsView({
                           table={table}
                           statusColor={statusColor}
                           isSelected={isSelected}
+                          statusRingOpacity={statusRingOpacity}
                           guests={todayReservations
                             .filter(r => String(r.table_number) === String(table.number) && r.status !== 'CANCELLED' && r.status !== 'COMPLETED' && r.status !== 'NO_SHOW')
                             .sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
@@ -3250,6 +3372,14 @@ export default function KassaReservationsView({
                   {floorPlanTablesDB.map(table => {
                     const { borderColor, res, count, guestLabel } = getFloorTableInfo(table.number)
                     const isSelected = selectedFloorTable?.id === table.id
+                    const statusRingOpacity =
+                      res?.status === 'CONFIRMED'
+                        ? computeConfirmedStatusRingOpacity(
+                            res.reservation_date,
+                            res.reservation_time,
+                            parseDurationMinutesFromRaw(res.duration_minutes, reservationSettings.defaultDurationMinutes),
+                          )
+                        : 1
 
                     return (
                       <div
@@ -3270,6 +3400,7 @@ export default function KassaReservationsView({
                             table={table}
                             statusColor={borderColor}
                             isSelected={isSelected}
+                            statusRingOpacity={statusRingOpacity}
                             guests={floorRes
                               .filter(r => String(r.table_number) === String(table.number))
                               .sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
