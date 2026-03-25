@@ -1112,7 +1112,15 @@ function IndustrySection() {
         '/images/kassa-platform-6.png',
       ],
     },
-    analytics: { images: ['/images/industry-analytics.png'] },
+    analytics: {
+      images: [
+        '/images/business-analytics-1.png',
+        '/images/business-analytics-2.png',
+        '/images/business-analytics-3.png',
+        '/images/business-analytics-4.png',
+        '/images/business-analytics-5.png',
+      ],
+    },
     accounting: { images: ['/images/cost-calculator-1.png'] },
     payroll: { images: ['/images/industry-payroll.png'] },
     whatsapp: { images: [
