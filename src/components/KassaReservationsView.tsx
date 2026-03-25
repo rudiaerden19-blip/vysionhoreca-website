@@ -956,17 +956,22 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests, statusRin
         {seats}p
       </text>
 
-      {/* Gast labels — per rij: volledige naam (voor + achternaam op één regel) + tijd rechts */}
+      {/* Gast labels — per rij: volledige naam + tijd; grotere tekst voor tablet / iPad */}
       {guests && guests.length > 0 && (() => {
-        const lineH = 22
-        const padL = 10
-        const padR = 8
-        const gapNameTime = 8
-        const timeW = 118 // "12:30 tot 14u00"
-        const labelW = Math.max(300, Math.round(tw * 1.45))
-        const nameW = Math.max(120, labelW - padL - padR - gapNameTime - timeW)
-        const totalH = guests.length * lineH + 10
+        const nameFont = 17
+        const timeFont = 14
+        const lineH = 34
+        const padTop = 11
+        const padBottom = 11
+        const padL = 12
+        const padR = 10
+        const gapNameTime = 10
+        const timeW = 168 // "12:00 tot 13u30" @ 14px
+        const labelW = Math.max(360, Math.round(tw * 1.6))
+        const nameW = Math.max(140, labelW - padL - padR - gapNameTime - timeW)
+        const totalH = guests.length * lineH + padTop + padBottom
         const startY = cy + (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + gap + chairH + 10
+        const baselineY = (i: number) => startY + padTop + i * lineH + 24
         const oneLineName = (n: string) => n.replace(/\r?\n|\r/g, ' ').replace(/\s+/g, ' ').trim()
         return (
           <>
@@ -975,18 +980,18 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests, statusRin
                 <rect x={cx - labelW / 2 + padL} y={startY} width={nameW} height={totalH} />
               </clipPath>
             </defs>
-            <rect x={cx - labelW / 2} y={startY} width={labelW} height={totalH} rx={10}
+            <rect x={cx - labelW / 2} y={startY} width={labelW} height={totalH} rx={14}
               fill="white" style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.22))' }} />
             {guests.map((g, i) => (
               <g key={i}>
                 <text
-                  x={cx - labelW / 2 + padL} y={startY + 17 + i * lineH}
-                  fill="#111827" fontSize={12} fontWeight="700"
+                  x={cx - labelW / 2 + padL} y={baselineY(i)}
+                  fill="#111827" fontSize={nameFont} fontWeight="700"
                   clipPath={`url(#nameClip-${table.id})`}
                 >
                   {oneLineName(g.name)}
                 </text>
-                <text x={cx + labelW / 2 - padR} y={startY + 17 + i * lineH} textAnchor="end" fill="#6b7280" fontSize={10}>
+                <text x={cx + labelW / 2 - padR} y={baselineY(i)} textAnchor="end" fill="#6b7280" fontSize={timeFont} fontWeight="500">
                   {g.time}
                 </text>
               </g>
