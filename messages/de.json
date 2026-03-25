@@ -114,7 +114,7 @@
     "businesses": "Aktive Gastronomiebetriebe",
     "uptime": "Verfügbarkeitsgarantie",
     "support": "Support verfügbar",
-    "award": "🏆 Bereits zur schnellsten und besten Online-Bestellplattform 2025/2026 gekürt",
+    "award": "🏆 Inzwischen bereits zur schnellsten und zuverlässigsten Plattform 2025/2026 gekürt",
     "award_sub": "Für Frittenbuden · Sandwichläden · Pizzerien · Kebabbuden und alle Unternehmen, die online verkaufen"
   },
   "orderApp": {
@@ -155,6 +155,7 @@
     "feature": "Funktion",
     "cta": "Starten Sie heute mit Vysion Horeca",
     "features": {
+      "kassaLicensePro": "Kassenlizenz Pro",
       "online": "Online-Bestellplattform",
       "website": "Eigene Website (vollständig anpassbar)",
       "terminal": "Zahlungsterminal-Integration",
@@ -387,12 +388,12 @@
         "we": "Wir bauen Ihre Bestellplattform"
       },
       "2": {
-        "you": "Sie wählen die Farben",
-        "we": "Wir bauen Ihre Website"
+        "you": "Sie geben uns Ihre Fotos und Daten",
+        "we": "Wir bauen Ihre komplette Kasse"
       },
       "3": {
-        "you": "Sie geben uns Ihre Fotos",
-        "we": "Wir platzieren sie auf Ihrer Seite"
+        "you": "Sie wählen die Farben",
+        "we": "Wir bauen Ihre Website"
       },
       "4": {
         "you": "Sie haben bereits eine Website?",

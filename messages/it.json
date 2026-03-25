@@ -114,7 +114,7 @@
     "businesses": "Attività attive",
     "uptime": "Garanzia uptime",
     "support": "Supporto disponibile",
-    "award": "🏆 Già premiata come la piattaforma di ordinazione online più veloce e migliore del 2025/2026",
+    "award": "🏆 Già riconosciuta come la piattaforma più veloce e affidabile del 2025/2026",
     "award_sub": "Per friggitorie · rosticcerie · pizzerie · kebab e tutte le aziende che vendono online"
   },
   "orderApp": {
@@ -155,6 +155,7 @@
     "feature": "Funzionalità",
     "cta": "Inizia oggi con Vysion Horeca",
     "features": {
+      "kassaLicensePro": "Licenza cassa Pro",
       "online": "Piattaforma ordini online",
       "website": "Sito web proprio (completamente personalizzabile)",
       "terminal": "Integrazione terminale pagamento",
@@ -387,12 +388,12 @@
         "we": "Costruiamo la tua piattaforma ordini"
       },
       "2": {
-        "you": "Scegli i colori",
-        "we": "Costruiamo il tuo sito web"
+        "you": "Ci dai le tue foto e i dati",
+        "we": "Costruiamo il tuo registratore di cassa completo"
       },
       "3": {
-        "you": "Ci dai le tue foto",
-        "we": "Le inseriamo nel tuo sito"
+        "you": "Scegli i colori",
+        "we": "Costruiamo il tuo sito web"
       },
       "4": {
         "you": "Hai già un sito web?",

@@ -114,7 +114,7 @@
     "businesses": "Negocios activos",
     "uptime": "Garantía de uptime",
     "support": "Soporte disponible",
-    "award": "🏆 Ya elegida la plataforma de pedidos online más rápida y mejor de 2025/2026",
+    "award": "🏆 Ya reconocida como la plataforma más rápida y fiable de 2025/2026",
     "award_sub": "Para freidurías · bocadillerías · pizzerías · kebabs y todas las empresas que venden online"
   },
   "orderApp": {
@@ -155,6 +155,7 @@
     "feature": "Función",
     "cta": "Empieza hoy con Vysion Horeca",
     "features": {
+      "kassaLicensePro": "Licencia de caja registradora Pro",
       "online": "Plataforma de pedidos online",
       "website": "Sitio web propio (totalmente personalizable)",
       "terminal": "Integración terminal de pago",
@@ -387,12 +388,12 @@
         "we": "Construimos tu plataforma de pedidos"
       },
       "2": {
-        "you": "Eliges los colores",
-        "we": "Construimos tu sitio web"
+        "you": "Nos das tus fotos y datos",
+        "we": "Construimos tu caja registradora completa"
       },
       "3": {
-        "you": "Nos das tus fotos",
-        "we": "Las colocamos en tu sitio"
+        "you": "Eliges los colores",
+        "we": "Construimos tu sitio web"
       },
       "4": {
         "you": "¿Ya tienes un sitio web?",

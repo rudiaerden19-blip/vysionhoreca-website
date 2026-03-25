@@ -115,7 +115,7 @@
     "businesses": "Actieve horecazaken",
     "uptime": "Uptime garantie",
     "support": "Support beschikbaar",
-    "award": "🏆 Ondertussen al uitgeroepen tot snelste en beste online bestelplatform van 2025/2026",
+    "award": "🏆 Ondertussen al uitgeroepen tot het snelst en meest betrouwbare platform van 2025/2026",
     "award_sub": "Voor frituren · broodjeszaken · pizzeria's · kebabzaken en alle bedrijven die online verkopen"
   },
   "orderApp": {
@@ -156,6 +156,7 @@
     "feature": "Functie",
     "cta": "Start vandaag met Vysion Horeca",
     "features": {
+      "kassaLicensePro": "Kassa licentie Pro",
       "online": "Online bestelplatform",
       "website": "Eigen website (volledig aanpasbaar)",
       "terminal": "Betaalterminal integratie",
@@ -388,19 +389,19 @@
         "we": "Wij bouwen je bestelplatform"
       },
       "2": {
-        "you": "Jij bepaalt de kleuren",
-        "we": "Wij bouwen je website"
+        "you": "Jij geeft ons je foto's en gegevens",
+        "we": "Wij bouwen je gehele kassa"
       },
       "3": {
-        "you": "Jij geeft ons je foto's",
-        "we": "Wij plaatsen ze in je site"
+        "you": "Jij bepaalt de kleuren",
+        "we": "Wij bouwen je website"
       },
       "4": {
         "you": "Jij hebt al een website?",
         "we": "Wij integreren de bestelknop"
       }
     },
-    "customBuildNote": "* Je kan natuurlijk ook kiezen voor je platform op jou tempo te bouwen",
+    "customBuildNote": "* Je kan natuurlijk ook kiezen voor je platform op jouw tempo te bouwen",
     "freeTitle": "Dit doen we GRATIS",
     "freeItems": {
       "1": "Gratis opstart",

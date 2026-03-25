@@ -993,15 +993,24 @@ function ButWaitSection() {
 function ComparisonSection() {
   const { t, locale } = useLanguage()
   
-  const featureKeys = ['online', 'website', 'terminal', 'kitchen', 'allergies', 'qr', 'promotions', 'reservation', 'inventory', 'seo', 'loyalty', 'staff', 'costCalculator', 'analytics', 'reviews', 'labels', 'groupOrders', 'languages', 'whatsapp', 'commission']
+  const featureKeys = ['kassaLicensePro', 'online', 'website', 'terminal', 'kitchen', 'allergies', 'qr', 'promotions', 'reservation', 'inventory', 'seo', 'loyalty', 'staff', 'costCalculator', 'analytics', 'reviews', 'labels', 'groupOrders', 'languages', 'whatsapp', 'commission']
   
-  const features = featureKeys.map(key => ({
-    name: t(`comparison.features.${key}`),
-    vysion: true,
-    lightspeed: ['terminal', 'kitchen', 'loyalty', 'staff', 'reservation', 'inventory'].includes(key) ? true : key === 'analytics' ? t('comparison.limited') : false,
-    square: ['terminal', 'kitchen', 'loyalty', 'inventory'].includes(key),
-    strobbo: ['online', 'terminal', 'kitchen'].includes(key),
-  }))
+  const features = featureKeys.map(key => {
+    const allGreen = key === 'kassaLicensePro'
+    return {
+      name: t(`comparison.features.${key}`),
+      vysion: true,
+      lightspeed: allGreen
+        ? true
+        : ['terminal', 'kitchen', 'loyalty', 'staff', 'reservation', 'inventory'].includes(key)
+          ? true
+          : key === 'analytics'
+            ? t('comparison.limited')
+            : false,
+      square: allGreen ? true : ['terminal', 'kitchen', 'loyalty', 'inventory'].includes(key),
+      strobbo: allGreen ? true : ['online', 'terminal', 'kitchen'].includes(key),
+    }
+  })
 
   const renderCheck = (value: boolean | string) => {
     if (value === true) {

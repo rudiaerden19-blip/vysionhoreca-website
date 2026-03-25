@@ -114,7 +114,7 @@
     "businesses": "Établissements actifs",
     "uptime": "Garantie de disponibilité",
     "support": "Support disponible",
-    "award": "🏆 Déjà désigné plateforme de commande en ligne la plus rapide et la meilleure de 2025/2026",
+    "award": "🏆 Déjà élue plateforme la plus rapide et la plus fiable de 2025/2026",
     "award_sub": "Pour friteries · sandwicheries · pizzerias · kebabs et toutes les entreprises qui vendent en ligne"
   },
   "orderApp": {
@@ -155,6 +155,7 @@
     "feature": "Fonctionnalité",
     "cta": "Commencez avec Vysion Horeca aujourd'hui",
     "features": {
+      "kassaLicensePro": "Licence caisse Pro",
       "online": "Plateforme de commande en ligne",
       "website": "Propre site web (entièrement personnalisable)",
       "terminal": "Intégration terminal de paiement",
@@ -387,12 +388,12 @@
         "we": "Nous construisons votre plateforme de commande"
       },
       "2": {
-        "you": "Vous choisissez les couleurs",
-        "we": "Nous construisons votre site web"
+        "you": "Vous nous donnez vos photos et informations",
+        "we": "Nous construisons votre caisse complète"
       },
       "3": {
-        "you": "Vous nous donnez vos photos",
-        "we": "Nous les plaçons sur votre site"
+        "you": "Vous choisissez les couleurs",
+        "we": "Nous construisons votre site web"
       },
       "4": {
         "you": "Vous avez déjà un site web?",

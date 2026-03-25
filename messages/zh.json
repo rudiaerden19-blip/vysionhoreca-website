@@ -114,7 +114,7 @@
     "businesses": "活跃商户",
     "uptime": "正常运行保证",
     "support": "可用支持",
-    "award": "🏆 已被评为2025/2026年最快、最佳在线订购平台",
+    "award": "🏆 已被评为2025/2026年度最快、最可靠的平台",
     "award_sub": "适用于炸薯条店·三明治店·披萨店·烤肉店及所有在线销售的企业"
   },
   "orderApp": {
@@ -155,6 +155,7 @@
     "feature": "功能",
     "cta": "今天就开始使用Vysion Horeca",
     "features": {
+      "kassaLicensePro": "收银系统专业版授权",
       "online": "在线订单平台",
       "website": "自有网站（完全可定制）",
       "terminal": "支付终端集成",
@@ -387,12 +388,12 @@
         "we": "我们构建您的订单平台"
       },
       "2": {
-        "you": "您选择颜色",
-        "we": "我们构建您的网站"
+        "you": "您提供照片和资料",
+        "we": "我们搭建您的完整收银系统"
       },
       "3": {
-        "you": "您提供照片",
-        "we": "我们放置到您的网站"
+        "you": "您选择颜色",
+        "we": "我们构建您的网站"
       },
       "4": {
         "you": "您已经有网站了？",
@@ -408,7 +409,7 @@
       "5": "无隐藏费用"
     },
     "cta": "立即免费开始",
-    "customBuildNote": "* Je kan natuurlijk ook kiezen voor je platform op jou tempo te bouwen"
+    "customBuildNote": "* 您也可以选择按自己的节奏搭建平台"
   },
   "cookies": {
     "message": "我们使用cookies来改善您的体验。继续即表示您同意我们的",
