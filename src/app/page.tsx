@@ -16,7 +16,7 @@ function WhyVysionSection() {
         aria-hidden
       />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-20 items-start">
           <div className="lg:col-span-5 order-2 lg:order-1">
             <h2 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-[1.15] mb-12 sm:mb-16 text-center lg:text-left max-w-xl lg:mx-0 mx-auto">
               {t('whyVysion.title')}
@@ -43,21 +43,21 @@ function WhyVysionSection() {
             </ul>
           </div>
 
-          <div className="lg:col-span-7 order-1 lg:order-2">
-            <div className="relative mx-auto max-w-2xl lg:max-w-none">
+          <div className="lg:col-span-7 order-1 lg:order-2 flex justify-center lg:justify-end">
+            <div className="relative w-full max-w-[210px] sm:max-w-[240px] lg:max-w-[230px] xl:max-w-[250px]">
               <div
-                className="absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-accent/20 via-accent/5 to-transparent opacity-80 blur-sm sm:-inset-4"
+                className="absolute -inset-2 rounded-2xl bg-gradient-to-br from-accent/20 via-accent/5 to-transparent opacity-80 blur-sm"
                 aria-hidden
               />
-              <figure className="relative rounded-2xl sm:rounded-3xl bg-gray-900/5 p-2 sm:p-3 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] ring-1 ring-black/[0.06]">
-                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#f5f0e8]">
+              <figure className="relative rounded-2xl bg-gray-900/5 p-1.5 sm:p-2 shadow-lg ring-1 ring-black/[0.06]">
+                <div className="relative overflow-hidden rounded-xl bg-[#f5f0e8]">
                   <Image
                     src="/images/why-vysion-pos-mockup.png"
                     alt=""
                     width={819}
                     height={1024}
-                    className="w-full h-auto object-contain"
-                    sizes="(min-width: 1024px) 42vw, 92vw"
+                    className="w-full h-auto max-h-[260px] sm:max-h-[280px] lg:max-h-[270px] xl:max-h-[290px] object-contain mx-auto"
+                    sizes="(min-width: 1280px) 250px, (min-width: 1024px) 230px, 90vw"
                     priority={false}
                   />
                 </div>
