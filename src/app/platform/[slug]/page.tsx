@@ -124,12 +124,14 @@ export default function PlatformDetailPage() {
             slug === 'bestelplatform' || slug === 'kassasysteem' ? 'max-w-4xl pt-10' : 'max-w-3xl pt-28'
           }`}
         >
-          <Link
-            href="/#platform"
-            className="inline-block text-accent font-semibold text-sm mb-8 hover:underline"
-          >
-            ← {t('platform.detailBack')}
-          </Link>
+          {slug !== 'kassasysteem' && (
+            <Link
+              href="/#platform"
+              className="inline-block text-accent font-semibold text-sm mb-8 hover:underline"
+            >
+              ← {t('platform.detailBack')}
+            </Link>
+          )}
           {slug !== 'kassasysteem' && slug !== 'bestelplatform' && (
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">{t(`${prefix}.title`)}</h1>
           )}
