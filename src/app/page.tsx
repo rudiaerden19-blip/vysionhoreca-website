@@ -1,192 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Navigation, Footer, CookieBanner } from '@/components'
+import { Navigation, Footer, CookieBanner, HomeLandingHero } from '@/components'
 import { useLanguage } from '@/i18n'
-
-// Hero Section
-function HeroSection() {
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const { t, locale } = useLanguage()
-  
-  const allImages = [
-    '/images/screen-1.png',
-    '/images/screen-2.png',
-    '/images/screen-3.png',
-    '/images/screen-4.png',
-    '/images/screen-5.png',
-    '/images/screen-6.png',
-    '/images/screen-7.png',
-    '/images/screen-8.png',
-    '/images/screen-9.png',
-    '/images/screen-10.png',
-    '/images/screen-11.png',
-    '/images/screen-12.png',
-    '/images/screen-13.png',
-    '/images/screen-14.png',
-    '/images/screen-15.png',
-    '/images/screen-16.png',
-    '/images/screen-17.png',
-    '/images/screen-18.png',
-    '/images/screen-19.png',
-  ]
-
-  const sliderImages = allImages.slice(1) // All except the first one (iPad screen)
-
-  const goToPrev = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (lightboxIndex !== null) {
-      setLightboxIndex(lightboxIndex === 0 ? allImages.length - 1 : lightboxIndex - 1)
-    }
-  }
-
-  const goToNext = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (lightboxIndex !== null) {
-      setLightboxIndex(lightboxIndex === allImages.length - 1 ? 0 : lightboxIndex + 1)
-    }
-  }
-  
-  return (
-    <section className="bg-[#e3e3e3] min-h-screen flex items-center pt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        {/* Badges centered under navbar */}
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-8 lg:gap-16 mb-12 -mt-8">
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span className="text-accent font-bold text-xs sm:text-sm uppercase">{t('hero.badge1')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span className="text-accent font-bold text-xs sm:text-sm uppercase">{t('hero.badge2')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span className="text-accent font-bold text-xs sm:text-sm uppercase">{t('hero.badge3')}</span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-center">
-          {/* Left content */}
-          <div className="opacity-0 animate-fadeInUp text-center lg:text-left">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-6">
-              {t('hero.title')}
-            </h1>
-            <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
-              {t('hero.description')}
-            </p>
-            <div className="bg-white rounded-2xl p-6 mb-6 max-w-lg mx-auto lg:mx-0 text-left">
-              <p className="text-base text-gray-800 font-semibold mb-4">
-                {t('hero.extras')}
-              </p>
-              <ul className="space-y-2 text-gray-600">
-                {String(t('hero.extrasList')).split('\n').map((item, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-accent font-bold">✓</span>
-                    <span>{item.replace('• ', '')}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <p className="text-lg font-bold text-accent mb-8 max-w-lg mx-auto lg:mx-0">
-              {t('hero.tagline')}
-            </p>
-            <div className="flex justify-center lg:justify-start">
-              <a href={`/registreer?lang=${locale}`} className="btn-primary text-center">
-                {t('hero.ctaPrimary')}
-              </a>
-            </div>
-            <p className="text-gray-500 mt-4 text-sm text-center lg:text-left">
-              {t('hero.trialInfo')}
-            </p>
-          </div>
-
-          {/* Right content - POS Monitor with Phone overlay */}
-          <div className="opacity-0 animate-fadeInUp delay-200">
-            <div className="flex flex-col items-center">
-              {/* POS Monitor with Phone */}
-              <div className="flex flex-col items-center">
-                <div className="relative w-full max-w-[280px] sm:max-w-[320px] md:max-w-[380px] lg:max-w-[440px]">
-                  {/* POS Monitor */}
-                  <img 
-                    src="/images/pos-monitor.jpg" 
-                    alt="Vysion Horeca POS Systeem" 
-                    className="w-full rounded-lg shadow-xl"
-                    loading="eager"
-                  />
-                  {/* Phone mockup overlay - left corner, more to the left */}
-                  <img 
-                    src="/images/phone-mockup.png" 
-                    alt="Vysion Horeca Mobiele App" 
-                    className="absolute -left-12 sm:-left-16 md:-left-20 bottom-0 w-[120px] sm:w-[150px] md:w-[180px] drop-shadow-2xl"
-                    loading="eager"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Lightbox with navigation */}
-          {lightboxIndex !== null && (
-            <div 
-              className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
-              onClick={() => setLightboxIndex(null)}
-            >
-              {/* Left Arrow */}
-              <button 
-                className="absolute left-4 sm:left-8 text-white text-5xl hover:text-accent transition-colors p-4"
-                onClick={goToPrev}
-                aria-label="Vorige afbeelding"
-              >
-                <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-
-              <img 
-                src={allImages[lightboxIndex]} 
-                alt="Vergrote afbeelding" 
-                className="max-w-full max-h-full object-contain"
-                onClick={(e) => e.stopPropagation()}
-              />
-
-              {/* Right Arrow */}
-              <button 
-                className="absolute right-4 sm:right-8 text-white text-5xl hover:text-accent transition-colors p-4"
-                onClick={goToNext}
-                aria-label="Volgende afbeelding"
-              >
-                <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-
-              {/* Close button */}
-              <button 
-                className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
-                onClick={() => setLightboxIndex(null)}
-                aria-label="Sluiten"
-              >
-                ×
-              </button>
-
-              {/* Image counter */}
-              <div className="absolute bottom-4 text-white text-sm">
-                {lightboxIndex + 1} / {allImages.length}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
-  )
-}
 
 // One Day Online Section
 function OneDayOnlineSection() {
@@ -1184,7 +1000,7 @@ function IndustrySection() {
   }, [activeTab])
 
   return (
-    <section className="py-24 bg-[#e3e3e3]">
+    <section id="sectoren" className="py-24 bg-[#e3e3e3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Title */}
         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12">
@@ -1790,10 +1606,12 @@ function ContactSection() {
 
 // Main Page Component
 export default function HomePage() {
+  const [stickyNav, setStickyNav] = useState(false)
+
   return (
     <main>
-      <Navigation />
-      <HeroSection />
+      {stickyNav && <Navigation />}
+      <HomeLandingHero onStickyNavChange={setStickyNav} />
       <OneDayOnlineSection />
       <FeaturesSection />
       <IndustrySection />

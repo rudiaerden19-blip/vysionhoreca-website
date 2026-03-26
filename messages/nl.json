@@ -13,7 +13,18 @@
     "resellers": "Resellers",
     "login": "Inloggen",
     "tryFree": "Gratis proberen",
-    "language": "Taal"
+    "language": "Taal",
+    "sectors": "Sectoren",
+    "services": "Onze diensten",
+    "integrations": "Integraties"
+  },
+  "heroLanding": {
+    "logoTagline": "Jouw horeca platform",
+    "title": "Het slimste horeca platform van België",
+    "subtitle": "Vysion helpt horecazaken slimmer en efficiënter te werken. Eén platform — alles bij de hand.",
+    "ctaReseller": "Word reseller",
+    "ctaTrial": "Start gratis proefperiode",
+    "demoRequest": "Demo aanvraag"
   },
   "hero": {
     "badge1": "1 Platform",

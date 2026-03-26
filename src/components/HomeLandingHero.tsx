@@ -1,0 +1,231 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import { useLanguage, Locale } from '@/i18n'
+
+type Props = {
+  onStickyNavChange?: (show: boolean) => void
+}
+
+const HERO_BG = '/images/hero-header.png'
+
+export default function HomeLandingHero({ onStickyNavChange }: Props) {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isLangOpen, setIsLangOpen] = useState(false)
+  const langRef = useRef<HTMLDivElement>(null)
+  const { locale, setLocale, t, locales, localeNames, localeFlags } = useLanguage()
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (langRef.current && !langRef.current.contains(event.target as Node)) {
+        setIsLangOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  useEffect(() => {
+    const hero = sectionRef.current
+    if (!hero || !onStickyNavChange) return
+
+    const onScroll = () => {
+      const rect = hero.getBoundingClientRect()
+      onStickyNavChange(rect.bottom < 72)
+    }
+
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [onStickyNavChange])
+
+  const handleLanguageSelect = (langCode: Locale) => {
+    setLocale(langCode)
+    setIsLangOpen(false)
+  }
+
+  const pillLinks: { href: string; label: string }[] = [
+    { href: '/', label: t('nav.home') },
+    { href: '/#sectoren', label: t('nav.sectors') },
+    { href: '/#functies', label: t('nav.services') },
+    { href: '/support', label: t('nav.integrations') },
+    { href: '/#contact', label: t('nav.contact') },
+  ]
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative min-h-[100svh] flex flex-col text-white overflow-hidden"
+    >
+      <div className="absolute inset-0">
+        <Image
+          src={HERO_BG}
+          alt=""
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-black/60" aria-hidden />
+      </div>
+
+      {/* Top bar */}
+      <header className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+        <div className="flex items-start justify-between gap-4">
+          <a href="/" className="group shrink-0">
+            <span className="block text-3xl sm:text-4xl font-extrabold tracking-tight text-blue-400 lowercase">
+              vysion
+            </span>
+            <span className="block text-sm sm:text-base text-white font-medium mt-0.5">
+              {t('heroLanding.logoTagline')}
+            </span>
+          </a>
+
+          {/* Desktop: pill nav */}
+          <nav
+            className="hidden lg:flex absolute left-1/2 -translate-x-1/2 top-6 xl:top-8 items-center gap-1 bg-white/95 rounded-full px-2 py-1.5 shadow-lg"
+            aria-label="Main"
+          >
+            {pillLinks.map(({ href, label }) => (
+              <a
+                key={href + label}
+                href={href}
+                className="px-3 xl:px-4 py-2 text-sm font-medium text-gray-900 rounded-full hover:bg-gray-100 transition-colors whitespace-nowrap"
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto lg:ml-0">
+            <a
+              href="/#contact"
+              className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-md transition-colors"
+            >
+              {t('heroLanding.demoRequest')}
+            </a>
+
+            <div className="relative hidden md:block" ref={langRef}>
+              <button
+                type="button"
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="flex items-center gap-1.5 text-white hover:text-white/90 px-2 py-2 rounded-lg hover:bg-white/10 transition-colors"
+                aria-expanded={isLangOpen}
+              >
+                <span className="text-lg">{localeFlags[locale]}</span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {isLangOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-gray-900 rounded-xl shadow-2xl border border-gray-700 py-2 z-50">
+                  {locales.map((langCode) => (
+                    <button
+                      key={langCode}
+                      type="button"
+                      onClick={() => handleLanguageSelect(langCode)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors ${
+                        locale === langCode ? 'text-accent' : 'text-white'
+                      }`}
+                    >
+                      <span className="text-xl">{localeFlags[langCode]}</span>
+                      <span>{localeNames[langCode]}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className="lg:hidden text-white p-2 rounded-lg hover:bg-white/10"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Menu"
+            >
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {isMenuOpen && (
+          <div className="lg:hidden mt-4 rounded-2xl bg-black/50 backdrop-blur-md border border-white/20 p-4 space-y-1">
+            {pillLinks.map(({ href, label }) => (
+              <a
+                key={href + label}
+                href={href}
+                className="block py-3 px-3 rounded-lg text-white font-medium hover:bg-white/10"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {label}
+              </a>
+            ))}
+            <a
+              href="/#contact"
+              className="block mt-2 text-center rounded-full bg-accent text-white font-semibold py-3"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {t('heroLanding.demoRequest')}
+            </a>
+            <div className="border-t border-white/20 pt-3 mt-3">
+              <p className="text-white/70 text-xs mb-2">{t('nav.language')}</p>
+              <div className="grid grid-cols-3 gap-2">
+                {locales.map((langCode) => (
+                  <button
+                    key={langCode}
+                    type="button"
+                    onClick={() => {
+                      handleLanguageSelect(langCode)
+                      setIsMenuOpen(false)
+                    }}
+        className={`py-2 rounded-lg text-sm ${
+          locale === langCode ? 'bg-accent text-white' : 'bg-white/10 text-white'
+        }`}
+                  >
+                    {localeFlags[langCode]} {langCode.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Center content */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 text-center pb-16 sm:pb-20 pt-8 sm:pt-12">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] font-bold leading-tight max-w-4xl">
+          {t('heroLanding.title')}
+        </h1>
+        <p className="mt-6 text-base sm:text-lg md:text-xl text-white/90 max-w-2xl font-normal leading-relaxed">
+          {t('heroLanding.subtitle')}
+        </p>
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+          <a
+            href="/resellers"
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors underline decoration-white/40 underline-offset-4"
+          >
+            {t('heroLanding.ctaReseller')}
+          </a>
+          <a
+            href={`/registreer?lang=${locale}`}
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-teal-500 hover:bg-teal-600 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors underline decoration-white/40 underline-offset-4"
+          >
+            {t('heroLanding.ctaTrial')}
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}

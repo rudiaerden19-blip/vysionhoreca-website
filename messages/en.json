@@ -13,7 +13,18 @@
     "resellers": "Resellers",
     "login": "Login",
     "tryFree": "Try Free",
-    "language": "Language"
+    "language": "Language",
+    "sectors": "Sectors",
+    "services": "Our services",
+    "integrations": "Integrations"
+  },
+  "heroLanding": {
+    "logoTagline": "Your hospitality platform",
+    "title": "Belgium's smartest hospitality platform",
+    "subtitle": "Vysion helps hospitality businesses work smarter and more efficiently. One platform — everything at your fingertips.",
+    "ctaReseller": "Become a reseller",
+    "ctaTrial": "Start free trial",
+    "demoRequest": "Request a demo"
   },
   "hero": {
     "badge1": "1 Platform",
@@ -212,17 +223,18 @@
       "name": "Vysion Premium",
       "allOfStarter": "Everything from Starter, plus:",
       "features": {
-        "1": "SEO visibility",
-        "2": "Customer card & loyalty",
-        "3": "Staff & payroll administration",
-        "4": "Full cost calculator",
-        "5": "Full business analysis",
-        "6": "Reviews",
-        "7": "Full cost calculation per product",
-        "8": "Your own reservation platform",
-        "9": "Voice ordering for customers",
-        "10": "Label/sticker printer per product",
-        "11": "Group orders (companies & schools)"
+        "1": "POS license included",
+        "2": "SEO visibility",
+        "3": "Customer card & loyalty",
+        "4": "Staff & payroll administration",
+        "5": "Full cost calculator",
+        "6": "Full business analysis",
+        "7": "Reviews",
+        "8": "Full cost calculation per product",
+        "9": "Your own reservation platform",
+        "10": "Voice ordering for customers",
+        "11": "Label/sticker printer per product",
+        "12": "Group orders (businesses & schools)"
       }
     },
     "faq": {
@@ -1846,7 +1858,8 @@
       "gksReports": "GKS REPORTS",
       "orders": "ORDERS",
       "statistics": "STATISTICS",
-      "groupOrders": "GROUP ORDERS"
+      "groupOrders": "GROUP ORDERS",
+      "bonnenprinter": "RECEIPT PRINTER"
     },
     "menu": {
       "dashboard": "Dashboard",
@@ -1893,7 +1906,8 @@
       "groupSessions": "Order Sessions",
       "groupOrdersOverview": "Group Orders",
       "labelPrinter": "Label Printer",
-      "onlineShopToggle": "Online shop on/off"
+      "onlineShopToggle": "Online shop on/off",
+      "bonnenprinter": "Receipt printer"
     },
     "viewWebsite": "View your shop",
     "display": "Display",
@@ -3492,6 +3506,11 @@
     "viewMenu": "View Menu",
     "scanToSeeMenu": "Scan to see our menu",
     "promotions": "Promotions",
+    "currentOffers": "See our current offers",
+    "minOrder": "Minimum order",
+    "free": "Free",
+    "orderNow": "Order now",
+    "close": "Close",
     "scanToSeeOffers": "Scan to see our offers",
     "giveReview": "Leave Review",
     "scanToReview": "Scan to leave a review",

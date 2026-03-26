@@ -10,9 +10,21 @@
     "about": "Über uns",
     "contact": "Kontakt",
     "support": "Support",
+    "resellers": "Reseller",
     "login": "Anmelden",
     "tryFree": "Kostenlos testen",
-    "language": "Sprache"
+    "language": "Sprache",
+    "sectors": "Branchen",
+    "services": "Unsere Leistungen",
+    "integrations": "Integrationen"
+  },
+  "heroLanding": {
+    "logoTagline": "Ihre Gastronomie-Plattform",
+    "title": "Die intelligenteste Gastronomie-Plattform in Belgien",
+    "subtitle": "Vysion hilft Gastronomiebetrieben, smarter und effizienter zu arbeiten. Eine Plattform – alles griffbereit.",
+    "ctaReseller": "Reseller werden",
+    "ctaTrial": "Kostenlos testen",
+    "demoRequest": "Demo anfragen"
   },
   "hero": {
     "badge1": "1 Plattform",
@@ -168,6 +180,7 @@
       "seo": "SEO-Sichtbarkeit",
       "loyalty": "Kundenkarte & Treue",
       "staff": "Personal & Lohnverwaltung",
+      "costCalculator": "Kostenrechner pro Produkt",
       "accounting": "SCRADA Buchhaltungssoftware",
       "peppol": "Peppol-Rechnungsstellung",
       "analytics": "Vollständige Geschäftsanalyse",
@@ -212,17 +225,18 @@
       "name": "Vysion Premium",
       "allOfStarter": "Alles von Starter, plus:",
       "features": {
-        "1": "SEO-Sichtbarkeit",
-        "2": "Kundenkarte & Treue",
-        "3": "Personal & Lohnverwaltung",
-        "4": "SCRADA & Peppol Buchhaltung",
-        "5": "Vollständige Geschäftsanalyse",
-        "6": "Bewertungen",
-        "7": "Vollständige Kostenberechnung pro Produkt",
-        "8": "Eigene Reservierungsplattform",
-        "9": "Sprachbestellung für Kunden",
-        "10": "Etiketten-/Aufkleberdrucker pro Produkt",
-        "11": "Gruppenbestellungen (Firmen & Schulen)"
+        "1": "Kassenlizenz inbegriffen",
+        "2": "SEO-Sichtbarkeit",
+        "3": "Kundenkarte & Treue",
+        "4": "Personal & Lohnverwaltung",
+        "5": "Vollständiger Kostenrechner",
+        "6": "Vollständige Geschäftsanalyse",
+        "7": "Bewertungen",
+        "8": "Vollständige Kostenberechnung pro Produkt",
+        "9": "Eigene Reservierungsplattform",
+        "10": "Sprachbestellung für Kunden",
+        "11": "Etiketten-/Aufkleberdrucker pro Produkt",
+        "12": "Gruppenbestellungen (Firmen & Schulen)"
       }
     },
     "faq": {
@@ -409,7 +423,7 @@
       "5": "Keine versteckten Kosten"
     },
     "cta": "Jetzt kostenlos starten",
-    "customBuildNote": "* Je kan natuurlijk ook kiezen voor je platform op jou tempo te bouwen"
+    "customBuildNote": "* Sie können Ihre Plattform auch in Ihrem eigenen Tempo aufbauen"
   },
   "cookies": {
     "message": "Wir verwenden Cookies, um Ihre Erfahrung zu verbessern. Durch Fortfahren stimmen Sie unserer",
@@ -554,6 +568,7 @@
       "settings": "Einstellungen",
       "accounting": "Buchhaltung",
       "invoices": "Rechnungen",
+      "costCalculator": "Kostenrechner",
       "scarda": "SCARDa & Peppol",
       "businessAnalysis": "Unternehmensanalyse",
       "account": "Konto"
@@ -565,175 +580,175 @@
       "noOrders": "Keine Bestellungen gefunden",
       "status": {
         "pending": "In Bearbeitung",
-        "completed": "Voltooid",
+        "completed": "Abgeschlossen",
         "cancelled": "Storniert"
       }
     },
     "customers": {
-      "title": "Klanten",
-      "noCustomers": "Geen klanten gevonden"
+      "title": "Kunden",
+      "noCustomers": "Keine Kunden gefunden"
     },
     "products": {
-      "title": "Producten",
+      "title": "Produkte",
       "noProducts": "Keine Produkte gefunden"
     },
     "reports": {
-      "title": "Rapporten"
+      "title": "Berichte"
     },
     "analytics": {
-      "title": "Analyse"
+      "title": "Analysen"
     },
     "settings": {
       "title": "Einstellungen"
     },
     "productCosts": {
-      "title": "Product Kostprijs Analyse",
-      "subtitle": "Alle producten uit je menu - klik om ingrediënten toe te voegen en je marge te berekenen",
-      "products": "Producten",
-      "configured": "Geconfigureerd",
-      "good": "Goed",
-      "tooLow": "Te laag",
-      "tooHigh": "Te hoog",
-      "searchProduct": "Zoek product...",
-      "ingredients": "ingrediënten",
-      "costPrice": "Kostprijs",
-      "advisedPrice": "Adviesprijs",
-      "sellingPrice": "Verkoopprijs",
-      "raise": "Verhoog",
+      "title": "Produktkostenanalyse",
+      "subtitle": "Alle Produkte aus Ihrer Speisekarte – klicken Sie, um Zutaten hinzuzufügen und Ihre Marge zu berechnen",
+      "products": "Produkte",
+      "configured": "Konfiguriert",
+      "good": "Gut",
+      "tooLow": "Zu niedrig",
+      "tooHigh": "Zu hoch",
+      "searchProduct": "Produkt suchen...",
+      "ingredients": "Zutaten",
+      "costPrice": "Einkaufspreis",
+      "advisedPrice": "Empfohlener Preis",
+      "sellingPrice": "Verkaufspreis",
+      "raise": "Erhöhen",
       "high": "Hoch",
-      "ingredientsInProduct": "Ingrediënten in dit product:",
-      "resetIngredients": "Reset ingrediënten",
-      "confirmReset": "Alle ingrediënten van dit product verwijderen? (Het product zelf blijft bestaan in je winkel)",
-      "ingredient": "Ingrediënt",
-      "quantity": "Anzahl",
-      "pricePerUnit": "Prijs/stuk",
+      "ingredientsInProduct": "Zutaten in diesem Produkt:",
+      "resetIngredients": "Zutaten zurücksetzen",
+      "confirmReset": "Alle Zutaten dieses Produkts entfernen? (Das Produkt selbst bleibt im Shop)",
+      "ingredient": "Zutat",
+      "quantity": "Menge",
+      "pricePerUnit": "Preis/Einheit",
       "total": "Gesamt",
-      "unknown": "Onbekend",
-      "totalCostPrice": "TOTAAL KOSTPRIJS",
-      "noIngredientsYet": "Nog geen ingrediënten toegevoegd",
-      "searchPlaceholder": "Typ om te zoeken (bijv. hamburger, saus, broodje)...",
-      "typeToSearch": "Typ minstens 2 letters om te zoeken",
-      "searchExample": "bijv. \"ham\", \"fri\", \"sau\"",
-      "searching": "Zoeken...",
-      "myIngredients": "Mijn Ingrediënten",
-      "supplierDatabase": "Leveranciers Database",
-      "alreadyAdded": "al toegevoegd",
-      "box": "Doos",
-      "noResults": "Geen resultaten voor",
-      "runSqlFirst": "Voer eerst de SQL uit in Supabase om de database te laden",
-      "advisedPriceMultiplier": "Adviesprijs (×{multiplier})",
-      "yourPrice": "Jouw prijs",
-      "priceTooLow": "Prijs te laag! Verhoog met €{amount} naar €{target}",
-      "highMargin": "Hoge marge: +€{amount} winst",
-      "goodPricing": "Goede prijszetting! Marge: €{amount}",
+      "unknown": "Unbekannt",
+      "totalCostPrice": "GESAMT EINKAUFSPREIS",
+      "noIngredientsYet": "Noch keine Zutaten hinzugefügt",
+      "searchPlaceholder": "Zum Suchen tippen (z. B. Burger, Soße, Brötchen)...",
+      "typeToSearch": "Mindestens 2 Zeichen zum Suchen eingeben",
+      "searchExample": "z. B. \"bur\", \"pom\", \"soß\"",
+      "searching": "Suche...",
+      "myIngredients": "Meine Zutaten",
+      "supplierDatabase": "Lieferanten-Datenbank",
+      "alreadyAdded": "bereits hinzugefügt",
+      "box": "Karton",
+      "noResults": "Keine Ergebnisse für",
+      "runSqlFirst": "Führen Sie zuerst das SQL in Supabase aus, um die Datenbank zu laden",
+      "advisedPriceMultiplier": "Empfohlener Preis (×{multiplier})",
+      "yourPrice": "Ihr Preis",
+      "priceTooLow": "Preis zu niedrig! Erhöhen Sie um €{amount} auf €{target}",
+      "highMargin": "Hohe Marge: +€{amount} Gewinn",
+      "goodPricing": "Gute Preisgestaltung! Marge: €{amount}",
       "noProductsFound": "Keine Produkte gefunden",
-      "addProductsFirst": "Voeg eerst producten toe aan je menu",
-      "noIngredientsWarning": "Du hast noch keine Zutaten hinzugefügt.",
-      "addIngredientsFirst": "Füge zuerst Zutaten hinzu",
+      "addProductsFirst": "Fügen Sie zuerst Produkte zur Speisekarte hinzu",
+      "noIngredientsWarning": "Sie haben noch keine Zutaten hinzugefügt.",
+      "addIngredientsFirst": "Zuerst Zutaten hinzufügen",
       "standardPricesTitle": "Feste Standardpreise",
       "doubleClickToAdd": "Doppelklick zum Hinzufügen zur ausgewählten Kostenberechnung",
-      "openProductFirst": "Öffne zuerst ein Produkt unten, dann doppelklicken zum Hinzufügen",
-      "standardPricesHint": "Diese Festpreise wurden von 150 Frittenbetreibern berechnet. Bei anderen Portionsgrößen kann dies manuell angepasst werden."
+      "openProductFirst": "Öffnen Sie zuerst ein Produkt unten, dann doppelklicken zum Hinzufügen",
+      "standardPricesHint": "Diese Festpreise basieren auf 150 Imbissbetrieben. Bei abweichenden Portionen können Sie manuell anpassen."
     },
     "ingredients": {
-      "title": "Ingrediënten",
-      "subtitle": "Beheer alle ingrediënten met hun inkoopprijzen",
-      "searchDatabase": "Zoek in Database",
-      "excelImport": "Excel Import",
-      "addManually": "Handmatig",
-      "searchIngredient": "Zoek ingrediënt...",
-      "editIngredient": "Ingrediënt bewerken",
-      "addNewIngredient": "Nieuw ingrediënt toevoegen",
+      "title": "Zutaten",
+      "subtitle": "Alle Zutaten mit Einkaufspreisen verwalten",
+      "searchDatabase": "Datenbank durchsuchen",
+      "excelImport": "Excel-Import",
+      "addManually": "Manuell",
+      "searchIngredient": "Zutat suchen...",
+      "editIngredient": "Zutat bearbeiten",
+      "addNewIngredient": "Zutat hinzufügen",
       "name": "Name",
-      "unit": "Eenheid",
-      "category": "Categorie",
-      "pricePerUnit": "Prijs/eenheid",
-      "boxPrice": "Doosprijs",
-      "actions": "Acties",
-      "selectCategory": "-- Selecteer --",
-      "notes": "Notities (optioneel)",
-      "notesPlaceholder": "bijv. Leverancier: Sligro",
-      "save": "Opslaan...",
-      "update": "Bijwerken",
+      "unit": "Einheit",
+      "category": "Kategorie",
+      "pricePerUnit": "Preis/Einheit",
+      "boxPrice": "Kartonpreis",
+      "actions": "Aktionen",
+      "selectCategory": "-- Auswählen --",
+      "notes": "Notizen (optional)",
+      "notesPlaceholder": "z. B. Lieferant: Metro",
+      "save": "Speichern...",
+      "update": "Aktualisieren",
       "add": "Hinzufügen",
       "cancel": "Abbrechen",
-      "confirmDelete": "Weet je zeker dat je dit ingrediënt wilt verwijderen?",
-      "noIngredientsFound": "Geen ingrediënten gevonden",
-      "noIngredientsYet": "Nog geen ingrediënten toegevoegd",
-      "totalIngredients": "ingrediënten in totaal",
-      "productAlreadyExists": "Dit product bestaat al in je ingrediëntenlijst!",
+      "confirmDelete": "Diese Zutat wirklich löschen?",
+      "noIngredientsFound": "Keine Zutaten gefunden",
+      "noIngredientsYet": "Noch keine Zutaten hinzugefügt",
+      "totalIngredients": "Zutaten gesamt",
+      "productAlreadyExists": "Dieses Produkt steht bereits in Ihrer Zutatenliste!",
       "units": {
-        "piece": "Stuk",
-        "kg": "Kilogram (kg)",
-        "gram": "Gram (g)",
+        "piece": "Stück",
+        "kg": "Kilogramm (kg)",
+        "gram": "Gramm (g)",
         "liter": "Liter (L)",
         "ml": "Milliliter (ml)",
-        "portion": "Portie",
-        "slice": "Schijf",
-        "sliceThin": "Plak",
-        "box": "Doos"
+        "portion": "Portion",
+        "slice": "Scheibe",
+        "sliceThin": "Dünne Scheibe",
+        "box": "Karton"
       },
       "pricing": {
-        "option1": "Vul direct de prijs per eenheid in",
-        "or": "OF",
-        "option2": "Vul doosprijs en aantal stuks in (prijs wordt automatisch berekend)",
-        "pricePerUnit": "Prijs per",
-        "boxPackagePrice": "Doos/verpakkingsprijs",
-        "unitsInBox": "Aantal in doos",
-        "calculatedPrice": "Berekende prijs per"
+        "option1": "Preis pro Einheit direkt eingeben",
+        "or": "ODER",
+        "option2": "Kartonpreis und Stückzahl eingeben (Preis wird automatisch berechnet)",
+        "pricePerUnit": "Preis pro",
+        "boxPackagePrice": "Karton-/Verpackungspreis",
+        "unitsInBox": "Stück im Karton",
+        "calculatedPrice": "Berechneter Preis pro"
       },
       "databaseSearch": {
-        "title": "Zoek in Leveranciers Database",
-        "subtitle": "Zoek uit 334 frituurproducten met automatische prijsberekening per stuk",
-        "searchPlaceholder": "Zoek bijv. hamburger, frikandel, saus...",
-        "allCategories": "Alle categorieën",
-        "search": "Zoek",
-        "product": "Product",
-        "category": "Categorie",
-        "box": "Doos",
-        "quantity": "Anzahl",
-        "perUnit": "Per stuk",
-        "action": "Actie",
-        "added": "Toegevoegd",
+        "title": "Lieferanten-Datenbank",
+        "subtitle": "334 Produkte mit automatischer Stückpreisberechnung",
+        "searchPlaceholder": "Suche z. B. Burger, Pommes, Soße...",
+        "allCategories": "Alle Kategorien",
+        "search": "Suchen",
+        "product": "Produkt",
+        "category": "Kategorie",
+        "box": "Karton",
+        "quantity": "Menge",
+        "perUnit": "Pro Stück",
+        "action": "Aktion",
+        "added": "Hinzugefügt",
         "addButton": "Hinzufügen",
-        "noProductsFound": "Geen producten gevonden. Probeer een andere zoekterm.",
-        "typeToSearch": "Typ een zoekterm en klik op zoeken",
-        "searchExample": "bijv. \"hamburger\", \"frikandel\", \"bicky saus\"",
-        "productsFound": "producten gevonden",
+      "noProductsFound": "Keine Produkte. Anderen Suchbegriff versuchen.",
+        "typeToSearch": "Suchbegriff eingeben und suchen",
+        "searchExample": "z. B. \"Burger\", \"Pommes\", \"Soße\"",
+        "productsFound": "Produkte gefunden",
         "close": "Schließen"
       },
       "excelImportModal": {
-        "title": "Van Zon Import",
-        "subtitle": "Kopieer je bestelgeschiedenis van shopvanzon.be en plak het hieronder",
-        "pasteHere": "Plak hier de gekopieerde tekst:",
-        "placeholder": "Kopieer de producten van Van Zon en plak hier...",
-        "preview": "Preview",
-        "productsFound": "producten gevonden",
+        "title": "Lieferanten-Import",
+        "subtitle": "Bestellhistorie kopieren und unten einfügen",
+        "pasteHere": "Text hier einfügen:",
+        "placeholder": "Produkte kopieren und hier einfügen...",
+        "preview": "Vorschau",
+        "productsFound": "Produkte gefunden",
         "articleNr": "Art.Nr",
         "name": "Name",
         "price": "Preis",
-        "pasteToPreview": "Plak tekst om preview te zien",
+        "pasteToPreview": "Text einfügen für Vorschau",
         "cancel": "Abbrechen",
-        "importing": "Importeren...",
-        "importProducts": "producten importeren",
-        "importResult": "producten toegevoegd, {skipped} dubbelen overgeslagen"
+        "importing": "Importieren...",
+        "importProducts": "Produkte importieren",
+        "importResult": "Produkte hinzugefügt, {skipped} Duplikate übersprungen"
       }
     },
     "costSettings": {
-      "title": "Marge Instellingen",
-      "subtitle": "Stel per categorie in welke winstmarge je wilt behalen (multiplier)",
+      "title": "Margen-Einstellungen",
+      "subtitle": "Gewinnmarge (Multiplikator) pro Kategorie festlegen",
       "addCategory": "Kategorie hinzufügen",
-      "howItWorks": "Hoe werkt het?",
-      "explanation": "De multiplier bepaalt hoeveel je verkoopprijs moet zijn t.o.v. de inkoopprijs.",
-      "example": "Vlees kost €1.00 inkoop × 3.0 multiplier = €3.00 verkoopprijs nodig",
-      "newCategory": "Nieuwe categorie toevoegen",
-      "categoryNamePlaceholder": "Categorienaam (bijv. Desserts)",
-      "multiplierPlaceholder": "bijv. 3 of 2,5",
-      "saving": "Opslaan...",
+      "howItWorks": "Wie funktioniert das?",
+      "explanation": "Der Multiplikator bestimmt den Verkaufspreis relativ zum Einkaufspreis.",
+      "example": "Fleisch kostet €1,00 Einkauf × 3,0 = €3,00 Verkauf nötig",
+      "newCategory": "Kategorie hinzufügen",
+      "categoryNamePlaceholder": "Kategoriename (z. B. Desserts)",
+      "multiplierPlaceholder": "z. B. 3 oder 2,5",
+      "saving": "Speichern...",
       "add": "Hinzufügen",
-      "confirmDelete": "Weet je zeker dat je deze categorie wilt verwijderen?",
-      "purchaseToSale": "inkoop → €{amount} verkoop",
-      "noCategoriesFound": "Geen categorieën gevonden. Voeg er een toe!"
+      "confirmDelete": "Diese Kategorie wirklich löschen?",
+      "purchaseToSale": "Einkauf → €{amount} Verkauf",
+      "noCategoriesFound": "Keine Kategorien. Bitte eine hinzufügen!"
     }
   },
   "legal": {
@@ -809,8 +824,8 @@
     "home": "Startseite",
     "anonymous": "Anonym",
     "noCategory": "Keine Kategorie",
-    "lastUpdated": "Laatst bijgewerkt",
-    "contact": "Contact",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "contact": "Kontakt",
     "email": "Email",
     "phone": "Telefon",
     "total": "Gesamt",
@@ -820,17 +835,17 @@
     "status": "Status",
     "type": "Type",
     "details": "Details",
-    "refresh": "Vernieuwen",
-    "noData": "Geen data beschikbaar",
-    "all": "Alles",
+    "refresh": "Aktualisieren",
+    "noData": "Keine Daten verfügbar",
+    "all": "Alle",
     "online": "Online",
-    "pos": "Kassa",
-    "pending": "Wachtend",
-    "items": "Items",
+    "pos": "Kasse",
+    "pending": "Ausstehend",
+    "items": "Artikel",
     "address": "Adresse",
-    "notes": "Opmerkingen",
+    "notes": "Notizen",
     "available": "Verfügbar",
-    "soldOut": "Uitverkocht",
+    "soldOut": "Ausverkauft",
     "active": "Aktiv",
     "notAvailable": "Nicht verfügbar"
   },
@@ -949,26 +964,26 @@
       "cancel": "Abbrechen",
       "confirmReject": "Bestellung ablehnen",
       "reasons": {
-        "tooBusy": "Te druk op dit moment",
-        "closed": "We zijn gesloten",
-        "soldOut": "Product(en) uitverkocht",
-        "deliveryUnavailable": "Levering niet beschikbaar",
-        "technical": "Technisch probleem",
-        "other": "Andere reden"
+        "tooBusy": "Zurzeit zu viel Auslastung",
+        "closed": "Wir haben geschlossen",
+        "soldOut": "Produkt(e) ausverkauft",
+        "deliveryUnavailable": "Lieferung nicht verfügbar",
+        "technical": "Technisches Problem",
+        "other": "Anderer Grund"
       },
-      "notesLabel": "Toelichting (optioneel)",
-      "notesPlaceholder": "Geef een korte toelichting...",
-      "customerNotified": "De klant ontvangt automatisch een e-mail met de reden van weigering."
+      "notesLabel": "Anmerkungen (optional)",
+      "notesPlaceholder": "Kurze Erläuterung angeben …",
+      "customerNotified": "Der Kunde erhält automatisch eine E-Mail mit dem Ablehnungsgrund."
     },
     "newOrderAlert": {
       "title": "NEUE BESTELLUNG!",
       "tapToClose": "Tippen um zu schließen",
-      "waitingApproval": "wacht op goedkeuring",
-      "waitingApprovalPlural": "wachten op goedkeuring",
-      "soundStopsAfter": "Geluid stopt na goedkeuren of weigeren"
+      "waitingApproval": "wartet auf Freigabe",
+      "waitingApprovalPlural": "warten auf Freigabe",
+      "soundStopsAfter": "Ton endet nach Freigabe oder Ablehnung"
     },
-    "browserNotifications": "Browser notificaties",
-    "sound": "Geluid",
+    "browserNotifications": "Browser-Benachrichtigungen",
+    "sound": "Ton",
     "paymentMethod": {
       "cash": "Cash",
       "card": "Kaart",
@@ -980,24 +995,24 @@
     "minutesAgo": "min",
     "hoursAgo": "u",
     "receipt": {
-      "title": "KASSABON",
-      "businessInfo": "Zaakgegevens",
+      "title": "BELEG",
+      "businessInfo": "Betriebsdaten",
       "customer": "Kunde",
-      "articles": "ARTIKELEN",
-      "deliveryFee": "Bezorgkosten",
+      "articles": "ARTIKEL",
+      "deliveryFee": "Liefergebühr",
       "discount": "Rabatt",
-      "totalExclVat": "Totaal excl. BTW",
+      "totalExclVat": "Gesamt netto",
       "vat": "MwSt",
-      "totalInclVat": "TOTAAL INCL. BTW",
-      "paymentMethod": "Betaalmethode",
-      "paid": "BETAALD",
-      "paymentPending": "Betaling: In afwachting",
+      "totalInclVat": "GESAMT BRUTTO",
+      "paymentMethod": "Zahlungsart",
+      "paid": "BEZAHLT",
+      "paymentPending": "Zahlung: ausstehend",
       "note": "Bemerkung",
-      "thankYou": "Bedankt voor uw bestelling!",
-      "keepReceipt": "Dit is uw kassabon. Bewaar deze bon als bewijs van aankoop."
+      "thankYou": "Vielen Dank für Ihre Bestellung!",
+      "keepReceipt": "Bewahren Sie diesen Beleg als Kaufnachweis auf."
     },
-    "customerDetails": "Klantgegevens",
-    "orderedProducts": "Bestelde producten"
+    "customerDetails": "Kundendaten",
+    "orderedProducts": "Bestellte Produkte"
   },
   "customersPage": {
     "title": "Kunden",
@@ -1096,10 +1111,10 @@
       "inactive": "Inaktiv"
     },
     "filter": {
-      "all": "Alles"
+      "all": "Alle"
     },
     "available": "Verfügbar",
-    "soldOut": "Uitverkocht"
+    "soldOut": "Ausverkauft"
   },
   "analysisPage": {
     "title": "Geschäftsanalyse",
@@ -1116,26 +1131,26 @@
       "trends": "Trends"
     },
     "stats": {
-      "totalRevenue": "Totale omzet",
-      "orders": "bestellingen",
-      "fixedCosts": "Vaste kosten",
-      "costItems": "kostenposten",
-      "netProfit": "Nettowinst",
-      "afterCosts": "Na kosten",
-      "profitMargin": "Winstmarge",
-      "ofRevenue": "Van omzet"
+      "totalRevenue": "Gesamtumsatz",
+      "orders": "Bestellungen",
+      "fixedCosts": "Fixkosten",
+      "costItems": "Kostenpositionen",
+      "netProfit": "Nettogewinn",
+      "afterCosts": "Nach Kosten",
+      "profitMargin": "Gewinnmarge",
+      "ofRevenue": "vom Umsatz"
     },
     "charts": {
-      "revenueByChannel": "Omzet per kanaal",
-      "pos": "Kassa",
+      "revenueByChannel": "Umsatz nach Kanal",
+      "pos": "Kasse",
       "online": "Online",
-      "paymentMethods": "Betaalmethodes",
-      "busiestHours": "Drukste uren",
-      "orders": "bestellingen",
-      "noData": "Geen data beschikbaar",
-      "fixedCostsBreakdown": "Vaste kosten overzicht",
-      "noCosts": "Geen kosten geregistreerd",
-      "cost": "Kost"
+      "paymentMethods": "Zahlungsarten",
+      "busiestHours": "Stoßzeiten",
+      "orders": "Bestellungen",
+      "noData": "Keine Daten verfügbar",
+      "fixedCostsBreakdown": "Übersicht Fixkosten",
+      "noCosts": "Keine Kosten erfasst",
+      "cost": "Kosten"
     }
   },
   "reportsPage": {
@@ -1302,6 +1317,7 @@
       "title": "Schnellaktionen",
       "addProduct": "Produkt hinzufügen",
       "openingHours": "Öffnungszeiten",
+      "whatsapp": "WhatsApp-Bestellung",
       "createQr": "QR-Code erstellen",
       "startPromotion": "Aktion starten"
     },
@@ -1342,6 +1358,7 @@
       "settings": "EINSTELLUNGEN",
       "menu": "MENÜ",
       "website": "WEBSITE",
+      "whatsapp": "WHATSAPP",
       "marketing": "MARKETING",
       "customers": "KUNDEN",
       "staff": "PERSONAL",
@@ -1349,8 +1366,9 @@
       "accounting": "BUCHHALTUNG",
       "orders": "BESTELLUNGEN",
       "statistics": "STATISTIKEN",
-      "gksReports": "GKS RAPPORTEN",
-      "groupOrders": "GRUPPENBESTELLUNGEN"
+      "gksReports": "GKS-Berichte",
+      "groupOrders": "GRUPPENBESTELLUNGEN",
+      "bonnenprinter": "BONDRUCKER"
     },
     "menu": {
       "dashboard": "Dashboard",
@@ -1371,6 +1389,8 @@
       "ourTeam": "Unser Team",
       "giftCards": "Geschenkkarten",
       "seo": "SEO",
+      "whatsappSettings": "Einstellungen",
+      "whatsappQr": "QR-Code",
       "emailMarketing": "E-Mail-Marketing",
       "qrCodes": "QR-Codes",
       "promotions": "Aktionen",
@@ -1384,6 +1404,7 @@
       "costSettings": "Margen-Einstellungen",
       "ingredients": "Zutaten",
       "productCosts": "Produktkosten",
+      "costCalculation": "Kostenberechnung",
       "scrada": "SCRADA",
       "orderList": "Bestellungen",
       "reservations": "Reservierungen",
@@ -1395,7 +1416,8 @@
       "groupSessions": "Bestellsitzungen",
       "groupOrdersOverview": "Gruppenbestellungen",
       "labelPrinter": "Etikettendrucker",
-      "onlineShopToggle": "Online-Shop an/aus"
+      "onlineShopToggle": "Online-Shop an/aus",
+      "bonnenprinter": "Bondrucker"
     },
     "viewWebsite": "Dein Shop ansehen",
     "display": "Bildschirm",
@@ -1504,6 +1526,7 @@
       "error": "Ein Fehler ist aufgetreten",
       "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
       "cancel": "Abbrechen",
+      "close": "Schließen",
       "delete": "Löschen",
       "edit": "Bearbeiten",
       "add": "Hinzufügen",
@@ -1622,16 +1645,16 @@
       "image": "Bild",
       "order": "Reihenfolge",
       "noCategories": "Noch keine Kategorien",
-      "newCategoryPlaceholder": "Nieuwe categorie naam...",
-      "add": "+ Toevoegen",
-      "dragHint": "💡 Sleep om de volgorde te wijzigen",
-      "noItems": "Nog geen categorieën. Voeg je eerste categorie toe!",
-      "confirmDelete": "Weet je zeker dat je deze categorie wilt verwijderen?",
-      "deleteFailed": "Verwijderen mislukt",
-      "addFailed": "Toevoegen mislukt",
-      "saveFailed": "Sommige categorieën konden niet worden opgeslagen",
-      "visible": "Zichtbaar",
-      "hidden": "Verborgen"
+      "newCategoryPlaceholder": "Name der neuen Kategorie...",
+      "add": "+ Hinzufügen",
+      "dragHint": "💡 Ziehen, um die Reihenfolge zu ändern",
+      "noItems": "Noch keine Kategorien. Fügen Sie die erste hinzu!",
+      "confirmDelete": "Diese Kategorie wirklich löschen?",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "addFailed": "Hinzufügen fehlgeschlagen",
+      "saveFailed": "Einige Kategorien konnten nicht gespeichert werden",
+      "visible": "Sichtbar",
+      "hidden": "Ausgeblendet"
     },
     "producten": {
       "title": "Produkte",
@@ -1646,43 +1669,43 @@
       "available": "Verfügbar",
       "soldOut": "Ausverkauft",
       "noProducts": "Noch keine Produkte",
-      "newProduct": "Nieuw product",
+      "newProduct": "Neues Produkt",
       "notAvailable": "Nicht verfügbar",
-      "noCategory": "Geen categorie",
+      "noCategory": "Keine Kategorie",
       "all": "Alle",
-      "promotions": "Promoties",
-      "searchPlaceholder": "Zoek producten...",
-      "dragToMove": "Sleep om te verplaatsen",
-      "popular": "Populair",
-      "notPopular": "Niet populair",
-      "promo": "Promotie",
-      "promoPrice": "Actieprijs",
-      "originalPrice": "Originele prijs",
-      "confirmDelete": "Weet je zeker dat je dit product wilt verwijderen?",
-      "deleteFailed": "Verwijderen mislukt",
-      "saveFailed": "Opslaan mislukt. Probeer opnieuw.",
-      "namePlaceholder": "Bijv. Grote Friet",
-      "descriptionPlaceholder": "Beschrijf het product...",
-      "selectCategory": "Selecteer...",
-      "linkOptions": "Opties & Extra's koppelen",
-      "linkOptionsDesc": "Selecteer welke opties klanten kunnen kiezen bij dit product",
-      "singleChoice": "Enkele keuze",
-      "multipleChoice": "Meerdere keuzes",
-      "required": "Verplicht",
-      "choices": "keuzes",
-      "allergens": "Allergenen",
-      "allergensDesc": "Selecteer welke allergenen in dit product zitten",
+      "promotions": "Aktionen",
+      "searchPlaceholder": "Produkte suchen...",
+      "dragToMove": "Ziehen zum Verschieben",
+      "popular": "Beliebt",
+      "notPopular": "Weniger beliebt",
+      "promo": "Aktion",
+      "promoPrice": "Aktionspreis",
+      "originalPrice": "Originalpreis",
+      "confirmDelete": "Dieses Produkt wirklich löschen?",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+      "namePlaceholder": "z. B. große Pommes",
+      "descriptionPlaceholder": "Produkt beschreiben...",
+      "selectCategory": "Auswählen...",
+      "linkOptions": "Optionen & Extras verknüpfen",
+      "linkOptionsDesc": "Wählen Sie, welche Optionen Kunden für dieses Produkt wählen können",
+      "singleChoice": "Einfachauswahl",
+      "multipleChoice": "Mehrfachauswahl",
+      "required": "Pflichtfeld",
+      "choices": "Auswahlmöglichkeiten",
+      "allergens": "Allergene",
+      "allergensDesc": "Wählen Sie die im Produkt enthaltenen Allergene",
       "status": "Status",
-      "statusAvailable": "✓ Beschikbaar",
-      "statusPopular": "🔥 Populair",
-      "statusPromo": "🎁 Promotie",
+      "statusAvailable": "✓ Verfügbar",
+      "statusPopular": "🔥 Beliebt",
+      "statusPromo": "🎁 Aktion",
       "printLabel": "Etikett drucken",
-      "imageDisplayMode": "Foto weergave",
-      "imageDefault": "Standaard",
+      "imageDisplayMode": "Fotoanzeige",
+      "imageDefault": "Standard",
       "imageCover": "Groß",
-      "imageContain": "Volledig",
+      "imageContain": "Vollständig",
       "noProductsFound": "Keine Produkte gefunden",
-      "adjustFilters": "Pas je filters aan of voeg een nieuw product toe"
+      "adjustFilters": "Filter anpassen oder neues Produkt hinzufügen"
     },
     "opties": {
       "title": "Optionen & Extras",
@@ -1692,28 +1715,28 @@
       "choices": "Auswahlmöglichkeiten",
       "required": "Erforderlich",
       "multiSelect": "Mehrfachauswahl möglich",
-      "editOption": "Optie bewerken",
-      "optionNamePlaceholder": "Bijv. Formaat, Saus, Extra toppings",
-      "choiceNamePlaceholder": "Naam (bijv. Klein, Medium, Groot)",
-      "mustChoose": "Ja, klant moet kiezen",
-      "noOptions": "Nog geen opties",
-      "noOptionsDesc": "Voeg opties toe zoals formaten, sauzen of extra's",
-      "addFirstOption": "+ Eerste optie toevoegen",
-      "addChoice": "+ Keuze toevoegen",
-      "typeChoice": "Type keuze",
-      "singleChoice": "☝️ Enkele keuze",
-      "multipleChoice": "✅ Meerdere keuzes",
-      "dragToSort": "sleep ⠿ om te verplaatsen",
-      "free": "Gratis",
-      "confirmDelete": "Weet je zeker dat je deze optie wilt verwijderen? Alle keuzes worden ook verwijderd.",
-      "deleteFailed": "Verwijderen mislukt",
-      "saveFailed": "Opslaan mislukt. Probeer opnieuw.",
-      "fillName": "Vul een naam in voor de optie",
-      "addAtLeastOne": "Voeg minstens één keuze toe",
-      "howItWorks": "💡 Hoe werken opties?",
-      "singleChoiceDesc": "Klant kiest 1 optie (bijv. formaat)",
-      "multipleChoiceDesc": "Klant kan meerdere selecteren (bijv. toppings)",
-      "requiredDesc": "Klant moet kiezen voordat ze bestellen"
+      "editOption": "Option bearbeiten",
+      "optionNamePlaceholder": "z. B. Größe, Soße, Extras",
+      "choiceNamePlaceholder": "Name (z. B. Klein, Mittel, Groß)",
+      "mustChoose": "Ja, Kunde muss wählen",
+      "noOptions": "Noch keine Optionen",
+      "noOptionsDesc": "Fügen Sie Optionen wie Größen, Soßen oder Extras hinzu",
+      "addFirstOption": "+ Erste Option hinzufügen",
+      "addChoice": "+ Auswahl hinzufügen",
+      "typeChoice": "Auswahltyp",
+      "singleChoice": "☝️ Einfachauswahl",
+      "multipleChoice": "✅ Mehrfachauswahl",
+      "dragToSort": "ziehen ⠿ zum Verschieben",
+      "free": "Kostenlos",
+      "confirmDelete": "Diese Option löschen? Alle Auswahlmöglichkeiten werden ebenfalls entfernt.",
+      "deleteFailed": "Löschen fehlgeschlagen",
+      "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+      "fillName": "Geben Sie einen Namen für die Option ein",
+      "addAtLeastOne": "Mindestens eine Auswahl hinzufügen",
+      "howItWorks": "💡 Wie funktionieren Optionen?",
+      "singleChoiceDesc": "Kunde wählt 1 Option (z. B. Größe)",
+      "multipleChoiceDesc": "Kunde kann mehrere wählen (z. B. Toppings)",
+      "requiredDesc": "Kunde muss vor der Bestellung wählen"
     },
     "allergenen": {
       "title": "Allergene",
@@ -1721,26 +1744,26 @@
       "addAllergen": "Allergen hinzufügen",
       "name": "Name",
       "icon": "Symbol",
-      "active": "✓ Actief",
-      "notActive": "Niet actief",
-      "selectRelevant": "Selecteer welke allergenen relevant zijn voor jouw zaak. Deze kun je dan bij elk product aangeven.",
-      "legalWarning": "⚠️ Wettelijke verplichting",
-      "legalText": "In België en Nederland ben je wettelijk verplicht om de 14 hoofdallergenen te vermelden. Zorg ervoor dat je bij elk product de juiste allergenen aangeeft.",
-      "preview": "Preview op website",
+      "active": "✓ Aktiv",
+      "notActive": "Inaktiv",
+      "selectRelevant": "Wählen Sie die für Ihren Betrieb relevanten Allergene. Sie können sie dann bei jedem Produkt angeben.",
+      "legalWarning": "⚠️ Gesetzliche Pflicht",
+      "legalText": "In Belgien und den Niederlanden müssen die 14 Hauptallergene angegeben werden. Stellen Sie sicher, dass pro Produkt die richtigen Allergene gesetzt sind.",
+      "preview": "Vorschau auf der Website",
       "allergenNames": {
-        "gluten": "Gluten",
-        "ei": "Eieren",
-        "melk": "Melk",
-        "noten": "Noten",
-        "pinda": "Pinda",
+        "gluten": "Glutenhaltiges Getreide",
+        "ei": "Eier",
+        "melk": "Milch",
+        "noten": "Schalenfrüchte",
+        "pinda": "Erdnüsse",
         "soja": "Soja",
-        "vis": "Vis",
-        "schaaldieren": "Schaaldieren",
-        "weekdieren": "Weekdieren",
-        "selderij": "Selderij",
-        "mosterd": "Mosterd",
-        "sesam": "Sesamzaad",
-        "sulfiet": "Sulfiet",
+        "vis": "Fisch",
+        "schaaldieren": "Krebstiere",
+        "weekdieren": "Weichtiere",
+        "selderij": "Sellerie",
+        "mosterd": "Senf",
+        "sesam": "Sesam",
+        "sulfiet": "Schwefeldioxid und Sulfite",
         "lupine": "Lupine"
       }
     },
@@ -2005,12 +2028,12 @@
     "previewSnacks": "Snacks",
     "orderNow": "Jetzt bestellen",
     "viewFullWebsite": "Vollständige Website anzeigen",
-    "imageDisplay": "Product Afbeeldingen",
-    "imageDisplayDesc": "Kies hoe productfoto's worden weergegeven in de menukaart",
-    "imageCover": "Grote foto's",
-    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
-    "imageContain": "Hele product zichtbaar",
-    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
+    "imageDisplay": "Produktfotos",
+    "imageDisplayDesc": "Wählen Sie, wie Produktfotos in der Speisekarte angezeigt werden",
+    "imageCover": "Große Fotos",
+    "imageCoverDesc": "Fotos füllen den Rahmen (kann beschnitten werden)",
+    "imageContain": "Ganzes Produkt sichtbar",
+    "imageContainDesc": "Vollständiges Foto sichtbar (ideal für Dosen/Flaschen)"
   },
   "websiteMedia": {
     "title": "Fotos & Medien",
@@ -2058,12 +2081,12 @@
     "noMedia": "Noch keine Medien",
     "noPhotosIn": "Keine Fotos in",
     "uploadFirstPhotos": "Laden Sie Ihre ersten Fotos hoch",
-    "imageDisplay": "Product Afbeeldingen",
-    "imageDisplayDesc": "Kies hoe productfoto's worden weergegeven in de menukaart",
-    "imageCover": "Grote foto's",
-    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
-    "imageContain": "Hele product zichtbaar",
-    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
+    "imageDisplay": "Produktfotos",
+    "imageDisplayDesc": "Wählen Sie, wie Produktfotos in der Speisekarte angezeigt werden",
+    "imageCover": "Große Fotos",
+    "imageCoverDesc": "Fotos füllen den Rahmen (kann beschnitten werden)",
+    "imageContain": "Ganzes Produkt sichtbar",
+    "imageContainDesc": "Vollständiges Foto sichtbar (ideal für Dosen/Flaschen)"
   },
   "websiteTexts": {
     "title": "Texte",
@@ -2185,6 +2208,11 @@
     "vacation": "Urlaub",
     "other": "Sonstiges",
     "total": "Gesamt",
+    "workedDays": "Gearbeitete Tage",
+    "commuteKm": "Pendeln km",
+    "commuteAllowance": "Kilometergeld",
+    "mealVouchers": "Essensgutscheine",
+    "mealVouchersCount": "Anzahl Gutscheine",
     "legend": "Legende",
     "existingEntries": "Bestehende Einträge",
     "addNewEntry": "Neuen Eintrag hinzufügen",
@@ -2269,6 +2297,8 @@
       "difference": "Differenz",
       "hour": "Std",
       "hoursPerMonth": "Std/Monat",
+      "commuteAndBenefits": "Pendeln & Zulagen",
+      "commuteDistance": "Entfernung einfache Strecke",
       "signatureEmployee": "Unterschrift Mitarbeiter",
       "signatureEmployer": "Unterschrift Arbeitgeber",
       "nameAndDate": "Name + Datum",
@@ -2404,12 +2434,12 @@
       "fixedCosts": "Fixkosten",
       "variableCosts": "Variable Kosten",
       "recommendations": "Diagnose & Empfehlungen",
-      "gross": "Bruto",
-      "sectorAverage": "Sector gemiddelde",
-      "perOrder": "Per bestelling",
-      "target": "Doel",
-      "noFixedCosts": "Nog geen vaste kosten ingevoerd",
-      "noPurchases": "Nog geen aankopen ingevoerd deze maand"
+      "gross": "Brutto",
+      "sectorAverage": "Branchendurchschnitt",
+      "perOrder": "Pro Bestellung",
+      "target": "Ziel",
+      "noFixedCosts": "Noch keine Fixkosten erfasst",
+      "noPurchases": "Keine Einkäufe diesen Monat erfasst"
     },
     "kassa": {
       "title": "Kassenumsatz eingeben",
@@ -2422,12 +2452,12 @@
       "noData": "Noch kein Kassenumsatz eingetragen",
       "monthTotal": "Gesamter Kassenumsatz",
       "confirmDelete": "Möchten Sie diesen Tag wirklich löschen?",
-      "editDay": "Dag Bewerken",
-      "cashRevenue": "Cash Omzet",
-      "cardRevenue": "Kaart Omzet",
-      "orderCount": "Aantal Bestellingen",
-      "notes": "Notities (optioneel)",
-      "clickNew": "Klik op \"Nieuwe Dag\" om te beginnen"
+      "editDay": "Tag bearbeiten",
+      "cashRevenue": "Bargeldeinnahmen",
+      "cardRevenue": "Kartenumsatz",
+      "orderCount": "Anzahl Bestellungen",
+      "notes": "Anmerkungen (optional)",
+      "clickNew": "Klicken Sie auf „Neuer Tag“, um zu starten"
     },
     "fixed": {
       "title": "Monatliche Fixkosten",
@@ -2441,11 +2471,11 @@
       "noData": "Noch keine Fixkosten",
       "monthTotal": "Gesamte Fixkosten pro Monat",
       "confirmDelete": "Möchten Sie diese Fixkosten wirklich löschen?",
-      "editCost": "Kost Bewerken",
-      "namePlaceholder": "Bv. Huur pand",
-      "perMonth": "per maand",
+      "editCost": "Kosten bearbeiten",
+      "namePlaceholder": "z. B. Miete",
+      "perMonth": "pro Monat",
       "edit": "Bearbeiten",
-      "noDataDesc": "Voeg je maandelijkse vaste kosten toe zoals huur, personeel, energie, etc."
+      "noDataDesc": "Erfassen Sie Ihre monatlichen Fixkosten wie Miete, Personal, Energie usw."
     },
     "variable": {
       "title": "Einkäufe & Rechnungen",
@@ -2459,10 +2489,10 @@
       "noData": "Noch keine Einkäufe eingetragen",
       "monthTotal": "Gesamte Einkäufe",
       "confirmDelete": "Möchten Sie diesen Einkauf wirklich löschen?",
-      "editPurchase": "Aankoop Bewerken",
-      "descriptionPlaceholder": "Bv. Aardappelen week 3",
-      "notes": "Notities (optioneel)",
-      "optional": "Optioneel"
+      "editPurchase": "Einkauf bearbeiten",
+      "descriptionPlaceholder": "z. B. Kartoffeln Woche 3",
+      "notes": "Anmerkungen (optional)",
+      "optional": "Optional"
     },
     "year": {
       "yearRevenue": "Jahresumsatz (Schätzung)",
@@ -2482,14 +2512,14 @@
       "saveTargets": "Ziele speichern",
       "targetsSaved": "Ziele gespeichert!",
       "benchmarks": "Branchenbenchmarks (Gastronomie)",
-      "targetMarginHelp": "Aanbevolen voor horeca: 25-30%",
-      "minMarginHelp": "Onder deze waarde krijg je een waarschuwing",
-      "maxPersonnelHelp": "Aanbevolen max: 30% van omzet",
-      "maxIngredientsHelp": "Aanbevolen max: 35% van omzet",
-      "avgMargin": "Gemiddelde winstmarge",
-      "goodPerformers": "Goede performers",
-      "topPerformers": "Top performers",
-      "maxPersonnelBenchmark": "Max personeel"
+      "targetMarginHelp": "Empfohlen für Gastronomie: 25–30 %",
+      "minMarginHelp": "Unter diesem Wert erhalten Sie eine Warnung",
+      "maxPersonnelHelp": "Empfohlenes Maximum: 30 % des Umsatzes",
+      "maxIngredientsHelp": "Empfohlenes Maximum: 35 % des Umsatzes",
+      "avgMargin": "Durchschnittliche Gewinnmarge",
+      "goodPerformers": "Gute Betriebe",
+      "topPerformers": "Spitzenreiter",
+      "maxPersonnelBenchmark": "Max. Personal"
     },
     "common": {
       "cancel": "Abbrechen",
@@ -2497,8 +2527,8 @@
       "saving": "Speichern...",
       "actions": "Aktionen",
       "total": "Gesamt",
-      "fillNameAndAmount": "Vul een naam en bedrag in",
-      "fillDescAndAmount": "Vul een beschrijving en bedrag in"
+      "fillNameAndAmount": "Name und Betrag eingeben",
+      "fillDescAndAmount": "Beschreibung und Betrag eingeben"
     },
     "fixedCategories": {
       "RENT": "Miete",
@@ -2635,20 +2665,20 @@
       "reasonLabel": "Ablehnungsgrund",
       "cancel": "Abbrechen",
       "confirmReject": "Ablehnen",
-      "reasonPlaceholder": "Bijv. Helaas zijn we volgeboekt op deze datum...",
-      "reasonSentToCustomer": "Deze reden wordt naar de klant gestuurd per e-mail.",
-      "processing": "Bezig..."
+      "reasonPlaceholder": "z. B. Leider sind wir an diesem Datum ausgebucht …",
+      "reasonSentToCustomer": "Dieser Grund wird dem Kunden per E-Mail mitgeteilt.",
+      "processing": "Wird verarbeitet …"
     },
     "confirmDelete": "Möchten Sie diese Reservierung wirklich löschen?",
-    "refresh": "Vernieuwen",
-    "newReservations": "nieuwe reservering",
-    "newReservationsPlural": "nieuwe reserveringen",
-    "confirmOrReject": "Bevestig of weiger om de klant op de hoogte te stellen",
-    "noUpcoming": "Er zijn geen komende reserveringen.",
-    "noToday": "Er zijn vandaag geen reserveringen.",
-    "noAny": "Er zijn nog geen reserveringen gemaakt.",
-    "at": "om",
-    "createdAt": "Aangemaakt",
+    "refresh": "Aktualisieren",
+    "newReservations": "neue Reservierung",
+    "newReservationsPlural": "neue Reservierungen",
+    "confirmOrReject": "Bestätigen oder ablehnen, um den Kunden zu informieren",
+    "noUpcoming": "Es gibt keine bevorstehenden Reservierungen.",
+    "noToday": "Heute gibt es keine Reservierungen.",
+    "noAny": "Es wurden noch keine Reservierungen vorgenommen.",
+    "at": "um",
+    "createdAt": "Erstellt",
     "todayLabel": "Heute",
     "tomorrowLabel": "Morgen"
   },
@@ -2868,6 +2898,11 @@
     "viewMenu": "Menü ansehen",
     "scanToSeeMenu": "Scannen Sie unser Menü",
     "promotions": "Aktionen",
+    "currentOffers": "Aktuelle Angebote ansehen",
+    "minOrder": "Mindestbestellung",
+    "free": "Gratis",
+    "orderNow": "Jetzt bestellen",
+    "close": "Schließen",
     "scanToSeeOffers": "Scannen Sie unsere Angebote",
     "giveReview": "Bewertung abgeben",
     "scanToReview": "Scannen Sie um zu bewerten",
@@ -3012,6 +3047,7 @@
     "tomorrow": "Morgen",
     "orderScheduledFor": "Ihre Bestellung ist geplant für",
     "selectDateRequired": "Bitte wählen Sie zuerst ein Datum für Ihre Bestellung",
+    "dateInClosingPeriod": "Dieses Datum liegt in einer Schließzeit. Bitte wählen Sie einen anderen Tag.",
     "whenPickup": "Wann abholen?",
     "date": "Datum",
     "time": "Zeit",
@@ -3134,402 +3170,402 @@
     "pleaseWait": "Bitte warten..."
   },
   "legalMain": {
-    "title": "Juridisch",
-    "policies": "Beleiden",
-    "contracts": "Contracten",
-    "privacy": "Privacy",
+    "title": "Rechtliches",
+    "policies": "Richtlinien",
+    "contracts": "Verträge",
+    "privacy": "Datenschutz",
     "links": {
-      "paymentPlatform": "Vysion Payments Platform Overeenkomst",
-      "aup": "Beleid voor Aanvaardbaar Gebruik",
-      "ip": "Beleid inzake inbreuk op intellectueel eigendom",
-      "trademark": "Vysion handelsmerk en auteursrechtrichtlijnen",
-      "serviceAgreement": "Vysion Dienstenovereenkomst",
+      "paymentPlatform": "Vysion Payments Plattform-Vertrag",
+      "aup": "Richtlinie zur zulässigen Nutzung",
+      "ip": "Richtlinie zum geistigen Eigentum",
+      "trademark": "Vysion Marken- und Urheberrechtsrichtlinien",
+      "serviceAgreement": "Vysion Dienstleistungsvertrag",
       "sla": "Service Level Agreement (SLA)",
-      "dpa": "Verwerkersovereenkomst",
-      "privacyPolicy": "Privacybeleid",
-      "cookies": "Cookiebeleid",
-      "subprocessors": "Subverwerkers"
+      "dpa": "Auftragsverarbeitungsvertrag",
+      "privacyPolicy": "Datenschutzerklärung",
+      "cookies": "Cookie-Richtlinie",
+      "subprocessors": "Unterauftragsverarbeiter"
     },
-    "backToHome": "← Terug naar home"
+    "backToHome": "← Zurück zur Startseite"
   },
   "cookiesPage": {
-    "title": "Cookiebeleid",
-    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "title": "Cookie-Richtlinie",
+    "lastUpdated": "Zuletzt aktualisiert: Dezember 2025",
     "whatAreCookies": {
-      "title": "Wat zijn cookies?",
-      "content": "Cookies zijn kleine tekstbestanden die op uw computer of mobiel apparaat worden opgeslagen wanneer u onze website bezoekt. Ze helpen ons om de website goed te laten functioneren en uw gebruikerservaring te verbeteren."
+      "title": "Was sind Cookies?",
+      "content": "Cookies sind kleine Textdateien, die auf Ihrem Computer oder Mobilgerät gespeichert werden, wenn Sie unsere Website besuchen. Sie helfen uns, die Website betriebssicher zu machen und Ihre Nutzererfahrung zu verbessern."
     },
     "whichCookies": {
-      "title": "Welke cookies gebruiken wij?",
+      "title": "Welche Cookies verwenden wir?",
       "necessary": {
-        "title": "Noodzakelijke cookies",
-        "content": "Deze cookies zijn essentieel voor het functioneren van de website. Zonder deze cookies kunnen bepaalde functies niet werken."
+        "title": "Notwendige Cookies",
+        "content": "Diese Cookies sind für den Betrieb der Website unverzichtbar. Ohne sie funktionieren bestimmte Funktionen nicht."
       },
       "functional": {
-        "title": "Functionele cookies",
-        "content": "Deze cookies onthouden uw voorkeuren en instellingen om uw ervaring te personaliseren."
+        "title": "Funktionale Cookies",
+        "content": "Diese Cookies speichern Ihre Einstellungen und Präferenzen, um die Nutzung zu personalisieren."
       },
       "analytical": {
-        "title": "Analytische cookies",
-        "content": "Met uw toestemming gebruiken wij analytische cookies om te begrijpen hoe bezoekers onze website gebruiken. Dit helpt ons om onze diensten te verbeteren."
+        "title": "Analyse-Cookies",
+        "content": "Mit Ihrer Einwilligung setzen wir Analyse-Cookies ein, um zu verstehen, wie Besucher unsere Website nutzen. So können wir unsere Dienste verbessern."
       }
     },
     "manageCookies": {
-      "title": "Cookies beheren",
-      "content": "U kunt uw cookievoorkeuren op elk moment aanpassen via uw browserinstellingen. Let op: het uitschakelen van bepaalde cookies kan de functionaliteit van de website beperken."
+      "title": "Cookies verwalten",
+      "content": "Sie können Ihre Cookie-Einstellungen jederzeit in Ihrem Browser anpassen. Hinweis: Das Deaktivieren bestimmter Cookies kann die Funktionalität der Website einschränken."
     },
     "contact": {
-      "title": "Contact",
-      "content": "Voor vragen over ons cookiebeleid kunt u contact opnemen via"
+      "title": "Kontakt",
+      "content": "Fragen zu dieser Cookie-Richtlinie richten Sie bitte an"
     },
-    "backToLegal": "← Terug naar Juridisch"
+    "backToLegal": "← Zurück zu Rechtliches"
   },
   "privacyPage": {
-    "title": "Privacy & Veiligheid",
-    "subtitle": "Hoe wij omgaan met jouw gegevens",
+    "title": "Datenschutz & Sicherheit",
+    "subtitle": "Wie wir mit Ihren Daten umgehen",
     "sections": {
       "intro": {
-        "title": "1. Inleiding",
-        "content": "Vysion Horeca, onderdeel van Vysion Group International, hecht veel waarde aan de bescherming van jouw persoonsgegevens. In deze privacyverklaring leggen wij uit welke gegevens wij verzamelen, waarom wij dit doen en hoe wij hiermee omgaan."
+        "title": "1. Einleitung",
+        "content": "Vysion Horeca, Teil der Vysion Group International, legt großen Wert auf den Schutz Ihrer personenbezogenen Daten. In dieser Datenschutzerklärung erläutern wir, welche Daten wir erheben, wozu und wie wir sie verarbeiten."
       },
       "whatData": {
-        "title": "2. Welke gegevens verzamelen wij?",
-        "intro": "Wij kunnen de volgende persoonsgegevens verzamelen:",
+        "title": "2. Welche Daten erheben wir?",
+        "intro": "Wir können folgende personenbezogene Daten verarbeiten:",
         "items": {
-          "1": "Naam en contactgegevens (e-mailadres, telefoonnummer)",
-          "2": "Bedrijfsgegevens (bedrijfsnaam, BTW-nummer, adres)",
-          "3": "Betalingsgegevens",
-          "4": "Gebruiksgegevens van onze software",
-          "5": "Communicatie die je met ons voert"
+          "1": "Name und Kontaktdaten (E-Mail, Telefon)",
+          "2": "Unternehmensdaten (Firmenname, USt-IdNr., Adresse)",
+          "3": "Zahlungsdaten",
+          "4": "Nutzungsdaten unserer Software",
+          "5": "Kommunikation mit uns"
         }
       },
       "whyData": {
-        "title": "3. Waarvoor gebruiken wij jouw gegevens?",
-        "intro": "Wij gebruiken jouw gegevens voor:",
+        "title": "3. Wofür nutzen wir Ihre Daten?",
+        "intro": "Wir nutzen Ihre Daten für:",
         "items": {
-          "1": "Het leveren van onze diensten en software",
-          "2": "Het verwerken van betalingen",
-          "3": "Klantenservice en ondersteuning",
-          "4": "Het verbeteren van onze producten",
-          "5": "Communicatie over updates en nieuwe functies",
-          "6": "Naleving van wettelijke verplichtingen (o.a. GKS, fiscale wetgeving)"
+          "1": "Bereitstellung unserer Dienste und Software",
+          "2": "Abwicklung von Zahlungen",
+          "3": "Kundenservice und Support",
+          "4": "Verbesserung unserer Produkte",
+          "5": "Information über Updates und neue Funktionen",
+          "6": "Erfüllung gesetzlicher Pflichten (u. a. GKS, Steuerrecht)"
         }
       },
       "security": {
-        "title": "4. Gegevensbeveiliging",
-        "intro": "Wij nemen de beveiliging van jouw gegevens zeer serieus. Onze systemen zijn beveiligd met:",
+        "title": "4. Datensicherheit",
+        "intro": "Wir nehmen den Schutz Ihrer Daten sehr ernst. Unsere Systeme sind abgesichert durch:",
         "items": {
-          "1": "SSL/TLS encryptie voor alle dataoverdracht",
-          "2": "Versleutelde opslag van gevoelige gegevens",
-          "3": "Regelmatige beveiligingsaudits",
-          "4": "Toegangscontrole en authenticatie",
-          "5": "Dagelijkse back-ups op beveiligde servers"
+          "1": "SSL/TLS-Verschlüsselung für alle Datenübertragungen",
+          "2": "Verschlüsselte Speicherung sensibler Daten",
+          "3": "Regelmäßige Sicherheitsaudits",
+          "4": "Zugriffskontrolle und Authentifizierung",
+          "5": "Tägliche Backups auf gesicherten Servern"
         }
       },
       "gks": {
-        "title": "5. GKS & Fiscale Compliance",
-        "content": "Vysion Horeca is volledig GKS-gecertificeerd en voldoet aan alle Belgische fiscale vereisten. Transactiegegevens worden veilig opgeslagen conform de wettelijke bewaartermijnen."
+        "title": "5. GKS & steuerliche Compliance",
+        "content": "Vysion Horeca ist vollständig GKS-zertifiziert und erfüllt alle belgischen steuerlichen Anforderungen. Transaktionsdaten werden sicher gemäß den gesetzlichen Aufbewahrungsfristen gespeichert."
       },
       "sharing": {
-        "title": "6. Delen van gegevens",
-        "content": "Wij delen jouw gegevens alleen met derden wanneer dit noodzakelijk is voor onze dienstverlening (zoals betalingsverwerkers) of wanneer wij hiertoe wettelijk verplicht zijn. Wij verkopen nooit jouw gegevens aan derden."
+        "title": "6. Weitergabe von Daten",
+        "content": "Wir geben Ihre Daten nur an Dritte weiter, wenn dies für unsere Leistungen nötig ist (z. B. Zahlungsdienstleister) oder wir gesetzlich dazu verpflichtet sind. Wir verkaufen Ihre Daten nicht."
       },
       "rights": {
-        "title": "7. Jouw rechten",
-        "intro": "Je hebt het recht om:",
+        "title": "7. Ihre Rechte",
+        "intro": "Sie haben das Recht:",
         "items": {
-          "1": "Inzage te vragen in jouw persoonsgegevens",
-          "2": "Jouw gegevens te laten corrigeren of verwijderen",
-          "3": "Bezwaar te maken tegen de verwerking",
-          "4": "Jouw gegevens over te dragen naar een andere dienst"
+          "1": "Auskunft über Ihre personenbezogenen Daten zu verlangen",
+          "2": "Berichtigung oder Löschung zu verlangen",
+          "3": "Der Verarbeitung zu widersprechen",
+          "4": "Datenübertragbarkeit zu einem anderen Anbieter zu verlangen"
         }
       },
       "cookies": {
         "title": "8. Cookies",
-        "content": "Onze website maakt gebruik van functionele cookies om de werking te verbeteren. Analytische cookies worden alleen geplaatst met jouw toestemming."
+        "content": "Unsere Website verwendet funktionale Cookies zur Verbesserung des Betriebs. Analyse-Cookies werden nur mit Ihrer Einwilligung gesetzt."
       },
       "contact": {
-        "title": "9. Contact",
-        "intro": "Voor vragen over deze privacyverklaring of jouw gegevens kun je contact opnemen via:"
+        "title": "9. Kontakt",
+        "intro": "Fragen zu dieser Datenschutzerklärung oder Ihren Daten richten Sie bitte an:"
       },
       "changes": {
-        "title": "10. Wijzigingen",
-        "content": "Wij kunnen deze privacyverklaring van tijd tot tijd aanpassen. De meest recente versie is altijd beschikbaar op deze pagina. Laatst bijgewerkt: december 2025."
+        "title": "10. Änderungen",
+        "content": "Wir können diese Datenschutzerklärung anpassen. Die aktuelle Fassung finden Sie stets auf dieser Seite. Zuletzt aktualisiert: Dezember 2025."
       }
     },
-    "backToHome": "← Terug naar home"
+    "backToHome": "← Zurück zur Startseite"
   },
   "dpaPage": {
-    "title": "Verwerkersovereenkomst",
-    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "title": "Auftragsverarbeitungsvertrag",
+    "lastUpdated": "Zuletzt aktualisiert: Dezember 2025",
     "sections": {
       "definitions": {
-        "title": "1. Definities",
-        "content": "In deze verwerkersovereenkomst wordt verstaan onder:",
-        "controller": "Verwerkingsverantwoordelijke:",
-        "controllerDef": "de klant die gebruik maakt van Vysion Horeca diensten",
-        "processor": "Verwerker:",
+        "title": "1. Begriffe",
+        "content": "In diesem Auftragsverarbeitungsvertrag gelten folgende Definitionen:",
+        "controller": "Verantwortlicher:",
+        "controllerDef": "der Kunde, der die Dienste von Vysion Horeca nutzt",
+        "processor": "Auftragsverarbeiter:",
         "processorDef": "Vysion Horeca / Vysion Group International",
-        "personalData": "Persoonsgegevens:",
-        "personalDataDef": "alle gegevens die betrekking hebben op een geïdentificeerde of identificeerbare natuurlijke persoon"
+        "personalData": "Personenbezogene Daten:",
+        "personalDataDef": "alle Informationen, die sich auf eine identifizierte oder identifizierbare natürliche Person beziehen"
       },
       "subject": {
-        "title": "2. Onderwerp en Duur",
-        "content": "Deze overeenkomst regelt de verwerking van persoonsgegevens door Vysion Horeca namens u. De overeenkomst is van kracht zolang u gebruik maakt van onze diensten."
+        "title": "2. Gegenstand und Laufzeit",
+        "content": "Dieser Vertrag regelt die Verarbeitung personenbezogener Daten durch Vysion Horeca in Ihrem Auftrag. Er gilt, solange Sie unsere Dienste nutzen."
       },
       "purpose": {
-        "title": "3. Aard en Doel van de Verwerking",
-        "intro": "Wij verwerken persoonsgegevens voor:",
+        "title": "3. Art und Zweck der Verarbeitung",
+        "intro": "Wir verarbeiten personenbezogene Daten für:",
         "items": {
-          "1": "Het leveren van kassasoftware en gerelateerde diensten",
-          "2": "Het verwerken van transacties en bestellingen",
-          "3": "Het bijhouden van klantgegevens en bestelhistorie",
-          "4": "Het genereren van rapporten en analyses"
+          "1": "Bereitstellung von Kassensoftware und zugehörigen Diensten",
+          "2": "Abwicklung von Transaktionen und Bestellungen",
+          "3": "Pflege von Kundendaten und Bestellhistorie",
+          "4": "Erstellung von Berichten und Analysen"
         }
       },
       "categories": {
-        "title": "4. Categorieën Persoonsgegevens",
+        "title": "4. Kategorien personenbezogener Daten",
         "items": {
-          "1": "Contactgegevens (naam, adres, e-mail, telefoon)",
-          "2": "Transactiegegevens",
-          "3": "Bestelgegevens",
-          "4": "Personeelsgegevens (indien van toepassing)"
+          "1": "Kontaktdaten (Name, Adresse, E-Mail, Telefon)",
+          "2": "Transaktionsdaten",
+          "3": "Bestelldaten",
+          "4": "Personaldaten (soweit einschlägig)"
         }
       },
       "obligations": {
-        "title": "5. Verplichtingen Verwerker",
-        "intro": "Vysion Horeca zal:",
+        "title": "5. Pflichten des Auftragsverarbeiters",
+        "intro": "Vysion Horeca wird:",
         "items": {
-          "1": "Persoonsgegevens alleen verwerken volgens uw instructies",
-          "2": "Passende technische en organisatorische maatregelen nemen",
-          "3": "Vertrouwelijkheid garanderen",
-          "4": "U bijstaan bij het nakomen van uw verplichtingen onder de AVG",
-          "5": "Na beëindiging gegevens verwijderen of retourneren"
+          "1": "Personenbezogene Daten nur nach Ihren Weisungen verarbeiten",
+          "2": "Geeignete technische und organisatorische Maßnahmen ergreifen",
+          "3": "Vertraulichkeit gewährleisten",
+          "4": "Sie bei der Erfüllung Ihrer Pflichten nach der DSGVO unterstützen",
+          "5": "Nach Beendigung Daten löschen oder herausgeben"
         }
       },
       "subprocessors": {
-        "title": "6. Subverwerkers",
-        "content": "Wij maken gebruik van subverwerkers voor bepaalde diensten. Een actuele lijst is beschikbaar op onze subverwerkers pagina. Wij informeren u bij wijzigingen."
+        "title": "6. Unterauftragsverarbeiter",
+        "content": "Wir setzen für bestimmte Leistungen Unterauftragsverarbeiter ein. Eine aktuelle Liste finden Sie auf unserer Seite zu Unterauftragsverarbeitern. Wir informieren Sie über Änderungen."
       },
       "security": {
-        "title": "7. Beveiliging",
-        "content": "Wij implementeren passende beveiligingsmaatregelen waaronder encryptie, toegangscontrole, en regelmatige beveiligingsaudits."
+        "title": "7. Sicherheit",
+        "content": "Wir setzen angemessene Sicherheitsmaßnahmen ein, u. a. Verschlüsselung, Zugangskontrolle und regelmäßige Sicherheitsaudits."
       },
       "breach": {
-        "title": "8. Datalekken",
-        "content": "Bij een datalek informeren wij u zonder onredelijke vertraging, zodat u aan uw meldingsplicht kunt voldoen."
+        "title": "8. Datenpannen",
+        "content": "Bei einer Datenpanne informieren wir Sie unverzüglich, damit Sie Ihren Meldepflichten nachkommen können."
       },
       "contact": {
-        "title": "9. Contact",
-        "content": "Voor vragen over deze overeenkomst kunt u contact opnemen via"
+        "title": "9. Kontakt",
+        "content": "Fragen zu diesem Vertrag richten Sie bitte an"
       }
     }
   },
   "slaPage": {
     "title": "Service Level Agreement (SLA)",
-    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "lastUpdated": "Zuletzt aktualisiert: Dezember 2025",
     "sections": {
       "availability": {
-        "title": "1. Beschikbaarheid",
-        "content": "Vysion Horeca garandeert een uptime van 99,9% voor alle kernservices. Dit is exclusief gepland onderhoud, dat vooraf wordt aangekondigd."
+        "title": "1. Verfügbarkeit",
+        "content": "Vysion Horeca garantiert eine Verfügbarkeit von 99,9 % für alle Kernservices. Ausgenommen ist geplante Wartung, die vorab angekündigt wird."
       },
       "maintenance": {
-        "title": "2. Gepland Onderhoud",
-        "content": "Gepland onderhoud vindt plaats buiten piekuren, bij voorkeur tussen 02:00 en 06:00 CET. Klanten worden minimaal 48 uur van tevoren geïnformeerd."
+        "title": "2. Geplante Wartung",
+        "content": "Wartungsarbeiten finden außerhalb der Spitzenzeiten statt, vorzugsweise zwischen 02:00 und 06:00 MEZ. Kunden werden mindestens 48 Stunden im Voraus informiert."
       },
       "response": {
-        "title": "3. Support Responstijden",
+        "title": "3. Support-Reaktionszeiten",
         "headers": {
-          "priority": "Prioriteit",
-          "description": "Über uns Text",
-          "responseTime": "Responstijd"
+          "priority": "Priorität",
+          "description": "Beschreibung",
+          "responseTime": "Reaktionszeit"
         },
         "critical": {
-          "name": "Kritiek",
-          "description": "Systeem volledig onbeschikbaar",
-          "time": "< 1 uur"
+          "name": "Kritisch",
+          "description": "System vollständig nicht verfügbar",
+          "time": "< 1 Stunde"
         },
         "high": {
           "name": "Hoch",
-          "description": "Belangrijke functie niet werkend",
-          "time": "< 4 uur"
+          "description": "Wichtige Funktion funktioniert nicht",
+          "time": "< 4 Stunden"
         },
         "medium": {
-          "name": "Medium",
-          "description": "Functie beperkt werkend",
-          "time": "< 8 uur"
+          "name": "Mittel",
+          "description": "Funktion nur eingeschränkt nutzbar",
+          "time": "< 8 Stunden"
         },
         "low": {
           "name": "Niedrig",
-          "description": "Vraag of verbetersuggestie",
-          "time": "< 24 uur"
+          "description": "Frage oder Verbesserungsvorschlag",
+          "time": "< 24 Stunden"
         }
       },
       "channels": {
-        "title": "4. Support Kanalen",
-        "email": "Email:",
-        "phone": "Telefoon:",
-        "inApp": "In-app support:",
-        "inAppDesc": "Beschikbaar in de Vysion Horeca applicatie"
+        "title": "4. Support-Kanäle",
+        "email": "E-Mail:",
+        "phone": "Telefon:",
+        "inApp": "In-App-Support:",
+        "inAppDesc": "Verfügbar in der Vysion-Horeca-Anwendung"
       },
       "hours": {
-        "title": "5. Support Uren",
-        "light": "Light plan:",
-        "lightHours": "Maandag t/m vrijdag, 09:00 - 17:00 CET",
-        "pro": "Pro plan:",
-        "proHours": "Maandag t/m zondag, 08:00 - 22:00 CET"
+        "title": "5. Support-Zeiten",
+        "light": "Light-Tarif:",
+        "lightHours": "Montag bis Freitag, 09:00 – 17:00 MEZ",
+        "pro": "Pro-Tarif:",
+        "proHours": "Montag bis Sonntag, 08:00 – 22:00 MEZ"
       },
       "backups": {
-        "title": "6. Back-ups",
-        "content": "Alle gegevens worden dagelijks geback-upt. Back-ups worden 30 dagen bewaard. In geval van dataverlies kunnen wij gegevens herstellen vanaf de meest recente back-up."
+        "title": "6. Backups",
+        "content": "Alle Daten werden täglich gesichert. Backups werden 30 Tage aufbewahrt. Bei Datenverlust können wir aus dem neuesten Stand wiederherstellen."
       },
       "updates": {
         "title": "7. Updates",
-        "content": "Software updates worden automatisch uitgerold, meestal 's nachts. Belangrijke updates worden vooraf gecommuniceerd."
+        "content": "Software-Updates werden automatisch ausgerollt, in der Regel nachts. Wichtige Updates werden vorab mitgeteilt."
       }
     }
   },
   "aupPage": {
-    "title": "Beleid voor Aanvaardbaar Gebruik",
-    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "title": "Richtlinie zur zulässigen Nutzung",
+    "lastUpdated": "Zuletzt aktualisiert: Dezember 2025",
     "sections": {
       "intro": {
-        "title": "Inleiding",
-        "content": "Dit Beleid voor Aanvaardbaar Gebruik beschrijft de regels voor het gebruik van de diensten van Vysion Horeca. Door onze diensten te gebruiken, gaat u akkoord met dit beleid."
+        "title": "Einleitung",
+        "content": "Diese Richtlinie beschreibt die Regeln für die Nutzung der Dienste von Vysion Horeca. Mit der Nutzung stimmen Sie dieser Richtlinie zu."
       },
       "allowed": {
-        "title": "Toegestaan Gebruik",
-        "intro": "U mag onze diensten gebruiken voor:",
+        "title": "Zulässige Nutzung",
+        "intro": "Sie dürfen unsere Dienste verwenden für:",
         "items": {
-          "1": "Het beheren van uw horecazaak",
-          "2": "Het verwerken van transacties en bestellingen",
-          "3": "Het bijhouden van uw boekhouding en administratie",
-          "4": "Het communiceren met klanten"
+          "1": "Die Verwaltung Ihres Gastronomiebetriebs",
+          "2": "Die Abwicklung von Transaktionen und Bestellungen",
+          "3": "Ihre Buchhaltung und Verwaltung",
+          "4": "Die Kommunikation mit Kunden"
         }
       },
       "prohibited": {
-        "title": "Verboden Gebruik",
-        "intro": "Het is verboden om onze diensten te gebruiken voor:",
+        "title": "Untersagte Nutzung",
+        "intro": "Es ist untersagt, unsere Dienste zu nutzen für:",
         "items": {
-          "1": "Illegale activiteiten of fraude",
-          "2": "Het verspreiden van malware of schadelijke software",
-          "3": "Het schenden van intellectuele eigendomsrechten",
-          "4": "Het verstoren van onze diensten of servers",
-          "5": "Het verzamelen van gegevens van andere gebruikers zonder toestemming",
-          "6": "Het omzeilen van beveiligingsmaatregelen"
+          "1": "Illegale Aktivitäten oder Betrug",
+          "2": "Die Verbreitung von Malware oder schädlicher Software",
+          "3": "Verletzungen geistigen Eigentums",
+          "4": "Die Störung unserer Dienste oder Server",
+          "5": "Das Erheben von Daten anderer Nutzer ohne Einwilligung",
+          "6": "Das Umgehen von Sicherheitsmaßnahmen"
         }
       },
       "enforcement": {
-        "title": "Handhaving",
-        "content": "Bij schending van dit beleid kunnen wij uw account opschorten of beëindigen. In ernstige gevallen kunnen wij juridische stappen ondernemen."
+        "title": "Durchsetzung",
+        "content": "Bei Verstößen können wir Ihr Konto sperren oder kündigen. In schweren Fällen behalten wir uns rechtliche Schritte vor."
       },
       "contact": {
-        "title": "Contact",
-        "content": "Voor vragen kunt u contact opnemen via"
+        "title": "Kontakt",
+        "content": "Bei Fragen wenden Sie sich bitte an"
       }
     }
   },
   "trademarkPage": {
-    "title": "Vysion Handelsmerk en Auteursrechtrichtlijnen",
-    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "title": "Vysion Marken- und Urheberrechtsrichtlinien",
+    "lastUpdated": "Zuletzt aktualisiert: Dezember 2025",
     "sections": {
       "brands": {
-        "title": "Onze Merken",
-        "intro": "De volgende merknamen en logo's zijn eigendom van Vysion Group International:",
+        "title": "Unsere Marken",
+        "intro": "Folgende Marken und Logos gehören der Vysion Group International:",
         "items": {
           "1": "Vysion™",
           "2": "Vysion Horeca™",
           "3": "Vysion Apps™",
           "4": "SCARDA™",
-          "5": "Het Vysion logo en alle varianten"
+          "5": "Das Vysion-Logo und alle Varianten"
         }
       },
       "allowed": {
-        "title": "Toegestaan Gebruik",
-        "intro": "U mag onze merknamen gebruiken om:",
+        "title": "Zulässige Nutzung",
+        "intro": "Sie dürfen unsere Markennamen verwenden, um:",
         "items": {
-          "1": "Naar onze producten of diensten te verwijzen in tekst",
-          "2": "Aan te geven dat u Vysion Horeca gebruikt in uw zaak",
-          "3": "Reviews of artikelen over onze diensten te schrijven"
+          "1": "In Texten auf unsere Produkte oder Dienste zu verweisen",
+          "2": "Anzugeben, dass Sie Vysion Horeca in Ihrem Betrieb nutzen",
+          "3": "Rezensionen oder Artikel über unsere Dienste zu verfassen"
         }
       },
       "notAllowed": {
-        "title": "Niet Toegestaan",
-        "intro": "Het is niet toegestaan om:",
+        "title": "Nicht zulässig",
+        "intro": "Nicht gestattet ist:",
         "items": {
-          "1": "Onze logo's te gebruiken zonder schriftelijke toestemming",
-          "2": "Onze merknamen te gebruiken in uw bedrijfsnaam of productnaam",
-          "3": "De indruk te wekken dat u door ons wordt gesponsord of ondersteund",
-          "4": "Onze merknamen te registreren als domeinnaam of social media handle",
-          "5": "Onze merken te wijzigen of te combineren met andere elementen"
+          "1": "Die Nutzung unserer Logos ohne schriftliche Genehmigung",
+          "2": "Die Nutzung unserer Marken in Ihrem Firmen- oder Produktnamen",
+          "3": "Den Eindruck einer Sponsoring- oder Partnerschaft mit uns zu erwecken",
+          "4": "Die Registrierung unserer Marken als Domain oder Social-Media-Handle",
+          "5": "Abwandlung oder Kombination unserer Marken mit anderen Elementen"
         }
       },
       "logoGuidelines": {
-        "title": "Logo Richtlijnen",
-        "intro": "Als u toestemming heeft om ons logo te gebruiken, houdt u zich aan de volgende richtlijnen:",
+        "title": "Logo-Richtlinien",
+        "intro": "Wenn Sie ein Logo nutzen dürfen, beachten Sie bitte:",
         "items": {
-          "1": "Gebruik alleen officiële logo-bestanden die wij aanleveren",
-          "2": "Wijzig de kleuren of verhoudingen niet",
-          "3": "Zorg voor voldoende witruimte rondom het logo",
-          "4": "Plaats het logo niet op drukke achtergronden"
+          "1": "Verwenden Sie nur offizielle Logo-Dateien von uns",
+          "2": "Ändern Sie keine Farben oder Proportionen",
+          "3": "Halten Sie ausreichend Freiraum um das Logo ein",
+          "4": "Platzieren Sie das Logo nicht auf unruhigen Hintergründen"
         }
       },
       "permission": {
-        "title": "Toestemming Aanvragen",
-        "content": "Voor toestemming om onze merknamen of logo's te gebruiken, neem contact op via"
+        "title": "Genehmigung einholen",
+        "content": "Für die Nutzung unserer Marken oder Logos wenden Sie sich bitte an"
       }
     }
   },
   "ipPage": {
-    "title": "Beleid inzake Intellectueel Eigendom",
-    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "title": "Richtlinie zum geistigen Eigentum",
+    "lastUpdated": "Zuletzt aktualisiert: Dezember 2025",
     "sections": {
       "ownership": {
-        "title": "1. Eigendom van Vysion",
-        "content": "Alle intellectuele eigendomsrechten met betrekking tot de Vysion Horeca software, inclusief maar niet beperkt tot de broncode, ontwerpen, logo's, merknamen en documentatie, zijn en blijven eigendom van Vysion Group International."
+        "title": "1. Eigentum von Vysion",
+        "content": "Alle Rechte am geistigen Eigentum an der Software Vysion Horeca, einschließlich Quellcode, Designs, Logos, Markennamen und Dokumentation, stehen der Vysion Group International zu und verbleiben bei ihr."
       },
       "license": {
-        "title": "2. Licentie",
-        "content": "Door een abonnement af te sluiten, ontvangt u een beperkte, niet-exclusieve, niet-overdraagbare licentie om de software te gebruiken voor uw bedrijfsvoering. Deze licentie eindigt bij beëindiging van het abonnement."
+        "title": "2. Lizenz",
+        "content": "Mit dem Abschluss eines Abonnements erhalten Sie eine eingeschränkte, nicht ausschließliche, nicht übertragbare Lizenz zur Nutzung der Software für Ihren Betrieb. Die Lizenz endet mit Beendigung des Abonnements."
       },
       "prohibited": {
-        "title": "3. Verboden Handelingen",
-        "intro": "Het is niet toegestaan om:",
+        "title": "3. Untersagte Handlungen",
+        "intro": "Untersagt ist:",
         "items": {
-          "1": "De software te kopiëren, wijzigen of reverse-engineeren",
-          "2": "De software te sublicentiëren of door te verkopen",
-          "3": "Beveiligingsmaatregelen te omzeilen",
-          "4": "Onze merknamen of logo's te gebruiken zonder toestemming"
+          "1": "Vervielfältigung, Änderung oder Reverse Engineering der Software",
+          "2": "Unterlizenzierung oder Weiterverkauf der Software",
+          "3": "Das Umgehen von Sicherheitsmaßnahmen",
+          "4": "Die Nutzung unserer Marken oder Logos ohne Genehmigung"
         }
       },
       "yourContent": {
-        "title": "4. Uw Content",
-        "content": "U behoudt alle rechten op uw eigen bedrijfsgegevens, productinformatie en klantdata. U verleent ons een licentie om deze gegevens te verwerken voor het leveren van onze diensten."
+        "title": "4. Ihre Inhalte",
+        "content": "Sie behalten alle Rechte an Ihren Geschäftsdaten, Produktinformationen und Kundendaten. Sie räumen uns ein Nutzungsrecht zur Verarbeitung dieser Daten zur Erbringung unserer Dienste ein."
       },
       "infringement": {
-        "title": "5. Meldingen van Inbreuk",
-        "content": "Als u vermoedt dat er inbreuk wordt gemaakt op intellectuele eigendomsrechten, neem dan contact met ons op. Wij nemen dergelijke meldingen serieus en zullen passende maatregelen treffen."
+        "title": "5. Hinweise auf Verstöße",
+        "content": "Bei Verdacht auf Verletzung geistigen Eigentums kontaktieren Sie uns. Wir prüfen solche Hinweise und ergreifen gegebenenfalls Maßnahmen."
       },
       "contact": {
-        "title": "6. Contact",
-        "content": "Voor vragen over intellectueel eigendom kunt u contact opnemen via"
+        "title": "6. Kontakt",
+        "content": "Fragen zum geistigen Eigentum richten Sie bitte an"
       }
     }
   },
   "paymentPage": {
-    "title": "Vysion Payments Platform Overeenkomst",
-    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "title": "Vysion Payments Plattform-Vertrag",
+    "lastUpdated": "Zuletzt aktualisiert: Dezember 2025",
     "sections": {
       "intro": {
-        "title": "1. Inleiding",
-        "content": "Deze overeenkomst beschrijft de voorwaarden voor het gebruik van betalingsdiensten via het Vysion Horeca platform. Betalingsverwerking gebeurt via onze partners Mollie en Stripe."
+        "title": "1. Einleitung",
+        "content": "Dieser Vertrag regelt die Nutzung von Zahlungsdiensten über die Plattform Vysion Horeca. Die Zahlungsabwicklung erfolgt über unsere Partner Mollie und Stripe."
       },
       "processing": {
-        "title": "2. Betalingsverwerking",
-        "content": "Vysion Horeca integreert met erkende betalingsverwerkers om veilige transacties te garanderen. Alle transacties worden versleuteld en voldoen aan PCI-DSS standaarden."
+        "title": "2. Zahlungsabwicklung",
+        "content": "Vysion Horeca bindet zertifizierte Zahlungsdienstleister ein. Alle Transaktionen sind verschlüsselt und erfüllen PCI-DSS."
       },
       "methods": {
-        "title": "3. Ondersteunde Betaalmethodes",
+        "title": "3. Unterstützte Zahlungsarten",
         "items": {
           "1": "Bancontact",
           "2": "Visa / Mastercard",
@@ -3539,150 +3575,154 @@
         }
       },
       "fees": {
-        "title": "4. Transactiekosten",
-        "content": "Transactiekosten worden bepaald door de betalingsverwerker en zijn afhankelijk van de betaalmethode en het transactievolume. Neem contact op voor actuele tarieven."
+        "title": "4. Transaktionsgebühren",
+        "content": "Gebühren legt der Zahlungsdienstleister fest und hängen von Zahlungsart und Volumen ab. Aktuelle Tarife erhalten Sie auf Anfrage."
       },
       "payouts": {
-        "title": "5. Uitbetalingen",
-        "content": "Ontvangen betalingen worden automatisch uitbetaald naar uw zakelijke bankrekening. De uitbetalingsfrequentie is instelbaar (dagelijks, wekelijks of maandelijks)."
+        "title": "5. Auszahlungen",
+        "content": "Eingangszahlungen werden auf Ihr Geschäftskonto ausgezahlt. Die Auszahlungsfrequenz ist einstellbar (täglich, wöchentlich oder monatlich)."
       },
       "chargebacks": {
-        "title": "6. Terugboekingen en Geschillen",
-        "content": "Bij een terugboeking (chargeback) ontvangt u een melding en heeft u de mogelijkheid om bewijs te leveren. Wij ondersteunen u bij het afhandelen van betalingsgeschillen."
+        "title": "6. Rückbuchungen und Streitfälle",
+        "content": "Bei Chargebacks erhalten Sie eine Benachrichtigung und können Nachweise einreichen. Wir unterstützen Sie bei der Klärung."
       },
       "security": {
-        "title": "7. Beveiliging",
-        "content": "Alle betalingsgegevens worden verwerkt conform PCI-DSS Level 1. Kaartgegevens worden nooit opgeslagen op onze servers."
+        "title": "7. Sicherheit",
+        "content": "Zahlungsdaten werden gemäß PCI-DSS Level 1 verarbeitet. Kartendaten speichern wir nicht auf unseren Servern."
       },
       "contact": {
-        "title": "8. Contact",
-        "content": "Voor vragen over betalingen kunt u contact opnemen via"
+        "title": "8. Kontakt",
+        "content": "Fragen zu Zahlungen richten Sie bitte an"
       }
     }
   },
   "subprocessorsPage": {
-    "title": "Subverwerkers",
-    "lastUpdated": "Laatst bijgewerkt: december 2025",
-    "intro": "Vysion Horeca maakt gebruik van de volgende subverwerkers voor het leveren van onze diensten. Alle subverwerkers zijn zorgvuldig geselecteerd en voldoen aan de AVG/GDPR vereisten.",
+    "title": "Unterauftragsverarbeiter",
+    "lastUpdated": "Zuletzt aktualisiert: Dezember 2025",
+    "intro": "Vysion Horeca setzt folgende Unterauftragsverarbeiter ein. Sie sind sorgfältig ausgewählt und erfüllen die Anforderungen der DSGVO.",
     "table": {
-      "subprocessor": "Subverwerker",
-      "purpose": "Doel",
-      "location": "Locatie",
+      "subprocessor": "Auftragsverarbeiter",
+      "purpose": "Zweck",
+      "location": "Standort",
       "aws": {
         "name": "Amazon Web Services (AWS)",
-        "purpose": "Cloud hosting en opslag",
+        "purpose": "Cloud-Hosting und Speicher",
         "location": "EU (Frankfurt)"
       },
       "mollie": {
         "name": "Mollie",
-        "purpose": "Betalingsverwerking",
-        "location": "Nederland"
+        "purpose": "Zahlungsabwicklung",
+        "location": "Niederlande"
       },
       "stripe": {
         "name": "Stripe",
-        "purpose": "Betalingsverwerking",
+        "purpose": "Zahlungsabwicklung",
         "location": "EU"
       },
       "vercel": {
         "name": "Vercel",
-        "purpose": "Website hosting",
+        "purpose": "Website-Hosting",
         "location": "EU"
       },
       "sendgrid": {
         "name": "SendGrid",
-        "purpose": "E-mail diensten",
+        "purpose": "E-Mail-Dienste",
         "location": "EU"
       }
     },
     "changes": {
-      "title": "Wijzigingen",
-      "content": "Wij informeren onze klanten bij wijzigingen in de lijst van subverwerkers. Als u bezwaar heeft tegen een nieuwe subverwerker, kunt u contact met ons opnemen."
+      "title": "Änderungen",
+      "content": "Wir informieren Kunden über Änderungen der Liste. Widersprechen Sie einem neuen Unterauftragsverarbeiter, kontaktieren Sie uns."
     },
     "contact": {
-      "title": "Contact",
-      "content": "Voor vragen over onze subverwerkers kunt u contact opnemen via"
+      "title": "Kontakt",
+      "content": "Fragen zu Unterauftragsverarbeitern richten Sie bitte an"
     }
   },
   "serviceAgreementPage": {
-    "title": "Vysion Dienstenovereenkomst",
-    "lastUpdated": "Laatst bijgewerkt: december 2025",
+    "title": "Vysion Dienstleistungsvertrag",
+    "lastUpdated": "Zuletzt aktualisiert: Dezember 2025",
     "sections": {
       "general": {
-        "title": "1. Algemeen",
-        "content": "Deze Dienstenovereenkomst (\"Overeenkomst\") is van toepassing op het gebruik van de diensten van Vysion Horeca, onderdeel van Vysion Group International. Door gebruik te maken van onze diensten gaat u akkoord met deze voorwaarden."
+        "title": "1. Allgemeines",
+        "content": "Dieser Dienstleistungsvertrag gilt für die Nutzung der Dienste von Vysion Horeca (Vysion Group International). Mit der Nutzung akzeptieren Sie diese Bedingungen."
       },
       "services": {
-        "title": "2. Diensten",
-        "content": "Vysion Horeca biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken."
+        "title": "2. Leistungen",
+        "content": "Vysion Horeca bietet Kassensoftware, Online-Bestellplattform, Buchhaltungssoftware und verwandte Leistungen für die Gastronomie. Wir können Leistungen ändern, erweitern oder einschränken."
       },
       "subscription": {
-        "title": "3. Abonnement en Betaling",
-        "intro": "De toegang tot onze diensten is beschikbaar via een maandelijks of jaarlijks abonnement. Betalingen worden vooraf gefactureerd en zijn niet-restitueerbaar, tenzij anders vermeld.",
+        "title": "3. Abonnement und Zahlung",
+        "intro": "Der Zugang erfolgt per monatlichem oder jährlichem Abonnement. Zahlungen werden im Voraus berechnet und sind nicht erstattungsfähig, sofern nicht anders angegeben.",
         "items": {
-          "1": "Facturen worden maandelijks of jaarlijks verstuurd",
-          "2": "Betalingstermijn is 14 dagen na factuurdatum",
-          "3": "Bij niet-betaling kan toegang worden opgeschort"
+          "1": "Rechnungen werden monatlich oder jährlich gestellt",
+          "2": "Zahlungsziel: 14 Tage ab Rechnungsdatum",
+          "3": "Bei Nichtzahlung kann der Zugang gesperrt werden"
         }
       },
       "usage": {
-        "title": "4. Gebruik van de Diensten",
-        "content": "U bent verantwoordelijk voor het rechtmatige gebruik van onze diensten. Het is verboden om de diensten te gebruiken voor illegale doeleinden, inbreuk te maken op intellectuele eigendomsrechten, of de diensten te verstoren."
+        "title": "4. Nutzung",
+        "content": "Sie sind für eine rechtmäßige Nutzung verantwortlich. Untersagt sind illegale Zwecke, Verletzungen geistigen Eigentums und die Störung der Dienste."
       },
       "privacy": {
-        "title": "5. Gegevens en Privacy",
-        "content": "Wij verwerken uw gegevens conform onze Privacyverklaring en de toepasselijke wetgeving, waaronder de AVG/GDPR. U behoudt eigendom over uw bedrijfsgegevens."
+        "title": "5. Daten und Datenschutz",
+        "content": "Wir verarbeiten Daten gemäß unserer Datenschutzerklärung und geltendem Recht einschließlich DSGVO. Ihre Geschäftsdaten bleiben in Ihrem Eigentum."
       },
       "liability": {
-        "title": "6. Aansprakelijkheid",
-        "content": "Vysion Horeca is niet aansprakelijk voor indirecte schade, gevolgschade of gederfde winst. Onze totale aansprakelijkheid is beperkt tot het bedrag dat u in de afgelopen 12 maanden aan ons heeft betaald."
+        "title": "6. Haftung",
+        "content": "Vysion Horeca haftet nicht für indirekte Schäden, Folgeschäden oder entgangenen Gewinn. Die Gesamthaftung ist auf die in den letzten 12 Monaten gezahlten Beträge begrenzt."
       },
       "termination": {
-        "title": "7. Beëindiging",
-        "content": "U kunt uw abonnement op elk moment opzeggen. De opzegging gaat in aan het einde van de lopende facturatieperiode. Wij kunnen de overeenkomst beëindigen bij schending van deze voorwaarden."
+        "title": "7. Kündigung",
+        "content": "Sie können das Abonnement jederzeit kündigen; wirksam zum Ende der laufenden Abrechnungsperiode. Wir können den Vertrag bei Verstoß kündigen."
       },
       "law": {
-        "title": "8. Toepasselijk Recht",
-        "content": "Op deze overeenkomst is Belgisch recht van toepassing. Geschillen worden voorgelegd aan de bevoegde rechtbank te België."
+        "title": "8. Anwendbares Recht",
+        "content": "Es gilt belgisches Recht. Streitigkeiten unterliegen den zuständigen Gerichten in Belgien."
       },
       "contact": {
-        "title": "9. Contact",
-        "content": "Voor vragen over deze overeenkomst kunt u contact opnemen via"
+        "title": "9. Kontakt",
+        "content": "Fragen zu diesem Vertrag richten Sie bitte an"
       }
     }
   },
   "zReport": {
-    "title": "Z-Rapport Online Verkopen",
-    "subtitle": "Dagelijks overzicht voor witte kassa (GKS)",
-    "reportTitle": "Z-RAPPORT",
-    "onlineSales": "ONLINE VERKOPEN",
-    "history": "Archief",
-    "print": "Afdrukken",
+    "title": "Z-Bericht — Online-Verkäufe",
+    "subtitle": "Tagesübersicht für Registrierkasse (GKS)",
+    "reportTitle": "Z-BERICHT",
+    "onlineSales": "ONLINE-VERKÄUFE",
+    "history": "Archiv",
+    "print": "Drucken",
+    "refresh": "Aktualisieren",
+    "sync": "Speichern",
+    "autoUpdated": "Automatisch aktualisiert",
+    "newOrdersDetected": "Neue Bestellungen — klicken Sie auf Aktualisieren",
     "save": "Speichern",
-    "saved": "Opgeslagen!",
-    "alreadySaved": "Al opgeslagen",
-    "savedToArchive": "Opgeslagen in archief",
-    "orderCount": "Aantal bestellingen",
-    "subtotal": "Subtotaal (excl. BTW)",
-    "vat": "MwSt",
-    "total": "TOTAAL",
-    "paymentMethods": "Betaalmethodes",
-    "onlinePaid": "Online betaald",
-    "cardPaid": "Kaart/PIN",
+    "saved": "Gespeichert!",
+    "alreadySaved": "Bereits gespeichert",
+    "savedToArchive": "Im Archiv gespeichert",
+    "orderCount": "Anzahl Bestellungen",
+    "subtotal": "Zwischensumme (ohne MwSt.)",
+    "vat": "MwSt.",
+    "total": "GESAMT",
+    "paymentMethods": "Zahlungsarten",
+    "onlinePaid": "Online bezahlt",
+    "cardPaid": "Karte/PIN",
     "cashPaid": "Bar",
-    "generatedOn": "Gegenereerd op",
-    "noOrders": "Geen bestellingen",
-    "noOrdersDesc": "Er zijn geen online bestellingen op deze dag.",
-    "howToUse": "Hoe invoeren in witte kassa?",
-    "step1": "Klik op 'Opslaan' om dit rapport te archiveren",
-    "step2": "Open je witte kassa en maak een nieuwe verkoop aan",
-    "step3": "Voer in: 'Online verkopen' met bedrag",
-    "step4": "Selecteer de juiste BTW-categorie",
-    "retention": "Z-Rapporten worden 7 jaar bewaard conform fiscale wetgeving.",
-    "savedReports": "Opgeslagen rapporten",
-    "noSavedReports": "Nog geen rapporten opgeslagen",
-    "orders": "bestellingen",
+    "generatedOn": "Erstellt am",
+    "noOrders": "Keine Bestellungen",
+    "noOrdersDesc": "An diesem Tag gibt es keine Online-Bestellungen.",
+    "howToUse": "So tragen Sie es in der Kasse ein",
+    "step1": "Klicken Sie auf «Speichern», um diesen Bericht zu archivieren",
+    "step2": "Öffnen Sie die Kasse und erfassen Sie einen neuen Verkauf",
+    "step3": "Geben Sie «Online-Verkäufe» mit Betrag ein",
+    "step4": "Wählen Sie die richtige MwSt.-Kategorie",
+    "retention": "Z-Berichte werden gemäß Steuergesetz 7 Jahre aufbewahrt.",
+    "savedReports": "Gespeicherte Berichte",
+    "noSavedReports": "Noch keine Berichte gespeichert",
+    "orders": "Bestellungen",
     "totalSaved": "Gesamt gespeichert",
-    "vatNumber": "MwSt"
+    "vatNumber": "MwSt."
   },
   "simulator": {
     "title": "Kostenrechner",
