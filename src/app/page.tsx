@@ -7,7 +7,7 @@ import { useLanguage } from '@/i18n'
 
 function WhyVysionSection() {
   const { t } = useLanguage()
-  const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice'] as const
+  const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice', 'inHouseSoftware', 'posQuality'] as const
 
   return (
     <section className="relative py-24 sm:py-32 lg:py-40 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
