@@ -9,6 +9,7 @@ type Props = {
 }
 
 const HERO_BG = '/images/hero-header.png'
+const LIVE_DEMO_URL = 'https://frituurnolim.ordervysion.com'
 
 export default function HomeLandingHero({ onStickyNavChange }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
@@ -205,24 +206,29 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
 
       {/* Center content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 text-center py-6 sm:py-8">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] font-bold leading-tight max-w-4xl">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold leading-tight max-w-4xl tracking-tight">
           {t('heroLanding.title')}
         </h1>
-        <p className="mt-4 sm:mt-5 text-base sm:text-lg md:text-xl text-white/90 max-w-2xl font-normal leading-relaxed">
+        <p className="mt-4 sm:mt-5 text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-2xl leading-snug">
+          {t('heroLanding.subtitleLead')}
+        </p>
+        <p className="mt-3 sm:mt-4 text-base sm:text-lg md:text-xl text-white/90 max-w-2xl font-normal leading-relaxed">
           {t('heroLanding.subtitle')}
         </p>
-        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-          <a
-            href="/resellers"
-            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors underline decoration-white/40 underline-offset-4"
-          >
-            {t('heroLanding.ctaReseller')}
-          </a>
+        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
           <a
             href={`/registreer?lang=${locale}`}
-            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-teal-500 hover:bg-teal-600 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors underline decoration-white/40 underline-offset-4"
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors"
           >
-            {t('heroLanding.ctaTrial')}
+            {t('heroLanding.ctaStartFree')}
+          </a>
+          <a
+            href={LIVE_DEMO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border-2 border-white/90 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors"
+          >
+            {t('heroLanding.ctaViewDemo')}
           </a>
         </div>
       </div>

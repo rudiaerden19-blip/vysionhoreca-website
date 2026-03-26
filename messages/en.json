@@ -20,10 +20,11 @@
   },
   "heroLanding": {
     "logoTagline": "Your hospitality platform",
-    "title": "Belgium's smartest hospitality platform",
-    "subtitle": "Vysion helps hospitality businesses work smarter and more efficiently. One platform — everything at your fingertips.",
-    "ctaReseller": "Become a reseller",
-    "ctaTrial": "Start free trial",
+    "title": "All-in-one hospitality platform",
+    "subtitleLead": "More revenue. Less busywork.",
+    "subtitle": "POS, orders and reservations in one system.",
+    "ctaStartFree": "Start free",
+    "ctaViewDemo": "View demo",
     "demoRequest": "Request a demo"
   },
   "hero": {

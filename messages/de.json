@@ -20,10 +20,11 @@
   },
   "heroLanding": {
     "logoTagline": "Ihre Gastronomie-Plattform",
-    "title": "Die intelligenteste Gastronomie-Plattform in Belgien",
-    "subtitle": "Vysion hilft Gastronomiebetrieben, smarter und effizienter zu arbeiten. Eine Plattform – alles griffbereit.",
-    "ctaReseller": "Reseller werden",
-    "ctaTrial": "Kostenlos testen",
+    "title": "All-in-one-Gastronomieplattform",
+    "subtitleLead": "Mehr Umsatz. Weniger Aufwand.",
+    "subtitle": "Kasse, Bestellungen und Reservierungen in einem System.",
+    "ctaStartFree": "Kostenlos starten",
+    "ctaViewDemo": "Demo ansehen",
     "demoRequest": "Demo anfragen"
   },
   "hero": {

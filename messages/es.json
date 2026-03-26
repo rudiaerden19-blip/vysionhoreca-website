@@ -20,10 +20,11 @@
   },
   "heroLanding": {
     "logoTagline": "Tu plataforma hostelera",
-    "title": "La plataforma hostelera más inteligente de Bélgica",
-    "subtitle": "Vysion ayuda a los negocios de hostelería a trabajar de forma más inteligente y eficiente. Una plataforma: todo a mano.",
-    "ctaReseller": "Ser revendedor",
-    "ctaTrial": "Prueba gratis",
+    "title": "Plataforma hostelera todo en uno",
+    "subtitleLead": "Más ingresos. Menos trabajo.",
+    "subtitle": "Caja, pedidos y reservas en un solo sistema.",
+    "ctaStartFree": "Empezar gratis",
+    "ctaViewDemo": "Ver demo",
     "demoRequest": "Solicitar demo"
   },
   "hero": {

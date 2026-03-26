@@ -20,10 +20,11 @@
   },
   "heroLanding": {
     "logoTagline": "La tua piattaforma horeca",
-    "title": "La piattaforma horeca più intelligente del Belgio",
-    "subtitle": "Vysion aiuta le attività horeca a lavorare in modo più smart ed efficiente. Una piattaforma — tutto sotto controllo.",
-    "ctaReseller": "Diventa rivenditore",
-    "ctaTrial": "Prova gratuita",
+    "title": "Piattaforma horeca tutto-in-uno",
+    "subtitleLead": "Più fatturato. Meno lavoro.",
+    "subtitle": "Cassa, ordini e prenotazioni in un unico sistema.",
+    "ctaStartFree": "Inizia gratis",
+    "ctaViewDemo": "Guarda la demo",
     "demoRequest": "Richiedi demo"
   },
   "hero": {

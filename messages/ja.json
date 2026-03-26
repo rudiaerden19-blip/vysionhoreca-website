@@ -20,10 +20,11 @@
   },
   "heroLanding": {
     "logoTagline": "あなたの飲食プラットフォーム",
-    "title": "ベルギーで最も賢い飲食向けプラットフォーム",
-    "subtitle": "Vysion は飲食店のよりスマートで効率的な運営を支援します。すべてを1つのプラットフォームで。",
-    "ctaReseller": "リセラーになる",
-    "ctaTrial": "無料トライアル",
+    "title": "飲食向けオールインワンプラットフォーム",
+    "subtitleLead": "売上アップ。手間はダウン。",
+    "subtitle": "レジ・注文・予約をひとつのシステムに。",
+    "ctaStartFree": "無料で始める",
+    "ctaViewDemo": "デモを見る",
     "demoRequest": "デモを依頼"
   },
   "hero": {

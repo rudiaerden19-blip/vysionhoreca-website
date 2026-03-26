@@ -20,10 +20,11 @@
   },
   "heroLanding": {
     "logoTagline": "您的餐饮平台",
-    "title": "比利时最智能的餐饮平台",
-    "subtitle": "Vysion 帮助餐饮企业更智能、更高效地运营。一个平台，尽在掌握。",
-    "ctaReseller": "成为经销商",
-    "ctaTrial": "免费试用",
+    "title": "一体化餐饮平台",
+    "subtitleLead": "增收减负。",
+    "subtitle": "收银、订单与预订，一套系统搞定。",
+    "ctaStartFree": "免费开始",
+    "ctaViewDemo": "查看演示",
     "demoRequest": "申请演示"
   },
   "hero": {

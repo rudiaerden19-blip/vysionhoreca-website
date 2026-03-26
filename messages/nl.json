@@ -20,10 +20,11 @@
   },
   "heroLanding": {
     "logoTagline": "Jouw horeca platform",
-    "title": "Het slimste horeca platform van België",
-    "subtitle": "Vysion helpt horecazaken slimmer en efficiënter te werken. Eén platform — alles bij de hand.",
-    "ctaReseller": "Word reseller",
-    "ctaTrial": "Start gratis proefperiode",
+    "title": "Alles-in-1 horeca platform",
+    "subtitleLead": "Meer omzet. Minder werk.",
+    "subtitle": "Kassa, bestellingen en reserveringen in één systeem.",
+    "ctaStartFree": "Start gratis",
+    "ctaViewDemo": "Bekijk demo",
     "demoRequest": "Demo aanvraag"
   },
   "hero": {
