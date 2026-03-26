@@ -22,7 +22,17 @@
   }
 }
 
-/* Vaste slots + geen mix-blend-mode → logo’s stapelen niet visueel en geen ‘lek’ naar andere lagen */
+/*
+ * Let op: globals zetten div { max-width: 100vw }. De marquee-track moet breder dan het scherm
+ * kunnen zijn voor een correcte loop (translateX(-50%) === één segment). Zonder max-width: none
+ * klopt de animatie niet → dubbele logo’s / overlap / rare strepen.
+ */
+.partner-marquee-viewport,
+.partner-marquee-track,
+.partner-marquee-segment {
+  max-width: none;
+}
+
 .partner-marquee-viewport {
   overflow: hidden;
 }
@@ -33,7 +43,9 @@
   flex-wrap: nowrap;
   align-items: center;
   width: max-content;
+  min-width: max-content;
   animation: partner-marquee-scroll 26s linear infinite;
+  will-change: transform;
 }
 
 .partner-marquee-segment {
@@ -41,17 +53,22 @@
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
+  flex: 0 0 auto;
   flex-shrink: 0;
+  gap: 2rem;
 }
 
 .partner-marquee-slot {
   box-sizing: border-box;
   flex: 0 0 auto;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 11.5rem;
-  padding: 0 1rem;
+  width: 12.5rem;
+  padding: 0 0.75rem;
+  background-color: #e3e3e3;
+  isolation: isolate;
 }
 
 .partner-marquee-slot img {
@@ -62,14 +79,19 @@
   max-height: 4.5rem;
   object-fit: contain;
   object-position: center;
-  filter: grayscale(1) brightness(0.45);
-  opacity: 0.55;
+  filter: grayscale(1);
+  opacity: 0.52;
+  mix-blend-mode: multiply;
 }
 
 @media (min-width: 640px) {
+  .partner-marquee-segment {
+    gap: 2.5rem;
+  }
+
   .partner-marquee-slot {
-    width: 13.5rem;
-    padding: 0 1.25rem;
+    width: 14.5rem;
+    padding: 0 1rem;
   }
 
   .partner-marquee-slot img {
@@ -78,9 +100,13 @@
 }
 
 @media (min-width: 768px) {
+  .partner-marquee-segment {
+    gap: 3rem;
+  }
+
   .partner-marquee-slot {
-    width: 15rem;
-    padding: 0 1.5rem;
+    width: 16rem;
+    padding: 0 1.25rem;
   }
 
   .partner-marquee-slot img {

@@ -236,7 +236,7 @@ function StatsAndLiveDemoSection() {
                       <img
                         src={src}
                         alt=""
-                        loading={dup === 0 ? 'eager' : 'lazy'}
+                        loading="eager"
                         decoding="async"
                       />
                     </div>
