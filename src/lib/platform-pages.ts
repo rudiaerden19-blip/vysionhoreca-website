@@ -2,7 +2,6 @@
 export const PLATFORM_PAGES = [
   { slug: 'kassasysteem', msgKey: 'kassasysteem' },
   { slug: 'bestelplatform', msgKey: 'bestelplatform' },
-  { slug: 'bestelzuilen', msgKey: 'bestelzuilen' },
   { slug: 'keukenschermen', msgKey: 'keukenschermen' },
   { slug: 'online-scherm', msgKey: 'onlineScherm' },
   { slug: 'reservaties', msgKey: 'reservaties' },
