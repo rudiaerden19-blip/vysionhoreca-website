@@ -8,8 +8,6 @@ export type PlatformPageEntry = {
   msgKey: string
   /** Optional photo strip bovenaan de kaart (homepage grid). */
   cardHeaderImage?: string
-  /** Geen ronde Lucide-icon onder de foto (bv. bestelplatform: alleen foto → titel → teaser). */
-  hideCardIcon?: boolean
 }
 
 export const PLATFORM_PAGES: PlatformPageEntry[] = [
@@ -18,7 +16,6 @@ export const PLATFORM_PAGES: PlatformPageEntry[] = [
     slug: 'bestelplatform',
     msgKey: 'bestelplatform',
     cardHeaderImage: BESTELPLATFORM_HERO_IMAGE,
-    hideCardIcon: true,
   },
   { slug: 'keukenschermen', msgKey: 'keukenschermen' },
   { slug: 'online-scherm', msgKey: 'onlineScherm' },

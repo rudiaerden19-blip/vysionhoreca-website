@@ -42,7 +42,7 @@ export default function PlatformGridSection() {
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6 lg:gap-7">
-          {PLATFORM_PAGES.map(({ slug, msgKey, cardHeaderImage, hideCardIcon }) => {
+          {PLATFORM_PAGES.map(({ slug, msgKey, cardHeaderImage }) => {
             const Icon = ICONS[msgKey] ?? Store
             const headerAlt =
               cardHeaderImage && t(`platform.${msgKey}.cardHeaderAlt`) !==
@@ -69,14 +69,12 @@ export default function PlatformGridSection() {
                 </div>
 
                 <div className="flex flex-1 flex-col items-center px-4 pb-5 pt-5 sm:px-6 sm:pb-6 sm:pt-6">
-                  {!hideCardIcon && (
-                    <div
-                      className="mb-4 flex h-[4.75rem] w-[4.75rem] sm:h-[5.25rem] sm:w-[5.25rem] shrink-0 items-center justify-center rounded-full border-2 border-accent bg-white text-accent group-hover:bg-orange-50/80 transition-colors"
-                      aria-hidden
-                    >
-                      <Icon className="h-9 w-9 sm:h-10 sm:w-10" strokeWidth={1.5} />
-                    </div>
-                  )}
+                  <div
+                    className="mb-4 flex h-[4.75rem] w-[4.75rem] sm:h-[5.25rem] sm:w-[5.25rem] shrink-0 items-center justify-center rounded-full border-2 border-accent bg-white text-accent group-hover:bg-orange-50/80 transition-colors"
+                    aria-hidden
+                  >
+                    <Icon className="h-9 w-9 sm:h-10 sm:w-10" strokeWidth={1.5} />
+                  </div>
                   <h3 className="text-base sm:text-lg font-bold text-gray-900 underline decoration-gray-900 underline-offset-4 mb-2.5 leading-snug px-1">
                     {t(`platform.${msgKey}.title`)}
                   </h3>
