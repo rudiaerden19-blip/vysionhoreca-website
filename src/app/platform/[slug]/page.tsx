@@ -53,15 +53,18 @@ export default function PlatformDetailPage() {
         )}
 
         {slug === 'kassasysteem' && (
-          <div className="relative w-full min-h-[min(42svh,520px)] sm:min-h-[min(48svh,580px)] border-b border-gray-900/80 bg-gray-900">
-            <Image
-              src={KASSASYSTEEM_HERO_IMAGE}
-              alt={t('platform.kassasysteem.heroAlt')}
-              fill
-              className="object-cover object-center"
-              sizes="100vw"
-              priority
-            />
+          <div className="relative w-full min-h-[min(42svh,520px)] sm:min-h-[min(48svh,580px)] overflow-hidden border-b border-gray-900/80 bg-gray-900">
+            {/* iets uitzoomen t.o.v. object-cover:zelfde headerhoogte, meer van de foto zichtbaar */}
+            <div className="absolute inset-0">
+              <Image
+                src={KASSASYSTEEM_HERO_IMAGE}
+                alt={t('platform.kassasysteem.heroAlt')}
+                fill
+                className="object-cover object-[center_36%] scale-[0.82] sm:scale-[0.86]"
+                sizes="100vw"
+                priority
+              />
+            </div>
             <div className="absolute inset-0 bg-black/55" aria-hidden />
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 sm:px-6 py-12 text-center">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white tracking-tight max-w-4xl drop-shadow-md">
