@@ -10,14 +10,20 @@ export default function OverOnsPage() {
     <main>
       <Navigation />
       
-      {/* Hero Section */}
-      <section className="bg-dark pt-32 pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero — restaurantfoto */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: 'url(/images/over-ons-hero-bg.png)' }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-black/55" aria-hidden />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-sm">
               {t('about.heroTitle')} <span className="text-accent">{t('about.heroTitleAccent')}</span> {t('about.heroTitleEnd')}
             </h1>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-200 max-w-3xl mx-auto">
               {t('about.heroSubtitle')}
             </p>
           </div>
@@ -80,20 +86,26 @@ export default function OverOnsPage() {
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="py-20 bg-dark">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Mission Section — tweede restaurantfoto */}
+      <section className="relative py-20 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: 'url(/images/over-ons-mission-bg.png)' }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-black/60" aria-hidden />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 drop-shadow-sm">
               {t('about.mission.title')}
             </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-200 max-w-3xl mx-auto">
               {t('about.mission.subtitle')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center border border-white/10">
               <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -103,7 +115,7 @@ export default function OverOnsPage() {
               <p className="text-gray-300">{t('about.mission.reliability.description')}</p>
             </div>
 
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center border border-white/10">
               <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -113,7 +125,7 @@ export default function OverOnsPage() {
               <p className="text-gray-300">{t('about.mission.speed.description')}</p>
             </div>
 
-            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center">
+            <div className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center border border-white/10">
               <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
