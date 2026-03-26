@@ -402,12 +402,12 @@ function PricingSection() {
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-6 lg:p-8">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-accent" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">{t('pricing.starter.name')}</h3>
+                <h3 className="text-xl font-bold text-accent">{t('pricing.starter.name')}</h3>
               </div>
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="text-lg text-gray-400 line-through">
@@ -417,14 +417,14 @@ function PricingSection() {
               </div>
               <div className="flex items-baseline mb-6">
                 <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{starterPrice}</span>
-                <span className="text-gray-500 ml-2">{periodLabel}</span>
+                <span className="text-accent font-medium ml-2">{periodLabel}</span>
               </div>
 
               <ul className="space-y-3 mb-8">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((i) => (
                   <li key={i} className="flex items-start gap-3">
                     <svg
-                      className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0"
+                      className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -442,19 +442,19 @@ function PricingSection() {
               >
                 {t('pricing.chooseStarter')}
               </a>
-              <p className="text-center text-gray-500 text-sm mt-3">{t('pricing.cancelAnytime')}</p>
+              <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
             </div>
           </div>
 
           {/* Pro */}
           <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-md overflow-hidden relative hover:shadow-lg transition-shadow">
-            <div className="absolute top-4 right-4 bg-gray-900 text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
+            <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
               {t('pricing.popular')}
             </div>
             <div className="p-6 lg:p-8">
               <div className="flex items-center gap-3 mb-5 pr-16">
-                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -463,7 +463,7 @@ function PricingSection() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">{t('pricing.pro.name')}</h3>
+                <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
               </div>
               <div className="flex flex-wrap items-center gap-2 mb-2">
                 <span className="text-lg text-gray-400 line-through">
@@ -473,7 +473,7 @@ function PricingSection() {
               </div>
               <div className="flex items-baseline mb-6">
                 <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{proPrice}</span>
-                <span className="text-gray-500 ml-2">{periodLabel}</span>
+                <span className="text-accent font-medium ml-2">{periodLabel}</span>
               </div>
 
               <p className="text-gray-700 mb-4 text-sm sm:text-base font-medium">{t('pricing.pro.allOfStarter')}</p>
@@ -482,7 +482,7 @@ function PricingSection() {
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
                   <li key={i} className="flex items-start gap-3">
                     <svg
-                      className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0"
+                      className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -500,7 +500,7 @@ function PricingSection() {
               >
                 {t('pricing.choosePro')}
               </a>
-              <p className="text-center text-gray-500 text-sm mt-3">{t('pricing.cancelAnytime')}</p>
+              <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
             </div>
           </div>
         </div>
