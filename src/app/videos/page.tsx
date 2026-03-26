@@ -148,13 +148,19 @@ export default function VideosPage() {
     <main>
       <Navigation />
 
-      {/* Hero */}
-      <section className="bg-dark pt-32 pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+      {/* Hero — achtergrond restaurant (afb. gebruiker) */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: 'url(/images/videos-header-bg.png)' }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-black/55" aria-hidden />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-sm">
             Help <span className="text-accent">Video's</span>
           </h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-200 max-w-3xl mx-auto">
             Leer alles over Vysion Horeca in korte video's van 3 minuten.
           </p>
         </div>
