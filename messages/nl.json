@@ -123,55 +123,65 @@
   },
   "platform": {
     "sectionTitle": "Ons platform",
-    "sectionSubtitle": "Negen bouwstenen van Vysion Horeca — klik een vak voor meer uitleg op een eigen pagina.",
+    "sectionSubtitle": "Elk vak opent een eigen pagina met meer uitleg.",
     "detailCta": "Gratis testen",
     "detailBack": "Terug naar overzicht",
     "notFoundTitle": "Pagina niet gevonden",
     "notFoundCta": "Naar de homepage",
+    "kassasysteem": {
+      "title": "Kassasysteem",
+      "teaser": "Snel afrekenen, gekoppeld aan online orders en rapporten.",
+      "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion Horeca beheer je producten, tafels, betalingen en personeel vanuit één omgeving — minder fouten tijdens piekuren en altijd zicht op de dagafsluiting."
+    },
+    "bestelplatform": {
+      "title": "Bestelplatform",
+      "teaser": "Klanten bestellen online bij jou — zonder tussenpartij die commissie vraagt.",
+      "body": "Afhalen, levering en bestellen aan tafel verlopen via jouw eigen site in jouw huisstijl. Orders komen gestructureerd binnen op kassa en keuken.\n\nZo verwerk je pieken beter en houd je de volledige marge op je online omzet."
+    },
+    "bestelzuilen": {
+      "title": "Bestelzuilen",
+      "teaser": "Zelfbediening aan de balie: minder wachtrij, hogere doorstroming.",
+      "body": "Een bestelzuil neemt routinematige orders op zodat je team zich kan focussen op bereiding en service.\n\nIdeaal voor drukke frituren, broodjeszaken en take-away: dezelfde producten en prijzen als online en aan de kassa."
+    },
+    "keukenschermen": {
+      "title": "Keukenschermen",
+      "teaser": "Orders in realtime, duidelijk gesorteerd per tijd en prioriteit.",
+      "body": "De keuken ziet precies wat er binnenkomt en wat klaar moet. Geen verloren briefjes of verkeerd overgeschreven bonnen.\n\nMinder stress tijdens de rush en een rustiger team achter de lijn."
+    },
+    "onlineScherm": {
+      "title": "Online scherm",
+      "teaser": "Toon gasten wat relevant is: menu, wachttijden of promoties.",
+      "body": "Een scherm in de zaak houdt klanten geïnformeerd zonder extra personeel. Koppel aan je actuele aanbod en prijzen.\n\nZo verminder je vragen aan de balie en versterk je je merk in de ruimte."
+    },
+    "reservaties": {
+      "title": "Reservaties",
+      "teaser": "Tafels en tijdsloten beheren zonder dubbel werk.",
+      "body": "Gasten reserveren online; jij ziet overzichtelijk wie wanneer komt. Koppel reservaties aan je zaak en plan personeel slimmer.\n\nMinder no-shows dankzij bevestigingen en heldere communicatie."
+    },
     "eigenWebsite": {
       "title": "Eigen website",
-      "teaser": "Volledig gepersonaliseerde website met je eigen domeinnaam, inclusief een bestelsysteem dat eenvoudig te beheren is.",
-      "body": "Met Vysion Horeca krijg je een professionele site in jouw huisstijl: logo, kleuren, foto's en teksten. Je klanten bestellen rechtstreeks online — zonder extra platform buiten jouw merk.\n\nJe beheert menu, prijzen en promoties zelf, in hetzelfde adminpaneel als je kassa en keuken. Zo blijft alles synchroon en hoef je niet te knippen en plakken tussen losse tools.\n\nEigen domein, SSL en een mobile-first ervaring horen standaard bij het verhaal: jouw zaak, jouw eerste indruk, jouw omzet."
+      "teaser": "Jouw domein, jouw merk — met bestellen erin geïntegreerd.",
+      "body": "Geen generieke tussenpagina: jouw logo, kleuren en foto's. Klanten herkennen direct jouw zaak.\n\nBeheer je site en je menu vanuit hetzelfde admin als de rest van Vysion Horeca."
     },
-    "tijdsbesparing": {
-      "title": "Tijdsbesparing",
-      "teaser": "Minder telefonische bestellingen betekent meer tijd voor personeel om zich te concentreren op andere operationele taken.",
-      "body": "Online bestellen en duidelijke flows per besteltype (afhalen, levering, aan tafel) halen druk van de telefoon en van de toonbank. Klanten kiezen zelf opties en allergenen — minder fouten, minder heen-en-weer.\n\nOrders komen gestructureerd binnen op kassa en keukenscherm. In piekmomenten merk je het verschil meteen: je team werkt sneller zonder extra personeel.\n\nMinder administratieve ruis betekent meer aandacht voor bereiding, gastvrijheid en netter afsluiten van de dag."
+    "whatsappBestellingen": {
+      "title": "WhatsApp-bestellingen",
+      "teaser": "Bestellen waar je klanten al zitten: gesprek, menu en afhandeling in één flow.",
+      "body": "WhatsApp is voor veel horeca de snelste manier om bestellingen binnen te halen. Wij koppelen menu en status aan je operationele flow.\n\nMinder misverstanden en snellere opvolging dan via losse chatberichten."
     },
-    "productupdates": {
-      "title": "Productupdates",
-      "teaser": "Je kunt productinformatie snel bijwerken en nieuwe producten toevoegen zonder grote inspanningen.",
-      "body": "Nieuwe suggesties, seizoensitems of prijswijzigingen zet je live wanneer jij wilt. Eén centrale productlijst voedt je website, QR-menu en kassa — geen dubbel werk.\n\nAfbeeldingen, beschrijvingen, opties en allergenen beheer je per product. Zo blijft je aanbod altijd actueel voor klanten én voor je team achter de schermen.\n\nSnel schakelen op de markt is in horeca cruciaal; met heldere updates blijf je wendbaar zonder technische rompslomp."
+    "loonadministratie": {
+      "title": "Loonadministratie",
+      "teaser": "Uren en verloning aansluiten op je planning en je team.",
+      "body": "Registratie van gewerkte uren hoort bij je dagelijkse operatie. Koppel aan je planning en vermijd handmatige lijstjes.\n\nZo blijven kosten voorspelbaar en wordt afsluiten van de periode overzichtelijker."
     },
-    "dataEnAnalyse": {
-      "title": "Data en analyse",
-      "teaser": "Uitgebreide gegevens en inzichten om voorraad, prijzen en marketing bij te sturen.",
-      "body": "Zie wat er verkoopt, wanneer het druk wordt en welke marges je realiseren. Combineer omzetcijfers met je kostencalculator en bestuur bewuster op piek en dal.\n\nInzicht in populariteit van producten helpt je menu en voorraad te verfijnen. Minder verspilling, betere promoties, scherpere personeelsplanning.\n\nData hoeft niet complex te zijn: wij bundelen de signalen die je nodig hebt om elke week kleine verbeteringen te maken — stap voor stap."
+    "bedrijfsanalyse": {
+      "title": "Bedrijfsanalyse",
+      "teaser": "Omzet, pieken en productprestaties in één overzicht.",
+      "body": "Welke dagen lopen hard? Welke categorie drukt de marge? Met duidelijke rapporten stuur je bij op menu, personeel en voorraad.\n\nGeen spreadsheet-geweld — wél de cijfers die je nodig hebt om beslissingen te nemen."
     },
-    "betalingsmogelijkheid": {
-      "title": "Betalingsmogelijkheid",
-      "teaser": "Klanten kunnen veilig en gemakkelijk online betalen, wat kan leiden tot snellere transacties.",
-      "body": "Online betalen verlaagt frictie: minder contant aan de deur, minder fouten bij het overmaken. Je koppelt betaling aan de bestelflow zodat alles traceerbaar blijft.\n\nSamen met duidelijke orderstatus geven prepaid bestellingen rust in de keuken en aan de pick-upbalie.\n\nVeilige betaalmethodes en een professionele afhandeling verhogen vertrouwen — essentieel voor herhalingsaankopen en grotere gemiddelde bon."
-    },
-    "voorraadbeheer": {
-      "title": "Voorraadbeheer",
-      "teaser": "Beheer makkelijk je voorraad zodat klanten kunnen zien hoeveel je er nog hebt staan.",
-      "body": "Houd regie op beschikbaarheid per product of variant. Toon klanten transparant wat nog leverbaar is en vermijd teleurstelling aan de balie.\n\nIntern zie je snel wat bijna op is, zodat je tijdig bijbestelt of tijdelijk uitverkocht zet op de site.\n\nStrakkere voorraad betekent minder wegwerp, scherpere planning en rust in het team — vooral bij items met korte houdbaarheid."
-    },
-    "nulCommissie": {
-      "title": "0% commissie",
-      "teaser": "Geen verborgen percentages op je omzet. Wat je verkoopt, blijft van jou.",
-      "body": "Bij Vysion Horeca rekenen we geen commissie per bestelling. Je abonnementsmodel is voorspelbaar; je marge op online verkopen blijft bij jou.\n\nDat verschil stapelt zich op in drukke maanden: elke euro die niet naar tussenpartijen gaat, investeer je in kwaliteit, team of groei.\n\nTransparante kosten passen bij hoe wij horeca zelf zouden willen ondernemen — eerlijk en zonder verrassingen achteraf."
-    },
-    "ondersteuning": {
-      "title": "Ondersteuning",
-      "teaser": "Ons team staat klaar met snelle, persoonlijke hulp wanneer je het nodig hebt.",
-      "body": "Je hoeft geen IT-specialist te zijn. We begeleiden bij opstart, koppelingen en de dagelijkse vragen van je zaak — van menu-opbouw tot een vlotte orderflow.\n\nSupport die begrijpt hoe een keuken loopt, scheelt tijd en stress. We denken mee in oplossingen, niet in tickets die blijven hangen.\n\nGoede ondersteuning is voor ons geen bijzaak maar deel van het product: horeca draait op mensen, en wij zorgen dat technologie meewerkt."
-    },
-    "qrBestellen": {
-      "title": "QR-bestellen",
-      "teaser": "Klanten scannen, bestellen en betalen direct vanaf de tafel — zonder gedoe.",
-      "body": "QR-bestellen versnelt bediening in drukke zalen en op terrassen. Gasten openen jullie menu op eigen telefoon, met jullie look & feel en actuele prijzen.\n\nOrders gaan rechtstreeks naar kassa en keuken — minder loopwerk, minder vergissen bij handmatig intikken.\n\nCombineer QR met tafels en zones voor overzicht op de vloer. Zo schaal je pieken op zonder dat de gastbeleving lijdt."
+    "kostencalculator": {
+      "title": "Kostencalculator",
+      "teaser": "Kostprijs per portie berekenen om verkoopprijzen scherp te zetten.",
+      "body": "Ingredienten, porties en verlies meenemen in je kostprijs helpt prijzen verdedigen en marge te beschermen.\n\nZie snel welke items te weinig of te veel marge geven — en stuur je menu bij op basis van feiten."
     }
   },
   "stats": {

@@ -1,14 +1,16 @@
 /** Homepage grid + /platform/[slug] detail routes (marketing only). */
 export const PLATFORM_PAGES = [
+  { slug: 'kassasysteem', msgKey: 'kassasysteem' },
+  { slug: 'bestelplatform', msgKey: 'bestelplatform' },
+  { slug: 'bestelzuilen', msgKey: 'bestelzuilen' },
+  { slug: 'keukenschermen', msgKey: 'keukenschermen' },
+  { slug: 'online-scherm', msgKey: 'onlineScherm' },
+  { slug: 'reservaties', msgKey: 'reservaties' },
   { slug: 'eigen-website', msgKey: 'eigenWebsite' },
-  { slug: 'tijdsbesparing', msgKey: 'tijdsbesparing' },
-  { slug: 'productupdates', msgKey: 'productupdates' },
-  { slug: 'data-en-analyse', msgKey: 'dataEnAnalyse' },
-  { slug: 'betalingsmogelijkheid', msgKey: 'betalingsmogelijkheid' },
-  { slug: 'voorraadbeheer', msgKey: 'voorraadbeheer' },
-  { slug: 'nul-commissie', msgKey: 'nulCommissie' },
-  { slug: 'ondersteuning', msgKey: 'ondersteuning' },
-  { slug: 'qr-bestellen', msgKey: 'qrBestellen' },
+  { slug: 'whatsapp-bestellingen', msgKey: 'whatsappBestellingen' },
+  { slug: 'loonadministratie', msgKey: 'loonadministratie' },
+  { slug: 'bedrijfsanalyse', msgKey: 'bedrijfsanalyse' },
+  { slug: 'kostencalculator', msgKey: 'kostencalculator' },
 ] as const
 
 export type PlatformPageSlug = (typeof PLATFORM_PAGES)[number]['slug']

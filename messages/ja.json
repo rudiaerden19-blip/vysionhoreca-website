@@ -4226,55 +4226,65 @@
   },
   "platform": {
     "sectionTitle": "Our platform",
-    "sectionSubtitle": "Nine building blocks of Vysion Horeca — click a tile for more detail on its own page.",
+    "sectionSubtitle": "Each tile opens its own page with more detail.",
     "detailCta": "Start free trial",
     "detailBack": "Back to overview",
     "notFoundTitle": "Page not found",
     "notFoundCta": "Go to homepage",
+    "kassasysteem": {
+      "title": "POS system",
+      "teaser": "Fast checkout linked to online orders and reporting.",
+      "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing."
+    },
+    "bestelplatform": {
+      "title": "Ordering platform",
+      "teaser": "Customers order with you directly — no marketplace taking a cut.",
+      "body": "Pickup, delivery and dine-in flow through your own branded site. Orders land cleanly on POS and kitchen screens.\n\nYou handle spikes better and keep full margin on online sales."
+    },
+    "bestelzuilen": {
+      "title": "Ordering kiosks",
+      "teaser": "Self-service at the counter: shorter queues, higher throughput.",
+      "body": "A kiosk absorbs repetitive order-taking so your team can focus on prep and hospitality.\n\nIdeal for busy takeaways: same catalogue and prices as online and at the till."
+    },
+    "keukenschermen": {
+      "title": "Kitchen screens",
+      "teaser": "Live tickets sorted by time and priority.",
+      "body": "The kitchen sees exactly what is due and when — no lost tickets or bad handwriting.\n\nLess stress during the rush and calmer service from the pass."
+    },
+    "onlineScherm": {
+      "title": "Display screen",
+      "teaser": "Show menus, wait times or promos in your venue.",
+      "body": "In-venue screens keep guests informed without extra staff on the floor. Tie into your live offer and pricing.\n\nFewer counter questions and a stronger brand presence in the room."
+    },
+    "reservaties": {
+      "title": "Reservations",
+      "teaser": "Manage tables and slots without double entry.",
+      "body": "Guests book online; you see who is coming when. Plan service and staffing with a clear overview.\n\nConfirmations and messaging help reduce no-shows."
+    },
     "eigenWebsite": {
       "title": "Your own website",
-      "teaser": "A fully personalised website on your own domain, including an ordering system that is easy to manage.",
-      "body": "Vysion Horeca gives you a professional site in your brand: logo, colours, photos and copy. Customers order online directly — without an extra platform outside your brand.\n\nYou manage menu, prices and promotions in the same admin as your POS and kitchen. Everything stays in sync; no copy-paste between siloed tools.\n\nYour domain, SSL and a mobile-first experience are part of the story: your business, your first impression, your revenue."
+      "teaser": "Your domain and brand — with ordering built in.",
+      "body": "Not a generic landing page: your logo, colours and photography. Customers recognise your business instantly.\n\nManage site and menu from the same admin as the rest of Vysion Horeca."
     },
-    "tijdsbesparing": {
-      "title": "Time savings",
-      "teaser": "Fewer phone orders means more time for staff to focus on other operational tasks.",
-      "body": "Online ordering and clear flows per order type (pickup, delivery, dine-in) reduce pressure on the phone and the counter. Customers choose options and allergens themselves — fewer mistakes, less back-and-forth.\n\nOrders arrive structured on POS and kitchen screens. At peak times you feel the difference immediately: your team moves faster without extra headcount.\n\nLess admin noise means more attention for preparation, hospitality and closing the day cleanly."
+    "whatsappBestellingen": {
+      "title": "WhatsApp ordering",
+      "teaser": "Order where guests already chat: menu and flow in one thread.",
+      "body": "WhatsApp is often the fastest channel for local hospitality. We connect catalogue and status to your operational workflow.\n\nFewer misunderstandings than ad-hoc chat messages alone."
     },
-    "productupdates": {
-      "title": "Product updates",
-      "teaser": "Update product information quickly and add new items without a heavy lift.",
-      "body": "Launch specials, seasonal items or price changes whenever you want. One central catalogue feeds your website, QR menu and POS — no duplicate work.\n\nImages, descriptions, options and allergens are managed per product. Your offer stays current for customers and for the team behind the screens.\n\nFast market moves matter in hospitality; with clear updates you stay agile without technical hassle."
+    "loonadministratie": {
+      "title": "Payroll",
+      "teaser": "Hours and pay aligned with rostering and your team.",
+      "body": "Tracked hours belong with day-to-day operations. Connect to planning and lose the manual spreadsheets.\n\nCosts stay predictable and period close becomes clearer."
     },
-    "dataEnAnalyse": {
-      "title": "Data and analytics",
-      "teaser": "Rich data to fine-tune stock, pricing and marketing.",
-      "body": "See what sells, when it gets busy and which margins you achieve. Combine revenue signals with your cost calculator and steer peak and off-peak more consciously.\n\nPopularity insights help refine your menu and stock. Less waste, sharper promos, better staff planning.\n\nData does not have to be overwhelming: we bundle the signals you need to improve bit by bit every week."
+    "bedrijfsanalyse": {
+      "title": "Business analytics",
+      "teaser": "Revenue, peaks and product performance in one place.",
+      "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide."
     },
-    "betalingsmogelijkheid": {
-      "title": "Payments",
-      "teaser": "Customers can pay safely and easily online for faster checkout.",
-      "body": "Online payment reduces friction: less cash at the door, fewer bank-transfer mistakes. Tie payment to the order flow so everything stays traceable.\n\nTogether with clear order status, prepaid orders bring calm to the kitchen and the pickup counter.\n\nTrusted payment methods and a professional flow increase confidence — key for repeat visits and higher average tickets."
-    },
-    "voorraadbeheer": {
-      "title": "Stock management",
-      "teaser": "Manage stock easily so customers see what is still available.",
-      "body": "Stay in control of availability per product or variant. Show customers transparently what can still be delivered and avoid disappointment at the counter.\n\nInternally you see what is running low so you can reorder or mark sold out on the site in time.\n\nTighter stock means less waste, sharper planning and a calmer team — especially for short shelf-life items."
-    },
-    "nulCommissie": {
-      "title": "0% commission",
-      "teaser": "No hidden take rate on your revenue. What you sell stays yours.",
-      "body": "With Vysion Horeca you do not pay commission per order. Your subscription is predictable; margin on online sales stays with you.\n\nThat difference adds up in busy months: every euro not sent to middlemen goes to quality, people or growth.\n\nTransparent pricing fits how we would run hospitality ourselves — fair, without surprises after the fact."
-    },
-    "ondersteuning": {
-      "title": "Support",
-      "teaser": "Our team is here with fast, personal help when you need it.",
-      "body": "You do not need to be an IT expert. We guide onboarding, integrations and day-to-day questions — from menu setup to a smooth order flow.\n\nSupport that understands how a kitchen runs saves time and stress. We think in solutions, not stuck tickets.\n\nGood support is not an afterthought for us: hospitality is people-first, and we make sure technology helps."
-    },
-    "qrBestellen": {
-      "title": "QR ordering",
-      "teaser": "Guests scan, order and pay from the table — without hassle.",
-      "body": "QR ordering speeds up service in busy rooms and on terraces. Guests open your menu on their phone, with your look & feel and live prices.\n\nOrders go straight to POS and kitchen — less walking, fewer manual entry mistakes.\n\nCombine QR with tables and zones for floor overview. Scale peaks without hurting the guest experience."
+    "kostencalculator": {
+      "title": "Cost calculator",
+      "teaser": "Cost per portion to price with confidence.",
+      "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts."
     }
   }
 }
