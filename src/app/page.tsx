@@ -181,9 +181,8 @@ function CountUp({ end, suffix = '', prefix = '' }: { end: number, suffix?: stri
   return <div ref={ref}>{prefix}{count.toLocaleString()}{suffix}</div>
 }
 
-/** Partnerlogo’s voor de trust-marquee onder de stats; PNG’s uit public/images/partner-logos. */
+/** Partnerlogo’s voor de trust-marquee onder de stats; PNG’s uit public/images/partner-logos. (Geen brede schermshots — die ogen als balk in de strip.) */
 const LIVE_DEMO_PARTNER_LOGOS = [
-  '/images/partner-logos/01.png',
   '/images/partner-logos/02.png',
   '/images/partner-logos/03.png',
   '/images/partner-logos/04.png',
@@ -222,7 +221,7 @@ function StatsAndLiveDemoSection() {
 
       {/* Logo-marquee: vaste breedte per slot zodat logo’s elkaar niet overlappen; viewport clip tegen rand-artefacten */}
       <div className="mt-12 sm:mt-16 md:mt-20">
-        <p className="text-center text-lg sm:text-xl md:text-2xl font-bold text-accent tracking-tight mb-5 sm:mb-6 md:mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-6xl font-bold text-accent tracking-tight leading-tight mb-5 sm:mb-6 md:mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {t('liveDemo.clientsLead')}
         </p>
         <div className="relative w-[100vw] max-w-[100vw] left-1/2 -translate-x-1/2 bg-[#E3E3E3] py-6 sm:py-8 md:py-10">
