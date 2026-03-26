@@ -2,53 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Zichtbare diepte op grijs/wit (marketing homepage) */
+/* Zichtbare diepte op grijs/wit (marketing homepage) — iets ingetoomd t.o.v. maximum */
 @layer utilities {
   .shadow-home-btn {
     box-shadow:
-      0 38px 78px -10px rgba(0, 0, 0, 0.48),
-      0 20px 46px -6px rgba(0, 0, 0, 0.36),
-      0 10px 24px rgba(0, 0, 0, 0.28);
+      0 32px 64px -10px rgba(0, 0, 0, 0.4),
+      0 17px 38px -6px rgba(0, 0, 0, 0.3),
+      0 8px 20px rgba(0, 0, 0, 0.22);
   }
   .shadow-home-image {
     box-shadow:
-      0 60px 140px -22px rgba(0, 0, 0, 0.55),
-      0 34px 88px -14px rgba(0, 0, 0, 0.42),
-      0 16px 44px rgba(0, 0, 0, 0.32);
+      0 48px 112px -20px rgba(0, 0, 0, 0.46),
+      0 28px 72px -12px rgba(0, 0, 0, 0.35),
+      0 13px 36px rgba(0, 0, 0, 0.26);
   }
   .shadow-home-card {
     box-shadow:
-      0 52px 124px -26px rgba(0, 0, 0, 0.5),
-      0 30px 76px -14px rgba(0, 0, 0, 0.38),
-      0 14px 36px rgba(0, 0, 0, 0.28);
+      0 42px 102px -22px rgba(0, 0, 0, 0.42),
+      0 25px 62px -12px rgba(0, 0, 0, 0.32),
+      0 12px 30px rgba(0, 0, 0, 0.22);
   }
   .shadow-home-thumb {
     box-shadow:
-      0 42px 96px -18px rgba(0, 0, 0, 0.46),
-      0 22px 52px -10px rgba(0, 0, 0, 0.34),
-      0 10px 26px rgba(0, 0, 0, 0.26);
+      0 34px 80px -16px rgba(0, 0, 0, 0.38),
+      0 18px 44px -8px rgba(0, 0, 0, 0.28),
+      0 8px 22px rgba(0, 0, 0, 0.2);
   }
   .shadow-home-benefit {
     box-shadow:
-      0 46px 108px -20px rgba(0, 0, 0, 0.44),
-      0 24px 58px -12px rgba(0, 0, 0, 0.33),
-      0 10px 28px rgba(0, 0, 0, 0.24);
+      0 38px 92px -18px rgba(0, 0, 0, 0.36),
+      0 20px 50px -10px rgba(0, 0, 0, 0.27),
+      0 8px 24px rgba(0, 0, 0, 0.19);
   }
   .shadow-home-benefit-hover {
     box-shadow:
-      0 56px 120px -20px rgba(0, 0, 0, 0.5),
-      0 28px 64px -12px rgba(0, 0, 0, 0.38),
-      0 12px 32px rgba(0, 0, 0, 0.28);
+      0 46px 102px -18px rgba(0, 0, 0, 0.42),
+      0 24px 56px -10px rgba(0, 0, 0, 0.32),
+      0 10px 28px rgba(0, 0, 0, 0.22);
   }
   .shadow-home-float {
     box-shadow:
-      0 32px 64px -8px rgba(0, 0, 0, 0.4),
-      0 14px 32px rgba(0, 0, 0, 0.28);
+      0 26px 52px -8px rgba(0, 0, 0, 0.33),
+      0 12px 26px rgba(0, 0, 0, 0.22);
   }
   .shadow-home-ghost {
     box-shadow:
-      0 36px 72px -10px rgba(0, 0, 0, 0.52),
-      0 18px 40px rgba(0, 0, 0, 0.35);
+      0 30px 60px -10px rgba(0, 0, 0, 0.44),
+      0 15px 34px rgba(0, 0, 0, 0.28);
   }
 }
 
@@ -127,10 +127,10 @@
   background: #fff;
   padding: 1rem 1rem 0.875rem;
   box-shadow:
-    0 56px 130px -24px rgba(0, 0, 0, 0.52),
-    0 32px 80px -14px rgba(0, 0, 0, 0.4),
-    0 14px 40px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(0, 0, 0, 0.06);
+    0 44px 104px -20px rgba(0, 0, 0, 0.44),
+    0 26px 68px -12px rgba(0, 0, 0, 0.34),
+    0 12px 34px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
 .partner-success-card .partner-success-logo {
@@ -337,8 +337,8 @@ input[type="number"] {
 .btn-primary:hover {
   @apply bg-opacity-90 transform scale-105;
   box-shadow:
-    0 46px 92px -10px rgba(0, 0, 0, 0.52),
-    0 24px 54px rgba(0, 0, 0, 0.38);
+    0 38px 78px -10px rgba(0, 0, 0, 0.44),
+    0 20px 46px rgba(0, 0, 0, 0.32);
 }
 
 .btn-outline {
