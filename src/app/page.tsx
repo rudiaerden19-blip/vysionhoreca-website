@@ -182,17 +182,6 @@ function StatsSection() {
             </div>
           ))}
         </div>
-        <div className="mt-16 text-center">
-          <p className="text-xl sm:text-2xl font-bold text-accent">
-            {t('stats.award')}
-          </p>
-          <p className="mt-3 text-base sm:text-lg text-gray-600">
-            {t('stats.award_sub')}
-          </p>
-          <p className="mt-2 text-sm text-gray-400">
-            🌍 Beschikbaar in 9 talen
-          </p>
-        </div>
       </div>
     </section>
   )
@@ -750,101 +739,6 @@ function ButWaitSection() {
   )
 }
 
-// Comparison Section
-function ComparisonSection() {
-  const { t, locale } = useLanguage()
-  
-  const featureKeys = ['kassaLicensePro', 'online', 'website', 'terminal', 'kitchen', 'allergies', 'qr', 'promotions', 'reservation', 'inventory', 'seo', 'loyalty', 'staff', 'costCalculator', 'analytics', 'reviews', 'labels', 'groupOrders', 'languages', 'whatsapp', 'commission']
-  
-  const features = featureKeys.map(key => {
-    const allGreen = key === 'kassaLicensePro'
-    return {
-      name: t(`comparison.features.${key}`),
-      vysion: true,
-      lightspeed: allGreen
-        ? true
-        : ['terminal', 'kitchen', 'loyalty', 'staff', 'reservation', 'inventory'].includes(key)
-          ? true
-          : key === 'analytics'
-            ? t('comparison.limited')
-            : false,
-      square: allGreen ? true : ['terminal', 'kitchen', 'loyalty', 'inventory'].includes(key),
-      strobbo: allGreen ? true : ['online', 'terminal', 'kitchen'].includes(key),
-    }
-  })
-
-  const renderCheck = (value: boolean | string) => {
-    if (value === true) {
-      return <svg className="w-6 h-6 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-    } else if (value === false) {
-      return <svg className="w-6 h-6 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-    } else {
-      return <span className="text-yellow-500 text-sm font-medium">{value}</span>
-    }
-  }
-
-  return (
-    <section className="py-24 bg-[#E3E3E3]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-            {t('comparison.title')}
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            {t('comparison.subtitle')}
-          </p>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full bg-white rounded-2xl shadow-xl overflow-hidden">
-            <thead>
-              <tr className="bg-dark text-white">
-                <th className="px-6 py-5 text-left font-semibold">{t('comparison.feature')}</th>
-                <th className="px-6 py-5 text-center">
-                  <div className="text-accent font-bold text-lg">Vysion Horeca</div>
-                  <div className="text-sm text-gray-300">€59 - €99/maand</div>
-                </th>
-                <th className="px-6 py-5 text-center">
-                  <div className="font-semibold">Lightspeed</div>
-                  <div className="text-sm text-gray-300">€79 - €249/maand</div>
-                </th>
-                <th className="px-6 py-5 text-center">
-                  <div className="font-semibold">Square</div>
-                  <div className="text-sm text-gray-300">€60 - €165/maand</div>
-                </th>
-                <th className="px-6 py-5 text-center">
-                  <div className="font-semibold">Strobbo</div>
-                  <div className="text-sm text-gray-300">€75 - €150/maand</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {features.map((feature, index) => (
-                <tr key={index} className={index % 2 === 0 ? 'bg-[#E3E3E3]' : 'bg-white'}>
-                  <td className="px-6 py-4 font-medium text-gray-900">{feature.name}</td>
-                  <td className="px-6 py-4 text-center bg-accent/5">{renderCheck(feature.vysion)}</td>
-                  <td className="px-6 py-4 text-center">{renderCheck(feature.lightspeed)}</td>
-                  <td className="px-6 py-4 text-center">{renderCheck(feature.square)}</td>
-                  <td className="px-6 py-4 text-center">{renderCheck(feature.strobbo)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="text-center mt-12">
-          <a
-            href={`/registreer?lang=${locale}`}
-            className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-lg"
-          >
-            {t('comparison.cta')}
-          </a>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 // Industry Section
 function IndustrySection() {
   const [activeTab, setActiveTab] = useState('ordering')
@@ -1098,142 +992,6 @@ function IndustrySection() {
           </div>
         )}
       </div>
-    </section>
-  )
-}
-
-// Cost Calculator Section
-function CostCalculatorSection() {
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxImage, setLightboxImage] = useState('')
-  const { t } = useLanguage()
-  
-  const images = [
-    '/images/cost-calculator-1.png',
-    '/images/cost-calculator-2.png',
-    '/images/cost-calculator-3.png',
-    '/images/cost-calculator-4.png',
-  ]
-  
-  const goToPrev = () => {
-    setCurrentSlide((prev) => (prev - 1 + images.length) % images.length)
-  }
-  
-  const goToNext = () => {
-    setCurrentSlide((prev) => (prev + 1) % images.length)
-  }
-
-  const openLightbox = (image: string) => {
-    setLightboxImage(image)
-    setLightboxOpen(true)
-  }
-
-  return (
-    <section className="py-24 bg-[#e3e3e3] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-orange-500">
-            {t('costCalculator.title')}
-          </h2>
-          <p className="text-xl sm:text-2xl font-semibold text-gray-900 mb-6">
-            {t('costCalculator.subtitle')}
-          </p>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            {t('costCalculator.description')}
-          </p>
-        </div>
-
-        {/* Image Carousel */}
-        <div className="relative max-w-4xl mx-auto">
-          {/* Left Arrow */}
-          <button
-            onClick={goToPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-gray-300 hover:bg-gray-400 rounded-full flex items-center justify-center transition-colors"
-          >
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          
-          {/* Right Arrow */}
-          <button
-            onClick={goToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-gray-300 hover:bg-gray-400 rounded-full flex items-center justify-center transition-colors"
-          >
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-          
-          {/* Images */}
-          <div className="overflow-hidden rounded-2xl mx-14">
-            <div 
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-            >
-              {images.map((image, index) => (
-                <div key={index} className="w-full flex-shrink-0">
-                  <img
-                    src={image}
-                    alt={`Cost Calculator Screenshot ${index + 1}`}
-                    className="w-full h-auto rounded-2xl shadow-2xl cursor-pointer hover:opacity-90 transition-opacity"
-                    onClick={() => openLightbox(image)}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          {/* Click to enlarge */}
-          <p className="text-center text-gray-500 mt-4 text-sm">
-            {t('costCalculator.clickToEnlarge')}
-          </p>
-          
-          {/* Dots */}
-          <div className="flex justify-center gap-2 mt-4">
-            {images.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  currentSlide === index ? 'bg-orange-500' : 'bg-gray-400'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="text-center mt-12">
-          <a
-            href="/registreer"
-            className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-colors"
-          >
-            {t('costCalculator.tryFree')}
-          </a>
-        </div>
-      </div>
-
-      {/* Lightbox */}
-      {lightboxOpen && (
-        <div 
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setLightboxOpen(false)}
-        >
-          <button
-            onClick={() => setLightboxOpen(false)}
-            className="absolute top-4 right-4 text-white text-3xl hover:opacity-70"
-          >
-            ×
-          </button>
-          <img
-            src={lightboxImage}
-            alt="Cost Calculator"
-            className="max-w-full max-h-full object-contain"
-          />
-        </div>
-      )}
     </section>
   )
 }
@@ -1565,8 +1323,6 @@ export default function HomePage() {
       <LiveDemoSection />
       <PricingSection />
       <ButWaitSection />
-      <ComparisonSection />
-      <CostCalculatorSection />
       <TestimonialSection />
       <CTASection />
       <ContactSection />
