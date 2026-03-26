@@ -166,7 +166,8 @@
   },
   "platform": {
     "sectionTitle": "Ons platform",
-    "sectionSubtitle": "Elk vak opent een eigen pagina met meer uitleg.",
+    "sectionSubtitle": "Alle kernonderdelen van Vysion in één overzicht.",
+    "gridTestCta": "Test het hier",
     "detailCta": "Gratis testen",
     "detailBack": "Terug naar overzicht",
     "notFoundTitle": "Pagina niet gevonden",

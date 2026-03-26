@@ -1,16 +1,7 @@
-/** Homepage grid + /platform/[slug] detail routes (marketing only). */
+/** Homepage platformgrid: kaartdata + afbeeldingen. */
 
 /** Zelfde afbeelding als op de platformkaart (homepage-grid). */
 export const BESTELPLATFORM_HERO_IMAGE = '/images/platform/bestelplatform-hero.jpg'
-
-/** Brede hero op /platform/bestelplatform (smartphone bestellen). */
-export const BESTELPLATFORM_PAGE_HERO_IMAGE = '/images/platform/bestelplatform-page-hero.jpg'
-
-/** Volle-breedte hero op /platform/kassasysteem. */
-export const KASSASYSTEEM_HERO_IMAGE = '/images/platform/kassasysteem-hero.png'
-
-/** Horeca POS-sectie op /platform/kassasysteem */
-export const HORECA_KASSASYSTEEM_POS_IMAGE = '/images/platform/horeca-kassasysteem-pos.png'
 
 export const KASSASYSTEEM_CARD_IMAGE = '/images/platform/kassasysteem-card.png'
 export const KEUKENSCHERMEN_CARD_IMAGE = '/images/platform/keukenschermen-card.png'
@@ -50,8 +41,3 @@ export const PLATFORM_PAGES: PlatformPageEntry[] = [
   { slug: 'kostencalculator', msgKey: 'kostencalculator', cardHeaderImage: KOSTENCALCULATOR_CARD_IMAGE },
 ]
 
-export type PlatformPageSlug = (typeof PLATFORM_PAGES)[number]['slug']
-
-export function getPlatformPage(slug: string) {
-  return PLATFORM_PAGES.find((p) => p.slug === slug)
-}

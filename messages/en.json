@@ -166,7 +166,8 @@
   },
   "platform": {
     "sectionTitle": "Our platform",
-    "sectionSubtitle": "Each tile opens its own page with more detail.",
+    "sectionSubtitle": "Everything Vysion offers, at a glance.",
+    "gridTestCta": "Try it here",
     "detailCta": "Start free trial",
     "detailBack": "Back to overview",
     "notFoundTitle": "Page not found",

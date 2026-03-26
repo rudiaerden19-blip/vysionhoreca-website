@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
 import {
   BarChart3,
@@ -18,6 +17,8 @@ import {
 import { useLanguage } from '@/i18n'
 import { PLATFORM_PAGES } from '@/lib/platform-pages'
 
+const LIVE_DEMO_URL = 'https://frituurnolim.ordervysion.com'
+
 const ICONS: Record<string, LucideIcon> = {
   kassasysteem: Store,
   bestelplatform: ShoppingBag,
@@ -30,6 +31,9 @@ const ICONS: Record<string, LucideIcon> = {
   bedrijfsanalyse: BarChart3,
   kostencalculator: Calculator,
 }
+
+const cardShellClasses =
+  'group flex min-h-[300px] sm:min-h-[320px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-sm transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
 
 export default function PlatformGridSection() {
   const { t } = useLanguage()
@@ -51,11 +55,7 @@ export default function PlatformGridSection() {
                 : ''
 
             return (
-              <Link
-                key={slug}
-                href={`/platform/${slug}`}
-                className="group flex min-h-[260px] sm:min-h-[280px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-sm transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]"
-              >
+              <div key={slug} className={cardShellClasses}>
                 <div className="relative h-28 sm:h-32 w-full shrink-0 overflow-hidden bg-gradient-to-br from-gray-300 via-gray-200 to-gray-100">
                   {cardHeaderImage ? (
                     <Image
@@ -75,14 +75,22 @@ export default function PlatformGridSection() {
                   >
                     <Icon className="h-9 w-9 sm:h-10 sm:w-10" strokeWidth={1.5} />
                   </div>
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900 underline decoration-gray-900 underline-offset-4 mb-2.5 leading-snug px-1">
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2.5 leading-snug px-1">
                     {t(`platform.${msgKey}.title`)}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-5">
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-5 grow">
                     {t(`platform.${msgKey}.teaser`)}
                   </p>
+                  <a
+                    href={LIVE_DEMO_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 w-full shrink-0 inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent/90 sm:py-3"
+                  >
+                    {t('platform.gridTestCta')}
+                  </a>
                 </div>
-              </Link>
+              </div>
             )
           })}
         </div>
