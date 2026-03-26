@@ -57,7 +57,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[100svh] flex flex-col text-white overflow-hidden"
+      className="relative min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-hidden"
     >
       <div className="absolute inset-0">
         <Image
@@ -72,20 +72,20 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
       </div>
 
       {/* Top bar */}
-      <header className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8">
+      <header className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-1">
         <div className="flex items-start justify-between gap-4">
-          <a href="/" className="group shrink-0">
-            <span className="block text-3xl sm:text-4xl font-extrabold tracking-tight text-blue-400 lowercase">
+          <a href="/" className="group shrink-0 leading-none">
+            <span className="block text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-blue-400 lowercase">
               vysion
             </span>
-            <span className="block text-sm sm:text-base text-white font-medium mt-0.5">
+            <span className="block text-base sm:text-lg md:text-xl text-white font-medium mt-1">
               {t('heroLanding.logoTagline')}
             </span>
           </a>
 
           {/* Desktop: pill nav */}
           <nav
-            className="hidden lg:flex absolute left-1/2 -translate-x-1/2 top-6 xl:top-8 items-center gap-1 bg-white/95 rounded-full px-2 py-1.5 shadow-lg"
+            className="hidden lg:flex absolute left-1/2 -translate-x-1/2 top-3 sm:top-4 items-center gap-1 bg-white/95 rounded-full px-2 py-1.5 shadow-lg"
             aria-label="Main"
           >
             {pillLinks.map(({ href, label }) => (
@@ -204,14 +204,14 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
       </header>
 
       {/* Center content */}
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 text-center pb-16 sm:pb-20 pt-8 sm:pt-12">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 sm:px-6 text-center py-6 sm:py-8">
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] font-bold leading-tight max-w-4xl">
           {t('heroLanding.title')}
         </h1>
-        <p className="mt-6 text-base sm:text-lg md:text-xl text-white/90 max-w-2xl font-normal leading-relaxed">
+        <p className="mt-4 sm:mt-5 text-base sm:text-lg md:text-xl text-white/90 max-w-2xl font-normal leading-relaxed">
           {t('heroLanding.subtitle')}
         </p>
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
           <a
             href="/resellers"
             className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors underline decoration-white/40 underline-offset-4"
