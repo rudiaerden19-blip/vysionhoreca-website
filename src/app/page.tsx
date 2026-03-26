@@ -43,7 +43,7 @@ function WhyVysionSection() {
             </ul>
           </div>
 
-          <div className="flex min-h-[260px] lg:min-h-0 h-full order-1 lg:order-2 lg:mt-[1cm] lg:self-start">
+          <div className="flex min-h-[260px] lg:min-h-0 h-full order-1 lg:order-2 lg:mt-[2cm] lg:self-start">
             <div className="relative w-full flex-1 min-h-[280px] lg:min-h-full rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/[0.08] bg-[#141414]">
               <Image
                 src="/images/why-vysion-kiosk.png"
