@@ -13,52 +13,83 @@
   animation: shimmer-right 2.5s ease-in-out infinite;
 }
 
-@keyframes live-demo-marquee {
+@keyframes partner-marquee-scroll {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
-.live-demo-marquee-track {
-  display: flex;
-  align-items: center;
-  width: max-content;
-  animation: live-demo-marquee 26s linear infinite;
+/* Vaste slots + geen mix-blend-mode → logo’s stapelen niet visueel en geen ‘lek’ naar andere lagen */
+.partner-marquee-viewport {
+  overflow: hidden;
 }
 
-/* Geen brightness(0): dat vult witte PNG-randen volledig zwart → grijs rechthoekig blok.
-   multiply laat wit/licht met de #E3E3E3-achtergrond versmelten; grayscale + opacity = zwart, gefade. */
-.partner-logo-marquee-item {
+.partner-marquee-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: max-content;
+  animation: partner-marquee-scroll 26s linear infinite;
+}
+
+.partner-marquee-segment {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
   flex-shrink: 0;
-  height: 4.5rem;
+}
+
+.partner-marquee-slot {
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 11.5rem;
+  padding: 0 1rem;
+}
+
+.partner-marquee-slot img {
+  display: block;
+  max-width: 100%;
   width: auto;
-  max-width: min(16rem, 42vw);
+  height: auto;
+  max-height: 4.5rem;
   object-fit: contain;
   object-position: center;
-  filter: grayscale(1);
-  opacity: 0.52;
-  mix-blend-mode: multiply;
+  filter: grayscale(1) brightness(0.45);
+  opacity: 0.55;
 }
 
 @media (min-width: 640px) {
-  .partner-logo-marquee-item {
-    height: 5.5rem;
-    max-width: min(18rem, 36vw);
+  .partner-marquee-slot {
+    width: 13.5rem;
+    padding: 0 1.25rem;
+  }
+
+  .partner-marquee-slot img {
+    max-height: 5.25rem;
   }
 }
 
 @media (min-width: 768px) {
-  .partner-logo-marquee-item {
-    height: 6.75rem;
-    max-width: min(20rem, 28vw);
+  .partner-marquee-slot {
+    width: 15rem;
+    padding: 0 1.5rem;
+  }
+
+  .partner-marquee-slot img {
+    max-height: 6rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .live-demo-marquee-track {
+  .partner-marquee-track {
     animation: none;
   }
 }

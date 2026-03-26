@@ -221,30 +221,29 @@ function StatsAndLiveDemoSection() {
         </div>
       </div>
 
-      {/* Logo-marquee: isolate + vaste achtergrond zodat mix-blend-mode niet op onderliggende secties/tekst mengt */}
+      {/* Logo-marquee: vaste breedte per slot zodat logo’s elkaar niet overlappen; viewport clip tegen rand-artefacten */}
       <div className="mt-12 sm:mt-16 md:mt-20">
         <div
-          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-x-clip py-6 sm:py-8 md:py-10 bg-[#E3E3E3] isolate"
+          className="relative w-[100vw] max-w-[100vw] left-1/2 -translate-x-1/2 bg-[#E3E3E3] py-6 sm:py-8 md:py-10"
           aria-hidden
         >
-          <div className="live-demo-marquee-track">
-            {[0, 1].map((dup) => (
-              <div
-                key={dup}
-                className="flex shrink-0 items-center gap-10 sm:gap-14 md:gap-20 pr-10 sm:pr-14 md:pr-20"
-              >
-                {LIVE_DEMO_PARTNER_LOGOS.map((src) => (
-                  <img
-                    key={`${dup}-${src}`}
-                    src={src}
-                    alt=""
-                    className="partner-logo-marquee-item"
-                    loading={dup === 0 ? 'eager' : 'lazy'}
-                    decoding="async"
-                  />
-                ))}
-              </div>
-            ))}
+          <div className="partner-marquee-viewport">
+            <div className="partner-marquee-track">
+              {[0, 1].map((dup) => (
+                <div key={dup} className="partner-marquee-segment">
+                  {LIVE_DEMO_PARTNER_LOGOS.map((src) => (
+                    <div key={`${dup}-${src}`} className="partner-marquee-slot">
+                      <img
+                        src={src}
+                        alt=""
+                        loading={dup === 0 ? 'eager' : 'lazy'}
+                        decoding="async"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
