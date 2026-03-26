@@ -181,9 +181,21 @@ function CountUp({ end, suffix = '', prefix = '' }: { end: number, suffix?: stri
   return <div ref={ref}>{prefix}{count.toLocaleString()}{suffix}</div>
 }
 
+/** Partnerlogo’s voor de trust-marquee onder de stats; PNG’s uit public/images/partner-logos. */
+const LIVE_DEMO_PARTNER_LOGOS = [
+  '/images/partner-logos/01.png',
+  '/images/partner-logos/02.png',
+  '/images/partner-logos/03.png',
+  '/images/partner-logos/04.png',
+  '/images/partner-logos/05.png',
+  '/images/partner-logos/06.png',
+  '/images/partner-logos/07.png',
+  '/images/partner-logos/08.png',
+  '/images/partner-logos/09.png',
+] as const
+
 function StatsSection() {
   const { t } = useLanguage()
-  const marqueeChunk = `${t('liveDemo.marquee')}${t('liveDemo.marquee')}${t('liveDemo.marquee')}`
 
   const stats = [
     { value: 2.5, prefix: '€', suffix: 'M+', labelKey: 'stats.processed' },
@@ -209,19 +221,30 @@ function StatsSection() {
         </div>
       </div>
 
-      {/* Marquee tussen stats-rij en kop “Wil je het platform…” (zo veel mogelijk in het midden) */}
+      {/* Logo-marquee tussen stats-rij en kop “Wil je het platform…” (zelfde verticale plek als vroeger de balk) */}
       <div className="mt-12 sm:mt-16 md:mt-20">
         <div
-          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-hidden py-3.5 sm:py-4 bg-black/40"
+          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-hidden py-6 sm:py-8 md:py-10"
           aria-hidden
         >
           <div className="live-demo-marquee-track">
-            <span className="shrink-0 block px-6 text-sm sm:text-base font-semibold tracking-wide text-white/90 whitespace-nowrap">
-              {marqueeChunk}
-            </span>
-            <span className="shrink-0 block px-6 text-sm sm:text-base font-semibold tracking-wide text-white/90 whitespace-nowrap">
-              {marqueeChunk}
-            </span>
+            {[0, 1].map((dup) => (
+              <div
+                key={dup}
+                className="flex shrink-0 items-center gap-10 sm:gap-14 md:gap-20 pr-10 sm:pr-14 md:pr-20"
+              >
+                {LIVE_DEMO_PARTNER_LOGOS.map((src) => (
+                  <img
+                    key={`${dup}-${src}`}
+                    src={src}
+                    alt=""
+                    className="partner-logo-marquee-item"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       </div>
