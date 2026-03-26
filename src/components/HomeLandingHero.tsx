@@ -51,7 +51,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
     { href: '/', label: t('nav.home') },
     { href: '/#sectoren', label: t('nav.sectors') },
     { href: '/#platform', label: t('nav.services') },
-    { href: '/support', label: t('nav.integrations') },
+    { href: '/videos', label: t('nav.videos') },
     { href: '/#contact', label: t('nav.contact') },
   ]
 
