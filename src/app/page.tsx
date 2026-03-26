@@ -199,14 +199,14 @@ function StatsAndLiveDemoSection() {
 
   const stats = [
     { value: 2.5, prefix: '€', suffix: 'M+', labelKey: 'stats.processed' },
-    { value: 500, prefix: '', suffix: '+', labelKey: 'stats.businesses' },
+    { value: 132, prefix: '', suffix: '', labelKey: 'stats.businesses' },
     { value: 99.9, prefix: '', suffix: '%', labelKey: 'stats.uptime' },
     { value: 24, prefix: '', suffix: '/7', labelKey: 'stats.support' },
   ]
 
   return (
     <section className="pt-24 sm:pt-32 pb-24 sm:pb-32 bg-[#E3E3E3]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative -translate-y-[3cm]">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <div key={index} className="text-center">
