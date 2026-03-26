@@ -223,11 +223,11 @@ function StatsAndLiveDemoSection() {
 
       {/* Logo-marquee: vaste breedte per slot zodat logo’s elkaar niet overlappen; viewport clip tegen rand-artefacten */}
       <div className="mt-12 sm:mt-16 md:mt-20">
-        <div
-          className="relative w-[100vw] max-w-[100vw] left-1/2 -translate-x-1/2 bg-[#E3E3E3] py-6 sm:py-8 md:py-10"
-          aria-hidden
-        >
-          <div className="partner-marquee-viewport">
+        <p className="text-center text-lg sm:text-xl md:text-2xl font-bold text-accent tracking-tight mb-5 sm:mb-6 md:mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {t('liveDemo.clientsLead')}
+        </p>
+        <div className="relative w-[100vw] max-w-[100vw] left-1/2 -translate-x-1/2 bg-[#E3E3E3] py-6 sm:py-8 md:py-10">
+          <div className="partner-marquee-viewport" aria-hidden>
             <div className="partner-marquee-track">
               {[0, 1].map((dup) => (
                 <div key={dup} className="partner-marquee-segment">
