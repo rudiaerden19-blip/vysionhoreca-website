@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { Navigation, Footer, PlatformScreenshotGallery } from '@/components'
+import { Navigation, Footer } from '@/components'
 import { useLanguage } from '@/i18n'
 import { BESTELPLATFORM_HERO_IMAGE, getPlatformPage } from '@/lib/platform-pages'
 
@@ -70,15 +70,6 @@ export default function PlatformDetailPage() {
               </p>
             ))}
           </div>
-
-          {slug === 'bestelplatform' && (
-            <PlatformScreenshotGallery
-              images={[
-                { src: '/images/platform/bestelplatform-1.png', alt: t('platform.bestelplatform.galleryAlt1') },
-                { src: '/images/platform/bestelplatform-2.png', alt: t('platform.bestelplatform.galleryAlt2') },
-              ]}
-            />
-          )}
 
           <div className="mt-12 flex flex-wrap gap-4">
             <a

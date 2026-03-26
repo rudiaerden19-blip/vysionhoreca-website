@@ -1,7 +1,7 @@
 /** Homepage grid + /platform/[slug] detail routes (marketing only). */
 
 /** Zelfde afbeelding als op de platformkaart + volle-breedte hero op /platform/bestelplatform. */
-export const BESTELPLATFORM_HERO_IMAGE = '/images/platform/bestelplatform-hero.png'
+export const BESTELPLATFORM_HERO_IMAGE = '/images/platform/bestelplatform-hero.jpg'
 
 export type PlatformPageEntry = {
   slug: string
