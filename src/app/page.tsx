@@ -1,8 +1,42 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import { LayoutGrid, Headphones, Euro, type LucideIcon } from 'lucide-react'
 import { Navigation, Footer, CookieBanner, HomeLandingHero, PlatformGridSection } from '@/components'
 import { useLanguage } from '@/i18n'
+
+function WhyVysionSection() {
+  const { t } = useLanguage()
+  const cards: { key: 'fullPlatform' | 'liveSupport' | 'rightPrice'; Icon: LucideIcon }[] = [
+    { key: 'fullPlatform', Icon: LayoutGrid },
+    { key: 'liveSupport', Icon: Headphones },
+    { key: 'rightPrice', Icon: Euro },
+  ]
+
+  return (
+    <section className="py-14 sm:py-16 bg-white border-b border-gray-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-center text-3xl sm:text-4xl font-bold text-gray-900 mb-10 sm:mb-12 tracking-tight">
+          {t('whyVysion.title')}
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          {cards.map(({ key, Icon }) => (
+            <div
+              key={key}
+              className="rounded-2xl border border-gray-200/80 bg-white p-8 text-center shadow-sm hover:border-accent/30 hover:shadow-md transition-all duration-300"
+            >
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full border-2 border-accent/30 bg-accent/5 text-accent">
+                <Icon className="h-7 w-7" strokeWidth={1.5} aria-hidden />
+              </div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">{t(`whyVysion.${key}.title`)}</h3>
+              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{t(`whyVysion.${key}.body`)}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 // One Day Online Section
 function OneDayOnlineSection() {
@@ -1550,6 +1584,7 @@ export default function HomePage() {
     <main>
       {stickyNav && <Navigation />}
       <HomeLandingHero onStickyNavChange={setStickyNav} />
+      <WhyVysionSection />
       <PlatformGridSection />
       <OneDayOnlineSection />
       <StatsSection />

@@ -121,6 +121,21 @@
       "description": "Laat je klanten rechtstreeks via WhatsApp bestellen. Menu bekijken, afrekenen en bestelling volgen - alles in WhatsApp. Geen app in de App Store nodig."
     }
   },
+  "whyVysion": {
+    "title": "Waarom kiezen voor Vysion",
+    "fullPlatform": {
+      "title": "Volledig platform",
+      "body": "Kassa, online bestellen, keukenscherm, reservaties, website en rapportage zitten in één omgeving. Geen losse tools of dubbel werk — alles werkt samen voor jouw horeca."
+    },
+    "liveSupport": {
+      "title": "Live support",
+      "body": "Ons team staat voor je klaar: bij opstart, dagelijkse vragen en drukke momenten. Snel antwoord, zodat je zaak blijft draaien."
+    },
+    "rightPrice": {
+      "title": "De juiste prijs",
+      "body": "Heldere abonnementen zonder verborgen kosten. Je betaalt voor wat je nodig hebt en schaalt mee als je zaak groeit."
+    }
+  },
   "platform": {
     "sectionTitle": "Ons platform",
     "sectionSubtitle": "Elk vak opent een eigen pagina met meer uitleg.",

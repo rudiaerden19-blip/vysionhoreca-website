@@ -4224,6 +4224,21 @@
     "eigenPlaceholder": "مثال: مغلق بسبب حدث خاص...",
     "bannerEigen": "مغلق مؤقتا"
   },
+  "whyVysion": {
+    "title": "Why choose Vysion",
+    "fullPlatform": {
+      "title": "Full platform",
+      "body": "POS, online ordering, kitchen display, reservations, website and reporting in one place. No scattered tools or double work — everything works together for your venue."
+    },
+    "liveSupport": {
+      "title": "Live support",
+      "body": "Our team is there when you need us: onboarding, day-to-day questions and busy shifts. Fast answers so you can keep service running."
+    },
+    "rightPrice": {
+      "title": "The right price",
+      "body": "Clear plans with no hidden fees. You pay for what you need and scale as your business grows."
+    }
+  },
   "platform": {
     "sectionTitle": "Our platform",
     "sectionSubtitle": "Each tile opens its own page with more detail.",
