@@ -4278,7 +4278,8 @@
     "kassasysteem": {
       "title": "POS system",
       "teaser": "Fast checkout linked to online orders and reporting.",
-      "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing."
+      "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing.",
+      "heroAlt": "Hand using a touchscreen POS with payment terminal at the counter in a café or restaurant"
     },
     "bestelplatform": {
       "title": "Ordering platform",

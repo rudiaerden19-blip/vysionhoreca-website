@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Navigation, Footer } from '@/components'
 import { useLanguage } from '@/i18n'
-import { BESTELPLATFORM_HERO_IMAGE, getPlatformPage } from '@/lib/platform-pages'
+import { BESTELPLATFORM_HERO_IMAGE, KASSASYSTEEM_HERO_IMAGE, getPlatformPage } from '@/lib/platform-pages'
 
 export default function PlatformDetailPage() {
   const params = useParams()
@@ -37,11 +37,15 @@ export default function PlatformDetailPage() {
     <main>
       <Navigation />
       <article className="bg-white">
-        {slug === 'bestelplatform' && (
+        {(slug === 'bestelplatform' || slug === 'kassasysteem') && (
           <div className="relative w-full min-h-[min(42svh,520px)] sm:min-h-[min(48svh,580px)] border-b border-gray-200/80 bg-gray-100">
             <Image
-              src={BESTELPLATFORM_HERO_IMAGE}
-              alt={t('platform.bestelplatform.cardHeaderAlt')}
+              src={slug === 'kassasysteem' ? KASSASYSTEEM_HERO_IMAGE : BESTELPLATFORM_HERO_IMAGE}
+              alt={
+                slug === 'kassasysteem'
+                  ? t('platform.kassasysteem.heroAlt')
+                  : t('platform.bestelplatform.cardHeaderAlt')
+              }
               fill
               className="object-cover object-center"
               sizes="100vw"
@@ -52,7 +56,7 @@ export default function PlatformDetailPage() {
 
         <div
           className={`mx-auto px-4 sm:px-6 lg:px-8 pb-16 ${
-            slug === 'bestelplatform' ? 'max-w-4xl pt-10' : 'max-w-3xl pt-28'
+            slug === 'bestelplatform' || slug === 'kassasysteem' ? 'max-w-4xl pt-10' : 'max-w-3xl pt-28'
           }`}
         >
           <Link
