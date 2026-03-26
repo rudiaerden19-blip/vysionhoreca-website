@@ -161,13 +161,13 @@
     "clientsLead": "سبقتك هذه الشركات بالفعل",
     "marquee": "مطاعم · مقالي · مطعم · مقهى · جزار · مخبز · كيترينج · مطعم أنيق · ساندويتش · نبيذ · فندق · Vysion Horeca · ",
     "successStories": {
-      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "زيادة حوالي 34% في الطلبات عبر الإنترنت بعد المنصة الجديدة" },
-      "broodZo": { "name": "Brood & Zo", "metric": "+1,750 يورو إيرادات إضافية شهريًا في الأشهر المزدحمة" },
-      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "انخفاض المكالمات وقت الذروة بنحو 25%" },
-      "saintGermain": { "name": "Frituur Saint Germain", "metric": "مزيد من الزبائن الدائمين بفضل تكرار الطلبات في التطبيق" },
-      "frituurAnn": { "name": "Frituur Ann", "metric": "+2,050 يورو في أيام العمل نفسها (قبل وبعد Vysion)" },
-      "butcher": { "name": "Butcher meat shop", "metric": "زيادة حوالي 36% في الطلبات عبر المتجر الإلكتروني" },
-      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "أخطاء أقل في الطلبات ووقت انتظار أقصر عند الرف" }
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metricHighlight": "+34%", "metricDetail": "طلبات عبر الإنترنت منذ المنصة الجديدة", "credibility": "خلال 3 أشهر" },
+      "broodZo": { "name": "Brood & Zo", "metricHighlight": "+€1,750", "metricDetail": "إيراد إضافي شهري في الأشهر المزدحمة", "credibility": "بدون عمولات" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metricHighlight": "−25%", "metricDetail": "مكالمات ذروة الغداء", "credibility": "منذ إطلاق صفحة الوجبات الجاهزة" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metricHighlight": "+28%", "metricDetail": "زبائن دائمون عبر تكرار الطلب في التطبيق", "credibility": "خلال شهرين" },
+      "frituurAnn": { "name": "Frituur Ann", "metricHighlight": "+€2,050", "metricDetail": "في أيام العمل نفسها (قبل/بعد Vysion)", "credibility": "بعد الانتقال من Takeaway" },
+      "butcher": { "name": "Butcher meat shop", "metricHighlight": "+36%", "metricDetail": "طلبات عبر المتجر الإلكتروني", "credibility": "بدون عمولات" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metricHighlight": "−32%", "metricDetail": "أخطاء الطلبات وطوابير أقصر", "credibility": "بعد جلسة تدريب واحدة" }
     }
   },
   "butWait": {

@@ -327,31 +327,45 @@
     "successStories": {
       "vivaldi": {
         "name": "VIVALDI 2.0 Food & Drinks",
-        "metric": "+34% more online orders since switching platforms"
+        "metricHighlight": "+34%",
+        "metricDetail": "more online orders since the new platform",
+        "credibility": "within 3 months"
       },
       "broodZo": {
         "name": "Brood & Zo",
-        "metric": "+€1,750 average extra revenue per month in busy months"
+        "metricHighlight": "+€1,750",
+        "metricDetail": "average extra revenue per month in peak months",
+        "credibility": "with zero commission"
       },
       "broodjesbar": {
         "name": "BROODJESBAR by Danver",
-        "metric": "About 25% fewer phone orders during the lunch rush"
+        "metricHighlight": "−25%",
+        "metricDetail": "fewer phone calls during the lunch rush",
+        "credibility": "since their own takeaway page went live"
       },
       "saintGermain": {
         "name": "Frituur Saint Germain",
-        "metric": "More regulars thanks to repeat orders in the app"
+        "metricHighlight": "+28%",
+        "metricDetail": "more regulars via repeat orders in the app",
+        "credibility": "within 2 months"
       },
       "frituurAnn": {
         "name": "Frituur Ann",
-        "metric": "+€2,050 on the same trading days (before vs after Vysion)"
+        "metricHighlight": "+€2,050",
+        "metricDetail": "on the same trading days (before vs after Vysion)",
+        "credibility": "after switching from Takeaway"
       },
       "butcher": {
         "name": "Butcher meat shop",
-        "metric": "+36% more orders through the webshop"
+        "metricHighlight": "+36%",
+        "metricDetail": "more orders through the webshop",
+        "credibility": "with zero commission"
       },
       "seelen": {
         "name": "Slagerij Seelen Traiteur",
-        "metric": "Fewer order mistakes and shorter wait time at the counter"
+        "metricHighlight": "−32%",
+        "metricDetail": "fewer order mistakes and shorter lines at the counter",
+        "credibility": "after one training session"
       }
     }
   },

@@ -161,13 +161,13 @@
     "clientsLead": "すでに導入いただいているお客様",
     "marquee": "外食 · フライ店 · レストラン · カフェ · 肉屋 · パン屋 · ケータリング · ブラッスリー · サンドイッチ · ワイン · ホテル · Vysion Horeca · ",
     "successStories": {
-      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "新プラットフォーム移行後、オンライン注文が約34%増" },
-      "broodZo": { "name": "Brood & Zo", "metric": "繁忙月で月平均プラス約1,750ユーロの売上" },
-      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "ランチピーク時の電話注文が約25%減" },
-      "saintGermain": { "name": "Frituur Saint Germain", "metric": "アプリのリピート注文で常連客が増加" },
-      "frituurAnn": { "name": "Frituur Ann", "metric": "同営業日比較でプラス約2,050ユーロ（導入前後）" },
-      "butcher": { "name": "Butcher meat shop", "metric": "Webショップ経由の注文が約36%増" },
-      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "注文ミス減少・カウンター待ち時間短縮" }
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metricHighlight": "+34%", "metricDetail": "新プラットフォーム以降のオンライン注文", "credibility": "3か月で" },
+      "broodZo": { "name": "Brood & Zo", "metricHighlight": "+€1,750", "metricDetail": "繁忙月の月平均の追加売上", "credibility": "手数料ゼロで" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metricHighlight": "−25%", "metricDetail": "ランチピーク時の電話", "credibility": "独自テイクアウトページ公開後" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metricHighlight": "+28%", "metricDetail": "アプリのリピート注文による常連客", "credibility": "2か月で" },
+      "frituurAnn": { "name": "Frituur Ann", "metricHighlight": "+€2,050", "metricDetail": "同営業日（導入前後）", "credibility": "Takeawayからの移行後" },
+      "butcher": { "name": "Butcher meat shop", "metricHighlight": "+36%", "metricDetail": "Webショップ経由の注文", "credibility": "手数料ゼロで" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metricHighlight": "−32%", "metricDetail": "注文ミスとカウンター待ち", "credibility": "1回の研修後" }
     }
   },
   "butWait": {

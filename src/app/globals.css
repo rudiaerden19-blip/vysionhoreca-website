@@ -77,9 +77,10 @@
   background: #fff;
   padding: 1rem 1rem 0.875rem;
   box-shadow:
-    0 32px 80px -16px rgba(15, 23, 42, 0.24),
-    0 16px 44px -10px rgba(15, 23, 42, 0.15),
-    0 0 0 1px rgba(0, 0, 0, 0.04);
+    0 44px 110px -22px rgba(15, 23, 42, 0.34),
+    0 24px 62px -14px rgba(15, 23, 42, 0.24),
+    0 10px 32px rgba(15, 23, 42, 0.14),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
 .partner-success-card .partner-success-logo {

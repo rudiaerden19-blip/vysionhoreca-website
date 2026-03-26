@@ -161,13 +161,13 @@
     "clientsLead": "这些客户已经走在了您前面",
     "marquee": "餐饮 · 炸薯条店 · 餐厅 · 咖啡馆 · 肉铺 · 面包房 · 宴会服务 · 餐吧 · 三明治 · 酒庄 · 酒店 · Vysion Horeca · ",
     "successStories": {
-      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "换新平台后线上订单约增34%" },
-      "broodZo": { "name": "Brood & Zo", "metric": "旺季月均额外收入约 1,750 欧元" },
-      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "午市高峰电话订单约减少25%" },
-      "saintGermain": { "name": "Frituur Saint Germain", "metric": "应用内复购带来更多常客" },
-      "frituurAnn": { "name": "Frituur Ann", "metric": "相同营业日对比约多 2,050 欧元（上线前后）" },
-      "butcher": { "name": "Butcher meat shop", "metric": "网店订单约增36%" },
-      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "订单错误更少，柜台等待更短" }
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metricHighlight": "+34%", "metricDetail": "新平台上线后的线上订单", "credibility": "3 个月内" },
+      "broodZo": { "name": "Brood & Zo", "metricHighlight": "+€1,750", "metricDetail": "旺季月均额外收入", "credibility": "零佣金" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metricHighlight": "−25%", "metricDetail": "午市高峰电话量", "credibility": "自营外卖页面上线后" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metricHighlight": "+28%", "metricDetail": "应用内复购带来的常客", "credibility": "2 个月内" },
+      "frituurAnn": { "name": "Frituur Ann", "metricHighlight": "+€2,050", "metricDetail": "相同营业日（切换前后）", "credibility": "从 Takeaway 迁移后" },
+      "butcher": { "name": "Butcher meat shop", "metricHighlight": "+36%", "metricDetail": "网店订单", "credibility": "零佣金" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metricHighlight": "−32%", "metricDetail": "订单错误与柜台排队", "credibility": "一次培训后" }
     }
   },
   "butWait": {

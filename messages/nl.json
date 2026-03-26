@@ -327,31 +327,45 @@
     "successStories": {
       "vivaldi": {
         "name": "VIVALDI 2.0 Food & Drinks",
-        "metric": "+34% meer online bestellingen sinds het nieuwe platform"
+        "metricHighlight": "+34%",
+        "metricDetail": "meer online bestellingen sinds het nieuwe platform",
+        "credibility": "in 3 maanden"
       },
       "broodZo": {
         "name": "Brood & Zo",
-        "metric": "+€1.750 gemiddelde extra omzet per maand (peakmaanden)"
+        "metricHighlight": "+€1.750",
+        "metricDetail": "gemiddelde extra omzet per maand (peakmaanden)",
+        "credibility": "zonder commissies"
       },
       "broodjesbar": {
         "name": "BROODJESBAR by Danver",
-        "metric": "Een kwart minder telefoon tijdens de middagrush"
+        "metricHighlight": "−25%",
+        "metricDetail": "minder telefoon tijdens de middagrush",
+        "credibility": "sinds eigen takeaway-pagina live staat"
       },
       "saintGermain": {
         "name": "Frituur Saint Germain",
-        "metric": "Meer vaste klanten dankzij herhaalbestellingen via de app"
+        "metricHighlight": "+28%",
+        "metricDetail": "meer vaste klanten via herhaalbestellingen in de app",
+        "credibility": "in 2 maanden"
       },
       "frituurAnn": {
         "name": "Frituur Ann",
-        "metric": "+€2.050 bij gelijke openingsdagen (voor/na Vysion)"
+        "metricHighlight": "+€2.050",
+        "metricDetail": "bij gelijke openingsdagen (voor/na Vysion)",
+        "credibility": "na overstap van Takeaway"
       },
       "butcher": {
         "name": "Butcher meat shop",
-        "metric": "+36% meer bestellingen via de webshop"
+        "metricHighlight": "+36%",
+        "metricDetail": "meer bestellingen via de webshop",
+        "credibility": "zonder commissies"
       },
       "seelen": {
         "name": "Slagerij Seelen Traiteur",
-        "metric": "Minder fouten in bestellingen en kortere wachttijd aan de toog"
+        "metricHighlight": "−32%",
+        "metricDetail": "minder fouten in bestellingen en kortere wacht aan de toog",
+        "credibility": "na één opleidingsmoment"
       }
     }
   },

@@ -246,17 +246,27 @@ function StatsAndLiveDemoSection() {
                         <p className="text-center text-sm sm:text-base font-bold text-gray-900 leading-snug mb-3 min-h-[2.5rem] sm:min-h-[2.75rem] flex items-center justify-center">
                           {t(`liveDemo.successStories.${card.key}.name`)}
                         </p>
-                        <div className="mt-auto flex gap-2.5 pt-3 border-t border-gray-100">
-                          <span
-                            className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white"
-                            aria-hidden
-                          >
-                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
-                          </span>
-                          <p className="text-xs sm:text-sm font-semibold text-gray-800 leading-snug">
-                            {t(`liveDemo.successStories.${card.key}.metric`)}
+                        <div className="mt-auto flex flex-col gap-2 pt-3 border-t border-gray-100">
+                          <div className="flex gap-2.5">
+                            <span
+                              className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white"
+                              aria-hidden
+                            >
+                              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            </span>
+                            <p className="text-left leading-snug">
+                              <span className="block text-lg sm:text-xl font-extrabold text-emerald-600 tabular-nums tracking-tight">
+                                {t(`liveDemo.successStories.${card.key}.metricHighlight`)}
+                              </span>
+                              <span className="mt-0.5 block text-xs sm:text-sm font-semibold text-gray-700">
+                                {t(`liveDemo.successStories.${card.key}.metricDetail`)}
+                              </span>
+                            </p>
+                          </div>
+                          <p className="border-l-2 border-accent/35 pl-2.5 text-[11px] sm:text-xs font-medium text-gray-500 leading-snug">
+                            {t(`liveDemo.successStories.${card.key}.credibility`)}
                           </p>
                         </div>
                       </div>

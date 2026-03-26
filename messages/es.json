@@ -161,13 +161,13 @@
     "clientsLead": "Estos clientes ya se adelantaron",
     "marquee": "Hostelería · Freiduría · Restaurante · Café · Carnicería · Panadería · Catering · Brasserie · Sandwich · Vinoteca · Hotel · Vysion Horeca · ",
     "successStories": {
-      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "+34 % más pedidos online desde la nueva plataforma" },
-      "broodZo": { "name": "Brood & Zo", "metric": "+1.750 € de ingresos extra al mes en temporadas fuertes" },
-      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "~25 % menos llamadas en la hora punta del mediodía" },
-      "saintGermain": { "name": "Frituur Saint Germain", "metric": "Más clientes habituales con pedidos repetidos en la app" },
-      "frituurAnn": { "name": "Frituur Ann", "metric": "+2.050 € en los mismos días abiertos (antes/después de Vysion)" },
-      "butcher": { "name": "Butcher meat shop", "metric": "+36 % más pedidos por la tienda web" },
-      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "Menos errores en pedidos y menos espera en barra" }
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metricHighlight": "+34 %", "metricDetail": "más pedidos online desde la nueva plataforma", "credibility": "en 3 meses" },
+      "broodZo": { "name": "Brood & Zo", "metricHighlight": "+1.750 €", "metricDetail": "ingresos extra medios al mes (temporadas fuertes)", "credibility": "sin comisiones" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metricHighlight": "−25 %", "metricDetail": "menos llamadas en la hora punta del mediodía", "credibility": "desde su página takeaway propia" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metricHighlight": "+28 %", "metricDetail": "más habituales con pedidos repetidos en la app", "credibility": "en 2 meses" },
+      "frituurAnn": { "name": "Frituur Ann", "metricHighlight": "+2.050 €", "metricDetail": "en los mismos días abiertos (antes/después de Vysion)", "credibility": "tras migrar desde Takeaway" },
+      "butcher": { "name": "Butcher meat shop", "metricHighlight": "+36 %", "metricDetail": "más pedidos por la tienda web", "credibility": "sin comisiones" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metricHighlight": "−32 %", "metricDetail": "errores en pedidos y menos cola en barra", "credibility": "tras una formación" }
     }
   },
   "butWait": {
