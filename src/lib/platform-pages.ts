@@ -3,6 +3,9 @@
 /** Zelfde afbeelding als op de platformkaart + volle-breedte hero op /platform/bestelplatform. */
 export const BESTELPLATFORM_HERO_IMAGE = '/images/platform/bestelplatform-hero.jpg'
 
+export const KASSASYSTEEM_CARD_IMAGE = '/images/platform/kassasysteem-card.png'
+export const KEUKENSCHERMEN_CARD_IMAGE = '/images/platform/keukenschermen-card.png'
+
 export type PlatformPageEntry = {
   slug: string
   msgKey: string
@@ -11,13 +14,13 @@ export type PlatformPageEntry = {
 }
 
 export const PLATFORM_PAGES: PlatformPageEntry[] = [
-  { slug: 'kassasysteem', msgKey: 'kassasysteem' },
+  { slug: 'kassasysteem', msgKey: 'kassasysteem', cardHeaderImage: KASSASYSTEEM_CARD_IMAGE },
   {
     slug: 'bestelplatform',
     msgKey: 'bestelplatform',
     cardHeaderImage: BESTELPLATFORM_HERO_IMAGE,
   },
-  { slug: 'keukenschermen', msgKey: 'keukenschermen' },
+  { slug: 'keukenschermen', msgKey: 'keukenschermen', cardHeaderImage: KEUKENSCHERMEN_CARD_IMAGE },
   { slug: 'online-scherm', msgKey: 'onlineScherm' },
   { slug: 'reservaties', msgKey: 'reservaties' },
   { slug: 'eigen-website', msgKey: 'eigenWebsite' },

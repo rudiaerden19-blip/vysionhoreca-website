@@ -131,7 +131,8 @@
     "kassasysteem": {
       "title": "Kassasysteem",
       "teaser": "Snel afrekenen, gekoppeld aan online orders en rapporten.",
-      "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion Horeca beheer je producten, tafels, betalingen en personeel vanuit één omgeving — minder fouten tijdens piekuren en altijd zicht op de dagafsluiting."
+      "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion Horeca beheer je producten, tafels, betalingen en personeel vanuit één omgeving — minder fouten tijdens piekuren en altijd zicht op de dagafsluiting.",
+      "cardHeaderAlt": "Kassa-opstelling met groot scherm, tablet en smartphone met horeca-ordersoftware."
     },
     "bestelplatform": {
       "title": "Bestelplatform",
@@ -142,7 +143,8 @@
     "keukenschermen": {
       "title": "Keukenschermen",
       "teaser": "Orders in realtime, duidelijk gesorteerd per tijd en prioriteit.",
-      "body": "De keuken ziet precies wat er binnenkomt en wat klaar moet. Geen verloren briefjes of verkeerd overgeschreven bonnen.\n\nMinder stress tijdens de rush en een rustiger team achter de lijn."
+      "body": "De keuken ziet precies wat er binnenkomt en wat klaar moet. Geen verloren briefjes of verkeerd overgeschreven bonnen.\n\nMinder stress tijdens de rush en een rustiger team achter de lijn.",
+      "cardHeaderAlt": "Chef die een keukenscherm aanraakt boven een RVS-werkstation met gestapelde kopjes."
     },
     "onlineScherm": {
       "title": "Online scherm",

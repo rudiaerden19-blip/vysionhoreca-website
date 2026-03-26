@@ -4234,7 +4234,8 @@
     "kassasysteem": {
       "title": "POS system",
       "teaser": "Fast checkout linked to online orders and reporting.",
-      "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing."
+      "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing.",
+      "cardHeaderAlt": "Point-of-sale setup with a large monitor, tablet and smartphone showing restaurant ordering software."
     },
     "bestelplatform": {
       "title": "Ordering platform",
@@ -4245,7 +4246,8 @@
     "keukenschermen": {
       "title": "Kitchen screens",
       "teaser": "Live tickets sorted by time and priority.",
-      "body": "The kitchen sees exactly what is due and when — no lost tickets or bad handwriting.\n\nLess stress during the rush and calmer service from the pass."
+      "body": "The kitchen sees exactly what is due and when — no lost tickets or bad handwriting.\n\nLess stress during the rush and calmer service from the pass.",
+      "cardHeaderAlt": "Chef in whites using a wall-mounted kitchen display above a stainless-steel workstation with stacked cups."
     },
     "onlineScherm": {
       "title": "Display screen",
