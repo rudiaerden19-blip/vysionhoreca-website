@@ -49,7 +49,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
   const pillLinks: { href: string; label: string }[] = [
     { href: '/', label: t('nav.home') },
     { href: '/#sectoren', label: t('nav.sectors') },
-    { href: '/#functies', label: t('nav.services') },
+    { href: '/#platform', label: t('nav.services') },
     { href: '/support', label: t('nav.integrations') },
     { href: '/#contact', label: t('nav.contact') },
   ]

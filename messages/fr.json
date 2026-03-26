@@ -4246,5 +4246,58 @@
     "reasonEigenDesc": "Ecrivez votre propre message pour le client",
     "eigenPlaceholder": "ex. Ferme pour un evenement prive...",
     "bannerEigen": "Ferme temporairement"
+  },
+  "platform": {
+    "sectionTitle": "Our platform",
+    "sectionSubtitle": "Nine building blocks of Vysion Horeca — click a tile for more detail on its own page.",
+    "detailCta": "Start free trial",
+    "detailBack": "Back to overview",
+    "notFoundTitle": "Page not found",
+    "notFoundCta": "Go to homepage",
+    "eigenWebsite": {
+      "title": "Your own website",
+      "teaser": "A fully personalised website on your own domain, including an ordering system that is easy to manage.",
+      "body": "Vysion Horeca gives you a professional site in your brand: logo, colours, photos and copy. Customers order online directly — without an extra platform outside your brand.\n\nYou manage menu, prices and promotions in the same admin as your POS and kitchen. Everything stays in sync; no copy-paste between siloed tools.\n\nYour domain, SSL and a mobile-first experience are part of the story: your business, your first impression, your revenue."
+    },
+    "tijdsbesparing": {
+      "title": "Time savings",
+      "teaser": "Fewer phone orders means more time for staff to focus on other operational tasks.",
+      "body": "Online ordering and clear flows per order type (pickup, delivery, dine-in) reduce pressure on the phone and the counter. Customers choose options and allergens themselves — fewer mistakes, less back-and-forth.\n\nOrders arrive structured on POS and kitchen screens. At peak times you feel the difference immediately: your team moves faster without extra headcount.\n\nLess admin noise means more attention for preparation, hospitality and closing the day cleanly."
+    },
+    "productupdates": {
+      "title": "Product updates",
+      "teaser": "Update product information quickly and add new items without a heavy lift.",
+      "body": "Launch specials, seasonal items or price changes whenever you want. One central catalogue feeds your website, QR menu and POS — no duplicate work.\n\nImages, descriptions, options and allergens are managed per product. Your offer stays current for customers and for the team behind the screens.\n\nFast market moves matter in hospitality; with clear updates you stay agile without technical hassle."
+    },
+    "dataEnAnalyse": {
+      "title": "Data and analytics",
+      "teaser": "Rich data to fine-tune stock, pricing and marketing.",
+      "body": "See what sells, when it gets busy and which margins you achieve. Combine revenue signals with your cost calculator and steer peak and off-peak more consciously.\n\nPopularity insights help refine your menu and stock. Less waste, sharper promos, better staff planning.\n\nData does not have to be overwhelming: we bundle the signals you need to improve bit by bit every week."
+    },
+    "betalingsmogelijkheid": {
+      "title": "Payments",
+      "teaser": "Customers can pay safely and easily online for faster checkout.",
+      "body": "Online payment reduces friction: less cash at the door, fewer bank-transfer mistakes. Tie payment to the order flow so everything stays traceable.\n\nTogether with clear order status, prepaid orders bring calm to the kitchen and the pickup counter.\n\nTrusted payment methods and a professional flow increase confidence — key for repeat visits and higher average tickets."
+    },
+    "voorraadbeheer": {
+      "title": "Stock management",
+      "teaser": "Manage stock easily so customers see what is still available.",
+      "body": "Stay in control of availability per product or variant. Show customers transparently what can still be delivered and avoid disappointment at the counter.\n\nInternally you see what is running low so you can reorder or mark sold out on the site in time.\n\nTighter stock means less waste, sharper planning and a calmer team — especially for short shelf-life items."
+    },
+    "nulCommissie": {
+      "title": "0% commission",
+      "teaser": "No hidden take rate on your revenue. What you sell stays yours.",
+      "body": "With Vysion Horeca you do not pay commission per order. Your subscription is predictable; margin on online sales stays with you.\n\nThat difference adds up in busy months: every euro not sent to middlemen goes to quality, people or growth.\n\nTransparent pricing fits how we would run hospitality ourselves — fair, without surprises after the fact."
+    },
+    "ondersteuning": {
+      "title": "Support",
+      "teaser": "Our team is here with fast, personal help when you need it.",
+      "body": "You do not need to be an IT expert. We guide onboarding, integrations and day-to-day questions — from menu setup to a smooth order flow.\n\nSupport that understands how a kitchen runs saves time and stress. We think in solutions, not stuck tickets.\n\nGood support is not an afterthought for us: hospitality is people-first, and we make sure technology helps."
+    },
+    "qrBestellen": {
+      "title": "QR ordering",
+      "teaser": "Guests scan, order and pay from the table — without hassle.",
+      "body": "QR ordering speeds up service in busy rooms and on terraces. Guests open your menu on their phone, with your look & feel and live prices.\n\nOrders go straight to POS and kitchen — less walking, fewer manual entry mistakes.\n\nCombine QR with tables and zones for floor overview. Scale peaks without hurting the guest experience."
+    }
   }
 }

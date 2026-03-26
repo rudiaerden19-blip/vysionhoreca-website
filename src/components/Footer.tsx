@@ -36,8 +36,8 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">{t('footer.product')}</h4>
             <ul className="space-y-2">
-              <li><a href="#functies" className="text-gray-400 hover:text-white transition-colors">{t('footer.features')}</a></li>
-              <li><a href="#prijzen" className="text-gray-400 hover:text-white transition-colors">{t('footer.pricing')}</a></li>
+              <li><a href="/#platform" className="text-gray-400 hover:text-white transition-colors">{t('footer.features')}</a></li>
+              <li><a href="/#prijzen" className="text-gray-400 hover:text-white transition-colors">{t('footer.pricing')}</a></li>
               <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.updates')}</a></li>
             </ul>
           </div>
@@ -46,7 +46,7 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">{t('footer.company')}</h4>
             <ul className="space-y-2">
               <li><a href="/over-ons" className="text-gray-400 hover:text-white transition-colors">{t('footer.about')}</a></li>
-              <li><a href="#contact" className="text-gray-400 hover:text-white transition-colors">{t('footer.contact')}</a></li>
+              <li><a href="/#contact" className="text-gray-400 hover:text-white transition-colors">{t('footer.contact')}</a></li>
               <li><a href="/support" className="text-gray-400 hover:text-white transition-colors">Support</a></li>
               <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors">{t('footer.privacy')}</a></li>
               <li><a href="/juridisch" className="text-gray-400 hover:text-white transition-colors">{t('footer.legal')}</a></li>

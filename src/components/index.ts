@@ -1,4 +1,5 @@
 export { default as HomeLandingHero } from './HomeLandingHero'
+export { default as PlatformGridSection } from './PlatformGridSection'
 export { default as Navigation } from './Navigation'
 export { default as Footer } from './Footer'
 export { default as CookieBanner } from './CookieBanner'

@@ -1,0 +1,74 @@
+'use client'
+
+import Link from 'next/link'
+import { useParams } from 'next/navigation'
+import { Navigation, Footer } from '@/components'
+import { useLanguage } from '@/i18n'
+import { getPlatformPage } from '@/lib/platform-pages'
+
+export default function PlatformDetailPage() {
+  const params = useParams()
+  const slug = typeof params.slug === 'string' ? params.slug : ''
+  const config = getPlatformPage(slug)
+  const { t, locale } = useLanguage()
+
+  if (!config) {
+    return (
+      <main>
+        <Navigation />
+        <section className="bg-[#e3e3e3] min-h-[50vh] pt-28 pb-20 px-4 text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('platform.notFoundTitle')}</h1>
+          <Link href="/" className="text-accent font-semibold underline">
+            {t('platform.notFoundCta')}
+          </Link>
+        </section>
+        <Footer />
+      </main>
+    )
+  }
+
+  const prefix = `platform.${config.msgKey}`
+  const bodyRaw = t(`${prefix}.body`)
+  const paragraphs =
+    bodyRaw === `${prefix}.body` ? [] : bodyRaw.split('\n\n').filter(Boolean)
+
+  return (
+    <main>
+      <Navigation />
+      <article className="bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
+          <Link
+            href="/#platform"
+            className="inline-block text-accent font-semibold text-sm mb-8 hover:underline"
+          >
+            ← {t('platform.detailBack')}
+          </Link>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">{t(`${prefix}.title`)}</h1>
+          <p className="text-lg text-gray-600 leading-relaxed mb-10">{t(`${prefix}.teaser`)}</p>
+          <div className="prose prose-lg text-gray-700 space-y-4 max-w-none">
+            {paragraphs.map((p, i) => (
+              <p key={i} className="leading-relaxed">
+                {p}
+              </p>
+            ))}
+          </div>
+          <div className="mt-12 flex flex-wrap gap-4">
+            <a
+              href={`/registreer?lang=${locale}`}
+              className="inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 transition-colors"
+            >
+              {t('platform.detailCta')}
+            </a>
+            <Link
+              href={`/#contact`}
+              className="inline-flex items-center justify-center rounded-full border-2 border-gray-300 text-gray-900 font-semibold px-8 py-4 hover:border-accent hover:text-accent transition-colors"
+            >
+              {t('heroLanding.demoRequest')}
+            </Link>
+          </div>
+        </div>
+      </article>
+      <Footer />
+    </main>
+  )
+}
