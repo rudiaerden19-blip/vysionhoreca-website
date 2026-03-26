@@ -50,14 +50,14 @@ function WhyVysionSection() {
                 aria-hidden
               />
               <figure className="relative rounded-2xl sm:rounded-3xl bg-gray-900/5 p-2 sm:p-3 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] ring-1 ring-black/[0.06]">
-                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-100">
+                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#f5f0e8]">
                   <Image
-                    src="/images/online-order-platform-1.png"
+                    src="/images/why-vysion-pos-mockup.png"
                     alt=""
-                    width={1200}
-                    height={800}
-                    className="w-full h-auto object-cover"
-                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    width={819}
+                    height={1024}
+                    className="w-full h-auto object-contain"
+                    sizes="(min-width: 1024px) 42vw, 92vw"
                     priority={false}
                   />
                 </div>
