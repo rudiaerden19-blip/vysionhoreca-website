@@ -46,6 +46,19 @@
     "body": "Je stelt je pakket zelf samen: één module of meerdere — jij kiest wat je nodig hebt. Elke module kun je apart aanzetten; je prijs past zich aan je selectie aan. Zo betaal je alleen voor wat je echt gebruikt en bouw je Vysion zoals het voor jouw zaak klopt.",
     "cta": "Neem contact op"
   },
+  "tableKiosk": {
+    "imageAlt": "Vysion tafelkiosk op een tafel in de zaak",
+    "title": "Nieuw bij Vysion",
+    "subtitle": "Onze tafelkiosk",
+    "body": "De tijd van grote, dure kiosken bij de ingang is voorbij: ze zijn fors, kostbaar en sluiten niet meer aan bij hoe gasten vandaag willen bestellen. Vysion heeft daar iets slimmers voor: een compacte tafelkiosk op het blad — zonder drukte aan de deur — gekoppeld aan jouw eigen online bestelplatform en je kassa.",
+    "features": {
+      "1": "Op tafel, volledig draadloos en eenvoudig oplaadbaar",
+      "2": "Ruim 36 uur batterij — betrouwbaar tijdens lange shifts",
+      "3": "Laad tot 2 smartphones tegelijk voor je gasten",
+      "4": "Jouw menu en huisstijl: hetzelfde bestelplatform als online",
+      "5": "Bestellen én afrekenen aan tafel — rechtstreeks naar je kassa"
+    }
+  },
   "oneDayOnline": {
     "title": "Ga op",
     "titleAccent": "1 dag",

@@ -46,6 +46,19 @@
     "body": "Componi il tuo pacchetto: un modulo o più — attivi solo ciò che ti serve. Ogni modulo si sceglie separatamente; il prezzo segue la tua selezione. Paghi solo ciò che usi davvero.",
     "cta": "Contattaci"
   },
+  "tableKiosk": {
+    "imageAlt": "Kiosk da tavolo Vysion in sala",
+    "title": "Novità da Vysion",
+    "subtitle": "Il nostro kiosk da tavolo",
+    "body": "Il tempo dei grandi kiosk costosi all’ingresso è finito: ingombranti, cari e lontani da come i clienti vogliono ordinare oggi. Vysion risponde con un kiosk da tavolo compatto, sul piano, collegato al tuo ordering online e al POS.",
+    "features": {
+      "1": "Sul tavolo, wireless e facile da ricaricare",
+      "2": "Oltre 36 ore di batteria — affidabile nei turni lunghi",
+      "3": "Ricarica fino a 2 smartphone per gli ospiti",
+      "4": "Menu e brand: la stessa esperienza del canale online",
+      "5": "Ordina e paga al tavolo — tutto va dritto in cassa"
+    }
+  },
   "oneDayOnline": {
     "title": "Vai online in",
     "titleAccent": "1 giorno",

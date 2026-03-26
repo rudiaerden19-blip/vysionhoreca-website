@@ -46,6 +46,19 @@
     "body": "Stellen Sie Ihr Paket selbst zusammen: ein Modul oder mehrere — Sie aktivieren nur, was Sie brauchen. Jedes Modul ist einzeln wählbar; der Preis richtet sich nach Ihrer Auswahl. Sie zahlen nur für das, was Sie wirklich nutzen.",
     "cta": "Kontakt aufnehmen"
   },
+  "tableKiosk": {
+    "imageAlt": "Vysion Tisch-Kiosk im Lokal",
+    "title": "Neu bei Vysion",
+    "subtitle": "Unser Tisch-Kiosk",
+    "body": "Die Zeit großer, teurer Kioske am Eingang ist vorbei — sperrig, kostspielig und nicht mehr passend dazu, wie Gäste heute bestellen wollen. Vysion bietet die Antwort: ein kompakter Tisch-Kiosk auf dem Tisch, angebunden an Ihr eigenes Online-Bestellsystem und Ihre Kasse.",
+    "features": {
+      "1": "Auf dem Tisch, kabellos und einfach wiederaufladbar",
+      "2": "Über 36 Stunden Akku — zuverlässig bei langen Schichten",
+      "3": "Zwei Smartphones gleichzeitig für Gäste laden",
+      "4": "Ihre Speisekarte und Ihr Look — dasselbe Erlebnis wie online",
+      "5": "Bestellen und bezahlen am Tisch — direkt in die Kasse"
+    }
+  },
   "oneDayOnline": {
     "title": "Gehen Sie in",
     "titleAccent": "1 Tag",

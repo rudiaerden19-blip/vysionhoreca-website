@@ -46,6 +46,19 @@
     "body": "Build your own bundle: one module or several — you only enable what you need. Each module can be selected on its own, and your price follows your choices. Pay for what you actually use and shape Vysion to fit your venue.",
     "cta": "Contact us"
   },
+  "tableKiosk": {
+    "imageAlt": "Vysion table kiosk in a restaurant",
+    "title": "New at Vysion",
+    "subtitle": "Our table kiosk",
+    "body": "The era of big, pricey entrance kiosks is over — they’re bulky, expensive, and out of step with how guests want to order today. Vysion’s answer is a compact table kiosk that sits on the tabletop and plugs into your own online ordering and POS.",
+    "features": {
+      "1": "On the table, fully wireless and easy to recharge",
+      "2": "36+ hours of battery — dependable through long services",
+      "3": "Charge up to two smartphones for guests at the table",
+      "4": "Your menu and branding: the same ordering experience as online",
+      "5": "Order and pay at the table — everything flows straight to the till"
+    }
+  },
   "oneDayOnline": {
     "title": "Go online in",
     "titleAccent": "1 day",

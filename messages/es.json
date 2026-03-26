@@ -46,6 +46,19 @@
     "body": "Arma tu propio paquete: un módulo o varios — solo activas lo que necesitas. Cada módulo se elige por separado; el precio se ajusta a tu selección. Pagas solo por lo que realmente usas.",
     "cta": "Contactar"
   },
+  "tableKiosk": {
+    "imageAlt": "Quiosco de mesa Vysion en el local",
+    "title": "Novedad en Vysion",
+    "subtitle": "Nuestro quiosco de mesa",
+    "body": "El tiempo de los quioscos enormes y caros en la entrada ha pasado: ocupan mucho, cuestan caro y ya no encajan con cómo quieren pedir los clientes. Vysion ofrece un quiosco de mesa compacto sobre la mesa, enlazado a tu pedido online y a tu TPV.",
+    "features": {
+      "1": "Sobre la mesa, inalámbrico y fácil de recargar",
+      "2": "Más de 36 horas de batería — fiable en turnos largos",
+      "3": "Carga hasta 2 smartphones para tus clientes",
+      "4": "Tu carta y tu marca: la misma experiencia que online",
+      "5": "Pedir y pagar en mesa — todo fluye directo a caja"
+    }
+  },
   "oneDayOnline": {
     "title": "Ponte en línea en",
     "titleAccent": "1 día",
