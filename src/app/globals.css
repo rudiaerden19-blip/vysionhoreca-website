@@ -16,6 +16,13 @@
       0 28px 72px -12px rgba(0, 0, 0, 0.35),
       0 13px 36px rgba(0, 0, 0, 0.26);
   }
+  /* Grote foto op lichte achtergrond (Why Vysion POS) — lichter dan shadow-home-image */
+  .shadow-home-photo {
+    box-shadow:
+      0 26px 56px -12px rgba(0, 0, 0, 0.28),
+      0 14px 36px -8px rgba(0, 0, 0, 0.2),
+      0 6px 18px rgba(0, 0, 0, 0.13);
+  }
   .shadow-home-card {
     box-shadow:
       0 42px 102px -22px rgba(0, 0, 0, 0.42),
