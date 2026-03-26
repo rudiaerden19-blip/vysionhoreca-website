@@ -334,28 +334,9 @@ function OrderAppSection() {
 }
 
 // Pricing Section
-function useCountdown(targetDate: Date) {
-  const calc = () => {
-    const diff = Math.max(0, targetDate.getTime() - Date.now())
-    return {
-      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((diff / (1000 * 60)) % 60),
-      seconds: Math.floor((diff / 1000) % 60),
-    }
-  }
-  const [time, setTime] = useState(calc)
-  useEffect(() => {
-    const id = setInterval(() => setTime(calc()), 1000)
-    return () => clearInterval(id)
-  }, [])
-  return time
-}
-
 function PricingSection() {
   const { t, locale } = useLanguage()
   const [isYearly, setIsYearly] = useState(false)
-  const countdown = useCountdown(new Date('2026-05-01T00:00:00'))
   
   // Jaarlijks = 10% korting
   const starterMonthly = 59
@@ -367,7 +348,7 @@ function PricingSection() {
   return (
     <section id="prijzen" className="py-24 bg-[#e3e3e3] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-8">
+        <div className="text-center mb-10">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
             {t('pricing.title')}
           </h2>
@@ -376,171 +357,142 @@ function PricingSection() {
           </p>
         </div>
 
-        {/* ── Aanbieding countdown banner ── */}
-        <div className="mb-10 rounded-2xl overflow-hidden border border-red-400/40 bg-gradient-to-r from-red-900/80 to-orange-900/80 p-6 text-center">
-          <p className="text-red-300 font-semibold text-sm uppercase tracking-widest mb-1">⏳ Tijdelijke aanbieding</p>
-          <p className="text-white text-xl font-bold mb-5">Aanbieding loopt tot 1 mei 2026</p>
-          <div className="flex items-center justify-center gap-3 sm:gap-6">
-            {[
-              { value: countdown.days, label: 'Dagen' },
-              { value: countdown.hours, label: 'Uren' },
-              { value: countdown.minutes, label: 'Minuten' },
-              { value: countdown.seconds, label: 'Seconden' },
-            ].map(({ value, label }, i, arr) => (
-              <React.Fragment key={label}>
-                <div className="flex flex-col items-center">
-                  <div className="bg-[#0f0f1a] border border-red-500/40 rounded-xl w-16 sm:w-20 h-16 sm:h-20 flex items-center justify-center">
-                    <span className="text-3xl sm:text-4xl font-black text-red-400 tabular-nums leading-none">
-                      {String(value).padStart(2, '0')}
-                    </span>
-                  </div>
-                  <span className="text-gray-300 text-xs mt-1.5 font-medium">{label}</span>
-                </div>
-                {i < arr.length - 1 && (
-                  <span className="text-red-400 text-2xl font-bold mb-5">:</span>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
         {/* Toggle Maandelijks / Jaarlijks */}
         <div className="flex flex-col items-center mb-12">
-          <div className="bg-gray-300 p-1 rounded-full inline-flex items-center">
+          <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-sm">
             <button
+              type="button"
               onClick={() => setIsYearly(false)}
               className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                !isYearly 
-                  ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
-                  : 'text-gray-600 hover:text-gray-900'
+                !isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Maandelijks
             </button>
             <button
+              type="button"
               onClick={() => setIsYearly(true)}
-              className={`px-6 py-3 rounded-full font-semibold transition-all relative ${
-                isYearly 
-                  ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
-                  : 'text-gray-600 hover:text-gray-900'
+              className={`px-6 py-3 rounded-full font-semibold transition-all relative pr-8 ${
+                isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Jaarlijks
-              <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className="absolute -top-1.5 -right-1 bg-gray-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none">
                 -10%
               </span>
             </button>
           </div>
           {isYearly && (
-            <p className="text-green-400 text-sm mt-3 font-medium">
-              ✓ Je bespaart 10% met een jaarabonnement!
-            </p>
+            <p className="text-gray-600 text-sm mt-3">{t('pricing.yearlySave')}</p>
           )}
         </div>
 
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
-          
-          {/* Vysion Starter */}
-          <div className="bg-gradient-to-b from-[#2d4a3e] to-[#1e3a2f] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 lg:gap-8">
+          {/* Starter */}
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-6 lg:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-yellow-400/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white">{t('pricing.starter.name')}</h3>
+                <h3 className="text-xl font-bold text-gray-900">{t('pricing.starter.name')}</h3>
               </div>
-              <div className="mb-3">
-                <span className="bg-red-500 text-white text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wide">
-                  ⏳ Tijdelijke aanbieding
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="text-lg text-gray-400 line-through">
+                  €{isYearly ? Math.round(99 * 12 * 0.9) : 99}/maand
                 </span>
-              </div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl font-bold text-gray-400 line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(99 * 12 * 0.9) : 99}/maand</span>
-                <span className="bg-green-500/20 text-green-400 text-sm font-bold px-2 py-0.5 rounded-lg">-40%</span>
+                <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">-40%</span>
               </div>
               <div className="flex items-baseline mb-6">
-                <span className="text-5xl font-bold text-yellow-400">€{starterPrice}</span>
-                <span className="text-gray-400 ml-2">{periodLabel}</span>
+                <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{starterPrice}</span>
+                <span className="text-gray-500 ml-2">{periodLabel}</span>
               </div>
-              
+
               <ul className="space-y-3 mb-8">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((i) => (
-                  <li key={i} className="flex items-center">
-                    <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <li key={i} className="flex items-start gap-3">
+                    <svg
+                      className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-gray-200">{t(`pricing.starter.features.${i}`)}</span>
+                    <span className="text-gray-600 text-sm sm:text-base leading-snug">{t(`pricing.starter.features.${i}`)}</span>
                   </li>
                 ))}
               </ul>
-              
-              <a 
+
+              <a
                 href={`/registreer?lang=${locale}&plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`}
-                className="block w-full bg-[#1a1a2e] text-white text-center py-4 rounded-full font-semibold hover:bg-[#0f0f1a] transition-colors"
+                className="block w-full border-2 border-gray-900 text-gray-900 text-center py-3.5 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-colors"
               >
                 {t('pricing.chooseStarter')}
               </a>
-              <p className="text-center text-gray-400 text-sm mt-3">{t('pricing.cancelAnytime')}</p>
+              <p className="text-center text-gray-500 text-sm mt-3">{t('pricing.cancelAnytime')}</p>
             </div>
           </div>
 
-          {/* Vysion Pro - POPULAR */}
-          <div className="bg-gradient-to-b from-[#4a3f6e] to-[#2d2654] rounded-3xl overflow-hidden transform hover:scale-[1.02] transition-transform shadow-2xl relative">
-            {/* Popular badge */}
-            <div className="absolute top-4 right-4 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+          {/* Pro */}
+          <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-md overflow-hidden relative hover:shadow-lg transition-shadow">
+            <div className="absolute top-4 right-4 bg-gray-900 text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
               {t('pricing.popular')}
             </div>
             <div className="p-6 lg:p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-purple-400/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              <div className="flex items-center gap-3 mb-5 pr-16">
+                <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                    />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white">{t('pricing.pro.name')}</h3>
+                <h3 className="text-xl font-bold text-gray-900">{t('pricing.pro.name')}</h3>
               </div>
-              <div className="mb-3">
-                <span className="bg-red-500 text-white text-xs font-black px-3 py-1.5 rounded-full uppercase tracking-wide">
-                  ⏳ Tijdelijke aanbieding
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className="text-lg text-gray-400 line-through">
+                  €{isYearly ? Math.round(129 * 12 * 0.9) : 129}/maand
                 </span>
-              </div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl font-bold text-gray-400 line-through decoration-red-500 decoration-2">€{isYearly ? Math.round(129 * 12 * 0.9) : 129}/maand</span>
-                <span className="bg-green-500/20 text-green-400 text-sm font-bold px-2 py-0.5 rounded-lg">-23%</span>
+                <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">-23%</span>
               </div>
               <div className="flex items-baseline mb-6">
-                <span className="text-5xl font-bold text-purple-300">€{proPrice}</span>
-                <span className="text-gray-400 ml-2">{periodLabel}</span>
+                <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{proPrice}</span>
+                <span className="text-gray-500 ml-2">{periodLabel}</span>
               </div>
-              
-              <p className="text-purple-200 mb-4 flex items-center">
-                <span className="mr-2">✨</span>
-                {t('pricing.pro.allOfStarter')}
-              </p>
-              
+
+              <p className="text-gray-700 mb-4 text-sm sm:text-base font-medium">{t('pricing.pro.allOfStarter')}</p>
+
               <ul className="space-y-3 mb-8">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
-                  <li key={i} className="flex items-center">
-                    <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <li key={i} className="flex items-start gap-3">
+                    <svg
+                      className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span className="text-gray-200">{t(`pricing.pro.features.${i}`)}</span>
+                    <span className="text-gray-600 text-sm sm:text-base leading-snug">{t(`pricing.pro.features.${i}`)}</span>
                   </li>
                 ))}
               </ul>
-              
-              <a 
+
+              <a
                 href={`/registreer?lang=${locale}&plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`}
-                className="block w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-center py-4 rounded-full font-semibold hover:from-pink-600 hover:to-purple-600 transition-colors"
+                className="block w-full bg-accent text-white text-center py-3.5 rounded-full font-semibold hover:bg-accent/90 transition-colors"
               >
                 {t('pricing.choosePro')}
               </a>
-              <p className="text-center text-gray-400 text-sm mt-3">{t('pricing.cancelAnytime')}</p>
+              <p className="text-center text-gray-500 text-sm mt-3">{t('pricing.cancelAnytime')}</p>
             </div>
           </div>
-
         </div>
       </div>
     </section>
