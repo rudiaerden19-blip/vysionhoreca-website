@@ -159,7 +159,16 @@
     "subtitle": "Sehen Sie sich eine echte Frittenbude an, die mit Vysion Horeca läuft",
     "cta": "Live-Demo ansehen",
     "clientsLead": "Diese Kunden waren Ihnen zuvorgekommen",
-    "marquee": "Gastronomie · Imbiss · Restaurant · Café · Metzgerei · Bäckerei · Catering · Brasserie · Feinkost · Sandwichbar · Weinhandel · Hotel · Vysion Horeca · "
+    "marquee": "Gastronomie · Imbiss · Restaurant · Café · Metzgerei · Bäckerei · Catering · Brasserie · Feinkost · Sandwichbar · Weinhandel · Hotel · Vysion Horeca · ",
+    "successStories": {
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "+34 % mehr Online-Bestellungen seit dem Wechsel" },
+      "broodZo": { "name": "Brood & Zo", "metric": "+1.750 € zusätzlicher Umsatz pro Monat in starken Monaten" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "Etwa 25 % weniger Anrufe zur Mittagszeit" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metric": "Mehr Stammgäste durch Wiederholungsbestellungen in der App" },
+      "frituurAnn": { "name": "Frituur Ann", "metric": "+2.050 € bei gleichen Öffnungstagen (vor/nach Vysion)" },
+      "butcher": { "name": "Butcher meat shop", "metric": "+36 % mehr Bestellungen über den Webshop" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "Weniger Bestellfehler und kürzere Wartezeit an der Theke" }
+    }
   },
   "butWait": {
     "label": "Warten Sie...",

@@ -323,7 +323,37 @@
     "subtitle": "Check out a real chip shop running on Vysion Horeca",
     "cta": "View Live Demo",
     "clientsLead": "These customers already went before you",
-    "marquee": "Hospitality · Chip shop · Restaurant · Café · Butcher · Bakery · Catering · Brasserie · Deli · Sandwich bar · Wine merchant · Hotel · Vysion Horeca · "
+    "marquee": "Hospitality · Chip shop · Restaurant · Café · Butcher · Bakery · Catering · Brasserie · Deli · Sandwich bar · Wine merchant · Hotel · Vysion Horeca · ",
+    "successStories": {
+      "vivaldi": {
+        "name": "VIVALDI 2.0 Food & Drinks",
+        "metric": "+34% more online orders since switching platforms"
+      },
+      "broodZo": {
+        "name": "Brood & Zo",
+        "metric": "+€1,750 average extra revenue per month in busy months"
+      },
+      "broodjesbar": {
+        "name": "BROODJESBAR by Danver",
+        "metric": "About 25% fewer phone orders during the lunch rush"
+      },
+      "saintGermain": {
+        "name": "Frituur Saint Germain",
+        "metric": "More regulars thanks to repeat orders in the app"
+      },
+      "frituurAnn": {
+        "name": "Frituur Ann",
+        "metric": "+€2,050 on the same trading days (before vs after Vysion)"
+      },
+      "butcher": {
+        "name": "Butcher meat shop",
+        "metric": "+36% more orders through the webshop"
+      },
+      "seelen": {
+        "name": "Slagerij Seelen Traiteur",
+        "metric": "Fewer order mistakes and shorter wait time at the counter"
+      }
+    }
   },
   "butWait": {
     "label": "Wait...",

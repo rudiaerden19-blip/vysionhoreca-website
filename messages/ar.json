@@ -159,7 +159,16 @@
     "subtitle": "شاهد مطعم بطاطس حقيقي يعمل على Vysion Horeca",
     "cta": "شاهد العرض المباشر",
     "clientsLead": "سبقتك هذه الشركات بالفعل",
-    "marquee": "مطاعم · مقالي · مطعم · مقهى · جزار · مخبز · كيترينج · مطعم أنيق · ساندويتش · نبيذ · فندق · Vysion Horeca · "
+    "marquee": "مطاعم · مقالي · مطعم · مقهى · جزار · مخبز · كيترينج · مطعم أنيق · ساندويتش · نبيذ · فندق · Vysion Horeca · ",
+    "successStories": {
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "زيادة حوالي 34% في الطلبات عبر الإنترنت بعد المنصة الجديدة" },
+      "broodZo": { "name": "Brood & Zo", "metric": "+1,750 يورو إيرادات إضافية شهريًا في الأشهر المزدحمة" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "انخفاض المكالمات وقت الذروة بنحو 25%" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metric": "مزيد من الزبائن الدائمين بفضل تكرار الطلبات في التطبيق" },
+      "frituurAnn": { "name": "Frituur Ann", "metric": "+2,050 يورو في أيام العمل نفسها (قبل وبعد Vysion)" },
+      "butcher": { "name": "Butcher meat shop", "metric": "زيادة حوالي 36% في الطلبات عبر المتجر الإلكتروني" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "أخطاء أقل في الطلبات ووقت انتظار أقصر عند الرف" }
+    }
   },
   "butWait": {
     "label": "انتظر...",

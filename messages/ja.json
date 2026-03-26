@@ -159,7 +159,16 @@
     "subtitle": "Vysion Horecaで稼働している本物のフライ店をご覧ください",
     "cta": "ライブデモを見る",
     "clientsLead": "すでに導入いただいているお客様",
-    "marquee": "外食 · フライ店 · レストラン · カフェ · 肉屋 · パン屋 · ケータリング · ブラッスリー · サンドイッチ · ワイン · ホテル · Vysion Horeca · "
+    "marquee": "外食 · フライ店 · レストラン · カフェ · 肉屋 · パン屋 · ケータリング · ブラッスリー · サンドイッチ · ワイン · ホテル · Vysion Horeca · ",
+    "successStories": {
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "新プラットフォーム移行後、オンライン注文が約34%増" },
+      "broodZo": { "name": "Brood & Zo", "metric": "繁忙月で月平均プラス約1,750ユーロの売上" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "ランチピーク時の電話注文が約25%減" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metric": "アプリのリピート注文で常連客が増加" },
+      "frituurAnn": { "name": "Frituur Ann", "metric": "同営業日比較でプラス約2,050ユーロ（導入前後）" },
+      "butcher": { "name": "Butcher meat shop", "metric": "Webショップ経由の注文が約36%増" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "注文ミス減少・カウンター待ち時間短縮" }
+    }
   },
   "butWait": {
     "label": "ちょっと待って...",

@@ -323,7 +323,37 @@
     "subtitle": "Bekijk een echte frituur die draait op Vysion Horeca",
     "cta": "Test gratis",
     "clientsLead": "Deze klanten gingen u reeds voor",
-    "marquee": "Horeca · Frituur · Restaurant · Café · Slagerij · Bakkerij · Catering · Brasserie · Traiteur · Broodjeszaak · Wijnhandel · Hotel · Vysion Horeca · "
+    "marquee": "Horeca · Frituur · Restaurant · Café · Slagerij · Bakkerij · Catering · Brasserie · Traiteur · Broodjeszaak · Wijnhandel · Hotel · Vysion Horeca · ",
+    "successStories": {
+      "vivaldi": {
+        "name": "VIVALDI 2.0 Food & Drinks",
+        "metric": "+34% meer online bestellingen sinds het nieuwe platform"
+      },
+      "broodZo": {
+        "name": "Brood & Zo",
+        "metric": "+€1.750 gemiddelde extra omzet per maand (peakmaanden)"
+      },
+      "broodjesbar": {
+        "name": "BROODJESBAR by Danver",
+        "metric": "Een kwart minder telefoon tijdens de middagrush"
+      },
+      "saintGermain": {
+        "name": "Frituur Saint Germain",
+        "metric": "Meer vaste klanten dankzij herhaalbestellingen via de app"
+      },
+      "frituurAnn": {
+        "name": "Frituur Ann",
+        "metric": "+€2.050 bij gelijke openingsdagen (voor/na Vysion)"
+      },
+      "butcher": {
+        "name": "Butcher meat shop",
+        "metric": "+36% meer bestellingen via de webshop"
+      },
+      "seelen": {
+        "name": "Slagerij Seelen Traiteur",
+        "metric": "Minder fouten in bestellingen en kortere wachttijd aan de toog"
+      }
+    }
   },
   "butWait": {
     "label": "Wacht even...",

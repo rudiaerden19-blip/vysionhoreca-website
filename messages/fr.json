@@ -159,7 +159,16 @@
     "subtitle": "Découvrez une vraie friterie fonctionnant avec Vysion Horeca",
     "cta": "Voir la démo en direct",
     "clientsLead": "Ces clients vous ont précédé",
-    "marquee": "Horeca · Friterie · Restaurant · Café · Boucherie · Boulangerie · Traiteur · Brasserie · Sandwicherie · Bar à vins · Hôtel · Vysion Horeca · "
+    "marquee": "Horeca · Friterie · Restaurant · Café · Boucherie · Boulangerie · Traiteur · Brasserie · Sandwicherie · Bar à vins · Hôtel · Vysion Horeca · ",
+    "successStories": {
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "+34 % de commandes en ligne depuis la nouvelle plateforme" },
+      "broodZo": { "name": "Brood & Zo", "metric": "+1 750 € de CA mensuel en plus en haute saison" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "Environ 25 % d’appels en moins à l’heure de pointe" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metric": "Plus de clients réguliers grâce aux commandes répétées dans l’app" },
+      "frituurAnn": { "name": "Frituur Ann", "metric": "+2 050 € sur les mêmes jours d’ouverture (avant/après Vysion)" },
+      "butcher": { "name": "Butcher meat shop", "metric": "+36 % de commandes via la boutique en ligne" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "Moins d’erreurs de commande et attente plus courte au comptoir" }
+    }
   },
   "butWait": {
     "label": "Attendez...",

@@ -159,7 +159,16 @@
     "subtitle": "Mira una freiduría real funcionando con Vysion Horeca",
     "cta": "Ver demo en vivo",
     "clientsLead": "Estos clientes ya se adelantaron",
-    "marquee": "Hostelería · Freiduría · Restaurante · Café · Carnicería · Panadería · Catering · Brasserie · Sandwich · Vinoteca · Hotel · Vysion Horeca · "
+    "marquee": "Hostelería · Freiduría · Restaurante · Café · Carnicería · Panadería · Catering · Brasserie · Sandwich · Vinoteca · Hotel · Vysion Horeca · ",
+    "successStories": {
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "+34 % más pedidos online desde la nueva plataforma" },
+      "broodZo": { "name": "Brood & Zo", "metric": "+1.750 € de ingresos extra al mes en temporadas fuertes" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "~25 % menos llamadas en la hora punta del mediodía" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metric": "Más clientes habituales con pedidos repetidos en la app" },
+      "frituurAnn": { "name": "Frituur Ann", "metric": "+2.050 € en los mismos días abiertos (antes/después de Vysion)" },
+      "butcher": { "name": "Butcher meat shop", "metric": "+36 % más pedidos por la tienda web" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "Menos errores en pedidos y menos espera en barra" }
+    }
   },
   "butWait": {
     "label": "Espera...",

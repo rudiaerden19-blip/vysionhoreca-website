@@ -181,15 +181,15 @@ function CountUp({ end, suffix = '', prefix = '' }: { end: number, suffix?: stri
   return <div ref={ref}>{prefix}{count.toLocaleString()}{suffix}</div>
 }
 
-/** Partnerlogo’s voor de trust-marquee onder de stats; PNG’s uit public/images/partner-logos. (Geen brede schermshots — die ogen als balk in de strip.) */
-const LIVE_DEMO_PARTNER_LOGOS = [
-  '/images/partner-logos/02.png',
-  '/images/partner-logos/03.png',
-  '/images/partner-logos/04.png',
-  '/images/partner-logos/05.png',
-  '/images/partner-logos/06.png',
-  '/images/partner-logos/07.png',
-  '/images/partner-logos/08.png',
+/** Trust-marquee: witte kaarten met logo + klantcase (i18n liveDemo.successStories.*). */
+const SUCCESS_STORY_CARDS = [
+  { src: '/images/partner-logos/02.png', key: 'vivaldi' },
+  { src: '/images/partner-logos/03.png', key: 'broodZo' },
+  { src: '/images/partner-logos/04.png', key: 'broodjesbar' },
+  { src: '/images/partner-logos/05.png', key: 'saintGermain' },
+  { src: '/images/partner-logos/06.png', key: 'frituurAnn' },
+  { src: '/images/partner-logos/07.png', key: 'butcher' },
+  { src: '/images/partner-logos/08.png', key: 'seelen' },
 ] as const
 
 function StatsAndLiveDemoSection() {
@@ -219,27 +219,47 @@ function StatsAndLiveDemoSection() {
         </div>
       </div>
 
-      {/* Logo-marquee: vaste breedte per slot zodat logo’s elkaar niet overlappen; viewport clip tegen rand-artefacten */}
+      {/* Succesverhalen-marquee: glijdende kaarten (zelfde animatie als vroeger) */}
       <div className="mt-12 sm:mt-16 md:mt-20">
         <p className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-6xl font-bold text-accent tracking-tight leading-tight mb-5 sm:mb-6 md:mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {t('liveDemo.clientsLead')}
         </p>
         <div className="relative w-[100vw] max-w-[100vw] left-1/2 -translate-x-1/2 bg-[#E3E3E3] py-8 sm:py-10 md:py-12">
-          <div className="partner-marquee-viewport" aria-hidden>
+          <div className="partner-marquee-viewport">
             <div className="partner-marquee-track">
               {[0, 1].map((dup) => (
                 <div key={dup} className="partner-marquee-segment">
-                  {LIVE_DEMO_PARTNER_LOGOS.map((src) => (
-                    <div key={`${dup}-${src}`} className="partner-marquee-slot">
-                      <Image
-                        src={src}
-                        alt=""
-                        width={480}
-                        height={300}
-                        sizes="(max-width: 768px) 55vw, 20rem"
-                        loading="lazy"
-                        className="partner-marquee-opt"
-                      />
+                  {SUCCESS_STORY_CARDS.map((card) => (
+                    <div key={`${dup}-${card.key}`} className="partner-marquee-slot">
+                      <div className="partner-success-card h-full">
+                        <div className="partner-success-logo">
+                          <Image
+                            src={card.src}
+                            alt=""
+                            width={280}
+                            height={120}
+                            sizes="(max-width: 768px) 60vw, 240px"
+                            loading="lazy"
+                            className="object-contain"
+                          />
+                        </div>
+                        <p className="text-center text-sm sm:text-base font-bold text-gray-900 leading-snug mb-3 min-h-[2.5rem] sm:min-h-[2.75rem] flex items-center justify-center">
+                          {t(`liveDemo.successStories.${card.key}.name`)}
+                        </p>
+                        <div className="mt-auto flex gap-2.5 pt-3 border-t border-gray-100">
+                          <span
+                            className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white"
+                            aria-hidden
+                          >
+                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </span>
+                          <p className="text-xs sm:text-sm font-semibold text-gray-800 leading-snug">
+                            {t(`liveDemo.successStories.${card.key}.metric`)}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>

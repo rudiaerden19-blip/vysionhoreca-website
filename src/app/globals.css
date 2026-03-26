@@ -52,68 +52,89 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  align-items: center;
+  align-items: stretch;
   flex: 0 0 auto;
   flex-shrink: 0;
-  gap: 2.25rem;
+  gap: 1rem;
 }
 
 .partner-marquee-slot {
   box-sizing: border-box;
   flex: 0 0 auto;
   flex-shrink: 0;
+  width: 15.75rem;
+  padding: 0 0.5rem;
+  background: transparent;
+  display: flex;
+  align-items: stretch;
+}
+
+.partner-success-card {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  border-radius: 1rem;
+  background: #fff;
+  padding: 1rem 1rem 0.875rem;
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.partner-success-card .partner-success-logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 15.5rem;
-  padding: 0 0.875rem;
-  background-color: #e3e3e3;
-  isolation: isolate;
+  min-height: 4.25rem;
+  margin-bottom: 0.75rem;
 }
 
-.partner-marquee-slot img.partner-marquee-opt,
-.partner-marquee-slot .partner-marquee-opt {
-  display: block;
-  max-width: 100%;
+.partner-success-card .partner-success-logo img {
+  max-height: 4rem;
   width: auto;
-  height: auto;
-  max-height: 6rem;
+  max-width: 100%;
   object-fit: contain;
   object-position: center;
-  filter: grayscale(1);
-  opacity: 0.58;
-  mix-blend-mode: multiply;
 }
 
 @media (min-width: 640px) {
   .partner-marquee-segment {
-    gap: 3rem;
+    gap: 1.25rem;
   }
 
   .partner-marquee-slot {
-    width: 18rem;
-    padding: 0 1.125rem;
+    width: 17.5rem;
+    padding: 0 0.625rem;
   }
 
-  .partner-marquee-slot img.partner-marquee-opt,
-  .partner-marquee-slot .partner-marquee-opt {
-    max-height: 7.5rem;
+  .partner-success-card {
+    padding: 1.125rem 1.125rem 1rem;
+  }
+
+  .partner-success-card .partner-success-logo {
+    min-height: 4.75rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .partner-success-card .partner-success-logo img {
+    max-height: 4.5rem;
   }
 }
 
 @media (min-width: 768px) {
   .partner-marquee-segment {
-    gap: 3.5rem;
+    gap: 1.5rem;
   }
 
   .partner-marquee-slot {
-    width: 20rem;
-    padding: 0 1.25rem;
+    width: 19rem;
+    padding: 0 0.75rem;
   }
 
-  .partner-marquee-slot img.partner-marquee-opt,
-  .partner-marquee-slot .partner-marquee-opt {
-    max-height: 9rem;
+  .partner-success-card .partner-success-logo {
+    min-height: 5.25rem;
+  }
+
+  .partner-success-card .partner-success-logo img {
+    max-height: 5rem;
   }
 }
 

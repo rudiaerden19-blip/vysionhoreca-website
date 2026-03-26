@@ -159,7 +159,16 @@
     "subtitle": "查看使用Vysion Horeca运营的真实薯条店",
     "cta": "查看实时演示",
     "clientsLead": "这些客户已经走在了您前面",
-    "marquee": "餐饮 · 炸薯条店 · 餐厅 · 咖啡馆 · 肉铺 · 面包房 · 宴会服务 · 餐吧 · 三明治 · 酒庄 · 酒店 · Vysion Horeca · "
+    "marquee": "餐饮 · 炸薯条店 · 餐厅 · 咖啡馆 · 肉铺 · 面包房 · 宴会服务 · 餐吧 · 三明治 · 酒庄 · 酒店 · Vysion Horeca · ",
+    "successStories": {
+      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metric": "换新平台后线上订单约增34%" },
+      "broodZo": { "name": "Brood & Zo", "metric": "旺季月均额外收入约 1,750 欧元" },
+      "broodjesbar": { "name": "BROODJESBAR by Danver", "metric": "午市高峰电话订单约减少25%" },
+      "saintGermain": { "name": "Frituur Saint Germain", "metric": "应用内复购带来更多常客" },
+      "frituurAnn": { "name": "Frituur Ann", "metric": "相同营业日对比约多 2,050 欧元（上线前后）" },
+      "butcher": { "name": "Butcher meat shop", "metric": "网店订单约增36%" },
+      "seelen": { "name": "Slagerij Seelen Traiteur", "metric": "订单错误更少，柜台等待更短" }
+    }
   },
   "butWait": {
     "label": "等一下...",
