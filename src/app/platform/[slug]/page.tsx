@@ -38,19 +38,15 @@ export default function PlatformDetailPage() {
       <Navigation />
       <article className="bg-white">
         {slug === 'bestelplatform' && (
-          <div className="border-b border-gray-100 bg-gradient-to-b from-gray-50 to-white pt-24 sm:pt-28">
-            <div className="mx-auto max-w-4xl px-4 pb-8 pt-4 sm:px-6">
-              <div className="relative mx-auto aspect-[9/18] w-full max-w-[min(100%,280px)] overflow-hidden rounded-2xl border border-gray-200/80 bg-gray-100 shadow-xl ring-1 ring-black/5 sm:max-w-[300px]">
-                <Image
-                  src={BESTELPLATFORM_HERO_IMAGE}
-                  alt={t('platform.bestelplatform.cardHeaderAlt')}
-                  fill
-                  className="object-cover object-top"
-                  sizes="300px"
-                  priority
-                />
-              </div>
-            </div>
+          <div className="relative w-full min-h-[min(42svh,520px)] sm:min-h-[min(48svh,580px)] border-b border-gray-200/80 bg-gray-100">
+            <Image
+              src={BESTELPLATFORM_HERO_IMAGE}
+              alt={t('platform.bestelplatform.cardHeaderAlt')}
+              fill
+              className="object-cover object-center"
+              sizes="100vw"
+              priority
+            />
           </div>
         )}
 

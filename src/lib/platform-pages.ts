@@ -1,6 +1,6 @@
 /** Homepage grid + /platform/[slug] detail routes (marketing only). */
 
-/** Gedeelde hero/header voor kaart én detailpagina bestelplatform (schermvoorbeeld app). */
+/** Zelfde afbeelding als op de platformkaart + volle-breedte hero op /platform/bestelplatform. */
 export const BESTELPLATFORM_HERO_IMAGE = '/images/platform/bestelplatform-hero.png'
 
 export type PlatformPageEntry = {
@@ -8,6 +8,8 @@ export type PlatformPageEntry = {
   msgKey: string
   /** Optional photo strip bovenaan de kaart (homepage grid). */
   cardHeaderImage?: string
+  /** Geen ronde Lucide-icon onder de foto (bv. bestelplatform: alleen foto → titel → teaser). */
+  hideCardIcon?: boolean
 }
 
 export const PLATFORM_PAGES: PlatformPageEntry[] = [
@@ -16,6 +18,7 @@ export const PLATFORM_PAGES: PlatformPageEntry[] = [
     slug: 'bestelplatform',
     msgKey: 'bestelplatform',
     cardHeaderImage: BESTELPLATFORM_HERO_IMAGE,
+    hideCardIcon: true,
   },
   { slug: 'keukenschermen', msgKey: 'keukenschermen' },
   { slug: 'online-scherm', msgKey: 'onlineScherm' },
