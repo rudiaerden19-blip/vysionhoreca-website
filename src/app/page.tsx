@@ -112,7 +112,7 @@ function OneDayOnlineSection() {
           {benefits.map((benefit, index) => (
             <div 
               key={index}
-              className="bg-white border border-gray-200 rounded-2xl p-6 hover:bg-gray-50 transition-all hover:scale-[1.02]"
+              className="bg-white border border-gray-200/90 rounded-2xl p-6 shadow-[0_14px_36px_-8px_rgba(15,23,42,0.16),0_6px_18px_-6px_rgba(15,23,42,0.1),0_2px_6px_rgba(15,23,42,0.06)] transition-all duration-300 hover:scale-[1.02] hover:bg-gray-50/80 hover:shadow-[0_22px_48px_-10px_rgba(15,23,42,0.22),0_10px_28px_-8px_rgba(15,23,42,0.14),0_3px_10px_rgba(15,23,42,0.08)]"
             >
               <div className="text-4xl mb-4">{benefit.icon}</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t(`oneDayOnline.benefits.${benefit.key}.title`)}</h3>
