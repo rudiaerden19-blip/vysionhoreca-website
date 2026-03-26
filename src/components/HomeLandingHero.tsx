@@ -86,7 +86,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
 
           {/* Desktop: pill nav */}
           <nav
-            className="hidden lg:flex absolute left-1/2 -translate-x-1/2 top-3 sm:top-4 items-center gap-1 bg-white/95 rounded-full px-2 py-1.5 shadow-lg"
+            className="hidden lg:flex absolute left-1/2 -translate-x-1/2 top-3 sm:top-4 items-center gap-1 bg-white/95 rounded-full px-2 py-1.5 shadow-home-float"
             aria-label="Main"
           >
             {pillLinks.map(({ href, label }) => (
@@ -103,7 +103,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto lg:ml-0">
             <a
               href="/#contact"
-              className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-[0_20px_44px_-10px_rgba(15,23,42,0.26),0_8px_20px_-6px_rgba(15,23,42,0.15)] transition-colors"
+              className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-home-btn transition-colors"
             >
               {t('heroLanding.demoRequest')}
             </a>
@@ -126,7 +126,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
                 </svg>
               </button>
               {isLangOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-900 rounded-xl shadow-2xl border border-gray-700 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-gray-900 rounded-xl shadow-home-image border border-gray-700 py-2 z-50">
                   {locales.map((langCode) => (
                     <button
                       key={langCode}
@@ -175,7 +175,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
             ))}
             <a
               href="/#contact"
-              className="block mt-2 text-center rounded-full bg-accent text-white font-semibold py-3"
+              className="block mt-2 text-center rounded-full bg-accent text-white font-semibold py-3 shadow-home-btn"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('heroLanding.demoRequest')}
@@ -218,7 +218,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
         <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
           <a
             href={`/registreer?lang=${locale}`}
-            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)] transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-home-btn transition-colors"
           >
             {t('heroLanding.ctaStartFree')}
           </a>
@@ -226,7 +226,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
             href={DEMO_HERO_LIVE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border-2 border-white/90 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border-2 border-white/90 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-home-ghost transition-colors"
           >
             {t('heroLanding.ctaViewDemo')}
           </a>

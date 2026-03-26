@@ -68,7 +68,7 @@ export default function Navigation() {
 
               {/* Dropdown */}
               {isLangOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-dark rounded-xl shadow-2xl border border-gray-700 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-dark rounded-xl shadow-home-image border border-gray-700 py-2 z-50">
                   {locales.map((langCode) => (
                     <button
                       key={langCode}
@@ -131,8 +131,8 @@ export default function Navigation() {
                       onClick={() => handleLanguageSelect(langCode)}
                       className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
                         locale === langCode 
-                          ? 'bg-accent text-white' 
-                          : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                          ? 'bg-accent text-white shadow-home-btn' 
+                          : 'bg-white/10 text-gray-300 hover:bg-white/20 shadow-home-float'
                       }`}
                     >
                       <span>{localeFlags[langCode]}</span>

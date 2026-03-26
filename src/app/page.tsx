@@ -45,7 +45,7 @@ function WhyVysionSection() {
           </div>
 
           <div className="flex min-h-[260px] lg:min-h-0 h-full order-1 lg:order-2 lg:mt-[2cm] lg:self-start">
-            <div className="relative w-full flex-1 min-h-[280px] lg:min-h-full rounded-3xl overflow-hidden shadow-[0_36px_90px_-18px_rgba(15,23,42,0.32),0_18px_48px_-12px_rgba(15,23,42,0.2),0_8px_24px_rgba(15,23,42,0.12)] ring-1 ring-black/[0.08] bg-[#141414]">
+            <div className="relative w-full flex-1 min-h-[280px] lg:min-h-full rounded-3xl overflow-hidden shadow-home-image ring-1 ring-black/[0.08] bg-[#141414]">
               <Image
                 src="/images/why-vysion-kiosk.png"
                 alt={t('whyVysion.imageAlt')}
@@ -74,7 +74,7 @@ function NewAtVysionSection() {
         <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-10">{t('newAtVysion.body')}</p>
         <a
           href="#contact"
-          className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)]"
+          className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors shadow-home-btn"
         >
           {t('newAtVysion.cta')}
         </a>
@@ -112,7 +112,7 @@ function OneDayOnlineSection() {
           {benefits.map((benefit, index) => (
             <div 
               key={index}
-              className="bg-white border border-gray-200/90 rounded-2xl p-6 shadow-[0_14px_36px_-8px_rgba(15,23,42,0.16),0_6px_18px_-6px_rgba(15,23,42,0.1),0_2px_6px_rgba(15,23,42,0.06)] transition-all duration-300 hover:scale-[1.02] hover:bg-gray-50/80 hover:shadow-[0_22px_48px_-10px_rgba(15,23,42,0.22),0_10px_28px_-8px_rgba(15,23,42,0.14),0_3px_10px_rgba(15,23,42,0.08)]"
+              className="bg-white border border-gray-200/90 rounded-2xl p-6 shadow-home-benefit transition-all duration-300 hover:scale-[1.02] hover:bg-gray-50/80 hover:shadow-home-benefit-hover"
             >
               <div className="text-4xl mb-4">{benefit.icon}</div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">{t(`oneDayOnline.benefits.${benefit.key}.title`)}</h3>
@@ -124,7 +124,7 @@ function OneDayOnlineSection() {
         <div className="text-center mt-12">
           <a 
             href={`/registreer?lang=${locale}`}
-            className="inline-block bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-full font-semibold text-lg transition-colors shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)]"
+            className="inline-block bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-full font-semibold text-lg transition-colors shadow-home-btn"
           >
             {t('oneDayOnline.cta')}
           </a>
@@ -291,7 +291,7 @@ function StatsAndLiveDemoSection() {
           href={DEMO_HERO_LIVE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-[0_32px_80px_-16px_rgba(15,23,42,0.28),0_14px_38px_-10px_rgba(15,23,42,0.17)] hover:shadow-[0_0_50px_rgba(234,88,12,0.6)] hover:scale-105"
+          className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-home-btn hover:shadow-[0_0_50px_rgba(234,88,12,0.6)] hover:scale-105"
         >
           <span>{t('liveDemo.cta')}</span>
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -375,7 +375,7 @@ function OrderAppSection() {
           {images.map((src, index) => (
             <div
               key={index}
-              className="transition-all duration-700 ease-out cursor-pointer aspect-[9/16] relative overflow-hidden rounded-2xl bg-gray-300 shadow-[0_32px_80px_-16px_rgba(15,23,42,0.26),0_16px_44px_-10px_rgba(15,23,42,0.16),0_6px_22px_rgba(15,23,42,0.09)]"
+              className="transition-all duration-700 ease-out cursor-pointer aspect-[9/16] relative overflow-hidden rounded-2xl bg-gray-300 shadow-home-image"
               style={{
                 opacity: visibleImages.includes(index) ? 1 : 0,
                 transform: visibleImages.includes(index) ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.95)',
@@ -423,7 +423,7 @@ function OrderAppSection() {
                 fill
                 sizes="100vw"
                 priority
-                className="object-contain rounded-2xl"
+                className="object-contain rounded-2xl shadow-home-image"
               />
             </div>
 
@@ -458,7 +458,7 @@ function OrderAppSection() {
         <div className="text-center mt-12">
           <a
             href="#contact"
-            className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)]"
+            className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-home-btn"
           >
             {t('orderApp.cta')}
           </a>
@@ -494,12 +494,12 @@ function PricingSection() {
 
         {/* Toggle Maandelijks / Jaarlijks */}
         <div className="flex flex-col items-center mb-14">
-          <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-sm">
+          <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-home-float">
             <button
               type="button"
               onClick={() => setIsYearly(false)}
               className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                !isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                !isYearly ? 'bg-gray-900 text-white shadow-home-float' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Maandelijks
@@ -508,7 +508,7 @@ function PricingSection() {
               type="button"
               onClick={() => setIsYearly(true)}
               className={`px-6 py-3 rounded-full font-semibold transition-all relative pr-8 ${
-                isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                isYearly ? 'bg-gray-900 text-white shadow-home-float' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Jaarlijks
@@ -524,7 +524,7 @@ function PricingSection() {
 
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 lg:gap-8">
           {/* Starter */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-[0_32px_80px_-16px_rgba(15,23,42,0.24),0_16px_44px_-10px_rgba(15,23,42,0.15)] overflow-hidden hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-home-card overflow-hidden transition-shadow hover:shadow-home-image">
             <div className="p-6 lg:p-8">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
@@ -563,7 +563,7 @@ function PricingSection() {
 
               <a
                 href={`/registreer?lang=${locale}&plan=starter&billing=${isYearly ? 'yearly' : 'monthly'}`}
-                className="block w-full border-2 border-gray-900 text-gray-900 text-center py-3.5 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-colors"
+                className="block w-full border-2 border-gray-900 text-gray-900 text-center py-3.5 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-colors shadow-home-float"
               >
                 {t('pricing.chooseStarter')}
               </a>
@@ -572,7 +572,7 @@ function PricingSection() {
           </div>
 
           {/* Pro */}
-          <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-[0_36px_88px_-18px_rgba(15,23,42,0.28),0_18px_48px_-12px_rgba(15,23,42,0.18)] overflow-hidden relative hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-home-card overflow-hidden relative transition-shadow hover:shadow-home-image">
             <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
               {t('pricing.popular')}
             </div>
@@ -621,7 +621,7 @@ function PricingSection() {
 
               <a
                 href={`/registreer?lang=${locale}&plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`}
-                className="block w-full bg-accent text-white text-center py-3.5 rounded-full font-semibold hover:bg-accent/90 transition-colors"
+                className="block w-full bg-accent text-white text-center py-3.5 rounded-full font-semibold hover:bg-accent/90 transition-colors shadow-home-btn"
               >
                 {t('pricing.choosePro')}
               </a>
@@ -717,7 +717,7 @@ function StopSection() {
           {cardKeys.map((key, index) => (
             <div 
               key={key}
-              className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-accent/50 transition-all duration-500 hover:scale-105"
+              className="bg-white rounded-2xl p-6 border border-gray-200 shadow-home-card hover:border-accent/50 transition-all duration-500 hover:scale-105 hover:shadow-home-image"
               style={{
                 opacity: phase >= 3 ? 1 : 0,
                 transform: `translateY(${phase >= 3 ? 0 : 20}px)`,
@@ -748,7 +748,7 @@ function StopSection() {
         
         {/* FREE Section */}
         <div 
-          className="bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20 rounded-3xl p-6 sm:p-10 border-2 border-accent/30 text-center transition-all duration-500"
+          className="bg-gradient-to-r from-accent/20 via-accent/10 to-accent/20 rounded-3xl p-6 sm:p-10 border-2 border-accent/30 text-center transition-all duration-500 shadow-home-card"
           style={{
             opacity: phase >= 3 ? 1 : 0,
             transform: `translateY(${phase >= 3 ? 0 : 20}px)`,
@@ -760,7 +760,7 @@ function StopSection() {
           </h3>
           <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-8">
             {freeKeys.map((key) => (
-              <div key={key} className="flex items-center gap-2 bg-white/60 px-4 py-2 rounded-full">
+              <div key={key} className="flex items-center gap-2 bg-white/60 px-4 py-2 rounded-full shadow-home-float">
                 <svg className="w-5 h-5 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                 </svg>
@@ -770,7 +770,7 @@ function StopSection() {
           </div>
           <a
             href={`/registreer?lang=${locale}`}
-            className="inline-block bg-accent text-white px-8 sm:px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-[0_32px_80px_-16px_rgba(15,23,42,0.28),0_14px_38px_-10px_rgba(15,23,42,0.17)] hover:shadow-[0_0_50px_rgba(234,88,12,0.7)] hover:scale-105"
+            className="inline-block bg-accent text-white px-8 sm:px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-home-btn hover:shadow-[0_0_50px_rgba(234,88,12,0.7)] hover:scale-105"
           >
             {t('stop.cta')}
           </a>
@@ -806,7 +806,7 @@ function ButWaitSection() {
         {/* Content Grid */}
         <div className="grid lg:grid-cols-2 gap-12 items-stretch">
           {/* Left - Image: h-full laat de foto zo hoog als het witte kaartblok (grid stretch), geen starre max-h */}
-          <div className="relative w-full min-h-[340px] sm:min-h-[420px] h-full rounded-3xl overflow-hidden shadow-[0_36px_90px_-18px_rgba(15,23,42,0.3),0_18px_48px_-12px_rgba(15,23,42,0.19),0_8px_24px_rgba(15,23,42,0.11)]">
+          <div className="relative w-full min-h-[340px] sm:min-h-[420px] h-full rounded-3xl overflow-hidden shadow-home-image">
             <Image
               src="/images/entrepreneur.jpg"
               alt="Ondernemer werkt met Vysion"
@@ -818,7 +818,7 @@ function ButWaitSection() {
           </div>
 
           {/* Right - Features List */}
-          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-[0_36px_90px_-18px_rgba(15,23,42,0.28),0_18px_48px_-12px_rgba(15,23,42,0.18)] flex flex-col justify-center">
+          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-home-card flex flex-col justify-center">
             <h3 className="text-accent text-2xl sm:text-3xl font-bold mb-10">{t('butWait.boxTitle')}</h3>
             <ul className="space-y-4">
               {featureKeys.map((key) => (
@@ -845,7 +845,7 @@ function TableKioskSection() {
     <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden" aria-labelledby="table-kiosk-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-          <div className="w-full rounded-3xl bg-[#e3e3e3] p-4 sm:p-6 shadow-[0_36px_90px_-18px_rgba(15,23,42,0.27),0_18px_48px_-12px_rgba(15,23,42,0.17)] ring-1 ring-black/[0.06]">
+          <div className="w-full rounded-3xl bg-[#e3e3e3] p-4 sm:p-6 shadow-home-image ring-1 ring-black/[0.06]">
             <Image
               src="/images/table-kiosk-device.png"
               alt={t('tableKiosk.imageAlt')}
@@ -1021,7 +1021,7 @@ function IndustrySection() {
             </p>
             <a
               href={`/registreer?lang=${locale}`}
-              className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)]"
+              className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-home-btn"
             >
               {t('industry.tryFree')}
             </a>
@@ -1035,7 +1035,7 @@ function IndustrySection() {
                   {current.images.map((img, idx) => (
                     <div
                       key={idx}
-                      className="relative w-full h-28 sm:h-36 rounded-xl shadow-[0_28px_70px_-14px_rgba(15,23,42,0.24),0_12px_32px_-8px_rgba(15,23,42,0.14)] overflow-hidden cursor-pointer border-2 border-gray-100 hover:scale-[1.02] transition-transform"
+                      className="relative w-full h-28 sm:h-36 rounded-xl shadow-home-thumb overflow-hidden cursor-pointer border-2 border-gray-100 hover:scale-[1.02] transition-transform"
                     >
                       <Image
                         src={img}
@@ -1053,7 +1053,7 @@ function IndustrySection() {
                   <button
                     type="button"
                     onClick={goInlinePrev}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-semibold shadow hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-semibold shadow-home-float hover:bg-gray-50 transition-colors"
                     aria-label={t('industry.prevImage')}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1064,7 +1064,7 @@ function IndustrySection() {
                   <button
                     type="button"
                     onClick={goInlineNext}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-semibold shadow hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-semibold shadow-home-float hover:bg-gray-50 transition-colors"
                     aria-label={t('industry.nextImage')}
                   >
                     {t('industry.nextImage')}
@@ -1083,7 +1083,7 @@ function IndustrySection() {
                 height={1200}
                 sizes="(min-width: 1024px) 660px, 90vw"
                 loading="lazy"
-                className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-[0_36px_88px_-18px_rgba(15,23,42,0.28),0_18px_44px_-12px_rgba(15,23,42,0.17)] cursor-pointer mx-auto"
+                className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-home-image cursor-pointer mx-auto"
                 onClick={() => openLightbox(0)}
               />
             )}
@@ -1120,7 +1120,7 @@ function IndustrySection() {
                 fill
                 sizes="100vw"
                 priority
-                className="object-contain"
+                className="object-contain shadow-home-image"
               />
             </div>
 
@@ -1187,7 +1187,7 @@ function TestimonialSection() {
           {/* Left Arrow */}
           <button 
             onClick={goToPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-lg transition-all hover:scale-110"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-home-float transition-all hover:scale-110"
             aria-label="Vorige review"
           >
             <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1198,7 +1198,7 @@ function TestimonialSection() {
           {/* Right Arrow */}
           <button 
             onClick={goToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-lg transition-all hover:scale-110"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-home-float transition-all hover:scale-110"
             aria-label="Volgende review"
           >
             <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1212,7 +1212,7 @@ function TestimonialSection() {
           >
             {testimonialKeys.map((key, index) => (
               <div key={index} className="w-full flex-shrink-0 px-4">
-                <div className="bg-white rounded-2xl p-8 shadow-[0_36px_90px_-18px_rgba(15,23,42,0.26),0_18px_44px_-12px_rgba(15,23,42,0.16)] max-w-2xl mx-auto">
+                <div className="bg-white rounded-2xl p-8 shadow-home-card max-w-2xl mx-auto">
                   <div className="flex mb-4 justify-center">
                     {[...Array(5)].map((_, i) => (
                       <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -1343,7 +1343,7 @@ function ContactSection() {
             
             <div className="space-y-6">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mr-4 shadow-home-float">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
@@ -1357,7 +1357,7 @@ function ContactSection() {
               </div>
 
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mr-4">
+                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mr-4 shadow-home-float">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
@@ -1372,7 +1372,7 @@ function ContactSection() {
             </div>
           </div>
 
-          <div className="bg-[#E3E3E3] rounded-2xl p-8">
+          <div className="bg-[#E3E3E3] rounded-2xl p-8 shadow-home-card">
             {status === 'success' ? (
               <div className="flex flex-col items-center justify-center h-full py-12">
                 <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4">
@@ -1447,7 +1447,7 @@ function ContactSection() {
                 <button 
                   type="submit"
                   disabled={status === 'loading'}
-                  className="w-full bg-accent hover:bg-accent/90 text-white py-4 rounded-lg font-semibold transition-colors disabled:bg-accent/50 disabled:cursor-not-allowed flex items-center justify-center shadow-[0_24px_50px_-12px_rgba(15,23,42,0.26),0_10px_24px_-8px_rgba(15,23,42,0.15)]"
+                  className="w-full bg-accent hover:bg-accent/90 text-white py-4 rounded-lg font-semibold transition-colors disabled:bg-accent/50 disabled:cursor-not-allowed flex items-center justify-center shadow-home-btn"
                 >
                   {status === 'loading' ? (
                     <>
