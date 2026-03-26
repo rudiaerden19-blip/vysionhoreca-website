@@ -132,7 +132,7 @@
       "title": "POS system",
       "teaser": "Fast checkout linked to online orders and reporting.",
       "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing.",
-      "cardHeaderAlt": "Point-of-sale setup with a large monitor, tablet and smartphone showing restaurant ordering software."
+      "cardHeaderAlt": "Handheld order terminal with stylus and large POS tablet on a bar, with glassware and a drink in the background."
     },
     "bestelplatform": {
       "title": "Ordering platform",
@@ -149,37 +149,44 @@
     "onlineScherm": {
       "title": "Display screen",
       "teaser": "Show menus, wait times or promos in your venue.",
-      "body": "In-venue screens keep guests informed without extra staff on the floor. Tie into your live offer and pricing.\n\nFewer counter questions and a stronger brand presence in the room."
+      "body": "In-venue screens keep guests informed without extra staff on the floor. Tie into your live offer and pricing.\n\nFewer counter questions and a stronger brand presence in the room.",
+      "cardHeaderAlt": "Three panels: chef in whites, two people in conversation, and someone focused on a laptop screen."
     },
     "reservaties": {
       "title": "Reservations",
       "teaser": "Manage tables and slots without double entry.",
-      "body": "Guests book online; you see who is coming when. Plan service and staffing with a clear overview.\n\nConfirmations and messaging help reduce no-shows."
+      "body": "Guests book online; you see who is coming when. Plan service and staffing with a clear overview.\n\nConfirmations and messaging help reduce no-shows.",
+      "cardHeaderAlt": "White table tent sign reading Reserved on a wooden restaurant table, softly blurred warm interior behind."
     },
     "eigenWebsite": {
       "title": "Your own website",
       "teaser": "Your domain and brand — with ordering built in.",
-      "body": "Not a generic landing page: your logo, colours and photography. Customers recognise your business instantly.\n\nManage site and menu from the same admin as the rest of Vysion Horeca."
+      "body": "Not a generic landing page: your logo, colours and photography. Customers recognise your business instantly.\n\nManage site and menu from the same admin as the rest of Vysion Horeca.",
+      "cardHeaderAlt": "Digital restaurant menu on a large touchscreen with food photos and prices."
     },
     "whatsappBestellingen": {
       "title": "WhatsApp ordering",
       "teaser": "Order where guests already chat: menu and flow in one thread.",
-      "body": "WhatsApp is often the fastest channel for local hospitality. We connect catalogue and status to your operational workflow.\n\nFewer misunderstandings than ad-hoc chat messages alone."
+      "body": "WhatsApp is often the fastest channel for local hospitality. We connect catalogue and status to your operational workflow.\n\nFewer misunderstandings than ad-hoc chat messages alone.",
+      "cardHeaderAlt": "Smartphone showing the WhatsApp app, held in two hands."
     },
     "loonadministratie": {
       "title": "Payroll",
       "teaser": "Hours and pay aligned with rostering and your team.",
-      "body": "Tracked hours belong with day-to-day operations. Connect to planning and lose the manual spreadsheets.\n\nCosts stay predictable and period close becomes clearer."
+      "body": "Tracked hours belong with day-to-day operations. Connect to planning and lose the manual spreadsheets.\n\nCosts stay predictable and period close becomes clearer.",
+      "cardHeaderAlt": "Three portraits: confident chef, two colleagues talking, and a professional looking at a laptop."
     },
     "bedrijfsanalyse": {
       "title": "Business analytics",
       "teaser": "Revenue, peaks and product performance in one place.",
-      "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide."
+      "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide.",
+      "cardHeaderAlt": "Tablet with a glowing holographic bar chart and growth arrow on a dark business-style background."
     },
     "kostencalculator": {
       "title": "Cost calculator",
       "teaser": "Cost per portion to price with confidence.",
-      "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts."
+      "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts.",
+      "cardHeaderAlt": "Hand using a calculator, with someone noting amounts in a notebook in the background."
     },
     "galleryHint": "Click the image to enlarge. Use the arrows to browse.",
     "galleryPrev": "Previous image",

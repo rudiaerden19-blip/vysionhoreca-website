@@ -4235,7 +4235,7 @@
       "title": "POS system",
       "teaser": "Fast checkout linked to online orders and reporting.",
       "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing.",
-      "cardHeaderAlt": "大画面モニター、タブレット、スマートフォンに表示された飲食店向けオーダーソフトのセットアップ。"
+      "cardHeaderAlt": "スタイラス付きのハンディ端末とバーに置かれた大型POSタブレット、グラスやドリンクが手前に。"
     },
     "bestelplatform": {
       "title": "Ordering platform",
@@ -4252,37 +4252,44 @@
     "onlineScherm": {
       "title": "Display screen",
       "teaser": "Show menus, wait times or promos in your venue.",
-      "body": "In-venue screens keep guests informed without extra staff on the floor. Tie into your live offer and pricing.\n\nFewer counter questions and a stronger brand presence in the room."
+      "body": "In-venue screens keep guests informed without extra staff on the floor. Tie into your live offer and pricing.\n\nFewer counter questions and a stronger brand presence in the room.",
+      "cardHeaderAlt": "三枚のパネル：白いコートのシェフ、会話する二人、ノートPCに集中する人。"
     },
     "reservaties": {
       "title": "Reservations",
       "teaser": "Manage tables and slots without double entry.",
-      "body": "Guests book online; you see who is coming when. Plan service and staffing with a clear overview.\n\nConfirmations and messaging help reduce no-shows."
+      "body": "Guests book online; you see who is coming when. Plan service and staffing with a clear overview.\n\nConfirmations and messaging help reduce no-shows.",
+      "cardHeaderAlt": "木のテーブルに置かれた「Reserved」と書かれた白い卓上サイン、後ろはぼかした温かい店内。"
     },
     "eigenWebsite": {
       "title": "Your own website",
       "teaser": "Your domain and brand — with ordering built in.",
-      "body": "Not a generic landing page: your logo, colours and photography. Customers recognise your business instantly.\n\nManage site and menu from the same admin as the rest of Vysion Horeca."
+      "body": "Not a generic landing page: your logo, colours and photography. Customers recognise your business instantly.\n\nManage site and menu from the same admin as the rest of Vysion Horeca.",
+      "cardHeaderAlt": "大きなタッチスクリーンに料理写真と価格が並ぶデジタルレストランメニュー。"
     },
     "whatsappBestellingen": {
       "title": "WhatsApp ordering",
       "teaser": "Order where guests already chat: menu and flow in one thread.",
-      "body": "WhatsApp is often the fastest channel for local hospitality. We connect catalogue and status to your operational workflow.\n\nFewer misunderstandings than ad-hoc chat messages alone."
+      "body": "WhatsApp is often the fastest channel for local hospitality. We connect catalogue and status to your operational workflow.\n\nFewer misunderstandings than ad-hoc chat messages alone.",
+      "cardHeaderAlt": "両手で持たれたスマートフォンにWhatsAppの画面が表示されている。"
     },
     "loonadministratie": {
       "title": "Payroll",
       "teaser": "Hours and pay aligned with rostering and your team.",
-      "body": "Tracked hours belong with day-to-day operations. Connect to planning and lose the manual spreadsheets.\n\nCosts stay predictable and period close becomes clearer."
+      "body": "Tracked hours belong with day-to-day operations. Connect to planning and lose the manual spreadsheets.\n\nCosts stay predictable and period close becomes clearer.",
+      "cardHeaderAlt": "三つの肖像：自信に満ちたシェフ、話し合う同僚二人、ノートPCを見るプロフェッショナル。"
     },
     "bedrijfsanalyse": {
       "title": "Business analytics",
       "teaser": "Revenue, peaks and product performance in one place.",
-      "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide."
+      "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide.",
+      "cardHeaderAlt": "暗いビジネス調の背景で、ホログラムの棒グラフと成長矢印が浮かぶタブレット。"
     },
     "kostencalculator": {
       "title": "Cost calculator",
       "teaser": "Cost per portion to price with confidence.",
-      "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts."
+      "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts.",
+      "cardHeaderAlt": "電卓を押す手と、背景でノートに金額を書く人。"
     },
     "galleryHint": "Click the image to enlarge. Use the arrows to browse.",
     "galleryPrev": "Previous image",
