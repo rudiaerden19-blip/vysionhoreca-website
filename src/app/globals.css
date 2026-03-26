@@ -26,7 +26,7 @@
   display: flex;
   align-items: center;
   width: max-content;
-  animation: live-demo-marquee 55s linear infinite;
+  animation: live-demo-marquee 26s linear infinite;
 }
 
 /* Geen brightness(0): dat vult witte PNG-randen volledig zwart → grijs rechthoekig blok.

@@ -194,7 +194,7 @@ const LIVE_DEMO_PARTNER_LOGOS = [
   '/images/partner-logos/09.png',
 ] as const
 
-function StatsSection() {
+function StatsAndLiveDemoSection() {
   const { t } = useLanguage()
 
   const stats = [
@@ -205,7 +205,7 @@ function StatsSection() {
   ]
 
   return (
-    <section className="pt-24 sm:pt-32 pb-0 bg-[#E3E3E3]">
+    <section className="pt-24 sm:pt-32 pb-24 sm:pb-32 bg-[#E3E3E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
@@ -221,10 +221,10 @@ function StatsSection() {
         </div>
       </div>
 
-      {/* Logo-marquee tussen stats-rij en kop “Wil je het platform…” (zelfde verticale plek als vroeger de balk) */}
+      {/* Logo-marquee: isolate + vaste achtergrond zodat mix-blend-mode niet op onderliggende secties/tekst mengt */}
       <div className="mt-12 sm:mt-16 md:mt-20">
         <div
-          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-hidden py-6 sm:py-8 md:py-10"
+          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-x-clip py-6 sm:py-8 md:py-10 bg-[#E3E3E3] isolate"
           aria-hidden
         >
           <div className="live-demo-marquee-track">
@@ -247,6 +247,27 @@ function StatsSection() {
             ))}
           </div>
         </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-10 sm:mt-12 md:mt-14">
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          {t('liveDemo.title')}
+        </h2>
+
+        <p className="text-lg sm:text-xl text-gray-600 mb-8">
+          {t('liveDemo.subtitle')}
+        </p>
+        <a
+          href={DEMO_HERO_LIVE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-[0_0_30px_rgba(234,88,12,0.4)] hover:shadow-[0_0_50px_rgba(234,88,12,0.6)] hover:scale-105"
+        >
+          <span>{t('liveDemo.cta')}</span>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </a>
       </div>
     </section>
   )
@@ -569,36 +590,6 @@ function PricingSection() {
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  )
-}
-
-// Live Demo Section
-function LiveDemoSection() {
-  const { t } = useLanguage()
-
-  return (
-    <section className="pt-12 sm:pt-16 md:pt-20 pb-24 sm:pb-32 bg-[#e3e3e3]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-          {t('liveDemo.title')}
-        </h2>
-
-        <p className="text-lg sm:text-xl text-gray-600 mb-8">
-          {t('liveDemo.subtitle')}
-        </p>
-        <a
-          href={DEMO_HERO_LIVE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-[0_0_30px_rgba(234,88,12,0.4)] hover:shadow-[0_0_50px_rgba(234,88,12,0.6)] hover:scale-105"
-        >
-          <span>{t('liveDemo.cta')}</span>
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-        </a>
       </div>
     </section>
   )
@@ -1433,8 +1424,7 @@ export default function HomePage() {
       <PlatformGridSection />
       <NewAtVysionSection />
       <OneDayOnlineSection />
-      <StatsSection />
-      <LiveDemoSection />
+      <StatsAndLiveDemoSection />
       <PricingSection />
       <ButWaitSection />
       <TableKioskSection />
