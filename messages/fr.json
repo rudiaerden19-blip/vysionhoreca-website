@@ -40,6 +40,11 @@
     "trialInfo": "Essai gratuit 14 jours • Commencez immédiatement",
     "clickToOpen": "Cliquez pour ouvrir"
   },
+  "newAtVysion": {
+    "title": "Nouveau chez Vysion",
+    "body": "Composez vous-même votre offre : un module ou plusieurs — vous n'activez que ce dont vous avez besoin. Chaque module est choisi séparément ; le prix suit votre sélection. Vous payez uniquement pour ce que vous utilisez vraiment.",
+    "cta": "Nous contacter"
+  },
   "oneDayOnline": {
     "title": "Soyez en ligne en",
     "titleAccent": "1 jour",

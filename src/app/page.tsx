@@ -38,6 +38,27 @@ function WhyVysionSection() {
   )
 }
 
+function NewAtVysionSection() {
+  const { t } = useLanguage()
+
+  return (
+    <section className="py-14 sm:py-16 bg-white border-t border-gray-100">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 tracking-tight">
+          {t('newAtVysion.title')}
+        </h2>
+        <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-8">{t('newAtVysion.body')}</p>
+        <a
+          href="#contact"
+          className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors"
+        >
+          {t('newAtVysion.cta')}
+        </a>
+      </div>
+    </section>
+  )
+}
+
 // One Day Online Section
 function OneDayOnlineSection() {
   const { t, locale } = useLanguage()
@@ -1538,6 +1559,7 @@ export default function HomePage() {
       <HomeLandingHero onStickyNavChange={setStickyNav} />
       <WhyVysionSection />
       <PlatformGridSection />
+      <NewAtVysionSection />
       <OneDayOnlineSection />
       <StatsSection />
       <LiveDemoSection />

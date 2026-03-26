@@ -40,6 +40,11 @@
     "trialInfo": "免费试用14天 • 立即开始",
     "clickToOpen": "点击打开"
   },
+  "newAtVysion": {
+    "title": "Vysion 新动态",
+    "body": "您可以按需自由组合模块：只需一个或多个均可。每个模块可单独选择，价格随所选模块而变化，只为实际使用的功能付费。",
+    "cta": "联系我们"
+  },
   "oneDayOnline": {
     "title": "在",
     "titleAccent": "1天",
