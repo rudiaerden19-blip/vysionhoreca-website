@@ -16,12 +16,25 @@ function WhyVysionSection() {
         aria-hidden
       />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-20 items-start">
-          <div className="lg:col-span-5 order-2 lg:order-1">
-            <h2 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-[1.15] mb-12 sm:mb-16 text-center lg:text-left max-w-xl lg:max-w-none lg:mx-0 mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-stretch">
+          <div className="flex min-h-[260px] lg:min-h-0 h-full">
+            <div className="relative w-full flex-1 min-h-[280px] lg:min-h-full rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/[0.08] bg-[#141414]">
+              <Image
+                src="/images/why-vysion-kiosk.png"
+                alt={t('whyVysion.imageAlt')}
+                fill
+                className="object-cover object-center"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                priority={false}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col min-h-0">
+            <h2 className="text-[clamp(1.05rem,3.4vw,2.5rem)] sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-none mb-10 sm:mb-12 lg:mb-14 text-center lg:text-left max-w-full lg:mx-0 mx-auto whitespace-nowrap">
               {t('whyVysion.title')}
             </h2>
-            <ul className="space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0">
+            <ul className="space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0 lg:max-w-none">
               {pointKeys.map((key, i) => (
                 <li key={key} className="flex gap-4 sm:gap-5">
                   <span
@@ -41,28 +54,6 @@ function WhyVysionSection() {
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div className="lg:col-span-7 order-1 lg:order-2 flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[400px] xl:max-w-[430px]">
-              <div
-                className="absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-accent/20 via-accent/5 to-transparent opacity-80 blur-sm sm:-inset-4"
-                aria-hidden
-              />
-              <figure className="relative rounded-2xl sm:rounded-3xl bg-gray-900/5 p-2 sm:p-3 shadow-[0_25px_50px_-15px_rgba(0,0,0,0.2)] ring-1 ring-black/[0.06]">
-                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#141414]">
-                  <Image
-                    src="/images/why-vysion-kiosk.png"
-                    alt={t('whyVysion.imageAlt')}
-                    width={887}
-                    height={801}
-                    className="w-full h-auto max-h-[min(88vw,480px)] sm:max-h-[520px] lg:max-h-[560px] object-contain mx-auto"
-                    sizes="(min-width: 1280px) 430px, (min-width: 1024px) 400px, (min-width: 640px) 380px, 320px"
-                    priority={false}
-                  />
-                </div>
-              </figure>
-            </div>
           </div>
         </div>
       </div>
