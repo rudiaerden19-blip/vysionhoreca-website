@@ -54,7 +54,7 @@ export default function PlatformGridSection() {
               <Link
                 key={slug}
                 href={`/platform/${slug}`}
-                className="group flex min-h-[260px] sm:min-h-[280px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-sm hover:border-accent/40 hover:shadow-md transition-all duration-300"
+                className="group flex min-h-[260px] sm:min-h-[280px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-sm transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]"
               >
                 <div className="relative h-28 sm:h-32 w-full shrink-0 overflow-hidden bg-gradient-to-br from-gray-300 via-gray-200 to-gray-100">
                   {cardHeaderImage ? (
