@@ -10,15 +10,15 @@ function WhyVysionSection() {
   const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice'] as const
 
   return (
-    <section className="relative py-16 sm:py-20 lg:py-24 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
+    <section className="relative py-24 sm:py-32 lg:py-40 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
       <div
         className="pointer-events-none absolute -right-24 top-1/4 h-72 w-72 rounded-full bg-accent/[0.08] blur-3xl sm:h-96 sm:w-96"
         aria-hidden
       />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-20 items-center">
           <div className="lg:col-span-5 order-2 lg:order-1">
-            <h2 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-[1.15] mb-10 sm:mb-12 text-center lg:text-left max-w-xl lg:mx-0 mx-auto">
+            <h2 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-[1.15] mb-12 sm:mb-16 text-center lg:text-left max-w-xl lg:mx-0 mx-auto">
               {t('whyVysion.title')}
             </h2>
             <ul className="space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0">
@@ -74,12 +74,12 @@ function NewAtVysionSection() {
   const { t } = useLanguage()
 
   return (
-    <section className="py-14 sm:py-16 bg-white border-t border-gray-100">
+    <section className="py-20 sm:py-28 lg:py-32 bg-white border-t border-gray-100">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 tracking-tight">
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 sm:mb-10 tracking-tight">
           {t('newAtVysion.title')}
         </h2>
-        <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-8">{t('newAtVysion.body')}</p>
+        <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-10">{t('newAtVysion.body')}</p>
         <a
           href="#contact"
           className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors"
@@ -105,10 +105,10 @@ function OneDayOnlineSection() {
   ]
 
   return (
-    <section className="py-20 bg-[#e3e3e3]">
+    <section className="py-24 sm:py-32 bg-[#e3e3e3]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-16 sm:mb-20">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-5">
             {t('oneDayOnline.title')} <span className="text-accent">{t('oneDayOnline.titleAccent')}</span> {t('oneDayOnline.titleEnd')}
           </h2>
           <p className="text-xl text-gray-600">
@@ -200,7 +200,7 @@ function StatsSection() {
   ]
 
   return (
-    <section className="py-20 bg-[#E3E3E3]">
+    <section className="py-24 sm:py-32 bg-[#E3E3E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
@@ -274,7 +274,7 @@ function OrderAppSection() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="py-24 bg-[#e3e3e3] overflow-hidden">
+    <section ref={sectionRef} className="py-28 sm:py-36 bg-[#e3e3e3] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
@@ -388,10 +388,10 @@ function PricingSection() {
   const periodLabel = isYearly ? '/jaar' : '/maand'
   
   return (
-    <section id="prijzen" className="py-24 bg-[#e3e3e3] relative overflow-hidden">
+    <section id="prijzen" className="py-28 sm:py-36 lg:py-40 bg-[#e3e3e3] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-14 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-5">
             {t('pricing.title')}
           </h2>
           <p className="text-xl text-gray-600">
@@ -400,7 +400,7 @@ function PricingSection() {
         </div>
 
         {/* Toggle Maandelijks / Jaarlijks */}
-        <div className="flex flex-col items-center mb-12">
+        <div className="flex flex-col items-center mb-14">
           <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-sm">
             <button
               type="button"
@@ -546,7 +546,7 @@ function LiveDemoSection() {
   const { t } = useLanguage()
   
   return (
-    <section className="py-16 sm:py-20 bg-[#e3e3e3]">
+    <section className="py-24 sm:py-32 bg-[#e3e3e3]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
           {t('liveDemo.title')}
@@ -723,7 +723,7 @@ function ButWaitSection() {
   const featureKeys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
 
   return (
-    <section className="py-20 bg-[#e3e3e3] overflow-hidden">
+    <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
@@ -871,10 +871,10 @@ function IndustrySection() {
   }, [activeTab])
 
   return (
-    <section id="sectoren" className="py-24 bg-[#e3e3e3]">
+    <section id="sectoren" className="py-28 sm:py-36 bg-[#e3e3e3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Title */}
-        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12">
+        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-14 sm:mb-16">
           {t('industry.sectionTitle')}
         </h2>
         
@@ -1044,7 +1044,7 @@ function TestimonialSection() {
   }
 
   return (
-    <section className="py-24 bg-[#E3E3E3] overflow-hidden">
+    <section className="py-28 sm:py-36 bg-[#E3E3E3] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -1116,7 +1116,7 @@ function CTASection() {
   const { t, locale } = useLanguage()
   
   return (
-    <section id="demo" className="relative overflow-hidden min-h-[500px] sm:min-h-[600px] flex items-center justify-center">
+    <section id="demo" className="relative overflow-hidden py-20 sm:py-28 min-h-[520px] sm:min-h-[620px] flex items-center justify-center">
       {/* Video Background */}
       <video 
         autoPlay 
@@ -1199,7 +1199,7 @@ function ContactSection() {
   }
   
   return (
-    <section id="contact" className="py-24 bg-[#E3E3E3]">
+    <section id="contact" className="py-28 sm:py-36 lg:py-40 bg-[#E3E3E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16">
           <div>

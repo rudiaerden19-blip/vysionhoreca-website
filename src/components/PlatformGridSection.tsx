@@ -35,9 +35,9 @@ export default function PlatformGridSection() {
   const { t } = useLanguage()
 
   return (
-    <section id="platform" className="py-12 sm:py-16 bg-white">
+    <section id="platform" className="py-20 sm:py-28 lg:py-36 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-center text-4xl sm:text-5xl font-bold text-gray-900 mb-10 sm:mb-12 tracking-tight">
+        <h2 className="text-center text-4xl sm:text-5xl font-bold text-gray-900 mb-12 sm:mb-16 tracking-tight">
           {t('platform.sectionTitle')}
         </h2>
 

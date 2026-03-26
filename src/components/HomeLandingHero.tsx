@@ -58,7 +58,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-hidden"
+      className="relative min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-hidden pb-14 sm:pb-20 lg:pb-24"
     >
       <div className="absolute inset-0">
         <Image
