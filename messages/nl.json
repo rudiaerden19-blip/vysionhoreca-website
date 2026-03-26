@@ -131,62 +131,52 @@
     "kassasysteem": {
       "title": "Kassasysteem",
       "teaser": "Snel afrekenen, gekoppeld aan online orders en rapporten.",
-      "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion Horeca beheer je producten, tafels, betalingen en personeel vanuit één omgeving — minder fouten tijdens piekuren en altijd zicht op de dagafsluiting.",
-      "cardHeaderAlt": "Handscanner met stylus en grote kassatablet aan de bar, met glaswerk en een cocktail op de toog."
+      "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion Horeca beheer je producten, tafels, betalingen en personeel vanuit één omgeving — minder fouten tijdens piekuren en altijd zicht op de dagafsluiting."
     },
     "bestelplatform": {
       "title": "Bestelplatform",
       "teaser": "Klanten bestellen online bij jou — zonder tussenpartij die commissie vraagt.",
-      "body": "Afhalen, levering en bestellen aan tafel verlopen via jouw eigen site in jouw huisstijl. Orders komen gestructureerd binnen op kassa en keuken.\n\nZo verwerk je pieken beter en houd je de volledige marge op je online omzet.",
-      "cardHeaderAlt": "Persoon die een bestel-app op een smartphone gebruikt aan een houten tafel, met laptop en plant op de achtergrond."
+      "body": "Afhalen, levering en bestellen aan tafel verlopen via jouw eigen site in jouw huisstijl. Orders komen gestructureerd binnen op kassa en keuken.\n\nZo verwerk je pieken beter en houd je de volledige marge op je online omzet."
     },
     "keukenschermen": {
       "title": "Keukenschermen",
       "teaser": "Orders in realtime, duidelijk gesorteerd per tijd en prioriteit.",
-      "body": "De keuken ziet precies wat er binnenkomt en wat klaar moet. Geen verloren briefjes of verkeerd overgeschreven bonnen.\n\nMinder stress tijdens de rush en een rustiger team achter de lijn.",
-      "cardHeaderAlt": "Chef die een keukenscherm aanraakt boven een RVS-werkstation met gestapelde kopjes."
+      "body": "De keuken ziet precies wat er binnenkomt en wat klaar moet. Geen verloren briefjes of verkeerd overgeschreven bonnen.\n\nMinder stress tijdens de rush en een rustiger team achter de lijn."
     },
     "onlineScherm": {
       "title": "Online scherm",
       "teaser": "Toon gasten wat relevant is: menu, wachttijden of promoties.",
-      "body": "Een scherm in de zaak houdt klanten geïnformeerd zonder extra personeel. Koppel aan je actuele aanbod en prijzen.\n\nZo verminder je vragen aan de balie en versterk je je merk in de ruimte.",
-      "cardHeaderAlt": "Drie beelden: chef in witte jas, twee mensen in gesprek, en iemand die geconcentreerd naar een laptop kijkt."
+      "body": "Een scherm in de zaak houdt klanten geïnformeerd zonder extra personeel. Koppel aan je actuele aanbod en prijzen.\n\nZo verminder je vragen aan de balie en versterk je je merk in de ruimte."
     },
     "reservaties": {
       "title": "Reservaties",
       "teaser": "Tafels en tijdsloten beheren zonder dubbel werk.",
-      "body": "Gasten reserveren online; jij ziet overzichtelijk wie wanneer komt. Koppel reservaties aan je zaak en plan personeel slimmer.\n\nMinder no-shows dankzij bevestigingen en heldere communicatie.",
-      "cardHeaderAlt": "Wit tafelbordje met de tekst Reserved op een houten tafel, zacht wazige horeca-achtergrond."
+      "body": "Gasten reserveren online; jij ziet overzichtelijk wie wanneer komt. Koppel reservaties aan je zaak en plan personeel slimmer.\n\nMinder no-shows dankzij bevestigingen en heldere communicatie."
     },
     "eigenWebsite": {
       "title": "Eigen website",
       "teaser": "Jouw domein, jouw merk — met bestellen erin geïntegreerd.",
-      "body": "Geen generieke tussenpagina: jouw logo, kleuren en foto's. Klanten herkennen direct jouw zaak.\n\nBeheer je site en je menu vanuit hetzelfde admin als de rest van Vysion Horeca.",
-      "cardHeaderAlt": "Digitaal restaurantmenu op een groot touchscreen met foto's van gerechten en prijzen."
+      "body": "Geen generieke tussenpagina: jouw logo, kleuren en foto's. Klanten herkennen direct jouw zaak.\n\nBeheer je site en je menu vanuit hetzelfde admin als de rest van Vysion Horeca."
     },
     "whatsappBestellingen": {
       "title": "WhatsApp-bestellingen",
       "teaser": "Bestellen waar je klanten al zitten: gesprek, menu en afhandeling in één flow.",
-      "body": "WhatsApp is voor veel horeca de snelste manier om bestellingen binnen te halen. Wij koppelen menu en status aan je operationele flow.\n\nMinder misverstanden en snellere opvolging dan via losse chatberichten.",
-      "cardHeaderAlt": "Smartphonescherm met de WhatsApp-app vastgehouden in twee handen."
+      "body": "WhatsApp is voor veel horeca de snelste manier om bestellingen binnen te halen. Wij koppelen menu en status aan je operationele flow.\n\nMinder misverstanden en snellere opvolging dan via losse chatberichten."
     },
     "loonadministratie": {
       "title": "Loonadministratie",
       "teaser": "Uren en verloning aansluiten op je planning en je team.",
-      "body": "Registratie van gewerkte uren hoort bij je dagelijkse operatie. Koppel aan je planning en vermijd handmatige lijstjes.\n\nZo blijven kosten voorspelbaar en wordt afsluiten van de periode overzichtelijker.",
-      "cardHeaderAlt": "Drie portretten: zelfverzekerde chef, twee collega's in gesprek, en een professional die naar een laptop kijkt."
+      "body": "Registratie van gewerkte uren hoort bij je dagelijkse operatie. Koppel aan je planning en vermijd handmatige lijstjes.\n\nZo blijven kosten voorspelbaar en wordt afsluiten van de periode overzichtelijker."
     },
     "bedrijfsanalyse": {
       "title": "Bedrijfsanalyse",
       "teaser": "Omzet, pieken en productprestaties in één overzicht.",
-      "body": "Welke dagen lopen hard? Welke categorie drukt de marge? Met duidelijke rapporten stuur je bij op menu, personeel en voorraad.\n\nGeen spreadsheet-geweld — wél de cijfers die je nodig hebt om beslissingen te nemen.",
-      "cardHeaderAlt": "Tablet met een gloeiend holografisch staafdiagram en groeipijl, donkere zakelijke achtergrond."
+      "body": "Welke dagen lopen hard? Welke categorie drukt de marge? Met duidelijke rapporten stuur je bij op menu, personeel en voorraad.\n\nGeen spreadsheet-geweld — wél de cijfers die je nodig hebt om beslissingen te nemen."
     },
     "kostencalculator": {
       "title": "Kostencalculator",
       "teaser": "Kostprijs per portie berekenen om verkoopprijzen scherp te zetten.",
-      "body": "Ingredienten, porties en verlies meenemen in je kostprijs helpt prijzen verdedigen en marge te beschermen.\n\nZie snel welke items te weinig of te veel marge geven — en stuur je menu bij op basis van feiten.",
-      "cardHeaderAlt": "Hand op een rekenmachine, op de achtergrond iemand die cijfers noteert in een schrift."
+      "body": "Ingredienten, porties en verlies meenemen in je kostprijs helpt prijzen verdedigen en marge te beschermen.\n\nZie snel welke items te weinig of te veel marge geven — en stuur je menu bij op basis van feiten."
     },
     "galleryHint": "Klik op de afbeelding om te vergroten. Gebruik de pijlen links en rechts om te bladeren.",
     "galleryPrev": "Vorige afbeelding",

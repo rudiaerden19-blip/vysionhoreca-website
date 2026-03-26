@@ -4257,62 +4257,52 @@
     "kassasysteem": {
       "title": "POS system",
       "teaser": "Fast checkout linked to online orders and reporting.",
-      "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing.",
-      "cardHeaderAlt": "Handheld order terminal with stylus and large POS tablet on a bar, with glassware and a drink in the background."
+      "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing."
     },
     "bestelplatform": {
       "title": "Ordering platform",
       "teaser": "Customers order with you directly — no marketplace taking a cut.",
-      "body": "Pickup, delivery and dine-in flow through your own branded site. Orders land cleanly on POS and kitchen screens.\n\nYou handle spikes better and keep full margin on online sales.",
-      "cardHeaderAlt": "Personne utilisant une application de commande sur smartphone à une table en bois, avec ordinateur portable et plante en arrière-plan."
+      "body": "Pickup, delivery and dine-in flow through your own branded site. Orders land cleanly on POS and kitchen screens.\n\nYou handle spikes better and keep full margin on online sales."
     },
     "keukenschermen": {
       "title": "Kitchen screens",
       "teaser": "Live tickets sorted by time and priority.",
-      "body": "The kitchen sees exactly what is due and when — no lost tickets or bad handwriting.\n\nLess stress during the rush and calmer service from the pass.",
-      "cardHeaderAlt": "Chef in whites using a wall-mounted kitchen display above a stainless-steel workstation with stacked cups."
+      "body": "The kitchen sees exactly what is due and when — no lost tickets or bad handwriting.\n\nLess stress during the rush and calmer service from the pass."
     },
     "onlineScherm": {
       "title": "Display screen",
       "teaser": "Show menus, wait times or promos in your venue.",
-      "body": "In-venue screens keep guests informed without extra staff on the floor. Tie into your live offer and pricing.\n\nFewer counter questions and a stronger brand presence in the room.",
-      "cardHeaderAlt": "Three panels: chef in whites, two people in conversation, and someone focused on a laptop screen."
+      "body": "In-venue screens keep guests informed without extra staff on the floor. Tie into your live offer and pricing.\n\nFewer counter questions and a stronger brand presence in the room."
     },
     "reservaties": {
       "title": "Reservations",
       "teaser": "Manage tables and slots without double entry.",
-      "body": "Guests book online; you see who is coming when. Plan service and staffing with a clear overview.\n\nConfirmations and messaging help reduce no-shows.",
-      "cardHeaderAlt": "White table tent sign reading Reserved on a wooden restaurant table, softly blurred warm interior behind."
+      "body": "Guests book online; you see who is coming when. Plan service and staffing with a clear overview.\n\nConfirmations and messaging help reduce no-shows."
     },
     "eigenWebsite": {
       "title": "Your own website",
       "teaser": "Your domain and brand — with ordering built in.",
-      "body": "Not a generic landing page: your logo, colours and photography. Customers recognise your business instantly.\n\nManage site and menu from the same admin as the rest of Vysion Horeca.",
-      "cardHeaderAlt": "Digital restaurant menu on a large touchscreen with food photos and prices."
+      "body": "Not a generic landing page: your logo, colours and photography. Customers recognise your business instantly.\n\nManage site and menu from the same admin as the rest of Vysion Horeca."
     },
     "whatsappBestellingen": {
       "title": "WhatsApp ordering",
       "teaser": "Order where guests already chat: menu and flow in one thread.",
-      "body": "WhatsApp is often the fastest channel for local hospitality. We connect catalogue and status to your operational workflow.\n\nFewer misunderstandings than ad-hoc chat messages alone.",
-      "cardHeaderAlt": "Smartphone showing the WhatsApp app, held in two hands."
+      "body": "WhatsApp is often the fastest channel for local hospitality. We connect catalogue and status to your operational workflow.\n\nFewer misunderstandings than ad-hoc chat messages alone."
     },
     "loonadministratie": {
       "title": "Payroll",
       "teaser": "Hours and pay aligned with rostering and your team.",
-      "body": "Tracked hours belong with day-to-day operations. Connect to planning and lose the manual spreadsheets.\n\nCosts stay predictable and period close becomes clearer.",
-      "cardHeaderAlt": "Three portraits: confident chef, two colleagues talking, and a professional looking at a laptop."
+      "body": "Tracked hours belong with day-to-day operations. Connect to planning and lose the manual spreadsheets.\n\nCosts stay predictable and period close becomes clearer."
     },
     "bedrijfsanalyse": {
       "title": "Business analytics",
       "teaser": "Revenue, peaks and product performance in one place.",
-      "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide.",
-      "cardHeaderAlt": "Tablet with a glowing holographic bar chart and growth arrow on a dark business-style background."
+      "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide."
     },
     "kostencalculator": {
       "title": "Cost calculator",
       "teaser": "Cost per portion to price with confidence.",
-      "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts.",
-      "cardHeaderAlt": "Hand using a calculator, with someone noting amounts in a notebook in the background."
+      "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts."
     },
     "galleryHint": "Click the image to enlarge. Use the arrows to browse.",
     "galleryPrev": "Previous image",
