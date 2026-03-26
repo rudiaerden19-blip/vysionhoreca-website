@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Navigation, Footer } from '@/components'
-import { DEMO_KASSA_VERCEL_URL } from '@/lib/demo-links'
+import { DEMO_KASSA_URL } from '@/lib/demo-links'
 
 /**
  * Kassa Landingspagina
@@ -225,7 +225,7 @@ export default function KassaPage() {
             Bekijk een echte frituur die draait op Vysion Kassa
           </p>
           <a
-            href={DEMO_KASSA_VERCEL_URL}
+            href={DEMO_KASSA_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-full font-semibold transition"

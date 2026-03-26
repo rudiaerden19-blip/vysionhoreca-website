@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useLanguage, Locale } from '@/i18n'
-import { DEMO_KASSA_VERCEL_URL } from '@/lib/demo-links'
+import { DEMO_KASSA_URL } from '@/lib/demo-links'
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -48,7 +48,7 @@ export default function Navigation() {
             <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
             <a href="/resellers" className="text-gray-300 hover:text-white transition-colors">{t('nav.resellers')}</a>
             <a
-              href={DEMO_KASSA_VERCEL_URL}
+              href={DEMO_KASSA_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-accent hover:text-accent/80 transition-colors font-medium"
@@ -131,7 +131,7 @@ export default function Navigation() {
               <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
               <a href="/resellers" className="text-accent font-medium">{t('nav.resellers')}</a>
               <a
-                href={DEMO_KASSA_VERCEL_URL}
+                href={DEMO_KASSA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent font-medium"
