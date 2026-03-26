@@ -29,6 +29,8 @@
   animation: live-demo-marquee 55s linear infinite;
 }
 
+/* Geen brightness(0): dat vult witte PNG-randen volledig zwart → grijs rechthoekig blok.
+   multiply laat wit/licht met de #E3E3E3-achtergrond versmelten; grayscale + opacity = zwart, gefade. */
 .partner-logo-marquee-item {
   flex-shrink: 0;
   height: 4.5rem;
@@ -36,8 +38,9 @@
   max-width: min(16rem, 42vw);
   object-fit: contain;
   object-position: center;
-  filter: grayscale(1) brightness(0);
-  opacity: 0.4;
+  filter: grayscale(1);
+  opacity: 0.52;
+  mix-blend-mode: multiply;
 }
 
 @media (min-width: 640px) {

@@ -239,7 +239,7 @@ function StatsSection() {
                     src={src}
                     alt=""
                     className="partner-logo-marquee-item"
-                    loading="lazy"
+                    loading={dup === 0 ? 'eager' : 'lazy'}
                     decoding="async"
                   />
                 ))}
