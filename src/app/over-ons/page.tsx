@@ -207,12 +207,12 @@ export default function OverOnsPage() {
               </div>
             </div>
 
-            <div className="bg-[#E3E3E3] rounded-3xl p-8 lg:p-12 flex items-center justify-center">
+            <div className="bg-[#E3E3E3] rounded-3xl p-8 lg:p-12 flex items-center justify-center shadow-home-card">
               <div className="text-center">
-                <div className="text-6xl font-bold text-accent mb-4">500+</div>
+                <div className="text-6xl font-bold text-accent mb-4 tabular-nums">{t('about.company.statBusinesses')}</div>
                 <p className="text-xl text-gray-700 mb-8">{t('about.company.happyBusinesses')}</p>
                 
-                <div className="text-6xl font-bold text-accent mb-4">€2.5M+</div>
+                <div className="text-6xl font-bold text-accent mb-4 tabular-nums">{t('about.company.statVolume')}</div>
                 <p className="text-xl text-gray-700 mb-8">{t('about.company.processedMonthly')}</p>
                 
                 <div className="text-6xl font-bold text-accent mb-4">24/7</div>
