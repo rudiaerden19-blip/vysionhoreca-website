@@ -224,7 +224,7 @@ function StatsAndLiveDemoSection() {
         <p className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-[2.75rem] xl:text-6xl font-bold text-accent tracking-tight leading-tight mb-5 sm:mb-6 md:mb-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {t('liveDemo.clientsLead')}
         </p>
-        <div className="relative w-[100vw] max-w-[100vw] left-1/2 -translate-x-1/2 bg-[#E3E3E3] py-6 sm:py-8 md:py-10">
+        <div className="relative w-[100vw] max-w-[100vw] left-1/2 -translate-x-1/2 bg-[#E3E3E3] py-8 sm:py-10 md:py-12">
           <div className="partner-marquee-viewport" aria-hidden>
             <div className="partner-marquee-track">
               {[0, 1].map((dup) => (
@@ -234,9 +234,9 @@ function StatsAndLiveDemoSection() {
                       <Image
                         src={src}
                         alt=""
-                        width={360}
-                        height={220}
-                        sizes="(max-width: 768px) 50vw, 16rem"
+                        width={480}
+                        height={300}
+                        sizes="(max-width: 768px) 55vw, 20rem"
                         loading="lazy"
                         className="partner-marquee-opt"
                       />
