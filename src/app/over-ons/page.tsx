@@ -223,20 +223,26 @@ export default function OverOnsPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-accent">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+      {/* CTA Section — restaurantfoto i.p.v. effen accentkleur */}
+      <section className="relative py-20 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: 'url(/images/over-ons-cta-bg.png)' }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-black/50" aria-hidden />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6 drop-shadow-md">
             {t('about.ctaTitle')}
           </h2>
-          <p className="text-xl text-white/90 mb-8">
+          <p className="text-xl text-white/95 mb-8 drop-shadow-sm">
             {t('about.ctaSubtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href={`/registreer?lang=${locale}`} className="bg-white text-accent px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all">
+            <a href={`/registreer?lang=${locale}`} className="bg-white text-accent px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all shadow-lg">
               {t('about.ctaPrimary')}
             </a>
-            <a href="/#contact" className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-accent transition-all">
+            <a href="/#contact" className="border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-accent transition-all shadow-md">
               {t('about.ctaSecondary')}
             </a>
           </div>
