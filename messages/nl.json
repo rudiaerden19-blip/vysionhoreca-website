@@ -321,7 +321,8 @@
   "liveDemo": {
     "title": "Wil je het platform in actie zien?",
     "subtitle": "Bekijk een echte frituur die draait op Vysion Horeca",
-    "cta": "Test gratis"
+    "cta": "Test gratis",
+    "marquee": "Horeca · Frituur · Restaurant · Café · Slagerij · Bakkerij · Catering · Brasserie · Traiteur · Broodjeszaak · Wijnhandel · Hotel · Vysion Horeca · "
   },
   "butWait": {
     "label": "Wacht even...",

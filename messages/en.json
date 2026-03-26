@@ -321,7 +321,8 @@
   "liveDemo": {
     "title": "Want to see the platform in action?",
     "subtitle": "Check out a real chip shop running on Vysion Horeca",
-    "cta": "View Live Demo"
+    "cta": "View Live Demo",
+    "marquee": "Hospitality · Chip shop · Restaurant · Café · Butcher · Bakery · Catering · Brasserie · Deli · Sandwich bar · Wine merchant · Hotel · Vysion Horeca · "
   },
   "butWait": {
     "label": "Wait...",

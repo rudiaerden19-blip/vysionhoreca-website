@@ -13,6 +13,27 @@
   animation: shimmer-right 2.5s ease-in-out infinite;
 }
 
+@keyframes live-demo-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.live-demo-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: live-demo-marquee 50s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-demo-marquee-track {
+    animation: none;
+  }
+}
+
 :root {
   --primary: #3C4D6B;
   --primary-light: #4A5D7B;

@@ -536,13 +536,30 @@ function PricingSection() {
 // Live Demo Section
 function LiveDemoSection() {
   const { t } = useLanguage()
-  
+  const marqueeChunk = `${t('liveDemo.marquee')}${t('liveDemo.marquee')}${t('liveDemo.marquee')}`
+
   return (
     <section className="py-24 sm:py-32 bg-[#e3e3e3]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
           {t('liveDemo.title')}
         </h2>
+
+        {/* Semi-transparante zwarte band, tekst zwart uitgefaded, scrollt rechts → links */}
+        <div
+          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-hidden mb-6 py-3 sm:py-3.5 bg-black/[0.28]"
+          aria-hidden
+        >
+          <div className="live-demo-marquee-track">
+            <span className="shrink-0 block px-6 text-sm sm:text-base font-semibold tracking-wide text-black/[0.55] whitespace-nowrap">
+              {marqueeChunk}
+            </span>
+            <span className="shrink-0 block px-6 text-sm sm:text-base font-semibold tracking-wide text-black/[0.55] whitespace-nowrap">
+              {marqueeChunk}
+            </span>
+          </div>
+        </div>
+
         <p className="text-lg sm:text-xl text-gray-600 mb-8">
           {t('liveDemo.subtitle')}
         </p>
