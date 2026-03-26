@@ -17,29 +17,23 @@ export const DEMO_ORDER_SITE_URL = DEMO_ORIGIN
 export const DEMO_HERO_LIVE_URL = DEMO_KASSA_URL
 
 /**
- * Per platformtegel: juiste demourl (kassa vs. bestelplatform vs. keuken, …).
+ * Per platformtegel: “Test het hier” — de meeste tegels naar dezelfde demokassa.
  * `msgKey` komt overeen met `PLATFORM_PAGES[].msgKey` in `platform-pages.ts`.
  */
 export function demoUrlForPlatformCard(msgKey: string): string {
   switch (msgKey) {
-    case 'kassasysteem':
-      return DEMO_KASSA_URL
     case 'bestelplatform':
-    case 'whatsappBestellingen':
     case 'eigenWebsite':
       return DEMO_ORDER_SITE_URL
+    case 'kassasysteem':
     case 'keukenschermen':
-      return `${DEMO_ORIGIN}/keuken/${DEMO_TENANT_SLUG}`
     case 'onlineScherm':
-      return `${DEMO_ORIGIN}/display`
     case 'reservaties':
-      return `${DEMO_ORIGIN}/admin/reserveringen`
+    case 'whatsappBestellingen':
     case 'loonadministratie':
-      return `${DEMO_ORIGIN}/admin/uren`
     case 'bedrijfsanalyse':
-      return `${DEMO_ORIGIN}/admin/analyse`
     case 'kostencalculator':
-      return `${DEMO_ORIGIN}/admin/kosten/producten`
+      return DEMO_KASSA_URL
     default:
       return DEMO_ORDER_SITE_URL
   }
