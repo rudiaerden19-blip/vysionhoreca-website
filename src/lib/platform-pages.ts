@@ -6,6 +6,9 @@ export const BESTELPLATFORM_HERO_IMAGE = '/images/platform/bestelplatform-hero.j
 /** Volle-breedte hero op /platform/kassasysteem. */
 export const KASSASYSTEEM_HERO_IMAGE = '/images/platform/kassasysteem-hero.png'
 
+/** Horeca POS-sectie op /platform/kassasysteem */
+export const HORECA_KASSASYSTEEM_POS_IMAGE = '/images/platform/horeca-kassasysteem-pos.png'
+
 export const KASSASYSTEEM_CARD_IMAGE = '/images/platform/kassasysteem-card.png'
 export const KEUKENSCHERMEN_CARD_IMAGE = '/images/platform/keukenschermen-card.png'
 export const RESERVATIES_CARD_IMAGE = '/images/platform/reservaties-card.png'

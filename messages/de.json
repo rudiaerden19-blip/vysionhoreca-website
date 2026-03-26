@@ -4302,7 +4302,42 @@
       "title": "POS system",
       "teaser": "Fast checkout linked to online orders and reporting.",
       "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing.",
-      "heroAlt": "Hand using a touchscreen POS with payment terminal at the counter in a café or restaurant"
+      "heroAlt": "Hand using a touchscreen POS with payment terminal at the counter in a café or restaurant",
+      "horecaSectorTitle": "Hospitality POS",
+      "horecaImageAlt": "Modern all-in-one POS system on a table in a restaurant",
+      "horecaLeadBefore": "Our POS solutions give you ",
+      "horecaLeadBold": "a broad set of features to run your business better.",
+      "horecaLeadAfter": " Works with most Windows-based POS PCs on a recent version. Also runs smoothly on iPad®, Android® and kiosks.",
+      "horecaCloudBold": "Run your venue effortlessly from the cloud",
+      "horecaCloudAfter": " — a web panel gives you everything you need to optimise and grow.",
+      "horecaDemoCta": "Request a demo",
+      "featuresTitle": "Features",
+      "features": {
+        "inventory": {
+          "title": "Stock control",
+          "body": "Stay on top of inventory so you can respond faster to customer demand."
+        },
+        "floorPlan": {
+          "title": "Table plan",
+          "body": "Flexible floor plans for clearer service and efficient seating."
+        },
+        "timeClock": {
+          "title": "Time clock",
+          "body": "Track staff hours with a built-in clock for accurate records."
+        },
+        "customerDisplay": {
+          "title": "Customer display",
+          "body": "Show orders and payment info so guests always know what they order and pay."
+        },
+        "productionTickets": {
+          "title": "Kitchen tickets",
+          "body": "Tickets go straight to kitchen or bar so nothing gets lost in communication."
+        },
+        "reporting": {
+          "title": "Reporting",
+          "body": "Detailed reports on sales, stock and more — stay in control of your operation."
+        }
+      }
     },
     "bestelplatform": {
       "title": "Ordering platform",

@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { Navigation, Footer } from '@/components'
+import { Navigation, Footer, KassasysteemFeaturesSection, KassasysteemHorecaSection } from '@/components'
 import { useLanguage } from '@/i18n'
 import { BESTELPLATFORM_HERO_IMAGE, KASSASYSTEEM_HERO_IMAGE, getPlatformPage } from '@/lib/platform-pages'
 
@@ -127,6 +127,13 @@ export default function PlatformDetailPage() {
             </div>
           )}
         </div>
+
+        {slug === 'kassasysteem' && (
+          <>
+            <KassasysteemHorecaSection />
+            <KassasysteemFeaturesSection />
+          </>
+        )}
       </article>
       <Footer />
     </main>

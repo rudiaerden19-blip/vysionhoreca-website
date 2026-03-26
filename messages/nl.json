@@ -175,7 +175,42 @@
       "title": "Kassasysteem",
       "teaser": "Snel afrekenen, gekoppeld aan online orders en rapporten.",
       "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion Horeca beheer je producten, tafels, betalingen en personeel vanuit één omgeving — minder fouten tijdens piekuren en altijd zicht op de dagafsluiting.",
-      "heroAlt": "Hand bedient een touchscreen-kassa met betaalterminal aan de toonbank in een horecazaak"
+      "heroAlt": "Hand bedient een touchscreen-kassa met betaalterminal aan de toonbank in een horecazaak",
+      "horecaSectorTitle": "Horeca kassasysteem",
+      "horecaImageAlt": "Moderne all-in-one horecakassa op een tafel in een restaurant",
+      "horecaLeadBefore": "Onze kassasystemen bieden een ",
+      "horecaLeadBold": "breed scala aan functies om jouw bedrijfsvoering te verbeteren.",
+      "horecaLeadAfter": " Compatibel met vrijwel elke kassa-pc op een recente versie van Windows. Ook naadloos te gebruiken op iPad®, Android® en kiosken.",
+      "horecaCloudBold": "Beheer uw zaak moeiteloos via de cloud",
+      "horecaCloudAfter": ", waarbij een webpanel alle mogelijkheden biedt om uw zaak te optimaliseren en te laten groeien.",
+      "horecaDemoCta": "Demo aanvragen",
+      "featuresTitle": "Functionaliteiten",
+      "features": {
+        "inventory": {
+          "title": "Voorraadbeheer",
+          "body": "Beheer moeiteloos je voorraad, zodat je beter kunt inspelen op de vraag van je klanten."
+        },
+        "floorPlan": {
+          "title": "Tafelplan",
+          "body": "Eenvoudig aanpasbaar tafelplan voor overzichtelijke bediening en efficiënte tafelschikking."
+        },
+        "timeClock": {
+          "title": "Prikklok",
+          "body": "Houd de werktijden van je medewerkers bij met de ingebouwde prikklok voor nauwkeurige urenregistratie."
+        },
+        "customerDisplay": {
+          "title": "Klantenscherm",
+          "body": "Toon bestellingen en betalinformatie op het klantenscherm, zodat klanten altijd weten wat ze bestellen en betalen."
+        },
+        "productionTickets": {
+          "title": "Productiebonnen",
+          "body": "Bonnetjes gaan automatisch naar de keuken of bar, zodat de communicatie vlekkeloos verloopt."
+        },
+        "reporting": {
+          "title": "Rapportages",
+          "body": "Gedetailleerde rapportages over verkopen, voorraad en meer, zodat je altijd grip houdt op je bedrijfsvoering."
+        }
+      }
     },
     "bestelplatform": {
       "title": "Bestelplatform",
