@@ -18,7 +18,7 @@ function WhyVysionSection() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-20 items-start">
           <div className="lg:col-span-5 order-2 lg:order-1">
-            <h2 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-[1.15] mb-12 sm:mb-16 text-center lg:text-left max-w-xl lg:mx-0 mx-auto">
+            <h2 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-[1.15] mb-12 sm:mb-16 text-center lg:text-left max-w-xl lg:max-w-none lg:mx-0 mx-auto">
               {t('whyVysion.title')}
             </h2>
             <ul className="space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0">
@@ -50,13 +50,13 @@ function WhyVysionSection() {
                 aria-hidden
               />
               <figure className="relative rounded-2xl sm:rounded-3xl bg-gray-900/5 p-2 sm:p-3 shadow-[0_25px_50px_-15px_rgba(0,0,0,0.2)] ring-1 ring-black/[0.06]">
-                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#f5f0e8]">
+                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#141414]">
                   <Image
-                    src="/images/why-vysion-pos-mockup.png"
-                    alt=""
-                    width={819}
-                    height={1024}
-                    className="w-full h-auto max-h-[min(92vw,520px)] sm:max-h-[560px] lg:max-h-[580px] object-contain mx-auto"
+                    src="/images/why-vysion-kiosk.png"
+                    alt={t('whyVysion.imageAlt')}
+                    width={887}
+                    height={801}
+                    className="w-full h-auto max-h-[min(88vw,480px)] sm:max-h-[520px] lg:max-h-[560px] object-contain mx-auto"
                     sizes="(min-width: 1280px) 430px, (min-width: 1024px) 400px, (min-width: 640px) 380px, 320px"
                     priority={false}
                   />

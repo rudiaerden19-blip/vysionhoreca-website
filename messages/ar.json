@@ -4245,7 +4245,8 @@
     "bannerEigen": "مغلق مؤقتا"
   },
   "whyVysion": {
-    "title": "Why choose Vysion",
+    "title": "Why choose\u00a0Vysion",
+    "imageAlt": "كiosk طاولة Vysion بشاشة لمس",
     "fullPlatform": {
       "title": "Full platform",
       "body": "POS, online ordering, kitchen display, reservations, website and reporting in one place. No scattered tools or double work — everything works together for your venue."
