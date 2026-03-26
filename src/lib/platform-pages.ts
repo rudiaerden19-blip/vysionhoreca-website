@@ -4,7 +4,7 @@
 export const BESTELPLATFORM_HERO_IMAGE = '/images/platform/bestelplatform-hero.jpg'
 
 /** Volle-breedte hero op /platform/kassasysteem. */
-export const KASSASYSTEEM_HERO_IMAGE = '/images/platform/kassasysteem-hero.jpg'
+export const KASSASYSTEEM_HERO_IMAGE = '/images/platform/kassasysteem-hero.png'
 
 export const KASSASYSTEEM_CARD_IMAGE = '/images/platform/kassasysteem-card.png'
 export const KEUKENSCHERMEN_CARD_IMAGE = '/images/platform/keukenschermen-card.png'
