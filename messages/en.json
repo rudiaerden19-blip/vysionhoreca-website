@@ -573,7 +573,9 @@
     "privacy": "Privacy",
     "legal": "Legal",
     "copyright": "All rights reserved.",
-    "designBy": "Design by Vysion"
+    "designBy": "Design by Vysion",
+    "backToTop": "TOP",
+    "backToTopAria": "Back to top"
   },
   "stop": {
     "title": "STOP",

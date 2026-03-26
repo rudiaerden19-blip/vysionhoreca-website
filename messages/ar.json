@@ -411,7 +411,9 @@
     "privacy": "الخصوصية",
     "legal": "قانوني",
     "copyright": "جميع الحقوق محفوظة.",
-    "designBy": "تصميم Vysion"
+    "designBy": "تصميم Vysion",
+    "backToTop": "TOP",
+    "backToTopAria": "العودة إلى الأعلى"
   },
   "stop": {
     "title": "قف",

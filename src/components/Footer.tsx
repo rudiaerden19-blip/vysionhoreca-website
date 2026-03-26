@@ -1,12 +1,15 @@
 'use client'
 
 import { useLanguage } from '@/i18n'
+import BackToTopBar from '@/components/BackToTopBar'
 
 export default function Footer() {
   const { t } = useLanguage()
-  
+
   return (
-    <footer className="bg-dark text-white py-16">
+    <>
+      <BackToTopBar />
+      <footer className="bg-dark text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           {/* Logo & Description */}
@@ -64,5 +67,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    </>
   )
 }

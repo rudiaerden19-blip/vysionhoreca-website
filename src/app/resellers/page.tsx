@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
+import BackToTopBar from '@/components/BackToTopBar'
 import { useLanguage } from '@/i18n/LanguageContext'
 
 const countries = [
@@ -87,21 +88,27 @@ export default function ResellersPage() {
     <div className={`min-h-screen ${sectionLight}`}>
       <Navigation />
 
-      {/* Hero */}
-      <section className={`pt-32 pb-20 px-4 ${sectionLight}`}>
-        <div className="max-w-6xl mx-auto text-center">
+      {/* Hero — partnerschap (handshake) */}
+      <section className="relative pt-32 pb-24 px-4 overflow-hidden min-h-[420px] md:min-h-[480px] flex items-center">
+        <div
+          className="absolute inset-0 bg-cover bg-[center_30%] md:bg-center"
+          style={{ backgroundImage: 'url(/images/resellers-hero-bg.png)' }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/55" aria-hidden />
+        <div className="relative z-10 max-w-6xl mx-auto w-full text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="inline-block px-4 py-2 bg-accent/15 text-accent rounded-full text-sm font-medium mb-6">
+            <span className="inline-block px-4 py-2 bg-white/95 text-accent rounded-full text-sm font-semibold mb-6 shadow-sm border border-white/50">
               🤝 {t('resellersPage.badge')}
             </span>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-md">
               {t('resellersPage.heroTitle')}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            <p className="text-xl text-white/95 max-w-3xl mx-auto drop-shadow-sm">
               {t('resellersPage.heroDesc')}
             </p>
           </motion.div>
@@ -385,6 +392,8 @@ export default function ResellersPage() {
           </a>
         </div>
       </section>
+
+      <BackToTopBar />
 
       <footer className="py-8 px-4 border-t border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto text-center text-gray-600">

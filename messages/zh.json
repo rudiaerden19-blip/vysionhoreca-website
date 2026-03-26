@@ -411,7 +411,9 @@
     "privacy": "隐私",
     "legal": "法律",
     "copyright": "版权所有。",
-    "designBy": "设计 by Vysion"
+    "designBy": "设计 by Vysion",
+    "backToTop": "TOP",
+    "backToTopAria": "返回顶部"
   },
   "stop": {
     "title": "停",

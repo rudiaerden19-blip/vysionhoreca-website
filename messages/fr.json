@@ -411,7 +411,9 @@
     "privacy": "Confidentialité",
     "legal": "Juridique",
     "copyright": "Tous droits réservés.",
-    "designBy": "Design par Vysion"
+    "designBy": "Design par Vysion",
+    "backToTop": "TOP",
+    "backToTopAria": "Retour en haut"
   },
   "stop": {
     "title": "STOP",

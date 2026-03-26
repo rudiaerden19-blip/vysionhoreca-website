@@ -411,7 +411,9 @@
     "privacy": "プライバシー",
     "legal": "法的情報",
     "copyright": "全著作権所有。",
-    "designBy": "デザイン by Vysion"
+    "designBy": "デザイン by Vysion",
+    "backToTop": "TOP",
+    "backToTopAria": "ページ上部へ"
   },
   "stop": {
     "title": "ストップ",
