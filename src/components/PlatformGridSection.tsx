@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import type { LucideIcon } from 'lucide-react'
 import {
@@ -41,26 +42,46 @@ export default function PlatformGridSection() {
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6 lg:gap-7">
-          {PLATFORM_PAGES.map(({ slug, msgKey }) => {
+          {PLATFORM_PAGES.map(({ slug, msgKey, cardHeaderImage }) => {
             const Icon = ICONS[msgKey] ?? Store
+            const headerAlt =
+              cardHeaderImage && t(`platform.${msgKey}.cardHeaderAlt`) !==
+                `platform.${msgKey}.cardHeaderAlt`
+                ? t(`platform.${msgKey}.cardHeaderAlt`)
+                : ''
+
             return (
               <Link
                 key={slug}
                 href={`/platform/${slug}`}
-                className="group flex min-h-[200px] sm:min-h-[220px] flex-col items-center justify-start text-center rounded-2xl bg-[#f4f4f4] p-6 sm:p-8 border border-gray-200/60 hover:border-accent/40 hover:shadow-md transition-all duration-300"
+                className="group flex min-h-[260px] sm:min-h-[280px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-sm hover:border-accent/40 hover:shadow-md transition-all duration-300"
               >
-                <div
-                  className="mb-4 flex h-[4.75rem] w-[4.75rem] sm:h-[5.25rem] sm:w-[5.25rem] shrink-0 items-center justify-center rounded-full border-2 border-accent bg-white text-accent group-hover:bg-orange-50/80 transition-colors"
-                  aria-hidden
-                >
-                  <Icon className="h-9 w-9 sm:h-10 sm:w-10" strokeWidth={1.5} />
+                <div className="relative h-28 sm:h-32 w-full shrink-0 overflow-hidden bg-gradient-to-br from-gray-300 via-gray-200 to-gray-100">
+                  {cardHeaderImage ? (
+                    <Image
+                      src={cardHeaderImage}
+                      alt={headerAlt}
+                      fill
+                      className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
+                      sizes="(max-width: 768px) 50vw, 20vw"
+                    />
+                  ) : null}
                 </div>
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 underline decoration-gray-900 underline-offset-4 mb-2.5 leading-snug px-1">
-                  {t(`platform.${msgKey}.title`)}
-                </h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-5">
-                  {t(`platform.${msgKey}.teaser`)}
-                </p>
+
+                <div className="flex flex-1 flex-col items-center px-4 pb-5 pt-5 sm:px-6 sm:pb-6 sm:pt-6">
+                  <div
+                    className="mb-4 flex h-[4.75rem] w-[4.75rem] sm:h-[5.25rem] sm:w-[5.25rem] shrink-0 items-center justify-center rounded-full border-2 border-accent bg-white text-accent group-hover:bg-orange-50/80 transition-colors"
+                    aria-hidden
+                  >
+                    <Icon className="h-9 w-9 sm:h-10 sm:w-10" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 underline decoration-gray-900 underline-offset-4 mb-2.5 leading-snug px-1">
+                    {t(`platform.${msgKey}.title`)}
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-5">
+                    {t(`platform.${msgKey}.teaser`)}
+                  </p>
+                </div>
               </Link>
             )
           })}
