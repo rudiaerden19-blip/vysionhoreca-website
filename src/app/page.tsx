@@ -191,7 +191,6 @@ const LIVE_DEMO_PARTNER_LOGOS = [
   '/images/partner-logos/06.png',
   '/images/partner-logos/07.png',
   '/images/partner-logos/08.png',
-  '/images/partner-logos/09.png',
 ] as const
 
 function StatsAndLiveDemoSection() {
