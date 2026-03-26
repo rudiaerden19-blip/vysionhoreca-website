@@ -50,9 +50,9 @@ function WhyVysionSection() {
                 src="/images/why-vysion-kiosk.png"
                 alt={t('whyVysion.imageAlt')}
                 fill
+                loading="lazy"
                 className="object-cover object-center"
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                priority={false}
+                sizes="(min-width: 1024px) 45vw, 95vw"
               />
             </div>
           </div>
@@ -231,11 +231,14 @@ function StatsAndLiveDemoSection() {
                 <div key={dup} className="partner-marquee-segment">
                   {LIVE_DEMO_PARTNER_LOGOS.map((src) => (
                     <div key={`${dup}-${src}`} className="partner-marquee-slot">
-                      <img
+                      <Image
                         src={src}
                         alt=""
-                        loading="eager"
-                        decoding="async"
+                        width={360}
+                        height={220}
+                        sizes="(max-width: 768px) 50vw, 16rem"
+                        loading="lazy"
+                        className="partner-marquee-opt"
                       />
                     </div>
                   ))}
@@ -349,11 +352,13 @@ function OrderAppSection() {
               }}
               onClick={() => setLightboxIndex(index)}
             >
-              <img
+              <Image
                 src={src}
                 alt={`Vysion Platform ${index + 1}`}
-                className="absolute inset-0 w-full h-full object-cover rounded-2xl hover:scale-105 transition-transform"
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                 loading="lazy"
+                className="object-cover rounded-2xl hover:scale-105 transition-transform"
               />
             </div>
           ))}
@@ -378,12 +383,19 @@ function OrderAppSection() {
               </svg>
             </button>
 
-            <img
-              src={images[lightboxIndex]}
-              alt="Vergroot"
-              className="max-w-full max-h-full object-contain rounded-2xl"
+            <div
+              className="relative w-full max-w-5xl h-[min(88vh,1280px)] max-h-[90vh]"
               onClick={(e) => e.stopPropagation()}
-            />
+            >
+              <Image
+                src={images[lightboxIndex]}
+                alt="Vergroot"
+                fill
+                sizes="100vw"
+                priority
+                className="object-contain rounded-2xl"
+              />
+            </div>
 
             {/* Right Arrow */}
             <button 
@@ -764,12 +776,14 @@ function ButWaitSection() {
         {/* Content Grid */}
         <div className="grid lg:grid-cols-2 gap-12 items-stretch">
           {/* Left - Image */}
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-            <img
+          <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] w-full max-h-[min(100vw,520px)]">
+            <Image
               src="/images/entrepreneur.jpg"
               alt="Ondernemer werkt met Vysion"
-              className="w-full h-full object-cover"
+              fill
+              sizes="(min-width: 1024px) 45vw, 95vw"
               loading="lazy"
+              className="object-cover"
             />
           </div>
 
@@ -807,8 +821,9 @@ function TableKioskSection() {
               alt={t('tableKiosk.imageAlt')}
               width={804}
               height={610}
+              loading="lazy"
               className="w-full h-auto max-h-[min(85vw,480px)] sm:max-h-[440px] lg:max-h-[500px] object-contain mx-auto"
-              sizes="(min-width: 1024px) 45vw, 100vw"
+              sizes="(min-width: 1024px) 40vw, 90vw"
             />
           </div>
 
@@ -988,14 +1003,20 @@ function IndustrySection() {
               <div className="relative w-full max-w-[520px]">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full">
                   {current.images.map((img, idx) => (
-                    <img
+                    <div
                       key={idx}
-                      src={img}
-                      alt={`${t(`industry.${activeTab}.tab`)} ${idx + 1}`}
-                      className="w-full h-28 sm:h-36 object-cover object-top rounded-xl shadow-lg cursor-pointer hover:scale-[1.02] transition-transform border-2 border-gray-100"
-                      loading="lazy"
-                      onClick={() => openLightbox(idx)}
-                    />
+                      className="relative w-full h-28 sm:h-36 rounded-xl shadow-lg overflow-hidden cursor-pointer border-2 border-gray-100 hover:scale-[1.02] transition-transform"
+                    >
+                      <Image
+                        src={img}
+                        alt={`${t(`industry.${activeTab}.tab`)} ${idx + 1}`}
+                        fill
+                        sizes="(max-width: 1024px) 33vw, 200px"
+                        loading="lazy"
+                        className="object-cover object-top"
+                        onClick={() => openLightbox(idx)}
+                      />
+                    </div>
                   ))}
                 </div>
                 <div className="flex items-center justify-center gap-4 mt-4">
@@ -1025,11 +1046,14 @@ function IndustrySection() {
               </div>
             ) : (
               /* Single image for other tabs */
-              <img
+              <Image
                 src={current.images[0]}
                 alt={activeTab}
-                className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-xl cursor-pointer"
+                width={900}
+                height={1200}
+                sizes="(min-width: 1024px) 660px, 90vw"
                 loading="lazy"
+                className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-xl cursor-pointer mx-auto"
                 onClick={() => openLightbox(0)}
               />
             )}
@@ -1056,12 +1080,19 @@ function IndustrySection() {
               </button>
             )}
 
-            <img
-              src={current.images[lightboxIndex]}
-              alt={activeTab}
-              className="max-w-full max-h-full object-contain"
+            <div
+              className="relative w-full max-w-6xl h-[min(90vh,1200px)] max-h-[92vh]"
               onClick={(e) => e.stopPropagation()}
-            />
+            >
+              <Image
+                src={current.images[lightboxIndex]}
+                alt={activeTab}
+                fill
+                sizes="100vw"
+                priority
+                className="object-contain"
+              />
+            </div>
 
             {/* Right Arrow */}
             {hasMultipleImages && (

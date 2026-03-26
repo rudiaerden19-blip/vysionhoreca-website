@@ -71,7 +71,8 @@
   isolation: isolate;
 }
 
-.partner-marquee-slot img {
+.partner-marquee-slot img.partner-marquee-opt,
+.partner-marquee-slot .partner-marquee-opt {
   display: block;
   max-width: 100%;
   width: auto;
@@ -94,7 +95,8 @@
     padding: 0 1rem;
   }
 
-  .partner-marquee-slot img {
+  .partner-marquee-slot img.partner-marquee-opt,
+  .partner-marquee-slot .partner-marquee-opt {
     max-height: 5.25rem;
   }
 }
@@ -109,7 +111,8 @@
     padding: 0 1.25rem;
   }
 
-  .partner-marquee-slot img {
+  .partner-marquee-slot img.partner-marquee-opt,
+  .partner-marquee-slot .partner-marquee-opt {
     max-height: 6rem;
   }
 }
