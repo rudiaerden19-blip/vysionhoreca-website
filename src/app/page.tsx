@@ -183,7 +183,8 @@ function CountUp({ end, suffix = '', prefix = '' }: { end: number, suffix?: stri
 
 function StatsSection() {
   const { t } = useLanguage()
-  
+  const marqueeChunk = `${t('liveDemo.marquee')}${t('liveDemo.marquee')}${t('liveDemo.marquee')}`
+
   const stats = [
     { value: 2.5, prefix: '€', suffix: 'M+', labelKey: 'stats.processed' },
     { value: 500, prefix: '', suffix: '+', labelKey: 'stats.businesses' },
@@ -192,7 +193,7 @@ function StatsSection() {
   ]
 
   return (
-    <section className="py-24 sm:py-32 bg-[#E3E3E3]">
+    <section className="pt-24 sm:pt-32 pb-0 bg-[#E3E3E3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
@@ -205,6 +206,23 @@ function StatsSection() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Marquee tussen stats-rij en kop “Wil je het platform…” (zo veel mogelijk in het midden) */}
+      <div className="mt-12 sm:mt-16 md:mt-20">
+        <div
+          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-hidden py-3.5 sm:py-4 bg-black/40"
+          aria-hidden
+        >
+          <div className="live-demo-marquee-track">
+            <span className="shrink-0 block px-6 text-sm sm:text-base font-semibold tracking-wide text-white/90 whitespace-nowrap">
+              {marqueeChunk}
+            </span>
+            <span className="shrink-0 block px-6 text-sm sm:text-base font-semibold tracking-wide text-white/90 whitespace-nowrap">
+              {marqueeChunk}
+            </span>
+          </div>
         </div>
       </div>
     </section>
@@ -536,29 +554,13 @@ function PricingSection() {
 // Live Demo Section
 function LiveDemoSection() {
   const { t } = useLanguage()
-  const marqueeChunk = `${t('liveDemo.marquee')}${t('liveDemo.marquee')}${t('liveDemo.marquee')}`
 
   return (
-    <section className="py-24 sm:py-32 bg-[#e3e3e3]">
+    <section className="pt-12 sm:pt-16 md:pt-20 pb-24 sm:pb-32 bg-[#e3e3e3]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
           {t('liveDemo.title')}
         </h2>
-
-        {/* Semi-transparante zwarte band, tekst zwart uitgefaded, scrollt rechts → links */}
-        <div
-          className="relative left-1/2 right-1/2 -mx-[50vw] w-screen max-w-[100vw] overflow-hidden mb-6 py-3 sm:py-3.5 bg-black/[0.28]"
-          aria-hidden
-        >
-          <div className="live-demo-marquee-track">
-            <span className="shrink-0 block px-6 text-sm sm:text-base font-semibold tracking-wide text-black/[0.55] whitespace-nowrap">
-              {marqueeChunk}
-            </span>
-            <span className="shrink-0 block px-6 text-sm sm:text-base font-semibold tracking-wide text-black/[0.55] whitespace-nowrap">
-              {marqueeChunk}
-            </span>
-          </div>
-        </div>
 
         <p className="text-lg sm:text-xl text-gray-600 mb-8">
           {t('liveDemo.subtitle')}
