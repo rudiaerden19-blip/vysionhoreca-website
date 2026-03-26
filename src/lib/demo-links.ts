@@ -2,13 +2,11 @@
 
 export const DEMO_TENANT_SLUG = 'frituurnolim' as const
 
-const DEMO_ORIGIN = `https://${DEMO_TENANT_SLUG}.ordervysion.com`
+/** Publieke demo-site — platformtegels bestelplatform & eigen website (https://frituurnolim.ordervysion.com) */
+export const DEMO_ORDER_SITE_URL = `https://${DEMO_TENANT_SLUG}.ordervysion.com`
 
-/** Demo-kassa (admin) op tenant-subdomein */
-export const DEMO_KASSA_URL = `${DEMO_ORIGIN}/admin/kassa`
-
-/** Klantzijde: online bestellen / shop op subdomein */
-export const DEMO_ORDER_SITE_URL = DEMO_ORIGIN
+/** Demo-kassa (admin) op hetzelfde subdomein */
+export const DEMO_KASSA_URL = `${DEMO_ORDER_SITE_URL}/admin/kassa`
 
 /**
  * “Bekijk demo” op homepage/hero: kassa (POS), niet de webshop-root.
