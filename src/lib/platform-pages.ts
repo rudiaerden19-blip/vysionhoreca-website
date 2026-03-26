@@ -1,7 +1,10 @@
 /** Homepage grid + /platform/[slug] detail routes (marketing only). */
 
-/** Zelfde afbeelding als op de platformkaart + volle-breedte hero op /platform/bestelplatform. */
+/** Zelfde afbeelding als op de platformkaart (homepage-grid). */
 export const BESTELPLATFORM_HERO_IMAGE = '/images/platform/bestelplatform-hero.jpg'
+
+/** Brede hero op /platform/bestelplatform (smartphone bestellen). */
+export const BESTELPLATFORM_PAGE_HERO_IMAGE = '/images/platform/bestelplatform-page-hero.jpg'
 
 /** Volle-breedte hero op /platform/kassasysteem. */
 export const KASSASYSTEEM_HERO_IMAGE = '/images/platform/kassasysteem-hero.png'

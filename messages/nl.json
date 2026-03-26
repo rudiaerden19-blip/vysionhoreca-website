@@ -215,7 +215,47 @@
     "bestelplatform": {
       "title": "Bestelplatform",
       "teaser": "Klanten bestellen online bij jou — zonder tussenpartij die commissie vraagt.",
-      "body": "Afhalen, levering en bestellen aan tafel verlopen via jouw eigen site in jouw huisstijl. Orders komen gestructureerd binnen op kassa en keuken.\n\nZo verwerk je pieken beter en houd je de volledige marge op je online omzet."
+      "body": "Afhalen, levering en bestellen aan tafel verlopen via jouw eigen site in jouw huisstijl. Orders komen gestructureerd binnen op kassa en keuken.\n\nZo verwerk je pieken beter en houd je de volledige marge op je online omzet.",
+      "heroAlt": "Smartphone met online bestellen in een horeca- of kantooromgeving",
+      "featuresTitle": "Jouw bestelplatform",
+      "features": {
+        "ownWebsite": {
+          "title": "Eigen website",
+          "body": "Volledig gepersonaliseerde website met je eigen domeinnaam, inclusief een bestelsysteem dat eenvoudig te beheren is."
+        },
+        "timeSaving": {
+          "title": "Tijdsbesparing",
+          "body": "Minder telefonische bestellingen: je team heeft meer tijd voor bediening en andere taken in de zaak."
+        },
+        "productUpdates": {
+          "title": "Productupdates",
+          "body": "Werk productinfo en prijzen snel bij en voeg nieuwe items toe zonder grote technische inspanning."
+        },
+        "dataAnalytics": {
+          "title": "Data en analyse",
+          "body": "Inzicht in omzet, populaire producten en piekmomenten om voorraad en aanbod slimmer af te stemmen."
+        },
+        "payments": {
+          "title": "Betalingsmogelijkheden",
+          "body": "Klanten betalen veilig online; jij verkort de afhandeling aan de kassa of bij afhalen."
+        },
+        "stockControl": {
+          "title": "Voorraadbeheer",
+          "body": "Houd voorraad en beschikbaarheid bij zodat klanten realistisch zien wat ze kunnen bestellen."
+        },
+        "zeroCommission": {
+          "title": "0% commissie",
+          "body": "Geen externe marketplace: klanten bestellen bij jou en jij behoudt de volledige marge op je online omzet."
+        },
+        "support": {
+          "title": "Ondersteuning",
+          "body": "Ons team helpt met opstart en dagelijkse vragen, zodat je platform betrouwbaar blijft."
+        },
+        "qrOrdering": {
+          "title": "QR-bestellen",
+          "body": "Laat gasten via een QR-code direct vanaf hun telefoon bestellen — ideaal aan tafel of bij afhaal."
+        }
+      }
     },
     "keukenschermen": {
       "title": "Keukenschermen",

@@ -4342,7 +4342,47 @@
     "bestelplatform": {
       "title": "Ordering platform",
       "teaser": "Customers order with you directly — no marketplace taking a cut.",
-      "body": "Pickup, delivery and dine-in flow through your own branded site. Orders land cleanly on POS and kitchen screens.\n\nYou handle spikes better and keep full margin on online sales."
+      "body": "Pickup, delivery and dine-in flow through your own branded site. Orders land cleanly on POS and kitchen screens.\n\nYou handle spikes better and keep full margin on online sales.",
+      "heroAlt": "Smartphone ordering food online at a table with laptop in the background",
+      "featuresTitle": "Your ordering stack",
+      "features": {
+        "ownWebsite": {
+          "title": "Your own website",
+          "body": "A fully branded site on your domain with ordering that is easy to manage day to day."
+        },
+        "timeSaving": {
+          "title": "Save time",
+          "body": "Fewer phone orders means staff can focus on service and other tasks in the venue."
+        },
+        "productUpdates": {
+          "title": "Product updates",
+          "body": "Refresh menus, prices and new items quickly without heavy technical work."
+        },
+        "dataAnalytics": {
+          "title": "Data & insight",
+          "body": "See sales patterns and peaks to tune stock and what you promote."
+        },
+        "payments": {
+          "title": "Payments",
+          "body": "Guests pay securely online for faster checkout at pickup or dine-in."
+        },
+        "stockControl": {
+          "title": "Stock control",
+          "body": "Keep availability accurate so customers only order what you can fulfil."
+        },
+        "zeroCommission": {
+          "title": "0% commission",
+          "body": "No third-party marketplace cut — orders go to you and you keep the margin."
+        },
+        "support": {
+          "title": "Support",
+          "body": "We help with launch and day-to-day questions so the platform stays reliable."
+        },
+        "qrOrdering": {
+          "title": "QR ordering",
+          "body": "Guests scan a QR code and order from their phone — ideal for tables or takeaway."
+        }
+      }
     },
     "keukenschermen": {
       "title": "Kitchen screens",
