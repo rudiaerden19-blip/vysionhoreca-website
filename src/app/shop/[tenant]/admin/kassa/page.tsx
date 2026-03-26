@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { Suspense, useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct, getTenantSettings, TenantSettings } from '@/lib/admin-api'
 import KassaFloorPlan from '@/components/KassaFloorPlan'
 import KassaReservationsView from '@/components/KassaReservationsView'
@@ -28,9 +28,12 @@ interface CartItem {
 
 type OrderType = 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
 
-export default function KassaAdminPage({ params }: { params: { tenant: string } }) {
+function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const demoViewOnly =
+    searchParams.get('demo') === 'bekijk' || searchParams.get('alleen_lezen') === '1'
   const baseUrl = `/shop/${tenant}/admin`
   const { locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
 
@@ -46,12 +49,14 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   // Eén keer per sessie (sessionStorage). Navigeren binnen de kassa toont het NIET opnieuw.
   // Bij nieuwe browsersessie (volgende ochtend) verschijnt het opnieuw.
   const SESSION_KEY = `vysion_kassa_audio_ok_${tenant}`
-  const [soundActivated, setSoundActivated] = useState(() =>
-    typeof window !== 'undefined' && sessionStorage.getItem(`vysion_kassa_audio_ok_${tenant}`) === 'true'
-  )
-  const [showSoundActivation, setShowSoundActivation] = useState(() =>
-    typeof window === 'undefined' ? false : sessionStorage.getItem(`vysion_kassa_audio_ok_${tenant}`) !== 'true'
-  )
+  const [soundActivated, setSoundActivated] = useState(() => {
+    if (demoViewOnly) return true
+    return typeof window !== 'undefined' && sessionStorage.getItem(SESSION_KEY) === 'true'
+  })
+  const [showSoundActivation, setShowSoundActivation] = useState(() => {
+    if (demoViewOnly) return false
+    return typeof window === 'undefined' ? false : sessionStorage.getItem(SESSION_KEY) !== 'true'
+  })
 
   const activateSound = () => {
     try {
@@ -105,6 +110,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
 
   // Alarm blijft spelen zolang er nieuwe bestellingen zijn (exact donor: gebruik ref)
   useEffect(() => {
+    if (demoViewOnly) return
     if (newOrderAlert) {
       if (!alarmIntervalRef.current) startAlarm()
       const verifyInterval = setInterval(() => {
@@ -113,7 +119,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       }, 2000)
       return () => clearInterval(verifyInterval)
     }
-  }, [newOrderAlert, startAlarm])
+  }, [newOrderAlert, startAlarm, demoViewOnly])
 
   // Cleanup alarm bij unmount
   useEffect(() => { return () => { if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current) } }, [])
@@ -125,8 +131,16 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     ;(window as any).isAlarmRunning = () => alarmIntervalRef.current !== null
   }, [stopAlarm, startAlarm])
 
+  useEffect(() => {
+    if (!demoViewOnly) return
+    try {
+      sessionStorage.setItem(SESSION_KEY, 'true')
+    } catch { /* ignore */ }
+  }, [demoViewOnly, SESSION_KEY])
+
   // Poll elke 3 seconden voor nieuwe online bestellingen
   useEffect(() => {
+    if (demoViewOnly) return
     let isFirstCheck = true
     const check = async () => {
       try {
@@ -171,7 +185,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
     check()
     const interval = setInterval(check, 3000)
     return () => clearInterval(interval)
-  }, [tenant, startAlarm, stopAlarm])
+  }, [tenant, startAlarm, stopAlarm, demoViewOnly])
 
   // Menu
   const [categories, setCategories] = useState<MenuCategory[]>([])
@@ -978,7 +992,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────
-  if (showSoundActivation && !soundActivated) {
+  if (showSoundActivation && !soundActivated && !demoViewOnly) {
     return (
       <div className="fixed inset-0 z-[200] bg-gradient-to-br from-[#2D3A52] to-[#5A7BA8] flex flex-col items-center justify-center p-8">
         <div className="text-white text-center max-w-md">
@@ -1005,7 +1019,19 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
   }
 
   return (
-    <div className="flex flex-col bg-[#e3e3e3] overflow-hidden" style={{ height: '100dvh' }}>
+    <div className="flex flex-col" style={{ height: '100dvh' }}>
+      {demoViewOnly && (
+        <div
+          role="status"
+          className="flex-shrink-0 z-[250] bg-amber-500 text-amber-950 px-4 py-2.5 text-center text-sm font-semibold shadow-md"
+        >
+          Demo — alleen bekijken. Je kunt hier niets wijzigen.
+        </div>
+      )}
+      <div
+        className="flex flex-col bg-[#e3e3e3] overflow-hidden flex-1 min-h-0"
+        {...(demoViewOnly ? ({ inert: true } as React.ComponentProps<'div'>) : {})}
+      >
 
       {/* ── Blauwe navigatiebalk — volledige breedte ── */}
       <div className="flex-shrink-0 bg-[#1e293b] flex items-center px-3 gap-2 relative z-30" style={{ height: 68 }}>
@@ -1954,7 +1980,7 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
       })()}
 
       {/* ── ORANJE SCHERM: Nieuwe online bestelling (exact donor) ── */}
-      {newOrderAlert && (
+      {newOrderAlert && !demoViewOnly && (
         <div
           className="fixed inset-0 z-[200] bg-orange-500 flex flex-col items-center justify-center animate-pulse cursor-pointer"
           onClick={() => {
@@ -1977,6 +2003,21 @@ export default function KassaAdminPage({ params }: { params: { tenant: string } 
           </div>
         </div>
       )}
+      </div>
     </div>
+  )
+}
+
+export default function KassaAdminPage(props: { params: { tenant: string } }) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[100dvh] flex items-center justify-center bg-[#e3e3e3] text-gray-600">
+          Laden…
+        </div>
+      }
+    >
+      <KassaAdminPageInner {...props} />
+    </Suspense>
   )
 }

@@ -16,8 +16,7 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/i18n'
 import { PLATFORM_PAGES } from '@/lib/platform-pages'
-
-const LIVE_DEMO_URL = 'https://frituurnolim.ordervysion.com'
+import { demoUrlForPlatformCard } from '@/lib/demo-links'
 
 const ICONS: Record<string, LucideIcon> = {
   kassasysteem: Store,
@@ -82,7 +81,7 @@ export default function PlatformGridSection() {
                     {t(`platform.${msgKey}.teaser`)}
                   </p>
                   <a
-                    href={LIVE_DEMO_URL}
+                    href={demoUrlForPlatformCard(msgKey)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-4 w-full shrink-0 inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent/90 sm:py-3"

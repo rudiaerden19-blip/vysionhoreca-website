@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useLanguage, Locale } from '@/i18n'
+import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
 type Props = {
   onStickyNavChange?: (show: boolean) => void
 }
 
 const HERO_BG = '/images/hero-header.png'
-const LIVE_DEMO_URL = 'https://frituurnolim.ordervysion.com'
 
 export default function HomeLandingHero({ onStickyNavChange }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
@@ -223,7 +223,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
             {t('heroLanding.ctaStartFree')}
           </a>
           <a
-            href={LIVE_DEMO_URL}
+            href={DEMO_HERO_LIVE_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border-2 border-white/90 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors"
