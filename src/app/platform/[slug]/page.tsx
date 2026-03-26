@@ -1,10 +1,11 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Navigation, Footer, PlatformScreenshotGallery } from '@/components'
 import { useLanguage } from '@/i18n'
-import { getPlatformPage } from '@/lib/platform-pages'
+import { BESTELPLATFORM_HERO_IMAGE, getPlatformPage } from '@/lib/platform-pages'
 
 export default function PlatformDetailPage() {
   const params = useParams()
@@ -36,9 +37,26 @@ export default function PlatformDetailPage() {
     <main>
       <Navigation />
       <article className="bg-white">
+        {slug === 'bestelplatform' && (
+          <div className="border-b border-gray-100 bg-gradient-to-b from-gray-50 to-white pt-24 sm:pt-28">
+            <div className="mx-auto max-w-4xl px-4 pb-8 pt-4 sm:px-6">
+              <div className="relative mx-auto aspect-[9/18] w-full max-w-[min(100%,280px)] overflow-hidden rounded-2xl border border-gray-200/80 bg-gray-100 shadow-xl ring-1 ring-black/5 sm:max-w-[300px]">
+                <Image
+                  src={BESTELPLATFORM_HERO_IMAGE}
+                  alt={t('platform.bestelplatform.cardHeaderAlt')}
+                  fill
+                  className="object-cover object-top"
+                  sizes="300px"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div
-          className={`mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 ${
-            slug === 'bestelplatform' ? 'max-w-4xl' : 'max-w-3xl'
+          className={`mx-auto px-4 sm:px-6 lg:px-8 pb-16 ${
+            slug === 'bestelplatform' ? 'max-w-4xl pt-10' : 'max-w-3xl pt-28'
           }`}
         >
           <Link

@@ -1,4 +1,8 @@
 /** Homepage grid + /platform/[slug] detail routes (marketing only). */
+
+/** Gedeelde hero/header voor kaart én detailpagina bestelplatform (schermvoorbeeld app). */
+export const BESTELPLATFORM_HERO_IMAGE = '/images/platform/bestelplatform-hero.png'
+
 export type PlatformPageEntry = {
   slug: string
   msgKey: string
@@ -11,7 +15,7 @@ export const PLATFORM_PAGES: PlatformPageEntry[] = [
   {
     slug: 'bestelplatform',
     msgKey: 'bestelplatform',
-    cardHeaderImage: '/images/platform/card-header-bestelplatform.png',
+    cardHeaderImage: BESTELPLATFORM_HERO_IMAGE,
   },
   { slug: 'keukenschermen', msgKey: 'keukenschermen' },
   { slug: 'online-scherm', msgKey: 'onlineScherm' },
