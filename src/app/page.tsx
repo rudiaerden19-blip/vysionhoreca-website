@@ -1552,11 +1552,8 @@ export default function HomePage() {
       <HomeLandingHero onStickyNavChange={setStickyNav} />
       <PlatformGridSection />
       <OneDayOnlineSection />
-      <IndustrySection />
       <StatsSection />
-      <OrderAppSection />
       <LiveDemoSection />
-      <StopSection />
       <PricingSection />
       <ButWaitSection />
       <ComparisonSection />
