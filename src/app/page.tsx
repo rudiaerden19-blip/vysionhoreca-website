@@ -44,20 +44,20 @@ function WhyVysionSection() {
           </div>
 
           <div className="lg:col-span-7 order-1 lg:order-2 flex justify-center lg:justify-end">
-            <div className="relative w-full max-w-[210px] sm:max-w-[240px] lg:max-w-[230px] xl:max-w-[250px]">
+            <div className="relative w-full max-w-[320px] sm:max-w-[380px] lg:max-w-[400px] xl:max-w-[430px]">
               <div
-                className="absolute -inset-2 rounded-2xl bg-gradient-to-br from-accent/20 via-accent/5 to-transparent opacity-80 blur-sm"
+                className="absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-accent/20 via-accent/5 to-transparent opacity-80 blur-sm sm:-inset-4"
                 aria-hidden
               />
-              <figure className="relative rounded-2xl bg-gray-900/5 p-1.5 sm:p-2 shadow-lg ring-1 ring-black/[0.06]">
-                <div className="relative overflow-hidden rounded-xl bg-[#f5f0e8]">
+              <figure className="relative rounded-2xl sm:rounded-3xl bg-gray-900/5 p-2 sm:p-3 shadow-[0_25px_50px_-15px_rgba(0,0,0,0.2)] ring-1 ring-black/[0.06]">
+                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-[#f5f0e8]">
                   <Image
                     src="/images/why-vysion-pos-mockup.png"
                     alt=""
                     width={819}
                     height={1024}
-                    className="w-full h-auto max-h-[260px] sm:max-h-[280px] lg:max-h-[270px] xl:max-h-[290px] object-contain mx-auto"
-                    sizes="(min-width: 1280px) 250px, (min-width: 1024px) 230px, 90vw"
+                    className="w-full h-auto max-h-[min(92vw,520px)] sm:max-h-[560px] lg:max-h-[580px] object-contain mx-auto"
+                    sizes="(min-width: 1280px) 430px, (min-width: 1024px) 400px, (min-width: 640px) 380px, 320px"
                     priority={false}
                   />
                 </div>
