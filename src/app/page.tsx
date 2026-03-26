@@ -1,37 +1,69 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { LayoutGrid, Headphones, Euro, type LucideIcon } from 'lucide-react'
+import Image from 'next/image'
 import { Navigation, Footer, CookieBanner, HomeLandingHero, PlatformGridSection } from '@/components'
 import { useLanguage } from '@/i18n'
 
 function WhyVysionSection() {
   const { t } = useLanguage()
-  const cards: { key: 'fullPlatform' | 'liveSupport' | 'rightPrice'; Icon: LucideIcon }[] = [
-    { key: 'fullPlatform', Icon: LayoutGrid },
-    { key: 'liveSupport', Icon: Headphones },
-    { key: 'rightPrice', Icon: Euro },
-  ]
+  const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice'] as const
 
   return (
-    <section className="py-14 sm:py-16 bg-white border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-center text-3xl sm:text-4xl font-bold text-gray-900 mb-10 sm:mb-12 tracking-tight">
-          {t('whyVysion.title')}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {cards.map(({ key, Icon }) => (
-            <div
-              key={key}
-              className="rounded-2xl border border-gray-200/80 bg-white p-8 text-center shadow-sm hover:border-accent/30 hover:shadow-md transition-all duration-300"
-            >
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full border-2 border-accent/30 bg-accent/5 text-accent">
-                <Icon className="h-7 w-7" strokeWidth={1.5} aria-hidden />
-              </div>
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3">{t(`whyVysion.${key}.title`)}</h3>
-              <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{t(`whyVysion.${key}.body`)}</p>
+    <section className="relative py-16 sm:py-20 lg:py-24 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
+      <div
+        className="pointer-events-none absolute -right-24 top-1/4 h-72 w-72 rounded-full bg-accent/[0.08] blur-3xl sm:h-96 sm:w-96"
+        aria-hidden
+      />
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+          <div className="lg:col-span-5 order-2 lg:order-1">
+            <h2 className="text-3xl sm:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-[1.15] mb-10 sm:mb-12 text-center lg:text-left max-w-xl lg:mx-0 mx-auto">
+              {t('whyVysion.title')}
+            </h2>
+            <ul className="space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0">
+              {pointKeys.map((key, i) => (
+                <li key={key} className="flex gap-4 sm:gap-5">
+                  <span
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent/12 text-sm font-bold tabular-nums text-accent ring-1 ring-accent/20"
+                    aria-hidden
+                  >
+                    {i + 1}
+                  </span>
+                  <div className="min-w-0 pt-0.5">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-snug">
+                      {t(`whyVysion.${key}.title`)}
+                    </h3>
+                    <p className="text-sm sm:text-base text-gray-600 leading-relaxed border-l-2 border-accent/25 pl-4">
+                      {t(`whyVysion.${key}.body`)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-7 order-1 lg:order-2">
+            <div className="relative mx-auto max-w-2xl lg:max-w-none">
+              <div
+                className="absolute -inset-3 rounded-[1.75rem] bg-gradient-to-br from-accent/20 via-accent/5 to-transparent opacity-80 blur-sm sm:-inset-4"
+                aria-hidden
+              />
+              <figure className="relative rounded-2xl sm:rounded-3xl bg-gray-900/5 p-2 sm:p-3 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.18)] ring-1 ring-black/[0.06]">
+                <div className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-gray-100">
+                  <Image
+                    src="/images/online-order-platform-1.png"
+                    alt=""
+                    width={1200}
+                    height={800}
+                    className="w-full h-auto object-cover"
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    priority={false}
+                  />
+                </div>
+              </figure>
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </section>
