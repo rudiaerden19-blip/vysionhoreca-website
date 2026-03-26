@@ -778,23 +778,24 @@ function TableKioskSection() {
   return (
     <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden" aria-labelledby="table-kiosk-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-stretch">
-          <div className="relative w-full aspect-[4/3] lg:aspect-auto lg:min-h-[420px] rounded-3xl overflow-hidden shadow-2xl">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
+          <div className="w-full rounded-3xl bg-[#e3e3e3] p-4 sm:p-6 shadow-xl ring-1 ring-black/[0.06]">
             <Image
-              src="/images/tafel-kiosk.png"
+              src="/images/table-kiosk-device.png"
               alt={t('tableKiosk.imageAlt')}
-              fill
-              className="object-cover object-center"
-              sizes="(min-width: 1024px) 50vw, 100vw"
+              width={804}
+              height={610}
+              className="w-full h-auto max-h-[min(85vw,480px)] sm:max-h-[440px] lg:max-h-[500px] object-contain mx-auto"
+              sizes="(min-width: 1024px) 45vw, 100vw"
             />
           </div>
 
-          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-xl flex flex-col justify-center">
+          <div className="flex flex-col justify-center py-2 lg:py-4">
             <h2 id="table-kiosk-heading" className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
               {t('tableKiosk.title')}
             </h2>
             <p className="text-accent text-xl sm:text-2xl font-bold mb-6">{t('tableKiosk.subtitle')}</p>
-            <p className="text-gray-600 text-base sm:text-lg leading-relaxed mb-10">{t('tableKiosk.body')}</p>
+            <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-10">{t('tableKiosk.body')}</p>
             <ul className="space-y-4">
               {featureKeys.map((key) => (
                 <li key={key} className="flex items-start gap-3">
@@ -807,7 +808,7 @@ function TableKioskSection() {
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-gray-700 text-base sm:text-lg leading-snug">{t(`tableKiosk.features.${key}`)}</span>
+                  <span className="text-gray-800 text-base sm:text-lg leading-snug">{t(`tableKiosk.features.${key}`)}</span>
                 </li>
               ))}
             </ul>
