@@ -197,7 +197,7 @@ function StatsAndLiveDemoSection() {
   const { t } = useLanguage()
 
   const stats = [
-    { value: 2.5, prefix: '€', suffix: 'M+', labelKey: 'stats.processed' },
+    { value: 250_000, prefix: '', suffix: '+', labelKey: 'stats.processed' },
     { value: 132, prefix: '', suffix: '', labelKey: 'stats.businesses' },
     { value: 99.9, prefix: '', suffix: '%', labelKey: 'stats.uptime' },
     { value: 24, prefix: '', suffix: '/7', labelKey: 'stats.support' },
