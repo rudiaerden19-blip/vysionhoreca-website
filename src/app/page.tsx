@@ -775,15 +775,15 @@ function ButWaitSection() {
 
         {/* Content Grid */}
         <div className="grid lg:grid-cols-2 gap-12 items-stretch">
-          {/* Left - Image */}
-          <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] w-full max-h-[min(100vw,520px)]">
+          {/* Left - Image: h-full laat de foto zo hoog als het witte kaartblok (grid stretch), geen starre max-h */}
+          <div className="relative w-full min-h-[340px] sm:min-h-[420px] h-full rounded-3xl overflow-hidden shadow-2xl">
             <Image
               src="/images/entrepreneur.jpg"
               alt="Ondernemer werkt met Vysion"
               fill
-              sizes="(min-width: 1024px) 45vw, 95vw"
+              sizes="(min-width: 1024px) 50vw, 100vw"
               loading="lazy"
-              className="object-cover"
+              className="object-cover object-center"
             />
           </div>
 
