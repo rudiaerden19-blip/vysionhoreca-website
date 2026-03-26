@@ -32,7 +32,7 @@ const ICONS: Record<string, LucideIcon> = {
 }
 
 const cardShellClasses =
-  'group flex min-h-[300px] sm:min-h-[320px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-sm transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
+  'group flex min-h-[300px] sm:min-h-[320px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-[0_32px_80px_-16px_rgba(15,23,42,0.26),0_16px_44px_-10px_rgba(15,23,42,0.16),0_6px_22px_rgba(15,23,42,0.09)] transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
 
 export default function PlatformGridSection() {
   const { t } = useLanguage()
@@ -85,7 +85,7 @@ export default function PlatformGridSection() {
                     href={demoUrlForPlatformCard(msgKey)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-4 w-full shrink-0 inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:bg-accent/90 sm:py-3"
+                    className="mt-4 w-full shrink-0 inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-center text-sm font-semibold text-white shadow-[0_18px_40px_-10px_rgba(15,23,42,0.28),0_8px_20px_-6px_rgba(15,23,42,0.16)] transition-colors hover:bg-accent/90 sm:py-3"
                   >
                     {t('platform.gridTestCta')}
                   </a>

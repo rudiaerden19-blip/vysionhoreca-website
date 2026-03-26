@@ -103,7 +103,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto lg:ml-0">
             <a
               href="/#contact"
-              className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-md transition-colors"
+              className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-[0_20px_44px_-10px_rgba(15,23,42,0.26),0_8px_20px_-6px_rgba(15,23,42,0.15)] transition-colors"
             >
               {t('heroLanding.demoRequest')}
             </a>
@@ -218,7 +218,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
         <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
           <a
             href={`/registreer?lang=${locale}`}
-            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-lg transition-colors"
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)] transition-colors"
           >
             {t('heroLanding.ctaStartFree')}
           </a>

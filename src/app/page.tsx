@@ -45,7 +45,7 @@ function WhyVysionSection() {
           </div>
 
           <div className="flex min-h-[260px] lg:min-h-0 h-full order-1 lg:order-2 lg:mt-[2cm] lg:self-start">
-            <div className="relative w-full flex-1 min-h-[280px] lg:min-h-full rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/[0.08] bg-[#141414]">
+            <div className="relative w-full flex-1 min-h-[280px] lg:min-h-full rounded-3xl overflow-hidden shadow-[0_36px_90px_-18px_rgba(15,23,42,0.32),0_18px_48px_-12px_rgba(15,23,42,0.2),0_8px_24px_rgba(15,23,42,0.12)] ring-1 ring-black/[0.08] bg-[#141414]">
               <Image
                 src="/images/why-vysion-kiosk.png"
                 alt={t('whyVysion.imageAlt')}
@@ -74,7 +74,7 @@ function NewAtVysionSection() {
         <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-10">{t('newAtVysion.body')}</p>
         <a
           href="#contact"
-          className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors"
+          className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)]"
         >
           {t('newAtVysion.cta')}
         </a>
@@ -124,7 +124,7 @@ function OneDayOnlineSection() {
         <div className="text-center mt-12">
           <a 
             href={`/registreer?lang=${locale}`}
-            className="inline-block bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-full font-semibold text-lg transition-colors"
+            className="inline-block bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-full font-semibold text-lg transition-colors shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)]"
           >
             {t('oneDayOnline.cta')}
           </a>
@@ -281,7 +281,7 @@ function StatsAndLiveDemoSection() {
           href={DEMO_HERO_LIVE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-[0_0_30px_rgba(234,88,12,0.4)] hover:shadow-[0_0_50px_rgba(234,88,12,0.6)] hover:scale-105"
+          className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-[0_32px_80px_-16px_rgba(15,23,42,0.28),0_14px_38px_-10px_rgba(15,23,42,0.17)] hover:shadow-[0_0_50px_rgba(234,88,12,0.6)] hover:scale-105"
         >
           <span>{t('liveDemo.cta')}</span>
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -365,7 +365,7 @@ function OrderAppSection() {
           {images.map((src, index) => (
             <div
               key={index}
-              className="transition-all duration-700 ease-out cursor-pointer aspect-[9/16] relative overflow-hidden rounded-2xl bg-gray-300"
+              className="transition-all duration-700 ease-out cursor-pointer aspect-[9/16] relative overflow-hidden rounded-2xl bg-gray-300 shadow-[0_32px_80px_-16px_rgba(15,23,42,0.26),0_16px_44px_-10px_rgba(15,23,42,0.16),0_6px_22px_rgba(15,23,42,0.09)]"
               style={{
                 opacity: visibleImages.includes(index) ? 1 : 0,
                 transform: visibleImages.includes(index) ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.95)',
@@ -448,7 +448,7 @@ function OrderAppSection() {
         <div className="text-center mt-12">
           <a
             href="#contact"
-            className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-lg"
+            className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)]"
           >
             {t('orderApp.cta')}
           </a>
@@ -514,7 +514,7 @@ function PricingSection() {
 
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-6 lg:gap-8">
           {/* Starter */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-[0_32px_80px_-16px_rgba(15,23,42,0.24),0_16px_44px_-10px_rgba(15,23,42,0.15)] overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-6 lg:p-8">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
@@ -562,7 +562,7 @@ function PricingSection() {
           </div>
 
           {/* Pro */}
-          <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-md overflow-hidden relative hover:shadow-lg transition-shadow">
+          <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-[0_36px_88px_-18px_rgba(15,23,42,0.28),0_18px_48px_-12px_rgba(15,23,42,0.18)] overflow-hidden relative hover:shadow-lg transition-shadow">
             <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide">
               {t('pricing.popular')}
             </div>
@@ -760,7 +760,7 @@ function StopSection() {
           </div>
           <a
             href={`/registreer?lang=${locale}`}
-            className="inline-block bg-accent text-white px-8 sm:px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-[0_0_30px_rgba(234,88,12,0.5)] hover:shadow-[0_0_50px_rgba(234,88,12,0.7)] hover:scale-105"
+            className="inline-block bg-accent text-white px-8 sm:px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-[0_32px_80px_-16px_rgba(15,23,42,0.28),0_14px_38px_-10px_rgba(15,23,42,0.17)] hover:shadow-[0_0_50px_rgba(234,88,12,0.7)] hover:scale-105"
           >
             {t('stop.cta')}
           </a>
@@ -796,7 +796,7 @@ function ButWaitSection() {
         {/* Content Grid */}
         <div className="grid lg:grid-cols-2 gap-12 items-stretch">
           {/* Left - Image: h-full laat de foto zo hoog als het witte kaartblok (grid stretch), geen starre max-h */}
-          <div className="relative w-full min-h-[340px] sm:min-h-[420px] h-full rounded-3xl overflow-hidden shadow-2xl">
+          <div className="relative w-full min-h-[340px] sm:min-h-[420px] h-full rounded-3xl overflow-hidden shadow-[0_36px_90px_-18px_rgba(15,23,42,0.3),0_18px_48px_-12px_rgba(15,23,42,0.19),0_8px_24px_rgba(15,23,42,0.11)]">
             <Image
               src="/images/entrepreneur.jpg"
               alt="Ondernemer werkt met Vysion"
@@ -808,7 +808,7 @@ function ButWaitSection() {
           </div>
 
           {/* Right - Features List */}
-          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-xl flex flex-col justify-center">
+          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-[0_36px_90px_-18px_rgba(15,23,42,0.28),0_18px_48px_-12px_rgba(15,23,42,0.18)] flex flex-col justify-center">
             <h3 className="text-accent text-2xl sm:text-3xl font-bold mb-10">{t('butWait.boxTitle')}</h3>
             <ul className="space-y-4">
               {featureKeys.map((key) => (
@@ -835,7 +835,7 @@ function TableKioskSection() {
     <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden" aria-labelledby="table-kiosk-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-          <div className="w-full rounded-3xl bg-[#e3e3e3] p-4 sm:p-6 shadow-xl ring-1 ring-black/[0.06]">
+          <div className="w-full rounded-3xl bg-[#e3e3e3] p-4 sm:p-6 shadow-[0_36px_90px_-18px_rgba(15,23,42,0.27),0_18px_48px_-12px_rgba(15,23,42,0.17)] ring-1 ring-black/[0.06]">
             <Image
               src="/images/table-kiosk-device.png"
               alt={t('tableKiosk.imageAlt')}
@@ -1011,7 +1011,7 @@ function IndustrySection() {
             </p>
             <a
               href={`/registreer?lang=${locale}`}
-              className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all"
+              className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-[0_24px_52px_-12px_rgba(15,23,42,0.26),0_10px_26px_-8px_rgba(15,23,42,0.16)]"
             >
               {t('industry.tryFree')}
             </a>
@@ -1025,7 +1025,7 @@ function IndustrySection() {
                   {current.images.map((img, idx) => (
                     <div
                       key={idx}
-                      className="relative w-full h-28 sm:h-36 rounded-xl shadow-lg overflow-hidden cursor-pointer border-2 border-gray-100 hover:scale-[1.02] transition-transform"
+                      className="relative w-full h-28 sm:h-36 rounded-xl shadow-[0_28px_70px_-14px_rgba(15,23,42,0.24),0_12px_32px_-8px_rgba(15,23,42,0.14)] overflow-hidden cursor-pointer border-2 border-gray-100 hover:scale-[1.02] transition-transform"
                     >
                       <Image
                         src={img}
@@ -1073,7 +1073,7 @@ function IndustrySection() {
                 height={1200}
                 sizes="(min-width: 1024px) 660px, 90vw"
                 loading="lazy"
-                className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-xl cursor-pointer mx-auto"
+                className="w-full max-w-[600px] lg:max-w-none lg:scale-110 h-auto object-contain rounded-2xl shadow-[0_36px_88px_-18px_rgba(15,23,42,0.28),0_18px_44px_-12px_rgba(15,23,42,0.17)] cursor-pointer mx-auto"
                 onClick={() => openLightbox(0)}
               />
             )}
@@ -1202,7 +1202,7 @@ function TestimonialSection() {
           >
             {testimonialKeys.map((key, index) => (
               <div key={index} className="w-full flex-shrink-0 px-4">
-                <div className="bg-white rounded-2xl p-8 shadow-sm max-w-2xl mx-auto">
+                <div className="bg-white rounded-2xl p-8 shadow-[0_36px_90px_-18px_rgba(15,23,42,0.26),0_18px_44px_-12px_rgba(15,23,42,0.16)] max-w-2xl mx-auto">
                   <div className="flex mb-4 justify-center">
                     {[...Array(5)].map((_, i) => (
                       <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -1437,7 +1437,7 @@ function ContactSection() {
                 <button 
                   type="submit"
                   disabled={status === 'loading'}
-                  className="w-full bg-accent hover:bg-accent/90 text-white py-4 rounded-lg font-semibold transition-colors disabled:bg-accent/50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="w-full bg-accent hover:bg-accent/90 text-white py-4 rounded-lg font-semibold transition-colors disabled:bg-accent/50 disabled:cursor-not-allowed flex items-center justify-center shadow-[0_24px_50px_-12px_rgba(15,23,42,0.26),0_10px_24px_-8px_rgba(15,23,42,0.15)]"
                 >
                   {status === 'loading' ? (
                     <>

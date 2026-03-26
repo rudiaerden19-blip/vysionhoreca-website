@@ -76,7 +76,10 @@
   border-radius: 1rem;
   background: #fff;
   padding: 1rem 1rem 0.875rem;
-  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 32px 80px -16px rgba(15, 23, 42, 0.24),
+    0 16px 44px -10px rgba(15, 23, 42, 0.15),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
 }
 
 .partner-success-card .partner-success-logo {
@@ -278,6 +281,9 @@ input[type="number"] {
 
 .btn-primary {
   @apply bg-accent text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-semibold text-base md:text-lg transition-all duration-300;
+  box-shadow:
+    0 22px 50px -12px rgba(15, 23, 42, 0.24),
+    0 10px 26px -8px rgba(15, 23, 42, 0.15);
 }
 
 .btn-primary:hover {
