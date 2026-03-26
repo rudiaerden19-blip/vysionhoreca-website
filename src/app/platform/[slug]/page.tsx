@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { Navigation, Footer } from '@/components'
+import { Navigation, Footer, PlatformScreenshotGallery } from '@/components'
 import { useLanguage } from '@/i18n'
 import { getPlatformPage } from '@/lib/platform-pages'
 
@@ -36,7 +36,11 @@ export default function PlatformDetailPage() {
     <main>
       <Navigation />
       <article className="bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
+        <div
+          className={`mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 ${
+            slug === 'bestelplatform' ? 'max-w-4xl' : 'max-w-3xl'
+          }`}
+        >
           <Link
             href="/#platform"
             className="inline-block text-accent font-semibold text-sm mb-8 hover:underline"
@@ -52,6 +56,16 @@ export default function PlatformDetailPage() {
               </p>
             ))}
           </div>
+
+          {slug === 'bestelplatform' && (
+            <PlatformScreenshotGallery
+              images={[
+                { src: '/images/platform/bestelplatform-1.png', alt: t('platform.bestelplatform.galleryAlt1') },
+                { src: '/images/platform/bestelplatform-2.png', alt: t('platform.bestelplatform.galleryAlt2') },
+              ]}
+            />
+          )}
+
           <div className="mt-12 flex flex-wrap gap-4">
             <a
               href={`/registreer?lang=${locale}`}

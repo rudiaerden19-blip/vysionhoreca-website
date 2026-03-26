@@ -4239,7 +4239,9 @@
     "bestelplatform": {
       "title": "Ordering platform",
       "teaser": "Customers order with you directly — no marketplace taking a cut.",
-      "body": "Pickup, delivery and dine-in flow through your own branded site. Orders land cleanly on POS and kitchen screens.\n\nYou handle spikes better and keep full margin on online sales."
+      "body": "Pickup, delivery and dine-in flow through your own branded site. Orders land cleanly on POS and kitchen screens.\n\nYou handle spikes better and keep full margin on online sales.",
+      "galleryAlt1": "Ordering app screenshots: fries menu, sandwiches and options.",
+      "galleryAlt2": "Ordering app screenshots: snacks, checkout and pickup or delivery."
     },
     "keukenschermen": {
       "title": "Kitchen screens",
@@ -4280,6 +4282,11 @@
       "title": "Cost calculator",
       "teaser": "Cost per portion to price with confidence.",
       "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts."
-    }
+    },
+    "galleryHint": "Click the image to enlarge. Use the arrows to browse.",
+    "galleryPrev": "Previous image",
+    "galleryNext": "Next image",
+    "galleryClose": "Close",
+    "galleryOpen": "Enlarge image"
   }
 }

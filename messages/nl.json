@@ -136,7 +136,9 @@
     "bestelplatform": {
       "title": "Bestelplatform",
       "teaser": "Klanten bestellen online bij jou — zonder tussenpartij die commissie vraagt.",
-      "body": "Afhalen, levering en bestellen aan tafel verlopen via jouw eigen site in jouw huisstijl. Orders komen gestructureerd binnen op kassa en keuken.\n\nZo verwerk je pieken beter en houd je de volledige marge op je online omzet."
+      "body": "Afhalen, levering en bestellen aan tafel verlopen via jouw eigen site in jouw huisstijl. Orders komen gestructureerd binnen op kassa en keuken.\n\nZo verwerk je pieken beter en houd je de volledige marge op je online omzet.",
+      "galleryAlt1": "Schermvoorbeelden online bestelplatform: menu frites, broodjes en opties.",
+      "galleryAlt2": "Schermvoorbeelden online bestelplatform: snacks, afrekenen en afhalen of levering."
     },
     "keukenschermen": {
       "title": "Keukenschermen",
@@ -177,7 +179,12 @@
       "title": "Kostencalculator",
       "teaser": "Kostprijs per portie berekenen om verkoopprijzen scherp te zetten.",
       "body": "Ingredienten, porties en verlies meenemen in je kostprijs helpt prijzen verdedigen en marge te beschermen.\n\nZie snel welke items te weinig of te veel marge geven — en stuur je menu bij op basis van feiten."
-    }
+    },
+    "galleryHint": "Klik op de afbeelding om te vergroten. Gebruik de pijlen links en rechts om te bladeren.",
+    "galleryPrev": "Vorige afbeelding",
+    "galleryNext": "Volgende afbeelding",
+    "galleryClose": "Sluiten",
+    "galleryOpen": "Vergroot afbeelding"
   },
   "stats": {
     "processed": "Verwerkt per maand",
