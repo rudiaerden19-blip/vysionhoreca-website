@@ -102,6 +102,10 @@ export default function PlatformGridSection() {
             )
           })}
         </div>
+
+        <p className="mt-10 sm:mt-12 text-center text-sm sm:text-base text-gray-600 max-w-5xl mx-auto leading-snug">
+          {t('platform.gridTrustLine')}
+        </p>
       </div>
     </section>
   )
