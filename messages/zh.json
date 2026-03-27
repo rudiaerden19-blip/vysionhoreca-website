@@ -168,13 +168,48 @@
     "clientsLead": "这些客户已经走在了您前面",
     "marquee": "餐饮 · 炸薯条店 · 餐厅 · 咖啡馆 · 肉铺 · 面包房 · 宴会服务 · 餐吧 · 三明治 · 酒庄 · 酒店 · Vysion Horeca · ",
     "successStories": {
-      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metricHighlight": "+34%", "metricDetail": "新平台上线后的线上订单", "credibility": "3 个月内" },
-      "broodZo": { "name": "Brood & Zo", "metricHighlight": "+€1,750", "metricDetail": "旺季月均额外收入", "credibility": "零佣金" },
-      "broodjesbar": { "name": "BROODJESBAR by Danver", "metricHighlight": "−25%", "metricDetail": "午市高峰电话量", "credibility": "自营外卖页面上线后" },
-      "saintGermain": { "name": "Frituur Saint Germain", "metricHighlight": "+28%", "metricDetail": "应用内复购带来的常客", "credibility": "2 个月内" },
-      "frituurAnn": { "name": "Frituur Ann", "metricHighlight": "+€2,050", "metricDetail": "相同营业日（切换前后）", "credibility": "从 Takeaway 迁移后" },
-      "butcher": { "name": "Butcher meat shop", "metricHighlight": "+36%", "metricDetail": "网店订单", "credibility": "零佣金" },
-      "seelen": { "name": "Slagerij Seelen Traiteur", "metricHighlight": "−32%", "metricDetail": "订单错误与柜台排队", "credibility": "一次培训后" }
+      "vivaldi": {
+        "name": "VIVALDI 2.0 Food & Drinks",
+        "metricHighlight": "+34%",
+        "metricDetail": "新平台上线后的线上订单",
+        "credibility": "3 个月内"
+      },
+      "broodZo": {
+        "name": "Brood & Zo",
+        "metricHighlight": "+€1,750",
+        "metricDetail": "旺季月均额外收入",
+        "credibility": "零佣金"
+      },
+      "broodjesbar": {
+        "name": "BROODJESBAR by Danver",
+        "metricHighlight": "−25%",
+        "metricDetail": "午市高峰电话量",
+        "credibility": "自营外卖页面上线后"
+      },
+      "saintGermain": {
+        "name": "Frituur Saint Germain",
+        "metricHighlight": "+28%",
+        "metricDetail": "应用内复购带来的常客",
+        "credibility": "2 个月内"
+      },
+      "frituurAnn": {
+        "name": "Frituur Ann",
+        "metricHighlight": "+€2,050",
+        "metricDetail": "相同营业日（切换前后）",
+        "credibility": "从 Takeaway 迁移后"
+      },
+      "butcher": {
+        "name": "Butcher meat shop",
+        "metricHighlight": "+36%",
+        "metricDetail": "网店订单",
+        "credibility": "零佣金"
+      },
+      "seelen": {
+        "name": "Slagerij Seelen Traiteur",
+        "metricHighlight": "−32%",
+        "metricDetail": "订单错误与柜台排队",
+        "credibility": "一次培训后"
+      }
     }
   },
   "butWait": {
@@ -1969,7 +2004,31 @@
     "onlineShopToggle": "网店开启/关闭"
   },
   "mediaPicker": {
-    "choosePhoto": "选择照片"
+    "choosePhoto": "选择照片",
+    "pickFromFilesTitle": "选择照片",
+    "pickFromFilesSubtitle": "从相册",
+    "takePhotoTitle": "拍照",
+    "takePhotoSubtitle": "使用相机",
+    "fromLibraryTitle": "从图库选择",
+    "fromLibrarySubtitle": "已有照片",
+    "uploading": "上传中...",
+    "errorHeading": "错误：",
+    "modalTitle": "选择照片",
+    "uploadNewPhoto": "上传新照片",
+    "allCategories": "全部",
+    "loading": "加载中...",
+    "noPhotosTitle": "还没有照片",
+    "noPhotosBody": "上传您的第一张照片",
+    "uploadPhotoCta": "上传照片",
+    "defaultPhotoName": "照片",
+    "noFileSelected": "未选择文件",
+    "dbNotConnected": "数据库未连接",
+    "unknownError": "未知错误",
+    "confirmDeletePhoto": "确定要删除这张照片吗？",
+    "deleteDbError": "从数据库删除失败",
+    "deleteErrorPrefix": "删除时出错：",
+    "selectedImageAlt": "所选图片",
+    "uploadErrorPrefix": "上传错误："
   },
   "marketingQr": {
     "title": "二维码",
@@ -4133,19 +4192,58 @@
     "videoCountMany": "{{count}} 个视频",
     "comingSoon": " — 即将上线",
     "cats": {
-      "registreren": { "title": "注册", "desc": "创建账户并了解管理后台" },
-      "modules": { "title": "概览", "desc": "订单屏幕、分析、销售等" },
-      "instellingen": { "title": "设置", "desc": "配置您的网店" },
-      "menu": { "title": "菜单", "desc": "管理商品、分类与选项" },
-      "whatsapp-bestellingen": { "title": "WhatsApp 订单", "desc": "接收并管理 WhatsApp 订单" },
-      "personeel": { "title": "员工", "desc": "管理员工、工时与招聘" },
-      "kostenberekening": { "title": "成本计算", "desc": "计算原料与商品价格" },
-      "z-rapporten": { "title": "Z 报表", "desc": "日报与日结" },
-      "bestellingen": { "title": "订单", "desc": "管理订单与预订" },
-      "groepsbestellingen": { "title": "团购", "desc": "管理团体订单" },
-      "bonnenprinter": { "title": "票据打印机", "desc": "设置并使用票据打印机" },
-      "de-website": { "title": "您的网站", "desc": "管理并自定义网站" },
-      "de-shop": { "title": "商店", "desc": "设置并管理网店" }
+      "registreren": {
+        "title": "注册",
+        "desc": "创建账户并了解管理后台"
+      },
+      "modules": {
+        "title": "概览",
+        "desc": "订单屏幕、分析、销售等"
+      },
+      "instellingen": {
+        "title": "设置",
+        "desc": "配置您的网店"
+      },
+      "menu": {
+        "title": "菜单",
+        "desc": "管理商品、分类与选项"
+      },
+      "whatsapp-bestellingen": {
+        "title": "WhatsApp 订单",
+        "desc": "接收并管理 WhatsApp 订单"
+      },
+      "personeel": {
+        "title": "员工",
+        "desc": "管理员工、工时与招聘"
+      },
+      "kostenberekening": {
+        "title": "成本计算",
+        "desc": "计算原料与商品价格"
+      },
+      "z-rapporten": {
+        "title": "Z 报表",
+        "desc": "日报与日结"
+      },
+      "bestellingen": {
+        "title": "订单",
+        "desc": "管理订单与预订"
+      },
+      "groepsbestellingen": {
+        "title": "团购",
+        "desc": "管理团体订单"
+      },
+      "bonnenprinter": {
+        "title": "票据打印机",
+        "desc": "设置并使用票据打印机"
+      },
+      "de-website": {
+        "title": "您的网站",
+        "desc": "管理并自定义网站"
+      },
+      "de-shop": {
+        "title": "商店",
+        "desc": "设置并管理网店"
+      }
     },
     "v": {
       "registratie1": "注册",
@@ -4337,7 +4435,7 @@
     "bannerEigen": "暂时关闭"
   },
   "whyVysion": {
-    "title": "Why\u00a0choose\u00a0Vysion",
+    "title": "Why choose Vysion",
     "imageAlt": "Vysion 触屏桌面终端",
     "fullPlatform": {
       "title": "Full platform",
@@ -4501,5 +4599,91 @@
     "galleryNext": "Next image",
     "galleryClose": "Close",
     "galleryOpen": "Enlarge image"
+  },
+  "ui": {
+    "ariaPrevImage": "上一张图片",
+    "ariaNextImage": "下一张图片",
+    "ariaClose": "关闭",
+    "ariaPrev": "上一个",
+    "ariaNext": "下一个",
+    "ariaPrevReview": "上一条评价",
+    "ariaNextReview": "下一条评价",
+    "ariaToggleMenu": "打开或关闭菜单",
+    "ariaMain": "主要内容",
+    "ariaNavMenu": "菜单",
+    "delete": "删除",
+    "edit": "编辑",
+    "zoomOut": "缩小（显示更多）",
+    "zoomIn": "放大（显示更少）",
+    "dragToReorder": "拖动排序",
+    "printReceipt": "打印小票",
+    "voiceOrder": "语音点餐",
+    "viewInvoice": "查看发票",
+    "linkInvoicePdf": "关联PDF发票",
+    "viewInvoicePdf": "查看发票PDF",
+    "clickToEditName": "点击编辑名称",
+    "countCashPlaceholder": "输入清点金额…",
+    "typeDeleteConfirm": "删除",
+    "promoCodeExample": "优惠10",
+    "stripePkPlaceholder": "pk_live_…",
+    "stripeSkPlaceholder": "sk_live_…",
+    "stripeWhsecPlaceholder": "whsec_…",
+    "ipExamplePlaceholder": "例如 192.168.1.100",
+    "closingNotePlaceholder": "例如 私事、维护…",
+    "holidayNotePlaceholder": "例如 假期、装修…",
+    "newPinPlaceholder": "新PIN",
+    "confirmPinPlaceholder": "确认PIN",
+    "ownerEmailPlaceholder": "owner@email.com",
+    "minPasswordPlaceholder": "至少8个字符",
+    "repeatPasswordPlaceholder": "重复密码",
+    "slideLabel": "幻灯片 {{n}}",
+    "productLabel": "商品 {{n}}",
+    "vatPlaceholder": "BE0123456789",
+    "facebookUrlPlaceholder": "https://facebook.com/…",
+    "instagramUrlPlaceholder": "https://instagram.com/…",
+    "tiktokUrlPlaceholder": "https://tiktok.com/@…",
+    "websiteUrlPlaceholder": "https://…",
+    "exampleDishPlaceholder": "例如 自制意面",
+    "exampleFishPlaceholder": "例如 新鲜鱼类",
+    "exampleBreadPlaceholder": "例如 手工面包",
+    "exampleBusinessPlaceholder": "例如 示例餐饮店",
+    "exampleShopEmailPlaceholder": "info@yourshop.cn",
+    "exampleSmtpPlaceholder": "例如 smtp.provider.cn",
+    "reservationNamePlaceholder": "王小明",
+    "reservationEmailPlaceholder": "wang@email.cn",
+    "reservationNotesPlaceholder": "过敏、儿童椅、轮椅、其他要求…",
+    "newCategoryPlaceholder": "新分类名称…",
+    "sendPaymentReminder": "发送付款提醒",
+    "tenantSlugPlaceholder": "my-venue",
+    "tenantNamePlaceholder": "示例咖啡厅",
+    "tenantEmailPlaceholder": "info@example.cn",
+    "superadminLoginPlaceholder": "admin@vysionhoreca.com",
+    "invoiceEmailPlaceholder": "invoice@company.cn",
+    "companyLegalPlaceholder": "示例有限公司",
+    "companyVatPlaceholder": "BE0123456789",
+    "firstNamePlaceholder": "明",
+    "lastNamePlaceholder": "王",
+    "exampleEmailPlaceholder": "wang@example.cn",
+    "lightboxImageAlt": "放大视图"
+  },
+  "pinGate": {
+    "incorrectPin": "PIN 错误，请重试。",
+    "invalidPin": "请输入有效的 4 位 PIN",
+    "pinMismatch": "两次 PIN 不一致",
+    "emailMismatch": "邮箱不匹配",
+    "noAccessTitle": "无访问权限",
+    "noAccessBody1": "您无权访问此模块。",
+    "noAccessBody2": "如果您是店主，请先在以下位置创建 PIN",
+    "kassaPinLink": "收银台 → PIN",
+    "back": "← 返回",
+    "forgotTitle": "忘记 PIN",
+    "forgotEmailHelp": "确认店主邮箱",
+    "confirm": "确认",
+    "newPinHelp": "设置新的 4 位 PIN",
+    "saving": "保存中...",
+    "saveNewPin": "保存新 PIN",
+    "ownerPinTitle": "店主 PIN",
+    "enterPinHelp": "输入您的 4 位 PIN",
+    "forgotLink": "忘记 PIN？"
   }
 }

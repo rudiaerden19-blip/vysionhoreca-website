@@ -168,13 +168,48 @@
     "clientsLead": "Ces clients vous ont précédé",
     "marquee": "Horeca · Friterie · Restaurant · Café · Boucherie · Boulangerie · Traiteur · Brasserie · Sandwicherie · Bar à vins · Hôtel · Vysion Horeca · ",
     "successStories": {
-      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metricHighlight": "+34 %", "metricDetail": "de commandes en ligne depuis la nouvelle plateforme", "credibility": "en 3 mois" },
-      "broodZo": { "name": "Brood & Zo", "metricHighlight": "+1 750 €", "metricDetail": "de CA mensuel en plus en moyenne (haute saison)", "credibility": "sans commissions" },
-      "broodjesbar": { "name": "BROODJESBAR by Danver", "metricHighlight": "−25 %", "metricDetail": "d’appels en moins au pic du midi", "credibility": "depuis la page takeaway dédiée" },
-      "saintGermain": { "name": "Frituur Saint Germain", "metricHighlight": "+28 %", "metricDetail": "de clients réguliers via commandes répétées dans l’app", "credibility": "en 2 mois" },
-      "frituurAnn": { "name": "Frituur Ann", "metricHighlight": "+2 050 €", "metricDetail": "sur les mêmes jours d’ouverture (avant/après Vysion)", "credibility": "après migration depuis Takeaway" },
-      "butcher": { "name": "Butcher meat shop", "metricHighlight": "+36 %", "metricDetail": "de commandes via la boutique en ligne", "credibility": "sans commissions" },
-      "seelen": { "name": "Slagerij Seelen Traiteur", "metricHighlight": "−32 %", "metricDetail": "d’erreurs de commande et file plus courte au comptoir", "credibility": "après une session de formation" }
+      "vivaldi": {
+        "name": "VIVALDI 2.0 Food & Drinks",
+        "metricHighlight": "+34 %",
+        "metricDetail": "de commandes en ligne depuis la nouvelle plateforme",
+        "credibility": "en 3 mois"
+      },
+      "broodZo": {
+        "name": "Brood & Zo",
+        "metricHighlight": "+1 750 €",
+        "metricDetail": "de CA mensuel en plus en moyenne (haute saison)",
+        "credibility": "sans commissions"
+      },
+      "broodjesbar": {
+        "name": "BROODJESBAR by Danver",
+        "metricHighlight": "−25 %",
+        "metricDetail": "d’appels en moins au pic du midi",
+        "credibility": "depuis la page takeaway dédiée"
+      },
+      "saintGermain": {
+        "name": "Frituur Saint Germain",
+        "metricHighlight": "+28 %",
+        "metricDetail": "de clients réguliers via commandes répétées dans l’app",
+        "credibility": "en 2 mois"
+      },
+      "frituurAnn": {
+        "name": "Frituur Ann",
+        "metricHighlight": "+2 050 €",
+        "metricDetail": "sur les mêmes jours d’ouverture (avant/après Vysion)",
+        "credibility": "après migration depuis Takeaway"
+      },
+      "butcher": {
+        "name": "Butcher meat shop",
+        "metricHighlight": "+36 %",
+        "metricDetail": "de commandes via la boutique en ligne",
+        "credibility": "sans commissions"
+      },
+      "seelen": {
+        "name": "Slagerij Seelen Traiteur",
+        "metricHighlight": "−32 %",
+        "metricDetail": "d’erreurs de commande et file plus courte au comptoir",
+        "credibility": "après une session de formation"
+      }
     }
   },
   "butWait": {
@@ -1475,7 +1510,30 @@
     "onlineShopToggle": "Boutique en ligne on/off"
   },
   "mediaPicker": {
-    "choosePhoto": "Choisir photo"
+    "choosePhoto": "Choisir une photo",
+    "pickFromFilesTitle": "Choisir une photo",
+    "pickFromFilesSubtitle": "Depuis la photothèque",
+    "takePhotoTitle": "Prendre une photo",
+    "takePhotoSubtitle": "Avec l’appareil photo",
+    "fromLibraryTitle": "Choisir dans la bibliothèque",
+    "fromLibrarySubtitle": "Photos existantes",
+    "uploading": "Téléversement...",
+    "errorHeading": "Erreur :",
+    "modalTitle": "Choisir une photo",
+    "uploadNewPhoto": "Téléverser une nouvelle photo",
+    "allCategories": "Tout",
+    "loading": "Chargement...",
+    "noPhotosTitle": "Pas encore de photos",
+    "noPhotosBody": "Téléversez votre première photo",
+    "uploadPhotoCta": "Téléverser une photo",
+    "defaultPhotoName": "Photo",
+    "noFileSelected": "Aucun fichier sélectionné",
+    "dbNotConnected": "Base de données non connectée",
+    "unknownError": "Erreur inconnue",
+    "confirmDeletePhoto": "Supprimer cette photo ?",
+    "deleteDbError": "Erreur lors de la suppression en base",
+    "deleteErrorPrefix": "Erreur lors de la suppression :",
+    "selectedImageAlt": "Image sélectionnée"
   },
   "marketingQr": {
     "title": "Codes QR",
@@ -4156,19 +4214,58 @@
     "videoCountMany": "{{count}} vidéos",
     "comingSoon": " — bientôt disponible",
     "cats": {
-      "registreren": { "title": "Inscription", "desc": "Créer un compte et découvrir l'administration" },
-      "modules": { "title": "Vue d'ensemble", "desc": "Écran commandes, analyse, ventes et plus" },
-      "instellingen": { "title": "Paramètres", "desc": "Tout configurer pour votre boutique en ligne" },
-      "menu": { "title": "Menu", "desc": "Gérer produits, catégories et options" },
-      "whatsapp-bestellingen": { "title": "Commandes WhatsApp", "desc": "Recevoir et gérer les commandes via WhatsApp" },
-      "personeel": { "title": "Personnel", "desc": "Gérer employés, horaires et offres d'emploi" },
-      "kostenberekening": { "title": "Calcul des coûts", "desc": "Calculer ingrédients et prix produits" },
-      "z-rapporten": { "title": "Rapports Z", "desc": "Rapports journaliers et clôture" },
-      "bestellingen": { "title": "Commandes", "desc": "Gérer commandes et réservations" },
-      "groepsbestellingen": { "title": "Commandes de groupe", "desc": "Gérer les commandes de groupe" },
-      "bonnenprinter": { "title": "Imprimante de tickets", "desc": "Configurer et utiliser l'imprimante" },
-      "de-website": { "title": "Votre site", "desc": "Gérer et personnaliser votre site" },
-      "de-shop": { "title": "La boutique", "desc": "Configurer votre boutique en ligne" }
+      "registreren": {
+        "title": "Inscription",
+        "desc": "Créer un compte et découvrir l'administration"
+      },
+      "modules": {
+        "title": "Vue d'ensemble",
+        "desc": "Écran commandes, analyse, ventes et plus"
+      },
+      "instellingen": {
+        "title": "Paramètres",
+        "desc": "Tout configurer pour votre boutique en ligne"
+      },
+      "menu": {
+        "title": "Menu",
+        "desc": "Gérer produits, catégories et options"
+      },
+      "whatsapp-bestellingen": {
+        "title": "Commandes WhatsApp",
+        "desc": "Recevoir et gérer les commandes via WhatsApp"
+      },
+      "personeel": {
+        "title": "Personnel",
+        "desc": "Gérer employés, horaires et offres d'emploi"
+      },
+      "kostenberekening": {
+        "title": "Calcul des coûts",
+        "desc": "Calculer ingrédients et prix produits"
+      },
+      "z-rapporten": {
+        "title": "Rapports Z",
+        "desc": "Rapports journaliers et clôture"
+      },
+      "bestellingen": {
+        "title": "Commandes",
+        "desc": "Gérer commandes et réservations"
+      },
+      "groepsbestellingen": {
+        "title": "Commandes de groupe",
+        "desc": "Gérer les commandes de groupe"
+      },
+      "bonnenprinter": {
+        "title": "Imprimante de tickets",
+        "desc": "Configurer et utiliser l'imprimante"
+      },
+      "de-website": {
+        "title": "Votre site",
+        "desc": "Gérer et personnaliser votre site"
+      },
+      "de-shop": {
+        "title": "La boutique",
+        "desc": "Configurer votre boutique en ligne"
+      }
     },
     "v": {
       "registratie1": "Inscription",
@@ -4360,7 +4457,7 @@
     "bannerEigen": "Ferme temporairement"
   },
   "whyVysion": {
-    "title": "Why\u00a0choose\u00a0Vysion",
+    "title": "Why choose Vysion",
     "imageAlt": "Borne de table Vysion avec écran tactile",
     "fullPlatform": {
       "title": "Full platform",
@@ -4524,5 +4621,91 @@
     "galleryNext": "Next image",
     "galleryClose": "Close",
     "galleryOpen": "Enlarge image"
+  },
+  "ui": {
+    "ariaPrevImage": "Image précédente",
+    "ariaNextImage": "Image suivante",
+    "ariaClose": "Fermer",
+    "ariaPrev": "Précédent",
+    "ariaNext": "Suivant",
+    "ariaPrevReview": "Avis précédent",
+    "ariaNextReview": "Avis suivant",
+    "ariaToggleMenu": "Ouvrir ou fermer le menu",
+    "ariaMain": "Contenu principal",
+    "ariaNavMenu": "Menu",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "zoomOut": "Dézoomer (voir plus)",
+    "zoomIn": "Zoomer (voir moins)",
+    "dragToReorder": "Glisser pour réorganiser",
+    "printReceipt": "Imprimer le ticket",
+    "voiceOrder": "Commander à la voix",
+    "viewInvoice": "Voir la facture",
+    "linkInvoicePdf": "Lier la facture PDF",
+    "viewInvoicePdf": "Voir le PDF de facture",
+    "clickToEditName": "Cliquer pour modifier le nom",
+    "countCashPlaceholder": "Saisir le montant compté…",
+    "typeDeleteConfirm": "SUPPRIMER",
+    "promoCodeExample": "PROMO10",
+    "stripePkPlaceholder": "pk_live_…",
+    "stripeSkPlaceholder": "sk_live_…",
+    "stripeWhsecPlaceholder": "whsec_…",
+    "ipExamplePlaceholder": "ex. 192.168.1.100",
+    "closingNotePlaceholder": "ex. Personnel, maintenance…",
+    "holidayNotePlaceholder": "ex. Vacances, travaux…",
+    "newPinPlaceholder": "Nouveau PIN",
+    "confirmPinPlaceholder": "Confirmer le PIN",
+    "ownerEmailPlaceholder": "propriétaire@email.com",
+    "minPasswordPlaceholder": "Au moins 8 caractères",
+    "repeatPasswordPlaceholder": "Répéter le mot de passe",
+    "slideLabel": "Diapositive {{n}}",
+    "productLabel": "Produit {{n}}",
+    "vatPlaceholder": "BE0123456789",
+    "facebookUrlPlaceholder": "https://facebook.com/…",
+    "instagramUrlPlaceholder": "https://instagram.com/…",
+    "tiktokUrlPlaceholder": "https://tiktok.com/@…",
+    "websiteUrlPlaceholder": "https://…",
+    "exampleDishPlaceholder": "ex. Pâte maison",
+    "exampleFishPlaceholder": "ex. Poissons frais",
+    "exampleBreadPlaceholder": "ex. Pain artisanal",
+    "exampleBusinessPlaceholder": "ex. Friterie Dupont",
+    "exampleShopEmailPlaceholder": "info@votreetablissement.be",
+    "exampleSmtpPlaceholder": "ex. smtp.fournisseur.be",
+    "reservationNamePlaceholder": "Jean Dupont",
+    "reservationEmailPlaceholder": "jean@email.be",
+    "reservationNotesPlaceholder": "Allergies, chaise haute, fauteuil, demandes spéciales…",
+    "newCategoryPlaceholder": "Nom de la nouvelle catégorie…",
+    "sendPaymentReminder": "Envoyer un rappel de paiement",
+    "tenantSlugPlaceholder": "mon-etablissement",
+    "tenantNamePlaceholder": "Exemple Café",
+    "tenantEmailPlaceholder": "info@exemple.be",
+    "superadminLoginPlaceholder": "admin@vysionhoreca.com",
+    "invoiceEmailPlaceholder": "facture@societe.be",
+    "companyLegalPlaceholder": "Société SARL",
+    "companyVatPlaceholder": "BE0123456789",
+    "firstNamePlaceholder": "Jean",
+    "lastNamePlaceholder": "Dupont",
+    "exampleEmailPlaceholder": "jean@exemple.be",
+    "lightboxImageAlt": "Vue agrandie"
+  },
+  "pinGate": {
+    "incorrectPin": "Code PIN incorrect. Réessayez.",
+    "invalidPin": "Entrez un code PIN à 4 chiffres valide",
+    "pinMismatch": "Les codes PIN ne correspondent pas",
+    "emailMismatch": "L’adresse e-mail ne correspond pas",
+    "noAccessTitle": "Pas d’accès",
+    "noAccessBody1": "Vous n’avez pas accès à ce module.",
+    "noAccessBody2": "Si vous êtes le propriétaire, créez d’abord un code PIN sous",
+    "kassaPinLink": "Caisse → Code PIN",
+    "back": "← Retour",
+    "forgotTitle": "Code PIN oublié",
+    "forgotEmailHelp": "Confirmez l’e-mail du propriétaire",
+    "confirm": "Confirmer",
+    "newPinHelp": "Définir un nouveau code PIN à 4 chiffres",
+    "saving": "Enregistrement...",
+    "saveNewPin": "Enregistrer le nouveau PIN",
+    "ownerPinTitle": "Code PIN propriétaire",
+    "enterPinHelp": "Entrez votre code PIN à 4 chiffres",
+    "forgotLink": "Code PIN oublié ?"
   }
 }

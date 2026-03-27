@@ -168,13 +168,48 @@
     "clientsLead": "سبقتك هذه الشركات بالفعل",
     "marquee": "مطاعم · مقالي · مطعم · مقهى · جزار · مخبز · كيترينج · مطعم أنيق · ساندويتش · نبيذ · فندق · Vysion Horeca · ",
     "successStories": {
-      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metricHighlight": "+34%", "metricDetail": "طلبات عبر الإنترنت منذ المنصة الجديدة", "credibility": "خلال 3 أشهر" },
-      "broodZo": { "name": "Brood & Zo", "metricHighlight": "+€1,750", "metricDetail": "إيراد إضافي شهري في الأشهر المزدحمة", "credibility": "بدون عمولات" },
-      "broodjesbar": { "name": "BROODJESBAR by Danver", "metricHighlight": "−25%", "metricDetail": "مكالمات ذروة الغداء", "credibility": "منذ إطلاق صفحة الوجبات الجاهزة" },
-      "saintGermain": { "name": "Frituur Saint Germain", "metricHighlight": "+28%", "metricDetail": "زبائن دائمون عبر تكرار الطلب في التطبيق", "credibility": "خلال شهرين" },
-      "frituurAnn": { "name": "Frituur Ann", "metricHighlight": "+€2,050", "metricDetail": "في أيام العمل نفسها (قبل/بعد Vysion)", "credibility": "بعد الانتقال من Takeaway" },
-      "butcher": { "name": "Butcher meat shop", "metricHighlight": "+36%", "metricDetail": "طلبات عبر المتجر الإلكتروني", "credibility": "بدون عمولات" },
-      "seelen": { "name": "Slagerij Seelen Traiteur", "metricHighlight": "−32%", "metricDetail": "أخطاء الطلبات وطوابير أقصر", "credibility": "بعد جلسة تدريب واحدة" }
+      "vivaldi": {
+        "name": "VIVALDI 2.0 Food & Drinks",
+        "metricHighlight": "+34%",
+        "metricDetail": "طلبات عبر الإنترنت منذ المنصة الجديدة",
+        "credibility": "خلال 3 أشهر"
+      },
+      "broodZo": {
+        "name": "Brood & Zo",
+        "metricHighlight": "+€1,750",
+        "metricDetail": "إيراد إضافي شهري في الأشهر المزدحمة",
+        "credibility": "بدون عمولات"
+      },
+      "broodjesbar": {
+        "name": "BROODJESBAR by Danver",
+        "metricHighlight": "−25%",
+        "metricDetail": "مكالمات ذروة الغداء",
+        "credibility": "منذ إطلاق صفحة الوجبات الجاهزة"
+      },
+      "saintGermain": {
+        "name": "Frituur Saint Germain",
+        "metricHighlight": "+28%",
+        "metricDetail": "زبائن دائمون عبر تكرار الطلب في التطبيق",
+        "credibility": "خلال شهرين"
+      },
+      "frituurAnn": {
+        "name": "Frituur Ann",
+        "metricHighlight": "+€2,050",
+        "metricDetail": "في أيام العمل نفسها (قبل/بعد Vysion)",
+        "credibility": "بعد الانتقال من Takeaway"
+      },
+      "butcher": {
+        "name": "Butcher meat shop",
+        "metricHighlight": "+36%",
+        "metricDetail": "طلبات عبر المتجر الإلكتروني",
+        "credibility": "بدون عمولات"
+      },
+      "seelen": {
+        "name": "Slagerij Seelen Traiteur",
+        "metricHighlight": "−32%",
+        "metricDetail": "أخطاء الطلبات وطوابير أقصر",
+        "credibility": "بعد جلسة تدريب واحدة"
+      }
     }
   },
   "butWait": {
@@ -1969,7 +2004,31 @@
     "onlineShopToggle": "المتجر الإلكتروني تشغيل/إيقاف"
   },
   "mediaPicker": {
-    "choosePhoto": "اختر صورة"
+    "choosePhoto": "اختر صورة",
+    "pickFromFilesTitle": "اختر صورة",
+    "pickFromFilesSubtitle": "من مكتبة الصور",
+    "takePhotoTitle": "التقط صورة",
+    "takePhotoSubtitle": "بالكاميرا",
+    "fromLibraryTitle": "اختر من المكتبة",
+    "fromLibrarySubtitle": "صور موجودة",
+    "uploading": "جاري الرفع...",
+    "errorHeading": "خطأ:",
+    "modalTitle": "اختر صورة",
+    "uploadNewPhoto": "رفع صورة جديدة",
+    "allCategories": "الكل",
+    "loading": "جاري التحميل...",
+    "noPhotosTitle": "لا توجد صور بعد",
+    "noPhotosBody": "ارفع صورتك الأولى",
+    "uploadPhotoCta": "رفع صورة",
+    "defaultPhotoName": "صورة",
+    "noFileSelected": "لم يتم اختيار ملف",
+    "dbNotConnected": "قاعدة البيانات غير متصلة",
+    "unknownError": "خطأ غير معروف",
+    "confirmDeletePhoto": "هل تريد حذف هذه الصورة؟",
+    "deleteDbError": "خطأ أثناء الحذف من قاعدة البيانات",
+    "deleteErrorPrefix": "خطأ أثناء الحذف:",
+    "selectedImageAlt": "الصورة المحددة",
+    "uploadErrorPrefix": "خطأ في الرفع: "
   },
   "marketingQr": {
     "title": "رموز QR",
@@ -4133,19 +4192,58 @@
     "videoCountMany": "{{count}} فيديوهات",
     "comingSoon": " — قريباً",
     "cats": {
-      "registreren": { "title": "التسجيل", "desc": "إنشاء حساب ولوحة الإدارة" },
-      "modules": { "title": "نظرة عامة", "desc": "شاشة الطلبات والتحليلات والمزيد" },
-      "instellingen": { "title": "الإعدادات", "desc": "ضبط كل شيء لمتجرك الإلكتروني" },
-      "menu": { "title": "القائمة", "desc": "إدارة المنتجات والفئات والخيارات" },
-      "whatsapp-bestellingen": { "title": "طلبات واتساب", "desc": "استلام وإدارة الطلبات عبر واتساب" },
-      "personeel": { "title": "الموظفون", "desc": "إدارة الموظفين والساعات والوظائف" },
-      "kostenberekening": { "title": "حساب التكاليف", "desc": "حساب المكونات وأسعار المنتجات" },
-      "z-rapporten": { "title": "تقارير Z", "desc": "تقارير يومية وإقفال" },
-      "bestellingen": { "title": "الطلبات", "desc": "إدارة الطلبات والحجوزات" },
-      "groepsbestellingen": { "title": "طلبات جماعية", "desc": "إدارة طلبات المجموعات" },
-      "bonnenprinter": { "title": "طابعة الإيصالات", "desc": "إعداد واستخدام الطابعة" },
-      "de-website": { "title": "موقعك", "desc": "إدارة وتخصيص الموقع" },
-      "de-shop": { "title": "المتجر", "desc": "إعداد وإدارة المتجر الإلكتروني" }
+      "registreren": {
+        "title": "التسجيل",
+        "desc": "إنشاء حساب ولوحة الإدارة"
+      },
+      "modules": {
+        "title": "نظرة عامة",
+        "desc": "شاشة الطلبات والتحليلات والمزيد"
+      },
+      "instellingen": {
+        "title": "الإعدادات",
+        "desc": "ضبط كل شيء لمتجرك الإلكتروني"
+      },
+      "menu": {
+        "title": "القائمة",
+        "desc": "إدارة المنتجات والفئات والخيارات"
+      },
+      "whatsapp-bestellingen": {
+        "title": "طلبات واتساب",
+        "desc": "استلام وإدارة الطلبات عبر واتساب"
+      },
+      "personeel": {
+        "title": "الموظفون",
+        "desc": "إدارة الموظفين والساعات والوظائف"
+      },
+      "kostenberekening": {
+        "title": "حساب التكاليف",
+        "desc": "حساب المكونات وأسعار المنتجات"
+      },
+      "z-rapporten": {
+        "title": "تقارير Z",
+        "desc": "تقارير يومية وإقفال"
+      },
+      "bestellingen": {
+        "title": "الطلبات",
+        "desc": "إدارة الطلبات والحجوزات"
+      },
+      "groepsbestellingen": {
+        "title": "طلبات جماعية",
+        "desc": "إدارة طلبات المجموعات"
+      },
+      "bonnenprinter": {
+        "title": "طابعة الإيصالات",
+        "desc": "إعداد واستخدام الطابعة"
+      },
+      "de-website": {
+        "title": "موقعك",
+        "desc": "إدارة وتخصيص الموقع"
+      },
+      "de-shop": {
+        "title": "المتجر",
+        "desc": "إعداد وإدارة المتجر الإلكتروني"
+      }
     },
     "v": {
       "registratie1": "التسجيل",
@@ -4337,7 +4435,7 @@
     "bannerEigen": "مغلق مؤقتا"
   },
   "whyVysion": {
-    "title": "Why\u00a0choose\u00a0Vysion",
+    "title": "Why choose Vysion",
     "imageAlt": "كiosk طاولة Vysion بشاشة لمس",
     "fullPlatform": {
       "title": "Full platform",
@@ -4501,5 +4599,91 @@
     "galleryNext": "Next image",
     "galleryClose": "Close",
     "galleryOpen": "Enlarge image"
+  },
+  "ui": {
+    "ariaPrevImage": "الصورة السابقة",
+    "ariaNextImage": "الصورة التالية",
+    "ariaClose": "إغلاق",
+    "ariaPrev": "السابق",
+    "ariaNext": "التالي",
+    "ariaPrevReview": "التقييم السابق",
+    "ariaNextReview": "التقييم التالي",
+    "ariaToggleMenu": "فتح أو إغلاق القائمة",
+    "ariaMain": "المحتوى الرئيسي",
+    "ariaNavMenu": "القائمة",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "zoomOut": "تصغير (رؤية أكثر)",
+    "zoomIn": "تكبير (رؤية أقل)",
+    "dragToReorder": "اسحب لإعادة الترتيب",
+    "printReceipt": "طباعة الإيصال",
+    "voiceOrder": "طلب صوتي",
+    "viewInvoice": "عرض الفاتورة",
+    "linkInvoicePdf": "ربط فاتورة PDF",
+    "viewInvoicePdf": "عرض PDF للفاتورة",
+    "clickToEditName": "انقر لتحرير الاسم",
+    "countCashPlaceholder": "أدخل المبلغ المحسوب…",
+    "typeDeleteConfirm": "حذف",
+    "promoCodeExample": "وفر10",
+    "stripePkPlaceholder": "pk_live_…",
+    "stripeSkPlaceholder": "sk_live_…",
+    "stripeWhsecPlaceholder": "whsec_…",
+    "ipExamplePlaceholder": "مثال 192.168.1.100",
+    "closingNotePlaceholder": "مثال: شخصي، صيانة…",
+    "holidayNotePlaceholder": "مثال: عطلة، تجديد…",
+    "newPinPlaceholder": "رمز PIN جديد",
+    "confirmPinPlaceholder": "تأكيد PIN",
+    "ownerEmailPlaceholder": "owner@email.com",
+    "minPasswordPlaceholder": "8 أحرف على الأقل",
+    "repeatPasswordPlaceholder": "كرر كلمة المرور",
+    "slideLabel": "الشريحة {{n}}",
+    "productLabel": "المنتج {{n}}",
+    "vatPlaceholder": "BE0123456789",
+    "facebookUrlPlaceholder": "https://facebook.com/…",
+    "instagramUrlPlaceholder": "https://instagram.com/…",
+    "tiktokUrlPlaceholder": "https://tiktok.com/@…",
+    "websiteUrlPlaceholder": "https://…",
+    "exampleDishPlaceholder": "مثال: معكرونة منزلية",
+    "exampleFishPlaceholder": "مثال: أطباق سمك طازج",
+    "exampleBreadPlaceholder": "مثال: خبز حرفي",
+    "exampleBusinessPlaceholder": "مثال: مطعم تجريبي",
+    "exampleShopEmailPlaceholder": "info@yourshop.com",
+    "exampleSmtpPlaceholder": "مثال: smtp.provider.com",
+    "reservationNamePlaceholder": "أحمد محمد",
+    "reservationEmailPlaceholder": "ahmed@email.com",
+    "reservationNotesPlaceholder": "حساسية، كرسي أطفال، كرسي متحرك، طلبات…",
+    "newCategoryPlaceholder": "اسم التصنيف الجديد…",
+    "sendPaymentReminder": "إرسال تذكير بالدفع",
+    "tenantSlugPlaceholder": "my-venue",
+    "tenantNamePlaceholder": "مقهى تجريبي",
+    "tenantEmailPlaceholder": "info@example.com",
+    "superadminLoginPlaceholder": "admin@vysionhoreca.com",
+    "invoiceEmailPlaceholder": "invoice@company.com",
+    "companyLegalPlaceholder": "شركة تجريبية",
+    "companyVatPlaceholder": "BE0123456789",
+    "firstNamePlaceholder": "أحمد",
+    "lastNamePlaceholder": "محمد",
+    "exampleEmailPlaceholder": "ahmed@example.com",
+    "lightboxImageAlt": "عرض مكبّر"
+  },
+  "pinGate": {
+    "incorrectPin": "رمز PIN غير صحيح. حاول مرة أخرى.",
+    "invalidPin": "أدخل رمز PIN مكوّناً من 4 أرقام",
+    "pinMismatch": "رموز PIN غير متطابقة",
+    "emailMismatch": "البريد الإلكتروني غير متطابق",
+    "noAccessTitle": "لا يوجد وصول",
+    "noAccessBody1": "ليس لديك وصول إلى هذه الوحدة.",
+    "noAccessBody2": "إذا كنت المالك، أنشئ رمز PIN أولاً ضمن",
+    "kassaPinLink": "الكاشير ← PIN",
+    "back": "← رجوع",
+    "forgotTitle": "نسيت PIN",
+    "forgotEmailHelp": "أكد بريد المالك",
+    "confirm": "تأكيد",
+    "newPinHelp": "عيّن رمز PIN جديداً من 4 أرقام",
+    "saving": "جاري الحفظ...",
+    "saveNewPin": "حفظ PIN الجديد",
+    "ownerPinTitle": "PIN المالك",
+    "enterPinHelp": "أدخل رمز PIN المكوّن من 4 أرقام",
+    "forgotLink": "نسيت PIN؟"
   }
 }

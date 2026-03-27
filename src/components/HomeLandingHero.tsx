@@ -87,7 +87,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
           {/* Desktop: pill nav */}
           <nav
             className="hidden lg:flex absolute left-1/2 -translate-x-1/2 top-3 sm:top-4 items-center gap-1 bg-white/95 rounded-full px-2 py-1.5 shadow-home-float"
-            aria-label="Main"
+            aria-label={t('ui.ariaMain')}
           >
             {pillLinks.map(({ href, label }) => (
               <a
@@ -148,7 +148,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
               type="button"
               className="lg:hidden text-white p-2 rounded-lg hover:bg-white/10"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Menu"
+              aria-label={t('ui.ariaNavMenu')}
             >
               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isMenuOpen ? (

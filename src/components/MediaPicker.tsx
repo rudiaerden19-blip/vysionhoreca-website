@@ -50,7 +50,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       setMedia(data.map(item => ({
         id: item.id,
         url: item.url || item.file_url || '',
-        name: item.name || item.file_name || 'Foto',
+        name: item.name || item.file_name || t('mediaPicker.defaultPhotoName'),
         category: item.category || ''
       })))
       const cats = Array.from(new Set(data.map(m => m.category).filter(c => c && c.trim() !== '')))
@@ -58,7 +58,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
     }
     
     setLoading(false)
-  }, [tenantSlug])
+  }, [tenantSlug, t])
 
   useEffect(() => {
     if (isOpen) {
@@ -123,11 +123,11 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
     setErrorMessage(null)
     
     if (!file) {
-      setErrorMessage('Geen bestand geselecteerd')
+      setErrorMessage(t('mediaPicker.noFileSelected'))
       return
     }
     if (!supabase) {
-      setErrorMessage('Database niet verbonden')
+      setErrorMessage(t('mediaPicker.dbNotConnected'))
       return
     }
     
@@ -155,7 +155,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
         })
       
       if (uploadError) {
-        setErrorMessage(`Upload fout: ${uploadError.message}`)
+        setErrorMessage(`${t('mediaPicker.uploadErrorPrefix')}${uploadError.message}`)
         setUploading(false)
         return
       }
@@ -168,7 +168,8 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       const publicUrl = urlData.publicUrl
       
       // Sla op in tenant_media tabel
-      const displayName = file.name || `Foto ${new Date().toLocaleDateString('nl-NL')}`
+      const displayName =
+        file.name || `${t('mediaPicker.defaultPhotoName')} ${new Date().toLocaleDateString()}`
       await supabase
         .from('tenant_media')
         .insert({
@@ -189,7 +190,9 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       loadMedia()
       
     } catch (error: any) {
-      setErrorMessage(`Fout: ${error?.message || 'Onbekende fout'}`)
+      setErrorMessage(
+        `${t('mediaPicker.errorHeading')} ${error?.message || t('mediaPicker.unknownError')}`
+      )
     } finally {
       // Zorg dat uploading ALTIJD op false gezet wordt
       setUploading(false)
@@ -218,7 +221,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
   const deleteMedia = async (e: React.MouseEvent, item: MediaItem) => {
     e.stopPropagation() // Voorkom selectie van de foto
     
-    if (!confirm('Weet je zeker dat je deze foto wilt verwijderen?')) {
+    if (!confirm(t('mediaPicker.confirmDeletePhoto'))) {
       return
     }
     
@@ -234,7 +237,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       
       if (dbError) {
         console.error('Database delete error:', dbError)
-        alert('Fout bij verwijderen uit database')
+        alert(t('mediaPicker.deleteDbError'))
         setDeletingId(null)
         return
       }
@@ -265,7 +268,9 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
       
     } catch (error: any) {
       console.error('Delete error:', error)
-      alert('Fout bij verwijderen: ' + (error?.message || 'Onbekende fout'))
+      alert(
+        `${t('mediaPicker.deleteErrorPrefix')} ${error?.message || t('mediaPicker.unknownError')}`
+      )
     } finally {
       setDeletingId(null)
     }
@@ -317,14 +322,14 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"
                 />
-                <span className="text-xs text-blue-600">Uploaden...</span>
+                <span className="text-xs text-blue-600">{t('mediaPicker.uploading')}</span>
               </div>
             ) : value ? (
-              <Image src={value} alt="Selected" fill className="object-cover" unoptimized />
+              <Image src={value} alt={t('mediaPicker.selectedImageAlt')} fill className="object-cover" unoptimized />
             ) : (
               <div className="text-center p-2">
                 <span className="text-3xl block mb-1">📷</span>
-                <span className="text-xs text-gray-500">{t('mediaPicker.choosePhoto') || 'Kies foto'}</span>
+                <span className="text-xs text-gray-500">{t('mediaPicker.choosePhoto')}</span>
               </div>
             )}
           </div>
@@ -356,8 +361,8 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                 >
                   <span className="text-xl">📁</span>
                   <div>
-                    <p className="font-medium text-gray-900">Kies foto</p>
-                    <p className="text-xs text-gray-500">Uit fotobibliotheek</p>
+                    <p className="font-medium text-gray-900">{t('mediaPicker.pickFromFilesTitle')}</p>
+                    <p className="text-xs text-gray-500">{t('mediaPicker.pickFromFilesSubtitle')}</p>
                   </div>
                 </button>
                 
@@ -380,8 +385,8 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                 >
                   <span className="text-xl">📸</span>
                   <div>
-                    <p className="font-medium text-gray-900">Maak foto</p>
-                    <p className="text-xs text-gray-500">Met camera</p>
+                    <p className="font-medium text-gray-900">{t('mediaPicker.takePhotoTitle')}</p>
+                    <p className="text-xs text-gray-500">{t('mediaPicker.takePhotoSubtitle')}</p>
                   </div>
                 </button>
                 
@@ -395,8 +400,8 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                 >
                   <span className="text-xl">🖼️</span>
                   <div>
-                    <p className="font-medium text-gray-900">Kies uit bibliotheek</p>
-                    <p className="text-xs text-gray-500">Bestaande foto's</p>
+                    <p className="font-medium text-gray-900">{t('mediaPicker.fromLibraryTitle')}</p>
+                    <p className="text-xs text-gray-500">{t('mediaPicker.fromLibrarySubtitle')}</p>
                   </div>
                 </button>
               </motion.div>
@@ -417,13 +422,13 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
           {/* Error message display */}
           {errorMessage && (
             <div className="bg-red-100 border border-red-300 text-red-700 px-3 py-2 rounded-lg text-sm max-w-[200px]">
-              <p className="font-medium">⚠️ Fout:</p>
+              <p className="font-medium">⚠️ {t('mediaPicker.errorHeading')}</p>
               <p className="text-xs mt-1">{errorMessage}</p>
               <button 
                 onClick={() => setErrorMessage(null)}
                 className="text-xs underline mt-2"
               >
-                Sluiten
+                {t('ui.ariaClose')}
               </button>
             </div>
           )}
@@ -457,7 +462,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
             >
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b flex-shrink-0">
-                <h3 className="text-lg font-semibold">Kies een foto</h3>
+                <h3 className="text-lg font-semibold">{t('mediaPicker.modalTitle')}</h3>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
@@ -466,7 +471,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                     }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
                   >
-                    <span>📤</span> Upload nieuwe foto
+                    <span>📤</span> {t('mediaPicker.uploadNewPhoto')}
                   </button>
                   <button
                     onClick={() => setIsOpen(false)}
@@ -489,7 +494,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                           : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                       }`}
                     >
-                      Alle
+                      {t('mediaPicker.allCategories')}
                     </button>
                     {categories.map(cat => (
                       <button
@@ -522,9 +527,9 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                 ) : filteredMedia.length === 0 ? (
                   <div className="text-center py-12">
                     <span className="text-6xl block mb-4">📷</span>
-                    <h4 className="font-semibold text-gray-900 mb-2">Nog geen foto's</h4>
+                    <h4 className="font-semibold text-gray-900 mb-2">{t('mediaPicker.noPhotosTitle')}</h4>
                     <p className="text-gray-500 text-sm mb-4">
-                      Upload je eerste foto
+                      {t('mediaPicker.noPhotosBody')}
                     </p>
                     <button
                       onClick={() => {
@@ -533,7 +538,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                       }}
                       className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
                     >
-                      📤 Upload foto
+                      📤 {t('mediaPicker.uploadPhotoCta')}
                     </button>
                   </div>
                 ) : (
@@ -565,7 +570,7 @@ export default function MediaPicker({ tenantSlug, value, onChange, label }: Medi
                           disabled={deletingId === item.id}
                           className="absolute top-2 right-2 w-10 h-10 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-full flex items-center justify-center shadow-xl border-2 border-white disabled:opacity-50"
                           style={{ zIndex: 50 }}
-                          title="Verwijderen"
+                          title={t('ui.delete')}
                         >
                           {deletingId === item.id ? (
                             <motion.div

@@ -97,7 +97,7 @@ export default function Navigation() {
           <button 
             className="md:hidden text-white p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label={t('ui.ariaToggleMenu')}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isMenuOpen ? (

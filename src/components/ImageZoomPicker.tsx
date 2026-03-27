@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import MediaPicker from './MediaPicker'
+import { useLanguage } from '@/i18n'
 
 interface ImageZoomSettings {
   url: string
@@ -20,6 +21,7 @@ interface ImageZoomPickerProps {
 }
 
 export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: ImageZoomPickerProps) {
+  const { t } = useLanguage()
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   
@@ -159,7 +161,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               <button
                 onClick={() => handleZoomChange(Math.max(0.5, settings.zoom - 0.1))}
                 className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg hover:bg-gray-300 text-lg font-bold"
-                title="Uitzoomen (meer zien)"
+                title={t('ui.zoomOut')}
               >
                 −
               </button>
@@ -175,7 +177,7 @@ export default function ImageZoomPicker({ tenantSlug, value, onChange, label }: 
               <button
                 onClick={() => handleZoomChange(Math.min(1.5, settings.zoom + 0.1))}
                 className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-lg hover:bg-gray-300 text-lg font-bold"
-                title="Inzoomen (minder zien)"
+                title={t('ui.zoomIn')}
               >
                 +
               </button>

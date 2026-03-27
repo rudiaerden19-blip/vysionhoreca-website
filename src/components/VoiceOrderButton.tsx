@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useLanguage } from '@/i18n'
 
 interface Product {
   id: string
@@ -121,6 +122,7 @@ export default function VoiceOrderButton({
   onGoToCheckout,
   translations: t,
 }: VoiceOrderButtonProps) {
+  const { t: tGlobal } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -629,7 +631,7 @@ export default function VoiceOrderButton({
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(true)}
         className="fixed bottom-24 right-4 sm:bottom-28 sm:right-6 z-40 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-white text-2xl bg-red-500"
-        aria-label="Bestel met spraak"
+        aria-label={tGlobal('ui.voiceOrder')}
       >
         🎤
       </motion.button>

@@ -413,7 +413,7 @@ function OrderAppSection() {
             <button 
               className="absolute left-4 sm:left-8 text-white text-5xl hover:text-accent transition-colors p-4"
               onClick={goToPrev}
-              aria-label="Vorige afbeelding"
+              aria-label={t('ui.ariaPrevImage')}
             >
               <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -426,7 +426,7 @@ function OrderAppSection() {
             >
               <Image
                 src={images[lightboxIndex]}
-                alt="Vergroot"
+                alt={t('ui.lightboxImageAlt')}
                 fill
                 sizes="100vw"
                 priority
@@ -438,7 +438,7 @@ function OrderAppSection() {
             <button 
               className="absolute right-4 sm:right-8 text-white text-5xl hover:text-accent transition-colors p-4"
               onClick={goToNext}
-              aria-label="Volgende afbeelding"
+              aria-label={t('ui.ariaNextImage')}
             >
               <svg className="w-10 h-10 sm:w-12 sm:h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -449,7 +449,7 @@ function OrderAppSection() {
             <button 
               className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
               onClick={() => setLightboxIndex(null)}
-              aria-label="Sluiten"
+              aria-label={t('ui.ariaClose')}
             >
               ×
             </button>
@@ -1109,7 +1109,7 @@ function IndustrySection() {
               <button
                 onClick={goToPrev}
                 className="absolute left-4 sm:left-8 text-white hover:text-gray-300 p-2 z-10"
-                aria-label="Vorige"
+                aria-label={t('ui.ariaPrev')}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 sm:h-14 sm:w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1136,7 +1136,7 @@ function IndustrySection() {
               <button
                 onClick={goToNext}
                 className="absolute right-4 sm:right-8 text-white hover:text-gray-300 p-2 z-10"
-                aria-label="Volgende"
+                aria-label={t('ui.ariaNext')}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 sm:h-14 sm:w-14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -1148,7 +1148,7 @@ function IndustrySection() {
             <button 
               className="absolute top-4 right-4 text-white text-4xl hover:text-gray-300"
               onClick={() => setShowLightbox(false)}
-              aria-label="Sluiten"
+              aria-label={t('ui.ariaClose')}
             >
               ×
             </button>
@@ -1195,7 +1195,7 @@ function TestimonialSection() {
           <button 
             onClick={goToPrev}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-home-float transition-all hover:scale-110"
-            aria-label="Vorige review"
+            aria-label={t('ui.ariaPrevReview')}
           >
             <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1206,7 +1206,7 @@ function TestimonialSection() {
           <button 
             onClick={goToNext}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white hover:bg-gray-100 rounded-full p-3 shadow-home-float transition-all hover:scale-110"
-            aria-label="Volgende review"
+            aria-label={t('ui.ariaNextReview')}
           >
             <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

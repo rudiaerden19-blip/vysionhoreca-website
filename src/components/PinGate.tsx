@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, ReactNode } from 'react'
+import { useLanguage } from '@/i18n'
 
 interface Props {
   tenant: string
@@ -10,6 +11,7 @@ interface Props {
 type State = 'loading' | 'no-pin' | 'locked' | 'unlocked' | 'forgot'
 
 export default function PinGate({ tenant, children }: Props) {
+  const { t } = useLanguage()
   const SESSION_KEY = `vysion_pin_unlocked_${tenant}`
   const [state, setState] = useState<State>('loading')
   const [pin, setPin] = useState('')
@@ -50,7 +52,7 @@ export default function PinGate({ tenant, children }: Props) {
       sessionStorage.setItem(SESSION_KEY, 'true')
       setState('unlocked')
     } else {
-      setError('Onjuiste PIN. Probeer opnieuw.')
+      setError(t('pinGate.incorrectPin'))
       setPin('')
     }
   }
@@ -65,8 +67,8 @@ export default function PinGate({ tenant, children }: Props) {
   }
 
   const handleSaveNewPin = async () => {
-    if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) { setError('Voer een geldig 4-cijferig PIN in'); return }
-    if (newPin !== confirmPin) { setError('PIN codes komen niet overeen'); return }
+    if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) { setError(t('pinGate.invalidPin')); return }
+    if (newPin !== confirmPin) { setError(t('pinGate.pinMismatch')); return }
     setSaving(true)
     const res = await fetch('/api/pin/set', {
       method: 'POST',
@@ -82,7 +84,7 @@ export default function PinGate({ tenant, children }: Props) {
       setNewPin('')
       setConfirmPin('')
     } else {
-      setError(data.error || 'E-mailadres komt niet overeen')
+      setError(data.error || t('pinGate.emailMismatch'))
       setForgotStep('email')
     }
   }
@@ -102,13 +104,13 @@ export default function PinGate({ tenant, children }: Props) {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
           <div className="text-5xl mb-4">🔒</div>
-          <h2 className="text-xl font-bold text-gray-800 mb-3">Geen toegang</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-3">{t('pinGate.noAccessTitle')}</h2>
           <p className="text-gray-600 leading-relaxed">
-            U heeft geen toegang tot deze module.
+            {t('pinGate.noAccessBody1')}
             <br /><br />
-            Als u de eigenaar bent, maak dan eerst een pincode aan onder{' '}
+            {t('pinGate.noAccessBody2')}{' '}
             <a href={`/shop/${tenant}/admin/kassa`} className="text-orange-500 font-semibold underline">
-              Kassa → Pincode
+              {t('pinGate.kassaPinLink')}
             </a>
           </p>
         </div>
@@ -121,40 +123,40 @@ export default function PinGate({ tenant, children }: Props) {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full">
           <button onClick={() => { setState('locked'); setForgotStep('email'); setError(''); setNewPin(''); setConfirmPin(''); setForgotEmail('') }}
-            className="text-gray-400 hover:text-gray-600 text-sm mb-4">← Terug</button>
+            className="text-gray-400 hover:text-gray-600 text-sm mb-4">{t('pinGate.back')}</button>
           <div className="text-4xl mb-3 text-center">🔑</div>
-          <h2 className="text-xl font-bold text-center mb-6">PIN vergeten</h2>
+          <h2 className="text-xl font-bold text-center mb-6">{t('pinGate.forgotTitle')}</h2>
 
           {forgotStep === 'email' ? (
             <>
-              <p className="text-gray-500 text-sm mb-4 text-center">Bevestig uw eigenaar e-mailadres</p>
+              <p className="text-gray-500 text-sm mb-4 text-center">{t('pinGate.forgotEmailHelp')}</p>
               <input
                 type="email"
                 value={forgotEmail}
                 onChange={e => setForgotEmail(e.target.value)}
-                placeholder="eigenaar@email.com"
+                placeholder={t('ui.ownerEmailPlaceholder')}
                 className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 outline-none text-center mb-4"
               />
               <button onClick={handleForgotEmail} disabled={!forgotEmail || saving}
                 className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold disabled:opacity-50">
-                Bevestigen
+                {t('pinGate.confirm')}
               </button>
             </>
           ) : (
             <>
-              <p className="text-gray-500 text-sm mb-4 text-center">Stel een nieuw 4-cijferig PIN in</p>
+              <p className="text-gray-500 text-sm mb-4 text-center">{t('pinGate.newPinHelp')}</p>
               <input type="password" inputMode="numeric" maxLength={4} value={newPin}
                 onChange={e => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                placeholder="Nieuw PIN"
+                placeholder={t('ui.newPinPlaceholder')}
                 className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 outline-none text-center text-2xl tracking-widest mb-3" />
               <input type="password" inputMode="numeric" maxLength={4} value={confirmPin}
                 onChange={e => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                placeholder="Bevestig PIN"
+                placeholder={t('ui.confirmPinPlaceholder')}
                 className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-orange-500 outline-none text-center text-2xl tracking-widest mb-4" />
               {error && <p className="text-red-500 text-sm text-center mb-3">{error}</p>}
               <button onClick={handleSaveNewPin} disabled={saving}
                 className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold disabled:opacity-50">
-                {saving ? 'Opslaan...' : 'Nieuw PIN opslaan'}
+                {saving ? t('pinGate.saving') : t('pinGate.saveNewPin')}
               </button>
             </>
           )}
@@ -168,8 +170,8 @@ export default function PinGate({ tenant, children }: Props) {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-xs w-full text-center">
         <div className="text-4xl mb-2">🔐</div>
-        <h2 className="text-xl font-bold mb-1">Eigenaar PIN</h2>
-        <p className="text-gray-500 text-sm mb-6">Voer uw 4-cijferige PIN in</p>
+        <h2 className="text-xl font-bold mb-1">{t('pinGate.ownerPinTitle')}</h2>
+        <p className="text-gray-500 text-sm mb-6">{t('pinGate.enterPinHelp')}</p>
 
         {/* PIN dots */}
         <div className="flex justify-center gap-4 mb-6">
@@ -204,7 +206,7 @@ export default function PinGate({ tenant, children }: Props) {
 
         <button onClick={() => { setState('forgot'); setError(''); setPin('') }}
           className="text-orange-500 text-sm underline hover:text-orange-700">
-          PIN vergeten?
+          {t('pinGate.forgotLink')}
         </button>
       </div>
     </div>

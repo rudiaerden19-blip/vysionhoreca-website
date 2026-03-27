@@ -168,13 +168,48 @@
     "clientsLead": "すでに導入いただいているお客様",
     "marquee": "外食 · フライ店 · レストラン · カフェ · 肉屋 · パン屋 · ケータリング · ブラッスリー · サンドイッチ · ワイン · ホテル · Vysion Horeca · ",
     "successStories": {
-      "vivaldi": { "name": "VIVALDI 2.0 Food & Drinks", "metricHighlight": "+34%", "metricDetail": "新プラットフォーム以降のオンライン注文", "credibility": "3か月で" },
-      "broodZo": { "name": "Brood & Zo", "metricHighlight": "+€1,750", "metricDetail": "繁忙月の月平均の追加売上", "credibility": "手数料ゼロで" },
-      "broodjesbar": { "name": "BROODJESBAR by Danver", "metricHighlight": "−25%", "metricDetail": "ランチピーク時の電話", "credibility": "独自テイクアウトページ公開後" },
-      "saintGermain": { "name": "Frituur Saint Germain", "metricHighlight": "+28%", "metricDetail": "アプリのリピート注文による常連客", "credibility": "2か月で" },
-      "frituurAnn": { "name": "Frituur Ann", "metricHighlight": "+€2,050", "metricDetail": "同営業日（導入前後）", "credibility": "Takeawayからの移行後" },
-      "butcher": { "name": "Butcher meat shop", "metricHighlight": "+36%", "metricDetail": "Webショップ経由の注文", "credibility": "手数料ゼロで" },
-      "seelen": { "name": "Slagerij Seelen Traiteur", "metricHighlight": "−32%", "metricDetail": "注文ミスとカウンター待ち", "credibility": "1回の研修後" }
+      "vivaldi": {
+        "name": "VIVALDI 2.0 Food & Drinks",
+        "metricHighlight": "+34%",
+        "metricDetail": "新プラットフォーム以降のオンライン注文",
+        "credibility": "3か月で"
+      },
+      "broodZo": {
+        "name": "Brood & Zo",
+        "metricHighlight": "+€1,750",
+        "metricDetail": "繁忙月の月平均の追加売上",
+        "credibility": "手数料ゼロで"
+      },
+      "broodjesbar": {
+        "name": "BROODJESBAR by Danver",
+        "metricHighlight": "−25%",
+        "metricDetail": "ランチピーク時の電話",
+        "credibility": "独自テイクアウトページ公開後"
+      },
+      "saintGermain": {
+        "name": "Frituur Saint Germain",
+        "metricHighlight": "+28%",
+        "metricDetail": "アプリのリピート注文による常連客",
+        "credibility": "2か月で"
+      },
+      "frituurAnn": {
+        "name": "Frituur Ann",
+        "metricHighlight": "+€2,050",
+        "metricDetail": "同営業日（導入前後）",
+        "credibility": "Takeawayからの移行後"
+      },
+      "butcher": {
+        "name": "Butcher meat shop",
+        "metricHighlight": "+36%",
+        "metricDetail": "Webショップ経由の注文",
+        "credibility": "手数料ゼロで"
+      },
+      "seelen": {
+        "name": "Slagerij Seelen Traiteur",
+        "metricHighlight": "−32%",
+        "metricDetail": "注文ミスとカウンター待ち",
+        "credibility": "1回の研修後"
+      }
     }
   },
   "butWait": {
@@ -1969,7 +2004,31 @@
     "onlineShopToggle": "オンラインショップ オン/オフ"
   },
   "mediaPicker": {
-    "choosePhoto": "写真を選択"
+    "choosePhoto": "写真を選択",
+    "pickFromFilesTitle": "写真を選択",
+    "pickFromFilesSubtitle": "フォトライブラリから",
+    "takePhotoTitle": "写真を撮る",
+    "takePhotoSubtitle": "カメラで",
+    "fromLibraryTitle": "ライブラリから選択",
+    "fromLibrarySubtitle": "既存の写真",
+    "uploading": "アップロード中...",
+    "errorHeading": "エラー:",
+    "modalTitle": "写真を選択",
+    "uploadNewPhoto": "新しい写真をアップロード",
+    "allCategories": "すべて",
+    "loading": "読み込み中...",
+    "noPhotosTitle": "写真はまだありません",
+    "noPhotosBody": "最初の写真をアップロード",
+    "uploadPhotoCta": "写真をアップロード",
+    "defaultPhotoName": "写真",
+    "noFileSelected": "ファイルが選択されていません",
+    "dbNotConnected": "データベースに接続されていません",
+    "unknownError": "不明なエラー",
+    "confirmDeletePhoto": "この写真を削除しますか？",
+    "deleteDbError": "データベースからの削除に失敗しました",
+    "deleteErrorPrefix": "削除エラー:",
+    "selectedImageAlt": "選択した画像",
+    "uploadErrorPrefix": "アップロードエラー: "
   },
   "marketingQr": {
     "title": "QRコード",
@@ -4133,19 +4192,58 @@
     "videoCountMany": "動画 {{count}} 本",
     "comingSoon": " — 近日公開",
     "cats": {
-      "registreren": { "title": "登録", "desc": "アカウント作成と管理画面の紹介" },
-      "modules": { "title": "概要", "desc": "オーダー画面、分析、販売など" },
-      "instellingen": { "title": "設定", "desc": "オンラインショップの設定" },
-      "menu": { "title": "メニュー", "desc": "商品・カテゴリ・オプションの管理" },
-      "whatsapp-bestellingen": { "title": "WhatsApp注文", "desc": "WhatsAppでの注文の受信と管理" },
-      "personeel": { "title": "スタッフ", "desc": "従業員・勤務時間・求人の管理" },
-      "kostenberekening": { "title": "原価計算", "desc": "材料と商品価格の計算" },
-      "z-rapporten": { "title": "Zレポート", "desc": "日次レポートと締め作業" },
-      "bestellingen": { "title": "注文", "desc": "注文と予約の管理" },
-      "groepsbestellingen": { "title": "団体注文", "desc": "グループ向け注文の管理" },
-      "bonnenprinter": { "title": "レシートプリンター", "desc": "レシートプリンターの設定と利用" },
-      "de-website": { "title": "ウェブサイト", "desc": "独自サイトの管理とカスタマイズ" },
-      "de-shop": { "title": "ショップ", "desc": "オンラインショップの設定と管理" }
+      "registreren": {
+        "title": "登録",
+        "desc": "アカウント作成と管理画面の紹介"
+      },
+      "modules": {
+        "title": "概要",
+        "desc": "オーダー画面、分析、販売など"
+      },
+      "instellingen": {
+        "title": "設定",
+        "desc": "オンラインショップの設定"
+      },
+      "menu": {
+        "title": "メニュー",
+        "desc": "商品・カテゴリ・オプションの管理"
+      },
+      "whatsapp-bestellingen": {
+        "title": "WhatsApp注文",
+        "desc": "WhatsAppでの注文の受信と管理"
+      },
+      "personeel": {
+        "title": "スタッフ",
+        "desc": "従業員・勤務時間・求人の管理"
+      },
+      "kostenberekening": {
+        "title": "原価計算",
+        "desc": "材料と商品価格の計算"
+      },
+      "z-rapporten": {
+        "title": "Zレポート",
+        "desc": "日次レポートと締め作業"
+      },
+      "bestellingen": {
+        "title": "注文",
+        "desc": "注文と予約の管理"
+      },
+      "groepsbestellingen": {
+        "title": "団体注文",
+        "desc": "グループ向け注文の管理"
+      },
+      "bonnenprinter": {
+        "title": "レシートプリンター",
+        "desc": "レシートプリンターの設定と利用"
+      },
+      "de-website": {
+        "title": "ウェブサイト",
+        "desc": "独自サイトの管理とカスタマイズ"
+      },
+      "de-shop": {
+        "title": "ショップ",
+        "desc": "オンラインショップの設定と管理"
+      }
     },
     "v": {
       "registratie1": "登録",
@@ -4337,7 +4435,7 @@
     "bannerEigen": "一時的に休業中"
   },
   "whyVysion": {
-    "title": "Why\u00a0choose\u00a0Vysion",
+    "title": "Why choose Vysion",
     "imageAlt": "タッチスクリーン付きのVysionテーブル端末",
     "fullPlatform": {
       "title": "Full platform",
@@ -4501,5 +4599,91 @@
     "galleryNext": "Next image",
     "galleryClose": "Close",
     "galleryOpen": "Enlarge image"
+  },
+  "ui": {
+    "ariaPrevImage": "前の画像",
+    "ariaNextImage": "次の画像",
+    "ariaClose": "閉じる",
+    "ariaPrev": "前へ",
+    "ariaNext": "次へ",
+    "ariaPrevReview": "前のレビュー",
+    "ariaNextReview": "次のレビュー",
+    "ariaToggleMenu": "メニューを開くまたは閉じる",
+    "ariaMain": "メインコンテンツ",
+    "ariaNavMenu": "メニュー",
+    "delete": "削除",
+    "edit": "編集",
+    "zoomOut": "ズームアウト（広く表示）",
+    "zoomIn": "ズームイン（狭く表示）",
+    "dragToReorder": "ドラッグして並べ替え",
+    "printReceipt": "レシート印刷",
+    "voiceOrder": "音声で注文",
+    "viewInvoice": "請求書を見る",
+    "linkInvoicePdf": "PDF請求書を紐付け",
+    "viewInvoicePdf": "請求書PDFを見る",
+    "clickToEditName": "クリックして名前を編集",
+    "countCashPlaceholder": "数えた金額を入力…",
+    "typeDeleteConfirm": "削除",
+    "promoCodeExample": "SAVE10",
+    "stripePkPlaceholder": "pk_live_…",
+    "stripeSkPlaceholder": "sk_live_…",
+    "stripeWhsecPlaceholder": "whsec_…",
+    "ipExamplePlaceholder": "例: 192.168.1.100",
+    "closingNotePlaceholder": "例: 私用、メンテナンス…",
+    "holidayNotePlaceholder": "例: 休暇、改修…",
+    "newPinPlaceholder": "新しいPIN",
+    "confirmPinPlaceholder": "PIN確認",
+    "ownerEmailPlaceholder": "owner@email.com",
+    "minPasswordPlaceholder": "8文字以上",
+    "repeatPasswordPlaceholder": "パスワード再入力",
+    "slideLabel": "スライド {{n}}",
+    "productLabel": "商品 {{n}}",
+    "vatPlaceholder": "BE0123456789",
+    "facebookUrlPlaceholder": "https://facebook.com/…",
+    "instagramUrlPlaceholder": "https://instagram.com/…",
+    "tiktokUrlPlaceholder": "https://tiktok.com/@…",
+    "websiteUrlPlaceholder": "https://…",
+    "exampleDishPlaceholder": "例: 手作りパスタ",
+    "exampleFishPlaceholder": "例: 鮮魚料理",
+    "exampleBreadPlaceholder": "例: 手工パン",
+    "exampleBusinessPlaceholder": "例: サンプル店",
+    "exampleShopEmailPlaceholder": "info@example.jp",
+    "exampleSmtpPlaceholder": "例: smtp.provider.jp",
+    "reservationNamePlaceholder": "山田 太郎",
+    "reservationEmailPlaceholder": "taro@example.jp",
+    "reservationNotesPlaceholder": "アレルギー、ベビーチェア、車椅子、その他のご要望…",
+    "newCategoryPlaceholder": "新しいカテゴリ名…",
+    "sendPaymentReminder": "支払いリマインダーを送信",
+    "tenantSlugPlaceholder": "my-shop",
+    "tenantNamePlaceholder": "サンプルカフェ",
+    "tenantEmailPlaceholder": "info@example.jp",
+    "superadminLoginPlaceholder": "admin@vysionhoreca.com",
+    "invoiceEmailPlaceholder": "invoice@company.jp",
+    "companyLegalPlaceholder": "株式会社サンプル",
+    "companyVatPlaceholder": "BE0123456789",
+    "firstNamePlaceholder": "太郎",
+    "lastNamePlaceholder": "山田",
+    "exampleEmailPlaceholder": "taro@example.jp",
+    "lightboxImageAlt": "拡大表示"
+  },
+  "pinGate": {
+    "incorrectPin": "PINが正しくありません。もう一度お試しください。",
+    "invalidPin": "有効な4桁のPINを入力してください",
+    "pinMismatch": "PINが一致しません",
+    "emailMismatch": "メールアドレスが一致しません",
+    "noAccessTitle": "アクセス不可",
+    "noAccessBody1": "このモジュールにアクセスできません。",
+    "noAccessBody2": "オーナーの方は、次で先にPINを作成してください",
+    "kassaPinLink": "レジ → PIN",
+    "back": "← 戻る",
+    "forgotTitle": "PINをお忘れですか",
+    "forgotEmailHelp": "オーナーのメールアドレスを確認",
+    "confirm": "確認",
+    "newPinHelp": "新しい4桁のPINを設定",
+    "saving": "保存中...",
+    "saveNewPin": "新しいPINを保存",
+    "ownerPinTitle": "オーナーPIN",
+    "enterPinHelp": "4桁のPINを入力",
+    "forgotLink": "PINをお忘れですか？"
   }
 }
