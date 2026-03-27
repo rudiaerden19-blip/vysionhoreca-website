@@ -167,7 +167,8 @@
   },
   "platform": {
     "sectionTitle": "Our platform",
-    "sectionSubtitle": "Everything Vysion offers, at a glance.",
+    "sectionSubtitle1": "Try the full system yourself (free)",
+    "sectionSubtitle2": "Click below and see how your business works with Vysion",
     "gridTestCta": "Start free demo",
     "detailCta": "Start free trial",
     "detailBack": "Back to overview",

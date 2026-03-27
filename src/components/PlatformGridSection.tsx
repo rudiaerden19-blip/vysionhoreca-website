@@ -40,9 +40,17 @@ export default function PlatformGridSection() {
   return (
     <section id="platform" className="py-20 sm:py-28 lg:py-36 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-center text-4xl sm:text-5xl font-bold text-gray-900 mb-12 sm:mb-16 tracking-tight">
-          {t('platform.sectionTitle')}
-        </h2>
+        <header className="text-center mb-12 sm:mb-16 max-w-3xl mx-auto">
+          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 tracking-tight">
+            {t('platform.sectionTitle')}
+          </h2>
+          <p className="mt-4 text-lg sm:text-xl text-gray-800 font-medium leading-snug">
+            {t('platform.sectionSubtitle1')}
+          </p>
+          <p className="mt-2 text-base sm:text-lg text-gray-600 leading-relaxed">
+            {t('platform.sectionSubtitle2')}
+          </p>
+        </header>
 
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6 lg:gap-7">
           {PLATFORM_PAGES.map(({ slug, msgKey, cardHeaderImage }) => {

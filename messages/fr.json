@@ -4309,7 +4309,8 @@
   },
   "platform": {
     "sectionTitle": "Our platform",
-    "sectionSubtitle": "Everything Vysion offers, at a glance.",
+    "sectionSubtitle1": "Essayez le système complet vous-même (gratuit)",
+    "sectionSubtitle2": "Cliquez ci-dessous et découvrez comment votre établissement fonctionne avec Vysion",
     "gridTestCta": "Démarrer la démo gratuite",
     "detailCta": "Start free trial",
     "detailBack": "Back to overview",

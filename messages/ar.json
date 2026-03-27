@@ -4286,7 +4286,8 @@
   },
   "platform": {
     "sectionTitle": "Our platform",
-    "sectionSubtitle": "Everything Vysion offers, at a glance.",
+    "sectionSubtitle1": "جرّب النظام كاملًا بنفسك (مجانًا)",
+    "sectionSubtitle2": "انقر أدناه واكتشف كيف يعمل عملك مع Vysion",
     "gridTestCta": "ابدأ العرض التجريبي مجانًا",
     "detailCta": "Start free trial",
     "detailBack": "Back to overview",
