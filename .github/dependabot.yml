@@ -1,4 +1,6 @@
 # Automatische dependency-PR's (review + CI vóór merge).
+# Geen npm-"groups": gegroepeerde bumps breken vaak in één keer (lint/build); losse PR's zijn
+# makkelijker te reviewen en veilig te mergen.
 version: 2
 updates:
   - package-ecosystem: npm
@@ -6,12 +8,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 12
-    groups:
-      production-dependencies:
-        dependency-type: production
-      development-dependencies:
-        dependency-type: development
+    open-pull-requests-limit: 20
 
   - package-ecosystem: github-actions
     directory: /
