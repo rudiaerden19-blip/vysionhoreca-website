@@ -856,8 +856,8 @@ function TableKioskSection() {
             <Image
               src="/images/table-kiosk-device.png"
               alt={t('tableKiosk.imageAlt')}
-              width={804}
-              height={610}
+              width={613}
+              height={804}
               loading="lazy"
               className="w-full h-auto max-h-[min(85vw,480px)] sm:max-h-[440px] lg:max-h-[500px] object-contain mx-auto"
               sizes="(min-width: 1024px) 40vw, 90vw"
