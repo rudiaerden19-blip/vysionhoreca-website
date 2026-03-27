@@ -291,7 +291,7 @@ function StatsAndLiveDemoSection() {
           href={DEMO_HERO_LIVE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-home-btn hover:shadow-[0_0_50px_rgba(234,88,12,0.6)] hover:scale-105"
+          className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-home-btn hover:shadow-[0_0_36px_rgba(234,88,12,0.38)] hover:scale-105"
         >
           <span>{t('liveDemo.cta')}</span>
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -770,7 +770,7 @@ function StopSection() {
           </div>
           <a
             href={`/registreer?lang=${locale}`}
-            className="inline-block bg-accent text-white px-8 sm:px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-home-btn hover:shadow-[0_0_50px_rgba(234,88,12,0.7)] hover:scale-105"
+            className="inline-block bg-accent text-white px-8 sm:px-10 py-4 rounded-full font-bold text-lg hover:bg-accent/90 transition-all shadow-home-btn hover:shadow-[0_0_36px_rgba(234,88,12,0.42)] hover:scale-105"
           >
             {t('stop.cta')}
           </a>

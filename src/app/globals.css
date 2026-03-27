@@ -6,15 +6,15 @@
 @layer utilities {
   .shadow-home-btn {
     box-shadow:
-      0 32px 64px -10px rgba(0, 0, 0, 0.4),
-      0 17px 38px -6px rgba(0, 0, 0, 0.3),
-      0 8px 20px rgba(0, 0, 0, 0.22);
+      0 22px 48px -10px rgba(0, 0, 0, 0.28),
+      0 12px 28px -6px rgba(0, 0, 0, 0.2),
+      0 5px 14px rgba(0, 0, 0, 0.14);
   }
   .shadow-home-image {
     box-shadow:
-      0 48px 112px -20px rgba(0, 0, 0, 0.46),
-      0 28px 72px -12px rgba(0, 0, 0, 0.35),
-      0 13px 36px rgba(0, 0, 0, 0.26);
+      0 34px 82px -18px rgba(0, 0, 0, 0.3),
+      0 20px 54px -10px rgba(0, 0, 0, 0.22),
+      0 9px 26px rgba(0, 0, 0, 0.15);
   }
   /* Grote foto op lichte achtergrond (Why Vysion POS) — lichter dan shadow-home-image */
   .shadow-home-photo {
@@ -25,9 +25,9 @@
   }
   .shadow-home-card {
     box-shadow:
-      0 42px 102px -22px rgba(0, 0, 0, 0.42),
-      0 25px 62px -12px rgba(0, 0, 0, 0.32),
-      0 12px 30px rgba(0, 0, 0, 0.22);
+      0 28px 68px -16px rgba(0, 0, 0, 0.26),
+      0 16px 44px -10px rgba(0, 0, 0, 0.19),
+      0 7px 20px rgba(0, 0, 0, 0.13);
   }
   .shadow-home-thumb {
     box-shadow:
@@ -341,8 +341,8 @@ input[type="number"] {
 .btn-primary:hover {
   @apply bg-opacity-90 transform scale-105;
   box-shadow:
-    0 38px 78px -10px rgba(0, 0, 0, 0.44),
-    0 20px 46px rgba(0, 0, 0, 0.32);
+    0 26px 54px -10px rgba(0, 0, 0, 0.26),
+    0 14px 32px rgba(0, 0, 0, 0.18);
 }
 
 .btn-outline {
