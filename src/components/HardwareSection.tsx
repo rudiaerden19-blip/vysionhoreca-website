@@ -81,7 +81,7 @@ export default function HardwareSection() {
                   loading="lazy"
                 />
               </div>
-              <p className="px-3 pb-3 sm:px-4 sm:pb-4 pt-1 text-center text-sm font-semibold text-gray-800 tracking-wide">
+              <p className="px-3 pb-3 sm:px-4 sm:pb-4 pt-2 text-center text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 tracking-tight leading-snug">
                 {item.model}
               </p>
             </button>
@@ -119,7 +119,7 @@ export default function HardwareSection() {
                 priority
               />
             </div>
-            <p id="hardware-lightbox-title" className="text-white text-center text-base sm:text-lg font-semibold">
+            <p id="hardware-lightbox-title" className="text-white text-center text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
               {HARDWARE_ITEMS[expanded].model}
             </p>
           </div>
