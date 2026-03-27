@@ -1,6 +1,8 @@
-# Automatische dependency-PR's (review + CI vóór merge).
-# Geen npm-"groups": gegroepeerde bumps breken vaak in één keer (lint/build); losse PR's zijn
-# makkelijker te reviewen en veilig te mergen.
+# Dependabot: alleen semver-patch en semver-minor voor npm.
+# Major upgrades (Tailwind 4, ESLint 10, React 19, Next 15/16, @types/node 25, …)
+# breken bijna altijd CI tot je bewust migreert — die doe je handmatig op main.
+#
+# Zie: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#specifying-the-type-of-updates-to-ignore
 version: 2
 updates:
   - package-ecosystem: npm
@@ -8,9 +10,17 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 20
+    open-pull-requests-limit: 15
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - version-update:semver-major
