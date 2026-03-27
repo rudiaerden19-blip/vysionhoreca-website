@@ -45,7 +45,9 @@
   "hardware": {
     "title": "Onze hardware",
     "subtitle": "Professionele kassa’s, tweede scherm, betaalterminals en randapparatuur — klaar om Vysion Horeca op te draaien in jouw zaak.",
-    "imageAlt": "Hardware voorbeeld"
+    "imageAlt": "Hardware voorbeeld",
+    "openExpanded": "Afbeelding vergroten",
+    "closeExpanded": "Sluiten"
   },
   "newAtVysion": {
     "title": "Stel zelf je pakket samen",

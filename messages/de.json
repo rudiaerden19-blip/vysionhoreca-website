@@ -45,7 +45,9 @@
   "hardware": {
     "title": "Unsere Hardware",
     "subtitle": "Professionelle Kassensysteme, Kundendisplays, Zahlungsgeräte und Peripherie — bereit für Vysion Horeca in Ihrem Betrieb.",
-    "imageAlt": "Hardware-Beispiel"
+    "imageAlt": "Hardware-Beispiel",
+    "openExpanded": "Bild vergrößern",
+    "closeExpanded": "Schließen"
   },
   "newAtVysion": {
     "title": "Stellen Sie Ihr Paket selbst zusammen",

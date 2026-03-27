@@ -45,7 +45,9 @@
   "hardware": {
     "title": "ハードウェア",
     "subtitle": "業務用POS端末、客向けディスプレイ、決済端末と周辺機器 — お店でVysion Horecaを稼働させるための構成です。",
-    "imageAlt": "ハードウェア例"
+    "imageAlt": "ハードウェア例",
+    "openExpanded": "画像を拡大",
+    "closeExpanded": "閉じる"
   },
   "newAtVysion": {
     "title": "パッケージを自由に組み立て",

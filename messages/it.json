@@ -45,7 +45,9 @@
   "hardware": {
     "title": "Il nostro hardware",
     "subtitle": "Terminali POS, display cliente, dispositivi di pagamento e periferiche professionali — pronti per Vysion Horeca nella tua attività.",
-    "imageAlt": "Esempio di hardware"
+    "imageAlt": "Esempio di hardware",
+    "openExpanded": "Ingrandisci immagine",
+    "closeExpanded": "Chiudi"
   },
   "newAtVysion": {
     "title": "Componi il tuo pacchetto",

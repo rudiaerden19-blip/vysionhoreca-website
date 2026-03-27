@@ -45,7 +45,9 @@
   "hardware": {
     "title": "Our hardware",
     "subtitle": "Professional POS terminals, customer displays, payment devices and peripherals — ready to run Vysion Horeca in your venue.",
-    "imageAlt": "Hardware example"
+    "imageAlt": "Hardware example",
+    "openExpanded": "Enlarge image",
+    "closeExpanded": "Close"
   },
   "newAtVysion": {
     "title": "Build your own package",

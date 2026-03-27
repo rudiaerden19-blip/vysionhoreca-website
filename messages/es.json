@@ -45,7 +45,9 @@
   "hardware": {
     "title": "Nuestro hardware",
     "subtitle": "TPVs profesionales, pantallas para el cliente, datáfonos y periféricos — listos para ejecutar Vysion Horeca en tu negocio.",
-    "imageAlt": "Ejemplo de hardware"
+    "imageAlt": "Ejemplo de hardware",
+    "openExpanded": "Ampliar imagen",
+    "closeExpanded": "Cerrar"
   },
   "newAtVysion": {
     "title": "Monta tu propio paquete",

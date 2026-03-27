@@ -45,7 +45,9 @@
   "hardware": {
     "title": "我们的硬件",
     "subtitle": "专业收银终端、客显屏、支付终端与周边设备 — 可在门店稳定运行 Vysion Horeca。",
-    "imageAlt": "硬件示例"
+    "imageAlt": "硬件示例",
+    "openExpanded": "放大图片",
+    "closeExpanded": "关闭"
   },
   "newAtVysion": {
     "title": "自由组合您的套餐",

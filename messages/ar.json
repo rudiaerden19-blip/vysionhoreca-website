@@ -45,7 +45,9 @@
   "hardware": {
     "title": "أجهزتنا",
     "subtitle": "طرفيات نقاط بيع احترافية، شاشات للعملاء، أجهزة دفع وملحقات — جاهزة لتشغيل Vysion Horeca في منشأتك.",
-    "imageAlt": "مثال على الأجهزة"
+    "imageAlt": "مثال على الأجهزة",
+    "openExpanded": "تكبير الصورة",
+    "closeExpanded": "إغلاق"
   },
   "newAtVysion": {
     "title": "اصنع باقتك بنفسك",

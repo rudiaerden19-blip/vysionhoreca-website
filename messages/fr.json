@@ -45,7 +45,9 @@
   "hardware": {
     "title": "Notre matériel",
     "subtitle": "Terminaux d’encaissement, écrans client, TPE et périphériques professionnels — prêts pour faire tourner Vysion Horeca dans votre établissement.",
-    "imageAlt": "Exemple de matériel"
+    "imageAlt": "Exemple de matériel",
+    "openExpanded": "Agrandir l’image",
+    "closeExpanded": "Fermer"
   },
   "newAtVysion": {
     "title": "Composez votre forfait vous-même",
