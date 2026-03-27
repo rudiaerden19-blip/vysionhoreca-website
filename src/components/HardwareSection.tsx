@@ -12,7 +12,7 @@ const HARDWARE_ITEMS = [
   { src: '/images/hardware/hardware-5.png', model: 'rf8000' },
   { src: '/images/hardware/hardware-6.png', model: 'vm789' },
   { src: '/images/hardware/hardware-7.png', model: 'vm20' },
-  { src: '/images/hardware/hardware-8.png', model: 'vsr 789' },
+  { src: '/images/hardware/hardware-8.png', model: 'handpalm betalingen' },
   { src: '/images/hardware/hardware-9.png', model: 'handpos t41' },
 ] as const
 
