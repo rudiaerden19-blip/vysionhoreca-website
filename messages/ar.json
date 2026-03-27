@@ -242,6 +242,12 @@
     "choosePro": "اختر Pro",
     "cancelAnytime": "إلغاء شهري",
     "yearlySave": "وفّر 10٪ مع الاشتراك السنوي.",
+    "billingMonthly": "شهري",
+    "billingYearly": "سنوي",
+    "perYear": "/سنة",
+    "badgeYearlyDiscount": "-10٪",
+    "compareDiscountStarter": "-40٪",
+    "compareDiscountPro": "-23٪",
     "starter": {
       "name": "Vysion Pro",
       "features": {
@@ -413,7 +419,8 @@
       "sending": "جاري الإرسال...",
       "required": "*",
       "successTitle": "تم إرسال الرسالة!",
-      "successMessage": "شكراً لرسالتك. سنتواصل معك في أقرب وقت ممكن."
+      "successMessage": "شكراً لرسالتك. سنتواصل معك في أقرب وقت ممكن.",
+      "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى."
     }
   },
   "footer": {
@@ -4118,6 +4125,65 @@
     "weeksAgo": "أسابيع",
     "monthsAgo": "أشهر"
   },
+  "videosPage": {
+    "heroTitle": "مساعدة",
+    "heroTitleAccent": "فيديوهات",
+    "heroSubtitle": "تعرّف على Vysion Horeca في فيديوهات قصيرة حوالي 3 دقائق.",
+    "videoCountOne": "فيديو واحد",
+    "videoCountMany": "{{count}} فيديوهات",
+    "comingSoon": " — قريباً",
+    "cats": {
+      "registreren": { "title": "التسجيل", "desc": "إنشاء حساب ولوحة الإدارة" },
+      "modules": { "title": "نظرة عامة", "desc": "شاشة الطلبات والتحليلات والمزيد" },
+      "instellingen": { "title": "الإعدادات", "desc": "ضبط كل شيء لمتجرك الإلكتروني" },
+      "menu": { "title": "القائمة", "desc": "إدارة المنتجات والفئات والخيارات" },
+      "whatsapp-bestellingen": { "title": "طلبات واتساب", "desc": "استلام وإدارة الطلبات عبر واتساب" },
+      "personeel": { "title": "الموظفون", "desc": "إدارة الموظفين والساعات والوظائف" },
+      "kostenberekening": { "title": "حساب التكاليف", "desc": "حساب المكونات وأسعار المنتجات" },
+      "z-rapporten": { "title": "تقارير Z", "desc": "تقارير يومية وإقفال" },
+      "bestellingen": { "title": "الطلبات", "desc": "إدارة الطلبات والحجوزات" },
+      "groepsbestellingen": { "title": "طلبات جماعية", "desc": "إدارة طلبات المجموعات" },
+      "bonnenprinter": { "title": "طابعة الإيصالات", "desc": "إعداد واستخدام الطابعة" },
+      "de-website": { "title": "موقعك", "desc": "إدارة وتخصيص الموقع" },
+      "de-shop": { "title": "المتجر", "desc": "إعداد وإدارة المتجر الإلكتروني" }
+    },
+    "v": {
+      "registratie1": "التسجيل",
+      "admin-overzicht2": "نظرة على الإدارة",
+      "keukenscherm3": "شاشة الطلبات",
+      "analyse-module4": "تحليل الأعمال",
+      "verkoop5": "المبيعات",
+      "populaire-items6": "عناصر شائعة",
+      "instellingen-online-shop": "المتجر الإلكتروني",
+      "zaakprofiel": "ملف المنشأة",
+      "openingstijden": "ساعات العمل",
+      "online-instellingen": "التوصيل والاستلام",
+      "betaal-methodes": "طرق الدفع",
+      "design-en-kleuren": "التصميم والألوان",
+      "team": "فريقنا",
+      "cadeau-bonnen": "قسائم الهدايا",
+      "producten": "المنتجات والفئات والخيارات",
+      "whatsapp": "واتساب",
+      "medewerker-aanmaken": "إنشاء موظف",
+      "uren-registratie": "تسجيل الوقت",
+      "vacature": "وظائف",
+      "berekening1": "تكلفة المكونات",
+      "prijs-berekening2": "تكلفة المنتج",
+      "z-rapport": "تقرير Z",
+      "bestellingen": "الطلبات",
+      "reserveringen": "الحجوزات",
+      "groepsbestellingen": "طلبات جماعية",
+      "printer": "طابعة إيصالات",
+      "de-website": "موقعك",
+      "de-shop": "المتجر"
+    }
+  },
+  "helpPage": {
+    "heroTitle": "مساعدة",
+    "heroTitleAccent": "صفحة",
+    "heroSubtitle": "اعثر هنا على إجابات لأسئلتك.",
+    "body": "المحتوى قريباً."
+  },
   "supportPage": {
     "heroTitle": "كيف يمكننا المساعدة?",
     "heroSubtitle": "فريق الدعم لدينا متاح 7 ايام في الاسبوع. نرد عادة في غضون 5 دقائق.",
@@ -4206,6 +4272,9 @@
     "expectedClients": "كم عميلا تتوقع سنويا?",
     "companyPlaceholder": "شركتك",
     "namePlaceholder": "اسمك",
+    "emailPlaceholder": "email@example.com",
+    "phonePlaceholder": "+966 …",
+    "websitePlaceholder": "https://…",
     "cityPlaceholder": "مدينتك",
     "experiencePlaceholder": "اخبرنا عن خبرتك...",
     "motivationPlaceholder": "دوافعك...",

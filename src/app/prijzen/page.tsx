@@ -12,7 +12,7 @@ export default function PrijzenPage() {
   const proMonthly = 99
   const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
   const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
-  const periodLabel = isYearly ? '/jaar' : t('pricing.perMonth')
+  const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')
 
   return (
     <div className="min-h-screen bg-[#e3e3e3]">
@@ -37,7 +37,7 @@ export default function PrijzenPage() {
                   !isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Maandelijks
+                {t('pricing.billingMonthly')}
               </button>
               <button
                 type="button"
@@ -46,9 +46,9 @@ export default function PrijzenPage() {
                   isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Jaarlijks
+                {t('pricing.billingYearly')}
                 <span className="absolute -top-1.5 -right-1 bg-gray-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none">
-                  -10%
+                  {t('pricing.badgeYearlyDiscount')}
                 </span>
               </button>
             </div>
@@ -68,9 +68,12 @@ export default function PrijzenPage() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-lg text-gray-400 line-through">
-                    €{isYearly ? Math.round(99 * 12 * 0.9) : 99}/maand
+                    €{isYearly ? Math.round(99 * 12 * 0.9) : 99}
+                    {t('pricing.perMonth')}
                   </span>
-                  <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">-40%</span>
+                  <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
+                    {t('pricing.compareDiscountStarter')}
+                  </span>
                 </div>
                 <div className="flex items-baseline mb-2">
                   <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{starterPrice}</span>
@@ -126,9 +129,12 @@ export default function PrijzenPage() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-lg text-gray-400 line-through">
-                    €{isYearly ? Math.round(129 * 12 * 0.9) : 129}/maand
+                    €{isYearly ? Math.round(129 * 12 * 0.9) : 129}
+                    {t('pricing.perMonth')}
                   </span>
-                  <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">-23%</span>
+                  <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
+                    {t('pricing.compareDiscountPro')}
+                  </span>
                 </div>
                 <div className="flex items-baseline mb-2">
                   <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{proPrice}</span>

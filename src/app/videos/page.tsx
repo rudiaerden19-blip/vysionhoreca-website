@@ -1,154 +1,119 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Navigation, Footer } from '@/components'
+import { useLanguage } from '@/i18n'
 
 type Video = { titel: string; src: string }
 
-const categorieen: { id: string; titel: string; beschrijving: string; icoon: string; videos: Video[] }[] = [
+const VIDEO_CATEGORY_DEFS = [
   {
     id: 'registreren',
-    titel: 'Registreren',
-    beschrijving: 'Account aanmaken en het admin paneel leren kennen',
     icoon: '🚀',
-    videos: [
-      { titel: 'Registreren', src: '/videos/registratie1.mp4' },
-      { titel: 'Admin paneel', src: '/videos/admin-overzicht2.mp4' },
-    ],
+    videoKeys: ['registratie1', 'admin-overzicht2'] as const,
   },
   {
     id: 'modules',
-    titel: 'Overzicht',
-    beschrijving: 'Order scherm, analyse, verkoop en meer',
     icoon: '🖥️',
-    videos: [
-      { titel: 'Order scherm', src: '/videos/keukenscherm3.mp4' },
-      { titel: 'Bedrijfs analyse', src: '/videos/analyse-module4.mp4' },
-      { titel: 'Verkoop', src: '/videos/verkoop5.mp4' },
-      { titel: 'Populaire items', src: '/videos/populaire-items6.mp4' },
-    ],
+    videoKeys: ['keukenscherm3', 'analyse-module4', 'verkoop5', 'populaire-items6'] as const,
   },
   {
     id: 'instellingen',
-    titel: 'Instellingen',
-    beschrijving: 'Alles instellen voor je online shop',
     icoon: '⚙️',
-    videos: [
-      { titel: 'Online shop', src: '/videos/instellingen-online-shop.mp4' },
-      { titel: 'Zaak profiel', src: '/videos/zaakprofiel.mp4' },
-      { titel: 'Openingstijden', src: '/videos/openingstijden.mp4' },
-      { titel: 'Levering en afhaal', src: '/videos/online-instellingen.mp4' },
-      { titel: 'Betaal methodes', src: '/videos/betaal-methodes.mp4' },
-      { titel: 'Design en kleuren', src: '/videos/design-en-kleuren.mp4' },
-      { titel: 'Ons team', src: '/videos/team.mp4' },
-      { titel: 'Cadeau bonnen', src: '/videos/cadeau-bonnen.mp4' },
-    ],
+    videoKeys: [
+      'instellingen-online-shop',
+      'zaakprofiel',
+      'openingstijden',
+      'online-instellingen',
+      'betaal-methodes',
+      'design-en-kleuren',
+      'team',
+      'cadeau-bonnen',
+    ] as const,
   },
   {
     id: 'menu',
-    titel: 'Menu',
-    beschrijving: 'Producten, categorieën en opties beheren',
     icoon: '🍽️',
-    videos: [
-      { titel: 'Producten, categorieën en opties', src: '/videos/producten.mp4' },
-    ],
+    videoKeys: ['producten'] as const,
   },
   {
     id: 'whatsapp-bestellingen',
-    titel: 'Whatsapp bestellingen',
-    beschrijving: 'Bestellingen via WhatsApp ontvangen en beheren',
     icoon: '💬',
-    videos: [
-      { titel: 'WhatsApp', src: '/videos/whatsapp.mp4' },
-    ],
+    videoKeys: ['whatsapp'] as const,
   },
   {
     id: 'personeel',
-    titel: 'Personeel',
-    beschrijving: 'Medewerkers, uren en vacatures beheren',
     icoon: '👥',
-    videos: [
-      { titel: 'Medewerker aanmaken', src: '/videos/medewerker-aanmaken.mp4' },
-      { titel: 'Uren registratie', src: '/videos/uren-registratie.mp4' },
-      { titel: 'Vacatures', src: '/videos/vacature.mp4' },
-    ],
+    videoKeys: ['medewerker-aanmaken', 'uren-registratie', 'vacature'] as const,
   },
   {
     id: 'kostenberekening',
-    titel: 'Kostenberekening',
-    beschrijving: 'Ingrediënten en productprijzen berekenen',
     icoon: '🧮',
-    videos: [
-      { titel: 'Ingrediënten berekening', src: '/videos/berekening1.mp4' },
-      { titel: 'Producten berekening', src: '/videos/prijs-berekening2.mp4' },
-    ],
+    videoKeys: ['berekening1', 'prijs-berekening2'] as const,
   },
   {
     id: 'z-rapporten',
-    titel: 'Z Rapporten',
-    beschrijving: 'Dagelijkse rapporten en afsluiting',
     icoon: '📊',
-    videos: [
-      { titel: 'Z Rapport', src: '/videos/z-rapport.mp4' },
-    ],
+    videoKeys: ['z-rapport'] as const,
   },
   {
     id: 'bestellingen',
-    titel: 'Bestellingen',
-    beschrijving: 'Bestellingen en reserveringen beheren',
     icoon: '📋',
-    videos: [
-      { titel: 'Bestellingen', src: '/videos/bestellingen.mp4' },
-      { titel: 'Reserveringen', src: '/videos/reserveringen.mp4' },
-    ],
+    videoKeys: ['bestellingen', 'reserveringen'] as const,
   },
   {
     id: 'groepsbestellingen',
-    titel: 'Groepsbestellingen',
-    beschrijving: 'Bestellingen beheren voor groepen',
     icoon: '👨‍👩‍👧‍👦',
-    videos: [
-      { titel: 'Groepsbestellingen', src: '/videos/groepsbestellingen.mp4' },
-    ],
+    videoKeys: ['groepsbestellingen'] as const,
   },
   {
     id: 'bonnenprinter',
-    titel: 'Bonnenprinter',
-    beschrijving: 'Bonnenprinter instellen en gebruiken',
     icoon: '🖨️',
-    videos: [
-      { titel: 'Bonnenprinter', src: '/videos/printer.mp4' },
-    ],
+    videoKeys: ['printer'] as const,
   },
   {
     id: 'de-website',
-    titel: 'De website',
-    beschrijving: 'Je eigen website beheren en aanpassen',
     icoon: '🌐',
-    videos: [
-      { titel: 'De website', src: '/videos/de-website.mp4' },
-    ],
+    videoKeys: ['de-website'] as const,
   },
   {
     id: 'de-shop',
-    titel: 'De shop',
-    beschrijving: 'Je online shop instellen en beheren',
     icoon: '🛒',
-    videos: [
-      { titel: 'De shop', src: '/videos/de-shop.mp4' },
-    ],
+    videoKeys: ['de-shop'] as const,
   },
-]
+] as const
+
+function videoSrc(key: string): string {
+  return `/videos/${key}.mp4`
+}
 
 export default function VideosPage() {
+  const { t } = useLanguage()
   const [actief, setActief] = useState<string | null>(null)
   const [actieveVideo, setActieveVideo] = useState<Video | null>(null)
+
+  const categorieen = useMemo(
+    () =>
+      VIDEO_CATEGORY_DEFS.map((def) => ({
+        id: def.id,
+        icoon: def.icoon,
+        titel: t(`videosPage.cats.${def.id}.title`),
+        beschrijving: t(`videosPage.cats.${def.id}.desc`),
+        videos: def.videoKeys.map((key) => ({
+          titel: t(`videosPage.v.${key}`),
+          src: videoSrc(key),
+        })),
+      })),
+    [t],
+  )
+
+  const videoCountLabel = (n: number) =>
+    n === 1 ? t('videosPage.videoCountOne') : t('videosPage.videoCountMany').replace('{{count}}', String(n))
 
   return (
     <main>
       <Navigation />
 
-      {/* Hero — achtergrond restaurant (afb. gebruiker) */}
       <section className="relative pt-32 pb-20 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -158,15 +123,12 @@ export default function VideosPage() {
         <div className="absolute inset-0 bg-black/55" aria-hidden />
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-sm">
-            Help <span className="text-accent">Video's</span>
+            {t('videosPage.heroTitle')} <span className="text-accent">{t('videosPage.heroTitleAccent')}</span>
           </h1>
-          <p className="text-xl text-gray-200 max-w-3xl mx-auto">
-            Leer alles over Vysion Horeca in korte video's van 3 minuten.
-          </p>
+          <p className="text-xl text-gray-200 max-w-3xl mx-auto">{t('videosPage.heroSubtitle')}</p>
         </div>
       </section>
 
-      {/* Categorieën */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -180,12 +142,11 @@ export default function VideosPage() {
                   <h2 className="text-xl font-bold text-gray-900 mb-1">{cat.titel}</h2>
                   <p className="text-gray-600 text-sm flex-1 line-clamp-2">{cat.beschrijving}</p>
                   <span className="text-accent font-medium text-sm mt-3">
-                    {cat.videos.length} video{cat.videos.length !== 1 ? "'s" : ''}
-                    {cat.videos.length === 0 ? ' — binnenkort beschikbaar' : ''}
+                    {videoCountLabel(cat.videos.length)}
+                    {cat.videos.length === 0 ? t('videosPage.comingSoon') : ''}
                   </span>
                 </div>
 
-                {/* Video lijst */}
                 {actief === cat.id && cat.videos.length > 0 && (
                   <div className="mt-4 space-y-3">
                     {cat.videos.map((video, i) => (
@@ -210,7 +171,6 @@ export default function VideosPage() {
         </div>
       </section>
 
-      {/* Video modal */}
       {actieveVideo && (
         <div
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
@@ -219,7 +179,7 @@ export default function VideosPage() {
           <div className="bg-black rounded-2xl overflow-hidden w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between px-6 py-4">
               <h3 className="text-white font-semibold text-lg">{actieveVideo.titel}</h3>
-              <button onClick={() => setActieveVideo(null)} className="text-gray-400 hover:text-white">
+              <button type="button" onClick={() => setActieveVideo(null)} className="text-gray-400 hover:text-white">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -229,7 +189,9 @@ export default function VideosPage() {
               key={actieveVideo.src}
               controls
               className="w-full aspect-video"
-              onLoadedMetadata={(e) => { (e.target as HTMLVideoElement).play().catch(() => {}) }}
+              onLoadedMetadata={(e) => {
+                void (e.target as HTMLVideoElement).play().catch(() => {})
+              }}
             >
               <source src={actieveVideo.src} type="video/mp4" />
             </video>

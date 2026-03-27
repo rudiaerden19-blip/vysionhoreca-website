@@ -441,6 +441,12 @@
     "choosePro": "Kies Premium",
     "cancelAnytime": "Maandelijks opzegbaar",
     "yearlySave": "Je bespaart 10% met een jaarabonnement.",
+    "billingMonthly": "Maandelijks",
+    "billingYearly": "Jaarlijks",
+    "perYear": "/jaar",
+    "badgeYearlyDiscount": "-10%",
+    "compareDiscountStarter": "-40%",
+    "compareDiscountPro": "-23%",
     "starter": {
       "name": "Vysion Pro",
       "features": {
@@ -612,7 +618,8 @@
       "sending": "Versturen...",
       "required": "*",
       "successTitle": "Bericht verzonden!",
-      "successMessage": "Bedankt voor je bericht. We nemen zo snel mogelijk contact met je op."
+      "successMessage": "Bedankt voor je bericht. We nemen zo snel mogelijk contact met je op.",
+      "errorGeneric": "Er ging iets mis. Probeer het opnieuw."
     }
   },
   "footer": {
@@ -4276,6 +4283,65 @@
     "weeksAgo": "weken geleden",
     "monthsAgo": "maanden geleden"
   },
+  "videosPage": {
+    "heroTitle": "Help",
+    "heroTitleAccent": "Video's",
+    "heroSubtitle": "Leer alles over Vysion Horeca in korte video's van ongeveer 3 minuten.",
+    "videoCountOne": "1 video",
+    "videoCountMany": "{{count}} video's",
+    "comingSoon": " — binnenkort beschikbaar",
+    "cats": {
+      "registreren": { "title": "Registreren", "desc": "Account aanmaken en het admin paneel leren kennen" },
+      "modules": { "title": "Overzicht", "desc": "Order scherm, analyse, verkoop en meer" },
+      "instellingen": { "title": "Instellingen", "desc": "Alles instellen voor je online shop" },
+      "menu": { "title": "Menu", "desc": "Producten, categorieën en opties beheren" },
+      "whatsapp-bestellingen": { "title": "WhatsApp-bestellingen", "desc": "Bestellingen via WhatsApp ontvangen en beheren" },
+      "personeel": { "title": "Personeel", "desc": "Medewerkers, uren en vacatures beheren" },
+      "kostenberekening": { "title": "Kostenberekening", "desc": "Ingrediënten en productprijzen berekenen" },
+      "z-rapporten": { "title": "Z-rapporten", "desc": "Dagelijkse rapporten en afsluiting" },
+      "bestellingen": { "title": "Bestellingen", "desc": "Bestellingen en reserveringen beheren" },
+      "groepsbestellingen": { "title": "Groepsbestellingen", "desc": "Bestellingen beheren voor groepen" },
+      "bonnenprinter": { "title": "Bonnenprinter", "desc": "Bonnenprinter instellen en gebruiken" },
+      "de-website": { "title": "De website", "desc": "Je eigen website beheren en aanpassen" },
+      "de-shop": { "title": "De shop", "desc": "Je online shop instellen en beheren" }
+    },
+    "v": {
+      "registratie1": "Registreren",
+      "admin-overzicht2": "Admin paneel",
+      "keukenscherm3": "Order scherm",
+      "analyse-module4": "Bedrijfsanalyse",
+      "verkoop5": "Verkoop",
+      "populaire-items6": "Populaire items",
+      "instellingen-online-shop": "Online shop",
+      "zaakprofiel": "Zaakprofiel",
+      "openingstijden": "Openingstijden",
+      "online-instellingen": "Levering en afhalen",
+      "betaal-methodes": "Betaalmethodes",
+      "design-en-kleuren": "Design en kleuren",
+      "team": "Ons team",
+      "cadeau-bonnen": "Cadeaubonnen",
+      "producten": "Producten, categorieën en opties",
+      "whatsapp": "WhatsApp",
+      "medewerker-aanmaken": "Medewerker aanmaken",
+      "uren-registratie": "Urenregistratie",
+      "vacature": "Vacatures",
+      "berekening1": "Ingrediëntenberekening",
+      "prijs-berekening2": "Productberekening",
+      "z-rapport": "Z-rapport",
+      "bestellingen": "Bestellingen",
+      "reserveringen": "Reserveringen",
+      "groepsbestellingen": "Groepsbestellingen",
+      "printer": "Bonnenprinter",
+      "de-website": "De website",
+      "de-shop": "De shop"
+    }
+  },
+  "helpPage": {
+    "heroTitle": "Help",
+    "heroTitleAccent": "pagina",
+    "heroSubtitle": "Hier vind je antwoorden op je vragen.",
+    "body": "Inhoud komt hier."
+  },
   "supportPage": {
     "heroTitle": "Hoe kunnen we helpen?",
     "heroSubtitle": "Ons supportteam staat 7 dagen per week voor je klaar. We reageren meestal binnen 5 minuten.",
@@ -4364,6 +4430,9 @@
     "expectedClients": "Hoeveel klanten verwacht je per jaar?",
     "companyPlaceholder": "Jouw bedrijf",
     "namePlaceholder": "Jouw naam",
+    "emailPlaceholder": "email@voorbeeld.be",
+    "phonePlaceholder": "+32 …",
+    "websitePlaceholder": "https://…",
     "cityPlaceholder": "Jouw stad",
     "experiencePlaceholder": "Vertel over je ervaring...",
     "motivationPlaceholder": "Jouw motivatie...",

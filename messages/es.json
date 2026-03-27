@@ -242,6 +242,12 @@
     "choosePro": "Elegir Pro",
     "cancelAnytime": "Cancelable mensualmente",
     "yearlySave": "Ahorras un 10 % con la suscripción anual.",
+    "billingMonthly": "Mensual",
+    "billingYearly": "Anual",
+    "perYear": "/año",
+    "badgeYearlyDiscount": "-10%",
+    "compareDiscountStarter": "-40%",
+    "compareDiscountPro": "-23%",
     "starter": {
       "name": "Vysion Pro",
       "features": {
@@ -413,7 +419,8 @@
       "sending": "Enviando...",
       "required": "*",
       "successTitle": "¡Mensaje enviado!",
-      "successMessage": "Gracias por tu mensaje. Te responderemos lo antes posible."
+      "successMessage": "Gracias por tu mensaje. Te responderemos lo antes posible.",
+      "errorGeneric": "Algo salió mal. Inténtalo de nuevo."
     }
   },
   "footer": {
@@ -4118,6 +4125,65 @@
     "weeksAgo": "semanas",
     "monthsAgo": "meses"
   },
+  "videosPage": {
+    "heroTitle": "Ayuda",
+    "heroTitleAccent": "vídeos",
+    "heroSubtitle": "Aprende todo sobre Vysion Horeca en vídeos cortos de unos 3 minutos.",
+    "videoCountOne": "1 vídeo",
+    "videoCountMany": "{{count}} vídeos",
+    "comingSoon": " — disponible pronto",
+    "cats": {
+      "registreren": { "title": "Registro", "desc": "Crear cuenta y conocer el panel de administración" },
+      "modules": { "title": "Resumen", "desc": "Pantalla de pedidos, análisis, ventas y más" },
+      "instellingen": { "title": "Ajustes", "desc": "Configura todo para tu tienda online" },
+      "menu": { "title": "Menú", "desc": "Gestiona productos, categorías y opciones" },
+      "whatsapp-bestellingen": { "title": "Pedidos WhatsApp", "desc": "Recibe y gestiona pedidos por WhatsApp" },
+      "personeel": { "title": "Personal", "desc": "Gestiona empleados, horas y vacantes" },
+      "kostenberekening": { "title": "Cálculo de costes", "desc": "Calcula ingredientes y precios de productos" },
+      "z-rapporten": { "title": "Informes Z", "desc": "Informes diarios y cierre" },
+      "bestellingen": { "title": "Pedidos", "desc": "Gestiona pedidos y reservas" },
+      "groepsbestellingen": { "title": "Pedidos grupales", "desc": "Gestiona pedidos para grupos" },
+      "bonnenprinter": { "title": "Impresora de tickets", "desc": "Configura y usa la impresora de tickets" },
+      "de-website": { "title": "Tu sitio web", "desc": "Gestiona y personaliza tu web" },
+      "de-shop": { "title": "La tienda", "desc": "Configura y gestiona tu tienda online" }
+    },
+    "v": {
+      "registratie1": "Registro",
+      "admin-overzicht2": "Vista admin",
+      "keukenscherm3": "Pantalla de pedidos",
+      "analyse-module4": "Análisis",
+      "verkoop5": "Ventas",
+      "populaire-items6": "Artículos populares",
+      "instellingen-online-shop": "Tienda online",
+      "zaakprofiel": "Perfil del local",
+      "openingstijden": "Horario",
+      "online-instellingen": "Entrega y recogida",
+      "betaal-methodes": "Métodos de pago",
+      "design-en-kleuren": "Diseño y colores",
+      "team": "Nuestro equipo",
+      "cadeau-bonnen": "Cheques regalo",
+      "producten": "Productos, categorías y opciones",
+      "whatsapp": "WhatsApp",
+      "medewerker-aanmaken": "Crear empleado",
+      "uren-registratie": "Registro horario",
+      "vacature": "Vacantes",
+      "berekening1": "Coste de ingredientes",
+      "prijs-berekening2": "Coste de producto",
+      "z-rapport": "Informe Z",
+      "bestellingen": "Pedidos",
+      "reserveringen": "Reservas",
+      "groepsbestellingen": "Pedidos grupales",
+      "printer": "Impresora tickets",
+      "de-website": "Tu sitio web",
+      "de-shop": "La tienda"
+    }
+  },
+  "helpPage": {
+    "heroTitle": "Ayuda",
+    "heroTitleAccent": "página",
+    "heroSubtitle": "Aquí encontrarás respuestas a tus preguntas.",
+    "body": "El contenido llegará pronto."
+  },
   "supportPage": {
     "heroTitle": "Como podemos ayudar?",
     "heroSubtitle": "Nuestro equipo de soporte esta disponible los 7 dias de la semana. Normalmente respondemos en menos de 5 minutos.",
@@ -4206,6 +4272,9 @@
     "expectedClients": "Cuantos clientes esperas por ano?",
     "companyPlaceholder": "Tu empresa",
     "namePlaceholder": "Tu nombre",
+    "emailPlaceholder": "email@ejemplo.es",
+    "phonePlaceholder": "+34 …",
+    "websitePlaceholder": "https://…",
     "cityPlaceholder": "Tu ciudad",
     "experiencePlaceholder": "Cuentanos sobre tu experiencia...",
     "motivationPlaceholder": "Tu motivacion...",

@@ -242,6 +242,12 @@
     "choosePro": "Choisir Pro",
     "cancelAnytime": "Résiliable mensuellement",
     "yearlySave": "Vous économisez 10 % avec l'abonnement annuel.",
+    "billingMonthly": "Mensuel",
+    "billingYearly": "Annuel",
+    "perYear": "/an",
+    "badgeYearlyDiscount": "-10 %",
+    "compareDiscountStarter": "-40 %",
+    "compareDiscountPro": "-23 %",
     "starter": {
       "name": "Vysion Pro",
       "features": {
@@ -413,7 +419,8 @@
       "sending": "Envoi en cours...",
       "required": "*",
       "successTitle": "Message envoyé!",
-      "successMessage": "Merci pour votre message. Nous vous répondrons dans les plus brefs délais."
+      "successMessage": "Merci pour votre message. Nous vous répondrons dans les plus brefs délais.",
+      "errorGeneric": "Une erreur s'est produite. Veuillez réessayer."
     }
   },
   "footer": {
@@ -4141,6 +4148,65 @@
     "weeksAgo": "semaines",
     "monthsAgo": "mois"
   },
+  "videosPage": {
+    "heroTitle": "Aide",
+    "heroTitleAccent": "vidéos",
+    "heroSubtitle": "Découvrez Vysion Horeca en courtes vidéos d'environ 3 minutes.",
+    "videoCountOne": "1 vidéo",
+    "videoCountMany": "{{count}} vidéos",
+    "comingSoon": " — bientôt disponible",
+    "cats": {
+      "registreren": { "title": "Inscription", "desc": "Créer un compte et découvrir l'administration" },
+      "modules": { "title": "Vue d'ensemble", "desc": "Écran commandes, analyse, ventes et plus" },
+      "instellingen": { "title": "Paramètres", "desc": "Tout configurer pour votre boutique en ligne" },
+      "menu": { "title": "Menu", "desc": "Gérer produits, catégories et options" },
+      "whatsapp-bestellingen": { "title": "Commandes WhatsApp", "desc": "Recevoir et gérer les commandes via WhatsApp" },
+      "personeel": { "title": "Personnel", "desc": "Gérer employés, horaires et offres d'emploi" },
+      "kostenberekening": { "title": "Calcul des coûts", "desc": "Calculer ingrédients et prix produits" },
+      "z-rapporten": { "title": "Rapports Z", "desc": "Rapports journaliers et clôture" },
+      "bestellingen": { "title": "Commandes", "desc": "Gérer commandes et réservations" },
+      "groepsbestellingen": { "title": "Commandes de groupe", "desc": "Gérer les commandes de groupe" },
+      "bonnenprinter": { "title": "Imprimante de tickets", "desc": "Configurer et utiliser l'imprimante" },
+      "de-website": { "title": "Votre site", "desc": "Gérer et personnaliser votre site" },
+      "de-shop": { "title": "La boutique", "desc": "Configurer votre boutique en ligne" }
+    },
+    "v": {
+      "registratie1": "Inscription",
+      "admin-overzicht2": "Aperçu admin",
+      "keukenscherm3": "Écran commandes",
+      "analyse-module4": "Analyse",
+      "verkoop5": "Ventes",
+      "populaire-items6": "Articles populaires",
+      "instellingen-online-shop": "Boutique en ligne",
+      "zaakprofiel": "Profil établissement",
+      "openingstijden": "Horaires",
+      "online-instellingen": "Livraison et retrait",
+      "betaal-methodes": "Moyens de paiement",
+      "design-en-kleuren": "Design et couleurs",
+      "team": "Notre équipe",
+      "cadeau-bonnen": "Chèques-cadeaux",
+      "producten": "Produits, catégories et options",
+      "whatsapp": "WhatsApp",
+      "medewerker-aanmaken": "Créer un employé",
+      "uren-registratie": "Pointage",
+      "vacature": "Offres d'emploi",
+      "berekening1": "Coût des ingrédients",
+      "prijs-berekening2": "Coût produit",
+      "z-rapport": "Rapport Z",
+      "bestellingen": "Commandes",
+      "reserveringen": "Réservations",
+      "groepsbestellingen": "Commandes de groupe",
+      "printer": "Imprimante tickets",
+      "de-website": "Votre site",
+      "de-shop": "La boutique"
+    }
+  },
+  "helpPage": {
+    "heroTitle": "Aide",
+    "heroTitleAccent": "page",
+    "heroSubtitle": "Retrouvez ici des réponses à vos questions.",
+    "body": "Le contenu arrive bientôt."
+  },
   "supportPage": {
     "heroTitle": "Comment pouvons-nous vous aider?",
     "heroSubtitle": "Notre equipe de support est disponible 7 jours sur 7. Nous repondons generalement en moins de 5 minutes.",
@@ -4229,6 +4295,9 @@
     "expectedClients": "Combien de clients attendez-vous par an?",
     "companyPlaceholder": "Votre entreprise",
     "namePlaceholder": "Votre nom",
+    "emailPlaceholder": "email@exemple.fr",
+    "phonePlaceholder": "+33 …",
+    "websitePlaceholder": "https://…",
     "cityPlaceholder": "Votre ville",
     "experiencePlaceholder": "Parlez-nous de votre experience...",
     "motivationPlaceholder": "Votre motivation...",

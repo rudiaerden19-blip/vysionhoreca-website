@@ -1315,7 +1315,7 @@ function ContactSection() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Er ging iets mis')
+        throw new Error(data.error || t('contact.form.errorGeneric'))
       }
 
       setStatus('success')
@@ -1325,7 +1325,7 @@ function ContactSection() {
       setTimeout(() => setStatus('idle'), 5000)
     } catch (error) {
       setStatus('error')
-      setErrorMessage(error instanceof Error ? error.message : 'Er ging iets mis')
+      setErrorMessage(error instanceof Error ? error.message : t('contact.form.errorGeneric'))
     }
   }
 

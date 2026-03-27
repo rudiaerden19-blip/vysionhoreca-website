@@ -1,29 +1,53 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '@/components/Navigation'
 import BackToTopBar from '@/components/BackToTopBar'
 import { useLanguage } from '@/i18n/LanguageContext'
+import type { Locale } from '@/i18n/config'
 
-const countries = [
-  { code: 'BE', name: 'België', flag: '🇧🇪' },
-  { code: 'NL', name: 'Nederland', flag: '🇳🇱' },
-  { code: 'FR', name: 'France', flag: '🇫🇷' },
-  { code: 'DE', name: 'Deutschland', flag: '🇩🇪' },
-  { code: 'ES', name: 'España', flag: '🇪🇸' },
-  { code: 'IT', name: 'Italia', flag: '🇮🇹' },
-  { code: 'AT', name: 'Österreich', flag: '🇦🇹' },
-  { code: 'CH', name: 'Schweiz', flag: '🇨🇭' },
-  { code: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
-  { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
-]
+const COUNTRY_CODES = ['BE', 'NL', 'FR', 'DE', 'ES', 'IT', 'AT', 'CH', 'LU', 'PT'] as const
+
+const FLAGS: Record<string, string> = {
+  BE: '🇧🇪',
+  NL: '🇳🇱',
+  FR: '🇫🇷',
+  DE: '🇩🇪',
+  ES: '🇪🇸',
+  IT: '🇮🇹',
+  AT: '🇦🇹',
+  CH: '🇨🇭',
+  LU: '🇱🇺',
+  PT: '🇵🇹',
+}
+
+function regionDisplayLocale(locale: Locale): string {
+  if (locale === 'zh') return 'zh-CN'
+  if (locale === 'ja') return 'ja-JP'
+  return locale
+}
 
 const sectionLight = 'bg-white text-gray-900'
 const sectionMuted = 'bg-[#e3e3e3] text-gray-900'
 
 export default function ResellersPage() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
+
+  const countries = useMemo(() => {
+    const intlLocale = regionDisplayLocale(locale)
+    let names: Intl.DisplayNames
+    try {
+      names = new Intl.DisplayNames([intlLocale], { type: 'region' })
+    } catch {
+      names = new Intl.DisplayNames(['en'], { type: 'region' })
+    }
+    return COUNTRY_CODES.map((code) => ({
+      code,
+      name: names.of(code) ?? code,
+      flag: FLAGS[code] ?? '🏳️',
+    }))
+  }, [locale])
   const [formData, setFormData] = useState({
     company_name: '',
     contact_name: '',
@@ -232,7 +256,7 @@ export default function ResellersPage() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className={inputClass}
-                    placeholder="email@example.com"
+                    placeholder={t('resellersPage.emailPlaceholder')}
                   />
                 </div>
                 <div>
@@ -242,7 +266,7 @@ export default function ResellersPage() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className={inputClass}
-                    placeholder="+32 ..."
+                    placeholder={t('resellersPage.phonePlaceholder')}
                   />
                 </div>
               </div>
@@ -284,7 +308,7 @@ export default function ResellersPage() {
                   value={formData.website}
                   onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                   className={inputClass}
-                  placeholder="https://..."
+                    placeholder={t('resellersPage.websitePlaceholder')}
                 />
               </div>
 

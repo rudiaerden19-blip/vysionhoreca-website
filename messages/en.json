@@ -441,6 +441,12 @@
     "choosePro": "Choose Pro",
     "cancelAnytime": "Cancel anytime",
     "yearlySave": "You save 10% with an annual subscription.",
+    "billingMonthly": "Monthly",
+    "billingYearly": "Yearly",
+    "perYear": "/year",
+    "badgeYearlyDiscount": "-10%",
+    "compareDiscountStarter": "-40%",
+    "compareDiscountPro": "-23%",
     "starter": {
       "name": "Vysion Pro",
       "features": {
@@ -612,7 +618,8 @@
       "sending": "Sending...",
       "required": "*",
       "successTitle": "Message sent!",
-      "successMessage": "Thank you for your message. We will get back to you as soon as possible."
+      "successMessage": "Thank you for your message. We will get back to you as soon as possible.",
+      "errorGeneric": "Something went wrong. Please try again."
     }
   },
   "footer": {
@@ -4276,6 +4283,65 @@
     "weeksAgo": "weeks ago",
     "monthsAgo": "months ago"
   },
+  "videosPage": {
+    "heroTitle": "Help",
+    "heroTitleAccent": "videos",
+    "heroSubtitle": "Learn everything about Vysion Horeca in short videos of about 3 minutes.",
+    "videoCountOne": "1 video",
+    "videoCountMany": "{{count}} videos",
+    "comingSoon": " — coming soon",
+    "cats": {
+      "registreren": { "title": "Sign up", "desc": "Create an account and learn the admin panel" },
+      "modules": { "title": "Overview", "desc": "Order screen, analytics, sales and more" },
+      "instellingen": { "title": "Settings", "desc": "Configure everything for your online shop" },
+      "menu": { "title": "Menu", "desc": "Manage products, categories and options" },
+      "whatsapp-bestellingen": { "title": "WhatsApp orders", "desc": "Receive and manage orders via WhatsApp" },
+      "personeel": { "title": "Staff", "desc": "Manage employees, hours and vacancies" },
+      "kostenberekening": { "title": "Costing", "desc": "Calculate ingredients and product prices" },
+      "z-rapporten": { "title": "Z-reports", "desc": "Daily reports and closing" },
+      "bestellingen": { "title": "Orders", "desc": "Manage orders and reservations" },
+      "groepsbestellingen": { "title": "Group orders", "desc": "Manage orders for groups" },
+      "bonnenprinter": { "title": "Receipt printer", "desc": "Set up and use your receipt printer" },
+      "de-website": { "title": "Your website", "desc": "Manage and customize your own website" },
+      "de-shop": { "title": "The shop", "desc": "Set up and manage your online shop" }
+    },
+    "v": {
+      "registratie1": "Sign up",
+      "admin-overzicht2": "Admin overview",
+      "keukenscherm3": "Order screen",
+      "analyse-module4": "Business analytics",
+      "verkoop5": "Sales",
+      "populaire-items6": "Popular items",
+      "instellingen-online-shop": "Online shop",
+      "zaakprofiel": "Venue profile",
+      "openingstijden": "Opening hours",
+      "online-instellingen": "Delivery and pickup",
+      "betaal-methodes": "Payment methods",
+      "design-en-kleuren": "Design and colours",
+      "team": "Our team",
+      "cadeau-bonnen": "Gift vouchers",
+      "producten": "Products, categories and options",
+      "whatsapp": "WhatsApp",
+      "medewerker-aanmaken": "Create employee",
+      "uren-registratie": "Time registration",
+      "vacature": "Vacancies",
+      "berekening1": "Ingredient costing",
+      "prijs-berekening2": "Product costing",
+      "z-rapport": "Z-report",
+      "bestellingen": "Orders",
+      "reserveringen": "Reservations",
+      "groepsbestellingen": "Group orders",
+      "printer": "Receipt printer",
+      "de-website": "Your website",
+      "de-shop": "The shop"
+    }
+  },
+  "helpPage": {
+    "heroTitle": "Help",
+    "heroTitleAccent": "center",
+    "heroSubtitle": "Find answers to your questions here.",
+    "body": "Content will appear here."
+  },
   "supportPage": {
     "heroTitle": "How can we help?",
     "heroSubtitle": "Our support team is available 7 days a week. We usually respond within 5 minutes.",
@@ -4364,6 +4430,9 @@
     "expectedClients": "How many clients do you expect per year?",
     "companyPlaceholder": "Your company",
     "namePlaceholder": "Your name",
+    "emailPlaceholder": "email@example.com",
+    "phonePlaceholder": "+32 …",
+    "websitePlaceholder": "https://…",
     "cityPlaceholder": "Your city",
     "experiencePlaceholder": "Tell us about your experience...",
     "motivationPlaceholder": "Your motivation...",

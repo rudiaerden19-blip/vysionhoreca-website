@@ -242,6 +242,12 @@
     "choosePro": "Proを選択",
     "cancelAnytime": "月単位で解約可能",
     "yearlySave": "年間プランで10%お得になります。",
+    "billingMonthly": "月額",
+    "billingYearly": "年額",
+    "perYear": "/年",
+    "badgeYearlyDiscount": "-10%",
+    "compareDiscountStarter": "-40%",
+    "compareDiscountPro": "-23%",
     "starter": {
       "name": "Vysion Pro",
       "features": {
@@ -413,7 +419,8 @@
       "sending": "送信中...",
       "required": "*",
       "successTitle": "送信完了！",
-      "successMessage": "メッセージをお送りいただきありがとうございます。できるだけ早くご連絡いたします。"
+      "successMessage": "メッセージをお送りいただきありがとうございます。できるだけ早くご連絡いたします。",
+      "errorGeneric": "問題が発生しました。もう一度お試しください。"
     }
   },
   "footer": {
@@ -4118,6 +4125,65 @@
     "weeksAgo": "週前",
     "monthsAgo": "ヶ月前"
   },
+  "videosPage": {
+    "heroTitle": "ヘルプ",
+    "heroTitleAccent": "動画",
+    "heroSubtitle": "約3分の短い動画ですべてのVysion Horecaの機能を学べます。",
+    "videoCountOne": "動画 1 本",
+    "videoCountMany": "動画 {{count}} 本",
+    "comingSoon": " — 近日公開",
+    "cats": {
+      "registreren": { "title": "登録", "desc": "アカウント作成と管理画面の紹介" },
+      "modules": { "title": "概要", "desc": "オーダー画面、分析、販売など" },
+      "instellingen": { "title": "設定", "desc": "オンラインショップの設定" },
+      "menu": { "title": "メニュー", "desc": "商品・カテゴリ・オプションの管理" },
+      "whatsapp-bestellingen": { "title": "WhatsApp注文", "desc": "WhatsAppでの注文の受信と管理" },
+      "personeel": { "title": "スタッフ", "desc": "従業員・勤務時間・求人の管理" },
+      "kostenberekening": { "title": "原価計算", "desc": "材料と商品価格の計算" },
+      "z-rapporten": { "title": "Zレポート", "desc": "日次レポートと締め作業" },
+      "bestellingen": { "title": "注文", "desc": "注文と予約の管理" },
+      "groepsbestellingen": { "title": "団体注文", "desc": "グループ向け注文の管理" },
+      "bonnenprinter": { "title": "レシートプリンター", "desc": "レシートプリンターの設定と利用" },
+      "de-website": { "title": "ウェブサイト", "desc": "独自サイトの管理とカスタマイズ" },
+      "de-shop": { "title": "ショップ", "desc": "オンラインショップの設定と管理" }
+    },
+    "v": {
+      "registratie1": "登録",
+      "admin-overzicht2": "管理画面の概要",
+      "keukenscherm3": "オーダー画面",
+      "analyse-module4": "事業分析",
+      "verkoop5": "販売",
+      "populaire-items6": "人気商品",
+      "instellingen-online-shop": "オンラインショップ",
+      "zaakprofiel": "店舗プロフィール",
+      "openingstijden": "営業時間",
+      "online-instellingen": "デリバリーと受け取り",
+      "betaal-methodes": "支払い方法",
+      "design-en-kleuren": "デザインと色",
+      "team": "私たちのチーム",
+      "cadeau-bonnen": "ギフト券",
+      "producten": "商品・カテゴリ・オプション",
+      "whatsapp": "WhatsApp",
+      "medewerker-aanmaken": "スタッフの作成",
+      "uren-registratie": "勤怠",
+      "vacature": "求人",
+      "berekening1": "材料原価",
+      "prijs-berekening2": "商品原価",
+      "z-rapport": "Zレポート",
+      "bestellingen": "注文",
+      "reserveringen": "予約",
+      "groepsbestellingen": "団体注文",
+      "printer": "レシートプリンター",
+      "de-website": "ウェブサイト",
+      "de-shop": "ショップ"
+    }
+  },
+  "helpPage": {
+    "heroTitle": "ヘルプ",
+    "heroTitleAccent": "ページ",
+    "heroSubtitle": "よくある質問の答えはこちらです。",
+    "body": "コンテンツは準備中です。"
+  },
   "supportPage": {
     "heroTitle": "どのようにお手伝いできますか?",
     "heroSubtitle": "サポートチームは週7日対応しております。通常5分以内にご返答いたします。",
@@ -4206,6 +4272,9 @@
     "expectedClients": "年間何件のクライアントを見込んでいますか?",
     "companyPlaceholder": "御社名",
     "namePlaceholder": "お名前",
+    "emailPlaceholder": "email@example.jp",
+    "phonePlaceholder": "+81 …",
+    "websitePlaceholder": "https://…",
     "cityPlaceholder": "市区町村",
     "experiencePlaceholder": "経験についてお聞かせください...",
     "motivationPlaceholder": "志望動機...",

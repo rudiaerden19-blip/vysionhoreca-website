@@ -242,6 +242,12 @@
     "choosePro": "Pro wählen",
     "cancelAnytime": "Monatlich kündbar",
     "yearlySave": "Sie sparen 10 % mit einem Jahresabo.",
+    "billingMonthly": "Monatlich",
+    "billingYearly": "Jährlich",
+    "perYear": "/Jahr",
+    "badgeYearlyDiscount": "-10%",
+    "compareDiscountStarter": "-40%",
+    "compareDiscountPro": "-23%",
     "starter": {
       "name": "Vysion Pro",
       "features": {
@@ -413,7 +419,8 @@
       "sending": "Wird gesendet...",
       "required": "*",
       "successTitle": "Nachricht gesendet!",
-      "successMessage": "Vielen Dank für Ihre Nachricht. Wir werden uns so schnell wie möglich bei Ihnen melden."
+      "successMessage": "Vielen Dank für Ihre Nachricht. Wir werden uns so schnell wie möglich bei Ihnen melden.",
+      "errorGeneric": "Etwas ist schiefgegangen. Bitte versuchen Sie es erneut."
     }
   },
   "footer": {
@@ -4141,6 +4148,65 @@
     "weeksAgo": "Wochen her",
     "monthsAgo": "Monate her"
   },
+  "videosPage": {
+    "heroTitle": "Hilfe",
+    "heroTitleAccent": "Videos",
+    "heroSubtitle": "Lernen Sie Vysion Horeca in kurzen Videos von etwa 3 Minuten kennen.",
+    "videoCountOne": "1 Video",
+    "videoCountMany": "{{count}} Videos",
+    "comingSoon": " — demnaechst",
+    "cats": {
+      "registreren": { "title": "Registrieren", "desc": "Konto erstellen und Admin-Bereich kennenlernen" },
+      "modules": { "title": "Ueberblick", "desc": "Bestellbildschirm, Analyse, Verkauf und mehr" },
+      "instellingen": { "title": "Einstellungen", "desc": "Alles fuer Ihren Onlineshop einrichten" },
+      "menu": { "title": "Menue", "desc": "Produkte, Kategorien und Optionen verwalten" },
+      "whatsapp-bestellingen": { "title": "WhatsApp-Bestellungen", "desc": "Bestellungen per WhatsApp empfangen und verwalten" },
+      "personeel": { "title": "Personal", "desc": "Mitarbeiter, Zeiten und Stellen verwalten" },
+      "kostenberekening": { "title": "Kalkulation", "desc": "Zutaten und Produktpreise berechnen" },
+      "z-rapporten": { "title": "Z-Berichte", "desc": "Tagesberichte und Abschluss" },
+      "bestellingen": { "title": "Bestellungen", "desc": "Bestellungen und Reservierungen verwalten" },
+      "groepsbestellingen": { "title": "Gruppenbestellungen", "desc": "Bestellungen fuer Gruppen verwalten" },
+      "bonnenprinter": { "title": "Bonndrucker", "desc": "Bonndrucker einrichten und nutzen" },
+      "de-website": { "title": "Ihre Website", "desc": "Eigene Website verwalten und anpassen" },
+      "de-shop": { "title": "Der Shop", "desc": "Onlineshop einrichten und verwalten" }
+    },
+    "v": {
+      "registratie1": "Registrieren",
+      "admin-overzicht2": "Admin-Uebersicht",
+      "keukenscherm3": "Bestellbildschirm",
+      "analyse-module4": "Betriebsanalyse",
+      "verkoop5": "Verkauf",
+      "populaire-items6": "Beliebte Artikel",
+      "instellingen-online-shop": "Onlineshop",
+      "zaakprofiel": "Betriebsprofil",
+      "openingstijden": "Oeffnungszeiten",
+      "online-instellingen": "Lieferung und Abholung",
+      "betaal-methodes": "Zahlungsmethoden",
+      "design-en-kleuren": "Design und Farben",
+      "team": "Unser Team",
+      "cadeau-bonnen": "Geschenkgutscheine",
+      "producten": "Produkte, Kategorien und Optionen",
+      "whatsapp": "WhatsApp",
+      "medewerker-aanmaken": "Mitarbeiter anlegen",
+      "uren-registratie": "Zeiterfassung",
+      "vacature": "Stellen",
+      "berekening1": "Zutatenkalkulation",
+      "prijs-berekening2": "Produktkalkulation",
+      "z-rapport": "Z-Bericht",
+      "bestellingen": "Bestellungen",
+      "reserveringen": "Reservierungen",
+      "groepsbestellingen": "Gruppenbestellungen",
+      "printer": "Bonndrucker",
+      "de-website": "Ihre Website",
+      "de-shop": "Der Shop"
+    }
+  },
+  "helpPage": {
+    "heroTitle": "Hilfe",
+    "heroTitleAccent": "Seite",
+    "heroSubtitle": "Hier finden Sie Antworten auf Ihre Fragen.",
+    "body": "Inhalt folgt in Kuerze."
+  },
   "supportPage": {
     "heroTitle": "Wie koennen wir helfen?",
     "heroSubtitle": "Unser Support-Team ist 7 Tage die Woche fuer Sie da. Wir antworten meist innerhalb von 5 Minuten.",
@@ -4229,6 +4295,9 @@
     "expectedClients": "Wie viele Kunden erwarten Sie pro Jahr?",
     "companyPlaceholder": "Ihr Unternehmen",
     "namePlaceholder": "Ihr Name",
+    "emailPlaceholder": "email@beispiel.de",
+    "phonePlaceholder": "+49 …",
+    "websitePlaceholder": "https://…",
     "cityPlaceholder": "Ihre Stadt",
     "experiencePlaceholder": "Erzaehlen Sie uns von Ihrer Erfahrung...",
     "motivationPlaceholder": "Ihre Motivation...",
