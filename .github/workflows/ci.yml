@@ -1,0 +1,54 @@
+# Kwaliteitsgate: gelijk aan wat lokaal groen moet zijn voor merge naar main.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      # Placeholders: genoeg voor `next build` zonder echte secrets (geen netwerk naar Supabase tijdens build).
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ci-placeholder
+      NEXT_PUBLIC_SITE_URL: https://ci.vysionhoreca.local
+      NEXT_PUBLIC_APP_URL: https://ci.vysionhoreca.local
+      NEXT_PUBLIC_BASE_URL: https://ci.vysionhoreca.local
+      SUPABASE_SERVICE_ROLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ci-service-placeholder
+      NEXT_PUBLIC_SENTRY_DSN: ''
+      STRIPE_SECRET_KEY: sk_test_ci_placeholder
+      CRON_SECRET: ci-cron-secret-not-for-production
+      NODE_ENV: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
