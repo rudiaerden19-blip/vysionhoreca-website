@@ -15,7 +15,7 @@ export const DEMO_KASSA_URL = `${DEMO_ORDER_SITE_URL}/admin/kassa`
 export const DEMO_HERO_LIVE_URL = DEMO_KASSA_URL
 
 /**
- * Per platformtegel: “Test het hier” — de meeste tegels naar dezelfde demokassa.
+ * Per platformtegel: CTA “Start gratis demo” — de meeste tegels naar dezelfde demokassa.
  * `msgKey` komt overeen met `PLATFORM_PAGES[].msgKey` in `platform-pages.ts`.
  */
 export function demoUrlForPlatformCard(msgKey: string): string {
