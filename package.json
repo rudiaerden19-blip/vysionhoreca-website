@@ -30,7 +30,7 @@
     "nodemailer": "^8.0.4",
     "openai": "^6.16.0",
     "react": "^18",
-    "react-dom": "^18",
+    "react-dom": "^19",
     "recharts": "^3.8.0",
     "stripe": "^20.2.0",
     "unpdf": "^1.4.0"
