@@ -133,11 +133,8 @@
   border-radius: 1rem;
   background: #fff;
   padding: 1rem 1rem 0.875rem;
-  box-shadow:
-    0 44px 104px -20px rgba(0, 0, 0, 0.44),
-    0 26px 68px -12px rgba(0, 0, 0, 0.34),
-    0 12px 34px rgba(0, 0, 0, 0.24),
-    0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: none;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .partner-success-card .partner-success-logo {
