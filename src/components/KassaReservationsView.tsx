@@ -42,6 +42,7 @@ import {
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { getAuthHeaders } from '@/lib/auth-headers'
+import { useLanguage } from '@/i18n'
 
 // ---- Types ----
 type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CHECKED_IN' | 'COMPLETED' | 'NO_SHOW' | 'CANCELLED' | 'WAITLIST'
@@ -467,6 +468,7 @@ function ContactsView({
   onPromoMailClick,
   onBulkPromoMailClick,
   promoSelectionReset = 0,
+  rk,
 }: {
   guestProfiles: GuestProfile[]
   searchQuery: string
@@ -474,6 +476,7 @@ function ContactsView({
   onPromoMailClick: (guest: GuestProfile) => void
   onBulkPromoMailClick: (guests: GuestProfile[]) => void
   promoSelectionReset?: number
+  rk: (key: string, rep?: Record<string, string>) => string
 }) {
   // Standaard: meest recent bovenaan — nieuwe klanten zijn altijd zichtbaar
   const [guestSort, setGuestSort] = useState<'lastVisit' | 'name' | 'visits'>('lastVisit')
@@ -600,7 +603,7 @@ function ContactsView({
       {/* Lege staat */}
       {paginated.length === 0 && (
         <div className="text-center py-16 text-gray-400 bg-white rounded-2xl border border-gray-100">
-          {searchQuery ? 'Geen resultaten voor deze zoekopdracht' : 'Nog geen gasten — ze verschijnen automatisch na de eerste reservatie'}
+          {searchQuery ? rk('guestsSearchNoResults') : rk('guestsEmpty')}
         </div>
       )}
 
@@ -1160,6 +1163,16 @@ export default function KassaReservationsView({
   onStartOrder,
 }: KassaReservationsViewProps) {
   const toast = useToast()
+  const { t } = useLanguage()
+  const rk = useCallback((key: string, rep?: Record<string, string>) => {
+    let out = t(`reservationKassa.${key}`)
+    if (rep) {
+      for (const [k, v] of Object.entries(rep)) {
+        out = out.split(`{${k}}`).join(v)
+      }
+    }
+    return out
+  }, [t])
 
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
@@ -1360,7 +1373,7 @@ export default function KassaReservationsView({
       .order('reservation_time', { ascending: true })
     if (error) {
       console.error('[loadReservations] Supabase error:', error)
-      if (!silent) toast.error('Fout bij laden reservaties: ' + error.message)
+      if (!silent) toast.error(rk('loadFailedPrefix') + error.message)
     }
     if (data) {
       const mapped = data.map((r: Record<string, unknown>) => {
@@ -1521,9 +1534,9 @@ export default function KassaReservationsView({
         .eq('id', d.id)
         .eq('tenant_slug', tenant)
       if (error) {
-        toast.error('Starttijd kon niet worden opgeslagen: ' + error.message)
+        toast.error(rk('startTimeSaveFailedPrefix') + error.message)
       } else {
-        toast.success(`Starttijd: ${timeStr}`)
+        toast.success(`${rk('startTimeLabel')}: ${timeStr}`)
       }
       await loadReservations(true)
     }
@@ -1585,9 +1598,9 @@ export default function KassaReservationsView({
         .eq('id', d.id)
         .eq('tenant_slug', tenant)
       if (error) {
-        toast.error('Duur kon niet worden opgeslagen: ' + error.message)
+        toast.error(rk('durationSaveFailedPrefix') + error.message)
       } else {
-        toast.success(`Duur: ${formatTimelineDurLabel(finalDur)}`)
+        toast.success(`${rk('durationLabel')}: ${formatTimelineDurLabel(finalDur)}`)
       }
       await loadReservations(true)
     }
@@ -1752,9 +1765,9 @@ export default function KassaReservationsView({
     const { error } = await supabase.from('reservation_settings')
       .upsert(buildSettingsPayload(reservationSettings), { onConflict: 'tenant_slug' })
     if (error) {
-      toast.error('Opslaan mislukt: ' + error.message)
+      toast.error(rk('settingsSaveFailedPrefix') + error.message)
     } else {
-      toast.success('✅ Instellingen opgeslagen!')
+      toast.success(rk('settingsSaved'))
     }
   }
 
@@ -1771,7 +1784,7 @@ export default function KassaReservationsView({
       .upsert({ tenant_slug: tenant, data: updated }, { onConflict: 'tenant_slug' })
     if (error) {
       console.error('[floor_plan_tables] upsert:', error.message)
-      toast.error('Plattegrond opslaan mislukt: ' + error.message)
+      toast.error(rk('floorPlanSaveFailedPrefix') + error.message)
       const { data: row } = await supabase
         .from('floor_plan_tables')
         .select('data')
@@ -1798,13 +1811,13 @@ export default function KassaReservationsView({
     setAddFloorNumber('')
     setAddFloorSeats(4)
     setShowAddFloorTable(false)
-    toast.success(`Tafel ${newTable.number} toegevoegd`)
+    toast.success(`${rk('tableAddedPrefix')}${newTable.number} ${rk('tableAddedSuffix')}`)
   }
 
   const deleteFloorTable = async (id: string) => {
     await saveFloorPlan(floorPlanTablesDB.filter(t => t.id !== id))
     setSelectedFloorTable(null)
-    toast.success('Tafel verwijderd')
+    toast.success(rk('tableRemoved'))
   }
 
   // Wheel zoom — zoom rond muispositie
@@ -2094,24 +2107,24 @@ export default function KassaReservationsView({
     if (status === 'CHECKED_IN') updates.checked_in_at = new Date().toISOString()
     if (status === 'COMPLETED') updates.completed_at = new Date().toISOString()
     const { error } = await supabase.from('reservations').update(updates).eq('id', id).eq('tenant_slug', tenant)
-    if (error) { toast.error('Status kon niet worden bijgewerkt: ' + error.message); return }
+    if (error) { toast.error(rk('statusUpdateFailedPrefix') + error.message); return }
     await loadReservations()
   }
 
   const handleCheckIn = async (r: Reservation) => {
     await updateStatus(r.id, 'CHECKED_IN')
-    toast.success(`${r.guest_name} aan tafel!`)
+    toast.success(`${r.guest_name}${rk('guestAtTableSuffix')}`)
     // Geen mail sturen bij aan tafel zetten — enkel interne statuswijziging
   }
 
   const handleUndoNoShow = async (r: Reservation) => {
     await updateStatus(r.id, 'CONFIRMED')
-    toast.success(`${r.guest_name} teruggezet naar Bevestigd`)
+    toast.success(`${r.guest_name} ${rk('guestBackConfirmed')}`)
   }
 
   const handleSendPush = async () => {
-    if (!pushTarget?.guest_email) { toast.error('Deze klant heeft geen emailadres'); return }
-    if (!pushSubject.trim() || !pushMessage.trim()) { toast.error('Vul onderwerp en bericht in'); return }
+    if (!pushTarget?.guest_email) { toast.error(rk('customerNoEmail')); return }
+    if (!pushSubject.trim() || !pushMessage.trim()) { toast.error(rk('fillSubjectMessage')); return }
     setPushSending(true)
     try {
       const res = await fetch('/api/marketing/send', {
@@ -2127,13 +2140,13 @@ export default function KassaReservationsView({
       })
       const data = await res.json()
       if (data.success) {
-        toast.success(`Email verstuurd naar ${pushTarget.guest_name}`)
+        toast.success(rk('emailSentPrefix') + pushTarget.guest_name)
         setPushTarget(null); setPushSubject(''); setPushMessage('')
       } else {
-        toast.error(data.error || 'Versturen mislukt')
+        toast.error(data.error || rk('sendFailed'))
       }
     } catch {
-      toast.error('Netwerk fout, probeer opnieuw')
+      toast.error(rk('networkErrorRetry'))
     } finally {
       setPushSending(false)
     }
@@ -2141,7 +2154,7 @@ export default function KassaReservationsView({
 
   const openContactPromoModal = (g: GuestProfile) => {
     if (!g.email?.trim()) {
-      toast.error('Deze contactpersoon heeft geen e-mailadres')
+      toast.error(rk('contactNoEmail'))
       return
     }
     setContactPromoRecipients([g])
@@ -2157,7 +2170,7 @@ export default function KassaReservationsView({
       return true
     })
     if (withEmail.length === 0) {
-      toast.error('Geen geselecteerde contacten met e-mailadres')
+      toast.error(rk('noContactsWithEmail'))
       return
     }
     setContactPromoRecipients(withEmail)
@@ -2170,11 +2183,11 @@ export default function KassaReservationsView({
       .map(g => ({ email: (g.email || '').trim(), name: g.name }))
       .filter(r => r.email.length > 0)
     if (recipients.length === 0) {
-      toast.error('Geen geldige e-mailadressen')
+      toast.error(rk('noValidEmails'))
       return
     }
     if (!contactPromoSubject.trim() || !contactPromoMessage.trim()) {
-      toast.error('Vul onderwerp en bericht in')
+      toast.error(rk('fillSubjectMessage'))
       return
     }
     setContactPromoSending(true)
@@ -2194,18 +2207,18 @@ export default function KassaReservationsView({
       if (data.success) {
         toast.success(
           recipients.length === 1
-            ? `Promotie e-mail verstuurd naar ${recipients[0].name}`
-            : `Promotie e-mail verstuurd naar ${recipients.length} ontvangers`,
+            ? rk('promoEmailSentOne', { name: recipients[0].name })
+            : rk('promoEmailSentMany', { count: String(recipients.length) }),
         )
         setContactPromoRecipients([])
         setContactPromoSubject('')
         setContactPromoMessage('')
         setContactPromoSelectionReset(n => n + 1)
       } else {
-        toast.error(data.error || 'Versturen mislukt')
+        toast.error(data.error || rk('sendFailed'))
       }
     } catch {
-      toast.error('Netwerkfout, probeer opnieuw')
+      toast.error(rk('networkErrorRetry2'))
     } finally {
       setContactPromoSending(false)
     }
@@ -2213,7 +2226,7 @@ export default function KassaReservationsView({
 
   const handleNoShow = async (r: Reservation) => {
     await updateStatus(r.id, 'NO_SHOW')
-    toast.error(`${r.guest_name} gemarkeerd als no-show`)
+    toast.error(`${r.guest_name} ${rk('markedNoShow')}`)
     // z9 - No-show fee aanrekenen als bescherming actief
     if (reservationSettings.noShowProtection && r.stripe_payment_method_id && r.guest_name) {
       try {
@@ -2227,7 +2240,9 @@ export default function KassaReservationsView({
             guestName: r.guest_name,
           }),
         })
-        toast.success(`No-show kost €${reservationSettings.noShowFee} aangerekend`)
+        toast.success(
+          rk('noShowFeeChargedPrefix') + reservationSettings.noShowFee + rk('noShowFeeChargedSuffix'),
+        )
       } catch { /* stille fout */ }
     }
   }
@@ -2248,20 +2263,20 @@ export default function KassaReservationsView({
   const doCancelReservation = async (r: Reservation) => {
     await updateStatus(r.id, 'CANCELLED')
     setCancelConfirm(null)
-    toast.success('Reservatie geannuleerd')
+    toast.success(rk('reservationCancelled'))
     // Geen mail bij annulatie — enkel interne statuswijziging
   }
 
   const handleComplete = async (r: Reservation) => {
     await updateStatus(r.id, 'COMPLETED')
-    toast.success(`${r.guest_name} vertrokken`)
+    toast.success(`${r.guest_name}${rk('guestDepartedSuffix')}`)
     // Geen automatische mail bij vertrekken — enkel interne statuswijziging
   }
 
   // z3 - Wachtlijst bevestigen
   const handleConfirmFromWaitlist = async (r: Reservation) => {
     await updateStatus(r.id, 'CONFIRMED')
-    toast.success(`${r.guest_name} bevestigd vanuit wachtlijst`)
+    toast.success(`${r.guest_name}${rk('confirmedFromWaitlistSuffix')}`)
     // Geen mail — enkel statuswijziging
   }
 
@@ -2301,11 +2316,17 @@ export default function KassaReservationsView({
     const updates: Record<string, unknown> = { status: 'confirmed' }
     if (assignedTable && !r.table_number) updates.table_number = assignedTable
     const { error } = await supabase.from('reservations').update(updates).eq('id', r.id).eq('tenant_slug', tenant)
-    if (error) { toast.error('Goedkeuren mislukt: ' + error.message); return }
+    if (error) { toast.error(rk('approveFailedPrefix') + error.message); return }
     await loadReservations()
     await loadGuestProfiles()
 
-    toast.success(`${r.guest_name} goedgekeurd${assignedTable && !r.table_number ? ` — Tafel ${assignedTable} toegewezen` : ''}`)
+    toast.success(
+      `${r.guest_name}${rk('guestApprovedSuffix')}${
+        assignedTable && !r.table_number
+          ? `${rk('approvedTableAssign')}${assignedTable}${rk('approvedTableAssignSuffix')}`
+          : ''
+      }`,
+    )
 
     // Stuur bevestigingsmail — haal businessInfo opnieuw op als leeg
     // guest_email kan '' zijn na mapping — haal ook raw DB waarde op als fallback
@@ -2340,12 +2361,12 @@ export default function KassaReservationsView({
         })
         if (!res.ok) {
           const err = await res.json().catch(() => ({}))
-          toast.error('Mail mislukt: ' + (err.error || res.statusText))
+          toast.error(rk('mailFailedPrefix') + (err.error || res.statusText))
         } else {
-          toast.success('Bevestigingsmail verstuurd naar ' + emailTo)
+          toast.success(rk('confirmMailSentPrefix') + emailTo)
         }
       } catch (e) {
-        toast.error('Mail kon niet verstuurd worden')
+        toast.error(rk('mailCouldNotSend'))
         console.error('Bevestigingsmail error:', e)
       }
     }
@@ -2354,10 +2375,10 @@ export default function KassaReservationsView({
   const handleReject = async (r: Reservation) => {
     const { error } = await supabase.from('reservations')
       .update({ status: 'cancelled' }).eq('id', r.id).eq('tenant_slug', tenant)
-    if (error) { toast.error('Weigeren mislukt: ' + error.message); return }
+    if (error) { toast.error(rk('rejectFailedPrefix') + error.message); return }
     await loadReservations()
     await loadGuestProfiles()
-    toast.success(`${r.guest_name} geweigerd`)
+    toast.success(`${r.guest_name}${rk('guestRejectedSuffix')}`)
 
     // Stuur weigeringsmail
     if (r.guest_email) {
@@ -2396,7 +2417,7 @@ export default function KassaReservationsView({
       notes: guest.notes || '',
     }, { onConflict: 'tenant_slug,phone' })
     await loadGuestProfiles()
-    toast.success(newVip ? 'VIP status toegevoegd' : 'VIP status verwijderd')
+    toast.success(newVip ? rk('vipAdded') : rk('vipRemoved'))
   }
 
   const handleToggleBlocked = async (guest: GuestProfile) => {
@@ -2411,22 +2432,22 @@ export default function KassaReservationsView({
       notes: guest.notes || '',
     }, { onConflict: 'tenant_slug,phone' })
     await loadGuestProfiles()
-    toast.success(newBlocked ? 'Gast geblokkeerd' : 'Gast gedeblokkeerd')
+    toast.success(newBlocked ? rk('guestBlocked') : rk('guestUnblocked'))
   }
 
   const handleAssignTable = async (reservationId: string, tableNumber: string) => {
     const { error } = await supabase.from('reservations').update({ table_number: tableNumber })
       .eq('id', reservationId).eq('tenant_slug', tenant)
-    if (error) { toast.error('Tafel toewijzen mislukt: ' + error.message); return }
+    if (error) { toast.error(rk('assignTableFailedPrefix') + error.message); return }
     await loadReservations()
-    toast.success('Tafel toegewezen')
+    toast.success(rk('tableAssigned'))
   }
 
   const handleDeleteReservation = async (id: string) => {
     const { error } = await supabase.from('reservations').delete().eq('id', id).eq('tenant_slug', tenant)
-    if (error) { toast.error('Verwijderen mislukt: ' + error.message); return }
+    if (error) { toast.error(rk('deleteFailedPrefix') + error.message); return }
     await loadReservations()
-    toast.success('Reservatie verwijderd')
+    toast.success(rk('reservationDeleted'))
   }
 
   const handleStartOrder = async (r: Reservation) => {
@@ -2436,9 +2457,9 @@ export default function KassaReservationsView({
     const tableNr = r.table_number || ''
     if (tableNr) {
       onStartOrder(tableNr)
-      toast.success(`Order gestart voor tafel ${tableNr}`)
+      toast.success(rk('orderStartedPrefix') + tableNr)
     } else {
-      toast.error('Wijs eerst een tafel toe aan deze reservatie')
+      toast.error(rk('assignTableFirst'))
     }
   }
 
@@ -2460,11 +2481,11 @@ export default function KassaReservationsView({
       total_spent: 0,
       notes: 'Walk-in',
     }])
-    if (error) { toast.error('Walk-in mislukt: ' + error.message); return }
+    if (error) { toast.error(rk('walkInFailedPrefix') + error.message); return }
     await loadReservations()
     await loadGuestProfiles()
     setShowWalkInModal(false)
-    toast.success(`Walk-in ${name} ingecheckt op tafel ${tableNumber}!`)
+    toast.success(rk('walkInChecked', { name, table: String(tableNumber) }))
   }
 
   // Wachtlijst: toevoegen met WAITLIST status + automatische positie
@@ -2484,11 +2505,11 @@ export default function KassaReservationsView({
       tenant_slug: tenant,
       total_spent: 0,
     }])
-    if (error) { toast.error('Wachtlijst mislukt: ' + error.message); return }
+    if (error) { toast.error(rk('waitlistFailedPrefix') + error.message); return }
     await loadReservations()
     await loadGuestProfiles()
     setShowWaitlistModal(false)
-    toast.success(`${name} toegevoegd aan wachtlijst (#${pos})`)
+    toast.success(rk('waitlistAdded', { name, pos: String(pos) }))
   }
 
   const handleAddReservation = async (data: Omit<Reservation, 'id' | 'tenant_slug' | 'total_spent' | 'created_at'>) => {
@@ -2514,11 +2535,11 @@ export default function KassaReservationsView({
       tenant_slug: tenant,
       total_spent: 0,
     }]).select().single()
-    if (error) { toast.error('Fout bij aanmaken: ' + error.message); return }
+    if (error) { toast.error(rk('createFailedPrefix') + error.message); return }
 
     await loadReservations()
     await loadGuestProfiles()
-    toast.success(`Reservatie voor ${data.guest_name} aangemaakt!`)
+    toast.success(rk('reservationCreated', { name: data.guest_name }))
     setShowNewReservationModal(false)
 
     // Enkel bevestigingsmail voor NIEUWE reservatie
@@ -4464,6 +4485,7 @@ export default function KassaReservationsView({
             onPromoMailClick={openContactPromoModal}
             onBulkPromoMailClick={openContactPromoModalMany}
             promoSelectionReset={contactPromoSelectionReset}
+            rk={rk}
           />
         )}
 
@@ -4843,7 +4865,7 @@ export default function KassaReservationsView({
                       onClick={() => {
                         const url = `${window.location.origin}/shop/${tenant}/reserveren`
                         navigator.clipboard?.writeText(url)
-                        toast.success('Link gekopieerd!')
+                        toast.success(rk('linkCopied'))
                       }}
                       className="mt-2 px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors"
                     >
@@ -4969,6 +4991,7 @@ export default function KassaReservationsView({
         <NewReservationModal
           onClose={() => setShowNewReservationModal(false)}
           onSave={handleAddReservation}
+          rk={rk}
           tables={
             // Gebruik floor plan tafels zodat nummers matchen; fallback op kassaTables
             floorPlanTablesDB.length > 0
@@ -4988,6 +5011,7 @@ export default function KassaReservationsView({
         <WalkInModal
           onClose={() => setShowWalkInModal(false)}
           onSave={handleWalkIn}
+          rk={rk}
           tables={floorPlanTablesDB.length > 0
             ? floorPlanTablesDB.map(t => ({ id: t.id, number: t.number, seats: t.seats, status: 'available' }))
             : kassaTables}
@@ -5000,6 +5024,7 @@ export default function KassaReservationsView({
         <WaitlistModal
           onClose={() => setShowWaitlistModal(false)}
           onSave={handleAddToWaitlist}
+          rk={rk}
         />
       )}
 
@@ -5149,18 +5174,18 @@ export default function KassaReservationsView({
               status: updated.status?.toLowerCase(),
               special_requests: updated.special_requests || '',
             }).eq('id', updated.id).eq('tenant_slug', tenant)
-            if (error) { toast.error('Opslaan mislukt: ' + error.message); return }
+            if (error) { toast.error(rk('saveFailedShort') + error.message); return }
             await loadReservations()
             setEditReservation(null)
-            toast.success('Reservatie opgeslagen')
+            toast.success(rk('reservationSaved'))
           }}
           onCancel={async () => {
             const { error } = await supabase.from('reservations')
               .update({ status: 'cancelled' }).eq('id', editReservation.id).eq('tenant_slug', tenant)
-            if (error) { toast.error('Annuleren mislukt: ' + error.message); return }
+            if (error) { toast.error(rk('cancelFailedPrefix') + error.message); return }
             await loadReservations()
             setEditReservation(null)
-            toast.success('Reservatie geannuleerd')
+            toast.success(rk('reservationCancelled'))
           }}
         />
       )}
@@ -5774,11 +5799,12 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
 // ============================================================
 
 // ---- Walk-in Modal ----
-function WalkInModal({ onClose, onSave, tables, reservations }: {
+function WalkInModal({ onClose, onSave, tables, reservations, rk }: {
   onClose: () => void
   onSave: (name: string, partySize: number, tableNumber: string) => Promise<void>
   tables: KassaTable[]
   reservations: Reservation[]
+  rk: (key: string, rep?: Record<string, string>) => string
 }) {
   const [name, setName] = useState('')
   const [partySize, setPartySize] = useState(2)
@@ -5806,8 +5832,8 @@ function WalkInModal({ onClose, onSave, tables, reservations }: {
   const freeTables = tables.filter(t => !busyNow.has(String(t.number)))
 
   const handleSubmit = async () => {
-    if (!name.trim()) { alert('Vul een naam in'); return }
-    if (!tableNumber) { alert('Kies een tafel'); return }
+    if (!name.trim()) { alert(rk('enterName')); return }
+    if (!tableNumber) { alert(rk('chooseTable')); return }
     setSaving(true)
     await onSave(name.trim(), partySize, tableNumber)
     setSaving(false)
@@ -5879,9 +5905,10 @@ function WalkInModal({ onClose, onSave, tables, reservations }: {
 }
 
 // ---- Wachtlijst Modal ----
-function WaitlistModal({ onClose, onSave }: {
+function WaitlistModal({ onClose, onSave, rk }: {
   onClose: () => void
   onSave: (name: string, phone: string, partySize: number, date: string, time: string) => Promise<void>
+  rk: (key: string, rep?: Record<string, string>) => string
 }) {
   const now = new Date()
   const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`
@@ -5893,7 +5920,7 @@ function WaitlistModal({ onClose, onSave }: {
   const [saving, setSaving] = useState(false)
 
   const handleSubmit = async () => {
-    if (!name.trim()) { alert('Vul een naam in'); return }
+    if (!name.trim()) { alert(rk('enterName')); return }
     setSaving(true)
     await onSave(name.trim(), phone.trim(), partySize, date, time)
     setSaving(false)
@@ -5974,9 +6001,10 @@ interface NewReservationModalProps {
   reservations: Reservation[]
   shifts: Shift[]
   bufferMinutes: number
+  rk: (key: string, rep?: Record<string, string>) => string
 }
 
-function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize, reservations, shifts, bufferMinutes }: NewReservationModalProps) {
+function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, maxPartySize, reservations, shifts, bufferMinutes, rk }: NewReservationModalProps) {
   const [formData, setFormData] = useState({
     guest_first_name: '',
     guest_last_name: '',
@@ -6052,13 +6080,19 @@ function NewReservationModal({ onClose, onSave, tables, defaultDurationMinutes, 
     // Automatisch toewijzen: zoek vrije tafel als niets geselecteerd
     const assignedTable = rest.table_number || autoAssignTable()
     if (!assignedTable) {
-      alert('Geen vrije tafel beschikbaar voor dit tijdstip en deze groepsgrootte.')
+      alert(rk('noFreeTable'))
       return
     }
     // Dubbele boeking check — ook bij manuele tafelselectie
     const conflict = getTableStatus(assignedTable)
     if (conflict.bezet) {
-      alert(`Tafel ${assignedTable} is al bezet op dit tijdstip (${conflict.door}, t/m ${conflict.tot}). Kies een andere tafel.`)
+      alert(
+        rk('tableConflict', {
+          table: String(assignedTable),
+          from: String(conflict.door ?? ''),
+          to: String(conflict.tot ?? ''),
+        }),
+      )
       return
     }
     onSave({

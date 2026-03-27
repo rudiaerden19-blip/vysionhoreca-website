@@ -59,7 +59,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Laden...</p>
+          <p className="text-gray-600">{t('adminLayout.loading')}</p>
         </div>
       </div>
     )
@@ -70,10 +70,10 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
           <span className="text-6xl mb-6 block">🔍</span>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Shop niet gevonden</h1>
-          <p className="text-gray-600 mb-6">Deze shop bestaat niet of is verwijderd.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('adminLayout.shopNotFound')}</h1>
+          <p className="text-gray-600 mb-6">{t('adminLayout.shopNotFoundDesc')}</p>
           <a href="https://www.vysionhoreca.com" className="text-blue-600 hover:text-blue-700 font-medium inline-block">
-            ← Terug naar Vysion
+            {t('adminLayout.backToVysion')}
           </a>
         </div>
       </div>
@@ -99,7 +99,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          <span>Kassa</span>
+          <span>{t('adminLayout.pos')}</span>
         </Link>
 
         {/* Tenant naam midden */}
@@ -116,7 +116,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
           >
             <span className="text-base">🖥️</span>
-            <span className="hidden sm:inline">Onlinescherm</span>
+            <span className="hidden sm:inline">{t('adminLayout.onlineDisplay')}</span>
           </Link>
           {showLockButton && <LockButton tenant={params.tenant} />}
           <LanguageSelector />
@@ -135,6 +135,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
 function LockButton({ tenant }: { tenant: string }) {
   const router = useRouter()
+  const { t } = useLanguage()
   const handleLock = () => {
     sessionStorage.removeItem(`vysion_pin_unlocked_${tenant}`)
     router.push(`/shop/${tenant}/admin/kassa`)
@@ -144,7 +145,7 @@ function LockButton({ tenant }: { tenant: string }) {
       onClick={handleLock}
       className="flex items-center gap-1.5 px-3 py-2 bg-red-500 hover:bg-red-600 rounded-xl text-white text-sm font-bold transition-colors"
     >
-      🔒 <span className="hidden sm:inline">Vergrendel</span>
+      🔒 <span className="hidden sm:inline">{t('adminLayout.lock')}</span>
     </button>
   )
 }

@@ -215,7 +215,7 @@
     }
   },
   "whyVysion": {
-    "title": "Waarom\u00a0kiezen\u00a0voor\u00a0Vysion",
+    "title": "Waarom kiezen voor Vysion",
     "imageAlt": "Vysion tafelkiosk met touchscreen",
     "fullPlatform": {
       "title": "Volledig platform",
@@ -4401,19 +4401,58 @@
     "videoCountMany": "{{count}} video's",
     "comingSoon": " — binnenkort beschikbaar",
     "cats": {
-      "registreren": { "title": "Registreren", "desc": "Account aanmaken en het admin paneel leren kennen" },
-      "modules": { "title": "Overzicht", "desc": "Order scherm, analyse, verkoop en meer" },
-      "instellingen": { "title": "Instellingen", "desc": "Alles instellen voor je online shop" },
-      "menu": { "title": "Menu", "desc": "Producten, categorieën en opties beheren" },
-      "whatsapp-bestellingen": { "title": "WhatsApp-bestellingen", "desc": "Bestellingen via WhatsApp ontvangen en beheren" },
-      "personeel": { "title": "Personeel", "desc": "Medewerkers, uren en vacatures beheren" },
-      "kostenberekening": { "title": "Kostenberekening", "desc": "Ingrediënten en productprijzen berekenen" },
-      "z-rapporten": { "title": "Z-rapporten", "desc": "Dagelijkse rapporten en afsluiting" },
-      "bestellingen": { "title": "Bestellingen", "desc": "Bestellingen en reserveringen beheren" },
-      "groepsbestellingen": { "title": "Groepsbestellingen", "desc": "Bestellingen beheren voor groepen" },
-      "bonnenprinter": { "title": "Bonnenprinter", "desc": "Bonnenprinter instellen en gebruiken" },
-      "de-website": { "title": "De website", "desc": "Je eigen website beheren en aanpassen" },
-      "de-shop": { "title": "De shop", "desc": "Je online shop instellen en beheren" }
+      "registreren": {
+        "title": "Registreren",
+        "desc": "Account aanmaken en het admin paneel leren kennen"
+      },
+      "modules": {
+        "title": "Overzicht",
+        "desc": "Order scherm, analyse, verkoop en meer"
+      },
+      "instellingen": {
+        "title": "Instellingen",
+        "desc": "Alles instellen voor je online shop"
+      },
+      "menu": {
+        "title": "Menu",
+        "desc": "Producten, categorieën en opties beheren"
+      },
+      "whatsapp-bestellingen": {
+        "title": "WhatsApp-bestellingen",
+        "desc": "Bestellingen via WhatsApp ontvangen en beheren"
+      },
+      "personeel": {
+        "title": "Personeel",
+        "desc": "Medewerkers, uren en vacatures beheren"
+      },
+      "kostenberekening": {
+        "title": "Kostenberekening",
+        "desc": "Ingrediënten en productprijzen berekenen"
+      },
+      "z-rapporten": {
+        "title": "Z-rapporten",
+        "desc": "Dagelijkse rapporten en afsluiting"
+      },
+      "bestellingen": {
+        "title": "Bestellingen",
+        "desc": "Bestellingen en reserveringen beheren"
+      },
+      "groepsbestellingen": {
+        "title": "Groepsbestellingen",
+        "desc": "Bestellingen beheren voor groepen"
+      },
+      "bonnenprinter": {
+        "title": "Bonnenprinter",
+        "desc": "Bonnenprinter instellen en gebruiken"
+      },
+      "de-website": {
+        "title": "De website",
+        "desc": "Je eigen website beheren en aanpassen"
+      },
+      "de-shop": {
+        "title": "De shop",
+        "desc": "Je online shop instellen en beheren"
+      }
     },
     "v": {
       "registratie1": "Registreren",
@@ -4603,5 +4642,131 @@
     "reasonEigenDesc": "Schrijf zelf een bericht voor de klant",
     "eigenPlaceholder": "bv. Gesloten wegens privé-evenement...",
     "bannerEigen": "Tijdelijk gesloten"
+  },
+  "reservationKassa": {
+    "guestsEmpty": "Nog geen gasten — ze verschijnen automatisch na de eerste reservatie",
+    "guestsSearchNoResults": "Geen resultaten voor deze zoekopdracht",
+    "loadFailedPrefix": "Fout bij laden reservaties: ",
+    "startTimeSaveFailedPrefix": "Starttijd kon niet worden opgeslagen: ",
+    "startTimeLabel": "Starttijd",
+    "durationLabel": "Duur",
+    "durationSaveFailedPrefix": "Duur kon niet worden opgeslagen: ",
+    "settingsSaveFailedPrefix": "Opslaan mislukt: ",
+    "settingsSaved": "✅ Instellingen opgeslagen!",
+    "floorPlanSaveFailedPrefix": "Plattegrond opslaan mislukt: ",
+    "tableAddedSuffix": "toegevoegd",
+    "tableAddedPrefix": "Tafel ",
+    "tableRemoved": "Tafel verwijderd",
+    "statusUpdateFailedPrefix": "Status kon niet worden bijgewerkt: ",
+    "guestAtTableSuffix": " aan tafel!",
+    "guestBackConfirmed": "teruggezet naar Bevestigd",
+    "customerNoEmail": "Deze klant heeft geen emailadres",
+    "fillSubjectMessage": "Vul onderwerp en bericht in",
+    "emailSentPrefix": "Email verstuurd naar ",
+    "sendFailed": "Versturen mislukt",
+    "networkErrorRetry": "Netwerk fout, probeer opnieuw",
+    "networkErrorRetry2": "Netwerkfout, probeer opnieuw",
+    "contactNoEmail": "Deze contactpersoon heeft geen e-mailadres",
+    "noContactsWithEmail": "Geen geselecteerde contacten met e-mailadres",
+    "noValidEmails": "Geen geldige e-mailadressen",
+    "markedNoShow": "gemarkeerd als no-show",
+    "noShowFeeChargedPrefix": "No-show kost €",
+    "noShowFeeChargedSuffix": " aangerekend",
+    "reservationCancelled": "Reservatie geannuleerd",
+    "guestDepartedSuffix": " vertrokken",
+    "confirmedFromWaitlistSuffix": " bevestigd vanuit wachtlijst",
+    "approveFailedPrefix": "Goedkeuren mislukt: ",
+    "guestApprovedSuffix": " goedgekeurd",
+    "approvedTableAssign": " — Tafel ",
+    "approvedTableAssignSuffix": " toegewezen",
+    "mailFailedPrefix": "Mail mislukt: ",
+    "confirmMailSentPrefix": "Bevestigingsmail verstuurd naar ",
+    "mailCouldNotSend": "Mail kon niet verstuurd worden",
+    "rejectFailedPrefix": "Weigeren mislukt: ",
+    "guestRejectedSuffix": " geweigerd",
+    "vipAdded": "VIP status toegevoegd",
+    "vipRemoved": "VIP status verwijderd",
+    "guestBlocked": "Gast geblokkeerd",
+    "guestUnblocked": "Gast gedeblokkeerd",
+    "assignTableFailedPrefix": "Tafel toewijzen mislukt: ",
+    "tableAssigned": "Tafel toegewezen",
+    "deleteFailedPrefix": "Verwijderen mislukt: ",
+    "reservationDeleted": "Reservatie verwijderd",
+    "orderStartedPrefix": "Order gestart voor tafel ",
+    "assignTableFirst": "Wijs eerst een tafel toe aan deze reservatie",
+    "walkInFailedPrefix": "Walk-in mislukt: ",
+    "walkInChecked": "Walk-in {name} ingecheckt op tafel {table}!",
+    "waitlistFailedPrefix": "Wachtlijst mislukt: ",
+    "waitlistAdded": "{name} toegevoegd aan wachtlijst (#{pos})",
+    "createFailedPrefix": "Fout bij aanmaken: ",
+    "reservationCreated": "Reservatie voor {name} aangemaakt!",
+    "linkCopied": "Link gekopieerd!",
+    "promoEmailSentOne": "Promotie e-mail verstuurd naar {name}",
+    "promoEmailSentMany": "Promotie e-mail verstuurd naar {count} ontvangers",
+    "reservationSaved": "Reservatie opgeslagen",
+    "saveFailedShort": "Opslaan mislukt: ",
+    "cancelFailedPrefix": "Annuleren mislukt: ",
+    "enterName": "Vul een naam in",
+    "chooseTable": "Kies een tafel",
+    "noFreeTable": "Geen vrije tafel beschikbaar voor dit tijdstip en deze groepsgrootte.",
+    "tableConflict": "Tafel {table} is al bezet op dit tijdstip ({from}, t/m {to}). Kies een andere tafel.",
+    "confirm": "Bevestigen",
+    "cancel": "Annuleren",
+    "save": "Opslaan",
+    "saving": "Opslaan...",
+    "saveChanges": "Wijzigingen opslaan",
+    "newTableFloorplanTitle": "Nieuwe tafel op de plattegrond",
+    "noReservationsToday": "Geen reservaties vandaag",
+    "noReservationForDate": "Geen reservatie voor {date}",
+    "noReservationsOnDate": "Geen reservaties op {date}",
+    "noReservations": "Geen reservaties",
+    "noDataLoaded": "Geen data geladen",
+    "newReservation": "Nieuwe reservatie",
+    "newReservationShort": "Nieuwe Reservatie",
+    "editLabel": "Bewerken",
+    "noReservationsFound": "Geen reservaties gevonden",
+    "settingsSaveFooter": "💾 Instellingen Opslaan",
+    "saveSettingsIcon": "💾 Opslaan",
+    "allShifts": "Alle shifts",
+    "noPreference": "— Geen voorkeur —",
+    "noReservationsInList": "Geen reservaties",
+    "noReservationsThisDay": "Geen reservaties op deze dag",
+    "newReservationCreate": "+ Nieuwe reservatie aanmaken",
+    "allTablesBusy": "Alle tafels bezet op dit moment",
+    "searchNoResultsNamed": "Geen resultaten voor \"{q}\"",
+    "searchNoBookings": "Geen reserveringen gevonden",
+    "freeTable": "Geen vrije tafel beschikbaar voor dit tijdstip en deze groepsgrootte."
+  },
+  "adminLayout": {
+    "loading": "Laden...",
+    "shopNotFound": "Shop niet gevonden",
+    "shopNotFoundDesc": "Deze shop bestaat niet of is verwijderd.",
+    "backToVysion": "← Terug naar Vysion",
+    "pos": "Kassa",
+    "onlineDisplay": "Onlinescherm",
+    "lock": "Vergrendel"
+  },
+  "voiceOrder": {
+    "title": "Spraakbestelling",
+    "tapAgainWhenDone": "Druk nogmaals op de knop als u klaar bent",
+    "exampleLabel": "Voorbeeld:",
+    "examplePhrase": "\"Een grote friet met mayonaise, een frikandel en een cola\"",
+    "pleaseWait": "Even geduld...",
+    "youSaid": "Je zei:",
+    "notFoundPrefix": "Niet gevonden:",
+    "totalLinePrefix": "Totaal:",
+    "errNoAudio": "Geen audio opgenomen. Probeer opnieuw.",
+    "errRecording": "Opname mislukt. Probeer opnieuw.",
+    "errMicSafari": "Geen toegang tot microfoon. Tik op \"Sta toe\" wanneer Safari vraagt.",
+    "errMicNotFound": "Geen microfoon gevonden op dit apparaat.",
+    "errMicStartPrefix": "Kon microfoon niet starten: ",
+    "errProcessing": "Verwerking mislukt",
+    "errGeneric": "Er ging iets mis. Probeer opnieuw.",
+    "errNoSpeech": "Geen spraak gedetecteerd. Druk op de knop en spreek duidelijk.",
+    "errMicBrowser": "Geen toegang tot microfoon. Klik op het slot-icoontje in je browser en sta microfoon toe.",
+    "errNetwork": "Netwerkfout. Controleer je internetverbinding.",
+    "errRecognitionDevice": "Spraakherkenning niet beschikbaar op dit apparaat. Probeer opnieuw.",
+    "errRecognition": "Spraakherkenning niet beschikbaar. Probeer opnieuw.",
+    "errProductMatch": "Product matching mislukt"
   }
 }

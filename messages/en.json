@@ -215,7 +215,7 @@
     }
   },
   "whyVysion": {
-    "title": "Why\u00a0choose\u00a0Vysion",
+    "title": "Why choose Vysion",
     "imageAlt": "Vysion table kiosk with touchscreen",
     "fullPlatform": {
       "title": "Full platform",
@@ -4401,19 +4401,58 @@
     "videoCountMany": "{{count}} videos",
     "comingSoon": " — coming soon",
     "cats": {
-      "registreren": { "title": "Sign up", "desc": "Create an account and learn the admin panel" },
-      "modules": { "title": "Overview", "desc": "Order screen, analytics, sales and more" },
-      "instellingen": { "title": "Settings", "desc": "Configure everything for your online shop" },
-      "menu": { "title": "Menu", "desc": "Manage products, categories and options" },
-      "whatsapp-bestellingen": { "title": "WhatsApp orders", "desc": "Receive and manage orders via WhatsApp" },
-      "personeel": { "title": "Staff", "desc": "Manage employees, hours and vacancies" },
-      "kostenberekening": { "title": "Costing", "desc": "Calculate ingredients and product prices" },
-      "z-rapporten": { "title": "Z-reports", "desc": "Daily reports and closing" },
-      "bestellingen": { "title": "Orders", "desc": "Manage orders and reservations" },
-      "groepsbestellingen": { "title": "Group orders", "desc": "Manage orders for groups" },
-      "bonnenprinter": { "title": "Receipt printer", "desc": "Set up and use your receipt printer" },
-      "de-website": { "title": "Your website", "desc": "Manage and customize your own website" },
-      "de-shop": { "title": "The shop", "desc": "Set up and manage your online shop" }
+      "registreren": {
+        "title": "Sign up",
+        "desc": "Create an account and learn the admin panel"
+      },
+      "modules": {
+        "title": "Overview",
+        "desc": "Order screen, analytics, sales and more"
+      },
+      "instellingen": {
+        "title": "Settings",
+        "desc": "Configure everything for your online shop"
+      },
+      "menu": {
+        "title": "Menu",
+        "desc": "Manage products, categories and options"
+      },
+      "whatsapp-bestellingen": {
+        "title": "WhatsApp orders",
+        "desc": "Receive and manage orders via WhatsApp"
+      },
+      "personeel": {
+        "title": "Staff",
+        "desc": "Manage employees, hours and vacancies"
+      },
+      "kostenberekening": {
+        "title": "Costing",
+        "desc": "Calculate ingredients and product prices"
+      },
+      "z-rapporten": {
+        "title": "Z-reports",
+        "desc": "Daily reports and closing"
+      },
+      "bestellingen": {
+        "title": "Orders",
+        "desc": "Manage orders and reservations"
+      },
+      "groepsbestellingen": {
+        "title": "Group orders",
+        "desc": "Manage orders for groups"
+      },
+      "bonnenprinter": {
+        "title": "Receipt printer",
+        "desc": "Set up and use your receipt printer"
+      },
+      "de-website": {
+        "title": "Your website",
+        "desc": "Manage and customize your own website"
+      },
+      "de-shop": {
+        "title": "The shop",
+        "desc": "Set up and manage your online shop"
+      }
     },
     "v": {
       "registratie1": "Sign up",
@@ -4603,5 +4642,131 @@
     "reasonEigenDesc": "Write your own message for the customer",
     "eigenPlaceholder": "e.g. Closed for a private event...",
     "bannerEigen": "Temporarily closed"
+  },
+  "reservationKassa": {
+    "guestsEmpty": "No guests yet — they appear automatically after the first reservation.",
+    "guestsSearchNoResults": "No results for this search",
+    "loadFailedPrefix": "Failed to load reservations: ",
+    "startTimeSaveFailedPrefix": "Could not save start time: ",
+    "startTimeLabel": "Start time",
+    "durationLabel": "Duration",
+    "durationSaveFailedPrefix": "Could not save duration: ",
+    "settingsSaveFailedPrefix": "Save failed: ",
+    "settingsSaved": "✅ Settings saved!",
+    "floorPlanSaveFailedPrefix": "Could not save floor plan: ",
+    "tableAddedSuffix": "added",
+    "tableAddedPrefix": "Table ",
+    "tableRemoved": "Table removed",
+    "statusUpdateFailedPrefix": "Could not update status: ",
+    "guestAtTableSuffix": " seated!",
+    "guestBackConfirmed": "moved back to Confirmed",
+    "customerNoEmail": "This customer has no email address",
+    "fillSubjectMessage": "Enter subject and message",
+    "emailSentPrefix": "Email sent to ",
+    "sendFailed": "Send failed",
+    "networkErrorRetry": "Network error, try again",
+    "networkErrorRetry2": "Network error, try again",
+    "contactNoEmail": "This contact has no email address",
+    "noContactsWithEmail": "No selected contacts with an email address",
+    "noValidEmails": "No valid email addresses",
+    "markedNoShow": "marked as no-show",
+    "noShowFeeChargedPrefix": "No-show fee of €",
+    "noShowFeeChargedSuffix": " charged",
+    "reservationCancelled": "Reservation cancelled",
+    "guestDepartedSuffix": " departed",
+    "confirmedFromWaitlistSuffix": " confirmed from waitlist",
+    "approveFailedPrefix": "Approve failed: ",
+    "guestApprovedSuffix": " approved",
+    "approvedTableAssign": " — Table ",
+    "approvedTableAssignSuffix": " assigned",
+    "mailFailedPrefix": "Mail failed: ",
+    "confirmMailSentPrefix": "Confirmation email sent to ",
+    "mailCouldNotSend": "Mail could not be sent",
+    "rejectFailedPrefix": "Reject failed: ",
+    "guestRejectedSuffix": " rejected",
+    "vipAdded": "VIP status added",
+    "vipRemoved": "VIP status removed",
+    "guestBlocked": "Guest blocked",
+    "guestUnblocked": "Guest unblocked",
+    "assignTableFailedPrefix": "Assign table failed: ",
+    "tableAssigned": "Table assigned",
+    "deleteFailedPrefix": "Delete failed: ",
+    "reservationDeleted": "Reservation deleted",
+    "orderStartedPrefix": "Order started for table ",
+    "assignTableFirst": "Assign a table to this reservation first",
+    "walkInFailedPrefix": "Walk-in failed: ",
+    "walkInChecked": "Walk-in {name} checked in at table {table}!",
+    "waitlistFailedPrefix": "Waitlist failed: ",
+    "waitlistAdded": "{name} added to waitlist (#{pos})",
+    "createFailedPrefix": "Create failed: ",
+    "reservationCreated": "Reservation for {name} created!",
+    "linkCopied": "Link copied!",
+    "promoEmailSentOne": "Promo email sent to {name}",
+    "promoEmailSentMany": "Promo email sent to {count} recipients",
+    "reservationSaved": "Reservation saved",
+    "saveFailedShort": "Save failed: ",
+    "cancelFailedPrefix": "Cancel failed: ",
+    "enterName": "Enter a name",
+    "chooseTable": "Choose a table",
+    "noFreeTable": "No free table for this time and party size.",
+    "tableConflict": "Table {table} is already taken at this time ({from}, until {to}). Choose another table.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "saveChanges": "Save changes",
+    "newTableFloorplanTitle": "New table on floor plan",
+    "noReservationsToday": "No reservations today",
+    "noReservationForDate": "No reservation for {date}",
+    "noReservationsOnDate": "No reservations on {date}",
+    "noReservations": "No reservations",
+    "noDataLoaded": "No data loaded",
+    "newReservation": "New reservation",
+    "newReservationShort": "New reservation",
+    "editLabel": "Edit",
+    "noReservationsFound": "No reservations found",
+    "settingsSaveFooter": "💾 Save settings",
+    "saveSettingsIcon": "💾 Save",
+    "allShifts": "All shifts",
+    "noPreference": "— No preference —",
+    "noReservationsInList": "No reservations",
+    "noReservationsThisDay": "No reservations on this day",
+    "newReservationCreate": "+ Create new reservation",
+    "allTablesBusy": "All tables are taken at this time",
+    "searchNoResultsNamed": "No results for \"{q}\"",
+    "searchNoBookings": "No bookings found",
+    "freeTable": "No free table for this time and party size."
+  },
+  "adminLayout": {
+    "loading": "Loading...",
+    "shopNotFound": "Shop not found",
+    "shopNotFoundDesc": "This shop does not exist or was removed.",
+    "backToVysion": "← Back to Vysion",
+    "pos": "POS",
+    "onlineDisplay": "Customer display",
+    "lock": "Lock"
+  },
+  "voiceOrder": {
+    "title": "Voice order",
+    "tapAgainWhenDone": "Tap the button again when you are done",
+    "exampleLabel": "Example:",
+    "examplePhrase": "\"A large fries with mayo, a frikandel and a cola\"",
+    "pleaseWait": "Please wait...",
+    "youSaid": "You said:",
+    "notFoundPrefix": "Not found:",
+    "totalLinePrefix": "Total:",
+    "errNoAudio": "No audio recorded. Try again.",
+    "errRecording": "Recording failed. Try again.",
+    "errMicSafari": "No microphone access. Tap Allow when Safari asks.",
+    "errMicNotFound": "No microphone found on this device.",
+    "errMicStartPrefix": "Could not start microphone: ",
+    "errProcessing": "Processing failed",
+    "errGeneric": "Something went wrong. Try again.",
+    "errNoSpeech": "No speech detected. Tap the button and speak clearly.",
+    "errMicBrowser": "No microphone access. Click the lock icon in your browser and allow the microphone.",
+    "errNetwork": "Network error. Check your internet connection.",
+    "errRecognitionDevice": "Speech recognition not available on this device. Try again.",
+    "errRecognition": "Speech recognition not available. Try again.",
+    "errProductMatch": "Product matching failed"
   }
 }

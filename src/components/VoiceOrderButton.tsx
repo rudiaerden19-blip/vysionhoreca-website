@@ -400,13 +400,13 @@ export default function VoiceOrderButton({
           setIsProcessing(true)
           await processAudioWithServer(audioBlob)
         } else {
-          setError('Geen audio opgenomen. Probeer opnieuw.')
+          setError(tGlobal('voiceOrder.errNoAudio'))
         }
       }
 
       mediaRecorder.onerror = (event: any) => {
         console.error('[Voice Order] MediaRecorder error:', event)
-        setError('Opname mislukt. Probeer opnieuw.')
+        setError(tGlobal('voiceOrder.errRecording'))
         setIsRecording(false)
       }
 
@@ -418,11 +418,11 @@ export default function VoiceOrderButton({
     } catch (err: any) {
       console.error('[Voice Order] MediaRecorder error:', err)
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        setError('Geen toegang tot microfoon. Tik op "Sta toe" wanneer Safari vraagt.')
+        setError(tGlobal('voiceOrder.errMicSafari'))
       } else if (err.name === 'NotFoundError') {
-        setError('Geen microfoon gevonden op dit apparaat.')
+        setError(tGlobal('voiceOrder.errMicNotFound'))
       } else {
-        setError(`Kon microfoon niet starten: ${err.message}`)
+        setError(`${tGlobal('voiceOrder.errMicStartPrefix')}${err.message}`)
       }
     }
   }
@@ -457,7 +457,7 @@ export default function VoiceOrderButton({
       const data = await response.json()
 
       if (!data.success) {
-        throw new Error(data.error || 'Verwerking mislukt')
+        throw new Error(data.error || tGlobal('voiceOrder.errProcessing'))
       }
 
       setTranscribedText(data.transcription || '')
@@ -472,7 +472,7 @@ export default function VoiceOrderButton({
 
     } catch (err: any) {
       console.error('[Voice Order] Server processing error:', err)
-      setError(err.message || 'Er ging iets mis. Probeer opnieuw.')
+      setError(err.message || tGlobal('voiceOrder.errGeneric'))
     } finally {
       setIsProcessing(false)
     }
@@ -516,23 +516,23 @@ export default function VoiceOrderButton({
         setIsRecording(false)
         
         if (event.error === 'no-speech') {
-          setError('Geen spraak gedetecteerd. Druk op de knop en spreek duidelijk.')
+          setError(tGlobal('voiceOrder.errNoSpeech'))
         } else if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-          setError('Geen toegang tot microfoon. Klik op het slot-icoontje in je browser en sta microfoon toe.')
+          setError(tGlobal('voiceOrder.errMicBrowser'))
         } else if (event.error === 'network') {
-          setError('Netwerkfout. Controleer je internetverbinding.')
+          setError(tGlobal('voiceOrder.errNetwork'))
         } else if (event.error === 'aborted') {
           // User stopped, not an error
         } else if (event.error === 'audio-capture') {
           // Microphone issue - switch to server processing
           console.log('[Voice Order] audio-capture error, switching to server processing')
           setUseServerProcessing(true)
-          setError('Spraakherkenning niet beschikbaar op dit apparaat. Probeer opnieuw.')
+          setError(tGlobal('voiceOrder.errRecognitionDevice'))
         } else {
           // Any other error - switch to server processing
           console.log('[Voice Order] Unknown error, switching to server processing')
           setUseServerProcessing(true)
-          setError('Spraakherkenning niet beschikbaar. Probeer opnieuw.')
+          setError(tGlobal('voiceOrder.errRecognition'))
         }
       }
 
@@ -544,7 +544,7 @@ export default function VoiceOrderButton({
     } catch (err) {
       console.error('[Voice Order] Speech recognition error:', err)
       setUseServerProcessing(true)
-      setError('Spraakherkenning niet beschikbaar. Probeer opnieuw.')
+      setError(tGlobal('voiceOrder.errRecognition'))
     }
   }
 
@@ -565,7 +565,7 @@ export default function VoiceOrderButton({
       const data = await response.json()
 
       if (!data.success) {
-        throw new Error(data.error || 'Product matching mislukt')
+        throw new Error(data.error || tGlobal('voiceOrder.errProductMatch'))
       }
 
       setMatchedProducts(data.matched || [])
@@ -579,7 +579,7 @@ export default function VoiceOrderButton({
 
     } catch (err: any) {
       console.error('[Voice Order] Processing error:', err)
-      setError(err.message || 'Er ging iets mis. Probeer opnieuw.')
+      setError(err.message || tGlobal('voiceOrder.errGeneric'))
     } finally {
       setIsProcessing(false)
     }
@@ -656,7 +656,7 @@ export default function VoiceOrderButton({
               {/* Header */}
               <div className={`p-6 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                 <div className="flex items-center justify-between">
-                  <h2 className={`text-xl font-bold ${textColor}`}>🎤 Spraakbestelling</h2>
+                  <h2 className={`text-xl font-bold ${textColor}`}>🎤 {tGlobal('voiceOrder.title')}</h2>
                   <button 
                     onClick={resetState}
                     className={`w-10 h-10 rounded-full ${cardBg} flex items-center justify-center ${textColor} text-xl`}
@@ -699,7 +699,7 @@ export default function VoiceOrderButton({
                         <>
                           <span className="block">{t.listening}</span>
                           <span className="block mt-1 font-medium">
-                            Druk nogmaals op de knop als u klaar bent
+                            {tGlobal('voiceOrder.tapAgainWhenDone')}
                           </span>
                         </>
                       ) : t.speakNow}
@@ -707,9 +707,9 @@ export default function VoiceOrderButton({
 
                     {/* Example text */}
                     <div className={`${cardBg} rounded-xl p-4`}>
-                      <p className={`text-sm ${mutedColor}`}>Voorbeeld:</p>
+                      <p className={`text-sm ${mutedColor}`}>{tGlobal('voiceOrder.exampleLabel')}</p>
                       <p className={`${textColor} italic`}>
-                        "Een grote friet met mayonaise, een frikandel en een cola"
+                        {tGlobal('voiceOrder.examplePhrase')}
                       </p>
                     </div>
                   </div>
@@ -725,7 +725,7 @@ export default function VoiceOrderButton({
                       style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
                     />
                     <p className={textColor}>{t.processing}</p>
-                    <p className={`text-sm ${mutedColor} mt-2`}>Even geduld...</p>
+                    <p className={`text-sm ${mutedColor} mt-2`}>{tGlobal('voiceOrder.pleaseWait')}</p>
                   </div>
                 )}
 
@@ -749,7 +749,7 @@ export default function VoiceOrderButton({
                   <div className="space-y-4">
                     {/* Transcribed text */}
                     <div className={`${cardBg} rounded-xl p-4`}>
-                      <p className={`text-sm ${mutedColor} mb-1`}>Je zei:</p>
+                      <p className={`text-sm ${mutedColor} mb-1`}>{tGlobal('voiceOrder.youSaid')}</p>
                       <p className={textColor}>"{transcribedText}"</p>
                     </div>
 
@@ -781,7 +781,7 @@ export default function VoiceOrderButton({
                     {notMatched.length > 0 && (
                       <div className={`${darkMode ? 'bg-yellow-900/30 border-yellow-700' : 'bg-yellow-50 border-yellow-200'} border rounded-xl p-4`}>
                         <p className={darkMode ? 'text-yellow-300' : 'text-yellow-800'} style={{ fontSize: '0.875rem' }}>
-                          ⚠️ Niet gevonden: {notMatched.join(', ')}
+                          ⚠️ {tGlobal('voiceOrder.notFoundPrefix')} {notMatched.join(', ')}
                         </p>
                       </div>
                     )}
@@ -815,7 +815,7 @@ export default function VoiceOrderButton({
                       ))}
                       <div className="border-t pt-2 mt-2" style={{ borderColor: primaryColor }}>
                         <p className="text-center text-2xl font-bold" style={{ color: primaryColor }}>
-                          Totaal: €{total.toFixed(2)}
+                          {tGlobal('voiceOrder.totalLinePrefix')} €{total.toFixed(2)}
                         </p>
                       </div>
                     </div>
