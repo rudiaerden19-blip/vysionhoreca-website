@@ -38,11 +38,29 @@ npm run k6:load
 |------------|---------|---------------------|
 | `VUS`      | `50`    | Gelijktijdige users |
 | `DURATION` | `60s`   | Looptijd test        |
+| `TENANT_FILE` | `k6/tenants.txt` | Slugs (één per regel) |
+| `HARD`     | —       | Zet `1` voor zwaardere run: kortere pauzes + `/checkout` + `/api/health` |
+| `RAMP`     | —       | Zet `1` voor **oplopende** VUs i.p.v. plat `VUS`/`DURATION` |
+| `RAMP_TARGET` | `200` | Piek-VUs bij `RAMP=1` |
+| `RAMP_STEADY` | `2m`  | Hoelang piek aanhoudt |
+| `RAMP_UP` / `RAMP_DOWN` | `30s` | Op- en afbouwen |
 
 Voorbeeld korte rook-test:
 
 ```bash
 VUS=10 DURATION=30s k6 run k6/ordervysion-load.js
+```
+
+Zwaarder (meer hits, minder “denktijd”):
+
+```bash
+HARD=1 VUS=200 DURATION=3m TENANT_FILE=k6/tenants.txt k6 run k6/ordervysion-load.js
+```
+
+Ramp naar 300 VUs:
+
+```bash
+HARD=1 RAMP=1 RAMP_TARGET=300 RAMP_STEADY=3m TENANT_FILE=k6/tenants.txt k6 run k6/ordervysion-load.js
 ```
 
 ### Output / metrics
