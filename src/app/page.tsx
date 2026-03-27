@@ -2,7 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
-import { Navigation, Footer, CookieBanner, HomeLandingHero, PlatformGridSection } from '@/components'
+import {
+  Navigation,
+  Footer,
+  CookieBanner,
+  HomeLandingHero,
+  PlatformGridSection,
+  HardwareSection,
+} from '@/components'
 import { useLanguage } from '@/i18n'
 import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
@@ -1480,6 +1487,7 @@ export default function HomePage() {
       <HomeLandingHero onStickyNavChange={setStickyNav} />
       <WhyVysionSection />
       <PlatformGridSection />
+      <HardwareSection />
       <NewAtVysionSection />
       <OneDayOnlineSection />
       <StatsAndLiveDemoSection />

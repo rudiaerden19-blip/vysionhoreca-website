@@ -42,6 +42,11 @@
     "trialInfo": "14 Tage kostenlos testen • Sofort loslegen",
     "clickToOpen": "Zum Öffnen klicken"
   },
+  "hardware": {
+    "title": "Unsere Hardware",
+    "subtitle": "Professionelle Kassensysteme, Kundendisplays, Zahlungsgeräte und Peripherie — bereit für Vysion Horeca in Ihrem Betrieb.",
+    "imageAlt": "Hardware-Beispiel"
+  },
   "newAtVysion": {
     "title": "Stellen Sie Ihr Paket selbst zusammen",
     "body": "Stellen Sie Ihr Paket selbst zusammen: ein Modul oder mehrere — Sie aktivieren nur, was Sie brauchen. Jedes Modul ist einzeln wählbar; der Preis richtet sich nach Ihrer Auswahl. Sie zahlen nur für das, was Sie wirklich nutzen.",

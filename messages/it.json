@@ -42,6 +42,11 @@
     "trialInfo": "Prova gratis 14 giorni • Inizia subito",
     "clickToOpen": "Clicca per aprire"
   },
+  "hardware": {
+    "title": "Il nostro hardware",
+    "subtitle": "Terminali POS, display cliente, dispositivi di pagamento e periferiche professionali — pronti per Vysion Horeca nella tua attività.",
+    "imageAlt": "Esempio di hardware"
+  },
   "newAtVysion": {
     "title": "Componi il tuo pacchetto",
     "body": "Componi il tuo pacchetto: un modulo o più — attivi solo ciò che ti serve. Ogni modulo si sceglie separatamente; il prezzo segue la tua selezione. Paghi solo ciò che usi davvero.",

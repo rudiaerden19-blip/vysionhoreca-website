@@ -42,6 +42,11 @@
     "trialInfo": "Free trial 14 days • Get started immediately",
     "clickToOpen": "Click to open"
   },
+  "hardware": {
+    "title": "Our hardware",
+    "subtitle": "Professional POS terminals, customer displays, payment devices and peripherals — ready to run Vysion Horeca in your venue.",
+    "imageAlt": "Hardware example"
+  },
   "newAtVysion": {
     "title": "Build your own package",
     "body": "Build your own bundle: one module or several — you only enable what you need. Each module can be selected on its own, and your price follows your choices. Pay for what you actually use and shape Vysion to fit your venue.",

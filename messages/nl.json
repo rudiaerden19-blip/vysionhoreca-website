@@ -42,6 +42,11 @@
     "trialInfo": "Gratis testen 14 dagen • Direct aan de slag",
     "clickToOpen": "Klik om te openen"
   },
+  "hardware": {
+    "title": "Onze hardware",
+    "subtitle": "Professionele kassa’s, tweede scherm, betaalterminals en randapparatuur — klaar om Vysion Horeca op te draaien in jouw zaak.",
+    "imageAlt": "Hardware voorbeeld"
+  },
   "newAtVysion": {
     "title": "Stel zelf je pakket samen",
     "body": "Je stelt je pakket zelf samen: één module of meerdere — jij kiest wat je nodig hebt. Elke module kun je apart aanzetten; je prijs past zich aan je selectie aan. Zo betaal je alleen voor wat je echt gebruikt en bouw je Vysion zoals het voor jouw zaak klopt.",

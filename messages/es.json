@@ -42,6 +42,11 @@
     "trialInfo": "Prueba gratis 7 días • Empieza de inmediato",
     "clickToOpen": "Clic para abrir"
   },
+  "hardware": {
+    "title": "Nuestro hardware",
+    "subtitle": "TPVs profesionales, pantallas para el cliente, datáfonos y periféricos — listos para ejecutar Vysion Horeca en tu negocio.",
+    "imageAlt": "Ejemplo de hardware"
+  },
   "newAtVysion": {
     "title": "Monta tu propio paquete",
     "body": "Arma tu propio paquete: un módulo o varios — solo activas lo que necesitas. Cada módulo se elige por separado; el precio se ajusta a tu selección. Pagas solo por lo que realmente usas.",

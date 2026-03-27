@@ -42,6 +42,11 @@
     "trialInfo": "Essai gratuit 14 jours • Commencez immédiatement",
     "clickToOpen": "Cliquez pour ouvrir"
   },
+  "hardware": {
+    "title": "Notre matériel",
+    "subtitle": "Terminaux d’encaissement, écrans client, TPE et périphériques professionnels — prêts pour faire tourner Vysion Horeca dans votre établissement.",
+    "imageAlt": "Exemple de matériel"
+  },
   "newAtVysion": {
     "title": "Composez votre forfait vous-même",
     "body": "Composez vous-même votre offre : un module ou plusieurs — vous n'activez que ce dont vous avez besoin. Chaque module est choisi séparément ; le prix suit votre sélection. Vous payez uniquement pour ce que vous utilisez vraiment.",
