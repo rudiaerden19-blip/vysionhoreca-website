@@ -238,12 +238,30 @@ interface KassaReservationsViewProps {
 }
 
 // ---- Rapporten View ----
-function RapportenView({ reservations, guestProfiles }: { reservations: Reservation[], guestProfiles: GuestProfile[] }) {
+function RapportenView({
+  reservations,
+  guestProfiles,
+  rk,
+}: {
+  reservations: Reservation[]
+  guestProfiles: GuestProfile[]
+  rk: (key: string, rep?: Record<string, string>) => string
+}) {
+  const { locale } = useLanguage()
+  const localeTag =
+    locale === 'nl' ? 'nl-BE' : locale === 'zh' ? 'zh-CN' : locale === 'ar' ? 'ar' : locale
+
   const now = new Date()
   const [rMonth, setRMonth] = useState(now.getMonth())
   const [rYear, setRYear] = useState(now.getFullYear())
 
-  const MONTHS = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December']
+  const monthNames = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) =>
+        new Date(2000, i, 15).toLocaleDateString(localeTag, { month: 'long' })
+      ),
+    [localeTag]
+  )
 
   // Filter reserveringen op geselecteerde maand
   const from = `${rYear}-${String(rMonth+1).padStart(2,'0')}-01`
@@ -264,9 +282,10 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
 
   // Bouw dagseries op voor grafieken
   const daysInMonth = new Date(rYear, rMonth+1, 0).getDate()
-  const dayLabels = Array.from({length: daysInMonth}, (_, i) => {
-    const d = new Date(rYear, rMonth, i+1)
-    return `${['Zo','Ma','Di','Wo','Do','Vr','Za'][d.getDay()]} ${i+1}`
+  const dayLabels = Array.from({ length: daysInMonth }, (_, i) => {
+    const d = new Date(rYear, rMonth, i + 1)
+    const dow = d.toLocaleDateString(localeTag, { weekday: 'short' })
+    return `${dow} ${i + 1}`
   })
   const guestsByDay = Array.from({length: daysInMonth}, (_, i) => {
     const d = `${rYear}-${String(rMonth+1).padStart(2,'0')}-${String(i+1).padStart(2,'0')}`
@@ -322,13 +341,19 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
   const xLabels = dayLabels.filter((_, i) => i % Math.ceil(daysInMonth / 10) === 0 || i === daysInMonth - 1)
   const xIdxs = Array.from({length: daysInMonth}, (_,i) => i).filter((i) => i % Math.ceil(daysInMonth / 10) === 0 || i === daysInMonth - 1)
 
-  // Status verdeling
   const statusData = [
-    { label: 'Bevestigd', status: 'CONFIRMED', color: '#3b82f6' },
-    { label: 'Ingecheckt', status: 'CHECKED_IN', color: '#22c55e' },
-    { label: 'Afgerond', status: 'COMPLETED', color: '#6b7280' },
-    { label: 'No-show', status: 'NO_SHOW', color: '#ef4444' },
-    { label: 'Geannuleerd', status: 'CANCELLED', color: '#d1d5db' },
+    { labelKey: 'statusConfirmed', status: 'CONFIRMED' as const, color: '#3b82f6' },
+    { labelKey: 'statusCheckedIn', status: 'CHECKED_IN' as const, color: '#22c55e' },
+    { labelKey: 'statusCompleted', status: 'COMPLETED' as const, color: '#6b7280' },
+    { labelKey: 'statusNoShow', status: 'NO_SHOW' as const, color: '#ef4444' },
+    { labelKey: 'statusCancelled', status: 'CANCELLED' as const, color: '#d1d5db' },
+  ]
+
+  const kpiRows: { labelKey: string; value: string; sub: string; color: string }[] = [
+    { labelKey: 'reportKpiReturning', value: `${returningPct}%`, sub: rk('reportKpiReturningSub'), color: 'text-gray-800' },
+    { labelKey: 'reportKpiCancellations', value: `${cancelPct}%`, sub: rk('reportKpiCancelledSub', { cancelled: String(cancelled) }), color: cancelPct > 20 ? 'text-red-500' : 'text-gray-800' },
+    { labelKey: 'reportKpiNoShows', value: `${noShowPct}%`, sub: rk('reportKpiNoShowSub', { noShows: String(noShows) }), color: noShowPct > 10 ? 'text-red-500' : 'text-gray-800' },
+    { labelKey: 'reportKpiAvgParty', value: avgGroup > 0 ? avgGroup.toFixed(1) : '—', sub: rk('reportKpiAvgPartySub'), color: 'text-gray-800' },
   ]
 
   return (
@@ -336,11 +361,11 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
       {/* Filter balk */}
       <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-wrap items-center gap-4">
         <div>
-          <label className="text-xs text-gray-500 block mb-1">Datumbereik</label>
+          <label className="text-xs text-gray-500 block mb-1">{rk('reportDateRangeLabel')}</label>
           <div className="flex items-center gap-2">
             <select value={rMonth} onChange={e => setRMonth(Number(e.target.value))}
               className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white outline-none focus:border-orange-400">
-              {MONTHS.map((m, i) => <option key={i} value={i}>{m}</option>)}
+              {monthNames.map((m, i) => <option key={i} value={i}>{m}</option>)}
             </select>
             <select value={rYear} onChange={e => setRYear(Number(e.target.value))}
               className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white outline-none focus:border-orange-400">
@@ -350,21 +375,20 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
         </div>
         <div className="h-8 w-px bg-gray-200 hidden sm:block"/>
         <div className="text-sm text-gray-500">
-          <span className="font-semibold text-gray-800">{total}</span> reservaties &nbsp;·&nbsp;
-          <span className="font-semibold text-gray-800">{totalGuests}</span> gasten in {MONTHS[rMonth]} {rYear}
+          {rk('reportSummaryResAndGuests', {
+            total: String(total),
+            guests: String(totalGuests),
+            month: monthNames[rMonth],
+            year: String(rYear),
+          })}
         </div>
       </div>
 
       {/* KPI kaarten */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Terugkerende gasten', value: `${returningPct}%`, sub: 'van alle gasten', color: 'text-gray-800' },
-          { label: 'Annuleringen', value: `${cancelPct}%`, sub: `${cancelled} geannuleerd`, color: cancelPct > 20 ? 'text-red-500' : 'text-gray-800' },
-          { label: 'No-shows', value: `${noShowPct}%`, sub: `${noShows} no-show`, color: noShowPct > 10 ? 'text-red-500' : 'text-gray-800' },
-          { label: 'Gem. groepsgrootte', value: avgGroup > 0 ? avgGroup.toFixed(1) : '—', sub: 'personen per reservatie', color: 'text-gray-800' },
-        ].map(({ label, value, sub, color }) => (
-          <div key={label} className="bg-white border border-gray-200 rounded-xl p-5">
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{label}</p>
+        {kpiRows.map(({ labelKey, value, sub, color }) => (
+          <div key={labelKey} className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{rk(labelKey)}</p>
             <p className={`text-3xl font-bold mb-1 ${color}`}>{value}</p>
             <p className="text-xs text-gray-400">{sub}</p>
           </div>
@@ -375,10 +399,10 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h4 className="font-bold text-gray-800">Gasten per dag</h4>
-            <p className="text-xs text-gray-400 mt-0.5">{MONTHS[rMonth]} {rYear}</p>
+            <h4 className="font-bold text-gray-800">{rk('reportGuestsPerDay')}</h4>
+            <p className="text-xs text-gray-400 mt-0.5">{monthNames[rMonth]} {rYear}</p>
           </div>
-          <span className="text-sm font-semibold text-gray-500">Totaal: {totalGuests}</span>
+          <span className="text-sm font-semibold text-gray-500">{rk('reportTotalLabel', { n: String(totalGuests) })}</span>
         </div>
         <AreaChart data={guestsByDay} max={maxGuests} color="#f97316"/>
         {/* X-as labels */}
@@ -389,7 +413,7 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
         </div>
         <div className="flex items-center gap-2 mt-3">
           <div className="w-3 h-3 rounded-full bg-orange-400"/>
-          <span className="text-xs text-gray-500">Handmatig / kassa</span>
+          <span className="text-xs text-gray-500">{rk('reportChartLegendManual')}</span>
         </div>
       </div>
 
@@ -397,10 +421,10 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
       <div className="bg-white border border-gray-200 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h4 className="font-bold text-gray-800">Reserveringen per dag</h4>
-            <p className="text-xs text-gray-400 mt-0.5">{MONTHS[rMonth]} {rYear}</p>
+            <h4 className="font-bold text-gray-800">{rk('reportReservationsPerDay')}</h4>
+            <p className="text-xs text-gray-400 mt-0.5">{monthNames[rMonth]} {rYear}</p>
           </div>
-          <span className="text-sm font-semibold text-gray-500">Totaal: {totalRes}</span>
+          <span className="text-sm font-semibold text-gray-500">{rk('reportTotalLabel', { n: String(totalRes) })}</span>
         </div>
         <AreaChart data={resByDay} max={maxRes} color="#3b82f6"/>
         <div className="flex justify-between mt-1 px-2">
@@ -410,21 +434,21 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
         </div>
         <div className="flex items-center gap-2 mt-3">
           <div className="w-3 h-3 rounded-full bg-blue-400"/>
-          <span className="text-xs text-gray-500">Handmatig / kassa</span>
+          <span className="text-xs text-gray-500">{rk('reportChartLegendManual')}</span>
         </div>
       </div>
 
       {/* Status verdeling + Top gasten */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h4 className="font-bold text-gray-800 mb-4">Status verdeling</h4>
+          <h4 className="font-bold text-gray-800 mb-4">{rk('reportStatusDistribution')}</h4>
           <div className="space-y-3">
-            {statusData.map(({ label, status, color }) => {
+            {statusData.map(({ labelKey, status, color }) => {
               const count = filtered.filter(r => r.status === status).length
               const pct = filtered.length > 0 ? (count / filtered.length) * 100 : 0
               return (
                 <div key={status} className="flex items-center gap-3">
-                  <span className="w-24 text-sm text-gray-600 shrink-0">{label}</span>
+                  <span className="w-24 text-sm text-gray-600 shrink-0">{rk(labelKey)}</span>
                   <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
                     <div className="h-full rounded-full transition-all" style={{width:`${pct}%`, backgroundColor: color}}/>
                   </div>
@@ -436,7 +460,7 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h4 className="font-bold text-gray-800 mb-4">Top 5 meest terugkerende gasten</h4>
+          <h4 className="font-bold text-gray-800 mb-4">{rk('reportTopReturning')}</h4>
           <div className="space-y-3">
             {[...guestProfiles].sort((a,b) => b.totalVisits - a.totalVisits).slice(0,5).map((g, i) => (
               <div key={g.id} className="flex items-center gap-3">
@@ -450,7 +474,7 @@ function RapportenView({ reservations, guestProfiles }: { reservations: Reservat
                 <span className="text-sm font-semibold text-gray-600 shrink-0">{g.totalVisits}x</span>
               </div>
             ))}
-            {guestProfiles.length === 0 && <p className="text-gray-400 text-sm text-center py-4">Nog geen gastdata</p>}
+            {guestProfiles.length === 0 && <p className="text-gray-400 text-sm text-center py-4">{rk('reportNoGuestData')}</p>}
           </div>
         </div>
       </div>
@@ -1007,14 +1031,14 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests, statusRin
 }
 
 // ---- Status config (exact kopie) ----
-const STATUS_CONFIG: Record<ReservationStatus, { label: string; color: string; bgColor: string; icon: React.ReactNode }> = {
-  PENDING: { label: 'In afwachting', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.15)', icon: <Clock size={14} /> },
-  CONFIRMED: { label: 'Bevestigd', color: '#3b82f6', bgColor: 'rgba(59, 130, 246, 0.15)', icon: <CheckCircle2 size={14} /> },
-  CHECKED_IN: { label: 'Ingecheckt', color: '#22c55e', bgColor: 'rgba(34, 197, 94, 0.15)', icon: <UserCheck size={14} /> },
-  COMPLETED: { label: 'Afgerond', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.15)', icon: <CheckCircle2 size={14} /> },
-  NO_SHOW: { label: 'No-show', color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.15)', icon: <UserX size={14} /> },
-  CANCELLED: { label: 'Geannuleerd', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.15)', icon: <XCircle size={14} /> },
-  WAITLIST: { label: 'Wachtlijst', color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.15)', icon: <Clock size={14} /> },
+const STATUS_CONFIG: Record<ReservationStatus, { labelKey: string; color: string; bgColor: string; icon: React.ReactNode }> = {
+  PENDING: { labelKey: 'statusPending', color: '#f59e0b', bgColor: 'rgba(245, 158, 11, 0.15)', icon: <Clock size={14} /> },
+  CONFIRMED: { labelKey: 'statusConfirmed', color: '#3b82f6', bgColor: 'rgba(59, 130, 246, 0.15)', icon: <CheckCircle2 size={14} /> },
+  CHECKED_IN: { labelKey: 'statusCheckedIn', color: '#22c55e', bgColor: 'rgba(34, 197, 94, 0.15)', icon: <UserCheck size={14} /> },
+  COMPLETED: { labelKey: 'statusCompleted', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.15)', icon: <CheckCircle2 size={14} /> },
+  NO_SHOW: { labelKey: 'statusNoShow', color: '#ef4444', bgColor: 'rgba(239, 68, 68, 0.15)', icon: <UserX size={14} /> },
+  CANCELLED: { labelKey: 'statusCancelled', color: '#6b7280', bgColor: 'rgba(107, 114, 128, 0.15)', icon: <XCircle size={14} /> },
+  WAITLIST: { labelKey: 'statusWaitlist', color: '#8b5cf6', bgColor: 'rgba(139, 92, 246, 0.15)', icon: <Clock size={14} /> },
 }
 
 // ---- Default settings ----
@@ -2593,7 +2617,7 @@ export default function KassaReservationsView({
                 style={{ backgroundColor: status.bgColor, color: status.color }}
               >
                 {status.icon}
-                {status.label}
+                {rk(status.labelKey)}
               </span>
             </div>
             <h3 className="font-semibold text-lg mt-1">{reservation.guest_name}</h3>
@@ -2913,7 +2937,7 @@ export default function KassaReservationsView({
                             <span className="text-sm font-bold text-gray-900">{r.reservation_time}</span>
                             <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium flex-shrink-0"
                               style={{ backgroundColor: status.bgColor, color: status.color }}>
-                              {status.label}
+                              {rk(status.labelKey)}
                             </span>
                           </div>
                           <p className="font-semibold text-gray-900 text-sm truncate">
@@ -3075,10 +3099,10 @@ export default function KassaReservationsView({
 
                   {/* Legenda */}
                   <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-xl px-4 py-2.5 flex items-center gap-4 shadow-md text-xs font-medium">
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-green-400" /><span>Vrij</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-violet-400" /><span>Gereserveerd</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-400" /><span>Bezet</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-400" /><span>Afwachting</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-green-400" /><span>{rk('floorLegendFree')}</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-violet-400" /><span>{rk('floorLegendReserved')}</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-400" /><span>{rk('floorLegendOccupied')}</span></div>
+                    <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-amber-400" /><span>{rk('floorLegendPending')}</span></div>
                   </div>
 
                   {/* Datum badge */}
@@ -3101,6 +3125,7 @@ export default function KassaReservationsView({
             onSelectReservation={setSelectedReservation}
             onNewReservation={() => setShowNewReservationModal(true)}
             renderReservationCard={renderReservationCard}
+            rk={rk}
           />
         )}
 
@@ -3114,7 +3139,7 @@ export default function KassaReservationsView({
             const all = floorRes.filter(r => String(r.table_number) === String(tableNum))
             // Geen reservaties of enkel afgeronde → vrij (groen)
             const active = all.filter(r => r.status !== 'COMPLETED')
-            if (active.length === 0) return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res: null, count: 0, guestLabel: '' }
+            if (active.length === 0) return { color: '#4ade80', borderColor: '#22c55e', label: rk('floorLegendFree'), res: null, count: 0, guestLabel: '' }
             // Toon de eerstvolgende actieve reservatie
             const res = active.sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))[0]
             const count = active.length
@@ -3123,10 +3148,10 @@ export default function KassaReservationsView({
               : count > 2
                 ? `${res.guest_name} +${count - 1}`
                 : res.guest_name
-            if (res.status === 'CHECKED_IN') return { color: '#60a5fa', borderColor: '#3b82f6', label: 'Bezet', res, count, guestLabel }
-            if (res.status === 'CONFIRMED') return { color: '#a78bfa', borderColor: '#8b5cf6', label: 'Gereserveerd', res, count, guestLabel }
-            if (res.status === 'PENDING') return { color: '#fbbf24', borderColor: '#f59e0b', label: 'Afwachting', res, count, guestLabel }
-            return { color: '#4ade80', borderColor: '#22c55e', label: 'Vrij', res, count, guestLabel }
+            if (res.status === 'CHECKED_IN') return { color: '#60a5fa', borderColor: '#3b82f6', label: rk('floorLegendOccupied'), res, count, guestLabel }
+            if (res.status === 'CONFIRMED') return { color: '#a78bfa', borderColor: '#8b5cf6', label: rk('floorLegendReserved'), res, count, guestLabel }
+            if (res.status === 'PENDING') return { color: '#fbbf24', borderColor: '#f59e0b', label: rk('floorLegendPending'), res, count, guestLabel }
+            return { color: '#4ade80', borderColor: '#22c55e', label: rk('floorLegendFree'), res, count, guestLabel }
           }
 
           const effectiveResListCollapsed = floorOnlyMode || resListCollapsed
@@ -3162,10 +3187,10 @@ export default function KassaReservationsView({
 
                 {/* Legend */}
                 <div className="hidden lg:flex items-center gap-4 text-sm font-medium text-gray-600">
-                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-green-400" /><span>Vrij</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-violet-400" /><span>Gereserveerd</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-blue-400" /><span>Bezet</span></div>
-                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-amber-400" /><span>Afwachting</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-green-400" /><span>{rk('floorLegendFree')}</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-violet-400" /><span>{rk('floorLegendReserved')}</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-blue-400" /><span>{rk('floorLegendOccupied')}</span></div>
+                  <div className="flex items-center gap-1.5"><div className="w-4 h-4 rounded bg-amber-400" /><span>{rk('floorLegendPending')}</span></div>
                 </div>
 
                 <div className="flex-1" />
@@ -3585,7 +3610,7 @@ export default function KassaReservationsView({
                                 <div className="flex items-center justify-between">
                                   <p className="text-gray-900 font-bold text-lg">{r.guest_name}</p>
                                   <span className="text-sm font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: STATUS_CONFIG[r.status]?.color }}>
-                                    {STATUS_CONFIG[r.status]?.label || r.status}
+                                    {STATUS_CONFIG[r.status] ? rk(STATUS_CONFIG[r.status].labelKey) : r.status}
                                   </span>
                                 </div>
                                 {/* Details */}
@@ -3849,14 +3874,14 @@ export default function KassaReservationsView({
                 {/* Legenda statuskleuren */}
                 <div className="flex items-center gap-4 mb-2 px-1">
                   {[
-                    { color:'#3B5BDB', label:'Verwacht/Bevestigd' },
-                    { color:'#16a34a', label:'Aan tafel' },
-                    { color:'#dc2626', label:'No-show' },
-                    { color:'#6B7280', label:'Vertrokken' },
+                    { color:'#3B5BDB', labelKey: 'timelineLegendExpected' as const },
+                    { color:'#16a34a', labelKey: 'timelineLegendAtTable' as const },
+                    { color:'#dc2626', labelKey: 'timelineLegendNoShow' as const },
+                    { color:'#6B7280', labelKey: 'timelineLegendDeparted' as const },
                   ].map(s => (
-                    <div key={s.label} className="flex items-center gap-1.5">
+                    <div key={s.labelKey} className="flex items-center gap-1.5">
                       <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: s.color }}/>
-                      <span className="text-xs text-gray-500">{s.label}</span>
+                      <span className="text-xs text-gray-500">{rk(s.labelKey)}</span>
                     </div>
                   ))}
                 </div>
@@ -4490,7 +4515,7 @@ export default function KassaReservationsView({
         )}
 
         {!loading && viewMode === 'stats' && (
-          <RapportenView reservations={reservations} guestProfiles={guestProfiles} />
+          <RapportenView reservations={reservations} guestProfiles={guestProfiles} rk={rk} />
         )}
 
         {!loading && viewMode === 'settings' && (
@@ -5048,6 +5073,7 @@ export default function KassaReservationsView({
               : kassaTables
           }
           guestProfile={guestProfiles.find(g => g.id === (selectedReservation.guest_phone || selectedReservation.guest_email || selectedReservation.guest_name))}
+          rk={rk}
         />
       )}
 
@@ -5452,9 +5478,10 @@ interface CalendarViewProps {
   onSelectReservation: (r: Reservation) => void
   onNewReservation: () => void
   renderReservationCard: (r: Reservation) => React.ReactNode
+  rk: (key: string, rep?: Record<string, string>) => string
 }
 
-function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReservation, onNewReservation }: CalendarViewProps) {
+function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReservation, onNewReservation, rk }: CalendarViewProps) {
   const [calMode, setCalMode] = useState<'week' | 'day' | 'month'>('week')
 
   // Huidige referentiedatum (geselecteerde dag)
@@ -5681,7 +5708,7 @@ function CalendarView({ reservations, selectedDate, onSelectDate, onSelectReserv
                               </div>
                             )}
                             <div className="px-2 py-1 rounded-lg text-xs font-bold" style={{ backgroundColor: sc.bgColor, color: sc.color }}>
-                              {sc.label}
+                              {rk(sc.labelKey)}
                             </div>
                           </div>
                         </div>
@@ -6408,6 +6435,7 @@ interface ReservationDetailModalProps {
   onEdit: () => void
   tables: KassaTable[]
   guestProfile?: GuestProfile
+  rk: (key: string, rep?: Record<string, string>) => string
 }
 
 function ReservationDetailModal({
@@ -6424,6 +6452,7 @@ function ReservationDetailModal({
   onEdit,
   tables,
   guestProfile,
+  rk,
 }: ReservationDetailModalProps) {
   const status = STATUS_CONFIG[reservation.status]
   const [showTableSelect, setShowTableSelect] = useState(false)
@@ -6456,7 +6485,7 @@ function ReservationDetailModal({
               style={{ backgroundColor: status.bgColor, color: status.color }}
             >
               {status.icon}
-              {status.label}
+              {rk(status.labelKey)}
             </span>
             <h2 className="text-lg font-bold mt-0.5 break-words sm:text-xl">{reservation.guest_name}</h2>
           </div>
