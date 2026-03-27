@@ -28,7 +28,7 @@
     "next": "^14",
     "next-intl": "^4.6.1",
     "nodemailer": "^8.0.4",
-    "openai": "^6.16.0",
+    "openai": "^6.33.0",
     "react": "^18",
     "react-dom": "^18",
     "recharts": "^3.8.0",
