@@ -4,15 +4,19 @@ import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 
+/** Zelfde hover/active-oranje glow als platformkaarten (`PlatformGridSection`). */
+const HARDWARE_CARD_INTERACTION =
+  'shadow-home-card transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
+
 const HARDWARE_ITEMS = [
-  { src: '/images/hardware/hardware-1.png', model: '1' },
+  { src: '/images/hardware/hardware-1.png', model: 'rfm789' },
   { src: '/images/hardware/hardware-2.png', model: 'tf9003' },
   { src: '/images/hardware/hardware-3.png', model: 'tf82002' },
   { src: '/images/hardware/hardware-4.png', model: 'rf8900' },
   { src: '/images/hardware/hardware-5.png', model: 'rf8000' },
   { src: '/images/hardware/hardware-6.png', model: 'vm789' },
   { src: '/images/hardware/hardware-7.png', model: 'vm20' },
-  { src: '/images/hardware/hardware-8.png', model: 'handpalm betalingen' },
+  { src: '/images/hardware/hardware-8.png', model: 'handpos tf741' },
   { src: '/images/hardware/hardware-9.png', model: 'handpos t41' },
 ] as const
 
@@ -68,7 +72,7 @@ export default function HardwareSection() {
               key={item.src}
               type="button"
               onClick={() => setExpanded(i)}
-              className="group rounded-2xl overflow-hidden bg-white border border-gray-200/90 shadow-sm text-left transition hover:shadow-md hover:border-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#EF5C3C] focus-visible:ring-offset-2"
+              className={`group relative w-full rounded-2xl overflow-hidden bg-white border border-gray-200/60 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${HARDWARE_CARD_INTERACTION}`}
               aria-label={`${t('hardware.openExpanded')}: ${item.model}`}
             >
               <div className="relative aspect-[4/3]">
