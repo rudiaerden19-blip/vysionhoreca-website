@@ -457,7 +457,7 @@
       "5": "隠れた費用なし"
     },
     "cta": "今すぐ無料で始める",
-    "customBuildNote": "* Je kan natuurlijk ook kiezen voor je platform op jou tempo te bouwen"
+    "customBuildNote": "* ご自身のペースでプラットフォームを構築することもできます"
   },
   "cookies": {
     "message": "体験を向上させるためにCookieを使用しています。続行することで、",
@@ -2558,12 +2558,12 @@
     "previewSnacks": "スナック",
     "orderNow": "今すぐ注文",
     "viewFullWebsite": "完全なウェブサイトを表示",
-    "imageDisplay": "Product Afbeeldingen",
+    "imageDisplay": "商品画像",
     "imageDisplayDesc": "メニューで商品写真の表示方法を選びます",
-    "imageCover": "Grote foto's",
-    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
-    "imageContain": "Hele product zichtbaar",
-    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
+    "imageCover": "大きな写真",
+    "imageCoverDesc": "領域いっぱいに表示（トリミングされる場合あり）",
+    "imageContain": "商品全体を表示",
+    "imageContainDesc": "写真全体を表示（缶・ボトル向け）"
   },
   "websiteMedia": {
     "title": "写真とメディア",
@@ -2611,12 +2611,12 @@
     "noMedia": "メディアがまだありません",
     "noPhotosIn": "写真がありません：",
     "uploadFirstPhotos": "最初の写真をアップロード",
-    "imageDisplay": "Product Afbeeldingen",
+    "imageDisplay": "商品画像",
     "imageDisplayDesc": "メニューで商品写真の表示方法を選びます",
-    "imageCover": "Grote foto's",
-    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
-    "imageContain": "Hele product zichtbaar",
-    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
+    "imageCover": "大きな写真",
+    "imageCoverDesc": "領域いっぱいに表示（トリミングされる場合あり）",
+    "imageContain": "商品全体を表示",
+    "imageContainDesc": "写真全体を表示（缶・ボトル向け）"
   },
   "websiteTexts": {
     "title": "テキスト",
@@ -2944,10 +2944,10 @@
       "good": "健全",
       "warning": "警告",
       "critical": "危機的",
-      "excellentDesc": "Je bedrijf presteert uitstekend!",
-      "goodDesc": "Je bedrijf is financieel gezond",
-      "warningDesc": "Let op je kosten en marges",
-      "criticalDesc": "Actie nodig om winstgevend te worden"
+      "excellentDesc": "事業は非常に好調です！",
+      "goodDesc": "財務的に健全な状態です",
+      "warningDesc": "コストと利益率に注意してください",
+      "criticalDesc": "黒字化に向けた対策が必要です"
     },
     "overview": {
       "totalRevenue": "総売上",
@@ -2960,14 +2960,14 @@
       "fixedCosts": "固定費",
       "variableCosts": "変動費",
       "recommendations": "診断と推奨事項",
-      "online": "Online",
-      "kassa": "Kassa",
-      "fixed": "Vast",
-      "variable": "Variabel",
-      "gross": "Bruto",
-      "sectorAverage": "Sector gemiddelde",
-      "perOrder": "Per bestelling",
-      "target": "Doel",
+      "online": "オンライン",
+      "kassa": "POS",
+      "fixed": "固定",
+      "variable": "変動",
+      "gross": "総計",
+      "sectorAverage": "業界平均",
+      "perOrder": "注文あたり",
+      "target": "目標",
       "noFixedCosts": "固定費がまだ入力されていません",
       "noPurchases": "今月の購入がまだ入力されていません"
     },
@@ -2981,13 +2981,13 @@
       "noData": "POS売上がありません",
       "monthTotal": "POS売上合計",
       "confirmDelete": "この日を削除しますか？",
-      "subtitle": "Vul hier je dagelijkse kassa verkopen in",
-      "editDay": "Dag Bewerken",
-      "cashRevenue": "Cash Omzet",
-      "cardRevenue": "Kaart Omzet",
-      "orderCount": "Aantal Bestellingen",
-      "notes": "Notities (optioneel)",
-      "clickNew": "Klik op \"Nieuwe Dag\" om te beginnen"
+      "subtitle": "日次のPOS売上をここに入力してください",
+      "editDay": "日を編集",
+      "cashRevenue": "現金売上",
+      "cardRevenue": "カード売上",
+      "orderCount": "注文数",
+      "notes": "メモ（任意）",
+      "clickNew": "「新規日」をクリックして開始"
     },
     "fixed": {
       "title": "月額固定費",
@@ -2997,14 +2997,14 @@
       "noData": "固定費がありません",
       "monthTotal": "月額固定費合計",
       "confirmDelete": "この固定費を削除しますか？",
-      "subtitle": "Kosten die elke maand terugkomen",
-      "editCost": "Kost Bewerken",
-      "namePlaceholder": "Bv. Huur pand",
-      "amountPerMonth": "Bedrag per Maand (€)",
-      "notes": "Notities (optioneel)",
-      "active": "Actief (meerekenen in analyse)",
-      "perMonth": "per maand",
-      "edit": "Bewerken",
+      "subtitle": "毎月発生するコスト",
+      "editCost": "コストを編集",
+      "namePlaceholder": "例：店舗賃料",
+      "amountPerMonth": "月額（€）",
+      "notes": "メモ（任意）",
+      "active": "有効（分析に含める）",
+      "perMonth": "/月",
+      "edit": "編集",
       "noDataDesc": "家賃・人件費・光熱費など、毎月の固定費を追加してください。"
     },
     "variable": {
@@ -3018,18 +3018,18 @@
       "noData": "仕入れがありません",
       "monthTotal": "仕入れ合計",
       "confirmDelete": "この仕入れを削除しますか？",
-      "editPurchase": "Aankoop Bewerken",
-      "descriptionPlaceholder": "Bv. Aardappelen week 3",
-      "invoiceNumber": "Factuurnr.",
-      "notes": "Notities (optioneel)",
-      "optional": "Optioneel"
+      "editPurchase": "仕入れを編集",
+      "descriptionPlaceholder": "例：第3週のじゃがいも",
+      "invoiceNumber": "請求書番号",
+      "notes": "メモ（任意）",
+      "optional": "任意"
     },
     "year": {
       "yearRevenue": "年間売上（見積）",
       "yearCosts": "年間コスト",
       "yearProfit": "年間利益",
       "averageMargin": "平均利益率",
-      "tip": "Vul elke maand je kassa omzet en aankopen in voor een nauwkeurig jaaroverzicht."
+      "tip": "正確な年間概要のため、毎月POS売上と仕入れを入力してください。"
     },
     "settings": {
       "title": "事業目標を設定",
@@ -3037,19 +3037,19 @@
       "minMargin": "最低利益率 (%)",
       "saveTargets": "目標を保存",
       "targetsSaved": "目標を保存しました!",
-      "subtitle": "Stel je targets in voor waarschuwingen en analyses",
-      "targetMarginHelp": "Aanbevolen voor horeca: 25-30%",
-      "minMarginHelp": "Onder deze waarde krijg je een waarschuwing",
-      "maxPersonnel": "Max Personeelskosten (%)",
-      "maxPersonnelHelp": "Aanbevolen max: 30% van omzet",
-      "maxIngredients": "Max Ingrediëntenkosten (%)",
-      "maxIngredientsHelp": "Aanbevolen max: 35% van omzet",
-      "targetTicket": "Doel Gemiddelde Bon (€)",
-      "benchmarks": "Sector Benchmarks (Horeca)",
-      "avgMargin": "Gemiddelde winstmarge",
-      "goodPerformers": "Goede performers",
-      "topPerformers": "Top performers",
-      "maxPersonnelBenchmark": "Max personeel"
+      "subtitle": "警告と分析のための目標値を設定",
+      "targetMarginHelp": "飲食店向けの目安：25〜30%",
+      "minMarginHelp": "この値を下回ると警告が表示されます",
+      "maxPersonnel": "人件費上限（%）",
+      "maxPersonnelHelp": "推奨上限：売上の30%",
+      "maxIngredients": "食材費上限（%）",
+      "maxIngredientsHelp": "推奨上限：売上の35%",
+      "targetTicket": "目標平均客単価（€）",
+      "benchmarks": "業界ベンチマーク（飲食）",
+      "avgMargin": "平均利益率",
+      "goodPerformers": "好調な事業者",
+      "topPerformers": "トップ層",
+      "maxPersonnelBenchmark": "人件費上限"
     },
     "common": {
       "cancel": "キャンセル",
@@ -4285,7 +4285,7 @@
     }
   },
   "platform": {
-    "sectionTitle": "Our platform",
+    "sectionTitle": "プラットフォーム",
     "sectionSubtitle1": "システム全体をご自身でお試しください（無料）",
     "sectionSubtitle2": "下のボタンから、Vysionでお店がどう動くか体験できます",
     "gridTestCta": "無料デモを始める",

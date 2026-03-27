@@ -457,7 +457,7 @@
       "5": "Nessun costo nascosto"
     },
     "cta": "Inizia gratis ora",
-    "customBuildNote": "* Je kan natuurlijk ook kiezen voor je platform op jou tempo te bouwen"
+    "customBuildNote": "* Puoi anche costruire la tua piattaforma al tuo ritmo"
   },
   "cookies": {
     "message": "Utilizziamo i cookie per migliorare la tua esperienza. Continuando, accetti la nostra",
@@ -1514,58 +1514,58 @@
       "cancel": "Annulla",
       "confirmReject": "Rifiuta ordine",
       "reasons": {
-        "tooBusy": "Te druk op dit moment",
-        "closed": "We zijn gesloten",
-        "soldOut": "Product(en) uitverkocht",
-        "deliveryUnavailable": "Levering niet beschikbaar",
-        "technical": "Technisch probleem",
-        "other": "Andere reden"
+        "tooBusy": "Troppo affollato in questo momento",
+        "closed": "Siamo chiusi",
+        "soldOut": "Prodotto/i esauriti",
+        "deliveryUnavailable": "Consegna non disponibile",
+        "technical": "Problema tecnico",
+        "other": "Altro motivo"
       },
-      "notesLabel": "Toelichting (optioneel)",
-      "notesPlaceholder": "Geef een korte toelichting...",
-      "customerNotified": "De klant ontvangt automatisch een e-mail met de reden van weigering."
+      "notesLabel": "Note (opzionale)",
+      "notesPlaceholder": "Aggiungi una breve spiegazione...",
+      "customerNotified": "Il cliente riceverà automaticamente un’e-mail con il motivo del rifiuto."
     },
     "newOrderAlert": {
       "title": "NUOVO ORDINE!",
       "tapToClose": "Tocca per chiudere",
-      "waitingApproval": "wacht op goedkeuring",
-      "waitingApprovalPlural": "wachten op goedkeuring",
-      "soundStopsAfter": "Geluid stopt na goedkeuren of weigeren"
+      "waitingApproval": "in attesa di approvazione",
+      "waitingApprovalPlural": "in attesa di approvazione",
+      "soundStopsAfter": "Il suono si interrompe dopo approvazione o rifiuto"
     },
-    "soundEnabled": "Geluid staat aan - klik om te activeren (browser vereiste)",
-    "reactivate": "Heractiveren",
-    "browserNotifications": "Browser notificaties",
-    "sound": "Geluid",
+    "soundEnabled": "Suono attivo — clicca per attivare (richiesto dal browser)",
+    "reactivate": "Riattiva",
+    "browserNotifications": "Notifiche del browser",
+    "sound": "Suono",
     "paymentMethod": {
-      "cash": "Cash",
-      "card": "Kaart",
+      "cash": "Contanti",
+      "card": "Carta",
       "online": "Online",
       "ideal": "iDEAL",
       "bancontact": "Bancontact"
     },
     "noItemsAvailable": "Nessun articolo disponibile",
-    "vat": "BTW",
+    "vat": "IVA",
     "minutesAgo": "min",
-    "hoursAgo": "u",
+    "hoursAgo": "h",
     "receipt": {
-      "title": "KASSABON",
-      "businessInfo": "Zaakgegevens",
+      "title": "Scontrino",
+      "businessInfo": "Dati attività",
       "customer": "Cliente",
-      "articles": "ARTIKELEN",
-      "deliveryFee": "Bezorgkosten",
-      "discount": "Korting",
-      "totalExclVat": "Totaal excl. BTW",
-      "vat": "BTW",
-      "totalInclVat": "TOTAAL INCL. BTW",
-      "paymentMethod": "Betaalmethode",
-      "paid": "BETAALD",
-      "paymentPending": "Betaling: In afwachting",
-      "note": "Opmerking",
-      "thankYou": "Bedankt voor uw bestelling!",
-      "keepReceipt": "Dit is uw kassabon. Bewaar deze bon als bewijs van aankoop."
+      "articles": "Articoli",
+      "deliveryFee": "Costo di consegna",
+      "discount": "Sconto",
+      "totalExclVat": "Totale IVA esclusa",
+      "vat": "IVA",
+      "totalInclVat": "Totale IVA inclusa",
+      "paymentMethod": "Metodo di pagamento",
+      "paid": "Pagato",
+      "paymentPending": "Pagamento: in sospeso",
+      "note": "Nota",
+      "thankYou": "Grazie per il suo ordine!",
+      "keepReceipt": "Questo è il suo scontrino. Conservarlo come prova d’acquisto."
     },
-    "customerDetails": "Klantgegevens",
-    "orderedProducts": "Bestelde producten"
+    "customerDetails": "Dati cliente",
+    "orderedProducts": "Prodotti ordinati"
   },
   "customersPage": {
     "title": "Clienti",
@@ -2558,12 +2558,12 @@
     "previewSnacks": "Snack",
     "orderNow": "Ordina Ora",
     "viewFullWebsite": "Visualizza sito completo",
-    "imageDisplay": "Product Afbeeldingen",
+    "imageDisplay": "Immagini prodotto",
     "imageDisplayDesc": "Scegli come mostrare le foto dei prodotti nel menu",
-    "imageCover": "Grote foto's",
-    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
-    "imageContain": "Hele product zichtbaar",
-    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
+    "imageCover": "Foto grandi",
+    "imageCoverDesc": "Le foto riempiono tutto lo spazio (possibile ritaglio)",
+    "imageContain": "Prodotto intero visibile",
+    "imageContainDesc": "Foto completa visibile (ideale per lattine/bottiglie)"
   },
   "websiteMedia": {
     "title": "Foto e Media",
@@ -2611,12 +2611,12 @@
     "noMedia": "Ancora nessun media",
     "noPhotosIn": "Nessuna foto in",
     "uploadFirstPhotos": "Carica le tue prime foto",
-    "imageDisplay": "Product Afbeeldingen",
+    "imageDisplay": "Immagini prodotto",
     "imageDisplayDesc": "Scegli come mostrare le foto dei prodotti nel menu",
-    "imageCover": "Grote foto's",
-    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
-    "imageContain": "Hele product zichtbaar",
-    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
+    "imageCover": "Foto grandi",
+    "imageCoverDesc": "Le foto riempiono tutto lo spazio (possibile ritaglio)",
+    "imageContain": "Prodotto intero visibile",
+    "imageContainDesc": "Foto completa visibile (ideale per lattine/bottiglie)"
   },
   "websiteTexts": {
     "title": "Testi",
@@ -2962,12 +2962,12 @@
       "fixedCosts": "Costi fissi",
       "variableCosts": "Costi variabili",
       "recommendations": "Diagnosi e Raccomandazioni",
-      "fixed": "Vast",
-      "variable": "Variabel",
-      "gross": "Bruto",
-      "sectorAverage": "Sector gemiddelde",
-      "perOrder": "Per bestelling",
-      "target": "Doel",
+      "fixed": "Fissi",
+      "variable": "Variabili",
+      "gross": "Lordo",
+      "sectorAverage": "Media del settore",
+      "perOrder": "Per ordine",
+      "target": "Obiettivo",
       "noFixedCosts": "Nessun costo fisso inserito",
       "noPurchases": "Nessun acquisto inserito questo mese"
     },
@@ -2982,12 +2982,12 @@
       "noData": "Nessun incasso POS inserito",
       "monthTotal": "Totale incassi POS",
       "confirmDelete": "Sei sicuro di voler eliminare questo giorno?",
-      "editDay": "Dag Bewerken",
-      "cashRevenue": "Cash Omzet",
-      "cardRevenue": "Kaart Omzet",
-      "orderCount": "Aantal Bestellingen",
-      "notes": "Notities (optioneel)",
-      "clickNew": "Klik op \"Nieuwe Dag\" om te beginnen"
+      "editDay": "Modifica giorno",
+      "cashRevenue": "Incassi contanti",
+      "cardRevenue": "Incassi carta",
+      "orderCount": "Numero ordini",
+      "notes": "Note (opzionale)",
+      "clickNew": "Clicca \"Nuovo giorno\" per iniziare"
     },
     "fixed": {
       "title": "Costi fissi mensili",
@@ -2999,11 +2999,11 @@
       "noData": "Nessun costo fisso ancora",
       "monthTotal": "Totale costi fissi al mese",
       "confirmDelete": "Sei sicuro di voler eliminare questo costo?",
-      "editCost": "Kost Bewerken",
-      "namePlaceholder": "Bv. Huur pand",
-      "notes": "Notities (optioneel)",
-      "active": "Actief (meerekenen in analyse)",
-      "perMonth": "per maand",
+      "editCost": "Modifica costo",
+      "namePlaceholder": "Es. Affitto locale",
+      "notes": "Note (opzionale)",
+      "active": "Attivo (includi nell’analisi)",
+      "perMonth": "al mese",
       "edit": "Modifica",
       "noDataDesc": "Aggiungi i costi fissi mensili come affitto, personale, energia, ecc."
     },
@@ -3011,7 +3011,7 @@
       "title": "Acquisti e Fatture",
       "newPurchase": "Nuovo acquisto",
       "category": "Categoria",
-      "description": "Testo chi siamo",
+      "description": "Descrizione",
       "supplier": "Fornitore",
       "invoiceNumber": "N° fattura",
       "amount": "Importo (€)",
@@ -3019,10 +3019,10 @@
       "noData": "Nessun acquisto inserito",
       "monthTotal": "Totale acquisti",
       "confirmDelete": "Sei sicuro di voler eliminare questo acquisto?",
-      "editPurchase": "Aankoop Bewerken",
-      "descriptionPlaceholder": "Bv. Aardappelen week 3",
-      "notes": "Notities (optioneel)",
-      "optional": "Optioneel"
+      "editPurchase": "Modifica acquisto",
+      "descriptionPlaceholder": "Es. Patate settimana 3",
+      "notes": "Note (opzionale)",
+      "optional": "Opzionale"
     },
     "year": {
       "yearRevenue": "Ricavi annuali (stima)",
@@ -3042,14 +3042,14 @@
       "saveTargets": "Salva obiettivi",
       "targetsSaved": "Obiettivi salvati!",
       "benchmarks": "Benchmark settore (Ristorazione)",
-      "targetMarginHelp": "Aanbevolen voor horeca: 25-30%",
-      "minMarginHelp": "Onder deze waarde krijg je een waarschuwing",
-      "maxPersonnelHelp": "Aanbevolen max: 30% van omzet",
-      "maxIngredientsHelp": "Aanbevolen max: 35% van omzet",
-      "avgMargin": "Gemiddelde winstmarge",
-      "goodPerformers": "Goede performers",
-      "topPerformers": "Top performers",
-      "maxPersonnelBenchmark": "Max personeel"
+      "targetMarginHelp": "Consigliato per la ristorazione: 25-30%",
+      "minMarginHelp": "Riceverai un avviso al di sotto di questo valore",
+      "maxPersonnelHelp": "Massimo consigliato: 30% dei ricavi",
+      "maxIngredientsHelp": "Massimo consigliato: 35% dei ricavi",
+      "avgMargin": "Margine medio",
+      "goodPerformers": "Buone prestazioni",
+      "topPerformers": "Migliori prestazioni",
+      "maxPersonnelBenchmark": "Personale max"
     },
     "common": {
       "cancel": "Annulla",
@@ -3123,13 +3123,13 @@
     "aboutStats": "Informazioni statistiche",
     "statsDescription": "Queste statistiche si basano su tutti gli ordini. Gli ordini annullati non sono conteggiati.",
     "days": [
-      "Zo",
-      "Ma",
-      "Di",
-      "Wo",
-      "Do",
-      "Vr",
-      "Za"
+      "Dom",
+      "Lun",
+      "Mar",
+      "Mer",
+      "Gio",
+      "Ven",
+      "Sab"
     ]
   },
   "popularPage": {
@@ -3195,22 +3195,22 @@
       "reasonLabel": "Motivo del rifiuto",
       "cancel": "Annulla",
       "confirmReject": "Rifiuta",
-      "reasonPlaceholder": "Bijv. Helaas zijn we volgeboekt op deze datum...",
-      "reasonSentToCustomer": "Deze reden wordt naar de klant gestuurd per e-mail.",
-      "processing": "Bezig..."
+      "reasonPlaceholder": "Es.: Spiacenti, siamo al completo in questa data…",
+      "reasonSentToCustomer": "Questo motivo verrà inviato al cliente via e-mail.",
+      "processing": "Elaborazione…"
     },
     "confirmDelete": "Sei sicuro di voler eliminare questa prenotazione?",
-    "refresh": "Vernieuwen",
-    "newReservations": "nieuwe reservering",
-    "newReservationsPlural": "nieuwe reserveringen",
-    "confirmOrReject": "Bevestig of weiger om de klant op de hoogte te stellen",
-    "noUpcoming": "Er zijn geen komende reserveringen.",
-    "noToday": "Er zijn vandaag geen reserveringen.",
-    "noAny": "Er zijn nog geen reserveringen gemaakt.",
-    "at": "om",
-    "createdAt": "Aangemaakt",
+    "refresh": "Aggiorna",
+    "newReservations": "nuova prenotazione",
+    "newReservationsPlural": "nuove prenotazioni",
+    "confirmOrReject": "Conferma o rifiuta per avvisare il cliente",
+    "noUpcoming": "Non ci sono prenotazioni in arrivo.",
+    "noToday": "Non ci sono prenotazioni oggi.",
+    "noAny": "Non è stata ancora effettuata alcuna prenotazione.",
+    "at": "·",
+    "createdAt": "Creata il",
     "todayLabel": "Oggi",
-    "tomorrowLabel": "Morgen"
+    "tomorrowLabel": "Domani"
   },
   "scradaPage": {
     "title": "Integrazione SCRADA",
@@ -4285,7 +4285,7 @@
     }
   },
   "platform": {
-    "sectionTitle": "Our platform",
+    "sectionTitle": "La nostra piattaforma",
     "sectionSubtitle1": "Prova il sistema completo tu stesso (gratis)",
     "sectionSubtitle2": "Clicca qui sotto e scopri come funziona la tua attività con Vysion",
     "gridTestCta": "Inizia demo gratuita",

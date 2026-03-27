@@ -457,7 +457,7 @@
       "5": "Pas de frais cachés"
     },
     "cta": "Commencez gratuitement",
-    "customBuildNote": "* Je kan natuurlijk ook kiezen voor je platform op jou tempo te bouwen"
+    "customBuildNote": "* Vous pouvez aussi construire votre plateforme à votre rythme"
   },
   "cookies": {
     "message": "Nous utilisons des cookies pour améliorer votre expérience. En continuant, vous acceptez notre",
@@ -2064,12 +2064,12 @@
     "previewSnacks": "Snacks",
     "orderNow": "Commander",
     "viewFullWebsite": "Voir le site complet",
-    "imageDisplay": "Product Afbeeldingen",
+    "imageDisplay": "Photos produits",
     "imageDisplayDesc": "Choisissez l’affichage des photos de produits dans la carte",
-    "imageCover": "Grote foto's",
-    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
-    "imageContain": "Hele product zichtbaar",
-    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
+    "imageCover": "Grandes photos",
+    "imageCoverDesc": "Les photos remplissent tout l’espace (recadrage possible)",
+    "imageContain": "Produit entier visible",
+    "imageContainDesc": "Photo entière visible (idéal pour canettes / bouteilles)"
   },
   "websiteMedia": {
     "title": "Photos & Médias",
@@ -2117,12 +2117,12 @@
     "noMedia": "Pas encore de médias",
     "noPhotosIn": "Pas de photos dans",
     "uploadFirstPhotos": "Téléchargez vos premières photos",
-    "imageDisplay": "Product Afbeeldingen",
+    "imageDisplay": "Photos produits",
     "imageDisplayDesc": "Choisissez l’affichage des photos de produits dans la carte",
-    "imageCover": "Grote foto's",
-    "imageCoverDesc": "Foto's vullen het hele vak (kan bijsnijden)",
-    "imageContain": "Hele product zichtbaar",
-    "imageContainDesc": "Volledige foto zichtbaar (ideaal voor blikjes/flessen)"
+    "imageCover": "Grandes photos",
+    "imageCoverDesc": "Les photos remplissent tout l’espace (recadrage possible)",
+    "imageContain": "Produit entier visible",
+    "imageContainDesc": "Photo entière visible (idéal pour canettes / bouteilles)"
   },
   "websiteTexts": {
     "title": "Textes",
@@ -2489,11 +2489,11 @@
       "monthTotal": "CA caisse total",
       "confirmDelete": "Voulez-vous vraiment supprimer ce jour?",
       "editDay": "Modifier le jour",
-      "cashRevenue": "Cash Omzet",
-      "cardRevenue": "Kaart Omzet",
-      "orderCount": "Aantal Bestellingen",
-      "notes": "Notities (optioneel)",
-      "clickNew": "Klik op \"Nieuwe Dag\" om te beginnen"
+      "cashRevenue": "CA espèces",
+      "cardRevenue": "CA carte",
+      "orderCount": "Nombre de commandes",
+      "notes": "Remarques (optionnel)",
+      "clickNew": "Cliquez sur « Nouveau jour » pour commencer"
     },
     "fixed": {
       "title": "Coûts fixes mensuels",
@@ -2506,18 +2506,18 @@
       "monthTotal": "Total coûts fixes par mois",
       "confirmDelete": "Voulez-vous vraiment supprimer ce coût?",
       "editCost": "Modifier le coût",
-      "namePlaceholder": "Bv. Huur pand",
-      "notes": "Notities (optioneel)",
-      "active": "Actief (meerekenen in analyse)",
-      "perMonth": "per maand",
+      "namePlaceholder": "Ex. : Loyer local",
+      "notes": "Remarques (optionnel)",
+      "active": "Actif (inclure dans l’analyse)",
+      "perMonth": "par mois",
       "edit": "Modifier",
       "noDataDesc": "Ajoutez vos charges fixes mensuelles : loyer, personnel, énergie, etc."
     },
     "variable": {
-      "title": "Achats & Factures",
+      "title": "Achats et factures",
       "newPurchase": "Nouvel achat",
       "category": "Catégorie",
-      "description": "Texte à propos de nous",
+      "description": "Description",
       "supplier": "Fournisseur",
       "invoiceNumber": "N° facture",
       "amount": "Montant (€)",
@@ -2526,9 +2526,9 @@
       "monthTotal": "Total achats",
       "confirmDelete": "Voulez-vous vraiment supprimer cet achat?",
       "editPurchase": "Modifier l'achat",
-      "descriptionPlaceholder": "Bv. Aardappelen week 3",
-      "notes": "Notities (optioneel)",
-      "optional": "Optioneel"
+      "descriptionPlaceholder": "Ex. : Pommes de terre semaine 3",
+      "notes": "Remarques (optionnel)",
+      "optional": "Facultatif"
     },
     "year": {
       "yearRevenue": "CA annuel (estimation)",
@@ -2548,14 +2548,14 @@
       "saveTargets": "Enregistrer",
       "targetsSaved": "Objectifs enregistrés!",
       "benchmarks": "Benchmarks secteur (Restauration)",
-      "targetMarginHelp": "Aanbevolen voor horeca: 25-30%",
-      "minMarginHelp": "Onder deze waarde krijg je een waarschuwing",
-      "maxPersonnelHelp": "Aanbevolen max: 30% van omzet",
-      "maxIngredientsHelp": "Aanbevolen max: 35% van omzet",
-      "avgMargin": "Gemiddelde winstmarge",
-      "goodPerformers": "Goede performers",
-      "topPerformers": "Top performers",
-      "maxPersonnelBenchmark": "Max personeel"
+      "targetMarginHelp": "Recommandé pour la restauration : 25-30 %",
+      "minMarginHelp": "Vous recevrez une alerte en dessous de cette valeur",
+      "maxPersonnelHelp": "Maximum conseillé : 30 % du chiffre d’affaires",
+      "maxIngredientsHelp": "Maximum conseillé : 35 % du chiffre d’affaires",
+      "avgMargin": "Marge moyenne",
+      "goodPerformers": "Bonnes performances",
+      "topPerformers": "Meilleures performances",
+      "maxPersonnelBenchmark": "Personnel max."
     },
     "common": {
       "cancel": "Annuler",
@@ -2629,13 +2629,13 @@
     "aboutStats": "À propos des statistiques",
     "statsDescription": "Ces statistiques sont basées sur toutes les commandes. Les commandes annulées ne sont pas comptées.",
     "days": [
-      "Zo",
-      "Ma",
-      "Di",
-      "Wo",
-      "Do",
-      "Vr",
-      "Za"
+      "Dim",
+      "Lun",
+      "Mar",
+      "Mer",
+      "Jeu",
+      "Ven",
+      "Sam"
     ]
   },
   "popularPage": {
@@ -2701,22 +2701,22 @@
       "reasonLabel": "Raison du refus",
       "cancel": "Annuler",
       "confirmReject": "Refuser",
-      "reasonPlaceholder": "Bijv. Helaas zijn we volgeboekt op deze datum...",
-      "reasonSentToCustomer": "Deze reden wordt naar de klant gestuurd per e-mail.",
-      "processing": "Bezig..."
+      "reasonPlaceholder": "Ex. : Malheureusement, nous sommes complets à cette date…",
+      "reasonSentToCustomer": "Ce motif sera envoyé au client par e-mail.",
+      "processing": "Traitement…"
     },
     "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette réservation?",
-    "refresh": "Vernieuwen",
-    "newReservations": "nieuwe reservering",
-    "newReservationsPlural": "nieuwe reserveringen",
-    "confirmOrReject": "Bevestig of weiger om de klant op de hoogte te stellen",
-    "noUpcoming": "Er zijn geen komende reserveringen.",
-    "noToday": "Er zijn vandaag geen reserveringen.",
-    "noAny": "Er zijn nog geen reserveringen gemaakt.",
-    "at": "om",
-    "createdAt": "Aangemaakt",
+    "refresh": "Actualiser",
+    "newReservations": "nouvelle réservation",
+    "newReservationsPlural": "nouvelles réservations",
+    "confirmOrReject": "Acceptez ou refusez pour prévenir le client",
+    "noUpcoming": "Il n’y a aucune réservation à venir.",
+    "noToday": "Il n’y a aucune réservation aujourd’hui.",
+    "noAny": "Aucune réservation pour le moment.",
+    "at": "·",
+    "createdAt": "Créé le",
     "todayLabel": "Aujourd'hui",
-    "tomorrowLabel": "Morgen"
+    "tomorrowLabel": "Demain"
   },
   "scradaPage": {
     "title": "Intégration SCRADA",
@@ -4308,7 +4308,7 @@
     }
   },
   "platform": {
-    "sectionTitle": "Our platform",
+    "sectionTitle": "Notre plateforme",
     "sectionSubtitle1": "Essayez le système complet vous-même (gratuit)",
     "sectionSubtitle2": "Cliquez ci-dessous et découvrez comment votre établissement fonctionne avec Vysion",
     "gridTestCta": "Démarrer la démo gratuite",
