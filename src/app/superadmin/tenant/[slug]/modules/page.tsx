@@ -135,7 +135,8 @@ export default function SuperadminTenantModulesPage() {
         <h1 className="text-2xl font-bold mb-1">Modules</h1>
         <p className="text-slate-400 text-sm mb-6">
           {businessName || slug} — schakel modules aan of uit. De klant ziet alleen aangezette onderdelen in
-          het adminportaal (kassa, instellingen en account blijven altijd beschikbaar).
+          het adminportaal. <strong className="text-slate-300">Kassa, instellingen en account</strong> staan
+          vast op <strong className="text-slate-300">aan</strong> (die schuivers zijn alleen ter info).
         </p>
 
         {isAdminTenant(slug) && (
@@ -160,6 +161,12 @@ export default function SuperadminTenantModulesPage() {
               }}
             />
           </div>
+          {modulesFullAccess && (
+            <p className="text-amber-200/90 text-xs mt-3 border border-amber-500/25 rounded-lg px-3 py-2 bg-amber-500/10">
+              Wil je <strong>losse modules</strong> aan/uit zetten? Zet <strong>Volledig pakket</strong> hierboven{' '}
+              <strong>uit</strong> — dan verschijnt de lijst met schuivers.
+            </p>
+          )}
         </div>
 
         {!modulesFullAccess && (
@@ -228,24 +235,37 @@ function ModuleSlider({
   disabled: boolean
   onChange: (next: boolean) => void
 }) {
+  /** Geen native `disabled`: browsers grijzen kinderen waardoor “aan” op slot eruit ziet als “uit”. */
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
+      aria-disabled={disabled}
+      tabIndex={disabled ? -1 : 0}
+      onClick={() => {
+        if (disabled) return
+        onChange(!checked)
+      }}
+      onKeyDown={(e) => {
+        if (disabled) return
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onChange(!checked)
+        }
+      }}
       className={`
-        relative inline-flex h-8 w-14 shrink-0 items-center rounded-full p-1 transition-colors
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400
+        relative h-8 w-14 shrink-0 rounded-full transition-colors
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900
         ${checked ? 'bg-emerald-500' : 'bg-slate-600'}
-        ${disabled ? 'opacity-45 cursor-not-allowed' : 'cursor-pointer'}
+        ${disabled ? 'cursor-default opacity-80' : 'cursor-pointer'}
       `}
     >
       <span
         aria-hidden
         className={`
-          pointer-events-none h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-200 ease-out
+          pointer-events-none absolute top-1 left-1 block h-6 w-6 rounded-full bg-white shadow-md
+          transition-transform duration-200 ease-out will-change-transform
           ${checked ? 'translate-x-6' : 'translate-x-0'}
         `}
       />
