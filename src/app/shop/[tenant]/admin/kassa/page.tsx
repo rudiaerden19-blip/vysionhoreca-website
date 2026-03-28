@@ -108,6 +108,7 @@ function buildHamburgerModules(baseUrl: string, shopTenant: string): HamburgerMo
         { icon: '📊', label: 'Rapportages', href: `${baseUrl}/rapporten` },
         { icon: '🧾', label: 'Z-Rapporten (GKS)', href: `${baseUrl}/z-rapport` },
         { icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
+        { icon: '💹', label: 'Verkoop', href: `${baseUrl}/verkoop` },
         { icon: '📊', label: 'Dashboard', href: `${baseUrl}` },
         { icon: '🔥', label: 'Populaire items', href: `${baseUrl}/populair` },
       ],

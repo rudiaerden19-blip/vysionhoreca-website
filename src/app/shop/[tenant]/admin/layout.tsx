@@ -143,13 +143,15 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
         {/* Rechts: display knop + vergrendel + taal */}
         <div className="flex items-center gap-2">
-          <Link
-            href={`/shop/${params.tenant}/display`}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
-          >
-            <span className="text-base">🖥️</span>
-            <span className="hidden sm:inline">{t('adminLayout.onlineDisplay')}</span>
-          </Link>
+          {moduleAccess['online-bestellingen'] && (
+            <Link
+              href={`/shop/${params.tenant}/display`}
+              className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
+            >
+              <span className="text-base">🖥️</span>
+              <span className="hidden sm:inline">{t('adminLayout.onlineDisplay')}</span>
+            </Link>
+          )}
           {showLockButton && <LockButton tenant={params.tenant} />}
           <LanguageSelector />
         </div>

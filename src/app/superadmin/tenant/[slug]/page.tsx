@@ -478,14 +478,20 @@ export default function TenantDetailPage() {
           </motion.div>
         </div>
 
-        {!isAdminTenant(slug) && (
-          <motion.div
+        <motion.div
+            id="modules"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
-            className="bg-slate-800 rounded-2xl p-6 border border-slate-700 mt-8"
+            className="bg-slate-800 rounded-2xl p-6 border border-slate-700 mt-8 scroll-mt-24"
           >
             <h2 className="text-xl font-bold text-white mb-2">Modules (klantportaal)</h2>
+            {isAdminTenant(slug) && (
+              <p className="text-amber-400/90 text-sm mb-4 border border-amber-500/30 rounded-xl p-3 bg-amber-500/5">
+                Dit is een platform-admin tenant (MAIN). In het klantportaal krijgen die automatisch
+                altijd alle modules; je kunt hier tóch preset bewaren voor later of voor tests.
+              </p>
+            )}
             <p className="text-slate-400 text-sm mb-6">
               <strong className="text-slate-300">Volledig pakket:</strong> alle menu-onderdelen.{' '}
               <strong className="text-slate-300">Aangepast:</strong> per blok. Nieuwe klanten: 14 dagen
@@ -578,7 +584,6 @@ export default function TenantDetailPage() {
               )}
             </div>
           </motion.div>
-        )}
       </div>
 
       {/* Subscription Modal */}

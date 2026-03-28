@@ -713,6 +713,12 @@ export default function SuperAdminDashboard() {
                           >
                             Details
                           </Link>
+                          <Link
+                            href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
+                            className="px-3 py-1 bg-indigo-500/90 hover:bg-indigo-600 text-white rounded-lg text-sm transition-colors"
+                          >
+                            Modules
+                          </Link>
                           {!isProtectedTenant(tenant.tenant_slug) && (
                             <>
                               <button

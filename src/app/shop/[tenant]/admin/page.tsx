@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
+import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 
 interface DashboardStats {
   todayOrders: number
@@ -35,6 +36,7 @@ interface RecentOrder {
 export default function AdminDashboard({ params }: { params: { tenant: string } }) {
   const { t } = useLanguage()
   const router = useRouter()
+  const { moduleAccess } = useTenantModuleFlags(params.tenant)
   const [businessName, setBusinessName] = useState<string>('')
 
   // Welkomstpagina: toon bij elke nieuwe sessie (tab/browser openen)
@@ -336,9 +338,11 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.recentOrders.title')}</h2>
-            <Link href={`/shop/${params.tenant}/admin/bestellingen`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
-              {t('adminDashboard.viewAll')} →
-            </Link>
+            {moduleAccess['online-bestellingen'] && (
+              <Link href={`/shop/${params.tenant}/admin/bestellingen`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
+                {t('adminDashboard.viewAll')} →
+              </Link>
+            )}
           </div>
           {recentOrders.length === 0 ? (
             <div className="text-center py-8 text-gray-400">
@@ -379,9 +383,11 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-900">{t('adminDashboard.popularItems.title')}</h2>
-            <Link href={`/shop/${params.tenant}/admin/verkoop`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
-              {t('adminDashboard.viewAll')} →
-            </Link>
+            {moduleAccess.rapporten && (
+              <Link href={`/shop/${params.tenant}/admin/verkoop`} className="text-blue-600 hover:text-blue-600 text-sm font-medium">
+                {t('adminDashboard.viewAll')} →
+              </Link>
+            )}
           </div>
           {stats.popularItems.length === 0 ? (
             <div className="text-center py-8 text-gray-400">

@@ -254,7 +254,8 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
     rest.startsWith('/rapporten') ||
     rest.startsWith('/z-rapport') ||
     rest.startsWith('/analyse') ||
-    rest.startsWith('/populair')
+    rest.startsWith('/populair') ||
+    rest.startsWith('/verkoop')
   ) {
     return { kind: 'module', module: 'rapporten' }
   }
