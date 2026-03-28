@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
+import { getStarterEnabledModulesRecord } from '@/lib/tenant-modules'
 import { isProtectedTenant, isAdminTenant, isDemoTenant, getProtectionError } from '@/lib/protected-tenants'
 
 interface Tenant {
@@ -155,6 +156,7 @@ export default function SuperAdminDashboard() {
         plan: 'starter',
         subscription_status: 'trial',
         trial_ends_at: trialEndsAt,
+        enabled_modules: getStarterEnabledModulesRecord(),
       })
 
     if (tenantsError) {

@@ -165,12 +165,14 @@ export async function POST(request: NextRequest) {
                 .insert(subscriptionData)
             }
 
-            // Also update tenants table
+            // Also update tenants table (Pro = volledig pakket / legacy NULL modules)
+            const paidPlan = (planId || 'starter').toLowerCase()
             await supabase
               .from('tenants')
               .update({
                 plan: planId || 'starter',
                 subscription_status: 'ACTIVE',
+                ...(paidPlan === 'pro' ? { enabled_modules: null } : {}),
               })
               .eq('slug', tenantSlug)
 

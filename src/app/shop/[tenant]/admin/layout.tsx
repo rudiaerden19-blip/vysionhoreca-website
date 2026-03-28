@@ -6,6 +6,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import TrialBanner from '@/components/TrialBanner'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
+import { adminPathToModule } from '@/lib/tenant-modules'
+import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -17,10 +19,12 @@ const LOCK_PAGES = ['categorieen', 'producten', 'analyse', 'rapporten', 'z-rappo
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
   const baseUrl = `/shop/${params.tenant}/admin`
+  const { moduleAccess, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
 
   const showLockButton =
     pathname === `/shop/${params.tenant}/admin` ||
@@ -53,6 +57,23 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       }
     } catch { /* ignore */ }
   }, [params.tenant, pathname])
+
+  useEffect(() => {
+    if (loading || modulesLoading || tenantExists === false) return
+    if (pathname.includes('/kassa')) return
+    const gate = adminPathToModule(pathname, params.tenant)
+    if (gate.kind === 'module' && !moduleAccess[gate.module]) {
+      router.replace(`/shop/${params.tenant}/admin/kassa`)
+    }
+  }, [
+    loading,
+    modulesLoading,
+    tenantExists,
+    pathname,
+    params.tenant,
+    moduleAccess,
+    router,
+  ])
 
   if (loading) {
     return (

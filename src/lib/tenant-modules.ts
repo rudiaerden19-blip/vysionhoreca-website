@@ -1,0 +1,232 @@
+import { isAdminTenant } from '@/lib/protected-tenants'
+
+/** Keys align with kassa hamburger `modules[].key`. */
+export const TENANT_MODULE_IDS = [
+  'kassa',
+  'online-bestellingen',
+  'instellingen',
+  'online',
+  'reservaties',
+  'personeel',
+  'kosten',
+  'rapporten',
+  'website',
+  'account',
+] as const
+
+export type TenantModuleId = (typeof TENANT_MODULE_IDS)[number]
+
+export const TENANT_MODULE_LABELS: Record<TenantModuleId, string> = {
+  kassa: 'Kassa (producten, categorieën, …)',
+  'online-bestellingen': 'Online bestellingen (schermen, bestellijst)',
+  instellingen: 'Instellingen (uren, levering, betaling)',
+  online: 'Online shop (klanten, promoties, WhatsApp, …)',
+  reservaties: 'Reservaties',
+  personeel: 'Personeel & uren',
+  kosten: 'Kostenberekening',
+  rapporten: 'Rapporten, Z-rapport, analyse',
+  website: 'Website & content (design, SEO, media, …)',
+  account: 'Mijn account / abonnement',
+}
+
+/** Starter template for new tenants (trial still sees all — see resolve). */
+export function getStarterEnabledModulesRecord(): Record<TenantModuleId, boolean> {
+  return {
+    kassa: true,
+    'online-bestellingen': true,
+    instellingen: true,
+    online: true,
+    website: true,
+    account: true,
+    reservaties: false,
+    personeel: false,
+    kosten: false,
+    rapporten: false,
+  }
+}
+
+export function allTenantModulesTrue(): Record<TenantModuleId, boolean> {
+  return Object.fromEntries(TENANT_MODULE_IDS.map((id) => [id, true])) as Record<
+    TenantModuleId,
+    boolean
+  >
+}
+
+function normalizeSubscriptionStatus(s: string | null | undefined): string {
+  return (s || '').toLowerCase()
+}
+
+export function isTrialSubscriptionActive(
+  subscription: { status?: string | null; trial_ends_at?: string | null } | null,
+  tenantRow: { subscription_status?: string | null; trial_ends_at?: string | null } | null
+): boolean {
+  const status = normalizeSubscriptionStatus(
+    subscription?.status ?? tenantRow?.subscription_status ?? ''
+  )
+  if (status !== 'trial') return false
+  const ends = subscription?.trial_ends_at || tenantRow?.trial_ends_at
+  if (!ends) return true
+  return new Date(ends) > new Date()
+}
+
+export function isTenantProPlan(
+  subscription: { plan?: string | null } | null,
+  tenantRow: { plan?: string | null } | null
+): boolean {
+  const p = (subscription?.plan || tenantRow?.plan || 'starter').toLowerCase()
+  return p === 'pro'
+}
+
+export function parseEnabledModulesJson(raw: unknown): Record<string, boolean> | null {
+  if (raw == null) return null
+  if (typeof raw !== 'object' || Array.isArray(raw)) return null
+  const out: Record<string, boolean> = {}
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof v === 'boolean') out[k] = v
+  }
+  return Object.keys(out).length ? out : null
+}
+
+/** Voor superadmin formulier: interpretatie van DB-json met starter-defaults voor ontbrekende keys. */
+export function mergeEnabledModulesFromDb(raw: unknown): Record<TenantModuleId, boolean> {
+  const p = parseEnabledModulesJson(raw)
+  const starter = getStarterEnabledModulesRecord()
+  if (!p) return allTenantModulesTrue()
+  const out = {} as Record<TenantModuleId, boolean>
+  for (const id of TENANT_MODULE_IDS) {
+    if (p[id] === true) out[id] = true
+    else if (p[id] === false) out[id] = false
+    else out[id] = starter[id]
+  }
+  out.kassa = true
+  out.account = true
+  out.instellingen = true
+  return out
+}
+
+/**
+ * Effective module access for UI and guards.
+ * - Platform admin tenants: always all on.
+ * - Active trial: all on (try-before-buy).
+ * - Pro plan: all on.
+ * - Legacy (enabled_modules null): all on.
+ * - Otherwise merge stored JSON with starter defaults for missing keys; force core modules on.
+ */
+export function resolveTenantModules(opts: {
+  tenantSlug: string
+  enabledModulesJson: Record<string, boolean> | null
+  subscription: { status?: string | null; trial_ends_at?: string | null; plan?: string | null } | null
+  tenantRow: {
+    subscription_status?: string | null
+    trial_ends_at?: string | null
+    plan?: string | null
+  } | null
+}): Record<TenantModuleId, boolean> {
+  const { tenantSlug, enabledModulesJson, subscription, tenantRow } = opts
+
+  if (isAdminTenant(tenantSlug)) {
+    return allTenantModulesTrue()
+  }
+  if (isTrialSubscriptionActive(subscription, tenantRow)) {
+    return allTenantModulesTrue()
+  }
+  if (isTenantProPlan(subscription, tenantRow)) {
+    return allTenantModulesTrue()
+  }
+  if (enabledModulesJson === null || enabledModulesJson === undefined) {
+    return allTenantModulesTrue()
+  }
+
+  const starter = getStarterEnabledModulesRecord()
+  const out = {} as Record<TenantModuleId, boolean>
+  for (const id of TENANT_MODULE_IDS) {
+    if (enabledModulesJson[id] === true) out[id] = true
+    else if (enabledModulesJson[id] === false) out[id] = false
+    else out[id] = starter[id]
+  }
+
+  out.kassa = true
+  out.account = true
+  out.instellingen = true
+  return out
+}
+
+export type AdminModuleGateResult =
+  | { kind: 'always' }
+  | { kind: 'module'; module: TenantModuleId }
+
+/**
+ * Map admin pathname to module. Paths under /shop/:tenant/admin only.
+ */
+export function adminPathToModule(pathname: string, tenantSlug: string): AdminModuleGateResult {
+  const base = `/shop/${tenantSlug}/admin`
+  if (!pathname.startsWith(base)) {
+    return { kind: 'always' }
+  }
+  const rest = pathname.slice(base.length).replace(/\/$/, '') || '/'
+
+  if (rest === '/' || rest === '') return { kind: 'always' }
+  if (rest.startsWith('/welkom')) return { kind: 'always' }
+  if (rest.startsWith('/kassa')) return { kind: 'always' }
+  if (rest.startsWith('/pincode')) return { kind: 'always' }
+  if (rest.startsWith('/abonnement')) return { kind: 'always' }
+
+  if (
+    rest.startsWith('/categorieen') ||
+    rest.startsWith('/producten') ||
+    rest.startsWith('/opties') ||
+    rest.startsWith('/voorraad') ||
+    rest.startsWith('/allergenen') ||
+    rest.startsWith('/bonnenprinter') ||
+    rest.startsWith('/labels')
+  ) {
+    return { kind: 'module', module: 'kassa' }
+  }
+  if (rest.startsWith('/bestellingen') || rest.startsWith('/groepen')) {
+    return { kind: 'module', module: 'online-bestellingen' }
+  }
+  if (rest.startsWith('/openingstijden') || rest.startsWith('/levering') || rest.startsWith('/betaling')) {
+    return { kind: 'module', module: 'instellingen' }
+  }
+  if (
+    rest.startsWith('/online-status') ||
+    rest.startsWith('/klanten') ||
+    rest.startsWith('/promoties') ||
+    rest.startsWith('/cadeaubonnen') ||
+    rest.startsWith('/whatsapp')
+  ) {
+    return { kind: 'module', module: 'online' }
+  }
+  if (rest.startsWith('/reserveringen')) {
+    return { kind: 'module', module: 'reservaties' }
+  }
+  if (rest.startsWith('/personeel') || rest.startsWith('/uren') || rest.startsWith('/vacatures')) {
+    return { kind: 'module', module: 'personeel' }
+  }
+  if (rest.startsWith('/kosten')) {
+    return { kind: 'module', module: 'kosten' }
+  }
+  if (
+    rest.startsWith('/rapporten') ||
+    rest.startsWith('/z-rapport') ||
+    rest.startsWith('/analyse') ||
+    rest.startsWith('/populair')
+  ) {
+    return { kind: 'module', module: 'rapporten' }
+  }
+  if (
+    rest.startsWith('/profiel') ||
+    rest.startsWith('/design') ||
+    rest.startsWith('/seo') ||
+    rest.startsWith('/teksten') ||
+    rest.startsWith('/reviews') ||
+    rest.startsWith('/marketing') ||
+    rest.startsWith('/qr-codes') ||
+    rest.startsWith('/media') ||
+    rest.startsWith('/team')
+  ) {
+    return { kind: 'module', module: 'website' }
+  }
+
+  return { kind: 'always' }
+}

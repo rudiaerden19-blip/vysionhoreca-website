@@ -6,6 +6,13 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { isAdminTenant } from '@/lib/protected-tenants'
+import {
+  TENANT_MODULE_IDS,
+  TENANT_MODULE_LABELS,
+  type TenantModuleId,
+  mergeEnabledModulesFromDb,
+  getStarterEnabledModulesRecord,
+} from '@/lib/tenant-modules'
 
 interface TenantDetails {
   id: string
@@ -19,6 +26,12 @@ interface TenantDetails {
   country: string
   btw_number: string
   created_at: string
+}
+
+interface TenantsCoreRow {
+  slug: string
+  plan: string
+  enabled_modules: Record<string, boolean> | null
 }
 
 interface Subscription {
@@ -51,6 +64,12 @@ export default function TenantDetailPage() {
   const [saving, setSaving] = useState(false)
   const [tenant, setTenant] = useState<TenantDetails | null>(null)
   const [subscription, setSubscription] = useState<Subscription | null>(null)
+  const [tenantsCore, setTenantsCore] = useState<TenantsCoreRow | null>(null)
+  const [modulesFullAccess, setModulesFullAccess] = useState(true)
+  const [moduleToggles, setModuleToggles] = useState<Record<TenantModuleId, boolean>>(
+    () => mergeEnabledModulesFromDb(null)
+  )
+  const [savingModules, setSavingModules] = useState(false)
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
   const [subForm, setSubForm] = useState<Subscription>({
     tenant_slug: slug,
@@ -97,6 +116,24 @@ export default function TenantDetailPage() {
       setTenant(tenantData)
     }
 
+    const { data: coreRow } = await supabase
+      .from('tenants')
+      .select('slug, plan, enabled_modules')
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (coreRow) {
+      setTenantsCore(coreRow as TenantsCoreRow)
+      const em = (coreRow as { enabled_modules?: unknown }).enabled_modules
+      const isNull = em == null
+      setModulesFullAccess(isNull)
+      setModuleToggles(mergeEnabledModulesFromDb(em))
+    } else {
+      setTenantsCore(null)
+      setModulesFullAccess(true)
+      setModuleToggles(mergeEnabledModulesFromDb(null))
+    }
+
     // Load subscription
     const { data: subData } = await supabase
       .from('subscriptions')
@@ -134,9 +171,42 @@ export default function TenantDetailPage() {
         .insert(subscriptionData)
     }
 
+    const planLower = (subForm.plan || 'starter').toLowerCase()
+    await supabase
+      .from('tenants')
+      .update({
+        plan: subForm.plan,
+        ...(planLower === 'pro' ? { enabled_modules: null } : {}),
+      })
+      .eq('slug', slug)
+
     await loadData()
     setShowSubscriptionModal(false)
     setSaving(false)
+  }
+
+  async function handleSaveModules() {
+    setSavingModules(true)
+    const payload = modulesFullAccess
+      ? { enabled_modules: null }
+      : {
+          enabled_modules: TENANT_MODULE_IDS.reduce(
+            (acc, id) => {
+              const on = !!moduleToggles[id]
+              acc[id] =
+                id === 'kassa' || id === 'instellingen' || id === 'account' ? true : on
+              return acc
+            },
+            {} as Record<string, boolean>
+          ),
+        }
+    const { error } = await supabase.from('tenants').update(payload).eq('slug', slug)
+    setSavingModules(false)
+    if (error) {
+      alert('Modules opslaan mislukt: ' + error.message)
+      return
+    }
+    await loadData()
   }
 
   async function handleActivateSubscription() {
@@ -401,6 +471,106 @@ export default function TenantDetailPage() {
             )}
           </motion.div>
         </div>
+
+        {!isAdminTenant(slug) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="bg-slate-800 rounded-2xl p-6 border border-slate-700 mt-8"
+          >
+            <h2 className="text-xl font-bold text-white mb-2">Modules (klantportaal)</h2>
+            <p className="text-slate-400 text-sm mb-6">
+              <strong className="text-slate-300">Volledig pakket:</strong> alle menu-onderdelen in de kassa.{' '}
+              <strong className="text-slate-300">Aangepast:</strong> alleen aangevinkte blokken. Trial- en
+              Pro-klanten zien tijdens trial resp. als Pro automatisch alles (los van deze instelling).
+              Nieuwe accounts krijgen standaard een beperkte set tot ze upgraden.
+            </p>
+
+            <div className="flex flex-wrap gap-4 mb-6">
+              <label className="flex items-center gap-2 text-white cursor-pointer">
+                <input
+                  type="radio"
+                  name="modpack"
+                  checked={modulesFullAccess}
+                  onChange={() => {
+                    setModulesFullAccess(true)
+                    setModuleToggles(mergeEnabledModulesFromDb(null))
+                  }}
+                  className="w-4 h-4"
+                />
+                Volledig pakket
+              </label>
+              <label className="flex items-center gap-2 text-white cursor-pointer">
+                <input
+                  type="radio"
+                  name="modpack"
+                  checked={!modulesFullAccess}
+                  onChange={() => {
+                    setModulesFullAccess(false)
+                    if (tenantsCore?.enabled_modules == null) {
+                      setModuleToggles(getStarterEnabledModulesRecord())
+                    }
+                  }}
+                  className="w-4 h-4"
+                />
+                Aangepast
+              </label>
+            </div>
+
+            {!modulesFullAccess && (
+              <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                {TENANT_MODULE_IDS.map((id) => {
+                  const locked = id === 'kassa' || id === 'instellingen' || id === 'account'
+                  return (
+                    <label
+                      key={id}
+                      className={`flex items-start gap-3 p-3 rounded-xl border ${
+                        locked ? 'border-slate-600 bg-slate-900/50' : 'border-slate-600 bg-slate-900/30'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="mt-1 w-4 h-4"
+                        checked={!!moduleToggles[id]}
+                        disabled={locked}
+                        onChange={(e) =>
+                          setModuleToggles((prev) => ({ ...prev, [id]: e.target.checked }))
+                        }
+                      />
+                      <span className="text-sm text-slate-200">
+                        {TENANT_MODULE_LABELS[id]}
+                        {locked && (
+                          <span className="block text-xs text-slate-500 mt-0.5">Altijd aan</span>
+                        )}
+                      </span>
+                    </label>
+                  )
+                })}
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleSaveModules}
+                disabled={savingModules}
+                className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium disabled:opacity-50"
+              >
+                {savingModules ? 'Opslaan…' : 'Modules opslaan'}
+              </button>
+              {!modulesFullAccess && (
+                <button
+                  type="button"
+                  onClick={() => setModuleToggles(getStarterEnabledModulesRecord())}
+                  className="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm"
+                >
+                  Template: starter-pakket
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Subscription Modal */}
