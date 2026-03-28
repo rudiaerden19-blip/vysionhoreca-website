@@ -7,6 +7,10 @@ import { registerRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-lim
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
+import {
+  isMissingPostTrialModulesColumnError,
+  withoutPostTrialModulesConfirmed,
+} from '@/lib/supabase-post-trial-column'
 
 // Secure password hashing with bcrypt
 async function hashPassword(password: string): Promise<string> {
@@ -125,21 +129,31 @@ export async function POST(request: NextRequest) {
     // ========================================
     // 1. CREATE TENANT (main table)
     // ========================================
-    const { data: tenant, error: tenantError } = await supabase
+    const tenantInsert = {
+      name: businessName.trim(),
+      slug: tenantSlug,
+      email: emailLower,
+      phone: phone.trim(),
+      plan: 'starter',
+      subscription_status: 'trial',
+      trial_ends_at: trialEndsAt.toISOString(),
+      enabled_modules: null as null,
+      post_trial_modules_confirmed: false,
+    }
+
+    let { data: tenant, error: tenantError } = await supabase
       .from('tenants')
-      .insert({
-        name: businessName.trim(),
-        slug: tenantSlug,
-        email: emailLower,
-        phone: phone.trim(),
-        plan: 'starter',
-        subscription_status: 'trial',
-        trial_ends_at: trialEndsAt.toISOString(),
-        enabled_modules: null,
-        post_trial_modules_confirmed: false,
-      })
+      .insert(tenantInsert)
       .select()
       .single()
+
+    if (tenantError && isMissingPostTrialModulesColumnError(tenantError)) {
+      ;({ data: tenant, error: tenantError } = await supabase
+        .from('tenants')
+        .insert(withoutPostTrialModulesConfirmed(tenantInsert as Record<string, unknown>))
+        .select()
+        .single())
+    }
 
     if (tenantError) {
       logger.error('Error creating tenant', { requestId, error: tenantError.message })

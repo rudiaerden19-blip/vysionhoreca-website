@@ -9,6 +9,7 @@ import {
   type TenantModuleId,
 } from '@/lib/tenant-modules'
 import { isAdminTenant } from '@/lib/protected-tenants'
+import { isMissingPostTrialModulesColumnError } from '@/lib/supabase-post-trial-column'
 
 export interface TenantModuleFlagsResult {
   moduleAccess: Record<TenantModuleId, boolean>
@@ -81,6 +82,18 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
       if (cancelled) return
 
       let row = tRes.data
+      if (tRes.error && isMissingPostTrialModulesColumnError(tRes.error)) {
+        const r2 = await supabase
+          .from('tenants')
+          .select(
+            'plan, enabled_modules, subscription_status, trial_ends_at, feature_group_orders, feature_label_printing'
+          )
+          .eq('slug', slug)
+          .maybeSingle()
+        if (!r2.error && r2.data) {
+          row = { ...r2.data, post_trial_modules_confirmed: true }
+        }
+      }
       let sub = sRes.data
       if (isAdminTenant(slug)) {
         if (row) {

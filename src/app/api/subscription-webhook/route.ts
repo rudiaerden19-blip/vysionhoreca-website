@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import {
+  isMissingPostTrialModulesColumnError,
+  withoutPostTrialModulesConfirmed,
+} from '@/lib/supabase-post-trial-column'
 
 // Extended types for Stripe objects with all necessary properties
 interface StripeSubscriptionExtended extends Stripe.Subscription {
@@ -167,16 +171,26 @@ export async function POST(request: NextRequest) {
 
             // Also update tenants table (Pro = volledig pakket / legacy NULL modules)
             const paidPlan = (planId || 'starter').toLowerCase()
-            await supabase
+            const tenantPaidUpdate = {
+              plan: planId || 'starter',
+              subscription_status: 'ACTIVE',
+              ...(paidPlan === 'pro'
+                ? { enabled_modules: null as null, post_trial_modules_confirmed: true }
+                : {}),
+            }
+            const { error: tenantUpdErr } = await supabase
               .from('tenants')
-              .update({
-                plan: planId || 'starter',
-                subscription_status: 'ACTIVE',
-                ...(paidPlan === 'pro'
-                  ? { enabled_modules: null, post_trial_modules_confirmed: true }
-                  : {}),
-              })
+              .update(tenantPaidUpdate)
               .eq('slug', tenantSlug)
+
+            if (tenantUpdErr && isMissingPostTrialModulesColumnError(tenantUpdErr)) {
+              await supabase
+                .from('tenants')
+                .update(
+                  withoutPostTrialModulesConfirmed(tenantPaidUpdate as Record<string, unknown>)
+                )
+                .eq('slug', tenantSlug)
+            }
 
             console.log(`Subscription activated for ${tenantSlug}`)
           }

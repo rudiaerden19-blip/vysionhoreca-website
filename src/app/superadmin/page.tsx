@@ -13,6 +13,10 @@ import {
   getProtectionError,
   donorAdminDisplaySubscription,
 } from '@/lib/protected-tenants'
+import {
+  isMissingPostTrialModulesColumnError,
+  withoutPostTrialModulesConfirmed,
+} from '@/lib/supabase-post-trial-column'
 
 interface Tenant {
   id: string
@@ -159,19 +163,24 @@ export default function SuperAdminDashboard() {
     const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
 
     // 1. Create tenants record
-    const { error: tenantsError } = await supabase
-      .from('tenants')
-      .insert({
-        name: newTenant.business_name,
-        slug: slug,
-        email: newTenant.email || '',
-        phone: newTenant.phone || '',
-        plan: 'starter',
-        subscription_status: 'trial',
-        trial_ends_at: trialEndsAt,
-        enabled_modules: null,
-        post_trial_modules_confirmed: false,
-      })
+    const tenantInsert = {
+      name: newTenant.business_name,
+      slug: slug,
+      email: newTenant.email || '',
+      phone: newTenant.phone || '',
+      plan: 'starter',
+      subscription_status: 'trial',
+      trial_ends_at: trialEndsAt,
+      enabled_modules: null as null,
+      post_trial_modules_confirmed: false,
+    }
+    let { error: tenantsError } = await supabase.from('tenants').insert(tenantInsert)
+
+    if (tenantsError && isMissingPostTrialModulesColumnError(tenantsError)) {
+      ;({ error: tenantsError } = await supabase
+        .from('tenants')
+        .insert(withoutPostTrialModulesConfirmed(tenantInsert as Record<string, unknown>)))
+    }
 
     if (tenantsError) {
       console.error('Error creating tenants:', tenantsError)

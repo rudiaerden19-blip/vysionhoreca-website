@@ -13,6 +13,10 @@ import {
   mergeEnabledModulesFromDb,
   getStarterEnabledModulesRecord,
 } from '@/lib/tenant-modules'
+import {
+  isMissingPostTrialModulesColumnError,
+  withoutPostTrialModulesConfirmed,
+} from '@/lib/supabase-post-trial-column'
 
 interface TenantDetails {
   id: string
@@ -117,11 +121,23 @@ export default function TenantDetailPage() {
       setTenant(tenantData)
     }
 
-    const { data: coreRow } = await supabase
+    let { data: coreRow, error: coreErr } = await supabase
       .from('tenants')
       .select('slug, plan, enabled_modules, post_trial_modules_confirmed')
       .eq('slug', slug)
       .maybeSingle()
+
+    if (coreErr && isMissingPostTrialModulesColumnError(coreErr)) {
+      const r2 = await supabase
+        .from('tenants')
+        .select('slug, plan, enabled_modules')
+        .eq('slug', slug)
+        .maybeSingle()
+      coreRow = r2.data
+        ? ({ ...r2.data, post_trial_modules_confirmed: true } satisfies TenantsCoreRow)
+        : null
+      coreErr = r2.error
+    }
 
     if (coreRow) {
       const row = coreRow as TenantsCoreRow
@@ -200,7 +216,11 @@ export default function TenantDetailPage() {
           ),
           post_trial_modules_confirmed: true,
         }
-    const { error } = await supabase.from('tenants').update(payload).eq('slug', slug)
+    let { error } = await supabase.from('tenants').update(payload).eq('slug', slug)
+    if (error && isMissingPostTrialModulesColumnError(error)) {
+      const fallback = withoutPostTrialModulesConfirmed(payload as Record<string, unknown>)
+      ;({ error } = await supabase.from('tenants').update(fallback).eq('slug', slug))
+    }
     setSavingModules(false)
     if (error) {
       alert('Modules opslaan mislukt: ' + error.message)
