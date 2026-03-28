@@ -620,7 +620,7 @@ export default function SuperAdminDashboard() {
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Alle Tenants ({filteredTenants.length})</h2>
             <p className="text-slate-400 text-sm mt-2">
-              In <span className="text-orange-400 font-semibold">Acties</span>: knop <span className="text-orange-400 font-semibold">Modules</span> staat direct na Details.
+              Laatste kolom <span className="text-orange-400 font-semibold">Modules</span> — klantportaal-modules per tenant (scroll naar rechts op smalle schermen).
             </p>
           </div>
           
@@ -635,6 +635,9 @@ export default function SuperAdminDashboard() {
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Betaald</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Aangemaakt</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Acties</th>
+                  <th className="px-3 py-4 text-center text-sm font-bold text-orange-300 whitespace-nowrap bg-slate-700/80">
+                    📦 Modules
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700">
@@ -724,8 +727,7 @@ export default function SuperAdminDashboard() {
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
                       </td>
                       <td className="px-6 py-4 align-top">
-                        <div className="flex flex-col gap-2 min-w-[200px]">
-                          {/* Eén vaste rij: Beheer → Details → Modules (nooit wrappen; voorkomt "verdwenen" knop) */}
+                        <div className="flex flex-col gap-2 min-w-[140px]">
                           <div className="flex flex-nowrap gap-1.5 items-center">
                             <Link
                               href={`/shop/${tenant.tenant_slug}/admin`}
@@ -740,12 +742,6 @@ export default function SuperAdminDashboard() {
                             >
                               Details
                             </Link>
-                            <a
-                              href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
-                              className="px-2.5 py-1.5 bg-orange-500 hover:bg-orange-400 text-white rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap shrink-0 ring-1 ring-orange-300/50"
-                            >
-                              📦 Modules
-                            </a>
                           </div>
                           <div className="flex flex-wrap gap-2 items-center">
                             {!isProtectedTenant(tenant.tenant_slug) && (
@@ -775,6 +771,15 @@ export default function SuperAdminDashboard() {
                             )}
                           </div>
                         </div>
+                      </td>
+                      <td className="px-3 py-4 align-middle bg-slate-800/90 border-l border-orange-500/30">
+                        <a
+                          href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
+                          className="flex flex-col items-center justify-center gap-1 min-w-[7.5rem] px-3 py-3 bg-orange-500 hover:bg-orange-400 text-white rounded-xl text-sm font-extrabold text-center shadow-lg shadow-orange-950/50 ring-2 ring-orange-300/60"
+                        >
+                          <span className="text-lg leading-none">📦</span>
+                          <span className="leading-tight">Modules</span>
+                        </a>
                       </td>
                     </tr>
                   )
