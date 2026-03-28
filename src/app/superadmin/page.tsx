@@ -699,7 +699,14 @@ export default function SuperAdminDashboard() {
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex flex-col gap-2 min-w-[10.5rem]">
+                          <Link
+                            href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
+                            className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition-colors text-center shadow-sm border border-indigo-400/30"
+                          >
+                            📦 Modules
+                          </Link>
+                          <div className="flex gap-2 flex-wrap">
                           <Link
                             href={`/shop/${tenant.tenant_slug}/admin`}
                             target="_blank"
@@ -712,12 +719,6 @@ export default function SuperAdminDashboard() {
                             className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors"
                           >
                             Details
-                          </Link>
-                          <Link
-                            href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
-                            className="px-3 py-1 bg-indigo-500/90 hover:bg-indigo-600 text-white rounded-lg text-sm transition-colors"
-                          >
-                            Modules
                           </Link>
                           {!isProtectedTenant(tenant.tenant_slug) && (
                             <>
@@ -744,6 +745,7 @@ export default function SuperAdminDashboard() {
                               🔒 Beschermd
                             </span>
                           )}
+                          </div>
                         </div>
                       </td>
                     </tr>
