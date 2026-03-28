@@ -1,8 +1,8 @@
 // Vysion Kassa – Service Worker
 // Zorgt voor offline werking van de kassa app + cache van productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v3'
-const STATIC_CACHE = 'vysion-static-v3'
+const CACHE = 'vysion-kassa-v4'
+const STATIC_CACHE = 'vysion-static-v4'
 const IMAGE_CACHE = 'vysion-images-v1'
 
 // Bij installatie: skip waiting zodat de nieuwe SW meteen actief wordt
@@ -115,6 +115,12 @@ self.addEventListener('fetch', event => {
         })
       )
     )
+    return
+  }
+
+  // Platform superadmin: NOOIT via SW cachen — oude HTML/JS gaf "ontbrekende knoppen" na deploy
+  if (url.pathname === '/superadmin' || url.pathname.startsWith('/superadmin/')) {
+    event.respondWith(fetch(request, { cache: 'no-store' }))
     return
   }
 

@@ -68,6 +68,12 @@ export default function SuperAdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Service worker: nieuwe sw.js ophalen (superadmin wordt niet meer gecached — oudere deploys toonden ontbrekende knoppen)
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return
+    navigator.serviceWorker.getRegistration().then((reg) => reg?.update()).catch(() => {})
+  }, [])
+
   async function checkAuth() {
     const adminId = localStorage.getItem('superadmin_id')
     const name = localStorage.getItem('superadmin_name')
