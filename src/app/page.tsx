@@ -61,7 +61,7 @@ function WhyVysionSection() {
                       <button
                         type="button"
                         onClick={() => setMijnVysionOpen(true)}
-                        className="mt-4 w-full max-w-xl rounded-2xl bg-accent px-5 py-4 text-center text-base font-bold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:py-5 sm:text-lg"
+                        className="mt-[calc(1rem+1cm)] w-full max-w-xl rounded-2xl bg-accent px-5 py-4 text-center text-base font-bold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:py-5 sm:text-lg"
                       >
                         {t('whyVysion.posQuality.videoCta')}
                       </button>
