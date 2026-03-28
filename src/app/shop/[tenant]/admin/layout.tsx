@@ -13,6 +13,7 @@ import {
 } from '@/lib/tenant-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
+import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -31,6 +32,8 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const baseUrl = `/shop/${params.tenant}/admin`
   const {
     moduleAccess,
+    featureGroupOrders,
+    featureLabelPrinting,
     loading: modulesLoading,
     needsPostTrialModulePicker,
     refetch: refetchModules,
@@ -134,16 +137,24 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
       {/* ── Slanke blauwe topbalk (zelfde stijl als kassa) ── */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-[#1e293b] flex items-center px-3 gap-2" style={{ height: 56 }}>
-        {/* ← Terug naar Kassa */}  
-        <Link
-          href={posHref}
-          className="flex items-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-white text-sm font-bold transition-colors"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>{t('adminLayout.pos')}</span>
-        </Link>
+        <div className="flex shrink-0 items-center gap-2">
+          <AdminHamburgerMenu
+            tenantSlug={params.tenant}
+            moduleAccess={moduleAccess}
+            featureGroupOrders={featureGroupOrders}
+            featureLabelPrinting={featureLabelPrinting}
+            loading={modulesLoading}
+          />
+          <Link
+            href={posHref}
+            className="flex items-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-white text-sm font-bold transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>{t('adminLayout.pos')}</span>
+          </Link>
+        </div>
 
         {/* Tenant naam midden */}
         <div className="flex-1 flex items-center justify-center">
