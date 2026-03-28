@@ -14,8 +14,9 @@ import {
 import { useLanguage } from '@/i18n'
 import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
-/** Bron: iMovie-segment (stilstaand beeld + lange audio) → public: cover JPG + m4a + mux als mijn-vysion.mp4. */
+/** Bron: iMovie-segment → mux als H.264 yuv420p (geen yuvj/full-range: zwart beeld op sommige browsers). */
 const MIJN_VYSION_VIDEO = '/videos/mijn-vysion.mp4'
+const MIJN_VYSION_POSTER = '/images/mijn-vysion-cover.jpg'
 
 function WhyVysionSection() {
   const { t } = useLanguage()
@@ -118,12 +119,14 @@ function WhyVysionSection() {
             >
               ×
             </button>
-            <div className="bg-black">
+            <div className="relative mx-auto aspect-video w-full max-h-[min(70vh,540px)] bg-black">
               <video
                 ref={mijnVysionVideoRef}
                 controls
                 playsInline
-                className="aspect-video w-full max-h-[min(70vh,540px)] bg-black object-contain"
+                preload="auto"
+                poster={MIJN_VYSION_POSTER}
+                className="absolute inset-0 h-full w-full object-contain"
                 onEnded={() => setMijnVysionOpen(false)}
               >
                 <source src={MIJN_VYSION_VIDEO} type="video/mp4" />
