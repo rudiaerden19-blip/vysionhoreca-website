@@ -8,6 +8,7 @@ import {
   resolveTenantModules,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
+import { isAdminTenant } from '@/lib/protected-tenants'
 
 export interface TenantModuleFlagsResult {
   moduleAccess: Record<TenantModuleId, boolean>
@@ -79,8 +80,21 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
 
       if (cancelled) return
 
-      const row = tRes.data
-      const sub = sRes.data
+      let row = tRes.data
+      let sub = sRes.data
+      if (isAdminTenant(slug)) {
+        if (row) {
+          row = {
+            ...row,
+            plan: 'pro',
+            subscription_status: 'active',
+            trial_ends_at: null,
+          }
+        }
+        if (sub) {
+          sub = { ...sub, plan: 'pro', status: 'active', trial_ends_at: null }
+        }
+      }
       const enabled = parseEnabledModulesJson(row?.enabled_modules)
 
       const moduleAccess = resolveTenantModules({

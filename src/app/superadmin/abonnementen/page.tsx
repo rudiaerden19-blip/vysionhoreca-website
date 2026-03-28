@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { isAdminTenant, donorAdminDisplaySubscription } from '@/lib/protected-tenants'
 
 interface SubscriptionWithTenant {
   id: string
@@ -66,10 +67,14 @@ export default function AbonnementenPage() {
 
     const tenantMap = new Map(tenantsData?.map(t => [t.tenant_slug, t.business_name]) || [])
 
-    const enrichedSubs = (subsData || []).map(sub => ({
-      ...sub,
-      business_name: tenantMap.get(sub.tenant_slug) || sub.tenant_slug,
-    }))
+    const enrichedSubs = (subsData || []).map((sub) => {
+      const view = donorAdminDisplaySubscription(sub.tenant_slug, sub)
+      return {
+        ...sub,
+        ...(view ? { plan: view.plan, status: view.status } : {}),
+        business_name: tenantMap.get(sub.tenant_slug) || sub.tenant_slug,
+      }
+    })
 
     setSubscriptions(enrichedSubs)
 
@@ -80,7 +85,8 @@ export default function AbonnementenPage() {
     const activeSubs = enrichedSubs.filter(s => s.status === 'active')
     const trialSubs = enrichedSubs.filter(s => s.status === 'trial')
     // Tel ook actieve abonnementen die bijna verlopen
-    const expiringSoon = enrichedSubs.filter(s => {
+    const expiringSoon = enrichedSubs.filter((s) => {
+      if (isAdminTenant(s.tenant_slug)) return false
       if (s.status === 'trial' && s.trial_ends_at) {
         return new Date(s.trial_ends_at) <= weekFromNow
       }
@@ -119,9 +125,10 @@ export default function AbonnementenPage() {
     }
   }
 
-  const filteredSubs = subscriptions.filter(sub => {
+  const filteredSubs = subscriptions.filter((sub) => {
     if (filter === 'all') return true
     if (filter === 'expiring') {
+      if (isAdminTenant(sub.tenant_slug)) return false
       const now = new Date()
       const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
       if (sub.status === 'trial' && sub.trial_ends_at) {

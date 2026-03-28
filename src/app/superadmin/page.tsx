@@ -6,7 +6,13 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
-import { isProtectedTenant, isAdminTenant, isDemoTenant, getProtectionError } from '@/lib/protected-tenants'
+import {
+  isProtectedTenant,
+  isAdminTenant,
+  isDemoTenant,
+  getProtectionError,
+  donorAdminDisplaySubscription,
+} from '@/lib/protected-tenants'
 
 interface Tenant {
   id: string
@@ -115,9 +121,11 @@ export default function SuperAdminDashboard() {
     const totalOrders = ordersData?.length || 0
     const totalRevenue = ordersData?.reduce((sum, o) => sum + (o.total || 0), 0) || 0
 
-    // Calculate stats
-    const activeSubs = subsData?.filter(s => s.status === 'active') || []
-    const trialSubs = subsData?.filter(s => s.status === 'trial') || []
+    // Calculate stats (donor-platformtenants tellen nooit als trial)
+    const activeSubs =
+      subsData?.filter((s) => s.status === 'active' || isAdminTenant(s.tenant_slug)) || []
+    const trialSubs =
+      subsData?.filter((s) => s.status === 'trial' && !isAdminTenant(s.tenant_slug)) || []
     const monthlyRecurring = activeSubs.reduce((sum, s) => sum + (s.price_monthly || 0), 0)
 
     setStats({
@@ -357,7 +365,8 @@ export default function SuperAdminDashboard() {
   }
 
   const handleCleanupExpired = async () => {
-    const expiredTrials = tenants.filter(t => {
+    const expiredTrials = tenants.filter((t) => {
+      if (isAdminTenant(t.tenant_slug)) return false
       const sub = getSubscription(t.tenant_slug)
       if (sub?.status === 'trial' && sub.trial_ends_at) {
         return new Date(sub.trial_ends_at) < new Date()
@@ -421,7 +430,8 @@ export default function SuperAdminDashboard() {
   }
 
   // Tel aantal dat binnenkort vervalt
-  const expiringCount = tenants.filter(t => {
+  const expiringCount = tenants.filter((t) => {
+    if (isAdminTenant(t.tenant_slug)) return false
     const sub = getSubscription(t.tenant_slug)
     return isExpiringSoon(sub)
   }).length
@@ -432,15 +442,16 @@ export default function SuperAdminDashboard() {
       t.tenant_slug?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.email?.toLowerCase().includes(searchQuery.toLowerCase())
     )
-    .filter(t => {
+    .filter((t) => {
       if (!showExpiringOnly) return true
+      if (isAdminTenant(t.tenant_slug)) return false
       const sub = getSubscription(t.tenant_slug)
       return isExpiringSoon(sub)
     })
     .sort((a, b) => {
       // Sorteer: niet-betalende tenants eerst
-      const subA = getSubscription(a.tenant_slug)
-      const subB = getSubscription(b.tenant_slug)
+      const subA = donorAdminDisplaySubscription(a.tenant_slug, getSubscription(a.tenant_slug))
+      const subB = donorAdminDisplaySubscription(b.tenant_slug, getSubscription(b.tenant_slug))
       const paidA = isPaid(subA)
       const paidB = isPaid(subB)
       
@@ -628,7 +639,10 @@ export default function SuperAdminDashboard() {
               </thead>
               <tbody className="divide-y divide-slate-700">
                 {filteredTenants.map((tenant) => {
-                  const sub = getSubscription(tenant.tenant_slug)
+                  const sub = donorAdminDisplaySubscription(
+                    tenant.tenant_slug,
+                    getSubscription(tenant.tenant_slug)
+                  )
                   return (
                     <tr key={tenant.id} className={`transition-colors ${tenant.is_blocked ? 'opacity-50' : ''} ${
                       isDemoTenant(tenant.tenant_slug)
@@ -682,7 +696,9 @@ export default function SuperAdminDashboard() {
                           ) : (
                             <>
                               <button
-                                onClick={() => handleTogglePaymentStatus(tenant, sub)}
+                                onClick={() =>
+                                  handleTogglePaymentStatus(tenant, getSubscription(tenant.tenant_slug))
+                                }
                                 className={`px-3 py-1 rounded-lg text-xs font-medium transition-all hover:scale-105 ${
                                   sub?.status === 'active'
                                     ? 'bg-green-500 hover:bg-green-600 text-white'

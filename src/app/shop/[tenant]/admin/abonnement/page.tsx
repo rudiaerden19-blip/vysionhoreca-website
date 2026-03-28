@@ -8,6 +8,7 @@ import { getAuthHeaders } from '@/lib/auth-headers'
 import { motion, AnimatePresence } from 'framer-motion'
 import PinGate from '@/components/PinGate'
 import { getTenantSettings, TenantSettings } from '@/lib/admin-api'
+import { isAdminTenant } from '@/lib/protected-tenants'
 
 interface Subscription {
   id: string
@@ -661,9 +662,13 @@ export default function AbonnementPage() {
   // Calculate trial info
   let daysLeft = 0
   let trialEndDate = ''
-  const trialEndsAt = subscription?.trial_ends_at || tenant?.trial_ends_at
-  const status = subscription?.status || tenant?.subscription_status || 'trial'
-  
+  const trialEndsAt =
+    isAdminTenant(tenantSlug) ? null : subscription?.trial_ends_at || tenant?.trial_ends_at
+  let status = subscription?.status || tenant?.subscription_status || 'trial'
+  if (isAdminTenant(tenantSlug)) {
+    status = 'active'
+  }
+
   if ((status === 'trial' || status === 'TRIAL') && trialEndsAt) {
     const now = new Date()
     const trialEnd = new Date(trialEndsAt)
@@ -675,7 +680,11 @@ export default function AbonnementPage() {
     })
   }
 
-  const currentPlan = (status === 'trial' || status === 'TRIAL') ? 'pro' : (subscription?.plan || tenant?.plan || 'starter')
+  const currentPlan = isAdminTenant(tenantSlug)
+    ? 'pro'
+    : (status === 'trial' || status === 'TRIAL')
+      ? 'pro'
+      : (subscription?.plan || tenant?.plan || 'starter')
   const isActive = status === 'active' || status === 'ACTIVE'
   const isTrial = status === 'trial' || status === 'TRIAL'
   const isExpired = status === 'expired' || status === 'EXPIRED'
