@@ -728,7 +728,7 @@ export default function SuperAdminDashboard() {
                       </td>
                       <td className="px-6 py-4 align-top">
                         <div className="flex flex-col gap-2 min-w-[140px]">
-                          <div className="flex flex-nowrap gap-1.5 items-center">
+                          <div className="flex flex-nowrap gap-1.5 items-center flex-wrap">
                             <Link
                               href={`/shop/${tenant.tenant_slug}/admin`}
                               target="_blank"
@@ -741,6 +741,12 @@ export default function SuperAdminDashboard() {
                               className="px-2.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs sm:text-sm whitespace-nowrap shrink-0"
                             >
                               Details
+                            </Link>
+                            <Link
+                              href={`/superadmin/tenant/${tenant.tenant_slug}/modules`}
+                              className="px-2.5 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0"
+                            >
+                              Modules
                             </Link>
                           </div>
                           <div className="flex flex-wrap gap-2 items-center">
@@ -773,13 +779,13 @@ export default function SuperAdminDashboard() {
                         </div>
                       </td>
                       <td className="px-3 py-4 align-middle bg-slate-800/90 border-l border-orange-500/30">
-                        <a
-                          href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
+                        <Link
+                          href={`/superadmin/tenant/${tenant.tenant_slug}/modules`}
                           className="flex flex-col items-center justify-center gap-1 min-w-[7.5rem] px-3 py-3 bg-orange-500 hover:bg-orange-400 text-white rounded-xl text-sm font-extrabold text-center shadow-lg shadow-orange-950/50 ring-2 ring-orange-300/60"
                         >
                           <span className="text-lg leading-none">📦</span>
                           <span className="leading-tight">Modules</span>
-                        </a>
+                        </Link>
                       </td>
                     </tr>
                   )

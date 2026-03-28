@@ -303,17 +303,18 @@ export default function TenantDetailPage() {
               <h1 className="text-xl font-bold text-white">{tenant?.business_name || slug}</h1>
               <code className="text-orange-400 text-sm">{slug}</code>
               <p className="text-indigo-300/90 text-xs mt-1.5 font-medium">
-                Scroll naar “Modules (klantportaal)” direct onder deze balk — of gebruik de knop rechts.
+                Gebruik de knop Modules voor de schuifschakelaar-pagina, of scroll hieronder voor het klassieke
+                overzicht.
               </p>
             </div>
           </div>
           <div className="flex flex-wrap gap-2 justify-end">
-            <a
-              href="#modules"
+            <Link
+              href={`/superadmin/tenant/${slug}/modules`}
               className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-colors font-semibold shrink-0"
             >
               📦 Modules
-            </a>
+            </Link>
             <Link
               href={`/shop/${slug}`}
               target="_blank"
