@@ -46,6 +46,8 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
       return
     }
 
+    const slug = tenantSlug
+
     let cancelled = false
 
     async function load() {
@@ -56,12 +58,12 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
           .select(
             'plan, enabled_modules, subscription_status, trial_ends_at, feature_group_orders, feature_label_printing'
           )
-          .eq('slug', tenantSlug)
+          .eq('slug', slug)
           .maybeSingle(),
         supabase
           .from('subscriptions')
           .select('status, trial_ends_at, plan')
-          .eq('tenant_slug', tenantSlug)
+          .eq('tenant_slug', slug)
           .maybeSingle(),
       ])
 
@@ -72,7 +74,7 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
       const enabled = parseEnabledModulesJson(row?.enabled_modules)
 
       const moduleAccess = resolveTenantModules({
-        tenantSlug,
+        tenantSlug: slug,
         enabledModulesJson: enabled,
         subscription: sub,
         tenantRow: row,
