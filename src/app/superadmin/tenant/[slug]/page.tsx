@@ -522,7 +522,10 @@ export default function TenantDetailPage() {
                     setModulesFullAccess(false)
                     if (tenantsCore?.enabled_modules == null) {
                       setModuleToggles(
-                        mergeEnabledModulesFromDb(null, tenantsCore.post_trial_modules_confirmed !== false)
+                        mergeEnabledModulesFromDb(
+                          null,
+                          tenantsCore?.post_trial_modules_confirmed !== false
+                        )
                       )
                     }
                   }}
