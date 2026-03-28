@@ -4453,6 +4453,10 @@
       "de-shop": {
         "title": "De shop",
         "desc": "Je online shop instellen en beheren"
+      },
+      "restaurant-reserveringen": {
+        "title": "Restaurant reserveringen",
+        "desc": "Reserveringen, tafels en walk-in beheren in je zaak"
       }
     },
     "v": {
@@ -4483,7 +4487,12 @@
       "groepsbestellingen": "Groepsbestellingen",
       "printer": "Bonnenprinter",
       "de-website": "De website",
-      "de-shop": "De shop"
+      "de-shop": "De shop",
+      "res-rest-overzicht": "Reserveringen overzicht",
+      "res-rest-bewerken": "Reservering bewerken",
+      "res-rest-online": "Online reserveringen",
+      "res-rest-tafel": "Tafel aanmaken",
+      "res-rest-walkin": "Walk-in"
     }
   },
   "helpPage": {

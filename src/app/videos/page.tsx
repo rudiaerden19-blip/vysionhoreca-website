@@ -81,6 +81,17 @@ const VIDEO_CATEGORY_DEFS = [
     icoon: '🛒',
     videoKeys: ['de-shop'] as const,
   },
+  {
+    id: 'restaurant-reserveringen',
+    icoon: '📅',
+    videoKeys: [
+      'res-rest-overzicht',
+      'res-rest-bewerken',
+      'res-rest-online',
+      'res-rest-tafel',
+      'res-rest-walkin',
+    ] as const,
+  },
 ] as const
 
 function videoSrc(key: string): string {

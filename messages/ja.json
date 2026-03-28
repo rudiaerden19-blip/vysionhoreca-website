@@ -4243,6 +4243,10 @@
       "de-shop": {
         "title": "ショップ",
         "desc": "オンラインショップの設定と管理"
+      },
+      "restaurant-reserveringen": {
+        "title": "レストラン予約",
+        "desc": "予約・テーブル・ウォークインの管理"
       }
     },
     "v": {
@@ -4273,7 +4277,12 @@
       "groepsbestellingen": "団体注文",
       "printer": "レシートプリンター",
       "de-website": "ウェブサイト",
-      "de-shop": "ショップ"
+      "de-shop": "ショップ",
+      "res-rest-overzicht": "予約一覧",
+      "res-rest-bewerken": "予約を編集",
+      "res-rest-online": "オンライン予約",
+      "res-rest-tafel": "テーブルを作成",
+      "res-rest-walkin": "ウォークイン"
     }
   },
   "helpPage": {

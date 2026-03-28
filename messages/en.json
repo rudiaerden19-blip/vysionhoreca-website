@@ -4453,6 +4453,10 @@
       "de-shop": {
         "title": "The shop",
         "desc": "Set up and manage your online shop"
+      },
+      "restaurant-reserveringen": {
+        "title": "Restaurant reservations",
+        "desc": "Manage reservations, tables and walk-ins"
       }
     },
     "v": {
@@ -4483,7 +4487,12 @@
       "groepsbestellingen": "Group orders",
       "printer": "Receipt printer",
       "de-website": "Your website",
-      "de-shop": "The shop"
+      "de-shop": "The shop",
+      "res-rest-overzicht": "Reservations overview",
+      "res-rest-bewerken": "Edit a reservation",
+      "res-rest-online": "Online reservations",
+      "res-rest-tafel": "Create a table",
+      "res-rest-walkin": "Walk-in"
     }
   },
   "helpPage": {

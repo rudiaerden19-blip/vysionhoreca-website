@@ -4243,6 +4243,10 @@
       "de-shop": {
         "title": "Lo shop",
         "desc": "Configura e gestisci lo shop online"
+      },
+      "restaurant-reserveringen": {
+        "title": "Prenotazioni ristorante",
+        "desc": "Gestisci prenotazioni, tavoli e walk-in"
       }
     },
     "v": {
@@ -4273,7 +4277,12 @@
       "groepsbestellingen": "Ordini di gruppo",
       "printer": "Stampante scontrini",
       "de-website": "Il tuo sito",
-      "de-shop": "Lo shop"
+      "de-shop": "Lo shop",
+      "res-rest-overzicht": "Panoramica prenotazioni",
+      "res-rest-bewerken": "Modifica prenotazione",
+      "res-rest-online": "Prenotazioni online",
+      "res-rest-tafel": "Crea un tavolo",
+      "res-rest-walkin": "Walk-in"
     }
   },
   "helpPage": {

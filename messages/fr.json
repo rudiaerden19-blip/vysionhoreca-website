@@ -4265,6 +4265,10 @@
       "de-shop": {
         "title": "La boutique",
         "desc": "Configurer votre boutique en ligne"
+      },
+      "restaurant-reserveringen": {
+        "title": "Réservations restaurant",
+        "desc": "Gérer réservations, tables et walk-in"
       }
     },
     "v": {
@@ -4295,7 +4299,12 @@
       "groepsbestellingen": "Commandes de groupe",
       "printer": "Imprimante tickets",
       "de-website": "Votre site",
-      "de-shop": "La boutique"
+      "de-shop": "La boutique",
+      "res-rest-overzicht": "Aperçu des réservations",
+      "res-rest-bewerken": "Modifier une réservation",
+      "res-rest-online": "Réservations en ligne",
+      "res-rest-tafel": "Créer une table",
+      "res-rest-walkin": "Walk-in"
     }
   },
   "helpPage": {

@@ -4243,6 +4243,10 @@
       "de-shop": {
         "title": "La tienda",
         "desc": "Configura y gestiona tu tienda online"
+      },
+      "restaurant-reserveringen": {
+        "title": "Reservas del restaurante",
+        "desc": "Gestiona reservas, mesas y walk-in"
       }
     },
     "v": {
@@ -4273,7 +4277,12 @@
       "groepsbestellingen": "Pedidos grupales",
       "printer": "Impresora tickets",
       "de-website": "Tu sitio web",
-      "de-shop": "La tienda"
+      "de-shop": "La tienda",
+      "res-rest-overzicht": "Resumen de reservas",
+      "res-rest-bewerken": "Editar una reserva",
+      "res-rest-online": "Reservas online",
+      "res-rest-tafel": "Crear una mesa",
+      "res-rest-walkin": "Walk-in"
     }
   },
   "helpPage": {

@@ -4243,6 +4243,10 @@
       "de-shop": {
         "title": "المتجر",
         "desc": "إعداد وإدارة المتجر الإلكتروني"
+      },
+      "restaurant-reserveringen": {
+        "title": "حجوزات المطعم",
+        "desc": "إدارة الحجوزات والطاولات وزوار الممر"
       }
     },
     "v": {
@@ -4273,7 +4277,12 @@
       "groepsbestellingen": "طلبات جماعية",
       "printer": "طابعة إيصالات",
       "de-website": "موقعك",
-      "de-shop": "المتجر"
+      "de-shop": "المتجر",
+      "res-rest-overzicht": "نظرة عامة على الحجوزات",
+      "res-rest-bewerken": "تعديل حجز",
+      "res-rest-online": "حجوزات عبر الإنترنت",
+      "res-rest-tafel": "إنشاء طاولة",
+      "res-rest-walkin": "زوار بدون حجز"
     }
   },
   "helpPage": {

@@ -4243,6 +4243,10 @@
       "de-shop": {
         "title": "商店",
         "desc": "设置并管理网店"
+      },
+      "restaurant-reserveringen": {
+        "title": "餐厅预订",
+        "desc": "管理预订、桌位与临时到店客人"
       }
     },
     "v": {
@@ -4273,7 +4277,12 @@
       "groepsbestellingen": "团购",
       "printer": "票据打印机",
       "de-website": "您的网站",
-      "de-shop": "商店"
+      "de-shop": "商店",
+      "res-rest-overzicht": "预订总览",
+      "res-rest-bewerken": "编辑预订",
+      "res-rest-online": "在线预订",
+      "res-rest-tafel": "创建桌位",
+      "res-rest-walkin": "临时到店"
     }
   },
   "helpPage": {

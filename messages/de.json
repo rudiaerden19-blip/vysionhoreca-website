@@ -4266,6 +4266,10 @@
       "de-shop": {
         "title": "Der Shop",
         "desc": "Onlineshop einrichten und verwalten"
+      },
+      "restaurant-reserveringen": {
+        "title": "Restaurant-Reservierungen",
+        "desc": "Reservierungen, Tische und Walk-ins verwalten"
       }
     },
     "v": {
@@ -4296,7 +4300,12 @@
       "groepsbestellingen": "Gruppenbestellungen",
       "printer": "Bonndrucker",
       "de-website": "Ihre Website",
-      "de-shop": "Der Shop"
+      "de-shop": "Der Shop",
+      "res-rest-overzicht": "Reservierungen Übersicht",
+      "res-rest-bewerken": "Reservierung bearbeiten",
+      "res-rest-online": "Online-Reservierungen",
+      "res-rest-tafel": "Tisch anlegen",
+      "res-rest-walkin": "Walk-in"
     }
   },
   "helpPage": {
