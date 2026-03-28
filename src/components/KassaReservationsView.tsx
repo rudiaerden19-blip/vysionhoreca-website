@@ -968,16 +968,17 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests, statusRin
       {/* Gast labels — per rij: volledige naam + tijd; grotere tekst voor tablet / iPad */}
       {guests && guests.length > 0 && (() => {
         const nameFont = 17
-        const timeFont = 14
+        const timeFont = 13
         const lineH = 34
         const padTop = 11
         const padBottom = 11
         const padL = 12
         const padR = 10
-        const gapNameTime = 10
-        const timeW = 168 // "12:00 tot 13u30" @ 14px
-        const labelW = Math.max(360, Math.round(tw * 1.6))
-        const nameW = Math.max(140, labelW - padL - padR - gapNameTime - timeW)
+        const gapNameTime = 8
+        const timeW = 112 // genoeg voor "20:00 tot 22u30" @ 13px; max. breedte pill blijft beperkt
+        // Vast label onder tafel: dichter bij tafelbreedte (was min. 360px → te breed op plattegrond)
+        const labelW = Math.min(220, Math.max(Math.round(tw * 1.2) + 52, 200))
+        const nameW = Math.max(48, labelW - padL - padR - gapNameTime - timeW)
         const totalH = guests.length * lineH + padTop + padBottom
         const startY = cy + (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + gap + chairH + 10
         const baselineY = (i: number) => startY + padTop + i * lineH + 24
