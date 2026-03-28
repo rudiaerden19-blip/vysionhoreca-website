@@ -235,6 +235,12 @@ interface KassaReservationsViewProps {
   kassaTables: KassaTable[]
   onClose: () => void
   onStartOrder: (tableNr: string) => void
+  /** Overlay over volledig scherm (standaard, vanuit Kassa). Admin-pagina houdt de globale topbalk zichtbaar. */
+  presentation?: 'fullscreenOverlay' | 'adminPage'
+  /** Standaard "Kassa". Bijv. "Overzicht" als kassa-module uit staat. */
+  closeButtonLabel?: string
+  /** false = geen "Start order" / naar kassa (module kassa uit). */
+  allowKassaHandoff?: boolean
 }
 
 // ---- Rapporten View ----
@@ -1161,7 +1167,15 @@ export default function KassaReservationsView({
   kassaTables,
   onClose,
   onStartOrder,
+  presentation = 'fullscreenOverlay',
+  closeButtonLabel,
+  allowKassaHandoff = true,
 }: KassaReservationsViewProps) {
+  const isAdminPagePresentation = presentation === 'adminPage'
+  const shellFixed = isAdminPagePresentation
+    ? 'flex h-[calc(100dvh-3.5rem)] min-h-0 w-full max-w-full flex-col overflow-hidden bg-white'
+    : 'fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-white h-[100dvh] max-h-[100dvh]'
+  const backLabel = closeButtonLabel ?? 'Kassa'
   const toast = useToast()
   const { t } = useLanguage()
   const rk = useCallback((key: string, rep?: Record<string, string>) => {
@@ -2451,6 +2465,7 @@ export default function KassaReservationsView({
   }
 
   const handleStartOrder = async (r: Reservation) => {
+    if (!allowKassaHandoff) return
     if (r.status === 'CONFIRMED' || r.status === 'PENDING') {
       await updateStatus(r.id, 'CHECKED_IN')
     }
@@ -2651,16 +2666,18 @@ export default function KassaReservationsView({
         <div className="flex gap-2">
           {reservation.status === 'CONFIRMED' && (
             <>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleStartOrder(reservation) }}
-                className="flex-1 py-2 px-3 rounded-lg bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600 transition-colors flex items-center justify-center gap-1"
-              >
-                <UtensilsCrossed size={16} />
-                Start Order
-              </button>
+              {allowKassaHandoff && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleStartOrder(reservation) }}
+                  className="flex-1 py-2 px-3 rounded-lg bg-emerald-500 text-white text-sm font-medium hover:bg-emerald-600 transition-colors flex items-center justify-center gap-1"
+                >
+                  <UtensilsCrossed size={16} />
+                  Start Order
+                </button>
+              )}
               <button
                 onClick={(e) => { e.stopPropagation(); handleNoShow(reservation) }}
-                className="py-2 px-3 rounded-lg bg-red-500/20 text-red-500 text-sm font-medium hover:bg-red-500/30 transition-colors"
+                className={`py-2 px-3 rounded-lg bg-red-500/20 text-red-500 text-sm font-medium hover:bg-red-500/30 transition-colors ${allowKassaHandoff ? '' : 'flex-1'}`}
               >
                 <UserX size={16} />
               </button>
@@ -2668,16 +2685,18 @@ export default function KassaReservationsView({
           )}
           {reservation.status === 'CHECKED_IN' && (
             <>
-              <button
-                onClick={(e) => { e.stopPropagation(); handleStartOrder(reservation) }}
-                className="flex-1 py-2 px-3 rounded-lg bg-[#3C4D6B] text-white text-sm font-medium hover:bg-[#4A5D7B] transition-colors flex items-center justify-center gap-1"
-              >
-                <UtensilsCrossed size={16} />
-                Naar Kassa
-              </button>
+              {allowKassaHandoff && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleStartOrder(reservation) }}
+                  className="flex-1 py-2 px-3 rounded-lg bg-[#3C4D6B] text-white text-sm font-medium hover:bg-[#4A5D7B] transition-colors flex items-center justify-center gap-1"
+                >
+                  <UtensilsCrossed size={16} />
+                  Naar Kassa
+                </button>
+              )}
               <button
                 onClick={(e) => { e.stopPropagation(); handleComplete(reservation) }}
-                className="py-2 px-3 rounded-lg bg-gray-500/20 text-gray-500 text-sm font-medium hover:bg-gray-500/30 transition-colors"
+                className={`py-2 px-3 rounded-lg bg-gray-500/20 text-gray-500 text-sm font-medium hover:bg-gray-500/30 transition-colors ${allowKassaHandoff ? '' : 'flex-1'}`}
               >
                 <CheckCircle2 size={16} />
               </button>
@@ -2702,7 +2721,13 @@ export default function KassaReservationsView({
   // ---- If not enabled ----
   if (!isEnabled) {
     return (
-      <div className="fixed inset-0 bg-white z-50 flex items-center justify-center p-6">
+      <div
+        className={
+          isAdminPagePresentation
+            ? 'flex min-h-[calc(100dvh-3.5rem)] w-full items-center justify-center bg-white p-6'
+            : 'fixed inset-0 bg-white z-50 flex items-center justify-center p-6'
+        }
+      >
         <div className="text-center max-w-md">
           <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
             <CalendarDays size={40} className="text-green-500" />
@@ -2726,7 +2751,7 @@ export default function KassaReservationsView({
 
   // ---- Main render ----
   return (
-    <div className="fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-white h-[100dvh] max-h-[100dvh]">
+    <div className={shellFixed}>
       {/* Toast */}
       {toast.msg && (
         <div
@@ -2762,7 +2787,7 @@ export default function KassaReservationsView({
               <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Kassa
+              {backLabel}
             </button>
             {viewMode !== 'guests' && viewMode !== 'settings' && (
               <>
@@ -2950,10 +2975,12 @@ export default function KassaReservationsView({
                           )}
                           {r.status === 'CHECKED_IN' && (
                             <div className="flex gap-1 mt-1.5">
-                              <button onClick={e => { e.stopPropagation(); handleStartOrder(r) }}
-                                className="text-[10px] px-2 py-1 rounded-md bg-[#3C4D6B] text-white font-medium hover:bg-[#4a5d7b] transition-colors">
-                                Naar Kassa
-                              </button>
+                              {allowKassaHandoff && (
+                                <button onClick={e => { e.stopPropagation(); handleStartOrder(r) }}
+                                  className="text-[10px] px-2 py-1 rounded-md bg-[#3C4D6B] text-white font-medium hover:bg-[#4a5d7b] transition-colors">
+                                  Naar Kassa
+                                </button>
+                              )}
                               <button onClick={e => { e.stopPropagation(); handleComplete(r) }}
                                 className="text-[10px] px-2 py-1 rounded-md bg-gray-100 text-gray-500 font-medium hover:bg-gray-200 transition-colors">
                                 Afronden
@@ -3543,10 +3570,12 @@ export default function KassaReservationsView({
                   const allTableRes = floorRes.filter(r => String(r.table_number) === String(selectedFloorTable.number)).sort((a,b) => a.reservation_time.localeCompare(b.reservation_time))
                   return (
                     <div
-                      className="fixed right-0 top-0 z-[55] flex min-h-0 w-[min(380px,95vw)] sm:w-[min(320px,85vw)] flex-col overflow-hidden border-l border-white/10 bg-[#16213e] shadow-2xl"
+                      className={`fixed right-0 z-[55] flex min-h-0 w-[min(380px,95vw)] sm:w-[min(320px,85vw)] flex-col overflow-hidden border-l border-white/10 bg-[#16213e] shadow-2xl ${
+                        isAdminPagePresentation ? 'top-14' : 'top-0'
+                      }`}
                       style={{
-                        height: '100dvh',
-                        maxHeight: '100dvh',
+                        height: isAdminPagePresentation ? 'calc(100dvh - 3.5rem)' : '100dvh',
+                        maxHeight: isAdminPagePresentation ? 'calc(100dvh - 3.5rem)' : '100dvh',
                         paddingTop: 'env(safe-area-inset-top, 0px)',
                         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
                       }}
@@ -3612,7 +3641,7 @@ export default function KassaReservationsView({
                                       <UserCheck size={15} /> Bezet
                                     </button>
                                   )}
-                                  {r.status === 'CHECKED_IN' && (
+                                  {r.status === 'CHECKED_IN' && allowKassaHandoff && (
                                     <button onClick={() => handleStartOrder(r)} className="min-h-[44px] rounded-xl bg-emerald-500 active:bg-emerald-700 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-1">
                                       <UtensilsCrossed size={15} /> Kassa
                                     </button>
@@ -5041,6 +5070,7 @@ export default function KassaReservationsView({
           onAssignTable={async (tableNumber) => { await handleAssignTable(selectedReservation.id, tableNumber); setSelectedReservation(null) }}
           onDelete={async () => { await handleDeleteReservation(selectedReservation.id); setSelectedReservation(null) }}
           onStartOrder={() => { handleStartOrder(selectedReservation); setSelectedReservation(null) }}
+          allowKassaHandoff={allowKassaHandoff}
           onEdit={() => { setEditReservation(selectedReservation); setSelectedReservation(null) }}
           tables={
             floorPlanTablesDB.length > 0
@@ -6405,6 +6435,7 @@ interface ReservationDetailModalProps {
   onAssignTable: (tableNumber: string) => void
   onDelete: () => void
   onStartOrder: () => void
+  allowKassaHandoff?: boolean
   onEdit: () => void
   tables: KassaTable[]
   guestProfile?: GuestProfile
@@ -6421,6 +6452,7 @@ function ReservationDetailModal({
   onAssignTable,
   onDelete,
   onStartOrder,
+  allowKassaHandoff: allowKassaHandoffModal = true,
   onEdit,
   tables,
   guestProfile,
@@ -6567,15 +6599,16 @@ function ReservationDetailModal({
             </button>
           )}
 
-          {/* === ACTIE KNOPPEN — altijd zichtbaar === */}
-          {/* Kassa knop */}
-          <button
-            onClick={onStartOrder}
-            className="w-full py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#4A5D7B] transition-colors flex items-center justify-center gap-2"
-          >
-            <UtensilsCrossed size={18} />
-            Naar Kassa
-          </button>
+          {/* === ACTIE KNOPPEN === */}
+          {allowKassaHandoffModal && (
+            <button
+              onClick={onStartOrder}
+              className="w-full py-3 rounded-xl bg-[#3C4D6B] text-white font-bold hover:bg-[#4A5D7B] transition-colors flex items-center justify-center gap-2"
+            >
+              <UtensilsCrossed size={18} />
+              Naar Kassa
+            </button>
+          )}
 
           {/* Status knoppen — 3 in een rij */}
           <div className="grid grid-cols-3 gap-2">
