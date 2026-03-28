@@ -599,6 +599,26 @@ export default function SuperAdminDashboard() {
           </motion.div>
         </div>
 
+        {/* Modules — altijd zichtbaar (tabel heeft veel kolommen: scroll horizontaal indien nodig) */}
+        <div className="mb-6 rounded-2xl border-2 border-orange-400/80 bg-gradient-to-r from-orange-500/20 to-amber-500/15 px-5 py-4 shadow-lg shadow-orange-950/30">
+          <p className="text-white font-bold text-base sm:text-lg flex flex-wrap items-center gap-2">
+            <span className="text-2xl">📦</span>
+            <span>Modules per tenant aanpassen</span>
+          </p>
+          <p className="text-slate-200 text-sm mt-2 leading-relaxed">
+            Bij elke rij: eerste knop in <strong className="text-orange-300">Acties</strong> is{' '}
+            <strong className="text-orange-300">📦 Modules</strong> (oranje). Daarnaast staat diezelfde link nog
+            eens in de <strong className="text-orange-300">laatste kolom</strong> rechts. Zie je oude knoppen
+            alleen? <strong className="text-white">Hard refresh</strong>: Mac{' '}
+            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Cmd</kbd>+
+            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Shift</kbd>+
+            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">R</kbd> — Windows{' '}
+            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Ctrl</kbd>+
+            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Shift</kbd>+
+            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">R</kbd>.
+          </p>
+        </div>
+
         {/* Search */}
         <div className="mb-6">
           <input
@@ -620,7 +640,9 @@ export default function SuperAdminDashboard() {
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Alle Tenants ({filteredTenants.length})</h2>
             <p className="text-slate-400 text-sm mt-2">
-              Laatste kolom <span className="text-orange-400 font-semibold">Modules</span> — klantportaal-modules per tenant (scroll naar rechts op smalle schermen).
+              <span className="text-orange-400 font-semibold">📦 Modules</span> staat als{' '}
+              <span className="text-white font-medium">eerste knop in Acties</span> én in de laatste kolom —
+              scroll de tabel horizontaal als je een smal scherm hebt.
             </p>
           </div>
           
@@ -634,7 +656,9 @@ export default function SuperAdminDashboard() {
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Status</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Betaald</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Aangemaakt</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Acties</th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">
+                    Acties <span className="text-orange-400 font-semibold">(📦 Modules = links)</span>
+                  </th>
                   <th className="px-3 py-4 text-center text-sm font-bold text-orange-300 whitespace-nowrap bg-slate-700/80">
                     📦 Modules
                   </th>
@@ -727,27 +751,29 @@ export default function SuperAdminDashboard() {
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
                       </td>
                       <td className="px-6 py-4 align-top">
-                        <div className="flex flex-col gap-2 min-w-[140px]">
-                          <div className="flex flex-nowrap gap-1.5 items-center flex-wrap">
-                            <Link
-                              href={`/shop/${tenant.tenant_slug}/admin`}
-                              target="_blank"
-                              className="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap shrink-0"
-                            >
-                              🔑 Beheer
-                            </Link>
-                            <Link
-                              href={`/superadmin/tenant/${tenant.tenant_slug}`}
-                              className="px-2.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs sm:text-sm whitespace-nowrap shrink-0"
-                            >
-                              Details
-                            </Link>
+                        <div className="flex flex-col gap-2 min-w-[200px]">
+                          <div className="flex flex-col gap-2">
                             <Link
                               href={`/superadmin/tenant/${tenant.tenant_slug}/modules`}
-                              className="px-2.5 py-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs sm:text-sm font-semibold whitespace-nowrap shrink-0"
+                              className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-orange-500 hover:bg-orange-400 text-white rounded-xl text-sm font-extrabold whitespace-nowrap shadow-md ring-2 ring-orange-300/50 w-full text-center"
                             >
-                              Modules
+                              📦 Modules
                             </Link>
+                            <div className="flex flex-wrap gap-1.5 items-center">
+                              <Link
+                                href={`/shop/${tenant.tenant_slug}/admin`}
+                                target="_blank"
+                                className="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap shrink-0"
+                              >
+                                🔑 Beheer
+                              </Link>
+                              <Link
+                                href={`/superadmin/tenant/${tenant.tenant_slug}`}
+                                className="px-2.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs sm:text-sm whitespace-nowrap shrink-0"
+                              >
+                                Details
+                              </Link>
+                            </div>
                           </div>
                           <div className="flex flex-wrap gap-2 items-center">
                             {!isProtectedTenant(tenant.tenant_slug) && (
