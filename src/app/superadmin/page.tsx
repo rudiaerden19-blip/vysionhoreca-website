@@ -723,52 +723,57 @@ export default function SuperAdminDashboard() {
                       <td className="px-6 py-4 text-slate-400 text-sm">
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2 flex-wrap items-center min-w-[10.5rem]">
-                          <Link
-                            href={`/shop/${tenant.tenant_slug}/admin`}
-                            target="_blank"
-                            className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition-colors font-medium shrink-0"
-                          >
-                            🔑 Beheer
-                          </Link>
-                          <Link
-                            href={`/superadmin/tenant/${tenant.tenant_slug}`}
-                            className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors shrink-0"
-                          >
-                            Details
-                          </Link>
-                          <Link
-                            href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
-                            className="px-3 py-1 bg-orange-500 hover:bg-orange-400 text-white rounded-lg text-sm font-bold transition-colors shrink-0 ring-1 ring-orange-300/50"
-                          >
-                            📦 Modules
-                          </Link>
-                          {!isProtectedTenant(tenant.tenant_slug) && (
-                            <>
-                              <button
-                                onClick={() => handleBlockTenant(tenant)}
-                                className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-                                  tenant.is_blocked 
-                                    ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
-                                    : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                                }`}
-                              >
-                                {tenant.is_blocked ? '✓ Deblokkeren' : '⚠️ Blokkeren'}
-                              </button>
-                              <button
-                                onClick={() => setShowDeleteModal(tenant)}
-                                className="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-sm transition-colors"
-                              >
-                                🗑️ Verwijderen
-                              </button>
-                            </>
-                          )}
-                          {isProtectedTenant(tenant.tenant_slug) && (
-                            <span className="px-3 py-1 bg-slate-700 text-slate-400 rounded-lg text-sm">
-                              🔒 Beschermd
-                            </span>
-                          )}
+                      <td className="px-6 py-4 align-top">
+                        <div className="flex flex-col gap-2 min-w-[200px]">
+                          {/* Eén vaste rij: Beheer → Details → Modules (nooit wrappen; voorkomt "verdwenen" knop) */}
+                          <div className="flex flex-nowrap gap-1.5 items-center">
+                            <Link
+                              href={`/shop/${tenant.tenant_slug}/admin`}
+                              target="_blank"
+                              className="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap shrink-0"
+                            >
+                              🔑 Beheer
+                            </Link>
+                            <Link
+                              href={`/superadmin/tenant/${tenant.tenant_slug}`}
+                              className="px-2.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs sm:text-sm whitespace-nowrap shrink-0"
+                            >
+                              Details
+                            </Link>
+                            <a
+                              href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
+                              className="px-2.5 py-1.5 bg-orange-500 hover:bg-orange-400 text-white rounded-lg text-xs sm:text-sm font-bold whitespace-nowrap shrink-0 ring-1 ring-orange-300/50"
+                            >
+                              📦 Modules
+                            </a>
+                          </div>
+                          <div className="flex flex-wrap gap-2 items-center">
+                            {!isProtectedTenant(tenant.tenant_slug) && (
+                              <>
+                                <button
+                                  onClick={() => handleBlockTenant(tenant)}
+                                  className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                                    tenant.is_blocked
+                                      ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                                      : 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                                  }`}
+                                >
+                                  {tenant.is_blocked ? '✓ Deblokkeren' : '⚠️ Blokkeren'}
+                                </button>
+                                <button
+                                  onClick={() => setShowDeleteModal(tenant)}
+                                  className="px-3 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-lg text-sm transition-colors"
+                                >
+                                  🗑️ Verwijderen
+                                </button>
+                              </>
+                            )}
+                            {isProtectedTenant(tenant.tenant_slug) && (
+                              <span className="px-3 py-1 bg-slate-700 text-slate-400 rounded-lg text-sm">
+                                🔒 Beschermd
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </td>
                     </tr>
