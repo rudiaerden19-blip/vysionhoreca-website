@@ -650,7 +650,9 @@ export default function SuperAdminDashboard() {
             <table className="w-full">
               <thead className="bg-slate-700/50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Bedrijf</th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">
+                    Bedrijf <span className="text-orange-400 font-semibold">+ 📦 Modules</span>
+                  </th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Slug</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Plan</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Status</th>
@@ -696,6 +698,12 @@ export default function SuperAdminDashboard() {
                               )}
                             </p>
                             <p className="text-sm text-slate-400">{tenant.email}</p>
+                            <Link
+                              href={`/superadmin/tenant/${tenant.tenant_slug}/modules`}
+                              className="mt-2 inline-flex items-center gap-1.5 px-3 py-2 bg-orange-500 hover:bg-orange-400 text-white rounded-lg text-xs font-extrabold shadow-md ring-1 ring-orange-300/60 w-fit"
+                            >
+                              📦 Modules aanpassen
+                            </Link>
                           </div>
                         </div>
                       </td>

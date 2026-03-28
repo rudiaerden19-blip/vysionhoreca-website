@@ -3,6 +3,16 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
+  const pathname = url.pathname
+
+  /** Superadmin: no CDN/browser cache — users were seeing stale UI zonder Modules-knop. */
+  if (pathname.startsWith('/superadmin')) {
+    const res = NextResponse.next()
+    res.headers.set('Cache-Control', 'private, no-store, max-age=0, must-revalidate')
+    res.headers.set('Pragma', 'no-cache')
+    return res
+  }
+
   const hostname = request.headers.get('host') || ''
   
   // Main domains - skip subdomain routing (exact match only)
@@ -68,7 +78,6 @@ export function middleware(request: NextRequest) {
 
   // Rewrite all requests to use /shop/[tenant] structure
   // This allows existing code to work without changes
-  const pathname = url.pathname
   
   // Skip rewriting for API routes, static files, and admin routes
   if (
