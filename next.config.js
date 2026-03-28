@@ -56,6 +56,12 @@ const securityHeaders = [
 ]
 
 const nextConfig = {
+  env: {
+    NEXT_PUBLIC_BUILD_SHA:
+      process.env.VERCEL_GIT_COMMIT_SHA ||
+      process.env.VERCEL_GIT_COMMIT_REF ||
+      'local',
+  },
   // Disable source maps in production to prevent 404 errors
   productionBrowserSourceMaps: false,
   
@@ -99,7 +105,19 @@ const nextConfig = {
   },
   // Security headers voor alle routes
   async headers() {
+    const noStoreSuperadmin = [
+      { key: 'Cache-Control', value: 'private, no-store, max-age=0, must-revalidate' },
+      { key: 'Pragma', value: 'no-cache' },
+    ]
     return [
+      {
+        source: '/superadmin',
+        headers: [...securityHeaders, ...noStoreSuperadmin],
+      },
+      {
+        source: '/superadmin/:path*',
+        headers: [...securityHeaders, ...noStoreSuperadmin],
+      },
       {
         // Apply to all routes
         source: '/:path*',

@@ -970,6 +970,43 @@ export default function SuperAdminDashboard() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <footer className="max-w-7xl mx-auto px-4 py-8 mt-4 border-t border-slate-800 text-center text-slate-500 text-xs space-y-3">
+        <p>
+          <span className="text-slate-400">Deploy-build:</span>{' '}
+          <code className="text-orange-400 bg-slate-800 px-2 py-0.5 rounded">
+            {(process.env.NEXT_PUBLIC_BUILD_SHA || 'local').slice(0, 7)}
+          </code>
+          <span className="text-slate-600 ml-2">
+            (als dit niet overeenkomt met Vercel → verkeerde site of oude cache)
+          </span>
+        </p>
+        <p className="text-slate-400 max-w-xl mx-auto">
+          Zie je <strong className="text-orange-300">geen oranje “Modules aanpassen”</strong> onder het
+          e-mailadres? Klik dan hieronder — daarna laadt de pagina opnieuw met de nieuwste bestanden.
+        </p>
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              if ('serviceWorker' in navigator) {
+                const regs = await navigator.serviceWorker.getRegistrations()
+                await Promise.all(regs.map((r) => r.unregister()))
+              }
+              if ('caches' in window) {
+                const keys = await caches.keys()
+                await Promise.all(keys.map((k) => caches.delete(k)))
+              }
+            } catch {
+              /* ignore */
+            }
+            window.location.reload()
+          }}
+          className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-medium"
+        >
+          Service worker + offline-cache legen en herladen
+        </button>
+      </footer>
     </div>
   )
 }

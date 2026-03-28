@@ -1,8 +1,8 @@
 // Vysion Kassa – Service Worker
 // Zorgt voor offline werking van de kassa app + cache van productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v6'
-const STATIC_CACHE = 'vysion-static-v6'
+const CACHE = 'vysion-kassa-v7'
+const STATIC_CACHE = 'vysion-static-v7'
 const IMAGE_CACHE = 'vysion-images-v1'
 
 // Bij installatie: skip waiting zodat de nieuwe SW meteen actief wordt
@@ -81,18 +81,21 @@ self.addEventListener('fetch', event => {
   // Eigen API-routes: altijd live
   if (url.pathname.startsWith('/api/')) return
 
-  // Next.js statische assets (hash in naam): cache-first – nooit verlopen
+  // Next.js build assets: network-first — cache-first liet oude superadmin-JS eeuwig zien na deploy
   if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/_next/image')) {
     event.respondWith(
-      caches.open(STATIC_CACHE).then(cache =>
-        cache.match(request).then(cached => {
-          if (cached) return cached
-          return fetch(request).then(response => {
-            if (response.ok) cache.put(request, response.clone())
-            return response
-          })
+      fetch(request)
+        .then(response => {
+          if (response.ok) {
+            caches.open(STATIC_CACHE).then(cache => cache.put(request, response.clone()))
+          }
+          return response
         })
-      )
+        .catch(() =>
+          caches.open(STATIC_CACHE).then(cache =>
+            cache.match(request).then(cached => cached || new Response('Offline', { status: 503 }))
+          )
+        )
     )
     return
   }
