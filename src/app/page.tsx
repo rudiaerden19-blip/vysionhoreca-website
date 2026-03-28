@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import { flushSync } from 'react-dom'
 import Image from 'next/image'
 import {
   Navigation,
@@ -22,13 +23,13 @@ function WhyVysionSection() {
   const mijnVysionVideoRef = useRef<HTMLVideoElement>(null)
   const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice', 'inHouseSoftware', 'posQuality'] as const
 
-  useEffect(() => {
-    if (!mijnVysionOpen) return
+  const openMijnVysion = () => {
+    flushSync(() => setMijnVysionOpen(true))
     const el = mijnVysionVideoRef.current
     if (!el) return
     el.currentTime = 0
     void el.play().catch(() => {})
-  }, [mijnVysionOpen])
+  }
 
   return (
     <section className="relative py-24 sm:py-32 lg:py-40 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
@@ -61,7 +62,7 @@ function WhyVysionSection() {
                     {key === 'posQuality' && (
                       <button
                         type="button"
-                        onClick={() => setMijnVysionOpen(true)}
+                        onClick={openMijnVysion}
                         className="mt-[calc(1rem+1cm)] w-full max-w-xl rounded-2xl bg-accent px-5 py-4 text-center text-base font-bold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:py-5 sm:text-lg"
                       >
                         {t('whyVysion.posQuality.videoCta')}
