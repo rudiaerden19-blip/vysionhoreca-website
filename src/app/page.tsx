@@ -13,9 +13,21 @@ import {
 import { useLanguage } from '@/i18n'
 import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
+const MIJN_VYSION_VIDEO_SRC = '/videos/mijn-vysion.mp4'
+
 function WhyVysionSection() {
   const { t } = useLanguage()
+  const [mijnVysionOpen, setMijnVysionOpen] = useState(false)
+  const mijnVysionVideoRef = useRef<HTMLVideoElement>(null)
   const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice', 'inHouseSoftware', 'posQuality'] as const
+
+  useEffect(() => {
+    if (!mijnVysionOpen) return
+    const el = mijnVysionVideoRef.current
+    if (!el) return
+    el.currentTime = 0
+    void el.play().catch(() => {})
+  }, [mijnVysionOpen])
 
   return (
     <section className="relative py-24 sm:py-32 lg:py-40 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
@@ -45,6 +57,15 @@ function WhyVysionSection() {
                     <p className="text-sm sm:text-base text-gray-600 leading-relaxed border-l-2 border-accent/25 pl-4">
                       {t(`whyVysion.${key}.body`)}
                     </p>
+                    {key === 'posQuality' && (
+                      <button
+                        type="button"
+                        onClick={() => setMijnVysionOpen(true)}
+                        className="mt-4 w-full max-w-xl rounded-2xl bg-accent px-5 py-4 text-center text-base font-bold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:py-5 sm:text-lg"
+                      >
+                        {t('whyVysion.posQuality.videoCta')}
+                      </button>
+                    )}
                   </div>
                 </li>
               ))}
@@ -65,6 +86,42 @@ function WhyVysionSection() {
           </div>
         </div>
       </div>
+
+      {mijnVysionOpen && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="mijn-vysion-video-title"
+          onClick={() => setMijnVysionOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl overflow-hidden rounded-2xl bg-black shadow-2xl ring-1 ring-white/10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="mijn-vysion-video-title" className="sr-only">
+              {t('whyVysion.posQuality.videoCta')}
+            </h2>
+            <button
+              type="button"
+              onClick={() => setMijnVysionOpen(false)}
+              className="absolute right-2 top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-2xl leading-none text-white transition-colors hover:bg-black/80"
+              aria-label={t('ui.ariaClose')}
+            >
+              ×
+            </button>
+            <video
+              ref={mijnVysionVideoRef}
+              controls
+              playsInline
+              className="aspect-video w-full"
+              onEnded={() => setMijnVysionOpen(false)}
+            >
+              <source src={MIJN_VYSION_VIDEO_SRC} type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      )}
     </section>
   )
 }
