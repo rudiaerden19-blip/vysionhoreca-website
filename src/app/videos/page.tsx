@@ -10,7 +10,7 @@ const VIDEO_CATEGORY_DEFS = [
   {
     id: 'registreren',
     icoon: '🚀',
-    videoKeys: ['registratie1', 'admin-overzicht2'] as const,
+    videoKeys: ['registreren', 'kassa-layout'] as const,
   },
   {
     id: 'modules',

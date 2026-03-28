@@ -4455,8 +4455,8 @@
       }
     },
     "v": {
-      "registratie1": "Sign up",
-      "admin-overzicht2": "Admin overview",
+      "registreren": "Sign up",
+      "kassa-layout": "Kassa layout",
       "keukenscherm3": "Order screen",
       "analyse-module4": "Business analytics",
       "verkoop5": "Sales",
