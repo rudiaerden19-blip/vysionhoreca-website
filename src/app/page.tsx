@@ -13,7 +13,8 @@ import {
 import { useLanguage } from '@/i18n'
 import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
-const MIJN_VYSION_VIDEO_SRC = '/videos/mijn-vysion.mp4'
+/** Bron: iMovie-segment (stilstaand beeld + lange audio) → public: cover JPG + m4a + mux als mijn-vysion.mp4. */
+const MIJN_VYSION_VIDEO = '/videos/mijn-vysion.mp4'
 
 function WhyVysionSection() {
   const { t } = useLanguage()
@@ -93,7 +94,10 @@ function WhyVysionSection() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="mijn-vysion-video-title"
-          onClick={() => setMijnVysionOpen(false)}
+          onClick={() => {
+            mijnVysionVideoRef.current?.pause()
+            setMijnVysionOpen(false)
+          }}
         >
           <div
             className="relative w-full max-w-4xl overflow-hidden rounded-2xl bg-black shadow-2xl ring-1 ring-white/10"
@@ -104,21 +108,26 @@ function WhyVysionSection() {
             </h2>
             <button
               type="button"
-              onClick={() => setMijnVysionOpen(false)}
+              onClick={() => {
+                mijnVysionVideoRef.current?.pause()
+                setMijnVysionOpen(false)
+              }}
               className="absolute right-2 top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-2xl leading-none text-white transition-colors hover:bg-black/80"
               aria-label={t('ui.ariaClose')}
             >
               ×
             </button>
-            <video
-              ref={mijnVysionVideoRef}
-              controls
-              playsInline
-              className="aspect-video w-full"
-              onEnded={() => setMijnVysionOpen(false)}
-            >
-              <source src={MIJN_VYSION_VIDEO_SRC} type="video/mp4" />
-            </video>
+            <div className="bg-black">
+              <video
+                ref={mijnVysionVideoRef}
+                controls
+                playsInline
+                className="aspect-video w-full max-h-[min(70vh,540px)] bg-black object-contain"
+                onEnded={() => setMijnVysionOpen(false)}
+              >
+                <source src={MIJN_VYSION_VIDEO} type="video/mp4" />
+              </video>
+            </div>
           </div>
         </div>
       )}
