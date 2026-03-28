@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import {
+  customerNeedsPostTrialModulePicker,
   parseEnabledModulesJson,
   resolveTenantModules,
   type TenantModuleId,
@@ -13,6 +14,8 @@ export interface TenantModuleFlagsResult {
   featureGroupOrders: boolean
   featureLabelPrinting: boolean
   loading: boolean
+  /** Trial voorbij, geen Pro, klant moet modules bevestigen. */
+  needsPostTrialModulePicker: boolean
 }
 
 const DEFAULT_FLAGS: TenantModuleFlagsResult = {
@@ -25,10 +28,16 @@ const DEFAULT_FLAGS: TenantModuleFlagsResult = {
   featureGroupOrders: false,
   featureLabelPrinting: false,
   loading: true,
+  needsPostTrialModulePicker: false,
 }
 
-export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModuleFlagsResult {
+export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModuleFlagsResult & {
+  refetch: () => void
+} {
   const [result, setResult] = useState<TenantModuleFlagsResult>(DEFAULT_FLAGS)
+  const [tick, setTick] = useState(0)
+
+  const refetch = useCallback(() => setTick((t) => t + 1), [])
 
   useEffect(() => {
     if (!tenantSlug || !supabase) {
@@ -42,6 +51,7 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
         featureGroupOrders: false,
         featureLabelPrinting: false,
         loading: false,
+        needsPostTrialModulePicker: false,
       })
       return
     }
@@ -56,7 +66,7 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
         supabase
           .from('tenants')
           .select(
-            'plan, enabled_modules, subscription_status, trial_ends_at, feature_group_orders, feature_label_printing'
+            'plan, enabled_modules, subscription_status, trial_ends_at, feature_group_orders, feature_label_printing, post_trial_modules_confirmed'
           )
           .eq('slug', slug)
           .maybeSingle(),
@@ -80,11 +90,14 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
         tenantRow: row,
       })
 
+      const needsPostTrialModulePicker = customerNeedsPostTrialModulePicker(slug, sub, row)
+
       setResult({
         moduleAccess,
         featureGroupOrders: !!(row as { feature_group_orders?: boolean })?.feature_group_orders,
         featureLabelPrinting: !!(row as { feature_label_printing?: boolean })?.feature_label_printing,
         loading: false,
+        needsPostTrialModulePicker,
       })
     }
 
@@ -92,7 +105,7 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
     return () => {
       cancelled = true
     }
-  }, [tenantSlug])
+  }, [tenantSlug, tick])
 
-  return result
+  return { ...result, refetch }
 }

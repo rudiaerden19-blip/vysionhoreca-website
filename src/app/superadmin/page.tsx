@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
-import { getStarterEnabledModulesRecord } from '@/lib/tenant-modules'
 import { isProtectedTenant, isAdminTenant, isDemoTenant, getProtectionError } from '@/lib/protected-tenants'
 
 interface Tenant {
@@ -143,7 +142,7 @@ export default function SuperAdminDashboard() {
     setSaving(true)
 
     const slug = newTenant.tenant_slug.toLowerCase().replace(/[^a-z0-9]/g, '')
-    const trialEndsAt = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
+    const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
 
     // 1. Create tenants record
     const { error: tenantsError } = await supabase
@@ -156,7 +155,8 @@ export default function SuperAdminDashboard() {
         plan: 'starter',
         subscription_status: 'trial',
         trial_ends_at: trialEndsAt,
-        enabled_modules: getStarterEnabledModulesRecord(),
+        enabled_modules: null,
+        post_trial_modules_confirmed: false,
       })
 
     if (tenantsError) {

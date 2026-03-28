@@ -7,7 +7,6 @@ import { registerRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-lim
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { ensureDeliverySettingsForTenant } from '@/lib/tenant-defaults'
-import { getStarterEnabledModulesRecord } from '@/lib/tenant-modules'
 
 // Secure password hashing with bcrypt
 async function hashPassword(password: string): Promise<string> {
@@ -121,7 +120,7 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await hashPassword(password)
     const trialEndsAt = new Date()
-    trialEndsAt.setDate(trialEndsAt.getDate() + 15)
+    trialEndsAt.setDate(trialEndsAt.getDate() + 14)
 
     // ========================================
     // 1. CREATE TENANT (main table)
@@ -136,7 +135,8 @@ export async function POST(request: NextRequest) {
         plan: 'starter',
         subscription_status: 'trial',
         trial_ends_at: trialEndsAt.toISOString(),
-        enabled_modules: getStarterEnabledModulesRecord(),
+        enabled_modules: null,
+        post_trial_modules_confirmed: false,
       })
       .select()
       .single()

@@ -8,6 +8,7 @@ import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import { adminPathToModule } from '@/lib/tenant-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -24,7 +25,12 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
   const baseUrl = `/shop/${params.tenant}/admin`
-  const { moduleAccess, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
+  const {
+    moduleAccess,
+    loading: modulesLoading,
+    needsPostTrialModulePicker,
+    refetch: refetchModules,
+  } = useTenantModuleFlags(params.tenant)
 
   const showLockButton =
     pathname === `/shop/${params.tenant}/admin` ||
@@ -108,6 +114,11 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   return (
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
+      <PostTrialModulePickerModal
+        tenantSlug={params.tenant}
+        open={needsPostTrialModulePicker}
+        onConfirmed={refetchModules}
+      />
       <TrialBanner tenantSlug={params.tenant} />
 
       {/* ── Slanke blauwe topbalk (zelfde stijl als kassa) ── */}

@@ -87,11 +87,27 @@ export function parseEnabledModulesJson(raw: unknown): Record<string, boolean> |
   return Object.keys(out).length ? out : null
 }
 
-/** Voor superadmin formulier: interpretatie van DB-json met starter-defaults voor ontbrekende keys. */
-export function mergeEnabledModulesFromDb(raw: unknown): Record<TenantModuleId, boolean> {
+/** Na trial vóór modulekeuze: beperkt starter-pakket. */
+export function getResolvedStarterOnlyAccess(): Record<TenantModuleId, boolean> {
+  const s = getStarterEnabledModulesRecord()
+  return { ...s, kassa: true, account: true, instellingen: true }
+}
+
+/**
+ * Voor superadmin: DB-json. Zonder JSON en `postTrialModulesConfirmed === false` → starter (niet alles aan).
+ */
+export function mergeEnabledModulesFromDb(
+  raw: unknown,
+  postTrialModulesConfirmed: boolean | null | undefined = true
+): Record<TenantModuleId, boolean> {
   const p = parseEnabledModulesJson(raw)
   const starter = getStarterEnabledModulesRecord()
-  if (!p) return allTenantModulesTrue()
+  if (!p) {
+    if (postTrialModulesConfirmed === false) {
+      return getResolvedStarterOnlyAccess()
+    }
+    return allTenantModulesTrue()
+  }
   const out = {} as Record<TenantModuleId, boolean>
   for (const id of TENANT_MODULE_IDS) {
     if (p[id] === true) out[id] = true
@@ -107,10 +123,10 @@ export function mergeEnabledModulesFromDb(raw: unknown): Record<TenantModuleId, 
 /**
  * Effective module access for UI and guards.
  * - Platform admin tenants: always all on.
- * - Active trial: all on (try-before-buy).
+ * - Active trial: all on (proef = volledig pakket).
  * - Pro plan: all on.
- * - Legacy (enabled_modules null): all on.
- * - Otherwise merge stored JSON with starter defaults for missing keys; force core modules on.
+ * - Anders: expliciete JSON indien gezet; anders bij post_trial_modules_confirmed → legacy vol pakket;
+ *   bij false (nieuwe tenant na trial, nog geen keuze) → starter-pakket tot klant bevestigt.
  */
 export function resolveTenantModules(opts: {
   tenantSlug: string
@@ -120,6 +136,7 @@ export function resolveTenantModules(opts: {
     subscription_status?: string | null
     trial_ends_at?: string | null
     plan?: string | null
+    post_trial_modules_confirmed?: boolean | null
   } | null
 }): Record<TenantModuleId, boolean> {
   const { tenantSlug, enabledModulesJson, subscription, tenantRow } = opts
@@ -133,22 +150,49 @@ export function resolveTenantModules(opts: {
   if (isTenantProPlan(subscription, tenantRow)) {
     return allTenantModulesTrue()
   }
-  if (enabledModulesJson === null || enabledModulesJson === undefined) {
+
+  const hasExplicit =
+    enabledModulesJson !== null &&
+    enabledModulesJson !== undefined &&
+    Object.keys(enabledModulesJson).length > 0
+
+  if (hasExplicit) {
+    const starter = getStarterEnabledModulesRecord()
+    const out = {} as Record<TenantModuleId, boolean>
+    for (const id of TENANT_MODULE_IDS) {
+      if (enabledModulesJson![id] === true) out[id] = true
+      else if (enabledModulesJson![id] === false) out[id] = false
+      else out[id] = starter[id]
+    }
+    out.kassa = true
+    out.account = true
+    out.instellingen = true
+    return out
+  }
+
+  const postOk = tenantRow?.post_trial_modules_confirmed !== false
+  if (postOk) {
     return allTenantModulesTrue()
   }
 
-  const starter = getStarterEnabledModulesRecord()
-  const out = {} as Record<TenantModuleId, boolean>
-  for (const id of TENANT_MODULE_IDS) {
-    if (enabledModulesJson[id] === true) out[id] = true
-    else if (enabledModulesJson[id] === false) out[id] = false
-    else out[id] = starter[id]
-  }
+  return getResolvedStarterOnlyAccess()
+}
 
-  out.kassa = true
-  out.account = true
-  out.instellingen = true
-  return out
+export function customerNeedsPostTrialModulePicker(
+  tenantSlug: string,
+  subscription: { status?: string | null; trial_ends_at?: string | null; plan?: string | null } | null,
+  tenantRow: {
+    subscription_status?: string | null
+    trial_ends_at?: string | null
+    plan?: string | null
+    post_trial_modules_confirmed?: boolean | null
+  } | null
+): boolean {
+  if (!tenantRow) return false
+  if (isAdminTenant(tenantSlug)) return false
+  if (isTrialSubscriptionActive(subscription, tenantRow)) return false
+  if (isTenantProPlan(subscription, tenantRow)) return false
+  return tenantRow.post_trial_modules_confirmed === false
 }
 
 export type AdminModuleGateResult =

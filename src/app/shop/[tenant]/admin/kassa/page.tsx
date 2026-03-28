@@ -12,6 +12,7 @@ import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemov
 import { prefetchProductImageUrls } from '@/lib/offline-product-images'
 import { allTenantModulesTrue, type TenantModuleId } from '@/lib/tenant-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 
 type HamburgerModule = {
   key: TenantModuleId
@@ -163,8 +164,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const baseUrl = `/shop/${tenant}/admin`
   const { locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
 
-  const { moduleAccess, featureGroupOrders, featureLabelPrinting, loading: moduleFlagsLoading } =
-    useTenantModuleFlags(tenant)
+  const {
+    moduleAccess,
+    featureGroupOrders,
+    featureLabelPrinting,
+    loading: moduleFlagsLoading,
+    needsPostTrialModulePicker,
+    refetch: refetchModules,
+  } = useTenantModuleFlags(tenant)
   const effectiveAccess =
     demoViewOnly || moduleFlagsLoading ? allTenantModulesTrue() : moduleAccess
   const effectiveGroupOrders = demoViewOnly || moduleFlagsLoading ? true : featureGroupOrders
@@ -1168,6 +1175,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   return (
     <div className="flex flex-col" style={{ height: '100dvh' }}>
+      <PostTrialModulePickerModal
+        tenantSlug={tenant}
+        open={needsPostTrialModulePicker && !demoViewOnly}
+        onConfirmed={refetchModules}
+      />
       {demoViewOnly && (
         <div
           role="status"

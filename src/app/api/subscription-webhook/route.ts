@@ -172,7 +172,9 @@ export async function POST(request: NextRequest) {
               .update({
                 plan: planId || 'starter',
                 subscription_status: 'ACTIVE',
-                ...(paidPlan === 'pro' ? { enabled_modules: null } : {}),
+                ...(paidPlan === 'pro'
+                  ? { enabled_modules: null, post_trial_modules_confirmed: true }
+                  : {}),
               })
               .eq('slug', tenantSlug)
 

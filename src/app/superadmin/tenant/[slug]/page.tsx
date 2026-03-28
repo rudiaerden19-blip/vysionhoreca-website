@@ -32,6 +32,7 @@ interface TenantsCoreRow {
   slug: string
   plan: string
   enabled_modules: Record<string, boolean> | null
+  post_trial_modules_confirmed?: boolean | null
 }
 
 interface Subscription {
@@ -67,7 +68,7 @@ export default function TenantDetailPage() {
   const [tenantsCore, setTenantsCore] = useState<TenantsCoreRow | null>(null)
   const [modulesFullAccess, setModulesFullAccess] = useState(true)
   const [moduleToggles, setModuleToggles] = useState<Record<TenantModuleId, boolean>>(
-    () => mergeEnabledModulesFromDb(null)
+    () => mergeEnabledModulesFromDb(null, true)
   )
   const [savingModules, setSavingModules] = useState(false)
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
@@ -118,20 +119,22 @@ export default function TenantDetailPage() {
 
     const { data: coreRow } = await supabase
       .from('tenants')
-      .select('slug, plan, enabled_modules')
+      .select('slug, plan, enabled_modules, post_trial_modules_confirmed')
       .eq('slug', slug)
       .maybeSingle()
 
     if (coreRow) {
-      setTenantsCore(coreRow as TenantsCoreRow)
-      const em = (coreRow as { enabled_modules?: unknown }).enabled_modules
-      const isNull = em == null
-      setModulesFullAccess(isNull)
-      setModuleToggles(mergeEnabledModulesFromDb(em))
+      const row = coreRow as TenantsCoreRow
+      setTenantsCore(row)
+      const em = row.enabled_modules as unknown
+      const ptOk = row.post_trial_modules_confirmed !== false
+      const isFull = em == null && ptOk
+      setModulesFullAccess(isFull)
+      setModuleToggles(mergeEnabledModulesFromDb(em, ptOk))
     } else {
       setTenantsCore(null)
       setModulesFullAccess(true)
-      setModuleToggles(mergeEnabledModulesFromDb(null))
+      setModuleToggles(mergeEnabledModulesFromDb(null, true))
     }
 
     // Load subscription
@@ -176,7 +179,9 @@ export default function TenantDetailPage() {
       .from('tenants')
       .update({
         plan: subForm.plan,
-        ...(planLower === 'pro' ? { enabled_modules: null } : {}),
+        ...(planLower === 'pro'
+          ? { enabled_modules: null, post_trial_modules_confirmed: true }
+          : {}),
       })
       .eq('slug', slug)
 
@@ -188,7 +193,7 @@ export default function TenantDetailPage() {
   async function handleSaveModules() {
     setSavingModules(true)
     const payload = modulesFullAccess
-      ? { enabled_modules: null }
+      ? { enabled_modules: null, post_trial_modules_confirmed: true }
       : {
           enabled_modules: TENANT_MODULE_IDS.reduce(
             (acc, id) => {
@@ -199,6 +204,7 @@ export default function TenantDetailPage() {
             },
             {} as Record<string, boolean>
           ),
+          post_trial_modules_confirmed: true,
         }
     const { error } = await supabase.from('tenants').update(payload).eq('slug', slug)
     setSavingModules(false)
@@ -481,10 +487,10 @@ export default function TenantDetailPage() {
           >
             <h2 className="text-xl font-bold text-white mb-2">Modules (klantportaal)</h2>
             <p className="text-slate-400 text-sm mb-6">
-              <strong className="text-slate-300">Volledig pakket:</strong> alle menu-onderdelen in de kassa.{' '}
-              <strong className="text-slate-300">Aangepast:</strong> alleen aangevinkte blokken. Trial- en
-              Pro-klanten zien tijdens trial resp. als Pro automatisch alles (los van deze instelling).
-              Nieuwe accounts krijgen standaard een beperkte set tot ze upgraden.
+              <strong className="text-slate-300">Volledig pakket:</strong> alle menu-onderdelen.{' '}
+              <strong className="text-slate-300">Aangepast:</strong> per blok. Nieuwe klanten: 14 dagen
+              volledig pakket tijdens trial; daarna moeten ze zelf modules kiezen (tenzij je hier
+              ingrijpt). Pro en actieve trial overrulen dit voor de klant.
             </p>
 
             <div className="flex flex-wrap gap-4 mb-6">
@@ -495,7 +501,7 @@ export default function TenantDetailPage() {
                   checked={modulesFullAccess}
                   onChange={() => {
                     setModulesFullAccess(true)
-                    setModuleToggles(mergeEnabledModulesFromDb(null))
+                    setModuleToggles(mergeEnabledModulesFromDb(null, true))
                   }}
                   className="w-4 h-4"
                 />
@@ -509,7 +515,9 @@ export default function TenantDetailPage() {
                   onChange={() => {
                     setModulesFullAccess(false)
                     if (tenantsCore?.enabled_modules == null) {
-                      setModuleToggles(getStarterEnabledModulesRecord())
+                      setModuleToggles(
+                        mergeEnabledModulesFromDb(null, tenantsCore.post_trial_modules_confirmed !== false)
+                      )
                     }
                   }}
                   className="w-4 h-4"
