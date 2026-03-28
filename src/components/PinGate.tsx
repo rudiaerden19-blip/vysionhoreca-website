@@ -109,7 +109,7 @@ export default function PinGate({ tenant, children }: Props) {
             {t('pinGate.noAccessBody1')}
             <br /><br />
             {t('pinGate.noAccessBody2')}{' '}
-            <a href={`/shop/${tenant}/admin/kassa`} className="text-orange-500 font-semibold underline">
+            <a href={`/shop/${tenant}/admin/pincode`} className="text-orange-500 font-semibold underline">
               {t('pinGate.kassaPinLink')}
             </a>
           </p>

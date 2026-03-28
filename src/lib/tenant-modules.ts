@@ -219,16 +219,62 @@ export type AdminModuleGateResult =
   | { kind: 'always' }
   | { kind: 'module'; module: TenantModuleId }
 
+/** Submenu-id's voor het echte kassascherm (niet pincode-instellingen). */
+export const KASSA_POS_SUBMENU_IDS = [
+  'sm_kassa_categorieen',
+  'sm_kassa_producten',
+  'sm_kassa_opties',
+  'sm_kassa_voorraad',
+  'sm_kassa_allergenen',
+  'sm_kassa_bonnenprinter',
+  'sm_kassa_labels',
+] as const
+
+/** Zelfde “effectief aan”-logica als submenu’s in de hamburger (zonder circulaire imports). */
+export function isTenantSubmenuEffectiveOn(
+  subId: string,
+  enabledJson: Record<string, boolean> | null,
+  parentModuleOn: boolean
+): boolean {
+  if (!parentModuleOn) return false
+  if (!enabledJson || !hasExplicitEnabledModules(enabledJson)) return true
+  if (enabledJson[subId] === false) return false
+  return true
+}
+
+/** Mag /shop/:tenant/admin/kassa (POS) geopend worden? */
+export function isKassaPosScreenEnabled(
+  enabledJson: Record<string, boolean> | null,
+  parentKassaOn: boolean
+): boolean {
+  if (!parentKassaOn) return false
+  return KASSA_POS_SUBMENU_IDS.some((id) =>
+    isTenantSubmenuEffectiveOn(id, enabledJson, parentKassaOn)
+  )
+}
+
 /**
  * Eerste admin-route waar de tenant recht op heeft (bij geweigerde module / kassa uit).
+ * Met expliciete submenu-JSON: alleen `/kassa` als er minstens één POS-submenu aan staat;
+ * anders `/pincode` als alleen pincode (of pincode + geen POS) bedoeld is.
  */
 export function getFirstAccessibleAdminPath(
   tenantSlug: string,
-  access: Record<TenantModuleId, boolean>
+  access: Record<TenantModuleId, boolean>,
+  enabledModulesJson: Record<string, boolean> | null = null
 ): string {
   const base = `/shop/${tenantSlug}/admin`
+
+  if (access.kassa) {
+    if (isKassaPosScreenEnabled(enabledModulesJson, true)) {
+      return `${base}/kassa`
+    }
+    if (isTenantSubmenuEffectiveOn('sm_kassa_pincode', enabledModulesJson, true)) {
+      return `${base}/pincode`
+    }
+  }
+
   const candidates: { m: TenantModuleId; path: string }[] = [
-    { m: 'kassa', path: '/kassa' },
     { m: 'online-bestellingen', path: '/bestellingen' },
     { m: 'reservaties', path: '/reserveringen' },
     { m: 'instellingen', path: '/openingstijden' },

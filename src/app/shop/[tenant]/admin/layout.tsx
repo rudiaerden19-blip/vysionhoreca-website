@@ -9,6 +9,7 @@ import { getTenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
   getFirstAccessibleAdminPath,
+  isKassaPosScreenEnabled,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
 import {
@@ -81,7 +82,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     if (loading || modulesLoading || tenantExists === false) return
     const gate = adminPathToModule(pathname, params.tenant)
     if (gate.kind === 'module' && !moduleAccess[gate.module]) {
-      router.replace(getFirstAccessibleAdminPath(params.tenant, moduleAccess))
+      router.replace(
+        getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson)
+      )
       return
     }
     const subId = getSubmenuIdForPathname(pathname, params.tenant)
@@ -133,10 +136,29 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     )
   }
 
-  // Kassa: geen layout wrapper, tenzij module uit — dan doorsturen (b.v. alleen reservaties)
+  // Kassa POS: geen layout wrapper; module uit of alleen pincode (geen POS-submenu) → niet op /kassa laten
   if (pathname.includes('/kassa')) {
     if (!modulesLoading && moduleAccess['kassa'] === false) {
-      return <RedirectToFirstAccessibleModule tenant={params.tenant} access={moduleAccess} />
+      return (
+        <RedirectToFirstAccessibleModule
+          tenant={params.tenant}
+          access={moduleAccess}
+          enabledModulesJson={enabledModulesJson}
+        />
+      )
+    }
+    if (
+      !modulesLoading &&
+      moduleAccess['kassa'] &&
+      !isKassaPosScreenEnabled(enabledModulesJson, true)
+    ) {
+      return (
+        <RedirectToFirstAccessibleModule
+          tenant={params.tenant}
+          access={moduleAccess}
+          enabledModulesJson={enabledModulesJson}
+        />
+      )
     }
     return <>{children}</>
   }
@@ -164,7 +186,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             enabledModulesJson={enabledModulesJson}
             loading={modulesLoading}
           />
-          {!modulesLoading && moduleAccess['kassa'] && (
+          {!modulesLoading &&
+            moduleAccess['kassa'] &&
+            isKassaPosScreenEnabled(enabledModulesJson, true) && (
             <Link
               href={`${baseUrl}/kassa`}
               className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400"
@@ -199,9 +223,13 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             <LockButton
               tenant={params.tenant}
               afterLockHref={
-                modulesLoading || moduleAccess['kassa']
-                  ? `/shop/${params.tenant}/admin/kassa`
-                  : getFirstAccessibleAdminPath(params.tenant, moduleAccess)
+                modulesLoading
+                  ? `/shop/${params.tenant}/admin`
+                  : getFirstAccessibleAdminPath(
+                      params.tenant,
+                      moduleAccess,
+                      enabledModulesJson
+                    )
               }
             />
           )}
@@ -222,14 +250,16 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 function RedirectToFirstAccessibleModule({
   tenant,
   access,
+  enabledModulesJson,
 }: {
   tenant: string
   access: Record<TenantModuleId, boolean>
+  enabledModulesJson: Record<string, boolean> | null
 }) {
   const router = useRouter()
   useEffect(() => {
-    router.replace(getFirstAccessibleAdminPath(tenant, access))
-  }, [tenant, router, access])
+    router.replace(getFirstAccessibleAdminPath(tenant, access, enabledModulesJson))
+  }, [tenant, router, access, enabledModulesJson])
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-3 text-white">
       <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />

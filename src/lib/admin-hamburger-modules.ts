@@ -1,5 +1,5 @@
 import type { TenantModuleId } from '@/lib/tenant-modules'
-import { hasExplicitEnabledModules } from '@/lib/tenant-modules'
+import { isTenantSubmenuEffectiveOn } from '@/lib/tenant-modules'
 
 /** Altijd bereikbaar in menu en routes (abonnement / facturatie). */
 export const SUBMENU_IDS_ALWAYS_ON = new Set<string>(['sm_abonnement'])
@@ -182,10 +182,7 @@ export function isSubmenuEnabledInTenantConfig(
   parentModuleAllowed: boolean
 ): boolean {
   if (isSubmenuForcedOn(subId)) return true
-  if (!parentModuleAllowed) return false
-  if (!enabledJson || !hasExplicitEnabledModules(enabledJson)) return true
-  if (enabledJson[subId] === false) return false
-  return true
+  return isTenantSubmenuEffectiveOn(subId, enabledJson, parentModuleAllowed)
 }
 
 export function filterHamburgerModulesForAccess(
