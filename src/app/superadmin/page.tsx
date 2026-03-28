@@ -599,24 +599,10 @@ export default function SuperAdminDashboard() {
           </motion.div>
         </div>
 
-        {/* Modules — altijd zichtbaar (tabel heeft veel kolommen: scroll horizontaal indien nodig) */}
-        <div className="mb-6 rounded-2xl border-2 border-orange-400/80 bg-gradient-to-r from-orange-500/20 to-amber-500/15 px-5 py-4 shadow-lg shadow-orange-950/30">
-          <p className="text-white font-bold text-base sm:text-lg flex flex-wrap items-center gap-2">
-            <span className="text-2xl">📦</span>
-            <span>Modules per tenant aanpassen</span>
-          </p>
-          <p className="text-slate-200 text-sm mt-2 leading-relaxed">
-            Bij elke rij: eerste knop in <strong className="text-orange-300">Acties</strong> is{' '}
-            <strong className="text-orange-300">📦 Modules</strong> (oranje). Daarnaast staat diezelfde link nog
-            eens in de <strong className="text-orange-300">laatste kolom</strong> rechts. Zie je oude knoppen
-            alleen? <strong className="text-white">Hard refresh</strong>: Mac{' '}
-            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Cmd</kbd>+
-            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Shift</kbd>+
-            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">R</kbd> — Windows{' '}
-            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Ctrl</kbd>+
-            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">Shift</kbd>+
-            <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">R</kbd>.
-          </p>
+        <div className="mb-6 rounded-xl border border-slate-600 bg-slate-800/80 px-4 py-3 text-slate-300 text-sm">
+          Per tenant één <strong className="text-orange-400">📦 Modules</strong>-knop bij{' '}
+          <strong>Acties</strong>. Oude scherm? <kbd className="px-1 bg-slate-900 rounded text-xs">Cmd+Shift+R</kbd> /{' '}
+          <kbd className="px-1 bg-slate-900 rounded text-xs">Ctrl+Shift+R</kbd>.
         </div>
 
         {/* Search */}
@@ -639,31 +625,20 @@ export default function SuperAdminDashboard() {
         >
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Alle Tenants ({filteredTenants.length})</h2>
-            <p className="text-slate-400 text-sm mt-2">
-              <span className="text-orange-400 font-semibold">📦 Modules</span> staat als{' '}
-              <span className="text-white font-medium">eerste knop in Acties</span> én in de laatste kolom —
-              scroll de tabel horizontaal als je een smal scherm hebt.
-            </p>
+            <p className="text-slate-400 text-sm mt-2">Modules beheer je via de oranje knop in Acties.</p>
           </div>
           
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-700/50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">
-                    Bedrijf <span className="text-orange-400 font-semibold">+ 📦 Modules</span>
-                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Bedrijf</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Slug</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Plan</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Status</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Betaald</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Aangemaakt</th>
-                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">
-                    Acties <span className="text-orange-400 font-semibold">(📦 Modules = links)</span>
-                  </th>
-                  <th className="px-3 py-4 text-center text-sm font-bold text-orange-300 whitespace-nowrap bg-slate-700/80">
-                    📦 Modules
-                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Acties</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700">
@@ -698,12 +673,6 @@ export default function SuperAdminDashboard() {
                               )}
                             </p>
                             <p className="text-sm text-slate-400">{tenant.email}</p>
-                            <Link
-                              href={`/superadmin/tenant/${tenant.tenant_slug}/modules`}
-                              className="mt-2 inline-flex items-center gap-1.5 px-3 py-2 bg-orange-500 hover:bg-orange-400 text-white rounded-lg text-xs font-extrabold shadow-md ring-1 ring-orange-300/60 w-fit"
-                            >
-                              📦 Modules aanpassen
-                            </Link>
                           </div>
                         </div>
                       </td>
@@ -759,29 +728,27 @@ export default function SuperAdminDashboard() {
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
                       </td>
                       <td className="px-6 py-4 align-top">
-                        <div className="flex flex-col gap-2 min-w-[200px]">
-                          <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-2 min-w-[160px]">
+                          <div className="flex flex-wrap gap-1.5 items-center">
                             <Link
                               href={`/superadmin/tenant/${tenant.tenant_slug}/modules`}
-                              className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-orange-500 hover:bg-orange-400 text-white rounded-xl text-sm font-extrabold whitespace-nowrap shadow-md ring-2 ring-orange-300/50 w-full text-center"
+                              className="px-2.5 py-1.5 bg-orange-500 hover:bg-orange-400 text-white rounded-lg text-xs font-semibold whitespace-nowrap"
                             >
                               📦 Modules
                             </Link>
-                            <div className="flex flex-wrap gap-1.5 items-center">
-                              <Link
-                                href={`/shop/${tenant.tenant_slug}/admin`}
-                                target="_blank"
-                                className="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap shrink-0"
-                              >
-                                🔑 Beheer
-                              </Link>
-                              <Link
-                                href={`/superadmin/tenant/${tenant.tenant_slug}`}
-                                className="px-2.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs sm:text-sm whitespace-nowrap shrink-0"
-                              >
-                                Details
-                              </Link>
-                            </div>
+                            <Link
+                              href={`/shop/${tenant.tenant_slug}/admin`}
+                              target="_blank"
+                              className="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium whitespace-nowrap shrink-0"
+                            >
+                              🔑 Beheer
+                            </Link>
+                            <Link
+                              href={`/superadmin/tenant/${tenant.tenant_slug}`}
+                              className="px-2.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs whitespace-nowrap shrink-0"
+                            >
+                              Details
+                            </Link>
                           </div>
                           <div className="flex flex-wrap gap-2 items-center">
                             {!isProtectedTenant(tenant.tenant_slug) && (
@@ -811,15 +778,6 @@ export default function SuperAdminDashboard() {
                             )}
                           </div>
                         </div>
-                      </td>
-                      <td className="px-3 py-4 align-middle bg-slate-800/90 border-l border-orange-500/30">
-                        <Link
-                          href={`/superadmin/tenant/${tenant.tenant_slug}/modules`}
-                          className="flex flex-col items-center justify-center gap-1 min-w-[7.5rem] px-3 py-3 bg-orange-500 hover:bg-orange-400 text-white rounded-xl text-sm font-extrabold text-center shadow-lg shadow-orange-950/50 ring-2 ring-orange-300/60"
-                        >
-                          <span className="text-lg leading-none">📦</span>
-                          <span className="leading-tight">Modules</span>
-                        </Link>
                       </td>
                     </tr>
                   )
@@ -982,8 +940,8 @@ export default function SuperAdminDashboard() {
           </span>
         </p>
         <p className="text-slate-400 max-w-xl mx-auto">
-          Zie je <strong className="text-orange-300">geen oranje “Modules aanpassen”</strong> onder het
-          e-mailadres? Klik dan hieronder — daarna laadt de pagina opnieuw met de nieuwste bestanden.
+          Zie je <strong className="text-orange-300">geen oranje 📦 Modules</strong> bij Acties? Klik hieronder —
+          daarna opnieuw laden.
         </p>
         <button
           type="button"
