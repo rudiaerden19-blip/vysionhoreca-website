@@ -52,8 +52,12 @@ export async function POST(request: NextRequest) {
     const payload: Record<string, boolean> = {}
     for (const id of TENANT_MODULE_IDS) {
       const v = enabled_modules[id]
-      payload[id] =
-        id === 'kassa' || id === 'instellingen' || id === 'account' ? true : !!v
+      if (superAccess.authorized) {
+        payload[id] = !!v
+      } else {
+        payload[id] =
+          id === 'kassa' || id === 'instellingen' || id === 'account' ? true : !!v
+      }
     }
 
     const { error: updErr } = await supabase

@@ -85,9 +85,7 @@ export default function SuperadminTenantModulesPage() {
       : {
           enabled_modules: TENANT_MODULE_IDS.reduce(
             (acc, id) => {
-              const on = !!moduleToggles[id]
-              acc[id] =
-                id === 'kassa' || id === 'instellingen' || id === 'account' ? true : on
+              acc[id] = !!moduleToggles[id]
               return acc
             },
             {} as Record<string, boolean>
@@ -134,9 +132,9 @@ export default function SuperadminTenantModulesPage() {
       <main className="max-w-2xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-1">Modules</h1>
         <p className="text-slate-400 text-sm mb-6">
-          {businessName || slug} — schakel modules aan of uit. De klant ziet alleen aangezette onderdelen in
-          het adminportaal. <strong className="text-slate-300">Kassa, instellingen en account</strong> staan
-          vast op <strong className="text-slate-300">aan</strong> (die schuivers zijn alleen ter info).
+          {businessName || slug} — als platformbeheerder zet je <strong className="text-slate-200">elke</strong>{' '}
+          module aan of uit (ook kassa, instellingen, account). Proef-/abonnementsniveau maakt niet uit zolang
+          er een expliciete lijst staat. Let op: alles uit behalve één module kan de klantflow beperken.
         </p>
 
         {isAdminTenant(slug) && (
@@ -172,22 +170,18 @@ export default function SuperadminTenantModulesPage() {
         {!modulesFullAccess && (
           <ul className="space-y-2 mb-8">
             {TENANT_MODULE_IDS.map((id) => {
-              const locked = id === 'kassa' || id === 'instellingen' || id === 'account'
               const on = !!moduleToggles[id]
               return (
                 <li
                   key={id}
-                  className={`flex items-center justify-between gap-4 rounded-xl border px-4 py-3 ${
-                    locked ? 'border-slate-600 bg-slate-800/50' : 'border-slate-600 bg-slate-800/80'
-                  }`}
+                  className="flex items-center justify-between gap-4 rounded-xl border border-slate-600 bg-slate-800/80 px-4 py-3"
                 >
                   <div>
                     <p className="text-sm font-medium text-slate-100">{TENANT_MODULE_LABELS[id]}</p>
-                    {locked && <p className="text-xs text-slate-500 mt-0.5">Altijd aan</p>}
                   </div>
                   <ModuleSlider
                     checked={on}
-                    disabled={locked}
+                    disabled={false}
                     onChange={(next) =>
                       setModuleToggles((prev) => ({
                         ...prev,

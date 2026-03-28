@@ -103,9 +103,6 @@ export function mergeFullAccessWithExplicitJson(
     if (json[id] === false) out[id] = false
     if (json[id] === true) out[id] = true
   }
-  out.kassa = true
-  out.account = true
-  out.instellingen = true
   return out
 }
 
@@ -136,19 +133,17 @@ export function mergeEnabledModulesFromDb(
     else if (p[id] === false) out[id] = false
     else out[id] = starter[id]
   }
-  out.kassa = true
-  out.account = true
-  out.instellingen = true
   return out
 }
 
 /**
  * Effective module access for UI and guards.
  * - Platform admin tenants: always all on.
- * - Active trial: standaard alles aan; mét expliciete `enabled_modules` (superadmin „Aangepast“) worden uitgezetten modules verborgen.
- * - Pro plan: idem — zonder JSON alles aan; met JSON worden toggles toegepast.
- * - Anders: expliciete JSON indien gezet; anders bij post_trial_modules_confirmed → legacy vol pakket;
- *   bij false (nieuwe tenant na trial, nog geen keuze) → starter-pakket tot klant bevestigt.
+ * - Active trial: standaard alles aan; mét expliciete `enabled_modules` (superadmin) worden alle keys
+ *   (inclusief kassa / instellingen / account) exact gevolgd.
+ * - Pro plan: idem.
+ * - Anders: expliciete JSON indien gezet (geen geforceerde “altijd aan”-modules); anders bij
+ *   post_trial_modules_confirmed → legacy vol pakket; bij false → starter-pakket tot klant bevestigt.
  */
 export function resolveTenantModules(opts: {
   tenantSlug: string
@@ -192,9 +187,6 @@ export function resolveTenantModules(opts: {
       else if (enabledModulesJson![id] === false) out[id] = false
       else out[id] = starter[id]
     }
-    out.kassa = true
-    out.account = true
-    out.instellingen = true
     return out
   }
 
@@ -228,6 +220,32 @@ export type AdminModuleGateResult =
   | { kind: 'module'; module: TenantModuleId }
 
 /**
+ * Eerste admin-route waar de tenant recht op heeft (bij geweigerde module / kassa uit).
+ */
+export function getFirstAccessibleAdminPath(
+  tenantSlug: string,
+  access: Record<TenantModuleId, boolean>
+): string {
+  const base = `/shop/${tenantSlug}/admin`
+  const candidates: { m: TenantModuleId; path: string }[] = [
+    { m: 'kassa', path: '/kassa' },
+    { m: 'online-bestellingen', path: '/bestellingen' },
+    { m: 'reservaties', path: '/reserveringen' },
+    { m: 'instellingen', path: '/openingstijden' },
+    { m: 'online', path: '/online-status' },
+    { m: 'personeel', path: '/personeel' },
+    { m: 'kosten', path: '/kosten' },
+    { m: 'rapporten', path: '/rapporten' },
+    { m: 'website', path: '/design' },
+    { m: 'account', path: '/abonnement' },
+  ]
+  for (const { m, path } of candidates) {
+    if (access[m]) return `${base}${path}`
+  }
+  return `${base}/`
+}
+
+/**
  * Map admin pathname to module. Paths under /shop/:tenant/admin only.
  */
 export function adminPathToModule(pathname: string, tenantSlug: string): AdminModuleGateResult {
@@ -239,7 +257,7 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
 
   if (rest === '/' || rest === '') return { kind: 'always' }
   if (rest.startsWith('/welkom')) return { kind: 'always' }
-  if (rest.startsWith('/kassa')) return { kind: 'always' }
+  if (rest.startsWith('/kassa')) return { kind: 'module', module: 'kassa' }
   if (rest.startsWith('/pincode')) return { kind: 'always' }
   if (rest.startsWith('/abonnement')) return { kind: 'always' }
 

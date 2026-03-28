@@ -6,7 +6,11 @@ import { usePathname, useRouter } from 'next/navigation'
 import TrialBanner from '@/components/TrialBanner'
 import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
-import { adminPathToModule } from '@/lib/tenant-modules'
+import {
+  adminPathToModule,
+  getFirstAccessibleAdminPath,
+  type TenantModuleId,
+} from '@/lib/tenant-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 
@@ -66,10 +70,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   useEffect(() => {
     if (loading || modulesLoading || tenantExists === false) return
-    if (pathname.includes('/kassa')) return
     const gate = adminPathToModule(pathname, params.tenant)
     if (gate.kind === 'module' && !moduleAccess[gate.module]) {
-      router.replace(`/shop/${params.tenant}/admin/kassa`)
+      router.replace(getFirstAccessibleAdminPath(params.tenant, moduleAccess))
     }
   }, [
     loading,
@@ -107,10 +110,18 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     )
   }
 
-  // Kassa: geen layout wrapper, pagina beheert zichzelf volledig
+  // Kassa: geen layout wrapper, tenzij module uit — dan doorsturen (b.v. alleen reservaties)
   if (pathname.includes('/kassa')) {
+    if (!modulesLoading && moduleAccess['kassa'] === false) {
+      return <RedirectToFirstAccessibleModule tenant={params.tenant} access={moduleAccess} />
+    }
     return <>{children}</>
   }
+
+  const posHref =
+    modulesLoading || moduleAccess['kassa']
+      ? `${baseUrl}/kassa`
+      : getFirstAccessibleAdminPath(params.tenant, moduleAccess)
 
   return (
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
@@ -123,9 +134,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
       {/* ── Slanke blauwe topbalk (zelfde stijl als kassa) ── */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-[#1e293b] flex items-center px-3 gap-2" style={{ height: 56 }}>
-        {/* ← Terug naar Kassa */}
+        {/* ← Terug naar Kassa */}  
         <Link
-          href={`${baseUrl}/kassa`}
+          href={posHref}
           className="flex items-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-white text-sm font-bold transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +163,16 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
               <span className="hidden sm:inline">{t('adminLayout.onlineDisplay')}</span>
             </Link>
           )}
-          {showLockButton && <LockButton tenant={params.tenant} />}
+          {showLockButton && (
+            <LockButton
+              tenant={params.tenant}
+              afterLockHref={
+                modulesLoading || moduleAccess['kassa']
+                  ? `/shop/${params.tenant}/admin/kassa`
+                  : getFirstAccessibleAdminPath(params.tenant, moduleAccess)
+              }
+            />
+          )}
           <LanguageSelector />
         </div>
       </div>
@@ -167,12 +187,31 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   )
 }
 
-function LockButton({ tenant }: { tenant: string }) {
+function RedirectToFirstAccessibleModule({
+  tenant,
+  access,
+}: {
+  tenant: string
+  access: Record<TenantModuleId, boolean>
+}) {
+  const router = useRouter()
+  useEffect(() => {
+    router.replace(getFirstAccessibleAdminPath(tenant, access))
+  }, [tenant, router, access])
+  return (
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center gap-3 text-white">
+      <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      <p className="text-sm text-slate-400">Doorverwijzen…</p>
+    </div>
+  )
+}
+
+function LockButton({ tenant, afterLockHref }: { tenant: string; afterLockHref: string }) {
   const router = useRouter()
   const { t } = useLanguage()
   const handleLock = () => {
     sessionStorage.removeItem(`vysion_pin_unlocked_${tenant}`)
-    router.push(`/shop/${tenant}/admin/kassa`)
+    router.push(afterLockHref)
   }
   return (
     <button

@@ -193,9 +193,7 @@ export default function TenantDetailPage() {
       : {
           enabled_modules: TENANT_MODULE_IDS.reduce(
             (acc, id) => {
-              const on = !!moduleToggles[id]
-              acc[id] =
-                id === 'kassa' || id === 'instellingen' || id === 'account' ? true : on
+              acc[id] = !!moduleToggles[id]
               return acc
             },
             {} as Record<string, boolean>
@@ -346,12 +344,9 @@ export default function TenantDetailPage() {
               </p>
             )}
             <p className="text-slate-400 text-sm mb-6">
-              <strong className="text-slate-300">Volledig pakket:</strong> alle zichtbare modules in het
-              klantportaal (trial en Pro krijgen standaard alles).{' '}
-              <strong className="text-slate-300">Aangepast + opslaan:</strong> je zet per tenant modules
-              uit of aan — dat geldt ook tijdens trial of op Pro. Kassa, instellingen en account blijven
-              altijd aan voor de klant. Na de proefperiode kiezen starters zelf modules tenzij jij hier
-              blijft sturen.
+              <strong className="text-slate-300">Volledig pakket:</strong> alle modules.{' '}
+              <strong className="text-slate-300">Aangepast:</strong> elke module (ook kassa, instellingen,
+              account) kun je uit zetten — ongeacht Pro of starter.
             </p>
 
             <div className="flex flex-wrap gap-4 mb-6">
@@ -392,33 +387,22 @@ export default function TenantDetailPage() {
 
             {!modulesFullAccess && (
               <div className="grid sm:grid-cols-2 gap-3 mb-6">
-                {TENANT_MODULE_IDS.map((id) => {
-                  const locked = id === 'kassa' || id === 'instellingen' || id === 'account'
-                  return (
-                    <label
-                      key={id}
-                      className={`flex items-start gap-3 p-3 rounded-xl border ${
-                        locked ? 'border-slate-600 bg-slate-900/50' : 'border-slate-600 bg-slate-900/30'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        className="mt-1 w-4 h-4"
-                        checked={!!moduleToggles[id]}
-                        disabled={locked}
-                        onChange={(e) =>
-                          setModuleToggles((prev) => ({ ...prev, [id]: e.target.checked }))
-                        }
-                      />
-                      <span className="text-sm text-slate-200">
-                        {TENANT_MODULE_LABELS[id]}
-                        {locked && (
-                          <span className="block text-xs text-slate-500 mt-0.5">Altijd aan</span>
-                        )}
-                      </span>
-                    </label>
-                  )
-                })}
+                {TENANT_MODULE_IDS.map((id) => (
+                  <label
+                    key={id}
+                    className="flex items-start gap-3 p-3 rounded-xl border border-slate-600 bg-slate-900/30"
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-1 w-4 h-4"
+                      checked={!!moduleToggles[id]}
+                      onChange={(e) =>
+                        setModuleToggles((prev) => ({ ...prev, [id]: e.target.checked }))
+                      }
+                    />
+                    <span className="text-sm text-slate-200">{TENANT_MODULE_LABELS[id]}</span>
+                  </label>
+                ))}
               </div>
             )}
 
