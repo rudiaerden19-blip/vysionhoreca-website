@@ -19,16 +19,6 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
       },
-      keyframes: {
-        'mijn-vysion-kenburns': {
-          '0%': { transform: 'scale(1) translate(0%, 0%)' },
-          '100%': { transform: 'scale(1.1) translate(-3.5%, -2.5%)' },
-        },
-      },
-      animation: {
-        'mijn-vysion-kenburns':
-          'mijn-vysion-kenburns 50s ease-in-out infinite alternate',
-      },
     },
   },
   plugins: [],

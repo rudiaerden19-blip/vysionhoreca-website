@@ -14,19 +14,19 @@ import {
 import { useLanguage } from '@/i18n'
 import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
-/** iMovie-export = 1 frame + lange voice-over: JPG + M4A (licht). Beeld oogt levend via Ken Burns (tailwind); echte bewegende beelden = apart videobestand nodig. */
-const MIJN_VYSION_COVER = '/images/mijn-vysion-cover.jpg'
-const MIJN_VYSION_AUDIO = '/videos/mijn-vysion-audio.m4a'
+/** Bron: export ‘Mijn film 2’ (1080p H.264 + AAC), remux met faststart; poster = eerste frame. */
+const MIJN_VYSION_VIDEO = '/videos/mijn-vysion.mp4'
+const MIJN_VYSION_POSTER = '/images/mijn-vysion-cover.jpg'
 
 function WhyVysionSection() {
   const { t } = useLanguage()
   const [mijnVysionOpen, setMijnVysionOpen] = useState(false)
-  const mijnVysionAudioRef = useRef<HTMLAudioElement>(null)
+  const mijnVysionVideoRef = useRef<HTMLVideoElement>(null)
   const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice', 'inHouseSoftware', 'posQuality'] as const
 
   const openMijnVysion = () => {
     flushSync(() => setMijnVysionOpen(true))
-    const el = mijnVysionAudioRef.current
+    const el = mijnVysionVideoRef.current
     if (!el) return
     el.currentTime = 0
     void el.play().catch(() => {})
@@ -97,7 +97,7 @@ function WhyVysionSection() {
           aria-modal="true"
           aria-labelledby="mijn-vysion-video-title"
           onClick={() => {
-            mijnVysionAudioRef.current?.pause()
+            mijnVysionVideoRef.current?.pause()
             setMijnVysionOpen(false)
           }}
         >
@@ -111,7 +111,7 @@ function WhyVysionSection() {
             <button
               type="button"
               onClick={() => {
-                mijnVysionAudioRef.current?.pause()
+                mijnVysionVideoRef.current?.pause()
                 setMijnVysionOpen(false)
               }}
               className="absolute right-2 top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-2xl leading-none text-white transition-colors hover:bg-black/80"
@@ -121,29 +121,18 @@ function WhyVysionSection() {
             </button>
             <div className="bg-black">
               <div className="relative mx-auto aspect-video w-full max-h-[min(70vh,540px)] overflow-hidden bg-black">
-                <div
-                  className="motion-safe:animate-mijn-vysion-kenburns absolute -inset-[12%] will-change-transform"
-                  aria-hidden
+                <video
+                  ref={mijnVysionVideoRef}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster={MIJN_VYSION_POSTER}
+                  className="absolute inset-0 h-full w-full object-contain"
+                  onEnded={() => setMijnVysionOpen(false)}
                 >
-                  <Image
-                    src={MIJN_VYSION_COVER}
-                    alt=""
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 1024px) 100vw, 896px"
-                    priority
-                  />
-                </div>
+                  <source src={MIJN_VYSION_VIDEO} type="video/mp4" />
+                </video>
               </div>
-              <audio
-                ref={mijnVysionAudioRef}
-                controls
-                preload="metadata"
-                className="w-full bg-black px-3 pb-3 pt-1"
-                onEnded={() => setMijnVysionOpen(false)}
-              >
-                <source src={MIJN_VYSION_AUDIO} type="audio/mp4" />
-              </audio>
             </div>
           </div>
         </div>
