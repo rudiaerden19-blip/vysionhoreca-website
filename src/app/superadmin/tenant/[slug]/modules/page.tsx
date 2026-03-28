@@ -236,15 +236,17 @@ function ModuleSlider({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={`
-        relative h-8 w-14 shrink-0 rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400
+        relative inline-flex h-8 w-14 shrink-0 items-center rounded-full p-1 transition-colors
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400
         ${checked ? 'bg-emerald-500' : 'bg-slate-600'}
         ${disabled ? 'opacity-45 cursor-not-allowed' : 'cursor-pointer'}
       `}
     >
       <span
+        aria-hidden
         className={`
-          absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-transform
-          ${checked ? 'translate-x-7' : 'translate-x-1'}
+          pointer-events-none h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-200 ease-out
+          ${checked ? 'translate-x-6' : 'translate-x-0'}
         `}
       />
     </button>
