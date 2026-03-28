@@ -87,6 +87,28 @@ export function parseEnabledModulesJson(raw: unknown): Record<string, boolean> |
   return Object.keys(out).length ? out : null
 }
 
+/** Niet-leeg opgeslagen JSON in `tenants.enabled_modules` (superadmin of klant na trial). */
+export function hasExplicitEnabledModules(json: Record<string, boolean> | null): boolean {
+  return json != null && Object.keys(json).length > 0
+}
+
+/**
+ * Trial/Pro-basis = alles aan; superadmin (of bewaarde keuze) kan modules uitzetten via expliciete false.
+ */
+export function mergeFullAccessWithExplicitJson(
+  json: Record<string, boolean>
+): Record<TenantModuleId, boolean> {
+  const out = allTenantModulesTrue()
+  for (const id of TENANT_MODULE_IDS) {
+    if (json[id] === false) out[id] = false
+    if (json[id] === true) out[id] = true
+  }
+  out.kassa = true
+  out.account = true
+  out.instellingen = true
+  return out
+}
+
 /** Na trial vóór modulekeuze: beperkt starter-pakket. */
 export function getResolvedStarterOnlyAccess(): Record<TenantModuleId, boolean> {
   const s = getStarterEnabledModulesRecord()
@@ -123,8 +145,8 @@ export function mergeEnabledModulesFromDb(
 /**
  * Effective module access for UI and guards.
  * - Platform admin tenants: always all on.
- * - Active trial: all on (proef = volledig pakket).
- * - Pro plan: all on.
+ * - Active trial: standaard alles aan; mét expliciete `enabled_modules` (superadmin „Aangepast“) worden uitgezetten modules verborgen.
+ * - Pro plan: idem — zonder JSON alles aan; met JSON worden toggles toegepast.
  * - Anders: expliciete JSON indien gezet; anders bij post_trial_modules_confirmed → legacy vol pakket;
  *   bij false (nieuwe tenant na trial, nog geen keuze) → starter-pakket tot klant bevestigt.
  */
@@ -145,9 +167,15 @@ export function resolveTenantModules(opts: {
     return allTenantModulesTrue()
   }
   if (isTrialSubscriptionActive(subscription, tenantRow)) {
+    if (hasExplicitEnabledModules(enabledModulesJson) && enabledModulesJson) {
+      return mergeFullAccessWithExplicitJson(enabledModulesJson)
+    }
     return allTenantModulesTrue()
   }
   if (isTenantProPlan(subscription, tenantRow)) {
+    if (hasExplicitEnabledModules(enabledModulesJson) && enabledModulesJson) {
+      return mergeFullAccessWithExplicitJson(enabledModulesJson)
+    }
     return allTenantModulesTrue()
   }
 

@@ -174,14 +174,10 @@ export default function TenantDetailPage() {
         .insert(subscriptionData)
     }
 
-    const planLower = (subForm.plan || 'starter').toLowerCase()
     await supabase
       .from('tenants')
       .update({
         plan: subForm.plan,
-        ...(planLower === 'pro'
-          ? { enabled_modules: null, post_trial_modules_confirmed: true }
-          : {}),
       })
       .eq('slug', slug)
 
@@ -349,10 +345,12 @@ export default function TenantDetailPage() {
               </p>
             )}
             <p className="text-slate-400 text-sm mb-6">
-              <strong className="text-slate-300">Volledig pakket:</strong> alle menu-onderdelen.{' '}
-              <strong className="text-slate-300">Aangepast:</strong> per blok. Nieuwe klanten: 14 dagen
-              volledig pakket tijdens trial; daarna moeten ze zelf modules kiezen (tenzij je hier
-              ingrijpt). Pro en actieve trial overrulen dit voor de klant.
+              <strong className="text-slate-300">Volledig pakket:</strong> alle zichtbare modules in het
+              klantportaal (trial en Pro krijgen standaard alles).{' '}
+              <strong className="text-slate-300">Aangepast + opslaan:</strong> je zet per tenant modules
+              uit of aan — dat geldt ook tijdens trial of op Pro. Kassa, instellingen en account blijven
+              altijd aan voor de klant. Na de proefperiode kiezen starters zelf modules tenzij jij hier
+              blijft sturen.
             </p>
 
             <div className="flex flex-wrap gap-4 mb-6">
