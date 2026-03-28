@@ -975,10 +975,10 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests, statusRin
         const padL = 12
         const padR = 10
         const gapNameTime = 8
-        const timeW = 112 // genoeg voor "20:00 tot 22u30" @ 13px; max. breedte pill blijft beperkt
-        // Vast label onder tafel: dichter bij tafelbreedte (was min. 360px → te breed op plattegrond)
-        const labelW = Math.min(220, Math.max(Math.round(tw * 1.2) + 52, 200))
-        const nameW = Math.max(48, labelW - padL - padR - gapNameTime - timeW)
+        const timeW = 104 // voldoende voor "20:00 tot 22u30" @ 13px
+        // Pill compacter dan vroeger (360px), maar ruim genoeg voor voor- + achternaam zonder clip
+        const labelW = Math.min(286, Math.max(Math.round(tw * 1.32) + 64, 244))
+        const nameW = Math.max(96, labelW - padL - padR - gapNameTime - timeW)
         const totalH = guests.length * lineH + padTop + padBottom
         const startY = cy + (table.shape === 'RECTANGLE' ? th / 2 : tableSize / 2) + gap + chairH + 10
         const baselineY = (i: number) => startY + padTop + i * lineH + 24
