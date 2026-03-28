@@ -323,11 +323,127 @@ export default function TenantDetailPage() {
             >
               🔑 Beheer Klant
             </Link>
+            <a
+              href="#modules"
+              className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-colors font-medium"
+            >
+              📦 Modules
+            </a>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <motion.div
+            id="modules"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 }}
+            className="bg-slate-800 rounded-2xl p-6 border-2 border-indigo-500/40 mb-8 scroll-mt-24 shadow-lg shadow-indigo-950/20"
+          >
+            <h2 className="text-xl font-bold text-white mb-2">Modules (klantportaal)</h2>
+            {isAdminTenant(slug) && (
+              <p className="text-amber-400/90 text-sm mb-4 border border-amber-500/30 rounded-xl p-3 bg-amber-500/5">
+                Dit is een platform-admin tenant (MAIN). In het klantportaal krijgen die automatisch
+                altijd alle modules; je kunt hier tóch preset bewaren voor later of voor tests.
+              </p>
+            )}
+            <p className="text-slate-400 text-sm mb-6">
+              <strong className="text-slate-300">Volledig pakket:</strong> alle menu-onderdelen.{' '}
+              <strong className="text-slate-300">Aangepast:</strong> per blok. Nieuwe klanten: 14 dagen
+              volledig pakket tijdens trial; daarna moeten ze zelf modules kiezen (tenzij je hier
+              ingrijpt). Pro en actieve trial overrulen dit voor de klant.
+            </p>
+
+            <div className="flex flex-wrap gap-4 mb-6">
+              <label className="flex items-center gap-2 text-white cursor-pointer">
+                <input
+                  type="radio"
+                  name="modpack"
+                  checked={modulesFullAccess}
+                  onChange={() => {
+                    setModulesFullAccess(true)
+                    setModuleToggles(mergeEnabledModulesFromDb(null, true))
+                  }}
+                  className="w-4 h-4"
+                />
+                Volledig pakket
+              </label>
+              <label className="flex items-center gap-2 text-white cursor-pointer">
+                <input
+                  type="radio"
+                  name="modpack"
+                  checked={!modulesFullAccess}
+                  onChange={() => {
+                    setModulesFullAccess(false)
+                    if (tenantsCore?.enabled_modules == null) {
+                      setModuleToggles(
+                        mergeEnabledModulesFromDb(
+                          null,
+                          tenantsCore?.post_trial_modules_confirmed !== false
+                        )
+                      )
+                    }
+                  }}
+                  className="w-4 h-4"
+                />
+                Aangepast
+              </label>
+            </div>
+
+            {!modulesFullAccess && (
+              <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                {TENANT_MODULE_IDS.map((id) => {
+                  const locked = id === 'kassa' || id === 'instellingen' || id === 'account'
+                  return (
+                    <label
+                      key={id}
+                      className={`flex items-start gap-3 p-3 rounded-xl border ${
+                        locked ? 'border-slate-600 bg-slate-900/50' : 'border-slate-600 bg-slate-900/30'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="mt-1 w-4 h-4"
+                        checked={!!moduleToggles[id]}
+                        disabled={locked}
+                        onChange={(e) =>
+                          setModuleToggles((prev) => ({ ...prev, [id]: e.target.checked }))
+                        }
+                      />
+                      <span className="text-sm text-slate-200">
+                        {TENANT_MODULE_LABELS[id]}
+                        {locked && (
+                          <span className="block text-xs text-slate-500 mt-0.5">Altijd aan</span>
+                        )}
+                      </span>
+                    </label>
+                  )
+                })}
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleSaveModules}
+                disabled={savingModules}
+                className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium disabled:opacity-50"
+              >
+                {savingModules ? 'Opslaan…' : 'Modules opslaan'}
+              </button>
+              {!modulesFullAccess && (
+                <button
+                  type="button"
+                  onClick={() => setModuleToggles(getStarterEnabledModulesRecord())}
+                  className="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm"
+                >
+                  Template: starter-pakket
+                </button>
+              )}
+            </div>
+          </motion.div>
+
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Tenant Info */}
           <motion.div
@@ -477,116 +593,6 @@ export default function TenantDetailPage() {
             )}
           </motion.div>
         </div>
-
-        <motion.div
-            id="modules"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
-            className="bg-slate-800 rounded-2xl p-6 border border-slate-700 mt-8 scroll-mt-24"
-          >
-            <h2 className="text-xl font-bold text-white mb-2">Modules (klantportaal)</h2>
-            {isAdminTenant(slug) && (
-              <p className="text-amber-400/90 text-sm mb-4 border border-amber-500/30 rounded-xl p-3 bg-amber-500/5">
-                Dit is een platform-admin tenant (MAIN). In het klantportaal krijgen die automatisch
-                altijd alle modules; je kunt hier tóch preset bewaren voor later of voor tests.
-              </p>
-            )}
-            <p className="text-slate-400 text-sm mb-6">
-              <strong className="text-slate-300">Volledig pakket:</strong> alle menu-onderdelen.{' '}
-              <strong className="text-slate-300">Aangepast:</strong> per blok. Nieuwe klanten: 14 dagen
-              volledig pakket tijdens trial; daarna moeten ze zelf modules kiezen (tenzij je hier
-              ingrijpt). Pro en actieve trial overrulen dit voor de klant.
-            </p>
-
-            <div className="flex flex-wrap gap-4 mb-6">
-              <label className="flex items-center gap-2 text-white cursor-pointer">
-                <input
-                  type="radio"
-                  name="modpack"
-                  checked={modulesFullAccess}
-                  onChange={() => {
-                    setModulesFullAccess(true)
-                    setModuleToggles(mergeEnabledModulesFromDb(null, true))
-                  }}
-                  className="w-4 h-4"
-                />
-                Volledig pakket
-              </label>
-              <label className="flex items-center gap-2 text-white cursor-pointer">
-                <input
-                  type="radio"
-                  name="modpack"
-                  checked={!modulesFullAccess}
-                  onChange={() => {
-                    setModulesFullAccess(false)
-                    if (tenantsCore?.enabled_modules == null) {
-                      setModuleToggles(
-                        mergeEnabledModulesFromDb(
-                          null,
-                          tenantsCore?.post_trial_modules_confirmed !== false
-                        )
-                      )
-                    }
-                  }}
-                  className="w-4 h-4"
-                />
-                Aangepast
-              </label>
-            </div>
-
-            {!modulesFullAccess && (
-              <div className="grid sm:grid-cols-2 gap-3 mb-6">
-                {TENANT_MODULE_IDS.map((id) => {
-                  const locked = id === 'kassa' || id === 'instellingen' || id === 'account'
-                  return (
-                    <label
-                      key={id}
-                      className={`flex items-start gap-3 p-3 rounded-xl border ${
-                        locked ? 'border-slate-600 bg-slate-900/50' : 'border-slate-600 bg-slate-900/30'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        className="mt-1 w-4 h-4"
-                        checked={!!moduleToggles[id]}
-                        disabled={locked}
-                        onChange={(e) =>
-                          setModuleToggles((prev) => ({ ...prev, [id]: e.target.checked }))
-                        }
-                      />
-                      <span className="text-sm text-slate-200">
-                        {TENANT_MODULE_LABELS[id]}
-                        {locked && (
-                          <span className="block text-xs text-slate-500 mt-0.5">Altijd aan</span>
-                        )}
-                      </span>
-                    </label>
-                  )
-                })}
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={handleSaveModules}
-                disabled={savingModules}
-                className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium disabled:opacity-50"
-              >
-                {savingModules ? 'Opslaan…' : 'Modules opslaan'}
-              </button>
-              {!modulesFullAccess && (
-                <button
-                  type="button"
-                  onClick={() => setModuleToggles(getStarterEnabledModulesRecord())}
-                  className="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm"
-                >
-                  Template: starter-pakket
-                </button>
-              )}
-            </div>
-          </motion.div>
       </div>
 
       {/* Subscription Modal */}
