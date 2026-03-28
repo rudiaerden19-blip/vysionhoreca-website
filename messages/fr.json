@@ -4808,6 +4808,7 @@
     "shopNotFoundDesc": "Cette boutique n'existe pas ou a été supprimée.",
     "backToVysion": "← Retour à Vysion",
     "pos": "Caisse",
+    "modulesMenu": "Modules",
     "onlineDisplay": "Écran client",
     "lock": "Verrouiller"
   },

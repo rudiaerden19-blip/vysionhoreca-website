@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
+import { useLanguage } from '@/i18n'
 import type { TenantModuleId } from '@/lib/tenant-modules'
 import { allTenantModulesTrue } from '@/lib/tenant-modules'
 import {
@@ -26,6 +27,7 @@ export function AdminHamburgerMenu({
   featureLabelPrinting: boolean
   loading: boolean
 }) {
+  const { t } = useLanguage()
   const baseUrl = `/shop/${tenantSlug}/admin`
 
   const filteredModules = useMemo(() => {
@@ -47,13 +49,9 @@ export function AdminHamburgerMenu({
   const activeMod = filteredModules.find((m) => m.key === subOpen)
 
   return (
-    <div className="relative z-[60]">
+    <div className="relative z-[110] shrink-0">
       {(open || subOpen) && (
-        <div
-          className="fixed inset-0 z-[55]"
-          aria-hidden
-          onClick={closeAll}
-        />
+        <div className="fixed inset-0 z-[105]" aria-hidden onClick={closeAll} />
       )}
       <button
         type="button"
@@ -61,18 +59,22 @@ export function AdminHamburgerMenu({
           setOpen((o) => !o)
           setSubOpen(null)
         }}
-        className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold transition-colors ${
-          open ? 'bg-orange-600 text-white' : 'bg-orange-500 text-white hover:bg-orange-400'
+        className={`flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold shadow-md transition-colors ${
+          open
+            ? 'bg-slate-200 text-slate-900 ring-2 ring-white'
+            : 'bg-white text-[#1e293b] ring-2 ring-white/50 hover:bg-slate-100'
         }`}
+        aria-expanded={open}
+        aria-haspopup="true"
       >
         <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-        <span className="hidden sm:inline">Menu</span>
+        <span className="max-w-[7rem] truncate sm:max-w-none">{t('adminLayout.modulesMenu')}</span>
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-[60] mt-1 flex">
+        <div className="absolute left-0 top-full z-[120] mt-1 flex">
           <div
             className="max-h-[85vh] overflow-y-auto rounded-2xl border border-gray-100 bg-white shadow-2xl"
             style={{ width: 240 }}

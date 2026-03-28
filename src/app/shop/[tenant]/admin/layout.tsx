@@ -121,11 +121,6 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     return <>{children}</>
   }
 
-  const posHref =
-    modulesLoading || moduleAccess['kassa']
-      ? `${baseUrl}/kassa`
-      : getFirstAccessibleAdminPath(params.tenant, moduleAccess)
-
   return (
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
       <PostTrialModulePickerModal
@@ -136,8 +131,11 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       <TrialBanner tenantSlug={params.tenant} />
 
       {/* ── Slanke blauwe topbalk (zelfde stijl als kassa) ── */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-[#1e293b] flex items-center px-3 gap-2" style={{ height: 56 }}>
-        <div className="flex shrink-0 items-center gap-2">
+      <div
+        className="fixed top-0 left-0 right-0 z-[100] flex items-center gap-2 bg-[#1e293b] px-2 sm:px-3"
+        style={{ height: 56 }}
+      >
+        <div className="flex min-w-0 shrink-0 items-center gap-2">
           <AdminHamburgerMenu
             tenantSlug={params.tenant}
             moduleAccess={moduleAccess}
@@ -145,26 +143,28 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             featureLabelPrinting={featureLabelPrinting}
             loading={modulesLoading}
           />
-          <Link
-            href={posHref}
-            className="flex items-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-white text-sm font-bold transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>{t('adminLayout.pos')}</span>
-          </Link>
+          {!modulesLoading && moduleAccess['kassa'] && (
+            <Link
+              href={`${baseUrl}/kassa`}
+              className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400"
+            >
+              <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>{t('adminLayout.pos')}</span>
+            </Link>
+          )}
         </div>
 
         {/* Tenant naam midden */}
-        <div className="flex-1 flex items-center justify-center">
-          <span className="text-red-400 font-medium text-base tracking-normal">
+        <div className="flex min-w-0 flex-1 items-center justify-center px-1">
+          <span className="truncate text-center text-sm font-medium tracking-normal text-red-400 sm:text-base">
             {params.tenant.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
           </span>
         </div>
 
         {/* Rechts: display knop + vergrendel + taal */}
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           {moduleAccess['online-bestellingen'] && (
             <Link
               href={`/shop/${params.tenant}/display`}

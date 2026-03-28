@@ -4743,6 +4743,7 @@
     "shopNotFoundDesc": "This shop does not exist or was removed.",
     "backToVysion": "← Back to Vysion",
     "pos": "POS",
+    "modulesMenu": "Modules",
     "onlineDisplay": "Customer display",
     "lock": "Lock"
   },
