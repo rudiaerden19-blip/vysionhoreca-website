@@ -542,9 +542,9 @@ export default function SuperAdminDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-slate-800 rounded-2xl p-6 border border-slate-700"
+            className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl p-6 border border-orange-400/60 shadow-lg shadow-orange-950/25"
           >
-            <p className="text-slate-400 text-sm">Totaal Tenants</p>
+            <p className="text-white/85 text-sm">Totaal Tenants</p>
             <p className="text-3xl font-bold text-white mt-1">{stats.totalTenants}</p>
           </motion.div>
 
@@ -552,10 +552,10 @@ export default function SuperAdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-slate-800 rounded-2xl p-6 border border-slate-700"
+            className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl p-6 border border-orange-400/60 shadow-lg shadow-orange-950/25"
           >
-            <p className="text-slate-400 text-sm">Actief</p>
-            <p className="text-3xl font-bold text-green-400 mt-1">{stats.activeTenants}</p>
+            <p className="text-white/85 text-sm">Actief</p>
+            <p className="text-3xl font-bold text-white mt-1">{stats.activeTenants}</p>
           </motion.div>
 
           <motion.div
