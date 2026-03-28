@@ -602,6 +602,9 @@ export default function SuperAdminDashboard() {
         >
           <div className="p-6 border-b border-slate-700">
             <h2 className="text-xl font-bold text-white">Alle Tenants ({filteredTenants.length})</h2>
+            <p className="text-slate-400 text-sm mt-2">
+              Kolom <span className="text-orange-400 font-semibold">Modules</span> — modules van het klantportaal aan/uit zetten (eigen kolom, niet verstopt onder andere knoppen).
+            </p>
           </div>
           
           <div className="overflow-x-auto">
@@ -614,6 +617,9 @@ export default function SuperAdminDashboard() {
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Status</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Betaald</th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Aangemaakt</th>
+                  <th className="px-3 py-4 text-center text-sm font-bold text-orange-300 whitespace-nowrap w-[1%]">
+                    📦 Modules
+                  </th>
                   <th className="px-6 py-4 text-left text-sm font-medium text-slate-300">Acties</th>
                 </tr>
               </thead>
@@ -698,15 +704,16 @@ export default function SuperAdminDashboard() {
                       <td className="px-6 py-4 text-slate-400 text-sm">
                         {tenant.created_at ? new Date(tenant.created_at).toLocaleDateString('nl-BE') : '-'}
                       </td>
+                      <td className="px-3 py-4 align-middle whitespace-nowrap">
+                        <Link
+                          href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
+                          className="inline-flex items-center justify-center min-w-[8.5rem] px-3 py-2.5 bg-orange-500 hover:bg-orange-400 text-white rounded-xl text-sm font-bold transition-colors text-center shadow-lg shadow-orange-900/40 ring-2 ring-orange-300/40"
+                        >
+                          Modules
+                        </Link>
+                      </td>
                       <td className="px-6 py-4">
-                        <div className="flex flex-col gap-2 min-w-[10.5rem]">
-                          <Link
-                            href={`/superadmin/tenant/${tenant.tenant_slug}#modules`}
-                            className="px-3 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition-colors text-center shadow-sm border border-indigo-400/30"
-                          >
-                            📦 Modules
-                          </Link>
-                          <div className="flex gap-2 flex-wrap">
+                        <div className="flex gap-2 flex-wrap min-w-[10.5rem]">
                           <Link
                             href={`/shop/${tenant.tenant_slug}/admin`}
                             target="_blank"
@@ -745,7 +752,6 @@ export default function SuperAdminDashboard() {
                               🔒 Beschermd
                             </span>
                           )}
-                          </div>
                         </div>
                       </td>
                     </tr>
