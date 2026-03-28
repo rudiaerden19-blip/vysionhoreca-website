@@ -306,40 +306,40 @@ export default function TenantDetailPage() {
             <div>
               <h1 className="text-xl font-bold text-white">{tenant?.business_name || slug}</h1>
               <code className="text-orange-400 text-sm">{slug}</code>
+              <p className="text-indigo-300/90 text-xs mt-1.5 font-medium">
+                Scroll naar “Modules (klantportaal)” direct onder deze balk — of gebruik de knop rechts.
+              </p>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 justify-end">
+            <a
+              href="#modules"
+              className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-colors font-semibold shrink-0"
+            >
+              📦 Modules
+            </a>
             <Link
               href={`/shop/${slug}`}
               target="_blank"
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-colors"
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-colors shrink-0"
             >
               Bekijk Shop
             </Link>
             <Link
               href={`/shop/${slug}/admin`}
               target="_blank"
-              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-colors font-medium"
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-colors font-medium shrink-0"
             >
               🔑 Beheer Klant
             </Link>
-            <a
-              href="#modules"
-              className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl transition-colors font-medium"
-            >
-              📦 Modules
-            </a>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <motion.div
+        <section
             id="modules"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            className="bg-slate-800 rounded-2xl p-6 border-2 border-indigo-500/40 mb-8 scroll-mt-24 shadow-lg shadow-indigo-950/20"
+            className="bg-slate-800 rounded-2xl p-6 border-2 border-indigo-500/40 mb-8 scroll-mt-28 shadow-lg shadow-indigo-950/20"
           >
             <h2 className="text-xl font-bold text-white mb-2">Modules (klantportaal)</h2>
             {isAdminTenant(slug) && (
@@ -442,7 +442,7 @@ export default function TenantDetailPage() {
                 </button>
               )}
             </div>
-          </motion.div>
+          </section>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Tenant Info */}
