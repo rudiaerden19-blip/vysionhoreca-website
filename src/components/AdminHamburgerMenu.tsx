@@ -19,12 +19,14 @@ export function AdminHamburgerMenu({
   moduleAccess,
   featureGroupOrders,
   featureLabelPrinting,
+  enabledModulesJson,
   loading,
 }: {
   tenantSlug: string
   moduleAccess: Record<TenantModuleId, boolean>
   featureGroupOrders: boolean
   featureLabelPrinting: boolean
+  enabledModulesJson: Record<string, boolean> | null
   loading: boolean
 }) {
   const { t } = useLanguage()
@@ -35,8 +37,9 @@ export function AdminHamburgerMenu({
     const access = loading ? allTenantModulesTrue() : moduleAccess
     const g = loading ? true : featureGroupOrders
     const l = loading ? true : featureLabelPrinting
-    return filterHamburgerModulesForAccess(all, access, g, l)
-  }, [baseUrl, tenantSlug, loading, moduleAccess, featureGroupOrders, featureLabelPrinting])
+    const json = loading ? null : enabledModulesJson
+    return filterHamburgerModulesForAccess(all, access, g, l, json)
+  }, [baseUrl, tenantSlug, loading, moduleAccess, featureGroupOrders, featureLabelPrinting, enabledModulesJson])
 
   const [open, setOpen] = useState(false)
   const [subOpen, setSubOpen] = useState<string | null>(null)
@@ -122,7 +125,7 @@ export function AdminHamburgerMenu({
               </div>
               {activeMod.items.map((item) => (
                 <Link
-                  key={item.href}
+                  key={item.id}
                   href={item.href}
                   prefetch={item.href === baseUrl ? false : undefined}
                   onClick={closeAll}

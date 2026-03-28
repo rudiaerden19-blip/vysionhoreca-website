@@ -12,6 +12,7 @@ import {
   type TenantModuleId,
   mergeEnabledModulesFromDb,
   getStarterEnabledModulesRecord,
+  parseEnabledModulesJson,
 } from '@/lib/tenant-modules'
 import {
   isMissingPostTrialModulesColumnError,
@@ -204,18 +205,22 @@ export default function TenantDetailPage() {
 
   async function handleSaveModules() {
     setSavingModules(true)
-    const payload = modulesFullAccess
-      ? { enabled_modules: null, post_trial_modules_confirmed: true }
-      : {
-          enabled_modules: TENANT_MODULE_IDS.reduce(
-            (acc, id) => {
-              acc[id] = !!moduleToggles[id]
-              return acc
-            },
-            {} as Record<string, boolean>
-          ),
-          post_trial_modules_confirmed: true,
-        }
+    let payload: Record<string, unknown>
+    if (modulesFullAccess) {
+      payload = { enabled_modules: null, post_trial_modules_confirmed: true }
+    } else {
+      const { data: cur } = await supabase
+        .from('tenants')
+        .select('enabled_modules')
+        .eq('slug', slug)
+        .maybeSingle()
+      const prev = parseEnabledModulesJson(cur?.enabled_modules) ?? {}
+      const merged: Record<string, boolean> = { ...prev }
+      for (const id of TENANT_MODULE_IDS) {
+        merged[id] = !!moduleToggles[id]
+      }
+      payload = { enabled_modules: merged, post_trial_modules_confirmed: true }
+    }
     let { error } = await supabase.from('tenants').update(payload).eq('slug', slug)
     if (error && isMissingPostTrialModulesColumnError(error)) {
       const fallback = withoutPostTrialModulesConfirmed(payload as Record<string, unknown>)

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { verifyTenantAccess, verifySuperAdminAccess } from '@/lib/verify-tenant-access'
-import { TENANT_MODULE_IDS, isTrialSubscriptionActive } from '@/lib/tenant-modules'
+import { TENANT_MODULE_IDS, isTrialSubscriptionActive, parseEnabledModulesJson } from '@/lib/tenant-modules'
 import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
@@ -63,19 +63,26 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const payload: Record<string, boolean> = {}
+    const { data: existingRow } = await supabase
+      .from('tenants')
+      .select('enabled_modules')
+      .eq('slug', tenantSlug)
+      .maybeSingle()
+    const prev = parseEnabledModulesJson(existingRow?.enabled_modules) ?? {}
+
+    const merged: Record<string, boolean> = { ...prev }
     for (const id of TENANT_MODULE_IDS) {
       const v = enabled_modules[id]
       if (superAccess.authorized) {
-        payload[id] = !!v
+        merged[id] = !!v
       } else {
-        payload[id] =
+        merged[id] =
           id === 'kassa' || id === 'instellingen' || id === 'account' ? true : !!v
       }
     }
 
     const updPayload = {
-      enabled_modules: payload,
+      enabled_modules: merged,
       post_trial_modules_confirmed: true,
     }
     let { error: updErr } = await supabase.from('tenants').update(updPayload).eq('slug', tenantSlug)

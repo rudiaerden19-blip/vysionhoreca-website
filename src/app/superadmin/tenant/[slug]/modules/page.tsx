@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -11,11 +11,16 @@ import {
   type TenantModuleId,
   mergeEnabledModulesFromDb,
   getStarterEnabledModulesRecord,
+  parseEnabledModulesJson,
 } from '@/lib/tenant-modules'
 import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
+import {
+  buildHamburgerModules,
+  SUBMENU_IDS_ALWAYS_ON,
+} from '@/lib/admin-hamburger-modules'
 
 interface TenantsCoreRow {
   slug: string
@@ -23,10 +28,40 @@ interface TenantsCoreRow {
   post_trial_modules_confirmed?: boolean | null
 }
 
+function buildSubToggleState(
+  raw: unknown,
+  moduleToggles: Record<TenantModuleId, boolean>,
+  tenantSlug: string
+): Record<string, boolean> {
+  const p = parseEnabledModulesJson(raw)
+  const baseUrl = `/shop/${tenantSlug}/admin`
+  const hmods = buildHamburgerModules(baseUrl, tenantSlug)
+  const subs: Record<string, boolean> = {}
+  for (const m of hmods) {
+    for (const it of m.items) {
+      if (subs[it.id] !== undefined) continue
+      const parentOn = !!moduleToggles[m.key]
+      if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) subs[it.id] = true
+      else if (p && typeof p[it.id] === 'boolean') subs[it.id] = p[it.id]
+      else subs[it.id] = parentOn
+    }
+  }
+  return subs
+}
+
 export default function SuperadminTenantModulesPage() {
   const router = useRouter()
   const params = useParams()
   const slug = params.slug as string
+  const baseUrl = `/shop/${slug}/admin`
+
+  const hamburgerByKey = useMemo(() => {
+    const mods = buildHamburgerModules(baseUrl, slug)
+    return Object.fromEntries(mods.map((m) => [m.key, m])) as Record<
+      TenantModuleId,
+      (typeof mods)[0]
+    >
+  }, [baseUrl, slug])
 
   const [loading, setLoading] = useState(true)
   const [businessName, setBusinessName] = useState('')
@@ -34,6 +69,7 @@ export default function SuperadminTenantModulesPage() {
   const [moduleToggles, setModuleToggles] = useState<Record<TenantModuleId, boolean>>(
     () => mergeEnabledModulesFromDb(null, true)
   )
+  const [subToggles, setSubToggles] = useState<Record<string, boolean>>({})
   const [saving, setSaving] = useState(false)
   const [saveMsg, setSaveMsg] = useState<'ok' | 'err' | null>(null)
 
@@ -70,10 +106,14 @@ export default function SuperadminTenantModulesPage() {
       const ptOk = row.post_trial_modules_confirmed !== false
       const isFull = em == null && ptOk
       setModulesFullAccess(isFull)
-      setModuleToggles(mergeEnabledModulesFromDb(em, ptOk))
+      const mod = mergeEnabledModulesFromDb(em, ptOk)
+      setModuleToggles({ ...mod, account: true })
+      setSubToggles(buildSubToggleState(em, { ...mod, account: true }, slug))
     } else {
       setModulesFullAccess(true)
-      setModuleToggles(mergeEnabledModulesFromDb(null, true))
+      const mod = mergeEnabledModulesFromDb(null, true)
+      setModuleToggles({ ...mod, account: true })
+      setSubToggles(buildSubToggleState(null, { ...mod, account: true }, slug))
     }
   }, [slug])
 
@@ -96,22 +136,55 @@ export default function SuperadminTenantModulesPage() {
   async function handleSave() {
     setSaving(true)
     setSaveMsg(null)
-    const payload = modulesFullAccess
-      ? { enabled_modules: null, post_trial_modules_confirmed: true }
-      : {
-          enabled_modules: TENANT_MODULE_IDS.reduce(
-            (acc, id) => {
-              acc[id] = !!moduleToggles[id]
-              return acc
-            },
-            {} as Record<string, boolean>
-          ),
-          post_trial_modules_confirmed: true,
-        }
-    let { error } = await supabase.from('tenants').update(payload).eq('slug', slug)
+    const payload: Record<string, boolean> = {}
+    if (modulesFullAccess) {
+      const fullPayload = { enabled_modules: null, post_trial_modules_confirmed: true }
+      let { error: fullErr } = await supabase.from('tenants').update(fullPayload).eq('slug', slug)
+      if (fullErr && isMissingPostTrialModulesColumnError(fullErr)) {
+        const r = await supabase
+          .from('tenants')
+          .update(withoutPostTrialModulesConfirmed(fullPayload as Record<string, unknown>))
+          .eq('slug', slug)
+        fullErr = r.error
+      }
+      if (fullErr) {
+        setSaving(false)
+        setSaveMsg('err')
+        alert('Opslaan mislukt: ' + fullErr.message)
+        return
+      }
+      setSaving(false)
+      setSaveMsg('ok')
+      await loadData()
+      setTimeout(() => setSaveMsg(null), 2500)
+      return
+    }
+
+    for (const id of TENANT_MODULE_IDS) {
+      payload[id] = id === 'account' ? true : !!moduleToggles[id]
+    }
+    const seen = new Set<string>()
+    const hmods = buildHamburgerModules(baseUrl, slug)
+    for (const m of hmods) {
+      for (const it of m.items) {
+        if (seen.has(it.id)) continue
+        seen.add(it.id)
+        const parentOn = m.key === 'account' ? true : !!moduleToggles[m.key]
+        if (SUBMENU_IDS_ALWAYS_ON.has(it.id)) payload[it.id] = true
+        else payload[it.id] = parentOn && !!subToggles[it.id]
+      }
+    }
+
+    const upd = {
+      enabled_modules: payload,
+      post_trial_modules_confirmed: true,
+    }
+    let { error } = await supabase.from('tenants').update(upd).eq('slug', slug)
     if (error && isMissingPostTrialModulesColumnError(error)) {
-      const fallback = withoutPostTrialModulesConfirmed(payload as Record<string, unknown>)
-      ;({ error } = await supabase.from('tenants').update(fallback).eq('slug', slug))
+      ;({ error } = await supabase
+        .from('tenants')
+        .update(withoutPostTrialModulesConfirmed(upd as Record<string, unknown>))
+        .eq('slug', slug))
     }
     setSaving(false)
     if (error) {
@@ -126,16 +199,16 @@ export default function SuperadminTenantModulesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-orange-500 border-t-transparent" />
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      <header className="sticky top-0 z-10 bg-slate-800 border-b border-slate-700 px-4 py-4">
-        <div className="max-w-2xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <header className="sticky top-0 z-10 border-b border-slate-700 bg-slate-800 px-4 py-4">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3 text-sm">
             <Link href="/superadmin" className="text-slate-400 hover:text-white">
               ← Tenants
@@ -145,74 +218,131 @@ export default function SuperadminTenantModulesPage() {
               Tenantdetails
             </Link>
           </div>
-          <code className="text-orange-400 text-sm">{slug}</code>
+          <code className="text-sm text-orange-400">{slug}</code>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-1">Modules</h1>
-        <p className="text-slate-400 text-sm mb-6">
-          {businessName || slug} — als platformbeheerder zet je <strong className="text-slate-200">elke</strong>{' '}
-          module aan of uit (ook kassa, instellingen, account). Proef-/abonnementsniveau maakt niet uit zolang
-          er een expliciete lijst staat. Let op: alles uit behalve één module kan de klantflow beperken.
+      <main className="mx-auto max-w-5xl px-4 py-8">
+        <h1 className="mb-1 text-2xl font-bold">Modules & menu-items</h1>
+        <p className="mb-6 text-sm text-slate-400">
+          {businessName || slug} — schakel <strong className="text-slate-200">hoofdmodules</strong> en{' '}
+          <strong className="text-slate-200">submenu&apos;s</strong> (onderdelen per module).{' '}
+          <strong className="text-slate-200">Overzicht</strong> en <strong className="text-slate-200">abonnement</strong>{' '}
+          blijven altijd beschikbaar voor de tenant. Account-hoofdmodule staat vast aan (zelfde reden).
         </p>
 
         {isAdminTenant(slug) && (
-          <p className="text-amber-400/90 text-sm mb-6 border border-amber-500/30 rounded-xl p-3 bg-amber-500/5">
+          <p className="mb-6 rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-400/90">
             Platform-admin tenant: in het portaal heeft deze altijd technisch volledige toegang. Instellingen
             hier bewaren wel vooraf in de database (bijv. voor tests).
           </p>
         )}
 
-        <div className="bg-slate-800 rounded-2xl border border-slate-700 p-5 mb-6">
-          <div className="flex items-center justify-between gap-4 mb-2">
+        <div className="mb-6 rounded-2xl border border-slate-700 bg-slate-800 p-5">
+          <div className="mb-2 flex items-center justify-between gap-4">
             <div>
               <p className="font-semibold text-white">Volledig pakket</p>
-              <p className="text-xs text-slate-400 mt-0.5">Alle modules zichtbaar (geen beperkingen via deze lijst).</p>
+              <p className="mt-0.5 text-xs text-slate-400">
+                Geen beperkingen; submenu&apos;s worden niet individueel opgeslagen.
+              </p>
             </div>
             <ModuleSlider
               checked={modulesFullAccess}
               disabled={false}
               onChange={(on) => {
                 setModulesFullAccess(on)
-                setModuleToggles(mergeEnabledModulesFromDb(null, true))
+                const mod = mergeEnabledModulesFromDb(null, true)
+                setModuleToggles({ ...mod, account: true })
+                setSubToggles(buildSubToggleState(null, { ...mod, account: true }, slug))
               }}
             />
           </div>
           {modulesFullAccess && (
-            <p className="text-amber-200/90 text-xs mt-3 border border-amber-500/25 rounded-lg px-3 py-2 bg-amber-500/10">
-              Wil je <strong>losse modules</strong> aan/uit zetten? Zet <strong>Volledig pakket</strong> hierboven{' '}
-              <strong>uit</strong> — dan verschijnt de lijst met schuivers.
+            <p className="mt-3 rounded-lg border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-xs text-amber-200/90">
+              Zet <strong>Volledig pakket</strong> <strong>uit</strong> voor een uitgebreide lijst met schuivers per
+              onderdeel.
             </p>
           )}
         </div>
 
         {!modulesFullAccess && (
-          <ul className="space-y-2 mb-8">
-            {TENANT_MODULE_IDS.map((id) => {
-              const on = !!moduleToggles[id]
-              return (
-                <li
-                  key={id}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-slate-600 bg-slate-800/80 px-4 py-3"
-                >
-                  <div>
-                    <p className="text-sm font-medium text-slate-100">{TENANT_MODULE_LABELS[id]}</p>
-                  </div>
-                  <ModuleSlider
-                    checked={on}
-                    disabled={false}
-                    onChange={(next) =>
-                      setModuleToggles((prev) => ({
-                        ...prev,
-                        [id]: next,
-                      }))
-                    }
-                  />
+          <div className="mb-8 space-y-6">
+            <div className="rounded-2xl border border-emerald-700/40 bg-emerald-950/30 p-4">
+              <p className="text-xs font-bold uppercase tracking-wider text-emerald-400/90">
+                Altijd zichtbaar in het menu
+              </p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                <li className="flex items-center justify-between gap-4 rounded-xl border border-slate-600/60 bg-slate-800/50 px-4 py-3">
+                  <span>🏠 Overzicht (dashboard)</span>
+                  <span className="text-xs font-semibold text-emerald-400">Aan · vast</span>
                 </li>
+                <li className="flex items-center justify-between gap-4 rounded-xl border border-slate-600/60 bg-slate-800/50 px-4 py-3">
+                  <span>📋 Abonnement / facturatie (/abonnement)</span>
+                  <span className="text-xs font-semibold text-emerald-400">Aan · vast</span>
+                </li>
+              </ul>
+            </div>
+
+            {TENANT_MODULE_IDS.map((id) => {
+              const mod = hamburgerByKey[id]
+              const parentOn = id === 'account' ? true : !!moduleToggles[id]
+              const nestedItems =
+                mod?.items.filter((it) => !SUBMENU_IDS_ALWAYS_ON.has(it.id)) ?? []
+
+              return (
+                <div key={id} className="rounded-2xl border border-slate-600 bg-slate-800/50 p-4 sm:p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-600/80 pb-3">
+                    <p className="text-base font-semibold text-white">{TENANT_MODULE_LABELS[id]}</p>
+                    {id === 'account' ? (
+                      <span className="text-xs font-bold text-emerald-400">Altijd aan</span>
+                    ) : (
+                      <ModuleSlider
+                        checked={!!moduleToggles[id]}
+                        disabled={false}
+                        onChange={(next) => {
+                          setModuleToggles((prev) => ({ ...prev, [id]: next }))
+                          if (!next) {
+                            setSubToggles((s) => {
+                              const nextS = { ...s }
+                              for (const it of nestedItems) {
+                                if (!SUBMENU_IDS_ALWAYS_ON.has(it.id)) nextS[it.id] = false
+                              }
+                              return nextS
+                            })
+                          }
+                        }}
+                      />
+                    )}
+                  </div>
+                  {nestedItems.length > 0 && (
+                    <ul className="mt-4 space-y-2 border-l-2 border-slate-600 pl-4">
+                      {nestedItems.map((it) => (
+                        <li
+                          key={it.id}
+                          className="flex items-center justify-between gap-4 rounded-lg bg-slate-900/40 px-3 py-2.5"
+                        >
+                          <span className="text-sm text-slate-200">
+                            <span className="mr-2">{it.icon}</span>
+                            {it.label}
+                          </span>
+                          <ModuleSlider
+                            checked={!!subToggles[it.id] && parentOn}
+                            disabled={!parentOn}
+                            onChange={(next) =>
+                              setSubToggles((s) => ({
+                                ...s,
+                                [it.id]: next,
+                              }))
+                            }
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               )
             })}
-          </ul>
+          </div>
         )}
 
         <div className="flex flex-wrap items-center gap-3">
@@ -220,15 +350,19 @@ export default function SuperadminTenantModulesPage() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white rounded-xl font-semibold"
+            className="rounded-xl bg-orange-500 px-6 py-3 font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
           >
             {saving ? 'Opslaan…' : 'Wijzigingen opslaan'}
           </button>
           {!modulesFullAccess && (
             <button
               type="button"
-              onClick={() => setModuleToggles(getStarterEnabledModulesRecord())}
-              className="px-4 py-3 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm text-slate-200"
+              onClick={() => {
+                const s = getStarterEnabledModulesRecord()
+                setModuleToggles({ ...s, account: true })
+                setSubToggles(buildSubToggleState(null, { ...s, account: true }, slug))
+              }}
+              className="rounded-xl bg-slate-700 px-4 py-3 text-sm text-slate-200 hover:bg-slate-600"
             >
               Template: starter
             </button>
@@ -249,7 +383,6 @@ function ModuleSlider({
   disabled: boolean
   onChange: (next: boolean) => void
 }) {
-  /** Geen native `disabled`: browsers grijzen kinderen waardoor “aan” op slot eruit ziet als “uit”. */
   return (
     <button
       type="button"
@@ -278,7 +411,7 @@ function ModuleSlider({
       <span
         aria-hidden
         className={`
-          pointer-events-none absolute top-1 left-1 block h-6 w-6 rounded-full bg-white shadow-md
+          pointer-events-none absolute left-1 top-1 block h-6 w-6 rounded-full bg-white shadow-md
           transition-transform duration-200 ease-out will-change-transform
           ${checked ? 'translate-x-6' : 'translate-x-0'}
         `}

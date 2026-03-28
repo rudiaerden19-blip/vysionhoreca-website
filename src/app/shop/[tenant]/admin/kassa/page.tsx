@@ -46,6 +46,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   const {
     moduleAccess,
+    enabledModulesJson,
     featureGroupOrders,
     featureLabelPrinting,
     loading: moduleFlagsLoading,
@@ -56,6 +57,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     demoViewOnly || moduleFlagsLoading ? allTenantModulesTrue() : moduleAccess
   const effectiveGroupOrders = demoViewOnly || moduleFlagsLoading ? true : featureGroupOrders
   const effectiveLabelPrinting = demoViewOnly || moduleFlagsLoading ? true : featureLabelPrinting
+  const effectiveJson =
+    demoViewOnly || moduleFlagsLoading ? null : enabledModulesJson
 
   const filteredHamburgerModules = useMemo(() => {
     const all = buildHamburgerModules(baseUrl, tenant)
@@ -63,9 +66,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       all,
       effectiveAccess,
       effectiveGroupOrders,
-      effectiveLabelPrinting
+      effectiveLabelPrinting,
+      effectiveJson
     )
-  }, [baseUrl, tenant, effectiveAccess, effectiveGroupOrders, effectiveLabelPrinting])
+  }, [baseUrl, tenant, effectiveAccess, effectiveGroupOrders, effectiveLabelPrinting, effectiveJson])
 
   const [navOpen, setNavOpen] = useState(false)
   const [kassaOpen, setKassaOpen] = useState(false)
@@ -1120,7 +1124,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                       <span>{activeMod.icon}</span> {activeMod.label}
                     </div>
                     {activeMod.items.map(item => (
-                      <Link key={item.href} href={item.href} prefetch={item.href === baseUrl ? false : undefined} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
+                      <Link key={item.id} href={item.href} prefetch={item.href === baseUrl ? false : undefined} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
                         className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
                         <span>{item.icon}</span>
                         <span>{item.label}</span>

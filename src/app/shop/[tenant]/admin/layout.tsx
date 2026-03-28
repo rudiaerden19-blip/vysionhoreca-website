@@ -11,6 +11,11 @@ import {
   getFirstAccessibleAdminPath,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
+import {
+  getSubmenuIdForPathname,
+  isSubmenuEnabledInTenantConfig,
+  isSubmenuForcedOn,
+} from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
@@ -32,6 +37,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const baseUrl = `/shop/${params.tenant}/admin`
   const {
     moduleAccess,
+    enabledModulesJson,
     featureGroupOrders,
     featureLabelPrinting,
     loading: modulesLoading,
@@ -76,6 +82,19 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     const gate = adminPathToModule(pathname, params.tenant)
     if (gate.kind === 'module' && !moduleAccess[gate.module]) {
       router.replace(getFirstAccessibleAdminPath(params.tenant, moduleAccess))
+      return
+    }
+    const subId = getSubmenuIdForPathname(pathname, params.tenant)
+    if (
+      subId &&
+      !isSubmenuForcedOn(subId) &&
+      !isSubmenuEnabledInTenantConfig(
+        subId,
+        enabledModulesJson,
+        gate.kind === 'module' ? moduleAccess[gate.module] : true
+      )
+    ) {
+      router.replace(`/shop/${params.tenant}/admin`)
     }
   }, [
     loading,
@@ -84,6 +103,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     pathname,
     params.tenant,
     moduleAccess,
+    enabledModulesJson,
     router,
   ])
 
@@ -141,6 +161,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             moduleAccess={moduleAccess}
             featureGroupOrders={featureGroupOrders}
             featureLabelPrinting={featureLabelPrinting}
+            enabledModulesJson={enabledModulesJson}
             loading={modulesLoading}
           />
           {!modulesLoading && moduleAccess['kassa'] && (

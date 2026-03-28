@@ -13,6 +13,8 @@ import { isMissingPostTrialModulesColumnError } from '@/lib/supabase-post-trial-
 
 export interface TenantModuleFlagsResult {
   moduleAccess: Record<TenantModuleId, boolean>
+  /** Ruwe `tenants.enabled_modules` (inclusief submenu-keys `sm_*`). */
+  enabledModulesJson: Record<string, boolean> | null
   featureGroupOrders: boolean
   featureLabelPrinting: boolean
   loading: boolean
@@ -27,6 +29,7 @@ const DEFAULT_FLAGS: TenantModuleFlagsResult = {
     subscription: null,
     tenantRow: null,
   }),
+  enabledModulesJson: null,
   featureGroupOrders: false,
   featureLabelPrinting: false,
   loading: true,
@@ -50,6 +53,7 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
           subscription: null,
           tenantRow: null,
         }),
+        enabledModulesJson: null,
         featureGroupOrders: false,
         featureLabelPrinting: false,
         loading: false,
@@ -121,6 +125,7 @@ export function useTenantModuleFlags(tenantSlug: string | undefined): TenantModu
 
       setResult({
         moduleAccess,
+        enabledModulesJson: enabled,
         featureGroupOrders: !!(row as { feature_group_orders?: boolean })?.feature_group_orders,
         featureLabelPrinting: !!(row as { feature_label_printing?: boolean })?.feature_label_printing,
         loading: false,
