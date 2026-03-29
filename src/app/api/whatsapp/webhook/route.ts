@@ -245,7 +245,7 @@ async function sendLanguageMenu(
           sections: [{
             title: 'Languages',
             rows: [
-              { id: 'nl', title: '🇳🇱 Nederlands' },
+              { id: 'nl', title: '🇧🇪 Nederlands' },
               { id: 'en', title: '🇬🇧 English' },
               { id: 'fr', title: '🇫🇷 Français' },
               { id: 'de', title: '🇩🇪 Deutsch' },
