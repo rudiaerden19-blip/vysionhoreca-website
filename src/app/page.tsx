@@ -1252,20 +1252,38 @@ function TestimonialSection() {
 // CTA Section
 function CTASection() {
   const { t, locale } = useLanguage()
-  
+  const ctaVideoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const el = ctaVideoRef.current
+    if (!el) return
+    el.muted = true
+    el.defaultMuted = true
+    const attempt = () => {
+      const p = el.play()
+      if (p !== undefined) {
+        p.catch(() => {})
+      }
+    }
+    attempt()
+    el.addEventListener('loadeddata', attempt)
+    return () => el.removeEventListener('loadeddata', attempt)
+  }, [])
+
   return (
     <section id="demo" className="relative overflow-hidden py-20 sm:py-28 min-h-[520px] sm:min-h-[620px] flex items-center justify-center">
-      {/* Video Background */}
-      <video 
-        autoPlay 
-        muted 
-        loop 
+      {/* Video Background — explicit play() + src on element handles React/Safari autoplay quirks */}
+      <video
+        ref={ctaVideoRef}
+        src="/images/cta-video.mp4"
+        autoPlay
+        muted
+        loop
         playsInline
+        preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
         style={{ objectPosition: 'center center', transform: 'scale(1.0)' }}
-      >
-        <source src="/images/cta-video.mp4" type="video/mp4" />
-      </video>
+      />
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/70"></div>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
