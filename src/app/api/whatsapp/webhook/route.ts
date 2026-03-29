@@ -12,7 +12,7 @@ const WHATSAPP_API_VERSION = 'v24.0'
 const WHATSAPP_API_URL = `https://graph.facebook.com/${WHATSAPP_API_VERSION}`
 
 // Base URL for the shop
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://vysionhoreca.com'
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.vysionhoreca.com'
 
 // Message deduplication - prevent processing same message twice
 const processedMessages = new Map<string, number>()

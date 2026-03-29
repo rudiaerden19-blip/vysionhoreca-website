@@ -19,7 +19,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
 }
 
-const siteUrl = 'https://vysionhoreca.com'
+const siteUrl = 'https://www.vysionhoreca.com'
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',

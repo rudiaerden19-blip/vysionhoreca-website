@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function sendResetEmail(email: string, name: string, token: string) {
-  const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://vysionhoreca.com'}/login/reset-password?token=${token}`
+  const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vysionhoreca.com'}/login/reset-password?token=${token}`
 
   const transporter = nodemailer.createTransport({
     host: 'smtp.zoho.eu',

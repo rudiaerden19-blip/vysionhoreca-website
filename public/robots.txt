@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://vysionhoreca.com/sitemap.xml
+Sitemap: https://www.vysionhoreca.com/sitemap.xml
 
 # Disallow admin and private areas
 Disallow: /api/

@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
               Bewaar deze e-mail als aankoopbewijs.
             </p>
             <p style="color: #999; font-size: 11px; margin: 15px 0 0;">
-              Powered by <a href="https://vysionhoreca.com" style="color: #f97316; text-decoration: none;">Vysion Horeca</a>
+              Powered by <a href="https://www.vysionhoreca.com" style="color: #f97316; text-decoration: none;">Vysion Horeca</a>
             </p>
           </div>
         </div>

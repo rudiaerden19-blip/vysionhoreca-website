@@ -294,7 +294,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function sendVerificationEmail(email: string, name: string, token: string) {
-  const verifyUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://vysionhoreca.com'}/api/auth/verify-email?token=${token}`
+  const verifyUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vysionhoreca.com'}/api/auth/verify-email?token=${token}`
 
   const transporter = nodemailer.createTransport({
     host: 'smtp.zoho.eu',
