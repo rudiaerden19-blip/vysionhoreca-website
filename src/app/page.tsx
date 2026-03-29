@@ -73,7 +73,7 @@ function NewAtVysionSection() {
   const { t } = useLanguage()
 
   return (
-    <section className="py-20 sm:py-28 lg:py-32 bg-white border-t border-gray-100">
+    <section id="updates" className="py-20 sm:py-28 lg:py-32 bg-white border-t border-gray-100">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 sm:mb-10 tracking-tight">
           {t('newAtVysion.title')}

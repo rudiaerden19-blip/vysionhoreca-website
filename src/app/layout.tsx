@@ -28,10 +28,28 @@ const organizationJsonLd = {
       '@type': 'Organization',
       '@id': `${siteUrl}/#organization`,
       name: 'Vysion Horeca',
+      legalName: 'Vysion Group International',
       url: siteUrl,
       logo: `${siteUrl}/favicon.svg`,
       description:
         'Alles-in-één horecasoftware: kassa (POS), reserveringsplatform, online bestelplatform, keukenscherm, kostencalculator, urenregistratie en bedrijfsanalyse voor België en Nederland.',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Siberiëstraat 24',
+        addressLocality: 'Pelt',
+        postalCode: '3900',
+        addressCountry: 'BE',
+      },
+      vatID: 'BE1003226953',
+      areaServed: [{ '@type': 'Country', name: 'België' }, { '@type': 'Country', name: 'Nederland' }],
+      contactPoint: {
+        '@type': 'ContactPoint',
+        contactType: 'customer support',
+        email: 'info@vysionhoreca.com',
+        areaServed: ['BE', 'NL'],
+        availableLanguage: ['Dutch', 'English', 'French', 'German'],
+      },
+      sameAs: ['https://www.vysionapps.io'],
     },
     {
       '@type': 'WebSite',
