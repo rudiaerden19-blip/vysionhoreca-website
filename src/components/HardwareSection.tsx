@@ -18,6 +18,9 @@ const HARDWARE_ITEMS = [
   { src: '/images/hardware/hardware-7.png', model: 'vm20' },
   { src: '/images/hardware/hardware-8.png', model: 'handpos tf741' },
   { src: '/images/hardware/hardware-9.png', model: 'handpos t41' },
+  { src: '/images/hardware/hardware-10-vm10-kiosk.png', model: 'vm 10 kiosk' },
+  { src: '/images/hardware/hardware-11-vt11-kiosk.png', model: 'vt 11 kiosk' },
+  { src: '/images/hardware/hardware-12-muur-kiosk-tl20.png', model: 'muur kiosk tl20' },
 ] as const
 
 export default function HardwareSection() {
