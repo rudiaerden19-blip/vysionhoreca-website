@@ -138,7 +138,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const dismissedOrderIdsRef = useRef<string[]>([]) // oranje scherm al getoond, niet opnieuw tonen
 
   const newReservAlertRef = useRef<{ id: string } | null>(null)
-  const reservAlarmIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const previousReservIdsRef = useRef<string[]>([])
 
   // Gebruik playOrderNotification uit sounds.ts — zelfde geactiveerde AudioContext als alle andere knoppen
@@ -159,18 +158,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     }, 2000)
   }).current
 
-  // Alarm blijft spelen zolang er nieuwe bestellingen zijn (exact donor: gebruik ref)
+  // Alarm blijft spelen (bestellingen + reserveringen delen hetzelfde interval als online orders)
   useEffect(() => {
     if (demoViewOnly) return
-    if (newOrderAlert) {
+    if (newOrderAlert || newReservAlert) {
       if (!alarmIntervalRef.current) startAlarm()
       const verifyInterval = setInterval(() => {
-        // Gebruik ref zodat we altijd de actuele waarde hebben (geen stale closure)
-        if (newOrderAlertRef.current && !alarmIntervalRef.current) startAlarm()
+        if ((newOrderAlertRef.current || newReservAlertRef.current) && !alarmIntervalRef.current) startAlarm()
       }, 2000)
       return () => clearInterval(verifyInterval)
     }
-  }, [newOrderAlert, startAlarm, demoViewOnly])
+  }, [newOrderAlert, newReservAlert, startAlarm, demoViewOnly])
 
   // Cleanup alarm bij unmount
   useEffect(() => { return () => { if (alarmIntervalRef.current) clearInterval(alarmIntervalRef.current) } }, [])
@@ -182,49 +180,34 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ;(window as any).isAlarmRunning = () => alarmIntervalRef.current !== null
   }, [stopAlarm, startAlarm])
 
-  // Reservaties: eigen interval —zelfde geluid/patroon als bestellingen, maar bestellingen-code blijft ongemoeid
-  const stopReservAlarm = useRef(() => {
-    if (reservAlarmIntervalRef.current) {
-      clearInterval(reservAlarmIntervalRef.current)
-      reservAlarmIntervalRef.current = null
-    }
-  }).current
-
-  const startReservAlarm = useRef(() => {
-    if (reservAlarmIntervalRef.current) return
-    playOrderNotification().catch(() => {})
-    reservAlarmIntervalRef.current = setInterval(() => {
-      playOrderNotification().catch(() => {})
-    }, 2000)
-  }).current
-
-  useEffect(() => {
-    if (demoViewOnly) return
-    if (newReservAlert) {
-      if (!reservAlarmIntervalRef.current) startReservAlarm()
-      const verifyInterval = setInterval(() => {
-        if (newReservAlertRef.current && !reservAlarmIntervalRef.current) startReservAlarm()
-      }, 2000)
-      return () => clearInterval(verifyInterval)
-    }
-  }, [newReservAlert, startReservAlarm, demoViewOnly])
-
-  useEffect(() => {
-    return () => {
-      if (reservAlarmIntervalRef.current) clearInterval(reservAlarmIntervalRef.current)
-    }
-  }, [])
-
   useEffect(() => {
     ;(window as any).stopReservationAlarm = () => {
-      stopReservAlarm()
       newReservAlertRef.current = null
       setNewReservAlert(null)
+      void (async () => {
+        try {
+          const [o, p] = await Promise.all([
+            supabase.from('orders').select('*', { count: 'exact', head: true }).eq('tenant_slug', tenant).eq('status', 'new'),
+            supabase
+              .from('reservations')
+              .select('*', { count: 'exact', head: true })
+              .eq('tenant_slug', tenant)
+              .or('status.eq.PENDING,status.eq.pending,status.eq.WAITLIST,status.eq.waitlist'),
+          ])
+          if ((o.count ?? 0) === 0 && (p.count ?? 0) === 0) {
+            stopAlarm()
+            newOrderAlertRef.current = null
+            setNewOrderAlert(null)
+          }
+        } catch {
+          /* ignore */
+        }
+      })()
     }
     return () => {
       delete (window as any).stopReservationAlarm
     }
-  }, [stopReservAlarm])
+  }, [tenant, stopAlarm])
 
   useEffect(() => {
     if (!demoViewOnly) return
@@ -233,49 +216,119 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     } catch { /* ignore */ }
   }, [demoViewOnly, SESSION_KEY])
 
-  // Poll elke 3 seconden voor nieuwe online bestellingen
+  // Poll elke 3s: online bestellingen + reserveringen — één alarm (startAlarm/stopAlarm) zoals voor orders
   useEffect(() => {
     if (demoViewOnly) return
-    let isFirstCheck = true
+    let isFirstOrderCheck = true
+    let isFirstReservCheck = true
     const check = async () => {
       try {
-        const { data: orders } = await supabase
-          .from('orders')
-          .select('id,order_number,total,status')
-          .eq('tenant_slug', tenant)
-          .eq('status', 'new')
-          .order('created_at', { ascending: false })
-          .limit(50)
+        const [{ data: orders }, { data: idRows }, pendingRes] = await Promise.all([
+          supabase
+            .from('orders')
+            .select('id,order_number,total,status')
+            .eq('tenant_slug', tenant)
+            .eq('status', 'new')
+            .order('created_at', { ascending: false })
+            .limit(50),
+          supabase
+            .from('reservations')
+            .select('id')
+            .eq('tenant_slug', tenant)
+            .order('created_at', { ascending: false })
+            .limit(50),
+          supabase
+            .from('reservations')
+            .select('*', { count: 'exact', head: true })
+            .eq('tenant_slug', tenant)
+            .or('status.eq.PENDING,status.eq.pending,status.eq.WAITLIST,status.eq.waitlist'),
+        ])
         const list = orders || []
-        const currentIds = list.map((o: any) => o.id)
-        const prevIds = previousOrderIdsRef.current
-        if (!isFirstCheck) {
-          const newOnes = list.filter((o: any) => !prevIds.includes(o.id))
-          if (newOnes.length > 0) {
+        const reservList = idRows || []
+        const pendingAndWl = pendingRes.count ?? 0
+        setPendingReservCount(pendingAndWl)
+
+        let newReservOnes: { id: string }[] = []
+
+        // ── Orders (zelfde als voorheen, alarm stop/start via gezamenlijke stap onderaan) ──
+        const currentOrderIds = list.map((o: any) => o.id)
+        const prevOrderIds = previousOrderIdsRef.current
+        if (!isFirstOrderCheck) {
+          const newOrderOnes = list.filter((o: any) => !prevOrderIds.includes(o.id))
+          if (newOrderOnes.length > 0) {
             startAlarm()
             try {
               if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('🔔 NIEUWE BESTELLING!', {
-                  body: `Bestelling #${newOnes[0].order_number} is binnengekomen!`,
-                  icon: '/favicon.ico', requireInteraction: true, tag: 'new-order',
+                  body: `Bestelling #${newOrderOnes[0].order_number} is binnengekomen!`,
+                  icon: '/favicon.ico',
+                  requireInteraction: true,
+                  tag: 'new-order',
                 })
               }
-            } catch { /* ignore */ }
-            const alert = { id: newOnes[0].id, orderNumber: newOnes[0].order_number, total: newOnes[0].total || 0 }
+            } catch {
+              /* ignore */
+            }
+            const alert = {
+              id: newOrderOnes[0].id,
+              orderNumber: newOrderOnes[0].order_number,
+              total: newOrderOnes[0].total || 0,
+            }
             newOrderAlertRef.current = alert
             setNewOrderAlert(alert)
           }
-          if (list.length > 0) {
-            if (!alarmIntervalRef.current) startAlarm()
-          } else {
-            if (alarmIntervalRef.current) { stopAlarm(); newOrderAlertRef.current = null; setNewOrderAlert(null) }
-          }
         } else {
-          isFirstCheck = false
+          isFirstOrderCheck = false
           if (list.length > 0) startAlarm()
         }
-        previousOrderIdsRef.current = currentIds
-      } catch { /* ignore */ }
+        previousOrderIdsRef.current = currentOrderIds
+
+        // ── Reserveringen: zelfde startAlarm, geen apart interval ──
+        const currentReservIds = reservList.map((r: { id: string }) => r.id)
+        const prevReservIds = previousReservIdsRef.current
+        if (!isFirstReservCheck) {
+          newReservOnes = reservList.filter((r: { id: string }) => !prevReservIds.includes(r.id))
+          if (newReservOnes.length > 0) {
+            startAlarm()
+            try {
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('📅 Nieuwe reservatie!', {
+                  body: 'Er is een nieuwe reservatie binnengekomen.',
+                  icon: '/favicon.ico',
+                  requireInteraction: true,
+                  tag: 'new-reservation',
+                })
+              }
+            } catch {
+              /* ignore */
+            }
+            const alert = { id: newReservOnes[0].id }
+            newReservAlertRef.current = alert
+            setNewReservAlert(alert)
+          }
+        } else {
+          isFirstReservCheck = false
+          if (pendingAndWl > 0) startAlarm()
+        }
+        previousReservIdsRef.current = currentReservIds
+
+        // ── Alarm aan/uit: nieuwe bestelling OF wachtende reservering (zelfde gedrag als alleen orders) ──
+        const needOrderAlarm = list.length > 0
+        const needReservAlarm = pendingAndWl > 0 || newReservOnes.length > 0
+        if (needOrderAlarm || needReservAlarm) {
+          if (!alarmIntervalRef.current) startAlarm()
+        } else {
+          if (alarmIntervalRef.current) {
+            stopAlarm()
+            newOrderAlertRef.current = null
+            setNewOrderAlert(null)
+          }
+          newReservAlertRef.current = null
+          setNewReservAlert(null)
+        }
+      } catch {
+        /* ignore */
+      }
     }
     check()
     const interval = setInterval(check, 3000)
@@ -623,73 +676,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   useEffect(() => {
     setSoundsOn(getSoundsEnabled())
   }, [])
-
-  // Reservaties: poll elke 3s — badge = alleen PENDING/WAITLIST (na goedkeuring geen “1” meer door CONFIRMED)
-  useEffect(() => {
-    if (demoViewOnly) return
-    let isFirstCheck = true
-    const check = async () => {
-      try {
-        const [{ data: idRows }, pendingRes] = await Promise.all([
-          supabase
-            .from('reservations')
-            .select('id')
-            .eq('tenant_slug', tenant)
-            .order('created_at', { ascending: false })
-            .limit(50),
-          supabase
-            .from('reservations')
-            .select('*', { count: 'exact', head: true })
-            .eq('tenant_slug', tenant)
-            .or('status.eq.PENDING,status.eq.pending,status.eq.WAITLIST,status.eq.waitlist'),
-        ])
-        const list = idRows || []
-        const pendingAndWl = pendingRes.count ?? 0
-        setPendingReservCount(pendingAndWl)
-
-        const currentIds = list.map((r: { id: string }) => r.id)
-        const prevIds = previousReservIdsRef.current
-        if (!isFirstCheck) {
-          const newOnes = list.filter((r: { id: string }) => !prevIds.includes(r.id))
-          if (newOnes.length > 0) {
-            startReservAlarm()
-            try {
-              if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('📅 Nieuwe reservatie!', {
-                  body: 'Er is een nieuwe reservatie binnengekomen.',
-                  icon: '/favicon.ico',
-                  requireInteraction: true,
-                  tag: 'new-reservation',
-                })
-              }
-            } catch {
-              /* ignore */
-            }
-            const alert = { id: newOnes[0].id }
-            newReservAlertRef.current = alert
-            setNewReservAlert(alert)
-          }
-          const keepAlarm = pendingAndWl > 0 || newOnes.length > 0
-          if (keepAlarm) {
-            if (!reservAlarmIntervalRef.current) startReservAlarm()
-          } else if (reservAlarmIntervalRef.current) {
-            stopReservAlarm()
-            newReservAlertRef.current = null
-            setNewReservAlert(null)
-          }
-        } else {
-          isFirstCheck = false
-          if (pendingAndWl > 0) startReservAlarm()
-        }
-        previousReservIdsRef.current = currentIds
-      } catch {
-        /* ignore */
-      }
-    }
-    check()
-    const interval = setInterval(check, 3000)
-    return () => clearInterval(interval)
-  }, [tenant, demoViewOnly, startReservAlarm, stopReservAlarm])
 
   // Online status check – gecombineerd: navigator.onLine + server ping
   useEffect(() => {
@@ -1269,7 +1255,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         {effectiveAccess.reservaties && (
           <button
             onClick={() => {
-              stopReservAlarm()
               newReservAlertRef.current = null
               setNewReservAlert(null)
               setShowReservations(true)
@@ -1839,7 +1824,6 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         <div
           className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex max-w-[95vw] items-center gap-4 bg-amber-500 text-white px-8 py-5 rounded-2xl shadow-2xl cursor-pointer border-4 border-amber-700"
           onClick={() => {
-            stopReservAlarm()
             newReservAlertRef.current = null
             setNewReservAlert(null)
             setShowReservations(true)
