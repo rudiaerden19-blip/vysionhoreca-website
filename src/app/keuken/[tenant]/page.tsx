@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase'
 import { getTenantSettings, updateOrderStatus } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import Link from 'next/link'
+import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { getAdminKassaEntryHref } from '@/lib/tenant-modules'
 import { 
   activateAudioForIOS,
   prewarmAudio,
@@ -39,6 +41,12 @@ interface BusinessSettings {
 
 export default function KeukenDisplayPage({ params }: { params: { tenant: string } }) {
   const { t, locale } = useLanguage()
+  const { moduleAccess, enabledModulesJson, loading: modulesLoading } = useTenantModuleFlags(params.tenant)
+  const adminBase = `/shop/${params.tenant}/admin`
+  const kassaEntryHref =
+    !modulesLoading && moduleAccess.kassa
+      ? getAdminKassaEntryHref(params.tenant, moduleAccess, enabledModulesJson) ?? `${adminBase}/kassa`
+      : null
   
   // Translation helper for kitchenDisplay keys
   const tx = (key: string) => t(`kitchenDisplay.${key}`)
@@ -460,7 +468,7 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <Link
-              href={`/shop/${params.tenant}/admin`}
+              href={adminBase}
               className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white shadow-md transition-colors hover:bg-orange-400"
             >
               <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -468,6 +476,17 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               </svg>
               {t('adminLayout.back')}
             </Link>
+            {kassaEntryHref && (
+              <Link
+                href={kassaEntryHref}
+                className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white shadow-md transition-colors hover:bg-orange-400"
+              >
+                <span className="text-base leading-none" aria-hidden>
+                  🧾
+                </span>
+                {t('adminLayout.pos')}
+              </Link>
+            )}
             <div className="h-10 w-10 shrink-0 bg-white/20 rounded-xl flex items-center justify-center text-xl">
               👨‍🍳
             </div>
