@@ -91,10 +91,10 @@ export function AdminHamburgerMenu({
               onClick={closeAll}
               className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-800 transition-colors hover:bg-blue-50"
             >
-              <svg className="h-4 w-4 shrink-0 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span>{t('adminLayout.back')}</span>
+              <span className="text-lg" aria-hidden>
+                🏠
+              </span>
+              <span>{t('adminLayout.overview')}</span>
             </Link>
             {filteredModules.map((mod) => (
               <div key={mod.key} className="border-b border-gray-100 last:border-0">

@@ -1092,17 +1092,19 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
               <div className="absolute top-full left-0 mt-1 flex z-30">
                 {/* Eerste kolom: modules */}
                 <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-y-auto" style={{ width: 240, maxHeight: '85vh' }}>
-                  <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">Menu</div>
+                  <div className="px-4 py-2.5 bg-[#1e293b] text-white text-xs font-bold uppercase tracking-wider sticky top-0 rounded-t-2xl">
+                    {t('adminLayout.menu')}
+                  </div>
                   <Link
                     href={baseUrl}
                     prefetch={false}
                     onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
                     className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm font-semibold text-gray-800 transition-colors hover:bg-blue-50"
                   >
-                    <svg className="h-4 w-4 shrink-0 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    <span>{t('adminLayout.back')}</span>
+                    <span className="text-lg" aria-hidden>
+                      🏠
+                    </span>
+                    <span>{t('adminLayout.overview')}</span>
                   </Link>
                   {modules.map(mod => (
                     <div key={mod.key} className="border-b border-gray-100 last:border-0">
