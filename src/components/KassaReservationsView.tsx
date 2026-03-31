@@ -2295,6 +2295,7 @@ export default function KassaReservationsView({
   // z3 - Wachtlijst bevestigen
   const handleConfirmFromWaitlist = async (r: Reservation) => {
     await updateStatus(r.id, 'CONFIRMED')
+    if (typeof window !== 'undefined') (window as unknown as { stopReservationAlarm?: () => void }).stopReservationAlarm?.()
     toast.success(`${r.guest_name}${rk('confirmedFromWaitlistSuffix')}`)
     // Geen mail — enkel statuswijziging
   }
@@ -2336,6 +2337,7 @@ export default function KassaReservationsView({
     if (assignedTable && !r.table_number) updates.table_number = assignedTable
     const { error } = await supabase.from('reservations').update(updates).eq('id', r.id).eq('tenant_slug', tenant)
     if (error) { toast.error(rk('approveFailedPrefix') + error.message); return }
+    if (typeof window !== 'undefined') (window as unknown as { stopReservationAlarm?: () => void }).stopReservationAlarm?.()
     await loadReservations()
     await loadGuestProfiles()
 
@@ -2395,6 +2397,7 @@ export default function KassaReservationsView({
     const { error } = await supabase.from('reservations')
       .update({ status: 'cancelled' }).eq('id', r.id).eq('tenant_slug', tenant)
     if (error) { toast.error(rk('rejectFailedPrefix') + error.message); return }
+    if (typeof window !== 'undefined') (window as unknown as { stopReservationAlarm?: () => void }).stopReservationAlarm?.()
     await loadReservations()
     await loadGuestProfiles()
     toast.success(`${r.guest_name}${rk('guestRejectedSuffix')}`)
@@ -4343,33 +4346,41 @@ export default function KassaReservationsView({
                 const pending = reservations.filter(r => r.status === 'PENDING')
                 if (pending.length === 0) return null
                 return (
-                  <div className="flex-shrink-0 bg-red-600 border-b-4 border-red-800 px-4 py-3 animate-pulse">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-white font-black text-sm tracking-wide">🔴 {pending.length} NIEUWE RESERVATIE{pending.length > 1 ? 'S' : ''} — WACHT OP GOEDKEURING</span>
+                  <div className="flex-shrink-0 bg-red-600 border-b-4 border-red-900 px-5 py-5 md:px-8 md:py-6 shadow-inner">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="text-white font-black text-lg md:text-2xl tracking-wide uppercase drop-shadow-sm">
+                        🔴 {pending.length} nieuwe reservatie{pending.length > 1 ? 's' : ''} — wacht op goedkeuring
+                      </span>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {pending.slice(0, 3).map(r => (
-                        <div key={r.id} className="flex items-center justify-between bg-white rounded-xl px-4 py-2.5 border-2 border-red-300 shadow-md">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-3 h-3 rounded-full bg-red-500 shrink-0 animate-ping"/>
+                        <div key={r.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white rounded-2xl px-5 py-4 border-4 border-red-400 shadow-lg">
+                          <div className="flex items-center gap-4 min-w-0">
+                            <div className="w-4 h-4 rounded-full bg-red-500 shrink-0 animate-ping"/>
                             <div className="min-w-0">
-                              <p className="font-semibold text-sm text-gray-800 truncate">{r.guest_name}</p>
-                              <p className="text-xs text-gray-500">{r.reservation_date} · {r.reservation_time} · {r.party_size}p</p>
+                              <p className="font-bold text-lg md:text-xl text-gray-900 truncate">{r.guest_name}</p>
+                              <p className="text-base text-gray-600 font-medium">{r.reservation_date} · {r.reservation_time} · {r.party_size} pers.</p>
                             </div>
                           </div>
-                          <div className="flex gap-2 shrink-0 ml-3">
-                            <button onClick={() => handleReject(r)}
-                              className="px-3 py-1.5 rounded-lg bg-red-100 text-red-600 text-xs font-bold hover:bg-red-200 transition-colors">
+                          <div className="flex gap-3 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => handleReject(r)}
+                              className="px-5 py-3 rounded-xl bg-red-100 text-red-700 text-base font-black hover:bg-red-200 transition-colors border-2 border-red-300"
+                            >
                               Weigeren
                             </button>
-                            <button onClick={() => handleConfirm(r)}
-                              className="px-3 py-1.5 rounded-lg bg-green-500 text-white text-xs font-bold hover:bg-green-600 transition-colors">
+                            <button
+                              type="button"
+                              onClick={() => handleConfirm(r)}
+                              className="px-5 py-3 rounded-xl bg-green-600 text-white text-base font-black hover:bg-green-500 transition-colors shadow-md"
+                            >
                               ✓ Goedkeuren
                             </button>
                           </div>
                         </div>
                       ))}
-                      {pending.length > 3 && <p className="text-xs text-amber-600 text-center">+{pending.length - 3} meer...</p>}
+                      {pending.length > 3 && <p className="text-sm font-bold text-amber-200 text-center">+{pending.length - 3} meer in de lijst hieronder…</p>}
                     </div>
                   </div>
                 )
