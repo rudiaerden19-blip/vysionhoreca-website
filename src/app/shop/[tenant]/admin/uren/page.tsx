@@ -3,7 +3,6 @@
 import { useLanguage } from '@/i18n'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { unstable_batchedUpdates } from 'react-dom'
 import { useParams } from 'next/navigation'
 import { 
   getActiveStaff,
@@ -121,10 +120,8 @@ export default function UrenPage() {
         getTimesheetEntries(tenant, staff.id, selectedYear, selectedMonth),
         getMonthlyTimesheet(tenant, staff.id, selectedYear, selectedMonth),
       ])
-      unstable_batchedUpdates(() => {
-        setEntries(entriesData)
-        setMonthlyTimesheet(timesheetData)
-      })
+      setEntries(entriesData)
+      setMonthlyTimesheet(timesheetData)
     } catch (e) {
       console.error('Uren loadData:', e)
     } finally {
@@ -298,16 +295,14 @@ export default function UrenPage() {
       const success = await approveTimesheetEntries(tenant, staff.id, selectedYear, selectedMonth, staff.id)
       if (success) {
         const nowIso = new Date().toISOString()
-        unstable_batchedUpdates(() => {
-          setEntries((prev) =>
-            prev.map((e) => ({
-              ...e,
-              is_approved: true,
-              approved_by: staff.id,
-              approved_at: nowIso,
-            }))
-          )
-        })
+        setEntries((prev) =>
+          prev.map((e) => ({
+            ...e,
+            is_approved: true,
+            approved_by: staff.id,
+            approved_at: nowIso,
+          }))
+        )
         await loadData()
       } else {
         alert(t('adminPages.common.saveFailed'))
@@ -326,9 +321,7 @@ export default function UrenPage() {
     try {
       const updated = await closeMonthlyTimesheet(tenant, staff.id, selectedYear, selectedMonth, staff.id)
       if (updated) {
-        unstable_batchedUpdates(() => {
-          setMonthlyTimesheet(updated)
-        })
+        setMonthlyTimesheet(updated)
         await loadData()
       } else {
         alert(t('adminPages.common.saveFailed'))
