@@ -764,29 +764,33 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests, statusRin
   if (table.shape === 'ROUND') {
     if (seats === 2) {
       const dist = tableSize / 2 + gap + chairH / 2
-      chairs.push({ x: 0, y: -dist, angle: -90 })
-      chairs.push({ x: 0, y: dist, angle: 90 })
+      chairs.push({ x: 0, y: -dist, angle: 0 })
+      chairs.push({ x: 0, y: dist, angle: 180 })
     } else {
       const dist = tableSize / 2 + gap + chairH / 2
       for (let i = 0; i < seats; i++) {
-        const angle = (i * 360) / seats - 90
-        const rad = (angle * Math.PI) / 180
-        chairs.push({ x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, angle })
+        const posDeg = (i * 360) / seats - 90
+        const rad = (posDeg * Math.PI) / 180
+        chairs.push({
+          x: Math.cos(rad) * dist,
+          y: Math.sin(rad) * dist,
+          angle: posDeg + 90,
+        })
       }
     }
   } else if (table.shape === 'SQUARE') {
     const half = tableSize / 2
     const dist = half + gap + chairH / 2
     if (seats === 2) {
-      chairs.push({ x: 0, y: -dist, angle: -90 })
-      chairs.push({ x: 0, y: dist, angle: 90 })
+      chairs.push({ x: 0, y: -dist, angle: 0 })
+      chairs.push({ x: 0, y: dist, angle: 180 })
     } else {
       const perSide = Math.ceil(seats / 4)
       const sides = [
-        { angle: -90, axis: 'x' as const, fixed: -dist },
-        { angle: 0,   axis: 'y' as const, fixed: dist },
-        { angle: 90,  axis: 'x' as const, fixed: dist },
-        { angle: 180, axis: 'y' as const, fixed: -dist },
+        { angle: 0, axis: 'x' as const, fixed: -dist },
+        { angle: -90, axis: 'y' as const, fixed: dist },
+        { angle: 180, axis: 'x' as const, fixed: dist },
+        { angle: 90, axis: 'y' as const, fixed: -dist },
       ]
       let placed = 0
       for (const side of sides) {
@@ -812,15 +816,15 @@ function ReservationTableSVG({ table, statusColor, isSelected, guests, statusRin
     const distSide = rectTw / 2 + gap + chairH / 2
     let placed = 0
     for (let i = 0; i < perLong && placed < seats; i++) {
-      chairs.push({ x: (i - (perLong - 1) / 2) * (chairW + 6), y: -distTop, angle: -90 })
+      chairs.push({ x: (i - (perLong - 1) / 2) * (chairW + 6), y: -distTop, angle: 0 })
       placed++
     }
     for (let i = 0; i < perLong && placed < seats; i++) {
-      chairs.push({ x: (i - (perLong - 1) / 2) * (chairW + 6), y: distTop, angle: 90 })
+      chairs.push({ x: (i - (perLong - 1) / 2) * (chairW + 6), y: distTop, angle: 180 })
       placed++
     }
-    if (placed < seats) { chairs.push({ x: -distSide, y: 0, angle: 180 }); placed++ }
-    if (placed < seats) { chairs.push({ x: distSide, y: 0, angle: 0 }) }
+    if (placed < seats) { chairs.push({ x: -distSide, y: 0, angle: 90 }); placed++ }
+    if (placed < seats) { chairs.push({ x: distSide, y: 0, angle: -90 }) }
   }
 
   const pad = 80

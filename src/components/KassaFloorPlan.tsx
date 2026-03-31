@@ -169,18 +169,22 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
   const chairs: Chair[] = []
 
   if (table.shape === 'ROUND') {
-    // 2 stoelen: exact tegenover (top + bottom)
+    // 2 stoelen: exact tegenover (top + bottom) — hoeken 0°/180° zodat zitvlak naar tafel wijst (icoon: rug boven)
     if (seats === 2) {
       const dist = tableSize / 2 + gap + chairH / 2
-      chairs.push({ x: 0, y: -dist, angle: -90 })
-      chairs.push({ x: 0, y:  dist, angle:  90 })
+      chairs.push({ x: 0, y: -dist, angle: 0 })
+      chairs.push({ x: 0, y:  dist, angle: 180 })
     } else {
       const radius = tableSize / 2
       const dist = radius + gap + chairH / 2
       for (let i = 0; i < seats; i++) {
-        const angle = (i * 360) / seats - 90
-        const rad = (angle * Math.PI) / 180
-        chairs.push({ x: Math.cos(rad) * dist, y: Math.sin(rad) * dist, angle })
+        const posDeg = (i * 360) / seats - 90
+        const rad = (posDeg * Math.PI) / 180
+        chairs.push({
+          x: Math.cos(rad) * dist,
+          y: Math.sin(rad) * dist,
+          angle: posDeg + 90,
+        })
       }
     }
   } else if (table.shape === 'SQUARE') {
@@ -188,15 +192,15 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
     const dist = half + gap + chairH / 2
     // 2 stoelen: altijd tegenover mekaar (top + bottom)
     if (seats === 2) {
-      chairs.push({ x: 0, y: -dist, angle: -90 })
-      chairs.push({ x: 0, y:  dist, angle:  90 })
+      chairs.push({ x: 0, y: -dist, angle: 0 })
+      chairs.push({ x: 0, y:  dist, angle: 180 })
     } else {
       const perSide = Math.ceil(seats / 4)
       const sides = [
-        { angle: -90, axis: 'x' as const, fixed: -dist },
-        { angle: 0,   axis: 'y' as const, fixed: dist },
-        { angle: 90,  axis: 'x' as const, fixed: dist },
-        { angle: 180, axis: 'y' as const, fixed: -dist },
+        { angle: 0, axis: 'x' as const, fixed: -dist },
+        { angle: -90, axis: 'y' as const, fixed: dist },
+        { angle: 180, axis: 'x' as const, fixed: dist },
+        { angle: 90, axis: 'y' as const, fixed: -dist },
       ]
       let placed = 0
       for (const side of sides) {
@@ -224,22 +228,22 @@ function TableSVG({ table, isSelected, onClick, effectiveStatus }: {
     // top
     for (let i = 0; i < perLong && placed < seats; i++) {
       const offset = (i - (perLong - 1) / 2) * (chairW + 6)
-      chairs.push({ x: offset, y: -distTop, angle: -90 })
+      chairs.push({ x: offset, y: -distTop, angle: 0 })
       placed++
     }
     // bottom
     for (let i = 0; i < perLong && placed < seats; i++) {
       const offset = (i - (perLong - 1) / 2) * (chairW + 6)
-      chairs.push({ x: offset, y: distTop, angle: 90 })
+      chairs.push({ x: offset, y: distTop, angle: 180 })
       placed++
     }
     // sides if needed
     if (placed < seats) {
-      chairs.push({ x: -distSide, y: 0, angle: 180 })
+      chairs.push({ x: -distSide, y: 0, angle: 90 })
       placed++
     }
     if (placed < seats) {
-      chairs.push({ x: distSide, y: 0, angle: 0 })
+      chairs.push({ x: distSide, y: 0, angle: -90 })
     }
   }
 
