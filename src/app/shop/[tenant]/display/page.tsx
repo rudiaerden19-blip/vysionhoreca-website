@@ -897,21 +897,30 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
       {/* Header */}
       <header className="bg-gray-800 border-b border-gray-700 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div 
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <Link
+              href={`/shop/${params.tenant}/admin`}
+              className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white shadow-md transition-colors hover:bg-orange-400"
+            >
+              <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              {t('adminLayout.back')}
+            </Link>
+            <div
+              className="h-10 w-10 shrink-0 rounded-xl flex items-center justify-center text-xl"
               style={{ backgroundColor: business?.primary_color }}
             >
               🖥️
             </div>
-            <div>
-              <h1 className="text-xl font-bold">{tx('title')}</h1>
-              <p className="text-gray-400 text-sm">{business?.business_name}</p>
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-bold sm:text-xl">{tx('title')}</h1>
+              <p className="truncate text-gray-400 text-xs sm:text-sm">{business?.business_name}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-4">
             {/* Sound - ALTIJD AAN */}
             <span 
               onClick={enableSound}
@@ -978,15 +987,6 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               )}
             </button>
 
-            <Link
-              href={`/shop/${params.tenant}/admin`}
-              className="flex items-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-sm font-bold text-white"
-            >
-              <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              {t('adminLayout.back')}
-            </Link>
             <Link
               href={`/keuken/${params.tenant}`}
               className="px-3 py-2 bg-orange-600 hover:bg-orange-500 rounded-xl text-sm font-bold text-white"
