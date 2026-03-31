@@ -8,7 +8,7 @@ import KassaFloorPlan from '@/components/KassaFloorPlan'
 import KassaReservationsView from '@/components/KassaReservationsView'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
-import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio, playOrderNotification } from '@/lib/sounds'
+import { getSoundsEnabled, setSoundsEnabled, playClick, playAddToCart, playRemove, playSuccess, playCashRegister, playCheckout, initAudio, prewarmAudio, playOrderNotification, activateAudioForIOS } from '@/lib/sounds'
 import { prefetchProductImageUrls } from '@/lib/offline-product-images'
 import { allTenantModulesTrue, type TenantModuleId } from '@/lib/tenant-modules'
 import {
@@ -93,11 +93,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   })
 
   const activateSound = () => {
-    try {
-      const AC = window.AudioContext || (window as any).webkitAudioContext
-      const ctx = new AC()
-      if (ctx.state === 'suspended') ctx.resume()
-    } catch { /* ignore */ }
+    // Zelfde singleton AudioContext + notification.mp3 als playOrderNotification (niet aparte AudioContext)
+    activateAudioForIOS()
     initAudio()
     prewarmAudio()
     if ('Notification' in window && Notification.permission === 'default') {
@@ -107,6 +104,21 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setSoundActivated(true)
     setShowSoundActivation(false)
   }
+
+  /** Eerste tik op kassa ontgrendelt audio (sessie al “ok”) zodat poll achtergrond alarm kan afspelen */
+  const audioUnlockOnceRef = useRef(false)
+  useEffect(() => {
+    if (demoViewOnly || !soundActivated || audioUnlockOnceRef.current) return
+    const onPointer = () => {
+      if (audioUnlockOnceRef.current) return
+      audioUnlockOnceRef.current = true
+      activateAudioForIOS()
+      initAudio()
+      window.removeEventListener('pointerdown', onPointer, true)
+    }
+    window.addEventListener('pointerdown', onPointer, true)
+    return () => window.removeEventListener('pointerdown', onPointer, true)
+  }, [soundActivated, demoViewOnly])
 
   const [cart, setCart] = useState<CartItem[]>([])
   const [orderType, setOrderType] = useState<OrderType>('DINE_IN')
@@ -718,6 +730,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     const next = !soundsOn
     setSoundsOn(next)
     setSoundsEnabled(next)
+    if (next) {
+      activateAudioForIOS()
+      initAudio()
+    }
     playClick()
   }
 
