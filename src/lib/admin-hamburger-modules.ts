@@ -58,7 +58,7 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
     {
       key: 'online',
       icon: '🛒',
-      label: 'Online',
+      label: 'Online platform',
       items: [
         { id: 'sm_online_status', icon: '🟢', label: 'Online Aan/Uitzetten', href: `${baseUrl}/online-status` },
         { id: 'sm_online_klanten', icon: '👥', label: 'Klanten', href: `${baseUrl}/klanten` },

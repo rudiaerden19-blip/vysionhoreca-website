@@ -20,7 +20,7 @@ export const TENANT_MODULE_LABELS: Record<TenantModuleId, string> = {
   kassa: 'Kassa (producten, categorieën, …)',
   'online-bestellingen': 'Online bestellingen (schermen, bestellijst)',
   instellingen: 'Instellingen (uren, levering, betaling)',
-  online: 'Online shop (klanten, promoties, WhatsApp, …)',
+  online: 'Online platform (klanten, promoties, WhatsApp, …)',
   reservaties: 'Reservaties',
   personeel: 'Personeel & uren',
   kosten: 'Kostenberekening',
