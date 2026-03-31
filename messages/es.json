@@ -4809,7 +4809,7 @@
     "backToVysion": "← Volver a Vysion",
     "pos": "TPV",
     "back": "Volver",
-    "modulesMenu": "Módulos",
+    "menu": "Menú",
     "onlineDisplay": "Pantalla cliente",
     "lock": "Bloquear"
   },

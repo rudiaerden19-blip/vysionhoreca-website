@@ -4809,7 +4809,7 @@
     "backToVysion": "← 返回 Vysion",
     "pos": "收银",
     "back": "返回",
-    "modulesMenu": "模块",
+    "menu": "菜单",
     "onlineDisplay": "顾客显示屏",
     "lock": "锁定"
   },

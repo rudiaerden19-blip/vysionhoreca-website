@@ -64,8 +64,8 @@ export function AdminHamburgerMenu({
         }}
         className={`flex min-h-[44px] min-w-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm font-bold shadow-md transition-colors ${
           open
-            ? 'bg-slate-200 text-slate-900 ring-2 ring-white'
-            : 'bg-white text-[#1e293b] ring-2 ring-white/50 hover:bg-slate-100'
+            ? 'bg-orange-600 text-white'
+            : 'bg-orange-500 text-white hover:bg-orange-400'
         }`}
         aria-expanded={open}
         aria-haspopup="true"
@@ -73,7 +73,7 @@ export function AdminHamburgerMenu({
         <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
-        <span className="max-w-[7rem] truncate sm:max-w-none">{t('adminLayout.modulesMenu')}</span>
+        <span className="max-w-[7rem] truncate sm:max-w-none">{t('adminLayout.menu')}</span>
       </button>
 
       {open && (
@@ -83,7 +83,7 @@ export function AdminHamburgerMenu({
             style={{ width: 240 }}
           >
             <div className="sticky top-0 rounded-t-2xl bg-[#1e293b] px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white">
-              Menu
+              {t('adminLayout.menu')}
             </div>
             <Link
               href={baseUrl}
