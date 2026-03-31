@@ -3,6 +3,7 @@
 import { useLanguage } from '@/i18n'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { unstable_batchedUpdates } from 'react-dom'
 import { useParams } from 'next/navigation'
 import { 
   getActiveStaff,
@@ -120,8 +121,12 @@ export default function UrenPage() {
         getTimesheetEntries(tenant, staff.id, selectedYear, selectedMonth),
         getMonthlyTimesheet(tenant, staff.id, selectedYear, selectedMonth),
       ])
-      setEntries(entriesData)
-      setMonthlyTimesheet(timesheetData)
+      unstable_batchedUpdates(() => {
+        setEntries(entriesData)
+        setMonthlyTimesheet(timesheetData)
+      })
+    } catch (e) {
+      console.error('Uren loadData:', e)
     } finally {
       setLoading(false)
     }
@@ -287,10 +292,28 @@ export default function UrenPage() {
     const staff = selectedStaffRef.current
     if (!staff?.id || !tenant) return
     if (!confirm(t('urenPage.confirmApproveAll'))) return
-    
-    const success = await approveTimesheetEntries(tenant, staff.id, selectedYear, selectedMonth, staff.id)
-    if (success) {
-      loadData()
+
+    setSaving(true)
+    try {
+      const success = await approveTimesheetEntries(tenant, staff.id, selectedYear, selectedMonth, staff.id)
+      if (success) {
+        const nowIso = new Date().toISOString()
+        unstable_batchedUpdates(() => {
+          setEntries((prev) =>
+            prev.map((e) => ({
+              ...e,
+              is_approved: true,
+              approved_by: staff.id,
+              approved_at: nowIso,
+            }))
+          )
+        })
+        await loadData()
+      } else {
+        alert(t('adminPages.common.saveFailed'))
+      }
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -298,10 +321,20 @@ export default function UrenPage() {
     const staff = selectedStaffRef.current
     if (!staff?.id || !tenant) return
     if (!confirm(t('urenPage.confirmCloseMonth'))) return
-    
-    const success = await closeMonthlyTimesheet(tenant, staff.id, selectedYear, selectedMonth, staff.id)
-    if (success) {
-      loadData()
+
+    setSaving(true)
+    try {
+      const updated = await closeMonthlyTimesheet(tenant, staff.id, selectedYear, selectedMonth, staff.id)
+      if (updated) {
+        unstable_batchedUpdates(() => {
+          setMonthlyTimesheet(updated)
+        })
+        await loadData()
+      } else {
+        alert(t('adminPages.common.saveFailed'))
+      }
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -666,7 +699,7 @@ Met vriendelijke groeten`,
         <button
           type="button"
           onClick={handleApproveAll}
-          disabled={isMonthClosed}
+          disabled={isMonthClosed || saving}
           className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:opacity-50"
         >
           ✓ {t('urenPage.approveAll')}
@@ -675,7 +708,8 @@ Met vriendelijke groeten`,
           <button
             type="button"
             onClick={() => setShowReopenModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            disabled={saving}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
           >
             🔓 {t('urenPage.reopenMonth')}
           </button>
@@ -683,7 +717,8 @@ Met vriendelijke groeten`,
           <button
             type="button"
             onClick={handleCloseMonth}
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition"
+            disabled={saving}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition disabled:opacity-50"
           >
             🔒 {t('urenPage.closeMonth')}
           </button>

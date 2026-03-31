@@ -3384,7 +3384,8 @@ export async function approveTimesheetEntries(
   approvedById: string
 ): Promise<boolean> {
   const startDate = `${year}-${String(month).padStart(2, '0')}-01`
-  const endDate = `${year}-${String(month).padStart(2, '0')}-31`
+  const lastDay = new Date(year, month, 0).getDate()
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
   
   const { error } = await supabase
     .from('timesheet_entries')
@@ -3449,9 +3450,12 @@ export async function getMonthlyTimesheet(
     .eq('staff_id', staffId)
     .eq('year', year)
     .eq('month', month)
-    .single()
-  
-  if (error) return null
+    .maybeSingle()
+
+  if (error) {
+    console.error('getMonthlyTimesheet:', error)
+    return null
+  }
   return data
 }
 
@@ -3545,27 +3549,32 @@ export async function closeMonthlyTimesheet(
   year: number, 
   month: number,
   closedById: string
-): Promise<boolean> {
-  // First regenerate to ensure up-to-date
-  await generateMonthlyTimesheet(tenantSlug, staffId, year, month)
-  
-  const { error } = await supabase
+): Promise<MonthlyTimesheet | null> {
+  const ensured = await generateMonthlyTimesheet(tenantSlug, staffId, year, month)
+  if (!ensured) {
+    console.error('closeMonthlyTimesheet: generateMonthlyTimesheet failed')
+    return null
+  }
+
+  const { data, error } = await supabase
     .from('monthly_timesheets')
-    .update({ 
-      is_closed: true, 
+    .update({
+      is_closed: true,
       closed_by: closedById,
-      closed_at: new Date().toISOString()
+      closed_at: new Date().toISOString(),
     })
     .eq('tenant_slug', tenantSlug)
     .eq('staff_id', staffId)
     .eq('year', year)
     .eq('month', month)
-  
+    .select()
+    .single()
+
   if (error) {
     console.error('Error closing monthly timesheet:', error)
-    return false
+    return null
   }
-  return true
+  return data
 }
 
 export async function markTimesheetExported(
