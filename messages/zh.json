@@ -4457,27 +4457,27 @@
     "bannerEigen": "暂时关闭"
   },
   "whyVysion": {
-    "title": "Why choose Vysion",
+    "title": "为什么选择 Vysion",
     "imageAlt": "Vysion 触屏桌面终端",
     "fullPlatform": {
-      "title": "Full platform",
-      "body": "POS, online ordering, kitchen display, reservations, website and reporting in one place. No scattered tools or double work — everything works together for your venue."
+      "title": "一体化平台",
+      "body": "收银、在线点餐、厨显、预订、网站与报表集中在一处。没有零散工具或重复劳动——一切协同服务您的门店。"
     },
     "liveSupport": {
-      "title": "Live support",
-      "body": "Our team is there when you need us: onboarding, day-to-day questions and busy shifts. Fast answers so you can keep service running."
+      "title": "实时支持",
+      "body": "需要帮助时我们都在：上线辅导、日常问题与高峰时段。快速响应，让营业不停摆。"
     },
     "rightPrice": {
-      "title": "The right price",
-      "body": "Clear plans with no hidden fees. You pay for what you need and scale as your business grows."
+      "title": "合适的价格",
+      "body": "方案透明、无隐性收费。按所需付费，随业务成长而扩展。"
     },
     "inHouseSoftware": {
-      "title": "Built in-house",
-      "body": "Our software is developed in-house by our own engineers."
+      "title": "自主研发",
+      "body": "软件由我们自有工程师在公司内部开发。"
     },
     "posQuality": {
-      "title": "Premium POS hardware",
-      "body": "Our registers are built to high standards — we stand behind their quality."
+      "title": "高端收银硬件",
+      "body": "收银设备达到高标准——我们为品质负责。"
     }
   },
   "platform": {
@@ -4486,141 +4486,141 @@
     "sectionSubtitle2": "在下方点击，感受 Vysion 如何助力您的店铺运营",
     "gridTestCta": "免费开始演示",
     "gridTrustLine": "无需安装 · 浏览器中直接使用 · 如同真实店铺",
-    "detailCta": "Start free trial",
-    "detailBack": "Back to overview",
-    "notFoundTitle": "Page not found",
-    "notFoundCta": "Go to homepage",
+    "detailCta": "免费试用",
+    "detailBack": "返回概览",
+    "notFoundTitle": "页面未找到",
+    "notFoundCta": "前往首页",
     "kassasysteem": {
-      "title": "POS system",
-      "teaser": "Fast checkout linked to online orders and reporting.",
-      "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing.",
-      "heroAlt": "Hand using a touchscreen POS with payment terminal at the counter in a café or restaurant",
-      "horecaSectorTitle": "Hospitality POS",
-      "horecaImageAlt": "Modern all-in-one POS system on a table in a restaurant",
-      "horecaLeadBefore": "Our POS solutions give you ",
-      "horecaLeadBold": "a broad set of features to run your business better.",
-      "horecaLeadAfter": " Works with most Windows-based POS PCs on a recent version. Also runs smoothly on iPad®, Android® and kiosks.",
-      "horecaCloudBold": "Run your venue effortlessly from the cloud",
-      "horecaCloudAfter": " — a web panel gives you everything you need to optimise and grow.",
-      "horecaDemoCta": "Request a demo",
-      "featuresTitle": "Features",
+      "title": "收银系统",
+      "teaser": "快速结账，与在线订单和报表联动。",
+      "body": "收银是门店核心：快速销售、准确小票，与点餐与后厨实时联动。\n\n使用 Vysion Horeca，在同一处管理商品、桌台、付款与员工——高峰少出错，日结一目了然。",
+      "heroAlt": "在咖啡馆或餐厅柜台使用触屏收银与收款终端的手部特写",
+      "horecaSectorTitle": "餐饮收银",
+      "horecaImageAlt": "餐厅餐桌上现代化的多合一收银机",
+      "horecaLeadBefore": "我们的收银方案为您提供 ",
+      "horecaLeadBold": "丰富的功能，帮助您更好地经营门店。",
+      "horecaLeadAfter": " 兼容多数近期版本的 Windows 收银电脑，亦适用于 iPad®、Android® 与自助终端。",
+      "horecaCloudBold": "通过云端轻松管理门店",
+      "horecaCloudAfter": "——网页后台涵盖优化与成长所需的工具。",
+      "horecaDemoCta": "申请演示",
+      "featuresTitle": "功能",
       "features": {
         "inventory": {
-          "title": "Stock control",
-          "body": "Stay on top of inventory so you can respond faster to customer demand."
+          "title": "库存管理",
+          "body": "掌握库存，更快响应顾客需求。"
         },
         "floorPlan": {
-          "title": "Table plan",
-          "body": "Flexible floor plans for clearer service and efficient seating."
+          "title": "桌台图",
+          "body": "灵活的桌位布局，服务更清晰、翻台更高效。"
         },
         "timeClock": {
-          "title": "Time clock",
-          "body": "Track staff hours with a built-in clock for accurate records."
+          "title": "打卡",
+          "body": "内置打卡准确记录员工工时。"
         },
         "customerDisplay": {
-          "title": "Customer display",
-          "body": "Show orders and payment info so guests always know what they order and pay."
+          "title": "客显屏",
+          "body": "展示订单与金额，顾客始终清楚点了什么、付了多少。"
         },
         "productionTickets": {
-          "title": "Kitchen tickets",
-          "body": "Tickets go straight to kitchen or bar so nothing gets lost in communication."
+          "title": "后厨单",
+          "body": "单据直达后厨或吧台——沟通不丢单。"
         },
         "reporting": {
-          "title": "Reporting",
-          "body": "Detailed reports on sales, stock and more — stay in control of your operation."
+          "title": "报表",
+          "body": "销售、库存等详细报表——经营状况尽在掌握。"
         }
       }
     },
     "bestelplatform": {
-      "title": "Ordering platform",
-      "teaser": "Customers order with you directly — no marketplace taking a cut.",
-      "body": "Pickup, delivery and dine-in flow through your own branded site. Orders land cleanly on POS and kitchen screens.\n\nYou handle spikes better and keep full margin on online sales.",
-      "heroAlt": "Smartphone ordering food online at a table with laptop in the background",
-      "featuresTitle": "Your ordering stack",
+      "title": "点餐平台",
+      "teaser": "顾客直接向您下单——无第三方平台抽佣。",
+      "body": "自提到店用餐都走您品牌官网，订单清晰进入收银与厨显。\n\n更好应对高峰，线上销售利润全部保留。",
+      "heroAlt": "餐桌旁用手机在线点餐，背景有笔记本电脑",
+      "featuresTitle": "您的点餐体系",
       "features": {
         "ownWebsite": {
-          "title": "Your own website",
-          "body": "A fully branded site on your domain with ordering that is easy to manage day to day."
+          "title": "自有网站",
+          "body": "您域名上的品牌站点，点餐日常易管理。"
         },
         "timeSaving": {
-          "title": "Save time",
-          "body": "Fewer phone orders means staff can focus on service and other tasks in the venue."
+          "title": "节省时间",
+          "body": "电话单减少，员工更专注现场服务与其他工作。"
         },
         "productUpdates": {
-          "title": "Product updates",
-          "body": "Refresh menus, prices and new items quickly without heavy technical work."
+          "title": "商品更新",
+          "body": "菜单、价格与新品快速更新，无需繁重技术工作。"
         },
         "dataAnalytics": {
-          "title": "Data & insight",
-          "body": "See sales patterns and peaks to tune stock and what you promote."
+          "title": "数据洞察",
+          "body": "看清销售规律与高峰，优化库存与促销。"
         },
         "payments": {
-          "title": "Payments",
-          "body": "Guests pay securely online for faster checkout at pickup or dine-in."
+          "title": "支付",
+          "body": "顾客安全在线支付，到店或取餐结账更快。"
         },
         "stockControl": {
-          "title": "Stock control",
-          "body": "Keep availability accurate so customers only order what you can fulfil."
+          "title": "库存控制",
+          "body": "可用量准确，顾客只下单您能提供的商品。"
         },
         "zeroCommission": {
-          "title": "0% commission",
-          "body": "No third-party marketplace cut — orders go to you and you keep the margin."
+          "title": "0% 佣金",
+          "body": "无第三方卖场分成——订单与利润都归您。"
         },
         "support": {
-          "title": "Support",
-          "body": "We help with launch and day-to-day questions so the platform stays reliable."
+          "title": "支持",
+          "body": "上线与日常使用全程协助，平台稳定可靠。"
         },
         "qrOrdering": {
-          "title": "QR ordering",
-          "body": "Guests scan a QR code and order from their phone — ideal for tables or takeaway."
+          "title": "扫码点餐",
+          "body": "顾客扫码用手机下单——堂食或外带皆宜。"
         }
       }
     },
     "keukenschermen": {
-      "title": "Kitchen screens",
-      "teaser": "Live tickets sorted by time and priority.",
-      "body": "The kitchen sees exactly what is due and when — no lost tickets or bad handwriting.\n\nLess stress during the rush and calmer service from the pass."
+      "title": "厨显屏幕",
+      "teaser": "实时厨单按时间与优先级排序。",
+      "body": "后厨清楚该做什么、何时完成——没有丢单与难辨认手写。\n\n高峰压力更小，出餐口更从容。"
     },
     "onlineScherm": {
-      "title": "Display screen",
-      "teaser": "Show menus, wait times or promos in your venue.",
-      "body": "In-venue screens keep guests informed without extra staff on the floor. Tie into your live offer and pricing.\n\nFewer counter questions and a stronger brand presence in the room."
+      "title": "展示屏",
+      "teaser": "在店内展示菜单、等待时间或促销。",
+      "body": "店内屏幕让顾客自助获取信息，与实时菜品和价格联动。\n\n减少吧台询问，品牌呈现更强。"
     },
     "reservaties": {
-      "title": "Reservations",
-      "teaser": "Manage tables and slots without double entry.",
-      "body": "Guests book online; you see who is coming when. Plan service and staffing with a clear overview.\n\nConfirmations and messaging help reduce no-shows."
+      "title": "预订",
+      "teaser": "管理桌台与时段，无需重复录入。",
+      "body": "顾客在线预订，您清楚谁来、何时来。服务与排班有据可依。\n\n确认与消息有助于减少爽约。"
     },
     "eigenWebsite": {
-      "title": "Your own website",
-      "teaser": "Your domain and brand — with ordering built in.",
-      "body": "Not a generic landing page: your logo, colours and photography. Customers recognise your business instantly.\n\nManage site and menu from the same admin as the rest of Vysion Horeca."
+      "title": "自有网站",
+      "teaser": "您的域名与品牌——内置点餐。",
+      "body": "不是千篇一律着陆页：您的标志、色彩与照片，顾客一眼认出。\n\n网站与菜单与 Vysion Horeca 其他模块同一后台管理。"
     },
     "whatsappBestellingen": {
-      "title": "WhatsApp ordering",
-      "teaser": "Order where guests already chat: menu and flow in one thread.",
-      "body": "WhatsApp is often the fastest channel for local hospitality. We connect catalogue and status to your operational workflow.\n\nFewer misunderstandings than ad-hoc chat messages alone."
+      "title": "WhatsApp 点餐",
+      "teaser": "在顾客常聊天的渠道完成：菜单与流程同一对话搞定。",
+      "body": "本地餐饮往往 WhatsApp 最快。我们把目录与状态接入您的运营流程。\n\n比零散聊天更少误会。"
     },
     "loonadministratie": {
-      "title": "Payroll",
-      "teaser": "Hours and pay aligned with rostering and your team.",
-      "body": "Tracked hours belong with day-to-day operations. Connect to planning and lose the manual spreadsheets.\n\nCosts stay predictable and period close becomes clearer."
+      "title": "薪资与人事",
+      "teaser": "工时与薪酬与排班、团队一致。",
+      "body": "记录的工时属于日常运营。连接排班，告别手工表格。\n\n成本更可预测，期末结算更清晰。"
     },
     "bedrijfsanalyse": {
-      "title": "Business analytics",
-      "teaser": "Revenue, peaks and product performance in one place.",
-      "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide."
+      "title": "经营分析",
+      "teaser": "营收、高峰与商品表现集中呈现。",
+      "body": "哪天最忙？哪条线贡献毛利？清晰报表助您调整菜单、人力与备货。\n\n不必折腾电子表格——决策所需数据就在眼前。"
     },
     "kostencalculator": {
-      "title": "Cost calculator",
-      "teaser": "Cost per portion to price with confidence.",
-      "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts."
+      "title": "成本计算器",
+      "teaser": "核算每份成本，定价更有依据。",
+      "body": "原料、份量与损耗计入成本价——支撑定价、保护毛利。\n\n快速发现表现偏低或偏高的品项，用数据调整菜单。"
     },
-    "galleryHint": "Click the image to enlarge. Use the arrows to browse.",
-    "galleryPrev": "Previous image",
-    "galleryNext": "Next image",
-    "galleryClose": "Close",
-    "galleryOpen": "Enlarge image"
+    "galleryHint": "点击图片可放大，使用左右箭头浏览。",
+    "galleryPrev": "上一张",
+    "galleryNext": "下一张",
+    "galleryClose": "关闭",
+    "galleryOpen": "放大图片"
   },
   "ui": {
     "ariaPrevImage": "上一张图片",

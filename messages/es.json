@@ -4457,27 +4457,27 @@
     "bannerEigen": "Cerrado temporalmente"
   },
   "whyVysion": {
-    "title": "Why choose Vysion",
+    "title": "Por qué elegir Vysion",
     "imageAlt": "Quiosco de mesa Vysion con pantalla táctil",
     "fullPlatform": {
-      "title": "Full platform",
-      "body": "POS, online ordering, kitchen display, reservations, website and reporting in one place. No scattered tools or double work — everything works together for your venue."
+      "title": "Plataforma completa",
+      "body": "TPV, pedidos online, pantalla de cocina, reservas, web e informes en un solo lugar. Sin herramientas dispersas ni doble trabajo: todo funciona junto para su negocio."
     },
     "liveSupport": {
-      "title": "Live support",
-      "body": "Our team is there when you need us: onboarding, day-to-day questions and busy shifts. Fast answers so you can keep service running."
+      "title": "Soporte en vivo",
+      "body": "Nuestro equipo está cuando lo necesita: puesta en marcha, dudas del día a día y turnos con mucho movimiento. Respuestas rápidas para que el servicio no se pare."
     },
     "rightPrice": {
-      "title": "The right price",
-      "body": "Clear plans with no hidden fees. You pay for what you need and scale as your business grows."
+      "title": "El precio adecuado",
+      "body": "Planes claros sin cargos ocultos. Paga por lo que necesita y crezca con su negocio."
     },
     "inHouseSoftware": {
-      "title": "Built in-house",
-      "body": "Our software is developed in-house by our own engineers."
+      "title": "Desarrollo propio",
+      "body": "Nuestro software lo desarrollan nuestros propios ingenieros en la empresa."
     },
     "posQuality": {
-      "title": "Premium POS hardware",
-      "body": "Our registers are built to high standards — we stand behind their quality."
+      "title": "Hardware TPV premium",
+      "body": "Nuestros equipos cumplen altos estándares y respaldamos su calidad."
     }
   },
   "platform": {
@@ -4486,141 +4486,141 @@
     "sectionSubtitle2": "Haga clic abajo y vea cómo funciona su negocio con Vysion",
     "gridTestCta": "Iniciar demo gratis",
     "gridTrustLine": "Sin instalación · Funciona directamente en el navegador · Como un negocio real",
-    "detailCta": "Start free trial",
-    "detailBack": "Back to overview",
-    "notFoundTitle": "Page not found",
-    "notFoundCta": "Go to homepage",
+    "detailCta": "Prueba gratis",
+    "detailBack": "Volver al resumen",
+    "notFoundTitle": "Página no encontrada",
+    "notFoundCta": "Ir al inicio",
     "kassasysteem": {
-      "title": "POS system",
-      "teaser": "Fast checkout linked to online orders and reporting.",
-      "body": "Your till is the heart of the business: quick sales, accurate receipts and a real-time link to your ordering stack and kitchen.\n\nWith Vysion Horeca you run products, tables, payments and staff from one place — fewer mistakes at peak and clear day-end closing.",
-      "heroAlt": "Hand using a touchscreen POS with payment terminal at the counter in a café or restaurant",
-      "horecaSectorTitle": "Hospitality POS",
-      "horecaImageAlt": "Modern all-in-one POS system on a table in a restaurant",
-      "horecaLeadBefore": "Our POS solutions give you ",
-      "horecaLeadBold": "a broad set of features to run your business better.",
-      "horecaLeadAfter": " Works with most Windows-based POS PCs on a recent version. Also runs smoothly on iPad®, Android® and kiosks.",
-      "horecaCloudBold": "Run your venue effortlessly from the cloud",
-      "horecaCloudAfter": " — a web panel gives you everything you need to optimise and grow.",
-      "horecaDemoCta": "Request a demo",
-      "featuresTitle": "Features",
+      "title": "Sistema TPV",
+      "teaser": "Cobro rápido enlazado a pedidos online e informes.",
+      "body": "La caja es el corazón del negocio: ventas rápidas, tickets correctos y vínculo en tiempo real con pedidos y cocina.\n\nCon Vysion Horeca gestiona productos, mesas, pagos y personal desde un solo lugar: menos errores en horas punta y cierres diarios claros.",
+      "heroAlt": "Mano usando un TPV táctil con datáfono en la barra de un café o restaurante",
+      "horecaSectorTitle": "TPV para hostelería",
+      "horecaImageAlt": "TPV todo en uno moderno sobre una mesa en un restaurante",
+      "horecaLeadBefore": "Nuestras soluciones TPV le ofrecen ",
+      "horecaLeadBold": "un amplio conjunto de funciones para gestionar mejor su negocio.",
+      "horecaLeadAfter": " Compatible con la mayoría de PCs TPV Windows recientes. También funciona bien en iPad®, Android® y quioscos.",
+      "horecaCloudBold": "Gestione su negocio desde la nube",
+      "horecaCloudAfter": " — un panel web le da todo lo necesario para optimizar y crecer.",
+      "horecaDemoCta": "Solicitar demo",
+      "featuresTitle": "Funcionalidades",
       "features": {
         "inventory": {
-          "title": "Stock control",
-          "body": "Stay on top of inventory so you can respond faster to customer demand."
+          "title": "Control de stock",
+          "body": "Mantenga el inventario bajo control y responda antes a la demanda."
         },
         "floorPlan": {
-          "title": "Table plan",
-          "body": "Flexible floor plans for clearer service and efficient seating."
+          "title": "Plano de mesas",
+          "body": "Planos flexibles para un servicio más claro y ubicación eficiente."
         },
         "timeClock": {
-          "title": "Time clock",
-          "body": "Track staff hours with a built-in clock for accurate records."
+          "title": "Fichaje",
+          "body": "Registre horas del personal con fichaje integrado."
         },
         "customerDisplay": {
-          "title": "Customer display",
-          "body": "Show orders and payment info so guests always know what they order and pay."
+          "title": "Pantalla cliente",
+          "body": "Muestre pedidos e importes para que siempre sepan qué piden y pagan."
         },
         "productionTickets": {
-          "title": "Kitchen tickets",
-          "body": "Tickets go straight to kitchen or bar so nothing gets lost in communication."
+          "title": "Tickets cocina",
+          "body": "Los comanda van directo a cocina o barra — sin perder información."
         },
         "reporting": {
-          "title": "Reporting",
-          "body": "Detailed reports on sales, stock and more — stay in control of your operation."
+          "title": "Informes",
+          "body": "Informes detallados de ventas, stock y más — control total del negocio."
         }
       }
     },
     "bestelplatform": {
-      "title": "Ordering platform",
-      "teaser": "Customers order with you directly — no marketplace taking a cut.",
-      "body": "Pickup, delivery and dine-in flow through your own branded site. Orders land cleanly on POS and kitchen screens.\n\nYou handle spikes better and keep full margin on online sales.",
-      "heroAlt": "Smartphone ordering food online at a table with laptop in the background",
-      "featuresTitle": "Your ordering stack",
+      "title": "Plataforma de pedidos",
+      "teaser": "Los clientes piden directo con usted — sin marketplace que cobre comisión.",
+      "body": "Recogida, entrega y en sala pasan por su web con su marca. Los pedidos llegan ordenados al TPV y pantallas de cocina.\n\nGestione mejor los picos y conserve todo el margen en ventas online.",
+      "heroAlt": "Smartphone pidiendo comida online en una mesa, portátil al fondo",
+      "featuresTitle": "Su stack de pedidos",
       "features": {
         "ownWebsite": {
-          "title": "Your own website",
-          "body": "A fully branded site on your domain with ordering that is easy to manage day to day."
+          "title": "Su propia web",
+          "body": "Sitio totalmente con su marca en su dominio y pedidos fáciles de gestionar cada día."
         },
         "timeSaving": {
-          "title": "Save time",
-          "body": "Fewer phone orders means staff can focus on service and other tasks in the venue."
+          "title": "Ahorro de tiempo",
+          "body": "Menos pedidos por teléfono: el equipo puede enfocarse en el servicio."
         },
         "productUpdates": {
-          "title": "Product updates",
-          "body": "Refresh menus, prices and new items quickly without heavy technical work."
+          "title": "Actualización de productos",
+          "body": "Carta, precios y novedades al día sin trabajo técnico pesado."
         },
         "dataAnalytics": {
-          "title": "Data & insight",
-          "body": "See sales patterns and peaks to tune stock and what you promote."
+          "title": "Datos e insights",
+          "body": "Vea tendencias y picos para ajustar stock y promociones."
         },
         "payments": {
-          "title": "Payments",
-          "body": "Guests pay securely online for faster checkout at pickup or dine-in."
+          "title": "Pagos",
+          "body": "Pago online seguro y cobro más rápido en recogida o en local."
         },
         "stockControl": {
-          "title": "Stock control",
-          "body": "Keep availability accurate so customers only order what you can fulfil."
+          "title": "Control de stock",
+          "body": "Disponibilidad fiable para que solo pidan lo que puede servir."
         },
         "zeroCommission": {
-          "title": "0% commission",
-          "body": "No third-party marketplace cut — orders go to you and you keep the margin."
+          "title": "0% comisión",
+          "body": "Sin marketplace tercero: los pedidos son suyos y el margen también."
         },
         "support": {
-          "title": "Support",
-          "body": "We help with launch and day-to-day questions so the platform stays reliable."
+          "title": "Soporte",
+          "body": "Ayuda en el arranque y el día a día para mantener la plataforma fiable."
         },
         "qrOrdering": {
-          "title": "QR ordering",
-          "body": "Guests scan a QR code and order from their phone — ideal for tables or takeaway."
+          "title": "Pedido por QR",
+          "body": "Escanean un QR y piden desde el móvil — ideal en mesa o para llevar."
         }
       }
     },
     "keukenschermen": {
-      "title": "Kitchen screens",
-      "teaser": "Live tickets sorted by time and priority.",
-      "body": "The kitchen sees exactly what is due and when — no lost tickets or bad handwriting.\n\nLess stress during the rush and calmer service from the pass."
+      "title": "Pantallas de cocina",
+      "teaser": "Tickets en vivo ordenados por tiempo y prioridad.",
+      "body": "La cocina ve qué hay que hacer y cuándo — sin tickets perdidos ni letra ilegible.\n\nMenos estrés en la hora punta y servicio más fluido en el pase."
     },
     "onlineScherm": {
-      "title": "Display screen",
-      "teaser": "Show menus, wait times or promos in your venue.",
-      "body": "In-venue screens keep guests informed without extra staff on the floor. Tie into your live offer and pricing.\n\nFewer counter questions and a stronger brand presence in the room."
+      "title": "Pantalla informativa",
+      "teaser": "Carta, tiempos de espera o promos en su local.",
+      "body": "Pantallas informan sin más personal en sala, enlazadas a su oferta y precios en vivo.\n\nMenos preguntas en barra y más presencia de marca."
     },
     "reservaties": {
-      "title": "Reservations",
-      "teaser": "Manage tables and slots without double entry.",
-      "body": "Guests book online; you see who is coming when. Plan service and staffing with a clear overview.\n\nConfirmations and messaging help reduce no-shows."
+      "title": "Reservas",
+      "teaser": "Mesas y franjas sin doble trabajo.",
+      "body": "Los clientes reservan online; usted ve quién viene y cuándo. Planifique servicio y equipo con claridad.\n\nConfirmaciones y mensajes reducen inasistencias."
     },
     "eigenWebsite": {
-      "title": "Your own website",
-      "teaser": "Your domain and brand — with ordering built in.",
-      "body": "Not a generic landing page: your logo, colours and photography. Customers recognise your business instantly.\n\nManage site and menu from the same admin as the rest of Vysion Horeca."
+      "title": "Su propia web",
+      "teaser": "Su dominio y marca — con pedidos integrados.",
+      "body": "No es una landing genérica: su logo, colores y fotos. El cliente reconoce su negocio al instante.\n\nWeb y carta desde el mismo admin que el resto de Vysion Horeca."
     },
     "whatsappBestellingen": {
-      "title": "WhatsApp ordering",
-      "teaser": "Order where guests already chat: menu and flow in one thread.",
-      "body": "WhatsApp is often the fastest channel for local hospitality. We connect catalogue and status to your operational workflow.\n\nFewer misunderstandings than ad-hoc chat messages alone."
+      "title": "Pedidos por WhatsApp",
+      "teaser": "Pedir donde ya chatean: menú y flujo en un hilo.",
+      "body": "WhatsApp suele ser el canal más rápido en hostelería local. Conectamos catálogo y estado a su operativa.\n\nMenos malentendidos que solo mensajes sueltos."
     },
     "loonadministratie": {
-      "title": "Payroll",
-      "teaser": "Hours and pay aligned with rostering and your team.",
-      "body": "Tracked hours belong with day-to-day operations. Connect to planning and lose the manual spreadsheets.\n\nCosts stay predictable and period close becomes clearer."
+      "title": "Nóminas y RR.HH.",
+      "teaser": "Horas y pagos alineados con turnos y equipo.",
+      "body": "Las horas registradas forman parte del día a día. Enlace con la planificación y evite hojas de cálculo manuales.\n\nCostes más previsibles y cierres de periodo más claros."
     },
     "bedrijfsanalyse": {
-      "title": "Business analytics",
-      "teaser": "Revenue, peaks and product performance in one place.",
-      "body": "Which days run hot? Which lines drive margin? Clear reports help you adjust menu, staff and stock.\n\nNo spreadsheet gymnastics — just the numbers you need to decide."
+      "title": "Análisis de negocio",
+      "teaser": "Ingresos, picos y rendimiento de producto en un solo sitio.",
+      "body": "¿Qué días marcan? ¿Qué líneas aportan margen? Informes claros para ajustar carta, equipo y stock.\n\nSin acrobacias en Excel — solo los datos para decidir."
     },
     "kostencalculator": {
-      "title": "Cost calculator",
-      "teaser": "Cost per portion to price with confidence.",
-      "body": "Ingredients, portions and waste belong in your cost price. That supports pricing and protects margin.\n\nSee quickly which items under- or over-perform — and adjust the menu on facts."
+      "title": "Calculadora de costes",
+      "teaser": "Coste por ración para fijar precios con seguridad.",
+      "body": "Ingredientes, raciones y mermas en su coste — mejor precio y margen protegido.\n\nVea rápido qué ítems van flojos o fuertes y ajuste la carta con datos."
     },
-    "galleryHint": "Click the image to enlarge. Use the arrows to browse.",
-    "galleryPrev": "Previous image",
-    "galleryNext": "Next image",
-    "galleryClose": "Close",
-    "galleryOpen": "Enlarge image"
+    "galleryHint": "Pulse la imagen para ampliarla. Use las flechas para navegar.",
+    "galleryPrev": "Imagen anterior",
+    "galleryNext": "Imagen siguiente",
+    "galleryClose": "Cerrar",
+    "galleryOpen": "Ampliar imagen"
   },
   "ui": {
     "ariaPrevImage": "Imagen anterior",
