@@ -19,6 +19,7 @@ import {
 } from '@/lib/supabase-post-trial-column'
 import {
   buildHamburgerModules,
+  mergeHamburgerRowsByTenantModule,
   SUBMENU_IDS_ALWAYS_ON,
 } from '@/lib/admin-hamburger-modules'
 
@@ -57,10 +58,7 @@ export default function SuperadminTenantModulesPage() {
 
   const hamburgerByKey = useMemo(() => {
     const mods = buildHamburgerModules(baseUrl, slug)
-    return Object.fromEntries(mods.map((m) => [m.key, m])) as Record<
-      TenantModuleId,
-      (typeof mods)[0]
-    >
+    return mergeHamburgerRowsByTenantModule(mods)
   }, [baseUrl, slug])
 
   const [loading, setLoading] = useState(true)

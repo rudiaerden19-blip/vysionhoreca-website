@@ -49,7 +49,7 @@ export function AdminHamburgerMenu({
     setSubOpen(null)
   }
 
-  const activeMod = filteredModules.find((m) => m.key === subOpen)
+  const activeMod = filteredModules.find((m) => m.rowKey === subOpen)
 
   return (
     <div className="relative z-[110] shrink-0">
@@ -97,12 +97,12 @@ export function AdminHamburgerMenu({
               <span>{t('adminLayout.overview')}</span>
             </Link>
             {filteredModules.map((mod) => (
-              <div key={mod.key} className="border-b border-gray-100 last:border-0">
+              <div key={mod.rowKey} className="border-b border-gray-100 last:border-0">
                 <button
                   type="button"
-                  onClick={() => setSubOpen(subOpen === mod.key ? null : mod.key)}
+                  onClick={() => setSubOpen(subOpen === mod.rowKey ? null : mod.rowKey)}
                   className={`flex w-full items-center justify-between px-4 py-3 transition-colors ${
-                    subOpen === mod.key ? 'bg-blue-50' : 'hover:bg-gray-50'
+                    subOpen === mod.rowKey ? 'bg-blue-50' : 'hover:bg-gray-50'
                   }`}
                 >
                   <div className="flex items-center gap-3">

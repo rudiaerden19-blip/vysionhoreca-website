@@ -23,7 +23,7 @@ export const TENANT_MODULE_LABELS: Record<TenantModuleId, string> = {
   online: 'Online platform (klanten, promoties, WhatsApp, …)',
   reservaties: 'Reservaties',
   personeel: 'Personeel & uren',
-  kosten: 'Kostenberekening',
+  kosten: 'Kosten berekening',
   rapporten: 'Rapporten, Z-rapport, analyse',
   website: 'Website & content (design, SEO, media, …)',
   account: 'Mijn account / abonnement',

@@ -12,15 +12,46 @@ export type AdminHamburgerItem = {
 }
 
 export type AdminHamburgerModule = {
+  /** Unieke rij voor React / open submenu (bij twee rijen dezelfde `key`). */
+  rowKey: string
   key: TenantModuleId
   icon: string
   label: string
   items: AdminHamburgerItem[]
 }
 
+/** Superadmin: één kaart per tenant-module; submenu’s van dubbele rijen mergen. */
+export function mergeHamburgerRowsByTenantModule(
+  modules: AdminHamburgerModule[]
+): Record<TenantModuleId, AdminHamburgerModule> {
+  const acc: Partial<Record<TenantModuleId, AdminHamburgerModule>> = {}
+  for (const m of modules) {
+    const cur = acc[m.key]
+    if (!cur) {
+      acc[m.key] = { ...m, items: [...m.items] }
+    } else {
+      const seen = new Set(cur.items.map((i) => i.id))
+      const extra = m.items.filter((i) => !seen.has(i.id))
+      acc[m.key] = { ...cur, items: [...cur.items, ...extra] }
+    }
+  }
+  return acc as Record<TenantModuleId, AdminHamburgerModule>
+}
+
 export function buildHamburgerModules(baseUrl: string, shopTenant: string): AdminHamburgerModule[] {
   return [
     {
+      rowKey: 'bestellingen',
+      key: 'online-bestellingen',
+      icon: '📲',
+      label: 'Bestellingen',
+      items: [
+        { id: 'sm_orders_bestellingen', icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
+        { id: 'sm_orders_groepen', icon: '🏢', label: 'Groepsbestellingen', href: `${baseUrl}/groepen` },
+      ],
+    },
+    {
+      rowKey: 'kassa',
       key: 'kassa',
       icon: '🖥️',
       label: 'Kassa',
@@ -36,26 +67,7 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       ],
     },
     {
-      key: 'online-bestellingen',
-      icon: '📲',
-      label: 'Bestellingen',
-      items: [
-        { id: 'sm_orders_bestellingen', icon: '📦', label: 'Bestellingen', href: `${baseUrl}/bestellingen` },
-        { id: 'sm_orders_groepen', icon: '🏢', label: 'Groepsbestellingen', href: `${baseUrl}/groepen` },
-        { id: 'sm_orders_display', icon: '🖥️', label: 'Online Scherm', href: `/shop/${shopTenant}/display` },
-        { id: 'sm_orders_keuken', icon: '👨‍🍳', label: 'Keuken Scherm', href: `/keuken/${shopTenant}` },
-      ],
-    },
-    {
-      key: 'instellingen',
-      icon: '⚙️',
-      label: 'Instellingen',
-      items: [
-        { id: 'sm_inst_betaling', icon: '💳', label: 'Betaalmethodes', href: `${baseUrl}/betaling` },
-        { id: 'sm_abonnement', icon: '📦', label: 'Abonnement', href: `${baseUrl}/abonnement` },
-      ],
-    },
-    {
+      rowKey: 'online-platform',
       key: 'online',
       icon: '🛒',
       label: 'Online platform',
@@ -65,51 +77,10 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
         { id: 'sm_online_beloningen', icon: '🎁', label: 'Beloningen', href: `${baseUrl}/klanten/beloningen` },
         { id: 'sm_online_promoties', icon: '🎫', label: 'Promoties', href: `${baseUrl}/promoties` },
         { id: 'sm_online_whatsapp', icon: '💬', label: 'WhatsApp', href: `${baseUrl}/whatsapp` },
-        { id: 'sm_online_shop_preview', icon: '🔗', label: 'Bekijk je Shop', href: `/shop/${shopTenant}` },
       ],
     },
     {
-      key: 'reservaties',
-      icon: '📅',
-      label: 'Reservaties',
-      items: [
-        { id: 'sm_reserveringen', icon: '📅', label: 'Restaurant Reservaties', href: `${baseUrl}/reserveringen` },
-      ],
-    },
-    {
-      key: 'personeel',
-      icon: '👔',
-      label: 'Personeel',
-      items: [
-        { id: 'sm_personeel_team', icon: '👤', label: 'Medewerkers', href: `${baseUrl}/personeel` },
-        { id: 'sm_personeel_uren', icon: '⏱️', label: 'Urenregistratie', href: `${baseUrl}/uren` },
-        { id: 'sm_personeel_vacatures', icon: '📋', label: 'Vacatures', href: `${baseUrl}/vacatures` },
-      ],
-    },
-    {
-      key: 'kosten',
-      icon: '🧮',
-      label: 'Kostenberekening',
-      items: [
-        { id: 'sm_kosten_marge', icon: '⚙️', label: 'Marge Instellingen', href: `${baseUrl}/kosten/instellingen` },
-        { id: 'sm_kosten_ingredienten', icon: '🥬', label: 'Ingrediënten', href: `${baseUrl}/kosten/ingredienten` },
-        { id: 'sm_kosten_product', icon: '📊', label: 'Product Kostprijs', href: `${baseUrl}/kosten/producten` },
-      ],
-    },
-    {
-      key: 'rapporten',
-      icon: '📊',
-      label: 'Rapporten',
-      items: [
-        { id: 'sm_rpt_rapporten', icon: '📊', label: 'Rapportages', href: `${baseUrl}/rapporten` },
-        { id: 'sm_rpt_z', icon: '🧾', label: 'Z-Rapporten (GKS)', href: `${baseUrl}/z-rapport` },
-        { id: 'sm_rpt_analyse', icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
-        { id: 'sm_rpt_verkoop', icon: '💹', label: 'Verkoop', href: `${baseUrl}/verkoop` },
-        { id: 'sm_rpt_dashboard', icon: '📊', label: 'Dashboard', href: `${baseUrl}` },
-        { id: 'sm_rpt_populair', icon: '🔥', label: 'Populaire items', href: `${baseUrl}/populair` },
-      ],
-    },
-    {
+      rowKey: 'website',
       key: 'website',
       icon: '🌐',
       label: 'Website',
@@ -130,6 +101,73 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       ],
     },
     {
+      rowKey: 'reservaties',
+      key: 'reservaties',
+      icon: '📅',
+      label: 'Reservaties',
+      items: [
+        { id: 'sm_reserveringen', icon: '📅', label: 'Restaurant Reservaties', href: `${baseUrl}/reserveringen` },
+      ],
+    },
+    {
+      rowKey: 'personeel',
+      key: 'personeel',
+      icon: '👔',
+      label: 'Personeel',
+      items: [
+        { id: 'sm_personeel_team', icon: '👤', label: 'Medewerkers', href: `${baseUrl}/personeel` },
+        { id: 'sm_personeel_uren', icon: '⏱️', label: 'Urenregistratie', href: `${baseUrl}/uren` },
+        { id: 'sm_personeel_vacatures', icon: '📋', label: 'Vacatures', href: `${baseUrl}/vacatures` },
+      ],
+    },
+    {
+      rowKey: 'online-schermen',
+      key: 'online-bestellingen',
+      icon: '📲',
+      label: 'Online',
+      items: [
+        { id: 'sm_orders_display', icon: '🖥️', label: 'Online Scherm', href: `/shop/${shopTenant}/display` },
+        { id: 'sm_orders_keuken', icon: '👨‍🍳', label: 'Keuken Scherm', href: `/keuken/${shopTenant}` },
+        { id: 'sm_online_shop_preview', icon: '🔗', label: 'Bekijk je Shop', href: `/shop/${shopTenant}` },
+      ],
+    },
+    {
+      rowKey: 'kosten',
+      key: 'kosten',
+      icon: '🧮',
+      label: 'Kosten berekening',
+      items: [
+        { id: 'sm_kosten_marge', icon: '⚙️', label: 'Marge Instellingen', href: `${baseUrl}/kosten/instellingen` },
+        { id: 'sm_kosten_ingredienten', icon: '🥬', label: 'Ingrediënten', href: `${baseUrl}/kosten/ingredienten` },
+        { id: 'sm_kosten_product', icon: '📊', label: 'Product Kostprijs', href: `${baseUrl}/kosten/producten` },
+      ],
+    },
+    {
+      rowKey: 'rapporten',
+      key: 'rapporten',
+      icon: '📊',
+      label: 'Rapporten',
+      items: [
+        { id: 'sm_rpt_rapporten', icon: '📊', label: 'Rapportages', href: `${baseUrl}/rapporten` },
+        { id: 'sm_rpt_z', icon: '🧾', label: 'Z-Rapporten (GKS)', href: `${baseUrl}/z-rapport` },
+        { id: 'sm_rpt_analyse', icon: '📈', label: 'Bedrijfsanalyse', href: `${baseUrl}/analyse` },
+        { id: 'sm_rpt_verkoop', icon: '💹', label: 'Verkoop', href: `${baseUrl}/verkoop` },
+        { id: 'sm_rpt_dashboard', icon: '📊', label: 'Dashboard', href: `${baseUrl}` },
+        { id: 'sm_rpt_populair', icon: '🔥', label: 'Populaire items', href: `${baseUrl}/populair` },
+      ],
+    },
+    {
+      rowKey: 'instellingen',
+      key: 'instellingen',
+      icon: '⚙️',
+      label: 'Instellingen',
+      items: [
+        { id: 'sm_inst_betaling', icon: '💳', label: 'Betaalmethodes', href: `${baseUrl}/betaling` },
+        { id: 'sm_abonnement', icon: '📦', label: 'Abonnement', href: `${baseUrl}/abonnement` },
+      ],
+    },
+    {
+      rowKey: 'account',
       key: 'account',
       icon: '👤',
       label: 'Account',

@@ -1087,7 +1087,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
           </button>
           {hamburgerOpen && (() => {
             const modules = filteredHamburgerModules
-            const activeMod = modules.find(m => m.key === hamburgerSubOpen)
+            const activeMod = modules.find(m => m.rowKey === hamburgerSubOpen)
             return (
               <div className="absolute top-full left-0 mt-1 flex z-30">
                 {/* Eerste kolom: modules */}
@@ -1107,10 +1107,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     <span>{t('adminLayout.overview')}</span>
                   </Link>
                   {modules.map(mod => (
-                    <div key={mod.key} className="border-b border-gray-100 last:border-0">
+                    <div key={mod.rowKey} className="border-b border-gray-100 last:border-0">
                       {(
-                        <button onClick={() => setHamburgerSubOpen(hamburgerSubOpen === mod.key ? null : mod.key)}
-                          className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.key ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
+                        <button onClick={() => setHamburgerSubOpen(hamburgerSubOpen === mod.rowKey ? null : mod.rowKey)}
+                          className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${hamburgerSubOpen === mod.rowKey ? 'bg-blue-50' : 'hover:bg-gray-50'}`}>
                           <div className="flex items-center gap-3">
                             <span className="text-lg">{mod.icon}</span>
                             <span className="font-semibold text-sm text-gray-700">{mod.label}</span>
