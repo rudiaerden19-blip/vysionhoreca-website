@@ -9,7 +9,7 @@ import { useLanguage } from '@/i18n'
 
 export default function AccountPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, locale, localeNames } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [customer, setCustomer] = useState<Customer | null>(null)
   const [orders, setOrders] = useState<Order[]>([])
@@ -272,6 +272,10 @@ export default function AccountPage({ params }: { params: { tenant: string } }) 
               <div className="col-span-2">
                 <span className="text-gray-500">{t('accountPage.address')}</span>
                 <p className="font-medium text-gray-900">{customer?.address || '-'}</p>
+              </div>
+              <div className="col-span-2">
+                <span className="text-gray-500">{t('nav.language')}</span>
+                <p className="font-medium text-gray-900">{localeNames[locale]}</p>
               </div>
             </div>
           )}

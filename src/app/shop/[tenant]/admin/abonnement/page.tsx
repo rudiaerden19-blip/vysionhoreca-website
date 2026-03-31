@@ -500,7 +500,7 @@ export default function AbonnementPage() {
   const params = useParams()
   const searchParams = useSearchParams()
   const tenantSlug = params.tenant as string
-  const { t: globalT, locale } = useLanguage()
+  const { t: globalT, locale, localeNames } = useLanguage()
   
   const [subscription, setSubscription] = useState<Subscription | null>(null)
   const [tenant, setTenant] = useState<Tenant | null>(null)
@@ -748,9 +748,10 @@ export default function AbonnementPage() {
               {(tenantInfo?.postal_code || tenantInfo?.city) && (
                 <div><span className="text-gray-500">Gemeente</span><p className="font-semibold text-gray-900">{[tenantInfo.postal_code, tenantInfo.city].filter(Boolean).join(' ')}</p></div>
               )}
-              {tenantInfo?.country && (
-                <div><span className="text-gray-500">Land</span><p className="font-semibold text-gray-900">{tenantInfo.country}</p></div>
-              )}
+              <div>
+                <span className="text-gray-500">{globalT('nav.language')}</span>
+                <p className="font-semibold text-gray-900">{localeNames[locale]}</p>
+              </div>
             </div>
           </div>
           {/* Upgrade knop voor starter plan */}
