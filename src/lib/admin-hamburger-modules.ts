@@ -51,8 +51,6 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       icon: '⚙️',
       label: 'Instellingen',
       items: [
-        { id: 'sm_inst_opening', icon: '🕐', label: 'Openingstijden', href: `${baseUrl}/openingstijden` },
-        { id: 'sm_inst_levering', icon: '🚚', label: 'Levering & Afhalen', href: `${baseUrl}/levering` },
         { id: 'sm_inst_betaling', icon: '💳', label: 'Betaalmethodes', href: `${baseUrl}/betaling` },
         { id: 'sm_abonnement', icon: '📦', label: 'Abonnement', href: `${baseUrl}/abonnement` },
       ],
@@ -66,7 +64,6 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
         { id: 'sm_online_klanten', icon: '👥', label: 'Klanten', href: `${baseUrl}/klanten` },
         { id: 'sm_online_beloningen', icon: '🎁', label: 'Beloningen', href: `${baseUrl}/klanten/beloningen` },
         { id: 'sm_online_promoties', icon: '🎫', label: 'Promoties', href: `${baseUrl}/promoties` },
-        { id: 'sm_online_cadeaubonnen', icon: '🎟️', label: 'Cadeaubonnen', href: `${baseUrl}/cadeaubonnen` },
         { id: 'sm_online_whatsapp', icon: '💬', label: 'WhatsApp', href: `${baseUrl}/whatsapp` },
         { id: 'sm_online_shop_preview', icon: '🔗', label: 'Bekijk je Shop', href: `/shop/${shopTenant}` },
       ],
@@ -118,6 +115,9 @@ export function buildHamburgerModules(baseUrl: string, shopTenant: string): Admi
       label: 'Website',
       items: [
         { id: 'sm_web_profiel', icon: '🏠', label: 'Zaak Profiel', href: `${baseUrl}/profiel` },
+        { id: 'sm_online_cadeaubonnen', icon: '🎟️', label: 'Cadeaubonnen', href: `${baseUrl}/cadeaubonnen` },
+        { id: 'sm_inst_opening', icon: '🕐', label: 'Openingstijden', href: `${baseUrl}/openingstijden` },
+        { id: 'sm_inst_levering', icon: '🚚', label: 'Levering & Afhalen', href: `${baseUrl}/levering` },
         { id: 'sm_web_design', icon: '🎨', label: 'Design', href: `${baseUrl}/design` },
         { id: 'sm_web_seo', icon: '🔍', label: 'SEO', href: `${baseUrl}/seo` },
         { id: 'sm_web_teksten', icon: '📝', label: 'Teksten & Info', href: `${baseUrl}/teksten` },
@@ -196,13 +196,28 @@ export function filterHamburgerModulesForAccess(
   const menuAccess: Record<TenantModuleId, boolean> = { ...effectiveAccess, account: true }
 
   return modules
-    .filter((m) => menuAccess[m.key])
+    .filter((m) => {
+      if (m.key === 'website') {
+        return (
+          menuAccess.website || menuAccess.instellingen || menuAccess.online
+        )
+      }
+      return menuAccess[m.key]
+    })
     .map((m) => ({
       ...m,
       items: m.items.filter((item) => {
         if (item.href.includes('/groepen') && !effectiveGroupOrders) return false
         if (item.href.includes('/labels') && !effectiveLabelPrinting) return false
-        return isSubmenuEnabledInTenantConfig(item.id, enabledModulesJson, effectiveAccess[m.key])
+        let parentOn = effectiveAccess[m.key]
+        if (m.key === 'website') {
+          if (item.id === 'sm_inst_opening' || item.id === 'sm_inst_levering') {
+            parentOn = effectiveAccess.website || effectiveAccess.instellingen
+          } else if (item.id === 'sm_online_cadeaubonnen') {
+            parentOn = effectiveAccess.website || effectiveAccess.online
+          }
+        }
+        return isSubmenuEnabledInTenantConfig(item.id, enabledModulesJson, parentOn)
       }),
     }))
     .filter((m) => m.items.length > 0)

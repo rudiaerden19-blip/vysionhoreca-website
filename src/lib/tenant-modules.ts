@@ -291,7 +291,7 @@ export function getFirstAccessibleAdminPath(
   const candidates: { m: TenantModuleId; path: string }[] = [
     { m: 'online-bestellingen', path: '/bestellingen' },
     { m: 'reservaties', path: '/reserveringen' },
-    { m: 'instellingen', path: '/openingstijden' },
+    { m: 'instellingen', path: '/betaling' },
     { m: 'online', path: '/online-status' },
     { m: 'personeel', path: '/personeel' },
     { m: 'kosten', path: '/kosten' },
@@ -303,6 +303,49 @@ export function getFirstAccessibleAdminPath(
     if (access[m]) return `${base}${path}`
   }
   return `${base}/`
+}
+
+/**
+ * Route-toegang: primaire module (adminPathToModule) óf legacy module voor items die
+ * onder Website staan maar historisch bij instellingen/online hoorden.
+ */
+export function hasModuleAccessForPathname(
+  pathname: string,
+  tenantSlug: string,
+  moduleAccess: Record<TenantModuleId, boolean>
+): boolean {
+  const gate = adminPathToModule(pathname, tenantSlug)
+  if (gate.kind !== 'module') return true
+  if (moduleAccess[gate.module]) return true
+  const base = `/shop/${tenantSlug}/admin`
+  let rest = pathname.slice(base.length).split('?')[0]
+  rest = rest.replace(/\/$/, '') || '/'
+  if (
+    (rest.startsWith('/openingstijden') || rest.startsWith('/levering')) &&
+    moduleAccess.instellingen
+  ) {
+    return true
+  }
+  if (rest.startsWith('/cadeaubonnen') && moduleAccess.online) {
+    return true
+  }
+  return false
+}
+
+/** Parent „aan” voor isSubmenuEnabledInTenantConfig bij verplaatste submenu’s. */
+export function submenuParentAllowedForSubmenuId(
+  subId: string,
+  gate: AdminModuleGateResult,
+  moduleAccess: Record<TenantModuleId, boolean>
+): boolean {
+  if (gate.kind !== 'module') return true
+  if (subId === 'sm_inst_opening' || subId === 'sm_inst_levering') {
+    return moduleAccess.website || moduleAccess.instellingen
+  }
+  if (subId === 'sm_online_cadeaubonnen') {
+    return moduleAccess.website || moduleAccess.online
+  }
+  return moduleAccess[gate.module]
 }
 
 /**
@@ -335,14 +378,13 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   if (rest.startsWith('/bestellingen') || rest.startsWith('/groepen')) {
     return { kind: 'module', module: 'online-bestellingen' }
   }
-  if (rest.startsWith('/openingstijden') || rest.startsWith('/levering') || rest.startsWith('/betaling')) {
+  if (rest.startsWith('/betaling')) {
     return { kind: 'module', module: 'instellingen' }
   }
   if (
     rest.startsWith('/online-status') ||
     rest.startsWith('/klanten') ||
     rest.startsWith('/promoties') ||
-    rest.startsWith('/cadeaubonnen') ||
     rest.startsWith('/whatsapp')
   ) {
     return { kind: 'module', module: 'online' }
@@ -367,6 +409,9 @@ export function adminPathToModule(pathname: string, tenantSlug: string): AdminMo
   }
   if (
     rest.startsWith('/profiel') ||
+    rest.startsWith('/openingstijden') ||
+    rest.startsWith('/levering') ||
+    rest.startsWith('/cadeaubonnen') ||
     rest.startsWith('/design') ||
     rest.startsWith('/seo') ||
     rest.startsWith('/teksten') ||

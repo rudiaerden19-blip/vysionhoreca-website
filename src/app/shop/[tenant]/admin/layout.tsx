@@ -10,7 +10,9 @@ import {
   adminPathToModule,
   getAdminKassaEntryHref,
   getFirstAccessibleAdminPath,
+  hasModuleAccessForPathname,
   isKassaPosScreenEnabled,
+  submenuParentAllowedForSubmenuId,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
 import {
@@ -82,7 +84,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   useEffect(() => {
     if (loading || modulesLoading || tenantExists === false) return
     const gate = adminPathToModule(pathname, params.tenant)
-    if (gate.kind === 'module' && !moduleAccess[gate.module]) {
+    if (gate.kind === 'module' && !hasModuleAccessForPathname(pathname, params.tenant, moduleAccess)) {
       router.replace(
         getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson)
       )
@@ -95,7 +97,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       !isSubmenuEnabledInTenantConfig(
         subId,
         enabledModulesJson,
-        gate.kind === 'module' ? moduleAccess[gate.module] : true
+        submenuParentAllowedForSubmenuId(subId, gate, moduleAccess)
       )
     ) {
       router.replace(`/shop/${params.tenant}/admin`)
