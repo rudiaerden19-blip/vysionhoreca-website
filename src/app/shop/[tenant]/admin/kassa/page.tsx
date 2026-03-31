@@ -119,10 +119,15 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
   // ── Nieuwe bestelling alarm (exact donor) ────────────────────────────────
   const [newOrderAlert, setNewOrderAlert] = useState<{id: string; orderNumber: number; total: number} | null>(null)
+  const [newReservAlert, setNewReservAlert] = useState<{ id: string } | null>(null)
   const newOrderAlertRef = useRef<{id: string; orderNumber: number; total: number} | null>(null)
   const alarmIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const previousOrderIdsRef = useRef<string[]>([])
   const dismissedOrderIdsRef = useRef<string[]>([]) // oranje scherm al getoond, niet opnieuw tonen
+
+  const newReservAlertRef = useRef<{ id: string } | null>(null)
+  const reservAlarmIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const previousReservIdsRef = useRef<string[]>([])
 
   // Gebruik playOrderNotification uit sounds.ts — zelfde geactiveerde AudioContext als alle andere knoppen
   const stopAlarm = useRef(() => {
@@ -164,6 +169,39 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     ;(window as any).startOrderAlarm = () => startAlarm()
     ;(window as any).isAlarmRunning = () => alarmIntervalRef.current !== null
   }, [stopAlarm, startAlarm])
+
+  // Reservaties: eigen interval —zelfde geluid/patroon als bestellingen, maar bestellingen-code blijft ongemoeid
+  const stopReservAlarm = useRef(() => {
+    if (reservAlarmIntervalRef.current) {
+      clearInterval(reservAlarmIntervalRef.current)
+      reservAlarmIntervalRef.current = null
+    }
+  }).current
+
+  const startReservAlarm = useRef(() => {
+    if (reservAlarmIntervalRef.current) return
+    playOrderNotification().catch(() => {})
+    reservAlarmIntervalRef.current = setInterval(() => {
+      playOrderNotification().catch(() => {})
+    }, 2000)
+  }).current
+
+  useEffect(() => {
+    if (demoViewOnly) return
+    if (newReservAlert) {
+      if (!reservAlarmIntervalRef.current) startReservAlarm()
+      const verifyInterval = setInterval(() => {
+        if (newReservAlertRef.current && !reservAlarmIntervalRef.current) startReservAlarm()
+      }, 2000)
+      return () => clearInterval(verifyInterval)
+    }
+  }, [newReservAlert, startReservAlarm, demoViewOnly])
+
+  useEffect(() => {
+    return () => {
+      if (reservAlarmIntervalRef.current) clearInterval(reservAlarmIntervalRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     if (!demoViewOnly) return
@@ -564,32 +602,83 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
     setSoundsOn(getSoundsEnabled())
   }, [])
 
-  // Pending reservaties tellen + realtime update + notificatie bij nieuwe
-  const prevPendingRef = useRef(0)
+  // Reservaties: zelfde aanpak als online bestellingen — poll elke 3s, nieuwe id’s detecteren, badge + geluid
+  // (PENDING + WAITLIST case-insensitive; recente CONFIRMED voor auto-bevestig via website)
   useEffect(() => {
-    const fetchPending = async (showNotif = false) => {
-      const { count } = await supabase
-        .from('reservations')
-        .select('*', { count: 'exact', head: true })
-        .eq('tenant_slug', tenant)
-        .eq('status', 'PENDING')
-      const n = count ?? 0
-      setPendingReservCount(n)
-      // Toon melding als er een nieuwe binnenkomt
-      if (showNotif && n > prevPendingRef.current) {
-        try { playOrderNotification() } catch {}
-        setNewReservNotif(true)
-        setTimeout(() => setNewReservNotif(false), 8000)
+    if (demoViewOnly) return
+    let isFirstCheck = true
+    const recentCutoff = () => new Date(Date.now() - 45 * 60 * 1000).toISOString()
+    const check = async () => {
+      try {
+        const [{ data: idRows }, pendingRes, recentConf] = await Promise.all([
+          supabase
+            .from('reservations')
+            .select('id')
+            .eq('tenant_slug', tenant)
+            .order('created_at', { ascending: false })
+            .limit(50),
+          supabase
+            .from('reservations')
+            .select('*', { count: 'exact', head: true })
+            .eq('tenant_slug', tenant)
+            .or('status.eq.PENDING,status.eq.pending,status.eq.WAITLIST,status.eq.waitlist'),
+          supabase
+            .from('reservations')
+            .select('*', { count: 'exact', head: true })
+            .eq('tenant_slug', tenant)
+            .or('status.eq.CONFIRMED,status.eq.confirmed')
+            .gte('created_at', recentCutoff()),
+        ])
+        const list = idRows || []
+        const attentionCount = (pendingRes.count ?? 0) + (recentConf.count ?? 0)
+        setPendingReservCount(attentionCount)
+
+        const currentIds = list.map((r: { id: string }) => r.id)
+        const prevIds = previousReservIdsRef.current
+        if (!isFirstCheck) {
+          const newOnes = list.filter((r: { id: string }) => !prevIds.includes(r.id))
+          if (newOnes.length > 0) {
+            startReservAlarm()
+            try {
+              if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('📅 Nieuwe reservatie!', {
+                  body: 'Er is een nieuwe online reservatie binnengekomen.',
+                  icon: '/favicon.ico',
+                  requireInteraction: true,
+                  tag: 'new-reservation',
+                })
+              }
+            } catch {
+              /* ignore */
+            }
+            const alert = { id: newOnes[0].id }
+            newReservAlertRef.current = alert
+            setNewReservAlert(alert)
+            setNewReservNotif(true)
+            setTimeout(() => setNewReservNotif(false), 8000)
+          }
+          if (attentionCount > 0) {
+            if (!reservAlarmIntervalRef.current) startReservAlarm()
+          } else {
+            if (reservAlarmIntervalRef.current) {
+              stopReservAlarm()
+              newReservAlertRef.current = null
+              setNewReservAlert(null)
+            }
+          }
+        } else {
+          isFirstCheck = false
+          if (attentionCount > 0) startReservAlarm()
+        }
+        previousReservIdsRef.current = currentIds
+      } catch {
+        /* ignore */
       }
-      prevPendingRef.current = n
     }
-    fetchPending(false)
-    const channel = supabase.channel('reservations-badge-v2')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'reservations' }, () => fetchPending(true))
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'reservations' }, () => fetchPending(false))
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
-  }, [tenant])
+    check()
+    const interval = setInterval(check, 3000)
+    return () => clearInterval(interval)
+  }, [tenant, demoViewOnly, startReservAlarm, stopReservAlarm])
 
   // Online status check – gecombineerd: navigator.onLine + server ping
   useEffect(() => {
@@ -1163,8 +1252,16 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
 
         {/* Reserveringen */}
         {effectiveAccess.reservaties && (
-          <button onClick={() => setShowReservations(true)}
-            className="relative flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors">
+          <button
+            onClick={() => {
+              stopReservAlarm()
+              newReservAlertRef.current = null
+              setNewReservAlert(null)
+              setNewReservNotif(false)
+              setShowReservations(true)
+            }}
+            className="relative flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
+          >
             <span className="text-lg">📅</span>
             <span>Reserveringen</span>
             {pendingReservCount > 0 && (
@@ -1727,7 +1824,13 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       {newReservNotif && !showReservations && (
         <div
           className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 bg-amber-500 text-white px-6 py-4 rounded-2xl shadow-2xl cursor-pointer animate-bounce"
-          onClick={() => { setShowReservations(true); setNewReservNotif(false) }}
+          onClick={() => {
+            stopReservAlarm()
+            newReservAlertRef.current = null
+            setNewReservAlert(null)
+            setShowReservations(true)
+            setNewReservNotif(false)
+          }}
         >
           <span className="text-2xl">📅</span>
           <div>
@@ -1735,7 +1838,10 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
             <p className="text-sm opacity-90">Klik om te bekijken en goed te keuren</p>
           </div>
           <button
-            onClick={(e) => { e.stopPropagation(); setNewReservNotif(false) }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setNewReservNotif(false)
+            }}
             className="ml-2 text-white/70 hover:text-white text-xl font-bold"
           >×</button>
         </div>
