@@ -8,6 +8,7 @@ import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
+  getAdminKassaEntryHref,
   getFirstAccessibleAdminPath,
   isKassaPosScreenEnabled,
   type TenantModuleId,
@@ -186,11 +187,15 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             enabledModulesJson={enabledModulesJson}
             loading={modulesLoading}
           />
-          {!modulesLoading &&
-            moduleAccess['kassa'] &&
-            isKassaPosScreenEnabled(enabledModulesJson, true) && (
+          {!modulesLoading && moduleAccess['kassa'] && (
             <Link
-              href={`${baseUrl}/kassa`}
+              href={
+                getAdminKassaEntryHref(
+                  params.tenant,
+                  moduleAccess,
+                  enabledModulesJson
+                ) ?? `${baseUrl}/`
+              }
               className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400"
             >
               <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

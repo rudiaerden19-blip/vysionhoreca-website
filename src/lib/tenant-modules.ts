@@ -254,6 +254,22 @@ export function isKassaPosScreenEnabled(
 }
 
 /**
+ * Bestemming voor de admin-topbalk «terug naar kassa».
+ * Niet alleen wanneer het POS-scherm aan staat — anders ontbreekt de knop bij veel tenants.
+ */
+export function getAdminKassaEntryHref(
+  tenantSlug: string,
+  access: Record<TenantModuleId, boolean>,
+  enabledModulesJson: Record<string, boolean> | null
+): string | null {
+  if (!access.kassa) return null
+  const base = `/shop/${tenantSlug}/admin`
+  if (isKassaPosScreenEnabled(enabledModulesJson, true)) return `${base}/kassa`
+  if (isTenantSubmenuEffectiveOn('sm_kassa_pincode', enabledModulesJson, true)) return `${base}/pincode`
+  return `${base}/`
+}
+
+/**
  * Eerste admin-route waar de tenant recht op heeft (bij geweigerde module / kassa uit).
  * Met expliciete submenu-JSON: alleen `/kassa` als er minstens één POS-submenu aan staat;
  * anders `/pincode` als alleen pincode (of pincode + geen POS) bedoeld is.
@@ -266,11 +282,9 @@ export function getFirstAccessibleAdminPath(
   const base = `/shop/${tenantSlug}/admin`
 
   if (access.kassa) {
-    if (isKassaPosScreenEnabled(enabledModulesJson, true)) {
-      return `${base}/kassa`
-    }
-    if (isTenantSubmenuEffectiveOn('sm_kassa_pincode', enabledModulesJson, true)) {
-      return `${base}/pincode`
+    const kassaHref = getAdminKassaEntryHref(tenantSlug, access, enabledModulesJson)
+    if (kassaHref && kassaHref !== `${base}/`) {
+      return kassaHref
     }
   }
 
