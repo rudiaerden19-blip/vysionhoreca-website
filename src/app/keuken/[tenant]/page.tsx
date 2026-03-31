@@ -520,18 +520,14 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
               🖨️ {printerStatus === 'online' ? 'Online' : printerStatus === 'offline' ? 'Offline' : 'Printer'}
             </button>
 
-            {/* Navigatie knoppen */}
-            <Link
-              href={`/shop/${params.tenant}/admin/kassa`}
-              className="px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-sm font-bold"
-            >
-              🖥️ Kassa
-            </Link>
             <Link
               href={`/shop/${params.tenant}/admin`}
-              className="px-3 py-2 bg-orange-700 hover:bg-orange-600 rounded-xl text-sm font-bold"
+              className="flex items-center gap-2 px-3 py-2 bg-orange-500 hover:bg-orange-400 rounded-xl text-sm font-bold text-white"
             >
-              ⚙️ Admin
+              <svg className="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              {t('adminLayout.back')}
             </Link>
           </div>
         </div>

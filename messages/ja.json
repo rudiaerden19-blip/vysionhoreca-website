@@ -4806,6 +4806,7 @@
     "shopNotFoundDesc": "このショップは存在しないか削除されました。",
     "backToVysion": "← Vysion に戻る",
     "pos": "レジ",
+    "back": "戻る",
     "modulesMenu": "モジュール",
     "onlineDisplay": "客向け画面",
     "lock": "ロック"

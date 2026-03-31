@@ -4808,6 +4808,7 @@
     "shopNotFoundDesc": "该店铺不存在或已被删除。",
     "backToVysion": "← 返回 Vysion",
     "pos": "收银",
+    "back": "返回",
     "modulesMenu": "模块",
     "onlineDisplay": "顾客显示屏",
     "lock": "锁定"

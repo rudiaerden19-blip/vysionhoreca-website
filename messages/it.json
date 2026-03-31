@@ -4808,6 +4808,7 @@
     "shopNotFoundDesc": "Questo negozio non esiste o è stato rimosso.",
     "backToVysion": "← Torna a Vysion",
     "pos": "Cassa",
+    "back": "Indietro",
     "modulesMenu": "Moduli",
     "onlineDisplay": "Display cliente",
     "lock": "Blocca"

@@ -4808,6 +4808,7 @@
     "shopNotFoundDesc": "Esta tienda no existe o fue eliminada.",
     "backToVysion": "← Volver a Vysion",
     "pos": "TPV",
+    "back": "Volver",
     "modulesMenu": "Módulos",
     "onlineDisplay": "Pantalla cliente",
     "lock": "Bloquear"
