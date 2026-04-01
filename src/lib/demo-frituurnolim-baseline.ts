@@ -60,12 +60,15 @@ const TENANT_SETTINGS_BRANDING = {
 }
 
 /** Zelfde als hierboven maar zonder kolommen die op oudere DB’s kunnen ontbreken. */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructuring om core te bouwen
-const {
-  payment_methods: _pm,
-  image_display_mode: _im,
-  ...TENANT_SETTINGS_BRANDING_CORE
-} = TENANT_SETTINGS_BRANDING
+const TENANT_SETTINGS_BRANDING_CORE: Omit<
+  typeof TENANT_SETTINGS_BRANDING,
+  'payment_methods' | 'image_display_mode'
+> = (() => {
+  const r = { ...TENANT_SETTINGS_BRANDING }
+  delete (r as Record<string, unknown>).payment_methods
+  delete (r as Record<string, unknown>).image_display_mode
+  return r as Omit<typeof TENANT_SETTINGS_BRANDING, 'payment_methods' | 'image_display_mode'>
+})()
 
 function buildNolimOpeningHours(tenantSlug: string) {
   const rowOpen = {
