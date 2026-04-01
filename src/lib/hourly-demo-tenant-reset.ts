@@ -1,10 +1,13 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
+import { applyFrituurNolimDemoBranding, type DemoBrandingResetStatus } from '@/lib/demo-frituurnolim-baseline'
 
 /**
  * Uurlijkse reset voor de publieke demo (DEMO_TENANT_SLUG = frituurnolim).
- * Verwijdert vooral data die bezoekers online / in de kassa “vuil” maken.
- * Bewust niet: tenant_settings, menu, staff, abonnementen, openingsuren.
+ * Verwijdert operationele data én zet naam, kleuren, adres, uren en teksten
+ * terug naar `demo-frituurnolim-baseline.ts` (Stripe/SMTP worden niet gewist — alleen niet mee in de update).
+ *
+ * Bewust niet: menu, staff/categorieën, abonnement.
  *
  * Volgorde houdt rekening met gangbare FK’s (orders vóór shop_customers, enz.).
  */
@@ -17,6 +20,7 @@ const TABLES_DELETE_IN_ORDER = [
   'loyalty_rewards',
   'reservations',
   'guest_profiles',
+  'team_members',
   'reviews',
   'promotions',
   'daily_sales',
@@ -51,6 +55,7 @@ function normalizeDecorJson(data: unknown): unknown {
 export type HourlyDemoResetResult = {
   tenant_slug: typeof DEMO_TENANT_SLUG
   deleted: { table: string; error: string | null }[]
+  branding: DemoBrandingResetStatus
   floor_plan_tables: 'updated' | 'skipped' | 'error'
   floor_plan_decor: 'updated' | 'skipped' | 'error'
   shop_online: 'updated' | 'skipped' | 'error'
@@ -66,6 +71,8 @@ export async function runHourlyDemoTenantReset(
     const { error } = await supabase.from(table).delete().eq('tenant_slug', slug)
     deleted.push({ table, error: error?.message ?? null })
   }
+
+  const branding = await applyFrituurNolimDemoBranding(supabase)
 
   let floor_plan_tables: HourlyDemoResetResult['floor_plan_tables'] = 'skipped'
   {
@@ -125,6 +132,7 @@ export async function runHourlyDemoTenantReset(
   return {
     tenant_slug: slug,
     deleted,
+    branding,
     floor_plan_tables,
     floor_plan_decor,
     shop_online,

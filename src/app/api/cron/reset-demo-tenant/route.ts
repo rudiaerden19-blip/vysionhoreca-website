@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
       durationMs,
       tenant: result.tenant_slug,
       deleteErrors: failedDeletes.length,
+      branding: result.branding,
       floor_tables: result.floor_plan_tables,
       floor_decor: result.floor_plan_decor,
       shop_online: result.shop_online,
