@@ -7,6 +7,7 @@ export const PROTECTED_TENANTS = [
   'frituurnolim',
   'frituur-nolim',
   'skippsbv',
+  'restaurantdekorf',
   'demo-frituur',
 ] as const
 
@@ -14,6 +15,7 @@ export const PROTECTED_TENANTS = [
 export const ADMIN_TENANTS = [
   'frituurnolim',
   'skippsbv',
+  'restaurantdekorf',
 ] as const
 
 // Demo accounts - publiek zichtbaar als live demo

@@ -7,7 +7,7 @@ SET
   subscription_status = 'active',
   trial_ends_at = NULL,
   updated_at = NOW()
-WHERE lower(slug) IN ('frituurnolim', 'skippsbv');
+WHERE lower(slug) IN ('frituurnolim', 'skippsbv', 'restaurantdekorf');
 
 UPDATE subscriptions
 SET
@@ -16,4 +16,4 @@ SET
   trial_started_at = NULL,
   trial_ends_at = NULL,
   updated_at = NOW()
-WHERE lower(tenant_slug) IN ('frituurnolim', 'skippsbv');
+WHERE lower(tenant_slug) IN ('frituurnolim', 'skippsbv', 'restaurantdekorf');
