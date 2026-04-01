@@ -429,7 +429,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
       )
       .subscribe()
-    return () => { supabase.removeChannel(tableChannel) }
+    return () => {
+      void supabase.removeChannel(tableChannel).catch(() => {})
+    }
   }, [tenant])
 
   // ── Realtime sync: open bestellingen per tafel tussen apparaten ───────────
@@ -459,7 +461,9 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         }
       )
       .subscribe()
-    return () => { supabase.removeChannel(ordersChannel) }
+    return () => {
+      void supabase.removeChannel(ordersChannel).catch(() => {})
+    }
   }, [tenant, tableOrdersKey])
 
   // Sla cart op voor huidige tafel

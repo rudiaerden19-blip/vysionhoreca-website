@@ -68,7 +68,7 @@ export default function LabelsPage({ params }: { params: { tenant: string } }) {
       .subscribe()
 
     return () => {
-      supabase.removeChannel(channel)
+      void supabase.removeChannel(channel).catch(() => {})
     }
   }, [params.tenant, loadLabels])
 

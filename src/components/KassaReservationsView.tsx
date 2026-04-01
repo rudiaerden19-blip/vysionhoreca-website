@@ -1679,7 +1679,7 @@ export default function KassaReservationsView({
     }, 30_000)
 
     return () => {
-      supabase.removeChannel(channel)
+      void supabase.removeChannel(channel).catch(() => {})
       clearInterval(interval)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

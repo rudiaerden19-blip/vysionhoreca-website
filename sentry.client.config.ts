@@ -4,6 +4,26 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+/** Chromium / service worker / extension noise; not actionable app code (no match in repo or deps). */
+function isMatchingIdUpdateNoise(value: unknown): boolean {
+  const s =
+    typeof value === "string"
+      ? value
+      : value != null &&
+          typeof value === "object" &&
+          "message" in value &&
+          typeof (value as { message: unknown }).message === "string"
+        ? (value as { message: string }).message
+        : value != null
+          ? String(value)
+          : "";
+  return (
+    s.includes("Object Not Found Matching Id") &&
+    s.includes("MethodName:update") &&
+    s.includes("ParamCount:")
+  );
+}
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
@@ -27,4 +47,19 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
+
+  ignoreErrors: [
+    /Object Not Found Matching Id:.*MethodName:update.*ParamCount:/i,
+  ],
+
+  beforeSend(event, hint) {
+    if (isMatchingIdUpdateNoise(hint.originalException)) {
+      return null;
+    }
+    const first = event.exception?.values?.[0]?.value;
+    if (first != null && isMatchingIdUpdateNoise(first)) {
+      return null;
+    }
+    return event;
+  },
 });

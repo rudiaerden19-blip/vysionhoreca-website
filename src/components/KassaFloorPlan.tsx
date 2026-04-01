@@ -505,8 +505,8 @@ export default function KassaFloorPlan({ tenant, onSelectTable, onClose, tableOr
       .subscribe()
 
     return () => {
-      supabase.removeChannel(tableChannel)
-      supabase.removeChannel(decorChannel)
+      void supabase.removeChannel(tableChannel).catch(() => {})
+      void supabase.removeChannel(decorChannel).catch(() => {})
     }
   }, [tenant, storageKey, decorKey, stoolStatusKey])
 
