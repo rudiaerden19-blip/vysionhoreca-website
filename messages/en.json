@@ -238,6 +238,11 @@
       "body": "Our registers are built to high standards — we stand behind their quality."
     }
   },
+  "gratisWebsiteBanner": {
+    "title": "Free website",
+    "body": "With your subscription you receive a completely free website of your own — included at no extra cost.",
+    "cta": "View example restaurant website"
+  },
   "platform": {
     "sectionTitle": "Our platform",
     "sectionSubtitle1": "Try the full system yourself (free)",

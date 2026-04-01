@@ -4480,6 +4480,11 @@
       "body": "Le nostre casse rispettano standard elevati: garantiamo la qualità."
     }
   },
+  "gratisWebsiteBanner": {
+    "title": "Sito web gratuito",
+    "body": "Con il tuo abbonamento ricevi un sito web tutto tuo, completamente gratuito — incluso senza costi extra.",
+    "cta": "Vedi esempio di sito ristorante"
+  },
   "platform": {
     "sectionTitle": "La nostra piattaforma",
     "sectionSubtitle1": "Prova il sistema completo tu stesso (gratis)",

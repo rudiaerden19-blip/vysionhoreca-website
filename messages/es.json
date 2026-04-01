@@ -4480,6 +4480,11 @@
       "body": "Nuestros equipos cumplen altos estándares y respaldamos su calidad."
     }
   },
+  "gratisWebsiteBanner": {
+    "title": "Sitio web gratuito",
+    "body": "Con tu suscripción recibes un sitio web propio totalmente gratuito, incluido sin coste adicional.",
+    "cta": "Ver ejemplo de web de restaurante"
+  },
   "platform": {
     "sectionTitle": "Nuestra plataforma",
     "sectionSubtitle1": "Pruebe el sistema completo usted mismo (gratis)",

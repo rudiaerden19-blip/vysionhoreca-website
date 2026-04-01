@@ -4502,6 +4502,11 @@
       "body": "Nos caisses répondent à des standards élevés — nous assurons leur qualité."
     }
   },
+  "gratisWebsiteBanner": {
+    "title": "Site web gratuit",
+    "body": "Avec votre abonnement, vous recevez un site web entièrement gratuit — inclus sans frais supplémentaires.",
+    "cta": "Voir un exemple de site restaurant"
+  },
   "platform": {
     "sectionTitle": "Notre plateforme",
     "sectionSubtitle1": "Essayez le système complet vous-même (gratuit)",

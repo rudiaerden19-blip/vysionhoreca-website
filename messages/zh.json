@@ -4480,6 +4480,11 @@
       "body": "收银设备达到高标准——我们为品质负责。"
     }
   },
+  "gratisWebsiteBanner": {
+    "title": "免费网站",
+    "body": "订阅即享完全免费的自有网站——已包含，无需额外费用。",
+    "cta": "查看餐厅网站示例"
+  },
   "platform": {
     "sectionTitle": "我们的平台",
     "sectionSubtitle1": "免费亲自体验完整系统",

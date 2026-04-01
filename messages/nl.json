@@ -238,6 +238,11 @@
       "body": "Onze kassa's zijn van uitstekende, hoogwaardige kwaliteit waar wij garant voor staan."
     }
   },
+  "gratisWebsiteBanner": {
+    "title": "Gratis website",
+    "body": "Bij je abonnement ontvang je een volledig gratis eigen website — mee inbegrepen, zonder extra kosten.",
+    "cta": "Klik hier voor restaurantwebsite"
+  },
   "platform": {
     "sectionTitle": "Ons platform",
     "sectionSubtitle1": "Probeer het volledige systeem zelf (gratis)",

@@ -13,6 +13,39 @@ import {
 import { useLanguage } from '@/i18n'
 import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
+const GRATIS_WEBSITE_EXAMPLE_HREF =
+  'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
+
+function GratisWebsiteBannerSection() {
+  const { t } = useLanguage()
+  return (
+    <section
+      className="relative py-12 sm:py-14 bg-white border-b border-gray-100"
+      aria-labelledby="gratis-website-heading"
+    >
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2
+          id="gratis-website-heading"
+          className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight mb-3"
+        >
+          {t('gratisWebsiteBanner.title')}
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 leading-relaxed mb-6">
+          {t('gratisWebsiteBanner.body')}
+        </p>
+        <a
+          href={GRATIS_WEBSITE_EXAMPLE_HREF}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center rounded-full bg-accent px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90"
+        >
+          {t('gratisWebsiteBanner.cta')}
+        </a>
+      </div>
+    </section>
+  )
+}
+
 function WhyVysionSection() {
   const { t } = useLanguage()
   const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice', 'inHouseSoftware', 'posQuality'] as const
@@ -1506,6 +1539,7 @@ export default function HomePage() {
       {stickyNav && <Navigation />}
       <HomeLandingHero onStickyNavChange={setStickyNav} />
       <WhyVysionSection />
+      <GratisWebsiteBannerSection />
       <PlatformGridSection />
       <HardwareSection />
       <NewAtVysionSection />

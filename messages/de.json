@@ -4503,6 +4503,11 @@
       "body": "Unsere Kassen erfüllen hohe Standards — wir stehen für ihre Qualität ein."
     }
   },
+  "gratisWebsiteBanner": {
+    "title": "Kostenlose Website",
+    "body": "Zu Ihrem Abonnement erhalten Sie eine völlig kostenlose eigene Website — ohne Aufpreis inbegriffen.",
+    "cta": "Beispiel-Restaurantwebsite ansehen"
+  },
   "platform": {
     "sectionTitle": "Unsere Plattform",
     "sectionSubtitle1": "Testen Sie das komplette System selbst (kostenlos)",
