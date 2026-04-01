@@ -241,7 +241,8 @@
   "gratisWebsiteBanner": {
     "title": "Gratis website",
     "body": "Bij je abonnement ontvang je een volledig gratis eigen website — mee inbegrepen, zonder extra kosten.",
-    "cta": "Klik hier voor restaurantwebsite"
+    "cta": "Klik hier voor restaurantwebsite",
+    "ctaFrituur": "Bekijk voorbeeld frituur"
   },
   "platform": {
     "sectionTitle": "Ons platform",

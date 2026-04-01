@@ -241,7 +241,8 @@
   "gratisWebsiteBanner": {
     "title": "Free website",
     "body": "With your subscription you receive a completely free website of your own — included at no extra cost.",
-    "cta": "View example restaurant website"
+    "cta": "View example restaurant website",
+    "ctaFrituur": "View example takeaway (frituur) site"
   },
   "platform": {
     "sectionTitle": "Our platform",

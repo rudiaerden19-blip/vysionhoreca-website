@@ -4483,7 +4483,8 @@
   "gratisWebsiteBanner": {
     "title": "Sitio web gratuito",
     "body": "Con tu suscripción recibes un sitio web propio totalmente gratuito, incluido sin coste adicional.",
-    "cta": "Ver ejemplo de web de restaurante"
+    "cta": "Ver ejemplo de web de restaurante",
+    "ctaFrituur": "Ver ejemplo de sitio tipo frituur / para llevar"
   },
   "platform": {
     "sectionTitle": "Nuestra plataforma",

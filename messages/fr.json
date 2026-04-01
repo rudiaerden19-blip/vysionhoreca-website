@@ -4505,7 +4505,8 @@
   "gratisWebsiteBanner": {
     "title": "Site web gratuit",
     "body": "Avec votre abonnement, vous recevez un site web entièrement gratuit — inclus sans frais supplémentaires.",
-    "cta": "Voir un exemple de site restaurant"
+    "cta": "Voir un exemple de site restaurant",
+    "ctaFrituur": "Voir un exemple friterie / takeaway"
   },
   "platform": {
     "sectionTitle": "Notre plateforme",

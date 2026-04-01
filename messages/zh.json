@@ -4483,7 +4483,8 @@
   "gratisWebsiteBanner": {
     "title": "免费网站",
     "body": "订阅即享完全免费的自有网站——已包含，无需额外费用。",
-    "cta": "查看餐厅网站示例"
+    "cta": "查看餐厅网站示例",
+    "ctaFrituur": "查看快餐/炸薯店示例站"
   },
   "platform": {
     "sectionTitle": "我们的平台",
