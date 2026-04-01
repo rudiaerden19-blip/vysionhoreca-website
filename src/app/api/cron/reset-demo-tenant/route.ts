@@ -3,8 +3,8 @@ import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
 import { runHourlyDemoTenantReset } from '@/lib/hourly-demo-tenant-reset'
 
-// Vercel Cron: elk uur (UTC) — alleen DEMO_TENANT_SLUG (frituurnolim), zie demo-links.ts
-// vercel.json: { "path": "/api/cron/reset-demo-tenant", "schedule": "0 * * * *" }
+// Vercel Cron: elke 30 min (UTC) — alleen DEMO_TENANT_SLUG (frituurnolim), zie demo-links.ts
+// vercel.json: schedule */30 * * * *
 
 export async function GET(request: NextRequest) {
   const requestId = crypto.randomUUID()

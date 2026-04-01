@@ -59,6 +59,14 @@ const TENANT_SETTINGS_BRANDING = {
   is_blocked: false,
 }
 
+/** Zelfde als hierboven maar zonder kolommen die op oudere DB’s kunnen ontbreken. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- destructuring om core te bouwen
+const {
+  payment_methods: _pm,
+  image_display_mode: _im,
+  ...TENANT_SETTINGS_BRANDING_CORE
+} = TENANT_SETTINGS_BRANDING
+
 function buildNolimOpeningHours(tenantSlug: string) {
   const rowOpen = {
     tenant_slug: tenantSlug,
@@ -144,8 +152,21 @@ export async function applyFrituurNolimDemoBranding(
   }
 
   {
-    const { error } = await supabase.from('tenant_settings').update(TENANT_SETTINGS_BRANDING).eq('tenant_slug', slug)
-    if (error) status.tenant_settings = 'error'
+    const { error: e1 } = await supabase
+      .from('tenant_settings')
+      .update(TENANT_SETTINGS_BRANDING)
+      .eq('tenant_slug', slug)
+    if (e1) {
+      console.warn('[frituurnolim demo reset] tenant_settings full update failed, retry core:', e1.message)
+      const { error: e2 } = await supabase
+        .from('tenant_settings')
+        .update(TENANT_SETTINGS_BRANDING_CORE)
+        .eq('tenant_slug', slug)
+      if (e2) {
+        console.error('[frituurnolim demo reset] tenant_settings core update failed:', e2.message)
+        status.tenant_settings = 'error'
+      }
+    }
   }
 
   {

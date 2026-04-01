@@ -1,7 +1,12 @@
 import { supabase } from './supabase'
 import { cache, CACHE_TTL, cacheKey } from './cache'
 import { buildDefaultDeliverySettingsRow } from '@/lib/tenant-defaults'
+import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
 import bcrypt from 'bcryptjs'
+
+function isPublicDemoTenantSlug(slug: string): boolean {
+  return slug === DEMO_TENANT_SLUG
+}
 
 // =====================================================
 // TIMEZONE HELPER - KRITIEK VOOR CORRECTE DATUMS
@@ -191,29 +196,35 @@ export interface TenantSettings {
 }
 
 export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {
+  const fetchTenantSettings = async (): Promise<TenantSettings | null> => {
+    const { data, error } = await supabase
+      .from('tenant_settings')
+      .select('*')
+      .eq('tenant_slug', tenantSlug)
+      .single()
+
+    if (error) {
+      console.error('Error fetching tenant settings:', error)
+      return null
+    }
+
+    if (data) {
+      const fullData = data as TenantSettings & { stripe_secret_key?: string; stripe_webhook_secret?: string }
+      delete fullData.stripe_secret_key
+      delete fullData.stripe_webhook_secret
+      return fullData as TenantSettings
+    }
+    return data
+  }
+
+  // Publieke demo: geen in-memory cache — uurlijkse reset moet meteen zichtbaar zijn
+  if (isPublicDemoTenantSlug(tenantSlug)) {
+    return fetchTenantSettings()
+  }
+
   return cache.getOrFetch(
     cacheKey('tenant_settings', tenantSlug),
-    async () => {
-      const { data, error } = await supabase
-        .from('tenant_settings')
-        .select('*')
-        .eq('tenant_slug', tenantSlug)
-        .single()
-      
-      if (error) {
-        console.error('Error fetching tenant settings:', error)
-        return null
-      }
-      
-      // SECURITY: Remove sensitive fields before returning to prevent exposure
-      if (data) {
-        const fullData = data as TenantSettings & { stripe_secret_key?: string; stripe_webhook_secret?: string }
-        delete fullData.stripe_secret_key
-        delete fullData.stripe_webhook_secret
-        return fullData as TenantSettings
-      }
-      return data
-    },
+    fetchTenantSettings,
     CACHE_TTL.TENANT_SETTINGS
   )
 }
@@ -298,21 +309,27 @@ export interface OpeningHour {
 }
 
 export async function getOpeningHours(tenantSlug: string): Promise<OpeningHour[]> {
+  const fetchHours = async (): Promise<OpeningHour[]> => {
+    const { data, error } = await supabase
+      .from('opening_hours')
+      .select('*')
+      .eq('tenant_slug', tenantSlug)
+      .order('day_of_week')
+
+    if (error) {
+      console.error('Error fetching opening hours:', error)
+      return []
+    }
+    return data || []
+  }
+
+  if (isPublicDemoTenantSlug(tenantSlug)) {
+    return fetchHours()
+  }
+
   return cache.getOrFetch(
     cacheKey('opening_hours', tenantSlug),
-    async () => {
-      const { data, error } = await supabase
-        .from('opening_hours')
-        .select('*')
-        .eq('tenant_slug', tenantSlug)
-        .order('day_of_week')
-      
-      if (error) {
-        console.error('Error fetching opening hours:', error)
-        return []
-      }
-      return data || []
-    },
+    fetchHours,
     CACHE_TTL.OPENING_HOURS
   )
 }
@@ -767,24 +784,30 @@ export interface DeliverySettings {
 }
 
 export async function getDeliverySettings(tenantSlug: string): Promise<DeliverySettings> {
+  const fetchDelivery = async (): Promise<DeliverySettings> => {
+    const { data, error } = await supabase
+      .from('delivery_settings')
+      .select('*')
+      .eq('tenant_slug', tenantSlug)
+      .maybeSingle()
+
+    if (error) {
+      console.error('Error fetching delivery settings:', error)
+      return buildDefaultDeliverySettingsRow(tenantSlug)
+    }
+    if (!data) {
+      return buildDefaultDeliverySettingsRow(tenantSlug)
+    }
+    return data as DeliverySettings
+  }
+
+  if (isPublicDemoTenantSlug(tenantSlug)) {
+    return fetchDelivery()
+  }
+
   return cache.getOrFetch(
     cacheKey('delivery_settings', tenantSlug),
-    async () => {
-      const { data, error } = await supabase
-        .from('delivery_settings')
-        .select('*')
-        .eq('tenant_slug', tenantSlug)
-        .maybeSingle()
-
-      if (error) {
-        console.error('Error fetching delivery settings:', error)
-        return buildDefaultDeliverySettingsRow(tenantSlug)
-      }
-      if (!data) {
-        return buildDefaultDeliverySettingsRow(tenantSlug)
-      }
-      return data as DeliverySettings
-    },
+    fetchDelivery,
     CACHE_TTL.DELIVERY_SETTINGS
   )
 }

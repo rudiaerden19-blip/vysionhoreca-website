@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
@@ -104,8 +105,14 @@ export function middleware(request: NextRequest) {
     // Add tenant prefix
     url.pathname = `/shop/${subdomain}${pathname === '/' ? '' : pathname}`
   }
-  
-  return NextResponse.rewrite(url)
+
+  const res = NextResponse.rewrite(url)
+  // Publieke demo: geen CDN/browser-cache van HTML — anders blijft oude titel/kleuren lang staan na uurlijkse reset
+  if (hostname.includes('ordervysion.com') && subdomain === DEMO_TENANT_SLUG) {
+    res.headers.set('Cache-Control', 'private, no-store, max-age=0, must-revalidate')
+    res.headers.set('Pragma', 'no-cache')
+  }
+  return res
 }
 
 export const config = {
