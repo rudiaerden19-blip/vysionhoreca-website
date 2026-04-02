@@ -1,0 +1,26 @@
+---
+description: Bij copy/marketing-wijzigingen alle taalbestanden synchroon houden
+alwaysApply: true
+---
+
+# i18n: alle locale-bestanden tegelijk
+
+Als je **zichtbare tekst** aanpast in `messages/nl.json` (of een andere `messages/*.json`), moet **dezelfde key** in **alle** locale-bestanden worden bijgewerkt met een passende vertaling.
+
+## Bestanden
+
+Werk altijd deze set af (zelfde JSON-structuur):
+
+- `messages/nl.json`
+- `messages/en.json`
+- `messages/de.json`, `fr.json`, `es.json`, `it.json`, `ja.json`, `zh.json`, `ar.json`
+
+## Werkwijze
+
+1. Zoek de key (bijv. `heroLanding.title`) met grep in `messages/`.
+2. Pas `nl` aan als dat de bron is; vertaal daarna naar elke andere taal (geen lege strings, geen enkele taal overslaan).
+3. Controleer met grep dat er geen enkel bestand nog de oude zin heeft als die vervangen moest worden.
+
+## Uitzondering
+
+Alleen puur landsspecifieke juridische of BTW-teksten mogen per locale verschillen zonder “vertaling” van andere talen — noteer dat kort in de commit als dat voorkomt.
