@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { useLanguage } from '@/i18n'
 import type { TenantModuleId } from '@/lib/tenant-modules'
+import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 import { allTenantModulesTrue } from '@/lib/tenant-modules'
 import {
   buildHamburgerModules,
@@ -131,12 +132,15 @@ export function AdminHamburgerMenu({
                   href={item.href}
                   prefetch={item.href === baseUrl ? false : undefined}
                   onClick={closeAll}
-                  className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm text-gray-700 transition-colors last:border-0 hover:bg-blue-50"
+                  className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-blue-50"
                 >
                   <span>{item.icon}</span>
                   <span>{item.label}</span>
                 </Link>
               ))}
+              {activeMod.rowKey === 'account' && (
+                <AccountMenuSessionBlock tenantSlug={tenantSlug} onClose={closeAll} />
+              )}
             </div>
           )}
         </div>

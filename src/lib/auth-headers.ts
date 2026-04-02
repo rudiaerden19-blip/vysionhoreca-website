@@ -107,3 +107,13 @@ export function getCurrentTenantSlug(): string | null {
     return null
   }
 }
+
+const normSlug = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
+
+/** Actieve zaak-sessie voor deze shop (URL-tenant vs localStorage). */
+export function isOwnerSessionForTenant(tenantSlug: string): boolean {
+  if (!isTenantLoggedIn()) return false
+  const cur = getCurrentTenantSlug()
+  if (!cur) return false
+  return normSlug(cur) === normSlug(tenantSlug)
+}

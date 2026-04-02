@@ -17,6 +17,7 @@ import {
 } from '@/lib/admin-hamburger-modules'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
+import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
 
 interface SelectedChoice {
   optionId: string
@@ -1223,11 +1224,17 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
                     </div>
                     {activeMod.items.map(item => (
                       <Link key={item.id} href={item.href} prefetch={item.href === baseUrl ? false : undefined} onClick={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 last:border-0 text-sm text-gray-700 transition-colors">
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 border-b border-gray-100 text-sm text-gray-700 transition-colors">
                         <span>{item.icon}</span>
                         <span>{item.label}</span>
                       </Link>
                     ))}
+                    {activeMod.rowKey === 'account' && (
+                      <AccountMenuSessionBlock
+                        tenantSlug={tenant}
+                        onClose={() => { setHamburgerOpen(false); setHamburgerSubOpen(null) }}
+                      />
+                    )}
                   </div>
                 )}
               </div>

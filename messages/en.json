@@ -4775,7 +4775,10 @@
     "menu": "Menu",
     "overview": "Overview",
     "onlineDisplay": "Customer display",
-    "lock": "Lock"
+    "lock": "Lock",
+    "session": "Session",
+    "login": "Log in",
+    "logout": "Log out"
   },
   "voiceOrder": {
     "title": "Voice order",

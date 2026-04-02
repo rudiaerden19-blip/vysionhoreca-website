@@ -4775,7 +4775,10 @@
     "menu": "Menu",
     "overview": "Overzicht",
     "onlineDisplay": "Onlinescherm",
-    "lock": "Vergrendel"
+    "lock": "Vergrendel",
+    "session": "Sessie",
+    "login": "Inloggen",
+    "logout": "Uitloggen"
   },
   "voiceOrder": {
     "title": "Spraakbestelling",
