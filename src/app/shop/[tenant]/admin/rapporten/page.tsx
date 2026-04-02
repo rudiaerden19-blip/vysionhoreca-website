@@ -69,6 +69,10 @@ function addMonths(d: Date, n: number) { return new Date(d.getFullYear(), d.getM
 function daysInMonth(y: number, m: number) { return new Date(y, m+1, 0).getDate() }
 function fmt(n: number) { return `€${n.toFixed(2)}` }
 function fmtDate(s: string) { const d = new Date(s); return `${d.getDate()} ${NL_MONTHS[d.getMonth()]}` }
+/** Korte datum voor periode-onderregels (nl-BE → “2 apr.”) */
+function fmtDayShort(d: Date) {
+  return d.toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }).replace(/\s+$/, '')
+}
 
 /** JSONB kan als object of als string binnenkomen — anders crasht .forEach op populaire producten. */
 function parseOrderItems(raw: unknown): Order['items'] {
@@ -185,6 +189,8 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
   const monthRevenue = revenueInPeriod(validOrders, monthStart)
   const todayOrders = ordersInPeriod(validOrders, todayStart)
   const avgOrder = todayOrders.length > 0 ? todayRevenue / todayOrders.length : 0
+  /** Week start (maandag) kan vóór de 1e van deze maand vallen → weekomzet > maandomzet is dan logisch. */
+  const weekStartsBeforeThisMonth = weekStart.getTime() < monthStart.getTime()
 
   // ── Last 7 days chart ──
   const last7Days = useMemo(() => {
@@ -562,18 +568,38 @@ export default function RapportenPage({ params }: { params: { tenant: string } }
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { title:'Omzet Vandaag', value:fmt(todayRevenue), sub:`${todayOrders.length} bestellingen`, icon:'€', color:'#10b981' },
-                { title:'Omzet Week', value:fmt(weekRevenue), icon:'📈', color:'#3b82f6' },
-                { title:'Omzet Maand', value:fmt(monthRevenue), icon:'📅', color:'#8b5cf6' },
+                {
+                  title:'Omzet Week',
+                  value:fmt(weekRevenue),
+                  sub:`Kalenderweek ma–zo · van ${fmtDayShort(weekStart)}`,
+                  icon:'📈',
+                  color:'#3b82f6',
+                },
+                {
+                  title:'Omzet Maand',
+                  value:fmt(monthRevenue),
+                  sub:`Vanaf ${fmtDayShort(monthStart)}`,
+                  icon:'📅',
+                  color:'#8b5cf6',
+                },
                 { title:'Gem. Bestelling', value:fmt(avgOrder), icon:'🛒', color:'#f59e0b' },
               ].map(c => (
                 <div key={c.title} className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg mb-4" style={{backgroundColor:c.color+'20',color:c.color}}>{c.icon}</div>
                   <p className="text-3xl font-bold text-gray-900 mb-1">{c.value}</p>
                   <p className="text-gray-500 text-sm">{c.title}</p>
-                  {c.sub && <p className="text-gray-400 text-xs mt-1">{c.sub}</p>}
+                  {c.sub && <p className="text-gray-400 text-xs mt-1 leading-snug">{c.sub}</p>}
                 </div>
               ))}
             </div>
+
+            {weekStartsBeforeThisMonth && (
+              <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 leading-relaxed">
+                <span className="font-medium">Waarom kan weekomzet hoger zijn dan maandomzet?</span>{' '}
+                De week tellen we vanaf maandag ({fmtDayShort(weekStart)}), de maand pas vanaf de 1e ({fmtDayShort(monthStart)}).
+                Dagen in de vorige maand zitten dus wel in de week, niet in deze maand. De totalen kloppen; de periodes zijn verschillend.
+              </p>
+            )}
 
             {/* Charts row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
