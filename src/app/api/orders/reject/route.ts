@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 import { sendCustomerRejectionEmail } from '@/lib/customer-rejection-email'
+import { tenantSlugLookupVariants } from '@/lib/tenant-slug-resolve'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,23 +28,18 @@ async function sendWhatsAppRejectionInBackground(params: {
 
   console.log('📱 Sending WhatsApp rejection to:', order.customer_phone)
 
-  const normalizedSlug = tenantSlug.replace(/-/g, '')
-
-  let { data: waSettings } = await supabaseAdmin
-    .from('whatsapp_settings')
-    .select('*')
-    .eq('tenant_slug', normalizedSlug)
-    .eq('is_active', true)
-    .single()
-
-  if (!waSettings) {
-    const { data: waSettingsAlt } = await supabaseAdmin
+  let waSettings: { phone_number_id: string; access_token: string } | null = null
+  for (const v of tenantSlugLookupVariants(tenantSlug)) {
+    const { data } = await supabaseAdmin
       .from('whatsapp_settings')
-      .select('*')
-      .eq('tenant_slug', tenantSlug)
+      .select('phone_number_id, access_token')
+      .eq('tenant_slug', v)
       .eq('is_active', true)
-      .single()
-    waSettings = waSettingsAlt
+      .maybeSingle()
+    if (data?.phone_number_id && data?.access_token) {
+      waSettings = data as { phone_number_id: string; access_token: string }
+      break
+    }
   }
 
   if (!waSettings) {
@@ -51,13 +47,18 @@ async function sendWhatsAppRejectionInBackground(params: {
     return
   }
 
-  const { data: tenantData } = await supabaseAdmin
-    .from('tenants')
-    .select('name')
-    .eq('slug', normalizedSlug)
-    .single()
-
-  const businessName = tenantData?.name || tenantSlug
+  let businessName = tenantSlug
+  for (const v of tenantSlugLookupVariants(tenantSlug)) {
+    const { data: tenantData } = await supabaseAdmin
+      .from('tenants')
+      .select('name')
+      .eq('slug', v)
+      .maybeSingle()
+    if (tenantData?.name) {
+      businessName = tenantData.name
+      break
+    }
+  }
 
   const formattedPhone = order.customer_phone
     .replace(/\s+/g, '')
