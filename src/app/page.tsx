@@ -106,57 +106,6 @@ function WhyVysionSection() {
   )
 }
 
-// One Day Online Section
-function OneDayOnlineSection() {
-  const { t, locale } = useLanguage()
-  
-  const benefits = [
-    { icon: "🚀", key: "oneDay" },
-    { icon: "💰", key: "noDeposit" },
-    { icon: "👨‍💻", key: "liveSupport" },
-    { icon: "✓", key: "cancelAnytime" },
-    { icon: "📈", key: "growth" },
-    { icon: "💬", key: "voiceOrder" }
-  ]
-
-  return (
-    <section className="py-24 sm:py-32 bg-[#e3e3e3]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16 sm:mb-20">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-5">
-            {t('oneDayOnline.title')} <span className="text-accent">{t('oneDayOnline.titleAccent')}</span> {t('oneDayOnline.titleEnd')}
-          </h2>
-          <p className="text-xl text-gray-600">
-            {t('oneDayOnline.subtitle')}
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {benefits.map((benefit, index) => (
-            <div 
-              key={index}
-              className="bg-white border border-gray-200/90 rounded-2xl p-6 shadow-home-benefit transition-all duration-300 hover:scale-[1.02] hover:bg-gray-50/80 hover:shadow-home-benefit-hover"
-            >
-              <div className="text-4xl mb-4">{benefit.icon}</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{t(`oneDayOnline.benefits.${benefit.key}.title`)}</h3>
-              <p className="text-gray-600">{t(`oneDayOnline.benefits.${benefit.key}.description`)}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <a 
-            href={`/registreer?lang=${locale}`}
-            className="inline-block bg-accent hover:bg-accent/90 text-white px-8 py-4 rounded-full font-semibold text-lg transition-colors shadow-home-btn"
-          >
-            {t('oneDayOnline.cta')}
-          </a>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 // Stats Section
 function CountUp({ end, suffix = '', prefix = '' }: { end: number, suffix?: string, prefix?: string }) {
   const [count, setCount] = useState(0)
@@ -1231,7 +1180,6 @@ export default function HomePage() {
       <GratisWebsiteBannerSection />
       <PlatformGridSection />
       <HardwareSection />
-      <OneDayOnlineSection />
       <StatsAndLiveDemoSection />
       <PricingSection />
       <TableKioskSection />
