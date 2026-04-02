@@ -85,6 +85,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const [rejectingOrder, setRejectingOrder] = useState<Order | null>(null)
   const [rejectionReason, setRejectionReason] = useState('')
   const [rejectionNotes, setRejectionNotes] = useState('')
+  const [rejectOrderError, setRejectOrderError] = useState<string | null>(null)
   
   const rejectionReasons = useMemo(() => [
     { value: 'too_busy', label: `🔥 ${t('ordersPage.rejection.reasons.tooBusy')}` },
@@ -402,6 +403,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   // Handle reject order (weigeren) - uses server-side API for reliability
   const handleRejectOrder = async () => {
     if (!rejectingOrder?.id || !rejectionReason) return
+    setRejectOrderError(null)
     setUpdatingId(rejectingOrder.id)
     // Stop alarm exact zoals donor
     if (typeof window !== 'undefined' && (window as any).stopOrderAlarm) {
@@ -439,6 +441,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
+                tenantSlug: params.tenant,
                 customerEmail: rejectingOrder.customer_email,
                 customerName: rejectingOrder.customer_name,
                 customerPhone: rejectingOrder.customer_phone,
@@ -465,10 +468,18 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         setRejectingOrder(null)
         setRejectionReason('')
         setRejectionNotes('')
+        setRejectOrderError(null)
       } else {
-        console.error('Failed to reject order')
+        const errBody = await response.json().catch(() => ({} as { error?: string }))
+        const msg =
+          typeof errBody.error === 'string'
+            ? errBody.error
+            : `Weigeren mislukt (HTTP ${response.status}). Controleer of je bent ingelogd.`
+        setRejectOrderError(msg)
+        console.error('Failed to reject order:', response.status, errBody)
       }
     } catch (e) {
+      setRejectOrderError('Netwerkfout bij weigeren. Probeer opnieuw.')
       console.error('Error rejecting order:', e)
     }
     
@@ -788,7 +799,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       </motion.button>
                       <motion.button
                         whileTap={{ scale: 0.95 }}
-                        onClick={() => setRejectingOrder(order)}
+                        onClick={() => {
+                          setRejectOrderError(null)
+                          setRejectingOrder(order)
+                        }}
                         disabled={updatingId === order.id}
                         className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xl font-bold"
                       >
@@ -1145,7 +1159,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => setRejectingOrder(order)}
+                        onClick={() => {
+                          setRejectOrderError(null)
+                          setRejectingOrder(order)
+                        }}
                         disabled={updatingId === order.id}
                         className="px-6 py-3 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white font-medium rounded-xl transition-colors"
                       >
@@ -1382,7 +1399,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => setRejectingOrder(null)}
+            onClick={() => {
+              setRejectingOrder(null)
+              setRejectOrderError(null)
+            }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -1399,6 +1419,12 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               
               {/* Content */}
               <div className="p-6 space-y-6">
+                {rejectOrderError && (
+                  <div className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+                    <strong className="font-semibold">Niet gelukt. </strong>
+                    {rejectOrderError}
+                  </div>
+                )}
                 <div>
                   <label className="block text-lg font-semibold text-gray-900 mb-3">
                     {t('ordersPage.rejection.reasonLabel')} *
@@ -1449,6 +1475,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     setRejectingOrder(null)
                     setRejectionReason('')
                     setRejectionNotes('')
+                    setRejectOrderError(null)
                   }}
                   className="flex-1 px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-100 font-medium"
                 >

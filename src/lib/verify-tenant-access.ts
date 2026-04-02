@@ -78,8 +78,9 @@ export async function verifyTenantAccess(
       }
     }
 
-    // Check if this profile has access to the requested tenant
-    if (profile.tenant_slug !== requestedTenantSlug) {
+    // Check if this profile has access to the requested tenant (zelfde normalisatie als order-routes: strips + lowercase)
+    const normTenant = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
+    if (normTenant(profile.tenant_slug || '') !== normTenant(requestedTenantSlug)) {
       logger.warn('Tenant access denied', { 
         requestId, 
         businessId,
