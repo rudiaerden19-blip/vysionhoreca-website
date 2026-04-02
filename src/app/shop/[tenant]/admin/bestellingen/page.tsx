@@ -423,6 +423,8 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         }),
       })
       
+      const rejectPayload = await response.json().catch(() => ({} as { emailError?: string; error?: string }))
+
       if (response.ok) {
         setOrders(prev => prev.map(o => 
           o.id === rejectingOrder.id ? { 
@@ -433,36 +435,10 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
             rejected_at: new Date().toISOString() 
           } : o
         ))
-        
-        // Send rejection email to customer with business details
-        if (rejectingOrder.customer_email) {
-          try {
-            await fetch('/api/send-order-status', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                tenantSlug: params.tenant,
-                customerEmail: rejectingOrder.customer_email,
-                customerName: rejectingOrder.customer_name,
-                customerPhone: rejectingOrder.customer_phone,
-                orderNumber: rejectingOrder.order_number,
-                orderType: rejectingOrder.order_type,
-                status: 'rejected',
-                businessName: tenantSettings?.business_name || 'Restaurant',
-                businessEmail: tenantSettings?.email,
-                businessPhone: tenantSettings?.phone,
-                businessAddress: tenantSettings?.address,
-                businessPostalCode: tenantSettings?.postal_code,
-                businessCity: tenantSettings?.city,
-                businessBtwNumber: tenantSettings?.btw_number,
-                rejectionReason: rejectionReason,
-                rejectionNotes: rejectionNotes,
-                total: rejectingOrder.total,
-              }),
-            })
-          } catch (e) {
-            console.error('Failed to send rejection email:', e)
-          }
+        if (rejectPayload.emailError && typeof window !== 'undefined') {
+          window.alert(
+            `Bestelling is geweigerd. E-mail naar de klant kon niet worden verstuurd:\n${rejectPayload.emailError}`
+          )
         }
         
         setRejectingOrder(null)
