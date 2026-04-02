@@ -447,6 +447,34 @@ function OrderAppSection() {
   )
 }
 
+function PromoMarqueeBand() {
+  const { t } = useLanguage()
+  const promoText = t('whyVysion.promoMarquee')
+
+  return (
+    <div
+      className="why-vysion-promo-viewport relative w-full bg-black py-2.5 sm:py-3"
+      role="marquee"
+      aria-label={promoText}
+    >
+      <div className="why-vysion-promo-track">
+        {[0, 1].map((dup) => (
+          <div key={dup} className="why-vysion-promo-segment" aria-hidden={dup === 1 ? true : undefined}>
+            {[0, 1, 2, 3].map((i) => (
+              <span
+                key={`${dup}-${i}`}
+                className="text-white font-bold text-lg sm:text-xl md:text-2xl tracking-tight whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
+              >
+                {promoText}
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // Pricing Section
 function PricingSection() {
   const { t, locale } = useLanguage()
@@ -1189,6 +1217,7 @@ export default function HomePage() {
       <HardwareSection />
       <StatsAndLiveDemoSection />
       <PricingSection />
+      <PromoMarqueeBand />
       <TableKioskSection />
       <TestimonialSection />
       <ContactPageSection sectionId="contact" />

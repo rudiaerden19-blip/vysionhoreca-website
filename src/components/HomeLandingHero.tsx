@@ -55,12 +55,10 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
     { href: '/#contact', label: t('nav.contact') },
   ]
 
-  const promoText = t('whyVysion.promoMarquee')
-
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-hidden pb-0"
+      className="relative min-h-[72svh] sm:min-h-[76svh] flex flex-col text-white overflow-hidden pb-6 sm:pb-8"
     >
       <div className="absolute inset-0">
         <Image
@@ -233,28 +231,6 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
         <p className="mt-[calc(1.25rem+2cm)] sm:mt-[calc(1.5rem+2cm)] text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-3xl leading-snug">
           {t('heroLanding.ctaModulesLine')}
         </p>
-      </div>
-
-      {/* Promo-ticker onderaan de header (wit op donkere strook) */}
-      <div
-        className="why-vysion-promo-viewport relative z-20 mt-auto border-t border-white/35 bg-black/40 backdrop-blur-[3px] py-2.5 sm:py-3 w-full"
-        role="marquee"
-        aria-label={promoText}
-      >
-        <div className="why-vysion-promo-track">
-          {[0, 1].map((dup) => (
-            <div key={dup} className="why-vysion-promo-segment" aria-hidden={dup === 1 ? true : undefined}>
-              {[0, 1, 2, 3].map((i) => (
-                <span
-                  key={`${dup}-${i}`}
-                  className="text-white font-bold text-lg sm:text-xl md:text-2xl tracking-tight whitespace-nowrap drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]"
-                >
-                  {promoText}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   )
