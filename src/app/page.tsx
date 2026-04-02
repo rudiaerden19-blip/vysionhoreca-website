@@ -86,7 +86,7 @@ function WhyVysionSection() {
                     <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-snug">
                       {t(`whyVysion.${key}.title`)}
                     </h3>
-                    <p className="text-sm sm:text-base text-gray-600 leading-relaxed border-l-2 border-accent/25 pl-4">
+                    <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                       {t(`whyVysion.${key}.body`)}
                     </p>
                   </div>
