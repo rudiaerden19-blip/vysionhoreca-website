@@ -100,7 +100,7 @@
     "badge2": "Gemaakt door horecaondernemers",
     "badge3": "Gemaakt voor horecaondernemers",
     "title": "Het platform dat geld oplevert.",
-    "description": "Laat klanten bestellen hoe zij willen — online, aan tafel of voor afhalen. Alles komt automatisch binnen op één plek en jij hoeft alleen nog te bereiden.",
+    "description": "Laat klanten bestellen hoe zij willen: online, aan tafel of voor afhalen. Alles komt automatisch binnen op één plek en jij hoeft alleen nog te bereiden.",
     "extras": "En dan… dit zit er ook gewoon bij:",
     "extrasList": "• Volledige kassa\n• Kassa voor foodtrucks\n• Je eigen website (klaar in jouw huisstijl)\n• Kostencalculator per product\n• Inzicht in omzet, piekmomenten en prestaties\n• Personeels- & urenregistratie\n• Weet of je te hoog of te laag geprijsd bent\n• Eigen restaurant of bistro reserveringsplatform\n• Push berichten\n• QR-codes\n• Geen losse systemen. Geen extra abonnementen.",
     "tagline": "Eén platform. Eén scherm. Volledige controle.",
@@ -115,27 +115,27 @@
   },
   "hardware": {
     "title": "Onze hardware",
-    "subtitle": "Professionele kassa’s, tweede scherm, betaalterminals en randapparatuur — klaar om Vysion Horeca op te draaien in jouw zaak.",
+    "subtitle": "Professionele kassa’s, tweede scherm, betaalterminals en randapparatuur, klaar om Vysion Horeca op te draaien in jouw zaak.",
     "imageAlt": "Hardware voorbeeld",
     "openExpanded": "Afbeelding vergroten",
     "closeExpanded": "Sluiten"
   },
   "newAtVysion": {
     "title": "Stel zelf je pakket samen",
-    "body": "Je stelt je pakket zelf samen: één module of meerdere — jij kiest wat je nodig hebt. Elke module kun je apart aanzetten; je prijs past zich aan je selectie aan. Zo betaal je alleen voor wat je echt gebruikt en bouw je Vysion zoals het voor jouw zaak klopt.",
+    "body": "Je stelt je pakket zelf samen: één module of meerdere; jij kiest wat je nodig hebt. Elke module kun je apart aanzetten; je prijs past zich aan je selectie aan. Zo betaal je alleen voor wat je echt gebruikt en bouw je Vysion zoals het voor jouw zaak klopt.",
     "cta": "Neem contact op"
   },
   "tableKiosk": {
     "imageAlt": "Vysion tafelkiosk: compacte displays met opladen op tafel",
     "title": "Nieuw bij Vysion",
     "subtitle": "Onze tafelkiosk",
-    "body": "De tijd van grote, dure kiosken bij de ingang is voorbij: ze zijn fors, kostbaar en sluiten niet meer aan bij hoe gasten vandaag willen bestellen. Vysion heeft daar iets slimmers voor: een compacte tafelkiosk op het blad — zonder drukte aan de deur — gekoppeld aan jouw eigen online bestelplatform en je kassa.",
+    "body": "De tijd van grote, dure kiosken bij de ingang is voorbij: ze zijn fors, kostbaar en sluiten niet meer aan bij hoe gasten vandaag willen bestellen. Vysion heeft daar iets slimmers voor: een compacte tafelkiosk op het blad, zonder drukte aan de deur, gekoppeld aan jouw eigen online bestelplatform en je kassa.",
     "features": {
       "1": "Op tafel, volledig draadloos en eenvoudig oplaadbaar",
-      "2": "Ruim 36 uur batterij — betrouwbaar tijdens lange shifts",
+      "2": "Ruim 36 uur batterij, betrouwbaar tijdens lange shifts",
       "3": "Laad tot 2 smartphones tegelijk voor je gasten",
       "4": "Jouw menu en huisstijl: hetzelfde bestelplatform als online",
-      "5": "Bestellen én afrekenen aan tafel — rechtstreeks naar je kassa"
+      "5": "Bestellen én afrekenen aan tafel, rechtstreeks naar je kassa"
     }
   },
   "oneDayOnline": {
@@ -167,7 +167,7 @@
       },
       "voiceOrder": {
         "title": "Bestellen via WhatsApp",
-        "description": "Laat de klant bestellen en afrekenen via zijn vertrouwde WhatsApp — geen app meer nodig. Alles 10× sneller."
+        "description": "Laat de klant bestellen en afrekenen via zijn vertrouwde WhatsApp: geen app meer nodig. Alles 10× sneller."
       }
     }
   },
@@ -192,7 +192,7 @@
     },
     "payments": {
       "title": "Tafels",
-      "description": "Pas je tafels live aan. Duurt een reservering langer, dan stel je dat direct per tafel bij — flexibel en zonder gedoe."
+      "description": "Pas je tafels live aan. Duurt een reservering langer, dan stel je dat direct per tafel bij, flexibel en zonder gedoe."
     },
     "invoicing": {
       "title": "Kostencalculator",
@@ -246,7 +246,7 @@
   },
   "gratisWebsiteBanner": {
     "title": "Gratis website",
-    "body": "Bij je abonnement ontvang je een volledig gratis eigen website — mee inbegrepen, zonder extra kosten.",
+    "body": "Bij je abonnement ontvang je een volledig gratis eigen website, mee inbegrepen, zonder extra kosten.",
     "cta": "Klik hier voor restaurantwebsite",
     "ctaFrituur": "Bekijk voorbeeld frituur"
   },
@@ -264,7 +264,7 @@
     "kassasysteem": {
       "title": "Kassasysteem",
       "teaser": "Snel afrekenen, gekoppeld aan online orders en rapporten.",
-      "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion Horeca beheer je producten, tafels, betalingen en personeel vanuit één omgeving — minder fouten tijdens piekuren en altijd zicht op de dagafsluiting.",
+      "body": "Je kassa is het hart van de zaak: snelle verkoop, correcte bonnen en een realtime koppeling met je bestelplatform en keuken.\n\nMet Vysion Horeca beheer je producten, tafels, betalingen en personeel vanuit één omgeving: minder fouten tijdens piekuren en altijd zicht op de dagafsluiting.",
       "heroAlt": "Hand bedient een touchscreen-kassa met betaalterminal aan de toonbank in een horecazaak",
       "horecaSectorTitle": "Horeca kassasysteem",
       "horecaImageAlt": "Moderne all-in-one horecakassa op een tafel in een restaurant",
@@ -304,7 +304,7 @@
     },
     "bestelplatform": {
       "title": "Bestel platform",
-      "teaser": "Klanten bestellen online bij jou — zonder tussenpartij die commissie vraagt.",
+      "teaser": "Klanten bestellen online bij jou, zonder tussenpartij die commissie vraagt.",
       "body": "Afhalen, levering en bestellen aan tafel verlopen via jouw eigen site in jouw huisstijl. Orders komen gestructureerd binnen op kassa en keuken.\n\nZo verwerk je pieken beter en houd je de volledige marge op je online omzet.",
       "heroAlt": "Smartphone met online bestellen in een horeca- of kantooromgeving",
       "featuresTitle": "Jouw bestelplatform",
@@ -343,7 +343,7 @@
         },
         "qrOrdering": {
           "title": "QR-bestellen",
-          "body": "Laat gasten via een QR-code direct vanaf hun telefoon bestellen — ideaal aan tafel of bij afhaal."
+          "body": "Laat gasten via een QR-code direct vanaf hun telefoon bestellen, ideaal aan tafel of bij afhaal."
         }
       }
     },
@@ -364,7 +364,7 @@
     },
     "eigenWebsite": {
       "title": "Eigen website",
-      "teaser": "Jouw domein, jouw merk — met bestellen erin geïntegreerd.",
+      "teaser": "Jouw domein, jouw merk, met bestellen erin geïntegreerd.",
       "body": "Geen generieke tussenpagina: jouw logo, kleuren en foto's. Klanten herkennen direct jouw zaak.\n\nBeheer je site en je menu vanuit hetzelfde admin als de rest van Vysion Horeca."
     },
     "whatsappBestellingen": {
@@ -380,12 +380,12 @@
     "bedrijfsanalyse": {
       "title": "Bedrijfsanalyse",
       "teaser": "Omzet, pieken en productprestaties in één overzicht.",
-      "body": "Welke dagen lopen hard? Welke categorie drukt de marge? Met duidelijke rapporten stuur je bij op menu, personeel en voorraad.\n\nGeen spreadsheet-geweld — wél de cijfers die je nodig hebt om beslissingen te nemen."
+      "body": "Welke dagen lopen hard? Welke categorie drukt de marge? Met duidelijke rapporten stuur je bij op menu, personeel en voorraad.\n\nGeen spreadsheet-geweld; wél de cijfers die je nodig hebt om beslissingen te nemen."
     },
     "kostencalculator": {
       "title": "Kostencalculator",
       "teaser": "Kostprijs per portie berekenen om verkoopprijzen scherp te zetten.",
-      "body": "Ingredienten, porties en verlies meenemen in je kostprijs helpt prijzen verdedigen en marge te beschermen.\n\nZie snel welke items te weinig of te veel marge geven — en stuur je menu bij op basis van feiten."
+      "body": "Ingredienten, porties en verlies meenemen in je kostprijs helpt prijzen verdedigen en marge te beschermen.\n\nZie snel welke items te weinig of te veel marge geven, en stuur je menu bij op basis van feiten."
     },
     "galleryHint": "Klik op de afbeelding om te vergroten. Gebruik de pijlen links en rechts om te bladeren.",
     "galleryPrev": "Vorige afbeelding",
@@ -602,7 +602,7 @@
     "kassa": {
       "tab": "Kassa",
       "title": "Snelle, overzichtelijke touchscreen-kassa.",
-      "description": "Verkoop met categorieën, productopties en extras, tafel/afhaal, meerdere betaalwijzen (contant, kaart, iDEAL, Bancontact, gesplitst betalen) en duidelijke bonnen. Na betaling stroomt de bestelling meteen door naar keuken en scherm — één doorlopende flow."
+      "description": "Verkoop met categorieën, productopties en extras, tafel/afhaal, meerdere betaalwijzen (contant, kaart, iDEAL, Bancontact, gesplitst betalen) en duidelijke bonnen. Na betaling stroomt de bestelling meteen door naar keuken en scherm: één doorlopende flow."
     },
     "analytics": {
       "tab": "Bedrijfsanalyse",
@@ -702,7 +702,7 @@
     }
   },
   "footer": {
-    "description": "Vysion Horeca is een onderdeel van de Vysion Group International. Cloud-horecasoftware voor België en Nederland: touchscreen kassa (POS), reserveringsplatform met zaalplattegrond, online bestelplatform en webshop, keukenscherm, kostprijsberekening, urenregistratie en bedrijfsanalyse — geschikt voor restaurant, brasserie, café en frituur.",
+    "description": "Vysion Horeca is een onderdeel van de Vysion Group International. Cloud-horecasoftware voor België en Nederland: touchscreen kassa (POS), reserveringsplatform met zaalplattegrond, online bestelplatform en webshop, keukenscherm, kostprijsberekening, urenregistratie en bedrijfsanalyse, geschikt voor restaurant, brasserie, café en frituur.",
     "address": "Adres:",
     "product": "Product",
     "features": "Functies & platform",
@@ -718,18 +718,18 @@
     "designBy": "Design by Vysion",
     "backToTop": "TOP",
     "backToTopAria": "Terug naar boven",
-    "navProductAria": "Product — snel naar functies, prijzen en nieuws",
-    "navCompanyAria": "Bedrijf — over ons, contact en beleid",
+    "navProductAria": "Product: snel naar functies, prijzen en nieuws",
+    "navCompanyAria": "Bedrijf: over ons, contact en beleid",
     "featuresLinkTitle": "Overzicht van kassa, reserveringen, online bestellen en alle modules",
     "pricingLinkTitle": "Abonnementen en prijzen voor horecasoftware",
     "updatesLinkTitle": "Productnieuws en updates van Vysion Horeca",
     "supportLinkTitle": "Hulp, handleidingen en technische ondersteuning",
     "aboutLinkTitle": "Meer over Vysion Horeca en het team",
-    "contactLinkTitle": "Neem contact op met Vysion — demo of vraag",
+    "contactLinkTitle": "Neem contact op met Vysion: demo of vraag",
     "privacyLinkTitle": "Privacybeleid en verwerking van gegevens",
     "legalLinkTitle": "Algemene voorwaarden en juridische documenten",
-    "linkAppsAria": "Vysion Apps — opens in een nieuw venster",
-    "linkHorecaAria": "Vysion Horeca — officiële website, nieuw venster"
+    "linkAppsAria": "Vysion Apps, opent in een nieuw venster",
+    "linkHorecaAria": "Vysion Horeca, officiële website, nieuw venster"
   },
   "stop": {
     "title": "STOP",
@@ -837,7 +837,7 @@
     "story": {
       "title": "Ons verhaal",
       "p1": "Vysion Horeca is ontstaan uit echte ervaring. Als horecaondernemers liepen we tegen hetzelfde probleem aan als jij: te veel systemen, te veel kosten en te weinig overzicht.",
-      "p2": "We betaalden elke maand voor losse tools: een bestelplatform, boekhouding, betalingen en analyses — alles apart, niets dat écht samenwerkte. De kosten liepen op. Het gedoe ook.",
+      "p2": "We betaalden elke maand voor losse tools: een bestelplatform, boekhouding, betalingen en analyses; alles apart, niets dat écht samenwerkte. De kosten liepen op. Het gedoe ook.",
       "p3": "Dus besloten we het anders te doen. We bouwden één slim platform, met het bestelplatform als hart, en alles wat je daarnaast nodig hebt gewoon inbegrepen. Geen overbodige functies. Geen losse abonnementen. Gewoon een eerlijk systeem dat werkt voor horecaondernemers."
     },
     "facts": {
@@ -4425,7 +4425,7 @@
     "heroSubtitle": "Leer alles over Vysion Horeca in korte video's van ongeveer 3 minuten.",
     "videoCountOne": "1 video",
     "videoCountMany": "{{count}} video's",
-    "comingSoon": " — binnenkort beschikbaar",
+    "comingSoon": ", binnenkort beschikbaar",
     "cats": {
       "registreren": {
         "title": "Registreren",
@@ -4679,7 +4679,7 @@
     "bannerEigen": "Tijdelijk gesloten"
   },
   "reservationKassa": {
-    "guestsEmpty": "Nog geen gasten — ze verschijnen automatisch na de eerste reservatie",
+    "guestsEmpty": "Nog geen gasten; ze verschijnen automatisch na de eerste reservatie",
     "guestsSearchNoResults": "Geen resultaten voor deze zoekopdracht",
     "loadFailedPrefix": "Fout bij laden reservaties: ",
     "startTimeSaveFailedPrefix": "Starttijd kon niet worden opgeslagen: ",
@@ -4712,7 +4712,7 @@
     "confirmedFromWaitlistSuffix": " bevestigd vanuit wachtlijst",
     "approveFailedPrefix": "Goedkeuren mislukt: ",
     "guestApprovedSuffix": " goedgekeurd",
-    "approvedTableAssign": " — Tafel ",
+    "approvedTableAssign": ", tafel ",
     "approvedTableAssignSuffix": " toegewezen",
     "mailFailedPrefix": "Mail mislukt: ",
     "confirmMailSentPrefix": "Bevestigingsmail verstuurd naar ",
@@ -4763,7 +4763,7 @@
     "settingsSaveFooter": "💾 Instellingen Opslaan",
     "saveSettingsIcon": "💾 Opslaan",
     "allShifts": "Alle shifts",
-    "noPreference": "— Geen voorkeur —",
+    "noPreference": "Geen voorkeur",
     "noReservationsInList": "Geen reservaties",
     "noReservationsThisDay": "Geen reservaties op deze dag",
     "newReservationCreate": "+ Nieuwe reservatie aanmaken",
