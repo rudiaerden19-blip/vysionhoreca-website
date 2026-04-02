@@ -81,7 +81,7 @@ function WhyVysionSection() {
               {[0, 1, 2, 3].map((i) => (
                 <span
                   key={`${dup}-${i}`}
-                  className="text-accent font-bold text-xl sm:text-2xl md:text-3xl lg:text-[2rem] tracking-tight whitespace-nowrap"
+                  className="text-gray-900 font-bold text-xl sm:text-2xl md:text-3xl lg:text-[2rem] tracking-tight whitespace-nowrap"
                 >
                   {promoText}
                 </span>
