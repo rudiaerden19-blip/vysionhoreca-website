@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { getOrders, updateOrderStatus, confirmOrder, approveWebshopOrder, completeWebshopOrder, rejectOrder, Order, getTenantSettings, TenantSettings, addLoyaltyPoints, isWebshopOrder } from '@/lib/admin-api'
 import { supabase } from '@/lib/supabase'
 import { getSoundsEnabled } from '@/lib/sounds'
+import { getAuthHeaders } from '@/lib/auth-headers'
 
 // Parse items from JSONB
 interface OrderItemJson {
@@ -411,7 +412,7 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       // Use server-side API that handles both database update and WhatsApp
       const response = await fetch('/api/orders/reject', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           orderId: rejectingOrder.id,
           tenantSlug: params.tenant,

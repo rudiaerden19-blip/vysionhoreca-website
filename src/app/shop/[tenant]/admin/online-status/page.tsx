@@ -3,6 +3,7 @@
 import { useLanguage } from '@/i18n'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import { getAuthHeaders } from '@/lib/auth-headers'
 
 const REASONS = [
   { key: 'volzet',   icon: '🔴', labelKey: 'reasonVolzet',   descKey: 'reasonVolzetDesc' },
@@ -53,7 +54,7 @@ export default function OnlineStatusPage({ params }: { params: { tenant: string 
     setSaveSuccess(false)
     const res = await fetch('/api/shop-offline', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
       body: JSON.stringify({ tenant: params.tenant, ...payload }),
     })
     const json = await res.json()

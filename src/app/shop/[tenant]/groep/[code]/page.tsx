@@ -71,7 +71,9 @@ export default function GroupJoinPage({ params }: { params: { tenant: string; co
   }
 
   async function loadSessions(groupId: string) {
-    const res = await fetch(`/api/groups/sessions?group_id=${groupId}`)
+    const res = await fetch(
+      `/api/groups/sessions?group_id=${encodeURIComponent(groupId)}&access_code=${encodeURIComponent(params.code)}`
+    )
     if (res.ok) {
       const data = await res.json()
       // Only show open sessions

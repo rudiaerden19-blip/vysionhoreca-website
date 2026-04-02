@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,13 +8,18 @@ const supabase = createClient(
 )
 
 // GET - List groups for a tenant
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const tenant_slug = searchParams.get('tenant_slug')
 
     if (!tenant_slug) {
       return NextResponse.json({ error: 'tenant_slug is required' }, { status: 400 })
+    }
+
+    const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
     }
 
     const { data, error } = await supabase
@@ -43,7 +49,7 @@ export async function GET(request: Request) {
 }
 
 // POST - Create a new group
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
@@ -69,7 +75,11 @@ export async function POST(request: Request) {
       )
     }
 
-    // Generate unique access code
+    const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+    }
+
     const { data: codeData } = await supabase.rpc('generate_group_access_code')
     const access_code = codeData || Math.random().toString(36).substring(2, 8).toUpperCase()
 
@@ -104,7 +114,7 @@ export async function POST(request: Request) {
 }
 
 // PUT - Update a group
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
     const { id, ...updates } = body
@@ -113,9 +123,26 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
     }
 
+    const { data: existing, error: loadError } = await supabase
+      .from('order_groups')
+      .select('tenant_slug')
+      .eq('id', id)
+      .single()
+
+    if (loadError || !existing?.tenant_slug) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+    }
+
+    const access = await verifyTenantOrSuperAdmin(request, existing.tenant_slug)
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+    }
+
+    const { tenant_slug: _t, id: _i, ...safeUpdates } = updates as Record<string, unknown>
+
     const { data, error } = await supabase
       .from('order_groups')
-      .update(updates)
+      .update(safeUpdates)
       .eq('id', id)
       .select()
       .single()
@@ -130,13 +157,28 @@ export async function PUT(request: Request) {
 }
 
 // DELETE - Archive a group
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    }
+
+    const { data: existing, error: loadError } = await supabase
+      .from('order_groups')
+      .select('tenant_slug')
+      .eq('id', id)
+      .single()
+
+    if (loadError || !existing?.tenant_slug) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+    }
+
+    const access = await verifyTenantOrSuperAdmin(request, existing.tenant_slug)
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
     }
 
     const { error } = await supabase

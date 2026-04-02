@@ -1,13 +1,18 @@
 import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+function normalizeTenantSlug(s: string) {
+  return (s || '').replace(/-/g, '').toLowerCase()
+}
+
 // GET - Get orders for a group session
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const session_id = searchParams.get('session_id')
@@ -18,6 +23,34 @@ export async function GET(request: Request) {
         { error: 'session_id or group_id is required' },
         { status: 400 }
       )
+    }
+
+    if (session_id) {
+      const { data: sess, error: sErr } = await supabase
+        .from('group_order_sessions')
+        .select('tenant_slug')
+        .eq('id', session_id)
+        .single()
+      if (sErr || !sess?.tenant_slug) {
+        return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+      }
+      const access = await verifyTenantOrSuperAdmin(request, sess.tenant_slug)
+      if (!access.authorized) {
+        return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      }
+    } else if (group_id) {
+      const { data: g, error: gErr } = await supabase
+        .from('order_groups')
+        .select('tenant_slug')
+        .eq('id', group_id)
+        .single()
+      if (gErr || !g?.tenant_slug) {
+        return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+      }
+      const access = await verifyTenantOrSuperAdmin(request, g.tenant_slug)
+      if (!access.authorized) {
+        return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      }
     }
 
     let query = supabase
@@ -35,7 +68,6 @@ export async function GET(request: Request) {
     }
 
     if (group_id) {
-      // Get all orders for all sessions of this group
       const { data: sessions } = await supabase
         .from('group_order_sessions')
         .select('id')
@@ -51,8 +83,7 @@ export async function GET(request: Request) {
 
     if (error) throw error
 
-    // Group orders by member for easy viewing
-    const ordersByMember: Record<string, typeof data> = {}
+    const ordersByMember: Record<string, NonNullable<typeof data>> = {}
     data?.forEach(order => {
       const memberName = order.group_members?.name || order.customer_name
       if (!ordersByMember[memberName]) {
@@ -96,7 +127,6 @@ export async function POST(request: Request) {
       )
     }
 
-    // Check if session is still open
     const { data: session, error: sessionError } = await supabase
       .from('group_order_sessions')
       .select('*')
@@ -107,6 +137,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 })
     }
 
+    if (normalizeTenantSlug(session.tenant_slug) !== normalizeTenantSlug(tenant_slug)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     if (session.status !== 'open') {
       return NextResponse.json(
         { error: 'Ordering session is closed' },
@@ -114,7 +148,6 @@ export async function POST(request: Request) {
       )
     }
 
-    // Check deadline
     if (new Date(session.order_deadline) < new Date()) {
       return NextResponse.json(
         { error: 'Order deadline has passed' },
@@ -122,17 +155,15 @@ export async function POST(request: Request) {
       )
     }
 
-    // Calculate totals
     const subtotal = items.reduce(
       (sum: number, item: { total_price: number }) => sum + item.total_price,
       0
     )
 
-    // Create order
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
-        tenant_slug,
+        tenant_slug: session.tenant_slug,
         customer_name,
         order_type: 'group',
         status: 'new',
@@ -150,7 +181,6 @@ export async function POST(request: Request) {
 
     if (orderError) throw orderError
 
-    // Create order items
     const orderItems = items.map((item: {
       product_id?: string
       product_name: string
@@ -162,7 +192,7 @@ export async function POST(request: Request) {
       notes?: string
     }) => ({
       order_id: order.id,
-      tenant_slug,
+      tenant_slug: session.tenant_slug,
       product_id: item.product_id,
       product_name: item.product_name,
       quantity: item.quantity,

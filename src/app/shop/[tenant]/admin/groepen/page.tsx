@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { getAuthHeaders } from '@/lib/auth-headers'
 import { useLanguage } from '@/i18n'
 
 interface OrderGroup {
@@ -65,7 +66,9 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
 
   async function loadGroups() {
     setLoading(true)
-    const response = await fetch(`/api/groups?tenant_slug=${params.tenant}`)
+    const response = await fetch(`/api/groups?tenant_slug=${params.tenant}`, {
+      headers: getAuthHeaders(),
+    })
     if (response.ok) {
       const data = await response.json()
       setGroups(data || [])
@@ -111,13 +114,13 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
       if (editGroup) {
         await fetch('/api/groups', {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
           body: JSON.stringify({ id: editGroup.id, ...formData })
         })
       } else {
         await fetch('/api/groups', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
           body: JSON.stringify({ tenant_slug: params.tenant, ...formData })
         })
       }
@@ -131,7 +134,7 @@ export default function GroupsPage({ params }: { params: { tenant: string } }) {
 
   async function archiveGroup(id: string) {
     if (!confirm(t('groupsModule.groups.archiveConfirm'))) return
-    await fetch(`/api/groups?id=${id}`, { method: 'DELETE' })
+    await fetch(`/api/groups?id=${id}`, { method: 'DELETE', headers: getAuthHeaders() })
     loadGroups()
   }
 

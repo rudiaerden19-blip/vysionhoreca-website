@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,12 +8,51 @@ const supabase = createClient(
 )
 
 // GET - List sessions for a group or tenant
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const group_id = searchParams.get('group_id')
     const tenant_slug = searchParams.get('tenant_slug')
     const status = searchParams.get('status')
+    const access_code = searchParams.get('access_code')
+
+    if (tenant_slug) {
+      const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
+      if (!access.authorized) {
+        return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+      }
+      if (group_id) {
+        const { data: g } = await supabase
+          .from('order_groups')
+          .select('tenant_slug')
+          .eq('id', group_id)
+          .single()
+        if (!g || g.tenant_slug !== tenant_slug) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+        }
+      }
+    } else if (group_id) {
+      if (!access_code?.trim()) {
+        return NextResponse.json(
+          { error: 'access_code is required for public group session listing' },
+          { status: 400 }
+        )
+      }
+      const { data: g, error: gErr } = await supabase
+        .from('order_groups')
+        .select('access_code')
+        .eq('id', group_id)
+        .eq('status', 'active')
+        .single()
+      if (gErr || !g || g.access_code.toUpperCase() !== access_code.trim().toUpperCase()) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+    } else {
+      return NextResponse.json(
+        { error: 'tenant_slug or group_id is required' },
+        { status: 400 }
+      )
+    }
 
     let query = supabase
       .from('group_order_sessions')
@@ -46,7 +86,7 @@ export async function GET(request: Request) {
 }
 
 // POST - Create a new order session
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const {
@@ -64,6 +104,20 @@ export async function POST(request: Request) {
         { error: 'group_id, tenant_slug, and order_deadline are required' },
         { status: 400 }
       )
+    }
+
+    const access = await verifyTenantOrSuperAdmin(request, tenant_slug)
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+    }
+
+    const { data: g } = await supabase
+      .from('order_groups')
+      .select('tenant_slug')
+      .eq('id', group_id)
+      .single()
+    if (!g || g.tenant_slug !== tenant_slug) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const { data, error } = await supabase
@@ -90,7 +144,7 @@ export async function POST(request: Request) {
 }
 
 // PUT - Update a session
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
     const { id, ...updates } = body
@@ -99,9 +153,26 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
     }
 
+    const { data: existing, error: loadError } = await supabase
+      .from('group_order_sessions')
+      .select('tenant_slug')
+      .eq('id', id)
+      .single()
+
+    if (loadError || !existing?.tenant_slug) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+    }
+
+    const access = await verifyTenantOrSuperAdmin(request, existing.tenant_slug)
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+    }
+
+    const { tenant_slug: _t, group_id: _g, id: _i, ...safeUpdates } = updates as Record<string, unknown>
+
     const { data, error } = await supabase
       .from('group_order_sessions')
-      .update(updates)
+      .update(safeUpdates)
       .eq('id', id)
       .select()
       .single()
@@ -116,13 +187,28 @@ export async function PUT(request: Request) {
 }
 
 // DELETE - Cancel a session
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
+    }
+
+    const { data: existing, error: loadError } = await supabase
+      .from('group_order_sessions')
+      .select('tenant_slug')
+      .eq('id', id)
+      .single()
+
+    if (loadError || !existing?.tenant_slug) {
+      return NextResponse.json({ error: 'Session not found' }, { status: 404 })
+    }
+
+    const access = await verifyTenantOrSuperAdmin(request, existing.tenant_slug)
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
     }
 
     const { error } = await supabase

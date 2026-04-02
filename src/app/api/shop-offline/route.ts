@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -77,6 +78,11 @@ export async function POST(request: NextRequest) {
 
   if (!tenant) {
     return NextResponse.json({ error: 'Missing tenant' }, { status: 400 })
+  }
+
+  const access = await verifyTenantOrSuperAdmin(request, tenant)
+  if (!access.authorized) {
+    return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
   }
 
   const ready = await ensureTable()

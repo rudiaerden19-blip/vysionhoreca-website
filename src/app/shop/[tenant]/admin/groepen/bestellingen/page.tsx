@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useSearchParams } from 'next/navigation'
 import { useLanguage } from '@/i18n'
+import { getAuthHeaders } from '@/lib/auth-headers'
 
 interface OrderItem { id: string; product_name: string; quantity: number; unit_price: number; total_price: number; options_json: Record<string, unknown> | null; notes: string | null }
 interface GroupMember { name: string; email: string | null; department: string | null }
@@ -26,13 +27,17 @@ export default function GroupOrdersPage({ params }: { params: { tenant: string }
   }, [sessionId, params.tenant])
 
   async function loadSession() {
-    const res = await fetch(`/api/groups/sessions?tenant_slug=${params.tenant}`)
+    const res = await fetch(`/api/groups/sessions?tenant_slug=${params.tenant}`, {
+      headers: getAuthHeaders(),
+    })
     if (res.ok) { const data = await res.json(); setSession(data.find((s: SessionInfo) => s.id === sessionId) || null) }
   }
 
   async function loadOrders() {
     setLoading(true)
-    const res = await fetch(`/api/groups/orders?session_id=${sessionId}`)
+    const res = await fetch(`/api/groups/orders?session_id=${sessionId}`, {
+      headers: getAuthHeaders(),
+    })
     if (res.ok) {
       const data = await res.json()
       setOrders(data.orders || [])

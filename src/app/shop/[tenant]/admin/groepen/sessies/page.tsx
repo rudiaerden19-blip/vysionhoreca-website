@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useLanguage } from '@/i18n'
+import { getAuthHeaders } from '@/lib/auth-headers'
 
 interface OrderGroup { id: string; name: string; contact_name: string; contact_email: string }
 
@@ -26,9 +27,13 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
 
   async function loadData() {
     setLoading(true)
-    const groupsRes = await fetch(`/api/groups?tenant_slug=${params.tenant}`)
+    const groupsRes = await fetch(`/api/groups?tenant_slug=${params.tenant}`, {
+      headers: getAuthHeaders(),
+    })
     if (groupsRes.ok) setGroups(await groupsRes.json() || [])
-    const sessionsRes = await fetch(`/api/groups/sessions?tenant_slug=${params.tenant}`)
+    const sessionsRes = await fetch(`/api/groups/sessions?tenant_slug=${params.tenant}`, {
+      headers: getAuthHeaders(),
+    })
     if (sessionsRes.ok) setSessions(await sessionsRes.json() || [])
     setLoading(false)
   }
@@ -39,7 +44,7 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
     try {
       await fetch('/api/groups/sessions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ ...formData, tenant_slug: params.tenant })
       })
       setShowModal(false)
@@ -49,7 +54,11 @@ export default function SessionsPage({ params }: { params: { tenant: string } })
   }
 
   async function updateStatus(id: string, status: string) {
-    await fetch('/api/groups/sessions', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) })
+    await fetch('/api/groups/sessions', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+      body: JSON.stringify({ id, status }),
+    })
     loadData()
   }
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,6 +21,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    const access = await verifyTenantOrSuperAdmin(request, tenantSlug)
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+    }
+
     // Get the order first to get customer phone
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
@@ -30,6 +36,11 @@ export async function POST(request: NextRequest) {
     if (orderError || !order) {
       console.error('❌ Order not found:', orderError)
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    }
+
+    const norm = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
+    if (norm(order.tenant_slug) !== norm(tenantSlug)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     // Update order status to rejected

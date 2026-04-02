@@ -1147,7 +1147,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   }
 
   return (
-    <div className="flex flex-col" style={{ height: '100dvh' }}>
+    <div className="flex flex-col" style={{ height: '100dvh' }} data-testid="kassa-app">
       <PostTrialModulePickerModal
         tenantSlug={tenant}
         open={needsPostTrialModulePicker && !demoViewOnly}

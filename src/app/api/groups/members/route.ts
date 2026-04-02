@@ -1,13 +1,33 @@
 import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { verifyTenantOrSuperAdmin } from '@/lib/verify-tenant-access'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+async function requireGroupTenantAccess(request: NextRequest, groupId: string) {
+  const { data: group, error } = await supabase
+    .from('order_groups')
+    .select('tenant_slug')
+    .eq('id', groupId)
+    .single()
+  if (error || !group?.tenant_slug) {
+    return { ok: false as const, response: NextResponse.json({ error: 'Group not found' }, { status: 404 }) }
+  }
+  const access = await verifyTenantOrSuperAdmin(request, group.tenant_slug)
+  if (!access.authorized) {
+    return {
+      ok: false as const,
+      response: NextResponse.json({ error: access.error || 'Forbidden' }, { status: 403 })
+    }
+  }
+  return { ok: true as const, tenant_slug: group.tenant_slug }
+}
+
 // GET - List members of a group
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const group_id = searchParams.get('group_id')
@@ -15,6 +35,9 @@ export async function GET(request: Request) {
     if (!group_id) {
       return NextResponse.json({ error: 'group_id is required' }, { status: 400 })
     }
+
+    const gate = await requireGroupTenantAccess(request, group_id)
+    if (!gate.ok) return gate.response
 
     const { data, error } = await supabase
       .from('group_members')
@@ -33,7 +56,7 @@ export async function GET(request: Request) {
 }
 
 // POST - Add member(s) to a group
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { group_id, members } = body
@@ -42,7 +65,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'group_id is required' }, { status: 400 })
     }
 
-    // Check group member limit
+    const gate = await requireGroupTenantAccess(request, group_id)
+    if (!gate.ok) return gate.response
+
     const { data: group } = await supabase
       .from('order_groups')
       .select('max_members')
@@ -55,9 +80,8 @@ export async function POST(request: Request) {
       .eq('group_id', group_id)
       .neq('status', 'removed')
 
-    // Handle single member or batch
     const membersToAdd = Array.isArray(members) ? members : [body]
-    
+
     if (group && count !== null && count + membersToAdd.length > group.max_members) {
       return NextResponse.json(
         { error: `Maximum ${group.max_members} members allowed` },
@@ -65,7 +89,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const insertData = membersToAdd.map(m => ({
+    const insertData = membersToAdd.map((m: Record<string, unknown>) => ({
       group_id,
       name: m.name,
       email: m.email || null,
@@ -89,7 +113,7 @@ export async function POST(request: Request) {
 }
 
 // PUT - Update a member
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
     const { id, ...updates } = body
@@ -97,6 +121,18 @@ export async function PUT(request: Request) {
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
     }
+
+    const { data: memberRow, error: mErr } = await supabase
+      .from('group_members')
+      .select('group_id')
+      .eq('id', id)
+      .single()
+    if (mErr || !memberRow?.group_id) {
+      return NextResponse.json({ error: 'Member not found' }, { status: 404 })
+    }
+
+    const gate = await requireGroupTenantAccess(request, memberRow.group_id)
+    if (!gate.ok) return gate.response
 
     const { data, error } = await supabase
       .from('group_members')
@@ -115,7 +151,7 @@ export async function PUT(request: Request) {
 }
 
 // DELETE - Remove a member (soft delete)
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
@@ -123,6 +159,18 @@ export async function DELETE(request: Request) {
     if (!id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
     }
+
+    const { data: memberRow, error: mErr } = await supabase
+      .from('group_members')
+      .select('group_id')
+      .eq('id', id)
+      .single()
+    if (mErr || !memberRow?.group_id) {
+      return NextResponse.json({ error: 'Member not found' }, { status: 404 })
+    }
+
+    const gate = await requireGroupTenantAccess(request, memberRow.group_id)
+    if (!gate.ok) return gate.response
 
     const { error } = await supabase
       .from('group_members')
