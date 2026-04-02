@@ -4486,6 +4486,10 @@
     "posQuality": {
       "title": "Software di alta qualità",
       "body": "Hardware e software di qualità molto elevata. Risparmia su installazione e costi del personale. Spesso oltre il 30% al mese."
+    },
+    "foodtrucksOffline": {
+      "title": "Food truck e offline",
+      "body": "La nostra piattaforma è pensata anche per i food truck e funziona perfettamente offline."
     }
   },
   "gratisWebsiteBanner": {

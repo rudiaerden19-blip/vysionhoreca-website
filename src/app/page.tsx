@@ -52,7 +52,14 @@ function GratisWebsiteBannerSection() {
 
 function WhyVysionSection() {
   const { t } = useLanguage()
-  const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice', 'inHouseSoftware', 'posQuality'] as const
+  const pointKeys = [
+    'fullPlatform',
+    'liveSupport',
+    'rightPrice',
+    'inHouseSoftware',
+    'posQuality',
+    'foodtrucksOffline',
+  ] as const
 
   return (
     <section className="relative pt-8 sm:pt-10 lg:pt-12 pb-24 sm:pb-32 lg:pb-40 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">

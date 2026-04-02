@@ -4486,6 +4486,10 @@
     "posQuality": {
       "title": "高品质软件",
       "body": "硬件与软件均具极高品质。节省安装与人力成本。每月往往可节省远超 30%。"
+    },
+    "foodtrucksOffline": {
+      "title": "餐车与离线可用",
+      "body": "我们的平台同样适合餐车，离线也能顺畅运行。"
     }
   },
   "gratisWebsiteBanner": {

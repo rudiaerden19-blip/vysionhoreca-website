@@ -242,6 +242,10 @@
     "posQuality": {
       "title": "High-quality software",
       "body": "Our hardware and software are built to a very high standard. Save on installation and staffing costs. Often well over 30% per month."
+    },
+    "foodtrucksOffline": {
+      "title": "Food trucks & offline",
+      "body": "Our platform is built for food trucks too and works flawlessly offline."
     }
   },
   "gratisWebsiteBanner": {
