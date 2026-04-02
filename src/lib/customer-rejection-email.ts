@@ -140,6 +140,9 @@ export async function sendCustomerRejectionEmail(
     host: 'smtp.zoho.eu',
     port: 465,
     secure: true,
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
     auth: {
       user: process.env.ZOHO_EMAIL,
       pass: process.env.ZOHO_PASSWORD,

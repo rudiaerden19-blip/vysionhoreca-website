@@ -404,6 +404,17 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
   const handleRejectOrder = async () => {
     if (!rejectingOrder?.id || !rejectionReason) return
     setRejectOrderError(null)
+    const auth = getAuthHeaders()
+    const hasOwnerSession =
+      !!auth['x-business-id']?.trim() && !!auth['x-auth-email']?.trim()
+    const hasSuperAdminSession =
+      !!auth['x-superadmin-id']?.trim() && !!auth['x-superadmin-email']?.trim()
+    if (!hasOwnerSession && !hasSuperAdminSession) {
+      setRejectOrderError(
+        'Je bent op dit toestel niet ingelogd (geen sessie). Open het menu, log in met je e-mail en wachtwoord, en probeer opnieuw.'
+      )
+      return
+    }
     setUpdatingId(rejectingOrder.id)
     // Stop alarm exact zoals donor
     if (typeof window !== 'undefined' && (window as any).stopOrderAlarm) {
@@ -411,17 +422,21 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
     }
     
     try {
+      const ac = new AbortController()
+      const abortT = window.setTimeout(() => ac.abort(), 30_000)
       // Use server-side API that handles both database update and WhatsApp
       const response = await fetch('/api/orders/reject', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+        headers: { 'Content-Type': 'application/json', ...auth },
         body: JSON.stringify({
           orderId: rejectingOrder.id,
           tenantSlug: params.tenant,
           rejectionReason: rejectionReason,
           rejectionNotes: rejectionNotes,
         }),
+        signal: ac.signal,
       })
+      window.clearTimeout(abortT)
       
       const rejectPayload = await response.json().catch(() => ({} as { emailError?: string; error?: string }))
 
@@ -446,16 +461,20 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
         setRejectionNotes('')
         setRejectOrderError(null)
       } else {
-        const errBody = await response.json().catch(() => ({} as { error?: string }))
         const msg =
-          typeof errBody.error === 'string'
-            ? errBody.error
+          typeof rejectPayload.error === 'string'
+            ? rejectPayload.error
             : `Weigeren mislukt (HTTP ${response.status}). Controleer of je bent ingelogd.`
         setRejectOrderError(msg)
-        console.error('Failed to reject order:', response.status, errBody)
+        console.error('Failed to reject order:', response.status, rejectPayload)
       }
     } catch (e) {
-      setRejectOrderError('Netwerkfout bij weigeren. Probeer opnieuw.')
+      const aborted = e instanceof Error && e.name === 'AbortError'
+      setRejectOrderError(
+        aborted
+          ? 'De server deed er te lang over (timeout). Controleer of de bestelling geweigerd is en of je bent ingelogd.'
+          : 'Netwerkfout bij weigeren. Probeer opnieuw.'
+      )
       console.error('Error rejecting order:', e)
     }
     
