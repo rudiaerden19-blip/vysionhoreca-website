@@ -56,7 +56,7 @@ export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }:
 
   return (
     <div
-      className={`home-stamp-wrap pointer-events-none absolute bottom-3 right-3 z-10 hidden md:block w-[168px] h-[168px] sm:w-[188px] sm:h-[188px] ${
+      className={`home-stamp-wrap pointer-events-none absolute bottom-3 right-3 z-10 hidden md:block w-[176px] h-[176px] sm:w-[198px] sm:h-[198px] ${
         visible ? 'home-stamp-visible' : 'home-stamp-hidden'
       }`}
       aria-hidden="true"
@@ -67,8 +67,9 @@ export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }:
         fill="none"
       >
         <defs>
-          <path id={arcUpperPathId} d="M 34 100 A 66 66 0 0 0 166 100" />
-          <path id={arcLowerPathId} d="M 34 100 A 66 66 0 0 1 166 100" />
+          {/* Langere straal = boogtekst dichter bij de buitenrand, meer ruimte rond het middenblok */}
+          <path id={arcUpperPathId} d="M 28 100 A 72 72 0 0 0 172 100" />
+          <path id={arcLowerPathId} d="M 28 100 A 72 72 0 0 1 172 100" />
         </defs>
         <circle
           cx="100"
@@ -89,9 +90,9 @@ export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }:
         {/* boven: meest (topArc) — koppeling aan path zo dat glyphs aan bovenkant van de stempel staan */}
         <text
           fill="currentColor"
-          fontSize="17"
+          fontSize="16"
           fontWeight="700"
-          letterSpacing="0.06em"
+          letterSpacing="0.08em"
           style={{ fontFamily: 'system-ui, sans-serif' }}
         >
           <textPath href={`#${arcLowerPathId}`} startOffset="50%" textAnchor="middle">
@@ -100,31 +101,31 @@ export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }:
         </text>
         <text
           fill="currentColor"
-          fontSize="17"
+          fontSize="16"
           fontWeight="700"
-          letterSpacing="0.04em"
+          letterSpacing="0.06em"
           style={{ fontFamily: 'system-ui, sans-serif' }}
         >
           <textPath href={`#${arcUpperPathId}`} startOffset="50%" textAnchor="middle">
             {bottomArc}
           </textPath>
         </text>
-        <text x="100" y="69" textAnchor="middle" fill="currentColor" fontSize="16" opacity="0.95">
+        <text x="100" y="58" textAnchor="middle" fill="currentColor" fontSize="15" opacity="0.95">
           ★
         </text>
-        <text x="100" y="140" textAnchor="middle" fill="currentColor" fontSize="16" opacity="0.95">
+        <text x="100" y="150" textAnchor="middle" fill="currentColor" fontSize="15" opacity="0.95">
           ★
         </text>
-        <line x1="16" y1="86" x2="184" y2="86" stroke="currentColor" strokeWidth="2.8" />
-        <line x1="16" y1="114" x2="184" y2="114" stroke="currentColor" strokeWidth="2.8" />
+        <line x1="14" y1="78" x2="186" y2="78" stroke="currentColor" strokeWidth="2.8" />
+        <line x1="14" y1="122" x2="186" y2="122" stroke="currentColor" strokeWidth="2.8" />
         <text
           x="100"
-          y="110"
+          y="105"
           textAnchor="middle"
           fill="currentColor"
-          fontSize="28"
+          fontSize="26"
           fontWeight="800"
-          letterSpacing="0.12em"
+          letterSpacing="0.14em"
           style={{ fontFamily: 'system-ui, sans-serif' }}
         >
           VYSION
