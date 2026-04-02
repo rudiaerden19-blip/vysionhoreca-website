@@ -4,6 +4,11 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage, Locale } from '@/i18n'
+import {
+  persistTenantSessionWithToday,
+  safeInternalNextPath,
+  internalShopPathToTenantHostPath,
+} from '@/lib/auth-headers'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -65,28 +70,33 @@ export default function LoginPage() {
 
       const tenant = data.tenant
 
-      // Store tenant in localStorage
-      localStorage.setItem('vysion_tenant', JSON.stringify(tenant))
-      
-      // ALTIJD naar tenant dashboard via subdomain - geen fallback!
       if (!tenant.tenant_slug) {
         setError('Geen tenant gevonden. Neem contact op met support.')
         setIsLoading(false)
         return
       }
-      
-      // Always redirect to ordervysion.com subdomain (except localhost)
-      const isLocalhost = typeof window !== 'undefined' && 
-        (window.location.hostname.includes('localhost') || 
-         window.location.hostname.includes('127.0.0.1'))
-      
-      // Wis welkom-sessie zodat welkomstscherm altijd verschijnt na login
+
+      persistTenantSessionWithToday(tenant as Record<string, unknown>)
+
+      const isLocalhost = typeof window !== 'undefined' &&
+        (window.location.hostname.includes('localhost') ||
+          window.location.hostname.includes('127.0.0.1'))
+
       try { sessionStorage.removeItem(`vysion_welcomed_${tenant.tenant_slug}`) } catch { /* ignore */ }
 
+      const nextParam =
+        typeof window !== 'undefined'
+          ? new URLSearchParams(window.location.search).get('next')
+          : null
+      const safeNext = safeInternalNextPath(nextParam, tenant.tenant_slug)
+
       if (isLocalhost) {
-        router.push(`/shop/${tenant.tenant_slug}/welkom`)
+        router.push(safeNext || `/shop/${tenant.tenant_slug}/welkom`)
       } else {
-        window.location.href = `https://${tenant.tenant_slug}.ordervysion.com/welkom`
+        const hostPath = safeNext
+          ? internalShopPathToTenantHostPath(safeNext, tenant.tenant_slug)
+          : '/welkom'
+        window.location.href = `https://${tenant.tenant_slug}.ordervysion.com${hostPath}`
       }
       
     } catch (err) {

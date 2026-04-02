@@ -5,12 +5,17 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useLanguage } from '@/i18n'
 import { Locale } from '@/i18n/config'
+import {
+  isSuperAdminLoggedIn,
+  isOwnerSessionFreshForTenant,
+} from '@/lib/auth-headers'
 
 interface Tenant {
   id: string
   name: string
   email: string
   business_id: string
+  tenant_slug?: string
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -68,7 +73,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const stored = localStorage.getItem('vysion_tenant')
     if (stored) {
       try {
-        setTenant(JSON.parse(stored))
+        const parsed = JSON.parse(stored) as Tenant
+        const slug = parsed.tenant_slug
+        if (
+          !slug ||
+          (!isSuperAdminLoggedIn() && !isOwnerSessionFreshForTenant(slug))
+        ) {
+          router.push('/login')
+          return
+        }
+        setTenant(parsed)
       } catch {
         router.push('/login')
         return

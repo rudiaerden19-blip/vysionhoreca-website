@@ -110,10 +110,73 @@ export function getCurrentTenantSlug(): string | null {
 
 const normSlug = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
 
+/** Kalenderdag in België (YYYY-MM-DD) — dagelijkse herauthenticatie voor admin/kassa. */
+export function getBrusselsCalendarDateString(date: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Brussels',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date)
+}
+
+/** Zet tenant in localStorage met `sessionCalDay` (na login/registratie). */
+export function persistTenantSessionWithToday(tenant: Record<string, unknown>): void {
+  if (typeof window === 'undefined') return
+  const enriched = { ...tenant, sessionCalDay: getBrusselsCalendarDateString() }
+  localStorage.setItem('vysion_tenant', JSON.stringify(enriched))
+}
+
+/**
+ * Valideer `next` na login: alleen intern pad onder /shop/{slug}/ (geen open redirect).
+ */
+export function safeInternalNextPath(next: string | null | undefined, tenantSlug: string): string | null {
+  if (!next || !tenantSlug) return null
+  let decoded: string
+  try {
+    decoded = decodeURIComponent(next.trim())
+  } catch {
+    return null
+  }
+  if (!decoded.startsWith('/') || decoded.includes('//')) return null
+  const prefix = `/shop/${tenantSlug}`
+  if (decoded !== prefix && !decoded.startsWith(`${prefix}/`)) return null
+  return decoded
+}
+
+/**
+ * Pad zoals in de adresbalk op tenant-subdomein (middleware rewrite verwacht pad zonder /shop/slug).
+ */
+export function internalShopPathToTenantHostPath(internalPath: string, tenantSlug: string): string {
+  const prefix = `/shop/${tenantSlug}`
+  if (!internalPath.startsWith(prefix)) return '/welkom'
+  const rest = internalPath.slice(prefix.length)
+  if (!rest || rest === '') return '/'
+  return rest.startsWith('/') ? rest : `/${rest}`
+}
+
 /** Actieve zaak-sessie voor deze shop (URL-tenant vs localStorage). */
 export function isOwnerSessionForTenant(tenantSlug: string): boolean {
   if (!isTenantLoggedIn()) return false
   const cur = getCurrentTenantSlug()
   if (!cur) return false
   return normSlug(cur) === normSlug(tenantSlug)
+}
+
+/**
+ * Eigenaar mag admin/kassa van deze tenant alleen met wachtwoord-login vandaag (BE).
+ * Geen `sessionCalDay` of andere tenant in localStorage → geweigerd.
+ */
+export function isOwnerSessionFreshForTenant(tenantSlug: string): boolean {
+  if (!isOwnerSessionForTenant(tenantSlug)) return false
+  const tenantData = localStorage.getItem('vysion_tenant')
+  if (!tenantData) return false
+  try {
+    const tenant = JSON.parse(tenantData) as { sessionCalDay?: string }
+    const day = tenant.sessionCalDay
+    if (!day || typeof day !== 'string') return false
+    return day === getBrusselsCalendarDateString()
+  } catch {
+    return false
+  }
 }

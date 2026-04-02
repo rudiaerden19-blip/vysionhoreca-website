@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage, Locale } from '@/i18n'
+import { persistTenantSessionWithToday } from '@/lib/auth-headers'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -139,7 +140,7 @@ export default function RegisterPage() {
         return
       }
       
-      localStorage.setItem('vysion_tenant', JSON.stringify(data.tenant))
+      persistTenantSessionWithToday(data.tenant as Record<string, unknown>)
       
       // Direct redirect to dashboard (no install popup)
       setTenantSlug(data.tenant.tenant_slug)

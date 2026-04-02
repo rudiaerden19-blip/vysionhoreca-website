@@ -23,6 +23,10 @@ import {
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
+import {
+  isSuperAdminLoggedIn,
+  isOwnerSessionFreshForTenant,
+} from '@/lib/auth-headers'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -38,6 +42,8 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
+  /** Na mount: alleen superadmin of eigenaar met wachtwoord-sessie vandaag voor exact deze URL-tenant. */
+  const [adminAccess, setAdminAccess] = useState<'pending' | 'ok' | 'login'>('pending')
   const baseUrl = `/shop/${params.tenant}/admin`
   const {
     moduleAccess,
@@ -55,12 +61,30 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   useEffect(() => {
     async function checkTenant() {
+      setLoading(true)
       const tenantData = await getTenantSettings(params.tenant)
       setTenantExists(tenantData !== null)
       setLoading(false)
     }
     checkTenant()
   }, [params.tenant])
+
+  useEffect(() => {
+    setAdminAccess('pending')
+  }, [params.tenant])
+
+  useEffect(() => {
+    if (loading || tenantExists === null) return
+    if (tenantExists === false) return
+    if (typeof window === 'undefined') return
+    if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)) {
+      setAdminAccess('ok')
+      return
+    }
+    setAdminAccess('login')
+    const next = `${window.location.pathname}${window.location.search}`
+    router.replace(`/login?next=${encodeURIComponent(next)}`)
+  }, [loading, tenantExists, params.tenant, router])
 
   /**
    * Welkom-splash (/welkom) wordt getoond vanuit admin/page als `vysion_welcomed_*` ontbreekt.
@@ -134,6 +158,19 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
           <a href="https://www.vysionhoreca.com" className="text-blue-600 hover:text-blue-700 font-medium inline-block">
             {t('adminLayout.backToVysion')}
           </a>
+        </div>
+      </div>
+    )
+  }
+
+  if (tenantExists && adminAccess !== 'ok') {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">
+            {adminAccess === 'login' ? t('adminLayout.redirectLogin') : t('adminLayout.loading')}
+          </p>
         </div>
       </div>
     )

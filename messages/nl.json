@@ -4767,6 +4767,7 @@
   },
   "adminLayout": {
     "loading": "Laden...",
+    "redirectLogin": "Doorverwijzen naar inloggen...",
     "shopNotFound": "Shop niet gevonden",
     "shopNotFoundDesc": "Deze shop bestaat niet of is verwijderd.",
     "backToVysion": "← Terug naar Vysion",

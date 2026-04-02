@@ -4767,6 +4767,7 @@
   },
   "adminLayout": {
     "loading": "Loading...",
+    "redirectLogin": "Redirecting to sign-in…",
     "shopNotFound": "Shop not found",
     "shopNotFoundDesc": "This shop does not exist or was removed.",
     "backToVysion": "← Back to Vysion",
