@@ -112,27 +112,6 @@ function WhyVysionSection() {
   )
 }
 
-function NewAtVysionSection() {
-  const { t } = useLanguage()
-
-  return (
-    <section id="updates" className="py-20 sm:py-28 lg:py-32 bg-white border-t border-gray-100">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 sm:mb-10 tracking-tight">
-          {t('newAtVysion.title')}
-        </h2>
-        <p className="text-base sm:text-lg text-gray-600 leading-relaxed mb-10">{t('newAtVysion.body')}</p>
-        <a
-          href="#contact"
-          className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-colors shadow-home-btn"
-        >
-          {t('newAtVysion.cta')}
-        </a>
-      </div>
-    </section>
-  )
-}
-
 // One Day Online Section
 function OneDayOnlineSection() {
   const { t, locale } = useLanguage()
@@ -832,63 +811,6 @@ function StopSection() {
   )
 }
 
-// But Wait Section
-function ButWaitSection() {
-  const { t } = useLanguage()
-  
-  const featureKeys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
-
-  return (
-    <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <p className="text-accent text-lg font-semibold tracking-wider uppercase mb-4">
-            {t('butWait.label')}
-          </p>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-            {t('butWait.title')}<br />
-            <span className="text-accent">{t('butWait.titleAccent')}</span>
-          </h2>
-          <p className="text-xl sm:text-2xl text-gray-600 mt-6">
-            {t('butWait.subtitle')}
-          </p>
-        </div>
-
-        {/* Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 items-stretch">
-          {/* Left - Image: h-full laat de foto zo hoog als het witte kaartblok (grid stretch), geen starre max-h */}
-          <div className="relative w-full min-h-[340px] sm:min-h-[420px] h-full rounded-3xl overflow-hidden shadow-home-image">
-            <Image
-              src="/images/entrepreneur.jpg"
-              alt="Ondernemer werkt met Vysion"
-              fill
-              sizes="(min-width: 1024px) 50vw, 100vw"
-              loading="lazy"
-              className="object-cover object-center"
-            />
-          </div>
-
-          {/* Right - Features List */}
-          <div className="bg-white rounded-3xl p-8 lg:p-10 shadow-home-card flex flex-col justify-center">
-            <h3 className="text-accent text-2xl sm:text-3xl font-bold mb-10">{t('butWait.boxTitle')}</h3>
-            <ul className="space-y-4">
-              {featureKeys.map((key) => (
-                <li key={key} className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="text-gray-700 text-lg">{t(`butWait.features.${key}`)}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 function TableKioskSection() {
   const { t } = useLanguage()
   const featureKeys = [1, 2, 3, 4, 5] as const
@@ -1294,63 +1216,6 @@ function TestimonialSection() {
   )
 }
 
-// CTA Section
-function CTASection() {
-  const { t, locale } = useLanguage()
-  const ctaVideoRef = useRef<HTMLVideoElement>(null)
-
-  useEffect(() => {
-    const el = ctaVideoRef.current
-    if (!el) return
-    el.muted = true
-    el.defaultMuted = true
-    const attempt = () => {
-      const p = el.play()
-      if (p !== undefined) {
-        p.catch(() => {})
-      }
-    }
-    attempt()
-    el.addEventListener('loadeddata', attempt)
-    return () => el.removeEventListener('loadeddata', attempt)
-  }, [])
-
-  return (
-    <section id="demo" className="relative overflow-hidden py-20 sm:py-28 min-h-[520px] sm:min-h-[620px] flex items-center justify-center">
-      {/* Video Background — explicit play() + src on element handles React/Safari autoplay quirks */}
-      <video
-        ref={ctaVideoRef}
-        src="/images/cta-video.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ objectPosition: 'center center', transform: 'scale(1.0)' }}
-      />
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-black/70"></div>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-          {t('cta.title')}
-        </h2>
-        <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          {t('cta.subtitle')}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a href={`/registreer?lang=${locale}`} className="btn-primary">
-            {t('cta.primary')}
-          </a>
-          <a href="#contact" className="btn-outline">
-            {t('cta.secondary')}
-          </a>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 // Contact Section
 function ContactSection() {
   const { t } = useLanguage()
@@ -1552,14 +1417,11 @@ export default function HomePage() {
       <GratisWebsiteBannerSection />
       <PlatformGridSection />
       <HardwareSection />
-      <NewAtVysionSection />
       <OneDayOnlineSection />
       <StatsAndLiveDemoSection />
       <PricingSection />
-      <ButWaitSection />
       <TableKioskSection />
       <TestimonialSection />
-      <CTASection />
       <ContactSection />
       <Footer />
       <CookieBanner />

@@ -231,7 +231,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
             {t('heroLanding.ctaViewDemo')}
           </a>
         </div>
-        <p className="mt-6 sm:mt-8 text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold leading-tight max-w-5xl text-accent">
+        <p className="mt-5 sm:mt-6 text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-3xl leading-snug">
           {t('heroLanding.ctaModulesLine')}
         </p>
       </div>

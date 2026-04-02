@@ -76,15 +76,6 @@ export default function Footer() {
                     {t('footer.pricing')}
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="/#updates"
-                    title={t('footer.updatesLinkTitle')}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    {t('footer.updates')}
-                  </a>
-                </li>
               </ul>
             </nav>
 
