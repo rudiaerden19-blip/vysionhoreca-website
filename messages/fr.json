@@ -43,6 +43,10 @@
     "trialInfo": "Essai gratuit 14 jours • Commencez immédiatement",
     "clickToOpen": "Cliquez pour ouvrir"
   },
+  "homeCornerStamp": {
+    "topArc": "Le plus",
+    "bottomArc": "avantageux"
+  },
   "hardware": {
     "title": "Notre matériel",
     "subtitle": "Terminaux d’encaissement, écrans client, TPE et périphériques professionnels — prêts pour faire tourner Vysion Horeca dans votre établissement.",

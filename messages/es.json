@@ -43,6 +43,10 @@
     "trialInfo": "Prueba gratis 7 días • Empieza de inmediato",
     "clickToOpen": "Clic para abrir"
   },
+  "homeCornerStamp": {
+    "topArc": "Lo más",
+    "bottomArc": "económico"
+  },
   "hardware": {
     "title": "Nuestro hardware",
     "subtitle": "TPVs profesionales, pantallas para el cliente, datáfonos y periféricos — listos para ejecutar Vysion Horeca en tu negocio.",

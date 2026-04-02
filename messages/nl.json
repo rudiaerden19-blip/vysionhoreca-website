@@ -109,6 +109,10 @@
     "trialInfo": "Gratis testen 14 dagen • Direct aan de slag",
     "clickToOpen": "Klik om te openen"
   },
+  "homeCornerStamp": {
+    "topArc": "meest",
+    "bottomArc": "voordeligste"
+  },
   "hardware": {
     "title": "Onze hardware",
     "subtitle": "Professionele kassa’s, tweede scherm, betaalterminals en randapparatuur — klaar om Vysion Horeca op te draaien in jouw zaak.",

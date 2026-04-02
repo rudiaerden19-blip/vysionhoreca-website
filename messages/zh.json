@@ -43,6 +43,10 @@
     "trialInfo": "免费试用14天 • 立即开始",
     "clickToOpen": "点击打开"
   },
+  "homeCornerStamp": {
+    "topArc": "最",
+    "bottomArc": "实惠"
+  },
   "hardware": {
     "title": "我们的硬件",
     "subtitle": "专业收银终端、客显屏、支付终端与周边设备 — 可在门店稳定运行 Vysion Horeca。",

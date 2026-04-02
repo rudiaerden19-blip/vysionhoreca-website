@@ -43,6 +43,10 @@
     "trialInfo": "تجربة مجانية 14 أيام • ابدأ فوراً",
     "clickToOpen": "انقر للفتح"
   },
+  "homeCornerStamp": {
+    "topArc": "الأكثر",
+    "bottomArc": "توفيراً"
+  },
   "hardware": {
     "title": "أجهزتنا",
     "subtitle": "طرفيات نقاط بيع احترافية، شاشات للعملاء، أجهزة دفع وملحقات — جاهزة لتشغيل Vysion Horeca في منشأتك.",

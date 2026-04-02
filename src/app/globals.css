@@ -430,3 +430,49 @@ input[type="number"] {
     padding-right: 1.5rem;
   }
 }
+
+/* Homepage corner stamp — “slam” + fade (pricing section) */
+.home-stamp-wrap {
+  transform-origin: 90% 90%;
+  will-change: transform, opacity;
+}
+
+.home-stamp-wrap.home-stamp-hidden {
+  opacity: 0;
+  transform: scale(1.48) rotate(-19deg);
+}
+
+.home-stamp-wrap.home-stamp-visible {
+  animation: home-stamp-slam 0.58s cubic-bezier(0.2, 0.95, 0.35, 1) forwards;
+}
+
+@keyframes home-stamp-slam {
+  0% {
+    opacity: 0;
+    transform: scale(1.5) rotate(-19deg);
+  }
+  52% {
+    opacity: 0.96;
+    transform: scale(0.94) rotate(-10deg);
+  }
+  76% {
+    transform: scale(1.04) rotate(-12.5deg);
+  }
+  100% {
+    opacity: 0.93;
+    transform: scale(1) rotate(-12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-stamp-wrap.home-stamp-visible {
+    animation: home-stamp-slam-reduced 0.01s forwards;
+  }
+}
+
+@keyframes home-stamp-slam-reduced {
+  to {
+    opacity: 0.92;
+    transform: scale(1) rotate(-12deg);
+  }
+}

@@ -43,6 +43,10 @@
     "trialInfo": "Prova gratis 14 giorni • Inizia subito",
     "clickToOpen": "Clicca per aprire"
   },
+  "homeCornerStamp": {
+    "topArc": "Il più",
+    "bottomArc": "conveniente"
+  },
   "hardware": {
     "title": "Il nostro hardware",
     "subtitle": "Terminali POS, display cliente, dispositivi di pagamento e periferiche professionali — pronti per Vysion Horeca nella tua attività.",

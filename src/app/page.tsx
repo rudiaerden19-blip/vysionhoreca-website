@@ -7,6 +7,7 @@ import {
   Footer,
   CookieBanner,
   ContactPageSection,
+  HomeCornerStamp,
   HomeLandingHero,
   PlatformGridSection,
   HardwareSection,
@@ -1259,6 +1260,7 @@ export default function HomePage() {
       <ContactPageSection sectionId="contact" />
       <Footer />
       <CookieBanner />
+      <HomeCornerStamp />
     </main>
   )
 }

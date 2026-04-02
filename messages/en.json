@@ -109,6 +109,10 @@
     "trialInfo": "Free trial 14 days • Get started immediately",
     "clickToOpen": "Click to open"
   },
+  "homeCornerStamp": {
+    "topArc": "Most",
+    "bottomArc": "affordable"
+  },
   "hardware": {
     "title": "Our hardware",
     "subtitle": "Professional POS terminals, customer displays, payment devices and peripherals — ready to run Vysion Horeca in your venue.",

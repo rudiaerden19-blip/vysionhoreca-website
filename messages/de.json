@@ -43,6 +43,10 @@
     "trialInfo": "14 Tage kostenlos testen • Sofort loslegen",
     "clickToOpen": "Zum Öffnen klicken"
   },
+  "homeCornerStamp": {
+    "topArc": "Am",
+    "bottomArc": "günstigsten"
+  },
   "hardware": {
     "title": "Unsere Hardware",
     "subtitle": "Professionelle Kassensysteme, Kundendisplays, Zahlungsgeräte und Peripherie — bereit für Vysion Horeca in Ihrem Betrieb.",

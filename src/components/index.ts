@@ -1,3 +1,4 @@
+export { default as HomeCornerStamp } from './HomeCornerStamp'
 export { default as HomeLandingHero } from './HomeLandingHero'
 export { default as PlatformGridSection } from './PlatformGridSection'
 export { default as HardwareSection } from './HardwareSection'
