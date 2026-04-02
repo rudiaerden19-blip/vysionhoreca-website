@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
+import { tenantExistsInDb } from '@/lib/tenant-slug-resolve'
 
 interface OrderItem {
   name?: string
@@ -22,13 +23,8 @@ export async function POST(request: NextRequest) {
     if (tenantSlug) {
       const supabase = getServerSupabaseClient()
       if (supabase) {
-        const { data: tenant } = await supabase
-          .from('tenants')
-          .select('slug')
-          .eq('slug', tenantSlug)
-          .single()
-        
-        if (!tenant) {
+        const ok = await tenantExistsInDb(supabase, tenantSlug)
+        if (!ok) {
           return NextResponse.json({ error: 'Invalid tenant' }, { status: 403 })
         }
       }
