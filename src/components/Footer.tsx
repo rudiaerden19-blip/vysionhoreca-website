@@ -93,7 +93,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <a
-                    href="/#contact"
+                    href="/contact"
                     title={t('footer.contactLinkTitle')}
                     className="text-gray-400 hover:text-white transition-colors"
                   >

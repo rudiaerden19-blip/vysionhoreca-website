@@ -86,6 +86,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/login') ||
+    pathname.startsWith('/contact') ||
     pathname.startsWith('/registreer') ||
     pathname.startsWith('/superadmin') ||
     pathname.startsWith('/kassa') ||

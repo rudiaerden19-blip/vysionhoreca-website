@@ -52,7 +52,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
     { href: '/#sectoren', label: t('nav.sectors') },
     { href: '/#platform', label: t('nav.services') },
     { href: '/videos', label: t('nav.videos') },
-    { href: '/#contact', label: t('nav.contact') },
+    { href: '/contact', label: t('nav.contact') },
   ]
 
   return (
@@ -102,7 +102,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto lg:ml-0">
             <a
-              href="/#contact"
+              href="/contact"
               className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-home-btn transition-colors"
             >
               {t('heroLanding.demoRequest')}
@@ -174,7 +174,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
               </a>
             ))}
             <a
-              href="/#contact"
+              href="/contact"
               className="block mt-2 text-center rounded-full bg-accent text-white font-semibold py-3 shadow-home-btn"
               onClick={() => setIsMenuOpen(false)}
             >

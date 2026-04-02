@@ -42,7 +42,7 @@ export default function Navigation() {
             <a href="/videos" className="text-gray-300 hover:text-white transition-colors">{t('nav.videos')}</a>
             <a href="/#prijzen" className="text-gray-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
             <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">{t('nav.about')}</a>
-            <a href="/#contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
+            <a href="/contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
             <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
             <a href="/resellers" className="text-gray-300 hover:text-white transition-colors">{t('nav.resellers')}</a>
           </div>
@@ -117,7 +117,7 @@ export default function Navigation() {
               <a href="/videos" className="text-gray-300 hover:text-white transition-colors">{t('nav.videos')}</a>
               <a href="/#prijzen" className="text-gray-300 hover:text-white transition-colors">{t('nav.pricing')}</a>
               <a href="/over-ons" className="text-gray-300 hover:text-white transition-colors">{t('nav.about')}</a>
-              <a href="/#contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
+              <a href="/contact" className="text-gray-300 hover:text-white transition-colors">{t('nav.contact')}</a>
               <a href="/support" className="text-gray-300 hover:text-white transition-colors">{t('nav.support')}</a>
               <a href="/resellers" className="text-gray-300 hover:text-white transition-colors">{t('nav.resellers')}</a>
 
