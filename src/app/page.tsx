@@ -806,15 +806,15 @@ function TableKioskSection() {
     <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden" aria-labelledby="table-kiosk-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-          <div className="w-full rounded-3xl bg-[#e3e3e3] p-4 sm:p-6 shadow-home-image ring-1 ring-black/[0.06]">
+          <div className="w-full max-w-md lg:max-w-lg mx-auto lg:mx-0 rounded-3xl bg-[#e3e3e3] p-3 sm:p-5 shadow-home-image ring-1 ring-black/[0.06]">
             <Image
               src="/images/table-kiosk-device.png"
               alt={t('tableKiosk.imageAlt')}
               width={613}
               height={804}
               loading="lazy"
-              className="w-full h-auto max-h-[min(85vw,480px)] sm:max-h-[440px] lg:max-h-[500px] object-contain mx-auto"
-              sizes="(min-width: 1024px) 40vw, 90vw"
+              className="w-full h-auto max-h-[min(68vw,320px)] sm:max-h-[300px] lg:max-h-[340px] object-contain mx-auto"
+              sizes="(min-width: 1024px) 360px, 90vw"
             />
           </div>
 
