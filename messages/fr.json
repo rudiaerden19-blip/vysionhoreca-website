@@ -4484,7 +4484,7 @@
     "imageAlt": "Borne de table Vysion avec écran tactile",
     "fullPlatform": {
       "title": "Plateforme complète",
-      "body": "Caisse, commande en ligne, écran cuisine, réservations, site web et rapports au même endroit. Pas d’outils éparpillés ni de double saisie — tout fonctionne ensemble pour votre établissement."
+      "body": "Caisse, commande en ligne, écran cuisine, réservations, site web et rapports au même endroit. Pas d’outils éparpillés ni de double saisie — tout fonctionne ensemble pour votre établissement. Vous choisissez les modules dont vous avez besoin."
     },
     "liveSupport": {
       "title": "Support en direct",
@@ -4492,15 +4492,15 @@
     },
     "rightPrice": {
       "title": "Le bon prix",
-      "body": "Des formules claires sans frais cachés. Vous payez pour ce dont vous avez besoin et évoluez quand votre activité grandit."
+      "body": "Fini les commissions et les frais d’installation à régler à part — c’est inclus dans votre abonnement. Des offres claires sans frais cachés : vous payez pour ce dont vous avez besoin et évoluez avec votre activité."
     },
     "inHouseSoftware": {
       "title": "Développé en interne",
       "body": "Notre logiciel est développé en interne par nos propres ingénieurs."
     },
     "posQuality": {
-      "title": "Matériel PDV haut de gamme",
-      "body": "Nos caisses répondent à des standards élevés — nous assurons leur qualité."
+      "title": "Logiciel haut de gamme",
+      "body": "Notre matériel et notre logiciel sont d’une très grande qualité. Économisez sur l’installation et la masse salariale — souvent bien plus de 30 % par mois."
     }
   },
   "gratisWebsiteBanner": {

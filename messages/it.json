@@ -4462,7 +4462,7 @@
     "imageAlt": "Kiosk da tavolo Vysion con touchscreen",
     "fullPlatform": {
       "title": "Piattaforma completa",
-      "body": "Cassa, ordini online, display cucina, prenotazioni, sito e report in un unico posto. Niente strumenti sparsi o doppio lavoro: tutto lavora insieme per la tua attività."
+      "body": "Cassa, ordini online, display cucina, prenotazioni, sito e report in un unico posto. Niente strumenti sparsi o doppio lavoro: tutto lavora insieme per la tua attività. Scegli tu quali moduli ti servono."
     },
     "liveSupport": {
       "title": "Supporto live",
@@ -4470,15 +4470,15 @@
     },
     "rightPrice": {
       "title": "Il prezzo giusto",
-      "body": "Piani chiari senza costi nascosti. Paghi ciò che ti serve e cresci con l’attività."
+      "body": "Basta commissioni e costi di installazione extra: da noi sono inclusi nell’abbonamento. Piani chiari senza sorprese; paghi ciò che ti serve e cresci con l’attività."
     },
     "inHouseSoftware": {
       "title": "Sviluppo interno",
       "body": "Il software è sviluppato in casa dai nostri ingegneri."
     },
     "posQuality": {
-      "title": "Hardware POS premium",
-      "body": "Le nostre casse rispettano standard elevati: garantiamo la qualità."
+      "title": "Software di alta qualità",
+      "body": "Hardware e software di qualità molto elevata. Risparmia su installazione e costi del personale — spesso oltre il 30% al mese."
     }
   },
   "gratisWebsiteBanner": {

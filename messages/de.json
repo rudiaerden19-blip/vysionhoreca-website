@@ -4485,7 +4485,7 @@
     "imageAlt": "Vysion Tisch-Kiosk mit Touchscreen",
     "fullPlatform": {
       "title": "Komplette Plattform",
-      "body": "Kasse, Online-Bestellung, Küchendisplay, Reservierungen, Website und Berichte an einem Ort. Keine verstreuten Tools und keine Doppelarbeit — alles arbeitet zusammen für Ihren Betrieb."
+      "body": "Kasse, Online-Bestellung, Küchendisplay, Reservierungen, Website und Berichte an einem Ort. Keine verstreuten Tools und keine Doppelarbeit — alles arbeitet zusammen für Ihren Betrieb. Sie wählen, welche Module Sie brauchen."
     },
     "liveSupport": {
       "title": "Live-Support",
@@ -4493,15 +4493,15 @@
     },
     "rightPrice": {
       "title": "Der richtige Preis",
-      "body": "Klare Pläne ohne versteckte Gebühren. Sie zahlen nur, was Sie brauchen, und skalieren mit Ihrem Wachstum."
+      "body": "Schluss mit Provisionszahlungen und separaten Installationskosten — das ist bei uns im Abo enthalten. Klare Pläne ohne versteckte Gebühren; Sie zahlen nur, was Sie brauchen, und skalieren mit Ihrem Wachstum."
     },
     "inHouseSoftware": {
       "title": "Eigenentwicklung",
       "body": "Unsere Software wird intern von unseren eigenen Entwicklern gebaut."
     },
     "posQuality": {
-      "title": "Hochwertige POS-Hardware",
-      "body": "Unsere Kassen erfüllen hohe Standards — wir stehen für ihre Qualität ein."
+      "title": "Hochwertige Software",
+      "body": "Unsere Hardware und Software sind von sehr hoher Qualität. Sparen Sie Installations- und Personalkosten — oft monatlich deutlich über 30 %."
     }
   },
   "gratisWebsiteBanner": {
