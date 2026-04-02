@@ -106,6 +106,38 @@ export default function ContactPageSection({ className = '', sectionId }: Contac
                   </a>
                 </div>
               </div>
+
+              <div className="flex items-start">
+                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center mr-4 shrink-0 shadow-home-float">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">{t('contact.address')}</p>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      'Siberiestraat 24, 3900 Pelt, Belgium',
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-900 hover:text-accent whitespace-pre-line"
+                  >
+                    {t('contact.addressValue')}
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
 

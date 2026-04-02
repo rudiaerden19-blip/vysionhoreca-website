@@ -444,6 +444,8 @@
     "subtitle": "关于Vysion Horeca有问题？我们的团队随时为您服务。",
     "email": "邮箱",
     "phone": "电话",
+    "address": "地址",
+    "addressValue": "Siberiestraat 24, 3900 Pelt, 比利时",
     "form": {
       "firstName": "名",
       "lastName": "姓",

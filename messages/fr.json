@@ -444,6 +444,8 @@
     "subtitle": "Questions sur Vysion Horeca? Notre équipe est prête à vous aider.",
     "email": "Email",
     "phone": "Téléphone",
+    "address": "Adresse",
+    "addressValue": "Siberiestraat 24, 3900 Pelt, Belgique",
     "form": {
       "firstName": "Prénom",
       "lastName": "Nom",
