@@ -8,6 +8,7 @@ import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProduct
 import { parseImageZoomSettings } from '@/components/ImageZoomPicker'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
+import { MarketingDemoSessionPrime } from '@/components/MarketingDemoSessionPrime'
 
 interface CoverImageSettings {
   url: string
@@ -849,6 +850,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
   return (
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-white">
+      <MarketingDemoSessionPrime tenant={params.tenant} />
       {/* Fixed Header - Clean & Compact */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">

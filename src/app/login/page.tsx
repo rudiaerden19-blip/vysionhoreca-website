@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage, Locale } from '@/i18n'
@@ -12,7 +12,8 @@ import {
 import {
   DEMO_MARKETING_LOGIN_EMAIL,
   DEMO_MARKETING_LOGIN_PASSWORD,
-  DEMO_TENANT_SLUG,
+  isMarketingDemoTenantSlug,
+  withPublicDemoSearchOnKassaPath,
 } from '@/lib/demo-links'
 
 export default function LoginPage() {
@@ -24,6 +25,22 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
+
+  // Marketing demo: /login?next=/shop/frituurnolim/admin/kassa zonder ?demo=bekijk → direct naar publieke demo (geen formulier).
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const nextRaw = params.get('next') || ''
+    let nextDecoded = nextRaw
+    try {
+      nextDecoded = decodeURIComponent(nextRaw)
+    } catch {
+      /* ignore */
+    }
+    if (!nextDecoded.startsWith('/')) return
+    const fixed = withPublicDemoSearchOnKassaPath(nextDecoded)
+    if (fixed) window.location.replace(fixed)
+  }, [])
 
   // Read language from URL parameter on mount
   useEffect(() => {
@@ -44,8 +61,11 @@ export default function LoginPage() {
     } catch {
       /* ignore */
     }
+    const tenantMatch = nextDecoded.match(/\/shop\/([^/?]+)/)
     const looksLikeDemoKassa =
-      nextDecoded.includes(DEMO_TENANT_SLUG) && nextDecoded.includes('/admin/kassa')
+      !!tenantMatch &&
+      isMarketingDemoTenantSlug(tenantMatch[1]) &&
+      nextDecoded.includes('/admin/kassa')
     if (params.get('prefill_demo') === '1' || looksLikeDemoKassa) {
       setEmail(DEMO_MARKETING_LOGIN_EMAIL)
       setPassword(DEMO_MARKETING_LOGIN_PASSWORD)

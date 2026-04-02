@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import TrialBanner from '@/components/TrialBanner'
@@ -27,7 +27,12 @@ import {
   isSuperAdminLoggedIn,
   isOwnerSessionFreshForTenant,
 } from '@/lib/auth-headers'
-import { DEMO_TENANT_SLUG, isPublicDemoKassaSearch } from '@/lib/demo-links'
+import {
+  isMarketingDemoTenantSlug,
+  isPublicDemoKassaSearch,
+  persistPublicDemoSessionIfNeeded,
+  publicDemoSessionMatchesTenant,
+} from '@/lib/demo-links'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -74,18 +79,41 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     setAdminAccess('pending')
   }, [params.tenant])
 
-  /** Publieke demo-kassa: /admin/kassa?demo=bekijk (of alleen_lezen=1) op frituurnolim — geen login. */
-  const demoPublicKassa =
-    typeof window !== 'undefined' &&
-    params.tenant === DEMO_TENANT_SLUG &&
-    pathname.includes('/admin/kassa') &&
-    isPublicDemoKassaSearch(window.location.search)
+  /**
+   * Marketing-demo (frituurnolim / frituur-nolim): `?demo=bekijk` of `alleen_lezen=1`, of actieve
+   * sessie na eerdere demo-URL — hele /admin/* zonder login (niet alleen kassa).
+   */
+  const [demoPublicUnauthenticated, setDemoPublicUnauthenticated] = useState(false)
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!isMarketingDemoTenantSlug(params.tenant)) {
+      setDemoPublicUnauthenticated(false)
+      return
+    }
+    const adminBase = `/shop/${params.tenant}/admin`
+    if (!pathname.startsWith(adminBase)) {
+      setDemoPublicUnauthenticated(false)
+      return
+    }
+    const q = window.location.search
+    if (isPublicDemoKassaSearch(q)) {
+      persistPublicDemoSessionIfNeeded(params.tenant, q)
+      setDemoPublicUnauthenticated(true)
+      return
+    }
+    if (publicDemoSessionMatchesTenant(params.tenant)) {
+      setDemoPublicUnauthenticated(true)
+      return
+    }
+    setDemoPublicUnauthenticated(false)
+  }, [params.tenant, pathname])
 
   useEffect(() => {
     if (loading || tenantExists === null) return
     if (tenantExists === false) return
     if (typeof window === 'undefined') return
-    if (demoPublicKassa) {
+    if (demoPublicUnauthenticated) {
       setAdminAccess('ok')
       return
     }
@@ -96,7 +124,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     setAdminAccess('login')
     const next = `${window.location.pathname}${window.location.search}`
     router.replace(`/login?next=${encodeURIComponent(next)}`)
-  }, [loading, tenantExists, params.tenant, router, demoPublicKassa])
+  }, [loading, tenantExists, params.tenant, router, demoPublicUnauthenticated])
 
   /**
    * Welkom-splash (/welkom) wordt getoond vanuit admin/page als `vysion_welcomed_*` ontbreekt.
@@ -119,7 +147,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   useEffect(() => {
     if (loading || modulesLoading || tenantExists === false) return
-    if (demoPublicKassa) return
+    if (demoPublicUnauthenticated) return
     const gate = adminPathToModule(pathname, params.tenant)
     if (gate.kind === 'module' && !hasModuleAccessForPathname(pathname, params.tenant, moduleAccess)) {
       router.replace(
@@ -148,7 +176,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     moduleAccess,
     enabledModulesJson,
     router,
-    demoPublicKassa,
+    demoPublicUnauthenticated,
   ])
 
   if (loading) {
@@ -192,7 +220,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   // Kassa POS: geen layout wrapper; module uit of alleen pincode (geen POS-submenu) → niet op /kassa laten
   if (pathname.includes('/kassa')) {
-    if (demoPublicKassa) {
+    if (demoPublicUnauthenticated) {
       return <>{children}</>
     }
     if (!modulesLoading && moduleAccess['kassa'] === false) {
@@ -224,10 +252,10 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
       <PostTrialModulePickerModal
         tenantSlug={params.tenant}
-        open={needsPostTrialModulePicker}
+        open={needsPostTrialModulePicker && !demoPublicUnauthenticated}
         onConfirmed={refetchModules}
       />
-      <TrialBanner tenantSlug={params.tenant} />
+      {!demoPublicUnauthenticated && <TrialBanner tenantSlug={params.tenant} />}
 
       {/* ── Slanke blauwe topbalk (zelfde stijl als kassa) ── */}
       <div

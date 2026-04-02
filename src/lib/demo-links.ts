@@ -6,6 +6,77 @@ export const DEMO_TENANT_SLUG = 'frituurnolim' as const
 export const DEMO_ORDER_SITE_URL = `https://${DEMO_TENANT_SLUG}.ordervysion.com`
 
 /**
+ * Zelfde shop met `demo=bekijk`: zet sessie-flag voor publieke admin (iPad/Safari behoudt zo toegang
+ * na interne navigatie zonder querystring).
+ */
+export const DEMO_ORDER_SITE_URL_WITH_DEMO = `${DEMO_ORDER_SITE_URL}?demo=bekijk`
+
+/** sessionStorage: marketing demo “geen login” voor frituurnolim (+ alias frituur-nolim). */
+export const DEMO_PUBLIC_SESSION_STORAGE_KEY = 'vysion_marketing_demo_bekijk_tenant'
+
+export function normalizeTenantSlugKey(slug: string): string {
+  return slug.toLowerCase().trim().replace(/-/g, '')
+}
+
+/** Canonical demo tenant(s) op marketing / subdomein — niet alleen exact DEMO_TENANT_SLUG. */
+export function isMarketingDemoTenantSlug(slug: string): boolean {
+  return normalizeTenantSlugKey(slug) === normalizeTenantSlugKey(DEMO_TENANT_SLUG)
+}
+
+/** Zet sessie alleen bij expliciete demo-query op die tenant. */
+export function persistPublicDemoSessionIfNeeded(tenant: string, search: string): void {
+  if (typeof window === 'undefined' || !isMarketingDemoTenantSlug(tenant)) return
+  if (!isPublicDemoKassaSearch(search)) return
+  try {
+    window.sessionStorage.setItem(DEMO_PUBLIC_SESSION_STORAGE_KEY, tenant)
+  } catch {
+    /* ignore */
+  }
+}
+
+export function readPublicDemoSessionTenant(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    return window.sessionStorage.getItem(DEMO_PUBLIC_SESSION_STORAGE_KEY)
+  } catch {
+    return null
+  }
+}
+
+export function clearPublicDemoSession(): void {
+  if (typeof window === 'undefined') return
+  try {
+    window.sessionStorage.removeItem(DEMO_PUBLIC_SESSION_STORAGE_KEY)
+  } catch {
+    /* ignore */
+  }
+}
+
+export function publicDemoSessionMatchesTenant(tenant: string): boolean {
+  const v = readPublicDemoSessionTenant()
+  if (!v) return false
+  return normalizeTenantSlugKey(v) === normalizeTenantSlugKey(tenant)
+}
+
+/**
+ * Intern pad `/shop/.../admin/kassa` zonder demo-query → zelfde pad met `demo=bekijk`.
+ * Anders null.
+ */
+export function withPublicDemoSearchOnKassaPath(nextInternalPath: string): string | null {
+  if (!nextInternalPath.includes('/admin/kassa')) return null
+  const m = nextInternalPath.match(/\/shop\/([^/?]+)/)
+  if (!m || !isMarketingDemoTenantSlug(m[1])) return null
+  const q = nextInternalPath.includes('?') ? nextInternalPath.slice(nextInternalPath.indexOf('?')) : ''
+  if (isPublicDemoKassaSearch(q || '?')) return null
+  const pathOnly = nextInternalPath.includes('?')
+    ? nextInternalPath.slice(0, nextInternalPath.indexOf('?'))
+    : nextInternalPath
+  const sp = new URLSearchParams(nextInternalPath.includes('?') ? nextInternalPath.split('?')[1] || '' : '')
+  sp.set('demo', 'bekijk')
+  return `${pathOnly}?${sp.toString()}`
+}
+
+/**
  * Publieke alleen-bekijken-kassa — zie admin layout (frituurnolim + deze query = geen login).
  * Zelfde als `alleen_lezen=1` (gebruikt in e2e).
  */
@@ -38,7 +109,7 @@ export function demoUrlForPlatformCard(msgKey: string): string {
   switch (msgKey) {
     case 'bestelplatform':
     case 'eigenWebsite':
-      return DEMO_ORDER_SITE_URL
+      return DEMO_ORDER_SITE_URL_WITH_DEMO
     case 'kassasysteem':
     case 'keukenschermen':
     case 'onlineScherm':

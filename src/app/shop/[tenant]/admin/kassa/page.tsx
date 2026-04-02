@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState, useEffect, useRef, useMemo } from 'react'
+import { Suspense, useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { MenuProduct, MenuCategory, ProductOption, ProductOptionChoice, getMenuCategories, getMenuProducts, getProductsWithOptions, getOptionsForProduct, getTenantSettings, TenantSettings } from '@/lib/admin-api'
@@ -18,6 +18,11 @@ import {
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AccountMenuSessionBlock } from '@/components/AccountMenuSessionBlock'
+import {
+  clearPublicDemoSession,
+  isMarketingDemoTenantSlug,
+  publicDemoSessionMatchesTenant,
+} from '@/lib/demo-links'
 
 interface SelectedChoice {
   optionId: string
@@ -40,8 +45,14 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
   const tenant = params.tenant
   const router = useRouter()
   const searchParams = useSearchParams()
-  const demoViewOnly =
+  const demoFromUrl =
     searchParams.get('demo') === 'bekijk' || searchParams.get('alleen_lezen') === '1'
+  const [demoFromMarketingSession, setDemoFromMarketingSession] = useState(false)
+  useLayoutEffect(() => {
+    if (!isMarketingDemoTenantSlug(tenant)) return
+    setDemoFromMarketingSession(publicDemoSessionMatchesTenant(tenant))
+  }, [tenant, searchParams])
+  const demoViewOnly = demoFromUrl || demoFromMarketingSession
   const baseUrl = `/shop/${tenant}/admin`
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
 
@@ -1117,6 +1128,11 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       sessionStorage.removeItem(`vysion_kassa_audio_ok_${tenant}`)
       sessionStorage.removeItem(`vysion_audio_activated_${tenant}`)
     } catch { /* ignore */ }
+    if (demoViewOnly) {
+      clearPublicDemoSession()
+      window.location.href = `/shop/${tenant}/admin/kassa?demo=bekijk`
+      return
+    }
     window.location.href = '/login'
   }
 
