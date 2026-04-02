@@ -100,8 +100,8 @@
         "description": "La plataforma de pedidos que te ahorra 11 horas de trabajo e incrementa tu facturación un 30%."
       },
       "voiceOrder": {
-        "title": "Pedido por voz",
-        "description": "Deja que los clientes dicten su pedido. 10 veces más rápido que la mayoría de plataformas de pedidos."
+        "title": "Pedidos por WhatsApp",
+        "description": "Tus clientes piden y pagan por el WhatsApp de confianza: sin app extra. Hasta 10× más rápido."
       }
     }
   },

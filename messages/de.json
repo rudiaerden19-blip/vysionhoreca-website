@@ -100,8 +100,8 @@
         "description": "Die Bestellplattform, die Ihnen 11 Stunden Arbeit erspart und Ihren Umsatz um 30% steigert."
       },
       "voiceOrder": {
-        "title": "Sprachbestellung",
-        "description": "Lassen Sie Kunden ihre Bestellung einsprechen. 10-mal schneller als die meisten Bestellplattformen."
+        "title": "Bestellen über WhatsApp",
+        "description": "Gäste bestellen und bezahlen über ihr gewohntes WhatsApp — keine extra App nötig. Bis zu 10× schneller."
       }
     }
   },

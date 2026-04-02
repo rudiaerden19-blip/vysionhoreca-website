@@ -100,8 +100,8 @@
         "description": "为您每周省下11小时工作量，并将营收提升30%的订餐平台。"
       },
       "voiceOrder": {
-        "title": "语音订单",
-        "description": "让客户说出他们的订单。比大多数订单平台快10倍。"
+        "title": "WhatsApp 点餐",
+        "description": "让顾客在熟悉的 WhatsApp 上点餐并付款——无需另装应用，最高可快 10 倍。"
       }
     }
   },

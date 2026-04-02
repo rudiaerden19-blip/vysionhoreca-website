@@ -124,7 +124,7 @@ function OneDayOnlineSection() {
     { icon: "👨‍💻", key: "liveSupport" },
     { icon: "✓", key: "cancelAnytime" },
     { icon: "📈", key: "growth" },
-    { icon: "🎤", key: "voiceOrder" }
+    { icon: "💬", key: "voiceOrder" }
   ]
 
   return (
