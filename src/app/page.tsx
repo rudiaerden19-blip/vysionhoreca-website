@@ -6,7 +6,7 @@ import {
   Navigation,
   Footer,
   CookieBanner,
-  ContactSection,
+  ContactPageSection,
   HomeLandingHero,
   PlatformGridSection,
   HardwareSection,
@@ -1234,7 +1234,7 @@ export default function HomePage() {
       <PricingSection />
       <TableKioskSection />
       <TestimonialSection />
-      <ContactSection />
+      <ContactPageSection sectionId="contact" />
       <Footer />
       <CookieBanner />
     </main>
