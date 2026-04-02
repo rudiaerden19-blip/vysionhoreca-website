@@ -840,7 +840,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div
+        className="min-h-[100dvh] bg-gray-900 flex items-center justify-center"
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
+      >
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -852,7 +858,14 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
 
   return (
-    <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-900 text-white">
+    <div
+      className="flex min-h-0 h-[100dvh] max-h-[100dvh] max-w-[100vw] flex-col overflow-hidden bg-gray-900 text-white"
+      style={{
+        width: '100%',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
+    >
       {/* FULLSCREEN NEW ORDER ALERT */}
       <AnimatePresence>
         {newOrderIds.size > 0 && (
@@ -904,7 +917,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </AnimatePresence>
 
       {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700 px-4 py-3">
+      <header className="shrink-0 bg-gray-800 border-b border-gray-700 px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <Link
@@ -1017,7 +1030,7 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
       </header>
 
       {/* Tabs */}
-      <div className="bg-gray-800/50 px-4 py-2 flex gap-2 items-center">
+      <div className="shrink-0 bg-gray-800/50 px-4 py-2 flex gap-2 items-center">
         <button
           onClick={() => setActiveTab('active')}
           className={`px-4 py-2 rounded-lg font-bold transition-colors ${
@@ -1046,8 +1059,8 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
         </button>
       </div>
 
-      {/* Orders Grid */}
-      <div className="p-4 h-[calc(100vh-120px)] overflow-y-auto">
+      {/* Orders Grid — flex-1 + min-h-0: correcte scroll op iPad Safari / PWA (was 100vh) */}
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
         {activeTab === 'active' ? (
           sortedActiveOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">

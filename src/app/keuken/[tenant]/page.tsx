@@ -450,7 +450,13 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div
+        className="min-h-[100dvh] bg-gray-900 flex items-center justify-center"
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
+      >
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
@@ -462,9 +468,15 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white overflow-hidden">
+    <div
+      className="flex min-h-0 h-[100dvh] max-h-[100dvh] max-w-[100vw] flex-col overflow-hidden bg-gray-900 text-white"
+      style={{
+        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      }}
+    >
       {/* Header */}
-      <header className="bg-blue-600 px-4 py-3">
+      <header className="shrink-0 bg-blue-600 px-4 py-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-2 sm:gap-3">
             <Link
@@ -552,8 +564,8 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
         </div>
       </header>
 
-      {/* Orders Grid */}
-      <div className="p-4 h-[calc(100vh-64px)] overflow-y-auto">
+      {/* Orders Grid — flex-1 + min-h-0: correcte scroll op iPad Safari / PWA */}
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4">
         {orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
             <span className="text-8xl mb-6">✅</span>
