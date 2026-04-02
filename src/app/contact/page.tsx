@@ -1,14 +1,15 @@
 'use client'
 
-import { Navigation, Footer, CookieBanner, ContactPageSection } from '@/components'
+import { useEffect } from 'react'
 
-export default function ContactPage() {
+/** Oude URL /contact → homepage-contactblok (zoals vroeger). */
+export default function ContactRedirectPage() {
+  useEffect(() => {
+    window.location.replace('/#contact')
+  }, [])
   return (
-    <main className="min-h-screen flex flex-col bg-[#E3E3E3]">
-      <Navigation />
-      <ContactPageSection className="!py-0 pt-24 sm:pt-28 pb-28 sm:pb-36 lg:pb-40" />
-      <Footer />
-      <CookieBanner />
+    <main className="min-h-screen bg-[#E3E3E3] flex items-center justify-center">
+      <p className="text-gray-600 text-sm">Doorverwijzen…</p>
     </main>
   )
 }

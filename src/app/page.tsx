@@ -487,7 +487,7 @@ function OrderAppSection() {
         {/* CTA */}
         <div className="text-center mt-12">
           <a
-            href="/contact"
+            href="/#contact"
             className="inline-block bg-accent text-white px-8 py-4 rounded-full font-semibold hover:bg-accent/90 transition-all shadow-home-btn"
           >
             {t('orderApp.cta')}

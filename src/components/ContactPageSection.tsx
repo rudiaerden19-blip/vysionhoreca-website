@@ -5,7 +5,7 @@ import { useLanguage } from '@/i18n'
 
 export type ContactPageSectionProps = {
   className?: string
-  /** Set on homepage for in-page anchors; omit on /contact */
+  /** Set on homepage for in-page anchors */
   sectionId?: string
 }
 
