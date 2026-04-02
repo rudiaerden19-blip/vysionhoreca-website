@@ -3,7 +3,8 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
 
-const DEFAULT_ANCHOR_ID = 'pricing-premium-card'
+/** Klein gebied bij Premium-CTA; volledige kaart triggert te vroeg als alleen de bovenkant in beeld is. */
+const DEFAULT_ANCHOR_ID = 'pricing-premium-stamp-anchor'
 
 type Props = {
   /** Card/container to observe; stamp animates when this intersects the viewport. */
@@ -31,21 +32,24 @@ export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }:
         setVisible(true)
       }
     }
-    if (!el) {
-      const timer = window.setTimeout(trigger, 4000)
-      return () => window.clearTimeout(timer)
-    }
+    // Geen timeout-fallback: die liet de stempel “meteen” verschijnen bij edge cases.
+    if (!el) return
+
     const obs = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting) {
+          // Strakker: merendeel van het anker zichtbaar, en binnen een ingekaderde viewport (minder vroeg).
+          if (e.isIntersecting && e.intersectionRatio >= 0.5) {
             trigger()
             obs.disconnect()
             break
           }
         }
       },
-      { threshold: 0.35, rootMargin: '0px 0px -8% 0px' }
+      {
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+        rootMargin: '-18% 0px -22% 0px',
+      }
     )
     obs.observe(el)
     return () => obs.disconnect()
