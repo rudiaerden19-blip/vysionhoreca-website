@@ -62,34 +62,12 @@ function WhyVysionSection() {
   const { t } = useLanguage()
   const pointKeys = ['fullPlatform', 'liveSupport', 'rightPrice', 'inHouseSoftware', 'posQuality'] as const
 
-  const promoText = t('whyVysion.promoMarquee')
-
   return (
     <section className="relative pt-8 sm:pt-10 lg:pt-12 pb-24 sm:pb-32 lg:pb-40 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
       <div
         className="pointer-events-none absolute -right-24 top-1/4 h-72 w-72 rounded-full bg-accent/[0.08] blur-3xl sm:h-96 sm:w-96"
         aria-hidden
       />
-      <div
-        className="why-vysion-promo-viewport relative z-10 mb-12 sm:mb-16 lg:mb-20 border-y border-accent/20 bg-white/80 py-3 sm:py-3.5 shadow-sm"
-        role="marquee"
-        aria-label={promoText}
-      >
-        <div className="why-vysion-promo-track">
-          {[0, 1].map((dup) => (
-            <div key={dup} className="why-vysion-promo-segment" aria-hidden={dup === 1 ? true : undefined}>
-              {[0, 1, 2, 3].map((i) => (
-                <span
-                  key={`${dup}-${i}`}
-                  className="text-gray-900 font-bold text-xl sm:text-2xl md:text-3xl lg:text-[2rem] tracking-tight whitespace-nowrap"
-                >
-                  {promoText}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-stretch">
           <div className="flex flex-col min-h-0 order-2 lg:order-1">
