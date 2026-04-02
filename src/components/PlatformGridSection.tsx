@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/i18n'
 import { PLATFORM_PAGES } from '@/lib/platform-pages'
+import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
 const ICONS: Record<string, LucideIcon> = {
   kassasysteem: Store,
@@ -94,9 +95,19 @@ export default function PlatformGridSection() {
           })}
         </div>
 
-        <p className="mt-10 sm:mt-12 text-center text-sm sm:text-base text-gray-600 max-w-5xl mx-auto leading-snug">
-          {t('platform.gridTrustLine')}
-        </p>
+        <div className="mt-10 sm:mt-12 max-w-5xl mx-auto text-center">
+          <p className="text-sm sm:text-base text-gray-600 leading-snug">
+            {t('platform.gridTrustLine')}
+          </p>
+          <a
+            href={DEMO_HERO_LIVE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 inline-flex items-center justify-center rounded-full bg-accent px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90"
+          >
+            {t('platform.gridDemoCta')}
+          </a>
+        </div>
       </div>
     </section>
   )
