@@ -60,43 +60,44 @@ export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }:
 
   return (
     <div
-      className={`home-stamp-wrap pointer-events-none absolute bottom-3 right-3 z-10 hidden md:block w-[176px] h-[176px] sm:w-[198px] sm:h-[198px] ${
+      className={`home-stamp-wrap pointer-events-none absolute bottom-3 right-3 z-10 hidden md:block overflow-visible w-[176px] h-[176px] sm:w-[198px] sm:h-[198px] ${
         visible ? 'home-stamp-visible' : 'home-stamp-hidden'
       }`}
       aria-hidden="true"
     >
       <svg
         viewBox="0 0 200 200"
+        overflow="visible"
         className="h-full w-full text-black drop-shadow-[0_10px_22px_rgba(0,0,0,0.12)]"
         fill="none"
       >
         <defs>
-          {/* Langere straal = boogtekst dichter bij de buitenrand, meer ruimte rond het middenblok */}
-          <path id={arcUpperPathId} d="M 28 100 A 72 72 0 0 0 172 100" />
-          <path id={arcLowerPathId} d="M 28 100 A 72 72 0 0 1 172 100" />
+          {/* Kleinere straal = boogtekst verder van de dubbele ring (meest was te dicht tegen de rand). */}
+          <path id={arcUpperPathId} d="M 42 100 A 58 58 0 0 0 158 100" />
+          <path id={arcLowerPathId} d="M 42 100 A 58 58 0 0 1 158 100" />
         </defs>
         <circle
           cx="100"
           cy="100"
-          r="80"
+          r="78"
           stroke="currentColor"
-          strokeWidth="4.2"
+          strokeWidth="4"
           opacity="0.95"
         />
         <circle
           cx="100"
           cy="100"
-          r="88"
+          r="85"
           stroke="currentColor"
-          strokeWidth="2.4"
+          strokeWidth="2.2"
           opacity="0.9"
         />
-        {/* boven: meest (topArc) — koppeling aan path zo dat glyphs aan bovenkant van de stempel staan */}
+        {/* boven: meest — groter lettertype, boog ver naar binnen */}
         <text
           fill="currentColor"
-          fontSize="16"
-          fontWeight="700"
-          letterSpacing="0.08em"
+          fontSize="19"
+          fontWeight="800"
+          letterSpacing="0.1em"
           style={{ fontFamily: 'system-ui, sans-serif' }}
         >
           <textPath href={`#${arcLowerPathId}`} startOffset="50%" textAnchor="middle">
@@ -105,19 +106,19 @@ export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }:
         </text>
         <text
           fill="currentColor"
-          fontSize="16"
+          fontSize="15"
           fontWeight="700"
-          letterSpacing="0.06em"
+          letterSpacing="0.05em"
           style={{ fontFamily: 'system-ui, sans-serif' }}
         >
           <textPath href={`#${arcUpperPathId}`} startOffset="50%" textAnchor="middle">
             {bottomArc}
           </textPath>
         </text>
-        <text x="100" y="58" textAnchor="middle" fill="currentColor" fontSize="15" opacity="0.95">
+        <text x="100" y="64" textAnchor="middle" fill="currentColor" fontSize="14" opacity="0.95">
           ★
         </text>
-        <text x="100" y="150" textAnchor="middle" fill="currentColor" fontSize="15" opacity="0.95">
+        <text x="100" y="148" textAnchor="middle" fill="currentColor" fontSize="14" opacity="0.95">
           ★
         </text>
         <line x1="14" y1="78" x2="186" y2="78" stroke="currentColor" strokeWidth="2.8" />
