@@ -71,8 +71,8 @@ function WhyVysionSection() {
         <h2 className="text-[clamp(1.05rem,3.4vw,2.5rem)] sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-none mb-10 sm:mb-12 lg:mb-14 text-center lg:text-left max-w-full lg:mx-0 mx-auto whitespace-nowrap">
           {t('whyVysion.title')}
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-stretch">
-          <ul className="order-2 lg:order-1 space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0 lg:max-w-none min-h-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-24 items-stretch">
+          <ul className="order-2 lg:order-1 space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0 lg:max-w-none min-h-0 lg:pr-4">
             {pointKeys.map((key, i) => (
               <li key={key} className="flex gap-4 sm:gap-5">
                 <span
@@ -93,9 +93,9 @@ function WhyVysionSection() {
             ))}
           </ul>
 
-          <div className="order-1 lg:order-2 relative w-full min-h-[280px] self-stretch lg:min-h-0">
+          <div className="order-1 lg:order-2 relative w-full min-h-[280px] self-stretch lg:min-h-0 lg:pl-6 xl:pl-10">
             <div className="relative min-h-[280px] lg:absolute lg:inset-0 lg:min-h-0">
-              <div className="relative min-h-[280px] rounded-3xl overflow-hidden shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] lg:absolute lg:inset-x-0 lg:bottom-0 lg:min-h-0 lg:top-[2.5rem]">
+              <div className="relative min-h-[280px] rounded-3xl overflow-hidden shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] lg:absolute lg:left-0 lg:right-0 lg:bottom-0 lg:min-h-0 lg:top-[2.5rem]">
                 <Image
                   src="/images/why-vysion-kiosk.png"
                   alt={t('whyVysion.imageAlt')}
