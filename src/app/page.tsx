@@ -13,7 +13,7 @@ import {
   HardwareSection,
 } from '@/components'
 import { useLanguage } from '@/i18n'
-import { DEMO_HERO_LIVE_URL, DEMO_ORDER_SITE_URL } from '@/lib/demo-links'
+import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
 const GRATIS_WEBSITE_EXAMPLE_HREF =
   'https://restaurantdekorf.ordervysion.com/shop/restaurantdekorf'
@@ -35,22 +35,14 @@ function GratisWebsiteBannerSection() {
         <p className="text-sm sm:text-base text-gray-600 leading-relaxed mb-6">
           {t('gratisWebsiteBanner.body')}
         </p>
-        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3">
+        <div className="flex justify-center">
           <a
             href={GRATIS_WEBSITE_EXAMPLE_HREF}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex w-full sm:w-auto items-center justify-center rounded-full bg-accent px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90"
+            className="inline-flex items-center justify-center rounded-full bg-accent px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90"
           >
             {t('gratisWebsiteBanner.cta')}
-          </a>
-          <a
-            href={DEMO_ORDER_SITE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex w-full sm:w-auto items-center justify-center rounded-full border-2 border-accent bg-white px-6 py-3 text-sm sm:text-base font-semibold text-accent transition-colors hover:bg-accent/10"
-          >
-            {t('gratisWebsiteBanner.ctaFrituur')}
           </a>
         </div>
       </div>
