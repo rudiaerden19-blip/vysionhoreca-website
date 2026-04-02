@@ -59,21 +59,26 @@ export function publicDemoSessionMatchesTenant(tenant: string): boolean {
 }
 
 /**
- * Intern pad `/shop/.../admin/kassa` zonder demo-query → zelfde pad met `demo=bekijk`.
- * Anders null.
+ * Pad naar publieke kassa zonder demo-query → `/shop/:tenant/admin/kassa?demo=bekijk`.
+ * Ondersteunt zowel `/shop/frituurnolim/admin/kassa` als tenant-subdomein-URL `/admin/kassa`.
  */
-export function withPublicDemoSearchOnKassaPath(nextInternalPath: string): string | null {
-  if (!nextInternalPath.includes('/admin/kassa')) return null
-  const m = nextInternalPath.match(/\/shop\/([^/?]+)/)
-  if (!m || !isMarketingDemoTenantSlug(m[1])) return null
-  const q = nextInternalPath.includes('?') ? nextInternalPath.slice(nextInternalPath.indexOf('?')) : ''
-  if (isPublicDemoKassaSearch(q || '?')) return null
-  const pathOnly = nextInternalPath.includes('?')
-    ? nextInternalPath.slice(0, nextInternalPath.indexOf('?'))
-    : nextInternalPath
-  const sp = new URLSearchParams(nextInternalPath.includes('?') ? nextInternalPath.split('?')[1] || '' : '')
+export function withPublicDemoSearchOnKassaPath(nextPath: string): string | null {
+  if (!nextPath.includes('/admin/kassa')) return null
+  const qPart = nextPath.includes('?') ? nextPath.slice(nextPath.indexOf('?')) : ''
+  if (isPublicDemoKassaSearch(qPart || '?')) return null
+
+  const pathOnly = nextPath.includes('?') ? nextPath.slice(0, nextPath.indexOf('?')) : nextPath
+  let tenant: string | null = null
+  const mShop = pathOnly.match(/^\/shop\/([^/]+)\/admin\/kassa/)
+  if (mShop) tenant = mShop[1]
+  else if (pathOnly === '/admin/kassa' || pathOnly.startsWith('/admin/kassa/')) {
+    tenant = DEMO_TENANT_SLUG
+  }
+  if (!tenant || !isMarketingDemoTenantSlug(tenant)) return null
+
+  const sp = new URLSearchParams(nextPath.includes('?') ? nextPath.split('?')[1] || '' : '')
   sp.set('demo', 'bekijk')
-  return `${pathOnly}?${sp.toString()}`
+  return `/shop/${tenant}/admin/kassa?${sp.toString()}`
 }
 
 /**

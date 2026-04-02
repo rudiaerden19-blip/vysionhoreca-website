@@ -61,11 +61,14 @@ export default function LoginPage() {
     } catch {
       /* ignore */
     }
+    const path0 = nextDecoded.split('?')[0]
     const tenantMatch = nextDecoded.match(/\/shop\/([^/?]+)/)
+    const subdomainStyleAdminKassa =
+      !tenantMatch && (path0 === '/admin/kassa' || path0.startsWith('/admin/kassa/'))
     const looksLikeDemoKassa =
-      !!tenantMatch &&
-      isMarketingDemoTenantSlug(tenantMatch[1]) &&
-      nextDecoded.includes('/admin/kassa')
+      nextDecoded.includes('/admin/kassa') &&
+      (subdomainStyleAdminKassa ||
+        (!!tenantMatch && isMarketingDemoTenantSlug(tenantMatch[1])))
     if (params.get('prefill_demo') === '1' || looksLikeDemoKassa) {
       setEmail(DEMO_MARKETING_LOGIN_EMAIL)
       setPassword(DEMO_MARKETING_LOGIN_PASSWORD)

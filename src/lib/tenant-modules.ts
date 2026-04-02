@@ -254,6 +254,20 @@ export function isKassaPosScreenEnabled(
 }
 
 /**
+ * Op tenant-subdomein (voorbeeld frituurnolim.ordervysion.com) toont de browser-URL `/admin/...`;
+ * intern is de route `/shop/:tenant/admin/...`. Alle admin-guards gebruiken deze normalisatie.
+ */
+export function normalizeShopAdminPathname(pathname: string, tenantSlug: string): string {
+  const base = `/shop/${tenantSlug}/admin`
+  if (pathname.startsWith(base)) return pathname
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    const suffix = pathname === '/admin' ? '' : pathname.slice('/admin'.length)
+    return `${base}${suffix}`
+  }
+  return pathname
+}
+
+/**
  * Bestemming voor de admin-topbalk «terug naar kassa».
  * Niet alleen wanneer het POS-scherm aan staat — anders ontbreekt de knop bij veel tenants.
  */

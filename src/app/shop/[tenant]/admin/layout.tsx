@@ -12,6 +12,7 @@ import {
   getFirstAccessibleAdminPath,
   hasModuleAccessForPathname,
   isKassaPosScreenEnabled,
+  normalizeShopAdminPathname,
   submenuParentAllowedForSubmenuId,
   type TenantModuleId,
 } from '@/lib/tenant-modules'
@@ -44,6 +45,7 @@ const LOCK_PAGES = ['categorieen', 'producten', 'analyse', 'rapporten', 'z-rappo
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const pathname = usePathname()
+  const adminPath = normalizeShopAdminPathname(pathname, params.tenant)
   const router = useRouter()
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
@@ -62,8 +64,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   } = useTenantModuleFlags(params.tenant)
 
   const showLockButton =
-    pathname === `/shop/${params.tenant}/admin` ||
-    LOCK_PAGES.some(p => pathname.includes(`/admin/${p}`))
+    adminPath === baseUrl ||
+    adminPath === `${baseUrl}/` ||
+    LOCK_PAGES.some(p => adminPath.includes(`/admin/${p}`))
 
   useEffect(() => {
     async function checkTenant() {
@@ -91,8 +94,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       setDemoPublicUnauthenticated(false)
       return
     }
-    const adminBase = `/shop/${params.tenant}/admin`
-    if (!pathname.startsWith(adminBase)) {
+    if (!adminPath.startsWith(baseUrl)) {
       setDemoPublicUnauthenticated(false)
       return
     }
@@ -107,7 +109,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       return
     }
     setDemoPublicUnauthenticated(false)
-  }, [params.tenant, pathname])
+  }, [params.tenant, adminPath, baseUrl])
 
   useEffect(() => {
     if (loading || tenantExists === null) return
@@ -136,26 +138,26 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     try {
       const key = `vysion_welcomed_${params.tenant}`
       if (sessionStorage.getItem(key)) return
-      if (pathname.includes('/kassa')) return
+      if (adminPath.includes('/kassa')) return
       const root = `/shop/${params.tenant}/admin`
-      const isDashboardRoot = pathname === root || pathname === `${root}/`
+      const isDashboardRoot = adminPath === root || adminPath === `${root}/`
       if (!isDashboardRoot) {
         sessionStorage.setItem(key, 'true')
       }
     } catch { /* ignore */ }
-  }, [params.tenant, pathname])
+  }, [params.tenant, adminPath])
 
   useEffect(() => {
     if (loading || modulesLoading || tenantExists === false) return
     if (demoPublicUnauthenticated) return
-    const gate = adminPathToModule(pathname, params.tenant)
-    if (gate.kind === 'module' && !hasModuleAccessForPathname(pathname, params.tenant, moduleAccess)) {
+    const gate = adminPathToModule(adminPath, params.tenant)
+    if (gate.kind === 'module' && !hasModuleAccessForPathname(adminPath, params.tenant, moduleAccess)) {
       router.replace(
         getFirstAccessibleAdminPath(params.tenant, moduleAccess, enabledModulesJson)
       )
       return
     }
-    const subId = getSubmenuIdForPathname(pathname, params.tenant)
+    const subId = getSubmenuIdForPathname(adminPath, params.tenant)
     if (
       subId &&
       !isSubmenuForcedOn(subId) &&
@@ -171,7 +173,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     loading,
     modulesLoading,
     tenantExists,
-    pathname,
+    adminPath,
     params.tenant,
     moduleAccess,
     enabledModulesJson,
@@ -219,7 +221,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   }
 
   // Kassa POS: geen layout wrapper; module uit of alleen pincode (geen POS-submenu) → niet op /kassa laten
-  if (pathname.includes('/kassa')) {
+  if (adminPath.includes('/kassa')) {
     if (demoPublicUnauthenticated) {
       return <>{children}</>
     }
