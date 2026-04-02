@@ -64,13 +64,13 @@ function WhyVysionSection() {
   const promoText = t('whyVysion.promoMarquee')
 
   return (
-    <section className="relative py-24 sm:py-32 lg:py-40 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
+    <section className="relative pt-8 sm:pt-10 lg:pt-12 pb-24 sm:pb-32 lg:pb-40 overflow-hidden border-b border-gray-100 bg-gradient-to-b from-[#faf8f6] via-white to-white">
       <div
         className="pointer-events-none absolute -right-24 top-1/4 h-72 w-72 rounded-full bg-accent/[0.08] blur-3xl sm:h-96 sm:w-96"
         aria-hidden
       />
       <div
-        className="why-vysion-promo-viewport relative z-10 mb-8 sm:mb-10 border-y border-accent/20 bg-white/80 py-2 sm:py-2.5 shadow-sm"
+        className="why-vysion-promo-viewport relative z-10 mb-12 sm:mb-16 lg:mb-20 border-y border-accent/20 bg-white/80 py-3 sm:py-3.5 shadow-sm"
         role="marquee"
         aria-label={promoText}
       >
@@ -80,7 +80,7 @@ function WhyVysionSection() {
               {[0, 1, 2, 3].map((i) => (
                 <span
                   key={`${dup}-${i}`}
-                  className="text-accent font-bold text-base sm:text-lg md:text-xl tracking-tight whitespace-nowrap"
+                  className="text-accent font-bold text-xl sm:text-2xl md:text-3xl lg:text-[2rem] tracking-tight whitespace-nowrap"
                 >
                   {promoText}
                 </span>
