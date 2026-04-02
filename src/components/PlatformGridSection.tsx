@@ -16,7 +16,6 @@ import {
 } from 'lucide-react'
 import { useLanguage } from '@/i18n'
 import { PLATFORM_PAGES } from '@/lib/platform-pages'
-import { demoUrlForPlatformCard } from '@/lib/demo-links'
 
 const ICONS: Record<string, LucideIcon> = {
   kassasysteem: Store,
@@ -86,17 +85,9 @@ export default function PlatformGridSection() {
                   <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-2.5 leading-snug px-1">
                     {t(`platform.${msgKey}.title`)}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-5 grow">
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed line-clamp-5">
                     {t(`platform.${msgKey}.teaser`)}
                   </p>
-                  <a
-                    href={demoUrlForPlatformCard(msgKey)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-4 w-full shrink-0 inline-flex items-center justify-center rounded-full bg-accent px-4 py-2.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:py-3"
-                  >
-                    {t('platform.gridTestCta')}
-                  </a>
                 </div>
               </div>
             )
