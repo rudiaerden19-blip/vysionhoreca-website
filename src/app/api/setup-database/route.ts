@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { assertInternalToolAccess } from '@/lib/api-internal-tool-gate'
 
 // Admin client with service role for DDL operations
 const supabaseAdmin = createClient(
@@ -7,7 +8,12 @@ const supabaseAdmin = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  const gate = await assertInternalToolAccess(request)
+  if (!gate.ok) {
+    return NextResponse.json(gate.json, { status: gate.status })
+  }
+
   try {
     // Create daily_sales table if it doesn't exist
     const { error: dailySalesError } = await supabaseAdmin.rpc('exec_sql', {
@@ -67,7 +73,12 @@ export async function POST() {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const gate = await assertInternalToolAccess(request)
+  if (!gate.ok) {
+    return NextResponse.json(gate.json, { status: gate.status })
+  }
+
   // Check which tables exist
   try {
     const tables = ['daily_sales', 'fixed_costs', 'variable_costs', 'business_targets']

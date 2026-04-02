@@ -1,6 +1,12 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { assertInternalToolAccess } from '@/lib/api-internal-tool-gate'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const gate = await assertInternalToolAccess(request)
+  if (!gate.ok) {
+    return NextResponse.json(gate.json, { status: gate.status })
+  }
+
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL!
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY!

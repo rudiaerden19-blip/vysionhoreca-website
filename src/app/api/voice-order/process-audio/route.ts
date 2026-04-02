@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { gateVoiceOrderRateLimit } from '@/lib/voice-order-rate-limit'
 
 interface Product {
   id: string
@@ -8,6 +9,9 @@ interface Product {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = await gateVoiceOrderRateLimit(request)
+  if (limited) return limited
+
   try {
     const formData = await request.formData()
     const audioFile = formData.get('audio') as File

@@ -4,7 +4,9 @@ Korte uitleg voor wie zelden met tests werkt.
 
 ## Wat gebeurt er?
 
-Playwright start een **browser**, opent je site zoals een echte gebruiker, en controleert of de pagina **zichtbaar** is. De eerste test gaat naar de **kassa** in **demo-modus** (`?alleen_lezen=1`), zodat je geen geluids-/PIN-stap hoeft te mocken.
+Playwright start een **browser**, opent je site zoals een echte gebruiker, en controleert of de pagina **zichtbaar** is. Er is o.a. een **kassa-smoke** (`?alleen_lezen=1`) en een lichte **`/api/health`**-check (geen volledige tenant-data nodig).
+
+**Documentatie:** `docs/API_SECURITY_INVENTORY.md`, `docs/INTERNAL_PLATFORM_OVERVIEW.md`, `supabase/README_RLS_AND_SECURITY_ADVISOR.md`.
 
 ## Eenmalig op je computer
 

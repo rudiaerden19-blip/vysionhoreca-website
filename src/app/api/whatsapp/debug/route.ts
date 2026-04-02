@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { assertInternalToolAccess } from '@/lib/api-internal-tool-gate'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,6 +16,11 @@ let lastWebhookTime: string | null = null
 
 // POST - store webhook for debugging
 export async function POST(request: NextRequest) {
+  const gate = await assertInternalToolAccess(request)
+  if (!gate.ok) {
+    return NextResponse.json(gate.json, { status: gate.status })
+  }
+
   try {
     const body = await request.json()
     lastWebhook = body
@@ -28,6 +34,11 @@ export async function POST(request: NextRequest) {
 
 // Debug endpoint to check WhatsApp settings
 export async function GET(request: NextRequest) {
+  const gate = await assertInternalToolAccess(request)
+  if (!gate.ok) {
+    return NextResponse.json(gate.json, { status: gate.status })
+  }
+
   try {
     // Get all whatsapp_settings
     const { data: settings, error: settingsError } = await supabaseAdmin

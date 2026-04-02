@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { gateVoiceOrderRateLimit } from '@/lib/voice-order-rate-limit'
 
 // Wavenet voices per language (female, natural sounding)
 const wavenetVoices: Record<string, { name: string; gender: string }> = {
@@ -21,6 +22,9 @@ function getLanguageCode(lang: string): string {
 
 // POST - returns base64 audio (for non-iOS)
 export async function POST(request: NextRequest) {
+  const limited = await gateVoiceOrderRateLimit(request)
+  if (limited) return limited
+
   try {
     const { text, lang } = await request.json()
 
@@ -97,6 +101,9 @@ export async function POST(request: NextRequest) {
 
 // GET - returns audio stream directly (for iOS)
 export async function GET(request: NextRequest) {
+  const limited = await gateVoiceOrderRateLimit(request)
+  if (limited) return limited
+
   try {
     const { searchParams } = new URL(request.url)
     const text = searchParams.get('text')
