@@ -9,6 +9,11 @@ import {
   safeInternalNextPath,
   internalShopPathToTenantHostPath,
 } from '@/lib/auth-headers'
+import {
+  DEMO_MARKETING_LOGIN_EMAIL,
+  DEMO_MARKETING_LOGIN_PASSWORD,
+  DEMO_TENANT_SLUG,
+} from '@/lib/demo-links'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -28,6 +33,24 @@ export default function LoginPage() {
       setLocale(langParam)
     }
   }, [setLocale, locales])
+
+  // Demomarketing: vul login in als bezoeker via oude link op /login belandt (kassa gebruikt liever ?demo=bekijk zonder login).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const nextRaw = params.get('next') || ''
+    let nextDecoded = nextRaw
+    try {
+      nextDecoded = decodeURIComponent(nextRaw)
+    } catch {
+      /* ignore */
+    }
+    const looksLikeDemoKassa =
+      nextDecoded.includes(DEMO_TENANT_SLUG) && nextDecoded.includes('/admin/kassa')
+    if (params.get('prefill_demo') === '1' || looksLikeDemoKassa) {
+      setEmail(DEMO_MARKETING_LOGIN_EMAIL)
+      setPassword(DEMO_MARKETING_LOGIN_PASSWORD)
+    }
+  }, [])
 
   // Close dropdown when clicking outside
   useEffect(() => {

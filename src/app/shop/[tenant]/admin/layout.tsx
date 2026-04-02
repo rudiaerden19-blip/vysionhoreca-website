@@ -27,6 +27,7 @@ import {
   isSuperAdminLoggedIn,
   isOwnerSessionFreshForTenant,
 } from '@/lib/auth-headers'
+import { DEMO_TENANT_SLUG, isPublicDemoKassaSearch } from '@/lib/demo-links'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -73,10 +74,21 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     setAdminAccess('pending')
   }, [params.tenant])
 
+  /** Publieke demo-kassa: /admin/kassa?demo=bekijk (of alleen_lezen=1) op frituurnolim — geen login. */
+  const demoPublicKassa =
+    typeof window !== 'undefined' &&
+    params.tenant === DEMO_TENANT_SLUG &&
+    pathname.includes('/admin/kassa') &&
+    isPublicDemoKassaSearch(window.location.search)
+
   useEffect(() => {
     if (loading || tenantExists === null) return
     if (tenantExists === false) return
     if (typeof window === 'undefined') return
+    if (demoPublicKassa) {
+      setAdminAccess('ok')
+      return
+    }
     if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)) {
       setAdminAccess('ok')
       return
@@ -84,7 +96,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     setAdminAccess('login')
     const next = `${window.location.pathname}${window.location.search}`
     router.replace(`/login?next=${encodeURIComponent(next)}`)
-  }, [loading, tenantExists, params.tenant, router])
+  }, [loading, tenantExists, params.tenant, router, demoPublicKassa])
 
   /**
    * Welkom-splash (/welkom) wordt getoond vanuit admin/page als `vysion_welcomed_*` ontbreekt.
@@ -107,6 +119,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   useEffect(() => {
     if (loading || modulesLoading || tenantExists === false) return
+    if (demoPublicKassa) return
     const gate = adminPathToModule(pathname, params.tenant)
     if (gate.kind === 'module' && !hasModuleAccessForPathname(pathname, params.tenant, moduleAccess)) {
       router.replace(
@@ -135,6 +148,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     moduleAccess,
     enabledModulesJson,
     router,
+    demoPublicKassa,
   ])
 
   if (loading) {
@@ -178,6 +192,9 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
   // Kassa POS: geen layout wrapper; module uit of alleen pincode (geen POS-submenu) → niet op /kassa laten
   if (pathname.includes('/kassa')) {
+    if (demoPublicKassa) {
+      return <>{children}</>
+    }
     if (!modulesLoading && moduleAccess['kassa'] === false) {
       return (
         <RedirectToFirstAccessibleModule
