@@ -84,6 +84,53 @@
  * kunnen zijn voor een correcte loop (translateX(-50%) === één segment). Zonder max-width: none
  * klopt de animatie niet → dubbele logo’s / overlap / rare strepen.
  */
+/* Waarom-Vysion: promo-regel rechts → links */
+@keyframes why-vysion-promo-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.why-vysion-promo-viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.why-vysion-promo-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: max-content;
+  min-width: max-content;
+  max-width: none;
+  animation: why-vysion-promo-scroll 22s linear infinite;
+  will-change: transform;
+}
+
+.why-vysion-promo-segment {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  gap: clamp(2.5rem, 6vw, 4rem);
+  padding-right: clamp(2.5rem, 6vw, 4rem);
+  max-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .why-vysion-promo-track {
+    animation: none;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 .partner-marquee-viewport,
 .partner-marquee-track,
 .partner-marquee-segment {
