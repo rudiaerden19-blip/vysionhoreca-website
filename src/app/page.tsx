@@ -68,43 +68,43 @@ function WhyVysionSection() {
         aria-hidden
       />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-[clamp(1.05rem,3.4vw,2.5rem)] sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-none mb-10 sm:mb-12 lg:mb-14 text-center lg:text-left max-w-full lg:mx-0 mx-auto whitespace-nowrap">
+          {t('whyVysion.title')}
+        </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-stretch">
-          <div className="flex flex-col min-h-0 order-2 lg:order-1">
-            <h2 className="text-[clamp(1.05rem,3.4vw,2.5rem)] sm:text-3xl md:text-4xl lg:text-[2.5rem] font-bold text-gray-900 tracking-tight leading-none mb-10 sm:mb-12 lg:mb-14 text-center lg:text-left max-w-full lg:mx-0 mx-auto whitespace-nowrap">
-              {t('whyVysion.title')}
-            </h2>
-            <ul className="space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0 lg:max-w-none">
-              {pointKeys.map((key, i) => (
-                <li key={key} className="flex gap-4 sm:gap-5">
-                  <span
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent/12 text-sm font-bold tabular-nums text-accent ring-1 ring-accent/20"
-                    aria-hidden
-                  >
-                    {i + 1}
-                  </span>
-                  <div className="min-w-0 pt-0.5">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-snug">
-                      {t(`whyVysion.${key}.title`)}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
-                      {t(`whyVysion.${key}.body`)}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="order-2 lg:order-1 space-y-9 sm:space-y-10 max-w-xl mx-auto lg:mx-0 lg:max-w-none min-h-0">
+            {pointKeys.map((key, i) => (
+              <li key={key} className="flex gap-4 sm:gap-5">
+                <span
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent/12 text-sm font-bold tabular-nums text-accent ring-1 ring-accent/20"
+                  aria-hidden
+                >
+                  {i + 1}
+                </span>
+                <div className="min-w-0 pt-0.5">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-snug">
+                    {t(`whyVysion.${key}.title`)}
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+                    {t(`whyVysion.${key}.body`)}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
 
-          <div className="order-1 lg:order-2 w-full min-h-[280px] lg:min-h-0 lg:h-full">
-            <div className="relative w-full h-full min-h-[280px] lg:min-h-0 rounded-3xl overflow-hidden shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414]">
-              <Image
-                src="/images/why-vysion-kiosk.png"
-                alt={t('whyVysion.imageAlt')}
-                fill
-                loading="lazy"
-                className="object-cover object-center"
-                sizes="(min-width: 1024px) 45vw, 95vw"
-              />
+          <div className="order-1 lg:order-2 relative w-full min-h-[280px] self-stretch lg:min-h-0">
+            <div className="relative min-h-[280px] lg:absolute lg:inset-0 lg:min-h-0">
+              <div className="relative min-h-[280px] rounded-3xl overflow-hidden shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] lg:absolute lg:inset-x-0 lg:bottom-0 lg:min-h-0 lg:top-[2.5rem]">
+                <Image
+                  src="/images/why-vysion-kiosk.png"
+                  alt={t('whyVysion.imageAlt')}
+                  fill
+                  loading="lazy"
+                  className="object-cover object-center"
+                  sizes="(min-width: 1024px) 45vw, 95vw"
+                />
+              </div>
             </div>
           </div>
         </div>
