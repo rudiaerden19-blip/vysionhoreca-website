@@ -16,36 +16,42 @@
  * })
  * ```
  */
+/**
+ * Zet zowel zaak- als superadmin-headers als beide in localStorage staan.
+ * API's gebruiken `verifyTenantOrSuperAdmin`: eerst eigenaar van de gevraagde tenant,
+ * anders geldige superadmin — zonder beide headers faalt superadmin naast een oude
+ * `vysion_tenant` van een andere zaak.
+ */
 export function getAuthHeaders(): Record<string, string> {
   if (typeof window === 'undefined') return {}
-  
-  // Check for regular tenant auth
+
+  const headers: Record<string, string> = {}
+
   const tenantData = localStorage.getItem('vysion_tenant')
   if (tenantData) {
     try {
-      const tenant = JSON.parse(tenantData)
-      return {
-        'x-business-id': tenant.business_id || tenant.id || '',
-        'x-auth-email': tenant.email || '',
-        'x-tenant-slug': tenant.tenant_slug || ''
+      const tenant = JSON.parse(tenantData) as {
+        business_id?: string
+        id?: string
+        email?: string
+        tenant_slug?: string
       }
+      headers['x-business-id'] = tenant.business_id || tenant.id || ''
+      headers['x-auth-email'] = tenant.email || ''
+      headers['x-tenant-slug'] = tenant.tenant_slug || ''
     } catch {
-      // Invalid JSON, clear it
       localStorage.removeItem('vysion_tenant')
     }
   }
-  
-  // Check for superadmin auth
+
   const superadminId = localStorage.getItem('superadmin_id')
   const superadminEmail = localStorage.getItem('superadmin_email')
   if (superadminId && superadminEmail) {
-    return {
-      'x-superadmin-id': superadminId,
-      'x-superadmin-email': superadminEmail
-    }
+    headers['x-superadmin-id'] = superadminId
+    headers['x-superadmin-email'] = superadminEmail
   }
-  
-  return {}
+
+  return headers
 }
 
 /**

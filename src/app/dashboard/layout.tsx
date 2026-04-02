@@ -88,6 +88,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return
       }
     } else {
+      if (isSuperAdminLoggedIn()) {
+        router.replace('/superadmin')
+        setLoading(false)
+        return
+      }
       router.push('/login')
       return
     }
