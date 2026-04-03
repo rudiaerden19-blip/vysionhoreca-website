@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { KIOSK_QUERY_KEY, parseKioskFlag, withKioskQuery } from '@/lib/kiosk-mode'
+import { isKioskSearchParams, withKioskQuery } from '@/lib/kiosk-mode'
 import {
   getTenantSettings,
   getDeliverySettings,
@@ -47,7 +47,7 @@ interface CustomerInfo {
 export default function CheckoutPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const isKiosk = parseKioskFlag(searchParams.get(KIOSK_QUERY_KEY))
+  const isKiosk = isKioskSearchParams(searchParams)
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)

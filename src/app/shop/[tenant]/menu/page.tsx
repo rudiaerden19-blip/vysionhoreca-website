@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { KIOSK_QUERY_KEY, parseKioskFlag, withKioskQuery } from '@/lib/kiosk-mode'
+import { isKioskSearchParams, withKioskQuery } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import VoiceOrderButton from '@/components/VoiceOrderButton'
@@ -64,7 +64,7 @@ function formatClosingDateNL(ymd: string): string {
 export default function MenuPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const isKiosk = parseKioskFlag(searchParams.get(KIOSK_QUERY_KEY))
+  const isKiosk = isKioskSearchParams(searchParams)
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [categories, setCategories] = useState<MenuCategory[]>([])

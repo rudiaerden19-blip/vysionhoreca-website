@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
-import { KIOSK_QUERY_KEY, parseKioskFlag } from '@/lib/kiosk-mode'
+import { isKioskSearchParams } from '@/lib/kiosk-mode'
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
@@ -33,8 +33,8 @@ export function middleware(request: NextRequest) {
     hostname.includes('vercel.app')
   
   if (isMainDomain) {
-    /** vaste kiosk-URL: /shop/tenant?kiosk=1 → direct menu (geen landingspagina). */
-    if (parseKioskFlag(url.searchParams.get(KIOSK_QUERY_KEY))) {
+    /** vaste kiosk-URL: /shop/tenant?kiosk1 of ?kiosk=1 → direct menu. */
+    if (isKioskSearchParams(url.searchParams)) {
       const shopRoot = pathname.match(/^\/shop\/([^/]+)\/?$/)
       if (shopRoot) {
         url.pathname = `/shop/${shopRoot[1]}/menu`
@@ -86,8 +86,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  /** tenant.domein/?kiosk=1 → /menu?kiosk=1 (geen landingspagina). */
-  if (parseKioskFlag(url.searchParams.get(KIOSK_QUERY_KEY)) && pathname === '/') {
+  /** tenant.domein/?kiosk1 → /menu?kiosk1 (geen landingspagina). */
+  if (isKioskSearchParams(url.searchParams) && pathname === '/') {
     url.pathname = '/menu'
     return NextResponse.redirect(url)
   }
