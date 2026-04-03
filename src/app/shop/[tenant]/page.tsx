@@ -1,14 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, getActivePromotions, getShopStatus, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview, Promotion, ShopStatus } from '@/lib/admin-api'
 import { parseImageZoomSettings } from '@/components/ImageZoomPicker'
 import { supabase } from '@/lib/supabase'
 import { useLanguage } from '@/i18n'
-import { MarketingDemoSessionPrime } from '@/components/MarketingDemoSessionPrime'
+
+const MarketingDemoSessionPrime = dynamic(
+  () => import('@/components/MarketingDemoSessionPrime').then((mod) => ({ default: mod.MarketingDemoSessionPrime })),
+  { ssr: true }
+)
 
 interface CoverImageSettings {
   url: string
@@ -833,7 +837,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const todayHours = business.opening_hours[getDayName()]
 
   return (
-    <LazyMotion features={domAnimation} strict>
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-white">
       <MarketingDemoSessionPrime tenant={params.tenant} />
       {/* Fixed Header - Clean & Compact */}
@@ -892,14 +895,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               </button>
               
               {/* Language Dropdown - fixed rechts */}
-              <AnimatePresence>
                 {showLanguageMenu && (
-                  <m.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl overflow-hidden z-50 min-w-[160px]"
-                  >
+                  <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl overflow-hidden z-50 min-w-[160px]">
                     {locales.map((loc) => (
                       <button
                         key={loc}
@@ -918,24 +915,16 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         )}
                       </button>
                     ))}
-                  </m.div>
+                  </div>
                 )}
-              </AnimatePresence>
             </div>
           </div>
         </div>
       </header>
 
       {/* Manual Offline Banner - always visible when manually offline */}
-      <AnimatePresence>
         {manualOffline?.is_offline && (
-          <m.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.5 }}
-            className="fixed top-16 left-0 right-0 z-40 bg-orange-600 text-white py-5 px-4 shadow-xl"
-          >
+          <div className="fixed top-16 left-0 right-0 z-40 bg-orange-600 text-white py-5 px-4 shadow-xl">
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex items-center justify-center gap-3 mb-1">
                 <span className="text-3xl">
@@ -960,20 +949,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {t('shopOffline.bannerSubtitle')}
               </p>
             </div>
-          </m.div>
+          </div>
         )}
-      </AnimatePresence>
 
       {/* Closed Shop Warning Banner - Show when shop is closed based on opening hours */}
-      <AnimatePresence>
         {shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && showClosedBanner && !manualOffline?.is_offline && (
-          <m.div
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.5 }}
-            className="fixed top-16 left-0 right-0 z-40 bg-red-600 text-white py-4 px-4 shadow-lg"
-          >
+          <div className="fixed top-16 left-0 right-0 z-40 bg-red-600 text-white py-4 px-4 shadow-lg">
             <div className="max-w-4xl mx-auto text-center">
               <div className="flex items-center justify-center gap-3 mb-2">
                 <span className="text-3xl">🚫</span>
@@ -986,20 +967,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {shopStatus.message || t('shopPage.shopClosedMessage')}
               </p>
             </div>
-          </m.div>
+          </div>
         )}
-      </AnimatePresence>
 
       {/* Hero Section with Parallax */}
       <section className="relative h-screen min-h-[500px] sm:min-h-[700px] overflow-hidden">
         {/* Background Image Slider */}
-        <AnimatePresence mode="wait">
-          <m.div
+          <div
             key={currentImageIndex}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1 }}
             style={{ transform: `translateY(${scrollY * 0.3}px)` }}
             className="absolute inset-0"
           >
@@ -1018,7 +993,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     fill
                     priority={currentImageIndex === 0}
                     sizes="100vw"
-                    quality={85}
+                    quality={72}
                     className="object-cover"
                     style={{ 
                       // Object-position bepaalt welk deel van de foto zichtbaar is
@@ -1031,25 +1006,17 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 </div>
               )
             })()}
-          </m.div>
-        </AnimatePresence>
+          </div>
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
 
         {/* Content */}
-        <m.div 
-          className="absolute inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16"
-        >
+        <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16">
           <div className="max-w-5xl mx-auto w-full">
             {/* Open/Closed Badge */}
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="mb-4"
-            >
+            <div className="mb-4">
               {manualOffline?.is_offline ? (
                 <span className="inline-flex items-center gap-2 bg-black/40 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm border border-white/20">
                   <span className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></span>
@@ -1075,36 +1042,21 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   {t('shopPage.closedNow')} · {t('shopPage.opensAt')} {getNextOpenTime()?.slice(0, 5)}
                 </span>
               )}
-            </m.div>
+            </div>
 
 
             {/* Title */}
-            <m.h1
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white mb-4 leading-none break-words"
-            >
+            <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white mb-4 leading-none break-words">
               {business.name}
-            </m.h1>
+            </h1>
 
             {/* Tagline */}
-            <m.p
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6 }}
-              className="text-base sm:text-xl md:text-2xl text-white/90 mb-6 font-light"
-            >
+            <p className="text-base sm:text-xl md:text-2xl text-white/90 mb-6 font-light">
               {business.tagline}
-            </m.p>
+            </p>
 
             {/* Quick Info Pills */}
-            <m.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-              className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6"
-            >
+            <div className="flex flex-wrap gap-2 sm:gap-3 mt-4 sm:mt-6">
               {business.pickup_enabled && (
                 <span className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-md text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm">
                   <span>🛍️</span> <span className="hidden xs:inline">{t('shopPage.pickup')} ·</span> {business.pickup_time}
@@ -1120,15 +1072,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <span className="shrink-0">📍</span> <span className="truncate">{business.address}{business.postal_code || business.city ? `, ${business.postal_code || ''} ${business.city || ''}`.trim() : ''}</span>
                 </span>
               )}
-            </m.div>
+            </div>
 
             {/* CTA Buttons */}
-            <m.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.6 }}
-              className="flex flex-wrap gap-3 mt-6 sm:mt-8"
-            >
+            <div className="flex flex-wrap gap-3 mt-6 sm:mt-8">
               {!manualOffline?.is_offline && (
                 <Link
                   href={`/shop/${params.tenant}/menu`}
@@ -1148,9 +1095,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <span>{t('shopPage.reserveTable') || 'Reserveer'}</span>
                 </Link>
               )}
-            </m.div>
+            </div>
           </div>
-        </m.div>
+        </div>
 
       </section>
 
@@ -2042,19 +1989,15 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       </footer>
 
       {/* Promoties Modal */}
-      <AnimatePresence>
         {showPromotionsModal && business && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
+            role="presentation"
             className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
             onClick={() => setShowPromotionsModal(false)}
           >
-            <m.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+            <div
+              role="dialog"
+              aria-modal="true"
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden"
             >
@@ -2137,25 +2080,20 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   {t('shopPage.close')}
                 </button>
               </div>
-            </m.div>
-          </m.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
 
       {/* Gift Card Modal */}
-      <AnimatePresence>
         {showGiftCardModal && business && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
+            role="presentation"
             className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
             onClick={() => setShowGiftCardModal(false)}
           >
-            <m.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+            <div
+              role="dialog"
+              aria-modal="true"
               onClick={(e) => e.stopPropagation()}
               className="bg-white rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
             >
@@ -2452,10 +2390,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   {t('shopPage.giftCardModal.cancel')}
                 </button>
               </div>
-            </m.div>
-          </m.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
 
       {/* Floating Order Button (Mobile) */}
       <div className="fixed bottom-4 left-3 right-3 sm:bottom-6 sm:left-4 sm:right-4 md:hidden z-50 pb-safe">
@@ -2480,6 +2417,5 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         )}
       </div>
     </div>
-    </LazyMotion>
   )
 }

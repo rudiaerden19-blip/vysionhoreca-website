@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -468,7 +467,7 @@ export default function MenuPageClient({
               alt={item.name}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 420px"
-              quality={60}
+              quality={50}
               loading="lazy"
               className={useContain ? 'object-contain p-2' : 'object-cover'}
             />
@@ -566,7 +565,6 @@ export default function MenuPageClient({
   }
 
   return (
-    <LazyMotion features={domAnimation} strict>
     <div className={`min-h-screen ${theme.bg}`}>
       {/* Manual Offline Overlay */}
       {manualOffline?.is_offline && (
@@ -845,19 +843,15 @@ export default function MenuPageClient({
       </div>
 
       {/* Product Detail Modal */}
-      <AnimatePresence>
-        {selectedItem && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+      {selectedItem && (
+          <div
+            role="presentation"
             onClick={() => { setSelectedItem(null); setModalQuantity(1) }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4"
           >
-            <m.div
-              initial={{ opacity: 0, y: 100 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 100 }}
+            <div
+              role="dialog"
+              aria-modal="true"
               onClick={(e) => e.stopPropagation()}
               className={`${theme.card} rounded-t-3xl md:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto`}
             >
@@ -872,7 +866,7 @@ export default function MenuPageClient({
                     alt={selectedItem.name}
                     fill
                     sizes="(max-width: 768px) 100vw, min(90vw, 480px)"
-                    quality={65}
+                    quality={55}
                     className={useContain ? 'object-contain p-4' : 'object-cover'}
                   />
                 ) : (
@@ -994,7 +988,8 @@ export default function MenuPageClient({
                   </div>
                 </div>
 
-                <m.button
+                <button
+                  type="button"
                   onClick={addToCart}
                   disabled={!selectedItem.is_available || !canAddToCart()}
                   style={{ backgroundColor: selectedItem.is_available && canAddToCart() ? primaryColor : undefined }}
@@ -1003,12 +998,11 @@ export default function MenuPageClient({
                   <span>🛒</span>
                   <span>{modalQuantity > 1 ? `${modalQuantity}x ` : ''}{t('menuPage.addToOrder')}</span>
                   <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">€{(calculateTotalPrice() * modalQuantity).toFixed(2)}</span>
-                </m.button>
+                </button>
               </div>
-            </m.div>
-          </m.div>
-        )}
-      </AnimatePresence>
+            </div>
+          </div>
+      )}
 
       {/* Voice Order Button */}
       <VoiceOrderButton
@@ -1065,12 +1059,9 @@ export default function MenuPageClient({
       />
 
       {/* Cart Button */}
-      <AnimatePresence>
-        {cartCount > 0 && (
-          <m.button
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
+      {cartCount > 0 && (
+          <button
+            type="button"
             onClick={() => setCartOpen(true)}
             style={{ backgroundColor: primaryColor, boxShadow: `0 25px 50px -12px ${primaryColor}66` }}
             className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-4 z-40 hover:opacity-90 text-sm sm:text-base max-w-[calc(100%-2rem)]"
@@ -1079,27 +1070,19 @@ export default function MenuPageClient({
             <span className="hidden sm:inline">{t('menuPage.viewOrder')}</span>
             <span className="sm:hidden">{t('menuPage.order')}</span>
             <span className="border-l border-white/30 pl-2 sm:pl-4 shrink-0">€{cartTotal.toFixed(2)}</span>
-          </m.button>
-        )}
-      </AnimatePresence>
+          </button>
+      )}
 
       {/* Cart Slide Panel */}
-      <AnimatePresence>
-        {cartOpen && (
-          <m.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+      {cartOpen && (
+          <div
+            role="presentation"
             onClick={() => setCartOpen(false)}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
           >
-            <m.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            <aside
               onClick={(e) => e.stopPropagation()}
-              className={`absolute right-0 top-0 h-full w-full max-w-md ${theme.card} shadow-2xl`}
+              className={`absolute right-0 top-0 h-full w-full max-w-md ${theme.card} shadow-2xl translate-x-0 transition-transform duration-200 ease-out motion-reduce:transition-none`}
             >
               <div className={`p-4 sm:p-6 border-b ${theme.border}`}>
                 <div className="flex items-center justify-between">
@@ -1127,7 +1110,7 @@ export default function MenuPageClient({
                               alt={cartItem.item.name} 
                               fill
                               sizes="80px"
-                              quality={60}
+                              quality={50}
                               className="object-contain p-1" 
                             />
                           </div>
@@ -1164,7 +1147,8 @@ export default function MenuPageClient({
                     <span className={theme.textMuted}>{t('menuPage.subtotal')}</span>
                     <span className={`text-xl font-bold ${theme.text}`}>€{cartTotal.toFixed(2)}</span>
                   </div>
-                  <m.button
+                  <button
+                    type="button"
                     onClick={() => {
                       setCartOpen(false)
                       router.push(shop('checkout'))
@@ -1173,14 +1157,12 @@ export default function MenuPageClient({
                     className="w-full text-white font-bold py-4 rounded-2xl transition-colors hover:opacity-90"
                   >
                     {t('menuPage.checkout')} →
-                  </m.button>
+                  </button>
                 </div>
               )}
-            </m.div>
-          </m.div>
-        )}
-      </AnimatePresence>
+            </aside>
+          </div>
+      )}
     </div>
-    </LazyMotion>
   )
 }

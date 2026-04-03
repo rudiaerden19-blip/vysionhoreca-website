@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { LazyMotion, domAnimation, m } from 'framer-motion'
 import Image from 'next/image'
 import { getTenantSettings, getMenuCategories, getMenuProducts, TenantSettings, MenuCategory, MenuProduct } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
@@ -64,7 +63,6 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
   }
 
   return (
-    <LazyMotion features={domAnimation} strict>
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-900">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md border-b border-white/10">
@@ -141,11 +139,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
               if (categoryProducts.length === 0) return null
               
               return (
-                <m.section
-                  key={category.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
+                <section key={category.id}>
                   <h2 
                     className="text-xl font-bold text-white mb-4 pb-2 border-b border-white/10 flex items-center gap-2"
                   >
@@ -157,16 +151,13 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                       <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} t={t} />
                     ))}
                   </div>
-                </m.section>
+                </section>
               )
             })}
             
             {/* Producten zonder categorie */}
             {products.filter(p => !p.category_id).length > 0 && (
-              <m.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
+              <section>
                 <h2 className="text-xl font-bold text-white mb-4 pb-2 border-b border-white/10">
                   🍽️ {t('menuCard.other')}
                 </h2>
@@ -175,7 +166,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                     <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} t={t} />
                   ))}
                 </div>
-              </m.section>
+              </section>
             )}
           </div>
         ) : (
@@ -208,7 +199,6 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
         </div>
       </footer>
     </div>
-    </LazyMotion>
   )
 }
 

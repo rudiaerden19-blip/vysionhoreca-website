@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { LazyMotion, domAnimation, m } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
@@ -589,7 +588,6 @@ export default function CheckoutPageClient({
   const maxDatePicker = addDaysToBelgiumYMD(todayBrussels, 30)
 
   return (
-    <LazyMotion features={domAnimation} strict>
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
@@ -618,11 +616,7 @@ export default function CheckoutPageClient({
           {/* Left Column - Forms */}
           <div className="space-y-4 sm:space-y-6">
             {/* Order Type */}
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
-            >
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.howReceiveOrder')}</h2>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 <button
@@ -662,14 +656,10 @@ export default function CheckoutPageClient({
                 </div>
               )}
 
-            </m.div>
+            </div>
 
             {/* Date & Time Picker */}
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
-            >
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 mb-4">📅 {t('checkoutPage.whenPickup')}</h2>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -716,15 +706,10 @@ export default function CheckoutPageClient({
                   ⛔ {t('checkoutPage.dateInClosingPeriod')}
                 </div>
               )}
-            </m.div>
+            </div>
 
             {/* Customer Info */}
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
-            >
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
               <div className="mb-4">
               <h2 className="text-lg font-bold text-gray-900 mb-2">{t('checkoutPage.yourDetails')}</h2>
               
@@ -847,15 +832,10 @@ export default function CheckoutPageClient({
                   />
                 </div>
               </div>
-            </m.div>
+            </div>
 
             {/* Payment Method */}
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
-            >
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
               <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.paymentMethod')}</h2>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 {/* Cash optie - alleen tonen als ingeschakeld */}
@@ -950,17 +930,12 @@ export default function CheckoutPageClient({
                   ℹ️ {t('checkoutPage.onlineComingSoon')}
                 </div>
               )}
-            </m.div>
+            </div>
           </div>
 
           {/* Right Column - Order Summary */}
           <div>
-            <m.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white rounded-2xl p-6 shadow-sm sticky top-24"
-            >
+            <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
               <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.yourOrder')}</h2>
               
               <div className="space-y-3 sm:space-y-4 max-h-80 overflow-y-auto mb-6">
@@ -1056,7 +1031,8 @@ export default function CheckoutPageClient({
               )}
 
               {/* Submit Button */}
-              <m.button
+              <button
+                type="button"
                 onClick={handleSubmit}
                 disabled={!canSubmit() || submitting}
                 style={{ backgroundColor: canSubmit() ? primaryColor : undefined }}
@@ -1073,16 +1049,15 @@ export default function CheckoutPageClient({
                     <span className="bg-white/20 px-3 py-1 rounded-full">€{total.toFixed(2)}</span>
                   </>
                 )}
-              </m.button>
+              </button>
 
               <p className="text-center text-sm text-gray-500 mt-4">
                 {t('checkoutPage.agreeTerms')}
               </p>
-            </m.div>
+            </div>
           </div>
         </div>
       </main>
     </div>
-    </LazyMotion>
   )
 }
