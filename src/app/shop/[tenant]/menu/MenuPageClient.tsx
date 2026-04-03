@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { isKioskSearchParams } from '@/lib/kiosk-mode'
+import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import VoiceOrderButton from '@/components/VoiceOrderButton'
@@ -64,13 +64,17 @@ function formatClosingDateNL(ymd: string): string {
 export default function MenuPageClient({
   params,
   initialKiosk,
+  shortKioskUrls,
 }: {
   params: { tenant: string }
   initialKiosk: boolean
+  shortKioskUrls: boolean
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const isKiosk = initialKiosk || isKioskSearchParams(searchParams)
+  const shop = (key: Parameters<typeof kioskShopHref>[1]) =>
+    kioskShopHref(params.tenant, key, { kiosk: isKiosk, shortUrls: shortKioskUrls })
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [categories, setCategories] = useState<MenuCategory[]>([])
@@ -240,7 +244,7 @@ export default function MenuPageClient({
       
       // Check of tenant bestaat - redirect naar niet gevonden als tenantData null is
       if (!tenantData) {
-        window.location.href = `/shop/${params.tenant}`
+        window.location.href = shop('home')
         return
       }
       
@@ -300,7 +304,7 @@ export default function MenuPageClient({
     }
 
     loadData()
-  }, [params.tenant, isKiosk])
+  }, [params.tenant, isKiosk, shortKioskUrls])
 
   const selectProduct = async (item: MenuItem) => {
     setSelectedItem(item)
@@ -580,7 +584,7 @@ export default function MenuPageClient({
             </h2>
             <p className="text-gray-500 mb-8">{t('shopOffline.bannerSubtitle')}</p>
             <a
-              href={isKiosk ? `/shop/${params.tenant}/menu` : `/shop/${params.tenant}`}
+              href={isKiosk ? shop('menu') : shop('home')}
               className="inline-block px-8 py-3 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-700 transition-all"
             >
               ← Terug
@@ -604,7 +608,7 @@ export default function MenuPageClient({
             {isKiosk ? (
               <div className="w-10 sm:min-w-[5.5rem] shrink-0" aria-hidden />
             ) : (
-              <Link href={`/shop/${params.tenant}`} className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}>
+              <Link href={shop('home')} className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
@@ -618,7 +622,7 @@ export default function MenuPageClient({
               <span className={`text-xs ${theme.textLight}`}>{t('menuPage.menu')}</span>
             </div>
             <Link 
-              href={`/shop/${params.tenant}/account`}
+              href={shop('account')}
               className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1044,7 +1048,7 @@ export default function MenuPageClient({
           })
         }}
         onGoToCheckout={() => {
-          router.push(`/shop/${params.tenant}/checkout`)
+          router.push(shop('checkout'))
         }}
         translations={{
           listening: 'Luisteren...',
@@ -1166,7 +1170,7 @@ export default function MenuPageClient({
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       setCartOpen(false)
-                      router.push(`/shop/${params.tenant}/checkout`)
+                      router.push(shop('checkout'))
                     }}
                     style={{ backgroundColor: primaryColor }}
                     className="w-full text-white font-bold py-4 rounded-2xl transition-colors hover:opacity-90"
