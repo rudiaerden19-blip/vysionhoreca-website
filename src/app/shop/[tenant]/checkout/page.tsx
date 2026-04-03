@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { KIOSK_QUERY_KEY, parseKioskFlag, withKioskQuery } from '@/lib/kiosk-mode'
 import {
   getTenantSettings,
   getDeliverySettings,
@@ -45,6 +46,8 @@ interface CustomerInfo {
 
 export default function CheckoutPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isKiosk = parseKioskFlag(searchParams.get(KIOSK_QUERY_KEY))
   const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -538,18 +541,20 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           
           <div className="space-y-3">
             <Link
-              href={`/shop/${params.tenant}/menu`}
+              href={withKioskQuery(`/shop/${params.tenant}/menu`, isKiosk)}
               style={{ backgroundColor: primaryColor }}
               className="block w-full text-white font-bold py-4 rounded-2xl hover:opacity-90 transition-colors"
             >
               {t('checkoutPage.backToMenu')}
             </Link>
-            <Link
-              href={`/shop/${params.tenant}`}
-              className="block w-full bg-gray-100 text-gray-700 font-medium py-4 rounded-2xl hover:bg-gray-200 transition-colors"
-            >
-              {t('checkoutPage.toHomepage')}
-            </Link>
+            {!isKiosk && (
+              <Link
+                href={`/shop/${params.tenant}`}
+                className="block w-full bg-gray-100 text-gray-700 font-medium py-4 rounded-2xl hover:bg-gray-200 transition-colors"
+              >
+                {t('checkoutPage.toHomepage')}
+              </Link>
+            )}
           </div>
         </motion.div>
       </div>
@@ -565,7 +570,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('checkoutPage.emptyCart')}</h1>
           <p className="text-gray-500 mb-6">{t('checkoutPage.emptyCartDesc')}</p>
           <Link
-            href={`/shop/${params.tenant}/menu`}
+            href={withKioskQuery(`/shop/${params.tenant}/menu`, isKiosk)}
             style={{ backgroundColor: primaryColor }}
             className="inline-block text-white font-bold py-4 px-8 rounded-2xl hover:opacity-90 transition-colors"
           >
@@ -586,7 +591,7 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="px-4 py-3 flex items-center justify-between max-w-2xl mx-auto">
           <Link
-            href={`/shop/${params.tenant}/menu`}
+            href={withKioskQuery(`/shop/${params.tenant}/menu`, isKiosk)}
             className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -724,14 +729,14 @@ export default function CheckoutPage({ params }: { params: { tenant: string } })
                   <p className="text-blue-800 font-medium mb-3">💡 {t('checkoutPage.loginForPoints')}</p>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Link
-                      href={`/shop/${params.tenant}/account/login?redirect=checkout`}
+                      href={withKioskQuery(`/shop/${params.tenant}/account/login?redirect=checkout`, isKiosk)}
                       style={{ backgroundColor: primaryColor }}
                       className="flex-1 text-center text-white font-medium py-2 px-4 rounded-lg hover:opacity-90 transition-opacity"
                     >
                       {t('checkoutPage.login')}
                     </Link>
                     <Link
-                      href={`/shop/${params.tenant}/account/register?redirect=checkout`}
+                      href={withKioskQuery(`/shop/${params.tenant}/account/register?redirect=checkout`, isKiosk)}
                       className="flex-1 text-center bg-white border border-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       {t('checkoutPage.createAccount')}

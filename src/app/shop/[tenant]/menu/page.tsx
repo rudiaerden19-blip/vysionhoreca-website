@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { KIOSK_QUERY_KEY, parseKioskFlag, withKioskQuery } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 import VoiceOrderButton from '@/components/VoiceOrderButton'
@@ -62,6 +63,8 @@ function formatClosingDateNL(ymd: string): string {
 
 export default function MenuPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isKiosk = parseKioskFlag(searchParams.get(KIOSK_QUERY_KEY))
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
   const [showLanguageMenu, setShowLanguageMenu] = useState(false)
   const [categories, setCategories] = useState<MenuCategory[]>([])
@@ -231,7 +234,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
       
       // Check of tenant bestaat - redirect naar niet gevonden als tenantData null is
       if (!tenantData) {
-        window.location.href = `/shop/${params.tenant}`
+        window.location.href = withKioskQuery(`/shop/${params.tenant}`, isKiosk)
         return
       }
       
@@ -291,7 +294,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
     }
 
     loadData()
-  }, [params.tenant])
+  }, [params.tenant, isKiosk])
 
   const selectProduct = async (item: MenuItem) => {
     setSelectedItem(item)
@@ -571,7 +574,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
             </h2>
             <p className="text-gray-500 mb-8">{t('shopOffline.bannerSubtitle')}</p>
             <a
-              href={`/shop/${params.tenant}`}
+              href={isKiosk ? withKioskQuery(`/shop/${params.tenant}/menu`, true) : `/shop/${params.tenant}`}
               className="inline-block px-8 py-3 bg-gray-900 text-white rounded-full font-semibold hover:bg-gray-700 transition-all"
             >
               ← Terug
@@ -592,12 +595,16 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         {/* Navigation Bar */}
         <div className={`border-b ${theme.border}`}>
           <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-            <Link href={`/shop/${params.tenant}`} className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="text-sm font-medium hidden sm:inline">{t('menuPage.back')}</span>
-            </Link>
+            {isKiosk ? (
+              <div className="w-10 sm:min-w-[5.5rem] shrink-0" aria-hidden />
+            ) : (
+              <Link href={`/shop/${params.tenant}`} className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span className="text-sm font-medium hidden sm:inline">{t('menuPage.back')}</span>
+              </Link>
+            )}
             <div className="flex flex-col items-center">
               <h1 className={`font-bold text-lg leading-tight ${theme.text}`}>
                 {businessName || t('menuPage.menu')}
@@ -605,7 +612,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
               <span className={`text-xs ${theme.textLight}`}>{t('menuPage.menu')}</span>
             </div>
             <Link 
-              href={`/shop/${params.tenant}/account`}
+              href={withKioskQuery(`/shop/${params.tenant}/account`, isKiosk)}
               className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1031,7 +1038,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
           })
         }}
         onGoToCheckout={() => {
-          router.push(`/shop/${params.tenant}/checkout`)
+          router.push(withKioskQuery(`/shop/${params.tenant}/checkout`, isKiosk))
         }}
         translations={{
           listening: 'Luisteren...',
@@ -1153,7 +1160,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       setCartOpen(false)
-                      router.push(`/shop/${params.tenant}/checkout`)
+                      router.push(withKioskQuery(`/shop/${params.tenant}/checkout`, isKiosk))
                     }}
                     style={{ backgroundColor: primaryColor }}
                     className="w-full text-white font-bold py-4 rounded-2xl transition-colors hover:opacity-90"

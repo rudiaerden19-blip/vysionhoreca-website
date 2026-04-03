@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
+import { KIOSK_QUERY_KEY, parseKioskFlag } from '@/lib/kiosk-mode'
 
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
@@ -32,6 +33,14 @@ export function middleware(request: NextRequest) {
     hostname.includes('vercel.app')
   
   if (isMainDomain) {
+    /** vaste kiosk-URL: /shop/tenant?kiosk=1 → direct menu (geen landingspagina). */
+    if (parseKioskFlag(url.searchParams.get(KIOSK_QUERY_KEY))) {
+      const shopRoot = pathname.match(/^\/shop\/([^/]+)\/?$/)
+      if (shopRoot) {
+        url.pathname = `/shop/${shopRoot[1]}/menu`
+        return NextResponse.redirect(url)
+      }
+    }
     return NextResponse.next()
   }
 
@@ -75,6 +84,12 @@ export function middleware(request: NextRequest) {
   // Skip if no valid subdomain found
   if (!subdomain || subdomain === 'www' || subdomain.length === 0) {
     return NextResponse.next()
+  }
+
+  /** tenant.domein/?kiosk=1 → /menu?kiosk=1 (geen landingspagina). */
+  if (parseKioskFlag(url.searchParams.get(KIOSK_QUERY_KEY)) && pathname === '/') {
+    url.pathname = '/menu'
+    return NextResponse.redirect(url)
   }
 
   // Rewrite all requests to use /shop/[tenant] structure
