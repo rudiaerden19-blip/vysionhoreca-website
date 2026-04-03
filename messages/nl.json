@@ -3,18 +3,6 @@
     "title": "Vysion Horeca | Alles-in-één Kassa & Betaalplatform",
     "description": "Het complete kassasysteem voor horeca. Kassa, online bestellingen, facturatie, personeelsbeheer en meer - allemaal in één platform. Probeer 14 dagen gratis."
   },
-  "pwa": {
-    "installShort": "App installeren",
-    "installTitle": "Openen zonder adresbalk",
-    "installCta": "Zet op bureaublad",
-    "chromeEdge": "Chrome of Edge: tik op ⋮ → «Deze site installeren» of «App installeren» als die er staat. Zie je alleen «Snelkoppeling maken», «Snelle link» of iets onder «Casten en delen»? Kies dat en vink «Openen als venster» aan (eigen venster, meestal zonder adresbalk). Op telefoon/tablet: «Toevoegen aan startscherm».",
-    "safariIos": "iPhone/iPad: tik op Deel → Zet op beginscherm.",
-    "safariMac": "Mac Safari: menu Archief → Voeg toe aan Dock (macOS Sonoma of nieuwer).",
-    "dismiss": "Sluiten",
-    "helpSteps": "Stappen",
-    "installFailed": "De installatiedialoog opent hier niet. Gebruik Chrome of Edge, of volg de stappen hieronder.",
-    "openInBrowserNote": "In een gewone browsertab blijft de adresbalk zichtbaar. Na installatie opent de site in een eigen app-venster zonder adresbalk."
-  },
   "nav": {
     "home": "Home",
     "features": "Functies",

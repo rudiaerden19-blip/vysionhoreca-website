@@ -3,18 +3,6 @@
     "title": "Vysion Horeca | オールインワンPOS＆決済プラットフォーム",
     "description": "飲食業向け完全POSシステム。レジ、オンライン注文、請求書、スタッフ管理など - すべて1つのプラットフォームで。14日間無料でお試し。"
   },
-  "pwa": {
-    "installShort": "アプリをインストール",
-    "installTitle": "アドレスバーなしで開く",
-    "installCta": "デスクトップに追加",
-    "chromeEdge": "Chrome / Edge：⋮ メニュー → 表示される場合は「このサイトをインストール」や「アプリをインストール」。「ショートカットを作成」「クイック リンク」などしかない場合はそれを選び、可能なら「ウィンドウとして開く」をオン。スマホ／タブレットは「ホーム画面に追加」。",
-    "safariIos": "iPhone / iPad：共有 → ホーム画面に追加。",
-    "safariMac": "Mac Safari：ファイル → Dockに追加（macOS Sonoma以降）。",
-    "dismiss": "閉じる",
-    "helpSteps": "手順",
-    "installFailed": "インストール画面が開きませんでした。Chrome または Edge を使うか、下の手順に従ってください。",
-    "openInBrowserNote": "通常のタブではアドレスバーが表示されます。インストール後は独自のアプリウィンドウで、アドレスバーなく開きます。"
-  },
   "nav": {
     "home": "ホーム",
     "features": "機能",

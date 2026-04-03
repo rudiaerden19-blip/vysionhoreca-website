@@ -3,18 +3,6 @@
     "title": "Vysion Horeca | Sistema POS e Piattaforma di Pagamento All-in-One",
     "description": "Il sistema POS completo per la ristorazione. Cassa, ordini online, fatturazione, gestione del personale e altro - tutto in una piattaforma. Prova 14 giorni gratis."
   },
-  "pwa": {
-    "installShort": "Installa app",
-    "installTitle": "Apri senza barra degli indirizzi",
-    "installCta": "Aggiungi al desktop",
-    "chromeEdge": "Chrome o Edge: menu (⋮) → «Installa questo sito» o «Installa app» se presente. Se vedi solo «Crea collegamento» o «Collegamento rapido», usalo e attiva «Apri come finestra» se proposto. Su telefono/tablet: «Aggiungi a schermata Home».",
-    "safariIos": "iPhone/iPad: Condividi → Aggiungi a Home.",
-    "safariMac": "Safari su Mac: Archivio → Aggiungi al Dock (macOS Sonoma o successivo).",
-    "dismiss": "Chiudi",
-    "helpSteps": "Passi",
-    "installFailed": "La finestra di installazione non si è aperta. Prova Chrome o Edge, o segui i passi sotto.",
-    "openInBrowserNote": "In una scheda normale la barra degli indirizzi resta visibile. Dopo l’installazione il sito si apre in una finestra app senza barra degli indirizzi."
-  },
   "nav": {
     "home": "Home",
     "features": "Funzionalità",

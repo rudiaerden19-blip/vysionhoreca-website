@@ -3,18 +3,6 @@
     "title": "Vysion Horeca | Sistema de Caja y Plataforma de Pago Todo en Uno",
     "description": "El sistema de caja completo para hostelería. Caja, pedidos online, facturación, gestión de personal y más - todo en una plataforma. Prueba 14 días gratis."
   },
-  "pwa": {
-    "installShort": "Instalar app",
-    "installTitle": "Abrir sin barra de dirección",
-    "installCta": "Añadir al escritorio",
-    "chromeEdge": "Chrome o Edge: menú (⋮) → «Instalar este sitio» o «Instalar aplicación» si aparece. Si solo ves «Crear acceso directo» o «Enlace rápido», úsalo y marca «Abrir como ventana» si se ofrece. En móvil/tablet: «Añadir a la pantalla de inicio».",
-    "safariIos": "iPhone/iPad: Compartir → Añadir a Inicio.",
-    "safariMac": "Safari en Mac: Archivo → Añadir al Dock (macOS Sonoma o posterior).",
-    "dismiss": "Cerrar",
-    "helpSteps": "Pasos",
-    "installFailed": "No se abrió el cuadro de instalación. Prueba Chrome u Edge, o sigue los pasos abajo.",
-    "openInBrowserNote": "En una pestaña normal la barra de dirección sigue visible. Tras instalar, el sitio se abre en una ventana propia sin barra de dirección."
-  },
   "nav": {
     "home": "Inicio",
     "features": "Funciones",
