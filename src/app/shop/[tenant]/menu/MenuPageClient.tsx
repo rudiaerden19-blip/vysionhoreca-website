@@ -270,13 +270,41 @@ export default function MenuPageClient({
   const activeCategoryRef = useRef(activeCategory)
   activeCategoryRef.current = activeCategory
 
-  // Fetch manual offline status
+  // Fetch manual offline status (kiosk: iets uitstellen zodat menu-data eerst de main thread krijgt)
   useEffect(() => {
-    fetch(`/api/shop-offline?tenant=${params.tenant}`)
-      .then(r => r.json())
-      .then(d => setManualOffline(d))
-      .catch(() => {})
-  }, [params.tenant])
+    let cancelled = false
+    const tenant = params.tenant
+    const load = () => {
+      fetch(`/api/shop-offline?tenant=${tenant}`)
+        .then((r) => r.json())
+        .then((d) => {
+          if (!cancelled) setManualOffline(d)
+        })
+        .catch(() => {})
+    }
+    if (lite) {
+      if (typeof requestIdleCallback !== 'undefined') {
+        const id = requestIdleCallback(() => {
+          if (!cancelled) load()
+        }, { timeout: 3500 })
+        return () => {
+          cancelled = true
+          cancelIdleCallback(id)
+        }
+      }
+      const t = window.setTimeout(() => {
+        if (!cancelled) load()
+      }, 400)
+      return () => {
+        cancelled = true
+        window.clearTimeout(t)
+      }
+    }
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [params.tenant, lite])
 
   // Save WhatsApp phone and set language if user came from WhatsApp link
   useEffect(() => {

@@ -162,7 +162,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const [giftCardLoading, setGiftCardLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [scrollY, setScrollY] = useState(0)
   const [isBlocked, setIsBlocked] = useState(false)
   const [isOwner, setIsOwner] = useState(false)
   
@@ -400,12 +399,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     setReservationForm({ firstName: '', lastName: '', phone: '', email: '', date: '', time: '', partySize: '', notes: '' })
     setReservationSubmitting(false)
   }
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   // Laad voorschot instellingen — lees alle velden, check snake_case én camelCase
   useEffect(() => {
@@ -970,12 +963,11 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           </div>
         )}
 
-      {/* Hero Section with Parallax */}
+      {/* Hero — statisch (geen scroll-parallax: minder re-renders en compositing op zwakke tablets) */}
       <section className="relative h-screen min-h-[500px] sm:min-h-[700px] overflow-hidden">
         {/* Background Image Slider */}
           <div
             key={currentImageIndex}
-            style={{ transform: `translateY(${scrollY * 0.3}px)` }}
             className="absolute inset-0"
           >
             {(() => {
