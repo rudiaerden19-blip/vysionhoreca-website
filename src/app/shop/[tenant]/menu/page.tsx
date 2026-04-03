@@ -446,13 +446,13 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
         className={`${theme.card} rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.22)] active:scale-[0.98] transition-all cursor-pointer group`}
       >
         {/* Afbeelding met overlay badges */}
-        <div className={`relative h-44 sm:h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
+        <div className={`relative h-48 sm:h-56 lg:h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
           {item.image_url ? (
             <Image
               src={item.image_url}
               alt={item.name}
               fill
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="(max-width: 1023px) 100vw, 50vw"
               quality={75}
               loading="lazy"
               className={`transition-transform duration-300 group-hover:scale-105 ${useContain ? 'object-contain p-2' : 'object-cover'}`}
@@ -710,7 +710,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 </h2>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
               {promotions.map((promo) => {
                 const linkedProduct = promo.product_id 
                   ? menuItems.find(item => item.id === promo.product_id)
@@ -734,11 +734,11 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                     }}
                     className={`${theme.card} rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ${theme.cardHover} transition-all ${linkedProduct ? 'cursor-pointer active:scale-[0.98]' : ''}`}
                   >
-                    <div className={`relative h-40 sm:h-48 overflow-hidden ${theme.imageBg}`}>
+                    <div className={`relative h-48 sm:h-52 lg:h-44 xl:h-40 overflow-hidden ${theme.imageBg}`}>
                       {promo.image_url ? (
-                        <Image src={promo.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={75} loading="lazy" className="object-cover" />
+                        <Image src={promo.image_url} alt={promo.name} fill sizes="(max-width: 1023px) 100vw, (max-width: 1279px) 50vw, 33vw" quality={75} loading="lazy" className="object-cover" />
                       ) : linkedProduct?.image_url ? (
-                        <Image src={linkedProduct.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 33vw" quality={75} loading="lazy" className="object-cover" />
+                        <Image src={linkedProduct.image_url} alt={promo.name} fill sizes="(max-width: 1023px) 100vw, (max-width: 1279px) 50vw, 33vw" quality={75} loading="lazy" className="object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-green-400 to-green-600">🎁</div>
                       )}
@@ -780,7 +780,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                 </h2>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
               {menuItems.filter(i => i.is_popular).map((item) => (
                 <ProductCard key={`popular-${item.id}`} item={item} />
               ))}
@@ -806,7 +806,7 @@ export default function MenuPage({ params }: { params: { tenant: string } }) {
                   <h2 className={`text-xl font-bold ${theme.text}`}>{category.name}</h2>
                 </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                 {categoryItems.map((item) => (
                   <ProductCard key={item.id} item={item} />
                 ))}
