@@ -7,7 +7,7 @@
     "installShort": "Installer l’app",
     "installTitle": "Ouvrir sans barre d’adresse",
     "installCta": "Ajouter au bureau",
-    "chromeEdge": "Chrome ou Edge : menu (⋮) → Installer ou Applications → Installer ce site…. ",
+    "chromeEdge": "Chrome ou Edge : menu (⋮) → «Installer ce site» ou «Installer l’app» si proposé. Sinon «Créer un raccourci» ou «Lien rapide» : choisissez l’option et cochez «Ouvrir dans une fenêtre» quand c’est disponible. Sur téléphone/tablette : «Ajouter à l’écran d’accueil».",
     "safariIos": "iPhone/iPad : Partager → Sur l’écran d’accueil.",
     "safariMac": "Safari sur Mac : Fichier → Ajouter au Dock (macOS Sonoma ou plus récent).",
     "dismiss": "Fermer",

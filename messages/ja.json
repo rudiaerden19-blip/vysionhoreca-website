@@ -7,7 +7,7 @@
     "installShort": "アプリをインストール",
     "installTitle": "アドレスバーなしで開く",
     "installCta": "デスクトップに追加",
-    "chromeEdge": "Chrome / Edge：メニュー（⋮）→「インストール」または「このサイトをインストール」。",
+    "chromeEdge": "Chrome / Edge：⋮ メニュー → 表示される場合は「このサイトをインストール」や「アプリをインストール」。「ショートカットを作成」「クイック リンク」などしかない場合はそれを選び、可能なら「ウィンドウとして開く」をオン。スマホ／タブレットは「ホーム画面に追加」。",
     "safariIos": "iPhone / iPad：共有 → ホーム画面に追加。",
     "safariMac": "Mac Safari：ファイル → Dockに追加（macOS Sonoma以降）。",
     "dismiss": "閉じる",

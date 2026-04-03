@@ -7,7 +7,7 @@
     "installShort": "安装应用",
     "installTitle": "无地址栏打开",
     "installCta": "添加到桌面",
-    "chromeEdge": "Chrome 或 Edge：菜单（⋮）→ 安装或应用 → 安装此网站…。",
+    "chromeEdge": "Chrome 或 Edge：⋮ 菜单 → 若有则点「安装此网站」或「安装应用」。若只有「创建快捷方式」或「快速链接」：选择后尽量勾选「在窗口中打开」。手机／平板：「添加到主屏幕」。",
     "safariIos": "iPhone / iPad：分享 → 添加到主屏幕。",
     "safariMac": "Mac Safari：文件 → 添加到程序坞（macOS Sonoma 或更新）。",
     "dismiss": "关闭",

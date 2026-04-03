@@ -7,7 +7,7 @@
     "installShort": "Installa app",
     "installTitle": "Apri senza barra degli indirizzi",
     "installCta": "Aggiungi al desktop",
-    "chromeEdge": "Chrome o Edge: menu (⋮) → Installa o App → Installa questo sito…. ",
+    "chromeEdge": "Chrome o Edge: menu (⋮) → «Installa questo sito» o «Installa app» se presente. Se vedi solo «Crea collegamento» o «Collegamento rapido», usalo e attiva «Apri come finestra» se proposto. Su telefono/tablet: «Aggiungi a schermata Home».",
     "safariIos": "iPhone/iPad: Condividi → Aggiungi a Home.",
     "safariMac": "Safari su Mac: Archivio → Aggiungi al Dock (macOS Sonoma o successivo).",
     "dismiss": "Chiudi",

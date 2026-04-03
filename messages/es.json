@@ -7,7 +7,7 @@
     "installShort": "Instalar app",
     "installTitle": "Abrir sin barra de dirección",
     "installCta": "Añadir al escritorio",
-    "chromeEdge": "Chrome o Edge: menú (⋮) → Instalar o Aplicaciones → Instalar este sitio…. ",
+    "chromeEdge": "Chrome o Edge: menú (⋮) → «Instalar este sitio» o «Instalar aplicación» si aparece. Si solo ves «Crear acceso directo» o «Enlace rápido», úsalo y marca «Abrir como ventana» si se ofrece. En móvil/tablet: «Añadir a la pantalla de inicio».",
     "safariIos": "iPhone/iPad: Compartir → Añadir a Inicio.",
     "safariMac": "Safari en Mac: Archivo → Añadir al Dock (macOS Sonoma o posterior).",
     "dismiss": "Cerrar",

@@ -7,7 +7,7 @@
     "installShort": "Install app",
     "installTitle": "Open without address bar",
     "installCta": "Add to desktop",
-    "chromeEdge": "Chrome or Edge: menu (⋮) → Install, cast and share → Install this site… (or Apps → Install).",
+    "chromeEdge": "Chrome or Edge: ⋮ menu → «Install this site» or «Install app» if shown. If you only see «Create shortcut», «Quick link» or options under «Save and share», use that and turn on «Open as window» when offered. On phone/tablet: «Add to Home screen».",
     "safariIos": "iPhone/iPad: tap Share → Add to Home Screen.",
     "safariMac": "Mac Safari: File menu → Add to Dock (macOS Sonoma or later).",
     "dismiss": "Close",

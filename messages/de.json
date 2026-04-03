@@ -7,7 +7,7 @@
     "installShort": "App installieren",
     "installTitle": "Ohne Adressleiste öffnen",
     "installCta": "Auf den Desktop legen",
-    "chromeEdge": "Chrome oder Edge: Menü (⋮) → Installieren / Diese Seite installieren… (oder Apps → Installieren).",
+    "chromeEdge": "Chrome oder Edge: Menü (⋮) → «Diese Seite installieren» oder «App installieren», falls vorhanden. Nur «Verknüpfung erstellen» oder «Schnelllink»? Diese Option wählen und «Als Fenster öffnen» aktivieren. Auf Telefon/Tablet: «Zum Startbildschirm hinzufügen».",
     "safariIos": "iPhone/iPad: Teilen → Zum Home-Bildschirm.",
     "safariMac": "Mac Safari: Ablage → Zum Dock hinzufügen (ab macOS Sonoma).",
     "dismiss": "Schließen",
