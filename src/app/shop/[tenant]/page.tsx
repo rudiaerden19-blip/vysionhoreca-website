@@ -440,43 +440,52 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   }, [shopStatus, manualOffline])
 
   useEffect(() => {
+    const ac = new AbortController()
+    const { signal } = ac
+
     async function loadData() {
       try {
         // Check of tenant geblokkeerd is
         if (supabase) {
-          const { data: blockCheck } = await supabase
+          const blockReq = supabase
             .from('tenant_settings')
             .select('is_blocked')
             .eq('tenant_slug', params.tenant)
-            .single()
-          
+          const { data: blockCheck } = await (signal ? blockReq.abortSignal(signal) : blockReq).single()
+
           if (blockCheck?.is_blocked) {
-            setIsBlocked(true)
-            setLoading(false)
+            if (!signal.aborted) {
+              setIsBlocked(true)
+              setLoading(false)
+            }
             return
           }
         }
 
-        // Laad data uit Supabase
+        // Laad data uit Supabase (signal: bij wegnavigeren geen lege cache / geen ruis-errors)
         const [tenantData, hoursData, deliveryData, productsData, textsData, reviewsData, promotionsData, statusData] = await Promise.all([
-          getTenantSettings(params.tenant),
-          getOpeningHours(params.tenant),
-          getDeliverySettings(params.tenant),
-          getMenuProducts(params.tenant),
-          getTenantTexts(params.tenant),
-          getVisibleReviews(params.tenant),
-          getActivePromotions(params.tenant),
-          getShopStatus(params.tenant),
+          getTenantSettings(params.tenant, signal),
+          getOpeningHours(params.tenant, signal),
+          getDeliverySettings(params.tenant, signal),
+          getMenuProducts(params.tenant, signal),
+          getTenantTexts(params.tenant, signal),
+          getVisibleReviews(params.tenant, signal),
+          getActivePromotions(params.tenant, signal),
+          getShopStatus(params.tenant, signal),
         ])
-        
+
+        if (signal.aborted) return
+
         // Zet promoties en shop status
         setPromotions(promotionsData)
         setShopStatus(statusData)
 
         // Check of tenant bestaat - als tenantData null is, bestaat de tenant niet
         if (!tenantData) {
-          setBusiness(null)
-          setLoading(false)
+          if (!signal.aborted) {
+            setBusiness(null)
+            setLoading(false)
+          }
           return
         }
 
@@ -571,13 +580,16 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
       // Team members ophalen
         if (supabase) {
-          const { data: teamData } = await supabase
+          const teamReq = supabase
             .from('team_members')
             .select('*')
             .eq('tenant_slug', params.tenant)
             .eq('is_active', true)
             .order('display_order', { ascending: true })
-          
+          const { data: teamData } = await (signal ? teamReq.abortSignal(signal) : teamReq)
+
+          if (signal.aborted) return
+
           if (teamData) {
             setTeamMembers(teamData)
           }
@@ -617,8 +629,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       }))
       setReviews(formattedReviews)
 
-        setLoading(false)
+        if (!signal.aborted) {
+          setLoading(false)
+        }
       } catch (error) {
+        const aborted =
+          (error instanceof DOMException && error.name === 'AbortError') ||
+          (error instanceof Error && error.name === 'AbortError')
+        if (aborted) return
         console.error('Error loading tenant data:', error)
         setLoading(false)
       }
@@ -630,7 +648,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
     const interval = setInterval(() => {
       setCurrentImageIndex(prev => (prev + 1) % 3)
     }, 5000)
-    return () => clearInterval(interval)
+    return () => {
+      ac.abort()
+      clearInterval(interval)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.tenant])
 

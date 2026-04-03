@@ -8,6 +8,16 @@ function isPublicDemoTenantSlug(slug: string): boolean {
   return slug === DEMO_TENANT_SLUG
 }
 
+/** Postgrest turns aborted fetches into `{ error: { message: 'AbortError: ...' } }`. Throw so in-memory cache and UI don't treat that as real empty data. */
+function throwIfSupabaseFetchAborted(error: { message?: string } | null | undefined): void {
+  const m = error?.message ?? ''
+  if (
+    /AbortError|The user aborted a request|signal is aborted|aborted without reason|^FetchError:/i.test(m)
+  ) {
+    throw new DOMException('The operation was aborted.', 'AbortError')
+  }
+}
+
 // =====================================================
 // TIMEZONE HELPER - KRITIEK VOOR CORRECTE DATUMS
 // België gebruikt CET (UTC+1) in winter, CEST (UTC+2) in zomer
@@ -195,15 +205,17 @@ export interface TenantSettings {
   dark_mode?: boolean
 }
 
-export async function getTenantSettings(tenantSlug: string): Promise<TenantSettings | null> {
+export async function getTenantSettings(tenantSlug: string, signal?: AbortSignal): Promise<TenantSettings | null> {
   const fetchTenantSettings = async (): Promise<TenantSettings | null> => {
-    const { data, error } = await supabase
+    const base = supabase
       .from('tenant_settings')
       .select('*')
       .eq('tenant_slug', tenantSlug)
-      .single()
+    const q = signal ? base.abortSignal(signal) : base
+    const { data, error } = await q.single()
 
     if (error) {
+      throwIfSupabaseFetchAborted(error)
       console.error('Error fetching tenant settings:', error)
       return null
     }
@@ -308,15 +320,17 @@ export interface OpeningHour {
   break_end?: string | null
 }
 
-export async function getOpeningHours(tenantSlug: string): Promise<OpeningHour[]> {
+export async function getOpeningHours(tenantSlug: string, signal?: AbortSignal): Promise<OpeningHour[]> {
   const fetchHours = async (): Promise<OpeningHour[]> => {
-    const { data, error } = await supabase
+    const base = supabase
       .from('opening_hours')
       .select('*')
       .eq('tenant_slug', tenantSlug)
       .order('day_of_week')
+    const { data, error } = signal ? await base.abortSignal(signal) : await base
 
     if (error) {
+      throwIfSupabaseFetchAborted(error)
       console.error('Error fetching opening hours:', error)
       return []
     }
@@ -370,10 +384,10 @@ function formatTimeShort(time: string): string {
   return time.slice(0, 5)
 }
 
-export async function getShopStatus(tenantSlug: string): Promise<ShopStatus> {
+export async function getShopStatus(tenantSlug: string, signal?: AbortSignal): Promise<ShopStatus> {
   const [hours, exceptionalClosings] = await Promise.all([
-    getOpeningHours(tenantSlug),
-    getExceptionalClosings(tenantSlug),
+    getOpeningHours(tenantSlug, signal),
+    getExceptionalClosings(tenantSlug, signal),
   ])
 
   // Check uitzonderlijke sluitingsdagen (feestdagen + eigen keuze) — kalenderdag = Europe/Brussels
@@ -698,17 +712,19 @@ export interface MenuProduct {
   low_stock_threshold?: number
 }
 
-export async function getMenuProducts(tenantSlug: string): Promise<MenuProduct[]> {
+export async function getMenuProducts(tenantSlug: string, signal?: AbortSignal): Promise<MenuProduct[]> {
   return cache.getOrFetch(
     cacheKey('menu_products', tenantSlug),
     async () => {
-      const { data, error } = await supabase
+      const base = supabase
         .from('menu_products')
         .select('*')
         .eq('tenant_slug', tenantSlug)
         .order('sort_order')
+      const { data, error } = signal ? await base.abortSignal(signal) : await base
       
       if (error) {
+        throwIfSupabaseFetchAborted(error)
         console.error('Error fetching menu products:', error)
         return []
       }
@@ -783,15 +799,17 @@ export interface DeliverySettings {
   payment_online: boolean
 }
 
-export async function getDeliverySettings(tenantSlug: string): Promise<DeliverySettings> {
+export async function getDeliverySettings(tenantSlug: string, signal?: AbortSignal): Promise<DeliverySettings> {
   const fetchDelivery = async (): Promise<DeliverySettings> => {
-    const { data, error } = await supabase
+    const base = supabase
       .from('delivery_settings')
       .select('*')
       .eq('tenant_slug', tenantSlug)
-      .maybeSingle()
+    const q = signal ? base.abortSignal(signal) : base
+    const { data, error } = await q.maybeSingle()
 
     if (error) {
+      throwIfSupabaseFetchAborted(error)
       console.error('Error fetching delivery settings:', error)
       return buildDefaultDeliverySettingsRow(tenantSlug)
     }
@@ -891,14 +909,16 @@ export interface TenantTexts {
   checkout_button_text?: string
 }
 
-export async function getTenantTexts(tenantSlug: string): Promise<TenantTexts | null> {
-  const { data, error } = await supabase
+export async function getTenantTexts(tenantSlug: string, signal?: AbortSignal): Promise<TenantTexts | null> {
+  const base = supabase
     .from('tenant_texts')
     .select('*')
     .eq('tenant_slug', tenantSlug)
-    .maybeSingle()
+  const q = signal ? base.abortSignal(signal) : base
+  const { data, error } = await q.maybeSingle()
   
   if (error) {
+    throwIfSupabaseFetchAborted(error)
     console.error('Error fetching tenant texts:', error)
     return null
   }
@@ -1354,17 +1374,19 @@ export async function getPromotions(tenantSlug: string): Promise<Promotion[]> {
 }
 
 // Haal alleen actieve promoties op voor de shop (niet verlopen)
-export async function getActivePromotions(tenantSlug: string): Promise<Promotion[]> {
+export async function getActivePromotions(tenantSlug: string, signal?: AbortSignal): Promise<Promotion[]> {
   const now = new Date().toISOString()
-  const { data, error } = await supabase
+  const base = supabase
     .from('promotions')
     .select('*')
     .eq('tenant_slug', tenantSlug)
     .eq('is_active', true)
     .or(`expires_at.is.null,expires_at.gt.${now}`)
     .order('created_at', { ascending: false })
+  const { data, error } = signal ? await base.abortSignal(signal) : await base
   
   if (error) {
+    throwIfSupabaseFetchAborted(error)
     console.error('Error fetching active promotions:', error)
     return []
   }
@@ -1496,16 +1518,18 @@ export async function getReviews(tenantSlug: string): Promise<Review[]> {
 }
 
 // Alleen goedgekeurde reviews voor de shop
-export async function getVisibleReviews(tenantSlug: string): Promise<Review[]> {
-  const { data, error } = await supabase
+export async function getVisibleReviews(tenantSlug: string, signal?: AbortSignal): Promise<Review[]> {
+  const base = supabase
     .from('reviews')
     .select('*')
     .eq('tenant_slug', tenantSlug)
     .eq('is_visible', true)
     .order('created_at', { ascending: false })
     .limit(10) // Max 10 reviews tonen in shop
+  const { data, error } = signal ? await base.abortSignal(signal) : await base
   
   if (error) {
+    throwIfSupabaseFetchAborted(error)
     console.error('Error fetching visible reviews:', error)
     return []
   }
@@ -4064,14 +4088,16 @@ export interface ExceptionalClosing {
   created_at?: string
 }
 
-export async function getExceptionalClosings(tenantSlug: string): Promise<ExceptionalClosing[]> {
-  const { data, error } = await supabase
+export async function getExceptionalClosings(tenantSlug: string, signal?: AbortSignal): Promise<ExceptionalClosing[]> {
+  const base = supabase
     .from('exceptional_closings')
     .select('*')
     .eq('tenant_slug', tenantSlug)
     .order('date', { ascending: true })
+  const { data, error } = signal ? await base.abortSignal(signal) : await base
 
   if (error) {
+    throwIfSupabaseFetchAborted(error)
     console.error('Error fetching exceptional closings:', error)
     return []
   }
