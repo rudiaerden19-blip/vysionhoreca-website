@@ -3590,7 +3590,8 @@
     "quantity": "Quantità",
     "remove": "Rimuovi",
     "subtotal": "Subtotale",
-    "checkout": "Paga"
+    "checkout": "Paga",
+    "close": "Chiudi"
   },
   "checkoutPage": {
     "back": "Indietro",

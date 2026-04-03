@@ -3096,7 +3096,8 @@
     "quantity": "Anzahl",
     "remove": "Entfernen",
     "subtotal": "Zwischensumme",
-    "checkout": "Zur Kasse"
+    "checkout": "Zur Kasse",
+    "close": "Schließen"
   },
   "checkoutPage": {
     "back": "Zurück",

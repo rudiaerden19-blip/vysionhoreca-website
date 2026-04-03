@@ -3968,7 +3968,8 @@
     "quantity": "Quantity",
     "remove": "Remove",
     "subtotal": "Subtotal",
-    "checkout": "Checkout"
+    "checkout": "Checkout",
+    "close": "Close"
   },
   "checkoutPage": {
     "back": "Back",

@@ -3590,7 +3590,8 @@
     "quantity": "数量",
     "remove": "削除",
     "subtotal": "小計",
-    "checkout": "お会計"
+    "checkout": "お会計",
+    "close": "閉じる"
   },
   "checkoutPage": {
     "back": "戻る",

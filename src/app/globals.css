@@ -59,6 +59,12 @@
   }
 }
 
+/* Tafelkiosk / touchscreen: sneller dan dubbel-tap-zoom, subtiele tik-highlight */
+.kiosk-touch-ui {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.07);
+}
+
 @keyframes partner-marquee-scroll {
   from {
     transform: translate3d(0, 0, 0);

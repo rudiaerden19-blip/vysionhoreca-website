@@ -3095,7 +3095,8 @@
     "quantity": "Quantité",
     "remove": "Supprimer",
     "subtotal": "Sous-total",
-    "checkout": "Payer"
+    "checkout": "Payer",
+    "close": "Fermer"
   },
   "checkoutPage": {
     "back": "Retour",

@@ -588,7 +588,10 @@ export default function CheckoutPageClient({
   const maxDatePicker = addDaysToBelgiumYMD(todayBrussels, 30)
 
   return (
-    <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
+    <div
+      style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }}
+      className={`min-h-screen bg-gray-50${isKiosk ? ' kiosk-touch-ui' : ''}`}
+    >
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="px-4 py-3 flex items-center justify-between max-w-2xl mx-auto">
@@ -620,11 +623,12 @@ export default function CheckoutPageClient({
               <h2 className="text-lg font-bold text-gray-900 mb-4">{t('checkoutPage.howReceiveOrder')}</h2>
               <div className="grid grid-cols-2 gap-2 sm:gap-4">
                 <button
+                  type="button"
                   onClick={() => setOrderType('pickup')}
                   style={orderType === 'pickup' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
-                  className={`p-4 rounded-xl border-2 transition-all ${
-                    orderType === 'pickup' ? '' : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                  className={`rounded-xl border-2 transition-all touch-manipulation ${
+                    isKiosk ? 'min-h-[56px] p-5' : 'p-4'
+                  } ${orderType === 'pickup' ? '' : 'border-gray-200 hover:border-gray-300'}`}
                 >
                   <span className="text-3xl block mb-2">🛍️</span>
                   <span className="font-bold text-gray-900">{t('checkoutPage.pickup')}</span>
@@ -635,11 +639,12 @@ export default function CheckoutPageClient({
                 
                 {deliverySettings?.delivery_enabled && (
                   <button
+                    type="button"
                     onClick={() => setOrderType('delivery')}
                     style={orderType === 'delivery' ? { borderColor: primaryColor, backgroundColor: `${primaryColor}10` } : {}}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      orderType === 'delivery' ? '' : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className={`rounded-xl border-2 transition-all touch-manipulation ${
+                      isKiosk ? 'min-h-[56px] p-5' : 'p-4'
+                    } ${orderType === 'delivery' ? '' : 'border-gray-200 hover:border-gray-300'}`}
                   >
                     <span className="text-3xl block mb-2">🚗</span>
                     <span className="font-bold text-gray-900">{t('checkoutPage.delivery')}</span>
@@ -1036,7 +1041,9 @@ export default function CheckoutPageClient({
                 onClick={handleSubmit}
                 disabled={!canSubmit() || submitting}
                 style={{ backgroundColor: canSubmit() ? primaryColor : undefined }}
-                className="w-full mt-4 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-colors flex items-center justify-center gap-2"
+                className={`w-full mt-4 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold rounded-2xl transition-colors flex items-center justify-center gap-2 touch-manipulation ${
+                  isKiosk ? 'py-5 text-lg min-h-[58px]' : 'py-4'
+                }`}
               >
                 {submitting ? (
                   <>

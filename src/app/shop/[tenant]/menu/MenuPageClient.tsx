@@ -123,7 +123,11 @@ const MenuProductCard = memo(function MenuProductCard({
           : 'shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.22)] active:scale-[0.98] transition-all'
       }`}
     >
-      <div className={`relative h-48 sm:h-56 lg:h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
+      <div
+        className={`relative overflow-hidden ${useContain ? theme.card : theme.imageBg} ${
+          lite ? 'h-52 sm:h-60 lg:h-52' : 'h-48 sm:h-56 lg:h-48'
+        }`}
+      >
         {item.image_url ? (
           <Image
             src={item.image_url}
@@ -180,8 +184,8 @@ const MenuProductCard = memo(function MenuProductCard({
         )}
       </div>
 
-      <div className="p-3 sm:p-4">
-        <h3 className={`font-bold text-base sm:text-lg ${theme.text} mb-1 leading-snug`}>{item.name}</h3>
+      <div className={lite ? 'p-4 pb-3' : 'p-3 sm:p-4'}>
+        <h3 className={`font-bold ${lite ? 'text-lg' : 'text-base sm:text-lg'} ${theme.text} mb-1 leading-snug`}>{item.name}</h3>
         {item.description && (
           <p className={`${theme.textLight} text-xs sm:text-sm mb-3 line-clamp-2 leading-relaxed`}>{item.description}</p>
         )}
@@ -198,7 +202,9 @@ const MenuProductCard = memo(function MenuProductCard({
           </div>
         )}
         <div
-          className="mt-2 w-full py-2 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2 transition-opacity group-hover:opacity-90"
+          className={`mt-2 w-full rounded-xl text-white font-semibold flex items-center justify-center gap-2 transition-opacity group-hover:opacity-90 ${
+            lite ? 'min-h-[52px] py-3.5 text-base' : 'py-2 text-sm'
+          }`}
           style={{ backgroundColor: item.is_available ? primaryColor : '#9ca3af' }}
         >
           {!item.is_available ? (
@@ -612,7 +618,7 @@ export default function MenuPageClient({
   }
 
   return (
-    <div className={`min-h-screen ${theme.bg}`}>
+    <div className={`min-h-screen ${theme.bg}${lite ? ' kiosk-touch-ui' : ''}`}>
       {/* Manual Offline Overlay */}
       {manualOffline?.is_offline && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-6">
@@ -715,11 +721,11 @@ export default function MenuPageClient({
 
         {/* Categories Bar */}
         <div className="max-w-4xl mx-auto px-4">
-          <div className="flex gap-2 py-3 overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className={`flex ${lite ? 'gap-3' : 'gap-2'} py-3 overflow-x-auto scrollbar-hide`} style={{ WebkitOverflowScrolling: 'touch' }}>
             {promotionsEnabled && promotions.length > 0 && (
               <button
                 onClick={() => handleCategoryChange('promo')}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'active:opacity-90' : 'transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
+                className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90' : 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
                   activeCategory === 'promo'
                     ? 'bg-green-500 text-white'
                     : 'bg-green-100 text-green-700 active:bg-green-200'
@@ -732,7 +738,7 @@ export default function MenuPageClient({
               <button
                 onClick={() => handleCategoryChange('popular')}
                 style={activeCategory === 'popular' ? { backgroundColor: primaryColor } : {}}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'active:opacity-90' : 'transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
+                className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90' : 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
                   activeCategory === 'popular'
                     ? 'text-white'
                     : `${theme.pill} ${theme.pillHover}`
@@ -746,7 +752,7 @@ export default function MenuPageClient({
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.id!)}
                 style={activeCategory === cat.id ? { backgroundColor: primaryColor } : {}}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'active:opacity-90' : 'transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
+                className={`rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'min-h-[52px] px-6 py-3 text-base active:opacity-90' : 'px-5 py-2.5 transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
                   activeCategory === cat.id
                     ? 'text-white'
                     : `${theme.pill} ${theme.pillHover}`
@@ -819,7 +825,11 @@ export default function MenuPageClient({
                       <h3 className={`font-bold text-base sm:text-lg ${theme.text} mb-1`}>{promo.name}</h3>
                       {promo.description && <p className={`${theme.textLight} text-xs sm:text-sm line-clamp-2`}>{promo.description}</p>}
                       {linkedProduct && promo.type === 'fixedPrice' && (
-                        <button style={{ backgroundColor: primaryColor }} className="w-full mt-3 py-2 text-white font-medium rounded-lg text-sm">
+                        <button
+                          type="button"
+                          style={{ backgroundColor: primaryColor }}
+                          className={`w-full mt-3 text-white font-medium rounded-lg touch-manipulation ${lite ? 'min-h-[52px] py-3.5 text-base' : 'py-2 text-sm'}`}
+                        >
                           + Toevoegen €{promo.value.toFixed(2)}
                         </button>
                       )}
@@ -943,10 +953,12 @@ export default function MenuPageClient({
                   </div>
                 )}
                 <button
+                  type="button"
                   onClick={() => { setSelectedItem(null); setModalQuantity(1) }}
-                  className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg"
+                  className={`absolute top-4 right-4 bg-white/90 backdrop-blur rounded-full flex items-center justify-center shadow-lg touch-manipulation ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px]' : 'w-10 h-10'}`}
+                  aria-label={t('menuPage.close')}
                 >
-                  <span className="text-2xl">×</span>
+                  <span className={lite ? 'text-3xl' : 'text-2xl'}>×</span>
                 </button>
                 <div className="absolute bottom-4 left-4 flex gap-2">
                   {selectedItem.is_popular && (
@@ -957,9 +969,9 @@ export default function MenuPageClient({
                 )
               })()}
 
-              <div className="p-6">
+              <div className={lite ? 'p-6 pt-5' : 'p-6'}>
                 <div className="flex justify-between items-start mb-4">
-                  <h2 className={`text-2xl font-bold ${theme.text}`}>{selectedItem.name}</h2>
+                  <h2 className={`${lite ? 'text-xl sm:text-2xl' : 'text-2xl'} font-bold ${theme.text}`}>{selectedItem.name}</h2>
                   <span style={darkMode ? {} : { color: primaryColor }} className={`text-2xl font-bold ${darkMode ? 'text-white' : ''}`}>€{selectedItem.price.toFixed(2)}</span>
                 </div>
                 <p className={`${theme.textMuted} mb-6`}>{selectedItem.description}</p>
@@ -1001,7 +1013,9 @@ export default function MenuPageClient({
                               <label
                                 key={choice.id}
                                 style={isSelected ? { backgroundColor: `${primaryColor}10`, borderColor: primaryColor } : {}}
-                                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                                className={`flex items-center justify-between rounded-lg cursor-pointer touch-manipulation transition-colors ${
+                                  lite ? 'min-h-[52px] px-3 py-3.5' : 'p-3'
+                                } ${
                                   isSelected
                                     ? 'border-2'
                                     : `${darkMode ? 'bg-[#3a3a3a] hover:bg-[#444]' : 'bg-gray-50 hover:bg-gray-100'} border-2 border-transparent`
@@ -1014,7 +1028,7 @@ export default function MenuPageClient({
                                     checked={isSelected}
                                     onChange={() => handleChoiceSelect(option.id!, choice.id!, option.type)}
                                     style={{ accentColor: primaryColor }}
-                                    className="w-5 h-5"
+                                    className={lite ? 'w-6 h-6 shrink-0' : 'w-5 h-5'}
                                   />
                                   <span className={`font-medium ${theme.text}`}>{choice.name}</span>
                                 </div>
@@ -1031,18 +1045,20 @@ export default function MenuPageClient({
                 )}
 
                 {/* Hoeveelheid kiezer */}
-                <div className={`flex items-center justify-between mb-4 p-4 rounded-2xl ${darkMode ? 'bg-[#2a2a2a]' : 'bg-gray-50'}`}>
+                <div className={`flex items-center justify-between mb-4 rounded-2xl ${darkMode ? 'bg-[#2a2a2a]' : 'bg-gray-50'} ${lite ? 'p-5 min-h-[60px]' : 'p-4'}`}>
                   <span className={`font-semibold ${theme.text}`}>Aantal</span>
                   <div className="flex items-center gap-4">
                     <button
+                      type="button"
                       onClick={() => setModalQuantity(q => Math.max(1, q - 1))}
-                      className="w-10 h-10 rounded-full border-2 flex items-center justify-center text-xl font-bold transition-colors"
+                      className={`rounded-full border-2 flex items-center justify-center font-bold transition-colors touch-manipulation ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px] text-2xl' : 'w-10 h-10 text-xl'}`}
                       style={{ borderColor: primaryColor, color: primaryColor }}
                     >−</button>
-                    <span className={`text-2xl font-bold w-8 text-center ${theme.text}`}>{modalQuantity}</span>
+                    <span className={`font-bold text-center ${theme.text} ${lite ? 'text-3xl w-12' : 'text-2xl w-8'}`}>{modalQuantity}</span>
                     <button
+                      type="button"
                       onClick={() => setModalQuantity(q => q + 1)}
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold text-white transition-colors"
+                      className={`rounded-full flex items-center justify-center font-bold text-white transition-colors touch-manipulation ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px] text-2xl' : 'w-10 h-10 text-xl'}`}
                       style={{ backgroundColor: primaryColor }}
                     >+</button>
                   </div>
@@ -1053,7 +1069,7 @@ export default function MenuPageClient({
                   onClick={addToCart}
                   disabled={!selectedItem.is_available || !canAddToCart()}
                   style={{ backgroundColor: selectedItem.is_available && canAddToCart() ? primaryColor : undefined }}
-                  className="w-full disabled:bg-gray-300 text-white font-bold py-4 rounded-2xl transition-colors flex items-center justify-center gap-2 hover:opacity-90"
+                  className={`w-full disabled:bg-gray-300 text-white font-bold rounded-2xl transition-colors flex items-center justify-center gap-2 hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]' : 'py-4'}`}
                 >
                   <span>🛒</span>
                   <span>{modalQuantity > 1 ? `${modalQuantity}x ` : ''}{t('menuPage.addToOrder')}</span>
@@ -1130,11 +1146,16 @@ export default function MenuPageClient({
                 ? { backgroundColor: primaryColor }
                 : { backgroundColor: primaryColor, boxShadow: `0 25px 50px -12px ${primaryColor}66` }
             }
-            className={`fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-2xl flex items-center gap-2 sm:gap-4 z-40 hover:opacity-90 text-sm sm:text-base max-w-[calc(100%-2rem)] ${lite ? 'shadow-md' : 'shadow-2xl'}`}
+            className={`fixed left-1/2 -translate-x-1/2 text-white font-bold rounded-2xl flex items-center z-40 hover:opacity-90 max-w-[calc(100%-2rem)] touch-manipulation ${lite ? 'bottom-5 py-5 px-8 gap-4 text-base min-h-[60px] w-[calc(100%-1.5rem)] max-w-lg justify-center shadow-md' : 'bottom-4 sm:bottom-6 py-3 sm:py-4 px-4 sm:px-8 gap-2 sm:gap-4 text-sm sm:text-base shadow-2xl'}`}
           >
-            <span style={{ color: primaryColor }} className="bg-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-sm sm:text-base shrink-0">{cartCount}</span>
-            <span className="hidden sm:inline">{t('menuPage.viewOrder')}</span>
-            <span className="sm:hidden">{t('menuPage.order')}</span>
+            <span
+              style={{ color: primaryColor }}
+              className={`bg-white rounded-full flex items-center justify-center font-bold shrink-0 ${lite ? 'w-10 h-10 text-lg' : 'w-7 h-7 sm:w-8 sm:h-8 text-sm sm:text-base'}`}
+            >
+              {cartCount}
+            </span>
+            <span className={lite ? 'inline' : 'hidden sm:inline'}>{t('menuPage.viewOrder')}</span>
+            <span className={lite ? 'hidden' : 'sm:hidden'}>{t('menuPage.order')}</span>
             <span className="border-l border-white/30 pl-2 sm:pl-4 shrink-0">€{cartTotal.toFixed(2)}</span>
           </button>
       )}
@@ -1153,8 +1174,13 @@ export default function MenuPageClient({
               <div className={`p-4 sm:p-6 border-b ${theme.border}`}>
                 <div className="flex items-center justify-between">
                   <h2 className={`text-xl sm:text-2xl font-bold ${theme.text}`}>{t('menuPage.yourOrder')}</h2>
-                  <button onClick={() => setCartOpen(false)} className={`w-10 h-10 ${darkMode ? 'bg-[#3a3a3a] hover:bg-[#444]' : 'bg-gray-100 hover:bg-gray-200'} rounded-full flex items-center justify-center ${theme.text}`}>
-                    <span className="text-2xl">×</span>
+                  <button
+                    type="button"
+                    onClick={() => setCartOpen(false)}
+                    aria-label={t('menuPage.close')}
+                    className={`${darkMode ? 'bg-[#3a3a3a] hover:bg-[#444]' : 'bg-gray-100 hover:bg-gray-200'} rounded-full flex items-center justify-center touch-manipulation ${theme.text} ${lite ? 'w-14 h-14 min-w-[56px] min-h-[56px]' : 'w-10 h-10'}`}
+                  >
+                    <span className={lite ? 'text-3xl' : 'text-2xl'}>×</span>
                   </button>
                 </div>
               </div>
@@ -1198,7 +1224,13 @@ export default function MenuPageClient({
                           <p style={darkMode ? {} : { color: primaryColor }} className={`font-bold ${darkMode ? 'text-white' : ''}`}>€{(cartItem.totalPrice * cartItem.quantity).toFixed(2)}</p>
                           <div className="flex items-center gap-2 mt-2">
                             <span className={theme.textLight}>{t('menuPage.quantity')}: {cartItem.quantity}</span>
-                            <button onClick={() => removeFromCart(index)} className="text-red-500 text-sm hover:underline">{t('menuPage.remove')}</button>
+                            <button
+                              type="button"
+                              onClick={() => removeFromCart(index)}
+                              className={`text-red-500 hover:underline touch-manipulation ${lite ? 'text-base min-h-[48px] px-2 py-2 -ml-2' : 'text-sm'}`}
+                            >
+                              {t('menuPage.remove')}
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -1220,7 +1252,7 @@ export default function MenuPageClient({
                       router.push(shop('checkout'))
                     }}
                     style={{ backgroundColor: primaryColor }}
-                    className="w-full text-white font-bold py-4 rounded-2xl transition-colors hover:opacity-90"
+                    className={`w-full text-white font-bold rounded-2xl transition-colors hover:opacity-90 touch-manipulation ${lite ? 'py-5 text-lg min-h-[58px]' : 'py-4'}`}
                   >
                     {t('menuPage.checkout')} →
                   </button>

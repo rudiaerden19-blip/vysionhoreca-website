@@ -3590,7 +3590,8 @@
     "quantity": "数量",
     "remove": "删除",
     "subtotal": "小计",
-    "checkout": "结账"
+    "checkout": "结账",
+    "close": "关闭"
   },
   "checkoutPage": {
     "back": "返回",

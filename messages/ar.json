@@ -3590,7 +3590,8 @@
     "quantity": "الكمية",
     "remove": "إزالة",
     "subtotal": "المجموع الفرعي",
-    "checkout": "الدفع"
+    "checkout": "الدفع",
+    "close": "إغلاق"
   },
   "checkoutPage": {
     "back": "رجوع",

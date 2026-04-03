@@ -3968,7 +3968,8 @@
     "quantity": "Aantal",
     "remove": "Verwijder",
     "subtotal": "Subtotaal",
-    "checkout": "Afrekenen"
+    "checkout": "Afrekenen",
+    "close": "Sluiten"
   },
   "checkoutPage": {
     "back": "Terug",
