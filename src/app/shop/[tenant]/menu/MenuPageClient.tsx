@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, memo, useMemo, useCallback, startTransition } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
-import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
+import { getMenuCategories, getMenuProducts, getAllMenuProductOptionsForTenant, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
 
 const VoiceOrderButton = dynamic(() => import('@/components/VoiceOrderButton'), { ssr: false })
@@ -62,6 +62,155 @@ function formatClosingDateNL(ymd: string): string {
   })
 }
 
+const ALLERGEN_ICONS: Record<string, { icon: string; color: string; label: string }> = {
+  gluten: { icon: '🌾', color: 'bg-amber-100 text-amber-800', label: 'Gluten' },
+  ei: { icon: '🥚', color: 'bg-yellow-100 text-yellow-800', label: 'Ei' },
+  melk: { icon: '🥛', color: 'bg-blue-100 text-blue-800', label: 'Melk' },
+  noten: { icon: '🥜', color: 'bg-orange-100 text-orange-800', label: 'Noten' },
+  soja: { icon: '🫘', color: 'bg-green-100 text-green-800', label: 'Soja' },
+  vis: { icon: '🐟', color: 'bg-cyan-100 text-cyan-800', label: 'Vis' },
+  schaaldieren: { icon: '🦐', color: 'bg-red-100 text-red-800', label: 'Schaaldieren' },
+  selderij: { icon: '🥬', color: 'bg-lime-100 text-lime-800', label: 'Selderij' },
+  mosterd: { icon: '🟡', color: 'bg-yellow-100 text-yellow-800', label: 'Mosterd' },
+  sesam: { icon: '⚪', color: 'bg-stone-100 text-stone-800', label: 'Sesam' },
+}
+
+type MenuProductCardTheme = {
+  card: string
+  imageBg: string
+  text: string
+  textLight: string
+}
+
+/** Buiten de pagina-component zodat scroll/activeCategory geen remount van alle kaarten veroorzaakt. */
+const MenuProductCard = memo(function MenuProductCard({
+  item,
+  imageDisplayModeDefault,
+  primaryColor,
+  theme,
+  hasLinkedOptions,
+  onSelect,
+  t,
+}: {
+  item: MenuItem
+  imageDisplayModeDefault: 'cover' | 'contain'
+  primaryColor: string
+  theme: MenuProductCardTheme
+  hasLinkedOptions: boolean
+  onSelect: (item: MenuItem) => void
+  t: (key: string) => string
+}) {
+  const itemDisplayMode = item.image_display_mode || imageDisplayModeDefault
+  const useContain = itemDisplayMode === 'contain'
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onSelect(item)
+        }
+      }}
+      onClick={() => onSelect(item)}
+      className={`${theme.card} rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.22)] active:scale-[0.98] transition-all cursor-pointer touch-manipulation group`}
+    >
+      <div className={`relative h-48 sm:h-56 lg:h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
+        {item.image_url ? (
+          <Image
+            src={item.image_url}
+            alt={item.name}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 420px"
+            quality={50}
+            loading="lazy"
+            className={useContain ? 'object-contain p-2' : 'object-cover'}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-6xl">🍟</div>
+        )}
+
+        {!useContain && <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />}
+
+        <div className="absolute top-3 left-3 flex gap-2">
+          {item.is_popular && (
+            <span style={{ backgroundColor: primaryColor }} className="text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
+              🔥 POPULAIR
+            </span>
+          )}
+          {item.is_promo && item.promo_price != null && (
+            <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">PROMO</span>
+          )}
+        </div>
+
+        <div className="absolute top-3 right-3">
+          {item.is_promo && item.promo_price != null ? (
+            <div className="flex flex-col items-end gap-1">
+              <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
+                €{item.promo_price.toFixed(2)}
+              </span>
+              <span className="bg-black/50 text-white/70 text-xs font-medium px-2 py-0.5 rounded-full line-through">
+                €{item.price.toFixed(2)}
+              </span>
+            </div>
+          ) : (
+            <span
+              className="text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-md"
+              style={{ backgroundColor: primaryColor }}
+            >
+              €{item.price.toFixed(2)}
+            </span>
+          )}
+        </div>
+
+        {!item.is_available && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-full">{t('menuPage.soldOut')}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="p-3 sm:p-4">
+        <h3 className={`font-bold text-base sm:text-lg ${theme.text} mb-1 leading-snug`}>{item.name}</h3>
+        {item.description && (
+          <p className={`${theme.textLight} text-xs sm:text-sm mb-3 line-clamp-2 leading-relaxed`}>{item.description}</p>
+        )}
+        {item.allergens.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {item.allergens.map(allergen => (
+              <span
+                key={allergen}
+                className={`text-xs px-2 py-0.5 rounded-full ${ALLERGEN_ICONS[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}
+              >
+                {ALLERGEN_ICONS[allergen.toLowerCase()]?.icon || '⚠️'}
+              </span>
+            ))}
+          </div>
+        )}
+        <div
+          className="mt-2 w-full py-2 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2 transition-opacity group-hover:opacity-90"
+          style={{ backgroundColor: item.is_available ? primaryColor : '#9ca3af' }}
+        >
+          {!item.is_available ? (
+            <span>{t('menuPage.soldOut')}</span>
+          ) : hasLinkedOptions ? (
+            <>
+              <span>⚙️</span>
+              <span>{t('menuPage.chooseOptions')}</span>
+            </>
+          ) : (
+            <>
+              <span>🛒</span>
+              <span>{t('menuPage.clickToOrder')}</span>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+})
+
 export default function MenuPageClient({
   params,
   initialKiosk,
@@ -88,7 +237,7 @@ export default function MenuPageClient({
   const [productOptions, setProductOptions] = useState<ProductOption[]>([])
   const [selectedChoices, setSelectedChoices] = useState<Record<string, string>>({})
   const [modalQuantity, setModalQuantity] = useState(1)
-  const [loadingOptions, setLoadingOptions] = useState(false)
+  const [optionsByProductId, setOptionsByProductId] = useState<Record<string, ProductOption[]>>({})
   const [primaryColor, setPrimaryColor] = useState('#FF6B35')
   const [businessName, setBusinessName] = useState('')
   const [imageDisplayMode, setImageDisplayMode] = useState<'cover' | 'contain'>('cover') // altijd cover als standaard
@@ -101,6 +250,8 @@ export default function MenuPageClient({
   const menuContentRef = useRef<HTMLDivElement>(null)
   const sectionRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const isScrollingToSection = useRef(false)
+  const activeCategoryRef = useRef(activeCategory)
+  activeCategoryRef.current = activeCategory
 
   // Fetch manual offline status
   useEffect(() => {
@@ -139,31 +290,26 @@ export default function MenuPageClient({
     }
   }, [params.tenant, setLocale])
 
-  // Scroll spy - update active category based on scroll position
+  // Scroll spy - update active category (lage prioriteit zodat tikken voorrang hebben)
   useEffect(() => {
     const handleScroll = () => {
-      // Skip als we handmatig naar een sectie scrollen
       if (isScrollingToSection.current) return
-      
-      const headerHeight = 130 // Sticky header hoogte
+
+      const headerHeight = 130
       let currentSection = ''
-      
-      // Vind de sectie die het meest zichtbaar is (top is net onder de header)
+
       sectionRefs.current.forEach((el, categoryId) => {
         const rect = el.getBoundingClientRect()
-        // Check of de top van de sectie binnen het zichtbare gebied is
-        // of als de sectie de header passeert
         if (rect.top <= headerHeight + 50 && rect.bottom > headerHeight) {
           currentSection = categoryId
         }
       })
-      
-      if (currentSection && currentSection !== activeCategory) {
-        setActiveCategory(currentSection)
+
+      if (currentSection && currentSection !== activeCategoryRef.current) {
+        startTransition(() => setActiveCategory(currentSection))
       }
     }
 
-    // Throttle de scroll handler voor performance
     let ticking = false
     const scrollListener = () => {
       if (!ticking) {
@@ -176,12 +322,10 @@ export default function MenuPageClient({
     }
 
     window.addEventListener('scroll', scrollListener, { passive: true })
-    
-    // Initial check
     handleScroll()
 
     return () => window.removeEventListener('scroll', scrollListener)
-  }, [categories, promotions, activeCategory])
+  }, [categories, promotions])
 
   // Handler voor categorie klikken - scrollt naar sectie
   const handleCategoryChange = (categoryId: string) => {
@@ -227,11 +371,11 @@ export default function MenuPageClient({
 
   useEffect(() => {
     async function loadData() {
-      const [categoriesData, productsData, tenantData, optionProducts, promotionsData, closingsData] = await Promise.all([
+      const [categoriesData, productsData, tenantData, optionsMap, promotionsData, closingsData] = await Promise.all([
         getMenuCategories(params.tenant),
         getMenuProducts(params.tenant),
         getTenantSettings(params.tenant),
-        getProductsWithOptions(params.tenant),
+        getAllMenuProductOptionsForTenant(params.tenant),
         getActivePromotions(params.tenant),
         getExceptionalClosings(params.tenant),
       ])
@@ -239,7 +383,8 @@ export default function MenuPageClient({
       const todayStr = todayYMDBrussels()
       setUpcomingClosings(filterActiveClosingAnnouncements(closingsData || [], todayStr))
       
-      setProductsWithOptions(optionProducts)
+      setOptionsByProductId(optionsMap)
+      setProductsWithOptions(Object.keys(optionsMap).filter(id => (optionsMap[id]?.length ?? 0) > 0))
       setPromotions(promotionsData)
       setPromotionsEnabled(tenantData?.promotions_enabled !== false)
       
@@ -307,16 +452,11 @@ export default function MenuPageClient({
     loadData()
   }, [params.tenant, isKiosk, shortKioskUrls])
 
-  const selectProduct = async (item: MenuItem) => {
+  const selectProduct = useCallback((item: MenuItem) => {
     setSelectedItem(item)
-    setSelectedChoices({})
-    setLoadingOptions(true)
-    
-    // Load options for this product
-    const options = await getOptionsForProduct(item.id)
+    setModalQuantity(1)
+    const options = optionsByProductId[item.id] ?? []
     setProductOptions(options)
-    
-    // Pre-select first choice for required single-choice options
     const initialChoices: Record<string, string> = {}
     options.forEach(opt => {
       if (opt.required && opt.type === 'single' && opt.choices && opt.choices.length > 0) {
@@ -324,8 +464,7 @@ export default function MenuPageClient({
       }
     })
     setSelectedChoices(initialChoices)
-    setLoadingOptions(false)
-  }
+  }, [optionsByProductId])
 
   const handleChoiceSelect = (optionId: string, choiceId: string, optionType: 'single' | 'multiple') => {
     setSelectedChoices(prev => {
@@ -421,8 +560,10 @@ export default function MenuPageClient({
   const cartTotal = cart.reduce((sum, c) => sum + (c.totalPrice * c.quantity), 0)
   const cartCount = cart.reduce((sum, c) => sum + c.quantity, 0)
 
+  const productsWithOptionsSet = useMemo(() => new Set(productsWithOptions), [productsWithOptions])
+
   // Theme classes voor dark mode
-  const theme = {
+  const theme = useMemo(() => ({
     bg: darkMode ? 'bg-[#0d0d0d]' : 'bg-[#e3e3e3]',
     header: darkMode ? 'bg-[#1a1a1a]' : 'bg-white',
     card: darkMode ? 'bg-[#2a2a2a]' : 'bg-white',
@@ -434,123 +575,14 @@ export default function MenuPageClient({
     pill: darkMode ? 'bg-[#3a3a3a] text-gray-200' : 'bg-gray-100 text-gray-700',
     pillHover: darkMode ? 'active:bg-[#444]' : 'active:bg-gray-200',
     imageBg: darkMode ? 'bg-[#222]' : 'bg-gray-100',
-  }
+  }), [darkMode])
 
-  const allergenIcons: Record<string, { icon: string, color: string, label: string }> = {
-    gluten: { icon: '🌾', color: 'bg-amber-100 text-amber-800', label: 'Gluten' },
-    ei: { icon: '🥚', color: 'bg-yellow-100 text-yellow-800', label: 'Ei' },
-    melk: { icon: '🥛', color: 'bg-blue-100 text-blue-800', label: 'Melk' },
-    noten: { icon: '🥜', color: 'bg-orange-100 text-orange-800', label: 'Noten' },
-    soja: { icon: '🫘', color: 'bg-green-100 text-green-800', label: 'Soja' },
-    vis: { icon: '🐟', color: 'bg-cyan-100 text-cyan-800', label: 'Vis' },
-    schaaldieren: { icon: '🦐', color: 'bg-red-100 text-red-800', label: 'Schaaldieren' },
-    selderij: { icon: '🥬', color: 'bg-lime-100 text-lime-800', label: 'Selderij' },
-    mosterd: { icon: '🟡', color: 'bg-yellow-100 text-yellow-800', label: 'Mosterd' },
-    sesam: { icon: '⚪', color: 'bg-stone-100 text-stone-800', label: 'Sesam' },
-  }
-
-  // ProductCard component voor herbruikbaarheid
-  const ProductCard = ({ item }: { item: MenuItem }) => {
-    const itemDisplayMode = item.image_display_mode || imageDisplayMode
-    const useContain = itemDisplayMode === 'contain'
-
-    return (
-      <div
-        onClick={() => selectProduct(item)}
-        className={`${theme.card} rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.22)] active:scale-[0.98] transition-all cursor-pointer group`}
-      >
-        {/* Afbeelding met overlay badges */}
-        <div className={`relative h-48 sm:h-56 lg:h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
-          {item.image_url ? (
-            <Image
-              src={item.image_url}
-              alt={item.name}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 420px"
-              quality={50}
-              loading="lazy"
-              className={useContain ? 'object-contain p-2' : 'object-cover'}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-6xl">🍟</div>
-          )}
-
-          {/* Gradient onderaan voor leesbaarheid */}
-          {!useContain && <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />}
-
-          {/* Top badges */}
-          <div className="absolute top-3 left-3 flex gap-2">
-            {item.is_popular && (
-              <span style={{ backgroundColor: primaryColor }} className="text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
-                🔥 POPULAIR
-              </span>
-            )}
-            {item.is_promo && item.promo_price != null && (
-              <span className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-md">
-                PROMO
-              </span>
-            )}
-          </div>
-
-          {/* Prijs badge rechts boven */}
-          <div className="absolute top-3 right-3">
-            {item.is_promo && item.promo_price != null ? (
-              <div className="flex flex-col items-end gap-1">
-                <span className="bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-md">
-                  €{item.promo_price.toFixed(2)}
-                </span>
-                <span className="bg-black/50 text-white/70 text-xs font-medium px-2 py-0.5 rounded-full line-through">
-                  €{item.price.toFixed(2)}
-                </span>
-              </div>
-            ) : (
-              <span className="text-white text-sm font-bold px-3 py-1.5 rounded-full shadow-md"
-                style={{ backgroundColor: primaryColor }}>
-                €{item.price.toFixed(2)}
-              </span>
-            )}
-          </div>
-
-          {/* Uitverkocht overlay */}
-          {!item.is_available && (
-            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-              <span className="bg-red-500 text-white font-bold px-4 py-2 rounded-full">{t('menuPage.soldOut')}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Kaartinhoud */}
-        <div className="p-3 sm:p-4">
-          <h3 className={`font-bold text-base sm:text-lg ${theme.text} mb-1 leading-snug`}>{item.name}</h3>
-          {item.description && (
-            <p className={`${theme.textLight} text-xs sm:text-sm mb-3 line-clamp-2 leading-relaxed`}>{item.description}</p>
-          )}
-          {item.allergens.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {item.allergens.map(allergen => (
-                <span key={allergen} className={`text-xs px-2 py-0.5 rounded-full ${allergenIcons[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}>
-                  {allergenIcons[allergen.toLowerCase()]?.icon || '⚠️'}
-                </span>
-              ))}
-            </div>
-          )}
-          {/* CTA knop */}
-          <div
-            className="mt-2 w-full py-2 rounded-xl text-white text-sm font-semibold flex items-center justify-center gap-2 transition-opacity group-hover:opacity-90"
-            style={{ backgroundColor: item.is_available ? primaryColor : '#9ca3af' }}
-          >
-            {!item.is_available ? (
-              <span>{t('menuPage.soldOut')}</span>
-            ) : productsWithOptions.includes(item.id) ? (
-              <><span>⚙️</span><span>{t('menuPage.chooseOptions')}</span></>
-            ) : (
-              <><span>🛒</span><span>{t('menuPage.clickToOrder')}</span></>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const cardTheme = useMemo((): MenuProductCardTheme => ({
+    card: theme.card,
+    imageBg: theme.imageBg,
+    text: theme.text,
+    textLight: theme.textLight,
+  }), [theme.card, theme.imageBg, theme.text, theme.textLight])
 
   if (loading) {
     return (
@@ -799,7 +831,16 @@ export default function MenuPageClient({
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
               {menuItems.filter(i => i.is_popular).map((item) => (
-                <ProductCard key={`popular-${item.id}`} item={item} />
+                <MenuProductCard
+                  key={`popular-${item.id}`}
+                  item={item}
+                  imageDisplayModeDefault={imageDisplayMode}
+                  primaryColor={primaryColor}
+                  theme={cardTheme}
+                  hasLinkedOptions={productsWithOptionsSet.has(item.id)}
+                  onSelect={selectProduct}
+                  t={t}
+                />
               ))}
             </div>
           </section>
@@ -825,7 +866,16 @@ export default function MenuPageClient({
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                 {categoryItems.map((item) => (
-                  <ProductCard key={item.id} item={item} />
+                  <MenuProductCard
+                    key={item.id}
+                    item={item}
+                    imageDisplayModeDefault={imageDisplayMode}
+                    primaryColor={primaryColor}
+                    theme={cardTheme}
+                    hasLinkedOptions={productsWithOptionsSet.has(item.id)}
+                    onSelect={selectProduct}
+                    t={t}
+                  />
                 ))}
               </div>
             </section>
@@ -903,9 +953,9 @@ export default function MenuPageClient({
                       {selectedItem.allergens.map(allergen => (
                         <span 
                           key={allergen}
-                          className={`text-sm px-3 py-1.5 rounded-full ${allergenIcons[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}
+                          className={`text-sm px-3 py-1.5 rounded-full ${ALLERGEN_ICONS[allergen.toLowerCase()]?.color || 'bg-gray-100 text-gray-600'}`}
                         >
-                          {allergenIcons[allergen.toLowerCase()]?.icon || '⚠️'} {allergenIcons[allergen.toLowerCase()]?.label || allergen}
+                          {ALLERGEN_ICONS[allergen.toLowerCase()]?.icon || '⚠️'} {ALLERGEN_ICONS[allergen.toLowerCase()]?.label || allergen}
                         </span>
                       ))}
                     </div>
@@ -913,15 +963,7 @@ export default function MenuPageClient({
                 )}
 
                 {/* Product Options */}
-                {loadingOptions ? (
-                  <div className="flex items-center justify-center py-4">
-                    <div
-                      className="w-6 h-6 border-2 rounded-full animate-spin"
-                      style={{ borderColor: `${primaryColor}40`, borderTopColor: primaryColor }}
-                      aria-hidden
-                    />
-                  </div>
-                ) : productOptions.length > 0 && (
+                {productOptions.length > 0 && (
                   <div className="space-y-4 mb-6">
                     {productOptions.map(option => (
                       <div key={option.id} className={`border ${theme.border} rounded-xl p-4`}>

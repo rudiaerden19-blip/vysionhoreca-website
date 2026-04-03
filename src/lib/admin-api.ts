@@ -1143,6 +1143,87 @@ export async function getOptionsForProduct(productId: string): Promise<ProductOp
   }))
 }
 
+/**
+ * Alle menu-productopties voor een tenant in één batch (geen extra roundtrip per producttik).
+ */
+export async function getAllMenuProductOptionsForTenant(
+  tenantSlug: string
+): Promise<Record<string, ProductOption[]>> {
+  const { data: prods, error: prodsError } = await supabase
+    .from('menu_products')
+    .select('id')
+    .eq('tenant_slug', tenantSlug)
+    .eq('is_active', true)
+
+  if (prodsError || !prods?.length) return {}
+
+  const productIds = prods.map(p => p.id).filter(Boolean) as string[]
+  const result: Record<string, ProductOption[]> = {}
+  productIds.forEach(id => {
+    result[id] = []
+  })
+
+  const { data: links, error: linksError } = await supabase
+    .from('product_option_links')
+    .select('product_id, option_id')
+    .in('product_id', productIds)
+
+  if (linksError || !links?.length) return result
+
+  const optionIds = [...new Set(links.map(l => l.option_id).filter(Boolean))] as string[]
+  if (optionIds.length === 0) return result
+
+  const { data: options, error: optionsError } = await supabase
+    .from('product_options')
+    .select('*')
+    .in('id', optionIds)
+    .eq('tenant_slug', tenantSlug)
+    .eq('is_active', true)
+    .order('sort_order')
+
+  if (optionsError || !options?.length) return result
+
+  const activeOptionIds = options.map(o => o.id!).filter(Boolean)
+  const { data: allChoices } = await supabase
+    .from('product_option_choices')
+    .select('*')
+    .in('option_id', activeOptionIds)
+    .eq('is_active', true)
+    .order('sort_order')
+
+  const choicesByOptionId: Record<string, ProductOptionChoice[]> = {}
+  ;(allChoices || []).forEach(choice => {
+    if (!choicesByOptionId[choice.option_id]) choicesByOptionId[choice.option_id] = []
+    choicesByOptionId[choice.option_id].push(choice)
+  })
+
+  const optionEntities: ProductOption[] = options.map(option => ({
+    ...option,
+    choices: choicesByOptionId[option.id!] || [],
+  }))
+  const optionById = new Map(optionEntities.map(o => [o.id!, o]))
+
+  const linksByProduct: Record<string, { product_id: string; option_id: string }[]> = {}
+  for (const l of links) {
+    if (!l.product_id || !l.option_id) continue
+    if (!linksByProduct[l.product_id]) linksByProduct[l.product_id] = []
+    linksByProduct[l.product_id].push(l as { product_id: string; option_id: string })
+  }
+
+  for (const pid of productIds) {
+    const plinks = linksByProduct[pid]
+    if (!plinks) continue
+    const opts: ProductOption[] = []
+    for (const link of plinks) {
+      const o = optionById.get(link.option_id)
+      if (o) opts.push(o)
+    }
+    opts.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    result[pid] = opts
+  }
+  return result
+}
+
 // =====================================================
 // QR CODES
 // =====================================================
