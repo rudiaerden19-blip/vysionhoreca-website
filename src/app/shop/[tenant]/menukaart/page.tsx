@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { LazyMotion, domAnimation, m } from 'framer-motion'
 import Image from 'next/image'
 import { getTenantSettings, getMenuCategories, getMenuProducts, TenantSettings, MenuCategory, MenuProduct } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
@@ -64,6 +64,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
   }
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-900">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md border-b border-white/10">
@@ -140,7 +141,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
               if (categoryProducts.length === 0) return null
               
               return (
-                <motion.section
+                <m.section
                   key={category.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -156,13 +157,13 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                       <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} t={t} />
                     ))}
                   </div>
-                </motion.section>
+                </m.section>
               )
             })}
             
             {/* Producten zonder categorie */}
             {products.filter(p => !p.category_id).length > 0 && (
-              <motion.section
+              <m.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
               >
@@ -174,7 +175,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
                     <MenuItemCard key={product.id} product={product} primaryColor={primaryColor} t={t} />
                   ))}
                 </div>
-              </motion.section>
+              </m.section>
             )}
           </div>
         ) : (
@@ -207,6 +208,7 @@ export default function MenukaartPage({ params }: { params: { tenant: string } }
         </div>
       </footer>
     </div>
+    </LazyMotion>
   )
 }
 
@@ -217,8 +219,7 @@ function MenuItemCard({ product, primaryColor, t }: { product: MenuProduct; prim
   const hasPromo = product.is_promo && product.promo_price !== undefined && product.promo_price < product.price
   
   return (
-    <motion.div
-      layout
+    <div
       onClick={() => setExpanded(!expanded)}
       className="bg-white/5 rounded-xl overflow-hidden cursor-pointer hover:bg-white/10 transition-colors"
     >
@@ -231,7 +232,7 @@ function MenuItemCard({ product, primaryColor, t }: { product: MenuProduct; prim
               alt={product.name}
               fill
               sizes="96px"
-              quality={70}
+              quality={55}
               loading="lazy"
               className="object-contain p-1"
             />
@@ -268,12 +269,7 @@ function MenuItemCard({ product, primaryColor, t }: { product: MenuProduct; prim
       
       {/* Expanded Content */}
       {expanded && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          className="px-3 pb-3"
-        >
+        <div className="px-3 pb-3">
           {product.description && (
             <p className="text-white/60 text-sm mb-2">{product.description}</p>
           )}
@@ -289,8 +285,8 @@ function MenuItemCard({ product, primaryColor, t }: { product: MenuProduct; prim
               ))}
             </div>
           )}
-        </motion.div>
+        </div>
       )}
-    </motion.div>
+    </div>
   )
 }

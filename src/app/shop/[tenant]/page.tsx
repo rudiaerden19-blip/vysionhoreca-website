@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getTenantSettings, getOpeningHours, getDeliverySettings, getMenuProducts, createReservation, getTenantTexts, getVisibleReviews, getActivePromotions, getShopStatus, TenantSettings, OpeningHour, DeliverySettings, MenuProduct, TenantTexts, Review as DbReview, Promotion, ShopStatus } from '@/lib/admin-api'
@@ -788,18 +788,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-            className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4"
-          />
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full mx-auto mb-4 animate-spin" />
           <p className="text-gray-600 font-medium">{t('shopPage.loading')}</p>
-        </motion.div>
+        </div>
       </div>
     )
   }
@@ -807,11 +799,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   if (isBlocked) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center"
-        >
+        <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
           <span className="text-6xl mb-6 block">🚫</span>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('shopPage.blockedTitle')}</h1>
           <p className="text-gray-600 mb-6">
@@ -820,7 +808,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <Link href="/" className="text-orange-500 hover:text-orange-600 font-medium">
             ← {t('shopPage.backToVysion')}
           </Link>
-        </motion.div>
+        </div>
       </div>
     )
   }
@@ -828,11 +816,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   if (!business) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center"
-        >
+        <div className="bg-white rounded-3xl p-12 shadow-xl max-w-md w-full text-center">
           <span className="text-6xl mb-6 block">🔍</span>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">{t('shopPage.notFoundTitle') || 'Shop niet gevonden'}</h1>
           <p className="text-gray-600 mb-6">
@@ -841,7 +825,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
           <a href="https://www.vysionhoreca.com" className="text-orange-500 hover:text-orange-600 font-medium inline-block">
             ← {t('shopPage.backToVysion') || 'Terug naar Vysion'}
           </a>
-        </motion.div>
+        </div>
       </div>
     )
   }
@@ -849,6 +833,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
   const todayHours = business.opening_hours[getDayName()]
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-white">
       <MarketingDemoSessionPrime tenant={params.tenant} />
       {/* Fixed Header - Clean & Compact */}
@@ -909,7 +894,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
               {/* Language Dropdown - fixed rechts */}
               <AnimatePresence>
                 {showLanguageMenu && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -933,7 +918,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         )}
                       </button>
                     ))}
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>
@@ -944,7 +929,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {/* Manual Offline Banner - always visible when manually offline */}
       <AnimatePresence>
         {manualOffline?.is_offline && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
@@ -975,14 +960,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {t('shopOffline.bannerSubtitle')}
               </p>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       {/* Closed Shop Warning Banner - Show when shop is closed based on opening hours */}
       <AnimatePresence>
         {shopStatus && (!shopStatus.isOpen || !shopStatus.canOrder) && showClosedBanner && !manualOffline?.is_offline && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
@@ -1001,7 +986,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 {shopStatus.message || t('shopPage.shopClosedMessage')}
               </p>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -1009,7 +994,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       <section className="relative h-screen min-h-[500px] sm:min-h-[700px] overflow-hidden">
         {/* Background Image Slider */}
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={currentImageIndex}
             initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -1046,7 +1031,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                 </div>
               )
             })()}
-          </motion.div>
+          </m.div>
         </AnimatePresence>
 
         {/* Gradient Overlay */}
@@ -1054,12 +1039,12 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
 
 
         {/* Content */}
-        <motion.div 
+        <m.div 
           className="absolute inset-0 flex flex-col justify-end p-6 md:p-12 lg:p-16"
         >
           <div className="max-w-5xl mx-auto w-full">
             {/* Open/Closed Badge */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -1090,31 +1075,31 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   {t('shopPage.closedNow')} · {t('shopPage.opensAt')} {getNextOpenTime()?.slice(0, 5)}
                 </span>
               )}
-            </motion.div>
+            </m.div>
 
 
             {/* Title */}
-            <motion.h1
+            <m.h1
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.6 }}
               className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white mb-4 leading-none break-words"
             >
               {business.name}
-            </motion.h1>
+            </m.h1>
 
             {/* Tagline */}
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.6 }}
               className="text-base sm:text-xl md:text-2xl text-white/90 mb-6 font-light"
             >
               {business.tagline}
-            </motion.p>
+            </m.p>
 
             {/* Quick Info Pills */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7, duration: 0.6 }}
@@ -1135,10 +1120,10 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <span className="shrink-0">📍</span> <span className="truncate">{business.address}{business.postal_code || business.city ? `, ${business.postal_code || ''} ${business.city || ''}`.trim() : ''}</span>
                 </span>
               )}
-            </motion.div>
+            </m.div>
 
             {/* CTA Buttons */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.6 }}
@@ -1163,9 +1148,9 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   <span>{t('shopPage.reserveTable') || 'Reserveer'}</span>
                 </Link>
               )}
-            </motion.div>
+            </m.div>
           </div>
-        </motion.div>
+        </m.div>
 
       </section>
 
@@ -2059,14 +2044,14 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
       {/* Promoties Modal */}
       <AnimatePresence>
         {showPromotionsModal && business && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
             onClick={() => setShowPromotionsModal(false)}
           >
-            <motion.div
+            <m.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -2152,22 +2137,22 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   {t('shopPage.close')}
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       {/* Gift Card Modal */}
       <AnimatePresence>
         {showGiftCardModal && business && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
             onClick={() => setShowGiftCardModal(false)}
           >
-            <motion.div
+            <m.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
@@ -2467,8 +2452,8 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                   {t('shopPage.giftCardModal.cancel')}
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -2495,5 +2480,6 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
         )}
       </div>
     </div>
+    </LazyMotion>
   )
 }

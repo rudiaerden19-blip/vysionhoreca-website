@@ -1,14 +1,16 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import dynamic from 'next/dynamic'
+import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
 import { getMenuCategories, getMenuProducts, getOptionsForProduct, getProductsWithOptions, getTenantSettings, getActivePromotions, getExceptionalClosings, ExceptionalClosing, MenuCategory, MenuProduct, ProductOption, ProductOptionChoice, Promotion } from '@/lib/admin-api'
 import { useLanguage } from '@/i18n'
-import VoiceOrderButton from '@/components/VoiceOrderButton'
+
+const VoiceOrderButton = dynamic(() => import('@/components/VoiceOrderButton'), { ssr: false })
 
 interface MenuItem {
   id: string
@@ -465,10 +467,10 @@ export default function MenuPageClient({
               src={item.image_url}
               alt={item.name}
               fill
-              sizes="(max-width: 1023px) 100vw, 50vw"
-              quality={75}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 420px"
+              quality={60}
               loading="lazy"
-              className={`transition-transform duration-300 group-hover:scale-105 ${useContain ? 'object-contain p-2' : 'object-cover'}`}
+              className={useContain ? 'object-contain p-2' : 'object-cover'}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-6xl">🍟</div>
@@ -554,17 +556,17 @@ export default function MenuPageClient({
   if (loading) {
     return (
       <div className={`min-h-screen ${theme.bg} flex items-center justify-center`}>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
-          className="w-12 h-12 border-4 rounded-full"
+        <div
+          className="w-12 h-12 border-4 rounded-full animate-spin"
+          style={{ borderColor: `${primaryColor}40`, borderTopColor: primaryColor }}
+          aria-hidden
         />
       </div>
     )
   }
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div className={`min-h-screen ${theme.bg}`}>
       {/* Manual Offline Overlay */}
       {manualOffline?.is_offline && (
@@ -753,9 +755,9 @@ export default function MenuPageClient({
                   >
                     <div className={`relative h-48 sm:h-52 lg:h-44 xl:h-40 overflow-hidden ${theme.imageBg}`}>
                       {promo.image_url ? (
-                        <Image src={promo.image_url} alt={promo.name} fill sizes="(max-width: 1023px) 100vw, (max-width: 1279px) 50vw, 33vw" quality={75} loading="lazy" className="object-cover" />
+                        <Image src={promo.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 480px" quality={60} loading="lazy" className="object-cover" />
                       ) : linkedProduct?.image_url ? (
-                        <Image src={linkedProduct.image_url} alt={promo.name} fill sizes="(max-width: 1023px) 100vw, (max-width: 1279px) 50vw, 33vw" quality={75} loading="lazy" className="object-cover" />
+                        <Image src={linkedProduct.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 480px" quality={60} loading="lazy" className="object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-green-400 to-green-600">🎁</div>
                       )}
@@ -845,14 +847,14 @@ export default function MenuPageClient({
       {/* Product Detail Modal */}
       <AnimatePresence>
         {selectedItem && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => { setSelectedItem(null); setModalQuantity(1) }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4"
           >
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 100 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 100 }}
@@ -869,8 +871,8 @@ export default function MenuPageClient({
                     src={selectedItem.image_url}
                     alt={selectedItem.name}
                     fill
-                    sizes="(max-width: 768px) 100vw, 500px"
-                    quality={80}
+                    sizes="(max-width: 768px) 100vw, min(90vw, 480px)"
+                    quality={65}
                     className={useContain ? 'object-contain p-4' : 'object-cover'}
                   />
                 ) : (
@@ -919,11 +921,10 @@ export default function MenuPageClient({
                 {/* Product Options */}
                 {loadingOptions ? (
                   <div className="flex items-center justify-center py-4">
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
-                      className="w-6 h-6 border-2 rounded-full"
+                    <div
+                      className="w-6 h-6 border-2 rounded-full animate-spin"
+                      style={{ borderColor: `${primaryColor}40`, borderTopColor: primaryColor }}
+                      aria-hidden
                     />
                   </div>
                 ) : productOptions.length > 0 && (
@@ -993,9 +994,7 @@ export default function MenuPageClient({
                   </div>
                 </div>
 
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <m.button
                   onClick={addToCart}
                   disabled={!selectedItem.is_available || !canAddToCart()}
                   style={{ backgroundColor: selectedItem.is_available && canAddToCart() ? primaryColor : undefined }}
@@ -1004,10 +1003,10 @@ export default function MenuPageClient({
                   <span>🛒</span>
                   <span>{modalQuantity > 1 ? `${modalQuantity}x ` : ''}{t('menuPage.addToOrder')}</span>
                   <span className="bg-white/20 px-2 py-0.5 rounded-full text-sm">€{(calculateTotalPrice() * modalQuantity).toFixed(2)}</span>
-                </motion.button>
+                </m.button>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -1068,7 +1067,7 @@ export default function MenuPageClient({
       {/* Cart Button */}
       <AnimatePresence>
         {cartCount > 0 && (
-          <motion.button
+          <m.button
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
@@ -1080,21 +1079,21 @@ export default function MenuPageClient({
             <span className="hidden sm:inline">{t('menuPage.viewOrder')}</span>
             <span className="sm:hidden">{t('menuPage.order')}</span>
             <span className="border-l border-white/30 pl-2 sm:pl-4 shrink-0">€{cartTotal.toFixed(2)}</span>
-          </motion.button>
+          </m.button>
         )}
       </AnimatePresence>
 
       {/* Cart Slide Panel */}
       <AnimatePresence>
         {cartOpen && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setCartOpen(false)}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
           >
-            <motion.div
+            <m.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
@@ -1120,7 +1119,7 @@ export default function MenuPageClient({
                 ) : (
                   <div className="space-y-4">
                     {cart.map((cartItem, index) => (
-                      <motion.div key={index} layout className={`flex gap-4 ${darkMode ? 'bg-[#3a3a3a]' : 'bg-gray-50'} rounded-xl p-4`}>
+                      <div key={index} className={`flex gap-4 ${darkMode ? 'bg-[#3a3a3a]' : 'bg-gray-50'} rounded-xl p-4`}>
                         {cartItem.item.image_url ? (
                           <div className={`relative w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg ${theme.card}`}>
                             <Image 
@@ -1153,7 +1152,7 @@ export default function MenuPageClient({
                             <button onClick={() => removeFromCart(index)} className="text-red-500 text-sm hover:underline">{t('menuPage.remove')}</button>
                           </div>
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -1165,9 +1164,7 @@ export default function MenuPageClient({
                     <span className={theme.textMuted}>{t('menuPage.subtotal')}</span>
                     <span className={`text-xl font-bold ${theme.text}`}>€{cartTotal.toFixed(2)}</span>
                   </div>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                  <m.button
                     onClick={() => {
                       setCartOpen(false)
                       router.push(shop('checkout'))
@@ -1176,13 +1173,14 @@ export default function MenuPageClient({
                     className="w-full text-white font-bold py-4 rounded-2xl transition-colors hover:opacity-90"
                   >
                     {t('menuPage.checkout')} →
-                  </motion.button>
+                  </m.button>
                 </div>
               )}
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
+    </LazyMotion>
   )
 }

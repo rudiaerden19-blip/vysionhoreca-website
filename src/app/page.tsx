@@ -1,17 +1,19 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import {
   Navigation,
   Footer,
   CookieBanner,
-  ContactPageSection,
   HomeCornerStamp,
   HomeLandingHero,
-  PlatformGridSection,
-  HardwareSection,
 } from '@/components'
+
+const PlatformGridSection = dynamic(() => import('@/components/PlatformGridSection'), { loading: () => null })
+const HardwareSection = dynamic(() => import('@/components/HardwareSection'), { loading: () => null })
+const ContactPageSection = dynamic(() => import('@/components/ContactPageSection'), { loading: () => null })
 import { useLanguage } from '@/i18n'
 import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 

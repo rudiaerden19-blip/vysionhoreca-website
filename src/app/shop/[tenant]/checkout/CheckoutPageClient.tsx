@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { LazyMotion, domAnimation, m } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isKioskSearchParams, kioskShopHref } from '@/lib/kiosk-mode'
@@ -503,11 +503,10 @@ export default function CheckoutPageClient({
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          style={{ borderColor: primaryColor, borderTopColor: 'transparent' }}
-          className="w-12 h-12 border-4 rounded-full"
+        <div
+          className="w-12 h-12 border-4 rounded-full animate-spin"
+          style={{ borderColor: `${primaryColor}40`, borderTopColor: primaryColor }}
+          aria-hidden
         />
       </div>
     )
@@ -517,19 +516,10 @@ export default function CheckoutPageClient({
   if (orderSuccess) {
     return (
       <div style={{ minHeight: '100dvh' }} className="bg-gray-50 flex items-center justify-center p-4">
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-xl"
-        >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring' }}
-            className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl bg-blue-100"
-          >
+        <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-xl">
+          <div className="w-24 h-24 rounded-full mx-auto mb-6 flex items-center justify-center text-5xl bg-blue-100">
             ⏳
-          </motion.div>
+          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('checkoutPage.orderReceived')}</h1>
           <p className="text-gray-600 mb-6">
             {t('checkoutPage.orderReceivedDesc').replace('{orderNumber}', String(orderNumber))}
@@ -569,7 +559,7 @@ export default function CheckoutPageClient({
               </Link>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
     )
   }
@@ -599,6 +589,7 @@ export default function CheckoutPageClient({
   const maxDatePicker = addDaysToBelgiumYMD(todayBrussels, 30)
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div style={{ width: '100vw', maxWidth: '100vw', overflowX: 'clip' }} className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white shadow-sm">
@@ -627,7 +618,7 @@ export default function CheckoutPageClient({
           {/* Left Column - Forms */}
           <div className="space-y-4 sm:space-y-6">
             {/* Order Type */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
@@ -671,10 +662,10 @@ export default function CheckoutPageClient({
                 </div>
               )}
 
-            </motion.div>
+            </m.div>
 
             {/* Date & Time Picker */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm"
@@ -725,10 +716,10 @@ export default function CheckoutPageClient({
                   ⛔ {t('checkoutPage.dateInClosingPeriod')}
                 </div>
               )}
-            </motion.div>
+            </m.div>
 
             {/* Customer Info */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -856,10 +847,10 @@ export default function CheckoutPageClient({
                   />
                 </div>
               </div>
-            </motion.div>
+            </m.div>
 
             {/* Payment Method */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -959,12 +950,12 @@ export default function CheckoutPageClient({
                   ℹ️ {t('checkoutPage.onlineComingSoon')}
                 </div>
               )}
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Right Column - Order Summary */}
           <div>
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -1065,9 +1056,7 @@ export default function CheckoutPageClient({
               )}
 
               {/* Submit Button */}
-              <motion.button
-                whileHover={{ scale: canSubmit() ? 1.02 : 1 }}
-                whileTap={{ scale: canSubmit() ? 0.98 : 1 }}
+              <m.button
                 onClick={handleSubmit}
                 disabled={!canSubmit() || submitting}
                 style={{ backgroundColor: canSubmit() ? primaryColor : undefined }}
@@ -1075,11 +1064,7 @@ export default function CheckoutPageClient({
               >
                 {submitting ? (
                   <>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                    />
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" aria-hidden />
                     <span>{t('checkoutPage.placingOrder')}</span>
                   </>
                 ) : (
@@ -1088,15 +1073,16 @@ export default function CheckoutPageClient({
                     <span className="bg-white/20 px-3 py-1 rounded-full">€{total.toFixed(2)}</span>
                   </>
                 )}
-              </motion.button>
+              </m.button>
 
               <p className="text-center text-sm text-gray-500 mt-4">
                 {t('checkoutPage.agreeTerms')}
               </p>
-            </motion.div>
+            </m.div>
           </div>
         </div>
       </main>
     </div>
+    </LazyMotion>
   )
 }
