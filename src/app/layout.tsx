@@ -6,6 +6,7 @@ import '@/lib/silence-console-prod' // Silence console.log in production
 import { GlobalAutoCapitalize } from '@/components/GlobalAutoCapitalize'
 import { PageViewTracker } from '@/components/PageViewTracker'
 import { PWARegister } from '@/components/PWARegister'
+import { InstallAppHint } from '@/components/InstallAppHint'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -97,11 +98,14 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Vysion Kassa',
+    title: 'Vysion Horeca',
   },
   icons: {
-    icon: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/icons/icon-192.png', sizes: '180x180', type: 'image/png' }],
   },
   openGraph: {
     title:
@@ -144,6 +148,7 @@ export default function RootLayout({
         />
         <LanguageProvider>
           <PWARegister />
+          <InstallAppHint />
           <GlobalAutoCapitalize />
           <PageViewTracker />
           {children}

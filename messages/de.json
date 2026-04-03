@@ -3,6 +3,16 @@
     "title": "Vysion Horeca | All-in-One Kassen- & Zahlungsplattform",
     "description": "Das komplette Kassensystem für die Gastronomie. Kasse, Online-Bestellungen, Rechnungsstellung, Personalverwaltung und mehr - alles in einer Plattform. 14 Tage kostenlos testen."
   },
+  "pwa": {
+    "installShort": "App installieren",
+    "installTitle": "Ohne Adressleiste öffnen",
+    "installCta": "Auf den Desktop legen",
+    "chromeEdge": "Chrome oder Edge: Menü (⋮) → Installieren / Diese Seite installieren… (oder Apps → Installieren).",
+    "safariIos": "iPhone/iPad: Teilen → Zum Home-Bildschirm.",
+    "safariMac": "Mac Safari: Ablage → Zum Dock hinzufügen (ab macOS Sonoma).",
+    "dismiss": "Schließen",
+    "openInBrowserNote": "In einem normalen Browser-Tab bleibt die Adressleiste sichtbar. Nach der Installation öffnet die Seite in einem eigenen App-Fenster ohne Adressleiste."
+  },
   "nav": {
     "home": "Startseite",
     "features": "Funktionen",
