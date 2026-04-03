@@ -3,6 +3,12 @@ import type { NextRequest } from 'next/server'
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
 import { isKioskSearchParams, KIOSK_COOKIE, KIOSK_REQUEST_HEADER } from '@/lib/kiosk-mode'
 
+/** Host zonder poort; anders faalt subdomein-split (bv. *.ordervysion.com:8080 → "com:8080"). */
+function normalizedHost(request: NextRequest): string {
+  const raw = request.headers.get('host') || ''
+  return raw.split(':')[0].toLowerCase()
+}
+
 function setKioskCookie(res: NextResponse, request: NextRequest) {
   res.cookies.set(KIOSK_COOKIE, '1', {
     path: '/',
@@ -35,7 +41,7 @@ export function middleware(request: NextRequest) {
     return res
   }
 
-  const hostname = request.headers.get('host') || ''
+  const hostname = normalizedHost(request)
 
   // Main domains - skip subdomain routing (exact match only)
   const exactMainDomains = [
