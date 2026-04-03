@@ -91,6 +91,7 @@ const MenuProductCard = memo(function MenuProductCard({
   hasLinkedOptions,
   onSelect,
   t,
+  lite,
 }: {
   item: MenuItem
   imageDisplayModeDefault: 'cover' | 'contain'
@@ -99,6 +100,8 @@ const MenuProductCard = memo(function MenuProductCard({
   hasLinkedOptions: boolean
   onSelect: (item: MenuItem) => void
   t: (key: string) => string
+  /** Kiosk: minder schaduw/compositing en lagere image-kwaliteit voor zwakke tablets */
+  lite?: boolean
 }) {
   const itemDisplayMode = item.image_display_mode || imageDisplayModeDefault
   const useContain = itemDisplayMode === 'contain'
@@ -114,7 +117,11 @@ const MenuProductCard = memo(function MenuProductCard({
         }
       }}
       onClick={() => onSelect(item)}
-      className={`${theme.card} rounded-2xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.22)] active:scale-[0.98] transition-all cursor-pointer touch-manipulation group`}
+      className={`${theme.card} rounded-2xl overflow-hidden cursor-pointer touch-manipulation group ${
+        lite
+          ? 'shadow-sm active:opacity-95'
+          : 'shadow-[0_4px_20px_rgba(0,0,0,0.18)] hover:shadow-[0_10px_40px_rgba(0,0,0,0.22)] active:scale-[0.98] transition-all'
+      }`}
     >
       <div className={`relative h-48 sm:h-56 lg:h-48 overflow-hidden ${useContain ? theme.card : theme.imageBg}`}>
         {item.image_url ? (
@@ -122,8 +129,8 @@ const MenuProductCard = memo(function MenuProductCard({
             src={item.image_url}
             alt={item.name}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 420px"
-            quality={50}
+            sizes={lite ? '(max-width: 640px) 80vw, 360px' : '(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 420px'}
+            quality={lite ? 38 : 50}
             loading="lazy"
             className={useContain ? 'object-contain p-2' : 'object-cover'}
           />
@@ -131,7 +138,9 @@ const MenuProductCard = memo(function MenuProductCard({
           <div className="w-full h-full flex items-center justify-center text-6xl">🍟</div>
         )}
 
-        {!useContain && <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />}
+        {!useContain && !lite && (
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />
+        )}
 
         <div className="absolute top-3 left-3 flex gap-2">
           {item.is_popular && (
@@ -223,6 +232,8 @@ export default function MenuPageClient({
   const router = useRouter()
   const searchParams = useSearchParams()
   const isKiosk = initialKiosk || isKioskSearchParams(searchParams)
+  /** Tafelkiosk: minder netwerk, DOM en GPU-belasting */
+  const lite = isKiosk
   const shop = (key: Parameters<typeof kioskShopHref>[1]) =>
     kioskShopHref(params.tenant, key, { kiosk: isKiosk, shortUrls: shortKioskUrls })
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
@@ -376,7 +387,7 @@ export default function MenuPageClient({
         getMenuProducts(params.tenant),
         getTenantSettings(params.tenant),
         getAllMenuProductOptionsForTenant(params.tenant),
-        getActivePromotions(params.tenant),
+        lite ? Promise.resolve([] as Promotion[]) : getActivePromotions(params.tenant),
         getExceptionalClosings(params.tenant),
       ])
 
@@ -420,7 +431,11 @@ export default function MenuPageClient({
             name: p.name,
             description: p.description,
             price: p.price,
-            image_url: p.image_url || 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400',
+            image_url:
+              p.image_url ||
+              (lite
+                ? 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=280&q=70'
+                : 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400'),
             category_id: p.category_id,
             category_name: category?.name || 'Overig',
             is_available: p.is_active,
@@ -434,8 +449,8 @@ export default function MenuPageClient({
 
       setMenuItems(items)
       
-      // Stel de default categorie in
-      const promoEnabled = tenantData?.promotions_enabled !== false
+      // Stel de default categorie in (kiosk slaat promoties-fetch over → altijd snel naar eerste sectie)
+      const promoEnabled = !lite && tenantData?.promotions_enabled !== false
       if (promoEnabled && promotionsData.length > 0) {
         setActiveCategory('promo')
       } else if (items.some(i => i.is_popular)) {
@@ -627,7 +642,7 @@ export default function MenuPageClient({
 
       {/* Sticky Header + Categories - SAMEN in 1 container voor iOS Safari */}
       <header 
-        className={`sticky top-0 z-50 ${theme.header} shadow-[0_4px_20px_rgba(0,0,0,0.18)]`}
+        className={`sticky top-0 z-50 ${theme.header} ${lite ? 'shadow-sm' : 'shadow-[0_4px_20px_rgba(0,0,0,0.18)]'}`}
         style={{
           position: '-webkit-sticky',
           WebkitTransform: 'translateZ(0)',
@@ -653,15 +668,19 @@ export default function MenuPageClient({
               </h1>
               <span className={`text-xs ${theme.textLight}`}>{t('menuPage.menu')}</span>
             </div>
-            <Link 
-              href={shop('account')}
-              className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
-              </svg>
-              <span className="text-sm font-medium hidden sm:inline">{t('menuPage.account')}</span>
-            </Link>
+            {lite ? (
+              <div className="w-10 sm:min-w-[5.5rem] shrink-0" aria-hidden />
+            ) : (
+              <Link
+                href={shop('account')}
+                className={`flex items-center gap-1.5 ${theme.textMuted} hover:opacity-70 transition-colors shrink-0`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" />
+                </svg>
+                <span className="text-sm font-medium hidden sm:inline">{t('menuPage.account')}</span>
+              </Link>
+            )}
           </div>
         </div>
 
@@ -700,7 +719,7 @@ export default function MenuPageClient({
             {promotionsEnabled && promotions.length > 0 && (
               <button
                 onClick={() => handleCategoryChange('promo')}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)] ${
+                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'active:opacity-90' : 'transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
                   activeCategory === 'promo'
                     ? 'bg-green-500 text-white'
                     : 'bg-green-100 text-green-700 active:bg-green-200'
@@ -713,7 +732,7 @@ export default function MenuPageClient({
               <button
                 onClick={() => handleCategoryChange('popular')}
                 style={activeCategory === 'popular' ? { backgroundColor: primaryColor } : {}}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)] ${
+                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'active:opacity-90' : 'transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
                   activeCategory === 'popular'
                     ? 'text-white'
                     : `${theme.pill} ${theme.pillHover}`
@@ -727,7 +746,7 @@ export default function MenuPageClient({
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.id!)}
                 style={activeCategory === cat.id ? { backgroundColor: primaryColor } : {}}
-                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)] ${
+                className={`px-5 py-2.5 rounded-full font-medium whitespace-nowrap touch-manipulation ${lite ? 'active:opacity-90' : 'transition-colors active:scale-95 shadow-[0_4px_14px_rgba(0,0,0,0.35)]'} ${
                   activeCategory === cat.id
                     ? 'text-white'
                     : `${theme.pill} ${theme.pillHover}`
@@ -753,7 +772,9 @@ export default function MenuPageClient({
             <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
               <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
-                <span className="category-shimmer absolute inset-y-0 w-12 rounded-full opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}99, transparent)`, left: 0 }}></span>
+                {!lite && (
+                  <span className="category-shimmer absolute inset-y-0 w-12 rounded-full opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}99, transparent)`, left: 0 }} />
+                )}
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
                   <span className="text-2xl">🎁</span> {t('menuPage.promotions')}
                 </h2>
@@ -781,13 +802,13 @@ export default function MenuPageClient({
                         setCartOpen(true)
                       }
                     }}
-                    className={`${theme.card} rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ${theme.cardHover} transition-all ${linkedProduct ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+                    className={`${theme.card} rounded-xl sm:rounded-2xl overflow-hidden shadow-sm ${lite ? '' : `${theme.cardHover} transition-all`} ${linkedProduct ? 'cursor-pointer touch-manipulation' : ''} ${!lite && linkedProduct ? 'active:scale-[0.98]' : ''}`}
                   >
                     <div className={`relative h-48 sm:h-52 lg:h-44 xl:h-40 overflow-hidden ${theme.imageBg}`}>
                       {promo.image_url ? (
-                        <Image src={promo.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 480px" quality={60} loading="lazy" className="object-cover" />
+                        <Image src={promo.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 480px" quality={lite ? 40 : 60} loading="lazy" className="object-cover" />
                       ) : linkedProduct?.image_url ? (
-                        <Image src={linkedProduct.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 480px" quality={60} loading="lazy" className="object-cover" />
+                        <Image src={linkedProduct.image_url} alt={promo.name} fill sizes="(max-width: 640px) 100vw, 480px" quality={lite ? 40 : 60} loading="lazy" className="object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-5xl bg-gradient-to-br from-green-400 to-green-600">🎁</div>
                       )}
@@ -823,7 +844,9 @@ export default function MenuPageClient({
             <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
               <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
               <div className="relative flex-1 px-4 py-3 flex items-center gap-2 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
-                <span className="category-shimmer absolute inset-y-0 w-12 rounded-full opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}99, transparent)`, left: 0 }}></span>
+                {!lite && (
+                  <span className="category-shimmer absolute inset-y-0 w-12 rounded-full opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}99, transparent)`, left: 0 }} />
+                )}
                 <h2 className={`text-xl font-bold ${theme.text} flex items-center gap-2`}>
                   <span className="text-2xl">🔥</span> {t('menuPage.popular')}
                 </h2>
@@ -840,6 +863,7 @@ export default function MenuPageClient({
                   hasLinkedOptions={productsWithOptionsSet.has(item.id)}
                   onSelect={selectProduct}
                   t={t}
+                  lite={lite}
                 />
               ))}
             </div>
@@ -860,7 +884,9 @@ export default function MenuPageClient({
               <div className="flex items-center gap-0 mb-5 rounded-xl overflow-hidden shadow-sm">
                 <span className="w-3 self-stretch flex-shrink-0" style={{ backgroundColor: primaryColor }}></span>
                 <div className="relative flex-1 px-4 py-3 overflow-hidden" style={{ backgroundColor: primaryColor + '35' }}>
-                  <span className="category-shimmer absolute inset-y-0 w-12 rounded-full opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}99, transparent)`, left: 0 }}></span>
+                  {!lite && (
+                    <span className="category-shimmer absolute inset-y-0 w-12 rounded-full opacity-40" style={{ background: `linear-gradient(90deg, transparent, ${primaryColor}99, transparent)`, left: 0 }} />
+                  )}
                   <h2 className={`text-xl font-bold ${theme.text}`}>{category.name}</h2>
                 </div>
               </div>
@@ -875,6 +901,7 @@ export default function MenuPageClient({
                     hasLinkedOptions={productsWithOptionsSet.has(item.id)}
                     onSelect={selectProduct}
                     t={t}
+                    lite={lite}
                   />
                 ))}
               </div>
@@ -897,7 +924,7 @@ export default function MenuPageClient({
           <div
             role="presentation"
             onClick={() => { setSelectedItem(null); setModalQuantity(1) }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end md:items-center justify-center p-4"
+            className={`fixed inset-0 bg-black/60 z-50 flex items-end md:items-center justify-center p-4 ${lite ? '' : 'backdrop-blur-sm'}`}
           >
             <div
               role="dialog"
@@ -915,8 +942,8 @@ export default function MenuPageClient({
                     src={selectedItem.image_url}
                     alt={selectedItem.name}
                     fill
-                    sizes="(max-width: 768px) 100vw, min(90vw, 480px)"
-                    quality={55}
+                    sizes={lite ? '(max-width: 768px) 100vw, 400px' : '(max-width: 768px) 100vw, min(90vw, 480px)'}
+                    quality={lite ? 38 : 55}
                     className={useContain ? 'object-contain p-4' : 'object-cover'}
                   />
                 ) : (
@@ -1046,7 +1073,8 @@ export default function MenuPageClient({
           </div>
       )}
 
-      {/* Voice Order Button */}
+      {/* Voice Order — zwaar op zwakke tablets; uit op kiosk */}
+      {!lite && (
       <VoiceOrderButton
         products={menuItems.map(item => ({
           id: item.id,
@@ -1099,14 +1127,19 @@ export default function MenuPageClient({
           releaseToStop: 'Druk nogmaals om te stoppen',
         }}
       />
+      )}
 
       {/* Cart Button */}
       {cartCount > 0 && (
           <button
             type="button"
             onClick={() => setCartOpen(true)}
-            style={{ backgroundColor: primaryColor, boxShadow: `0 25px 50px -12px ${primaryColor}66` }}
-            className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-4 z-40 hover:opacity-90 text-sm sm:text-base max-w-[calc(100%-2rem)]"
+            style={
+              lite
+                ? { backgroundColor: primaryColor }
+                : { backgroundColor: primaryColor, boxShadow: `0 25px 50px -12px ${primaryColor}66` }
+            }
+            className={`fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 text-white font-bold py-3 sm:py-4 px-4 sm:px-8 rounded-2xl flex items-center gap-2 sm:gap-4 z-40 hover:opacity-90 text-sm sm:text-base max-w-[calc(100%-2rem)] ${lite ? 'shadow-md' : 'shadow-2xl'}`}
           >
             <span style={{ color: primaryColor }} className="bg-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-sm sm:text-base shrink-0">{cartCount}</span>
             <span className="hidden sm:inline">{t('menuPage.viewOrder')}</span>
@@ -1120,11 +1153,11 @@ export default function MenuPageClient({
           <div
             role="presentation"
             onClick={() => setCartOpen(false)}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className={`fixed inset-0 bg-black/60 z-50 ${lite ? '' : 'backdrop-blur-sm'}`}
           >
             <aside
               onClick={(e) => e.stopPropagation()}
-              className={`absolute right-0 top-0 h-full w-full max-w-md ${theme.card} shadow-2xl translate-x-0 transition-transform duration-200 ease-out motion-reduce:transition-none`}
+              className={`absolute right-0 top-0 h-full w-full max-w-md ${theme.card} ${lite ? 'shadow-lg' : 'shadow-2xl'} translate-x-0 transition-transform duration-200 ease-out motion-reduce:transition-none`}
             >
               <div className={`p-4 sm:p-6 border-b ${theme.border}`}>
                 <div className="flex items-center justify-between">

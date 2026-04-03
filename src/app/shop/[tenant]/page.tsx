@@ -993,7 +993,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     fill
                     priority={currentImageIndex === 0}
                     sizes="100vw"
-                    quality={72}
+                    quality={58}
                     className="object-cover"
                     style={{ 
                       // Object-position bepaalt welk deel van de foto zichtbaar is
@@ -1122,7 +1122,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                     alt="Onze frituur"
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    quality={80}
+                    quality={62}
                     loading="lazy"
                     className="object-cover"
                   />
@@ -1170,7 +1170,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         alt={business.specialty_1_title || t('shopPage.specialty')}
                         fill
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={80}
+                        quality={62}
                         loading="lazy"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         style={{
@@ -1200,7 +1200,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         alt={business.specialty_2_title || t('shopPage.specialty')}
                         fill
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={80}
+                        quality={62}
                         loading="lazy"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         style={{
@@ -1230,7 +1230,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                         alt={business.specialty_3_title || t('shopPage.specialty')}
                         fill
                         sizes="(max-width: 768px) 100vw, 33vw"
-                        quality={80}
+                        quality={62}
                         loading="lazy"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         style={{
@@ -1589,7 +1589,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
                       alt={`${t('shopPage.topSeller')} ${index + 1}`}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      quality={80}
+                      quality={62}
                       loading="lazy"
                       className="object-cover"
                       style={{
