@@ -59,17 +59,6 @@
   }
 }
 
-@keyframes shimmer-right {
-  0% { transform: translateX(-100%); opacity: 0; }
-  30% { opacity: 1; }
-  70% { opacity: 1; }
-  100% { transform: translateX(400%); opacity: 0; }
-}
-
-.category-shimmer {
-  animation: shimmer-right 2.5s ease-in-out infinite;
-}
-
 @keyframes partner-marquee-scroll {
   from {
     transform: translate3d(0, 0, 0);
