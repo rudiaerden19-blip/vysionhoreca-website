@@ -11,6 +11,8 @@
     "safariIos": "iPhone/iPad: tik op Deel → Zet op beginscherm.",
     "safariMac": "Mac Safari: menu Archief → Voeg toe aan Dock (macOS Sonoma of nieuwer).",
     "dismiss": "Sluiten",
+    "helpSteps": "Stappen",
+    "installFailed": "De installatiedialoog opent hier niet. Gebruik Chrome of Edge, of volg de stappen hieronder.",
     "openInBrowserNote": "In een gewone browsertab blijft de adresbalk zichtbaar. Na installatie opent de site in een eigen app-venster zonder adresbalk."
   },
   "nav": {

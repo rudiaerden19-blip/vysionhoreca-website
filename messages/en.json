@@ -11,6 +11,8 @@
     "safariIos": "iPhone/iPad: tap Share → Add to Home Screen.",
     "safariMac": "Mac Safari: File menu → Add to Dock (macOS Sonoma or later).",
     "dismiss": "Close",
+    "helpSteps": "Steps",
+    "installFailed": "The install dialog did not open. Try Chrome or Edge, or follow the steps below.",
     "openInBrowserNote": "A normal browser tab keeps the address bar. After installation the site opens in its own app window without it."
   },
   "nav": {

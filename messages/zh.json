@@ -11,6 +11,8 @@
     "safariIos": "iPhone / iPad：分享 → 添加到主屏幕。",
     "safariMac": "Mac Safari：文件 → 添加到程序坞（macOS Sonoma 或更新）。",
     "dismiss": "关闭",
+    "helpSteps": "步骤",
+    "installFailed": "安装对话框未打开。请使用 Chrome 或 Edge，或按照下方步骤操作。",
     "openInBrowserNote": "普通浏览器标签会显示地址栏。安装后会在独立应用窗口中打开，无地址栏。"
   },
   "nav": {

@@ -7,6 +7,7 @@ import { GlobalAutoCapitalize } from '@/components/GlobalAutoCapitalize'
 import { PageViewTracker } from '@/components/PageViewTracker'
 import { PWARegister } from '@/components/PWARegister'
 import { InstallAppHint } from '@/components/InstallAppHint'
+import { BEFORE_INSTALL_PROMPT_INLINE } from '@/lib/before-install-prompt-inline'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -140,6 +141,9 @@ export default function RootLayout({
   return (
     <html lang="nl" className={inter.variable}>
       <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
+        <script
+          dangerouslySetInnerHTML={{ __html: BEFORE_INSTALL_PROMPT_INLINE }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

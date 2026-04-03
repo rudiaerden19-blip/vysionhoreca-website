@@ -11,6 +11,8 @@
     "safariIos": "iPhone/iPad: Compartir → Añadir a Inicio.",
     "safariMac": "Safari en Mac: Archivo → Añadir al Dock (macOS Sonoma o posterior).",
     "dismiss": "Cerrar",
+    "helpSteps": "Pasos",
+    "installFailed": "No se abrió el cuadro de instalación. Prueba Chrome u Edge, o sigue los pasos abajo.",
     "openInBrowserNote": "En una pestaña normal la barra de dirección sigue visible. Tras instalar, el sitio se abre en una ventana propia sin barra de dirección."
   },
   "nav": {

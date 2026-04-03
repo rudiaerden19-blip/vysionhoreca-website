@@ -11,6 +11,8 @@
     "safariIos": "iPhone/iPad: Teilen → Zum Home-Bildschirm.",
     "safariMac": "Mac Safari: Ablage → Zum Dock hinzufügen (ab macOS Sonoma).",
     "dismiss": "Schließen",
+    "helpSteps": "Anleitung",
+    "installFailed": "Der Installationsdialog öffnet sich hier nicht. Nutzen Sie Chrome oder Edge, oder folgen Sie den Schritten unten.",
     "openInBrowserNote": "In einem normalen Browser-Tab bleibt die Adressleiste sichtbar. Nach der Installation öffnet die Seite in einem eigenen App-Fenster ohne Adressleiste."
   },
   "nav": {
