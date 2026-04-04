@@ -11,6 +11,10 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
+    const name = error?.name ?? "";
+    const msg = error?.message ?? "";
+    if (name === "AbortError") return;
+    if (/the operation was aborted|signal is aborted|aborted a request/i.test(msg)) return;
     Sentry.captureException(error);
   }, [error]);
 

@@ -24,6 +24,29 @@ function isMatchingIdUpdateNoise(value: unknown): boolean {
   );
 }
 
+/** Next.js / fetch annuleert requests bij navigatie of remount — geen applicatie-bug. */
+function isBenignAbortError(value: unknown): boolean {
+  if (value == null) return false;
+  if (typeof DOMException !== "undefined" && value instanceof DOMException) {
+    return value.name === "AbortError";
+  }
+  if (value instanceof Error && value.name === "AbortError") return true;
+  const msg =
+    value instanceof Error
+      ? value.message
+      : typeof value === "object" &&
+          value !== null &&
+          "message" in value &&
+          typeof (value as { message: unknown }).message === "string"
+        ? (value as { message: string }).message
+        : String(value);
+  return (
+    /the operation was aborted/i.test(msg) ||
+    /signal is aborted without reason/i.test(msg) ||
+    /the user aborted a request/i.test(msg)
+  );
+}
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
@@ -50,14 +73,26 @@ Sentry.init({
 
   ignoreErrors: [
     /Object Not Found Matching Id:.*MethodName:update.*ParamCount:/i,
+    /^AbortError$/,
+    /the operation was aborted/i,
+    /signal is aborted without reason/i,
+    /the user aborted a request/i,
   ],
 
   beforeSend(event, hint) {
+    if (isBenignAbortError(hint.originalException)) {
+      return null;
+    }
     if (isMatchingIdUpdateNoise(hint.originalException)) {
       return null;
     }
-    const first = event.exception?.values?.[0]?.value;
-    if (first != null && isMatchingIdUpdateNoise(first)) {
+    const first = event.exception?.values?.[0];
+    const val = first?.value;
+    const typ = first?.type;
+    if (typ === "AbortError" || (typeof val === "string" && isBenignAbortError(val))) {
+      return null;
+    }
+    if (val != null && isMatchingIdUpdateNoise(val)) {
       return null;
     }
     return event;
