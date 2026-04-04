@@ -9,11 +9,7 @@ import {
   safeInternalNextPath,
   internalShopPathToTenantHostPath,
 } from '@/lib/auth-headers'
-import {
-  DEMO_MARKETING_LOGIN_EMAIL,
-  isNextStrictlyMarketingDemoAdminKassa,
-  withPublicDemoSearchOnKassaPath,
-} from '@/lib/demo-links'
+import { withPublicDemoSearchOnKassaPath } from '@/lib/demo-links'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -50,20 +46,8 @@ export default function LoginPage() {
     }
   }, [setLocale, locales])
 
-  // Alleen demotenant: `next` moet exact `/shop/<frituurnolim>/admin/kassa` bevatten (nooit naakte `/admin/kassa`).
-  // Alleen e-mail als hint; wachtwoord nooit prefills — dat lekte naar alle klanten met de oude logica.
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const nextRaw = params.get('next') || ''
-    let nextDecoded = nextRaw
-    try {
-      nextDecoded = decodeURIComponent(nextRaw)
-    } catch {
-      /* ignore */
-    }
-    if (!isNextStrictlyMarketingDemoAdminKassa(nextDecoded)) return
-    setEmail(DEMO_MARKETING_LOGIN_EMAIL)
-  }, [])
+  // Geen programmatische e-mail/wachtwoord: alle tenants gebruiken /login; autofill alleen via browser
+  // (Chrome: instellingen → wachtwoorden / opgeslagen gegevens voor dit domein wissen indien nodig).
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -212,17 +196,21 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off" method="post">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                   {t('login.emailAddress')}
                 </label>
                 <input
                   id="email"
+                  name="vysion_email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
                   placeholder={t('login.emailPlaceholder')}
                   className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                 />
@@ -234,11 +222,13 @@ export default function LoginPage() {
                 </label>
                 <input
                   id="password"
+                  name="vysion_password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="••••••••"
+                  autoComplete="off"
+                  placeholder=""
                   className="w-full px-4 py-3 bg-white/10 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all"
                 />
               </div>

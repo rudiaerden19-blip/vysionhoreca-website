@@ -1,8 +1,8 @@
 // Vysion Kassa – Service Worker
 // Zorgt voor offline werking van de kassa app + cache van productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v8'
-const STATIC_CACHE = 'vysion-static-v8'
+const CACHE = 'vysion-kassa-v9'
+const STATIC_CACHE = 'vysion-static-v9'
 const IMAGE_CACHE = 'vysion-images-v1'
 
 // Bij installatie: skip waiting zodat de nieuwe SW meteen actief wordt
