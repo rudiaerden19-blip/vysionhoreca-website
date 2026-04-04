@@ -93,8 +93,7 @@ export const metadata: Metadata = {
     'frituur software',
     'restaurant software',
   ],
-  manifest: '/manifest.json',
-  /** Oudere Android/helpers naast Web App Manifest */
+  /** Web App Manifest: zie <link rel="manifest"> in <head> (Next metadata zou crossOrigin=use-credentials zetten → soms geen Install op Android). */
   other: {
     'mobile-web-app-capable': 'yes',
   },
@@ -142,6 +141,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="nl" className={inter.variable}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body className={`${inter.className} bg-white text-gray-900 antialiased`}>
         <script
           type="application/ld+json"
