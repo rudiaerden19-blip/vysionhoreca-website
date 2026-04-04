@@ -8,7 +8,7 @@ import { isKioskSearchParams, KIOSK_COOKIE, KIOSK_REQUEST_HEADER } from '@/lib/k
  * Zonder dit zijn manifest + icons op *.ordervysion.com = 404 → geen “Install app” in Chrome.
  */
 function isTenantPublicStaticBypass(pathname: string): boolean {
-  if (pathname === '/manifest.json' || pathname === '/sw.js') return true
+  if (pathname === '/manifest' || pathname === '/manifest.json' || pathname === '/sw.js') return true
   if (pathname === '/favicon.svg' || pathname === '/robots.txt' || pathname === '/sitemap.xml') return true
   if (pathname === '/notification.mp3') return true
   if (pathname.startsWith('/icons/')) return true

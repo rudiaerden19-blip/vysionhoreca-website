@@ -103,6 +103,7 @@ self.addEventListener('fetch', event => {
   // Statische publieke bestanden: cache-first
   if (
     url.pathname === '/manifest.json' ||
+    url.pathname === '/manifest' ||
     url.pathname === '/favicon.svg' ||
     url.pathname.startsWith('/icons/') ||
     url.pathname.endsWith('.mp3') ||

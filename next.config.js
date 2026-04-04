@@ -126,9 +126,9 @@ const nextConfig = {
       },
     ]
   },
-  // Allow subdomain routing
+  // Standaard Web App Manifest-pad blijft /manifest.json → dynamische route /manifest
   async rewrites() {
-    return []
+    return [{ source: '/manifest.json', destination: '/manifest' }]
   },
 }
 
