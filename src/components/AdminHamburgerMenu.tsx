@@ -10,6 +10,7 @@ import {
   buildHamburgerModules,
   filterHamburgerModulesForAccess,
 } from '@/lib/admin-hamburger-modules'
+import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
 
 /**
  * Zelfde module-structuur als kassa; alleen modules die de tenant aan heeft staan.
@@ -35,10 +36,12 @@ export function AdminHamburgerMenu({
 
   const filteredModules = useMemo(() => {
     const all = buildHamburgerModules(baseUrl, tenantSlug)
-    const access = loading ? allTenantModulesTrue() : moduleAccess
-    const g = loading ? true : featureGroupOrders
-    const l = loading ? true : featureLabelPrinting
-    const json = loading ? null : enabledModulesJson
+    const superOk = typeof window !== 'undefined' && isSuperAdminLoggedIn()
+    const access =
+      loading || superOk ? allTenantModulesTrue() : moduleAccess
+    const g = loading || superOk ? true : featureGroupOrders
+    const l = loading || superOk ? true : featureLabelPrinting
+    const json = loading || superOk ? null : enabledModulesJson
     return filterHamburgerModulesForAccess(all, access, g, l, json)
   }, [baseUrl, tenantSlug, loading, moduleAccess, featureGroupOrders, featureLabelPrinting, enabledModulesJson])
 

@@ -8,6 +8,7 @@ import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import {
   adminPathToModule,
+  allTenantModulesTrue,
   getAdminKassaEntryHref,
   getFirstAccessibleAdminPath,
   hasModuleAccessForPathname,
@@ -150,6 +151,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   useEffect(() => {
     if (loading || modulesLoading || tenantExists === false) return
     if (demoPublicUnauthenticated) return
+    if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) return
     const gate = adminPathToModule(adminPath, params.tenant)
     if (gate.kind === 'module' && !hasModuleAccessForPathname(adminPath, params.tenant, moduleAccess)) {
       router.replace(
@@ -225,6 +227,12 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     if (demoPublicUnauthenticated) {
       return <>{children}</>
     }
+    if (
+      typeof window !== 'undefined' &&
+      isSuperAdminLoggedIn()
+    ) {
+      return <>{children}</>
+    }
     if (!modulesLoading && moduleAccess['kassa'] === false) {
       return (
         <RedirectToFirstAccessibleModule
@@ -254,7 +262,11 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     <div style={{ maxWidth: '100vw', overflowX: 'hidden', width: '100%' }} className="min-h-screen bg-gray-100">
       <PostTrialModulePickerModal
         tenantSlug={params.tenant}
-        open={needsPostTrialModulePicker && !demoPublicUnauthenticated}
+        open={
+          needsPostTrialModulePicker &&
+          !demoPublicUnauthenticated &&
+          !isSuperAdminLoggedIn()
+        }
         onConfirmed={refetchModules}
       />
       {!demoPublicUnauthenticated && <TrialBanner tenantSlug={params.tenant} />}
@@ -282,14 +294,14 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
             </svg>
             <span>{t('adminLayout.back')}</span>
           </Link>
-          {!modulesLoading && moduleAccess['kassa'] && (
+          {!modulesLoading && (isSuperAdminLoggedIn() || moduleAccess['kassa']) && (
             <Link
               href={
                 getAdminKassaEntryHref(
                   params.tenant,
-                  moduleAccess,
-                  enabledModulesJson
-                ) ?? `${baseUrl}/`
+                  isSuperAdminLoggedIn() ? allTenantModulesTrue() : moduleAccess,
+                  isSuperAdminLoggedIn() ? null : enabledModulesJson
+                ) ?? `${baseUrl}/kassa`
               }
               className="flex shrink-0 items-center gap-2 rounded-xl bg-orange-500 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-400"
             >
@@ -310,7 +322,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
 
         {/* Rechts: display knop + vergrendel + taal */}
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-          {moduleAccess['online-bestellingen'] && (
+          {(isSuperAdminLoggedIn() || moduleAccess['online-bestellingen']) && (
             <Link
               href={`/shop/${params.tenant}/display`}
               className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-white text-sm font-bold transition-colors"
