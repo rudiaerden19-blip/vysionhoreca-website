@@ -749,8 +749,9 @@ export default function SuperAdminDashboard() {
                               📦 Modules
                             </Link>
                             <Link
-                              href={`/shop/${tenant.tenant_slug}/admin`}
+                              href={`/api/auth/superadmin-tenant-entry?slug=${encodeURIComponent(tenant.tenant_slug)}&path=${encodeURIComponent('/admin')}`}
                               target="_blank"
+                              title="Opent de klant-site (subdomein); geen zaak-wachtwoord"
                               className="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-medium whitespace-nowrap shrink-0"
                             >
                               🔑 Beheer

@@ -348,8 +348,9 @@ export default function TenantDetailPage() {
               Bekijk Shop
             </Link>
             <Link
-              href={`/shop/${slug}/admin`}
+              href={`/api/auth/superadmin-tenant-entry?slug=${encodeURIComponent(slug)}&path=${encodeURIComponent('/admin')}`}
               target="_blank"
+              title="Subdomein klantadmin — geen zaak-login"
               className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-colors font-medium shrink-0"
             >
               🔑 Beheer Klant

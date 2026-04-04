@@ -39,6 +39,18 @@ export default function SuperAdminLogin() {
       localStorage.setItem('superadmin_name', data.admin.name)
       writeSuperadminSessionCookies(data.admin.id, data.admin.email, data.admin.name || '')
 
+      const nextHandoff =
+        typeof window !== 'undefined'
+          ? new URLSearchParams(window.location.search).get('next')
+          : null
+      if (
+        nextHandoff &&
+        nextHandoff.startsWith('/api/auth/superadmin-tenant-entry')
+      ) {
+        window.location.assign(`${window.location.origin}${nextHandoff}`)
+        return
+      }
+
       router.push('/superadmin')
     } catch (err) {
       setError('Er is iets misgegaan')
