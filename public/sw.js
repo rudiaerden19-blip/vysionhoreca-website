@@ -1,9 +1,9 @@
 // Vysion Kassa – Service Worker
 // Zorgt voor offline werking van de kassa app + cache van productafbeeldingen (externe URL's)
 
-const CACHE = 'vysion-kassa-v9'
-const STATIC_CACHE = 'vysion-static-v9'
-const IMAGE_CACHE = 'vysion-images-v1'
+const CACHE = 'vysion-kassa-v10'
+const STATIC_CACHE = 'vysion-static-v10'
+const IMAGE_CACHE = 'vysion-images-v2'
 
 // Bij installatie: skip waiting zodat de nieuwe SW meteen actief wordt
 self.addEventListener('install', () => self.skipWaiting())
@@ -71,6 +71,9 @@ self.addEventListener('fetch', event => {
 
   // Supabase API / auth: altijd live, niet cachen
   if (isSupabaseNonStorageRequest(url)) return
+
+  // QR-service: nooit via SW (cache-first brak SVG/QR op shop-landingspagina’s)
+  if (url.hostname === 'api.qrserver.com' || url.hostname.endsWith('.qrserver.com')) return
 
   // Externe hosts: cache-first voor afbeeldingen (Supabase Storage, CDN, prefetch, …)
   if (url.hostname !== self.location.hostname) {

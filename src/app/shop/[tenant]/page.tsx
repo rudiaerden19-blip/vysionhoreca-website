@@ -1903,7 +1903,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <Link href={`/shop/${params.tenant}/menukaart`} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer block">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&margin=10&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart`)}`}
                   alt="Menu QR Code"
                   className="w-full h-full"
                 />
@@ -1918,7 +1918,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <Link href={`/shop/${params.tenant}/menukaart?promo=1`} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer block">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart?promo=1`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&margin=10&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/menukaart?promo=1`)}`}
                   alt="Promoties QR Code"
                   className="w-full h-full"
                 />
@@ -1933,7 +1933,7 @@ export default function TenantLandingPage({ params }: { params: { tenant: string
             <Link href={`/shop/${params.tenant}/review`} className="bg-white rounded-2xl p-8 shadow-lg text-center hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer block">
               <div className="w-48 h-48 mx-auto mb-6 bg-white p-3 rounded-xl shadow-inner">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=svg&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/review`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&format=png&margin=10&data=${encodeURIComponent(`https://www.vysionhoreca.com/shop/${params.tenant}/review`)}`}
                   alt="Review QR Code"
                   className="w-full h-full"
                 />
