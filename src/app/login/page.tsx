@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useLanguage, Locale } from '@/i18n'
 import {
   persistTenantSessionWithToday,
-  safeInternalNextPath,
+  normalizeLoginNextPath,
   internalShopPathToTenantHostPath,
 } from '@/lib/auth-headers'
 import { withPublicDemoSearchOnKassaPath } from '@/lib/demo-links'
@@ -118,7 +118,7 @@ export default function LoginPage() {
         typeof window !== 'undefined'
           ? new URLSearchParams(window.location.search).get('next')
           : null
-      const safeNext = safeInternalNextPath(nextParam, tenant.tenant_slug)
+      const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
 
       const host =
         typeof window !== 'undefined' ? window.location.hostname : ''

@@ -151,6 +151,35 @@ export function safeInternalNextPath(next: string | null | undefined, tenantSlug
 }
 
 /**
+ * Na login: `next` komt van admin-layout als `window.location.pathname` — op tenant-subdomein
+ * is dat vaak `/admin` of `/admin/...`, niet `/shop/{slug}/admin`. Zonder deze normalisatie
+ * faalt safeInternalNextPath en belandt de gebruiker op /welkom terwijl de sessie net gezet is.
+ */
+export function normalizeLoginNextPath(
+  next: string | null | undefined,
+  tenantSlug: string
+): string | null {
+  const internal = safeInternalNextPath(next, tenantSlug)
+  if (internal) return internal
+  if (!next || !tenantSlug) return null
+  let decoded: string
+  try {
+    decoded = decodeURIComponent(next.trim())
+  } catch {
+    return null
+  }
+  if (!decoded.startsWith('/') || decoded.includes('//')) return null
+  const q = decoded.indexOf('?')
+  const pathOnly = q === -1 ? decoded : decoded.slice(0, q)
+  const search = q === -1 ? '' : decoded.slice(q)
+  if (pathOnly === '/admin' || pathOnly.startsWith('/admin/')) {
+    const rest = pathOnly === '/admin' ? '' : pathOnly.slice('/admin'.length)
+    return `/shop/${tenantSlug}/admin${rest}${search}`
+  }
+  return null
+}
+
+/**
  * Pad zoals in de adresbalk op tenant-subdomein (middleware rewrite verwacht pad zonder /shop/slug).
  */
 export function internalShopPathToTenantHostPath(internalPath: string, tenantSlug: string): string {
