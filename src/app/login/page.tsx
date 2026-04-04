@@ -9,7 +9,11 @@ import {
   safeInternalNextPath,
   internalShopPathToTenantHostPath,
 } from '@/lib/auth-headers'
-import { withPublicDemoSearchOnKassaPath } from '@/lib/demo-links'
+import {
+  DEMO_MARKETING_LOGIN_EMAIL,
+  isNextStrictlyMarketingDemoAdminKassa,
+  withPublicDemoSearchOnKassaPath,
+} from '@/lib/demo-links'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -46,8 +50,20 @@ export default function LoginPage() {
     }
   }, [setLocale, locales])
 
-  // Geen automatische invulling van e-mail/wachtwoord: /login?next=/admin/kassa komt voor elke tenant
-  // (subdomein-stijl) en zou anders overal demogegevens tonen — kritiek privacy-/securityrisico.
+  // Alleen demotenant: `next` moet exact `/shop/<frituurnolim>/admin/kassa` bevatten (nooit naakte `/admin/kassa`).
+  // Alleen e-mail als hint; wachtwoord nooit prefills — dat lekte naar alle klanten met de oude logica.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const nextRaw = params.get('next') || ''
+    let nextDecoded = nextRaw
+    try {
+      nextDecoded = decodeURIComponent(nextRaw)
+    } catch {
+      /* ignore */
+    }
+    if (!isNextStrictlyMarketingDemoAdminKassa(nextDecoded)) return
+    setEmail(DEMO_MARKETING_LOGIN_EMAIL)
+  }, [])
 
   // Close dropdown when clicking outside
   useEffect(() => {

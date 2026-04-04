@@ -90,9 +90,18 @@ export const DEMO_KASSA_PUBLIC_QUERY = 'demo=bekijk' as const
 /** Demo-kassa (admin) op hetzelfde subdomein, met publieke view-only gate */
 export const DEMO_KASSA_URL = `${DEMO_ORDER_SITE_URL}/admin/kassa?${DEMO_KASSA_PUBLIC_QUERY}`
 
-/** Prefill op /login wanneer iemand tóch op het inlogscherm komt (b.v. oude bookmark). Publiek demoprofiel. */
+/** Publiek demo-inlog (alleen e-mail in UI); wachtwoord nooit in client bundle. */
 export const DEMO_MARKETING_LOGIN_EMAIL = 'info@frituurnolim.be'
-export const DEMO_MARKETING_LOGIN_PASSWORD = '123456'
+
+/**
+ * Of `next` uitsluitend naar marketing-demo-kassa wijst: pad moet `/shop/:slug/admin/kassa` zijn
+ * en :slug moet de demotenant zijn. Nooit waar voor naakte `/admin/kassa` (alle tenants).
+ */
+export function isNextStrictlyMarketingDemoAdminKassa(nextDecoded: string): boolean {
+  const pathOnly = nextDecoded.split('?')[0]
+  const m = pathOnly.match(/^\/shop\/([^/]+)\/admin\/kassa\/?$/)
+  return !!(m && isMarketingDemoTenantSlug(m[1]))
+}
 
 export function isPublicDemoKassaSearch(search: string): boolean {
   const q = search.startsWith('?') ? search.slice(1) : search
