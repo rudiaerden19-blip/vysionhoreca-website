@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { writeSuperadminSessionCookies } from '@/lib/superadmin-cookies'
 
 export default function SuperAdminLogin() {
   const router = useRouter()
@@ -31,10 +32,11 @@ export default function SuperAdminLogin() {
         return
       }
 
-      // Store session
+      // Store session (localStorage + gedeelde cookie op .ordervysion.com zodat klant-subdomeinen superadmin herkennen)
       localStorage.setItem('superadmin_id', data.admin.id)
       localStorage.setItem('superadmin_email', data.admin.email)
       localStorage.setItem('superadmin_name', data.admin.name)
+      writeSuperadminSessionCookies(data.admin.id, data.admin.email, data.admin.name || '')
 
       router.push('/superadmin')
     } catch (err) {

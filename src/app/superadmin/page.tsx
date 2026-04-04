@@ -17,6 +17,7 @@ import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
+import { clearSuperadminSessionCookies, mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 
 interface Tenant {
   id: string
@@ -85,6 +86,7 @@ export default function SuperAdminDashboard() {
   }, [])
 
   async function checkAuth() {
+    mirrorSuperadminSessionFromCookieToLocalStorage()
     const adminId = localStorage.getItem('superadmin_id')
     const name = localStorage.getItem('superadmin_name')
     
@@ -148,6 +150,7 @@ export default function SuperAdminDashboard() {
     localStorage.removeItem('superadmin_id')
     localStorage.removeItem('superadmin_email')
     localStorage.removeItem('superadmin_name')
+    clearSuperadminSessionCookies()
     router.push('/superadmin/login')
   }
 

@@ -22,6 +22,7 @@ import {
   mergeHamburgerRowsByTenantModule,
   SUBMENU_IDS_ALWAYS_ON,
 } from '@/lib/admin-hamburger-modules'
+import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 
 interface TenantsCoreRow {
   slug: string
@@ -116,6 +117,7 @@ export default function SuperadminTenantModulesPage() {
   }, [slug])
 
   useEffect(() => {
+    mirrorSuperadminSessionFromCookieToLocalStorage()
     const adminId = localStorage.getItem('superadmin_id')
     if (!adminId) {
       router.push('/superadmin/login')

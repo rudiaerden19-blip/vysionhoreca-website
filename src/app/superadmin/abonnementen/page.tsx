@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { isAdminTenant, donorAdminDisplaySubscription } from '@/lib/protected-tenants'
+import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 
 interface SubscriptionWithTenant {
   id: string
@@ -45,6 +46,7 @@ export default function AbonnementenPage() {
   }, [])
 
   async function checkAuth() {
+    mirrorSuperadminSessionFromCookieToLocalStorage()
     const adminId = localStorage.getItem('superadmin_id')
     if (!adminId) {
       router.push('/superadmin/login')

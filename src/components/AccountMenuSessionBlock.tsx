@@ -9,6 +9,7 @@ import {
   isOwnerSessionForTenant,
   isSuperAdminLoggedIn,
 } from '@/lib/auth-headers'
+import { clearSuperadminSessionCookies } from '@/lib/superadmin-cookies'
 
 /**
  * Onder Account in het admin-/kassa-hamburgermenu: Inloggen of Uitloggen.
@@ -39,6 +40,8 @@ export function AccountMenuSessionBlock({
       localStorage.removeItem('vysion_tenant')
       localStorage.removeItem('superadmin_id')
       localStorage.removeItem('superadmin_email')
+      localStorage.removeItem('superadmin_name')
+      clearSuperadminSessionCookies()
       sessionStorage.removeItem(`vysion_pin_unlocked_${tenantSlug}`)
     } catch {
       /* ignore */

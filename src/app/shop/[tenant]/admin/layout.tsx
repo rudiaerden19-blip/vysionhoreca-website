@@ -52,7 +52,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
   const { t } = useLanguage()
   const [tenantExists, setTenantExists] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(true)
-  /** Na mount: alleen superadmin of eigenaar met wachtwoord-sessie vandaag voor exact deze URL-tenant. */
+  /** Na mount: superadmin (platform) óf zaak-eigenaar met wachtwoord vandaag. Klanten zonder geldige `vysion_tenant` blijven naar /login — géén automatische tenant-sessie via cookies. */
   const [adminAccess, setAdminAccess] = useState<'pending' | 'ok' | 'login'>('pending')
   const baseUrl = `/shop/${params.tenant}/admin`
   const {

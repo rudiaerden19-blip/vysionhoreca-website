@@ -1,6 +1,7 @@
 'use client'
 
 import { isMarketingDemoTenantSlug } from '@/lib/demo-links'
+import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 
 /**
  * Gets authentication headers for API requests.
@@ -26,6 +27,8 @@ import { isMarketingDemoTenantSlug } from '@/lib/demo-links'
  */
 export function getAuthHeaders(): Record<string, string> {
   if (typeof window === 'undefined') return {}
+
+  mirrorSuperadminSessionFromCookieToLocalStorage()
 
   const headers: Record<string, string> = {}
 
@@ -95,8 +98,10 @@ export function isTenantLoggedIn(): boolean {
 /**
  * Checks if user is logged in as superadmin.
  */
+/** Alleen superadmin; zaak-sessie (`vysion_tenant`) staat hier los van. */
 export function isSuperAdminLoggedIn(): boolean {
   if (typeof window === 'undefined') return false
+  mirrorSuperadminSessionFromCookieToLocalStorage()
   return !!(localStorage.getItem('superadmin_id') && localStorage.getItem('superadmin_email'))
 }
 

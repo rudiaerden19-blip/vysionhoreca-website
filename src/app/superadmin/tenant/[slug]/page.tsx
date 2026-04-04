@@ -18,6 +18,7 @@ import {
   isMissingPostTrialModulesColumnError,
   withoutPostTrialModulesConfirmed,
 } from '@/lib/supabase-post-trial-column'
+import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 
 interface TenantDetails {
   id: string
@@ -102,6 +103,7 @@ export default function TenantDetailPage() {
   }, [])
 
   async function checkAuth() {
+    mirrorSuperadminSessionFromCookieToLocalStorage()
     const adminId = localStorage.getItem('superadmin_id')
     if (!adminId) {
       router.push('/superadmin/login')

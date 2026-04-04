@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 
 interface DailyStats {
   date: string
@@ -37,6 +38,7 @@ export default function AnalyticsPage() {
   }, [])
 
   async function checkAuth() {
+    mirrorSuperadminSessionFromCookieToLocalStorage()
     const adminId = localStorage.getItem('superadmin_id')
     if (!adminId) {
       router.push('/superadmin/login')
