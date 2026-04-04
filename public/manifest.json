@@ -7,8 +7,8 @@
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
   "orientation": "any",
-  "background_color": "#1a1a2e",
-  "theme_color": "#f97316",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "lang": "nl",
   "categories": ["business", "food"],
   "icons": [

@@ -17,6 +17,8 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  /** Lichte systeembalk (Android Chrome); oranje theme viel te hard op bij witte shop-header. */
+  themeColor: '#ffffff',
 }
 
 const siteUrl = 'https://www.vysionhoreca.com'
