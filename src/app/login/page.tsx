@@ -9,12 +9,7 @@ import {
   safeInternalNextPath,
   internalShopPathToTenantHostPath,
 } from '@/lib/auth-headers'
-import {
-  DEMO_MARKETING_LOGIN_EMAIL,
-  DEMO_MARKETING_LOGIN_PASSWORD,
-  isMarketingDemoTenantSlug,
-  withPublicDemoSearchOnKassaPath,
-} from '@/lib/demo-links'
+import { withPublicDemoSearchOnKassaPath } from '@/lib/demo-links'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -51,29 +46,8 @@ export default function LoginPage() {
     }
   }, [setLocale, locales])
 
-  // Demomarketing: vul login in als bezoeker via oude link op /login belandt (kassa gebruikt liever ?demo=bekijk zonder login).
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const nextRaw = params.get('next') || ''
-    let nextDecoded = nextRaw
-    try {
-      nextDecoded = decodeURIComponent(nextRaw)
-    } catch {
-      /* ignore */
-    }
-    const path0 = nextDecoded.split('?')[0]
-    const tenantMatch = nextDecoded.match(/\/shop\/([^/?]+)/)
-    const subdomainStyleAdminKassa =
-      !tenantMatch && (path0 === '/admin/kassa' || path0.startsWith('/admin/kassa/'))
-    const looksLikeDemoKassa =
-      nextDecoded.includes('/admin/kassa') &&
-      (subdomainStyleAdminKassa ||
-        (!!tenantMatch && isMarketingDemoTenantSlug(tenantMatch[1])))
-    if (params.get('prefill_demo') === '1' || looksLikeDemoKassa) {
-      setEmail(DEMO_MARKETING_LOGIN_EMAIL)
-      setPassword(DEMO_MARKETING_LOGIN_PASSWORD)
-    }
-  }, [])
+  // Geen automatische invulling van e-mail/wachtwoord: /login?next=/admin/kassa komt voor elke tenant
+  // (subdomein-stijl) en zou anders overal demogegevens tonen — kritiek privacy-/securityrisico.
 
   // Close dropdown when clicking outside
   useEffect(() => {
