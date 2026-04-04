@@ -11,6 +11,20 @@ import {
 } from '@/lib/auth-headers'
 import { withPublicDemoSearchOnKassaPath } from '@/lib/demo-links'
 
+/** Zelfde hosts als middleware `exactMainDomains` (+ dev): sessie blijft in localStorage van dit domein. */
+function stayOnMainDomainForShopSession(hostname: string): boolean {
+  const h = hostname.toLowerCase().split(':')[0]
+  return (
+    h === 'www.vysionhoreca.com' ||
+    h === 'vysionhoreca.com' ||
+    h === 'www.ordervysion.com' ||
+    h === 'ordervysion.com' ||
+    h.includes('localhost') ||
+    h === '127.0.0.1' ||
+    h.includes('vercel.app')
+  )
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const { t, locale, setLocale, locales, localeNames, localeFlags } = useLanguage()
@@ -98,10 +112,6 @@ export default function LoginPage() {
 
       persistTenantSessionWithToday(tenant as Record<string, unknown>)
 
-      const isLocalhost = typeof window !== 'undefined' &&
-        (window.location.hostname.includes('localhost') ||
-          window.location.hostname.includes('127.0.0.1'))
-
       try { sessionStorage.removeItem(`vysion_welcomed_${tenant.tenant_slug}`) } catch { /* ignore */ }
 
       const nextParam =
@@ -110,13 +120,15 @@ export default function LoginPage() {
           : null
       const safeNext = safeInternalNextPath(nextParam, tenant.tenant_slug)
 
-      if (isLocalhost) {
+      const host =
+        typeof window !== 'undefined' ? window.location.hostname : ''
+      if (stayOnMainDomainForShopSession(host)) {
         router.push(safeNext || `/shop/${tenant.tenant_slug}/welkom`)
       } else {
         const hostPath = safeNext
           ? internalShopPathToTenantHostPath(safeNext, tenant.tenant_slug)
           : '/welkom'
-        window.location.href = `https://${tenant.tenant_slug}.ordervysion.com${hostPath}`
+        window.location.assign(`${window.location.origin}${hostPath}`)
       }
       
     } catch (err) {
