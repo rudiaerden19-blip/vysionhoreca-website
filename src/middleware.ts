@@ -3,6 +3,18 @@ import type { NextRequest } from 'next/server'
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
 import { isKioskSearchParams, KIOSK_COOKIE, KIOSK_REQUEST_HEADER } from '@/lib/kiosk-mode'
 
+/**
+ * Public bestanden uit /public — niet naar /shop/{tenant}/… herschrijven.
+ * Zonder dit zijn manifest + icons op *.ordervysion.com = 404 → geen “Install app” in Chrome.
+ */
+function isTenantPublicStaticBypass(pathname: string): boolean {
+  if (pathname === '/manifest.json' || pathname === '/sw.js') return true
+  if (pathname === '/favicon.svg' || pathname === '/robots.txt' || pathname === '/sitemap.xml') return true
+  if (pathname === '/notification.mp3') return true
+  if (pathname.startsWith('/icons/')) return true
+  return false
+}
+
 /** Host zonder poort; anders faalt subdomein-split (bv. *.ordervysion.com:8080 → "com:8080"). */
 function normalizedHost(request: NextRequest): string {
   const raw = request.headers.get('host') || ''
@@ -110,6 +122,10 @@ export function middleware(request: NextRequest) {
 
   // Skip if no valid subdomain found
   if (!subdomain || subdomain === 'www' || subdomain.length === 0) {
+    return NextResponse.next()
+  }
+
+  if (isTenantPublicStaticBypass(pathname)) {
     return NextResponse.next()
   }
 
