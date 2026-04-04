@@ -1,5 +1,7 @@
 'use client'
 
+import { isMarketingDemoTenantSlug } from '@/lib/demo-links'
+
 /**
  * Gets authentication headers for API requests.
  * Uses the stored tenant info from localStorage to authenticate requests.
@@ -150,10 +152,24 @@ export function safeInternalNextPath(next: string | null | undefined, tenantSlug
   return decoded
 }
 
+/** Verwijder marketing-demo query (`demo=bekijk`) als de ingelogde tenant geen publieke demo is. */
+function stripMarketingDemoSearchForTenant(search: string, tenantSlug: string): string {
+  if (!search || search === '?') return ''
+  if (isMarketingDemoTenantSlug(tenantSlug)) return search
+  const raw = search.startsWith('?') ? search.slice(1) : search
+  const sp = new URLSearchParams(raw)
+  if (sp.get('demo') === 'bekijk') sp.delete('demo')
+  const out = sp.toString()
+  return out ? `?${out}` : ''
+}
+
 /**
  * Na login: `next` komt van admin-layout als `window.location.pathname` — op tenant-subdomein
  * is dat vaak `/admin` of `/admin/...`, niet `/shop/{slug}/admin`. Zonder deze normalisatie
  * faalt safeInternalNextPath en belandt de gebruiker op /welkom terwijl de sessie net gezet is.
+ *
+ * Ook: bookmark/CTA met `/shop/frituurnolim/...` op `skippsbv.ordervysion.com` — zelfde pad
+ * voor de **ingelogde** tenant, geen open redirect naar andere zaak.
  */
 export function normalizeLoginNextPath(
   next: string | null | undefined,
@@ -171,9 +187,23 @@ export function normalizeLoginNextPath(
   if (!decoded.startsWith('/') || decoded.includes('//')) return null
   const q = decoded.indexOf('?')
   const pathOnly = q === -1 ? decoded : decoded.slice(0, q)
-  const search = q === -1 ? '' : decoded.slice(q)
+  let search = q === -1 ? '' : decoded.slice(q)
+
+  const shopMatch = pathOnly.match(/^\/shop\/([^/]+)(\/.*)?$/)
+  if (shopMatch) {
+    const pathTenant = shopMatch[1]
+    const rest = shopMatch[2] || ''
+    if (rest.includes('..')) return null
+    if (normSlug(pathTenant) !== normSlug(tenantSlug) || pathTenant !== tenantSlug) {
+      search = stripMarketingDemoSearchForTenant(search, tenantSlug)
+      return `/shop/${tenantSlug}${rest}${search}`
+    }
+  }
+
   if (pathOnly === '/admin' || pathOnly.startsWith('/admin/')) {
     const rest = pathOnly === '/admin' ? '' : pathOnly.slice('/admin'.length)
+    if (rest.includes('..')) return null
+    search = stripMarketingDemoSearchForTenant(search, tenantSlug)
     return `/shop/${tenantSlug}/admin${rest}${search}`
   }
   return null
