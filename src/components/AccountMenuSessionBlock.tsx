@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useMemo } from 'react'
 import { useLanguage } from '@/i18n'
 import {
+  buildShopInternalReturnPath,
   isOwnerSessionForTenant,
   isSuperAdminLoggedIn,
 } from '@/lib/auth-headers'
@@ -20,6 +22,14 @@ export function AccountMenuSessionBlock({
 }) {
   const { t } = useLanguage()
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const searchKey = searchParams.toString()
+  const loginReturnHref = useMemo(() => {
+    const search = searchKey ? `?${searchKey}` : ''
+    const next = buildShopInternalReturnPath(tenantSlug, pathname, search)
+    return `/login?next=${encodeURIComponent(next)}`
+  }, [tenantSlug, pathname, searchKey])
   const ownerHere = typeof window !== 'undefined' && isOwnerSessionForTenant(tenantSlug)
   const superHere = typeof window !== 'undefined' && isSuperAdminLoggedIn()
 
@@ -34,7 +44,7 @@ export function AccountMenuSessionBlock({
       /* ignore */
     }
     onClose()
-    router.push(superOnly ? '/superadmin/login' : '/login')
+    router.push(superOnly ? '/superadmin/login' : loginReturnHref)
     router.refresh()
   }
 
@@ -54,7 +64,7 @@ export function AccountMenuSessionBlock({
         </button>
       ) : (
         <Link
-          href="/login"
+          href={loginReturnHref}
           prefetch={false}
           onClick={onClose}
           className="flex items-center gap-3 border-b border-gray-100 px-4 py-3 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-50"

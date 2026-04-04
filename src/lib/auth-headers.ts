@@ -210,6 +210,23 @@ export function normalizeLoginNextPath(
 }
 
 /**
+ * Zelfde vorm als admin-layout bij redirect naar login: browserpad (evt. `/admin/…` op subdomein)
+ * → intern canoniek `/shop/{tenant}/…` voor `?next=`.
+ */
+export function buildShopInternalReturnPath(
+  tenantSlug: string,
+  browserPathname: string,
+  browserSearch: string = ''
+): string {
+  const path = browserPathname
+  const search = browserSearch || ''
+  if (path === '/admin' || path.startsWith('/admin/')) {
+    return `/shop/${tenantSlug}/admin${path === '/admin' ? '' : path.slice('/admin'.length)}${search}`
+  }
+  return `${path}${search}`
+}
+
+/**
  * Pad zoals in de adresbalk op tenant-subdomein (middleware rewrite verwacht pad zonder /shop/slug).
  * Slug in URL en `tenantSlug` uit login mogen qua koppeltekens verschillen zolang normSlug gelijk is.
  */

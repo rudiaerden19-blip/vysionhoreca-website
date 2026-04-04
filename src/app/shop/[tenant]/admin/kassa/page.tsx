@@ -23,6 +23,7 @@ import {
   isMarketingDemoTenantSlug,
   publicDemoSessionMatchesTenant,
 } from '@/lib/demo-links'
+import { buildShopInternalReturnPath } from '@/lib/auth-headers'
 
 interface SelectedChoice {
   optionId: string
@@ -1133,7 +1134,8 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
       window.location.href = `/shop/${tenant}/admin/kassa?demo=bekijk`
       return
     }
-    window.location.href = '/login'
+    const next = buildShopInternalReturnPath(tenant, window.location.pathname, window.location.search)
+    window.location.href = `/login?next=${encodeURIComponent(next)}`
   }
 
   // ── Geluid activatie scherm (exact donor) — toon elke sessie ───────────

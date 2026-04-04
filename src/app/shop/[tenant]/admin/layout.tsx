@@ -26,6 +26,7 @@ import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
 import PostTrialModulePickerModal from '@/components/PostTrialModulePickerModal'
 import { AdminHamburgerMenu } from '@/components/AdminHamburgerMenu'
 import {
+  buildShopInternalReturnPath,
   isSuperAdminLoggedIn,
   isOwnerSessionFreshForTenant,
 } from '@/lib/auth-headers'
@@ -125,13 +126,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
       return
     }
     setAdminAccess('login')
-    /** Op tenant-subdomein is de URL /admin/…; zet altijd intern /shop/{tenant}/… in next zodat login geen open redirect hoeft te raden. */
-    const path = window.location.pathname
-    const search = window.location.search
-    const next =
-      path === '/admin' || path.startsWith('/admin/')
-        ? `/shop/${params.tenant}/admin${path === '/admin' ? '' : path.slice('/admin'.length)}${search}`
-        : `${path}${search}`
+    const next = buildShopInternalReturnPath(params.tenant, window.location.pathname, window.location.search)
     router.replace(`/login?next=${encodeURIComponent(next)}`)
   }, [loading, tenantExists, params.tenant, router, demoPublicUnauthenticated])
 
