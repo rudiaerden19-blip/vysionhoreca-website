@@ -211,13 +211,22 @@ export function normalizeLoginNextPath(
 
 /**
  * Pad zoals in de adresbalk op tenant-subdomein (middleware rewrite verwacht pad zonder /shop/slug).
+ * Slug in URL en `tenantSlug` uit login mogen qua koppeltekens verschillen zolang normSlug gelijk is.
  */
 export function internalShopPathToTenantHostPath(internalPath: string, tenantSlug: string): string {
-  const prefix = `/shop/${tenantSlug}`
-  if (!internalPath.startsWith(prefix)) return '/welkom'
-  const rest = internalPath.slice(prefix.length)
-  if (!rest || rest === '') return '/'
-  return rest.startsWith('/') ? rest : `/${rest}`
+  const qIndex = internalPath.indexOf('?')
+  const pathOnly = qIndex === -1 ? internalPath : internalPath.slice(0, qIndex)
+  const search = qIndex === -1 ? '' : internalPath.slice(qIndex)
+
+  const m = pathOnly.match(/^\/shop\/([^/]+)(\/.*)?$/)
+  if (!m) return '/welkom'
+  const pathSlug = m[1]
+  const rest = m[2] || ''
+  if (normSlug(pathSlug) !== normSlug(tenantSlug)) return '/welkom'
+
+  if (!rest || rest === '') return search ? `/${search}` : '/'
+  const pathPart = rest.startsWith('/') ? rest : `/${rest}`
+  return `${pathPart}${search}`
 }
 
 /** Actieve zaak-sessie voor deze shop (URL-tenant vs localStorage). */

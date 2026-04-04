@@ -9,7 +9,11 @@ import {
   normalizeLoginNextPath,
   internalShopPathToTenantHostPath,
 } from '@/lib/auth-headers'
-import { withPublicDemoSearchOnKassaPath } from '@/lib/demo-links'
+import {
+  withPublicDemoSearchOnKassaPath,
+  isMarketingDemoTenantSlug,
+  normalizeTenantSlugKey,
+} from '@/lib/demo-links'
 
 /** Zelfde hosts als middleware `exactMainDomains` (+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -35,7 +39,8 @@ export default function LoginPage() {
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
 
-  // Marketing demo: /login?next=/shop/frituurnolim/admin/kassa zonder ?demo=bekijk → direct naar publieke demo (geen formulier).
+  // Marketing demo: op www/localhost of op het demo-subdomein zelf → zonder ?demo= al naar publieke demokassa.
+  // Niet doen op ander tenant-subdomein met `next` naar frituurnolim (anders blijft de gebruiker de login “kwijt”).
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
@@ -48,7 +53,19 @@ export default function LoginPage() {
     }
     if (!nextDecoded.startsWith('/')) return
     const fixed = withPublicDemoSearchOnKassaPath(nextDecoded)
-    if (fixed) window.location.replace(fixed)
+    if (!fixed) return
+    const host = window.location.hostname.toLowerCase().split(':')[0]
+    if (!stayOnMainDomainForShopSession(host)) {
+      const pathMatch = nextDecoded.match(/^\/shop\/([^/]+)\/admin\/kassa/)
+      const nextSlug = pathMatch?.[1] || ''
+      const sub = host.split('.')[0] || ''
+      const allowedHere =
+        nextSlug &&
+        isMarketingDemoTenantSlug(nextSlug) &&
+        normalizeTenantSlugKey(sub) === normalizeTenantSlugKey(nextSlug)
+      if (!allowedHere) return
+    }
+    window.location.replace(fixed)
   }, [])
 
   // Read language from URL parameter on mount
@@ -119,15 +136,15 @@ export default function LoginPage() {
           ? new URLSearchParams(window.location.search).get('next')
           : null
       const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
+      const fallbackAfterLogin = `/shop/${tenant.tenant_slug}/admin`
 
       const host =
         typeof window !== 'undefined' ? window.location.hostname : ''
       if (stayOnMainDomainForShopSession(host)) {
-        router.push(safeNext || `/shop/${tenant.tenant_slug}/welkom`)
+        router.push(safeNext || fallbackAfterLogin)
       } else {
-        const hostPath = safeNext
-          ? internalShopPathToTenantHostPath(safeNext, tenant.tenant_slug)
-          : '/welkom'
+        const target = safeNext || fallbackAfterLogin
+        const hostPath = internalShopPathToTenantHostPath(target, tenant.tenant_slug)
         window.location.assign(`${window.location.origin}${hostPath}`)
       }
       
