@@ -113,8 +113,14 @@ export function InstallPWABanner() {
       <div className="mx-auto flex max-w-lg flex-col gap-2 text-sm text-amber-950">
         <p className="font-medium">Geen adresbalk (Android)</p>
         <p className="text-amber-900/90">
-          In een <strong>normale tab</strong> blijft de adresbalk altijd zichtbaar. Installeer de site als app — open
-          daarna <strong>via het pictogram op je startscherm</strong>.
+          <strong>Toevoegen aan startscherm</strong> maakt vaak alleen een <strong>snelkoppeling</strong> — die opent
+          nog in een gewone Chrome-tab mét balk. Je moet de app <strong>installeren</strong>.
+        </p>
+        <p className="text-amber-900/90">
+          Gebruik liefst <strong>Google Chrome</strong> (niet Samsung Internet). Menu <strong>⋮</strong> → kies{' '}
+          <strong>App installeren</strong> of <strong>Install app</strong> (niet alleen &quot;Snelkoppeling&quot;).
+          Daarna op het <strong>nieuwe</strong> startscherm-icoon tikken — liefst het oude verwijderen om verwarring te
+          voorkomen.
         </p>
         {installEvent ? (
           <button

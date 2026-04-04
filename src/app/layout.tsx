@@ -94,6 +94,10 @@ export const metadata: Metadata = {
     'restaurant software',
   ],
   manifest: '/manifest.json',
+  /** Oudere Android/helpers naast Web App Manifest */
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
