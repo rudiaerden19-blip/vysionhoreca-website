@@ -8,7 +8,9 @@ import {
   persistTenantSessionWithToday,
   normalizeLoginNextPath,
   internalShopPathToTenantHostPath,
+  isSuperAdminLoggedIn,
 } from '@/lib/auth-headers'
+import { getCurrentTenantSlug as tenantSlugFromLocation } from '@/lib/tenant-url'
 import {
   withPublicDemoSearchOnKassaPath,
   isMarketingDemoTenantSlug,
@@ -39,15 +41,45 @@ export default function LoginPage() {
   const [isLangOpen, setIsLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
 
+  // Superadmin: gedeelde cookie → mirror in isSuperAdminLoggedIn; direct door naar `next` zonder zaak-wachtwoord.
+  // (Zonder dit bleef het tenant-loginformulier zichtbaar tot je handmatig logt.)
   // Marketing demo: op www/localhost of op het demo-subdomein zelf → zonder ?demo= al naar publieke demokassa.
   // Niet doen op ander tenant-subdomein met `next` naar frituurnolim (anders blijft de gebruiker de login “kwijt”).
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
     const params = new URLSearchParams(window.location.search)
-    const nextRaw = params.get('next') || ''
-    let nextDecoded = nextRaw
+    const nextRaw = params.get('next')
+
+    if (isSuperAdminLoggedIn()) {
+      let nextDecoded = (nextRaw || '').trim()
+      try {
+        if (nextRaw) nextDecoded = decodeURIComponent(nextRaw.trim())
+      } catch {
+        nextDecoded = nextRaw || ''
+      }
+      let tenantSlug: string | null = null
+      if (nextDecoded.startsWith('/')) {
+        const m = nextDecoded.match(/^\/shop\/([^/]+)/)
+        if (m) tenantSlug = m[1]
+      }
+      if (!tenantSlug) tenantSlug = tenantSlugFromLocation()
+      if (tenantSlug) {
+        const safeNext = normalizeLoginNextPath(nextRaw, tenantSlug) ?? `/shop/${tenantSlug}/admin`
+        const host = window.location.hostname.toLowerCase().split(':')[0]
+        if (stayOnMainDomainForShopSession(host)) {
+          router.replace(safeNext)
+        } else {
+          const hostPath = internalShopPathToTenantHostPath(safeNext, tenantSlug)
+          window.location.replace(`${window.location.origin}${hostPath}`)
+        }
+        return
+      }
+    }
+
+    const nextRawDemo = nextRaw || ''
+    let nextDecoded = nextRawDemo
     try {
-      nextDecoded = decodeURIComponent(nextRaw)
+      nextDecoded = decodeURIComponent(nextRawDemo)
     } catch {
       /* ignore */
     }
@@ -66,7 +98,7 @@ export default function LoginPage() {
       if (!allowedHere) return
     }
     window.location.replace(fixed)
-  }, [])
+  }, [router])
 
   // Read language from URL parameter on mount
   useEffect(() => {
