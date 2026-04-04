@@ -30,6 +30,97 @@ function setKioskCookie(res: NextResponse, request: NextRequest) {
   })
 }
 
+const SA_COOKIE_ID = 'vysion_sa_id'
+const SA_COOKIE_EMAIL = 'vysion_sa_email'
+
+function hasSuperadminSessionCookie(request: NextRequest): boolean {
+  const id = request.cookies.get(SA_COOKIE_ID)?.value?.trim()
+  const email = request.cookies.get(SA_COOKIE_EMAIL)?.value?.trim()
+  return !!id && !!email
+}
+
+const normSlugMw = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
+
+/**
+ * Superadmin mag /login op tenant-host niet zien: stuur naar canoniek pad in de adresbalk (/admin/…).
+ */
+function redirectSuperadminPastLoginOnTenantHost(
+  request: NextRequest,
+  hostSubdomain: string,
+  nextParam: string | null
+): NextResponse | null {
+  if (!hasSuperadminSessionCookie(request)) return null
+  const raw = (nextParam || '').trim()
+  let pathOut = '/admin'
+  let searchOut = ''
+  if (raw) {
+    try {
+      const decoded = decodeURIComponent(raw)
+      const qi = decoded.indexOf('?')
+      const pathOnly = qi === -1 ? decoded : decoded.slice(0, qi)
+      const qs = qi === -1 ? '' : decoded.slice(qi)
+      if (pathOnly.startsWith('/shop/')) {
+        const m = pathOnly.match(/^\/shop\/([^/]+)(\/.*)?$/)
+        if (m) {
+          const slug = m[1]
+          const rest = m[2] || ''
+          if (normSlugMw(slug) !== normSlugMw(hostSubdomain)) {
+            pathOut = '/admin'
+          } else if (rest && rest.length > 0) {
+            pathOut = rest.startsWith('/') ? rest : `/${rest}`
+          }
+          searchOut = qs
+        }
+      } else if (pathOnly === '/admin' || pathOnly.startsWith('/admin/')) {
+        pathOut = pathOnly
+        searchOut = qs
+      }
+    } catch {
+      return null
+    }
+  }
+  const redir = request.nextUrl.clone()
+  redir.pathname = pathOut.split('?')[0]
+  if (searchOut) {
+    redir.search = searchOut.startsWith('?') ? searchOut : `?${searchOut}`
+  } else {
+    redir.search = ''
+  }
+  return NextResponse.redirect(redir)
+}
+
+/** Superadmin op www: /login?next=/shop/slug/… → direct dat pad (geen zaak-login UI). */
+function redirectSuperadminPastLoginOnMainHost(
+  request: NextRequest,
+  url: URL,
+  pathname: string
+): NextResponse | null {
+  if (!pathname.startsWith('/login')) return null
+  if (!hasSuperadminSessionCookie(request)) return null
+  const nextRaw = url.searchParams.get('next')?.trim()
+  if (nextRaw) {
+    try {
+      const decoded = decodeURIComponent(nextRaw)
+      if (decoded.startsWith('/shop/') && !decoded.includes('//')) {
+        const qi = decoded.indexOf('?')
+        const pathOnly = qi === -1 ? decoded : decoded.slice(0, qi)
+        const qs = qi === -1 ? '' : decoded.slice(qi)
+        const redir = request.nextUrl.clone()
+        redir.pathname = pathOnly.split('?')[0]
+        if (qs) redir.search = qs.startsWith('?') ? qs : `?${qs}`
+        else redir.search = ''
+        return NextResponse.redirect(redir)
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  const redir = request.nextUrl.clone()
+  redir.pathname = '/superadmin'
+  redir.search = ''
+  return NextResponse.redirect(redir)
+}
+
 /** URL in de balk blijft /kiosk1 of …/kiosk1; internally menu + kiosk-header + cookie. */
 function rewriteMenuAsKiosk(request: NextRequest, menuPathname: string): NextResponse {
   const rewriteUrl = request.nextUrl.clone()
@@ -71,6 +162,9 @@ export function middleware(request: NextRequest) {
     hostname.includes('vercel.app')
 
   if (isMainDomain) {
+    const saMain = redirectSuperadminPastLoginOnMainHost(request, url, pathname)
+    if (saMain) return saMain
+
     /** /shop/tenant/kiosk1 → menu (zonder ? in de URL). */
     const kioskPathMatch = pathname.match(/^\/shop\/([^/]+)\/kiosk1\/?$/)
     if (kioskPathMatch) {
@@ -146,11 +240,20 @@ export function middleware(request: NextRequest) {
   // This allows existing code to work without changes
 
   // Skip rewriting for API routes, static files, and admin routes
+  if (pathname.startsWith('/login')) {
+    const bypass = redirectSuperadminPastLoginOnTenantHost(
+      request,
+      subdomain,
+      url.searchParams.get('next')
+    )
+    if (bypass) return bypass
+    return NextResponse.next()
+  }
+
   if (
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/login') ||
     pathname.startsWith('/contact') ||
     pathname.startsWith('/registreer') ||
     pathname.startsWith('/superadmin') ||
