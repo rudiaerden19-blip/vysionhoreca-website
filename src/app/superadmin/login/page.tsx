@@ -20,6 +20,7 @@ export default function SuperAdminLogin() {
     try {
       const response = await fetch('/api/auth/superadmin-login', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       })

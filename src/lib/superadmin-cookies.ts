@@ -5,9 +5,16 @@
  * in localStorage (dagelijkse `sessionCalDay`). Deze cookies worden nergens bij tenant-login gezet.
  */
 
-const COOKIE_ID = 'vysion_sa_id'
-const COOKIE_EMAIL = 'vysion_sa_email'
-const COOKIE_NAME = 'vysion_sa_name'
+/** Zelfde keys in middleware (Edge) + client — niet los laten verspringen. */
+export const VYSION_SUPERADMIN_COOKIE = {
+  id: 'vysion_sa_id',
+  email: 'vysion_sa_email',
+  name: 'vysion_sa_name',
+} as const
+
+const COOKIE_ID = VYSION_SUPERADMIN_COOKIE.id
+const COOKIE_EMAIL = VYSION_SUPERADMIN_COOKIE.email
+const COOKIE_NAME = VYSION_SUPERADMIN_COOKIE.name
 
 /** Host-only (geen Domain=) op preview/localhost — server + client. */
 export function superadminCookieDomainForHost(hostname: string): string | undefined {
@@ -80,4 +87,18 @@ export function mirrorSuperadminSessionFromCookieToLocalStorage(): void {
   } catch {
     /* storage blocked */
   }
+}
+
+/** Superadmin direct uit document.cookie (ook als localStorage faalt of leeg blijft). */
+export function peekSuperadminFromBrowserCookie(): {
+  id: string
+  email: string
+  name: string | null
+} | null {
+  if (typeof document === 'undefined') return null
+  const id = readCookie(COOKIE_ID)?.trim()
+  const email = readCookie(COOKIE_EMAIL)?.trim()
+  if (!id || !email) return null
+  const nameRaw = readCookie(COOKIE_NAME)
+  return { id, email, name: nameRaw?.trim() || null }
 }

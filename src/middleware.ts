@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
 import { isKioskSearchParams, KIOSK_COOKIE, KIOSK_REQUEST_HEADER } from '@/lib/kiosk-mode'
+import { VYSION_SUPERADMIN_COOKIE } from '@/lib/superadmin-cookies'
 
 /**
  * Public bestanden uit /public — niet naar /shop/{tenant}/… herschrijven.
@@ -30,12 +31,9 @@ function setKioskCookie(res: NextResponse, request: NextRequest) {
   })
 }
 
-const SA_COOKIE_ID = 'vysion_sa_id'
-const SA_COOKIE_EMAIL = 'vysion_sa_email'
-
 function hasSuperadminSessionCookie(request: NextRequest): boolean {
-  const id = request.cookies.get(SA_COOKIE_ID)?.value?.trim()
-  const email = request.cookies.get(SA_COOKIE_EMAIL)?.value?.trim()
+  const id = request.cookies.get(VYSION_SUPERADMIN_COOKIE.id)?.value?.trim()
+  const email = request.cookies.get(VYSION_SUPERADMIN_COOKIE.email)?.value?.trim()
   return !!id && !!email
 }
 

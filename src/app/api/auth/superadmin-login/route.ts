@@ -126,6 +126,8 @@ export async function POST(request: NextRequest) {
       maxAge,
       sameSite: 'lax' as const,
       secure,
+      /** Zichtbaar in document.cookie zodat client + admin-layout API-headers werken op subdomeinen. */
+      httpOnly: false,
       ...(domain ? { domain } : {}),
     }
     res.cookies.set('vysion_sa_id', admin.id, cookieOpts)

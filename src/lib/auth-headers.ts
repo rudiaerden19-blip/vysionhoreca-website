@@ -1,7 +1,10 @@
 'use client'
 
 import { isMarketingDemoTenantSlug } from '@/lib/demo-links'
-import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
+import {
+  mirrorSuperadminSessionFromCookieToLocalStorage,
+  peekSuperadminFromBrowserCookie,
+} from '@/lib/superadmin-cookies'
 
 /**
  * Gets authentication headers for API requests.
@@ -49,11 +52,18 @@ export function getAuthHeaders(): Record<string, string> {
     }
   }
 
-  const superadminId = localStorage.getItem('superadmin_id')
-  const superadminEmail = localStorage.getItem('superadmin_email')
-  if (superadminId && superadminEmail) {
-    headers['x-superadmin-id'] = superadminId
-    headers['x-superadmin-email'] = superadminEmail
+  let superadminId = localStorage.getItem('superadmin_id')
+  let superadminEmail = localStorage.getItem('superadmin_email')
+  if (!superadminId?.trim() || !superadminEmail?.trim()) {
+    const fromCookie = peekSuperadminFromBrowserCookie()
+    if (fromCookie) {
+      superadminId = fromCookie.id
+      superadminEmail = fromCookie.email
+    }
+  }
+  if (superadminId?.trim() && superadminEmail?.trim()) {
+    headers['x-superadmin-id'] = superadminId.trim()
+    headers['x-superadmin-email'] = superadminEmail.trim()
   }
 
   return headers
@@ -102,7 +112,10 @@ export function isTenantLoggedIn(): boolean {
 export function isSuperAdminLoggedIn(): boolean {
   if (typeof window === 'undefined') return false
   mirrorSuperadminSessionFromCookieToLocalStorage()
-  return !!(localStorage.getItem('superadmin_id') && localStorage.getItem('superadmin_email'))
+  if (localStorage.getItem('superadmin_id')?.trim() && localStorage.getItem('superadmin_email')?.trim()) {
+    return true
+  }
+  return !!peekSuperadminFromBrowserCookie()
 }
 
 /**
