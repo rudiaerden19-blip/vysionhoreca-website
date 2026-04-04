@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs'
 import { loginRateLimiter, checkRateLimit, getClientIP } from '@/lib/rate-limit'
 import { getServerSupabaseClient } from '@/lib/supabase-server'
 import { logger } from '@/lib/logger'
+import { superadminCookieDomainForHost } from '@/lib/superadmin-cookies'
 
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
@@ -107,8 +108,7 @@ export async function POST(request: NextRequest) {
       duration: Date.now() - startTime 
     })
 
-    // Return admin info (not sensitive data)
-    return NextResponse.json({
+    const res = NextResponse.json({
       success: true,
       admin: {
         id: admin.id,
@@ -116,6 +116,23 @@ export async function POST(request: NextRequest) {
         name: admin.name
       }
     })
+
+    const host = (request.headers.get('host') || '').split(':')[0]
+    const domain = superadminCookieDomainForHost(host)
+    const secure = request.nextUrl.protocol === 'https:'
+    const maxAge = 60 * 60 * 24 * 14
+    const cookieOpts = {
+      path: '/',
+      maxAge,
+      sameSite: 'lax' as const,
+      secure,
+      ...(domain ? { domain } : {}),
+    }
+    res.cookies.set('vysion_sa_id', admin.id, cookieOpts)
+    res.cookies.set('vysion_sa_email', admin.email, cookieOpts)
+    res.cookies.set('vysion_sa_name', admin.name || '', cookieOpts)
+
+    return res
 
   } catch (error) {
     logger.error('Superadmin login error', { 

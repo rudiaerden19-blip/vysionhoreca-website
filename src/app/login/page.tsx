@@ -16,6 +16,7 @@ import {
   isMarketingDemoTenantSlug,
   normalizeTenantSlugKey,
 } from '@/lib/demo-links'
+import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 
 /** Zelfde hosts als middleware `exactMainDomains` (+ dev): sessie blijft in localStorage van dit domein. */
 function stayOnMainDomainForShopSession(hostname: string): boolean {
@@ -50,6 +51,7 @@ export default function LoginPage() {
     const params = new URLSearchParams(window.location.search)
     const nextRaw = params.get('next')
 
+    mirrorSuperadminSessionFromCookieToLocalStorage()
     if (isSuperAdminLoggedIn()) {
       let nextDecoded = (nextRaw || '').trim()
       try {

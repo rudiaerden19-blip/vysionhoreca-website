@@ -30,6 +30,7 @@ import {
   isSuperAdminLoggedIn,
   isOwnerSessionFreshForTenant,
 } from '@/lib/auth-headers'
+import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 import {
   isMarketingDemoTenantSlug,
   isPublicDemoKassaSearch,
@@ -113,10 +114,11 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     setDemoPublicUnauthenticated(false)
   }, [params.tenant, adminPath, baseUrl])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (loading || tenantExists === null) return
     if (tenantExists === false) return
     if (typeof window === 'undefined') return
+    mirrorSuperadminSessionFromCookieToLocalStorage()
     if (demoPublicUnauthenticated) {
       setAdminAccess('ok')
       return

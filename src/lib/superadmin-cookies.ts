@@ -9,12 +9,17 @@ const COOKIE_ID = 'vysion_sa_id'
 const COOKIE_EMAIL = 'vysion_sa_email'
 const COOKIE_NAME = 'vysion_sa_name'
 
-export function superadminSharedCookieDomain(): string | undefined {
-  if (typeof window === 'undefined') return undefined
-  const h = window.location.hostname.toLowerCase()
+/** Host-only (geen Domain=) op preview/localhost — server + client. */
+export function superadminCookieDomainForHost(hostname: string): string | undefined {
+  const h = hostname.toLowerCase().split(':')[0]
   if (h === 'ordervysion.com' || h.endsWith('.ordervysion.com')) return '.ordervysion.com'
   if (h === 'vysionhoreca.com' || h.endsWith('.vysionhoreca.com')) return '.vysionhoreca.com'
   return undefined
+}
+
+export function superadminSharedCookieDomain(): string | undefined {
+  if (typeof window === 'undefined') return undefined
+  return superadminCookieDomainForHost(window.location.hostname)
 }
 
 function readCookie(name: string): string | null {
@@ -58,11 +63,13 @@ export function clearSuperadminSessionCookies(): void {
   }
 }
 
-/** Zet cookie-waarden in localStorage op dit host als daar nog geen superadmin staat. */
+/**
+ * Cookie → localStorage wanneer er een geldige superadmin-cookie is (cookie is bron van waarheid).
+ * Zonder vroege return: oude/lege LS op tenant-subdomein overschrijven zodra cookie er is.
+ */
 export function mirrorSuperadminSessionFromCookieToLocalStorage(): void {
   if (typeof window === 'undefined') return
   try {
-    if (localStorage.getItem('superadmin_id') && localStorage.getItem('superadmin_email')) return
     const id = readCookie(COOKIE_ID)
     const email = readCookie(COOKIE_EMAIL)
     const name = readCookie(COOKIE_NAME)
