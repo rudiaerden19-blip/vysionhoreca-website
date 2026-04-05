@@ -105,7 +105,10 @@
     "imageAlt": "ハードウェア例",
     "openExpanded": "画像を拡大",
     "closeExpanded": "閉じる",
-    "ctaOurRegisters": "レジ端末一覧"
+    "ctaOurRegisters": "レジ端末一覧",
+    "premiumIncludedTf30": "tf 30",
+    "premiumIncludedPrinterX40": "プリンター x 40",
+    "premiumIncludedLade": "ドロア"
   },
   "newAtVysion": {
     "title": "パッケージを自由に組み立て",

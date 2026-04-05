@@ -105,7 +105,10 @@
     "imageAlt": "Exemple de matériel",
     "openExpanded": "Agrandir l’image",
     "closeExpanded": "Fermer",
-    "ctaOurRegisters": "Nos caisses"
+    "ctaOurRegisters": "Nos caisses",
+    "premiumIncludedTf30": "tf 30",
+    "premiumIncludedPrinterX40": "imprimante x 40",
+    "premiumIncludedLade": "tiroir-caisse"
   },
   "newAtVysion": {
     "title": "Composez votre forfait vous-même",

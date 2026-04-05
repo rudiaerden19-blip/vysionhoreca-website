@@ -8,6 +8,10 @@ import { useLanguage } from '@/i18n'
 const HARDWARE_CARD_INTERACTION =
   'shadow-home-card transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
 
+/** Premium-abonnement: vaste oranje schaduw (altijd zichtbaar), zelfde grid-UX. */
+const HARDWARE_PREMIUM_ORANGE_SHADOW =
+  'shadow-[0_12px_40px_-6px_rgba(232,90,60,0.48),0_8px_28px_-4px_rgba(232,90,60,0.36),0_0_0_1px_rgba(232,90,60,0.18)] border-accent/35 transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-[0_16px_48px_-6px_rgba(232,90,60,0.55),0_12px_36px_-4px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.22)] active:z-10 active:-translate-y-0.5'
+
 const HARDWARE_ITEMS = [
   { src: '/images/hardware/hardware-1.png', model: 'rfm789' },
   { src: '/images/hardware/hardware-2.png', model: 'tf9003' },
@@ -23,8 +27,20 @@ const HARDWARE_ITEMS = [
   { src: '/images/hardware/hardware-12-muur-kiosk-tl20.png', model: 'muur kiosk tl20' },
 ] as const
 
+const HARDWARE_PREMIUM_INCLUDED = [
+  { src: '/images/hardware/hardware-premium-tf30.png', labelKey: 'premiumIncludedTf30' as const },
+  { src: '/images/hardware/hardware-premium-printer-x40.png', labelKey: 'premiumIncludedPrinterX40' as const },
+  { src: '/images/hardware/hardware-premium-lade.png', labelKey: 'premiumIncludedLade' as const },
+] as const
+
+function hardwareLabel(item: (typeof HARDWARE_ITEMS)[number] | (typeof HARDWARE_PREMIUM_INCLUDED)[number], t: (key: string) => string): string {
+  if ('labelKey' in item) return t(`hardware.${item.labelKey}`)
+  return item.model
+}
+
 export default function HardwareSection() {
   const { t } = useLanguage()
+  const allItems = [...HARDWARE_ITEMS, ...HARDWARE_PREMIUM_INCLUDED] as const
   const [expanded, setExpanded] = useState<number | null>(null)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
 
@@ -79,29 +95,35 @@ export default function HardwareSection() {
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-          {HARDWARE_ITEMS.map((item, i) => (
-            <button
-              key={item.src}
-              type="button"
-              onClick={() => setExpanded(i)}
-              className={`group relative w-full rounded-2xl overflow-hidden bg-white border border-gray-200/60 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${HARDWARE_CARD_INTERACTION}`}
-              aria-label={`${t('hardware.openExpanded')}: ${item.model}`}
-            >
-              <div className="relative aspect-[4/3]">
-                <Image
-                  src={item.src}
-                  alt={`${t('hardware.imageAlt')} — ${item.model}`}
-                  fill
-                  className="object-contain p-3 sm:p-4 group-hover:scale-[1.02] transition-transform duration-200"
-                  sizes="(min-width: 1024px) 32vw, (min-width: 640px) 50vw, 100vw"
-                  loading="lazy"
-                />
-              </div>
-              <p className="px-3 pb-3 sm:px-4 sm:pb-4 pt-2 text-center text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 tracking-tight leading-snug">
-                {item.model}
-              </p>
-            </button>
-          ))}
+          {allItems.map((item, i) => {
+            const label = hardwareLabel(item, t)
+            const orange = 'labelKey' in item
+            return (
+              <button
+                key={item.src}
+                type="button"
+                onClick={() => setExpanded(i)}
+                className={`group relative w-full rounded-2xl overflow-hidden bg-white border text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 ${
+                  orange ? HARDWARE_PREMIUM_ORANGE_SHADOW : `border-gray-200/60 ${HARDWARE_CARD_INTERACTION}`
+                }`}
+                aria-label={`${t('hardware.openExpanded')}: ${label}`}
+              >
+                <div className="relative aspect-[4/3]">
+                  <Image
+                    src={item.src}
+                    alt={`${t('hardware.imageAlt')} — ${label}`}
+                    fill
+                    className="object-contain p-3 sm:p-4 group-hover:scale-[1.02] transition-transform duration-200"
+                    sizes="(min-width: 1024px) 32vw, (min-width: 640px) 50vw, 100vw"
+                    loading="lazy"
+                  />
+                </div>
+                <p className="px-3 pb-3 sm:px-4 sm:pb-4 pt-2 text-center text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 tracking-tight leading-snug">
+                  {label}
+                </p>
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -127,8 +149,8 @@ export default function HardwareSection() {
           >
             <div className="relative w-full h-[min(85vh,900px)] max-h-[85vh]">
               <Image
-                src={HARDWARE_ITEMS[expanded].src}
-                alt={`${t('hardware.imageAlt')} — ${HARDWARE_ITEMS[expanded].model}`}
+                src={allItems[expanded].src}
+                alt={`${t('hardware.imageAlt')} — ${hardwareLabel(allItems[expanded], t)}`}
                 fill
                 className="object-contain"
                 sizes="100vw"
@@ -136,7 +158,7 @@ export default function HardwareSection() {
               />
             </div>
             <p id="hardware-lightbox-title" className="text-white text-center text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight">
-              {HARDWARE_ITEMS[expanded].model}
+              {hardwareLabel(allItems[expanded], t)}
             </p>
           </div>
         </div>

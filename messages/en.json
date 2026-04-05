@@ -171,7 +171,10 @@
     "imageAlt": "Hardware example",
     "openExpanded": "Enlarge image",
     "closeExpanded": "Close",
-    "ctaOurRegisters": "Our POS systems"
+    "ctaOurRegisters": "Our POS systems",
+    "premiumIncludedTf30": "tf 30",
+    "premiumIncludedPrinterX40": "printer x 40",
+    "premiumIncludedLade": "cash drawer"
   },
   "newAtVysion": {
     "title": "Build your own package",

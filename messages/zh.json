@@ -105,7 +105,10 @@
     "imageAlt": "硬件示例",
     "openExpanded": "放大图片",
     "closeExpanded": "关闭",
-    "ctaOurRegisters": "我们的收银机"
+    "ctaOurRegisters": "我们的收银机",
+    "premiumIncludedTf30": "tf 30",
+    "premiumIncludedPrinterX40": "打印机 x 40",
+    "premiumIncludedLade": "钱箱"
   },
   "newAtVysion": {
     "title": "自由组合您的套餐",

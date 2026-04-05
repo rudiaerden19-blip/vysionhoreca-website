@@ -105,7 +105,10 @@
     "imageAlt": "Hardware-Beispiel",
     "openExpanded": "Bild vergrößern",
     "closeExpanded": "Schließen",
-    "ctaOurRegisters": "Unsere Kassen"
+    "ctaOurRegisters": "Unsere Kassen",
+    "premiumIncludedTf30": "tf 30",
+    "premiumIncludedPrinterX40": "Drucker x 40",
+    "premiumIncludedLade": "Kassenlade"
   },
   "newAtVysion": {
     "title": "Stellen Sie Ihr Paket selbst zusammen",

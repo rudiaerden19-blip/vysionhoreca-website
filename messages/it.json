@@ -105,7 +105,10 @@
     "imageAlt": "Esempio di hardware",
     "openExpanded": "Ingrandisci immagine",
     "closeExpanded": "Chiudi",
-    "ctaOurRegisters": "Le nostre casse"
+    "ctaOurRegisters": "Le nostre casse",
+    "premiumIncludedTf30": "tf 30",
+    "premiumIncludedPrinterX40": "stampante x 40",
+    "premiumIncludedLade": "cassetto contanti"
   },
   "newAtVysion": {
     "title": "Componi il tuo pacchetto",

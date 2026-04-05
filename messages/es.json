@@ -105,7 +105,10 @@
     "imageAlt": "Ejemplo de hardware",
     "openExpanded": "Ampliar imagen",
     "closeExpanded": "Cerrar",
-    "ctaOurRegisters": "Nuestras cajas"
+    "ctaOurRegisters": "Nuestras cajas",
+    "premiumIncludedTf30": "tf 30",
+    "premiumIncludedPrinterX40": "impresora x 40",
+    "premiumIncludedLade": "cajón portamonedas"
   },
   "newAtVysion": {
     "title": "Monta tu propio paquete",
