@@ -17,7 +17,20 @@
     "sectors": "Sectoren",
     "services": "Onze diensten",
     "integrations": "Integraties",
-    "videos": "Video's"
+    "videos": "Video's",
+    "subscriptions": "Abonnementen"
+  },
+  "subscriptionsPage": {
+    "title": "Abonnementen",
+    "subtitle": "Eén platform voor uw zaak — transparant en maandelijks opzegbaar.",
+    "lead": "U kiest Starter of Pro en betaalt per maand of jaar. Updates en ondersteuning horen bij uw abonnement.",
+    "bullet1": "Geen langlopende contracten; op elk moment maandelijks opzegbaar.",
+    "bullet2": "14 dagen gratis uitproberen, zonder creditcard.",
+    "bullet3": "Kassa, reserveringen, online bestellen en meer in dezelfde omgeving.",
+    "bullet4": "Concrete prijzen en pakketten op de pagina Prijzen.",
+    "ctaPricing": "Bekijk prijzen",
+    "ctaTrial": "Gratis starten",
+    "contactLine": "Vragen? Ga naar het contactblok op de homepage."
   },
   "ui": {
     "ariaPrevImage": "Vorige afbeelding",

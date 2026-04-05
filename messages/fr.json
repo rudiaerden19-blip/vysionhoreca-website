@@ -17,7 +17,20 @@
     "sectors": "Secteurs",
     "services": "Nos services",
     "integrations": "Intégrations",
-    "videos": "Vidéos"
+    "videos": "Vidéos",
+    "subscriptions": "Abonnements"
+  },
+  "subscriptionsPage": {
+    "title": "Abonnements",
+    "subtitle": "Une seule plateforme pour votre établissement — transparent et résiliable chaque mois.",
+    "lead": "Choisissez Starter ou Pro et payez au mois ou à l'année. Mises à jour et support inclus.",
+    "bullet1": "Sans engagement longue durée ; résiliation à tout moment en mensuel.",
+    "bullet2": "Essai gratuit 14 jours, sans carte bancaire.",
+    "bullet3": "Caisse, réservations, commandes en ligne et plus encore au même endroit.",
+    "bullet4": "Tarifs détaillés et comparaison sur la page Tarifs.",
+    "ctaPricing": "Voir les tarifs",
+    "ctaTrial": "Commencer gratuitement",
+    "contactLine": "Des questions ? Utilisez le bloc contact en page d’accueil."
   },
   "heroLanding": {
     "logoTagline": "Votre plateforme horeca",

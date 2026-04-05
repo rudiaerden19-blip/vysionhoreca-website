@@ -52,7 +52,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
     { href: '/#sectoren', label: t('nav.sectors') },
     { href: '/#platform', label: t('nav.services') },
     { href: '/videos', label: t('nav.videos') },
-    { href: '/#contact', label: t('nav.contact') },
+    { href: '/abonnementen', label: t('nav.subscriptions') },
   ]
 
   return (

@@ -17,7 +17,20 @@
     "sectors": "Branchen",
     "services": "Unsere Leistungen",
     "integrations": "Integrationen",
-    "videos": "Videos"
+    "videos": "Videos",
+    "subscriptions": "Abonnements"
+  },
+  "subscriptionsPage": {
+    "title": "Abonnements",
+    "subtitle": "Eine Plattform für Ihr Geschäft — transparent und monatlich kündbar.",
+    "lead": "Wählen Sie Starter oder Pro und zahlen Sie monatlich oder jährlich. Updates und Support sind enthalten.",
+    "bullet1": "Keine langfristige Bindung; monatlich kündbar.",
+    "bullet2": "14 Tage kostenlos testen, keine Kreditkarte nötig.",
+    "bullet3": "Kasse, Reservierungen, Online-Bestellungen und mehr an einem Ort.",
+    "bullet4": "Konkrete Preise und Pakete auf unserer Preisseite.",
+    "ctaPricing": "Zu den Preisen",
+    "ctaTrial": "Kostenlos starten",
+    "contactLine": "Fragen? Nutzen Sie den Kontaktbereich auf der Startseite."
   },
   "heroLanding": {
     "logoTagline": "Ihre Gastronomie-Plattform",

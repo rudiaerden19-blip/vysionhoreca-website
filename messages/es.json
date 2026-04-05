@@ -17,7 +17,20 @@
     "sectors": "Sectores",
     "services": "Nuestros servicios",
     "integrations": "Integraciones",
-    "videos": "Vídeos"
+    "videos": "Vídeos",
+    "subscriptions": "Suscripciones"
+  },
+  "subscriptionsPage": {
+    "title": "Suscripciones",
+    "subtitle": "Una sola plataforma para tu negocio — transparente y con baja mensual.",
+    "lead": "Elige Starter o Pro y paga mensual o anual. Actualizaciones y soporte incluidos.",
+    "bullet1": "Sin permanencia larga; cancela en cualquier momento en plan mensual.",
+    "bullet2": "Prueba gratis 14 días, sin tarjeta.",
+    "bullet3": "TPV, reservas, pedidos online y más en un solo sitio.",
+    "bullet4": "Precios concretos y comparación en la página de Precios.",
+    "ctaPricing": "Ver precios",
+    "ctaTrial": "Empezar gratis",
+    "contactLine": "¿Dudas? Usa el bloque de contacto en la página de inicio."
   },
   "heroLanding": {
     "logoTagline": "Tu plataforma hostelera",

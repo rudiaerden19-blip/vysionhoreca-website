@@ -17,7 +17,20 @@
     "sectors": "Sectors",
     "services": "Our services",
     "integrations": "Integrations",
-    "videos": "Videos"
+    "videos": "Videos",
+    "subscriptions": "Subscriptions"
+  },
+  "subscriptionsPage": {
+    "title": "Subscriptions",
+    "subtitle": "One platform for your business — transparent and cancel monthly.",
+    "lead": "Choose Starter or Pro and pay monthly or yearly. Updates and support are included.",
+    "bullet1": "No long-term lock-in; cancel anytime on a monthly plan.",
+    "bullet2": "14-day free trial, no credit card required.",
+    "bullet3": "POS, reservations, online ordering and more in one place.",
+    "bullet4": "See exact pricing and compare plans on the Pricing page.",
+    "ctaPricing": "View pricing",
+    "ctaTrial": "Start free trial",
+    "contactLine": "Questions? Use the contact section on the homepage."
   },
   "ui": {
     "ariaPrevImage": "Previous image",

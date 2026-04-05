@@ -17,7 +17,20 @@
     "sectors": "Settori",
     "services": "I nostri servizi",
     "integrations": "Integrazioni",
-    "videos": "Video"
+    "videos": "Video",
+    "subscriptions": "Abbonamenti"
+  },
+  "subscriptionsPage": {
+    "title": "Abbonamenti",
+    "subtitle": "Un’unica piattaforma per la tua attività — trasparente e disdetta mensile.",
+    "lead": "Scegli Starter o Pro e paga mensile o annuale. Aggiornamenti e assistenza inclusi.",
+    "bullet1": "Nessun vincolo pluriennale; disdici quando vuoi con piano mensile.",
+    "bullet2": "Prova gratuita 14 giorni, senza carta di credito.",
+    "bullet3": "Cassa, prenotazioni, ordinazioni online e altro nello stesso ambiente.",
+    "bullet4": "Prezzi dettagliati e confronto nella pagina Prezzi.",
+    "ctaPricing": "Vedi prezzi",
+    "ctaTrial": "Inizia gratis",
+    "contactLine": "Domande? Usa il blocco contatti in homepage."
   },
   "heroLanding": {
     "logoTagline": "La tua piattaforma horeca",

@@ -253,6 +253,7 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/contact') ||
+    pathname.startsWith('/abonnementen') ||
     pathname.startsWith('/registreer') ||
     pathname.startsWith('/superadmin') ||
     pathname.startsWith('/kassa') ||

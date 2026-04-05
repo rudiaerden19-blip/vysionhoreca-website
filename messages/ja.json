@@ -17,7 +17,20 @@
     "sectors": "業種",
     "services": "サービス",
     "integrations": "連携",
-    "videos": "動画"
+    "videos": "動画",
+    "subscriptions": "プラン"
+  },
+  "subscriptionsPage": {
+    "title": "サブスクリプション",
+    "subtitle": "店舗のための統合プラットフォーム — 分かりやすい料金で、月単位で解約可能。",
+    "lead": "Starter または Pro を選び、月額または年額でお支払い。アップデートとサポートはプランに含まれます。",
+    "bullet1": "長期契約なし。月額プランはいつでも解約できます。",
+    "bullet2": "14 日間の無料トライアル、クレジットカード不要。",
+    "bullet3": "POS、予約、オンライン注文などを同一環境で。",
+    "bullet4": "詳しい料金とプラン比較は「料金」ページをご覧ください。",
+    "ctaPricing": "料金を見る",
+    "ctaTrial": "無料で始める",
+    "contactLine": "ご質問はホームページのお問い合わせへ。"
   },
   "heroLanding": {
     "logoTagline": "あなたの飲食プラットフォーム",
