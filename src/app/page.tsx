@@ -95,7 +95,7 @@ function WhyVysionSection() {
             ))}
           </ul>
 
-          <div className="order-1 lg:order-2 relative flex w-full min-h-0 flex-col self-stretch lg:pl-6 xl:pl-10">
+          <div className="order-1 lg:order-2 relative flex w-full min-h-0 flex-col gap-10 self-stretch sm:gap-12 lg:gap-14 lg:pl-6 xl:pl-10">
             <div className="relative min-h-[280px] flex-1 lg:min-h-[320px]">
               <div className="relative h-full min-h-[280px] lg:absolute lg:inset-0 lg:min-h-0">
                 <div className="relative min-h-[280px] h-full rounded-3xl overflow-hidden shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] lg:absolute lg:left-0 lg:right-0 lg:bottom-0 lg:min-h-0 lg:top-[2.5rem]">
@@ -110,7 +110,7 @@ function WhyVysionSection() {
                 </div>
               </div>
             </div>
-            <div className="relative z-10 mt-6 flex w-full shrink-0 flex-col items-stretch gap-4 sm:mt-8 sm:flex-row sm:items-center sm:justify-center lg:justify-start lg:px-0">
+            <div className="relative z-10 flex w-full shrink-0 flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center lg:justify-start lg:px-0">
               <a
                 href={`/registreer?lang=${locale}`}
                 className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:flex-1 lg:max-w-[220px] lg:flex-initial"
