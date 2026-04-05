@@ -138,11 +138,30 @@ export default function LoginPage() {
     setError('')
     
     try {
+      const nextParam =
+        typeof window !== 'undefined'
+          ? new URLSearchParams(window.location.search).get('next')
+          : null
+      let targetTenantSlug: string | undefined
+      if (nextParam) {
+        try {
+          const dec = decodeURIComponent(nextParam.trim())
+          const m = dec.match(/^\/shop\/([^/?#]+)/)
+          if (m?.[1]) targetTenantSlug = m[1].toLowerCase()
+        } catch {
+          /* ignore */
+        }
+      }
+
       // Server-side API call voor robuuste login
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({
+          email,
+          password,
+          ...(targetTenantSlug ? { target_tenant_slug: targetTenantSlug } : {}),
+        }),
       })
 
       const data = await response.json()
@@ -165,10 +184,6 @@ export default function LoginPage() {
 
       try { sessionStorage.removeItem(`vysion_welcomed_${tenant.tenant_slug}`) } catch { /* ignore */ }
 
-      const nextParam =
-        typeof window !== 'undefined'
-          ? new URLSearchParams(window.location.search).get('next')
-          : null
       const safeNext = normalizeLoginNextPath(nextParam, tenant.tenant_slug)
       const fallbackAfterLogin = `/shop/${tenant.tenant_slug}/admin`
 

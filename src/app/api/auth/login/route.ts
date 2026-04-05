@@ -27,6 +27,24 @@ async function verifyPassword(password: string, storedHash: string): Promise<boo
   return legacyHash === storedHash
 }
 
+const normTenant = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
+
+const TARGET_SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+/** Zelfde regels als superadmin-login (bcrypt of legacy plaintext). */
+async function verifySuperadminPassword(
+  plain: string,
+  storedHash: string,
+  dummyHash: string
+): Promise<boolean> {
+  const hashToVerify = storedHash || dummyHash
+  if (hashToVerify.startsWith('$2')) {
+    return bcrypt.compare(plain, hashToVerify)
+  }
+  if (!storedHash) return false
+  return hashToVerify === plain
+}
+
 export async function POST(request: NextRequest) {
   const requestId = crypto.randomUUID()
   const startTime = Date.now()
@@ -44,7 +62,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { email, password } = await request.json()
+    const body = await request.json()
+    const email = body.email as string
+    const password = body.password as string
+    const targetTenantSlugRaw =
+      typeof body.target_tenant_slug === 'string' ? body.target_tenant_slug.trim().toLowerCase() : ''
 
     if (!email || !password) {
       return NextResponse.json(
@@ -63,6 +85,98 @@ export async function POST(request: NextRequest) {
     }
 
     const emailLower = email.trim().toLowerCase()
+
+    const dummySaHash =
+      '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4uSl9.y5zq5z5z5z'
+
+    // ── Superadmin op gemeenschappelijke tenant-login: zelfde e-mail/wachtwoord als /superadmin/login
+    // Vereist target_tenant_slug (uit ?next=/shop/{slug}/…) zodat niet op “losse” /login alles wordt vrijgegeven.
+    if (targetTenantSlugRaw && TARGET_SLUG_RE.test(targetTenantSlugRaw)) {
+      const { data: saRow, error: saErr } = await supabase
+        .from('super_admins')
+        .select('id, email, name, password_hash, is_active')
+        .eq('email', emailLower)
+        .maybeSingle()
+
+      if (saErr) {
+        logger.error('Superadmin tenant-login lookup error', { requestId, error: saErr.message })
+        return NextResponse.json({ error: 'Database fout' }, { status: 500 })
+      }
+
+      const saValid = await verifySuperadminPassword(
+        password,
+        saRow?.password_hash || '',
+        dummySaHash
+      )
+
+      if (saRow && saValid && saRow.is_active) {
+        let canonicalSlug = targetTenantSlugRaw
+        const { data: tenantRow } = await supabase
+          .from('tenants')
+          .select('slug')
+          .eq('slug', targetTenantSlugRaw)
+          .maybeSingle()
+        if (tenantRow?.slug) canonicalSlug = tenantRow.slug
+
+        let { data: owner } = await supabase
+          .from('business_profiles')
+          .select('id, name, email, tenant_slug, email_verified')
+          .eq('tenant_slug', canonicalSlug)
+          .maybeSingle()
+
+        if (!owner) {
+          const { data: ownerRows, error: ownerErr } = await supabase
+            .from('business_profiles')
+            .select('id, name, email, tenant_slug, email_verified')
+            .not('tenant_slug', 'is', null)
+
+          if (ownerErr) {
+            logger.error('Superadmin tenant-login owner fallback', { requestId, error: ownerErr.message })
+            return NextResponse.json({ error: 'Database fout' }, { status: 500 })
+          }
+
+          owner =
+            ownerRows?.find(
+              (r) => normTenant(r.tenant_slug || '') === normTenant(targetTenantSlugRaw)
+            ) ?? null
+        }
+
+        if (!owner) {
+          logger.warn('Superadmin tenant-login: geen eigenaar voor tenant', {
+            requestId,
+            targetTenantSlugRaw,
+          })
+          return NextResponse.json(
+            { error: 'Geen zaak-account gevonden voor deze tenant. Neem contact op met support.' },
+            { status: 404 }
+          )
+        }
+
+        await supabase
+          .from('super_admins')
+          .update({ last_login: new Date().toISOString() })
+          .eq('id', saRow.id)
+
+        logger.info('Superadmin tenant-login granted (sessie als zaak-eigenaar)', {
+          requestId,
+          tenantSlug: owner.tenant_slug,
+          superadminId: saRow.id,
+        })
+
+        return NextResponse.json({
+          tenant: {
+            id: owner.id,
+            name: owner.name || owner.email,
+            email: owner.email,
+            business_id: owner.id,
+            tenant_slug: owner.tenant_slug,
+            email_verified: owner.email_verified || false,
+          },
+          login_via_superadmin: true,
+        })
+      }
+      // Geen geldige superadmin-credentials: val verder door naar normale zaak-login
+    }
 
     // Find business profile by email
     const { data: profile, error: profileError } = await supabase
@@ -94,6 +208,21 @@ export async function POST(request: NextRequest) {
         { error: 'Onjuist wachtwoord' },
         { status: 401 }
       )
+    }
+
+    if (targetTenantSlugRaw && TARGET_SLUG_RE.test(targetTenantSlugRaw)) {
+      if (normTenant(profile.tenant_slug || '') !== normTenant(targetTenantSlugRaw)) {
+        logger.warn('Login geweigerd: account past niet bij gevraagde tenant', {
+          requestId,
+          email: emailLower,
+          profileTenant: profile.tenant_slug,
+          targetTenantSlugRaw,
+        })
+        return NextResponse.json(
+          { error: 'Dit account hoort niet bij deze zaak. Controleer e-mail of open de juiste winkel-URL.' },
+          { status: 403 }
+        )
+      }
     }
 
     // Auto-upgrade legacy passwords to bcrypt
