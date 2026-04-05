@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, ReactNode } from 'react'
+import { useState, useLayoutEffect, ReactNode } from 'react'
 import { useLanguage } from '@/i18n'
+import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
 
 interface Props {
   tenant: string
@@ -22,7 +23,11 @@ export default function PinGate({ tenant, children }: Props) {
   const [saving, setSaving] = useState(false)
   const [forgotStep, setForgotStep] = useState<'email' | 'newpin'>('email')
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (isSuperAdminLoggedIn()) {
+      setState('unlocked')
+      return
+    }
     if (sessionStorage.getItem(SESSION_KEY) === 'true') {
       setState('unlocked')
       return
