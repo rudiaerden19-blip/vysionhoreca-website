@@ -77,7 +77,11 @@
     "subtitle": "Caja, pedidos y reservas en un solo sistema.",
     "ctaStartFree": "Empezar gratis",
     "ctaViewDemo": "Ver demo",
-    "ctaModulesLine": "Tú eliges tus propios módulos: una plataforma totalmente adaptada a tu negocio",
+    "ctaModulesHeadline": "Sistema completo",
+    "ctaModulesSubline": "Con impresora y cajón portamonedas",
+    "ctaModulesPricePrefix": "por",
+    "ctaModulesPriceAmount": "99",
+    "ctaModulesPricePeriod": "al mes",
     "demoRequest": "Solicitar demo"
   },
   "hero": {

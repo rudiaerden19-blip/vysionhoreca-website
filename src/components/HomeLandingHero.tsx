@@ -228,9 +228,31 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
             {t('heroLanding.ctaViewDemo')}
           </a>
         </div>
-        <p className="mt-[calc(1.25rem+2cm)] sm:mt-[calc(1.5rem+2cm)] text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-3xl leading-snug">
-          {t('heroLanding.ctaModulesLine')}
-        </p>
+        <div
+          className="mt-10 sm:mt-14 md:mt-16 w-full max-w-lg sm:max-w-xl mx-auto rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10"
+          role="region"
+          aria-label={`${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}`}
+        >
+          <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
+            {t('heroLanding.ctaModulesHeadline')}
+          </p>
+          <p className="mt-2 text-base sm:text-lg text-white/88 font-medium text-balance leading-snug">
+            {t('heroLanding.ctaModulesSubline')}
+          </p>
+          <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-white/20 flex flex-wrap items-baseline justify-center gap-x-2 gap-y-1 text-white">
+            <span className="text-base sm:text-lg text-white/90 font-medium shrink-0">
+              {t('heroLanding.ctaModulesPricePrefix')}
+            </span>
+            <span className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-accent tracking-tight tabular-nums shrink-0">
+              €&nbsp;{t('heroLanding.ctaModulesPriceAmount')}
+            </span>
+            {t('heroLanding.ctaModulesPricePeriod') ? (
+              <span className="text-base sm:text-lg font-semibold text-white/95 shrink-0">
+                {t('heroLanding.ctaModulesPricePeriod')}
+              </span>
+            ) : null}
+          </div>
+        </div>
       </div>
     </section>
   )

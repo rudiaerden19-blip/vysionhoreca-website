@@ -143,7 +143,11 @@
     "subtitle": "Kassa, bestellingen en reserveringen in één systeem.",
     "ctaStartFree": "Start gratis",
     "ctaViewDemo": "Bekijk demo",
-    "ctaModulesLine": "Compleet systeem printer / geldlade enz. voor 99 euro per maand",
+    "ctaModulesHeadline": "Compleet systeem",
+    "ctaModulesSubline": "Met printer en geldlade",
+    "ctaModulesPricePrefix": "voor",
+    "ctaModulesPriceAmount": "99",
+    "ctaModulesPricePeriod": "per maand",
     "demoRequest": "Demo aanvraag"
   },
   "hero": {

@@ -77,7 +77,11 @@
     "subtitle": "收银、订单与预订，一套系统搞定。",
     "ctaStartFree": "免费开始",
     "ctaViewDemo": "查看演示",
-    "ctaModulesLine": "自选模块，专为您的店铺打造的平台",
+    "ctaModulesHeadline": "完整系统",
+    "ctaModulesSubline": "含打印机与钱箱",
+    "ctaModulesPricePrefix": "每月",
+    "ctaModulesPriceAmount": "99",
+    "ctaModulesPricePeriod": "欧元",
     "demoRequest": "申请演示"
   },
   "hero": {

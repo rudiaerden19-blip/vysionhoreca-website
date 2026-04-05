@@ -77,7 +77,11 @@
     "subtitle": "الصندوق والطلبات والحجوزات في نظام واحد.",
     "ctaStartFree": "ابدأ مجانًا",
     "ctaViewDemo": "شاهد العرض",
-    "ctaModulesLine": "اختر وحداتك بنفسك — منصة مُصمَّمة بالكامل لعملك",
+    "ctaModulesHeadline": "نظام متكامل",
+    "ctaModulesSubline": "مع طابعة ودرج نقدية",
+    "ctaModulesPricePrefix": "بـ",
+    "ctaModulesPriceAmount": "99",
+    "ctaModulesPricePeriod": "شهريًا",
     "demoRequest": "اطلب عرضًا"
   },
   "hero": {

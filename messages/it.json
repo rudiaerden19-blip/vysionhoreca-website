@@ -77,7 +77,11 @@
     "subtitle": "Cassa, ordini e prenotazioni in un unico sistema.",
     "ctaStartFree": "Inizia gratis",
     "ctaViewDemo": "Guarda la demo",
-    "ctaModulesLine": "Scegli i tuoi moduli — una piattaforma su misura per la tua attività",
+    "ctaModulesHeadline": "Sistema completo",
+    "ctaModulesSubline": "Con stampante e cassetto contanti",
+    "ctaModulesPricePrefix": "A soli",
+    "ctaModulesPriceAmount": "99",
+    "ctaModulesPricePeriod": "al mese",
     "demoRequest": "Richiedi demo"
   },
   "hero": {

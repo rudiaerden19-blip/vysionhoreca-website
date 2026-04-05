@@ -77,7 +77,11 @@
     "subtitle": "レジ・注文・予約をひとつのシステムに。",
     "ctaStartFree": "無料で始める",
     "ctaViewDemo": "デモを見る",
-    "ctaModulesLine": "必要なモジュールを自分で選べる、お店に合わせたプラットフォーム",
+    "ctaModulesHeadline": "一式のシステム",
+    "ctaModulesSubline": "プリンター・ドロワー付き",
+    "ctaModulesPricePrefix": "月額",
+    "ctaModulesPriceAmount": "99",
+    "ctaModulesPricePeriod": "",
     "demoRequest": "デモを依頼"
   },
   "hero": {

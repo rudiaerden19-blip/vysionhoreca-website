@@ -77,7 +77,11 @@
     "subtitle": "Caisse, commandes et réservations dans un seul système.",
     "ctaStartFree": "Commencer gratuitement",
     "ctaViewDemo": "Voir la démo",
-    "ctaModulesLine": "Vous choisissez vos propres modules — une plateforme entièrement adaptée à votre établissement",
+    "ctaModulesHeadline": "Système complet",
+    "ctaModulesSubline": "Avec imprimante et tiroir-caisse",
+    "ctaModulesPricePrefix": "pour",
+    "ctaModulesPriceAmount": "99",
+    "ctaModulesPricePeriod": "par mois",
     "demoRequest": "Demander une démo"
   },
   "hero": {

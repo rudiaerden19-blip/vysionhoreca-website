@@ -143,7 +143,11 @@
     "subtitle": "POS, orders and reservations in one system.",
     "ctaStartFree": "Start free",
     "ctaViewDemo": "View demo",
-    "ctaModulesLine": "You choose your own modules — a platform fully tailored to your business",
+    "ctaModulesHeadline": "Complete system",
+    "ctaModulesSubline": "With printer and cash drawer",
+    "ctaModulesPricePrefix": "for",
+    "ctaModulesPriceAmount": "99",
+    "ctaModulesPricePeriod": "per month",
     "demoRequest": "Request a demo"
   },
   "hero": {
