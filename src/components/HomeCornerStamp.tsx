@@ -30,6 +30,8 @@ export default function HomeCornerStamp({
   /** Path meta: sweep 0 = bovenboog in SVG; textPath zet glyphs visueel langs de andere boog. */
   const arcUpperPathId = `home-stamp-arc-u-${uid}`
   const arcLowerPathId = `home-stamp-arc-l-${uid}`
+  /** Langere onderboog voor software/hardware-stempel: "hardware" lager + ruimer om de ★ heen. */
+  const arcUpperOuterPathId = `home-stamp-arc-uout-${uid}`
   const [visible, setVisible] = useState(false)
   const triggeredRef = useRef(false)
 
@@ -87,6 +89,9 @@ export default function HomeCornerStamp({
           {/* Kleinere straal = boogtekst verder van de dubbele ring (meest was te dicht tegen de rand). */}
           <path id={arcUpperPathId} d="M 42 100 A 58 58 0 0 0 158 100" />
           <path id={arcLowerPathId} d="M 42 100 A 58 58 0 0 1 158 100" />
+          {centerWordKey ? (
+            <path id={arcUpperOuterPathId} d="M 28 100 A 72 72 0 0 0 172 100" />
+          ) : null}
         </defs>
         <circle
           cx="100"
@@ -118,12 +123,16 @@ export default function HomeCornerStamp({
         </text>
         <text
           fill="currentColor"
-          fontSize="15"
+          fontSize={centerWordKey ? 17 : 15}
           fontWeight="700"
-          letterSpacing="0.05em"
+          letterSpacing={centerWordKey ? '0.07em' : '0.05em'}
           style={{ fontFamily: 'system-ui, sans-serif' }}
         >
-          <textPath href={`#${arcUpperPathId}`} startOffset="50%" textAnchor="middle">
+          <textPath
+            href={`#${centerWordKey ? arcUpperOuterPathId : arcUpperPathId}`}
+            startOffset="50%"
+            textAnchor="middle"
+          >
             {bottomArc}
           </textPath>
         </text>
