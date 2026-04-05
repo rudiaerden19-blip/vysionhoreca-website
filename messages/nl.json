@@ -68,7 +68,8 @@
     "onboardingStep4Title": "4: Klaar binnen 7 dagen",
     "onboardingStep4Desc": "Je kassasysteem staat plug en play klaar, inclusief alle hardware.",
     "onboardingStep5Title": "5: Levering en persoonlijke uitleg",
-    "onboardingStep5Desc": "We komen je hardware leveren en je krijgt van ons een gratis opleiding."
+    "onboardingStep5Desc": "We komen je hardware leveren en je krijgt van ons een gratis opleiding.",
+    "readGeneralTermsCta": "Lees algemene voorwaarden"
   },
   "ui": {
     "ariaPrevImage": "Vorige afbeelding",
@@ -1730,6 +1731,12 @@
       "title": "Contact",
       "content": "Voor vragen over onze subverwerkers kunt u contact opnemen via"
     }
+  },
+  "generalTermsPage": {
+    "title": "Algemene voorwaarden",
+    "lastUpdated": "Laatst bijgewerkt: april 2026",
+    "intro": "Onderstaande bepalingen zijn van toepassing op het gebruik van het Vysion Horeca-platform en op uw abonnement. Ze sluiten aan bij onze formele dienstenovereenkomst.",
+    "formalNote": "De volledige contractuele versie van deze bepalingen vindt u in de"
   },
   "serviceAgreementPage": {
     "title": "Vysion Dienstenovereenkomst",

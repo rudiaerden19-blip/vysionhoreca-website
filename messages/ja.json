@@ -68,7 +68,8 @@
     "onboardingStep4Title": "4：7日以内に準備完了",
     "onboardingStep4Desc": "ハードウェア込みでプラグアンドプレイの状態でお渡しします。",
     "onboardingStep5Title": "5：納品と個別レクチャー",
-    "onboardingStep5Desc": "ハードウェアをお届けし、無料の研修をご提供します。"
+    "onboardingStep5Desc": "ハードウェアをお届けし、無料の研修をご提供します。",
+    "readGeneralTermsCta": "利用規約を読む"
   },
   "heroLanding": {
     "logoTagline": "あなたの飲食プラットフォーム",
@@ -1489,6 +1490,12 @@
       "title": "お問い合わせ",
       "content": "副処理者に関するご質問は、以下までお問い合わせください"
     }
+  },
+  "generalTermsPage": {
+    "title": "利用規約",
+    "lastUpdated": "最終更新日: 2026年4月",
+    "intro": "以下の条項は、Vysion Horeca プラットフォームのご利用およびご契約に適用されます。正式なサービス契約と整合しています。",
+    "formalNote": "契約上の全文は次のとおりです："
   },
   "serviceAgreementPage": {
     "title": "Vysionサービス契約",

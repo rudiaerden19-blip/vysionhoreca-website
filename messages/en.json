@@ -68,7 +68,8 @@
     "onboardingStep4Title": "4: Ready within 7 days",
     "onboardingStep4Desc": "Your POS is plug and play, including all hardware.",
     "onboardingStep5Title": "5: Delivery and personal walkthrough",
-    "onboardingStep5Desc": "We deliver your hardware to you and you get free training from us."
+    "onboardingStep5Desc": "We deliver your hardware to you and you get free training from us.",
+    "readGeneralTermsCta": "Read general terms and conditions"
   },
   "ui": {
     "ariaPrevImage": "Previous image",
@@ -1730,6 +1731,12 @@
       "title": "Contact",
       "content": "For questions about our subprocessors, please contact us at"
     }
+  },
+  "generalTermsPage": {
+    "title": "General terms and conditions",
+    "lastUpdated": "Last updated: April 2026",
+    "intro": "The following provisions apply to your use of the Vysion Horeca platform and your subscription. They align with our formal service agreement.",
+    "formalNote": "The full contractual version of these provisions is available in the"
   },
   "serviceAgreementPage": {
     "title": "Vysion Service Agreement",

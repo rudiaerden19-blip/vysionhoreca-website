@@ -68,7 +68,8 @@
     "onboardingStep4Title": "4：7 天内就绪",
     "onboardingStep4Desc": "含硬件在内，系统即插即用。",
     "onboardingStep5Title": "5：交付与现场讲解",
-    "onboardingStep5Desc": "我们为您配送硬件，并提供免费培训。"
+    "onboardingStep5Desc": "我们为您配送硬件，并提供免费培训。",
+    "readGeneralTermsCta": "阅读通用条款"
   },
   "heroLanding": {
     "logoTagline": "您的餐饮平台",
@@ -1489,6 +1490,12 @@
       "title": "联系我们",
       "content": "关于我们次级处理者的问题，您可以联系"
     }
+  },
+  "generalTermsPage": {
+    "title": "通用条款",
+    "lastUpdated": "最后更新：2026 年 4 月",
+    "intro": "以下条款适用于您使用 Vysion Horeca 平台及订阅服务，并与我们的正式服务协议一致。",
+    "formalNote": "完整的合同版本请见"
   },
   "serviceAgreementPage": {
     "title": "Vysion服务协议",

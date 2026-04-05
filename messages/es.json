@@ -68,7 +68,8 @@
     "onboardingStep4Title": "4: Listo en 7 días",
     "onboardingStep4Desc": "Tu TPV queda plug & play, con hardware incluido.",
     "onboardingStep5Title": "5: Entrega y puesta en marcha",
-    "onboardingStep5Desc": "Te entregamos el hardware y te damos formación gratuita."
+    "onboardingStep5Desc": "Te entregamos el hardware y te damos formación gratuita.",
+    "readGeneralTermsCta": "Leer condiciones generales"
   },
   "heroLanding": {
     "logoTagline": "Tu plataforma hostelera",
@@ -1489,6 +1490,12 @@
       "title": "Contacto",
       "content": "Para preguntas sobre nuestros subprocesadores puede contactar a"
     }
+  },
+  "generalTermsPage": {
+    "title": "Condiciones generales",
+    "lastUpdated": "Última actualización: abril 2026",
+    "intro": "Las siguientes disposiciones se aplican al uso de la plataforma Vysion Horeca y a su suscripción. Se alinean con nuestro acuerdo de servicios formal.",
+    "formalNote": "La versión contractual completa está disponible en el"
   },
   "serviceAgreementPage": {
     "title": "Acuerdo de Servicios Vysion",

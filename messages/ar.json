@@ -68,7 +68,8 @@
     "onboardingStep4Title": "4: جاهز خلال 7 أيام",
     "onboardingStep4Desc": "نظامك جاهز للتوصيل والتشغيل، بما في ذلك العتاد.",
     "onboardingStep5Title": "5: التسليم وشرح شخصي",
-    "onboardingStep5Desc": "نوصّل لك المعدات ونقدّم لك تدريبًا مجانيًا."
+    "onboardingStep5Desc": "نوصّل لك المعدات ونقدّم لك تدريبًا مجانيًا.",
+    "readGeneralTermsCta": "اقرأ الشروط العامة"
   },
   "heroLanding": {
     "logoTagline": "منصتك لفن الضيافة",
@@ -1489,6 +1490,12 @@
       "title": "اتصل بنا",
       "content": "للأسئلة حول المعالجين الفرعيين يمكنك الاتصال بـ"
     }
+  },
+  "generalTermsPage": {
+    "title": "الشروط العامة",
+    "lastUpdated": "آخر تحديث: أبريل 2026",
+    "intro": "تنطبق الأحكام التالية على استخدامك لمنصة Vysion Horeca واشتراكك، وهي متوافقة مع اتفاقية الخدمات الرسمية.",
+    "formalNote": "النسخة التعاقدية الكاملة متوفرة في"
   },
   "serviceAgreementPage": {
     "title": "اتفاقية خدمة Vysion",

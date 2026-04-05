@@ -68,7 +68,8 @@
     "onboardingStep4Title": "4 : Prêt sous 7 jours",
     "onboardingStep4Desc": "Votre système est plug & play, matériel inclus.",
     "onboardingStep5Title": "5 : Livraison et mise en main",
-    "onboardingStep5Desc": "Nous livrons votre matériel et vous offrons une formation gratuite."
+    "onboardingStep5Desc": "Nous livrons votre matériel et vous offrons une formation gratuite.",
+    "readGeneralTermsCta": "Lire les conditions générales"
   },
   "heroLanding": {
     "logoTagline": "Votre plateforme horeca",
@@ -3833,6 +3834,12 @@
       "title": "Contact",
       "content": "Voor vragen over onze subverwerkers kunt u contact opnemen via"
     }
+  },
+  "generalTermsPage": {
+    "title": "Conditions générales",
+    "lastUpdated": "Dernière mise à jour : avril 2026",
+    "intro": "Les dispositions ci-dessous régissent l’utilisation de la plateforme Vysion Horeca et votre abonnement. Elles correspondent à notre contrat de services formel.",
+    "formalNote": "La version contractuelle complète est disponible dans la"
   },
   "serviceAgreementPage": {
     "title": "Vysion Dienstenovereenkomst",

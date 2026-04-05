@@ -68,7 +68,8 @@
     "onboardingStep4Title": "4: In 7 Tagen startklar",
     "onboardingStep4Desc": "Ihr Kassensystem steht plug & play inklusive Hardware bereit.",
     "onboardingStep5Title": "5: Lieferung und persönliche Einweisung",
-    "onboardingStep5Desc": "Wir liefern Ihre Hardware und Sie erhalten eine kostenlose Schulung von uns."
+    "onboardingStep5Desc": "Wir liefern Ihre Hardware und Sie erhalten eine kostenlose Schulung von uns.",
+    "readGeneralTermsCta": "Allgemeine Geschäftsbedingungen lesen"
   },
   "heroLanding": {
     "logoTagline": "Ihre Gastronomie-Plattform",
@@ -3834,6 +3835,12 @@
       "title": "Kontakt",
       "content": "Fragen zu Unterauftragsverarbeitern richten Sie bitte an"
     }
+  },
+  "generalTermsPage": {
+    "title": "Allgemeine Geschäftsbedingungen",
+    "lastUpdated": "Zuletzt aktualisiert: April 2026",
+    "intro": "Die folgenden Bestimmungen gelten für die Nutzung der Vysion Horeca-Plattform und Ihr Abonnement. Sie entsprechen unserem formellen Dienstleistungsvertrag.",
+    "formalNote": "Die vollständige Vertragsfassung finden Sie in der"
   },
   "serviceAgreementPage": {
     "title": "Vysion Dienstleistungsvertrag",

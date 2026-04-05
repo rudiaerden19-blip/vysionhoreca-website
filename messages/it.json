@@ -68,7 +68,8 @@
     "onboardingStep4Title": "4: Pronto in 7 giorni",
     "onboardingStep4Desc": "Il POS è plug & play, hardware incluso.",
     "onboardingStep5Title": "5: Consegna e spiegazione",
-    "onboardingStep5Desc": "Ti consegniamo l’hardware e ti offriamo formazione gratuita."
+    "onboardingStep5Desc": "Ti consegniamo l’hardware e ti offriamo formazione gratuita.",
+    "readGeneralTermsCta": "Leggi le condizioni generali"
   },
   "heroLanding": {
     "logoTagline": "La tua piattaforma horeca",
@@ -1489,6 +1490,12 @@
       "title": "Contatti",
       "content": "Per domande sui nostri sub-responsabili puoi contattare"
     }
+  },
+  "generalTermsPage": {
+    "title": "Condizioni generali",
+    "lastUpdated": "Ultimo aggiornamento: aprile 2026",
+    "intro": "Le disposizioni seguenti si applicano all’uso della piattaforma Vysion Horeca e al tuo abbonamento. Sono allineate al nostro accordo di servizi formale.",
+    "formalNote": "La versione contrattuale completa è disponibile nell’"
   },
   "serviceAgreementPage": {
     "title": "Accordo sui Servizi Vysion",

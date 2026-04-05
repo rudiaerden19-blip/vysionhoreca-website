@@ -20,15 +20,25 @@ export default function AbonnementenPage() {
   const { t, locale } = useLanguage()
   const [isYearly, setIsYearly] = useState(false)
   const [lightbox, setLightbox] = useState<LightboxState>(null)
+  const [generalTermsOpen, setGeneralTermsOpen] = useState(false)
+
+  const sa = (key: string) => t(`serviceAgreementPage.${key}`)
 
   useEffect(() => {
-    if (!lightbox) return
+    if (!lightbox && !generalTermsOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setLightbox(null)
+      if (e.key !== 'Escape') return
+      if (lightbox) setLightbox(null)
+      else setGeneralTermsOpen(false)
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [lightbox])
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [lightbox, generalTermsOpen])
 
   const starterMonthly = 59
   const proMonthly = 99
@@ -244,7 +254,7 @@ export default function AbonnementenPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-16 sm:mb-24 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 max-w-6xl mx-auto">
             {GALLERY_IMAGES.map((item) => {
               const alt = t(`subscriptionsPage.${item.altKey}`)
               return (
@@ -269,6 +279,16 @@ export default function AbonnementenPage() {
                 </button>
               )
             })}
+          </div>
+
+          <div className="flex justify-center mb-16 sm:mb-24 max-w-6xl mx-auto px-1">
+            <button
+              type="button"
+              onClick={() => setGeneralTermsOpen(true)}
+              className="inline-flex items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
+            >
+              {t('subscriptionsPage.readGeneralTermsCta')}
+            </button>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start mt-12 sm:mt-20 lg:mt-24 xl:mt-28 pt-4 sm:pt-6">
@@ -442,6 +462,80 @@ export default function AbonnementenPage() {
           </div>
         </div>
       </section>
+
+      {generalTermsOpen && (
+        <div
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-4 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="abonnementen-terms-title"
+          onClick={() => setGeneralTermsOpen(false)}
+        >
+          <div
+            className="relative flex max-h-[min(90vh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-200 px-5 py-4 sm:px-6 sm:py-5">
+              <div>
+                <h2 id="abonnementen-terms-title" className="text-lg font-bold text-gray-900 sm:text-xl">
+                  {t('generalTermsPage.title')}
+                </h2>
+                <p className="mt-1 text-xs text-gray-500 sm:text-sm">{t('generalTermsPage.lastUpdated')}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGeneralTermsOpen(false)}
+                className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+                aria-label={t('ui.ariaClose')}
+              >
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6 sm:py-5 text-left">
+              <p className="mb-6 text-sm leading-relaxed text-gray-600">{t('generalTermsPage.intro')}</p>
+              <div className="prose prose-sm max-w-none text-gray-700">
+                <h3 className="text-base font-bold text-gray-900">{sa('sections.general.title')}</h3>
+                <p className="mb-5 text-sm leading-relaxed">{sa('sections.general.content')}</p>
+                <h3 className="text-base font-bold text-gray-900">{sa('sections.services.title')}</h3>
+                <p className="mb-5 text-sm leading-relaxed">{sa('sections.services.content')}</p>
+                <h3 className="text-base font-bold text-gray-900">{sa('sections.subscription.title')}</h3>
+                <p className="mb-3 text-sm leading-relaxed">{sa('sections.subscription.intro')}</p>
+                <ul className="mb-5 list-disc space-y-1 pl-5 text-sm">
+                  <li>{sa('sections.subscription.items.1')}</li>
+                  <li>{sa('sections.subscription.items.2')}</li>
+                  <li>{sa('sections.subscription.items.3')}</li>
+                </ul>
+                <h3 className="text-base font-bold text-gray-900">{sa('sections.usage.title')}</h3>
+                <p className="mb-5 text-sm leading-relaxed">{sa('sections.usage.content')}</p>
+                <h3 className="text-base font-bold text-gray-900">{sa('sections.privacy.title')}</h3>
+                <p className="mb-5 text-sm leading-relaxed">{sa('sections.privacy.content')}</p>
+                <h3 className="text-base font-bold text-gray-900">{sa('sections.liability.title')}</h3>
+                <p className="mb-5 text-sm leading-relaxed">{sa('sections.liability.content')}</p>
+                <h3 className="text-base font-bold text-gray-900">{sa('sections.termination.title')}</h3>
+                <p className="mb-5 text-sm leading-relaxed">{sa('sections.termination.content')}</p>
+                <h3 className="text-base font-bold text-gray-900">{sa('sections.law.title')}</h3>
+                <p className="mb-5 text-sm leading-relaxed">{sa('sections.law.content')}</p>
+                <h3 className="text-base font-bold text-gray-900">{sa('sections.contact.title')}</h3>
+                <p className="mb-5 text-sm leading-relaxed">
+                  {sa('sections.contact.content')}{' '}
+                  <a href="mailto:info@vysionhoreca.com" className="text-accent hover:underline">
+                    info@vysionhoreca.com
+                  </a>
+                </p>
+                <p className="border-t border-gray-200 pt-5 text-xs leading-relaxed text-gray-600">
+                  {t('generalTermsPage.formalNote')}{' '}
+                  <a href="/juridisch/dienstenovereenkomst" className="font-medium text-accent hover:underline">
+                    {t('legalMain.links.serviceAgreement')}
+                  </a>
+                  .
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {lightbox && (
         <div
