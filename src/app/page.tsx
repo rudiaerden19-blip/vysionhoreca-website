@@ -110,7 +110,7 @@ function WhyVysionSection() {
                 </div>
               </div>
             </div>
-            <div className="relative z-10 flex w-full shrink-0 flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center lg:justify-start lg:px-0">
+            <div className="relative z-10 mt-[2cm] flex w-full shrink-0 flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-center lg:justify-start lg:px-0">
               <a
                 href={`/registreer?lang=${locale}`}
                 className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:flex-1 lg:max-w-[220px] lg:flex-initial"
