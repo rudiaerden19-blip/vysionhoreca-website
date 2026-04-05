@@ -30,7 +30,11 @@
     "bullet4": "具体价格与套餐对比请见「价格」页面。",
     "ctaPricing": "查看价格",
     "ctaTrial": "免费试用",
-    "contactLine": "有疑问？请使用首页的联系区块。"
+    "contactLine": "有疑问？请使用首页的联系区块。",
+    "vysionProHeading": "Vysion Pro",
+    "vysionProImageAlt": "Vysion Pro 套餐概览",
+    "vysionProRightP1": "Vysion Pro 将在线订餐、自有网站、库存、厨房屏、桌位预订等整合在同一订阅中。",
+    "vysionProRightP2": "支持按月或按年付费；年付可省 10%。卡片上所列功能均已包含，并提供免费入门培训与支持。"
   },
   "heroLanding": {
     "logoTagline": "您的餐饮平台",

@@ -30,7 +30,11 @@
     "bullet4": "詳しい料金とプラン比較は「料金」ページをご覧ください。",
     "ctaPricing": "料金を見る",
     "ctaTrial": "無料で始める",
-    "contactLine": "ご質問はホームページのお問い合わせへ。"
+    "contactLine": "ご質問はホームページのお問い合わせへ。",
+    "vysionProHeading": "Vysion Pro",
+    "vysionProImageAlt": "Vysion Pro パッケージの概要",
+    "vysionProRightP1": "Vysion Pro なら、オンライン注文、独自サイト、在庫、キッチンディスプレイ、テーブル予約などをひとつのサブスクにまとめられます。",
+    "vysionProRightP2": "月額・年額から選択可能。年払いは 10% お得です。カード記載の機能はすべて含まれ、無料のオンボーディング研修とサポート付きです。"
   },
   "heroLanding": {
     "logoTagline": "あなたの飲食プラットフォーム",
