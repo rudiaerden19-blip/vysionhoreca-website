@@ -1005,21 +1005,21 @@ function TableKioskSection() {
         typeof document !== 'undefined' &&
         createPortal(
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4 sm:p-6"
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black p-0 sm:bg-black/90 sm:p-6"
             role="dialog"
             aria-modal="true"
             aria-label={t('subscriptionsPage.enlargeImageHint')}
             onClick={() => setKioskLightboxOpen(false)}
           >
             <div
-              className="relative inline-block max-h-[min(85vh,920px)] max-w-full"
+              className="relative flex h-[100dvh] w-full max-w-[100vw] items-center justify-center sm:inline-flex sm:h-auto sm:max-h-[min(85vh,920px)] sm:w-auto sm:max-w-full"
               onClick={(e) => e.stopPropagation()}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- lightbox: native img op ware grootte */}
               <img
                 src={TABLE_KIOSK_SLIDES[kioskSlide]}
                 alt={`${t('ui.lightboxImageAlt')}: ${t('tableKiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
-                className="block max-h-[min(85vh,920px)] max-w-[calc(100vw-2rem)] w-auto h-auto object-contain rounded-lg shadow-2xl"
+                className="block h-auto max-h-[100dvh] w-auto max-w-[100vw] object-contain sm:max-h-[min(85vh,920px)] sm:max-w-[calc(100vw-3rem)] sm:rounded-lg sm:shadow-2xl"
               />
               <button
                 type="button"
@@ -1027,7 +1027,7 @@ function TableKioskSection() {
                   e.stopPropagation()
                   setKioskLightboxOpen(false)
                 }}
-                className="absolute top-2 right-2 z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 sm:top-3 sm:right-3 sm:h-11 sm:w-11"
+                className="absolute z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 top-[max(0.5rem,env(safe-area-inset-top))] right-[max(0.5rem,env(safe-area-inset-right))] sm:top-3 sm:right-3 sm:h-11 sm:w-11"
                 aria-label={t('ui.ariaClose')}
               >
                 <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -1040,7 +1040,7 @@ function TableKioskSection() {
                   e.stopPropagation()
                   setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
                 }}
-                className="absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 sm:left-3 sm:h-12 sm:w-12"
+                className="absolute left-[max(0.5rem,env(safe-area-inset-left))] top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 sm:left-3 sm:h-12 sm:w-12"
                 aria-label={t('ui.ariaPrevImage')}
               >
                 <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -1053,7 +1053,7 @@ function TableKioskSection() {
                   e.stopPropagation()
                   setKioskSlide((i) => (i + 1) % kioskCount)
                 }}
-                className="absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 sm:right-3 sm:h-12 sm:w-12"
+                className="absolute right-[max(0.5rem,env(safe-area-inset-right))] top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/80 bg-black/55 text-white shadow-md backdrop-blur-sm transition-colors hover:bg-black/75 sm:right-3 sm:h-12 sm:w-12"
                 aria-label={t('ui.ariaNextImage')}
               >
                 <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
