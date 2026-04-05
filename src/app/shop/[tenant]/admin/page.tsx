@@ -9,6 +9,7 @@ import { useLanguage } from '@/i18n'
 import { getTenantSettings } from '@/lib/admin-api'
 import PinGate from '@/components/PinGate'
 import { useTenantModuleFlags } from '@/lib/use-tenant-modules'
+import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
 
 interface DashboardStats {
   todayOrders: number
@@ -39,9 +40,10 @@ export default function AdminDashboard({ params }: { params: { tenant: string } 
   const { moduleAccess } = useTenantModuleFlags(params.tenant)
   const [businessName, setBusinessName] = useState<string>('')
 
-  // Welkomstpagina: toon bij elke nieuwe sessie (tab/browser openen)
+  // Welkomstpagina: zaak-eigenaren bij eerste bezoek; superadmin slaat dit over (anders paarse splash + verkeerde doorlink naar subdomein).
   useEffect(() => {
     try {
+      if (typeof window !== 'undefined' && isSuperAdminLoggedIn()) return
       const key = `vysion_welcomed_${params.tenant}`
       const seen = sessionStorage.getItem(key)
       if (!seen) {

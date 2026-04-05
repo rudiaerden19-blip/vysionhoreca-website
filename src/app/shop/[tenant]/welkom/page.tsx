@@ -1,12 +1,25 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { getTenantUrl } from '@/lib/tenant-url'
+import { isSuperAdminLoggedIn } from '@/lib/auth-headers'
+import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
 
 export default function WelkomPage({ params }: { params: { tenant: string } }) {
   const router = useRouter()
   const [showTitle, setShowTitle] = useState(false)
   const [showButton, setShowButton] = useState(false)
+
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return
+    mirrorSuperadminSessionFromCookieToLocalStorage()
+    if (!isSuperAdminLoggedIn()) return
+    try {
+      sessionStorage.setItem(`vysion_welcomed_${params.tenant}`, 'true')
+    } catch { /* ignore */ }
+    router.replace(`/shop/${params.tenant}/admin`)
+  }, [params.tenant, router])
 
   useEffect(() => {
     // Start fade-in title na korte delay
@@ -24,12 +37,12 @@ export default function WelkomPage({ params }: { params: { tenant: string } }) {
       sessionStorage.removeItem(`vysion_kassa_audio_ok_${params.tenant}`)
       sessionStorage.removeItem(`vysion_audio_activated_${params.tenant}`)
     } catch { /* ignore */ }
-    const isLocalhost = typeof window !== 'undefined' &&
-      (window.location.hostname.includes('localhost') || window.location.hostname.includes('127.0.0.1'))
-    if (isLocalhost) {
-      router.push(`/shop/${params.tenant}/admin/kassa`)
+    const target = getTenantUrl(params.tenant, '/admin/kassa')
+    // Hoofddomein / preview: blijf op zelfde host (/shop/…); geen harde jump naar *.ordervysion.com (breekt superadmin-sessie op www).
+    if (target.startsWith('/')) {
+      router.push(target)
     } else {
-      window.location.href = `https://${params.tenant}.ordervysion.com/admin/kassa`
+      window.location.href = target
     }
   }
 
