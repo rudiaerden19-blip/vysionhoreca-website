@@ -165,6 +165,7 @@
     "bottomArc": "affordable"
   },
   "hardware": {
+    "kicker": "Hardware included in the Premium subscription",
     "title": "Our hardware",
     "subtitle": "Professional POS terminals, customer displays, payment devices and peripherals — ready to run Vysion Horeca in your venue.",
     "imageAlt": "Hardware example",

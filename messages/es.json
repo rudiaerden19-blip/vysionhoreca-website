@@ -99,6 +99,7 @@
     "bottomArc": "económico"
   },
   "hardware": {
+    "kicker": "Hardware incluido en la suscripción Premium",
     "title": "Nuestro hardware",
     "subtitle": "TPVs profesionales, pantallas para el cliente, datáfonos y periféricos — listos para ejecutar Vysion Horeca en tu negocio.",
     "imageAlt": "Ejemplo de hardware",
