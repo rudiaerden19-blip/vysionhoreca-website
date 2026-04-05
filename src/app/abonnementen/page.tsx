@@ -6,7 +6,6 @@ import { Navigation, Footer, CookieBanner } from '@/components'
 import { useLanguage } from '@/i18n'
 
 const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
-const PREMIUM_CARD_IMAGE = '/images/abonnement-premium-card.png'
 
 const GALLERY_IMAGES = [
   { src: '/images/abonnement-gallery-pos-1.png', width: 782, height: 788, altKey: 'galleryHardwareAlt1' as const },
@@ -31,7 +30,9 @@ export default function AbonnementenPage() {
   }, [lightbox])
 
   const starterMonthly = 59
+  const proMonthly = 99
   const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
+  const proPrice = isYearly ? Math.round(proMonthly * 12 * 0.9) : proMonthly
   const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')
 
   return (
@@ -186,9 +187,36 @@ export default function AbonnementenPage() {
       {/* Sectie 3 — grote foto-rij, daarna Premium-beeld + pitch (geen CSS-schaduw/rand op kaart) */}
       <section className="pb-16 sm:pb-20 bg-[#e3e3e3]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-8 sm:mb-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-8">
             {t('subscriptionsPage.premiumShowcaseTitle')}
           </h2>
+
+          <div className="flex flex-col items-center mb-8 sm:mb-10">
+            <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-sm">
+              <button
+                type="button"
+                onClick={() => setIsYearly(false)}
+                className={`px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all ${
+                  !isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {t('pricing.billingMonthly')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsYearly(true)}
+                className={`px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all relative pr-7 sm:pr-8 ${
+                  isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {t('pricing.billingYearly')}
+                <span className="absolute -top-1.5 -right-1 bg-gray-700 text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none">
+                  {t('pricing.badgeYearlyDiscount')}
+                </span>
+              </button>
+            </div>
+            {isYearly && <p className="text-gray-600 text-sm mt-3">{t('pricing.yearlySave')}</p>}
+          </div>
 
           <div className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-5 mb-10 sm:mb-12 max-w-5xl mx-auto">
             {GALLERY_IMAGES.map((item) => {
@@ -218,17 +246,73 @@ export default function AbonnementenPage() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
-            <div className="rounded-2xl overflow-hidden shadow-none border-0 outline-none bg-transparent [&_img]:shadow-none [&_img]:border-0 block leading-none">
-              <Image
-                src={PREMIUM_CARD_IMAGE}
-                alt={t('subscriptionsPage.premiumCardShowcaseAlt')}
-                width={591}
-                height={873}
-                className="w-full h-auto object-cover block align-top max-w-full"
-                style={{ boxShadow: 'none' }}
-                sizes="(min-width: 1024px) 44vw, 100vw"
-                priority={false}
-              />
+            <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-sm overflow-hidden relative">
+              <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide z-10">
+                {t('pricing.popular')}
+              </div>
+              <div className="p-6 lg:p-8">
+                <div className="flex items-center gap-3 mb-5 pr-16">
+                  <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="text-lg text-gray-400 line-through">
+                    €{isYearly ? Math.round(129 * 12 * 0.9) : 129}
+                    {t('pricing.perMonth')}
+                  </span>
+                  <span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-md">
+                    {t('pricing.compareDiscountPro')}
+                  </span>
+                </div>
+                <div className="flex items-baseline mb-1">
+                  <span className="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">€{proPrice}</span>
+                  <span className="text-accent font-medium ml-2">{periodLabel}</span>
+                </div>
+                <p className="text-gray-500 text-xs mb-3">{t('pricing.exclVat')}</p>
+                {isYearly && (
+                  <p className="text-accent text-sm font-medium mb-4">
+                    = €{Math.round(proMonthly * 0.9)}
+                    {t('pricing.perMonth')}
+                  </p>
+                )}
+
+                <p className="text-gray-700 mb-4 text-sm sm:text-base font-medium">{t('pricing.pro.allOfStarter')}</p>
+
+                <ul className="space-y-3 mb-8">
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <svg
+                        className="w-5 h-5 text-accent mt-0.5 flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-600 text-sm sm:text-base leading-snug">
+                        {t(`pricing.pro.features.${i}`)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <a
+                  href={`/registreer?lang=${locale}&plan=pro&billing=${isYearly ? 'yearly' : 'monthly'}`}
+                  className="block w-full bg-accent text-white text-center py-3.5 rounded-full font-semibold hover:bg-accent/90 transition-colors"
+                >
+                  {t('pricing.choosePro')}
+                </a>
+                <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
+              </div>
             </div>
             <div className="lg:pt-1">
               <p className="text-gray-900 text-lg sm:text-xl font-bold leading-snug mb-3">
