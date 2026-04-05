@@ -3,11 +3,12 @@ import { DEMO_TENANT_SLUG } from '@/lib/demo-links'
 import { applyFrituurNolimDemoBranding, type DemoBrandingResetStatus } from '@/lib/demo-frituurnolim-baseline'
 
 /**
- * Periodieke reset voor de publieke demo (DEMO_TENANT_SLUG = frituurnolim), o.a. elke 30 min via Vercel cron.
+ * Periodieke reset voor de publieke demo (DEMO_TENANT_SLUG = frituurnolim), elk uur via Vercel cron (UTC).
  * Verwijdert operationele data én zet naam, kleuren, adres, uren en teksten
  * terug naar `demo-frituurnolim-baseline.ts` (Stripe/SMTP worden niet gewist — alleen niet mee in de update).
  *
- * Bewust niet: menu, staff/categorieën, abonnement.
+ * Nog niet automatisch teruggezet: menustructuur (categorieën/producten), personeelstabellen, abonnement.
+ * Uitbreiding: verwijder + her-seed menu indien je canonieke demo-SQL hebt.
  *
  * Volgorde houdt rekening met gangbare FK’s (orders vóór shop_customers, enz.).
  */

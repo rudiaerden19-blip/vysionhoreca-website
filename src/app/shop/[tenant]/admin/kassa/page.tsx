@@ -1172,18 +1172,7 @@ function KassaAdminPageInner({ params }: { params: { tenant: string } }) {
         open={needsPostTrialModulePicker && !demoViewOnly}
         onConfirmed={refetchModules}
       />
-      {demoViewOnly && (
-        <div
-          role="status"
-          className="flex-shrink-0 z-[250] bg-amber-500 text-amber-950 px-4 py-2.5 text-center text-sm font-semibold shadow-md"
-        >
-          Demo — alleen bekijken. Je kunt hier niets wijzigen.
-        </div>
-      )}
-      <div
-        className="flex flex-col bg-[#e3e3e3] overflow-hidden flex-1 min-h-0"
-        {...(demoViewOnly ? ({ inert: true } as React.ComponentProps<'div'>) : {})}
-      >
+      <div className="flex flex-col bg-[#e3e3e3] overflow-hidden flex-1 min-h-0">
 
       {/* ── Blauwe navigatiebalk — volledige breedte ── */}
       <div className="flex-shrink-0 bg-[#1e293b] flex items-center px-3 gap-2 relative z-30" style={{ height: 68 }}>
