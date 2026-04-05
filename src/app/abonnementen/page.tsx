@@ -109,7 +109,7 @@ export default function AbonnementenPage() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden lg:mt-[3cm]">
               <div className="p-6 sm:p-8 lg:p-10">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
