@@ -169,14 +169,23 @@ export default function AbonnementenPage() {
             </div>
 
             <div className="flex flex-col lg:mt-[3cm] lg:pl-2">
+              <p className="text-3xl sm:text-4xl font-bold text-accent leading-tight mb-6 sm:mb-8">
+                {t('subscriptionsPage.vysionProLargeTitle')}
+              </p>
               <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10">
                 {t('subscriptionsPage.vysionProRightP1')}
               </p>
-              <p className="text-gray-600 text-base leading-relaxed mb-10 sm:mb-12">
+              <p className="text-gray-600 text-base leading-relaxed mb-8 sm:mb-10">
                 {t('subscriptionsPage.vysionProRightP2')}
               </p>
-              <p className="text-gray-500 text-sm mb-2">{t('pricing.trialInfo')}</p>
-              <div className="mt-10 sm:mt-12 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm">
+              <p className="text-gray-500 text-sm mb-6">{t('pricing.trialInfo')}</p>
+              <a
+                href={`/registreer?lang=${locale}`}
+                className="inline-flex items-center justify-center w-full sm:w-fit bg-accent text-white text-center py-3.5 px-10 rounded-full font-semibold hover:bg-accent/90 transition-colors mb-10 sm:mb-12"
+              >
+                {t('heroLanding.ctaStartFree')}
+              </a>
+              <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm">
                 <Image
                   src={LIFESTYLE_IMAGE}
                   alt={t('subscriptionsPage.vysionProLifestyleAlt')}
@@ -254,7 +263,7 @@ export default function AbonnementenPage() {
             })}
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start pt-4 sm:pt-6">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start mt-12 sm:mt-20 lg:mt-24 xl:mt-28 pt-4 sm:pt-6">
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden relative hover:shadow-md transition-shadow">
               <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide z-10">
                 {t('pricing.popular')}
@@ -324,6 +333,9 @@ export default function AbonnementenPage() {
               </div>
             </div>
             <div className="lg:pt-2 lg:pl-2">
+              <p className="text-3xl sm:text-4xl font-bold text-accent leading-tight mb-6 sm:mb-8">
+                {t('subscriptionsPage.vysionPremiumLargeTitle')}
+              </p>
               <p className="text-gray-900 text-lg sm:text-xl font-bold leading-snug mb-5 sm:mb-6">
                 {t('subscriptionsPage.premiumPitchLead')}
               </p>
@@ -333,9 +345,15 @@ export default function AbonnementenPage() {
               <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10">
                 {t('subscriptionsPage.premiumPitchP1')}
               </p>
-              <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
+              <p className="text-gray-600 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10">
                 {t('subscriptionsPage.premiumPitchP2')}
               </p>
+              <a
+                href={`/registreer?lang=${locale}`}
+                className="inline-flex items-center justify-center w-full sm:w-fit bg-accent text-white text-center py-3.5 px-10 rounded-full font-semibold hover:bg-accent/90 transition-colors"
+              >
+                {t('heroLanding.ctaStartFree')}
+              </a>
             </div>
           </div>
         </div>
