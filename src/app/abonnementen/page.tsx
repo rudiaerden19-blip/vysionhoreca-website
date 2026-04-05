@@ -183,75 +183,70 @@ export default function AbonnementenPage() {
         </div>
       </section>
 
-      {/* Sectie 3 — hardware (3 vergrootbare foto’s links, Premium-kaart rechts) */}
+      {/* Sectie 3 — drie hardware-thumbnails boven Premium-kaart; bundeltekst zonder kader */}
       <section className="pb-16 sm:pb-20 bg-[#e3e3e3] border-t border-gray-300/60">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-12">
+        <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-8 sm:mb-10">
             {t('subscriptionsPage.premiumShowcaseTitle')}
           </h2>
 
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
-            <div className="flex flex-col gap-4">
-              {GALLERY_IMAGES.map((item) => {
-                const alt = t(`subscriptionsPage.${item.altKey}`)
-                return (
-                  <button
-                    key={item.src}
-                    type="button"
-                    onClick={() => setLightbox({ src: item.src, alt })}
-                    className="group relative rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md hover:ring-2 hover:ring-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-all text-left w-full p-0"
-                    aria-label={`${t('subscriptionsPage.enlargeImageHint')}: ${alt}`}
-                  >
-                    <Image
-                      src={item.src}
-                      alt={alt}
-                      width={item.width}
-                      height={item.height}
-                      className="w-full h-auto object-cover"
-                      sizes="(min-width: 1024px) min(520px, 45vw), 100vw"
-                    />
-                    <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/65 text-white text-xs font-medium px-3 py-1.5 opacity-90 group-hover:opacity-100">
-                      {t('subscriptionsPage.enlargeImageHint')}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="flex flex-col gap-6">
-              <div className="rounded-2xl overflow-hidden bg-white shadow-lg shadow-black/5">
-                <Image
-                  src={PREMIUM_CARD_IMAGE}
-                  alt={t('subscriptionsPage.premiumCardShowcaseAlt')}
-                  width={591}
-                  height={873}
-                  className="w-full h-auto object-cover"
-                  sizes="(min-width: 1024px) min(520px, 45vw), 100vw"
-                  priority={false}
-                />
-              </div>
-              <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-7 shadow-sm">
-                <ul className="space-y-3.5">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <svg
-                        className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        aria-hidden
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span className="text-gray-800 text-sm sm:text-base leading-snug">
-                        {t(`subscriptionsPage.premiumBundleItem${i}`)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-5 sm:mb-6">
+            {GALLERY_IMAGES.map((item) => {
+              const alt = t(`subscriptionsPage.${item.altKey}`)
+              return (
+                <button
+                  key={item.src}
+                  type="button"
+                  onClick={() => setLightbox({ src: item.src, alt })}
+                  className="group relative aspect-square rounded-xl overflow-hidden border border-gray-200 bg-gray-100 hover:ring-2 hover:ring-accent/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-all p-0 w-full"
+                  aria-label={`${t('subscriptionsPage.enlargeImageHint')}: ${alt}`}
+                >
+                  <Image
+                    src={item.src}
+                    alt={alt}
+                    width={item.width}
+                    height={item.height}
+                    className="w-full h-full object-cover"
+                    sizes="(max-width: 640px) 28vw, 9rem"
+                  />
+                  <span className="pointer-events-none absolute bottom-1 right-1 max-w-[calc(100%-0.5rem)] truncate rounded-md bg-black/70 text-white text-[10px] sm:text-xs font-medium px-1.5 py-0.5 opacity-90 group-hover:opacity-100">
+                    {t('subscriptionsPage.enlargeImageHint')}
+                  </span>
+                </button>
+              )
+            })}
           </div>
+
+          <div className="rounded-2xl overflow-hidden bg-white">
+            <Image
+              src={PREMIUM_CARD_IMAGE}
+              alt={t('subscriptionsPage.premiumCardShowcaseAlt')}
+              width={591}
+              height={873}
+              className="w-full h-auto object-cover"
+              sizes="(min-width: 640px) 32rem, 100vw"
+              priority={false}
+            />
+          </div>
+
+          <ul className="mt-6 sm:mt-8 space-y-3.5 px-0 sm:px-1">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <li key={i} className="flex items-start gap-3">
+                <svg
+                  className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-gray-800 text-sm sm:text-base leading-snug">
+                  {t(`subscriptionsPage.premiumBundleItem${i}`)}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
