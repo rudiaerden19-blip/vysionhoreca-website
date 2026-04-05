@@ -6,6 +6,7 @@ import { Navigation, Footer, CookieBanner } from '@/components'
 import { useLanguage } from '@/i18n'
 
 const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
+const ONBOARDING_IMAGE = '/images/abonnement-onboarding-pos-restaurant.png'
 
 const GALLERY_IMAGES = [
   { src: '/images/abonnement-gallery-pos-1.png', width: 782, height: 788, altKey: 'galleryHardwareAlt1' as const },
@@ -185,6 +186,61 @@ export default function AbonnementenPage() {
                   sizes="(min-width: 1024px) min(520px, 45vw), 100vw"
                 />
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sectie 2b — overstap naar Vysion: uitleg + stappenplan */}
+      <section className="bg-white border-t border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-28">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 leading-tight">
+                {t('subscriptionsPage.onboardingTitle')}
+              </h2>
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-5 sm:mb-6">
+                {t('subscriptionsPage.onboardingP1')}
+              </p>
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-5 sm:mb-6">
+                {t('subscriptionsPage.onboardingP2')}
+              </p>
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10">
+                <span className="font-bold text-gray-900">{t('subscriptionsPage.onboardingP3Bold')}</span>
+                {t('subscriptionsPage.onboardingP3After')}
+              </p>
+              <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-gray-50">
+                <Image
+                  src={ONBOARDING_IMAGE}
+                  alt={t('subscriptionsPage.onboardingImageAlt')}
+                  width={916}
+                  height={767}
+                  className="w-full h-auto object-cover"
+                  sizes="(min-width: 1024px) min(560px, 46vw), 100vw"
+                />
+              </div>
+            </div>
+
+            <div
+              className="rounded-3xl p-8 sm:p-10 text-white shadow-lg lg:sticky lg:top-28"
+              style={{ backgroundColor: '#c05617' }}
+            >
+              <ol className="relative ml-1 border-l-2 border-white/35 pl-8 sm:pl-10 space-y-8 sm:space-y-10">
+                {[1, 2, 3, 4, 5].map((step) => (
+                  <li key={step} className="relative">
+                    <span
+                      className="absolute -left-[calc(0.5rem+3px)] top-2 h-3 w-3 rounded-full bg-white ring-4 ring-[#c05617]"
+                      aria-hidden
+                    />
+                    <p className="font-bold text-base sm:text-lg mb-2">
+                      {t(`subscriptionsPage.onboardingStep${step}Title`)}
+                    </p>
+                    <p className="text-white/95 text-sm sm:text-base leading-relaxed">
+                      {t(`subscriptionsPage.onboardingStep${step}Desc`)}
+                    </p>
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
         </div>
