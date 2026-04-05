@@ -122,6 +122,7 @@
   },
   "tableKiosk": {
     "imageAlt": "Kiosk da tavolo Vysion in sala",
+    "carouselAria": "Foto del kiosk da tavolo e dell’app — scorri con le frecce",
     "title": "Novità da Vysion",
     "subtitle": "Il nostro kiosk da tavolo",
     "body": "Il tempo dei grandi kiosk costosi all’ingresso è finito: ingombranti, cari e lontani da come i clienti vogliono ordinare oggi. Vysion risponde con un kiosk da tavolo compatto, sul piano, collegato al tuo ordering online e al POS.",

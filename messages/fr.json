@@ -122,6 +122,7 @@
   },
   "tableKiosk": {
     "imageAlt": "Borne de table Vysion au restaurant",
+    "carouselAria": "Photos de la borne de table et de l’application — feuilleter avec les flèches",
     "title": "Nouveau chez Vysion",
     "subtitle": "Notre borne de table",
     "body": "L’époque des grands kiosques coûteux à l’entrée est révolue — encombrants, chers et déconnectés de la façon dont les clients veulent commander. Vysion propose une borne de table compacte, sur le plateau, reliée à votre commande en ligne et à votre caisse.",

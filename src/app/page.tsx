@@ -844,24 +844,80 @@ function StopSection() {
   )
 }
 
+const TABLE_KIOSK_SLIDES = [
+  '/images/table-kiosk-device.png',
+  '/images/table-kiosk-slide-2.png',
+  '/images/table-kiosk-slide-3.png',
+  '/images/table-kiosk-slide-4.png',
+] as const
+
 function TableKioskSection() {
   const { t, locale } = useLanguage()
   const featureKeys = [1, 2, 3, 4, 5] as const
+  const [kioskSlide, setKioskSlide] = useState(0)
+  const kioskCount = TABLE_KIOSK_SLIDES.length
 
   return (
     <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden" aria-labelledby="table-kiosk-heading">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-          <div className="w-full max-w-md lg:max-w-lg mx-auto lg:mx-0 rounded-3xl bg-[#e3e3e3] p-3 sm:p-5 shadow-home-image ring-1 ring-black/[0.06]">
-            <Image
-              src="/images/table-kiosk-device.png"
-              alt={t('tableKiosk.imageAlt')}
-              width={613}
-              height={804}
-              loading="lazy"
-              className="w-full h-auto max-h-[min(68vw,320px)] sm:max-h-[300px] lg:max-h-[340px] object-contain mx-auto"
-              sizes="(min-width: 1024px) 360px, 90vw"
-            />
+          <div className="w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto lg:mx-0 rounded-3xl bg-[#e3e3e3] p-3 sm:p-5 lg:p-6 shadow-home-image ring-1 ring-black/[0.06]">
+            <div
+              className="relative outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#e3e3e3] rounded-2xl"
+              role="region"
+              aria-roledescription="carousel"
+              aria-label={t('tableKiosk.carouselAria')}
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowLeft') {
+                  e.preventDefault()
+                  setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
+                }
+                if (e.key === 'ArrowRight') {
+                  e.preventDefault()
+                  setKioskSlide((i) => (i + 1) % kioskCount)
+                }
+              }}
+            >
+              <div className="relative mx-auto h-[min(78vw,440px)] w-full sm:h-[min(72vw,480px)] lg:h-[520px]">
+                <Image
+                  src={TABLE_KIOSK_SLIDES[kioskSlide]}
+                  alt={`${t('tableKiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
+                  fill
+                  className="object-contain object-center drop-shadow-sm"
+                  sizes="(min-width: 1024px) 520px, (min-width: 640px) 90vw, 100vw"
+                  priority={kioskSlide === 0}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)}
+                className="absolute left-1 sm:left-2 top-1/2 z-10 flex h-10 w-10 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                aria-label={t('ui.ariaPrevImage')}
+              >
+                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={() => setKioskSlide((i) => (i + 1) % kioskCount)}
+                className="absolute right-1 sm:right-2 top-1/2 z-10 flex h-10 w-10 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                aria-label={t('ui.ariaNextImage')}
+              >
+                <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+            <div className="mt-4 flex justify-center gap-1.5" aria-hidden>
+              {TABLE_KIOSK_SLIDES.map((src, i) => (
+                <span
+                  key={src}
+                  className={`h-1.5 w-1.5 rounded-full ${i === kioskSlide ? 'bg-accent' : 'bg-gray-400/60'}`}
+                />
+              ))}
+            </div>
           </div>
 
           <div className="flex flex-col justify-center py-2 lg:py-4">
@@ -886,7 +942,7 @@ function TableKioskSection() {
                 </li>
               ))}
             </ul>
-            <div className="mt-10 flex flex-col gap-3 sm:mt-12 sm:flex-row sm:items-center sm:gap-4">
+            <div className="mt-[calc(2.5rem+2cm)] flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
               <a
                 href={`/registreer?lang=${locale}`}
                 className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
