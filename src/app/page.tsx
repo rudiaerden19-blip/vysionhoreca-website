@@ -844,18 +844,34 @@ function StopSection() {
   )
 }
 
+/** Alleen deze vier beelden, vaste volgorde (gebruikersassets). */
 const TABLE_KIOSK_SLIDES = [
-  '/images/table-kiosk-device.png',
-  '/images/table-kiosk-slide-2.png',
-  '/images/table-kiosk-slide-3.png',
-  '/images/table-kiosk-slide-4.png',
+  '/images/table-kiosk-1.png',
+  '/images/table-kiosk-2.png',
+  '/images/table-kiosk-3.png',
+  '/images/table-kiosk-4.png',
 ] as const
 
 function TableKioskSection() {
   const { t, locale } = useLanguage()
   const featureKeys = [1, 2, 3, 4, 5] as const
   const [kioskSlide, setKioskSlide] = useState(0)
+  const [kioskLightboxOpen, setKioskLightboxOpen] = useState(false)
   const kioskCount = TABLE_KIOSK_SLIDES.length
+
+  useEffect(() => {
+    if (!kioskLightboxOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setKioskLightboxOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [kioskLightboxOpen])
 
   return (
     <section className="py-24 sm:py-32 bg-[#e3e3e3] overflow-hidden" aria-labelledby="table-kiosk-heading">
@@ -879,19 +895,27 @@ function TableKioskSection() {
                 }
               }}
             >
-              <div className="relative mx-auto h-[min(78vw,440px)] w-full sm:h-[min(72vw,480px)] lg:h-[520px]">
+              <button
+                type="button"
+                onClick={() => setKioskLightboxOpen(true)}
+                className="relative mx-auto h-[min(78vw,440px)] w-full cursor-zoom-in sm:h-[min(72vw,480px)] lg:h-[520px]"
+                aria-label={`${t('subscriptionsPage.enlargeImageHint')}: ${t('tableKiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
+              >
                 <Image
                   src={TABLE_KIOSK_SLIDES[kioskSlide]}
                   alt={`${t('tableKiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
                   fill
-                  className="object-contain object-center drop-shadow-sm"
+                  className="object-contain object-center drop-shadow-sm pointer-events-none"
                   sizes="(min-width: 1024px) 520px, (min-width: 640px) 90vw, 100vw"
                   priority={kioskSlide === 0}
                 />
-              </div>
+              </button>
               <button
                 type="button"
-                onClick={() => setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
+                }}
                 className="absolute left-1 sm:left-2 top-1/2 z-10 flex h-10 w-10 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 aria-label={t('ui.ariaPrevImage')}
               >
@@ -901,7 +925,10 @@ function TableKioskSection() {
               </button>
               <button
                 type="button"
-                onClick={() => setKioskSlide((i) => (i + 1) % kioskCount)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setKioskSlide((i) => (i + 1) % kioskCount)
+                }}
                 className="absolute right-1 sm:right-2 top-1/2 z-10 flex h-10 w-10 sm:h-11 sm:w-11 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/95 text-gray-800 shadow-md transition-colors hover:bg-white hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 aria-label={t('ui.ariaNextImage')}
               >
@@ -921,10 +948,12 @@ function TableKioskSection() {
           </div>
 
           <div className="flex flex-col justify-center py-2 lg:py-4">
-            <h2 id="table-kiosk-heading" className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
-              {t('tableKiosk.title')}
+            <h2
+              id="table-kiosk-heading"
+              className="text-3xl sm:text-4xl font-bold text-accent tracking-tight mb-6"
+            >
+              {t('tableKiosk.subtitle')}
             </h2>
-            <p className="text-accent text-xl sm:text-2xl font-bold mb-6">{t('tableKiosk.subtitle')}</p>
             <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-10">{t('tableKiosk.body')}</p>
             <ul className="space-y-4">
               {featureKeys.map((key) => (
@@ -961,6 +990,60 @@ function TableKioskSection() {
           </div>
         </div>
       </div>
+
+      {kioskLightboxOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/88 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('subscriptionsPage.enlargeImageHint')}
+          onClick={() => setKioskLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            onClick={() => setKioskLightboxOpen(false)}
+            className="absolute z-10 rounded-full bg-white/12 p-2.5 text-white transition-colors hover:bg-white/20 top-[max(1rem,env(safe-area-inset-top))] right-[max(1rem,env(safe-area-inset-right))]"
+            aria-label={t('ui.ariaClose')}
+          >
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setKioskSlide((i) => (i - 1 + kioskCount) % kioskCount)
+            }}
+            className="absolute left-2 sm:left-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25"
+            aria-label={t('ui.ariaPrevImage')}
+          >
+            <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setKioskSlide((i) => (i + 1) % kioskCount)
+            }}
+            className="absolute right-2 sm:right-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25"
+            aria-label={t('ui.ariaNextImage')}
+          >
+            <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element -- lightbox: native img voor volledig scherm */}
+          <img
+            src={TABLE_KIOSK_SLIDES[kioskSlide]}
+            alt={`${t('ui.lightboxImageAlt')}: ${t('tableKiosk.imageAlt')} (${kioskSlide + 1} / ${kioskCount})`}
+            className="max-h-[min(92vh,900px)] max-w-full w-auto object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </section>
   )
 }
