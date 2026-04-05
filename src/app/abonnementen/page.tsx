@@ -218,7 +218,7 @@ export default function AbonnementenPage() {
               })}
             </div>
 
-            <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-lg shadow-black/5">
+            <div className="rounded-2xl overflow-hidden bg-white shadow-lg shadow-black/5">
               <Image
                 src={PREMIUM_CARD_IMAGE}
                 alt={t('subscriptionsPage.premiumCardShowcaseAlt')}
