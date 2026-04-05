@@ -73,13 +73,13 @@ export default function HardwareSection() {
       aria-labelledby="hardware-heading"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent tracking-tight mb-3 sm:mb-4">
+        <header className="text-center max-w-3xl mx-auto mb-10 sm:mb-14 px-1">
+          <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-accent tracking-tight mb-3 sm:mb-4 text-balance break-words">
             {t('hardware.kicker')}
           </p>
           <h2
             id="hardware-heading"
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight"
+            className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 tracking-tight text-balance break-words"
           >
             {t('hardware.title')}
           </h2>

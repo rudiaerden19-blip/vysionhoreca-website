@@ -37,13 +37,15 @@ export default function AbonnementenPage() {
   const periodLabel = isYearly ? t('pricing.perYear') : t('pricing.perMonth')
 
   return (
-    <div className="min-h-screen bg-[#e3e3e3]">
+    <div className="min-h-screen bg-[#e3e3e3] overflow-x-hidden">
       <Navigation />
 
       {/* Sectie 1 — intro (zoals mockup: titel, twee regels, vier voordeelkaarten) */}
       <section className="pt-28 sm:pt-36 pb-20 sm:pb-28 bg-[#e3e3e3]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-8 sm:mb-10">{t('subscriptionsPage.title')}</h1>
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-8 sm:mb-10 text-balance break-words">
+            {t('subscriptionsPage.title')}
+          </h1>
           <p className="text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
             {t('subscriptionsPage.subtitle')}
           </p>
@@ -75,16 +77,16 @@ export default function AbonnementenPage() {
       {/* Sectie 2 — Vysion Pro: toggle, prijs links, tekst rechts */}
       <section className="pb-24 sm:pb-32 bg-[#e3e3e3] border-t border-gray-300/60">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-14">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-14 text-balance break-words px-1">
             {t('subscriptionsPage.vysionProHeading')}
           </h2>
 
-          <div className="flex flex-col items-center mb-12 sm:mb-16">
-            <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-sm">
+          <div className="flex flex-col items-center mb-12 sm:mb-16 w-full max-w-full">
+            <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex flex-wrap justify-center items-center gap-y-1 shadow-sm max-w-full">
               <button
                 type="button"
                 onClick={() => setIsYearly(false)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all ${
+                className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all ${
                   !isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -93,7 +95,7 @@ export default function AbonnementenPage() {
               <button
                 type="button"
                 onClick={() => setIsYearly(true)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all relative pr-8 ${
+                className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all relative pr-7 sm:pr-8 ${
                   isYearly ? 'bg-gray-900 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -209,12 +211,12 @@ export default function AbonnementenPage() {
       {/* Sectie 3 — grote foto-rij, daarna Premium + pitch */}
       <section className="pb-24 sm:pb-32 bg-[#e3e3e3]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-14">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-14 text-balance break-words px-1">
             {t('subscriptionsPage.premiumShowcaseTitle')}
           </h2>
 
-          <div className="flex flex-col items-center mb-12 sm:mb-16">
-            <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-sm">
+          <div className="flex flex-col items-center mb-12 sm:mb-16 w-full max-w-full">
+            <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex flex-wrap justify-center items-center gap-y-1 shadow-sm max-w-full">
               <button
                 type="button"
                 onClick={() => setIsYearly(false)}
@@ -242,7 +244,7 @@ export default function AbonnementenPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-16 sm:mb-24 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-16 sm:mb-24 max-w-6xl mx-auto">
             {GALLERY_IMAGES.map((item) => {
               const alt = t(`subscriptionsPage.${item.altKey}`)
               return (
@@ -452,7 +454,7 @@ export default function AbonnementenPage() {
           <button
             type="button"
             onClick={() => setLightbox(null)}
-            className="absolute top-4 right-4 z-10 rounded-full bg-white/10 hover:bg-white/20 text-white p-2.5 transition-colors"
+            className="absolute z-10 rounded-full bg-white/10 hover:bg-white/20 text-white p-2.5 transition-colors top-[max(1rem,env(safe-area-inset-top))] right-[max(1rem,env(safe-area-inset-right))]"
             aria-label={t('ui.ariaClose')}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

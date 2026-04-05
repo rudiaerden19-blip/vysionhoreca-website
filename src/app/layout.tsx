@@ -16,7 +16,8 @@ const inter = Inter({
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  /** Pinch-zoom toegestaan (iPhone/iPad, toegankelijkheid); layout blijft responsive via CSS. */
+  maximumScale: 5,
   /** Lichte systeembalk (Android Chrome); oranje theme viel te hard op bij witte shop-header. */
   themeColor: '#ffffff',
 }
