@@ -192,7 +192,7 @@ const SUCCESS_STORY_CARDS = [
 ] as const
 
 function StatsAndLiveDemoSection() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
 
   const stats = [
     { value: 250_000, prefix: '', suffix: '+', labelKey: 'stats.processed' },
@@ -286,17 +286,25 @@ function StatsAndLiveDemoSection() {
         <p className="text-lg sm:text-xl text-gray-600 mb-8">
           {t('liveDemo.subtitle')}
         </p>
-        <a
-          href={DEMO_HERO_LIVE_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-3 bg-gradient-to-r from-accent to-orange-600 text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-lg sm:text-xl hover:from-accent/90 hover:to-orange-600/90 transition-all shadow-home-btn hover:shadow-[0_0_36px_rgba(234,88,12,0.38)] hover:scale-105"
-        >
-          <span>{t('liveDemo.cta')}</span>
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-          </svg>
-        </a>
+        <div className="flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center sm:gap-5">
+          <a
+            href={`/registreer?lang=${locale}`}
+            className="inline-flex min-h-[52px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-4 text-center text-base font-bold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:px-10 sm:text-lg"
+          >
+            {t('heroLanding.ctaStartFree')}
+          </a>
+          <a
+            href={DEMO_HERO_LIVE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[52px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-accent to-orange-600 px-8 py-4 text-base font-bold text-white shadow-home-btn transition-all hover:scale-105 hover:from-accent/90 hover:to-orange-600/90 hover:shadow-[0_0_36px_rgba(234,88,12,0.38)] sm:px-10 sm:py-5 sm:text-lg"
+          >
+            <span>{t('liveDemo.cta')}</span>
+            <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
+        </div>
       </div>
     </section>
   )
@@ -668,6 +676,23 @@ function PricingSection() {
             <HomeCornerStamp />
           </div>
         </div>
+
+        <div className="mt-12 flex flex-col items-stretch justify-center gap-3 sm:mt-14 sm:flex-row sm:items-center sm:gap-4">
+          <a
+            href={`/registreer?lang=${locale}`}
+            className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
+          >
+            {t('heroLanding.ctaStartFree')}
+          </a>
+          <a
+            href={DEMO_HERO_LIVE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
+          >
+            {t('heroLanding.ctaViewDemo')}
+          </a>
+        </div>
       </div>
     </section>
   )
@@ -820,7 +845,7 @@ function StopSection() {
 }
 
 function TableKioskSection() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const featureKeys = [1, 2, 3, 4, 5] as const
 
   return (
@@ -861,6 +886,22 @@ function TableKioskSection() {
                 </li>
               ))}
             </ul>
+            <div className="mt-10 flex flex-col gap-3 sm:mt-12 sm:flex-row sm:items-center sm:gap-4">
+              <a
+                href={`/registreer?lang=${locale}`}
+                className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
+              >
+                {t('heroLanding.ctaStartFree')}
+              </a>
+              <a
+                href={DEMO_HERO_LIVE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
+              >
+                {t('heroLanding.ctaViewDemo')}
+              </a>
+            </div>
           </div>
         </div>
       </div>

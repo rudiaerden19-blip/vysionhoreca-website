@@ -35,7 +35,7 @@ const cardShellClasses =
   'group flex min-h-[300px] sm:min-h-[320px] flex-col overflow-hidden rounded-2xl border border-gray-200/60 bg-[#f4f4f4] text-center shadow-home-card transition-all duration-300 hover:z-10 hover:-translate-y-0.5 hover:border-accent/55 hover:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.55),0_28px_70px_-12px_rgba(232,90,60,0.42),0_0_0_1px_rgba(232,90,60,0.2),0_0_60px_8px_rgba(232,90,60,0.28)] active:z-10 active:-translate-y-0.5 active:border-accent/60 active:shadow-[0_12px_40px_-6px_rgba(232,90,60,0.6),0_28px_70px_-12px_rgba(232,90,60,0.48),0_0_0_1px_rgba(232,90,60,0.22),0_0_72px_10px_rgba(232,90,60,0.32)]'
 
 export default function PlatformGridSection() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
 
   return (
     <section id="platform" className="py-20 sm:py-28 lg:py-36 bg-white">
@@ -99,14 +99,22 @@ export default function PlatformGridSection() {
           <p className="text-sm sm:text-base text-gray-600 leading-snug">
             {t('platform.gridTrustLine')}
           </p>
-          <a
-            href={DEMO_HERO_LIVE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 inline-flex items-center justify-center rounded-full bg-accent px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90"
-          >
-            {t('platform.gridDemoCta')}
-          </a>
+          <div className="mt-5 flex flex-col items-stretch justify-center gap-3 sm:mt-6 sm:flex-row sm:items-center sm:gap-4">
+            <a
+              href={`/registreer?lang=${locale}`}
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-6 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:text-base"
+            >
+              {t('heroLanding.ctaStartFree')}
+            </a>
+            <a
+              href={DEMO_HERO_LIVE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:text-base"
+            >
+              {t('platform.gridDemoCta')}
+            </a>
+          </div>
         </div>
       </div>
     </section>
