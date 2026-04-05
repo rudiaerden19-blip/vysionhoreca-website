@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useLanguage, Locale } from '@/i18n'
+import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 
 type Props = {
   onStickyNavChange?: (show: boolean) => void
@@ -198,7 +199,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
         <div
           className="mt-8 sm:mt-10 md:mt-12 w-full max-w-lg sm:max-w-xl mx-auto rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10"
           role="region"
-          aria-label={`${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')} ${t('heroLanding.ctaModulesPriceOwnership')}`}
+          aria-label={`${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')} ${t('heroLanding.ctaModulesPriceOwnership')}. ${t('heroLanding.readTermsLink')}`}
         >
           <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
             {t('heroLanding.ctaModulesHeadline')}
@@ -229,6 +230,11 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
             <p className="mt-1.5 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
               {t('heroLanding.ctaModulesPriceOwnership')}
             </p>
+            <SubscriptionsTermsPopup
+              className="mt-3 flex justify-center"
+              labelKey="heroLanding.readTermsLink"
+              buttonClassName="text-[0.65rem] sm:text-[0.7rem] text-white/50 hover:text-white/80 font-normal underline underline-offset-[3px] decoration-white/25 hover:decoration-white/45 px-2 py-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 rounded-sm"
+            />
           </div>
         </div>
       </div>

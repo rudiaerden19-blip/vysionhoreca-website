@@ -11,13 +11,17 @@ type SubscriptionsTermsPopupProps = {
   className?: string
   /** Optionele knop-styling; default = witte pill met zwarte rand */
   buttonClassName?: string
+  /** Optionele t()-key voor knoptekst (default: subscriptionsPage.readGeneralTermsCta) */
+  labelKey?: string
 }
 
 export default function SubscriptionsTermsPopup({
   className = '',
   buttonClassName = DEFAULT_BUTTON_CLASS,
+  labelKey,
 }: SubscriptionsTermsPopupProps) {
   const { t } = useLanguage()
+  const label = labelKey ? t(labelKey) : t('subscriptionsPage.readGeneralTermsCta')
   const [open, setOpen] = useState(false)
   const titleId = `subscriptions-terms-${useId().replace(/:/g, '')}`
 
@@ -39,7 +43,7 @@ export default function SubscriptionsTermsPopup({
     <>
       <div className={className}>
         <button type="button" onClick={() => setOpen(true)} className={buttonClassName}>
-          {t('subscriptionsPage.readGeneralTermsCta')}
+          {label}
         </button>
       </div>
 
