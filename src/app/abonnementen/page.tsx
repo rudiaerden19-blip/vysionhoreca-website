@@ -338,7 +338,7 @@ export default function AbonnementenPage() {
                 <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
               </div>
             </div>
-            <div className="lg:pt-2 lg:pl-2">
+            <div className="lg:pt-2 lg:pl-2 lg:mt-[2cm]">
               <p className="text-3xl sm:text-4xl font-bold text-accent leading-tight mb-6 sm:mb-8">
                 {t('subscriptionsPage.vysionPremiumLargeTitle')}
               </p>
