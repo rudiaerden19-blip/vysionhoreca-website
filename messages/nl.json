@@ -1732,11 +1732,11 @@
       "content": "Voor vragen over onze subverwerkers kunt u contact opnemen via"
     }
   },
-  "generalTermsPage": {
+  "subscriptionsTermsPopup": {
     "title": "Algemene voorwaarden",
     "lastUpdated": "Laatst bijgewerkt: april 2026",
-    "intro": "Onderstaande bepalingen zijn van toepassing op het gebruik van het Vysion Horeca-platform en op uw abonnement. Ze sluiten aan bij onze formele dienstenovereenkomst.",
-    "formalNote": "De volledige contractuele versie van deze bepalingen vindt u in de"
+    "footerBeforeLink": "Aanvullende contractuele bepalingen vindt u in de",
+    "body": "1. Algemeen\n\nDeze Dienstenovereenkomst (\"Overeenkomst\") is van toepassing op het gebruik van de diensten van Vysion Horeca, onderdeel van Vysion Group International. Door gebruik te maken van onze diensten gaat u akkoord met deze voorwaarden.\n\n2. Diensten\n\nVysion Horeca biedt kassasoftware, online bestelplatform, boekhoudsoftware en aanverwante diensten voor de horecasector. Wij behouden ons het recht voor om onze diensten te wijzigen, uit te breiden of te beperken.\n\n3. Abonnement en betaling\n\nDe toegang tot onze diensten is beschikbaar via een maandelijks of jaarlijks abonnement. Betalingen worden vooraf gefactureerd en zijn niet-restitueerbaar, tenzij anders vermeld.\n\n• Facturen worden maandelijks of jaarlijks verstuurd\n• Betalingstermijn is 14 dagen na factuurdatum\n• Bij niet-betaling kan toegang worden opgeschort\n\n4. Gebruik van de diensten\n\nU bent verantwoordelijk voor het rechtmatige gebruik van onze diensten. Het is verboden om de diensten te gebruiken voor illegale doeleinden, inbreuk te maken op intellectuele eigendomsrechten, of de diensten te verstoren.\n\n5. Gegevens en privacy\n\nWij verwerken uw gegevens conform onze Privacyverklaring en de toepasselijke wetgeving, waaronder de AVG/GDPR. U behoudt eigendom over uw bedrijfsgegevens.\n\n6. Aansprakelijkheid\n\nVysion Horeca is niet aansprakelijk voor indirecte schade, gevolgschade of gederfde winst. Onze totale aansprakelijkheid is beperkt tot het bedrag dat u in de afgelopen 12 maanden aan ons heeft betaald.\n\n7. Beëindiging\n\nU kunt uw abonnement op elk moment opzeggen. De opzegging gaat in aan het einde van de lopende facturatieperiode. Wij kunnen de overeenkomst beëindigen bij schending van deze voorwaarden.\n\n8. Toepasselijk recht\n\nOp deze overeenkomst is Belgisch recht van toepassing. Geschillen worden voorgelegd aan de bevoegde rechtbank te België.\n\n9. Contact\n\nVoor vragen over deze overeenkomst kunt u contact opnemen via info@vysionhoreca.com"
   },
   "serviceAgreementPage": {
     "title": "Vysion Dienstenovereenkomst",

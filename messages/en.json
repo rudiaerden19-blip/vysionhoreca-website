@@ -1732,11 +1732,11 @@
       "content": "For questions about our subprocessors, please contact us at"
     }
   },
-  "generalTermsPage": {
+  "subscriptionsTermsPopup": {
     "title": "General terms and conditions",
     "lastUpdated": "Last updated: April 2026",
-    "intro": "The following provisions apply to your use of the Vysion Horeca platform and your subscription. They align with our formal service agreement.",
-    "formalNote": "The full contractual version of these provisions is available in the"
+    "footerBeforeLink": "Additional contractual provisions are available in the",
+    "body": "1. General\n\nThis Service Agreement (\"Agreement\") applies to the use of Vysion Horeca services, part of Vysion Group International. By using our services, you agree to these terms.\n\n2. Services\n\nVysion Horeca provides POS software, online ordering platform, accounting software and related services for the hospitality sector. We reserve the right to modify, expand or limit our services.\n\n3. Subscription and payment\n\nAccess to our services is available through monthly or annual subscription. Payments are invoiced in advance and are non-refundable unless otherwise stated.\n\n• Invoices are sent monthly or annually\n• Payment term is 14 days from invoice date\n• Access may be suspended for non-payment\n\n4. Use of services\n\nYou are responsible for lawful use of our services. It is prohibited to use the services for illegal purposes, infringe intellectual property rights, or disrupt the services.\n\n5. Data and privacy\n\nWe process your data in accordance with our Privacy Policy and applicable legislation, including GDPR. You retain ownership of your business data.\n\n6. Liability\n\nVysion Horeca is not liable for indirect damage, consequential damage or lost profits. Our total liability is limited to the amount you have paid us in the past 12 months.\n\n7. Termination\n\nYou can cancel your subscription at any time. Cancellation takes effect at the end of the current billing period. We may terminate the agreement for breach of these terms.\n\n8. Applicable law\n\nBelgian law applies to this agreement. Disputes are submitted to the competent court in Belgium.\n\n9. Contact\n\nFor questions about this agreement, please contact us at info@vysionhoreca.com"
   },
   "serviceAgreementPage": {
     "title": "Vysion Service Agreement",

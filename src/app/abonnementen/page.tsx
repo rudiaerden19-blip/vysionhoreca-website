@@ -22,8 +22,6 @@ export default function AbonnementenPage() {
   const [lightbox, setLightbox] = useState<LightboxState>(null)
   const [generalTermsOpen, setGeneralTermsOpen] = useState(false)
 
-  const sa = (key: string) => t(`serviceAgreementPage.${key}`)
-
   useEffect(() => {
     if (!lightbox && !generalTermsOpen) return
     const prev = document.body.style.overflow
@@ -478,9 +476,9 @@ export default function AbonnementenPage() {
             <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-200 px-5 py-4 sm:px-6 sm:py-5">
               <div>
                 <h2 id="abonnementen-terms-title" className="text-lg font-bold text-gray-900 sm:text-xl">
-                  {t('generalTermsPage.title')}
+                  {t('subscriptionsTermsPopup.title')}
                 </h2>
-                <p className="mt-1 text-xs text-gray-500 sm:text-sm">{t('generalTermsPage.lastUpdated')}</p>
+                <p className="mt-1 text-xs text-gray-500 sm:text-sm">{t('subscriptionsTermsPopup.lastUpdated')}</p>
               </div>
               <button
                 type="button"
@@ -494,44 +492,17 @@ export default function AbonnementenPage() {
               </button>
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6 sm:py-5 text-left">
-              <p className="mb-6 text-sm leading-relaxed text-gray-600">{t('generalTermsPage.intro')}</p>
-              <div className="prose prose-sm max-w-none text-gray-700">
-                <h3 className="text-base font-bold text-gray-900">{sa('sections.general.title')}</h3>
-                <p className="mb-5 text-sm leading-relaxed">{sa('sections.general.content')}</p>
-                <h3 className="text-base font-bold text-gray-900">{sa('sections.services.title')}</h3>
-                <p className="mb-5 text-sm leading-relaxed">{sa('sections.services.content')}</p>
-                <h3 className="text-base font-bold text-gray-900">{sa('sections.subscription.title')}</h3>
-                <p className="mb-3 text-sm leading-relaxed">{sa('sections.subscription.intro')}</p>
-                <ul className="mb-5 list-disc space-y-1 pl-5 text-sm">
-                  <li>{sa('sections.subscription.items.1')}</li>
-                  <li>{sa('sections.subscription.items.2')}</li>
-                  <li>{sa('sections.subscription.items.3')}</li>
-                </ul>
-                <h3 className="text-base font-bold text-gray-900">{sa('sections.usage.title')}</h3>
-                <p className="mb-5 text-sm leading-relaxed">{sa('sections.usage.content')}</p>
-                <h3 className="text-base font-bold text-gray-900">{sa('sections.privacy.title')}</h3>
-                <p className="mb-5 text-sm leading-relaxed">{sa('sections.privacy.content')}</p>
-                <h3 className="text-base font-bold text-gray-900">{sa('sections.liability.title')}</h3>
-                <p className="mb-5 text-sm leading-relaxed">{sa('sections.liability.content')}</p>
-                <h3 className="text-base font-bold text-gray-900">{sa('sections.termination.title')}</h3>
-                <p className="mb-5 text-sm leading-relaxed">{sa('sections.termination.content')}</p>
-                <h3 className="text-base font-bold text-gray-900">{sa('sections.law.title')}</h3>
-                <p className="mb-5 text-sm leading-relaxed">{sa('sections.law.content')}</p>
-                <h3 className="text-base font-bold text-gray-900">{sa('sections.contact.title')}</h3>
-                <p className="mb-5 text-sm leading-relaxed">
-                  {sa('sections.contact.content')}{' '}
-                  <a href="mailto:info@vysionhoreca.com" className="text-accent hover:underline">
-                    info@vysionhoreca.com
-                  </a>
-                </p>
-                <p className="border-t border-gray-200 pt-5 text-xs leading-relaxed text-gray-600">
-                  {t('generalTermsPage.formalNote')}{' '}
-                  <a href="/juridisch/dienstenovereenkomst" className="font-medium text-accent hover:underline">
-                    {t('legalMain.links.serviceAgreement')}
-                  </a>
-                  .
-                </p>
+              <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-800">
+                {t('subscriptionsTermsPopup.body')}
               </div>
+              <p className="mt-8 border-t border-gray-200 pt-5 text-xs leading-relaxed text-gray-600">
+                {t('subscriptionsTermsPopup.footer')}
+                {' '}
+                <a href="/juridisch/dienstenovereenkomst" className="font-medium text-accent hover:underline">
+                  {t('legalMain.links.serviceAgreement')}
+                </a>
+                .
+              </p>
             </div>
           </div>
         </div>
