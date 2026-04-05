@@ -9,13 +9,22 @@ const DEFAULT_ANCHOR_ID = 'pricing-premium-stamp-anchor'
 type Props = {
   /** Card/container to observe; stamp animates when this intersects the viewport. */
   observeAnchorId?: string
+  /** Optional i18n keys (full path, e.g. `subscriptionsPage.premiumStampTop`). Omits defaults: home boogteksten + midden `VYSION`. */
+  arcTopKey?: string
+  arcBottomKey?: string
+  centerWordKey?: string
 }
 
 /**
  * Rubber-stamp graphic for the pricing Premium (Pro) card.
  * Renders absolute — parent must be `relative`.
  */
-export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }: Props) {
+export default function HomeCornerStamp({
+  observeAnchorId = DEFAULT_ANCHOR_ID,
+  arcTopKey,
+  arcBottomKey,
+  centerWordKey,
+}: Props) {
   const { t } = useLanguage()
   const uid = useId().replace(/:/g, '')
   /** Path meta: sweep 0 = bovenboog in SVG; textPath zet glyphs visueel langs de andere boog. */
@@ -55,8 +64,11 @@ export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }:
     return () => obs.disconnect()
   }, [observeAnchorId])
 
-  const topArc = t('homeCornerStamp.topArc')
-  const bottomArc = t('homeCornerStamp.bottomArc')
+  const topArc = arcTopKey ? t(arcTopKey) : t('homeCornerStamp.topArc')
+  const bottomArc = arcBottomKey ? t(arcBottomKey) : t('homeCornerStamp.bottomArc')
+  const centerWord = centerWordKey ? t(centerWordKey) : 'VYSION'
+  const centerFontSize = centerWordKey ? (centerWord.length > 9 ? 14 : centerWord.length > 6 ? 17 : 22) : 26
+  const centerLetterSpacing = centerWordKey ? '0.06em' : '0.14em'
 
   return (
     <div
@@ -128,12 +140,12 @@ export default function HomeCornerStamp({ observeAnchorId = DEFAULT_ANCHOR_ID }:
           y="105"
           textAnchor="middle"
           fill="currentColor"
-          fontSize="26"
+          fontSize={centerFontSize}
           fontWeight="800"
-          letterSpacing="0.14em"
+          letterSpacing={centerLetterSpacing}
           style={{ fontFamily: 'system-ui, sans-serif' }}
         >
-          VYSION
+          {centerWord}
         </text>
       </svg>
     </div>

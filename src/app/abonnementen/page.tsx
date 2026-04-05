@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Navigation, Footer, CookieBanner } from '@/components'
+import { Navigation, Footer, CookieBanner, HomeCornerStamp } from '@/components'
 import { useLanguage } from '@/i18n'
 
 const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
@@ -270,24 +270,25 @@ export default function AbonnementenPage() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start mt-12 sm:mt-20 lg:mt-24 xl:mt-28 pt-4 sm:pt-6">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden relative hover:shadow-md transition-shadow">
-              <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide z-10">
-                {t('pricing.popular')}
-              </div>
-              <div className="p-6 sm:p-8 lg:p-10">
-                <div className="flex items-center gap-3 mb-5 pr-16">
-                  <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
+            <div className="relative">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden relative hover:shadow-md transition-shadow">
+                <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide z-10">
+                  {t('pricing.popular')}
                 </div>
+                <div className="p-6 sm:p-8 lg:p-10">
+                  <div className="flex items-center gap-3 mb-5 pr-16">
+                    <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
+                      <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-accent">{t('pricing.pro.name')}</h3>
+                  </div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-lg text-gray-400 line-through">
                     €{isYearly ? Math.round(129 * 12 * 0.9) : 129}
@@ -336,7 +337,19 @@ export default function AbonnementenPage() {
                   {t('pricing.choosePro')}
                 </a>
                 <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
+                </div>
               </div>
+              <div
+                id="abonnementen-premium-stamp-anchor"
+                className="pointer-events-none absolute bottom-[6.5rem] left-3 right-3 h-16 opacity-0"
+                aria-hidden
+              />
+              <HomeCornerStamp
+                observeAnchorId="abonnementen-premium-stamp-anchor"
+                arcTopKey="subscriptionsPage.premiumStampTop"
+                arcBottomKey="subscriptionsPage.premiumStampBottom"
+                centerWordKey="subscriptionsPage.premiumStampCenter"
+              />
             </div>
             <div className="lg:pt-2 lg:pl-2 lg:mt-[2cm]">
               <p className="text-3xl sm:text-4xl font-bold text-accent leading-tight mb-6 sm:mb-8">
