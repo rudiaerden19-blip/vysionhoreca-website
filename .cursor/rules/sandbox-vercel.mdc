@@ -1,5 +1,5 @@
 ---
-description: Altijd commit + push na bouwen; Vercel sandbox/preview via GitHub
+description: Altijd commit + push + Vercel; één build bedient alle tenants
 alwaysApply: true
 ---
 
@@ -7,15 +7,20 @@ alwaysApply: true
 
 Zie ook `TESTRAPORT.md`: omgeving = **sandbox via Vercel** na GitHub push.
 
+## Alle tenants — één deploy
+
+Dit is **één** Next.js-app op Vercel: **één production build en deployment geldt voor elke tenant** (subdomeinen/routering). Er is geen aparte “build per klant”. Wijzigingen zijn pas live voor iedereen **ná** geslaagde deploy op `main` (of jullie production branch). Nooit aannemen dat “lokaal klaar” genoeg is.
+
 ## Altijd — na elke bouwtaak met code-/configwijzigingen
 
 Einde van de taak (tenzij de gebruiker expliciet zegt *niet* te committen/pushen):
 
 1. **`git status`** — alle relevante bestanden meenemen.
-2. **`git commit`** — duidelijke boodschap (wat + waarom).
-3. **`git push origin`** (huidige branch, meestal `main`).
+2. **`npx tsc --noEmit`** als er TypeScript-wijzigingen zijn — voorkom kapotte `main`.
+3. **`git commit`** — duidelijke boodschap (wat + waarom).
+4. **`git push origin`** (huidige branch, meestal `main`).
 
-**Deploy:** push naar GitHub triggert **Vercel** (production en/of preview). Dat is de standaard-deploy; geen “alleen lokaal klaar” zonder push als er wijzigingen zijn.
+**Deploy:** push naar GitHub triggert **Vercel** (production en/of preview). **Niet vergeten:** altijd pushen na commit zodat alle tenants dezelfde nieuwe build krijgen.
 
 **Uitzonderingen:** geen commit bij puur uitleg/lezen zonder bestandswijzigingen; geen lege commits.
 
@@ -27,5 +32,5 @@ Einde van de taak (tenzij de gebruiker expliciet zegt *niet* te committen/pushen
 
 ## Niet doen
 
-- Bouwwerk afronden zonder commit + push terwijl er uncommitted wijzigingen zijn (tenzij gebruiker het verbiedt).
+- Bouwwerk afronden zonder **commit + push** terwijl er uncommitted wijzigingen zijn (tenzij gebruiker het verbiedt) — alle tenants missen dan de fix.
 - Alleen productie-URL als test gebruiken als het team preview gebruikt — preview/sandbox waar mogelijk.
