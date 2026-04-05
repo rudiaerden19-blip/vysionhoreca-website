@@ -23,6 +23,7 @@ export default function PrijzenPage() {
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">{t('pricing.title')}</h1>
           <p className="text-xl text-gray-600 mb-4">{t('pricing.subtitle')}</p>
           <p className="text-gray-500 text-sm sm:text-base">{t('pricing.trialInfo')}</p>
+          <p className="text-gray-600 text-xs sm:text-sm mt-2 font-medium">{t('pricing.exclVat')}</p>
         </div>
       </section>
 

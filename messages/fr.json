@@ -30,7 +30,11 @@
     "bullet4": "Tarifs détaillés et comparaison sur la page Tarifs.",
     "ctaPricing": "Voir les tarifs",
     "ctaTrial": "Commencer gratuitement",
-    "contactLine": "Des questions ? Utilisez le bloc contact en page d’accueil."
+    "contactLine": "Des questions ? Utilisez le bloc contact en page d’accueil.",
+    "vysionProHeading": "Vysion Pro",
+    "vysionProImageAlt": "Aperçu du forfait Vysion Pro",
+    "vysionProRightP1": "Avec Vysion Pro, vous regroupez commandes en ligne, site web, stocks, écran cuisine, réservations de tables et bien plus dans un seul abonnement.",
+    "vysionProRightP2": "Choisissez la facturation mensuelle ou annuelle ; l’offre annuelle inclut 10 % de réduction. Tous les avantages listés sont inclus, avec formation et support."
   },
   "heroLanding": {
     "logoTagline": "Votre plateforme horeca",
@@ -289,6 +293,7 @@
     "subtitle": "Tout inclus. Pas de surprises.",
     "perMonth": "/mois",
     "trialInfo": "14 jours d'essai gratuit • Sans carte de crédit • Résiliable à tout moment",
+    "exclVat": "Tous les prix HT (TVA non comprise).",
     "popular": "Popular",
     "chooseStarter": "Choisir Starter",
     "chooseStandard": "Choisir Standard",

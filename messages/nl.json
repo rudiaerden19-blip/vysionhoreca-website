@@ -30,7 +30,11 @@
     "bullet4": "Concrete prijzen en pakketten op de pagina Prijzen.",
     "ctaPricing": "Bekijk prijzen",
     "ctaTrial": "Gratis starten",
-    "contactLine": "Vragen? Ga naar het contactblok op de homepage."
+    "contactLine": "Vragen? Ga naar het contactblok op de homepage.",
+    "vysionProHeading": "Vysion Pro",
+    "vysionProImageAlt": "Overzicht van het Vysion Pro pakket",
+    "vysionProRightP1": "Met Vysion Pro krijgt u online bestellen, uw eigen website, voorraad, keukenscherm, tafelreservatie en nog veel meer in één abonnement.",
+    "vysionProRightP2": "Kies maandelijks of jaarlijks betalen; met jaarbetaling profiteert u van 10% korting. Alle vermelde voordelen zitten inbegrepen, inclusief gratis opleiding en support."
   },
   "ui": {
     "ariaPrevImage": "Vorige afbeelding",
@@ -531,6 +535,7 @@
     "subtitle": "Alles inbegrepen. Geen verrassingen.",
     "perMonth": "/maand",
     "trialInfo": "14 dagen gratis proberen • Geen creditcard nodig • Maandelijks opzegbaar",
+    "exclVat": "Alle prijzen excl. BTW.",
     "popular": "Popular",
     "chooseStarter": "Kies Pro",
     "chooseStandard": "Kies Standaard",

@@ -499,6 +499,7 @@ function PricingSection() {
           <p className="text-xl text-gray-600">
             {t('pricing.subtitle')}
           </p>
+          <p className="text-gray-600 text-sm sm:text-base mt-3 font-medium">{t('pricing.exclVat')}</p>
         </div>
 
         {/* Toggle Maandelijks / Jaarlijks */}

@@ -30,7 +30,11 @@
     "bullet4": "See exact pricing and compare plans on the Pricing page.",
     "ctaPricing": "View pricing",
     "ctaTrial": "Start free trial",
-    "contactLine": "Questions? Use the contact section on the homepage."
+    "contactLine": "Questions? Use the contact section on the homepage.",
+    "vysionProHeading": "Vysion Pro",
+    "vysionProImageAlt": "Vysion Pro plan overview",
+    "vysionProRightP1": "Vysion Pro brings online ordering, your own website, stock, kitchen display, table reservations and more together in one subscription.",
+    "vysionProRightP2": "Choose monthly or yearly billing; yearly plans save 10%. Every feature on the card is included, with free onboarding training and support."
   },
   "ui": {
     "ariaPrevImage": "Previous image",
@@ -531,6 +535,7 @@
     "subtitle": "Everything included. No surprises.",
     "perMonth": "/month",
     "trialInfo": "14 days free trial • No credit card required • Cancel anytime",
+    "exclVat": "All prices excl. VAT.",
     "popular": "Popular",
     "chooseStarter": "Choose Starter",
     "chooseStandard": "Choose Standard",
