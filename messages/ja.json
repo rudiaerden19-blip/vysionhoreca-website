@@ -82,6 +82,7 @@
     "ctaModulesPricePrefix": "月額",
     "ctaModulesPriceAmount": "99",
     "ctaModulesPricePeriod": "",
+    "ctaModulesPriceNote": "プレミアムプランに含まれます",
     "demoRequest": "デモを依頼"
   },
   "hero": {

@@ -82,6 +82,7 @@
     "ctaModulesPricePrefix": "每月",
     "ctaModulesPriceAmount": "99",
     "ctaModulesPricePeriod": "欧元",
+    "ctaModulesPriceNote": "已包含在 Premium 订阅中",
     "demoRequest": "申请演示"
   },
   "hero": {

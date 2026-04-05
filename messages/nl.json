@@ -148,6 +148,7 @@
     "ctaModulesPricePrefix": "voor",
     "ctaModulesPriceAmount": "99",
     "ctaModulesPricePeriod": "per maand",
+    "ctaModulesPriceNote": "inbegrepen in je premium abonnement",
     "demoRequest": "Demo aanvraag"
   },
   "hero": {

@@ -82,6 +82,7 @@
     "ctaModulesPricePrefix": "A soli",
     "ctaModulesPriceAmount": "99",
     "ctaModulesPricePeriod": "al mese",
+    "ctaModulesPriceNote": "incluso nell’abbonamento Premium",
     "demoRequest": "Richiedi demo"
   },
   "hero": {
