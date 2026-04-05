@@ -233,7 +233,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
             <SubscriptionsTermsPopup
               className="mt-3 flex justify-center"
               labelKey="heroLanding.readTermsLink"
-              buttonClassName="text-[0.65rem] sm:text-[0.7rem] text-white/50 hover:text-white/80 font-normal underline underline-offset-[3px] decoration-white/25 hover:decoration-white/45 px-2 py-1 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-black/20 rounded-sm"
+              buttonClassName="inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/[0.08] backdrop-blur-md px-3 py-1.5 text-[0.65rem] sm:text-[0.7rem] font-medium text-white/72 hover:text-white hover:bg-white/[0.14] hover:border-white/35 ring-1 ring-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.15)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/45 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             />
           </div>
         </div>
