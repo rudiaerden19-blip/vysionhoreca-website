@@ -41,7 +41,12 @@
     "galleryHardwareAlt1": "POS touchscreen nero con stampante scontrini al banco",
     "galleryHardwareAlt2": "POS touchscreen bianco in ambiente ristorazione",
     "galleryHardwareAlt3": "Display menu digitale su bancone in marmo",
-    "enlargeImageHint": "Ingrandisci immagine"
+    "enlargeImageHint": "Ingrandisci immagine",
+    "premiumBundleItem1": "Software Premium incluso",
+    "premiumBundleItem2": "Hardware incluso",
+    "premiumBundleItem3": "Stampante, cassa, cassetto contanti",
+    "premiumBundleItem4": "Nessun investimento iniziale",
+    "premiumBundleItem5": "Nessuna scrittura illeggibile"
   },
   "heroLanding": {
     "logoTagline": "La tua piattaforma horeca",

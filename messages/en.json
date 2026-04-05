@@ -41,7 +41,12 @@
     "galleryHardwareAlt1": "Black touchscreen POS with receipt printer on the counter",
     "galleryHardwareAlt2": "White touchscreen POS in a hospitality interior",
     "galleryHardwareAlt3": "Digital menu display on a marble counter",
-    "enlargeImageHint": "Enlarge image"
+    "enlargeImageHint": "Enlarge image",
+    "premiumBundleItem1": "Premium software included",
+    "premiumBundleItem2": "Hardware included",
+    "premiumBundleItem3": "Printer, POS, cash drawer",
+    "premiumBundleItem4": "No upfront investment",
+    "premiumBundleItem5": "No fine print"
   },
   "ui": {
     "ariaPrevImage": "Previous image",

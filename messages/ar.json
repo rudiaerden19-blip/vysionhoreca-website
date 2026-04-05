@@ -41,7 +41,12 @@
     "galleryHardwareAlt1": "كاشير لمس أسود مع طابعة إيصالات على الطاولة",
     "galleryHardwareAlt2": "كاشير لمس أبيض داخل مطعم",
     "galleryHardwareAlt3": "شاشة قائمة رقمية على طاولة رخامية",
-    "enlargeImageHint": "تكبير الصورة"
+    "enlargeImageHint": "تكبير الصورة",
+    "premiumBundleItem1": "برنامج بريميوم مشمول",
+    "premiumBundleItem2": "أجهزة مشمولة",
+    "premiumBundleItem3": "طابعة، كاشير، درجة نقود",
+    "premiumBundleItem4": "بدون استثمار مبدئي",
+    "premiumBundleItem5": "بدون بنود مخفية"
   },
   "heroLanding": {
     "logoTagline": "منصتك لفن الضيافة",

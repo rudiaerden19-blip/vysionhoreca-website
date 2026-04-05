@@ -41,7 +41,12 @@
     "galleryHardwareAlt1": "黑色触屏收银机与票据打印机",
     "galleryHardwareAlt2": "白色触屏收银机（餐饮环境）",
     "galleryHardwareAlt3": "大理石柜台上的电子菜单屏",
-    "enlargeImageHint": "放大图片"
+    "enlargeImageHint": "放大图片",
+    "premiumBundleItem1": "包含高级版软件",
+    "premiumBundleItem2": "包含硬件",
+    "premiumBundleItem3": "打印机、收银机、钱箱",
+    "premiumBundleItem4": "无需前期投入",
+    "premiumBundleItem5": "无隐性条款"
   },
   "heroLanding": {
     "logoTagline": "您的餐饮平台",

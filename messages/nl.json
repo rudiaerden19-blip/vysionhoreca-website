@@ -41,7 +41,12 @@
     "galleryHardwareAlt1": "Zwarte touchscreen-kassa met bonprinter op de toonbank",
     "galleryHardwareAlt2": "Witte touchscreen-kassa in een horeca-interieur",
     "galleryHardwareAlt3": "Digitaal menu-scherm op marmeren toonbank",
-    "enlargeImageHint": "Vergroot foto"
+    "enlargeImageHint": "Vergroot foto",
+    "premiumBundleItem1": "Inbegrepen Premium software",
+    "premiumBundleItem2": "Inbegrepen hardware",
+    "premiumBundleItem3": "Printer, kassa, geldlade",
+    "premiumBundleItem4": "Geen investering",
+    "premiumBundleItem5": "Geen kleine lettertjes"
   },
   "ui": {
     "ariaPrevImage": "Vorige afbeelding",

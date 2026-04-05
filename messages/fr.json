@@ -41,7 +41,12 @@
     "galleryHardwareAlt1": "Caisse tactile noire avec imprimante de tickets sur le comptoir",
     "galleryHardwareAlt2": "Caisse tactile blanche dans un établissement horeca",
     "galleryHardwareAlt3": "Écran de menu numérique sur un comptoir en marbre",
-    "enlargeImageHint": "Agrandir l’image"
+    "enlargeImageHint": "Agrandir l’image",
+    "premiumBundleItem1": "Logiciel Premium inclus",
+    "premiumBundleItem2": "Matériel inclus",
+    "premiumBundleItem3": "Imprimante, caisse, tiroir-caisse",
+    "premiumBundleItem4": "Aucun investissement",
+    "premiumBundleItem5": "Pas de petites lignes"
   },
   "heroLanding": {
     "logoTagline": "Votre plateforme horeca",

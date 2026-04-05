@@ -218,16 +218,38 @@ export default function AbonnementenPage() {
               })}
             </div>
 
-            <div className="rounded-2xl overflow-hidden bg-white shadow-lg shadow-black/5">
-              <Image
-                src={PREMIUM_CARD_IMAGE}
-                alt={t('subscriptionsPage.premiumCardShowcaseAlt')}
-                width={591}
-                height={873}
-                className="w-full h-auto object-cover"
-                sizes="(min-width: 1024px) min(520px, 45vw), 100vw"
-                priority={false}
-              />
+            <div className="flex flex-col gap-6">
+              <div className="rounded-2xl overflow-hidden bg-white shadow-lg shadow-black/5">
+                <Image
+                  src={PREMIUM_CARD_IMAGE}
+                  alt={t('subscriptionsPage.premiumCardShowcaseAlt')}
+                  width={591}
+                  height={873}
+                  className="w-full h-auto object-cover"
+                  sizes="(min-width: 1024px) min(520px, 45vw), 100vw"
+                  priority={false}
+                />
+              </div>
+              <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-7 shadow-sm">
+                <ul className="space-y-3.5">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <svg
+                        className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-gray-800 text-sm sm:text-base leading-snug">
+                        {t(`subscriptionsPage.premiumBundleItem${i}`)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>

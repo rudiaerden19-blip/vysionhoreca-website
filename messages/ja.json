@@ -41,7 +41,12 @@
     "galleryHardwareAlt1": "黒のタッチスクリーンPOSとレシートプリンター",
     "galleryHardwareAlt2": "白のタッチスクリーンPOS（飲食店内）",
     "galleryHardwareAlt3": "大理石カウンタ上のデジタルメニュー画面",
-    "enlargeImageHint": "画像を拡大"
+    "enlargeImageHint": "画像を拡大",
+    "premiumBundleItem1": "プレミアムソフトウェア込み",
+    "premiumBundleItem2": "ハードウェア込み",
+    "premiumBundleItem3": "プリンター・レジ・ドロア",
+    "premiumBundleItem4": "初期投資なし",
+    "premiumBundleItem5": "ごまかしのない条件"
   },
   "heroLanding": {
     "logoTagline": "あなたの飲食プラットフォーム",

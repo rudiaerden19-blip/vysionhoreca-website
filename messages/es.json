@@ -41,7 +41,12 @@
     "galleryHardwareAlt1": "TPV táctil negro con impresora de tickets en la barra",
     "galleryHardwareAlt2": "TPV táctil blanco en interior hostelero",
     "galleryHardwareAlt3": "Pantalla de menú digital sobre mostrador de mármol",
-    "enlargeImageHint": "Ampliar imagen"
+    "enlargeImageHint": "Ampliar imagen",
+    "premiumBundleItem1": "Software Premium incluido",
+    "premiumBundleItem2": "Hardware incluido",
+    "premiumBundleItem3": "Impresora, TPV, cajón portamonedas",
+    "premiumBundleItem4": "Sin inversión inicial",
+    "premiumBundleItem5": "Sin letras pequeñas"
   },
   "heroLanding": {
     "logoTagline": "Tu plataforma hostelera",

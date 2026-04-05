@@ -41,7 +41,12 @@
     "galleryHardwareAlt1": "Schwarze Touchscreen-Kasse mit Bondrucker auf der Theke",
     "galleryHardwareAlt2": "Weiße Touchscreen-Kasse in einem Gastronomie-Interieur",
     "galleryHardwareAlt3": "Digitales Menüdisplay auf einer Marmortheke",
-    "enlargeImageHint": "Bild vergrößern"
+    "enlargeImageHint": "Bild vergrößern",
+    "premiumBundleItem1": "Premium-Software inklusive",
+    "premiumBundleItem2": "Hardware inklusive",
+    "premiumBundleItem3": "Drucker, Kasse, Geldlade",
+    "premiumBundleItem4": "Keine Investition",
+    "premiumBundleItem5": "Kein Kleingedrucktes"
   },
   "heroLanding": {
     "logoTagline": "Ihre Gastronomie-Plattform",
