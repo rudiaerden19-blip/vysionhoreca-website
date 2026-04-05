@@ -90,6 +90,10 @@ export const DEMO_KASSA_PUBLIC_QUERY = 'demo=bekijk' as const
 /** Demo-kassa (admin) op hetzelfde subdomein, met publieke view-only gate */
 export const DEMO_KASSA_URL = `${DEMO_ORDER_SITE_URL}/admin/kassa?${DEMO_KASSA_PUBLIC_QUERY}`
 
+/** Publieke demomenu / online shop op het marketingdomein */
+export const DEMO_ONLINE_SHOP_MENU_URL =
+  `https://www.vysionhoreca.com/shop/${DEMO_TENANT_SLUG}/menu` as const
+
 export function isPublicDemoKassaSearch(search: string): boolean {
   const q = search.startsWith('?') ? search.slice(1) : search
   const sp = new URLSearchParams(q)
