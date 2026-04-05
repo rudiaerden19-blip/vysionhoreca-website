@@ -289,7 +289,7 @@ function StatsAndLiveDemoSection() {
         <div className="flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center sm:gap-5">
           <a
             href={`/registreer?lang=${locale}`}
-            className="inline-flex min-h-[52px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-4 text-center text-base font-bold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:px-10 sm:text-lg"
+            className="inline-flex min-h-[52px] items-center justify-center rounded-full bg-accent px-8 py-4 text-center text-base font-bold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:px-10 sm:py-5 sm:text-lg"
           >
             {t('heroLanding.ctaStartFree')}
           </a>
@@ -297,10 +297,10 @@ function StatsAndLiveDemoSection() {
             href={DEMO_HERO_LIVE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-[52px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-accent to-orange-600 px-8 py-4 text-base font-bold text-white shadow-home-btn transition-all hover:scale-105 hover:from-accent/90 hover:to-orange-600/90 hover:shadow-[0_0_36px_rgba(234,88,12,0.38)] sm:px-10 sm:py-5 sm:text-lg"
+            className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full border-2 border-gray-900 bg-white px-8 py-4 text-base font-bold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:px-10 sm:py-5 sm:text-lg"
           >
             <span>{t('liveDemo.cta')}</span>
-            <svg className="h-5 w-5 sm:h-6 sm:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 sm:h-6 sm:w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </a>
@@ -680,7 +680,7 @@ function PricingSection() {
         <div className="mt-12 flex flex-col items-stretch justify-center gap-3 sm:mt-14 sm:flex-row sm:items-center sm:gap-4">
           <a
             href={`/registreer?lang=${locale}`}
-            className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
           >
             {t('heroLanding.ctaStartFree')}
           </a>
@@ -688,7 +688,7 @@ function PricingSection() {
             href={DEMO_HERO_LIVE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
+            className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
           >
             {t('heroLanding.ctaViewDemo')}
           </a>
@@ -889,7 +889,7 @@ function TableKioskSection() {
             <div className="mt-10 flex flex-col gap-3 sm:mt-12 sm:flex-row sm:items-center sm:gap-4">
               <a
                 href={`/registreer?lang=${locale}`}
-                className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
               >
                 {t('heroLanding.ctaStartFree')}
               </a>
@@ -897,7 +897,7 @@ function TableKioskSection() {
                 href={DEMO_HERO_LIVE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:text-base"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
               >
                 {t('heroLanding.ctaViewDemo')}
               </a>
