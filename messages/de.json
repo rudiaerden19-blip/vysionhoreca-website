@@ -555,7 +555,8 @@
     "privacyLinkTitle": "Datenschutzerklärung",
     "legalLinkTitle": "AGB und rechtliche Hinweise",
     "linkAppsAria": "Vysion Apps — neues Fenster",
-    "linkHorecaAria": "Offizielle Vysion-Horeca-Website — neues Fenster"
+    "linkHorecaAria": "Offizielle Vysion-Horeca-Website — neues Fenster",
+    "linkWebvysionAria": "Web Vysion — neues Fenster"
   },
   "stop": {
     "title": "STOP",

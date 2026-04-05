@@ -52,6 +52,15 @@ export default function Footer() {
                 >
                   www.vysionhoreca.com
                 </a>
+                <a
+                  href="https://www.webvysion.tech"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent hover:underline block"
+                  aria-label={t('footer.linkWebvysionAria')}
+                >
+                  www.webvysion.tech
+                </a>
               </p>
             </div>
 

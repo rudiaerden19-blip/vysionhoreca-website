@@ -555,7 +555,8 @@
     "privacyLinkTitle": "隐私政策",
     "legalLinkTitle": "条款与法律信息",
     "linkAppsAria": "Vysion Apps — 新标签页打开",
-    "linkHorecaAria": "Vysion Horeca官网 — 新标签页"
+    "linkHorecaAria": "Vysion Horeca官网 — 新标签页",
+    "linkWebvysionAria": "Web Vysion — 新标签页打开"
   },
   "stop": {
     "title": "停",

@@ -52,7 +52,11 @@ const organizationJsonLd = {
         areaServed: ['BE', 'NL'],
         availableLanguage: ['Dutch', 'English', 'French', 'German'],
       },
-      sameAs: ['https://www.vysionapps.io'],
+      sameAs: [
+        'https://www.vysionapps.io',
+        'https://www.vysionhoreca.com',
+        'https://www.webvysion.tech',
+      ],
     },
     {
       '@type': 'WebSite',

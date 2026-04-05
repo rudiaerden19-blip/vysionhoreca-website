@@ -797,7 +797,8 @@
     "privacyLinkTitle": "Privacy policy and data processing",
     "legalLinkTitle": "Terms of use and legal information",
     "linkAppsAria": "Vysion Apps — opens in a new tab",
-    "linkHorecaAria": "Vysion Horeca — official website, new tab"
+    "linkHorecaAria": "Vysion Horeca — official website, new tab",
+    "linkWebvysionAria": "Web Vysion — opens in a new tab"
   },
   "stop": {
     "title": "STOP",
