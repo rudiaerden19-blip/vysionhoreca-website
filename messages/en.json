@@ -35,7 +35,13 @@
     "vysionProImageAlt": "Vysion Pro plan overview",
     "vysionProRightP1": "Vysion Pro brings online ordering, your own website, stock, kitchen display, table reservations and more together in one subscription.",
     "vysionProRightP2": "Choose monthly or yearly billing; yearly plans save 10%. Every feature on the card is included, with free onboarding training and support.",
-    "vysionProLifestyleAlt": "Hospitality: shared pan with Asian dishes, glazed meat and prawns on a set restaurant table."
+    "vysionProLifestyleAlt": "Hospitality: shared pan with Asian dishes, glazed meat and prawns on a set restaurant table.",
+    "premiumShowcaseTitle": "Vysion Premium & hardware in your venue",
+    "premiumCardShowcaseAlt": "Overview of the Vysion Premium plan with features and pricing",
+    "galleryHardwareAlt1": "Black touchscreen POS with receipt printer on the counter",
+    "galleryHardwareAlt2": "White touchscreen POS in a hospitality interior",
+    "galleryHardwareAlt3": "Digital menu display on a marble counter",
+    "enlargeImageHint": "Enlarge image"
   },
   "ui": {
     "ariaPrevImage": "Previous image",

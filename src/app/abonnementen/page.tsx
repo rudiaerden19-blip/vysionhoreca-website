@@ -1,15 +1,34 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import { useLanguage } from '@/i18n'
 
 const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
+const PREMIUM_CARD_IMAGE = '/images/abonnement-premium-card.png'
+
+const GALLERY_IMAGES = [
+  { src: '/images/abonnement-gallery-pos-1.png', width: 782, height: 788, altKey: 'galleryHardwareAlt1' as const },
+  { src: '/images/abonnement-gallery-pos-2.png', width: 720, height: 780, altKey: 'galleryHardwareAlt2' as const },
+  { src: '/images/abonnement-gallery-pos-3.png', width: 787, height: 784, altKey: 'galleryHardwareAlt3' as const },
+]
+
+type LightboxState = { src: string; alt: string } | null
 
 export default function AbonnementenPage() {
   const { t, locale } = useLanguage()
   const [isYearly, setIsYearly] = useState(false)
+  const [lightbox, setLightbox] = useState<LightboxState>(null)
+
+  useEffect(() => {
+    if (!lightbox) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightbox(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [lightbox])
 
   const starterMonthly = 59
   const starterPrice = isYearly ? Math.round(starterMonthly * 12 * 0.9) : starterMonthly
@@ -163,6 +182,84 @@ export default function AbonnementenPage() {
           </div>
         </div>
       </section>
+
+      {/* Sectie 3 — hardware (3 vergrootbare foto’s links, Premium-kaart rechts) */}
+      <section className="pb-16 sm:pb-20 bg-[#e3e3e3] border-t border-gray-300/60">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-12">
+            {t('subscriptionsPage.premiumShowcaseTitle')}
+          </h2>
+
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+            <div className="flex flex-col gap-4">
+              {GALLERY_IMAGES.map((item) => {
+                const alt = t(`subscriptionsPage.${item.altKey}`)
+                return (
+                  <button
+                    key={item.src}
+                    type="button"
+                    onClick={() => setLightbox({ src: item.src, alt })}
+                    className="group relative rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm hover:shadow-md hover:ring-2 hover:ring-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-all text-left w-full p-0"
+                    aria-label={`${t('subscriptionsPage.enlargeImageHint')}: ${alt}`}
+                  >
+                    <Image
+                      src={item.src}
+                      alt={alt}
+                      width={item.width}
+                      height={item.height}
+                      className="w-full h-auto object-cover"
+                      sizes="(min-width: 1024px) min(520px, 45vw), 100vw"
+                    />
+                    <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/65 text-white text-xs font-medium px-3 py-1.5 opacity-90 group-hover:opacity-100">
+                      {t('subscriptionsPage.enlargeImageHint')}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-lg shadow-black/5">
+              <Image
+                src={PREMIUM_CARD_IMAGE}
+                alt={t('subscriptionsPage.premiumCardShowcaseAlt')}
+                width={591}
+                height={873}
+                className="w-full h-auto object-cover"
+                sizes="(min-width: 1024px) min(520px, 45vw), 100vw"
+                priority={false}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('subscriptionsPage.enlargeImageHint')}
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            type="button"
+            onClick={() => setLightbox(null)}
+            className="absolute top-4 right-4 z-10 rounded-full bg-white/10 hover:bg-white/20 text-white p-2.5 transition-colors"
+            aria-label={t('ui.ariaClose')}
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element -- lightbox gebruikt native img voor vaste weergave */}
+          <img
+            src={lightbox.src}
+            alt={lightbox.alt}
+            className="max-h-[90vh] max-w-full w-auto object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
       <Footer />
       <CookieBanner />

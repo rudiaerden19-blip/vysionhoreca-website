@@ -35,7 +35,13 @@
     "vysionProImageAlt": "Vysion Pro パッケージの概要",
     "vysionProRightP1": "Vysion Pro なら、オンライン注文、独自サイト、在庫、キッチンディスプレイ、テーブル予約などをひとつのサブスクにまとめられます。",
     "vysionProRightP2": "月額・年額から選択可能。年払いは 10% お得です。カード記載の機能はすべて含まれ、無料のオンボーディング研修とサポート付きです。",
-    "vysionProLifestyleAlt": "飲食：レストランのテーブルで囲むアジア風のシェア料理、照り焼き風の肉とエビ。"
+    "vysionProLifestyleAlt": "飲食：レストランのテーブルで囲むアジア風のシェア料理、照り焼き風の肉とエビ。",
+    "premiumShowcaseTitle": "Vysion Premium と店内ハードウェア",
+    "premiumCardShowcaseAlt": "Vysion Premium プランの機能と料金の概要",
+    "galleryHardwareAlt1": "黒のタッチスクリーンPOSとレシートプリンター",
+    "galleryHardwareAlt2": "白のタッチスクリーンPOS（飲食店内）",
+    "galleryHardwareAlt3": "大理石カウンタ上のデジタルメニュー画面",
+    "enlargeImageHint": "画像を拡大"
   },
   "heroLanding": {
     "logoTagline": "あなたの飲食プラットフォーム",

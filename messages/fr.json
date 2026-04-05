@@ -35,7 +35,13 @@
     "vysionProImageAlt": "Aperçu du forfait Vysion Pro",
     "vysionProRightP1": "Avec Vysion Pro, vous regroupez commandes en ligne, site web, stocks, écran cuisine, réservations de tables et bien plus dans un seul abonnement.",
     "vysionProRightP2": "Choisissez la facturation mensuelle ou annuelle ; l’offre annuelle inclut 10 % de réduction. Tous les avantages listés sont inclus, avec formation et support.",
-    "vysionProLifestyleAlt": "Restauration : plat à partager avec spécialités asiatiques, viande laquée et gambas dans un cadre restaurant."
+    "vysionProLifestyleAlt": "Restauration : plat à partager avec spécialités asiatiques, viande laquée et gambas dans un cadre restaurant.",
+    "premiumShowcaseTitle": "Vysion Premium et matériel sur site",
+    "premiumCardShowcaseAlt": "Aperçu de l’offre Vysion Premium avec fonctionnalités et tarif",
+    "galleryHardwareAlt1": "Caisse tactile noire avec imprimante de tickets sur le comptoir",
+    "galleryHardwareAlt2": "Caisse tactile blanche dans un établissement horeca",
+    "galleryHardwareAlt3": "Écran de menu numérique sur un comptoir en marbre",
+    "enlargeImageHint": "Agrandir l’image"
   },
   "heroLanding": {
     "logoTagline": "Votre plateforme horeca",
