@@ -1,8 +1,11 @@
 'use client'
 
 import React, { useState } from 'react'
+import Image from 'next/image'
 import { Navigation, Footer, CookieBanner } from '@/components'
 import { useLanguage } from '@/i18n'
+
+const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
 
 export default function AbonnementenPage() {
   const { t, locale } = useLanguage()
@@ -138,7 +141,7 @@ export default function AbonnementenPage() {
               </div>
             </div>
 
-            <div className="lg:pt-2">
+            <div className="lg:pt-2 flex flex-col">
               <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-6">
                 {t('subscriptionsPage.vysionProRightP1')}
               </p>
@@ -149,6 +152,16 @@ export default function AbonnementenPage() {
               <a href="/prijzen" className="inline-block mt-6 text-accent font-semibold hover:underline">
                 {t('subscriptionsPage.ctaPricing')} →
               </a>
+              <div className="mt-8 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-md shadow-black/5">
+                <Image
+                  src={LIFESTYLE_IMAGE}
+                  alt={t('subscriptionsPage.vysionProLifestyleAlt')}
+                  width={733}
+                  height={457}
+                  className="w-full h-auto object-cover"
+                  sizes="(min-width: 1024px) min(520px, 45vw), 100vw"
+                />
+              </div>
             </div>
           </div>
         </div>
