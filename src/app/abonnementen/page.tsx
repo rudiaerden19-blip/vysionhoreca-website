@@ -40,17 +40,21 @@ export default function AbonnementenPage() {
       <Navigation />
 
       {/* Sectie 1 — intro (zoals mockup: titel, twee regels, vier voordeelkaarten) */}
-      <section className="pt-28 sm:pt-32 pb-12 sm:pb-16 bg-[#e3e3e3]">
+      <section className="pt-28 sm:pt-36 pb-20 sm:pb-28 bg-[#e3e3e3]">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-6">{t('subscriptionsPage.title')}</h1>
-          <p className="text-xl text-gray-600 mb-4">{t('subscriptionsPage.subtitle')}</p>
-          <p className="text-gray-600 leading-relaxed mb-10">{t('subscriptionsPage.lead')}</p>
+          <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-8 sm:mb-10">{t('subscriptionsPage.title')}</h1>
+          <p className="text-xl text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed">
+            {t('subscriptionsPage.subtitle')}
+          </p>
+          <p className="text-gray-600 leading-relaxed mb-14 sm:mb-16 max-w-2xl mx-auto">
+            {t('subscriptionsPage.lead')}
+          </p>
 
-          <ul className="space-y-4 text-left max-w-2xl mx-auto">
+          <ul className="space-y-5 sm:space-y-6 text-left max-w-2xl mx-auto">
             {[1, 2, 3, 4].map((i) => (
               <li
                 key={i}
-                className="flex items-start gap-3 bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
+                className="flex items-start gap-4 bg-white rounded-2xl border border-gray-200 p-6 sm:p-7 shadow-sm"
               >
                 <svg
                   className="w-6 h-6 text-accent mt-0.5 flex-shrink-0"
@@ -68,13 +72,13 @@ export default function AbonnementenPage() {
       </section>
 
       {/* Sectie 2 — Vysion Pro: toggle, prijs links, tekst rechts */}
-      <section className="pb-16 sm:pb-20 bg-[#e3e3e3] border-t border-gray-300/60">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-8">
+      <section className="pb-24 sm:pb-32 bg-[#e3e3e3] border-t border-gray-300/60">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-14">
             {t('subscriptionsPage.vysionProHeading')}
           </h2>
 
-          <div className="flex flex-col items-center mb-8">
+          <div className="flex flex-col items-center mb-12 sm:mb-16">
             <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-sm">
               <button
                 type="button"
@@ -98,12 +102,14 @@ export default function AbonnementenPage() {
                 </span>
               </button>
             </div>
-            {isYearly && <p className="text-gray-600 text-sm mt-3">{t('pricing.yearlySave')}</p>}
+            {isYearly && (
+              <p className="text-gray-600 text-sm mt-4 sm:mt-5">{t('pricing.yearlySave')}</p>
+            )}
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-start">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start">
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="p-6 lg:p-8">
+              <div className="p-6 sm:p-8 lg:p-10">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
                     <svg className="w-5 h-5 text-accent" fill="currentColor" viewBox="0 0 20 20">
@@ -133,7 +139,7 @@ export default function AbonnementenPage() {
                   </p>
                 )}
 
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-3.5 sm:space-y-4 mb-8 sm:mb-10">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((i) => (
                     <li key={i} className="flex items-start gap-3">
                       <svg
@@ -161,15 +167,15 @@ export default function AbonnementenPage() {
               </div>
             </div>
 
-            <div className="flex flex-col lg:mt-[3cm]">
-              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-6">
+            <div className="flex flex-col lg:mt-[3cm] lg:pl-2">
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10">
                 {t('subscriptionsPage.vysionProRightP1')}
               </p>
-              <p className="text-gray-600 text-base leading-relaxed mb-8">
+              <p className="text-gray-600 text-base leading-relaxed mb-10 sm:mb-12">
                 {t('subscriptionsPage.vysionProRightP2')}
               </p>
-              <p className="text-gray-500 text-sm">{t('pricing.trialInfo')}</p>
-              <div className="mt-8 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-md shadow-black/5">
+              <p className="text-gray-500 text-sm mb-2">{t('pricing.trialInfo')}</p>
+              <div className="mt-10 sm:mt-12 rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm">
                 <Image
                   src={LIFESTYLE_IMAGE}
                   alt={t('subscriptionsPage.vysionProLifestyleAlt')}
@@ -184,14 +190,14 @@ export default function AbonnementenPage() {
         </div>
       </section>
 
-      {/* Sectie 3 — grote foto-rij, daarna Premium-beeld + pitch (geen CSS-schaduw/rand op kaart) */}
-      <section className="pb-16 sm:pb-20 bg-[#e3e3e3]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-6 sm:mb-8">
+      {/* Sectie 3 — grote foto-rij, daarna Premium + pitch */}
+      <section className="pb-24 sm:pb-32 bg-[#e3e3e3]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-28">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-10 sm:mb-14">
             {t('subscriptionsPage.premiumShowcaseTitle')}
           </h2>
 
-          <div className="flex flex-col items-center mb-8 sm:mb-10">
+          <div className="flex flex-col items-center mb-12 sm:mb-16">
             <div className="bg-white border border-gray-200 p-1 rounded-full inline-flex items-center shadow-sm">
               <button
                 type="button"
@@ -215,10 +221,12 @@ export default function AbonnementenPage() {
                 </span>
               </button>
             </div>
-            {isYearly && <p className="text-gray-600 text-sm mt-3">{t('pricing.yearlySave')}</p>}
+            {isYearly && (
+              <p className="text-gray-600 text-sm mt-4 sm:mt-5">{t('pricing.yearlySave')}</p>
+            )}
           </div>
 
-          <div className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-5 mb-10 sm:mb-12 max-w-5xl mx-auto">
+          <div className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-16 sm:mb-24 max-w-6xl mx-auto">
             {GALLERY_IMAGES.map((item) => {
               const alt = t(`subscriptionsPage.${item.altKey}`)
               return (
@@ -226,7 +234,7 @@ export default function AbonnementenPage() {
                   key={item.src}
                   type="button"
                   onClick={() => setLightbox({ src: item.src, alt })}
-                  className="group relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-200/80 ring-1 ring-gray-300/80 hover:ring-2 hover:ring-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#e3e3e3] transition-shadow shadow-none"
+                  className="group relative w-full aspect-[4/3] sm:min-h-[140px] md:min-h-[180px] rounded-xl overflow-hidden bg-gray-200/80 ring-1 ring-gray-300/80 hover:ring-2 hover:ring-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#e3e3e3] transition-shadow shadow-none"
                   aria-label={`${t('subscriptionsPage.enlargeImageHint')}: ${alt}`}
                 >
                   <Image
@@ -235,7 +243,7 @@ export default function AbonnementenPage() {
                     width={item.width}
                     height={item.height}
                     className="w-full h-full object-cover"
-                    sizes="(max-width: 640px) 31vw, (max-width: 1024px) 28vw, 300px"
+                    sizes="(max-width: 640px) 32vw, (max-width: 1024px) 30vw, 360px"
                   />
                   <span className="pointer-events-none absolute bottom-2 right-2 rounded-md bg-black/70 text-white text-[10px] sm:text-xs font-medium px-2 py-1">
                     {t('subscriptionsPage.enlargeImageHint')}
@@ -245,12 +253,12 @@ export default function AbonnementenPage() {
             })}
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
-            <div className="bg-white rounded-2xl border-2 border-gray-900 shadow-sm overflow-hidden relative">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start pt-4 sm:pt-6">
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden relative hover:shadow-md transition-shadow">
               <div className="absolute top-4 right-4 bg-accent text-white text-[11px] font-semibold px-3 py-1 rounded-full uppercase tracking-wide z-10">
                 {t('pricing.popular')}
               </div>
-              <div className="p-6 lg:p-8">
+              <div className="p-6 sm:p-8 lg:p-10">
                 <div className="flex items-center gap-3 mb-5 pr-16">
                   <div className="w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center">
                     <svg className="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,7 +295,7 @@ export default function AbonnementenPage() {
 
                 <p className="text-gray-700 mb-4 text-sm sm:text-base font-medium">{t('pricing.pro.allOfStarter')}</p>
 
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-3.5 sm:space-y-4 mb-8 sm:mb-10">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
                     <li key={i} className="flex items-start gap-3">
                       <svg
@@ -314,15 +322,17 @@ export default function AbonnementenPage() {
                 <p className="text-center text-accent text-sm mt-3 font-medium">{t('pricing.cancelAnytime')}</p>
               </div>
             </div>
-            <div className="lg:pt-1">
-              <p className="text-gray-900 text-lg sm:text-xl font-bold leading-snug mb-3">
+            <div className="lg:pt-2 lg:pl-2">
+              <p className="text-gray-900 text-lg sm:text-xl font-bold leading-snug mb-5 sm:mb-6">
                 {t('subscriptionsPage.premiumPitchLead')}
               </p>
-              <p className="text-gray-600 text-xs sm:text-sm font-medium mb-6">{t('pricing.exclVat')}</p>
-              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-6">
+              <p className="text-gray-600 text-xs sm:text-sm font-medium mb-8 sm:mb-10">
+                {t('pricing.exclVat')}
+              </p>
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10">
                 {t('subscriptionsPage.premiumPitchP1')}
               </p>
-              <p className="text-gray-600 text-base leading-relaxed">
+              <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
                 {t('subscriptionsPage.premiumPitchP2')}
               </p>
             </div>
