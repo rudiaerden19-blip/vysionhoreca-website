@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/i18n'
+import SubscriptionsTermsPopup from './SubscriptionsTermsPopup'
 
 /** Zelfde hover/active-oranje glow als platformkaarten (`PlatformGridSection`). */
 const HARDWARE_CARD_INTERACTION =
@@ -119,6 +120,8 @@ export default function HardwareSection() {
             )
           })}
         </div>
+
+        <SubscriptionsTermsPopup className="mt-10 sm:mt-12 flex justify-center px-1" />
       </div>
 
       {expanded !== null && (

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Navigation, Footer, CookieBanner, HomeCornerStamp } from '@/components'
+import { Navigation, Footer, CookieBanner, HomeCornerStamp, SubscriptionsTermsPopup } from '@/components'
 import { useLanguage } from '@/i18n'
 
 const LIFESTYLE_IMAGE = '/images/abonnement-vysion-pro-lifestyle.png'
@@ -20,23 +20,20 @@ export default function AbonnementenPage() {
   const { t, locale } = useLanguage()
   const [isYearly, setIsYearly] = useState(false)
   const [lightbox, setLightbox] = useState<LightboxState>(null)
-  const [generalTermsOpen, setGeneralTermsOpen] = useState(false)
 
   useEffect(() => {
-    if (!lightbox && !generalTermsOpen) return
+    if (!lightbox) return
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape') return
-      if (lightbox) setLightbox(null)
-      else setGeneralTermsOpen(false)
+      if (e.key === 'Escape') setLightbox(null)
     }
     window.addEventListener('keydown', onKey)
     return () => {
       document.body.style.overflow = prev
       window.removeEventListener('keydown', onKey)
     }
-  }, [lightbox, generalTermsOpen])
+  }, [lightbox])
 
   const starterMonthly = 59
   const proMonthly = 99
@@ -279,15 +276,7 @@ export default function AbonnementenPage() {
             })}
           </div>
 
-          <div className="flex justify-center mb-16 sm:mb-24 max-w-6xl mx-auto px-1">
-            <button
-              type="button"
-              onClick={() => setGeneralTermsOpen(true)}
-              className="inline-flex items-center justify-center rounded-full border-2 border-gray-900 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:text-base"
-            >
-              {t('subscriptionsPage.readGeneralTermsCta')}
-            </button>
-          </div>
+          <SubscriptionsTermsPopup className="mb-16 sm:mb-24 flex justify-center max-w-6xl mx-auto px-1" />
 
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-start mt-12 sm:mt-20 lg:mt-24 xl:mt-28 pt-4 sm:pt-6">
             <div className="relative">
@@ -460,53 +449,6 @@ export default function AbonnementenPage() {
           </div>
         </div>
       </section>
-
-      {generalTermsOpen && (
-        <div
-          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-4 sm:p-6"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="abonnementen-terms-title"
-          onClick={() => setGeneralTermsOpen(false)}
-        >
-          <div
-            className="relative flex max-h-[min(90vh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-200 px-5 py-4 sm:px-6 sm:py-5">
-              <div>
-                <h2 id="abonnementen-terms-title" className="text-lg font-bold text-gray-900 sm:text-xl">
-                  {t('subscriptionsTermsPopup.title')}
-                </h2>
-                <p className="mt-1 text-xs text-gray-500 sm:text-sm">{t('subscriptionsTermsPopup.lastUpdated')}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setGeneralTermsOpen(false)}
-                className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
-                aria-label={t('ui.ariaClose')}
-              >
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4 sm:px-6 sm:py-5 text-left">
-              <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-800">
-                {t('subscriptionsTermsPopup.body')}
-              </div>
-              <p className="mt-8 border-t border-gray-200 pt-5 text-xs leading-relaxed text-gray-600">
-                {t('subscriptionsTermsPopup.footer')}
-                {' '}
-                <a href="/juridisch/dienstenovereenkomst" className="font-medium text-accent hover:underline">
-                  {t('legalMain.links.serviceAgreement')}
-                </a>
-                .
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {lightbox && (
         <div
