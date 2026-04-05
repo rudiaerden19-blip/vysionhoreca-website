@@ -53,7 +53,7 @@ function GratisWebsiteBannerSection() {
 }
 
 function WhyVysionSection() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const pointKeys = [
     'fullPlatform',
     'liveSupport',
@@ -95,18 +95,36 @@ function WhyVysionSection() {
             ))}
           </ul>
 
-          <div className="order-1 lg:order-2 relative w-full min-h-[280px] self-stretch lg:min-h-0 lg:pl-6 xl:pl-10">
-            <div className="relative min-h-[280px] lg:absolute lg:inset-0 lg:min-h-0">
-              <div className="relative min-h-[280px] rounded-3xl overflow-hidden shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] lg:absolute lg:left-0 lg:right-0 lg:bottom-0 lg:min-h-0 lg:top-[2.5rem]">
-                <Image
-                  src="/images/why-vysion-kiosk.png"
-                  alt={t('whyVysion.imageAlt')}
-                  fill
-                  loading="lazy"
-                  className="object-cover object-center"
-                  sizes="(min-width: 1024px) 45vw, 95vw"
-                />
+          <div className="order-1 lg:order-2 relative flex w-full min-h-0 flex-col self-stretch lg:pl-6 xl:pl-10">
+            <div className="relative min-h-[280px] flex-1 lg:min-h-[320px]">
+              <div className="relative h-full min-h-[280px] lg:absolute lg:inset-0 lg:min-h-0">
+                <div className="relative min-h-[280px] h-full rounded-3xl overflow-hidden shadow-home-photo ring-1 ring-black/[0.08] bg-[#141414] lg:absolute lg:left-0 lg:right-0 lg:bottom-0 lg:min-h-0 lg:top-[2.5rem]">
+                  <Image
+                    src="/images/why-vysion-kiosk.png"
+                    alt={t('whyVysion.imageAlt')}
+                    fill
+                    loading="lazy"
+                    className="object-cover object-center"
+                    sizes="(min-width: 1024px) 45vw, 95vw"
+                  />
+                </div>
               </div>
+            </div>
+            <div className="relative z-10 mt-6 flex w-full shrink-0 flex-col items-stretch gap-4 sm:mt-8 sm:flex-row sm:items-center sm:justify-center lg:justify-start lg:px-0">
+              <a
+                href={`/registreer?lang=${locale}`}
+                className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full bg-accent px-8 py-3.5 text-center text-sm font-semibold text-white shadow-home-btn transition-colors hover:bg-accent/90 sm:min-w-[200px] sm:flex-1 lg:max-w-[220px] lg:flex-initial"
+              >
+                {t('heroLanding.ctaStartFree')}
+              </a>
+              <a
+                href={DEMO_HERO_LIVE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[48px] w-full items-center justify-center rounded-full border-2 border-gray-900/85 bg-white px-8 py-3.5 text-center text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 sm:min-w-[200px] sm:flex-1 lg:max-w-[220px] lg:flex-initial"
+              >
+                {t('heroLanding.ctaViewDemo')}
+              </a>
             </div>
           </div>
         </div>

@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { useLanguage, Locale } from '@/i18n'
-import { DEMO_HERO_LIVE_URL } from '@/lib/demo-links'
 
 type Props = {
   onStickyNavChange?: (show: boolean) => void
@@ -196,24 +195,8 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
         <p className="mt-4 sm:mt-5 text-lg sm:text-xl md:text-2xl text-white font-semibold max-w-2xl leading-snug">
           {t('heroLanding.subtitleLead')}
         </p>
-        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-          <a
-            href={`/registreer?lang=${locale}`}
-            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-home-btn transition-colors"
-          >
-            {t('heroLanding.ctaStartFree')}
-          </a>
-          <a
-            href={DEMO_HERO_LIVE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center rounded-full border-2 border-white/90 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-semibold px-8 py-4 min-w-[200px] text-center shadow-home-ghost transition-colors"
-          >
-            {t('heroLanding.ctaViewDemo')}
-          </a>
-        </div>
         <div
-          className="mt-10 sm:mt-14 md:mt-16 w-full max-w-lg sm:max-w-xl mx-auto rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10"
+          className="mt-8 sm:mt-10 md:mt-12 w-full max-w-lg sm:max-w-xl mx-auto rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10"
           role="region"
           aria-label={`${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')}`}
         >
