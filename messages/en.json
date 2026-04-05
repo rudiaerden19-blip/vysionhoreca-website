@@ -151,6 +151,7 @@
     "ctaModulesPricePeriod": "per month",
     "ctaModulesPriceNote": "included in your Premium subscription",
     "ctaModulesPriceExtra": "€0 upfront — hardware and software included",
+    "ctaModulesPriceOwnership": "After 2 years, the hardware becomes the customer's property",
     "demoRequest": "Request a demo"
   },
   "hero": {

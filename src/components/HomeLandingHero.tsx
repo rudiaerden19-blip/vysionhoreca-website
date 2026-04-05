@@ -198,7 +198,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
         <div
           className="mt-8 sm:mt-10 md:mt-12 w-full max-w-lg sm:max-w-xl mx-auto rounded-2xl border border-white/25 bg-white/[0.07] backdrop-blur-md px-5 py-6 sm:px-8 sm:py-7 shadow-[0_12px_40px_rgba(0,0,0,0.4)] ring-1 ring-white/10"
           role="region"
-          aria-label={`${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')}`}
+          aria-label={`${t('heroLanding.ctaModulesHeadline')} ${t('heroLanding.ctaModulesSubline')} ${t('heroLanding.ctaModulesPricePrefix')} €${t('heroLanding.ctaModulesPriceAmount')} ${t('heroLanding.ctaModulesPricePeriod')}. ${t('heroLanding.ctaModulesPriceNote')} ${t('heroLanding.ctaModulesPriceExtra')} ${t('heroLanding.ctaModulesPriceOwnership')}`}
         >
           <p className="text-xl sm:text-2xl md:text-[1.65rem] font-bold text-white tracking-tight text-balance leading-snug">
             {t('heroLanding.ctaModulesHeadline')}
@@ -225,6 +225,9 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
             </p>
             <p className="mt-1.5 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
               {t('heroLanding.ctaModulesPriceExtra')}
+            </p>
+            <p className="mt-1.5 text-center text-[0.7rem] sm:text-xs text-white/60 font-normal leading-snug max-w-md mx-auto">
+              {t('heroLanding.ctaModulesPriceOwnership')}
             </p>
           </div>
         </div>
