@@ -83,6 +83,7 @@
     "ctaModulesPriceAmount": "99",
     "ctaModulesPricePeriod": "al mes",
     "ctaModulesPriceNote": "incluido en tu suscripción Premium",
+    "ctaModulesPriceExtra": "0 € de inversión — hardware y software incluidos",
     "demoRequest": "Solicitar demo"
   },
   "hero": {

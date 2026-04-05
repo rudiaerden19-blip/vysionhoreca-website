@@ -83,6 +83,7 @@
     "ctaModulesPriceAmount": "99",
     "ctaModulesPricePeriod": "",
     "ctaModulesPriceNote": "プレミアムプランに含まれます",
+    "ctaModulesPriceExtra": "初期投資 0 円 — ハードウェア・ソフトウェア込み",
     "demoRequest": "デモを依頼"
   },
   "hero": {

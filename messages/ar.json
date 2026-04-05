@@ -83,6 +83,7 @@
     "ctaModulesPriceAmount": "99",
     "ctaModulesPricePeriod": "شهريًا",
     "ctaModulesPriceNote": "مشمول في اشتراك بريميوم",
+    "ctaModulesPriceExtra": "صفر استثمار مبدئي — الجهاز والبرنامج مشمولان",
     "demoRequest": "اطلب عرضًا"
   },
   "hero": {
