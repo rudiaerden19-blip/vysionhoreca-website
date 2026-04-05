@@ -136,7 +136,10 @@ export function getCurrentTenantSlug(): string | null {
 
 const normSlug = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
 
-/** Kalenderdag in België (YYYY-MM-DD) — dagelijkse herauthenticatie voor admin/kassa. */
+/** Na zaak-login (wachtwoord): sessie blijft geldig zolang `sessionExpiresAt` in de toekomst ligt. */
+const OWNER_SESSION_TTL_MS = 14 * 24 * 60 * 60 * 1000
+
+/** Kalenderdag in België (YYYY-MM-DD) — legacy / backwards compatible. */
 export function getBrusselsCalendarDateString(date: Date = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Europe/Brussels',
@@ -146,10 +149,15 @@ export function getBrusselsCalendarDateString(date: Date = new Date()): string {
   }).format(date)
 }
 
-/** Zet tenant in localStorage met `sessionCalDay` (na login/registratie). */
+/** Zet tenant in localStorage na login/registratie (rollende sessie + legacy dagveld). */
 export function persistTenantSessionWithToday(tenant: Record<string, unknown>): void {
   if (typeof window === 'undefined') return
-  const enriched = { ...tenant, sessionCalDay: getBrusselsCalendarDateString() }
+  const sessionExpiresAt = new Date(Date.now() + OWNER_SESSION_TTL_MS).toISOString()
+  const enriched = {
+    ...tenant,
+    sessionCalDay: getBrusselsCalendarDateString(),
+    sessionExpiresAt,
+  }
   localStorage.setItem('vysion_tenant', JSON.stringify(enriched))
 }
 
@@ -273,15 +281,22 @@ export function isOwnerSessionForTenant(tenantSlug: string): boolean {
 }
 
 /**
- * Eigenaar mag admin/kassa van deze tenant alleen met wachtwoord-login vandaag (BE).
- * Geen `sessionCalDay` of andere tenant in localStorage → geweigerd.
+ * Eigenaar mag admin/kassa van deze tenant na wachtwoord-login tot `sessionExpiresAt`
+ * (rollende periode). Oude sessies zonder `sessionExpiresAt`: alleen die kalenderdag (BE).
  */
 export function isOwnerSessionFreshForTenant(tenantSlug: string): boolean {
   if (!isOwnerSessionForTenant(tenantSlug)) return false
   const tenantData = localStorage.getItem('vysion_tenant')
   if (!tenantData) return false
   try {
-    const tenant = JSON.parse(tenantData) as { sessionCalDay?: string }
+    const tenant = JSON.parse(tenantData) as {
+      sessionCalDay?: string
+      sessionExpiresAt?: string
+    }
+    if (tenant.sessionExpiresAt) {
+      const exp = new Date(tenant.sessionExpiresAt).getTime()
+      if (!Number.isNaN(exp)) return exp > Date.now()
+    }
     const day = tenant.sessionCalDay
     if (!day || typeof day !== 'string') return false
     return day === getBrusselsCalendarDateString()

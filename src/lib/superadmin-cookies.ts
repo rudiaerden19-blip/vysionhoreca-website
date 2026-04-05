@@ -1,8 +1,8 @@
 /**
  * Alleen **superadmin**-sessie, cross-subdomein (bv. www → tenant.ordervysion.com).
  *
- * **Zaak-eigenaren:** géén cookie — die blijven alleen via `/api/auth/login` + `vysion_tenant`
- * in localStorage (dagelijkse `sessionCalDay`). Deze cookies worden nergens bij tenant-login gezet.
+ * **Zaak-eigenaren:** géén cookie — die blijven via `/api/auth/login` + `vysion_tenant` in localStorage
+ * (`sessionExpiresAt`, rollende geldigheid). Deze cookies worden nergens bij tenant-login gezet.
  */
 
 /** Zelfde keys in middleware (Edge) + client — niet los laten verspringen. */
