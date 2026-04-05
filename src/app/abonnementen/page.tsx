@@ -175,8 +175,14 @@ export default function AbonnementenPage() {
               <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10">
                 {t('subscriptionsPage.vysionProRightP1')}
               </p>
-              <p className="text-gray-600 text-base leading-relaxed mb-8 sm:mb-10">
+              <p className="text-gray-600 text-base leading-relaxed mb-6 sm:mb-8">
                 {t('subscriptionsPage.vysionProRightP2')}
+              </p>
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-5 sm:mb-6">
+                {t('subscriptionsPage.vysionProModulesP1')}
+              </p>
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10">
+                {t('subscriptionsPage.vysionProModulesP2')}
               </p>
               <p className="text-gray-500 text-sm mb-6">{t('pricing.trialInfo')}</p>
               <a
@@ -348,12 +354,20 @@ export default function AbonnementenPage() {
               <p className="text-gray-600 text-base sm:text-lg leading-relaxed mb-8 sm:mb-10">
                 {t('subscriptionsPage.premiumPitchP2')}
               </p>
-              <a
-                href={`/registreer?lang=${locale}`}
-                className="inline-flex items-center justify-center w-full sm:w-fit bg-accent text-white text-center py-3.5 px-10 rounded-full font-semibold hover:bg-accent/90 transition-colors"
-              >
-                {t('heroLanding.ctaStartFree')}
-              </a>
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 items-stretch sm:items-center">
+                <a
+                  href={`/registreer?lang=${locale}`}
+                  className="inline-flex items-center justify-center w-full sm:w-fit bg-accent text-white text-center py-3.5 px-10 rounded-full font-semibold hover:bg-accent/90 transition-colors"
+                >
+                  {t('heroLanding.ctaStartFree')}
+                </a>
+                <a
+                  href="/#hardware"
+                  className="inline-flex items-center justify-center w-full sm:w-fit border-2 border-gray-900 text-gray-900 bg-white text-center py-3.5 px-10 rounded-full font-semibold hover:bg-gray-50 transition-colors"
+                >
+                  {t('subscriptionsPage.ctaToHardware')}
+                </a>
+              </div>
             </div>
           </div>
         </div>
