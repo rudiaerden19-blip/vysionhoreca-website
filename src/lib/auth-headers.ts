@@ -136,7 +136,10 @@ export function getCurrentTenantSlug(): string | null {
 
 const normSlug = (s: string) => (s || '').replace(/-/g, '').toLowerCase()
 
-/** Na zaak-login (wachtwoord): sessie blijft geldig zolang `sessionExpiresAt` in de toekomst ligt. */
+/**
+ * Hoe lang de **browser** een zaak-login (localStorage) onthoudt na wachtwoord.
+ * Dit is géén abonnement/proefperiode — die loopt via `subscriptions.trial_ends_at` / `isTrialSubscriptionActive` in de DB.
+ */
 const OWNER_SESSION_TTL_MS = 14 * 24 * 60 * 60 * 1000
 
 /** Kalenderdag in België (YYYY-MM-DD) — legacy / backwards compatible. */
