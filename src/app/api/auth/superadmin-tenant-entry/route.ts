@@ -24,11 +24,25 @@ function handoffLoginUrl(request: NextRequest, slug: string, path: string): URL 
   return u
 }
 
-function tenantOriginForSlug(request: NextRequest, slug: string): string | null {
+/** Zelfde hosts als middleware `exactMainDomain` + previews: handoff via /shop/{slug}/… op dit origin (betrouwbaarder dan tenant-subdomein). */
+function shouldHandoffViaMainSiteShopPath(request: NextRequest): boolean {
   const host = (request.headers.get('host') || '').split(':')[0].toLowerCase()
+  const mainHosts = new Set([
+    'www.vysionhoreca.com',
+    'vysionhoreca.com',
+    'www.ordervysion.com',
+    'ordervysion.com',
+  ])
+  if (mainHosts.has(host)) return true
   if (host.includes('localhost') || host === '127.0.0.1' || host.includes('vercel.app')) {
-    return null
+    return true
   }
+  return false
+}
+
+/** Alleen als superadmin API ooit vanaf een tenant-host wordt aangeroepen: doorverwijzen naar echt subdomein. */
+function tenantOriginForSlug(request: NextRequest, slug: string): string {
+  const host = (request.headers.get('host') || '').split(':')[0].toLowerCase()
   if (host.endsWith('ordervysion.com')) return `https://${slug}.ordervysion.com`
   if (host.endsWith('vysionhoreca.com')) return `https://${slug}.vysionhoreca.com`
   return `https://${slug}.ordervysion.com`
@@ -87,8 +101,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(handoffLoginUrl(request, slug, path))
   }
 
-  const origin = tenantOriginForSlug(request, slug)
-  if (!origin) {
+  // www / apex / preview: altijd zelfde deployment als Super Admin → geen aparte tenant-URL nodig
+  // (voorkomt Vercel/DNS edge cases op *.ordervysion.com).
+  if (shouldHandoffViaMainSiteShopPath(request)) {
     const u = request.nextUrl.clone()
     u.pathname = `/shop/${slug}${path}`
     u.search = ''
@@ -97,7 +112,7 @@ export async function GET(request: NextRequest) {
     return res
   }
 
-  const dest = `${origin}${path}`
+  const dest = `${tenantOriginForSlug(request, slug)}${path}`
   const res = NextResponse.redirect(dest)
   attachSuperadminCookies(res, request, id, email, name)
   return res
