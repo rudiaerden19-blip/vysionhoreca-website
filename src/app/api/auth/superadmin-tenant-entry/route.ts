@@ -106,7 +106,8 @@ export async function GET(request: NextRequest) {
   if (shouldHandoffViaMainSiteShopPath(request)) {
     const u = request.nextUrl.clone()
     u.pathname = `/shop/${slug}${path}`
-    u.search = ''
+    // Query vlag: admin-layout zet superadmin in LS vóór login-redirect (lost na volledige navigatie cookies → LS).
+    u.searchParams.set('sa_handoff', '1')
     const res = NextResponse.redirect(u)
     attachSuperadminCookies(res, request, id, email, name)
     return res

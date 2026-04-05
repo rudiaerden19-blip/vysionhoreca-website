@@ -30,7 +30,10 @@ import {
   isSuperAdminLoggedIn,
   isOwnerSessionFreshForTenant,
 } from '@/lib/auth-headers'
-import { mirrorSuperadminSessionFromCookieToLocalStorage } from '@/lib/superadmin-cookies'
+import {
+  mirrorSuperadminSessionFromCookieToLocalStorage,
+  peekSuperadminFromBrowserCookie,
+} from '@/lib/superadmin-cookies'
 import {
   isMarketingDemoTenantSlug,
   isPublicDemoKassaSearch,
@@ -118,19 +121,87 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     if (loading || tenantExists === null) return
     if (tenantExists === false) return
     if (typeof window === 'undefined') return
+
+    const stripHandoffParamFromSearch = (search: string) => {
+      if (!search || search === '?') return ''
+      const raw = search.startsWith('?') ? search.slice(1) : search
+      const p = new URLSearchParams(raw)
+      p.delete('sa_handoff')
+      const s = p.toString()
+      return s ? `?${s}` : ''
+    }
+
+    const removeHandoffFromAddressBar = () => {
+      const clean = stripHandoffParamFromSearch(window.location.search)
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${clean}${window.location.hash}`
+      )
+    }
+
+    const goTenantLogin = () => {
+      setAdminAccess('login')
+      const clean = stripHandoffParamFromSearch(window.location.search)
+      const next = buildShopInternalReturnPath(
+        params.tenant,
+        window.location.pathname,
+        clean
+      )
+      // Volledige navigatie: voorkomt vastloper tussen client router.replace, RSC en middleware
+      // (superadmin-cookie op /login → 302 terug naar /shop terwijl client superadmin nog niet ziet).
+      window.location.assign(`${window.location.origin}/login?next=${encodeURIComponent(next)}`)
+    }
+
     mirrorSuperadminSessionFromCookieToLocalStorage()
+    const sp = new URLSearchParams(
+      window.location.search.startsWith('?') ? window.location.search.slice(1) : window.location.search
+    )
+    const fromSaHandoff = sp.get('sa_handoff') === '1'
+
     if (demoPublicUnauthenticated) {
       setAdminAccess('ok')
       return
     }
-    if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)) {
+
+    const hasAccess =
+      isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)
+
+    if (hasAccess) {
+      if (fromSaHandoff) removeHandoffFromAddressBar()
       setAdminAccess('ok')
       return
     }
-    setAdminAccess('login')
-    const next = buildShopInternalReturnPath(params.tenant, window.location.pathname, window.location.search)
-    router.replace(`/login?next=${encodeURIComponent(next)}`)
-  }, [loading, tenantExists, params.tenant, router, demoPublicUnauthenticated])
+
+    // Direct na superadmin-handoff: cookie kan vlak na 302 nog niet in document.cookie staan — één korte retry.
+    if (fromSaHandoff) {
+      let cancelled = false
+      const t = window.setTimeout(() => {
+        if (cancelled) return
+        mirrorSuperadminSessionFromCookieToLocalStorage()
+        if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)) {
+          removeHandoffFromAddressBar()
+          setAdminAccess('ok')
+        } else if (peekSuperadminFromBrowserCookie()) {
+          mirrorSuperadminSessionFromCookieToLocalStorage()
+          if (isSuperAdminLoggedIn() || isOwnerSessionFreshForTenant(params.tenant)) {
+            removeHandoffFromAddressBar()
+            setAdminAccess('ok')
+          } else {
+            goTenantLogin()
+          }
+        } else {
+          goTenantLogin()
+        }
+      }, 100)
+      return () => {
+        cancelled = true
+        window.clearTimeout(t)
+      }
+    }
+
+    goTenantLogin()
+  }, [loading, tenantExists, params.tenant, demoPublicUnauthenticated])
 
   /**
    * Welkom-splash (/welkom) wordt getoond vanuit admin/page als `vysion_welcomed_*` ontbreekt.
