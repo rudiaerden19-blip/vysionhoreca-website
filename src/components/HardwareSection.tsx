@@ -86,12 +86,6 @@ export default function HardwareSection() {
           <p className="mt-4 text-base sm:text-lg text-gray-600 leading-relaxed">
             {t('hardware.subtitle')}
           </p>
-          <a
-            href="/"
-            className="mt-8 inline-flex items-center justify-center rounded-full bg-accent text-white font-semibold px-8 py-3.5 text-base hover:bg-accent/90 transition-colors shadow-sm"
-          >
-            {t('hardware.ctaOurRegisters')}
-          </a>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
