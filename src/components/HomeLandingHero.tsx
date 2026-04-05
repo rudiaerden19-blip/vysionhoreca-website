@@ -84,23 +84,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
             </span>
           </a>
 
-          {/* Desktop: pill nav */}
-          <nav
-            className="hidden lg:flex absolute left-1/2 -translate-x-1/2 top-3 sm:top-4 items-center gap-1 bg-white/95 rounded-full px-2 py-1.5 shadow-home-float"
-            aria-label={t('ui.ariaMain')}
-          >
-            {pillLinks.map(({ href, label }) => (
-              <a
-                key={href + label}
-                href={href}
-                className="px-3 xl:px-4 py-2 text-sm font-medium text-gray-900 rounded-full hover:bg-gray-100 transition-colors whitespace-nowrap"
-              >
-                {label}
-              </a>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto lg:ml-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
             <a
               href="/#contact"
               className="hidden sm:inline-flex items-center justify-center rounded-md bg-accent hover:bg-accent/90 text-white text-sm font-semibold px-4 py-2.5 shadow-home-btn transition-colors"
@@ -146,7 +130,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
 
             <button
               type="button"
-              className="lg:hidden text-white p-2 rounded-lg hover:bg-white/10"
+              className="text-white p-2 rounded-lg hover:bg-white/10"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label={t('ui.ariaNavMenu')}
             >
@@ -162,7 +146,7 @@ export default function HomeLandingHero({ onStickyNavChange }: Props) {
         </div>
 
         {isMenuOpen && (
-          <div className="lg:hidden mt-4 rounded-2xl bg-black/50 backdrop-blur-md border border-white/20 p-4 space-y-1">
+          <div className="mt-4 rounded-2xl bg-black/50 backdrop-blur-md border border-white/20 p-4 space-y-1">
             {pillLinks.map(({ href, label }) => (
               <a
                 key={href + label}
