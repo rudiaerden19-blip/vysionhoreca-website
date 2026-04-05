@@ -44,9 +44,9 @@
     "galleryHardwareAlt2": "White touchscreen POS in a hospitality interior",
     "galleryHardwareAlt3": "Digital menu display on a marble counter",
     "enlargeImageHint": "Enlarge image",
-    "premiumPitchLead": "Full POS system with hardware, software & unlimited support for just €139/month",
-    "premiumPitchP1": "You get a full professional cash register system built for hospitality—not an iPad that starts failing after a year.",
-    "premiumPitchP2": "Everything is ready: you pick it up or we deliver on site, with a personal walkthrough over coffee. Plug in, start up, and get to work—no installation hassle or call-centre queues. When you have questions, someone local answers the phone and helps you right away.",
+    "premiumPitchLead": "Full POS system with hardware, software & unlimited support for just €99/month",
+    "premiumPitchP1": "You get a robust, professional system that stays fast with the latest updates—not an iPad-based till that breaks after a year.",
+    "premiumPitchP2": "We take care of everything for you: we deliver your till or ordering platform and provide free training, with no installation hassle. Afterwards you get direct numbers for our developers—no phone robots.",
     "onboardingTitle": "Switching to Vysion is surprisingly simple",
     "onboardingP1": "Many hospitality businesses put off moving to a new POS, but it doesn't have to be difficult. At Vysion we do the heavy lifting. You share your menu; we build everything in exactly the way you work.",
     "onboardingP2": "Nothing to install, nothing to figure out alone, and no vague roadmaps or call-centre runaround.",
@@ -163,7 +163,8 @@
     "subtitle": "Professional POS terminals, customer displays, payment devices and peripherals — ready to run Vysion Horeca in your venue.",
     "imageAlt": "Hardware example",
     "openExpanded": "Enlarge image",
-    "closeExpanded": "Close"
+    "closeExpanded": "Close",
+    "ctaOurRegisters": "Our POS systems"
   },
   "newAtVysion": {
     "title": "Build your own package",

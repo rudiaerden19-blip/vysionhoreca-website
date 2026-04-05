@@ -44,9 +44,9 @@
     "galleryHardwareAlt2": "Caisse tactile blanche dans un établissement horeca",
     "galleryHardwareAlt3": "Écran de menu numérique sur un comptoir en marbre",
     "enlargeImageHint": "Agrandir l’image",
-    "premiumPitchLead": "Système d’encaissement complet avec matériel, logiciel & support illimité pour seulement €139/mois",
-    "premiumPitchP1": "Vous obtenez une caisse professionnelle conçue pour l’horeca—pas un iPad qui coince au bout d’un an.",
-    "premiumPitchP2": "Tout est prêt : vous retirez chez nous ou nous livrons sur place, avec une prise en main conviviale autour d’un café. Brancher, démarrer, travailler tout de suite—sans galère d’installation ni files d’attente chez un call-center. Pour vos questions, quelqu’un d’ici répond au téléphone et vous aide tout de suite.",
+    "premiumPitchLead": "Système d’encaissement complet avec matériel, logiciel & support illimité pour seulement €99/mois",
+    "premiumPitchP1": "Vous obtenez un système robuste et professionnel, ultra rapide avec les dernières mises à jour—pas une caisse iPad qui tombe en panne au bout d’un an.",
+    "premiumPitchP2": "Nous organisons tout pour vous : nous livrons votre caisse ou votre plateforme de commande et formons gratuitement, sans galère d’installation. Ensuite vous avez les numéros directs de nos développeurs—pas de robots au téléphone.",
     "onboardingTitle": "Passer à Vysion, c’est étonnamment simple",
     "onboardingP1": "Beaucoup de restaurants repoussent le passage à une nouvelle caisse, mais ce n’est pas une corvée. Chez Vysion, on s’occupe de tout. Vous nous envoyez votre carte ; nous construisons le système exactement comme vous travaillez.",
     "onboardingP2": "À installer : rien. À déchiffrer seul : rien. Fini les feuilles de route floues et les centres d’appel interminables.",
@@ -97,7 +97,8 @@
     "subtitle": "Terminaux d’encaissement, écrans client, TPE et périphériques professionnels — prêts pour faire tourner Vysion Horeca dans votre établissement.",
     "imageAlt": "Exemple de matériel",
     "openExpanded": "Agrandir l’image",
-    "closeExpanded": "Fermer"
+    "closeExpanded": "Fermer",
+    "ctaOurRegisters": "Nos caisses"
   },
   "newAtVysion": {
     "title": "Composez votre forfait vous-même",

@@ -44,9 +44,9 @@
     "galleryHardwareAlt2": "TPV táctil blanco en interior hostelero",
     "galleryHardwareAlt3": "Pantalla de menú digital sobre mostrador de mármol",
     "enlargeImageHint": "Ampliar imagen",
-    "premiumPitchLead": "TPV completo con hardware, software y soporte ilimitado por solo €139/mes",
-    "premiumPitchP1": "Obtienes un sistema de caja profesional hecho para hostelería, no un iPad que empieza a fallar al año.",
-    "premiumPitchP2": "Todo listo: lo recoges o lo llevamos a tu local, con una explicación personal tomando un café. Enchufar, arrancar y trabajar al momento, sin complicaciones de instalación ni colas en un call center. Si tienes dudas, te atiende alguien de aquí por teléfono, con ayuda inmediata.",
+    "premiumPitchLead": "TPV completo con hardware, software y soporte ilimitado por solo €99/mes",
+    "premiumPitchP1": "Obtienes un sistema robusto y profesional, muy rápido con las últimas actualizaciones: no un TPV con iPad que se rompe al cabo de un año.",
+    "premiumPitchP2": "Lo tenemos todo listo para ti: entregamos tu caja o plataforma de pedidos y te formamos gratis, sin líos de instalación. Después tienes los números directos de nuestros programadores—nada de robots por teléfono.",
     "onboardingTitle": "Cambiar a Vysion es sorprendentemente sencillo",
     "onboardingP1": "Muchos locales de hostelería posponen pasarse a un nuevo TPV, pero no tiene por qué ser un lío. En Vysion lo hacemos todo nosotros. Tú nos das la carta; nosotros la dejamos montada tal como trabajas.",
     "onboardingP2": "Nada que instalar, nada que averiguar en solitario y sin planes confusos ni call centers.",
@@ -97,7 +97,8 @@
     "subtitle": "TPVs profesionales, pantallas para el cliente, datáfonos y periféricos — listos para ejecutar Vysion Horeca en tu negocio.",
     "imageAlt": "Ejemplo de hardware",
     "openExpanded": "Ampliar imagen",
-    "closeExpanded": "Cerrar"
+    "closeExpanded": "Cerrar",
+    "ctaOurRegisters": "Nuestras cajas"
   },
   "newAtVysion": {
     "title": "Monta tu propio paquete",

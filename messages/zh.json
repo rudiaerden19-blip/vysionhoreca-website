@@ -44,9 +44,9 @@
     "galleryHardwareAlt2": "白色触屏收银机（餐饮环境）",
     "galleryHardwareAlt3": "大理石柜台上的电子菜单屏",
     "enlargeImageHint": "放大图片",
-    "premiumPitchLead": "硬件、软件与无限支持的一体化收银方案，每月仅需 €139",
-    "premiumPitchP1": "您将获得专为餐饮业打造的专业收银系统，而不是一年后就开始出问题的 iPad。",
-    "premiumPitchP2": "一切就绪：您可自取，或我们送货上门，并当面边喝咖啡边讲解。插上电源即可开工，没有繁琐安装，也不用在呼叫中心排队。有任何问题，本地团队随时接听，即时协助。",
+    "premiumPitchLead": "硬件、软件与无限支持的一体化收银方案，每月仅需 €99",
+    "premiumPitchP1": "您将获得稳健、专业的系统，配合最新更新保持极速——而不是用满一年就出问题的 iPad 收银方案。",
+    "premiumPitchP2": "我们为您全程安排：配送收银或点餐平台，并提供免费培训，免去安装烦恼。之后可直接联系我们的程序员——绝无电话机器人。",
     "onboardingTitle": "切换到 Vysion，出奇简单",
     "onboardingP1": "许多餐饮老板迟迟不换新的收银系统，其实不必折腾。在 Vysion，我们为您包办：您提供菜单，我们按您的经营方式完整搭建。",
     "onboardingP2": "无需自行安装、无需自己摸索，也没有含糊步骤或呼叫中心扯皮。",
@@ -97,7 +97,8 @@
     "subtitle": "专业收银终端、客显屏、支付终端与周边设备 — 可在门店稳定运行 Vysion Horeca。",
     "imageAlt": "硬件示例",
     "openExpanded": "放大图片",
-    "closeExpanded": "关闭"
+    "closeExpanded": "关闭",
+    "ctaOurRegisters": "我们的收银机"
   },
   "newAtVysion": {
     "title": "自由组合您的套餐",

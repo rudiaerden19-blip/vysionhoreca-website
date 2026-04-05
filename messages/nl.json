@@ -44,9 +44,9 @@
     "galleryHardwareAlt2": "Witte touchscreen-kassa in een horeca-interieur",
     "galleryHardwareAlt3": "Digitaal menu-scherm op marmeren toonbank",
     "enlargeImageHint": "Vergroot foto",
-    "premiumPitchLead": "Volledig kassasysteem met hardware, software & onbeperkte support voor maar €139/maand",
-    "premiumPitchP1": "Je krijgt een volwaardig professioneel kassasysteem dat wél gemaakt is voor horeca, geen iPad die na een jaar kraakt.",
-    "premiumPitchP2": "Alles staat klaar, jij haalt het op of wij leveren het ter plaatse, mét een persoonlijke uitleg bij een koffie. Insteken, opstarten en direct werken, zonder installatiegedoe of wachttijden bij callcenters. En bij vragen krijg je altijd iemand van hier aan de lijn, meteen geholpen.",
+    "premiumPitchLead": "Volledig kassasysteem met hardware, software & onbeperkte support voor maar €99/maand",
+    "premiumPitchP1": "Je krijgt een zeer robuust en professioneel systeem dat razendsnel is met de nieuwste updates — geen iPad-kassa die na een jaar kapot is.",
+    "premiumPitchP2": "Wij maken alles in orde voor jou: we leveren je kassa of bestelplatform en geven je gratis opleiding, zonder installatiegedoe. Als je daarna vragen hebt, krijg je de rechtstreekse nummers van onze programmeurs — geen robots aan de telefoon.",
     "onboardingTitle": "Overschakelen naar Vysion is verrassend simpel",
     "onboardingP1": "Veel horecazaken zien op tegen de overstap naar een nieuw kassasysteem, maar dat hoeft helemaal geen gedoe te zijn. Bij Vysion doen wij gewoon alles voor jou. Jij levert je menukaart aan, wij bouwen het volledig in zoals jij werkt.",
     "onboardingP2": "Je hoeft niets te installeren, niets zelf uit te zoeken en je zit niet vast aan vage stappenplannen of callcenters.",
@@ -163,7 +163,8 @@
     "subtitle": "Professionele kassa’s, tweede scherm, betaalterminals en randapparatuur, klaar om Vysion Horeca op te draaien in jouw zaak.",
     "imageAlt": "Hardware voorbeeld",
     "openExpanded": "Afbeelding vergroten",
-    "closeExpanded": "Sluiten"
+    "closeExpanded": "Sluiten",
+    "ctaOurRegisters": "Onze kassa's"
   },
   "newAtVysion": {
     "title": "Stel zelf je pakket samen",

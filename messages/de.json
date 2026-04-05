@@ -44,9 +44,9 @@
     "galleryHardwareAlt2": "Weiße Touchscreen-Kasse in einem Gastronomie-Interieur",
     "galleryHardwareAlt3": "Digitales Menüdisplay auf einer Marmortheke",
     "enlargeImageHint": "Bild vergrößern",
-    "premiumPitchLead": "Komplettes Kassensystem mit Hardware, Software & unbegrenztem Support für nur €139/Monat",
-    "premiumPitchP1": "Sie erhalten ein vollwertiges, professionelles Kassensystem für die Gastronomie—kein iPad, das nach einem Jahr klemmt.",
-    "premiumPitchP2": "Alles steht bereit: Sie holen ab oder wir liefern vor Ort, mit persönlicher Einweisung bei einem Kaffee. Einstecken, starten, sofort arbeiten—ohne Installationsstress oder Callcenter-Wartezeiten. Bei Fragen haben Sie immer jemanden vom Team am Telefon, der Ihnen direkt hilft.",
+    "premiumPitchLead": "Komplettes Kassensystem mit Hardware, Software & unbegrenztem Support für nur €99/Monat",
+    "premiumPitchP1": "Sie erhalten ein robustes, professionelles System, das mit den neuesten Updates rasant schnell bleibt—keine iPad-Kasse, die nach einem Jahr ausfällt.",
+    "premiumPitchP2": "Wir kümmern uns um alles: wir liefern Ihre Kasse oder Ihr Bestellsystem und schulen Sie kostenlos—ohne Installationsstress. Danach erhalten Sie die direkten Nummern unserer Entwickler—keine Telefonroboter.",
     "onboardingTitle": "Der Wechsel zu Vysion ist überraschend einfach",
     "onboardingP1": "Viele Gastronomiebetriebe schieben den Umstieg auf ein neues Kassensystem vor sich her, aber es muss kein Stress sein. Bei Vysion erledigen wir einfach alles für Sie. Sie liefern Ihre Speisekarte—wir bauen alles genau so ein, wie Sie arbeiten.",
     "onboardingP2": "Nichts installieren, nichts allein herausfinden—keine vagen Stufenpläne oder Callcenter-Schleifen.",
@@ -97,7 +97,8 @@
     "subtitle": "Professionelle Kassensysteme, Kundendisplays, Zahlungsgeräte und Peripherie — bereit für Vysion Horeca in Ihrem Betrieb.",
     "imageAlt": "Hardware-Beispiel",
     "openExpanded": "Bild vergrößern",
-    "closeExpanded": "Schließen"
+    "closeExpanded": "Schließen",
+    "ctaOurRegisters": "Unsere Kassen"
   },
   "newAtVysion": {
     "title": "Stellen Sie Ihr Paket selbst zusammen",
