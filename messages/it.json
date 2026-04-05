@@ -42,11 +42,9 @@
     "galleryHardwareAlt2": "POS touchscreen bianco in ambiente ristorazione",
     "galleryHardwareAlt3": "Display menu digitale su bancone in marmo",
     "enlargeImageHint": "Ingrandisci immagine",
-    "premiumBundleItem1": "Software Premium incluso",
-    "premiumBundleItem2": "Hardware incluso",
-    "premiumBundleItem3": "Stampante, cassa, cassetto contanti",
-    "premiumBundleItem4": "Nessun investimento iniziale",
-    "premiumBundleItem5": "Nessuna scrittura illeggibile"
+    "premiumPitchLead": "Sistema cassa completo con hardware, software e assistenza illimitata a soli €139/mese",
+    "premiumPitchP1": "Ottieni un sistema di cassa professionale pensato per la ristorazione, non un iPad che dopo un anno inizia a dare problemi.",
+    "premiumPitchP2": "Tutto pronto: ritiri tu o consegniamo in loco, con una spiegazione personalizzata davanti a un caffè. Collegare, accendere e lavorare subito, senza stress di installazione o attese al call center. Per le domande hai sempre qualcuno del team al telefono, con il supporto immediato."
   },
   "heroLanding": {
     "logoTagline": "La tua piattaforma horeca",

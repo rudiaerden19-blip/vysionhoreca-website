@@ -42,11 +42,9 @@
     "galleryHardwareAlt2": "TPV táctil blanco en interior hostelero",
     "galleryHardwareAlt3": "Pantalla de menú digital sobre mostrador de mármol",
     "enlargeImageHint": "Ampliar imagen",
-    "premiumBundleItem1": "Software Premium incluido",
-    "premiumBundleItem2": "Hardware incluido",
-    "premiumBundleItem3": "Impresora, TPV, cajón portamonedas",
-    "premiumBundleItem4": "Sin inversión inicial",
-    "premiumBundleItem5": "Sin letras pequeñas"
+    "premiumPitchLead": "TPV completo con hardware, software y soporte ilimitado por solo €139/mes",
+    "premiumPitchP1": "Obtienes un sistema de caja profesional hecho para hostelería, no un iPad que empieza a fallar al año.",
+    "premiumPitchP2": "Todo listo: lo recoges o lo llevamos a tu local, con una explicación personal tomando un café. Enchufar, arrancar y trabajar al momento, sin complicaciones de instalación ni colas en un call center. Si tienes dudas, te atiende alguien de aquí por teléfono, con ayuda inmediata."
   },
   "heroLanding": {
     "logoTagline": "Tu plataforma hostelera",

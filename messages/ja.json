@@ -42,11 +42,9 @@
     "galleryHardwareAlt2": "白のタッチスクリーンPOS（飲食店内）",
     "galleryHardwareAlt3": "大理石カウンタ上のデジタルメニュー画面",
     "enlargeImageHint": "画像を拡大",
-    "premiumBundleItem1": "プレミアムソフトウェア込み",
-    "premiumBundleItem2": "ハードウェア込み",
-    "premiumBundleItem3": "プリンター・レジ・ドロア",
-    "premiumBundleItem4": "初期投資なし",
-    "premiumBundleItem5": "ごまかしのない条件"
+    "premiumPitchLead": "ハード・ソフト・無制限サポート込みの本格POS、月額わずか €139",
+    "premiumPitchP1": "飲食店向けに作られたプロ仕様のレジです。一年も経たずに限界が来るiPadとは違います。",
+    "premiumPitchP2": "準備はすべて整っています。お取り寄せでも現地搬入でも、コーヒーを飲みながら個別にご説明。接続して起動すればすぐ稼働、インストールの手間やコールセンターの待ち時間もありません。ご質問はいつでも国内の担当が電話ですぐ対応します。"
   },
   "heroLanding": {
     "logoTagline": "あなたの飲食プラットフォーム",

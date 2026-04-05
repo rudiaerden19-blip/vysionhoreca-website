@@ -183,14 +183,14 @@ export default function AbonnementenPage() {
         </div>
       </section>
 
-      {/* Sectie 3 — drie hardware-thumbnails boven Premium-kaart; bundeltekst zonder kader */}
-      <section className="pb-16 sm:pb-20 bg-[#e3e3e3] border-t border-gray-300/60">
-        <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
+      {/* Sectie 3 — grote foto-rij, daarna Premium-beeld + pitch (geen CSS-schaduw/rand op kaart) */}
+      <section className="pb-16 sm:pb-20 bg-[#e3e3e3]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-8 sm:mb-10">
             {t('subscriptionsPage.premiumShowcaseTitle')}
           </h2>
 
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-5 sm:mb-6">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 md:gap-5 mb-10 sm:mb-12 max-w-5xl mx-auto">
             {GALLERY_IMAGES.map((item) => {
               const alt = t(`subscriptionsPage.${item.altKey}`)
               return (
@@ -198,7 +198,7 @@ export default function AbonnementenPage() {
                   key={item.src}
                   type="button"
                   onClick={() => setLightbox({ src: item.src, alt })}
-                  className="group relative aspect-square rounded-xl overflow-hidden border border-gray-200 bg-gray-100 hover:ring-2 hover:ring-accent/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 transition-all p-0 w-full"
+                  className="group relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-200/80 ring-1 ring-gray-300/80 hover:ring-2 hover:ring-accent/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#e3e3e3] transition-shadow shadow-none"
                   aria-label={`${t('subscriptionsPage.enlargeImageHint')}: ${alt}`}
                 >
                   <Image
@@ -207,9 +207,9 @@ export default function AbonnementenPage() {
                     width={item.width}
                     height={item.height}
                     className="w-full h-full object-cover"
-                    sizes="(max-width: 640px) 28vw, 9rem"
+                    sizes="(max-width: 640px) 31vw, (max-width: 1024px) 28vw, 300px"
                   />
-                  <span className="pointer-events-none absolute bottom-1 right-1 max-w-[calc(100%-0.5rem)] truncate rounded-md bg-black/70 text-white text-[10px] sm:text-xs font-medium px-1.5 py-0.5 opacity-90 group-hover:opacity-100">
+                  <span className="pointer-events-none absolute bottom-2 right-2 rounded-md bg-black/70 text-white text-[10px] sm:text-xs font-medium px-2 py-1">
                     {t('subscriptionsPage.enlargeImageHint')}
                   </span>
                 </button>
@@ -217,36 +217,32 @@ export default function AbonnementenPage() {
             })}
           </div>
 
-          <div className="rounded-2xl overflow-hidden bg-white">
-            <Image
-              src={PREMIUM_CARD_IMAGE}
-              alt={t('subscriptionsPage.premiumCardShowcaseAlt')}
-              width={591}
-              height={873}
-              className="w-full h-auto object-cover"
-              sizes="(min-width: 640px) 32rem, 100vw"
-              priority={false}
-            />
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 items-start">
+            <div className="rounded-2xl overflow-hidden shadow-none border-0 outline-none bg-transparent [&_img]:shadow-none [&_img]:border-0 block leading-none">
+              <Image
+                src={PREMIUM_CARD_IMAGE}
+                alt={t('subscriptionsPage.premiumCardShowcaseAlt')}
+                width={591}
+                height={873}
+                className="w-full h-auto object-cover block align-top max-w-full"
+                style={{ boxShadow: 'none' }}
+                sizes="(min-width: 1024px) 44vw, 100vw"
+                priority={false}
+              />
+            </div>
+            <div className="lg:pt-1">
+              <p className="text-gray-900 text-lg sm:text-xl font-bold leading-snug mb-3">
+                {t('subscriptionsPage.premiumPitchLead')}
+              </p>
+              <p className="text-gray-600 text-xs sm:text-sm font-medium mb-6">{t('pricing.exclVat')}</p>
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed mb-6">
+                {t('subscriptionsPage.premiumPitchP1')}
+              </p>
+              <p className="text-gray-600 text-base leading-relaxed">
+                {t('subscriptionsPage.premiumPitchP2')}
+              </p>
+            </div>
           </div>
-
-          <ul className="mt-6 sm:mt-8 space-y-3.5 px-0 sm:px-1">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <li key={i} className="flex items-start gap-3">
-                <svg
-                  className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-800 text-sm sm:text-base leading-snug">
-                  {t(`subscriptionsPage.premiumBundleItem${i}`)}
-                </span>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 

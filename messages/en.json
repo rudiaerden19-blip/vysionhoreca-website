@@ -42,11 +42,9 @@
     "galleryHardwareAlt2": "White touchscreen POS in a hospitality interior",
     "galleryHardwareAlt3": "Digital menu display on a marble counter",
     "enlargeImageHint": "Enlarge image",
-    "premiumBundleItem1": "Premium software included",
-    "premiumBundleItem2": "Hardware included",
-    "premiumBundleItem3": "Printer, POS, cash drawer",
-    "premiumBundleItem4": "No upfront investment",
-    "premiumBundleItem5": "No fine print"
+    "premiumPitchLead": "Full POS system with hardware, software & unlimited support for just €139/month",
+    "premiumPitchP1": "You get a full professional cash register system built for hospitality—not an iPad that starts failing after a year.",
+    "premiumPitchP2": "Everything is ready: you pick it up or we deliver on site, with a personal walkthrough over coffee. Plug in, start up, and get to work—no installation hassle or call-centre queues. When you have questions, someone local answers the phone and helps you right away."
   },
   "ui": {
     "ariaPrevImage": "Previous image",
