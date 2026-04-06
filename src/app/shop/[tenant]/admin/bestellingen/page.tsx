@@ -787,22 +787,30 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
 
                 {/* Items */}
                 {items.length > 0 && (
-                  <div className="mb-4 p-3 bg-black/20 rounded-xl">
-                    <p className="font-bold mb-2">{t('ordersPage.kitchen.products')}:</p>
-                    {items.map((item, i) => (
-                      <div key={i} className="text-sm mb-1">
-                        <div className="flex justify-between">
-                          <span>{item.quantity}x {item.name || item.product_name}</span>
-                          <span>€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                  <div className="mb-4 p-3 bg-black/20 rounded-xl min-h-0">
+                    <p className="font-bold mb-2 text-lg">{t('ordersPage.kitchen.products')}:</p>
+                    <div className="max-h-[min(45vh,20rem)] overflow-y-auto overscroll-y-contain space-y-2 pr-1 [scrollbar-gutter:stable]">
+                      {items.map((item, i) => (
+                        <div key={i} className="text-base mb-1 font-medium">
+                          <div className="flex justify-between gap-2">
+                            <span className="font-semibold">
+                              {item.quantity}× {item.name || item.product_name}
+                            </span>
+                            <span className="font-bold tabular-nums shrink-0">
+                              €{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}
+                            </span>
+                          </div>
+                          {item.options && item.options.length > 0 && (
+                            <div className="text-sm opacity-90 ml-1 pl-2 border-l-2 border-white/30 mt-0.5">
+                              + {item.options.map(o => o.name).join(', ')}
+                            </div>
+                          )}
+                          {item.notes && (
+                            <div className="text-sm text-orange-200 font-bold ml-1 pl-2 mt-0.5">⚠️ {item.notes}</div>
+                          )}
                         </div>
-                        {item.options && item.options.length > 0 && (
-                          <div className="text-xs opacity-70 ml-4">+ {item.options.map(o => o.name).join(', ')}</div>
-                        )}
-                        {item.notes && (
-                          <div className="text-xs text-orange-300 font-bold ml-4">⚠️ {item.notes}</div>
-                        )}
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -1159,21 +1167,36 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                     )}
                   </div>
 
-                  <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-sm text-gray-500 mb-1">{t('ordersPage.order')} ({items.length} {t('ordersPage.items')})</p>
+                  <div className="bg-gray-50 rounded-xl p-4 min-h-0 flex flex-col">
+                    <p className="text-sm font-semibold text-gray-700 mb-2">
+                      {t('ordersPage.order')} ({items.length} {t('ordersPage.items')})
+                    </p>
                     {items.length > 0 ? (
-                      <div className="space-y-2 max-h-32 overflow-y-auto">
+                      <div
+                        className="space-y-2.5 max-h-[min(50vh,22rem)] sm:max-h-96 overflow-y-auto overscroll-y-contain rounded-lg border-2 border-gray-200 bg-white p-3 pr-2 shadow-inner [scrollbar-gutter:stable]"
+                        tabIndex={0}
+                        aria-label={t('ordersPage.order')}
+                      >
                         {items.map((item, i) => (
-                          <div key={i} className="text-sm text-gray-700">
-                            <div className="flex justify-between">
-                              <span>{item.quantity}x {item.name || item.product_name}</span>
-                              <span>€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                          <div key={i} className="text-base text-gray-900 pb-2 border-b border-gray-100 last:border-0 last:pb-0">
+                            <div className="flex justify-between gap-3 items-baseline">
+                              <span className="font-semibold leading-snug">
+                                <span className="tabular-nums text-[#0f2744]">{item.quantity}×</span>{' '}
+                                {item.name || item.product_name}
+                              </span>
+                              <span className="font-bold tabular-nums shrink-0 text-gray-900">
+                                €{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}
+                              </span>
                             </div>
                             {item.options && item.options.length > 0 && (
-                              <div className="text-xs text-gray-500 ml-4">+ {item.options.map(o => o.name).join(', ')}</div>
+                              <div className="text-sm text-gray-800 font-medium mt-1 ml-1 pl-3 border-l-2 border-slate-200">
+                                + {item.options.map(o => o.name).join(', ')}
+                              </div>
                             )}
                             {item.notes && (
-                              <div className="text-xs text-orange-500 font-medium ml-4">⚠️ {item.notes}</div>
+                              <div className="text-sm text-orange-700 font-semibold mt-1 ml-1 pl-3 border-l-2 border-orange-200">
+                                ⚠️ {item.notes}
+                              </div>
                             )}
                           </div>
                         ))}
@@ -1362,26 +1385,32 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
                 </div>
 
                 {/* Items */}
-                <div className="bg-blue-50 rounded-xl p-5">
-                  <p className="text-sm text-blue-600 font-medium mb-3">🍟 {t('ordersPage.orderedProducts')}</p>
+                <div className="bg-blue-50 rounded-xl p-5 min-h-0">
+                  <p className="text-sm text-blue-800 font-semibold mb-3">🍟 {t('ordersPage.orderedProducts')}</p>
                   {(() => {
                     const items = parseItems(selectedOrder)
                     return items.length > 0 ? (
-                      <div className="space-y-3">
+                      <div className="max-h-[min(58vh,28rem)] overflow-y-auto overscroll-y-contain space-y-3 pr-1 rounded-lg border-2 border-blue-100 bg-white/80 p-3 [scrollbar-gutter:stable]">
                         {items.map((item, i) => (
-                          <div key={i} className="bg-white p-3 rounded-lg">
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <span className="font-bold text-blue-600 mr-2">{item.quantity}x</span>
-                                <span className="text-gray-900 font-medium">{item.name || item.product_name}</span>
+                          <div key={i} className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                            <div className="flex justify-between items-center gap-3">
+                              <div className="min-w-0">
+                                <span className="font-bold text-[#0f2744] tabular-nums mr-2">{item.quantity}×</span>
+                                <span className="text-gray-900 font-semibold text-base">{item.name || item.product_name}</span>
                               </div>
-                              <span className="font-bold text-gray-900">€{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}</span>
+                              <span className="font-bold text-gray-900 tabular-nums shrink-0">
+                                €{((item.price || item.unit_price || 0) * item.quantity).toFixed(2)}
+                              </span>
                             </div>
                             {item.options && item.options.length > 0 && (
-                              <div className="text-sm text-gray-500 ml-8 mt-1">+ {item.options.map(o => o.name).join(', ')}</div>
+                              <div className="text-sm text-gray-800 font-medium ml-1 mt-2 pl-3 border-l-2 border-blue-200">
+                                + {item.options.map(o => o.name).join(', ')}
+                              </div>
                             )}
                             {item.notes && (
-                              <div className="text-sm text-orange-500 font-bold ml-8 mt-1">⚠️ {item.notes}</div>
+                              <div className="text-sm text-orange-600 font-bold ml-1 mt-2 pl-3 border-l-2 border-orange-200">
+                                ⚠️ {item.notes}
+                              </div>
                             )}
                           </div>
                         ))}

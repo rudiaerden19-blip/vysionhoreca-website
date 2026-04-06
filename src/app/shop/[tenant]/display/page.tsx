@@ -1135,14 +1135,16 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                       </span>
                     </div>
 
-                    {/* Items preview */}
-                    <div className="text-sm text-gray-600 mb-2">
-                      {order.items?.slice(0, 2).map((item: any, i: number) => (
-                        <p key={i} className="truncate">{item.quantity}x {item.product_name || item.name}</p>
-                      ))}
-                      {(order.items?.length || 0) > 2 && (
-                        <p className="text-gray-500">+{order.items.length - 2} {tx('more')}</p>
-                      )}
+                    {/* Items — scrollbaar bij lange lijsten */}
+                    <div className="mb-2 max-h-40 overflow-y-auto overscroll-y-contain rounded-lg border border-gray-200 bg-white px-2 py-1.5 [scrollbar-gutter:stable]">
+                      <div className="text-sm space-y-1">
+                        {order.items?.map((item: any, i: number) => (
+                          <p key={i} className="text-gray-900 font-semibold leading-snug break-words">
+                            <span className="tabular-nums text-[#0f2744]">{item.quantity}×</span>{' '}
+                            {item.product_name || item.name}
+                          </p>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Total */}
@@ -1268,25 +1270,29 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
 
                 {/* Items */}
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
-                  <h3 className="font-semibold text-sm uppercase tracking-wide text-gray-500 mb-3">{tx('order')}</h3>
-                  <div className="space-y-2">
+                  <h3 className="font-semibold text-sm uppercase tracking-wide text-gray-600 mb-3">{tx('order')}</h3>
+                  <div className="max-h-[min(56vh,26rem)] overflow-y-auto overscroll-y-contain space-y-2 pr-1 rounded-lg border border-gray-200 bg-white p-3 [scrollbar-gutter:stable]">
                     {selectedOrder.items?.map((item: any, i: number) => (
-                      <div key={i} className="flex items-start justify-between py-2 border-b border-gray-200 last:border-0">
-                        <div className="flex items-start gap-3">
-                          <span className="w-8 h-8 bg-gray-200 rounded-md flex items-center justify-center font-semibold text-sm shrink-0 text-gray-900">
+                      <div key={i} className="flex items-start justify-between py-2 border-b border-gray-100 last:border-0 gap-3">
+                        <div className="flex items-start gap-3 min-w-0">
+                          <span className="w-9 h-9 bg-[#0f2744] text-white rounded-md flex items-center justify-center font-bold text-sm shrink-0">
                             {item.quantity}
                           </span>
                           <div>
-                            <span className="font-medium">{item.product_name || item.name}</span>
+                            <span className="font-semibold text-gray-900 text-base">{item.product_name || item.name}</span>
                             {item.options?.map((opt: any, j: number) => (
-                              <p key={j} className="text-sm text-gray-600">+ {opt.name}</p>
+                              <p key={j} className="text-sm text-gray-800 font-medium mt-0.5 pl-2 border-l-2 border-gray-200">
+                                + {opt.name}
+                              </p>
                             ))}
                             {item.notes && (
-                              <p className="text-sm text-gray-600 mt-1">Opmerking: {item.notes}</p>
+                              <p className="text-sm text-gray-700 mt-1 font-medium">Opmerking: {item.notes}</p>
                             )}
                           </div>
                         </div>
-                        <span className="font-semibold tabular-nums shrink-0">€{(item.total_price || item.price * item.quantity)?.toFixed(2)}</span>
+                        <span className="font-bold tabular-nums shrink-0 text-gray-900">
+                          €{(item.total_price || item.price * item.quantity)?.toFixed(2)}
+                        </span>
                       </div>
                     ))}
                   </div>

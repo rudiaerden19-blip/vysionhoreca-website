@@ -640,19 +640,21 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                     <span className="text-gray-500 text-xs shrink-0 ml-2 tabular-nums">{getTimeSince(order.created_at)}</span>
                   </div>
 
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                  <div className="space-y-2 max-h-[min(20rem,48vh)] overflow-y-auto overscroll-y-contain rounded-lg border border-gray-200 bg-white px-2 py-1 [scrollbar-gutter:stable]">
                     {order.items?.map((item: any, i: number) => (
-                      <div key={i} className="flex items-start gap-3 pb-2 border-b border-gray-200 last:border-0">
-                        <span className="w-8 h-8 bg-gray-200 text-gray-900 rounded-md flex items-center justify-center font-semibold text-sm shrink-0">
+                      <div key={i} className="flex items-start gap-3 pb-2 border-b border-gray-100 last:border-0">
+                        <span className="w-9 h-9 bg-[#0f2744] text-white rounded-md flex items-center justify-center font-bold text-sm shrink-0">
                           {item.quantity}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{item.product_name || item.name}</p>
+                          <p className="font-semibold text-gray-900 text-sm leading-snug">{item.product_name || item.name}</p>
                           {item.options?.map((opt: any, j: number) => (
-                            <p key={j} className="text-sm text-gray-600">+ {opt.name}</p>
+                            <p key={j} className="text-sm text-gray-800 font-medium mt-0.5 pl-2 border-l-2 border-gray-200">
+                              + {opt.name}
+                            </p>
                           ))}
                           {item.notes && (
-                            <p className="text-sm text-gray-600 mt-0.5">Opmerking: {item.notes}</p>
+                            <p className="text-sm text-gray-700 mt-0.5 font-medium">Opmerking: {item.notes}</p>
                           )}
                         </div>
                       </div>
@@ -773,21 +775,27 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   </div>
                 </div>
 
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
-                  <h3 className="font-semibold text-sm uppercase tracking-wide text-gray-500 mb-4">{tx('toPrepare')}</h3>
-                  <div className="space-y-4">
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 min-h-0">
+                  <h3 className="font-semibold text-sm uppercase tracking-wide text-gray-600 mb-4">{tx('toPrepare')}</h3>
+                  <div className="max-h-[min(62vh,32rem)] overflow-y-auto overscroll-y-contain space-y-4 pr-1 rounded-lg border border-gray-200 bg-white p-4 [scrollbar-gutter:stable]">
                     {selectedOrder.items?.map((item: any, i: number) => (
-                      <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-200 last:border-0">
-                        <span className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-200 text-gray-900 rounded-lg flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0">
+                      <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
+                        <span className="w-12 h-12 sm:w-14 sm:h-14 bg-[#0f2744] text-white rounded-lg flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0">
                           {item.quantity}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-xl sm:text-2xl leading-tight">{item.product_name || item.name}</p>
+                          <p className="font-semibold text-xl sm:text-2xl leading-tight text-gray-900">
+                            {item.product_name || item.name}
+                          </p>
                           {item.options?.map((opt: any, j: number) => (
-                            <p key={j} className="text-base text-gray-600 mt-1">+ {opt.name}</p>
+                            <p key={j} className="text-base text-gray-800 font-medium mt-1 pl-3 border-l-2 border-gray-200">
+                              + {opt.name}
+                            </p>
                           ))}
                           {item.notes && (
-                            <p className="text-base text-gray-700 mt-2 p-2 bg-white border border-gray-200 rounded-lg">Opmerking: {item.notes}</p>
+                            <p className="text-base text-gray-800 mt-2 p-2 bg-gray-50 border border-gray-200 rounded-lg font-medium">
+                              Opmerking: {item.notes}
+                            </p>
                           )}
                         </div>
                       </div>
