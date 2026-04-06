@@ -49,15 +49,22 @@ export default function SubscriptionsTermsPopup({
 
       {open && (
         <div
-          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 p-4 sm:p-6"
+          className="fixed inset-0 z-[110] flex cursor-default touch-manipulation items-center justify-center bg-black/50 p-4 sm:p-6"
           role="dialog"
           aria-modal="true"
           aria-labelledby={titleId}
-          onClick={() => setOpen(false)}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setOpen(false)
+          }}
+          onPointerDown={(e) => {
+            /* iOS/iPad: pointer sluit betrouwbaarder dan soms gemiste click op overlay */
+            if (e.target === e.currentTarget) setOpen(false)
+          }}
         >
           <div
-            className="relative flex max-h-[min(90vh,880px)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+            className="relative flex max-h-[min(90vh,880px)] w-full max-w-2xl cursor-default flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
             onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
           >
             <div className="flex shrink-0 items-start justify-between gap-3 border-b border-gray-200 px-5 py-4 sm:px-6 sm:py-5">
               <div>
@@ -69,10 +76,11 @@ export default function SubscriptionsTermsPopup({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="-m-1 flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                /* Geen hover-achtergrond: op iPad vangt :hover de eerste tik en slaat de click over. */
+                className="-m-1 z-10 flex min-h-11 min-w-11 shrink-0 cursor-pointer touch-manipulation items-center justify-center rounded-full text-gray-600 transition-colors active:bg-gray-100 active:text-gray-900 [@media(hover:hover)]:hover:bg-gray-100 [@media(hover:hover)]:hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                 aria-label={t('ui.ariaClose')}
               >
-                <svg className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <svg className="pointer-events-none h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
