@@ -281,7 +281,18 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
       if (success) {
         const now = new Date().toISOString()
         setOrders(prev => prev.map(o =>
-          o.id === order.id ? { ...o, status: 'completed', completed_at: now, payment_status: (o.payment_status || '').toLowerCase() === 'pending' ? 'paid' : o.payment_status } : o
+          o.id === order.id
+            ? {
+                ...o,
+                status: 'completed',
+                completed_at: now,
+                payment_status:
+                  (o.payment_method || '').toLowerCase() === 'cash' &&
+                  (o.payment_status || '').toLowerCase() === 'pending'
+                    ? 'paid'
+                    : o.payment_status,
+              }
+            : o
         ))
       }
     } else {
@@ -315,7 +326,6 @@ export default function BestellingenPage({ params }: { params: { tenant: string 
               ...o,
               status: 'confirmed',
               confirmed_at: now,
-              ...(web && (o.payment_status || '').toLowerCase() === 'pending' ? { payment_status: 'paid' as const } : {}),
             }
           : o
       ))

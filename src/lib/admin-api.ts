@@ -2042,8 +2042,9 @@ export async function confirmOrder(id: string): Promise<boolean> {
 }
 
 /**
- * Webshop: goedkeuren → confirmed + betaald (pending→paid) + Z-rapport.
- * Keuken/onlinescherm tonen orders op status `confirmed` tot iemand afrondt met completeWebshopOrder.
+ * Webshop: goedkeuren → confirmed — payment_status niet aanpassen.
+ * Alleen Stripe-webhook (`checkout.session.completed`) zet `paid` voor online betalingen;
+ * cash blijft `pending` tot afronden (zie completeWebshopOrder).
  */
 export async function approveWebshopOrder(id: string): Promise<boolean> {
   if (!supabase) return false
@@ -2074,11 +2075,6 @@ export async function approveWebshopOrder(id: string): Promise<boolean> {
     confirmed_at: new Date().toISOString(),
   }
 
-  const ps = (order.payment_status || '').toLowerCase()
-  if (ps === 'pending') {
-    updates.payment_status = 'paid'
-  }
-
   const { error } = await supabase.from('orders').update(updates).eq('id', id)
 
   if (error) {
@@ -2092,13 +2088,15 @@ export async function approveWebshopOrder(id: string): Promise<boolean> {
 
 /**
  * Webshop: definitief afgerond (na keuken / Afronden-knop).
+ * `paid` voor online betaalmethode alleen als webhook dat al zette; nooit pending→paid voor online.
+ * Cash bij afhaal: bij afronden nog pending → markeer paid (ontvangen bij afhalen).
  */
 export async function completeWebshopOrder(id: string): Promise<boolean> {
   if (!supabase) return false
 
   const { data: order, error: fetchError } = await supabase
     .from('orders')
-    .select('tenant_slug, created_at, payment_status, order_type, status')
+    .select('tenant_slug, created_at, payment_status, order_type, status, payment_method')
     .eq('id', id)
     .single()
 
@@ -2123,7 +2121,8 @@ export async function completeWebshopOrder(id: string): Promise<boolean> {
   }
 
   const ps = (order.payment_status || '').toLowerCase()
-  if (ps === 'pending') {
+  const pm = (order.payment_method || '').toLowerCase()
+  if (ps === 'pending' && pm === 'cash') {
     updates.payment_status = 'paid'
   }
 
