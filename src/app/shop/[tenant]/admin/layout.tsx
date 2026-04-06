@@ -46,7 +46,7 @@ interface AdminLayoutProps {
   params: { tenant: string }
 }
 
-// Vergrendel-knop in topbalk op deze admin-subroutes (o.a. rapportages, Z-rapport, producten, categorieën, analyse)
+// Vergrendel-knop in topbalk op deze admin-subroutes — niet op het dashboard/overzicht (admin root).
 const LOCK_PAGES = ['categorieen', 'producten', 'analyse', 'rapporten', 'z-rapport']
 
 export default function AdminLayout({ children, params }: AdminLayoutProps) {
@@ -69,10 +69,7 @@ export default function AdminLayout({ children, params }: AdminLayoutProps) {
     refetch: refetchModules,
   } = useTenantModuleFlags(params.tenant)
 
-  const showLockButton =
-    adminPath === baseUrl ||
-    adminPath === `${baseUrl}/` ||
-    LOCK_PAGES.some(p => adminPath.includes(`/admin/${p}`))
+  const showLockButton = LOCK_PAGES.some(p => adminPath.includes(`/admin/${p}`))
 
   useEffect(() => {
     async function checkTenant() {
