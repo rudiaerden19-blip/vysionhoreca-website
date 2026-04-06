@@ -439,13 +439,18 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
     return `${Math.floor(mins / 60)}u ${mins % 60}m`
   }
 
-  const getTimeColor = (dateString: string) => {
-    const diff = Date.now() - new Date(dateString).getTime()
-    const mins = Math.floor(diff / 60000)
-    if (mins < 5) return 'text-green-400'
-    if (mins < 10) return 'text-yellow-400'
-    if (mins < 15) return 'text-orange-400'
-    return 'text-red-400'
+  /** Statusregel in kaartkop (zelfde vertalingen als shop display, multi-tenant) */
+  const kitchenHeaderStatus = (status: string) => {
+    const s = status.toLowerCase()
+    if (s === 'preparing') return t('shopDisplay.statusPreparing')
+    return t('shopDisplay.statusKitchen')
+  }
+
+  const orderTypeLabelShort = (order: Order) => {
+    if (order.order_type === 'delivery' || order.order_type === 'DELIVERY') return `🚗 ${tx('delivery')}`
+    if (order.order_type === 'DINE_IN') return '🍽️ Ter plaatse'
+    if (order.order_type === 'TAKEAWAY') return '📦 Afhalen'
+    return `🛍️ ${tx('pickup')}`
   }
 
   if (loading) {
@@ -581,10 +586,10 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className={`bg-gray-800 text-white rounded-2xl overflow-hidden cursor-pointer transition-all ${
+                className={`rounded-xl overflow-hidden cursor-pointer transition-all border border-gray-200 bg-white shadow-sm text-gray-900 ${
                   newOrderIds.has(order.id)
-                    ? 'ring-4 ring-blue-500 shadow-[0_0_40px_rgba(59,130,246,0.6)]'
-                    : 'hover:ring-2 hover:ring-gray-600'
+                    ? 'ring-2 ring-[#0f2744] shadow-md'
+                    : 'hover:border-gray-300'
                 }`}
                 onClick={() => {
                   setSelectedOrder(order)
@@ -595,78 +600,77 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   })
                 }}
               >
-                {/* Order Header */}
-                <div className="bg-blue-600 px-4 py-3 flex items-center justify-between">
-                  <span className="font-bold text-2xl">#{order.order_number}</span>
-                  <span className={`font-mono font-bold ${getTimeColor(order.created_at)}`}>
-                    {getTimeSince(order.created_at)}
+                {/* Orderkop — zelfde donkerblauw + wit als onlinescherm */}
+                <div className="bg-[#0f2744] text-white px-4 py-2.5 flex items-center justify-between border-b border-black/20">
+                  <span className="font-bold text-lg tabular-nums">#{order.order_number}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-white bg-white/15 px-2 py-1 rounded-md border border-white/25 max-w-[55%] text-right leading-tight">
+                    {kitchenHeaderStatus(order.status)}
                   </span>
                 </div>
 
-                {/* Order Type Badge */}
-                <div className={`px-4 py-2 text-center font-bold text-lg ${
-                  order.order_type === 'delivery' 
-                    ? 'bg-purple-600' 
-                    : 'bg-green-600'
-                }`}>
-                  {order.order_type === 'delivery' || order.order_type === 'DELIVERY' ? `🚗 ${tx('delivery')}` : order.order_type === 'DINE_IN' ? '🍽️ Ter plaatse' : order.order_type === 'TAKEAWAY' ? '📦 Afhalen' : `🛍️ ${tx('pickup')}`}
+                <div className="px-3 py-2 text-sm font-medium text-gray-800 bg-gray-50 border-b border-gray-100 text-center">
+                  {orderTypeLabelShort(order)}
                 </div>
 
-                {/* Geplande datum/tijd */}
                 {(order.scheduled_date || order.scheduled_time) && (
-                  <div className="px-4 py-2 bg-yellow-400 text-black text-center font-black text-base">
+                  <div className="px-3 py-2 bg-gray-100 border-b border-gray-200 text-gray-800 text-sm font-medium text-center">
                     📅 {order.scheduled_date ? new Date(order.scheduled_date).toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }) : ''}{order.scheduled_time ? ` om ${order.scheduled_time}` : ''}
                   </div>
                 )}
 
-                {/* Items List */}
-                <div className="p-4">
+                <div className="p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold truncate">{order.customer_name}</span>
+                    <span className="text-gray-500 text-xs shrink-0 ml-2 tabular-nums">{getTimeSince(order.created_at)}</span>
+                  </div>
+
                   <div className="space-y-2 max-h-64 overflow-y-auto">
                     {order.items?.map((item: any, i: number) => (
-                      <div key={i} className="flex items-start gap-3 pb-2 border-b border-gray-700 last:border-0">
-                        <span className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-lg shrink-0">
+                      <div key={i} className="flex items-start gap-3 pb-2 border-b border-gray-200 last:border-0">
+                        <span className="w-8 h-8 bg-gray-200 text-gray-900 rounded-md flex items-center justify-center font-semibold text-sm shrink-0">
                           {item.quantity}
                         </span>
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-lg truncate">{item.product_name || item.name}</p>
+                          <p className="font-medium truncate">{item.product_name || item.name}</p>
                           {item.options?.map((opt: any, j: number) => (
-                            <p key={j} className="text-sm text-gray-400">+ {opt.name}</p>
+                            <p key={j} className="text-sm text-gray-600">+ {opt.name}</p>
                           ))}
                           {item.notes && (
-                            <p className="text-sm text-yellow-400 italic">📝 {item.notes}</p>
+                            <p className="text-sm text-gray-600 mt-0.5">Opmerking: {item.notes}</p>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* Notes */}
                   {order.customer_notes && (
-                    <div className="mt-3 p-2 bg-yellow-500/20 rounded-lg">
-                      <p className="text-sm text-yellow-400">📝 {order.customer_notes}</p>
+                    <div className="mt-3 p-2 bg-gray-50 border border-gray-200 rounded-lg">
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-0.5">Opmerking</p>
+                      <p className="text-sm text-gray-800">{order.customer_notes}</p>
                     </div>
                   )}
                 </div>
 
-                {/* Quick Actions */}
-                <div className="p-3 bg-gray-700/50 flex gap-2">
+                <div className="p-3 border-t border-gray-200 bg-gray-50 flex gap-2">
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       printOrder(order)
                     }}
-                    className="flex-1 py-3 bg-gray-600 hover:bg-gray-500 rounded-xl font-bold text-lg"
+                    className="flex-1 py-3 rounded-lg font-semibold border border-gray-300 bg-white hover:bg-gray-50 text-gray-800"
                   >
-                    🖨️ {tx('print')}
+                    {tx('print')}
                   </button>
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.stopPropagation()
                       handleReady(order)
                     }}
-                    className="flex-1 py-3 bg-green-500 hover:bg-green-600 rounded-xl font-bold text-lg"
+                    className="flex-1 py-3 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-semibold"
                   >
-                    ✓ {tx('ready')}
+                    {tx('ready')}
                   </button>
                 </div>
               </motion.div>
@@ -682,88 +686,78 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             onClick={() => setSelectedOrder(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-gray-800 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+              exit={{ scale: 0.96, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-gray-200 shadow-2xl text-gray-900"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
-              <div className="bg-blue-600 p-6">
-                <div className="flex items-center justify-between">
+              {/* Kop — donkerblauw + wit (zelfde als onlinescherm) */}
+              <div className="bg-[#0f2744] text-white p-6 rounded-t-2xl border-b border-black/20">
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="text-5xl font-bold">#{selectedOrder.order_number}</h2>
-                    <div className="flex items-center gap-3 mt-2">
-                      <span className={`px-3 py-1 rounded-lg font-bold ${
-                        selectedOrder.order_type === 'delivery' ? 'bg-purple-500' : 'bg-green-500'
-                      }`}>
-                        {selectedOrder.order_type === 'delivery' || selectedOrder.order_type === 'DELIVERY' ? `🚗 ${tx('delivery')}` : selectedOrder.order_type === 'DINE_IN' ? '🍽️ Ter plaatse' : selectedOrder.order_type === 'TAKEAWAY' ? '📦 Afhalen' : `🛍️ ${tx('pickup')}`}
-                      </span>
-                      <span className={`font-mono font-bold text-lg ${getTimeColor(selectedOrder.created_at)}`}>
-                        ⏱️ {getTimeSince(selectedOrder.created_at)}
-                      </span>
-                    </div>
+                    <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight tabular-nums">#{selectedOrder.order_number}</h2>
+                    <p className="text-sm font-medium text-white/85 mt-1 uppercase tracking-wide">
+                      {kitchenHeaderStatus(selectedOrder.status)}
+                    </p>
+                    <p className="text-sm text-white/70 mt-2">{orderTypeLabelShort(selectedOrder)} · {getTimeSince(selectedOrder.created_at)}</p>
                   </div>
                   <button
+                    type="button"
                     onClick={() => setSelectedOrder(null)}
-                    className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-3xl hover:bg-white/30"
+                    className="w-11 h-11 shrink-0 rounded-full bg-white/15 flex items-center justify-center text-xl text-white hover:bg-white/25"
+                    aria-label={t('shopDisplay.cancel')}
                   >
                     ✕
                   </button>
                 </div>
               </div>
 
-              {/* Content */}
               <div className="p-6">
-                {/* Geplande datum/tijd */}
                 {(selectedOrder.scheduled_date || selectedOrder.scheduled_time) && (
-                  <div className="bg-yellow-400 text-black rounded-2xl p-4 mb-4 text-center">
-                    <p className="text-sm font-semibold">📅 Gewenst tijdstip</p>
-                    <p className="text-2xl font-black">
+                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 text-center">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Gewenst tijdstip</p>
+                    <p className="text-lg font-semibold text-gray-900 mt-1">
                       {selectedOrder.scheduled_date ? new Date(selectedOrder.scheduled_date).toLocaleDateString('nl-BE', { weekday: 'long', day: '2-digit', month: 'long' }) : ''}
                       {selectedOrder.scheduled_time ? ` om ${selectedOrder.scheduled_time}` : ''}
                     </p>
                   </div>
                 )}
 
-                {/* Customer Info */}
-                <div className="bg-gray-700/50 rounded-2xl p-4 mb-4">
-                  <div className="flex items-center justify-between">
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <p className="text-gray-400 text-sm">{tx('customer')}</p>
-                      <p className="font-bold text-2xl">{selectedOrder.customer_name}</p>
+                      <p className="text-gray-500 text-sm">{tx('customer')}</p>
+                      <p className="font-semibold text-xl">{selectedOrder.customer_name}</p>
                     </div>
                     {selectedOrder.customer_phone && (
-                      <div className="text-right">
-                        <p className="text-gray-400 text-sm">{tx('phone')}</p>
-                        <p className="font-bold text-xl">{selectedOrder.customer_phone}</p>
+                      <div className="text-left sm:text-right">
+                        <p className="text-gray-500 text-sm">{tx('phone')}</p>
+                        <p className="font-semibold text-lg tabular-nums">{selectedOrder.customer_phone}</p>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Items - BIG for kitchen */}
-                <div className="bg-gray-700/50 rounded-2xl p-4 mb-4">
-                  <h3 className="font-bold text-xl mb-4 text-blue-400">{tx('toPrepare')}</h3>
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
+                  <h3 className="font-semibold text-sm uppercase tracking-wide text-gray-500 mb-4">{tx('toPrepare')}</h3>
                   <div className="space-y-4">
                     {selectedOrder.items?.map((item: any, i: number) => (
-                      <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-600 last:border-0">
-                        <span className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center font-bold text-3xl shrink-0">
+                      <div key={i} className="flex items-start gap-4 pb-4 border-b border-gray-200 last:border-0">
+                        <span className="w-12 h-12 sm:w-14 sm:h-14 bg-gray-200 text-gray-900 rounded-lg flex items-center justify-center font-bold text-xl sm:text-2xl shrink-0">
                           {item.quantity}
                         </span>
-                        <div className="flex-1">
-                          <p className="font-bold text-2xl">{item.product_name || item.name}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-xl sm:text-2xl leading-tight">{item.product_name || item.name}</p>
                           {item.options?.map((opt: any, j: number) => (
-                            <p key={j} className="text-lg text-gray-400 mt-1">+ {opt.name}</p>
+                            <p key={j} className="text-base text-gray-600 mt-1">+ {opt.name}</p>
                           ))}
                           {item.notes && (
-                            <p className="text-lg text-yellow-400 mt-2 p-2 bg-yellow-500/20 rounded-lg">
-                              📝 {item.notes}
-                            </p>
+                            <p className="text-base text-gray-700 mt-2 p-2 bg-white border border-gray-200 rounded-lg">Opmerking: {item.notes}</p>
                           )}
                         </div>
                       </div>
@@ -771,31 +765,31 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
                   </div>
                 </div>
 
-                {/* Notes */}
                 {selectedOrder.customer_notes && (
-                  <div className="bg-yellow-500/20 rounded-2xl p-4 mb-4">
-                    <h3 className="font-bold text-lg mb-2 text-yellow-400">📝 {tx('notes')}</h3>
-                    <p className="text-xl">{selectedOrder.customer_notes}</p>
+                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{tx('notes')}</p>
+                    <p className="text-lg font-medium text-gray-900">{selectedOrder.customer_notes}</p>
                   </div>
                 )}
 
-                {/* Action Buttons */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    type="button"
                     onClick={() => printOrder(selectedOrder)}
-                    className="py-6 bg-gray-600 hover:bg-gray-500 rounded-2xl font-bold text-2xl"
+                    className="py-5 rounded-xl font-semibold text-lg border border-gray-300 bg-white hover:bg-gray-50 text-gray-900"
                   >
-                    🖨️ {tx('printReceipt')}
+                    {tx('printReceipt')}
                   </motion.button>
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    type="button"
                     onClick={() => handleReady(selectedOrder)}
-                    className="py-6 bg-green-500 hover:bg-green-600 rounded-2xl font-bold text-2xl"
+                    className="py-5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl font-semibold text-lg"
                   >
-                    ✓ {tx('markReady')}
+                    {tx('markReady')}
                   </motion.button>
                 </div>
               </div>
@@ -811,75 +805,73 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             onClick={() => setShowPrinterSettings(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-gray-800 rounded-3xl max-w-md w-full p-6"
+              exit={{ scale: 0.96, opacity: 0 }}
+              className="bg-white rounded-2xl max-w-md w-full p-6 border border-gray-200 shadow-2xl text-gray-900"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-2xl font-bold mb-2 text-center">🖨️ Printer Instellingen</h2>
-              <p className="text-gray-400 text-center mb-6">Verbind met de Vysion Print iPad app</p>
+              <h2 className="text-xl font-semibold mb-1 text-center">Printer</h2>
+              <p className="text-gray-600 text-sm text-center mb-6">Verbind met de Vysion Print iPad app</p>
 
               <div className="mb-6">
-                <label className="block text-sm text-gray-400 mb-2">iPad IP Adres</label>
+                <label className="block text-sm text-gray-600 mb-2 font-medium">iPad IP-adres</label>
                 <input
                   type="text"
                   defaultValue={printerIP || ''}
                   placeholder="bijv. 192.168.1.100"
-                  className="w-full px-4 py-3 bg-gray-700 rounded-xl border-none text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400"
                   id="keuken-printer-ip-input"
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Je vindt dit IP adres in de Vysion Print app op de iPad
+                  Je vindt dit IP-adres in de Vysion Print app op de iPad
                 </p>
               </div>
 
-              {/* Status indicator */}
-              <div className={`mb-6 p-4 rounded-xl ${
-                printerStatus === 'online' 
-                  ? 'bg-green-500/20 text-green-400' 
+              <div className={`mb-6 p-4 rounded-lg border ${
+                printerStatus === 'online'
+                  ? 'bg-gray-50 border-gray-200 text-gray-800'
                   : printerStatus === 'offline'
-                  ? 'bg-red-500/20 text-red-400'
-                  : 'bg-gray-700 text-gray-400'
+                  ? 'bg-gray-50 border-gray-200 text-gray-800'
+                  : 'bg-gray-50 border-gray-200 text-gray-600'
               }`}>
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">
-                    {printerStatus === 'online' ? '✅' : printerStatus === 'offline' ? '❌' : '❓'}
-                  </span>
                   <div>
-                    <p className="font-bold">
-                      {printerStatus === 'online' 
-                        ? 'Printer Verbonden' 
+                    <p className="font-semibold">
+                      {printerStatus === 'online'
+                        ? 'Printer verbonden'
                         : printerStatus === 'offline'
-                        ? 'Printer Niet Bereikbaar'
-                        : 'Nog Niet Geconfigureerd'}
+                        ? 'Printer niet bereikbaar'
+                        : 'Nog niet geconfigureerd'}
                     </p>
                     {printerIP && (
-                      <p className="text-sm opacity-80">{printerIP}:3001</p>
+                      <p className="text-sm text-gray-600 mt-0.5 tabular-nums">{printerIP}:3001</p>
                     )}
                   </div>
                 </div>
               </div>
 
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 <button
+                  type="button"
                   onClick={() => setShowPrinterSettings(false)}
-                  className="flex-1 py-4 bg-gray-700 hover:bg-gray-600 rounded-2xl font-bold text-lg"
+                  className="flex-1 py-3.5 rounded-lg font-semibold border border-gray-300 bg-white hover:bg-gray-50 text-gray-800"
                 >
                   Annuleren
                 </button>
                 <button
+                  type="button"
                   onClick={() => {
                     const input = document.getElementById('keuken-printer-ip-input') as HTMLInputElement
                     if (input?.value) {
                       savePrinterIP(input.value.trim())
                     }
                   }}
-                  className="flex-1 py-4 bg-blue-500 hover:bg-blue-600 rounded-2xl font-bold text-lg"
+                  className="flex-1 py-3.5 bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-semibold"
                 >
                   Opslaan
                 </button>
@@ -887,10 +879,11 @@ export default function KeukenDisplayPage({ params }: { params: { tenant: string
 
               {printerIP && (
                 <button
+                  type="button"
                   onClick={() => checkPrinterStatus(printerIP)}
-                  className="w-full mt-4 py-3 bg-green-500/20 text-green-400 hover:bg-green-500/30 rounded-xl font-bold"
+                  className="w-full mt-3 py-3 rounded-lg font-semibold border border-gray-300 bg-white hover:bg-gray-50 text-gray-800"
                 >
-                  🔄 Verbinding Testen
+                  Verbinding testen
                 </button>
               )}
             </motion.div>

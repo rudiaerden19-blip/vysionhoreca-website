@@ -783,9 +783,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
     browserPrint(order, type)
   }
 
-  /** Compact card header stripe — neutral enterprise styling */
+  /** Kaartkop + modal header: donkerblauw, witte tekst (zelfde op alle tenants) */
   const getStatusColor = (_status: string) =>
-    'bg-gray-50 text-gray-900 border-b border-gray-200'
+    'bg-[#0f2744] text-white border-b border-black/20'
 
   /** Card shell — witte kaart, subtiele rand; geen status-regenboog */
   const getStatusBgColor = (_status: string) => 'bg-white border-gray-200'
@@ -1075,9 +1075,9 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
                   }}
                 >
                   {/* Order Header */}
-                  <div className={`${getStatusColor(order.status)} px-4 py-2 flex items-center justify-between`}>
-                    <span className="font-bold text-lg">#{order.order_number}</span>
-                    <span className="text-xs font-semibold uppercase tracking-wide text-gray-600 bg-gray-100 px-2 py-1 rounded-md border border-gray-200">
+                  <div className={`${getStatusColor(order.status)} px-4 py-2.5 flex items-center justify-between`}>
+                    <span className="font-bold text-lg tabular-nums">#{order.order_number}</span>
+                    <span className="text-xs font-semibold uppercase tracking-wide text-white bg-white/15 px-2 py-1 rounded-md border border-white/25">
                       {getStatusLabel(order.status)}
                     </span>
                   </div>
@@ -1127,19 +1127,19 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
             {completedOrders.slice(0, 50).map((order) => (
               <div
                 key={order.id}
-                className="bg-white border border-gray-200 rounded-xl p-3 cursor-pointer hover:bg-gray-50 transition-colors shadow-sm"
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:bg-gray-50 transition-colors shadow-sm"
                 onClick={() => setSelectedOrder(order)}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold">#{order.order_number}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-md font-medium border ${
-                    order.status === 'completed' ? 'bg-gray-100 text-gray-800 border-gray-200' : 'bg-gray-100 text-gray-800 border-gray-200'
-                  }`}>
-                    {order.status === 'completed' ? `✓ ${tx('completed')}` : `✗ ${tx('rejected')}`}
+                <div className="bg-[#0f2744] text-white px-3 py-2.5 flex items-center justify-between border-b border-black/20">
+                  <span className="font-bold tabular-nums">#{order.order_number}</span>
+                  <span className="text-xs font-semibold uppercase tracking-wide text-white bg-white/15 px-2 py-1 rounded-md border border-white/25">
+                    {order.status === 'completed' ? tx('statusCompleted') : tx('statusRejected')}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">{order.customer_name}</p>
-                <p className="text-sm text-gray-700 font-medium tabular-nums">€{order.total?.toFixed(2)}</p>
+                <div className="p-3">
+                  <p className="text-sm text-gray-600">{order.customer_name}</p>
+                  <p className="text-sm text-gray-700 font-medium tabular-nums">€{order.total?.toFixed(2)}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -1167,13 +1167,13 @@ export default function ShopDisplayPage({ params }: { params: { tenant: string }
               <div className={`${getStatusColor(selectedOrder.status)} p-6 rounded-t-2xl`}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h2 className="text-3xl font-semibold tracking-tight">#{selectedOrder.order_number}</h2>
-                    <p className="text-sm font-medium text-gray-500 mt-1">{getStatusLabel(selectedOrder.status)}</p>
+                    <h2 className="text-3xl font-semibold tracking-tight text-white tabular-nums">#{selectedOrder.order_number}</h2>
+                    <p className="text-sm font-medium text-white/85 mt-1 uppercase tracking-wide">{getStatusLabel(selectedOrder.status)}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setSelectedOrder(null)}
-                    className="w-11 h-11 shrink-0 rounded-full bg-gray-200/80 flex items-center justify-center text-xl text-gray-600 hover:bg-gray-300"
+                    className="w-11 h-11 shrink-0 rounded-full bg-white/15 flex items-center justify-center text-xl text-white hover:bg-white/25"
                     aria-label={tx('cancel')}
                   >
                     ✕
