@@ -3,6 +3,10 @@ description: Multi-tenant architectuur regels voor Vysion Horeca platform
 alwaysApply: true
 ---
 
+# 🚨 MULTI-TENANT — ALTIJD ALLES VOOR ALLE TENANTS
+
+**Absolute regel:** bouw **nooit** iets voor één demo-zaak of één slug. Elke wijziging (UI, API, SQL, seeds, cron) moet **expliciet** `tenant_slug` / `tenantSlug` / route-tenant respecteren en getest worden alsof er **500+** zaken op hetzelfde platform draaien.
+
 # 🚨 MULTI-TENANT — ALTIJD CONTROLEREN
 
 Dit platform heeft 500+ tenants. Elke feature die je bouwt MOET werken voor ALLE tenants, niet alleen voor één.
@@ -31,9 +35,11 @@ Dit platform heeft 500+ tenants. Elke feature die je bouwt MOET werken voor ALLE
 
 ## ❌ VERBODEN
 ```typescript
-// NOOIT doen — hardcoded of zonder tenant filter
+// NOOIT doen — hardcoded tenant, of reads/writes zonder tenant filter
 supabase.from('reservations').select('*')
+supabase.from('reservations').update({ status: 'x' }).eq('id', id) // mist tenant_slug
 supabase.from('tables').insert({ name: 'Tafel 1' })
+if (slug === 'demo-frituur') { ... }
 ```
 
 ## ✅ VERPLICHT
